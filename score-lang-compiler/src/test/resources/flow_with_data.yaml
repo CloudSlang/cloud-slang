@@ -1,0 +1,20 @@
+namespace: slang.sample.flows
+
+imports:
+  - ops: slang.ops.operations
+
+flow:
+  name: SimpleFlow
+  inputs:
+  - city_name
+
+  workflow:
+    CheckWeather:
+      do:
+        ops.check_Weather:
+          - city: city_name
+      publish:
+        - weather
+      navigate:
+        - SUCCESS: SUCCESS
+        - FAILURE: FAILURE

@@ -1,0 +1,6 @@
+namespace: user.ops
+
+operations:
+  - test_op:
+      action:
+        python_script: 'print "hello world"'

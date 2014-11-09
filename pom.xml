@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!--
+        Licensed to Hewlett-Packard Development Company, L.P. under one
+        or more contributor license agreements.  See the NOTICE file
+        distributed with this work for additional information
+        regarding copyright ownership.  The ASF licenses this file
+        to you under the Apache License, Version 2.0 (the
+        "License"); you may not use this file except in compliance
+        with the License.  You may obtain a copy of the License at
+        
+          http://www.apache.org/licenses/LICENSE-2.0
+        
+        Unless required by applicable law or agreed to in writing,
+        software distributed under the License is distributed on an
+        "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+        KIND, either express or implied.  See the License for the
+        specific language governing permissions and limitations
+        under the License.
+    -->
+    <groupId>com.hp.score.lang</groupId>
+    <artifactId>score-language</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+
+    <packaging>pom</packaging>
+    <name>com.hp.score.lang:score-language</name>
+    <description>A DSL for writing flows</description>
+    <url>https://github.com/HPSoftware/score-language</url>
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <score.version>0.1.228</score.version>
+        <spring.version>4.0.0.RELEASE</spring.version>
+
+        <gpg.skip>true</gpg.skip>
+    </properties>
+
+    <scm>
+        <connection>scm:git:https://github.com/HPSoftware/score-language.git</connection>
+        <developerConnection>scm:git:git@github.com:HPSoftware/score-language.git</developerConnection>
+        <url>https://github.com/HPSoftware/score-language.git</url>
+        <tag>master</tag>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>nexus-repository</id>
+            <name>nexus repository</name>
+            <url>http://mydphdb0166.hpswlabs.adapps.hp.com:8081/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus-snapshot-repository</id>
+            <name>nexus snapshots repository</name>
+            <url>http://mydphdb0166.hpswlabs.adapps.hp.com:8081/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <developers>
+        <developer>
+            <id>hararzafrir</id>
+            <email>zafrir@hp.com</email>
+            <name>Harar Zafrir</name>
+            <url>https://github.com/hararzafrir</url>
+            <organization>HP Software</organization>
+            <organizationUrl>http://www8.hp.com/us/en/software/enterprise-software.html</organizationUrl>
+            <timezone>+2</timezone>
+        </developer>
+        <developer>
+            <id>meshipeer</id>
+            <email>meshi.peer@hp.com</email>
+            <name>Meshi Peer</name>
+            <url>https://github.com/meshipeer</url>
+            <organization>HP Software</organization>
+            <organizationUrl>http://www8.hp.com/us/en/software/enterprise-software.html</organizationUrl>
+            <timezone>+2</timezone>
+        </developer>
+        <developer>
+            <id>meirwah</id>
+            <email>meir.wahnon@hp.com</email>
+            <name>Meir Wahnon</name>
+            <url>https://github.com/meirwah</url>
+            <organization>HP Software</organization>
+            <organizationUrl>http://www8.hp.com/us/en/software/enterprise-software.html</organizationUrl>
+            <timezone>+2</timezone>
+        </developer>
+        <developer>
+            <id>TudorLesanHP</id>
+            <email>tudor-andrei.lesan@hp.com</email>
+            <name>Tudor Lesan</name>
+            <url>https://github.com/TudorLesanHP</url>
+            <organizationUrl>http://www8.hp.com/us/en/software/enterprise-software.html</organizationUrl>
+            <organization>HP Software</organization>
+            <timezone>+2</timezone>
+        </developer>
+        <developer>
+            <id>orius123</id>
+            <email>eliya.sadan@hp.com</email>
+            <name>Eliya Sadan</name>
+            <url>https://github.com/orius123</url>
+            <organization>HP Software</organization>
+            <organizationUrl>http://www8.hp.com/us/en/software/enterprise-software.html</organizationUrl>
+            <timezone>+2</timezone>
+        </developer>
+        <developer>
+            <id>oritstone</id>
+            <email>orit.stone@hp.com</email>
+            <name>Orit Stone</name>
+            <url>https://github.com/oritstone</url>
+            <organization>HP Software</organization>
+            <organizationUrl>http://www8.hp.com/us/en/software/enterprise-software.html</organizationUrl>
+            <timezone>+2</timezone>
+        </developer>
+        <developer>
+            <id>avimora</id>
+            <email>avi.moradi@hp.com</email>
+            <name>Avi Moradi</name>
+            <url>https://github.com/avimora</url>
+            <organization>HP Software</organization>
+            <organizationUrl>http://www8.hp.com/us/en/software/enterprise-software.html</organizationUrl>
+            <timezone>+2</timezone>
+        </developer>
+    </developers>
+
+    <!--contributors>
+        <contributor>
+            <id>johndoe</id>
+            <email>john.doe@foo.bar.com</email>
+            <name>John Doe</name>
+            <url>https://github.com/johndoe</url>
+            <organization>Foo-Bar inc.</organization>
+            <timezone>UTC</timezone>
+        </contributor>
+    </contributors-->
+
+    <dependencyManagement>
+        <dependencies>
+            <!--score dependencies-->
+            <dependency>
+                <groupId>com.hp.score</groupId>
+                <artifactId>score-api</artifactId>
+                <version>${score.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.hp.score.sdk</groupId>
+                <artifactId>score-content-sdk</artifactId>
+                <version>1.4</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.hp.score</groupId>
+                <artifactId>score-all</artifactId>
+                <version>${score.version}</version>
+            </dependency>
+            <!--end of score dependencies-->
+
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.17</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>1.7.2</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.3.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>3.2.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.3</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.googlecode.lambdaj</groupId>
+                <artifactId>lambdaj</artifactId>
+                <version>2.3.3</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>1.14</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.python</groupId>
+                <artifactId>jython-standalone</artifactId>
+                <version>2.7-b3</version>
+                <scope>compile</scope>
+            </dependency>
+
+            <!-- spring artifacts -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
+            <!-- end of spring artifacts -->
+
+            <!-- DB drivers -->
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>1.3.175</version>
+            </dependency>
+
+            <!--tests artifacts-->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.10</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-test</artifactId>
+                <version>${spring.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>1.9.5</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>findbugs-maven-plugin</artifactId>
+                    <version>2.4.0</version>
+                    <configuration>
+                        <xmlOutput>true</xmlOutput>
+                        <findbugsXmlOutput>true</findbugsXmlOutput>
+                        <!--
+                            In general the idea is to have as little false positives as possible. So we might ignore
+                            some real stuff, but this is better than having false positives.
+
+                                  Findbugs produces a false positive on System.out and System.err with the FindNullDeref
+                                  detector - this detector is omitted (ever though it is important) until findbugs (finally)
+                                  fix this problem.
+
+                                  The FindDeadLocalStores has a lot of false positives and is relatively uninteresting. See:
+                                  http://findbugs.sourceforge.net/bugDescriptions.html#DLS_DEAD_STORE_OF_CLASS_LITERAL
+
+                                  The NumberConstructor is unavoidable when using Groovy, so we're ignoring that too. See:
+                                  http://findbugs.sourceforge.net/bugDescriptions.html#DM_FP_NUMBER_CTOR
+
+                                  UnreadFields get confused by all the injecting frameworks we use (Guice, Gin, Plexus, Spring)
+                              -->
+                        <omitVisitors>FindNullDeref,FindDeadLocalStores,NumberConstructor,UnreadFields</omitVisitors>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.0</version>
+                    <configuration>
+                        <source>1.7</source>
+                        <target>1.7</target>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>2.14</version>
+                    <executions>
+                        <execution>
+                            <id>verify integration tests execution</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <runOrder>alphabetical</runOrder>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.15</version>
+                    <configuration>
+                        <runOrder>alphabetical</runOrder>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.8</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.7</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.3.1</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-versions</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <requireMavenVersion>
+                                        <version>3.0.4</version>
+                                    </requireMavenVersion>
+                                    <requireJavaVersion>
+                                        <version>1.7</version>
+                                    </requireJavaVersion>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.2.1</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <attach>true</attach>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-enforcer-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+    <modules>
+        <module>score-lang-runtime</module>
+        <module>score-lang-compiler</module>
+        <module>score-lang-entities</module>
+        <module>score-lang-tests</module>
+    </modules>
+
+
+</project>
