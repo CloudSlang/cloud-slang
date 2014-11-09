@@ -22,17 +22,23 @@ package com.hp.score.lang.compiler;
  * Created by orius123 on 05/11/14.
  */
 
+import ch.lambdaj.Lambda;
 import com.hp.score.api.ExecutionPlan;
 import com.hp.score.api.TriggeringProperties;
 import com.hp.score.lang.compiler.domain.SlangFile;
 import com.hp.score.lang.compiler.utils.ExecutableBuilder;
 import com.hp.score.lang.compiler.utils.NamespaceBuilder;
 import com.hp.score.lang.compiler.utils.YamlParser;
+import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.*;
+
+import static ch.lambdaj.Lambda.having;
+import static ch.lambdaj.Lambda.on;
+import static org.hamcrest.Matchers.equalTo;
 
 @Component
 public class SlangCompiler {
@@ -46,14 +52,14 @@ public class SlangCompiler {
     @Autowired
     private YamlParser yamlParser;
 
-    public TriggeringProperties compileWithDependencies(File source, List<File> classpath){
+    public TriggeringProperties compileWithDependencies(File source, List<File> classpath) {
         TriggeringProperties triggeringProperties = TriggeringProperties.create(new ExecutionPlan());
         triggeringProperties.setDependencies(new HashMap<String, ExecutionPlan>());
         return triggeringProperties;
     }
 
 
-    public ExecutionPlan compile(File source, List<File> classpath) {
+    public ExecutionPlan compile(File source, String operationName, List<File> classpath) {
 
         SlangFile slangFile = yamlParser.loadMomaFile(source);
 
@@ -61,9 +67,9 @@ public class SlangCompiler {
 
         switch (slangFile.getType()) {
             case OPERATIONS:
+                Validate.notEmpty(operationName, "When compiling an operation you must specify its name");
                 List<ExecutionPlan> operationsExecutionPlans = compileOperations(slangFile.getOperations(), dependencies);
-                //todo for now we get(0) (the first) operation always so we are able to compile one op, should be changed to get the op by name.
-                ExecutionPlan executionPlan = operationsExecutionPlans.get(0);
+                ExecutionPlan executionPlan = Lambda.selectFirst(operationsExecutionPlans, having(on(ExecutionPlan.class).getName(), equalTo(operationName)));
                 executionPlan.setFlowUuid(slangFile.getNamespace() + "." + executionPlan.getName());
                 return executionPlan;
             case FLOW:
@@ -96,7 +102,7 @@ public class SlangCompiler {
         for (Map.Entry<String, File> entry : dependencies.entrySet()) {
             //todo another hack...... for operation support.....
             if (entry.getValue() != null && !entry.getValue().getName().contains(SlangTextualKeys.OPERATIONS_KEY)) {
-                ExecutionPlan executionPlan = compile(entry.getValue(), classpath);
+                ExecutionPlan executionPlan = compile(entry.getValue(), null, classpath);
                 compiledDependencies.put(entry.getKey(), executionPlan);
             }
         }

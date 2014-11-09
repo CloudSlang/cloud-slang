@@ -39,7 +39,7 @@ public class SlangFile {
         return flow;
     }
 
-    public List getImports() {
+    public List<Map<String, String>> getImports() {
         return imports;
     }
 

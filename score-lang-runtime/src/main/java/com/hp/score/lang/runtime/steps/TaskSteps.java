@@ -87,7 +87,7 @@ public class TaskSteps extends AbstractSteps {
         runEnv.getStack().pushContext(flowContext);
     }
 
-    private static Map<String, Serializable> createBindOutputsContext(Map<String, String> operationResultContext, LinkedHashMap<String, Serializable> taskOutputs) {
+    private Map<String, Serializable> createBindOutputsContext(Map<String, String> operationResultContext, LinkedHashMap<String, Serializable> taskOutputs) {
         Map<String, Serializable> tempContext = new LinkedHashMap<>();
         if (taskOutputs != null) {
             for (Map.Entry<String, Serializable> output : taskOutputs.entrySet()) {
@@ -114,7 +114,7 @@ public class TaskSteps extends AbstractSteps {
         return tempContext;
     }
 
-    private static Long calculateNextPosition(String result, LinkedHashMap<String, Long> taskNavigationValues) {
+    private Long calculateNextPosition(String result, LinkedHashMap<String, Long> taskNavigationValues) {
         //todo: implement
         return taskNavigationValues.get(result);
     }

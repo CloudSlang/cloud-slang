@@ -44,7 +44,7 @@ public class CompileBasicFlowTest {
     @Test
     public void testCompileFlowBasic() throws Exception {
         URL resource = getClass().getResource("/flow.yaml");
-        ExecutionPlan executionPlan = compiler.compile(new File(resource.toURI()), null);
+        ExecutionPlan executionPlan = compiler.compile(new File(resource.toURI()), null, null);
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
         Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());

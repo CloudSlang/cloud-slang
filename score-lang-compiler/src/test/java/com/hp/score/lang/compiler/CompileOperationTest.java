@@ -48,7 +48,7 @@ public class CompileOperationTest {
     @Test
     public void testCompileOperationBasic() throws Exception {
         URL resource = getClass().getResource("/operation.yaml");
-        ExecutionPlan executionPlan = compiler.compile(new File(resource.toURI()), null);
+        ExecutionPlan executionPlan = compiler.compile(new File(resource.toURI()), "test_op", null);
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 3, executionPlan.getSteps().size());
     }
@@ -56,7 +56,7 @@ public class CompileOperationTest {
     @Test
     public void testCompileOperationWithData() throws Exception {
         URL resource = getClass().getResource("/operation_with_data.yaml");
-        ExecutionPlan executionPlan = compiler.compile(new File(resource.toURI()), null);
+        ExecutionPlan executionPlan = compiler.compile(new File(resource.toURI()), "test_op", null);
 
         ExecutionStep startStep = executionPlan.getStep(1L);
         @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) startStep.getActionData().get(ScoreLangConstants.OPERATION_INPUTS_KEY);
