@@ -37,6 +37,11 @@ import java.util.Map;
 @Component
 public class InputsTransformer implements Transformer<List<Object>, List<Input>> {
 
+    /**
+     * Transforms a list of inputs in (raw data form) to Input objects.
+     * @param rawData : inputs as described in Yaml file.
+     * @return : list of inputs after transformation.
+     */
     @Override
     public List<Input> transform(List<Object> rawData) {
         List<Input> result = new ArrayList<>();

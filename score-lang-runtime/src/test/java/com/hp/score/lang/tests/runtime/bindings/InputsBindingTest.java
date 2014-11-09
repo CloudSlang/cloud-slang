@@ -157,6 +157,20 @@ public class InputsBindingTest {
         Assert.assertEquals(3, result.get("input1"));
     }
 
+    @Test
+    public void testComplexExpr() throws Exception {
+        Map<String,Serializable> context = new HashMap<>();
+        context.put("input1",3);
+        Input input = new Input("input2"," input1 + 3 * 2 ",null,false,false);
+        List<Input> inputs = Lists.newArrayList(input);
+
+        Map<String,Serializable> result = inputsBinding.bindInputs(context,inputs);
+        Assert.assertFalse(result.isEmpty());
+        Assert.assertTrue(result.containsKey("input2"));
+        Assert.assertEquals(9, result.get("input2"));
+        Assert.assertEquals(1, result.size());
+    }
+
     private Input createDefaultValueInput(Serializable value){
         return new Input("input1",null,value,false,false);
     }

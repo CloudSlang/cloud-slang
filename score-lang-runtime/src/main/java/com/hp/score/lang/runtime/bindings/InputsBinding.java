@@ -35,6 +35,12 @@ public final class InputsBinding {
     @Autowired
     ScriptEvaluator scriptEvaluator;
 
+    /**
+     * Binds the inputs to a new result map
+     * @param context : initial context
+     * @param inputs : the inputs to bind
+     * @return : a new map with all inputs resolved (does not include initial context)
+     */
     public Map<String,Serializable> bindInputs(Map<String,Serializable> context,
                                                List<Input> inputs){
         Map<String,Serializable> resultContext = new HashMap<>();
