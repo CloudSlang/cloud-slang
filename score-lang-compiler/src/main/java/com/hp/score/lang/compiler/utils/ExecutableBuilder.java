@@ -53,8 +53,8 @@ public class ExecutableBuilder {
     public ExecutionPlan compileExecutable(Map<String, Object> operationRawData, Map<String, ExecutionPlan> dependencies, SlangFile.Type type) {
         Map<String, Serializable> preOperationActionData = new HashMap<>();
         Map<String, Serializable> postOperationActionData = new HashMap<>();
-        DoAction doAction = null;
-        Workflow workflow = null;
+        CompiledDoAction compiledDoAction = null;
+        CompiledWorkflow compiledWorkflow = null;
 
         List<Transformer> preOpTransformers = Lambda.filter(having(on(Transformer.class).getScopes().contains(Transformer.Scope.BEFORE_OPERATION)), transformers);
         List<Transformer> postOpTransformers = Lambda.filter(having(on(Transformer.class).getScopes().contains(Transformer.Scope.AFTER_OPERATION)), transformers);
@@ -67,11 +67,11 @@ public class ExecutableBuilder {
             String key = pairs.getKey();
 
             if (key.equals(SlangTextualKeys.ACTION_KEY)) {
-                doAction = compileAction((Map<String, Object>) pairs.getValue());
+                compiledDoAction = compileAction((Map<String, Object>) pairs.getValue());
             }
 
             if (key.equals(SlangTextualKeys.WORKFLOW_KEY)) {
-                workflow = compileWorkFlow((Map<String, Object>) pairs.getValue());
+                compiledWorkflow = compileWorkFlow((Map<String, Object>) pairs.getValue());
             }
 
             preOperationActionData.putAll(runTransformers(operationRawData, preOpTransformers, key));
@@ -82,13 +82,13 @@ public class ExecutableBuilder {
         }
 
         if (type == SlangFile.Type.FLOW) {
-            return createFlowExecutionPlan(new Flow(preOperationActionData, postOperationActionData, workflow), dependencies);
+            return createFlowExecutionPlan(new CompiledFlow(preOperationActionData, postOperationActionData, compiledWorkflow), dependencies);
         } else {
-            return createOperationExecutionPlan(new Operation(preOperationActionData, postOperationActionData, doAction));
+            return createOperationExecutionPlan(new CompiledOperation(preOperationActionData, postOperationActionData, compiledDoAction));
         }
     }
 
-    private DoAction compileAction(Map<String, Object> actionRawData) {
+    private CompiledDoAction compileAction(Map<String, Object> actionRawData) {
         Map<String, Serializable> actionData = new HashMap<>();
 
         List<Transformer> actionTransformers = Lambda.filter(having(on(Transformer.class).getScopes().contains(Transformer.Scope.ACTION)), transformers);
@@ -104,48 +104,48 @@ public class ExecutableBuilder {
 
             it.remove();
         }
-        return new DoAction(actionData);
+        return new CompiledDoAction(actionData);
     }
 
-    private Workflow compileWorkFlow(Map<String, Object> workFlowRawData) {
-        List<Task> tasks = new ArrayList<>();
+    private CompiledWorkflow compileWorkFlow(Map<String, Object> workFlowRawData) {
+        List<CompiledTask> compiledTasks = new ArrayList<>();
 
         Validate.notEmpty(workFlowRawData, "Flow must have tasks in its workflow");
 
         for (Map.Entry<String, Object> taskRawData : workFlowRawData.entrySet()) {
-            tasks.add(compileTask(taskRawData.getKey(), (Map<String, Object>) taskRawData.getValue()));
+            compiledTasks.add(compileTask(taskRawData.getKey(), (Map<String, Object>) taskRawData.getValue()));
         }
-        return new Workflow(tasks);
+        return new CompiledWorkflow(compiledTasks);
     }
 
-    private ExecutionPlan createOperationExecutionPlan(Operation operation) {
+    private ExecutionPlan createOperationExecutionPlan(CompiledOperation compiledOperation) {
         ExecutionPlan executionPlan = new ExecutionPlan();
         executionPlan.setLanguage(SLANG_NAME);
         executionPlan.setBeginStep(1L);
 
-        executionPlan.addStep(stepFactory.createStartStep(1L, operation.getPreExecActionData()));
-        executionPlan.addStep(stepFactory.createActionStep(2L, operation.getDoAction().getActionData()));
-        executionPlan.addStep(stepFactory.createEndStep(3L, operation.getPostExecActionData()));
+        executionPlan.addStep(stepFactory.createStartStep(1L, compiledOperation.getPreExecActionData()));
+        executionPlan.addStep(stepFactory.createActionStep(2L, compiledOperation.getCompiledDoAction().getActionData()));
+        executionPlan.addStep(stepFactory.createEndStep(3L, compiledOperation.getPostExecActionData()));
         return executionPlan;
     }
 
-    private ExecutionPlan createFlowExecutionPlan(Flow flow, Map<String, ExecutionPlan> dependencies) {
+    private ExecutionPlan createFlowExecutionPlan(CompiledFlow compiledFlow, Map<String, ExecutionPlan> dependencies) {
         ExecutionPlan executionPlan = new ExecutionPlan();
         executionPlan.setLanguage(SLANG_NAME);
 
         Long index = 1L;
         executionPlan.setBeginStep(index);
-        executionPlan.addStep(stepFactory.createStartStep(index++, flow.getPreExecActionData()));
-        for (Task task : flow.getWorkflow().getTasks()) {
-            executionPlan.addStep(stepFactory.createBeginTaskStep(index++, task.getPreTaskActionData()));
-            executionPlan.addStep(stepFactory.createFinishTaskStep(index++, task.getPostTaskActionData()));
+        executionPlan.addStep(stepFactory.createStartStep(index++, compiledFlow.getPreExecActionData()));
+        for (CompiledTask compiledTask : compiledFlow.getCompiledWorkflow().getCompiledTasks()) {
+            executionPlan.addStep(stepFactory.createBeginTaskStep(index++, compiledTask.getPreTaskActionData()));
+            executionPlan.addStep(stepFactory.createFinishTaskStep(index++, compiledTask.getPostTaskActionData()));
         }
-        executionPlan.addStep(stepFactory.createEndStep(0L, flow.getPostExecActionData()));
+        executionPlan.addStep(stepFactory.createEndStep(0L, compiledFlow.getPostExecActionData()));
 
         return executionPlan;
     }
 
-    private Task compileTask(String taskName, Map<String, Object> taskRawData) {
+    private CompiledTask compileTask(String taskName, Map<String, Object> taskRawData) {
         Map<String, Serializable> preTaskData = new HashMap<>();
         Map<String, Serializable> postTaskData = new HashMap<>();
 
@@ -172,7 +172,7 @@ public class ExecutableBuilder {
             it.remove();
         }
 
-        return new Task(taskName, preTaskData, postTaskData);
+        return new CompiledTask(taskName, preTaskData, postTaskData);
     }
 
     private Map<String, Serializable> runTransformers(Map<String, Object> rawData, List<Transformer> transformers, String key) {

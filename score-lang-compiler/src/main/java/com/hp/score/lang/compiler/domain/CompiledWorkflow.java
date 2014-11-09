@@ -22,15 +22,15 @@ import java.util.List;
 /*
  * Created by orius123 on 06/11/14.
  */
-public class Workflow {
+public class CompiledWorkflow {
 
-    private final List<Task> tasks;
+    private final List<CompiledTask> compiledTasks;
 
-    public Workflow(List<Task> tasks) {
-        this.tasks = tasks;
+    public CompiledWorkflow(List<CompiledTask> compiledTasks) {
+        this.compiledTasks = compiledTasks;
     }
 
-    public List<Task> getTasks() {
-        return tasks;
+    public List<CompiledTask> getCompiledTasks() {
+        return compiledTasks;
     }
 }

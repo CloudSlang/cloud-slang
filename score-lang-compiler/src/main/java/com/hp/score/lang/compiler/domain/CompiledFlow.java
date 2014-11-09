@@ -23,17 +23,17 @@ import java.util.Map;
 /*
  * Created by orius123 on 09/11/14.
  */
-public class Operation extends Executable {
+public class CompiledFlow extends CompiledExecutable {
 
-    private final DoAction doAction;
+    private final CompiledWorkflow compiledWorkflow;
 
-
-    public Operation(Map<String, Serializable> preOpActionData, Map<String, Serializable> postOpActionData, DoAction doAction) {
+    public CompiledFlow(Map<String, Serializable> preOpActionData, Map<String, Serializable> postOpActionData, CompiledWorkflow compiledWorkflow) {
         super(preOpActionData, postOpActionData);
-        this.doAction = doAction;
+        this.compiledWorkflow = compiledWorkflow;
     }
 
-    public DoAction getDoAction() {
-        return doAction;
+    public CompiledWorkflow getCompiledWorkflow() {
+        return compiledWorkflow;
     }
+
 }

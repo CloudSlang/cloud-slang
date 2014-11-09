@@ -21,19 +21,29 @@ import java.io.Serializable;
 import java.util.Map;
 
 /*
- * Created by orius123 on 09/11/14.
+ * Created by orius123 on 06/11/14.
  */
-public class Flow extends Executable {
+public class CompiledTask {
 
-    private final Workflow workflow;
+    private final String name;
+    private final Map<String, Serializable> preTaskActionData;
+    private final Map<String, Serializable> postTaskActionData;
 
-    public Flow(Map<String, Serializable> preOpActionData, Map<String, Serializable> postOpActionData, Workflow workflow) {
-        super(preOpActionData, postOpActionData);
-        this.workflow = workflow;
+    public CompiledTask(String name, Map<String, Serializable> preTaskActionData, Map<String, Serializable> postTaskActionData) {
+        this.name = name;
+        this.preTaskActionData = preTaskActionData;
+        this.postTaskActionData = postTaskActionData;
     }
 
-    public Workflow getWorkflow() {
-        return workflow;
+    public String getName() {
+        return name;
     }
 
+    public Map<String, Serializable> getPreTaskActionData() {
+        return preTaskActionData;
+    }
+
+    public Map<String, Serializable> getPostTaskActionData() {
+        return postTaskActionData;
+    }
 }

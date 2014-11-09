@@ -1,4 +1,5 @@
-package com.hp.score.lang.compiler.domain;/*
+package com.hp.score.lang.compiler.domain;
+/*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -17,33 +18,21 @@ package com.hp.score.lang.compiler.domain;/*
  * under the License.
 */
 
+/*
+ * Created by orius123 on 05/11/14.
+ */
 import java.io.Serializable;
 import java.util.Map;
 
-/*
- * Created by orius123 on 06/11/14.
- */
-public class Task {
+public class CompiledDoAction {
 
-    private final String name;
-    private final Map<String, Serializable> preTaskActionData;
-    private final Map<String, Serializable> postTaskActionData;
+    private final Map<String, Serializable> actionData;
 
-    public Task(String name, Map<String, Serializable> preTaskActionData, Map<String, Serializable> postTaskActionData) {
-        this.name = name;
-        this.preTaskActionData = preTaskActionData;
-        this.postTaskActionData = postTaskActionData;
+    public CompiledDoAction(Map<String, Serializable> actionData) {
+        this.actionData = actionData;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public Map<String, Serializable> getPreTaskActionData() {
-        return preTaskActionData;
-    }
-
-    public Map<String, Serializable> getPostTaskActionData() {
-        return postTaskActionData;
+    public Map<String, Serializable> getActionData() {
+        return actionData;
     }
 }

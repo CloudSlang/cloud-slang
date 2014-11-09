@@ -25,12 +25,12 @@ package com.hp.score.lang.compiler.domain;
 import java.io.Serializable;
 import java.util.Map;
 
-public abstract class Executable {
+public abstract class CompiledExecutable {
 
     protected final Map<String, Serializable> preExecActionData;
     protected final Map<String, Serializable> postExecActionData;
 
-    protected Executable(Map<String, Serializable> preExecActionData, Map<String, Serializable> postExecActionData) {
+    protected CompiledExecutable(Map<String, Serializable> preExecActionData, Map<String, Serializable> postExecActionData) {
         this.preExecActionData = preExecActionData;
         this.postExecActionData = postExecActionData;
     }
