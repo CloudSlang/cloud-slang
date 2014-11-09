@@ -1,0 +1,9 @@
+target/
+.*
+output/
+build/
+.idea/
+*.class
+*.log
+*.ipr
+*.iml
