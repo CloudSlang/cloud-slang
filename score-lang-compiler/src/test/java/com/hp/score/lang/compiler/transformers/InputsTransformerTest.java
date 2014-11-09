@@ -99,6 +99,26 @@ public class InputsTransformerTest {
         Assert.assertEquals(false,input.isRequired());
     }
 
+    @Test
+    public void testInlineConstInput() throws Exception {
+        List<Input> inputs = (List<Input>)inputTransformer.transform(inputsMap);
+        Input input = inputs.get(6);
+        Assert.assertEquals("input7",input.getName());
+        Assert.assertEquals(77,input.getDefaultValue());
+        Assert.assertEquals(false,input.isEncrypted());
+        Assert.assertEquals(true,input.isRequired());
+    }
+
+    @Test
+    public void testDefaultExprRefInput() throws Exception {
+        List<Input> inputs = (List<Input>)inputTransformer.transform(inputsMap);
+        Input input = inputs.get(7);
+        Assert.assertEquals("input8",input.getName());
+        Assert.assertEquals("input6",input.getExpression());
+        Assert.assertEquals(false,input.isEncrypted());
+        Assert.assertEquals(true,input.isRequired());
+    }
+
     @org.springframework.context.annotation.Configuration
     public static class Configuration {
 

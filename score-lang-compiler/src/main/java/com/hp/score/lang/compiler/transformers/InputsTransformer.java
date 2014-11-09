@@ -49,7 +49,7 @@ public class InputsTransformer implements Transformer<List<Object>, List<Input>>
                 Map.Entry entry = (Map.Entry) ((Map) rawInput).entrySet().iterator().next();
                 // - some_input: some_expression
                 // the value of the input is an expression we need to evaluate at runtime
-                if (entry.getValue() instanceof String) {
+                if (entry.getValue() instanceof String && isExpression((String)entry.getValue())) {
                     result.add(createExpressionInput(entry));
                 }
                 // - some_inputs:
@@ -59,6 +59,11 @@ public class InputsTransformer implements Transformer<List<Object>, List<Input>>
                 else if (entry.getValue() instanceof Map) {
                     result.add(createPropInput(entry));
                 }
+                //inline const:
+                // - input1: 77
+                else if(entry.getValue() instanceof Serializable){
+                    result.add(createDefaultValueInput((String)entry.getKey(),(Serializable)entry.getValue()));
+                }
             }
         }
         return result;
@@ -66,7 +71,7 @@ public class InputsTransformer implements Transformer<List<Object>, List<Input>>
 
     private Input createPropInput(Map.Entry<String, Map<String, Serializable>> entry) {
         Map<String, Serializable> prop = entry.getValue();
-        boolean required = prop.containsKey(SlangTextualKeys.REQUIRED_KEY) && ((boolean) prop.get(SlangTextualKeys.REQUIRED_KEY));
+        boolean required = !prop.containsKey(SlangTextualKeys.REQUIRED_KEY) || ((boolean) prop.get(SlangTextualKeys.REQUIRED_KEY));//default is required=true
         boolean encrypted = prop.containsKey(SlangTextualKeys.ENCRYPTED_KEY) && ((boolean) prop.get(SlangTextualKeys.ENCRYPTED_KEY));
 
         Serializable valueProp = prop.containsKey(SlangTextualKeys.DEFAULT_KEY) ? (prop.get(SlangTextualKeys.DEFAULT_KEY)) : null;
@@ -104,6 +109,11 @@ public class InputsTransformer implements Transformer<List<Object>, List<Input>>
     private Input createRefInput(String rawInput) {
         return new Input(rawInput, rawInput);
     }
+
+    private Input createDefaultValueInput(String inputName, Serializable value){
+        return new Input(inputName,null,value,false,true);
+    }
+
 
     @Override
     public List<Scope> getScopes() {

@@ -14,6 +14,10 @@ operations:
         - input6:
             default: ->1 + 5
             required: False
+        - input7: 77
+        - input8:
+            default: ->input6
+
       action:
         python_script: |
                 # this is python amigos!!
