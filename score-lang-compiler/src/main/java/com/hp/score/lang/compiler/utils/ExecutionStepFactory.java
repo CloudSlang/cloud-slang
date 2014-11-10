@@ -39,7 +39,7 @@ public class ExecutionStepFactory {
 
     private static final String STEPS_PACKAGE = "com.hp.score.lang.runtime.steps";
     private static final String TASK_STEPS_CLASS = ".TaskSteps";
-    private static final String OPERATION_STEPS_CLASS = STEPS_PACKAGE + ".OperationSteps";
+    private static final String OPERATION_STEPS_CLASS = STEPS_PACKAGE + ".ExecutableSteps";
     private static final String ACTION_STEPS_CLASS = STEPS_PACKAGE + ".ActionSteps";
     private static final String NAVIGATION_ACTIONS_CLASS = "com.hp.score.lang.runtime.navigations.Navigations";
     private static final String SIMPLE_NAVIGATION_METHOD = "navigate";
@@ -65,7 +65,7 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.TASK_PUBLISH_KEY, postTaskData.get(SlangTextualKeys.PUBLISH_KEY));
         actionData.put(ScoreLangConstants.TASK_NAVIGATION_KEY, hackToRunSingleTaskFlow(postTaskData));
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
-        ExecutionStep finishTask = createGeneralStep(index, TASK_STEPS_CLASS, "finishTask", ++index, actionData);
+        ExecutionStep finishTask = createGeneralStep(index, TASK_STEPS_CLASS, "endTask", ++index, actionData);
         finishTask.setNavigationData(null);
         return finishTask;
     }
@@ -80,12 +80,12 @@ public class ExecutionStepFactory {
         return navigationValues;
     }
 
-    public ExecutionStep createStartStep(Long index, Map<String, Serializable> preOpData) {
-        Validate.notNull(preOpData, "preOpData is null");
+    public ExecutionStep createStartStep(Long index, Map<String, Serializable> preExecutableData) {
+        Validate.notNull(preExecutableData, "preExecutableData is null");
         Map<String, Serializable> actionData = new HashMap<>();
-        actionData.put(ScoreLangConstants.OPERATION_INPUTS_KEY, preOpData.get(SlangTextualKeys.INPUTS_KEY));
+        actionData.put(ScoreLangConstants.OPERATION_INPUTS_KEY, preExecutableData.get(SlangTextualKeys.INPUTS_KEY));
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
-        return createGeneralStep(index, OPERATION_STEPS_CLASS, "start", ++index, actionData);
+        return createGeneralStep(index, OPERATION_STEPS_CLASS, "startExecutable", ++index, actionData);
     }
 
     public ExecutionStep createActionStep(Long index, Map<String, Serializable> actionData) {
@@ -95,13 +95,13 @@ public class ExecutionStepFactory {
         return createGeneralStep(index, ACTION_STEPS_CLASS, "doAction", ++index, actionData);
     }
 
-    public ExecutionStep createEndStep(Long index, Map<String, Serializable> postOpData) {
-        Validate.notNull(postOpData, "postOpData is null");
+    public ExecutionStep createEndStep(Long index, Map<String, Serializable> postExecutableData) {
+        Validate.notNull(postExecutableData, "postExecutableData is null");
         Map<String, Serializable> actionData = new HashMap<>();
-        actionData.put(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, postOpData.get(SlangTextualKeys.OUTPUTS_KEY));
-        actionData.put(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, postOpData.get(SlangTextualKeys.RESULT_KEY));
+        actionData.put(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, postExecutableData.get(SlangTextualKeys.OUTPUTS_KEY));
+        actionData.put(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, postExecutableData.get(SlangTextualKeys.RESULT_KEY));
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
-        return createGeneralStep(index, OPERATION_STEPS_CLASS, "end", null, actionData);
+        return createGeneralStep(index, OPERATION_STEPS_CLASS, "finishExecutable", null, actionData);
     }
 
 
