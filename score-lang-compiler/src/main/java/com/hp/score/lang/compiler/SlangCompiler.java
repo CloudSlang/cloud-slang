@@ -24,11 +24,11 @@ package com.hp.score.lang.compiler;
 
 import ch.lambdaj.Lambda;
 import com.hp.score.api.ExecutionPlan;
-import com.hp.score.api.TriggeringProperties;
 import com.hp.score.lang.compiler.domain.SlangFile;
 import com.hp.score.lang.compiler.utils.ExecutableBuilder;
 import com.hp.score.lang.compiler.utils.NamespaceBuilder;
 import com.hp.score.lang.compiler.utils.YamlParser;
+import com.hp.score.lang.entities.CompilationArtifact;
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -52,7 +52,7 @@ public class SlangCompiler {
     @Autowired
     private YamlParser yamlParser;
 
-    public TriggeringProperties compile(File source, String operationName, List<File> path) {
+    public CompilationArtifact compile(File source, String operationName, List<File> path) {
 
         SlangFile slangFile = yamlParser.loadSlangFile(source);
 
@@ -80,8 +80,8 @@ public class SlangCompiler {
 
         }
         executionPlan.setFlowUuid(getFlowUuid(slangFile, executionPlan));
-        return TriggeringProperties.create(executionPlan)
-                .setDependencies(dependencies);
+        return new CompilationArtifact(executionPlan, dependencies, null); //todo add actual inputs instead of null
+
     }
 
 
