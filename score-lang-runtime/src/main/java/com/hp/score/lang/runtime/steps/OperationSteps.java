@@ -2,6 +2,7 @@ package com.hp.score.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.score.lang.ExecutionRuntimeServices;
+import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Result;
 import com.hp.score.lang.runtime.bindings.InputsBinding;
 import com.hp.score.lang.runtime.bindings.ResultsBinding;
@@ -13,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 import static com.hp.score.lang.entities.ScoreLangConstants.*;
 import static com.hp.score.lang.runtime.events.LanguageEventData.*;
@@ -37,7 +35,7 @@ public class OperationSteps extends AbstractSteps {
     @Autowired
     private InputsBinding inputsBinding;
 
-    public void start(@Param(OPERATION_INPUTS_KEY) LinkedHashMap<String, Serializable> operationInputs,
+    public void start(@Param(OPERATION_INPUTS_KEY) List<Input> operationInputs,
                       @Param(RUN_ENV) RunEnvironment runEnv,
                       @Param(USER_INPUTS_KEY) HashMap<String, Serializable> userInputs,
                       @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
@@ -46,17 +44,17 @@ public class OperationSteps extends AbstractSteps {
         System.out.println(" start ");
         System.out.println("=======");
         runEnv.getExecutionPath().down();
-        Map<String, Serializable> operationContext = new HashMap<>();
 
         resolveGroups();
 
         Map<String, Serializable> callArguments = runEnv.removeCallArguments();
         callArguments.putAll(userInputs);
+        Map<String, Serializable>  operationContext = inputsBinding.bindInputs(callArguments,operationInputs);
 
-        Map<String, Serializable> actionArguments = createBindInputsMap(callArguments, operationInputs, executionRuntimeServices, runEnv);
+        Map<String, Serializable> actionArguments = new HashMap<>();
 
         //todo: clone action context before updating
-        operationContext.putAll(actionArguments);
+        actionArguments.putAll(operationContext);
 
         //done with the user inputs, don't want it to be available in next start steps..
         userInputs.clear();

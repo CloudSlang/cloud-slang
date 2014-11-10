@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public final class InputsBinding {
+public class InputsBinding {
 
     @Autowired
     ScriptEvaluator scriptEvaluator;
