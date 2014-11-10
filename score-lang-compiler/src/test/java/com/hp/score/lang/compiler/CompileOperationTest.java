@@ -27,7 +27,7 @@ import com.hp.score.api.ExecutionStep;
 import com.hp.score.lang.compiler.configuration.SpringConfiguration;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.entities.bindings.Input;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

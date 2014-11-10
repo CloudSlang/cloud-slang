@@ -52,7 +52,14 @@ public class SlangCompiler {
     @Autowired
     private YamlParser yamlParser;
 
+    public CompilationArtifact compileFlow(File source, List<File> path) {
+        return compile(source, null, path);
+    }
+
     public CompilationArtifact compile(File source, String operationName, List<File> path) {
+
+        Validate.notNull(source, "You must supply a file to compile");
+        Validate.isTrue(!source.isDirectory(), "Source file can't be a directory");
 
         SlangFile slangFile = yamlParser.loadSlangFile(source);
 
@@ -81,13 +88,15 @@ public class SlangCompiler {
         }
         executionPlan.setFlowUuid(getFlowUuid(slangFile, executionPlan));
         return new CompilationArtifact(executionPlan, dependencies, null); //todo add actual inputs instead of null
-
     }
 
 
     private Map<String, ExecutionPlan> compileDependencies(TreeMap<String, List<SlangFile>> dependencies) {
         Map<String, ExecutionPlan> compiledDependencies = new HashMap<>();
         for (Map.Entry<String, List<SlangFile>> entry : dependencies.entrySet()) {
+            if (entry.getValue() == null) {
+                throw new RuntimeException("No dependencies were found in path for: " + entry.getKey());
+            }
             for (SlangFile slangFile : entry.getValue()) {
                 switch (slangFile.getType()) {
                     case FLOW:

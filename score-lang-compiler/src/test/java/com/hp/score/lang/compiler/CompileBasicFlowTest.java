@@ -23,8 +23,13 @@ package com.hp.score.lang.compiler;
  */
 
 import com.hp.score.api.ExecutionPlan;
+import com.hp.score.api.ExecutionStep;
 import com.hp.score.lang.compiler.configuration.SpringConfiguration;
-import junit.framework.Assert;
+import com.hp.score.lang.entities.CompilationArtifact;
+import com.hp.score.lang.entities.ScoreLangConstants;
+import com.hp.score.lang.entities.bindings.Input;
+import com.hp.score.lang.entities.bindings.Result;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +40,7 @@ import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SpringConfiguration.class)
@@ -47,16 +53,58 @@ public class CompileBasicFlowTest {
     public void testCompileFlowBasic() throws Exception {
         URI flow = getClass().getResource("/flow.yaml").toURI();
         URI operation = getClass().getResource("/operation.yaml").toURI();
-        URI operation_2 = getClass().getResource("/operation_with_data.yaml").toURI();
 
-        List<File> classpath = new ArrayList<>();
-        classpath.add(new File(operation));
-        classpath.add(new File(operation_2));
+        List<File> path = new ArrayList<>();
+        path.add(new File(operation));
 
-        ExecutionPlan executionPlan = compiler.compile(new File(flow), null, classpath).getExecutionPlan();
+        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
+        ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
         Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());
+        Assert.assertEquals("the dependencies size is not as expected", 2, compilationArtifact.getDependencies().size());
+    }
+
+    @Test
+    public void testCompileFlowWithData() throws Exception {
+        URI flow = getClass().getResource("/flow_with_data.yaml").toURI();
+        URI operation = getClass().getResource("/operation.yaml").toURI();
+
+        List<File> path = new ArrayList<>();
+        path.add(new File(operation));
+
+        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
+        ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
+        Assert.assertNotNull("execution plan is null", executionPlan);
+        Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
+        Assert.assertEquals("execution plan name is different than expected", "SimpleFlow", executionPlan.getName());
+        Assert.assertEquals("the dependencies size is not as expected", 2, compilationArtifact.getDependencies().size());
+
+        ExecutionStep startStep = executionPlan.getStep(1L);
+        @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) startStep.getActionData().get(ScoreLangConstants.OPERATION_INPUTS_KEY);
+        Assert.assertNotNull("inputs doesn't exist", inputs);
+        Assert.assertEquals("there is a different number of inputs than expected", 1, inputs.size());
+
+        ExecutionStep beginTaskStep = executionPlan.getStep(2L);
+        @SuppressWarnings("unchecked") List<Input> taskArguments = (List<Input>) beginTaskStep.getActionData().get(ScoreLangConstants.TASK_INPUTS_KEY);
+        Assert.assertNotNull("arguments doesn't exist", taskArguments);
+        Assert.assertEquals("there is a different number of arguments than expected", 1, taskArguments.size());
+
+        ExecutionStep FinishTaskSteps = executionPlan.getStep(3L);
+        Object publish = FinishTaskSteps.getActionData().get(ScoreLangConstants.TASK_PUBLISH_KEY); //todo test
+        @SuppressWarnings("unchecked") Map<String, String> navigate = (Map<String, String>) FinishTaskSteps.getActionData().get(ScoreLangConstants.TASK_NAVIGATION_KEY);
+
+        Assert.assertNotNull("publish don't exist", publish);
+        Assert.assertNotNull("navigate don't exist", navigate);
+        Assert.assertEquals("there is a different number of navigation values than expected", 2, navigate.size());
+
+
+        ExecutionStep endStep = executionPlan.getStep(0L);
+        Object outputs = endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY); //todo test
+        @SuppressWarnings("unchecked") List<Result> results = (List<Result>) endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_RESULTS_KEY);
+
+        Assert.assertNotNull("outputs don't exist", outputs);
+        Assert.assertEquals("there is a different number of results values than expected", 1, results.size());
     }
 
 }
