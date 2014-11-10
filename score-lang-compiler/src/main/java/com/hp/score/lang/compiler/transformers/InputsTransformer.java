@@ -55,7 +55,7 @@ public class InputsTransformer implements Transformer<List<Object>, List<Input>>
                 // - some_input: some_expression
                 // the value of the input is an expression we need to evaluate at runtime
                 if (entry.getValue() instanceof String && isExpression((String)entry.getValue())) {
-                    result.add(createExpressionInput(entry));
+                    result.add(createInlineExpressionInput(entry));
                 }
                 // - some_inputs:
                 //      property1: value1
@@ -67,7 +67,7 @@ public class InputsTransformer implements Transformer<List<Object>, List<Input>>
                 //inline const:
                 // - input1: 77
                 else if(entry.getValue() instanceof Serializable){
-                    result.add(createDefaultValueInput((String)entry.getKey(),(Serializable)entry.getValue()));
+                    result.add(createInlineDefaultValueInput((String) entry.getKey(), (Serializable) entry.getValue()));
                 }
             }
         }
@@ -78,13 +78,15 @@ public class InputsTransformer implements Transformer<List<Object>, List<Input>>
         Map<String, Serializable> prop = entry.getValue();
         boolean required = !prop.containsKey(SlangTextualKeys.REQUIRED_KEY) || ((boolean) prop.get(SlangTextualKeys.REQUIRED_KEY));//default is required=true
         boolean encrypted = prop.containsKey(SlangTextualKeys.ENCRYPTED_KEY) && ((boolean) prop.get(SlangTextualKeys.ENCRYPTED_KEY));
+        boolean override = prop.containsKey(SlangTextualKeys.OVERRIDE_KEY) && ((boolean) prop.get(SlangTextualKeys.OVERRIDE_KEY));
 
         Serializable valueProp = prop.containsKey(SlangTextualKeys.DEFAULT_KEY) ? (prop.get(SlangTextualKeys.DEFAULT_KEY)) : null;
 
-        return createPropInput(entry.getKey(), required, encrypted, valueProp);
+        return createPropInput(entry.getKey(), required, encrypted, valueProp, override);
     }
 
-    private Input createPropInput(String inputName, boolean required,boolean encrypted, Serializable value){
+    private Input createPropInput(String inputName, boolean required,boolean encrypted, Serializable value,
+                                  boolean override){
         String expression = null;
         Serializable defaultValue = null;
         if(isExpression(value)){
@@ -96,7 +98,7 @@ public class InputsTransformer implements Transformer<List<Object>, List<Input>>
         else{
             expression = inputName ;
         }
-        return new Input(inputName, expression, defaultValue, encrypted, required);
+        return new Input(inputName, expression, defaultValue, encrypted, required, override);
     }
 
     private String extractExpression(String defaultProp) {
@@ -107,16 +109,16 @@ public class InputsTransformer implements Transformer<List<Object>, List<Input>>
         return (defaultValue instanceof String) && StringUtils.startsWith((String)defaultValue,SlangTextualKeys.EXPRESSION_PREFIX_KEY);
     }
 
-    private Input createExpressionInput(Map.Entry<String, String> entry) {
-        return createPropInput(entry.getKey() , true, false, entry.getValue());
+    private Input createInlineExpressionInput(Map.Entry<String, String> entry) {
+        return createPropInput(entry.getKey() , true, false, entry.getValue(), false);
     }
 
     private Input createRefInput(String rawInput) {
         return new Input(rawInput, rawInput);
     }
 
-    private Input createDefaultValueInput(String inputName, Serializable value){
-        return new Input(inputName,null,value,false,true);
+    private Input createInlineDefaultValueInput(String inputName, Serializable value){
+        return new Input(inputName,null,value,false,true, false);
     }
 
 

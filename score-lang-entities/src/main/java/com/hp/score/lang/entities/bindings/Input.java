@@ -35,20 +35,24 @@ public class Input {
 
     private final boolean required;
 
+    private final boolean override;
+
     public Input(String name,String expression) {
         this.name = name;
         this.defaultValue = null;
         this.expression = expression;
         this.encrypted = false ;
         this.required = true ;
+        this.override = false ;
     }
 
-    public Input(String name,String expression,Serializable defaultValue,boolean encrypted,boolean required) {
+    public Input(String name,String expression,Serializable defaultValue,boolean encrypted,boolean required,boolean override) {
         this.name = name;
         this.defaultValue = defaultValue;
         this.expression = expression;
         this.encrypted = encrypted ;
         this.required = required ;
+        this.override = override ;
     }
 
     public String getName() {
@@ -71,4 +75,7 @@ public class Input {
         return required;
     }
 
+    public boolean isOverride() {
+        return override;
+    }
 }

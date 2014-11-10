@@ -69,12 +69,13 @@ public class DoTransformer implements Transformer<LinkedHashMap<String, List>, L
     }
 
     private Input createPropInput(Map.Entry<String, Map<String, Serializable>> entry) {
+        //todo - fix this , either the inputs transformers is used for this or something else...
         Map<String, Serializable> prop = entry.getValue();
         boolean required = prop.containsKey(REQUIRED_KEY) && ((boolean) prop.get(REQUIRED_KEY));
         boolean encrypted = prop.containsKey(ENCRYPTED_KEY) && ((boolean) prop.get(ENCRYPTED_KEY));
         String expression = prop.containsValue(EXPRESSION_KEY) ? ((String) prop.get(ENCRYPTED_KEY)) : null;
         Serializable defaultValue = prop.containsValue(DEFAULT_KEY) ? (prop.get(DEFAULT_KEY)) : null;
-        return new Input(entry.getKey(), expression, defaultValue, encrypted, required);
+        return new Input(entry.getKey(), expression, defaultValue, encrypted, required, true);
     }
 
     private Input createExpressionInput(Map.Entry<String, String> entry) {

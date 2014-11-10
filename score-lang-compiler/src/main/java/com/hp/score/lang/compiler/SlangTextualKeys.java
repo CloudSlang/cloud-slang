@@ -43,9 +43,10 @@ public interface SlangTextualKeys {
     String NAVIGATION_KEY = "navigate";
 
     //inputs
-    public static final String DEFAULT_KEY = "default";
-    public static final String EXPRESSION_PREFIX_KEY = "->";
-    public static final String REQUIRED_KEY = "required";
-    public static final String ENCRYPTED_KEY = "encrypted";
+    String DEFAULT_KEY = "default";
+    String EXPRESSION_PREFIX_KEY = "->";
+    String REQUIRED_KEY = "required";
+    String ENCRYPTED_KEY = "encrypted";
+    String OVERRIDE_KEY = "override";
 }
 

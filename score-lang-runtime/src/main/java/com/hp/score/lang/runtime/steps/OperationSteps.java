@@ -3,6 +3,7 @@ package com.hp.score.lang.runtime.steps;
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.entities.bindings.Result;
+import com.hp.score.lang.runtime.bindings.InputsBinding;
 import com.hp.score.lang.runtime.bindings.ResultsBinding;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
@@ -32,6 +33,9 @@ public class OperationSteps extends AbstractSteps {
 
     @Autowired
     private ResultsBinding resultsBinding;
+
+    @Autowired
+    private InputsBinding inputsBinding;
 
     public void start(@Param(OPERATION_INPUTS_KEY) LinkedHashMap<String, Serializable> operationInputs,
                       @Param(RUN_ENV) RunEnvironment runEnv,

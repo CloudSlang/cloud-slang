@@ -64,7 +64,7 @@ public final class InputsBinding {
     private Serializable resolveValue(String inputName, Input input, Map<String, Serializable> context) {
         Serializable value = null;
 
-        if(context.containsKey(inputName)){
+        if(context.containsKey(inputName) && !input.isOverride()){
             value = context.get(inputName);
         }
 

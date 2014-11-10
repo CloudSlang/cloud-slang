@@ -17,6 +17,9 @@ operations:
         - input7: 77
         - input8:
             default: ->input6
+        - input9:
+            default: ->input6
+            override: true
 
       action:
         python_script: |
