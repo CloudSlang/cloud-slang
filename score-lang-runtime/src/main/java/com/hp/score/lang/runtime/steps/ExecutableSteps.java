@@ -90,10 +90,7 @@ public class ExecutableSteps extends AbstractSteps {
                 Pair.of("actionReturnValues", actionReturnValues));
 
         // Resolving the result of the operation/flow
-        String result = actionReturnValues.getResult();
-        if(result == null) {
-            result = resultsBinding.resolveResult(actionReturnValues.getOutputs(), executableResults);
-        }
+        String result = resultsBinding.resolveResult(actionReturnValues.getOutputs(), executableResults, actionReturnValues.getResult());
 
         Map<String, String> operationReturnOutputs = createOperationBindOutputsContext(operationContext, actionReturnValues.getOutputs(), executableOutputs);
 

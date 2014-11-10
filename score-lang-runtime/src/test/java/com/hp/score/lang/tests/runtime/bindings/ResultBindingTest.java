@@ -53,16 +53,16 @@ public class ResultBindingTest {
     public void testConstExprChooseFirstResult() throws Exception {
         List<Result> results = Lists.newArrayList(createResult(ScoreLangConstants.SUCCESS_RESULT, "1==1"),
                                                     createResult(ScoreLangConstants.FAILURE_RESULT, "1==2"));
-        String result = resultsBinding.resolveResult(new HashMap<String, String>(), results);
-        Assert.assertTrue(result.equals(ScoreLangConstants.SUCCESS_RESULT));
+        String result = resultsBinding.resolveResult(new HashMap<String, String>(), results, null);
+        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result);
     }
 
     @Test
     public void testConstExprChooseSecondAResult() throws Exception {
         List<Result> results = Lists.newArrayList(createResult(ScoreLangConstants.SUCCESS_RESULT, "1==2"),
                                                 createResult(ScoreLangConstants.FAILURE_RESULT, "1==1"));
-        String result = resultsBinding.resolveResult(new HashMap<String, String>(), results);
-        Assert.assertTrue(result.equals(ScoreLangConstants.FAILURE_RESULT));
+        String result = resultsBinding.resolveResult(new HashMap<String, String>(), results, null);
+        Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
     @Test
@@ -71,8 +71,8 @@ public class ResultBindingTest {
                                                 createResult(ScoreLangConstants.FAILURE_RESULT, "int(status) == -1"));
         HashMap<String, String> context = new HashMap<>();
         context.put("status", "1");
-        String result = resultsBinding.resolveResult(context, results);
-        Assert.assertTrue(result.equals(ScoreLangConstants.SUCCESS_RESULT));
+        String result = resultsBinding.resolveResult(context, results, null);
+        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result);
     }
 
     @Test
@@ -81,8 +81,8 @@ public class ResultBindingTest {
                                                 createResult(ScoreLangConstants.FAILURE_RESULT, "int(status) == -1"));
         HashMap<String, String> context = new HashMap<>();
         context.put("status", "-1");
-        String result = resultsBinding.resolveResult(context, results);
-        Assert.assertTrue(result.equals(ScoreLangConstants.FAILURE_RESULT));
+        String result = resultsBinding.resolveResult(context, results, null);
+        Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
     @Test(expected = RuntimeException.class)
@@ -91,7 +91,7 @@ public class ResultBindingTest {
                                                 createResult(ScoreLangConstants.FAILURE_RESULT, "int(status) == -1"));
         HashMap<String, String> context = new HashMap<>();
         context.put("status", "-1");
-        resultsBinding.resolveResult(context, results);
+        resultsBinding.resolveResult(context, results, null);
     }
 
     @Test
@@ -100,8 +100,8 @@ public class ResultBindingTest {
                                                 createResult(ScoreLangConstants.FAILURE_RESULT, null));
         HashMap<String, String> context = new HashMap<>();
         context.put("status", "-1");
-        String result = resultsBinding.resolveResult(context, results);
-        Assert.assertTrue(result.equals(ScoreLangConstants.FAILURE_RESULT));
+        String result = resultsBinding.resolveResult(context, results, null);
+        Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
     @Test
@@ -110,8 +110,8 @@ public class ResultBindingTest {
                                             createResult(ScoreLangConstants.FAILURE_RESULT, ""));
         HashMap<String, String> context = new HashMap<>();
         context.put("status", "-1");
-        String result = resultsBinding.resolveResult(context, results);
-        Assert.assertTrue(result.equals(ScoreLangConstants.FAILURE_RESULT));
+        String result = resultsBinding.resolveResult(context, results, null);
+        Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
     @Test(expected = RuntimeException.class)
@@ -119,13 +119,43 @@ public class ResultBindingTest {
         List<Result> results = Lists.newArrayList();
         HashMap<String, String> context = new HashMap<>();
         context.put("status", "-1");
-        String result = resultsBinding.resolveResult(context, results);
-        Assert.assertTrue(result.equals(ScoreLangConstants.FAILURE_RESULT));
+        resultsBinding.resolveResult(context, results, null);
     }
 
+    @Test
+    public void testPresetResult() throws Exception {
+        List<Result> results = Lists.newArrayList(createEmptyResult(ScoreLangConstants.SUCCESS_RESULT),
+                createEmptyResult(ScoreLangConstants.FAILURE_RESULT));
+        HashMap<String, String> context = new HashMap<>();
+        String result = resultsBinding.resolveResult(context, results, ScoreLangConstants.FAILURE_RESULT);
+        Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testIllegalPresetResult() throws Exception {
+        List<Result> results = Lists.newArrayList(createEmptyResult(ScoreLangConstants.SUCCESS_RESULT),
+                createEmptyResult(ScoreLangConstants.FAILURE_RESULT));
+        HashMap<String, String> context = new HashMap<>();
+        resultsBinding.resolveResult(context, results, "IllegalResult");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testIllegalResultExpression() throws Exception {
+        List<Result> results = Lists.newArrayList(createResult(ScoreLangConstants.SUCCESS_RESULT, "status"),
+                createResult(ScoreLangConstants.FAILURE_RESULT, null));
+        HashMap<String, String> context = new HashMap<>();
+        context.put("status", "-1");
+        resultsBinding.resolveResult(context, results, null);
+    }
     private Result createResult(String name, String expression){
         return new Result(name, expression);
     }
+
+    private Result createEmptyResult(String name){
+        return new Result(name, null);
+    }
+
+
 
     @Configuration
     @Import(SlangRuntimeSpringConfig.class)
