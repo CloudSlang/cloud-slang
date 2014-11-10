@@ -43,7 +43,7 @@ import java.util.List;
  * Time: 10:02
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
+@ContextConfiguration(classes = ResultBindingTest.Config.class)
 public class ResultBindingTest {
 
     @Autowired
