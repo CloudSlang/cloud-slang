@@ -46,6 +46,7 @@ public class ScriptEvaluator {
         try {
             return (Serializable)engine.eval(expr,scriptContext);
         } catch (ScriptException e) {
+            //todo add to log/event?
             e.printStackTrace();
         }
         return null;
