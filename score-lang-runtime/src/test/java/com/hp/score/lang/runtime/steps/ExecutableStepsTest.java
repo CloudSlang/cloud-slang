@@ -19,12 +19,14 @@ package com.hp.score.lang.runtime.steps;
  * under the License.
 */
 
+import com.hp.score.events.ScoreEvent;
 import com.hp.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.runtime.bindings.InputsBinding;
 import com.hp.score.lang.runtime.bindings.ResultsBinding;
 import com.hp.score.lang.runtime.bindings.ScriptEvaluator;
 import com.hp.score.lang.runtime.env.RunEnvironment;
+import com.hp.score.lang.runtime.events.LanguageEventData;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,11 +39,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.script.ScriptEngine;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -81,6 +81,34 @@ public class ExecutableStepsTest {
         Assert.assertEquals(1,callArg.size());
         Assert.assertTrue(callArg.containsKey("input1"));
         Assert.assertEquals(5,callArg.get("input1"));
+    }
+
+    @Test
+    public void testBoundInputEvent(){
+        List<Input> inputs = Lists.newArrayList(new Input("input1","input1"),new Input("input2",null,3,true,true,true));
+        RunEnvironment runEnv = new RunEnvironment();
+        ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
+        Map<String,Serializable> resultMap = new HashMap<>();
+        resultMap.put("input1",5);
+        resultMap.put("input2",3);
+
+        when(inputsBinding.bindInputs(anyMap(),eq(inputs))).thenReturn(resultMap);
+        executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Serializable>(), runtimeServices);
+        Collection<ScoreEvent> events = runtimeServices.getEvents();
+
+        Assert.assertFalse(events.isEmpty());
+        ScoreEvent boundInputEvent = null;
+        for(ScoreEvent event:events){
+            if(event.getEventType().equals(EVENT_INPUT_END)){
+                boundInputEvent = event;
+            }
+        }
+        Assert.assertNotNull(boundInputEvent);
+        Map<String,Serializable> eventData = (Map<String,Serializable>)boundInputEvent.getData();
+        Assert.assertTrue(eventData.containsKey(LanguageEventData.BOUND_INPUTS));
+        Map<String,Serializable> inputsBounded = (Map<String,Serializable>)eventData.get(LanguageEventData.BOUND_INPUTS);
+        Assert.assertEquals(5,inputsBounded.get("input1"));
+        Assert.assertEquals(LanguageEventData.ENCRYPTED_VALUE,inputsBounded.get("input2"));
     }
 
     @Configuration

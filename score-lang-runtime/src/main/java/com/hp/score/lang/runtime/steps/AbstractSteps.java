@@ -1,6 +1,7 @@
 package com.hp.score.lang.runtime.steps;
 
 import com.hp.score.lang.ExecutionRuntimeServices;
+import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.runtime.env.ContextStack;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
@@ -10,9 +11,7 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import static com.hp.score.lang.entities.ScoreLangConstants.*;
@@ -42,6 +41,22 @@ public abstract class AbstractSteps {
         }
         fireEvent(executionRuntimeServices, runEnv, EVENT_INPUT_END, "Input binding finished", Pair.of(BOUND_INPUTS, (Serializable)tempContext));
         return tempContext;
+    }
+
+    public void sendBindingInputsEvent(List<Input> inputs, final Map<String, Serializable> context,
+                                            RunEnvironment runEnv, ExecutionRuntimeServices executionRuntimeServices,String desc) {
+        Map<String,Serializable> inputsForEvent = new HashMap<>();
+        for(Input input:inputs){
+            String inputName = input.getName();
+            Serializable inputValue = context.get(inputName);
+            if(input.isEncrypted()){
+                inputsForEvent.put(inputName, ENCRYPTED_VALUE);
+            }
+            else{
+                inputsForEvent.put(inputName, inputValue);
+            }
+        }
+        fireEvent(executionRuntimeServices, runEnv, EVENT_INPUT_END, desc, Pair.of(BOUND_INPUTS, (Serializable)inputsForEvent));
     }
 
     protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment, Map<String, Serializable> currentContext, Map<String, Serializable> callArguments) {

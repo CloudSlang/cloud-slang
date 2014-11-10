@@ -17,6 +17,7 @@ package com.hp.score.lang.runtime.bindings;/*
  * under the License.
 */
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +36,8 @@ import java.util.Map;
 @Component
 public class ScriptEvaluator {
 
+    private static final Logger logger = Logger.getLogger(ScriptEvaluator.class);
+
     @Autowired
     private ScriptEngine engine;
 
@@ -46,8 +49,8 @@ public class ScriptEvaluator {
         try {
             return (Serializable)engine.eval(expr,scriptContext);
         } catch (ScriptException e) {
-            //todo add to log/event?
-            e.printStackTrace();
+            logger.error("Error in running script expression or variable reference ,for expression: " + expr,e);
+            //todo - add event here?
         }
         return null;
     }
