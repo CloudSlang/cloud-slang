@@ -48,7 +48,7 @@ public class ExecutionStepFactory {
     public ExecutionStep createBeginTaskStep(Long index, Map<String, Serializable> preTaskData, String refId) {
         Validate.notNull(preTaskData, "preOpData is null");
         Map<String, Serializable> actionData = new HashMap<>();
-        actionData.put(ScoreLangConstants.TASK_INPUTS_KEY, preTaskData.get(SlangTextualKeys.INPUTS_KEY));
+        actionData.put(ScoreLangConstants.TASK_INPUTS_KEY, preTaskData.get(SlangTextualKeys.DO_KEY));
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
         ExecutionStep beginTaskStep = createGeneralStep(index, TASK_STEPS_CLASS, "beginTask", ++index, actionData);
 

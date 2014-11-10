@@ -1,7 +1,7 @@
 namespace: slang.sample.flows
 
 imports:
-  ops: slang.ops.operations
+  ops: user.ops
 
 flow:
   name: SimpleFlow
@@ -18,3 +18,7 @@ flow:
       navigate:
         - SUCCESS: SUCCESS
         - FAILURE: FAILURE
+  outputs:
+    - weather
+  results:
+    - SUCCESS
