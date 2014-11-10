@@ -90,29 +90,6 @@ public class RuntimeTest {
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 
-    private void registerHandlers() {
-        Set<String> handlerTypes = new HashSet<>();
-        handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
-        handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
-        handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
-        handlerTypes.add(EVENT_ACTION_START);
-        handlerTypes.add(EVENT_ACTION_END);
-        handlerTypes.add(EVENT_ACTION_ERROR);
-        handlerTypes.add(EVENT_INPUT_START);
-        handlerTypes.add(EVENT_INPUT_END);
-        handlerTypes.add(EVENT_OUTPUT_START);
-        handlerTypes.add(EVENT_OUTPUT_END);
-        eventBus.subscribe(new ScoreEventListener() {
-            @Override
-            public void onEvent(ScoreEvent event) {
-                try {
-                    queue.put(event);
-                } catch (InterruptedException ignore) {
-                }
-            }
-        }, handlerTypes);
-    }
-
     @Test
     public void testSubFlow() throws InterruptedException {
 
@@ -143,18 +120,40 @@ public class RuntimeTest {
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 
-    private void addUserInputs(Map<String, Serializable> executionContext) {
-        HashMap<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("name", "orit");
-        userInputs.put("id", "123");
-        executionContext.put(USER_INPUTS, userInputs);
-    }
+	private static Map<String, Serializable> createExecutionContext() {
+		Map<String, Serializable> executionContext = new HashMap<>();
+		executionContext.put(ScoreLangConstants.RUN_ENV, new RunEnvironment());
+		return executionContext;
+	}
 
-    private static Map<String, Serializable> createExecutionContext() {
-        Map<String, Serializable> executionContext = new HashMap<>();
-        executionContext.put(ScoreLangConstants.RUN_ENV, new RunEnvironment());
-        return executionContext;
-    }
+	private static void addUserInputs(Map<String, Serializable> executionContext) {
+		HashMap<String, Serializable> userInputs = new HashMap<>();
+		userInputs.put("name", "orit");
+		userInputs.put("id", "123");
+		executionContext.put(USER_INPUTS, userInputs);
+	}
 
+	private void registerHandlers() {
+		Set<String> handlerTypes = new HashSet<>();
+		handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
+		handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
+		handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
+		handlerTypes.add(EVENT_ACTION_START);
+		handlerTypes.add(EVENT_ACTION_END);
+		handlerTypes.add(EVENT_ACTION_ERROR);
+		handlerTypes.add(EVENT_INPUT_START);
+		handlerTypes.add(EVENT_INPUT_END);
+		handlerTypes.add(EVENT_OUTPUT_START);
+		handlerTypes.add(EVENT_OUTPUT_END);
+		eventBus.subscribe(new ScoreEventListener() {
+
+			@Override
+			public void onEvent(ScoreEvent event) {
+				try {
+					queue.put(event);
+				} catch(InterruptedException ignore) {}
+			}
+		}, handlerTypes);
+	}
 
 }

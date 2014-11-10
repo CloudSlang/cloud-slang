@@ -19,6 +19,7 @@ import java.util.Iterator;
  */
 public class ExecutionPath implements Serializable {
 
+	public static final String PATH_SEPARATOR = "/";
 	private static final long serialVersionUID = 5536588094244112461L;
 
 	private Deque<Integer> parentPositions;
@@ -46,7 +47,7 @@ public class ExecutionPath implements Serializable {
 	public String getCurrentPath() {
 		StringBuilder result = new StringBuilder();
 		for(Iterator<Integer> iterator = parentPositions.descendingIterator(); iterator.hasNext();) {
-			result.append(iterator.next()).append("/");
+			result.append(iterator.next()).append(PATH_SEPARATOR);
 		}
 		result.append(position);
 		return result.toString();
