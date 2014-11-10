@@ -35,7 +35,7 @@ public class YamlParser {
     @Autowired
     private Yaml yaml;
 
-    public SlangFile loadMomaFile(File source) {
+    public SlangFile loadSlangFile(File source) {
         SlangFile slangFile;
         try (FileInputStream is = new FileInputStream(source)) {
             slangFile = yaml.loadAs(is, SlangFile.class);

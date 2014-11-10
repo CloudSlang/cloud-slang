@@ -21,20 +21,19 @@ package com.hp.score.lang.compiler.utils;
 /*
  * Created by orius123 on 05/11/14.
  */
+
 import ch.lambdaj.Lambda;
 import ch.lambdaj.function.matcher.Predicate;
-import com.hp.score.lang.compiler.domain.SlangFile
-;
-import org.apache.commons.collections.MapUtils;
+import com.hp.score.lang.compiler.domain.SlangFile;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.*;
-
-import static org.hamcrest.Matchers.not;
 
 @Component
 public class NamespaceBuilder {
@@ -42,20 +41,19 @@ public class NamespaceBuilder {
     @Autowired
     private YamlParser yamlParser;
 
-    public TreeMap<String, File> filterNonImportedFiles(TreeMap<String, File> namespaces, List<Map<String, String>> imports) {
-        if (MapUtils.isEmpty(namespaces)) {
-            throw new RuntimeException("no classpath but there are imports!!??");
-        }
-        TreeMap<String, File> importsFiles = new TreeMap<>();
-        for (Map<String, String> anImport : imports) {
-            Map.Entry<String, String> entry = anImport.entrySet().iterator().next();
-            importsFiles.put(entry.getKey(), namespaces.get(entry.getValue().substring(0, entry.getValue().lastIndexOf("."))));
-        }
+    public TreeMap<String, List<SlangFile>> buildNamespace(List<File> classpath, SlangFile slangFile) {
+        Validate.notEmpty(classpath, "Can't build namespaces without a classpath");
+        Validate.notEmpty(slangFile.getImports(), "cannot filter dependencies when there are no imports");
 
-        return importsFiles;
+//        first we build a map of all the relevant files we got in the classpath sorted by their namespace
+        List<File> filteredClassPath = filterNonSlangFiles(classpath);
+        TreeMap<String, List<SlangFile>> namespaces = sortByNameSpace(filteredClassPath);
+
+//        then we filter the files that their namespace was not imported
+        return filterNonImportedFiles(namespaces, slangFile.getImports());
     }
 
-    public List<File> filterClassPath(List<File> classpath) {
+    private List<File> filterNonSlangFiles(List<File> classpath) {
         String[] extensions = System.getProperty("classpath.extensions", "yaml,yml,py").split(",");
         List<File> filteredClassPath = new ArrayList<>();
         for (File file : classpath) {
@@ -68,8 +66,8 @@ public class NamespaceBuilder {
         return filteredClassPath;
     }
 
-    public TreeMap<String, File> sortByNameSpace(List<File> classpath) {
-        TreeMap<String, File> namespaces = new TreeMap<>();
+    private TreeMap<String, List<SlangFile>> sortByNameSpace(List<File> classpath) {
+        TreeMap<String, List<SlangFile>> namespaces = new TreeMap<>();
         final List<String> yamlExtensions = Arrays.asList("yaml", "yml");
         Predicate<File> isYaml = new Predicate<File>() {
             @Override
@@ -78,16 +76,35 @@ public class NamespaceBuilder {
             }
         };
         Iterable<File> yamlFiles = Lambda.filter(isYaml, classpath);
-        Iterable<File> otherFiles = Lambda.filter(not(isYaml), classpath);
+//        Iterable<File> otherFiles = Lambda.filter(not(isYaml), classpath); //todo this is indented for supporting python files
         for (File yamlFile : yamlFiles) {
-            SlangFile slangFile = yamlParser.loadMomaFile(yamlFile);
-            namespaces.put(slangFile.getNamespace(), yamlFile);
+            SlangFile slangFile = yamlParser.loadSlangFile(yamlFile);
+            List<SlangFile> existingSlangFiles = namespaces.get(slangFile.getNamespace());
+
+            List<SlangFile> slangFilesToAdd = new ArrayList<>();
+            if (CollectionUtils.isNotEmpty(existingSlangFiles)) {
+                slangFilesToAdd.addAll(existingSlangFiles);
+            }
+
+            slangFilesToAdd.add(slangFile);
+            namespaces.put(slangFile.getNamespace(), slangFilesToAdd);
         }
 //        for (File file : otherFiles) {
-//            namespaces.put(FilenameUtils.getBaseName(file.getAbsolutePath()), file);
+//            namespaces.put(FilenameUtils.getBaseName(file.getAbsolutePath()), file); //todo this is indented for supporting python files
 //        }
 
         return namespaces;
+    }
+
+    private TreeMap<String, List<SlangFile>> filterNonImportedFiles(TreeMap<String, List<SlangFile>> namespaces, Map<String, String> imports) {
+        Validate.notEmpty(namespaces, "File that was requested to compile has imports but no classpath was given");
+
+        TreeMap<String, List<SlangFile>> importsFiles = new TreeMap<>();
+        for (Map.Entry<String, String> anImport : imports.entrySet()) {
+            importsFiles.put(anImport.getKey(), namespaces.get(anImport.getValue()));
+        }
+
+        return importsFiles;
     }
 
 

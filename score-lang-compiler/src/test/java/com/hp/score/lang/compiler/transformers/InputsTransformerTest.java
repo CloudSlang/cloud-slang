@@ -35,108 +35,108 @@ public class InputsTransformerTest {
     @Before
     public void init() throws URISyntaxException {
         URL resource = getClass().getResource("/operation_with_data.yaml");
-        SlangFile file = yamlParser.loadMomaFile(new File(resource.toURI()));
-        Map op =  file.getOperations().iterator().next();
-        Map<String,Object> opProp = (Map)op.get("test_op");
+        SlangFile file = yamlParser.loadSlangFile(new File(resource.toURI()));
+        Map op = file.getOperations().iterator().next();
+        Map<String, Object> opProp = (Map) op.get("test_op_2");
         inputsMap = opProp.get("inputs");
     }
 
     @Test
     public void testTransform() throws Exception {
-        List<Input> inputs = (List<Input>)inputTransformer.transform(inputsMap);
+        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
         Assert.assertFalse(inputs.isEmpty());
     }
 
     @Test
-     public void testSimpleRefInput() throws Exception {
-        List<Input> inputs = (List<Input>)inputTransformer.transform(inputsMap);
+    public void testSimpleRefInput() throws Exception {
+        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
         Input input = inputs.get(0);
-        Assert.assertEquals("input1",input.getName());
-        Assert.assertEquals("input1",input.getExpression());
+        Assert.assertEquals("input1", input.getName());
+        Assert.assertEquals("input1", input.getExpression());
     }
 
     @Test
     public void testExplicitRefInput() throws Exception {
-        List<Input> inputs = (List<Input>)inputTransformer.transform(inputsMap);
+        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
         Input input = inputs.get(1);
-        Assert.assertEquals("input2",input.getName());
-        Assert.assertEquals("input2",input.getExpression());
+        Assert.assertEquals("input2", input.getName());
+        Assert.assertEquals("input2", input.getExpression());
     }
 
     @Test
     public void testDefaultValueInput() throws Exception {
-        List<Input> inputs = (List<Input>)inputTransformer.transform(inputsMap);
+        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
         Input input = inputs.get(2);
-        Assert.assertEquals("input3",input.getName());
-        Assert.assertEquals("value3",input.getDefaultValue());
+        Assert.assertEquals("input3", input.getName());
+        Assert.assertEquals("value3", input.getDefaultValue());
     }
 
     @Test
     public void testInlineExprInput() throws Exception {
-        List<Input> inputs = (List<Input>)inputTransformer.transform(inputsMap);
+        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
         Input input = inputs.get(3);
-        Assert.assertEquals("input4",input.getName());
-        Assert.assertEquals("'value4' if input3 == value3 else None",input.getExpression());
+        Assert.assertEquals("input4", input.getName());
+        Assert.assertEquals("'value4' if input3 == value3 else None", input.getExpression());
     }
 
     @Test
     public void testReqEncInput() throws Exception {
-        List<Input> inputs = (List<Input>)inputTransformer.transform(inputsMap);
+        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
         Input input = inputs.get(4);
-        Assert.assertEquals("input5",input.getName());
-        Assert.assertEquals("input5",input.getExpression());
-        Assert.assertEquals(true,input.isEncrypted());
-        Assert.assertEquals(true,input.isRequired());
+        Assert.assertEquals("input5", input.getName());
+        Assert.assertEquals("input5", input.getExpression());
+        Assert.assertEquals(true, input.isEncrypted());
+        Assert.assertEquals(true, input.isRequired());
     }
 
     @Test
     public void testDefaultExprReqInput() throws Exception {
-        List<Input> inputs = (List<Input>)inputTransformer.transform(inputsMap);
+        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
         Input input = inputs.get(5);
-        Assert.assertEquals("input6",input.getName());
-        Assert.assertEquals("1 + 5",input.getExpression());
-        Assert.assertEquals(false,input.isEncrypted());
-        Assert.assertEquals(false,input.isRequired());
+        Assert.assertEquals("input6", input.getName());
+        Assert.assertEquals("1 + 5", input.getExpression());
+        Assert.assertEquals(false, input.isEncrypted());
+        Assert.assertEquals(false, input.isRequired());
     }
 
     @Test
     public void testInlineConstInput() throws Exception {
-        List<Input> inputs = (List<Input>)inputTransformer.transform(inputsMap);
+        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
         Input input = inputs.get(6);
-        Assert.assertEquals("input7",input.getName());
-        Assert.assertEquals(77,input.getDefaultValue());
-        Assert.assertEquals(false,input.isEncrypted());
-        Assert.assertEquals(true,input.isRequired());
+        Assert.assertEquals("input7", input.getName());
+        Assert.assertEquals(77, input.getDefaultValue());
+        Assert.assertEquals(false, input.isEncrypted());
+        Assert.assertEquals(true, input.isRequired());
     }
 
     @Test
     public void testDefaultExprRefInput() throws Exception {
-        List<Input> inputs = (List<Input>)inputTransformer.transform(inputsMap);
+        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
         Input input = inputs.get(7);
-        Assert.assertEquals("input8",input.getName());
-        Assert.assertEquals("input6",input.getExpression());
-        Assert.assertEquals(false,input.isEncrypted());
-        Assert.assertEquals(true,input.isRequired());
+        Assert.assertEquals("input8", input.getName());
+        Assert.assertEquals("input6", input.getExpression());
+        Assert.assertEquals(false, input.isEncrypted());
+        Assert.assertEquals(true, input.isRequired());
     }
 
     @org.springframework.context.annotation.Configuration
     public static class Configuration {
 
         @Bean
-        public Yaml yaml(){
+        public Yaml yaml() {
             Yaml yaml = new Yaml();
             yaml.setBeanAccess(BeanAccess.FIELD);
             return yaml;
         }
 
         @Bean
-        public YamlParser yamlParser(){
+        public YamlParser yamlParser() {
             YamlParser yamlParser = new YamlParser();
             return yamlParser;
         }
 
         @Bean
-        public Transformer inputTransformer(){
+        public Transformer inputTransformer() {
             return new InputsTransformer();
         }
 

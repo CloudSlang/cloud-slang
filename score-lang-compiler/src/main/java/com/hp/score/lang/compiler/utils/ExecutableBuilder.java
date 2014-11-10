@@ -34,6 +34,7 @@ import java.util.*;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
+import static org.hamcrest.Matchers.hasKey;
 
 /*
  * Created by orius123 on 09/11/14.
@@ -50,7 +51,7 @@ public class ExecutableBuilder {
     @Autowired
     private ExecutionStepFactory stepFactory;
 
-    public ExecutionPlan compileExecutable(Map<String, Object> operationRawData, Map<String, ExecutionPlan> dependencies, SlangFile.Type type) {
+    public ExecutionPlan compileExecutable(Map<String, Object> operationRawData, TreeMap<String, List<SlangFile>> dependenciesByNamespace, SlangFile.Type type) {
         Map<String, Serializable> preOperationActionData = new HashMap<>();
         Map<String, Serializable> postOperationActionData = new HashMap<>();
         CompiledDoAction compiledDoAction = null;
@@ -82,7 +83,7 @@ public class ExecutableBuilder {
         }
 
         if (type == SlangFile.Type.FLOW) {
-            return createFlowExecutionPlan(new CompiledFlow(preOperationActionData, postOperationActionData, compiledWorkflow), dependencies);
+            return createFlowExecutionPlan(new CompiledFlow(preOperationActionData, postOperationActionData, compiledWorkflow), dependenciesByNamespace);
         } else {
             return createOperationExecutionPlan(new CompiledOperation(preOperationActionData, postOperationActionData, compiledDoAction));
         }
@@ -129,7 +130,7 @@ public class ExecutableBuilder {
         return executionPlan;
     }
 
-    private ExecutionPlan createFlowExecutionPlan(CompiledFlow compiledFlow, Map<String, ExecutionPlan> dependencies) {
+    private ExecutionPlan createFlowExecutionPlan(CompiledFlow compiledFlow, TreeMap<String, List<SlangFile>> dependenciesByNamespace) {
         ExecutionPlan executionPlan = new ExecutionPlan();
         executionPlan.setLanguage(SLANG_NAME);
 
@@ -137,12 +138,28 @@ public class ExecutableBuilder {
         executionPlan.setBeginStep(index);
         executionPlan.addStep(stepFactory.createStartStep(index++, compiledFlow.getPreExecActionData()));
         for (CompiledTask compiledTask : compiledFlow.getCompiledWorkflow().getCompiledTasks()) {
-            executionPlan.addStep(stepFactory.createBeginTaskStep(index++, compiledTask.getPreTaskActionData()));
+            String refId = resolveRefId(compiledTask.getPreTaskActionData(), dependenciesByNamespace);
+            executionPlan.addStep(stepFactory.createBeginTaskStep(index++, compiledTask.getPreTaskActionData(), refId));
             executionPlan.addStep(stepFactory.createFinishTaskStep(index++, compiledTask.getPostTaskActionData()));
         }
         executionPlan.addStep(stepFactory.createEndStep(0L, compiledFlow.getPostExecActionData()));
 
         return executionPlan;
+    }
+
+    private String resolveRefId(Map<String, Serializable> preTaskActionData, TreeMap<String, List<SlangFile>> dependenciesByNamespace) {
+        String refId = (String) preTaskActionData.remove(ScoreLangConstants.REF_ID);
+        List<SlangFile> slangFilesList = dependenciesByNamespace.get(refId.substring(0, refId.indexOf(".")));
+        List<Map> operationList = new ArrayList<>();
+        for (SlangFile slangFile : slangFilesList) {
+            operationList.addAll(slangFile.getOperations());
+        }
+        String refIdSuffix = refId.substring(refId.indexOf(".") + 1, refId.length());
+        Map matchingOperation = Lambda.selectFirst(operationList, hasKey(refIdSuffix));
+        if (matchingOperation == null) {
+            throw new RuntimeException("no operation was found in the classpath that for ref: " + refId);
+        }
+        return slangFilesList.get(0).getNamespace() + "." + refIdSuffix;
     }
 
     private CompiledTask compileTask(String taskName, Map<String, Object> taskRawData) {

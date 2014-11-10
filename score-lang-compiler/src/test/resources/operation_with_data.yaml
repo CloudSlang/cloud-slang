@@ -1,7 +1,7 @@
 namespace: user.ops
 
 operations:
-  - test_op:
+  - test_op_2:
       inputs:
         - input1
         - input2: ->input2

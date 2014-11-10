@@ -52,80 +52,83 @@ public class SlangCompiler {
     @Autowired
     private YamlParser yamlParser;
 
-    public TriggeringProperties compileWithDependencies(File source, List<File> classpath) {
-        TriggeringProperties triggeringProperties = TriggeringProperties.create(new ExecutionPlan());
-        triggeringProperties.setDependencies(new HashMap<String, ExecutionPlan>());
-        return triggeringProperties;
-    }
+    public TriggeringProperties compile(File source, String operationName, List<File> classpath) {
 
+        SlangFile slangFile = yamlParser.loadSlangFile(source);
 
-    public ExecutionPlan compile(File source, String operationName, List<File> classpath) {
+        Map<String, ExecutionPlan> dependencies = null;
+        TreeMap<String, List<SlangFile>> dependenciesByNamespace = null;
+        if (slangFile.getImports() != null) {
+            Validate.noNullElements(classpath, "File that was requested to compile has imports but no classpath was given");
+            dependenciesByNamespace = namespaceBuilder.buildNamespace(classpath, slangFile);
+            dependencies = compileDependencies(dependenciesByNamespace);
+        }
 
-        SlangFile slangFile = yamlParser.loadMomaFile(source);
-
-        Map<String, ExecutionPlan> dependencies = handleDependencies(classpath, slangFile);
+        ExecutionPlan executionPlan;
 
         switch (slangFile.getType()) {
             case OPERATIONS:
                 Validate.notEmpty(operationName, "When compiling an operation you must specify its name");
-                List<ExecutionPlan> operationsExecutionPlans = compileOperations(slangFile.getOperations(), dependencies);
-                ExecutionPlan executionPlan = Lambda.selectFirst(operationsExecutionPlans, having(on(ExecutionPlan.class).getName(), equalTo(operationName)));
-                executionPlan.setFlowUuid(slangFile.getNamespace() + "." + executionPlan.getName());
-                return executionPlan;
+                List<ExecutionPlan> operationsExecutionPlans = compileOperations(slangFile.getOperations(), dependenciesByNamespace);
+                executionPlan = Lambda.selectFirst(operationsExecutionPlans, having(on(ExecutionPlan.class).getName(), equalTo(operationName)));
+                break;
             case FLOW:
-                return compileFlow(slangFile.getFlow(), dependencies);
+                executionPlan = compileFlow(slangFile.getFlow(), dependenciesByNamespace);
+                break;
             default:
                 throw new RuntimeException("Nothing to compile");
+
         }
+        executionPlan.setFlowUuid(getFlowUuid(slangFile, executionPlan));
+        return TriggeringProperties.create(executionPlan)
+                .setDependencies(dependencies);
     }
 
-    private Map<String, ExecutionPlan> handleDependencies(List<File> classpath, SlangFile slangFile) {
-//        first we build a map of all the relevant files we got in the classpath sorted by their namespace
-        TreeMap<String, File> namespaces = new TreeMap<>();
-        if (classpath != null) {
-            List<File> filterClassPath = namespaceBuilder.filterClassPath(classpath);
-            namespaces = namespaceBuilder.sortByNameSpace(filterClassPath);
-        }
 
-//        then we filter the files that their namespace was not imported
-        Map<String, ExecutionPlan> dependencies = new HashMap<>();
-        if (slangFile.getImports() != null) {
-            TreeMap<String, File> importsFiles = namespaceBuilder.filterNonImportedFiles(namespaces, slangFile.getImports());
-            dependencies = compileDependencies(importsFiles, classpath);
-            //todo cyclic dependencies
-        }
-        return dependencies;
-    }
-
-    private TreeMap<String, ExecutionPlan> compileDependencies(TreeMap<String, File> dependencies, List<File> classpath) {
-        TreeMap<String, ExecutionPlan> compiledDependencies = new TreeMap<>();
-        for (Map.Entry<String, File> entry : dependencies.entrySet()) {
-            //todo another hack...... for operation support.....
-            if (entry.getValue() != null && !entry.getValue().getName().contains(SlangTextualKeys.OPERATIONS_KEY)) {
-                ExecutionPlan executionPlan = compile(entry.getValue(), null, classpath);
-                compiledDependencies.put(entry.getKey(), executionPlan);
+    private Map<String, ExecutionPlan> compileDependencies(TreeMap<String, List<SlangFile>> dependencies) {
+        Map<String, ExecutionPlan> compiledDependencies = new HashMap<>();
+        for (Map.Entry<String, List<SlangFile>> entry : dependencies.entrySet()) {
+            for (SlangFile slangFile : entry.getValue()) {
+                switch (slangFile.getType()) {
+                    case FLOW:
+                        ExecutionPlan flowExecutionPlan = compileFlow(slangFile.getFlow(), dependencies);
+                        flowExecutionPlan.setFlowUuid(getFlowUuid(slangFile, flowExecutionPlan));
+                        compiledDependencies.put(flowExecutionPlan.getFlowUuid(), flowExecutionPlan);
+                        break;
+                    case OPERATIONS:
+                        for (ExecutionPlan operationExecutionPlan : compileOperations(slangFile.getOperations(), dependencies)) {
+                            operationExecutionPlan.setFlowUuid(getFlowUuid(slangFile, operationExecutionPlan));
+                            compiledDependencies.put(operationExecutionPlan.getFlowUuid(), operationExecutionPlan);
+                        }
+                        break;
+                    default:
+                        throw new RuntimeException("dependency: " + slangFile.getNamespace() + " is not a flow and not an operation");
+                }
             }
         }
-
         return compiledDependencies;
     }
 
-    private List<ExecutionPlan> compileOperations(List<Map> operationsRawData, Map<String, ExecutionPlan> dependencies) {
+    private List<ExecutionPlan> compileOperations(List<Map<String, Map<String, Object>>> operationsRawData, TreeMap<String, List<SlangFile>> dependenciesByNamespace) {
         List<ExecutionPlan> executionPlans = new ArrayList<>();
-        for (Map operation : operationsRawData) {
-            Map.Entry<String, Map> entry = (Map.Entry<String, Map>) operation.entrySet().iterator().next();
-            ExecutionPlan executionPlan = executableBuilder.compileExecutable(entry.getValue(), dependencies, SlangFile.Type.OPERATIONS);
+        for (Map<String, Map<String, Object>> operation : operationsRawData) {
+            Map.Entry<String, Map<String, Object>> entry = operation.entrySet().iterator().next();
+            ExecutionPlan executionPlan = executableBuilder.compileExecutable(entry.getValue(), dependenciesByNamespace, SlangFile.Type.OPERATIONS);
             executionPlan.setName(entry.getKey());
             executionPlans.add(executionPlan);
         }
         return executionPlans;
     }
 
-    private ExecutionPlan compileFlow(Map<String, Object> flowRawData, Map<String, ExecutionPlan> dependencies) {
+    private ExecutionPlan compileFlow(Map<String, Object> flowRawData, TreeMap<String, List<SlangFile>> dependenciesByNamespace) {
         String flowName = (String) flowRawData.remove(SlangTextualKeys.FLOW_NAME_KEY);
-        ExecutionPlan executionPlan = executableBuilder.compileExecutable(flowRawData, dependencies, SlangFile.Type.FLOW);
+        ExecutionPlan executionPlan = executableBuilder.compileExecutable(flowRawData, dependenciesByNamespace, SlangFile.Type.FLOW);
         executionPlan.setName(flowName);
         return executionPlan;
+    }
+
+    private String getFlowUuid(SlangFile slangFile, ExecutionPlan executionPlan) {
+        return slangFile.getNamespace() + "." + executionPlan.getName();
     }
 
 

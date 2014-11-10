@@ -45,10 +45,9 @@ public class ExecutionStepFactory {
     private static final String SIMPLE_NAVIGATION_METHOD = "navigate";
 
 
-    public ExecutionStep createBeginTaskStep(Long index, Map<String, Serializable> preTaskData) {
+    public ExecutionStep createBeginTaskStep(Long index, Map<String, Serializable> preTaskData, String refId) {
         Validate.notNull(preTaskData, "preOpData is null");
         Map<String, Serializable> actionData = new HashMap<>();
-        Serializable refId = preTaskData.remove(ScoreLangConstants.REF_ID);
         actionData.put(ScoreLangConstants.TASK_INPUTS_KEY, preTaskData.get(SlangTextualKeys.INPUTS_KEY));
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
         ExecutionStep beginTaskStep = createGeneralStep(index, TASK_STEPS_CLASS, "beginTask", ++index, actionData);
@@ -73,7 +72,7 @@ public class ExecutionStepFactory {
 
     private LinkedHashMap<String, Long> hackToRunSingleTaskFlow(Map<String, Serializable> postTaskData) {
         //todo as it name implies this is a hack to run single task flows
-        @SuppressWarnings("unchecked") LinkedHashMap<String, String> navigationStringValues = (LinkedHashMap<String, String>)postTaskData.get(SlangTextualKeys.NAVIGATION_KEY);
+        @SuppressWarnings("unchecked") LinkedHashMap<String, String> navigationStringValues = (LinkedHashMap<String, String>) postTaskData.get(SlangTextualKeys.NAVIGATION_KEY);
         LinkedHashMap<String, Long> navigationValues = new LinkedHashMap<>();
         for (String nextStep : navigationStringValues.keySet()) {
             navigationValues.put(nextStep, 0L);

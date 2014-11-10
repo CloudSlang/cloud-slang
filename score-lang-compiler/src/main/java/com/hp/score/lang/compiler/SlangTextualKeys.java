@@ -23,9 +23,6 @@ package com.hp.score.lang.compiler;
  */
 public interface SlangTextualKeys {
 
-    //file
-    String OPERATIONS_KEY = "operations";
-
     //executable
     String RESULT_KEY = "results";
     String INPUTS_KEY = "inputs";

@@ -1,7 +1,7 @@
 namespace: slang.sample.flows
 
 imports:
-  - ops: slang.ops.operations
+  ops: slang.ops.operations
 
 flow:
   name: SimpleFlow

@@ -32,7 +32,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
-import java.net.URL;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SpringConfiguration.class)
@@ -43,8 +45,15 @@ public class CompileBasicFlowTest {
 
     @Test
     public void testCompileFlowBasic() throws Exception {
-        URL resource = getClass().getResource("/flow.yaml");
-        ExecutionPlan executionPlan = compiler.compile(new File(resource.toURI()), null, null);
+        URI flow = getClass().getResource("/flow.yaml").toURI();
+        URI operation = getClass().getResource("/operation.yaml").toURI();
+        URI operation_2 = getClass().getResource("/operation_with_data.yaml").toURI();
+
+        List<File> classpath = new ArrayList<>();
+        classpath.add(new File(operation));
+        classpath.add(new File(operation_2));
+
+        ExecutionPlan executionPlan = compiler.compile(new File(flow), null, classpath).getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
         Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());

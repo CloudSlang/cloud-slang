@@ -21,14 +21,15 @@ package com.hp.score.lang.compiler.domain;
 /*
  * Created by orius123 on 05/11/14.
  */
+
 import java.util.List;
 import java.util.Map;
 
 public class SlangFile {
 
-    private List<Map<String, String>> imports;
+    private Map<String, String> imports;
     private Map<String, Object> flow;
-    private List<Map> operations;
+    private List<Map<String, Map<String, Object>>> operations;
     private String namespace;
 
     public String getNamespace() {
@@ -39,15 +40,15 @@ public class SlangFile {
         return flow;
     }
 
-    public List<Map<String, String>> getImports() {
+    public Map<String, String> getImports() {
         return imports;
     }
 
-    public List<Map> getOperations() {
+    public List<Map<String, Map<String, Object>>> getOperations() {
         return operations;
     }
 
-    public Type getType(){
+    public Type getType() {
         return flow != null ? Type.FLOW : Type.OPERATIONS;
     }
 

@@ -1,5 +1,8 @@
 namespace: user.ops
 
+imports:
+  ops: user.ops
+
 flow:
   name: basic_flow
   workflow:
