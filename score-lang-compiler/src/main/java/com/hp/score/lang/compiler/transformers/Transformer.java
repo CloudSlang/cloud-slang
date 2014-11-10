@@ -37,8 +37,8 @@ public interface Transformer<F, T> {
     enum Scope {
         BEFORE_TASK,
         AFTER_TASK,
-        BEFORE_OPERATION,
-        AFTER_OPERATION,
+        BEFORE_EXECUTABLE,
+        AFTER_EXECUTABLE,
         ACTION
     }
 

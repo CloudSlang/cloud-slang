@@ -38,7 +38,7 @@ public class OutputsTransformer implements Transformer<List<Object>, String> {
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Scope.AFTER_OPERATION);
+        return Arrays.asList(Scope.AFTER_EXECUTABLE);
     }
 
     @Override

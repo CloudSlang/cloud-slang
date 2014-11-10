@@ -51,18 +51,18 @@ public class ExecutableBuilder {
     @Autowired
     private ExecutionStepFactory stepFactory;
 
-    public ExecutionPlan compileExecutable(Map<String, Object> operationRawData, TreeMap<String, List<SlangFile>> dependenciesByNamespace, SlangFile.Type type) {
-        Map<String, Serializable> preOperationActionData = new HashMap<>();
-        Map<String, Serializable> postOperationActionData = new HashMap<>();
+    public ExecutionPlan compileExecutable(Map<String, Object> executableRawData, TreeMap<String, List<SlangFile>> dependenciesByNamespace, SlangFile.Type type) {
+        Map<String, Serializable> preExecutableActionData = new HashMap<>();
+        Map<String, Serializable> postExecutableActionData = new HashMap<>();
         CompiledDoAction compiledDoAction = null;
         CompiledWorkflow compiledWorkflow = null;
 
-        List<Transformer> preOpTransformers = Lambda.filter(having(on(Transformer.class).getScopes().contains(Transformer.Scope.BEFORE_OPERATION)), transformers);
-        List<Transformer> postOpTransformers = Lambda.filter(having(on(Transformer.class).getScopes().contains(Transformer.Scope.AFTER_OPERATION)), transformers);
+        List<Transformer> preExecTransformers = Lambda.filter(having(on(Transformer.class).getScopes().contains(Transformer.Scope.BEFORE_EXECUTABLE)), transformers);
+        List<Transformer> postExecTransformers = Lambda.filter(having(on(Transformer.class).getScopes().contains(Transformer.Scope.AFTER_EXECUTABLE)), transformers);
 
-        validateKeyWordsAreValid(operationRawData, ListUtils.union(preOpTransformers, postOpTransformers), Arrays.asList(SlangTextualKeys.ACTION_KEY, SlangTextualKeys.WORKFLOW_KEY));
+        validateKeyWordsAreValid(executableRawData, ListUtils.union(preExecTransformers, postExecTransformers), Arrays.asList(SlangTextualKeys.ACTION_KEY, SlangTextualKeys.WORKFLOW_KEY));
 
-        Iterator<Map.Entry<String, Object>> it = operationRawData.entrySet().iterator();
+        Iterator<Map.Entry<String, Object>> it = executableRawData.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, Object> pairs = it.next();
             String key = pairs.getKey();
@@ -75,17 +75,17 @@ public class ExecutableBuilder {
                 compiledWorkflow = compileWorkFlow((Map<String, Object>) pairs.getValue());
             }
 
-            preOperationActionData.putAll(runTransformers(operationRawData, preOpTransformers, key));
+            preExecutableActionData.putAll(runTransformers(executableRawData, preExecTransformers, key));
 
-            postOperationActionData.putAll(runTransformers(operationRawData, postOpTransformers, key));
+            postExecutableActionData.putAll(runTransformers(executableRawData, postExecTransformers, key));
 
             it.remove();
         }
 
         if (type == SlangFile.Type.FLOW) {
-            return createFlowExecutionPlan(new CompiledFlow(preOperationActionData, postOperationActionData, compiledWorkflow), dependenciesByNamespace);
+            return createFlowExecutionPlan(new CompiledFlow(preExecutableActionData, postExecutableActionData, compiledWorkflow), dependenciesByNamespace);
         } else {
-            return createOperationExecutionPlan(new CompiledOperation(preOperationActionData, postOperationActionData, compiledDoAction));
+            return createOperationExecutionPlan(new CompiledOperation(preExecutableActionData, postExecutableActionData, compiledDoAction));
         }
     }
 

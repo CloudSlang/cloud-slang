@@ -52,15 +52,15 @@ public class SlangCompiler {
     @Autowired
     private YamlParser yamlParser;
 
-    public TriggeringProperties compile(File source, String operationName, List<File> classpath) {
+    public TriggeringProperties compile(File source, String operationName, List<File> path) {
 
         SlangFile slangFile = yamlParser.loadSlangFile(source);
 
         Map<String, ExecutionPlan> dependencies = null;
         TreeMap<String, List<SlangFile>> dependenciesByNamespace = null;
         if (slangFile.getImports() != null) {
-            Validate.noNullElements(classpath, "File that was requested to compile has imports but no classpath was given");
-            dependenciesByNamespace = namespaceBuilder.buildNamespace(classpath, slangFile);
+            Validate.noNullElements(path, "File that was requested to compile has imports but no path was given");
+            dependenciesByNamespace = namespaceBuilder.buildNamespace(path, slangFile);
             dependencies = compileDependencies(dependenciesByNamespace);
         }
 

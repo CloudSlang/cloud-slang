@@ -52,7 +52,7 @@ public class ResultsTransformer implements Transformer<List<Object>, List<Result
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Scope.AFTER_OPERATION);
+        return Arrays.asList(Scope.AFTER_EXECUTABLE);
     }
 
     @Override

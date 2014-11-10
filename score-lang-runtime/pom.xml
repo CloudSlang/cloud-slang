@@ -36,11 +36,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.hp.score</groupId>
-            <artifactId>score-api</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.hp.score.sdk</groupId>
             <artifactId>score-content-sdk</artifactId>
         </dependency>

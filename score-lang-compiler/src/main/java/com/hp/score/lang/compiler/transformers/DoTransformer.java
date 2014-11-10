@@ -87,7 +87,7 @@ public class DoTransformer implements Transformer<LinkedHashMap<String, List>, L
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Scope.BEFORE_OPERATION, Scope.BEFORE_TASK);
+        return Arrays.asList(Scope.BEFORE_EXECUTABLE, Scope.BEFORE_TASK);
     }
 
     @Override
