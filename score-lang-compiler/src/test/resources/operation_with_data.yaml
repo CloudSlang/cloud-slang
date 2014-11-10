@@ -38,5 +38,6 @@ operations:
         - output2: input2
       results:
         - SUCCESS: 1 != 123456
-          #this test should be very lucky to fail
-        - FAILURE: 1 == 123456
+        - NO_ACTION: true
+        - FAILURE
+
