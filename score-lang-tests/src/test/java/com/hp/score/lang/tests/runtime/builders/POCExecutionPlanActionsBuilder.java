@@ -108,9 +108,9 @@ public class POCExecutionPlanActionsBuilder {
     private ExecutionStep createEndStep() {
         Map<String, Serializable> actionData = new HashMap<>();
         HashMap<String, Serializable> operationOutputs = createOperationOutputs();
-        actionData.put("operationOutputs", operationOutputs);
+        actionData.put(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, operationOutputs);
         LinkedList<Result> operationResults = createOperationResults();
-        actionData.put("operationResults", operationResults);
+        actionData.put(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, operationResults);
         return createGeneralStep(index, ExecutableSteps.class.getName(), "finishExecutable", ++index, actionData);
     }
 
@@ -128,9 +128,9 @@ public class POCExecutionPlanActionsBuilder {
     private ExecutionStep createFlowEndStep() {
         Map<String, Serializable> actionData = new HashMap<>();
         HashMap<String, Serializable> flowOutputs = createFlowOutputs();
-        actionData.put("operationOutputs", flowOutputs);
+        actionData.put(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, flowOutputs);
         LinkedList<Result> flowResults = createFlowResults();
-        actionData.put("operationResults", flowResults);
+        actionData.put(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, flowResults);
         return createGeneralStep(index, ExecutableSteps.class.getName(), "finishExecutable", null, actionData);
     }
 

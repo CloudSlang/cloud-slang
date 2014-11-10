@@ -69,8 +69,8 @@ public class CompileOperationTest {
         Assert.assertTrue("script is different than expected", script.startsWith("# this is python amigos!!"));
 
         ExecutionStep endStep = executionPlan.getStep(3L);
-        Object outputs = endStep.getActionData().get(ScoreLangConstants.OPERATION_OUTPUTS_KEY);
-        Object results = endStep.getActionData().get(ScoreLangConstants.OPERATION_RESULTS_KEY);
+        Object outputs = endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY);
+        Object results = endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_RESULTS_KEY);
 
         Assert.assertNotNull("outputs don't exist", outputs);
         Assert.assertNotNull("results don't exist", results);

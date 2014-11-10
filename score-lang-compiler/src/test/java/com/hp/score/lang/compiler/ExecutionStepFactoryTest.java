@@ -62,8 +62,8 @@ public class ExecutionStepFactoryTest {
         HashMap<String, Serializable> postOpData = new HashMap<>();
         postOpData.put(SlangTextualKeys.OUTPUTS_KEY, placeHolder);
         ExecutionStep endStep = factory.createEndStep(1L, postOpData);
-        Assert.assertNotNull("outputs key is null", endStep.getActionData().get(ScoreLangConstants.OPERATION_OUTPUTS_KEY));
-        Assert.assertEquals("outputs are not set under their key", placeHolder, endStep.getActionData().get(ScoreLangConstants.OPERATION_OUTPUTS_KEY));
+        Assert.assertNotNull("outputs key is null", endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY));
+        Assert.assertEquals("outputs are not set under their key", placeHolder, endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY));
     }
 
     @Test
@@ -73,8 +73,8 @@ public class ExecutionStepFactoryTest {
         HashMap<String, Serializable> postOpData = new HashMap<>();
         postOpData.put(SlangTextualKeys.RESULT_KEY, placeHolder);
         ExecutionStep endStep = factory.createEndStep(1L, postOpData);
-        Assert.assertNotNull("results key is null", endStep.getActionData().get(ScoreLangConstants.OPERATION_RESULTS_KEY));
-        Assert.assertEquals("results are not set under their key", placeHolder, endStep.getActionData().get(ScoreLangConstants.OPERATION_RESULTS_KEY));
+        Assert.assertNotNull("results key is null", endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_RESULTS_KEY));
+        Assert.assertEquals("results are not set under their key", placeHolder, endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_RESULTS_KEY));
     }
 
     @Test(expected = IllegalArgumentException.class)

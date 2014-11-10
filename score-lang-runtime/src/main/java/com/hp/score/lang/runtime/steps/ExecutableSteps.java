@@ -2,6 +2,7 @@ package com.hp.score.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.score.lang.ExecutionRuntimeServices;
+import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Result;
 import com.hp.score.lang.runtime.bindings.InputsBinding;
@@ -69,13 +70,13 @@ public class ExecutableSteps extends AbstractSteps {
      * This method is executed by the finishExecutable execution step of an operation/flow
      *
      * @param runEnv the run environment object
-     * @param operationOutputs the operation outputs data
-     * @param operationResults the operation results data
+     * @param executableOutputs the operation outputs data
+     * @param executableResults the operation results data
      * @param executionRuntimeServices services supplied by score engine for handling the execution
      */
     public void finishExecutable(@Param(RUN_ENV) RunEnvironment runEnv,
-                                 @Param(OPERATION_OUTPUTS_KEY) LinkedHashMap<String, Serializable> operationOutputs,
-                                 @Param(OPERATION_RESULTS_KEY) LinkedList<Result> operationResults,
+                                 @Param(EXECUTABLE_OUTPUTS_KEY) LinkedHashMap<String, Serializable> executableOutputs,
+                                 @Param(EXECUTABLE_RESULTS_KEY) LinkedList<Result> executableResults,
                                  @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
 
         System.out.println("===============");
@@ -83,15 +84,18 @@ public class ExecutableSteps extends AbstractSteps {
         System.out.println("===============");
         Map<String, Serializable> operationContext = runEnv.getStack().popContext();
         ReturnValues actionReturnValues = runEnv.removeReturnValues();
-        fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_START, "Output binding started", Pair.of("operationOutputs", operationOutputs), Pair.of("operationResults", operationResults), Pair.of("actionReturnValues", actionReturnValues));
+        fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_START, "Output binding started",
+                Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, executableOutputs),
+                Pair.of(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, executableResults),
+                Pair.of("actionReturnValues", actionReturnValues));
 
         // Resolving the result of the operation/flow
         String result = actionReturnValues.getResult();
         if(result == null) {
-            result = resultsBinding.resolveResult(actionReturnValues.getOutputs(), operationResults);
+            result = resultsBinding.resolveResult(actionReturnValues.getOutputs(), executableResults);
         }
 
-        Map<String, String> operationReturnOutputs = createOperationBindOutputsContext(operationContext, actionReturnValues.getOutputs(), operationOutputs);
+        Map<String, String> operationReturnOutputs = createOperationBindOutputsContext(operationContext, actionReturnValues.getOutputs(), executableOutputs);
 
         //todo: hook
 
