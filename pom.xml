@@ -93,6 +93,15 @@
             <timezone>+2</timezone>
         </developer>
         <developer>
+            <id>Bonczidai</id>
+            <email>levente.bonczidai@hp.com</email>
+            <name>Bonczidai Levente</name>
+            <url>https://github.com/Bonczidai</url>
+            <organizationUrl>http://www8.hp.com/us/en/software/enterprise-software.html</organizationUrl>
+            <organization>HP Software</organization>
+            <timezone>+2</timezone>
+        </developer>
+        <developer>
             <id>TudorLesanHP</id>
             <email>tudor-andrei.lesan@hp.com</email>
             <name>Tudor Lesan</name>
