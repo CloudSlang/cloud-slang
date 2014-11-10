@@ -7,18 +7,17 @@
  */
 package com.hp.score.lang.runtime.steps;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.stereotype.Component;
-
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.stereotype.Component;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static com.hp.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
@@ -57,14 +56,14 @@ public class TaskSteps extends AbstractSteps {
         updateCallArgumentsAndPushContextToStack(runEnv, flowContext, operationArguments);
     }
 
-    public void finishTask(@Param(RUN_ENV) RunEnvironment runEnv,
-                           @Param(TASK_PUBLISH_KEY) LinkedHashMap<String, Serializable> taskPublishValues,
-                           @Param(TASK_NAVIGATION_KEY) LinkedHashMap<String, Long> taskNavigationValues,
-                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
+    public void endTask(@Param(RUN_ENV) RunEnvironment runEnv,
+                        @Param(TASK_PUBLISH_KEY) LinkedHashMap<String, Serializable> taskPublishValues,
+                        @Param(TASK_NAVIGATION_KEY) LinkedHashMap<String, Long> taskNavigationValues,
+                        @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
 
-        System.out.println("============");
-        System.out.println(" finishTask ");
-        System.out.println("============");
+        System.out.println("=========");
+        System.out.println(" endTask ");
+        System.out.println("=========");
 
         Map<String, Serializable> flowContext = runEnv.getStack().popContext();
 

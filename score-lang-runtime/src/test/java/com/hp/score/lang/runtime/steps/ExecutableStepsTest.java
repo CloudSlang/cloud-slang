@@ -48,18 +48,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
-public class OperationStepsTest {
+@ContextConfiguration(classes = ExecutableStepsTest.Config.class)
+public class ExecutableStepsTest {
 
     @Autowired
-    private OperationSteps operationSteps;
+    private ExecutableSteps executableSteps;
 
     @Autowired
     private InputsBinding inputsBinding;
 
     @Test
     public void testStart() throws Exception {
-        operationSteps.start(new ArrayList<Input>(),new RunEnvironment(),new HashMap<String, Serializable>(),new ExecutionRuntimeServices());
+        executableSteps.startExecutable(new ArrayList<Input>(), new RunEnvironment(), new HashMap<String, Serializable>(), new ExecutionRuntimeServices());
     }
 
     @Test
@@ -71,7 +71,7 @@ public class OperationStepsTest {
         resultMap.put("input1",5);
 
         when(inputsBinding.bindInputs(anyMap(),eq(inputs))).thenReturn(resultMap);
-        operationSteps.start(inputs, runEnv, new HashMap<String, Serializable>(), new ExecutionRuntimeServices());
+        executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Serializable>(), new ExecutionRuntimeServices());
 
         Map<String,Serializable> opContext = runEnv.getStack().popContext();
         Assert.assertTrue(opContext.containsKey("input1"));
@@ -107,8 +107,8 @@ public class OperationStepsTest {
         }
 
         @Bean
-        public OperationSteps operationSteps(){
-            return new OperationSteps();
+        public ExecutableSteps operationSteps(){
+            return new ExecutableSteps();
         }
 
     }

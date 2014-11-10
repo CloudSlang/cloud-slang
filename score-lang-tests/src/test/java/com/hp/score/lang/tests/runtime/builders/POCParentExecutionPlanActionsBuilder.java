@@ -26,7 +26,7 @@ import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.entities.bindings.Result;
 import com.hp.score.lang.runtime.navigations.Navigations;
 import com.hp.score.lang.runtime.steps.ActionSteps;
-import com.hp.score.lang.runtime.steps.OperationSteps;
+import com.hp.score.lang.runtime.steps.ExecutableSteps;
 import com.hp.score.lang.runtime.steps.TaskSteps;
 import com.hp.score.lang.tests.runtime.actions.LangActions;
 
@@ -80,7 +80,7 @@ public class POCParentExecutionPlanActionsBuilder {
         actionData.put("taskPublishValues", taskPublishValues);
         HashMap<String, Long> taskNavigationValues = createSecondTaskNavigationValues();
         actionData.put("taskNavigationValues", taskNavigationValues);
-        ExecutionStep finishTask = createGeneralStep(index, TaskSteps.class.getName(), "finishTask", ++index, actionData);
+        ExecutionStep finishTask = createGeneralStep(index, TaskSteps.class.getName(), "endTask", ++index, actionData);
         finishTask.setNavigationData(null);
         return finishTask;
     }
@@ -90,7 +90,7 @@ public class POCParentExecutionPlanActionsBuilder {
         actionData.put("operationOutputs", new LinkedHashMap<>());
         LinkedList<Result> operationResults = createOperationResults();
         actionData.put("operationResults", operationResults);
-        return createGeneralStep(index, OperationSteps.class.getName(), "end", ++index, actionData);
+        return createGeneralStep(index, ExecutableSteps.class.getName(), "finishExecutable", ++index, actionData);
     }
 
     private LinkedList<Result> createOperationResults() {
@@ -113,7 +113,7 @@ public class POCParentExecutionPlanActionsBuilder {
         Map<String, Serializable> actionData = new HashMap<>();
         HashMap<String, Serializable> operationInputs = createOperationInputs();
         actionData.put("operationInputs", operationInputs);
-        return createGeneralStep(index, OperationSteps.class.getName(), "start", ++index, actionData);
+        return createGeneralStep(index, ExecutableSteps.class.getName(), "startExecutable", ++index, actionData);
     }
 
     private HashMap<String, Serializable> createOperationInputs() {
@@ -150,7 +150,7 @@ public class POCParentExecutionPlanActionsBuilder {
         Map<String, Serializable> actionData = new HashMap<>();
         HashMap<String, Serializable> flowInputs = createFlowInputs();
         actionData.put("operationInputs", flowInputs);
-        return createGeneralStep(index, OperationSteps.class.getName(), "start", ++index, actionData);
+        return createGeneralStep(index, ExecutableSteps.class.getName(), "startExecutable", ++index, actionData);
     }
 
     private ExecutionStep createFirstBeginTaskStep() {
@@ -172,7 +172,7 @@ public class POCParentExecutionPlanActionsBuilder {
         actionData.put("taskPublishValues", taskPublishValues);
         HashMap<String, Long> taskNavigationValues = createFirstTaskNavigationValues();
         actionData.put("taskNavigationValues", taskNavigationValues);
-        ExecutionStep finishTask = createGeneralStep(index, TaskSteps.class.getName(), "finishTask", ++index, actionData);
+        ExecutionStep finishTask = createGeneralStep(index, TaskSteps.class.getName(), "endTask", ++index, actionData);
         finishTask.setNavigationData(null);
         return finishTask;
     }
@@ -183,7 +183,7 @@ public class POCParentExecutionPlanActionsBuilder {
         actionData.put("operationOutputs", flowOutputs);
         LinkedList<Result> flowResults = createFlowResults();
         actionData.put("operationResults", flowResults);
-        return createGeneralStep(index, OperationSteps.class.getName(), "end", null, actionData);
+        return createGeneralStep(index, ExecutableSteps.class.getName(), "finishExecutable", null, actionData);
     }
 
     private HashMap<String, Serializable> createFirstBeginTaskTaskInputs() {

@@ -27,7 +27,7 @@ import static com.hp.score.api.execution.ExecutionParametersConsts.*;
  */
 //todo: decide on a name that is suitable for both flow & operation
 @Component
-public class OperationSteps extends AbstractSteps {
+public class ExecutableSteps extends AbstractSteps {
 
     @Autowired
     private ResultsBinding resultsBinding;
@@ -35,14 +35,14 @@ public class OperationSteps extends AbstractSteps {
     @Autowired
     private InputsBinding inputsBinding;
 
-    public void start(@Param(OPERATION_INPUTS_KEY) List<Input> operationInputs,
-                      @Param(RUN_ENV) RunEnvironment runEnv,
-                      @Param(USER_INPUTS_KEY) HashMap<String, Serializable> userInputs,
-                      @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
+    public void startExecutable(@Param(OPERATION_INPUTS_KEY) List<Input> operationInputs,
+                                @Param(RUN_ENV) RunEnvironment runEnv,
+                                @Param(USER_INPUTS_KEY) HashMap<String, Serializable> userInputs,
+                                @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
 
-        System.out.println("=======");
-        System.out.println(" start ");
-        System.out.println("=======");
+        System.out.println("=================");
+        System.out.println(" startExecutable ");
+        System.out.println("=================");
         runEnv.getExecutionPath().down();
 
         resolveGroups();
@@ -56,7 +56,7 @@ public class OperationSteps extends AbstractSteps {
         //todo: clone action context before updating
         actionArguments.putAll(operationContext);
 
-        //done with the user inputs, don't want it to be available in next start steps..
+        //done with the user inputs, don't want it to be available in next startExecutable steps..
         userInputs.clear();
 
         //todo: hook
@@ -66,21 +66,21 @@ public class OperationSteps extends AbstractSteps {
     }
 
     /**
-     * This method is executed by the end execution step of an operation/flow
+     * This method is executed by the finishExecutable execution step of an operation/flow
      *
      * @param runEnv the run environment object
      * @param operationOutputs the operation outputs data
      * @param operationResults the operation results data
      * @param executionRuntimeServices services supplied by score engine for handling the execution
      */
-    public void end(@Param(RUN_ENV) RunEnvironment runEnv,
-                    @Param(OPERATION_OUTPUTS_KEY) LinkedHashMap<String, Serializable> operationOutputs,
-                    @Param(OPERATION_RESULTS_KEY) LinkedList<Result> operationResults,
-                    @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
+    public void finishExecutable(@Param(RUN_ENV) RunEnvironment runEnv,
+                                 @Param(OPERATION_OUTPUTS_KEY) LinkedHashMap<String, Serializable> operationOutputs,
+                                 @Param(OPERATION_RESULTS_KEY) LinkedList<Result> operationResults,
+                                 @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
 
-        System.out.println("=====");
-        System.out.println(" end ");
-        System.out.println("=====");
+        System.out.println("===============");
+        System.out.println(" finishExecutable ");
+        System.out.println("===============");
         Map<String, Serializable> operationContext = runEnv.getStack().popContext();
         ReturnValues actionReturnValues = runEnv.removeReturnValues();
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_START, "Output binding started", Pair.of("operationOutputs", operationOutputs), Pair.of("operationResults", operationResults), Pair.of("actionReturnValues", actionReturnValues));
