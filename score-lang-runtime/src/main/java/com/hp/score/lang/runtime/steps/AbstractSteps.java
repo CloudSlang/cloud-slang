@@ -6,42 +6,20 @@ import com.hp.score.lang.runtime.env.ContextStack;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import com.hp.score.lang.runtime.events.LanguageEventData;
-
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
-import static com.hp.score.lang.entities.ScoreLangConstants.*;
-import static com.hp.score.lang.runtime.events.LanguageEventData.*;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
+import static com.hp.score.lang.runtime.events.LanguageEventData.BOUND_INPUTS;
+import static com.hp.score.lang.runtime.events.LanguageEventData.ENCRYPTED_VALUE;
 
 public abstract class AbstractSteps {
-
-    protected Map<String, Serializable> createBindInputsMap(Map<String, Serializable> callArguments, Map<String, Serializable> inputs, ExecutionRuntimeServices executionRuntimeServices, RunEnvironment runEnv) {
-        fireEvent(executionRuntimeServices, runEnv, EVENT_INPUT_START, "Start binding inputs", Pair.of(CALL_ARGUMENTS, (Serializable)callArguments), Pair.of(INPUTS, (Serializable)inputs));
-        Map<String, Serializable> tempContext = new LinkedHashMap<>();
-        if (MapUtils.isEmpty(inputs)) return tempContext;
-        for (Map.Entry<String, Serializable> input : inputs.entrySet()) {
-            String inputKey = input.getKey();
-            Serializable value = input.getValue();
-            if (value != null) {
-                if (value instanceof String) {
-                    // assigning from another param
-                    String paramName = (String) value;
-                    Serializable callArgument = callArguments.get(paramName);
-                    tempContext.put(inputKey, callArgument == null ? value : callArgument);
-                } else {
-                    tempContext.put(inputKey, value);
-                }
-            } else {
-                tempContext.put(inputKey, callArguments.get(inputKey));
-            }
-        }
-        fireEvent(executionRuntimeServices, runEnv, EVENT_INPUT_END, "Input binding finished", Pair.of(BOUND_INPUTS, (Serializable)tempContext));
-        return tempContext;
-    }
 
     public void sendBindingInputsEvent(List<Input> inputs, final Map<String, Serializable> context,
                                             RunEnvironment runEnv, ExecutionRuntimeServices executionRuntimeServices,String desc) {
