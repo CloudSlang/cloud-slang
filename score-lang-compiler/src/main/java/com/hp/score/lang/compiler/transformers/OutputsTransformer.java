@@ -1,4 +1,3 @@
-package com.hp.score.lang.compiler.transformers;
 /*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,23 +16,51 @@ package com.hp.score.lang.compiler.transformers;
  * specific language governing permissions and limitations
  * under the License.
 */
+package com.hp.score.lang.compiler.transformers;
 
-/*
- * Created by orius123 on 05/11/14.
- */
+import com.hp.score.lang.entities.bindings.Output;
 
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+/**
+ * Date: 11/7/2014
+ *
+ * @author Bonczidai Levente
+ */
 @Component
-public class OutputsTransformer implements Transformer<List<Object>, String> {
-
+public class OutputsTransformer implements Transformer<List<Object>, List<Output>> {
 
     @Override
-    public String transform(List<Object> rawData) {
-        return "hi";
+    public List<Output> transform(List<Object> rawData) {
+        List<Output> outputs = new ArrayList<>();
+        for (Object rawOutput : rawData) {
+            //- some_output
+            //this is our default behavior that if the user specifies only a key, the key is also the ref we look for
+            if (rawOutput instanceof String) {
+                outputs.add(createRefOutput((String) rawOutput));
+            } else if (rawOutput instanceof Map) {
+                @SuppressWarnings("unchecked") Map.Entry<String, ?> entry = (Map.Entry<String, ?>) (((Map) rawOutput).entrySet()).iterator().next();
+                // - some_output: some_expression
+                // the value of the input is an expression we need to evaluate at runtime
+                if (entry.getValue() instanceof String) {
+                    outputs.add(createExpressionOutput(entry.getKey(), (String)entry.getValue()));
+                }
+            }
+        }
+        return outputs;
+    }
+
+    private Output createRefOutput(String rawOutput) {
+        return new Output(rawOutput, rawOutput);
+    }
+
+    private Output createExpressionOutput(String outputName, String outputExpression){//Map.Entry<String, String> entry) {
+        return new Output(outputName, outputExpression);
     }
 
     @Override
@@ -50,6 +77,5 @@ public class OutputsTransformer implements Transformer<List<Object>, String> {
     public String keyToRegister() {
         return null;
     }
-
 
 }
