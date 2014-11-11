@@ -94,7 +94,7 @@ public class OutputsBindingTest {
 
     //todo: do we want to throw an exception?
     @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
-    public void testOperationOutputsNoExpressionMissing() throws Exception {
+    public void testMissingOperationOutputsNoExpression() throws Exception {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, String> actionReturnValues = new HashMap<>();
         List<Output> outputs =  Lists.newArrayList(createNoExpressionOutput("actionOutputKey1"));
