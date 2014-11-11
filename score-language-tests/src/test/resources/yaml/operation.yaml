@@ -1,0 +1,17 @@
+namespace: user.ops
+
+operations:
+  - test_op:
+      action:
+        python_script: 'print "hello world"'
+
+  - check_Weather:
+      inputs:
+        - city
+      action:
+        python_script: 'print "weather thing"'
+      outputs:
+        - weather: 'great!!'
+      results:
+        - SUCCESS: 1 == 1
+

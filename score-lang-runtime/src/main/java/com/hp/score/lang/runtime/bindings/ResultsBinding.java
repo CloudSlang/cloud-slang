@@ -19,6 +19,7 @@ package com.hp.score.lang.runtime.bindings;
 */
 
 import com.hp.score.lang.entities.bindings.Result;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -57,7 +58,7 @@ public class ResultsBinding {
                                 String presetResult) {
 
         // We must have possible results
-        if (possibleResults.isEmpty()) {
+        if (CollectionUtils.isEmpty(possibleResults)) {
             throw new RuntimeException("No results were found");
         }
 

@@ -1,0 +1,45 @@
+namespace: user.ops
+
+operations:
+  - test_op_2:
+      inputs:
+        - input1
+        - input2: ->input2
+        - input3:
+            default: value3
+        - input4: ->'value4' if input3 == value3 else None
+        - input5:
+            required: yes
+            encrypted: true
+        - input6:
+            default: ->1 + 5
+            required: False
+        - input7: 77
+        - input8:
+            default: ->input6
+        - input9:
+            default: ->input6
+            override: true
+
+      action:
+        python_script: |
+                # this is python amigos!!
+                import os
+                processId = os.geteuid()
+                print processId
+                print input1
+                print input2
+                print input3
+                print input4
+                print input5
+                print input6
+      outputs:
+        - output1: input1
+        - output2: processId
+        - output3: slangInputsKey['input1']
+        - output4
+      results:
+        - SUCCESS: 1 != 123456
+        - NO_ACTION: true
+        - FAILURE
+

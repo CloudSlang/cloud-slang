@@ -24,7 +24,7 @@ public abstract class AbstractSteps {
     public void sendBindingInputsEvent(List<Input> inputs, final Map<String, Serializable> context,
                                             RunEnvironment runEnv, ExecutionRuntimeServices executionRuntimeServices,String desc) {
         Map<String,Serializable> inputsForEvent = new HashMap<>();
-        for(Input input:inputs){
+        for(Input input: inputs){
             String inputName = input.getName();
             Serializable inputValue = context.get(inputName);
             if(input.isEncrypted()){

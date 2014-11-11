@@ -423,7 +423,7 @@
         <module>score-lang-runtime</module>
         <module>score-lang-compiler</module>
         <module>score-lang-entities</module>
-        <module>score-lang-tests</module>
+        <module>score-language-tests</module>
     </modules>
 
 

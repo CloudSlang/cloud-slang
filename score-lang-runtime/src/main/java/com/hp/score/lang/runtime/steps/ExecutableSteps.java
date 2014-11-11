@@ -54,7 +54,9 @@ public class ExecutableSteps extends AbstractSteps {
 
         Map<String, Serializable> callArguments = runEnv.removeCallArguments();
 
-        callArguments.putAll(userInputs);
+        if(userInputs != null) {
+            callArguments.putAll(userInputs);
+        }
         Map<String, Serializable>  operationContext = inputsBinding.bindInputs(callArguments,operationInputs);
 
         Map<String, Serializable> actionArguments = new HashMap<>();
@@ -82,7 +84,7 @@ public class ExecutableSteps extends AbstractSteps {
      */
     public void finishExecutable(@Param(RUN_ENV) RunEnvironment runEnv,
                                  @Param(EXECUTABLE_OUTPUTS_KEY) List<Output> executableOutputs,
-                                 @Param(EXECUTABLE_RESULTS_KEY) LinkedList<Result> executableResults,
+                                 @Param(EXECUTABLE_RESULTS_KEY) List<Result> executableResults,
                                  @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
 
         System.out.println("===============");
@@ -92,7 +94,7 @@ public class ExecutableSteps extends AbstractSteps {
         ReturnValues actionReturnValues = runEnv.removeReturnValues();
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_START, "Output binding started",
                 Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable) executableOutputs),
-                Pair.of(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, executableResults),
+                Pair.of(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable)executableResults),
                 Pair.of("actionReturnValues", actionReturnValues));
 
         // Resolving the result of the operation/flow

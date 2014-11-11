@@ -51,6 +51,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.python</groupId>
             <artifactId>jython-standalone</artifactId>
         </dependency>
@@ -59,6 +64,8 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
         </dependency>
+
+        <!-- For tests -->
 
         <dependency>
             <groupId>junit</groupId>

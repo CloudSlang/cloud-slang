@@ -33,7 +33,7 @@ import java.util.Map;
 public class InputsBinding {
 
     @Autowired
-    ScriptEvaluator scriptEvaluator;
+    private ScriptEvaluator scriptEvaluator;
 
     /**
      * Binds the inputs to a new result map
@@ -44,7 +44,7 @@ public class InputsBinding {
     public Map<String,Serializable> bindInputs(Map<String,Serializable> context,
                                                List<Input> inputs){
         Map<String,Serializable> resultContext = new HashMap<>();
-        for(Input input:inputs){
+        for(Input input : inputs){
             bindInput(input,context,resultContext);
         }
         return resultContext;
