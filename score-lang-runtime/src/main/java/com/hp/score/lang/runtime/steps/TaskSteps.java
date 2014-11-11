@@ -59,6 +59,7 @@ public class TaskSteps extends AbstractSteps {
         Map<String, Serializable> operationArguments = inputsBinding.bindInputs(flowContext,taskInputs);
 
         //todo: hook
+
         sendBindingInputsEvent(taskInputs, operationArguments,runEnv, executionRuntimeServices,"Task inputs resolved");
 
         updateCallArgumentsAndPushContextToStack(runEnv, flowContext, operationArguments);
