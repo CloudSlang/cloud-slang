@@ -1,4 +1,4 @@
-package com.hp.score.lang.tests.runtime.bindings;
+package com.hp.score.lang.runtime.bindings;
 
 /*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
@@ -20,9 +20,6 @@ package com.hp.score.lang.tests.runtime.bindings;
 */
 
 import com.hp.score.lang.entities.bindings.Input;
-import com.hp.score.lang.runtime.bindings.InputsBinding;
-import com.hp.score.lang.runtime.bindings.ScriptEvaluator;
-import com.hp.score.lang.runtime.configuration.SlangRuntimeSpringConfig;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,17 +27,18 @@ import org.python.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
+@ContextConfiguration(classes = InputsBindingTest.Config.class)
 public class InputsBindingTest {
 
     @Autowired
@@ -262,7 +260,6 @@ public class InputsBindingTest {
     }
 
     @Configuration
-    @Import(SlangRuntimeSpringConfig.class)
     static class Config{
 
         @Bean
@@ -273,6 +270,12 @@ public class InputsBindingTest {
         @Bean
         public ScriptEvaluator scriptEvaluator(){
             return new ScriptEvaluator();
+        }
+
+
+        @Bean
+        public ScriptEngine scriptEngine(){
+            return  new ScriptEngineManager().getEngineByName("python");
         }
     }
 }

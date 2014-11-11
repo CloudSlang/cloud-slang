@@ -1,4 +1,5 @@
-package com.hp.score.lang.runtime.bindings;/*
+package com.hp.score.lang.runtime.bindings;
+/*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information

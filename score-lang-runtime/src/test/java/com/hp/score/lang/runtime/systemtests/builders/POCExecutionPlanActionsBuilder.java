@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
 */
-package com.hp.score.lang.tests.runtime.builders;
+package com.hp.score.lang.runtime.systemtests.builders;
 
 import com.hp.score.api.ControlActionMetadata;
 import com.hp.score.api.ExecutionPlan;
@@ -28,7 +28,7 @@ import com.hp.score.lang.runtime.navigations.Navigations;
 import com.hp.score.lang.runtime.steps.ActionSteps;
 import com.hp.score.lang.runtime.steps.ExecutableSteps;
 import com.hp.score.lang.runtime.steps.TaskSteps;
-import com.hp.score.lang.tests.runtime.actions.LangActions;
+import com.hp.score.lang.runtime.systemtests.actions.LangActions;
 
 import java.io.Serializable;
 import java.util.HashMap;

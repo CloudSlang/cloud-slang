@@ -16,18 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
 */
-package com.hp.score.lang.tests.runtime.steps;
+package com.hp.score.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
-import com.hp.score.lang.runtime.steps.ActionSteps;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -37,7 +37,6 @@ import java.util.Map;
 
 import static com.hp.score.lang.entities.ActionType.JAVA;
 import static com.hp.score.lang.entities.ActionType.PYTHON;
-import static com.hp.score.lang.entities.ScoreLangConstants.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -134,10 +133,11 @@ public class ActionInvokerTest {
         return returnValues;
     }
 
+    @Configuration
     static class Config {
 
         @Bean
-        public ActionSteps actionSteps() {
+        public ActionSteps actionInvoker() {
             return new ActionSteps();
         }
 

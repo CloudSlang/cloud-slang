@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
 */
-package com.hp.score.lang.tests.runtime.actions;
+package com.hp.score.lang.runtime.systemtests.actions;
 
 import com.hp.oo.sdk.content.annotations.Param;
 

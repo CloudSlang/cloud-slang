@@ -16,9 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
 */
-package com.hp.score.lang.tests;
+package com.hp.score.lang.runtime.systemtests;
 
-import com.google.common.collect.ImmutableMap;
 import com.hp.score.api.ExecutionPlan;
 import com.hp.score.api.Score;
 import com.hp.score.api.TriggeringProperties;
@@ -28,8 +27,8 @@ import com.hp.score.events.ScoreEvent;
 import com.hp.score.events.ScoreEventListener;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import com.hp.score.lang.entities.ScoreLangConstants;
-import com.hp.score.lang.tests.runtime.builders.POCExecutionPlanActionsBuilder;
-import com.hp.score.lang.tests.runtime.builders.POCParentExecutionPlanActionsBuilder;
+import com.hp.score.lang.runtime.systemtests.builders.POCExecutionPlanActionsBuilder;
+import com.hp.score.lang.runtime.systemtests.builders.POCParentExecutionPlanActionsBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -105,7 +104,8 @@ public class RuntimeTest {
         Map<String, Serializable> executionContext = createExecutionContext();
         addUserInputs(executionContext);
 
-        Map<String, ExecutionPlan> dependencies = ImmutableMap.of("childFlow", executionPlan);
+        Map<String, ExecutionPlan> dependencies = new HashMap<>();
+        dependencies.put("childFlow", executionPlan);
         TriggeringProperties triggeringProperties = TriggeringProperties
                 .create(parentExecutionPlan)
                 .setContext(executionContext)
