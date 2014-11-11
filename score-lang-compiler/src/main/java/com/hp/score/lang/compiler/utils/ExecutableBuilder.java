@@ -170,10 +170,18 @@ public class ExecutableBuilder {
         List<SlangFile> slangFilesList = dependenciesByNamespace.get(importAlias);
         List<Map> executableList = new ArrayList<>();
         for (SlangFile slangFile : slangFilesList) {
-            executableList.addAll(slangFile.getOperations());
-            Map<Object, Object> flow = new HashMap<>();
-            flow.put(slangFile.getFlow().get(SlangTextualKeys.FLOW_NAME_KEY), null);
-            executableList.add(flow);
+            switch (slangFile.getType()){
+                case OPERATIONS:
+                    executableList.addAll(slangFile.getOperations());
+                    break;
+                case FLOW:
+                    Map<Object, Object> flow = new HashMap<>();
+                    flow.put(slangFile.getFlow().get(SlangTextualKeys.FLOW_NAME_KEY), null);
+                    executableList.add(flow);
+                    break;
+                default:
+                    throw new RuntimeException("File: is not a flow and not an operation");
+            }
         }
         String refIdSuffix = StringUtils.substringAfter(refIdString, ".");
         Map matchingExecutable = Lambda.selectFirst(executableList, hasKey(refIdSuffix));
