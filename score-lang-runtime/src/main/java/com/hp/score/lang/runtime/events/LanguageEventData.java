@@ -29,6 +29,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     public static final String INPUTS = "INPUTS";
     public static final String BOUND_INPUTS = "BOUND_INPUTS";
     public static final String RETURN_VALUES = "RETURN_VALUES";
+    public static final String OUTPUTS = "OUTPUTS";
 
     public static final String ENCRYPTED_VALUE = "*****";
 
@@ -80,6 +81,14 @@ public class LanguageEventData extends HashMap<String, Serializable> {
 
     public void setInputs(Map<String, Serializable> inputs) {
         put(INPUTS, (Serializable)inputs);
+    }
+
+    public Map<String, Serializable> getOutputs() {
+        return (Map<String, Serializable>) get(OUTPUTS);
+    }
+
+    public void setOutputs(Map<String, Serializable> outputs) {
+        put(OUTPUTS, (Serializable) outputs);
     }
 
 }

@@ -68,7 +68,7 @@ public class ActionSteps extends AbstractSteps {
             }
         } catch (Exception ex) {
             fireEvent(executionRuntimeServices, runEnv, EVENT_ACTION_ERROR, ex.getMessage(), Pair.of(EXCEPTION, ex));
-            logger.error(ex.getMessage());
+            logger.error(ex);
         }
 
         //todo: hook
@@ -187,13 +187,13 @@ public class ActionSteps extends AbstractSteps {
     @SuppressWarnings("unchecked")
     private Map<String, String> prepareAndRunPythonAction(
             Map<String, Serializable> callArguments,
-            String pythonScript) throws Exception {
+            String pythonScript) {
 
         if (StringUtils.isNotBlank(pythonScript)) {
             return runPythonAction(callArguments, pythonScript);
         }
 
-        throw new Exception("Python script not found in action data");
+        throw new RuntimeException("Python script not found in action data");
     }
 
     //we need this method to be synchronized so we will ot have multiple scripts run in parallel on the same context

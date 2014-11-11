@@ -23,6 +23,7 @@ import com.hp.score.events.ScoreEvent;
 import com.hp.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.runtime.bindings.InputsBinding;
+import com.hp.score.lang.runtime.bindings.OutputsBinding;
 import com.hp.score.lang.runtime.bindings.ResultsBinding;
 import com.hp.score.lang.runtime.bindings.ScriptEvaluator;
 import com.hp.score.lang.runtime.env.RunEnvironment;
@@ -117,6 +118,11 @@ public class ExecutableStepsTest {
         @Bean
         public InputsBinding inputsBinding(){
             return mock(InputsBinding.class);
+        }
+
+        @Bean
+        public OutputsBinding outputsBinding(){
+            return mock(OutputsBinding.class);
         }
 
         @Bean

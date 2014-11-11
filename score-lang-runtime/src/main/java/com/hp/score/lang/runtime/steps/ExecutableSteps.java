@@ -4,11 +4,14 @@ import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.entities.bindings.Input;
+import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.entities.bindings.Result;
 import com.hp.score.lang.runtime.bindings.InputsBinding;
+import com.hp.score.lang.runtime.bindings.OutputsBinding;
 import com.hp.score.lang.runtime.bindings.ResultsBinding;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,7 +28,6 @@ import static com.hp.score.lang.runtime.events.LanguageEventData.*;
  * Date: 02/11/2014
  * Time: 10:24
  */
-//todo: decide on a name that is suitable for both flow & operation
 @Component
 public class ExecutableSteps extends AbstractSteps {
 
@@ -34,6 +36,9 @@ public class ExecutableSteps extends AbstractSteps {
 
     @Autowired
     private InputsBinding inputsBinding;
+
+    @Autowired
+    private OutputsBinding outputsBinding;
 
     public void startExecutable(@Param(OPERATION_INPUTS_KEY) List<Input> operationInputs,
                                 @Param(RUN_ENV) RunEnvironment runEnv,
@@ -76,7 +81,7 @@ public class ExecutableSteps extends AbstractSteps {
      * @param executionRuntimeServices services supplied by score engine for handling the execution
      */
     public void finishExecutable(@Param(RUN_ENV) RunEnvironment runEnv,
-                                 @Param(EXECUTABLE_OUTPUTS_KEY) LinkedHashMap<String, Serializable> executableOutputs,
+                                 @Param(EXECUTABLE_OUTPUTS_KEY) List<Output> executableOutputs,
                                  @Param(EXECUTABLE_RESULTS_KEY) LinkedList<Result> executableResults,
                                  @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
 
@@ -86,14 +91,14 @@ public class ExecutableSteps extends AbstractSteps {
         Map<String, Serializable> operationContext = runEnv.getStack().popContext();
         ReturnValues actionReturnValues = runEnv.removeReturnValues();
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_START, "Output binding started",
-                Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, executableOutputs),
+                Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable) executableOutputs),
                 Pair.of(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, executableResults),
                 Pair.of("actionReturnValues", actionReturnValues));
 
         // Resolving the result of the operation/flow
         String result = resultsBinding.resolveResult(actionReturnValues.getOutputs(), executableResults, actionReturnValues.getResult());
 
-        Map<String, String> operationReturnOutputs = createOperationBindOutputsContext(operationContext, actionReturnValues.getOutputs(), executableOutputs);
+        Map<String, String> operationReturnOutputs = outputsBinding.bindOperationOutputs(operationContext, actionReturnValues.getOutputs(), executableOutputs);
 
         //todo: hook
 
@@ -105,39 +110,6 @@ public class ExecutableSteps extends AbstractSteps {
     }
 
     private void resolveGroups() {
-    }
-
-    private Map<String, String> createOperationBindOutputsContext(Map<String, Serializable> context,
-                                                                  Map<String, String> retValue,
-                                                                  Map<String, Serializable> outputs) {
-        Map<String, String> tempContext = new LinkedHashMap<>();
-        if (outputs != null) {
-            for (Map.Entry<String, Serializable> output : outputs.entrySet()) {
-                String outputKey = output.getKey();
-                Serializable outputValue = output.getValue();
-                String outputRetValue = null;
-                if (outputValue != null) {
-                    if (outputValue instanceof String) {
-                        // assigning from another param
-                        String paramName = (String) outputValue;
-                        // TODO: missing - evaluate script
-                        outputRetValue = retValue.get(getRetValueKey(paramName));
-                        if (outputRetValue == null)
-                            outputRetValue = paramName;
-                    }
-                } else {
-                    outputRetValue = (String) context.get(outputKey);
-                }
-                tempContext.put(outputKey, outputRetValue);
-            }
-        }
-        return tempContext;
-    }
-
-    private String getRetValueKey(String outputValue) {
-        return outputValue;
-        //todo: temp solution. currently removing the prefix of retVal[ and suffix of ]
-//        return outputValue.substring(7, outputValue.length() - 1);
     }
 
 }
