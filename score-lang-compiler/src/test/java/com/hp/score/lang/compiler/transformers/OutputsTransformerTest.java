@@ -95,7 +95,7 @@ public class OutputsTransformerTest {
         List<Output> outputs = (List<Output>) outputTransformer.transform(outputsMap);
         Output output = outputs.get(2);
         Assert.assertEquals("output3", output.getName());
-        Assert.assertEquals("inputs['input1']", output.getExpression());
+        Assert.assertEquals("slangInputsKey['input1']", output.getExpression());
     }
 
     @org.springframework.context.annotation.Configuration
