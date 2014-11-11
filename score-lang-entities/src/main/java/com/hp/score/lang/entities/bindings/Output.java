@@ -18,12 +18,14 @@
 */
 package com.hp.score.lang.entities.bindings;
 
+import java.io.Serializable;
+
 /**
  * Date: 11/7/2014
  *
  * @author Bonczidai Levente
  */
-public class Output {
+public class Output implements Serializable {
     private final String name;
 
     private final String expression ;

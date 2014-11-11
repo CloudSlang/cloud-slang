@@ -23,7 +23,7 @@ import java.io.Serializable;
 /*
  * Created by orius123 on 05/11/14.
  */
-public class Input {
+public class Input implements Serializable{
 
     private final String name;
 
