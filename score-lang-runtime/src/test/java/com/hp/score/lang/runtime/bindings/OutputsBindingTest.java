@@ -177,9 +177,5 @@ public class OutputsBindingTest {
             return new OutputsBinding();
         }
 
-        @Bean
-        public ScriptEvaluator scriptEvaluator(){
-            return new ScriptEvaluator();
-        }
     }
 }
