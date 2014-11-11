@@ -69,7 +69,7 @@ public class ExecutableSteps extends AbstractSteps {
 
         updateCallArgumentsAndPushContextToStack(runEnv, operationContext, actionArguments);
 
-        sendBindingInputsEvent(operationInputs, operationContext, runEnv, executionRuntimeServices,"Post Input binding for operation/flow ");
+        sendBindingInputsEvent(operationInputs, operationContext, runEnv, executionRuntimeServices,"Post Input binding for operation/flow");
     }
 
     /**

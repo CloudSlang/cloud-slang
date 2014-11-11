@@ -9,14 +9,18 @@ package com.hp.score.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.score.lang.ExecutionRuntimeServices;
+import com.hp.score.lang.entities.bindings.Input;
+import com.hp.score.lang.runtime.bindings.InputsBinding;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.hp.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
@@ -36,7 +40,10 @@ import static com.hp.score.lang.runtime.events.LanguageEventData.RETURN_VALUES;
 @Component
 public class TaskSteps extends AbstractSteps {
 
-    public void beginTask(@Param(TASK_INPUTS_KEY) LinkedHashMap<String, Serializable> taskInputs,
+    @Autowired
+    private InputsBinding inputsBinding;
+
+    public void beginTask(@Param(TASK_INPUTS_KEY) List<Input> taskInputs,
                           @Param(RUN_ENV) RunEnvironment runEnv,
                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
 
@@ -49,9 +56,10 @@ public class TaskSteps extends AbstractSteps {
 
         Map<String, Serializable> flowContext = runEnv.getStack().popContext();
 
-        Map<String, Serializable> operationArguments = createBindInputsMap(flowContext, taskInputs, executionRuntimeServices, runEnv);
+        Map<String, Serializable> operationArguments = inputsBinding.bindInputs(flowContext,taskInputs);
 
         //todo: hook
+        sendBindingInputsEvent(taskInputs, operationArguments,runEnv, executionRuntimeServices,"Task inputs resolved");
 
         updateCallArgumentsAndPushContextToStack(runEnv, flowContext, operationArguments);
     }
