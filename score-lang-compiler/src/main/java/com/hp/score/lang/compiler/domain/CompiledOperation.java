@@ -27,7 +27,6 @@ public class CompiledOperation extends CompiledExecutable {
 
     private final CompiledDoAction compiledDoAction;
 
-
     public CompiledOperation(Map<String, Serializable> preOpActionData, Map<String, Serializable> postOpActionData, CompiledDoAction compiledDoAction) {
         super(preOpActionData, postOpActionData);
         this.compiledDoAction = compiledDoAction;

@@ -28,11 +28,15 @@ public class CompiledTask {
     private final String name;
     private final Map<String, Serializable> preTaskActionData;
     private final Map<String, Serializable> postTaskActionData;
+    private final Map<String, String> navigationStrings;
+    private final String refId;
 
-    public CompiledTask(String name, Map<String, Serializable> preTaskActionData, Map<String, Serializable> postTaskActionData) {
+    public CompiledTask(String name, Map<String, Serializable> preTaskActionData, Map<String, Serializable> postTaskActionData, Map<String, String> navigationStrings, String refId) {
         this.name = name;
         this.preTaskActionData = preTaskActionData;
         this.postTaskActionData = postTaskActionData;
+        this.navigationStrings = navigationStrings;
+        this.refId = refId;
     }
 
     public String getName() {
@@ -45,5 +49,13 @@ public class CompiledTask {
 
     public Map<String, Serializable> getPostTaskActionData() {
         return postTaskActionData;
+    }
+
+    public Map<String, String> getNavigationStrings() {
+        return navigationStrings;
+    }
+
+    public String getRefId() {
+        return refId;
     }
 }

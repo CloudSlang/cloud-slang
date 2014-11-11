@@ -25,7 +25,7 @@ package com.hp.score.lang.compiler.utils;
 import ch.lambdaj.Lambda;
 import ch.lambdaj.function.matcher.Predicate;
 import com.hp.score.lang.compiler.domain.SlangFile;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;

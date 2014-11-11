@@ -16,8 +16,8 @@ flow:
       publish:
         - weather
       navigate:
-        - SUCCESS: SUCCESS
-        - FAILURE: FAILURE
+        SUCCESS: SUCCESS
+        FAILURE: FAILURE
   outputs:
     - weather
   results:

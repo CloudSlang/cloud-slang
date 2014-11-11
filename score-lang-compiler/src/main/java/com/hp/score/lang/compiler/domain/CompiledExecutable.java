@@ -29,6 +29,7 @@ public abstract class CompiledExecutable {
 
     protected final Map<String, Serializable> preExecActionData;
     protected final Map<String, Serializable> postExecActionData;
+    //todo add name
 
     protected CompiledExecutable(Map<String, Serializable> preExecActionData, Map<String, Serializable> postExecActionData) {
         this.preExecActionData = preExecActionData;

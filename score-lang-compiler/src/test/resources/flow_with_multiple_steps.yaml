@@ -1,0 +1,45 @@
+namespace: user.ops
+
+imports:
+  ops: user.ops
+
+flow:
+  name: basic_flow
+  workflow:
+    CheckWeather:
+      do:
+        ops.test_op:
+          - city: input_1
+      publish:
+        - weather
+
+    RealCheckWeather:
+      do:
+        ops.check_Weather:
+          - city: input_1
+      publish:
+        - weather
+      navigate:
+        SUCCESS: RealRealCheckWeather
+        FAILURE: FAILURE
+
+    RealRealCheckWeather:
+      do:
+        ops.check_Weather:
+          - city: input_1
+      publish:
+        - weather
+      navigate:
+        SUCCESS: SUCCESS
+        FAILURE: NotRealCheckWeather
+
+    NotRealCheckWeather:
+      do:
+        ops.check_Weather:
+          - city: input_1
+      publish:
+        - weather
+
+  results:
+    - SUCCESS
+    - FAILURE

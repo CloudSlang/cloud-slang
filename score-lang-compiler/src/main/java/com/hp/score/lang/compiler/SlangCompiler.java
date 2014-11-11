@@ -24,8 +24,11 @@ package com.hp.score.lang.compiler;
 
 import ch.lambdaj.Lambda;
 import com.hp.score.api.ExecutionPlan;
+import com.hp.score.lang.compiler.domain.CompiledFlow;
+import com.hp.score.lang.compiler.domain.CompiledOperation;
 import com.hp.score.lang.compiler.domain.SlangFile;
 import com.hp.score.lang.compiler.utils.ExecutableBuilder;
+import com.hp.score.lang.compiler.utils.ExecutionPlanBuilder;
 import com.hp.score.lang.compiler.utils.NamespaceBuilder;
 import com.hp.score.lang.compiler.utils.YamlParser;
 import com.hp.score.lang.entities.CompilationArtifact;
@@ -48,6 +51,9 @@ public class SlangCompiler {
 
     @Autowired
     private NamespaceBuilder namespaceBuilder;
+
+    @Autowired
+    private ExecutionPlanBuilder executionPlanBuilder;
 
     @Autowired
     private YamlParser yamlParser;
@@ -122,7 +128,8 @@ public class SlangCompiler {
         List<ExecutionPlan> executionPlans = new ArrayList<>();
         for (Map<String, Map<String, Object>> operation : operationsRawData) {
             Map.Entry<String, Map<String, Object>> entry = operation.entrySet().iterator().next();
-            ExecutionPlan executionPlan = executableBuilder.compileExecutable(entry.getValue(), dependenciesByNamespace, SlangFile.Type.OPERATIONS);
+            CompiledOperation compiledOperation = (CompiledOperation) executableBuilder.compileExecutable(entry.getValue(), dependenciesByNamespace, SlangFile.Type.OPERATIONS);
+            ExecutionPlan executionPlan = executionPlanBuilder.createOperationExecutionPlan(compiledOperation);
             executionPlan.setName(entry.getKey());
             executionPlans.add(executionPlan);
         }
@@ -131,7 +138,8 @@ public class SlangCompiler {
 
     private ExecutionPlan compileFlow(Map<String, Object> flowRawData, TreeMap<String, List<SlangFile>> dependenciesByNamespace) {
         String flowName = (String) flowRawData.remove(SlangTextualKeys.FLOW_NAME_KEY);
-        ExecutionPlan executionPlan = executableBuilder.compileExecutable(flowRawData, dependenciesByNamespace, SlangFile.Type.FLOW);
+        CompiledFlow compiledFlow = (CompiledFlow) executableBuilder.compileExecutable(flowRawData, dependenciesByNamespace, SlangFile.Type.FLOW);
+        ExecutionPlan executionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFlow);
         executionPlan.setName(flowName);
         return executionPlan;
     }

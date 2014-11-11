@@ -28,7 +28,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /*
@@ -59,25 +58,15 @@ public class ExecutionStepFactory {
         return beginTaskStep;
     }
 
-    public ExecutionStep createFinishTaskStep(Long index, Map<String, Serializable> postTaskData) {
+    public ExecutionStep createFinishTaskStep(Long index, Map<String, Serializable> postTaskData, Map<String, Long> navigationValues) {
         Validate.notNull(postTaskData, "postTaskData is null");
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.TASK_PUBLISH_KEY, postTaskData.get(SlangTextualKeys.PUBLISH_KEY));
-        actionData.put(ScoreLangConstants.TASK_NAVIGATION_KEY, hackToRunSingleTaskFlow(postTaskData));
+        actionData.put(ScoreLangConstants.TASK_NAVIGATION_KEY, new HashMap<>(navigationValues));
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
         ExecutionStep finishTask = createGeneralStep(index, TASK_STEPS_CLASS, "endTask", ++index, actionData);
         finishTask.setNavigationData(null);
         return finishTask;
-    }
-
-    private LinkedHashMap<String, Long> hackToRunSingleTaskFlow(Map<String, Serializable> postTaskData) {
-        //todo as it name implies this is a hack to run single task flows
-        @SuppressWarnings("unchecked") LinkedHashMap<String, String> navigationStringValues = (LinkedHashMap<String, String>) postTaskData.get(SlangTextualKeys.NAVIGATION_KEY);
-        LinkedHashMap<String, Long> navigationValues = new LinkedHashMap<>();
-        for (String nextStep : navigationStringValues.keySet()) {
-            navigationValues.put(nextStep, 0L);
-        }
-        return navigationValues;
     }
 
     public ExecutionStep createStartStep(Long index, Map<String, Serializable> preExecutableData) {
