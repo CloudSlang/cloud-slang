@@ -20,6 +20,11 @@ operations:
         - input9:
             default: ->input6
             override: true
+        - input10:
+            default: -> input5
+        - input11: ->  5 + 6
+
+
 
       action:
         python_script: |

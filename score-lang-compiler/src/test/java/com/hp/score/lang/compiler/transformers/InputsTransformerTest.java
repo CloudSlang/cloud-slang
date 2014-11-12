@@ -150,6 +150,26 @@ public class InputsTransformerTest {
         Assert.assertNull(input.getDefaultValue());
     }
 
+    @Test
+    public void testLeadingSpaces() throws Exception {
+        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
+        Input input = inputs.get(9);
+        Assert.assertEquals("input10", input.getName());
+        Assert.assertEquals("input5", input.getExpression());
+
+        Assert.assertNull(input.getDefaultValue());
+    }
+
+    @Test
+    public void testLeadingAndTrailingSpaces() throws Exception {
+        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
+        Input input = inputs.get(10);
+        Assert.assertEquals("input11", input.getName());
+        Assert.assertEquals("5 + 6", input.getExpression());
+
+        Assert.assertNull(input.getDefaultValue());
+    }
+
     @org.springframework.context.annotation.Configuration
     public static class Configuration {
 

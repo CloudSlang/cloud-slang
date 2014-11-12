@@ -83,7 +83,7 @@ public abstract class AbstractInputsTransformer {
     }
 
     private String extractExpression(String defaultProp) {
-        return StringUtils.removeStart(defaultProp, SlangTextualKeys.EXPRESSION_PREFIX_KEY);
+        return StringUtils.removeStart(defaultProp, SlangTextualKeys.EXPRESSION_PREFIX_KEY).trim();
     }
 
     private boolean isExpression(Serializable defaultValue) {
