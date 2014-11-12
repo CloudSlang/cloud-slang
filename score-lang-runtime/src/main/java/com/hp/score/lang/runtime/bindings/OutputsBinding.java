@@ -20,6 +20,7 @@ package com.hp.score.lang.runtime.bindings;
 
 import com.hp.score.lang.entities.bindings.Output;
 
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,9 +43,9 @@ public class OutputsBinding {
     @Autowired
     ScriptEvaluator scriptEvaluator;
 
-    public Map<String, String> bindOperationOutputs(Map<String, Serializable> inputs,
-                                                    Map<String, String> actionReturnValues,
-                                                    List<Output> possibleOutputs) {
+    public Map<String, String> bindOutputs(Map<String, Serializable> inputs,
+                                           Map<String, String> actionReturnValues,
+                                           List<Output> possibleOutputs) {
 
         Map<String, String> outputs = new LinkedHashMap<>();
         if (possibleOutputs != null) {
@@ -57,7 +58,9 @@ public class OutputsBinding {
                     //put action outputs
                     scriptContext.putAll(actionReturnValues);
                     //put operation inputs as a map
-                    scriptContext.put(BIND_OUTPUT_FROM_INPUTS_KEY, (Serializable) inputs);
+                    if(MapUtils.isNotEmpty(inputs)) {
+                        scriptContext.put(BIND_OUTPUT_FROM_INPUTS_KEY, (Serializable) inputs);
+                    }
 
                     //evaluate expression
                     Serializable scriptResult = scriptEvaluator.evalExpr(outputExpr, scriptContext);

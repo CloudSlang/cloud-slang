@@ -5,6 +5,7 @@ import com.hp.score.events.ScoreEvent;
 import com.hp.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.runtime.bindings.InputsBinding;
+import com.hp.score.lang.runtime.bindings.OutputsBinding;
 import com.hp.score.lang.runtime.bindings.ScriptEvaluator;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import junit.framework.Assert;
@@ -54,6 +55,9 @@ public class TaskStepsTest {
     @Autowired
     private InputsBinding inputsBinding;
 
+    @Autowired
+    private OutputsBinding outputsBinding;
+
     @Test
     public void testBeginTaskEmptyInputs() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
@@ -97,6 +101,11 @@ public class TaskStepsTest {
         @Bean
         public InputsBinding inputsBinding(){
             return mock(InputsBinding.class);
+        }
+
+        @Bean
+        public OutputsBinding outputsBinding() {
+            return mock(OutputsBinding.class);
         }
 
         @Bean

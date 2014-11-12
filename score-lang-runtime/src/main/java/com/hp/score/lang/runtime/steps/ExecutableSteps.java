@@ -100,7 +100,7 @@ public class ExecutableSteps extends AbstractSteps {
         // Resolving the result of the operation/flow
         String result = resultsBinding.resolveResult(actionReturnValues.getOutputs(), executableResults, actionReturnValues.getResult());
 
-        Map<String, String> operationReturnOutputs = outputsBinding.bindOperationOutputs(operationContext, actionReturnValues.getOutputs(), executableOutputs);
+        Map<String, String> operationReturnOutputs = outputsBinding.bindOutputs(operationContext, actionReturnValues.getOutputs(), executableOutputs);
 
         //todo: hook
 

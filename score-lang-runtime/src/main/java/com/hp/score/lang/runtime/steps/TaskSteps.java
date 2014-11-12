@@ -10,7 +10,9 @@ package com.hp.score.lang.runtime.steps;
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.entities.bindings.Input;
+import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.runtime.bindings.InputsBinding;
+import com.hp.score.lang.runtime.bindings.OutputsBinding;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import org.apache.commons.lang3.tuple.Pair;
@@ -43,6 +45,10 @@ public class TaskSteps extends AbstractSteps {
     @Autowired
     private InputsBinding inputsBinding;
 
+    @Autowired
+    private OutputsBinding outputsBinding;
+
+
     public void beginTask(@Param(TASK_INPUTS_KEY) List<Input> taskInputs,
                           @Param(RUN_ENV) RunEnvironment runEnv,
                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
@@ -66,7 +72,7 @@ public class TaskSteps extends AbstractSteps {
     }
 
     public void endTask(@Param(RUN_ENV) RunEnvironment runEnv,
-                        @Param(TASK_PUBLISH_KEY) LinkedHashMap<String, Serializable> taskPublishValues,
+                        @Param(TASK_PUBLISH_KEY) List<Output> taskPublishValues,
                         @Param(TASK_NAVIGATION_KEY) LinkedHashMap<String, Long> taskNavigationValues,
                         @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
 
@@ -77,8 +83,13 @@ public class TaskSteps extends AbstractSteps {
         Map<String, Serializable> flowContext = runEnv.getStack().popContext();
 
         ReturnValues operationReturnValues = runEnv.removeReturnValues();
-        fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_START, "Output binding started", Pair.of(TASK_PUBLISH_KEY, taskPublishValues), Pair.of(TASK_NAVIGATION_KEY, taskNavigationValues), Pair.of("operationReturnValues", operationReturnValues));
-        Map<String, Serializable> publishValues = createBindOutputsContext(operationReturnValues.getOutputs(), taskPublishValues);
+        fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_START, "Output binding started",
+                    Pair.of(TASK_PUBLISH_KEY, (Serializable)taskPublishValues),
+                    Pair.of(TASK_NAVIGATION_KEY, taskNavigationValues),
+                    Pair.of("operationReturnValues", operationReturnValues));
+
+        Map<String, String> publishValues = outputsBinding.bindOutputs(null, operationReturnValues.getOutputs(), taskPublishValues);
+
         flowContext.putAll(publishValues);
         printMap(flowContext, "flowContext");
 
@@ -93,33 +104,6 @@ public class TaskSteps extends AbstractSteps {
         System.out.println("next position: " + nextPosition);
 
         runEnv.getStack().pushContext(flowContext);
-    }
-
-    private Map<String, Serializable> createBindOutputsContext(Map<String, String> operationResultContext, LinkedHashMap<String, Serializable> taskOutputs) {
-        Map<String, Serializable> tempContext = new LinkedHashMap<>();
-        if (taskOutputs != null) {
-            for (Map.Entry<String, Serializable> output : taskOutputs.entrySet()) {
-                String outputKey = output.getKey();
-                Serializable outputValue = output.getValue();
-                String outputRetValue = null;
-                if (outputValue != null) {
-                    if (outputValue instanceof String) {
-                        // assigning from another param
-                        String paramName = (String) outputValue;
-                        // TODO: missing - evaluate script
-                        outputRetValue = operationResultContext.get(paramName);
-                        if (outputRetValue == null)
-                            outputRetValue = paramName;
-                    } else {
-                        tempContext.put(outputKey, outputValue);
-                    }
-                } else {
-                    outputRetValue = operationResultContext.get(outputKey);
-                }
-                tempContext.put(outputKey, outputRetValue);
-            }
-        }
-        return tempContext;
     }
 
     private Long calculateNextPosition(String result, LinkedHashMap<String, Long> taskNavigationValues) {
