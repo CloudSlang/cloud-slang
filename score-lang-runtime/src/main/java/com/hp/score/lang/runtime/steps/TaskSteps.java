@@ -21,17 +21,11 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import static com.hp.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
-import static com.hp.score.lang.entities.ScoreLangConstants.RUN_ENV;
-import static com.hp.score.lang.entities.ScoreLangConstants.TASK_INPUTS_KEY;
-import static com.hp.score.lang.entities.ScoreLangConstants.TASK_NAVIGATION_KEY;
-import static com.hp.score.lang.entities.ScoreLangConstants.TASK_PUBLISH_KEY;
+import static com.hp.score.lang.entities.ScoreLangConstants.*;
 import static com.hp.score.lang.runtime.events.LanguageEventData.RETURN_VALUES;
 
 /**
@@ -62,18 +56,18 @@ public class TaskSteps extends AbstractSteps {
 
         Map<String, Serializable> flowContext = runEnv.getStack().popContext();
 
-        Map<String, Serializable> operationArguments = inputsBinding.bindInputs(flowContext,taskInputs);
+        Map<String, Serializable> operationArguments = inputsBinding.bindInputs(flowContext, taskInputs);
 
         //todo: hook
 
-        sendBindingInputsEvent(taskInputs, operationArguments,runEnv, executionRuntimeServices,"Task inputs resolved");
+        sendBindingInputsEvent(taskInputs, operationArguments, runEnv, executionRuntimeServices, "Task inputs resolved");
 
         updateCallArgumentsAndPushContextToStack(runEnv, flowContext, operationArguments);
     }
 
     public void endTask(@Param(RUN_ENV) RunEnvironment runEnv,
                         @Param(TASK_PUBLISH_KEY) List<Output> taskPublishValues,
-                        @Param(TASK_NAVIGATION_KEY) LinkedHashMap<String, Long> taskNavigationValues,
+                        @Param(TASK_NAVIGATION_KEY) Map<String, Long> taskNavigationValues,
                         @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
 
         System.out.println("=========");
@@ -84,9 +78,9 @@ public class TaskSteps extends AbstractSteps {
 
         ReturnValues operationReturnValues = runEnv.removeReturnValues();
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_START, "Output binding started",
-                    Pair.of(TASK_PUBLISH_KEY, (Serializable)taskPublishValues),
-                    Pair.of(TASK_NAVIGATION_KEY, taskNavigationValues),
-                    Pair.of("operationReturnValues", operationReturnValues));
+                Pair.of(TASK_PUBLISH_KEY, (Serializable) taskPublishValues),
+                Pair.of(TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues),
+                Pair.of("operationReturnValues", operationReturnValues));
 
         Map<String, String> publishValues = outputsBinding.bindOutputs(null, operationReturnValues.getOutputs(), taskPublishValues);
 
@@ -106,7 +100,7 @@ public class TaskSteps extends AbstractSteps {
         runEnv.getStack().pushContext(flowContext);
     }
 
-    private Long calculateNextPosition(String result, LinkedHashMap<String, Long> taskNavigationValues) {
+    private Long calculateNextPosition(String result, Map<String, Long> taskNavigationValues) {
         //todo: implement
         return taskNavigationValues.get(result);
     }

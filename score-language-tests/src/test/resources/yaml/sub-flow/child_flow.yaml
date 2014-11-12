@@ -1,0 +1,15 @@
+namespace: user.flows
+
+imports:
+  ops: user.ops
+
+flow:
+  name: child_flow
+  inputs:
+    - input1: value
+  workflow:
+    CheckWeather:
+      do:
+        ops.test_op:
+  outputs:
+    - val_output: fromInputs['input1']

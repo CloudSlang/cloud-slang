@@ -18,9 +18,7 @@ import com.hp.score.lang.runtime.env.RunEnvironment;
 import com.hp.score.lang.runtime.steps.AbstractSteps;
 
 import static com.hp.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_STEP_ERROR;
-import static com.hp.score.lang.entities.ScoreLangConstants.NEXT_STEP_ID_KEY;
-import static com.hp.score.lang.entities.ScoreLangConstants.RUN_ENV;
+import static com.hp.score.lang.entities.ScoreLangConstants.*;
 import static com.hp.score.lang.runtime.events.LanguageEventData.EXCEPTION;
 
 /**
@@ -30,9 +28,13 @@ import static com.hp.score.lang.runtime.events.LanguageEventData.EXCEPTION;
  */
 public class Navigations {
 
-	@SuppressWarnings("static-method")
-	public Long navigate(@Param(RUN_ENV) RunEnvironment runEnv, @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices, String subFlowId,
-		@Param(ExecutionParametersConsts.RUNNING_EXECUTION_PLAN_ID) Long RUNNING_EXECUTION_PLAN_ID, @Param(NEXT_STEP_ID_KEY) Long nextStepId) {
+	public Long navigate(
+            @Param(RUN_ENV) RunEnvironment runEnv,
+            @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
+            @Param(REF_ID) String subFlowId,
+		    @Param(ExecutionParametersConsts.RUNNING_EXECUTION_PLAN_ID) Long RUNNING_EXECUTION_PLAN_ID,
+            @Param(NEXT_STEP_ID_KEY) Long nextStepId) {
+
 		if(executionRuntimeServices.hasStepErrorKey()) {
 			AbstractSteps.fireEvent(executionRuntimeServices, runEnv, EVENT_STEP_ERROR, "Error detected during step",
 				Pair.of(EXCEPTION, new RuntimeException(executionRuntimeServices.getStepErrorKey())));

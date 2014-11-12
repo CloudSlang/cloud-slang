@@ -38,7 +38,7 @@ import java.util.Map;
 public class ExecutionStepFactory {
 
     private static final String STEPS_PACKAGE = "com.hp.score.lang.runtime.steps";
-    private static final String TASK_STEPS_CLASS = ".TaskSteps";
+    private static final String TASK_STEPS_CLASS = STEPS_PACKAGE + ".TaskSteps";
     private static final String OPERATION_STEPS_CLASS = STEPS_PACKAGE + ".ExecutableSteps";
     private static final String ACTION_STEPS_CLASS = STEPS_PACKAGE + ".ActionSteps";
     private static final String NAVIGATION_ACTIONS_CLASS = "com.hp.score.lang.runtime.navigations.Navigations";

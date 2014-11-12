@@ -9,9 +9,11 @@ operations:
       inputs:
         - city
       action:
-        python_script: 'print "weather thing"'
+        python_script: |
+          weather = "weather thing"
+          print city
       outputs:
-        - weather: 'great!!'
+        - weather: weather
       results:
-        - SUCCESS: 1 == 1
+        - SUCCESS: 'weather == "weather thing"'
 

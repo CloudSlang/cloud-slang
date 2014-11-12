@@ -34,11 +34,15 @@ public class DoTransformer extends AbstractInputsTransformer implements Transfor
 
     @Override
     public List<Input> transform(LinkedHashMap<String, List> rawData) {
+        //todo handle also String type
         List<Input> result = new ArrayList<>();
         if (MapUtils.isEmpty(rawData)) {
             return result;
         }
         Map.Entry<String, List> inputsEntry = rawData.entrySet().iterator().next();
+        if (inputsEntry.getValue() == null) {
+            return result;
+        }
         for (Object rawInput : inputsEntry.getValue()) {
             Input input = transformSingleInput(rawInput);
             result.add(input);
@@ -48,7 +52,7 @@ public class DoTransformer extends AbstractInputsTransformer implements Transfor
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Scope.BEFORE_EXECUTABLE, Scope.BEFORE_TASK);
+        return Arrays.asList(Scope.BEFORE_TASK);
     }
 
     @Override
