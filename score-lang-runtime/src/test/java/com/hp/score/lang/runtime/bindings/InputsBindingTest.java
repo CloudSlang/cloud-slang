@@ -285,6 +285,27 @@ public class InputsBindingTest {
         Assert.assertTrue("orig context should not change",context.isEmpty());
     }
 
+    @Test
+    public void testComplexExpressionInput() throws Exception {
+        Map<String,Serializable> context = new HashMap<>();
+        context.put("varX",5);
+
+        Input input1 = new Input("input1",null,5,false,false,false);
+        Input input2 = new Input("input2","input1 + 5 + varX");
+        List<Input> inputs = Lists.newArrayList(input1,input2);
+
+        Map<String,Serializable> result = inputsBinding.bindInputs(context,inputs);
+        Assert.assertFalse(result.isEmpty());
+        Assert.assertTrue(result.containsKey("input1"));
+        Assert.assertEquals(5, result.get("input1"));
+        Assert.assertTrue(result.containsKey("input2"));
+        Assert.assertEquals(15, result.get("input2"));
+        Assert.assertEquals(2, result.size());
+
+        Assert.assertEquals("orig context should not change",1,context.size());
+    }
+
+
     private Input createDefaultValueInput(Serializable value){
         return new Input("input1",null,value,false,false,false);
     }
