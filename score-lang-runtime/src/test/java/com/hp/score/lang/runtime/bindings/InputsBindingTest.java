@@ -89,6 +89,8 @@ public class InputsBindingTest {
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
         Assert.assertEquals("xxx", result.get("input1"));
+
+        Assert.assertEquals(1,context.size());
     }
 
     @Test
@@ -101,6 +103,8 @@ public class InputsBindingTest {
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
         Assert.assertEquals(8, result.get("input1"));
+
+        Assert.assertEquals(1,context.size());
     }
 
     @Test
@@ -127,6 +131,8 @@ public class InputsBindingTest {
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
         Assert.assertEquals("val", result.get("input1"));
+
+        Assert.assertTrue(context.isEmpty());
     }
 
     @Test
@@ -140,6 +146,9 @@ public class InputsBindingTest {
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
         Assert.assertEquals(3, result.get("input1"));
+
+        Assert.assertEquals(1,context.size());
+        Assert.assertEquals(3,context.get("input1"));
     }
 
     @Test
@@ -197,6 +206,8 @@ public class InputsBindingTest {
         Assert.assertTrue(result.containsKey("input1"));
         Assert.assertEquals(3, result.get("input1"));
         Assert.assertEquals(1, result.size());
+
+        Assert.assertEquals(2, context.size());
     }
 
     @Test
@@ -253,6 +264,25 @@ public class InputsBindingTest {
         Assert.assertTrue(result.containsKey("input1"));
         Assert.assertEquals(null, result.get("input1"));
         Assert.assertEquals(1, result.size());
+    }
+
+    @Test
+    public void testInputAssignFromAnotherInput() throws Exception {
+        Map<String,Serializable> context = new HashMap<>();
+
+        Input input1 = new Input("input1",null,5,false,false,false);
+        Input input2 = new Input("input2","input1");
+        List<Input> inputs = Lists.newArrayList(input1,input2);
+
+        Map<String,Serializable> result = inputsBinding.bindInputs(context,inputs);
+        Assert.assertFalse(result.isEmpty());
+        Assert.assertTrue(result.containsKey("input1"));
+        Assert.assertEquals(5, result.get("input1"));
+        Assert.assertTrue(result.containsKey("input2"));
+        Assert.assertEquals(5, result.get("input2"));
+        Assert.assertEquals(2, result.size());
+
+        Assert.assertTrue("orig context should not change",context.isEmpty());
     }
 
     private Input createDefaultValueInput(Serializable value){

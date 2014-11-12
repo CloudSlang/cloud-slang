@@ -21,6 +21,7 @@ package com.hp.score.lang.runtime.bindings;
 
 import com.hp.score.lang.entities.bindings.Input;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,24 +45,27 @@ public class InputsBinding {
     public Map<String,Serializable> bindInputs(Map<String,Serializable> context,
                                                List<Input> inputs){
         Map<String,Serializable> resultContext = new HashMap<>();
+        Map<String,Serializable> srcContext = new HashMap<>(context); //we do not want to change original context map
         for(Input input : inputs){
-            bindInput(input,context,resultContext);
+            bindInput(input,srcContext,resultContext);
         }
         return resultContext;
     }
 
-    private void bindInput(Input input, Map<String,Serializable> context,Map<String,Serializable> resultContext) {
+    private void bindInput(Input input, Map<String,Serializable> context,Map<String,Serializable> targetContext) {
         String inputName = input.getName();
-        Serializable value = resolveValue(inputName, input, context);
+        Validate.notEmpty(inputName);
+        Serializable value = resolveValue(inputName, input, context, targetContext);
 
         if(input.isRequired() && value == null) {
             throw new RuntimeException("Input with name :"+ inputName + " is Required, but value is empty");
         }
 
-        resultContext.put(inputName,value);
+        targetContext.put(inputName,value);
     }
 
-    private Serializable resolveValue(String inputName, Input input, Map<String, Serializable> context) {
+    private Serializable resolveValue(String inputName, Input input, Map<String, Serializable> context,
+                                      Map<String, Serializable> targetContext) {
         Serializable value = null;
 
         if(context.containsKey(inputName) && !input.isOverride()){
@@ -73,8 +77,11 @@ public class InputsBinding {
         }
 
         if(value == null && StringUtils.isNotEmpty(input.getExpression())){
+            Map<String,Serializable> scriptContext = new HashMap<>(context); //we do not want to change original context map
+            scriptContext.putAll(targetContext);//so you can resolve previous inputs already binded
+
             String expr = input.getExpression();
-            value = scriptEvaluator.evalExpr(expr, context);
+            value = scriptEvaluator.evalExpr(expr, scriptContext);
         }
 
         return value;
