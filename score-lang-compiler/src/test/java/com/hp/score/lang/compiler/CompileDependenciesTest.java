@@ -27,7 +27,6 @@ import com.hp.score.lang.compiler.configuration.SlangCompilerSpringConfig;
 import com.hp.score.lang.entities.CompilationArtifact;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -108,6 +107,18 @@ public class CompileDependenciesTest {
     }
 
     @Test
+    public void pathHasDirectoriesInIt() throws Exception {
+        URI flow = getClass().getResource("/flow.yaml").toURI();
+        URI notImportedOperation = getClass().getResource("/").toURI();
+        List<File> path = new ArrayList<>();
+        path.add(new File(notImportedOperation));
+
+        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
+        Assert.assertThat(compilationArtifact.getDependencies(), Matchers.<String, ExecutionPlan>hasKey("user.ops.test_op"));
+        Assert.assertThat(compilationArtifact.getDependencies(), not(Matchers.<String, ExecutionPlan>hasKey("slang.sample.flows.SimpleFlow")));
+    }
+
+    @Test
     public void sourceFileIsADirectory() throws Exception {
         URI dir = getClass().getResource("/").toURI();
 
@@ -117,11 +128,24 @@ public class CompileDependenciesTest {
         compiler.compileFlow(new File(dir), null);
     }
 
-    @Ignore
+    @Test
+    public void bothFileAreDependentOnTheSameFile() throws Exception {
+        URI flow = getClass().getResource("/circular-dependencies/parent_flow.yaml").toURI();
+        URI child_flow = getClass().getResource("/circular-dependencies/child_flow.yaml").toURI();
+        URI operation = getClass().getResource("/operation.yaml").toURI();
+        List<File> path = new ArrayList<>();
+        path.add(new File(child_flow));
+        path.add(new File(operation));
+        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
+        ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
+        Assert.assertNotNull(executionPlan);
+        Assert.assertEquals("different number of dependencies than expected", 5, compilationArtifact.getDependencies().size());
+    }
+
     @Test
     public void circularDependencies() throws Exception {
         URI flow = getClass().getResource("/circular-dependencies/parent_flow.yaml").toURI();
-        URI child_flow = getClass().getResource("/circular-dependencies/child_flow.yaml").toURI();
+        URI child_flow = getClass().getResource("/circular-dependencies/circular_child_flow.yaml").toURI();
         URI operation = getClass().getResource("/operation.yaml").toURI();
         List<File> path = new ArrayList<>();
         path.add(new File(child_flow));

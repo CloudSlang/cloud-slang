@@ -1,0 +1,11 @@
+namespace: user.flows.circualr
+
+imports:
+  flows: user.flows.circualr
+
+flow:
+  name: child_flow
+  workflow:
+    CheckWeather:
+      do:
+        flows.parent_flow:

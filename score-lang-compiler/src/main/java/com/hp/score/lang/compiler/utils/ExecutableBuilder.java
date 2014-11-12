@@ -178,7 +178,7 @@ public class ExecutableBuilder {
         String refIdSuffix = StringUtils.substringAfter(refIdString, ".");
         Map matchingExecutable = Lambda.selectFirst(executableList, hasKey(refIdSuffix));
         if (matchingExecutable == null) {
-            throw new RuntimeException("No executable was found in the classpath that for ref: " + refIdString);
+            throw new RuntimeException("No executable was found in the path that for ref: " + refIdString);
         }
         return slangFilesList.get(0).getNamespace() + "." + refIdSuffix;
     }
