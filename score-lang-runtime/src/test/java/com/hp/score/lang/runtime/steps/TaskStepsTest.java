@@ -3,9 +3,11 @@ package com.hp.score.lang.runtime.steps;
 import com.hp.score.events.ScoreEvent;
 import com.hp.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.entities.bindings.Input;
+import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.runtime.bindings.InputsBinding;
 import com.hp.score.lang.runtime.bindings.OutputsBinding;
 import com.hp.score.lang.runtime.bindings.ScriptEvaluator;
+import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import com.hp.score.lang.runtime.events.LanguageEventData;
 import junit.framework.Assert;
@@ -22,6 +24,9 @@ import java.io.Serializable;
 import java.util.*;
 
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -70,7 +75,7 @@ public class TaskStepsTest {
     public void testBeginTaskInputsEvents() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
-        List<Input> inputs = Arrays.asList(new Input("input1","input1"),new Input("input2","input2"));
+        List<Input> inputs = Arrays.asList(new Input("input1", "input1"), new Input("input2", "input2"));
         Map<String,Serializable> resultMap = new HashMap<>();
         resultMap.put("input1",5);
         resultMap.put("input2",3);
@@ -97,10 +102,33 @@ public class TaskStepsTest {
     }
 
 
-    /*@Test
+    @Test
     public void testEndTask() throws Exception {
+        RunEnvironment runEnv = new RunEnvironment();
+        ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String,String>(),""));
+        runEnv.getStack().pushContext(new HashMap<String, Serializable>());
 
-    }*/
+        when(outputsBinding.bindOutputs(anyMap(), anyMap(), anyList())).thenReturn(new HashMap<String, String>());
+        taskSteps.endTask(runEnv, new ArrayList<Output>(),new HashMap<String, Long>(),runtimeServices, "task1");
+
+
+        Collection<ScoreEvent> events = runtimeServices.getEvents();
+        Assert.assertEquals(2,events.size());
+        Iterator<ScoreEvent> eventsIter = events.iterator();
+        ScoreEvent outputStart = eventsIter.next();
+        Assert.assertEquals(EVENT_OUTPUT_START,outputStart.getEventType());
+
+        Map<String,Serializable> eventData = (Map<String,Serializable>)outputStart.getData();
+        Assert.assertEquals("task1",eventData.get(LanguageEventData.levelName.TASK_NAME.name()));
+
+        ScoreEvent outputEnd = eventsIter.next();
+        Assert.assertEquals(EVENT_OUTPUT_END,outputEnd.getEventType());
+
+        eventData = (Map<String,Serializable>)outputEnd.getData();
+        Assert.assertEquals("task1",eventData.get(LanguageEventData.levelName.TASK_NAME.name()));
+
+    }
 
     @Configuration
     static class Config{

@@ -72,7 +72,8 @@ public class TaskSteps extends AbstractSteps {
     public void endTask(@Param(RUN_ENV) RunEnvironment runEnv,
                         @Param(TASK_PUBLISH_KEY) List<Output> taskPublishValues,
                         @Param(TASK_NAVIGATION_KEY) Map<String, Long> taskNavigationValues,
-                        @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
+                        @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
+                        @Param(ScoreLangConstants.TASK_NAME_KEY) String taskName) {
 
         System.out.println("=========");
         System.out.println(" endTask ");
@@ -84,7 +85,7 @@ public class TaskSteps extends AbstractSteps {
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_START, "Output binding started",
                 Pair.of(TASK_PUBLISH_KEY, (Serializable) taskPublishValues),
                 Pair.of(TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues),
-                Pair.of("operationReturnValues", operationReturnValues));
+                Pair.of("operationReturnValues", operationReturnValues),Pair.of(LanguageEventData.levelName.TASK_NAME.name(),taskName));
 
         Map<String, String> publishValues = outputsBinding.bindOutputs(null, operationReturnValues.getOutputs(), taskPublishValues);
 
@@ -97,7 +98,9 @@ public class TaskSteps extends AbstractSteps {
         runEnv.putNextStepPosition(nextPosition);
         ReturnValues returnValues = new ReturnValues(new HashMap<String, String>(), operationReturnValues.getResult());
         runEnv.putReturnValues(returnValues);
-        fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_END, "Output binding finished", Pair.of(RETURN_VALUES, returnValues), Pair.of("nextPosition", nextPosition));
+        fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_END, "Output binding finished",
+                Pair.of(RETURN_VALUES, returnValues), Pair.of("nextPosition", nextPosition),
+                Pair.of(LanguageEventData.levelName.TASK_NAME.name(),taskName));
         printReturnValues(returnValues);
         System.out.println("next position: " + nextPosition);
 
