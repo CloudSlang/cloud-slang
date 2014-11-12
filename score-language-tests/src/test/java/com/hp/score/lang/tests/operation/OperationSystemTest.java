@@ -109,8 +109,6 @@ public class OperationSystemTest {
         userInputs.put("input2", "value2");
         userInputs.put("input4", "value4");
         userInputs.put("input5", "value5");
-        //not supposed to be supplied
-        userInputs.put("input6", "value6");
         ScoreEvent event = triggerOperation(executionPlan, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
