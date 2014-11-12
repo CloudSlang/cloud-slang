@@ -1,6 +1,5 @@
 package com.hp.score.lang.runtime.steps;
 
-import com.google.common.collect.Lists;
 import com.hp.score.events.ScoreEvent;
 import com.hp.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.entities.bindings.Input;
@@ -70,7 +69,7 @@ public class TaskStepsTest {
     public void testBeginTaskInputsEvents() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
-        List<Input> inputs = Lists.newArrayList(new Input("input1","input1"),new Input("input2","input2"));
+        List<Input> inputs = Arrays.asList(new Input("input1","input1"),new Input("input2","input2"));
         Map<String,Serializable> resultMap = new HashMap<>();
         resultMap.put("input1",5);
         resultMap.put("input2",3);

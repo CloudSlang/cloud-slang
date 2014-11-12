@@ -7,7 +7,7 @@ imports:
 flow:
   name: parent_flow
   inputs:
-    - input11
+    - input1
   workflow:
     CheckWeather:
       do:
