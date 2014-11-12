@@ -138,6 +138,18 @@ public class InputsTransformerTest {
         Assert.assertEquals(true, input.isRequired());
     }
 
+    @Test
+    public void testOverrideInput() throws Exception {
+        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
+        Input input = inputs.get(8);
+        Assert.assertEquals("input9", input.getName());
+        Assert.assertEquals("input6", input.getExpression());
+        Assert.assertTrue(input.isOverride());
+        Assert.assertFalse(input.isEncrypted());
+        Assert.assertTrue(input.isRequired());
+        Assert.assertNull(input.getDefaultValue());
+    }
+
     @org.springframework.context.annotation.Configuration
     public static class Configuration {
 
