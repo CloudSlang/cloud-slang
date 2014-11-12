@@ -27,6 +27,8 @@ public interface ScoreLangConstants {
 
     String RUN_ENV = "runEnv";
     String HOOKS = "hooks";
+    String NODE_NAME_KEY = "nodeName";
+
     //action scope
     String ACTION_CLASS_KEY = "className";
     String ACTION_TYPE = "actionType";
@@ -48,7 +50,7 @@ public interface ScoreLangConstants {
     String TASK_PUBLISH_KEY = "taskPublishValues";
     String TASK_NAVIGATION_KEY = "taskNavigationValues";
     String REF_ID = "subFlowId";
-    String TASK_NAME_KEY = "taskName";
+
 
 	String EVENT_STEP_ERROR = "EVENT_STEP_ERROR";
 	String EVENT_ACTION_START = "EVENT_ACTION_START";
