@@ -63,7 +63,7 @@ public abstract class AbstractSteps {
     }
 
     @SafeVarargs
-    protected static void fireEvent(ExecutionRuntimeServices runtimeServices, RunEnvironment runEnvironment, String type, String description, Map.Entry<String, ? extends Serializable>... fields) {
+	public static void fireEvent(ExecutionRuntimeServices runtimeServices, RunEnvironment runEnvironment, String type, String description, Map.Entry<String, ? extends Serializable>... fields) {
         LanguageEventData eventData = new LanguageEventData();
         eventData.setEventType(type);
         eventData.setDescription(description);

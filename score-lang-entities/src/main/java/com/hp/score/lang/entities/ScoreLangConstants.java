@@ -49,6 +49,7 @@ public interface ScoreLangConstants {
     String TASK_NAVIGATION_KEY = "taskNavigationValues";
     String REF_ID = "subFlowId";
 
+	String EVENT_STEP_ERROR = "EVENT_STEP_ERROR";
 	String EVENT_ACTION_START = "EVENT_ACTION_START";
 	String EVENT_ACTION_END = "EVENT_ACTION_END";
 	String EVENT_ACTION_ERROR = "EVENT_ACTION_ERROR";

@@ -138,6 +138,7 @@ public class RuntimeTest {
 		handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
 		handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
 		handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
+		handlerTypes.add(EVENT_STEP_ERROR);
 		handlerTypes.add(EVENT_ACTION_START);
 		handlerTypes.add(EVENT_ACTION_END);
 		handlerTypes.add(EVENT_ACTION_ERROR);
