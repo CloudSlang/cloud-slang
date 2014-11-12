@@ -66,7 +66,7 @@ public class TaskStepsTest {
         Assert.assertTrue(callArgs.isEmpty());
     }
 
-    @Test
+    @Test(timeout = 3000L)
     public void testBeginTaskInputsEvents() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();

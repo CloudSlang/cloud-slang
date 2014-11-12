@@ -45,11 +45,12 @@ public class ExecutionStepFactory {
     private static final String SIMPLE_NAVIGATION_METHOD = "navigate";
 
 
-    public ExecutionStep createBeginTaskStep(Long index, Map<String, Serializable> preTaskData, String refId) {
+    public ExecutionStep createBeginTaskStep(Long index, Map<String, Serializable> preTaskData, String refId, String taskName) {
         Validate.notNull(preTaskData, "preTaskData is null");
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.TASK_INPUTS_KEY, preTaskData.get(SlangTextualKeys.DO_KEY));
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
+        actionData.put(ScoreLangConstants.TASK_NAME_KEY,taskName);
         ExecutionStep beginTaskStep = createGeneralStep(index, TASK_STEPS_CLASS, "beginTask", ++index, actionData);
 
         HashMap<String, Object> navigationData = new HashMap<>(new HashMap<>(beginTaskStep.getNavigationData()));
@@ -59,12 +60,14 @@ public class ExecutionStepFactory {
         return beginTaskStep;
     }
 
-    public ExecutionStep createFinishTaskStep(Long index, Map<String, Serializable> postTaskData, Map<String, Long> navigationValues) {
+    public ExecutionStep createFinishTaskStep(Long index, Map<String, Serializable> postTaskData,
+                                              Map<String, Long> navigationValues, String taskName) {
         Validate.notNull(postTaskData, "postTaskData is null");
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.TASK_PUBLISH_KEY, postTaskData.get(SlangTextualKeys.PUBLISH_KEY));
         actionData.put(ScoreLangConstants.TASK_NAVIGATION_KEY, new HashMap<>(navigationValues));
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
+        actionData.put(ScoreLangConstants.TASK_NAME_KEY,taskName);
         ExecutionStep finishTask = createGeneralStep(index, TASK_STEPS_CLASS, "endTask", ++index, actionData);
         finishTask.setNavigationData(null);
         return finishTask;

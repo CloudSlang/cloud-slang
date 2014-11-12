@@ -26,7 +26,10 @@ import com.hp.score.lang.entities.ScoreLangConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
@@ -85,21 +88,24 @@ public class ExecutionPlanBuilder {
 
     private Long buildTaskExecutionSteps(ExecutionPlan executionPlan, Long stepsIndex, Map<String, Long> tasksReferences,
                                          CompiledTask compiledTask, List<CompiledTask> compiledTasks) {
+        String taskName = compiledTask.getName();
         //Begin Task
-        tasksReferences.put(compiledTask.getName(), stepsIndex);
-        executionPlan.addStep(stepFactory.createBeginTaskStep(stepsIndex++, compiledTask.getPreTaskActionData(), compiledTask.getRefId()));
+        tasksReferences.put(taskName, stepsIndex);
+        executionPlan.addStep(stepFactory.createBeginTaskStep(stepsIndex++, compiledTask.getPreTaskActionData(),
+                compiledTask.getRefId(),taskName));
         Long endTaskIndex = stepsIndex++;
 
         //End Task
         Map<String, Long> navigationValues = new LinkedHashMap<>();
         for (Map.Entry<String, String> entry : compiledTask.getNavigationStrings().entrySet()) {
             if (tasksReferences.get(entry.getValue()) == null) {
-                CompiledTask nextTaskToCompile = Lambda.selectFirst(compiledTasks, having(on(CompiledTask.class).getName(), equalTo(entry.getValue())));
+                CompiledTask nextTaskToCompile = Lambda.selectFirst(compiledTasks,
+                        having(on(CompiledTask.class).getName(), equalTo(entry.getValue())));
                 stepsIndex = buildTaskExecutionSteps(executionPlan, stepsIndex, tasksReferences, nextTaskToCompile, compiledTasks);
-            }
-            navigationValues.put(entry.getKey(), tasksReferences.get(entry.getValue()));
+            }            navigationValues.put(entry.getKey(), tasksReferences.get(entry.getValue()));
         }
-        executionPlan.addStep(stepFactory.createFinishTaskStep(endTaskIndex, compiledTask.getPostTaskActionData(), navigationValues));
+        executionPlan.addStep(stepFactory.createFinishTaskStep(endTaskIndex, compiledTask.getPostTaskActionData(),
+                navigationValues, taskName));
         return stepsIndex;
         //todo do we have tasks that no one ref to?
     }
