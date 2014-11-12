@@ -58,7 +58,7 @@ public class OutputsBindingTest {
         Map<String, String> actionReturnValues = new HashMap<>();
         List<Output> outputs = new LinkedList<>();
 
-        Map<String, String> result = outputsBinding.bindOperationOutputs(operationContext, actionReturnValues, outputs);
+        Map<String, String> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
 
         Assert.assertTrue("result cannot be null", result != null);
         Assert.assertTrue("result should be empty", result.isEmpty());
@@ -70,7 +70,7 @@ public class OutputsBindingTest {
         Map<String, String> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Lists.newArrayList(createNoExpressionOutput("host1"));
 
-        Map<String, String> result = outputsBinding.bindOperationOutputs(operationContext, actionReturnValues, outputs);
+        Map<String, String> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
 
         Map<String, String> expectedOutputs = new HashMap<>();
         expectedOutputs.put("host1", "valueHost1");
@@ -84,7 +84,7 @@ public class OutputsBindingTest {
         Map<String, String> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Lists.newArrayList(createNoExpressionOutput("host1"), createNoExpressionOutput("host2"));
 
-        Map<String, String> result = outputsBinding.bindOperationOutputs(operationContext, actionReturnValues, outputs);
+        Map<String, String> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
 
         Map<String, String> expectedOutputs = new HashMap<>();
         expectedOutputs.put("host1", "valueHost1");
@@ -100,7 +100,7 @@ public class OutputsBindingTest {
         Map<String, String> actionReturnValues = new HashMap<>();
         List<Output> outputs = Lists.newArrayList(createNoExpressionOutput("actionOutputKey1"));
 
-        outputsBinding.bindOperationOutputs(operationContext, actionReturnValues, outputs);
+        outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -109,7 +109,7 @@ public class OutputsBindingTest {
         Map<String, String> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Lists.newArrayList(createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(fromInputs['port'])"));
 
-        Map<String, String> result = outputsBinding.bindOperationOutputs(operationContext, actionReturnValues, outputs);
+        Map<String, String> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
 
         Map<String, String> expectedOutputs = new HashMap<>();
         expectedOutputs.put("hostFromExpression", "http://hostExpr:9999");
@@ -123,7 +123,7 @@ public class OutputsBindingTest {
         Map<String, String> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Lists.newArrayList(createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(fromInputs[SHOULD_BE_STRING])"));
 
-        outputsBinding.bindOperationOutputs(operationContext, actionReturnValues, outputs);
+        outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -134,7 +134,7 @@ public class OutputsBindingTest {
                 createNoExpressionOutput("host1"),
                 createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(fromInputs['port'])"));
 
-        Map<String, String> result = outputsBinding.bindOperationOutputs(operationContext, actionReturnValues, outputs);
+        Map<String, String> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
 
         Map<String, String> expectedOutputs = new HashMap<>();
         expectedOutputs.put("hostFromExpression", "http://hostExpr:9999");

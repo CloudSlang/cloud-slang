@@ -23,6 +23,7 @@ import com.hp.score.api.ExecutionPlan;
 import com.hp.score.api.ExecutionStep;
 import com.hp.score.lang.entities.ActionType;
 import com.hp.score.lang.entities.ScoreLangConstants;
+import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.entities.bindings.Result;
 import com.hp.score.lang.runtime.navigations.Navigations;
 import com.hp.score.lang.runtime.steps.ActionSteps;
@@ -76,8 +77,8 @@ public class POCParentExecutionPlanActionsBuilder {
 
     private ExecutionStep createSecondFinishTaskStep() {
         Map<String, Serializable> actionData = new HashMap<>();
-        HashMap<String, Serializable> taskPublishValues = createFirstTaskPublishValues();
-        actionData.put("taskPublishValues", taskPublishValues);
+        LinkedList<Output> taskPublishValues = createFirstTaskPublishValues();
+        actionData.put(ScoreLangConstants.TASK_PUBLISH_KEY, taskPublishValues);
         HashMap<String, Long> taskNavigationValues = createSecondTaskNavigationValues();
         actionData.put("taskNavigationValues", taskNavigationValues);
         ExecutionStep finishTask = createGeneralStep(index, TaskSteps.class.getName(), "endTask", ++index, actionData);
@@ -168,8 +169,8 @@ public class POCParentExecutionPlanActionsBuilder {
 
     private ExecutionStep createFirstFinishTaskStep() {
         Map<String, Serializable> actionData = new HashMap<>();
-        HashMap<String, Serializable> taskPublishValues = createFirstTaskPublishValues();
-        actionData.put("taskPublishValues", taskPublishValues);
+        LinkedList<Output>  taskPublishValues = createFirstTaskPublishValues();
+        actionData.put(ScoreLangConstants.TASK_PUBLISH_KEY, taskPublishValues);
         HashMap<String, Long> taskNavigationValues = createFirstTaskNavigationValues();
         actionData.put("taskNavigationValues", taskNavigationValues);
         ExecutionStep finishTask = createGeneralStep(index, TaskSteps.class.getName(), "endTask", ++index, actionData);
@@ -202,10 +203,10 @@ public class POCParentExecutionPlanActionsBuilder {
         return flowInputs;
     }
 
-    private HashMap<String, Serializable> createFirstTaskPublishValues() {
-        LinkedHashMap<String, Serializable> taskPublishValues = new LinkedHashMap<>();
-        taskPublishValues.put("user", null);
-        taskPublishValues.put("dur", "duration");
+    private LinkedList<Output> createFirstTaskPublishValues() {
+        LinkedList<Output> taskPublishValues = new LinkedList<> ();
+        taskPublishValues.add(new Output("user", "user"));
+        taskPublishValues.add(new Output("dur", "duration"));
         return taskPublishValues;
     }
 
@@ -225,7 +226,7 @@ public class POCParentExecutionPlanActionsBuilder {
 
     private HashMap<String, Serializable> createFlowOutputs() {
         LinkedHashMap<String, Serializable> flowOutputs = new LinkedHashMap<>();
-        flowOutputs.put("flow_url", "$task_url");
+        flowOutputs.put("flow_url", "task_url");
         return flowOutputs;
     }
 

@@ -12,7 +12,7 @@ flow:
     CheckWeather:
       do:
         ops.check_Weather:
-          - city: city_name
+          - city: ->city_name
       publish:
         - weather
       navigate:

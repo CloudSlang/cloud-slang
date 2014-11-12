@@ -18,6 +18,7 @@
 */
 package com.hp.score.lang.compiler.transformers;
 
+import com.hp.score.lang.compiler.SlangTextualKeys;
 import com.hp.score.lang.compiler.domain.SlangFile;
 import com.hp.score.lang.compiler.utils.YamlParser;
 import com.hp.score.lang.entities.bindings.Output;
@@ -65,7 +66,7 @@ public class OutputsTransformerTest {
         SlangFile file = yamlParser.loadSlangFile(new File(resource.toURI()));
         Map op = file.getOperations().iterator().next();
         Map<String, Object> opProp = (Map) op.get("test_op_2");
-        outputsMap = opProp.get("outputs");
+        outputsMap = opProp.get(SlangTextualKeys.OUTPUTS_KEY);
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)

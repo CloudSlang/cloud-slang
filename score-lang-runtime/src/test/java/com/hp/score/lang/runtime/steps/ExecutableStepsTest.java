@@ -22,13 +22,17 @@ package com.hp.score.lang.runtime.steps;
 import com.hp.score.events.ScoreEvent;
 import com.hp.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.entities.bindings.Input;
+import com.hp.score.lang.entities.bindings.Output;
+import com.hp.score.lang.entities.bindings.Result;
 import com.hp.score.lang.runtime.bindings.InputsBinding;
 import com.hp.score.lang.runtime.bindings.OutputsBinding;
 import com.hp.score.lang.runtime.bindings.ResultsBinding;
 import com.hp.score.lang.runtime.bindings.ScriptEvaluator;
+import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import com.hp.score.lang.runtime.events.LanguageEventData;
 import junit.framework.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.python.google.common.collect.Lists;
@@ -40,11 +44,17 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.script.ScriptEngine;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
 import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -57,6 +67,9 @@ public class ExecutableStepsTest {
 
     @Autowired
     private InputsBinding inputsBinding;
+
+    @Autowired
+    private ResultsBinding resultsBinding;
 
     @Test
     public void testStart() throws Exception {
@@ -90,8 +103,8 @@ public class ExecutableStepsTest {
         RunEnvironment runEnv = new RunEnvironment();
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         Map<String,Serializable> resultMap = new HashMap<>();
-        resultMap.put("input1",5);
-        resultMap.put("input2",3);
+        resultMap.put("input1", 5);
+        resultMap.put("input2", 3);
 
         when(inputsBinding.bindInputs(anyMap(),eq(inputs))).thenReturn(resultMap);
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Serializable>(), runtimeServices);
@@ -108,8 +121,24 @@ public class ExecutableStepsTest {
         Map<String,Serializable> eventData = (Map<String,Serializable>)boundInputEvent.getData();
         Assert.assertTrue(eventData.containsKey(LanguageEventData.BOUND_INPUTS));
         Map<String,Serializable> inputsBounded = (Map<String,Serializable>)eventData.get(LanguageEventData.BOUND_INPUTS);
-        Assert.assertEquals(5,inputsBounded.get("input1"));
+        Assert.assertEquals(5, inputsBounded.get("input1"));
         Assert.assertEquals(LanguageEventData.ENCRYPTED_VALUE,inputsBounded.get("input2"));
+    }
+
+    @Test
+    @Ignore
+    public void testFinishExecutableWithResult() throws Exception {
+        List<Result> results = Lists.newArrayList(new Result("SUCCESS","true"));
+        RunEnvironment runEnv = new RunEnvironment();
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), null));
+
+        String boundResult = "SUCCESS";
+
+        when(resultsBinding.resolveResult(anyMapOf(String.class, String.class), eq(results), isNull(String.class))).thenReturn(boundResult);
+        executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), results, new ExecutionRuntimeServices());
+
+        ReturnValues returnValues= runEnv.removeReturnValues();
+        Assert.assertTrue(returnValues.getResult().equals(boundResult));
     }
 
     @Configuration
