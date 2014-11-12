@@ -5,6 +5,8 @@ imports:
 
 flow:
   name: basic_flow
+  inputs:
+    - input1
   workflow:
     CheckWeather:
       do:
