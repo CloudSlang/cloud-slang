@@ -131,12 +131,18 @@ public class ExecutableBuilder {
         return new CompiledTask(taskName, preTaskData, postTaskData, navigationStrings, refId);
     }
 
-    private Map<String, Serializable> runTransformers(Map<String, Object> taskRawData, List<Transformer> scopeTransfomers) {
+    private Map<String, Serializable> runTransformers(Map<String, Object> rawData, List<Transformer> scopeTransformers) {
         Map<String, Serializable> transformedData = new HashMap<>();
-        for (Transformer transformer : scopeTransfomers) {
+        for (Transformer transformer : scopeTransformers) {
             String key = keyToTransform(transformer);
-            @SuppressWarnings("unchecked") Object value = transformer.transform(taskRawData.get(key));
-            transformedData.put(key, (Serializable) value);
+            try {
+                @SuppressWarnings("unchecked") Object value = transformer.transform(rawData.get(key));
+                transformedData.put(key, (Serializable) value);
+            } catch (ClassCastException e){
+                String message = "\nFailed casting for transformer: " + transformer.getClass().getName() + " with key: " + key + "\n" +
+                        "Raw data is: " + rawData.toString();
+                throw new RuntimeException(message, e);
+            }
         }
         return transformedData;
     }

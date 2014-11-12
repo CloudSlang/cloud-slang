@@ -1,0 +1,26 @@
+namespace: user.flows
+
+imports:
+  ops: user.ops
+  flows: user.flows
+
+flow:
+  name: parent_flow
+  inputs:
+    - input11
+  workflow:
+    CheckWeather:
+      do:
+        ops.check_Weather:
+          - city: input_1
+      publish:
+        - weather
+
+    SubFlow:
+      do:
+        flows.child_flow:
+      publish:
+        - val_output
+  results:
+    - SUCCESS
+    - FAILURE

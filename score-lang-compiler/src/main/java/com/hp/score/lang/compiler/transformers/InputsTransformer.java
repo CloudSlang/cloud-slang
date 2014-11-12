@@ -54,7 +54,7 @@ public class InputsTransformer extends AbstractInputsTransformer implements Tran
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Scope.BEFORE_EXECUTABLE, Scope.BEFORE_TASK);
+        return Arrays.asList(Scope.BEFORE_EXECUTABLE);
     }
 
     @Override
