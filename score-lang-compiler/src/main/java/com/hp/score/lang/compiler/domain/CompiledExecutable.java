@@ -22,18 +22,35 @@ package com.hp.score.lang.compiler.domain;
  * Created by orius123 on 05/11/14.
  */
 
+import com.hp.score.lang.entities.bindings.Input;
+import com.hp.score.lang.entities.bindings.Output;
+import com.hp.score.lang.entities.bindings.Result;
+
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 public abstract class CompiledExecutable {
 
     protected final Map<String, Serializable> preExecActionData;
     protected final Map<String, Serializable> postExecActionData;
-    //todo add name
+    protected final String name;
+    protected final List<Input> inputs;
+    protected final List<Output> outputs;
+    protected final List<Result> results;
 
-    protected CompiledExecutable(Map<String, Serializable> preExecActionData, Map<String, Serializable> postExecActionData) {
+    protected CompiledExecutable(Map<String, Serializable> preExecActionData,
+                                 Map<String, Serializable> postExecActionData,
+                                 String name,
+                                 List<Input> inputs,
+                                 List<Output> outputs,
+                                 List<Result> results) {
         this.preExecActionData = preExecActionData;
         this.postExecActionData = postExecActionData;
+        this.name = name;
+        this.inputs = inputs;
+        this.outputs = outputs;
+        this.results = results;
     }
 
     public Map<String, Serializable> getPreExecActionData() {
@@ -44,5 +61,19 @@ public abstract class CompiledExecutable {
         return postExecActionData;
     }
 
+    public String getName() {
+        return name;
+    }
 
+    public List<Input> getInputs() {
+        return inputs;
+    }
+
+    public List<Output> getOutputs() {
+        return outputs;
+    }
+
+    public List<Result> getResults() {
+        return results;
+    }
 }

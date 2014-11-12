@@ -22,7 +22,7 @@ import com.hp.score.api.ExecutionPlan;
 import com.hp.score.lang.compiler.domain.CompiledFlow;
 import com.hp.score.lang.compiler.domain.CompiledOperation;
 import com.hp.score.lang.compiler.domain.CompiledTask;
-import com.hp.score.lang.entities.ScoreLangConstants;
+import com.hp.score.lang.entities.bindings.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -46,19 +46,21 @@ public class ExecutionPlanBuilder {
 
     private static final String SLANG_NAME = "slang";
 
-    public ExecutionPlan createOperationExecutionPlan(CompiledOperation compiledOperation) {
+    public ExecutionPlan createOperationExecutionPlan(CompiledOperation compiledOp) {
         ExecutionPlan executionPlan = new ExecutionPlan();
+        executionPlan.setName(compiledOp.getName());
         executionPlan.setLanguage(SLANG_NAME);
         executionPlan.setBeginStep(1L);
 
-        executionPlan.addStep(stepFactory.createStartStep(1L, compiledOperation.getPreExecActionData()));
-        executionPlan.addStep(stepFactory.createActionStep(2L, compiledOperation.getCompiledDoAction().getActionData()));
-        executionPlan.addStep(stepFactory.createEndStep(3L, compiledOperation.getPostExecActionData()));
+        executionPlan.addStep(stepFactory.createStartStep(1L, compiledOp.getPreExecActionData(), compiledOp.getInputs()));
+        executionPlan.addStep(stepFactory.createActionStep(2L, compiledOp.getCompiledDoAction().getActionData()));
+        executionPlan.addStep(stepFactory.createEndStep(3L, compiledOp.getPostExecActionData(), compiledOp.getOutputs(), compiledOp.getResults()));
         return executionPlan;
     }
 
     public ExecutionPlan createFlowExecutionPlan(CompiledFlow compiledFlow) {
         ExecutionPlan executionPlan = new ExecutionPlan();
+        executionPlan.setName(compiledFlow.getName());
         executionPlan.setLanguage(SLANG_NAME);
 
         final long FLOW_END_STEP_INDEX = 0L;
@@ -66,15 +68,16 @@ public class ExecutionPlanBuilder {
         Long stepsIndex = 1L;
         executionPlan.setBeginStep(stepsIndex);
         //flow start step
-        executionPlan.addStep(stepFactory.createStartStep(stepsIndex++, compiledFlow.getPreExecActionData()));
+        executionPlan.addStep(stepFactory.createStartStep(stepsIndex++, compiledFlow.getPreExecActionData(), compiledFlow.getInputs()));
         //flow end step
-        executionPlan.addStep(stepFactory.createEndStep(FLOW_END_STEP_INDEX, compiledFlow.getPostExecActionData()));
+        executionPlan.addStep(stepFactory.createEndStep(FLOW_END_STEP_INDEX, compiledFlow.getPostExecActionData(), compiledFlow.getOutputs(), compiledFlow.getResults()));
 
         Map<String, Long> tasksReferences = new HashMap<>();
-        tasksReferences.put(ScoreLangConstants.SUCCESS_RESULT, FLOW_END_STEP_INDEX); //todo take actual flow results
-        tasksReferences.put(ScoreLangConstants.FAILURE_RESULT, FLOW_END_STEP_INDEX); //todo take actual flow results
+        for (Result result : compiledFlow.getResults()) {
+            tasksReferences.put(result.getName(), FLOW_END_STEP_INDEX);
+        }
 
-        List<CompiledTask> compiledTasks = compiledFlow.getCompiledWorkflow().getCompiledTasks();//todo get only names
+        List<CompiledTask> compiledTasks = compiledFlow.getCompiledWorkflow().getCompiledTasks();
         for (CompiledTask compiledTask : compiledTasks) {
             if (tasksReferences.get(compiledTask.getName()) != null) {
                 continue;
@@ -92,7 +95,7 @@ public class ExecutionPlanBuilder {
         //Begin Task
         tasksReferences.put(taskName, stepsIndex);
         executionPlan.addStep(stepFactory.createBeginTaskStep(stepsIndex++, compiledTask.getPreTaskActionData(),
-                compiledTask.getRefId(),taskName));
+                compiledTask.getRefId(), taskName));
         Long endTaskIndex = stepsIndex++;
 
         //End Task
@@ -102,7 +105,8 @@ public class ExecutionPlanBuilder {
                 CompiledTask nextTaskToCompile = Lambda.selectFirst(compiledTasks,
                         having(on(CompiledTask.class).getName(), equalTo(entry.getValue())));
                 stepsIndex = buildTaskExecutionSteps(executionPlan, stepsIndex, tasksReferences, nextTaskToCompile, compiledTasks);
-            }            navigationValues.put(entry.getKey(), tasksReferences.get(entry.getValue()));
+            }
+            navigationValues.put(entry.getKey(), tasksReferences.get(entry.getValue()));
         }
         executionPlan.addStep(stepFactory.createFinishTaskStep(endTaskIndex, compiledTask.getPostTaskActionData(),
                 navigationValues, taskName));

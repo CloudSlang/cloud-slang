@@ -17,7 +17,12 @@ package com.hp.score.lang.compiler.domain;/*
  * under the License.
 */
 
+import com.hp.score.lang.entities.bindings.Input;
+import com.hp.score.lang.entities.bindings.Output;
+import com.hp.score.lang.entities.bindings.Result;
+
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 /*
@@ -27,8 +32,14 @@ public class CompiledFlow extends CompiledExecutable {
 
     private final CompiledWorkflow compiledWorkflow;
 
-    public CompiledFlow(Map<String, Serializable> preOpActionData, Map<String, Serializable> postOpActionData, CompiledWorkflow compiledWorkflow) {
-        super(preOpActionData, postOpActionData);
+    public CompiledFlow(Map<String, Serializable> preOpActionData,
+                        Map<String, Serializable> postOpActionData,
+                        CompiledWorkflow compiledWorkflow,
+                        String name,
+                        List<Input> inputs,
+                        List<Output> outputs,
+                        List<Result> results) {
+        super(preOpActionData, postOpActionData, name, inputs, outputs, results);
         this.compiledWorkflow = compiledWorkflow;
     }
 

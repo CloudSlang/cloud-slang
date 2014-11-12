@@ -90,13 +90,13 @@ public class CompileBasicFlowTest {
         @SuppressWarnings("unchecked") List<Input> taskArguments = (List<Input>) beginTaskStep.getActionData().get(ScoreLangConstants.TASK_INPUTS_KEY);
         Assert.assertNotNull("arguments doesn't exist", taskArguments);
         Assert.assertEquals("there is a different number of arguments than expected", 1, taskArguments.size());
-        Assert.assertEquals("city",taskArguments.get(0).getName());
-        Assert.assertEquals("CheckWeather",beginTaskStep.getActionData().get(ScoreLangConstants.TASK_NAME_KEY));
+        Assert.assertEquals("city", taskArguments.get(0).getName());
+        Assert.assertEquals("CheckWeather", beginTaskStep.getActionData().get(ScoreLangConstants.TASK_NAME_KEY));
 
         ExecutionStep FinishTaskSteps = executionPlan.getStep(3L);
         Object publish = FinishTaskSteps.getActionData().get(ScoreLangConstants.TASK_PUBLISH_KEY); //todo test
         @SuppressWarnings("unchecked") Map<String, String> navigate = (Map<String, String>) FinishTaskSteps.getActionData().get(ScoreLangConstants.TASK_NAVIGATION_KEY);
-        Assert.assertEquals("CheckWeather",FinishTaskSteps.getActionData().get(ScoreLangConstants.TASK_NAME_KEY));
+        Assert.assertEquals("CheckWeather", FinishTaskSteps.getActionData().get(ScoreLangConstants.TASK_NAME_KEY));
 
         Assert.assertNotNull("publish don't exist", publish);
         Assert.assertNotNull("navigate don't exist", navigate);
@@ -104,13 +104,13 @@ public class CompileBasicFlowTest {
 
 
         ExecutionStep endStep = executionPlan.getStep(0L);
-        @SuppressWarnings("unchecked") List<Output>  outputs = (List<Output>) endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY);
+        @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY);
         Assert.assertNotNull("outputs don't exist", outputs);
         Assert.assertEquals("there is a different number of outputs than expected", 1, outputs.size());
 
         @SuppressWarnings("unchecked") List<Result> results = (List<Result>) endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_RESULTS_KEY);
         Assert.assertNotNull("results don't exist", results);
-        Assert.assertEquals("there is a different number of results values than expected", 1, results.size());
+        Assert.assertEquals("there is a different number of results values than expected", 2, results.size());
     }
 
 }

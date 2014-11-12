@@ -22,6 +22,9 @@ import com.hp.score.lang.compiler.SlangTextualKeys;
 import com.hp.score.lang.compiler.domain.*;
 import com.hp.score.lang.compiler.transformers.Transformer;
 import com.hp.score.lang.entities.ScoreLangConstants;
+import com.hp.score.lang.entities.bindings.Input;
+import com.hp.score.lang.entities.bindings.Output;
+import com.hp.score.lang.entities.bindings.Result;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -48,7 +51,7 @@ public class ExecutableBuilder {
     @Autowired
     private List<Transformer> transformers;
 
-    public CompiledExecutable compileExecutable(Map<String, Object> executableRawData, TreeMap<String, List<SlangFile>> dependenciesByNamespace, SlangFile.Type type) {
+    public CompiledExecutable compileExecutable(String execName, Map<String, Object> executableRawData, TreeMap<String, List<SlangFile>> dependenciesByNamespace, SlangFile.Type type) {
         Map<String, Serializable> preExecutableActionData = new HashMap<>();
         Map<String, Serializable> postExecutableActionData = new HashMap<>();
 
@@ -62,14 +65,18 @@ public class ExecutableBuilder {
 
         postExecutableActionData.putAll(runTransformers(executableRawData, postExecTransformers));
 
+        @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) preExecutableActionData.remove(SlangTextualKeys.INPUTS_KEY);
+        @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) postExecutableActionData.remove(SlangTextualKeys.OUTPUTS_KEY);
+        @SuppressWarnings("unchecked") List<Result> results = (List<Result>) postExecutableActionData.remove(SlangTextualKeys.RESULTS_KEY);
+
         if (type == SlangFile.Type.FLOW) {
             @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> workFlowRawData = (LinkedHashMap<String, Map<String, Object>>) executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
             CompiledWorkflow compiledWorkflow = compileWorkFlow(workFlowRawData, dependenciesByNamespace);
-            return new CompiledFlow(preExecutableActionData, postExecutableActionData, compiledWorkflow);
+            return new CompiledFlow(preExecutableActionData, postExecutableActionData, compiledWorkflow, execName, inputs, outputs, results);
         } else {
             @SuppressWarnings("unchecked") Map<String, Object> actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
             CompiledDoAction compiledDoAction = compileAction(actionRawData);
-            return new CompiledOperation(preExecutableActionData, postExecutableActionData, compiledDoAction);
+            return new CompiledOperation(preExecutableActionData, postExecutableActionData, compiledDoAction, execName, inputs, outputs, results);
         }
     }
 
@@ -138,7 +145,7 @@ public class ExecutableBuilder {
             try {
                 @SuppressWarnings("unchecked") Object value = transformer.transform(rawData.get(key));
                 transformedData.put(key, (Serializable) value);
-            } catch (ClassCastException e){
+            } catch (ClassCastException e) {
                 String message = "\nFailed casting for transformer: " + transformer.getClass().getName() + " with key: " + key + "\n" +
                         "Raw data is: " + rawData.toString();
                 throw new RuntimeException(message, e);

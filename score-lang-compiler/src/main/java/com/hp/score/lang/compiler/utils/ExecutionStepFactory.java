@@ -23,12 +23,16 @@ import com.hp.score.api.ExecutionStep;
 import com.hp.score.lang.compiler.SlangTextualKeys;
 import com.hp.score.lang.entities.ActionType;
 import com.hp.score.lang.entities.ScoreLangConstants;
+import com.hp.score.lang.entities.bindings.Input;
+import com.hp.score.lang.entities.bindings.Output;
+import com.hp.score.lang.entities.bindings.Result;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.Validate;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /*
@@ -50,7 +54,7 @@ public class ExecutionStepFactory {
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.TASK_INPUTS_KEY, preTaskData.get(SlangTextualKeys.DO_KEY));
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
-        actionData.put(ScoreLangConstants.TASK_NAME_KEY,taskName);
+        actionData.put(ScoreLangConstants.TASK_NAME_KEY, taskName);
         ExecutionStep beginTaskStep = createGeneralStep(index, TASK_STEPS_CLASS, "beginTask", ++index, actionData);
 
         HashMap<String, Object> navigationData = new HashMap<>(new HashMap<>(beginTaskStep.getNavigationData()));
@@ -67,17 +71,18 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.TASK_PUBLISH_KEY, postTaskData.get(SlangTextualKeys.PUBLISH_KEY));
         actionData.put(ScoreLangConstants.TASK_NAVIGATION_KEY, new HashMap<>(navigationValues));
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
-        actionData.put(ScoreLangConstants.TASK_NAME_KEY,taskName);
+        actionData.put(ScoreLangConstants.TASK_NAME_KEY, taskName);
         ExecutionStep finishTask = createGeneralStep(index, TASK_STEPS_CLASS, "endTask", ++index, actionData);
         finishTask.setNavigationData(null);
         return finishTask;
     }
 
-    public ExecutionStep createStartStep(Long index, Map<String, Serializable> preExecutableData) {
+    public ExecutionStep createStartStep(Long index, Map<String, Serializable> preExecutableData, List<Input> execInputs) {
         Validate.notNull(preExecutableData, "preExecutableData is null");
+        Validate.notNull(execInputs, "Executable inputs are null");
         Map<String, Serializable> actionData = new HashMap<>();
-        actionData.put(ScoreLangConstants.OPERATION_INPUTS_KEY, preExecutableData.get(SlangTextualKeys.INPUTS_KEY));
-        actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
+        actionData.put(ScoreLangConstants.OPERATION_INPUTS_KEY, (Serializable) execInputs);
+        actionData.put(ScoreLangConstants.HOOKS, (Serializable) preExecutableData);
         return createGeneralStep(index, OPERATION_STEPS_CLASS, "startExecutable", ++index, actionData);
     }
 
@@ -95,12 +100,15 @@ public class ExecutionStepFactory {
         return createGeneralStep(index, ACTION_STEPS_CLASS, "doAction", ++index, actionData);
     }
 
-    public ExecutionStep createEndStep(Long index, Map<String, Serializable> postExecutableData) {
+    public ExecutionStep createEndStep(Long index, Map<String, Serializable> postExecutableData,
+                                       List<Output> outputs, List<Result> results) {
         Validate.notNull(postExecutableData, "postExecutableData is null");
+        Validate.notNull(outputs, "Executable outputs are null");
+        Validate.notNull(results, "Executable results are null");
         Map<String, Serializable> actionData = new HashMap<>();
-        actionData.put(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, postExecutableData.get(SlangTextualKeys.OUTPUTS_KEY));
-        actionData.put(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, postExecutableData.get(SlangTextualKeys.RESULT_KEY));
-        actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
+        actionData.put(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable) outputs);
+        actionData.put(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable) results);
+        actionData.put(ScoreLangConstants.HOOKS, (Serializable) postExecutableData);
         return createGeneralStep(index, OPERATION_STEPS_CLASS, "finishExecutable", null, actionData);
     }
 

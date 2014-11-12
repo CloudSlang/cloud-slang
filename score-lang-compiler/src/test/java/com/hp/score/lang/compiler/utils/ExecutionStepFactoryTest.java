@@ -3,11 +3,15 @@ package com.hp.score.lang.compiler.utils;
 import com.hp.score.api.ExecutionStep;
 import com.hp.score.lang.compiler.SlangTextualKeys;
 import com.hp.score.lang.entities.ScoreLangConstants;
+import com.hp.score.lang.entities.bindings.Input;
+import com.hp.score.lang.entities.bindings.Output;
+import com.hp.score.lang.entities.bindings.Result;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ExecutionStepFactoryTest {
@@ -21,23 +25,26 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateStartStep() throws Exception {
-        ExecutionStep startStep = factory.createStartStep(1L, new HashMap<String, Serializable>());
+        ExecutionStep startStep = factory.createStartStep(1L, new HashMap<String, Serializable>(), new ArrayList<Input>());
         Assert.assertNotNull("step should not be null", startStep);
     }
 
     @Test
     public void testCreateStartStepPutInputsUnderTheRightKey() throws Exception {
-        String placeHolder = "place_holder";
-        HashMap<String, Serializable> preOpData = new HashMap<>();
-        preOpData.put(SlangTextualKeys.INPUTS_KEY, placeHolder);
-        ExecutionStep startStep = factory.createStartStep(1L, preOpData);
+        ArrayList<Input> execInputs = new ArrayList<>();
+        ExecutionStep startStep = factory.createStartStep(1L, new HashMap<String, Serializable>(), execInputs);
         Assert.assertNotNull("inputs key is null", startStep.getActionData().get(ScoreLangConstants.OPERATION_INPUTS_KEY));
-        Assert.assertEquals("inputs are not set under their key", placeHolder, startStep.getActionData().get(ScoreLangConstants.OPERATION_INPUTS_KEY));
+        Assert.assertSame("inputs are not set under their key", execInputs, startStep.getActionData().get(ScoreLangConstants.OPERATION_INPUTS_KEY));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateStartStepWithNullData() throws Exception {
-        factory.createStartStep(1L, null);
+        factory.createStartStep(1L, null, new ArrayList<Input>());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateStartStepWithNullInputs() throws Exception {
+        factory.createStartStep(1L, new HashMap<String, Serializable>(), null);
     }
 
     @Test
@@ -64,32 +71,38 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateEndStep() throws Exception {
-        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>());
+        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), new ArrayList<Result>());
         Assert.assertNotNull("step should not be null", endStep);
     }
 
     @Test
     public void testCreateEndStepPutOutputsUnderTheRightKey() throws Exception {
-        String placeHolder = "place_holder";
-        HashMap<String, Serializable> postOpData = new HashMap<>();
-        postOpData.put(SlangTextualKeys.OUTPUTS_KEY, placeHolder);
-        ExecutionStep endStep = factory.createEndStep(1L, postOpData);
+        ArrayList<Output> outputs = new ArrayList<>();
+        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), outputs, new ArrayList<Result>());
         Assert.assertNotNull("outputs key is null", endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY));
-        Assert.assertEquals("outputs are not set under their key", placeHolder, endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY));
+        Assert.assertSame("outputs are not set under their key", outputs, endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY));
     }
 
     @Test
     public void testCreateEndStepPutResultsUnderTheRightKey() throws Exception {
-        String placeHolder = "place_holder";
-        HashMap<String, Serializable> postOpData = new HashMap<>();
-        postOpData.put(SlangTextualKeys.RESULT_KEY, placeHolder);
-        ExecutionStep endStep = factory.createEndStep(1L, postOpData);
+        ArrayList<Result> results = new ArrayList<>();
+        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), results);
         Assert.assertNotNull("results key is null", endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_RESULTS_KEY));
-        Assert.assertEquals("results are not set under their key", placeHolder, endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_RESULTS_KEY));
+        Assert.assertSame("results are not set under their key", results, endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_RESULTS_KEY));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateEndStepWithNullData() throws Exception {
-        factory.createEndStep(1L, null);
+        factory.createEndStep(1L, null, new ArrayList<Output>(), new ArrayList<Result>());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateEndStepWithNullOutputs() throws Exception {
+        factory.createEndStep(1L, new HashMap<String, Serializable>(), null, new ArrayList<Result>());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateEndStepWithNullResults() throws Exception {
+        factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), null);
     }
 }

@@ -20,5 +20,3 @@ flow:
         FAILURE: FAILURE
   outputs:
     - weather
-  results:
-    - SUCCESS

@@ -70,9 +70,9 @@ public class ResultsTransformerTest {
     private List getResultsFromOperationFile(String fileName, String operationName) throws URISyntaxException {
         URL resource = getClass().getResource(fileName);
         SlangFile file = yamlParser.loadSlangFile(new File(resource.toURI()));
-        Map<String, Map<String, Object>> op =  file.getOperations().iterator().next();
-        Map<String,  Object> operationWithData = op.get(operationName);
-        return (List)operationWithData.get(SlangTextualKeys.RESULT_KEY);
+        Map<String, Map<String, Object>> op = file.getOperations().iterator().next();
+        Map<String, Object> operationWithData = op.get(operationName);
+        return (List) operationWithData.get(SlangTextualKeys.RESULTS_KEY);
     }
 
     @Test
@@ -118,19 +118,19 @@ public class ResultsTransformerTest {
     static class Config {
 
         @Bean
-        public Yaml yaml(){
+        public Yaml yaml() {
             Yaml yaml = new Yaml();
             yaml.setBeanAccess(BeanAccess.FIELD);
             return yaml;
         }
 
         @Bean
-        public YamlParser yamlParser(){
+        public YamlParser yamlParser() {
             return new YamlParser();
         }
 
         @Bean
-        public ResultsTransformer resultsTransformer(){
+        public ResultsTransformer resultsTransformer() {
             return new ResultsTransformer();
         }
     }
