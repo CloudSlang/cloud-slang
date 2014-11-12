@@ -77,7 +77,13 @@ public class OperationSystemTest {
         URL resource = getClass().getResource("/yaml/operation.yaml");
         ExecutionPlan executionPlan = compiler.compile(new File(resource.toURI()), "test_op", null).getExecutionPlan();
         //Trigger ExecutionPlan
-        Map<String, Serializable> executionContext = createExecutionContext(new HashMap<String, Serializable>());
+        Map<String, Serializable> userInputs = new HashMap<>();
+        ScoreEvent event = triggerOperation(executionPlan, userInputs);
+        Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
+    }
+
+    private ScoreEvent triggerOperation(ExecutionPlan executionPlan, Map<String, Serializable> userInputs) throws InterruptedException {
+        Map<String, Serializable> executionContext = createExecutionContext(userInputs);
 
         TriggeringProperties triggeringProperties = TriggeringProperties
                 .create(executionPlan)
@@ -90,7 +96,7 @@ public class OperationSystemTest {
             event = queue.take();
             System.out.println("Event received: " + event.getEventType() + " Data is: " + event.getData());
         } while(!EventConstants.SCORE_FINISHED_EVENT.equals(event.getEventType()));
-        Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
+        return event;
     }
 
     @Test
@@ -105,19 +111,7 @@ public class OperationSystemTest {
         userInputs.put("input5", "value5");
         //not supposed to be supplied
         userInputs.put("input6", "value6");
-        Map<String, Serializable> executionContext = createExecutionContext(userInputs);
-
-        TriggeringProperties triggeringProperties = TriggeringProperties
-                .create(executionPlan)
-                .setContext(executionContext);
-
-        registerHandlers();
-        score.trigger(triggeringProperties);
-        ScoreEvent event;
-        do {
-            event = queue.take();
-            System.out.println("Event received: " + event.getEventType() + " Data is: " + event.getData());
-        } while(!EventConstants.SCORE_FINISHED_EVENT.equals(event.getEventType()));
+        ScoreEvent event = triggerOperation(executionPlan, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 
