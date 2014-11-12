@@ -23,6 +23,7 @@ import com.hp.score.api.ExecutionPlan;
 import com.hp.score.api.ExecutionStep;
 import com.hp.score.lang.entities.ActionType;
 import com.hp.score.lang.entities.ScoreLangConstants;
+import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.entities.bindings.Result;
 import com.hp.score.lang.runtime.navigations.Navigations;
 import com.hp.score.lang.runtime.steps.ActionSteps;
@@ -116,8 +117,8 @@ public class POCExecutionPlanActionsBuilder {
 
     private ExecutionStep createFirstFinishTaskStep() {
         Map<String, Serializable> actionData = new HashMap<>();
-        HashMap<String, Serializable> taskPublishValues = createTaskPublishValues();
-        actionData.put("taskPublishValues", taskPublishValues);
+        LinkedList<Output> taskPublishValues = createTaskPublishValues();
+        actionData.put(ScoreLangConstants.TASK_PUBLISH_KEY, taskPublishValues);
         HashMap<String, Long> taskNavigationValues = createFirstTaskNavigationValues();
         actionData.put("taskNavigationValues", taskNavigationValues);
         ExecutionStep finishTask = createGeneralStep(index, TaskSteps.class.getName(), "endTask", ++index, actionData);
@@ -159,7 +160,7 @@ public class POCExecutionPlanActionsBuilder {
 
     private HashMap<String, Serializable> createOperationOutputs() {
         LinkedHashMap<String, Serializable> operationOutputs = new LinkedHashMap<>();
-        operationOutputs.put("user", null);
+        operationOutputs.put("user", "user");
         operationOutputs.put("duration", "dur");
         return operationOutputs;
     }
@@ -171,10 +172,10 @@ public class POCExecutionPlanActionsBuilder {
         return operationResults;
     }
 
-    private HashMap<String, Serializable> createTaskPublishValues() {
-        LinkedHashMap<String, Serializable> taskPublishValues = new LinkedHashMap<>();
-        taskPublishValues.put("user", null);
-        taskPublishValues.put("duration", null);
+    private LinkedList<Output> createTaskPublishValues() {
+        LinkedList<Output> taskPublishValues = new LinkedList<>();
+        taskPublishValues.add(new Output("user", "user"));
+        taskPublishValues.add(new Output("duration", "duration"));
         return taskPublishValues;
     }
 
@@ -187,7 +188,7 @@ public class POCExecutionPlanActionsBuilder {
 
     private HashMap<String, Serializable> createFlowOutputs() {
         LinkedHashMap<String, Serializable> flowOutputs = new LinkedHashMap<>();
-        flowOutputs.put("user", null);
+        flowOutputs.put("user", "user");
         flowOutputs.put("duration", null);
         return flowOutputs;
     }

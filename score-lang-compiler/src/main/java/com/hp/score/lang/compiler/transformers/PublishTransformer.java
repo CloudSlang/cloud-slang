@@ -22,18 +22,18 @@ package com.hp.score.lang.compiler.transformers;
  * Created by orius123 on 05/11/14.
  */
 
+import com.hp.score.lang.entities.bindings.Output;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Component
-public class PublishTransformer implements Transformer<List<Object>, String> {
-
+public class PublishTransformer extends AbstractOutputsTransformer implements Transformer<List<Object>, List<Output>> {
 
     @Override
-    public String transform(List<Object> rawData) {
-        return "hi";
+    public List<Output> transform(List<Object> rawData) {
+        return super.transform(rawData);
     }
 
     @Override
