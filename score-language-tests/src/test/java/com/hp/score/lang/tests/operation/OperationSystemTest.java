@@ -29,7 +29,6 @@ import com.hp.score.lang.compiler.SlangCompiler;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,12 +73,11 @@ public class OperationSystemTest {
     LinkedBlockingQueue<ScoreEvent> queue = new LinkedBlockingQueue<>();
 
     @Test
-    @Ignore
     public void testCompileAndRunOperationBasic() throws Exception {
         URL resource = getClass().getResource("/yaml/operation.yaml");
         ExecutionPlan executionPlan = compiler.compile(new File(resource.toURI()), "test_op", null).getExecutionPlan();
         //Trigger ExecutionPlan
-        Map<String, Serializable> executionContext = createExecutionContext();
+        Map<String, Serializable> executionContext = createExecutionContext(new HashMap<String, Serializable>());
 
         TriggeringProperties triggeringProperties = TriggeringProperties
                 .create(executionPlan)
@@ -90,15 +88,43 @@ public class OperationSystemTest {
         ScoreEvent event;
         do {
             event = queue.take();
-            System.out.println("Event recieved: " + event);
+            System.out.println("Event received: " + event.getEventType() + " Data is: " + event.getData());
         } while(!EventConstants.SCORE_FINISHED_EVENT.equals(event.getEventType()));
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 
-    private static Map<String, Serializable> createExecutionContext() {
+    @Test
+    public void testCompileAndRunOperationWithData() throws Exception {
+        URL resource = getClass().getResource("/yaml/operation_with_data.yaml");
+        ExecutionPlan executionPlan = compiler.compile(new File(resource.toURI()), "test_op_2", null).getExecutionPlan();
+        //Trigger ExecutionPlan
+        Map<String, Serializable> userInputs = new HashMap<>();
+        userInputs.put("input1", "value1");
+        userInputs.put("input2", "value2");
+        userInputs.put("input4", "value4");
+        userInputs.put("input5", "value5");
+        //not supposed to be supplied
+        userInputs.put("input6", "value6");
+        Map<String, Serializable> executionContext = createExecutionContext(userInputs);
+
+        TriggeringProperties triggeringProperties = TriggeringProperties
+                .create(executionPlan)
+                .setContext(executionContext);
+
+        registerHandlers();
+        score.trigger(triggeringProperties);
+        ScoreEvent event;
+        do {
+            event = queue.take();
+            System.out.println("Event received: " + event.getEventType() + " Data is: " + event.getData());
+        } while(!EventConstants.SCORE_FINISHED_EVENT.equals(event.getEventType()));
+        Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
+    }
+
+    private static Map<String, Serializable> createExecutionContext(Map<String, Serializable> userInputs) {
         Map<String, Serializable> executionContext = new HashMap<>();
         executionContext.put(ScoreLangConstants.RUN_ENV, new RunEnvironment());
-        executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, new HashMap<String, Serializable>());
+        executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable) userInputs);
         return executionContext;
     }
 

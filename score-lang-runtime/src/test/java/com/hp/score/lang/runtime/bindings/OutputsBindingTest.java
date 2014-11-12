@@ -19,18 +19,19 @@
 package com.hp.score.lang.runtime.bindings;
 
 import com.hp.score.lang.entities.bindings.Output;
-import com.hp.score.lang.runtime.configuration.SlangRuntimeSpringConfig;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.python.google.common.collect.Lists;
+import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -43,7 +44,7 @@ import java.util.Map;
  * @author Bonczidai Levente
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes=OutputsBindingTest.Config.class)
+@ContextConfiguration(classes = OutputsBindingTest.Config.class)
 public class OutputsBindingTest {
 
     private static final long DEFAULT_TIMEOUT = 10000;
@@ -51,7 +52,7 @@ public class OutputsBindingTest {
     @Autowired
     private OutputsBinding outputsBinding;
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testOperationEmptyOutputs() throws Exception {
         Map<String, Serializable> operationContext = new HashMap<>();
         Map<String, String> actionReturnValues = new HashMap<>();
@@ -63,11 +64,11 @@ public class OutputsBindingTest {
         Assert.assertTrue("result should be empty", result.isEmpty());
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testOperationOutputsNoExpression() throws Exception {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, String> actionReturnValues = prepareActionReturnValues();
-        List<Output> outputs =  Lists.newArrayList(createNoExpressionOutput("host1"));
+        List<Output> outputs = Lists.newArrayList(createNoExpressionOutput("host1"));
 
         Map<String, String> result = outputsBinding.bindOperationOutputs(operationContext, actionReturnValues, outputs);
 
@@ -77,11 +78,11 @@ public class OutputsBindingTest {
         Assert.assertEquals("Binding results are not as expected", expectedOutputs, result);
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testOperationOutputsNoExpressionMultipleOutputs() throws Exception {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, String> actionReturnValues = prepareActionReturnValues();
-        List<Output> outputs =  Lists.newArrayList(createNoExpressionOutput("host1"), createNoExpressionOutput("host2"));
+        List<Output> outputs = Lists.newArrayList(createNoExpressionOutput("host1"), createNoExpressionOutput("host2"));
 
         Map<String, String> result = outputsBinding.bindOperationOutputs(operationContext, actionReturnValues, outputs);
 
@@ -93,20 +94,20 @@ public class OutputsBindingTest {
     }
 
     //todo: do we want to throw an exception?
-    @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
+    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void testMissingOperationOutputsNoExpression() throws Exception {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, String> actionReturnValues = new HashMap<>();
-        List<Output> outputs =  Lists.newArrayList(createNoExpressionOutput("actionOutputKey1"));
+        List<Output> outputs = Lists.newArrayList(createNoExpressionOutput("actionOutputKey1"));
 
         outputsBinding.bindOperationOutputs(operationContext, actionReturnValues, outputs);
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testOperationOutputsExpression() throws Exception {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, String> actionReturnValues = prepareActionReturnValues();
-        List<Output> outputs =  Lists.newArrayList(createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(slangInputsKey['port'])"));
+        List<Output> outputs = Lists.newArrayList(createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(slangInputsKey['port'])"));
 
         Map<String, String> result = outputsBinding.bindOperationOutputs(operationContext, actionReturnValues, outputs);
 
@@ -116,20 +117,20 @@ public class OutputsBindingTest {
         Assert.assertEquals("Binding results are not as expected", expectedOutputs, result);
     }
 
-    @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
+    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void testOperationOutputsInvalidExpression() throws Exception {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, String> actionReturnValues = prepareActionReturnValues();
-        List<Output> outputs =  Lists.newArrayList(createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(slangInputsKey[SHOULD_BE_STRING])"));
+        List<Output> outputs = Lists.newArrayList(createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(slangInputsKey[SHOULD_BE_STRING])"));
 
         outputsBinding.bindOperationOutputs(operationContext, actionReturnValues, outputs);
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testOperationOutputsMixed() throws Exception {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, String> actionReturnValues = prepareActionReturnValues();
-        List<Output> outputs =  Lists.newArrayList(
+        List<Output> outputs = Lists.newArrayList(
                 createNoExpressionOutput("host1"),
                 createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(slangInputsKey['port'])"));
 
@@ -169,13 +170,28 @@ public class OutputsBindingTest {
     }
 
     @Configuration
-    @Import(SlangRuntimeSpringConfig.class)
-    static class Config{
+    static class Config {
 
         @Bean
-        public OutputsBinding outputsBinding(){
+        public OutputsBinding outputsBinding() {
             return new OutputsBinding();
         }
+
+        @Bean
+        public PythonInterpreter interpreter() {
+            return new PythonInterpreter();
+        }
+
+        @Bean
+        public ScriptEvaluator scriptEvaluator() {
+            return new ScriptEvaluator();
+        }
+
+        @Bean
+        public ScriptEngine scriptEngine() {
+            return new ScriptEngineManager().getEngineByName("python");
+        }
+
 
     }
 }

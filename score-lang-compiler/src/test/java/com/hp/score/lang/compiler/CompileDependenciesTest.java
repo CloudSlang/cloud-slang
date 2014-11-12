@@ -23,10 +23,11 @@ package com.hp.score.lang.compiler;
  */
 
 import com.hp.score.api.ExecutionPlan;
-import com.hp.score.lang.compiler.configuration.SpringConfiguration;
+import com.hp.score.lang.compiler.configuration.SlangCompilerSpringConfig;
 import com.hp.score.lang.entities.CompilationArtifact;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -44,7 +45,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = SpringConfiguration.class)
+@ContextConfiguration(classes = SlangCompilerSpringConfig.class)
 public class CompileDependenciesTest {
 
     @Rule
@@ -114,6 +115,18 @@ public class CompileDependenciesTest {
         exception.expectMessage(containsString("directory"));
 
         compiler.compileFlow(new File(dir), null);
+    }
+
+    @Ignore
+    @Test
+    public void circularDependencies() throws Exception {
+        URI flow = getClass().getResource("/circular-dependencies/parent_flow.yaml").toURI();
+        URI child_flow = getClass().getResource("/circular-dependencies/child_flow.yaml").toURI();
+        URI operation = getClass().getResource("/operation.yaml").toURI();
+        List<File> path = new ArrayList<>();
+        path.add(new File(child_flow));
+        path.add(new File(operation));
+        compiler.compileFlow(new File(flow), path);
     }
 
 }

@@ -1,0 +1,25 @@
+namespace: user.flows.circualr
+
+imports:
+  ops: user.ops
+  flows: user.flows.circualr
+
+flow:
+  name: parent_flow
+  workflow:
+    CheckWeather:
+      do:
+        ops.test_op:
+          - city: input_1
+      publish:
+        - weather
+
+    SubFlow:
+      do:
+        flows.child_flow:
+          - city: input_1
+      publish:
+        - weather
+  results:
+    - SUCCESS
+    - FAILURE

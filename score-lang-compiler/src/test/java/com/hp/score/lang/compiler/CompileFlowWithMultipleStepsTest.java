@@ -23,7 +23,7 @@ package com.hp.score.lang.compiler;
  */
 
 import com.hp.score.api.ExecutionPlan;
-import com.hp.score.lang.compiler.configuration.SpringConfiguration;
+import com.hp.score.lang.compiler.configuration.SlangCompilerSpringConfig;
 import com.hp.score.lang.entities.CompilationArtifact;
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = SpringConfiguration.class)
+@ContextConfiguration(classes = SlangCompilerSpringConfig.class)
 public class CompileFlowWithMultipleStepsTest {
 
     @Autowired

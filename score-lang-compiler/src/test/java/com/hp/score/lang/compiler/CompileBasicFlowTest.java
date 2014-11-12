@@ -24,7 +24,7 @@ package com.hp.score.lang.compiler;
 
 import com.hp.score.api.ExecutionPlan;
 import com.hp.score.api.ExecutionStep;
-import com.hp.score.lang.compiler.configuration.SpringConfiguration;
+import com.hp.score.lang.compiler.configuration.SlangCompilerSpringConfig;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.entities.bindings.Input;
@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = SpringConfiguration.class)
+@ContextConfiguration(classes = SlangCompilerSpringConfig.class)
 public class CompileBasicFlowTest {
 
     @Autowired

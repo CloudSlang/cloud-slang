@@ -23,6 +23,7 @@ package com.hp.score.lang.compiler.transformers;
  */
 
 import com.hp.score.lang.entities.bindings.Input;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -41,6 +42,9 @@ public class InputsTransformer extends AbstractInputsTransformer implements Tran
     @Override
     public List<Input> transform(List<Object> rawData) {
         List<Input> result = new ArrayList<>();
+        if (CollectionUtils.isEmpty(rawData)){
+            return result;
+        }
         for (Object rawInput : rawData) {
             Input input = transformSingleInput(rawInput);
             result.add(input);

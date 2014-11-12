@@ -216,13 +216,11 @@ public class ActionSteps extends AbstractSteps {
     }
 
     private void executePythonScript(PythonInterpreter interpreter, String script, Map<String, Serializable> userVars) {
-        Iterator varsIterator = userVars.entrySet().iterator();
-        while (varsIterator.hasNext()) {
-            Map.Entry pairs = (Map.Entry) varsIterator.next();
-            String key = (String) pairs.getKey();
-            String value = (String) pairs.getValue();
-            interpreter.set(key, value);
-            varsIterator.remove();
+        Iterator<Map.Entry<String, Serializable>> iterator = userVars.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, Serializable> entry = iterator.next();
+            interpreter.set(entry.getKey(), entry.getValue());
+            iterator.remove();
         }
 
         interpreter.exec(script);

@@ -20,6 +20,7 @@ package com.hp.score.lang.compiler.transformers;
 
 import com.hp.score.lang.entities.bindings.Output;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -38,6 +39,9 @@ public class OutputsTransformer implements Transformer<List<Object>, List<Output
     @Override
     public List<Output> transform(List<Object> rawData) {
         List<Output> outputs = new ArrayList<>();
+        if (CollectionUtils.isEmpty(rawData)){
+            return outputs;
+        }
         for (Object rawOutput : rawData) {
             //- some_output
             //this is our default behavior that if the user specifies only a key, the key is also the ref we look for

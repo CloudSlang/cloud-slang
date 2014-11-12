@@ -22,6 +22,7 @@ import com.hp.score.lang.compiler.SlangTextualKeys;
 import com.hp.score.lang.compiler.domain.*;
 import com.hp.score.lang.compiler.transformers.Transformer;
 import com.hp.score.lang.entities.ScoreLangConstants;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.iterators.PeekingIterator;
 import org.apache.commons.lang.StringUtils;
@@ -34,7 +35,8 @@ import java.util.*;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalToIgnoringCase;
+import static org.hamcrest.Matchers.hasKey;
 
 /*
  * Created by orius123 on 09/11/14.
@@ -48,39 +50,23 @@ public class ExecutableBuilder {
     public CompiledExecutable compileExecutable(Map<String, Object> executableRawData, TreeMap<String, List<SlangFile>> dependenciesByNamespace, SlangFile.Type type) {
         Map<String, Serializable> preExecutableActionData = new HashMap<>();
         Map<String, Serializable> postExecutableActionData = new HashMap<>();
-        CompiledDoAction compiledDoAction = null;
-        CompiledWorkflow compiledWorkflow = null;
 
         List<Transformer> preExecTransformers = Lambda.filter(having(on(Transformer.class).getScopes().contains(Transformer.Scope.BEFORE_EXECUTABLE)), transformers);
         List<Transformer> postExecTransformers = Lambda.filter(having(on(Transformer.class).getScopes().contains(Transformer.Scope.AFTER_EXECUTABLE)), transformers);
 
         validateKeyWordsExits(executableRawData, ListUtils.union(preExecTransformers, postExecTransformers), Arrays.asList(SlangTextualKeys.ACTION_KEY, SlangTextualKeys.WORKFLOW_KEY));
 
-        Iterator<Map.Entry<String, Object>> it = executableRawData.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, Object> pairs = it.next();
-            String key = pairs.getKey();
+        preExecutableActionData.putAll(runTransformers(executableRawData, preExecTransformers));
 
-            if (key.equals(SlangTextualKeys.ACTION_KEY)) {
-                @SuppressWarnings("unchecked") Map<String, Object> actionRawData = (Map<String, Object>) pairs.getValue();
-                compiledDoAction = compileAction(actionRawData);
-            }
-
-            if (key.equals(SlangTextualKeys.WORKFLOW_KEY)) {
-                @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> workFlowRawData = (LinkedHashMap<String, Map<String, Object>>) pairs.getValue();
-                compiledWorkflow = compileWorkFlow(workFlowRawData, dependenciesByNamespace);
-            }
-
-            preExecutableActionData.putAll(runTransformers(executableRawData, preExecTransformers, key));
-
-            postExecutableActionData.putAll(runTransformers(executableRawData, postExecTransformers, key));
-
-            it.remove();
-        }
+        postExecutableActionData.putAll(runTransformers(executableRawData, postExecTransformers));
 
         if (type == SlangFile.Type.FLOW) {
+            @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> workFlowRawData = (LinkedHashMap<String, Map<String, Object>>) executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
+            CompiledWorkflow compiledWorkflow = compileWorkFlow(workFlowRawData, dependenciesByNamespace);
             return new CompiledFlow(preExecutableActionData, postExecutableActionData, compiledWorkflow);
         } else {
+            @SuppressWarnings("unchecked") Map<String, Object> actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
+            CompiledDoAction compiledDoAction = compileAction(actionRawData);
             return new CompiledOperation(preExecutableActionData, postExecutableActionData, compiledDoAction);
         }
     }
@@ -92,15 +78,8 @@ public class ExecutableBuilder {
 
         validateKeyWordsExits(actionRawData, actionTransformers, null);
 
-        Iterator<Map.Entry<String, Object>> it = actionRawData.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, Object> pairs = it.next();
-            String key = pairs.getKey();
+        actionData.putAll(runTransformers(actionRawData, actionTransformers));
 
-            actionData.putAll(runTransformers(actionRawData, actionTransformers, key));
-
-            it.remove();
-        }
         return new CompiledDoAction(actionData);
     }
 
@@ -125,35 +104,20 @@ public class ExecutableBuilder {
     private CompiledTask compileTask(String taskName, Map<String, Object> taskRawData, String followingTaskName, TreeMap<String, List<SlangFile>> dependenciesByNamespace) {
         Map<String, Serializable> preTaskData = new HashMap<>();
         Map<String, Serializable> postTaskData = new HashMap<>();
-        Map<String, String> navigationStrings = null;
-        String refId = null;
 
         List<Transformer> preTaskTransformers = Lambda.filter(having(on(Transformer.class).getScopes().contains(Transformer.Scope.BEFORE_TASK)), transformers);
         List<Transformer> postTaskTransformers = Lambda.filter(having(on(Transformer.class).getScopes().contains(Transformer.Scope.AFTER_TASK)), transformers);
 
         validateKeyWordsExits(taskRawData, ListUtils.union(preTaskTransformers, postTaskTransformers), Arrays.asList(SlangTextualKeys.DO_KEY, SlangTextualKeys.NAVIGATION_KEY));
 
-        Iterator<Map.Entry<String, Object>> it = taskRawData.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, Object> entry = it.next();
-            String key = entry.getKey();
+        preTaskData.putAll(runTransformers(taskRawData, preTaskTransformers));
+        postTaskData.putAll(runTransformers(taskRawData, postTaskTransformers));
 
-            if (key.equals(SlangTextualKeys.DO_KEY)) {
-                @SuppressWarnings("unchecked") LinkedHashMap<String, Object> doRawData = (LinkedHashMap<String, Object>) entry.getValue();
-                String refString = doRawData.keySet().iterator().next();
-                refId = resolveRefId(refString, dependenciesByNamespace);
-            }
+        @SuppressWarnings("unchecked") LinkedHashMap<String, Object> doRawData = (LinkedHashMap<String, Object>) taskRawData.get(SlangTextualKeys.DO_KEY);
+        String refString = doRawData.keySet().iterator().next();
+        String refId = resolveRefId(refString, dependenciesByNamespace);
 
-            if (key.equals(SlangTextualKeys.NAVIGATION_KEY)) {
-                navigationStrings = (Map<String, String>) entry.getValue();
-            }
-
-            preTaskData.putAll(runTransformers(taskRawData, preTaskTransformers, key));
-
-            postTaskData.putAll(runTransformers(taskRawData, postTaskTransformers, key));
-
-            it.remove();
-        }
+        @SuppressWarnings("unchecked") Map<String, String> navigationStrings = (Map<String, String>) postTaskData.get(SlangTextualKeys.NAVIGATION_KEY);
 
         //default navigation
         if (navigationStrings == null) {
@@ -165,12 +129,25 @@ public class ExecutableBuilder {
         return new CompiledTask(taskName, preTaskData, postTaskData, navigationStrings, refId);
     }
 
+    private Map<String, Serializable> runTransformers(Map<String, Object> taskRawData, List<Transformer> scopeTransfomers) {
+        Map<String, Serializable> transformedData = new HashMap<>();
+        for (Transformer transformer : scopeTransfomers) {
+            String key = keyToTransform(transformer);
+            @SuppressWarnings("unchecked") Object value = transformer.transform(taskRawData.get(key));
+            transformedData.put(key, (Serializable) value);
+        }
+        return transformedData;
+    }
+
     private String resolveRefId(String refIdString, TreeMap<String, List<SlangFile>> dependenciesByNamespace) {
         String importAlias = StringUtils.substringBefore(refIdString, ".");
         List<SlangFile> slangFilesList = dependenciesByNamespace.get(importAlias);
+        if (CollectionUtils.isEmpty(slangFilesList)) {
+            throw new RuntimeException("No file was found in the classpath for import: " + importAlias);
+        }
         List<Map> executableList = new ArrayList<>();
         for (SlangFile slangFile : slangFilesList) {
-            switch (slangFile.getType()){
+            switch (slangFile.getType()) {
                 case OPERATIONS:
                     executableList.addAll(slangFile.getOperations());
                     break;
@@ -191,17 +168,6 @@ public class ExecutableBuilder {
         return slangFilesList.get(0).getNamespace() + "." + refIdSuffix;
     }
 
-    private Map<String, Serializable> runTransformers(Map<String, Object> rawData, List<Transformer> transformers, String key) {
-        Map<String, Serializable> transformedData = new HashMap<>();
-        for (Transformer transformer : transformers) {
-            if (shouldApplyTransformer(transformer, key)) {
-                @SuppressWarnings("unchecked") Object value = transformer.transform(rawData.get(key));
-                transformedData.put(key, (Serializable) value);
-            }
-        }
-        return transformedData;
-    }
-
     private void validateKeyWordsExits(Map<String, Object> operationRawData, List<Transformer> allRelevantTransformers, List<String> additionalValidKeyWords) {
         Set<String> validKeywords = new HashSet<>();
 
@@ -220,11 +186,6 @@ public class ExecutableBuilder {
         }
     }
 
-    private boolean shouldApplyTransformer(Transformer transformer, String key) {
-        String transformerName = keyToTransform(transformer);
-        return transformerName.equalsIgnoreCase(key);
-    }
-
     private String keyToTransform(Transformer transformer) {
         String key;
         if (transformer.keyToTransform() != null) {
@@ -233,6 +194,6 @@ public class ExecutableBuilder {
             String simpleClassName = transformer.getClass().getSimpleName();
             key = simpleClassName.substring(0, simpleClassName.indexOf("Transformer"));
         }
-        return key;
+        return key.toLowerCase();
     }
 }

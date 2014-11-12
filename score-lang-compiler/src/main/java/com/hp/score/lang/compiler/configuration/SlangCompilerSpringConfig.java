@@ -29,7 +29,7 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 
 @Configuration
 @ComponentScan("com.hp.score.lang.compiler")
-public class SpringConfiguration {
+public class SlangCompilerSpringConfig {
 
     @Bean
     public Yaml yaml(){

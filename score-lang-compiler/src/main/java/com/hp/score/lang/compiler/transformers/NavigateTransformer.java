@@ -22,33 +22,35 @@ package com.hp.score.lang.compiler.transformers;
  * Created by orius123 on 05/11/14.
  */
 
-import com.hp.score.lang.entities.bindings.Input;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-
 @Component
-public class DoTransformer extends AbstractInputsTransformer implements Transformer<LinkedHashMap<String, List>, List<Input>> {
+public class NavigateTransformer implements Transformer<Map<String, Object>, Map<String, String>> {
 
     @Override
-    public List<Input> transform(LinkedHashMap<String, List> rawData) {
-        List<Input> result = new ArrayList<>();
-        if (MapUtils.isEmpty(rawData)) {
-            return result;
+    public Map<String, String> transform(Map<String, Object> rawData) {
+        if (MapUtils.isEmpty(rawData)){
+            return new LinkedHashMap<>();
         }
-        Map.Entry<String, List> inputsEntry = rawData.entrySet().iterator().next();
-        for (Object rawInput : inputsEntry.getValue()) {
-            Input input = transformSingleInput(rawInput);
-            result.add(input);
+        Map<String, String> navigationData = new HashMap<>();
+        for (Map.Entry<String, Object> entry : rawData.entrySet()) {
+            //todo currently we support only string navigation
+            // - SUCCESS: some_task
+            // the value of the navigation is the step to go to
+            if (entry.getValue() instanceof String){
+                navigationData.put(entry.getKey(), (String) entry.getValue());
+            }
         }
-        return result;
+
+        return navigationData;
     }
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Scope.BEFORE_EXECUTABLE, Scope.BEFORE_TASK);
+        return Arrays.asList(Scope.AFTER_TASK);
     }
 
     @Override
@@ -60,5 +62,5 @@ public class DoTransformer extends AbstractInputsTransformer implements Transfor
     public String keyToRegister() {
         return null;
     }
-
 }
+

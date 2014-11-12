@@ -28,9 +28,12 @@ operations:
                 processId = os.geteuid()
                 print processId
                 print input1
+                input1 = "new input"
+                print input1
                 print input2
                 print input3
                 print input4
+                output4 = input4
                 print input5
                 print input6
       outputs:

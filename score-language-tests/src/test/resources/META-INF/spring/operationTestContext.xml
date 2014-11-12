@@ -8,7 +8,7 @@
                         http://www.hp.com/schema/score/score.xsd">
 
     <bean class="com.hp.score.lang.runtime.configuration.SlangRuntimeSpringConfig"/>
-    <bean class="com.hp.score.lang.compiler.configuration.SpringConfiguration"/>
+    <bean class="com.hp.score.lang.compiler.configuration.SlangCompilerSpringConfig"/>
 
     <score:engine />
 
