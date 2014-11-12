@@ -25,7 +25,7 @@ operations:
         python_script: |
                 # this is python amigos!!
                 import os
-                processId = os.geteuid()
+                processId = os.getpid()
                 print processId
                 print input1
                 print input2
