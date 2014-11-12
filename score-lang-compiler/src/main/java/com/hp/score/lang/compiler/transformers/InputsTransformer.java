@@ -62,9 +62,4 @@ public class InputsTransformer extends AbstractInputsTransformer implements Tran
         return null;
     }
 
-    @Override
-    public String keyToRegister() {
-        return null;
-    }
-
 }

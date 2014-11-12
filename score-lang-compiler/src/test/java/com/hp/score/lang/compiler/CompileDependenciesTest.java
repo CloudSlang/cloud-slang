@@ -126,7 +126,9 @@ public class CompileDependenciesTest {
         List<File> path = new ArrayList<>();
         path.add(new File(child_flow));
         path.add(new File(operation));
-        compiler.compileFlow(new File(flow), path);
+        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
+        ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
+        Assert.assertNotNull(executionPlan);
     }
 
 }

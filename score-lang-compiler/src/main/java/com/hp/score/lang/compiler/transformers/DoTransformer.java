@@ -56,9 +56,4 @@ public class DoTransformer extends AbstractInputsTransformer implements Transfor
         return null;
     }
 
-    @Override
-    public String keyToRegister() {
-        return null;
-    }
-
 }

@@ -46,10 +46,5 @@ public class ActionTransformer implements Transformer<Map<String, Object>, Strin
         return null;
     }
 
-    @Override
-    public String keyToRegister() {
-        return null;
-    }
-
 
 }

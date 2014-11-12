@@ -28,6 +28,7 @@ import com.hp.score.lang.compiler.configuration.SlangCompilerSpringConfig;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.entities.bindings.Input;
+import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.entities.bindings.Result;
 import org.junit.Assert;
 import org.junit.Test;
@@ -62,7 +63,7 @@ public class CompileBasicFlowTest {
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
         Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());
-        Assert.assertEquals("the dependencies size is not as expected", 2, compilationArtifact.getDependencies().size());
+        Assert.assertEquals("the dependencies size is not as expected", 3, compilationArtifact.getDependencies().size());
     }
 
     @Test
@@ -78,7 +79,7 @@ public class CompileBasicFlowTest {
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
         Assert.assertEquals("execution plan name is different than expected", "SimpleFlow", executionPlan.getName());
-        Assert.assertEquals("the dependencies size is not as expected", 2, compilationArtifact.getDependencies().size());
+        Assert.assertEquals("the dependencies size is not as expected", 3, compilationArtifact.getDependencies().size());
 
         ExecutionStep startStep = executionPlan.getStep(1L);
         @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) startStep.getActionData().get(ScoreLangConstants.OPERATION_INPUTS_KEY);
@@ -100,10 +101,12 @@ public class CompileBasicFlowTest {
 
 
         ExecutionStep endStep = executionPlan.getStep(0L);
-        Object outputs = endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY); //todo test
-        @SuppressWarnings("unchecked") List<Result> results = (List<Result>) endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_RESULTS_KEY);
-
+        @SuppressWarnings("unchecked") List<Output>  outputs = (List<Output>) endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY);
         Assert.assertNotNull("outputs don't exist", outputs);
+        Assert.assertEquals("there is a different number of outputs than expected", 1, outputs.size());
+
+        @SuppressWarnings("unchecked") List<Result> results = (List<Result>) endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_RESULTS_KEY);
+        Assert.assertNotNull("results don't exist", results);
         Assert.assertEquals("there is a different number of results values than expected", 1, results.size());
     }
 

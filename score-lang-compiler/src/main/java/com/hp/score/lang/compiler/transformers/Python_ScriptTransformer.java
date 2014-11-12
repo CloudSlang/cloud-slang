@@ -45,10 +45,5 @@ public class Python_ScriptTransformer implements Transformer<String, String> {
         return null;
     }
 
-    @Override
-    public String keyToRegister() {
-        return null;
-    }
-
 
 }

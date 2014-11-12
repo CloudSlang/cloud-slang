@@ -46,10 +46,5 @@ public class PublishTransformer implements Transformer<List<Object>, String> {
         return null;
     }
 
-    @Override
-    public String keyToRegister() {
-        return null;
-    }
-
 
 }

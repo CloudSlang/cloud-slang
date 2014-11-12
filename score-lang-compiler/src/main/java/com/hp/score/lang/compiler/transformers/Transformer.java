@@ -32,8 +32,6 @@ public interface Transformer<F, T> {
 
     String keyToTransform();
 
-    String keyToRegister();
-
     enum Scope {
         BEFORE_TASK,
         AFTER_TASK,

@@ -57,6 +57,6 @@ public class CompileFlowWithMultipleStepsTest {
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 10, executionPlan.getSteps().size());
         Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());
-        Assert.assertEquals("the dependencies size is not as expected", 2, compilationArtifact.getDependencies().size());
+        Assert.assertEquals("the dependencies size is not as expected", 3, compilationArtifact.getDependencies().size());
     }
 }

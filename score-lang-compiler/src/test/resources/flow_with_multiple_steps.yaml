@@ -15,7 +15,7 @@ flow:
 
     RealCheckWeather:
       do:
-        ops.check_Weather:
+        ops.java_op:
           - city: input_1
       publish:
         - weather

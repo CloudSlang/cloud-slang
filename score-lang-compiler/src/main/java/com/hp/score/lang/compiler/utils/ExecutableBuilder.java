@@ -24,6 +24,7 @@ import com.hp.score.lang.compiler.transformers.Transformer;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.iterators.PeekingIterator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
@@ -54,7 +55,8 @@ public class ExecutableBuilder {
         List<Transformer> preExecTransformers = Lambda.filter(having(on(Transformer.class).getScopes().contains(Transformer.Scope.BEFORE_EXECUTABLE)), transformers);
         List<Transformer> postExecTransformers = Lambda.filter(having(on(Transformer.class).getScopes().contains(Transformer.Scope.AFTER_EXECUTABLE)), transformers);
 
-        validateKeyWordsExits(executableRawData, ListUtils.union(preExecTransformers, postExecTransformers), Arrays.asList(SlangTextualKeys.ACTION_KEY, SlangTextualKeys.WORKFLOW_KEY));
+        validateKeyWordsExits(executableRawData, ListUtils.union(preExecTransformers, postExecTransformers),
+                Arrays.asList(SlangTextualKeys.ACTION_KEY, SlangTextualKeys.WORKFLOW_KEY, SlangTextualKeys.FLOW_NAME_KEY));
 
         preExecutableActionData.putAll(runTransformers(executableRawData, preExecTransformers));
 
@@ -120,7 +122,7 @@ public class ExecutableBuilder {
         @SuppressWarnings("unchecked") Map<String, String> navigationStrings = (Map<String, String>) postTaskData.get(SlangTextualKeys.NAVIGATION_KEY);
 
         //default navigation
-        if (navigationStrings == null) {
+        if (MapUtils.isEmpty(navigationStrings)) {
             navigationStrings = new HashMap<>();
             navigationStrings.put(ScoreLangConstants.SUCCESS_RESULT, followingTaskName == null ? ScoreLangConstants.SUCCESS_RESULT : followingTaskName);
             navigationStrings.put(ScoreLangConstants.FAILURE_RESULT, ScoreLangConstants.FAILURE_RESULT);
@@ -143,7 +145,7 @@ public class ExecutableBuilder {
         String importAlias = StringUtils.substringBefore(refIdString, ".");
         List<SlangFile> slangFilesList = dependenciesByNamespace.get(importAlias);
         if (CollectionUtils.isEmpty(slangFilesList)) {
-            throw new RuntimeException("No file was found in the classpath for import: " + importAlias);
+            throw new RuntimeException("No file was found in the path for import: " + importAlias);
         }
         List<Map> executableList = new ArrayList<>();
         for (SlangFile slangFile : slangFilesList) {

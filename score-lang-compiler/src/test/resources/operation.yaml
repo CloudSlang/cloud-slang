@@ -5,6 +5,12 @@ operations:
       action:
         python_script: 'print "hello world"'
 
+  - java_op:
+      action:
+        java_action:
+          className: com.hp.thing
+          methodName: someMethod
+
   - check_Weather:
       inputs:
         - city

@@ -72,11 +72,6 @@ public class ResultsTransformer implements Transformer<List, List<Result>> {
         return null;
     }
 
-    @Override
-    public String keyToRegister() {
-        return null;
-    }
-
     private Result createNoExpressionResult(String rawResult) {
         return new Result(rawResult, null);
     }

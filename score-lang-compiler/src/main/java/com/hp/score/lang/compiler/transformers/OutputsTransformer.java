@@ -77,9 +77,4 @@ public class OutputsTransformer implements Transformer<List<Object>, List<Output
         return null;
     }
 
-    @Override
-    public String keyToRegister() {
-        return null;
-    }
-
 }

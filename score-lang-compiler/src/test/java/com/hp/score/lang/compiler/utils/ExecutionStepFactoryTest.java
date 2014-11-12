@@ -1,9 +1,10 @@
-package com.hp.score.lang.compiler;
+package com.hp.score.lang.compiler.utils;
 
 import com.hp.score.api.ExecutionStep;
-import com.hp.score.lang.compiler.utils.ExecutionStepFactory;
+import com.hp.score.lang.compiler.SlangTextualKeys;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import junit.framework.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.Serializable;
@@ -11,9 +12,15 @@ import java.util.HashMap;
 
 public class ExecutionStepFactoryTest {
 
+    private ExecutionStepFactory factory;
+
+    @Before
+    public void init() {
+        factory = new ExecutionStepFactory();
+    }
+
     @Test
     public void testCreateStartStep() throws Exception {
-        ExecutionStepFactory factory = new ExecutionStepFactory();
         ExecutionStep startStep = factory.createStartStep(1L, new HashMap<String, Serializable>());
         Assert.assertNotNull("step should not be null", startStep);
     }
@@ -21,7 +28,6 @@ public class ExecutionStepFactoryTest {
     @Test
     public void testCreateStartStepPutInputsUnderTheRightKey() throws Exception {
         String placeHolder = "place_holder";
-        ExecutionStepFactory factory = new ExecutionStepFactory();
         HashMap<String, Serializable> preOpData = new HashMap<>();
         preOpData.put(SlangTextualKeys.INPUTS_KEY, placeHolder);
         ExecutionStep startStep = factory.createStartStep(1L, preOpData);
@@ -31,26 +37,33 @@ public class ExecutionStepFactoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateStartStepWithNullData() throws Exception {
-        ExecutionStepFactory factory = new ExecutionStepFactory();
         factory.createStartStep(1L, null);
     }
 
     @Test
     public void testCreateActionStep() throws Exception {
-        ExecutionStepFactory factory = new ExecutionStepFactory();
         ExecutionStep actionStep = factory.createActionStep(1L, new HashMap<String, Serializable>());
         Assert.assertNotNull("step should not be null", actionStep);
     }
 
+    @Test
+    public void testCreateJavaActionStep() throws Exception {
+        HashMap<String, Serializable> actionRawData = new HashMap<>();
+        HashMap<String, String> javaActionData = new HashMap<>();
+        javaActionData.put("key", "value");
+        actionRawData.put(SlangTextualKeys.JAVA_ACTION, javaActionData);
+        ExecutionStep actionStep = factory.createActionStep(1L, actionRawData);
+        Assert.assertNotNull("step should not be null", actionStep);
+        Assert.assertEquals(actionStep.getActionData().get("key"), "value");
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testCreateActionStepWithNullData() throws Exception {
-        ExecutionStepFactory factory = new ExecutionStepFactory();
         factory.createActionStep(1L, null);
     }
 
     @Test
     public void testCreateEndStep() throws Exception {
-        ExecutionStepFactory factory = new ExecutionStepFactory();
         ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>());
         Assert.assertNotNull("step should not be null", endStep);
     }
@@ -58,7 +71,6 @@ public class ExecutionStepFactoryTest {
     @Test
     public void testCreateEndStepPutOutputsUnderTheRightKey() throws Exception {
         String placeHolder = "place_holder";
-        ExecutionStepFactory factory = new ExecutionStepFactory();
         HashMap<String, Serializable> postOpData = new HashMap<>();
         postOpData.put(SlangTextualKeys.OUTPUTS_KEY, placeHolder);
         ExecutionStep endStep = factory.createEndStep(1L, postOpData);
@@ -69,7 +81,6 @@ public class ExecutionStepFactoryTest {
     @Test
     public void testCreateEndStepPutResultsUnderTheRightKey() throws Exception {
         String placeHolder = "place_holder";
-        ExecutionStepFactory factory = new ExecutionStepFactory();
         HashMap<String, Serializable> postOpData = new HashMap<>();
         postOpData.put(SlangTextualKeys.RESULT_KEY, placeHolder);
         ExecutionStep endStep = factory.createEndStep(1L, postOpData);
@@ -79,7 +90,6 @@ public class ExecutionStepFactoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateEndStepWithNullData() throws Exception {
-        ExecutionStepFactory factory = new ExecutionStepFactory();
         factory.createEndStep(1L, null);
     }
 }

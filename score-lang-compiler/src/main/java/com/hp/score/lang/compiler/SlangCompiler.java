@@ -137,7 +137,7 @@ public class SlangCompiler {
     }
 
     private ExecutionPlan compileFlow(Map<String, Object> flowRawData, TreeMap<String, List<SlangFile>> dependenciesByNamespace) {
-        String flowName = (String) flowRawData.remove(SlangTextualKeys.FLOW_NAME_KEY);
+        String flowName = (String) flowRawData.get(SlangTextualKeys.FLOW_NAME_KEY);
         CompiledFlow compiledFlow = (CompiledFlow) executableBuilder.compileExecutable(flowRawData, dependenciesByNamespace, SlangFile.Type.FLOW);
         ExecutionPlan executionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFlow);
         executionPlan.setName(flowName);

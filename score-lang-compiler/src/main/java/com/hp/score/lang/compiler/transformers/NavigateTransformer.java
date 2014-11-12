@@ -58,9 +58,5 @@ public class NavigateTransformer implements Transformer<Map<String, Object>, Map
         return null;
     }
 
-    @Override
-    public String keyToRegister() {
-        return null;
-    }
 }
 

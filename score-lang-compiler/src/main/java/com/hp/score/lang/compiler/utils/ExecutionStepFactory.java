@@ -23,6 +23,7 @@ import com.hp.score.api.ExecutionStep;
 import com.hp.score.lang.compiler.SlangTextualKeys;
 import com.hp.score.lang.entities.ActionType;
 import com.hp.score.lang.entities.ScoreLangConstants;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.Validate;
 import org.springframework.stereotype.Component;
 
@@ -77,9 +78,16 @@ public class ExecutionStepFactory {
         return createGeneralStep(index, OPERATION_STEPS_CLASS, "startExecutable", ++index, actionData);
     }
 
-    public ExecutionStep createActionStep(Long index, Map<String, Serializable> actionData) {
-        Validate.notNull(actionData, "actionData is null");
-        ActionType actionType = actionData.get(ScoreLangConstants.ACTION_CLASS_KEY) != null ? ActionType.JAVA : ActionType.PYTHON;
+    public ExecutionStep createActionStep(Long index, Map<String, Serializable> actionRawData) {
+        Validate.notNull(actionRawData, "actionData is null");
+        Map<String, Serializable> actionData = new HashMap<>();
+        @SuppressWarnings("unchecked") Map<String, String> javaActionData = (Map<String, String>) actionRawData.remove(SlangTextualKeys.JAVA_ACTION);
+        ActionType actionType = ActionType.PYTHON;
+        if (MapUtils.isNotEmpty(javaActionData)) {
+            actionType = ActionType.JAVA;
+            actionData.putAll(javaActionData);
+        }
+        actionData.putAll(actionRawData);
         actionData.put(ScoreLangConstants.ACTION_TYPE, actionType);
         return createGeneralStep(index, ACTION_STEPS_CLASS, "doAction", ++index, actionData);
     }

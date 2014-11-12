@@ -28,11 +28,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+
 @Component
-public class WorkFlowTransformer implements Transformer<Map<String, Object>, Map<String, Object>> {
+public class Java_ActionTransformer implements Transformer<Map<String, String>, Map<String, String>> {
 
     @Override
-    public Map<String, Object> transform(Map<String, Object> rawData) {
+    public Map<String, String> transform(Map<String, String> rawData) {
         return rawData;
     }
 
@@ -46,5 +47,5 @@ public class WorkFlowTransformer implements Transformer<Map<String, Object>, Map
         return null;
     }
 
-
 }
+

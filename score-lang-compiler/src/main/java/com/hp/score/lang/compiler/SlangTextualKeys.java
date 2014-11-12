@@ -33,6 +33,7 @@ public interface SlangTextualKeys {
     String WORKFLOW_KEY = "workflow";
 
     //action
+    String JAVA_ACTION = "java_action";
 
     //operation
     String ACTION_KEY = "action";
