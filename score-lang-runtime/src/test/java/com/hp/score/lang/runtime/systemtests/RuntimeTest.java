@@ -64,7 +64,7 @@ public class RuntimeTest {
 
     public static final String USER_INPUTS = "userInputs";
 
-    @Test
+    @Test(timeout = 20000)
     public void testFlow() throws InterruptedException {
 
         //Parse YAML -> flow
@@ -89,7 +89,7 @@ public class RuntimeTest {
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 
-    @Test
+    @Test(timeout = 20000)
     public void testSubFlow() throws InterruptedException {
 
         //Parse YAML -> flow
