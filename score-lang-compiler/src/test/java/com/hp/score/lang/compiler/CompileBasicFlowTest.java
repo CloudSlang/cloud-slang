@@ -91,12 +91,12 @@ public class CompileBasicFlowTest {
         Assert.assertNotNull("arguments doesn't exist", taskArguments);
         Assert.assertEquals("there is a different number of arguments than expected", 1, taskArguments.size());
         Assert.assertEquals("city", taskArguments.get(0).getName());
-        Assert.assertEquals("CheckWeather", beginTaskStep.getActionData().get(ScoreLangConstants.TASK_NAME_KEY));
+        Assert.assertEquals("CheckWeather", beginTaskStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
 
         ExecutionStep FinishTaskSteps = executionPlan.getStep(3L);
         Object publish = FinishTaskSteps.getActionData().get(ScoreLangConstants.TASK_PUBLISH_KEY); //todo test
         @SuppressWarnings("unchecked") Map<String, String> navigate = (Map<String, String>) FinishTaskSteps.getActionData().get(ScoreLangConstants.TASK_NAVIGATION_KEY);
-        Assert.assertEquals("CheckWeather", FinishTaskSteps.getActionData().get(ScoreLangConstants.TASK_NAME_KEY));
+        Assert.assertEquals("CheckWeather", FinishTaskSteps.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
 
         Assert.assertNotNull("publish don't exist", publish);
         Assert.assertNotNull("navigate don't exist", navigate);

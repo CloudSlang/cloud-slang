@@ -48,7 +48,7 @@ public class TaskSteps extends AbstractSteps {
     public void beginTask(@Param(TASK_INPUTS_KEY) List<Input> taskInputs,
                           @Param(RUN_ENV) RunEnvironment runEnv,
                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
-                          @Param(ScoreLangConstants.TASK_NAME_KEY) String taskName) {
+                          @Param(ScoreLangConstants.NODE_NAME_KEY) String taskName) {
 
         System.out.println("===========");
         System.out.println(" beginTask ");
@@ -73,7 +73,7 @@ public class TaskSteps extends AbstractSteps {
                         @Param(TASK_PUBLISH_KEY) List<Output> taskPublishValues,
                         @Param(TASK_NAVIGATION_KEY) Map<String, Long> taskNavigationValues,
                         @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
-                        @Param(ScoreLangConstants.TASK_NAME_KEY) String taskName) {
+                        @Param(ScoreLangConstants.NODE_NAME_KEY) String taskName) {
 
         System.out.println("=========");
         System.out.println(" endTask ");
