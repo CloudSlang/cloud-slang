@@ -38,7 +38,7 @@ public interface ScoreLangConstants {
 
     //operation scope
     String OPERATION_INPUTS_KEY = "operationInputs";
-    String INPUTS_DSL_KEY = "slangInputsKey";
+    String BIND_OUTPUT_FROM_INPUTS_KEY = "fromInputs";
     String USER_INPUTS_KEY = "userInputs";
     String EXECUTABLE_OUTPUTS_KEY = "executableOutputs";
     String EXECUTABLE_RESULTS_KEY = "executableResults";

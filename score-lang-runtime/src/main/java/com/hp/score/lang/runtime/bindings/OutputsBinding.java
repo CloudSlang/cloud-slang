@@ -29,7 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.hp.score.lang.entities.ScoreLangConstants.INPUTS_DSL_KEY;
+import static com.hp.score.lang.entities.ScoreLangConstants.BIND_OUTPUT_FROM_INPUTS_KEY;
 
 /**
  * Date: 11/7/2014
@@ -57,7 +57,7 @@ public class OutputsBinding {
                     //put action outputs
                     scriptContext.putAll(actionReturnValues);
                     //put operation inputs as a map
-                    scriptContext.put(INPUTS_DSL_KEY, (Serializable) inputs);
+                    scriptContext.put(BIND_OUTPUT_FROM_INPUTS_KEY, (Serializable) inputs);
 
                     //evaluate expression
                     Serializable scriptResult = scriptEvaluator.evalExpr(outputExpr, scriptContext);

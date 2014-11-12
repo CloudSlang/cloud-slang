@@ -39,7 +39,7 @@ operations:
       outputs:
         - output1: input1
         - output2: processId
-        - output3: slangInputsKey['input1']
+        - output3: fromInputs['input1']
         - output4
       results:
         - SUCCESS: 1 != 123456
