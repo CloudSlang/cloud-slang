@@ -29,6 +29,7 @@ flow:
           - city: input_1
       publish:
         - weather
+        - temp: temperature
       navigate:
         SUCCESS: SUCCESS
         FAILURE: NotRealCheckWeather
