@@ -77,12 +77,14 @@ public class ExecutionStepFactory {
         return finishTask;
     }
 
-    public ExecutionStep createStartStep(Long index, Map<String, Serializable> preExecutableData, List<Input> execInputs) {
+    public ExecutionStep createStartStep(Long index, Map<String, Serializable> preExecutableData, List<Input>
+            execInputs,String stepName) {
         Validate.notNull(preExecutableData, "preExecutableData is null");
         Validate.notNull(execInputs, "Executable inputs are null");
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.OPERATION_INPUTS_KEY, (Serializable) execInputs);
         actionData.put(ScoreLangConstants.HOOKS, (Serializable) preExecutableData);
+        actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
         return createGeneralStep(index, OPERATION_STEPS_CLASS, "startExecutable", ++index, actionData);
     }
 

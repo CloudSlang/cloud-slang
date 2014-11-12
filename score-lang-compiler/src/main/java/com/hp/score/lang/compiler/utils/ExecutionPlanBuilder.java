@@ -52,7 +52,8 @@ public class ExecutionPlanBuilder {
         executionPlan.setLanguage(SLANG_NAME);
         executionPlan.setBeginStep(1L);
 
-        executionPlan.addStep(stepFactory.createStartStep(1L, compiledOp.getPreExecActionData(), compiledOp.getInputs()));
+        executionPlan.addStep(stepFactory.createStartStep(1L, compiledOp.getPreExecActionData(), compiledOp.getInputs(),
+                compiledOp.getName()));
         executionPlan.addStep(stepFactory.createActionStep(2L, compiledOp.getCompiledDoAction().getActionData()));
         executionPlan.addStep(stepFactory.createEndStep(3L, compiledOp.getPostExecActionData(), compiledOp.getOutputs(),
                 compiledOp.getResults(), compiledOp.getName()));
@@ -69,7 +70,8 @@ public class ExecutionPlanBuilder {
         Long stepsIndex = 1L;
         executionPlan.setBeginStep(stepsIndex);
         //flow start step
-        executionPlan.addStep(stepFactory.createStartStep(stepsIndex++, compiledFlow.getPreExecActionData(), compiledFlow.getInputs()));
+        executionPlan.addStep(stepFactory.createStartStep(stepsIndex++, compiledFlow.getPreExecActionData(),
+                compiledFlow.getInputs(),compiledFlow.getName()));
         //flow end step
         executionPlan.addStep(stepFactory.createEndStep(FLOW_END_STEP_INDEX, compiledFlow.getPostExecActionData(),
                 compiledFlow.getOutputs(), compiledFlow.getResults(), compiledFlow.getName()));
