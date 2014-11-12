@@ -31,6 +31,10 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     public static final String RETURN_VALUES = "RETURN_VALUES";
     public static final String OUTPUTS = "OUTPUTS";
 
+    public enum levelName{
+        TASK_NAME,OP_NAME;
+    }
+
     public static final String ENCRYPTED_VALUE = "*****";
 
     private static final long serialVersionUID = 2885051907156304718L;

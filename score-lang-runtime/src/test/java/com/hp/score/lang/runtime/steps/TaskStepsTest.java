@@ -7,6 +7,7 @@ import com.hp.score.lang.runtime.bindings.InputsBinding;
 import com.hp.score.lang.runtime.bindings.OutputsBinding;
 import com.hp.score.lang.runtime.bindings.ScriptEvaluator;
 import com.hp.score.lang.runtime.env.RunEnvironment;
+import com.hp.score.lang.runtime.events.LanguageEventData;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,7 +61,7 @@ public class TaskStepsTest {
     @Test
     public void testBeginTaskEmptyInputs() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
-        taskSteps.beginTask(new ArrayList<Input>(),runEnv,new ExecutionRuntimeServices());
+        taskSteps.beginTask(new ArrayList<Input>(),runEnv,new ExecutionRuntimeServices(),"task1");
         Map<String,Serializable> callArgs = runEnv.removeCallArguments();
         Assert.assertTrue(callArgs.isEmpty());
     }
@@ -76,7 +77,7 @@ public class TaskStepsTest {
 
         when(inputsBinding.bindInputs(anyMap(),eq(inputs))).thenReturn(resultMap);
 
-        taskSteps.beginTask(inputs,runEnv,runtimeServices);
+        taskSteps.beginTask(inputs,runEnv,runtimeServices,"task1");
         Map<String,Serializable> callArgs = runEnv.removeCallArguments();
         Assert.assertFalse(callArgs.isEmpty());
         Assert.assertEquals(5, callArgs.get("input1"));
@@ -86,6 +87,13 @@ public class TaskStepsTest {
         Assert.assertEquals(1,events.size());
         ScoreEvent inputEvent = events.iterator().next();
         Assert.assertEquals(EVENT_INPUT_END,inputEvent.getEventType());
+
+        Map<String,Serializable> eventData = (Map<String,Serializable>)inputEvent.getData();
+        Assert.assertEquals("task1",eventData.get(LanguageEventData.levelName.TASK_NAME.name()));
+
+        Map<String,Serializable> boundInputs = (Map<String,Serializable>)eventData.get(LanguageEventData.BOUND_INPUTS);
+        Assert.assertEquals(5,boundInputs.get("input1"));
+        Assert.assertEquals(3,boundInputs.get("input2"));
     }
 
 

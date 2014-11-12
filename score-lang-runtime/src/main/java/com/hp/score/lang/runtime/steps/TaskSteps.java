@@ -9,12 +9,14 @@ package com.hp.score.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.score.lang.ExecutionRuntimeServices;
+import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.runtime.bindings.InputsBinding;
 import com.hp.score.lang.runtime.bindings.OutputsBinding;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
+import com.hp.score.lang.runtime.events.LanguageEventData;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -45,7 +47,8 @@ public class TaskSteps extends AbstractSteps {
 
     public void beginTask(@Param(TASK_INPUTS_KEY) List<Input> taskInputs,
                           @Param(RUN_ENV) RunEnvironment runEnv,
-                          @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
+                          @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
+                          @Param(ScoreLangConstants.TASK_NAME_KEY) String taskName) {
 
         System.out.println("===========");
         System.out.println(" beginTask ");
@@ -60,7 +63,8 @@ public class TaskSteps extends AbstractSteps {
 
         //todo: hook
 
-        sendBindingInputsEvent(taskInputs, operationArguments, runEnv, executionRuntimeServices, "Task inputs resolved");
+        sendBindingInputsEvent(taskInputs, operationArguments, runEnv, executionRuntimeServices, "Task inputs resolved",
+                taskName, LanguageEventData.levelName.TASK_NAME);
 
         updateCallArgumentsAndPushContextToStack(runEnv, flowContext, operationArguments);
     }

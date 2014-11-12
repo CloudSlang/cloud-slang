@@ -21,8 +21,9 @@ import static com.hp.score.lang.runtime.events.LanguageEventData.ENCRYPTED_VALUE
 
 public abstract class AbstractSteps {
 
-    public void sendBindingInputsEvent(List<Input> inputs, final Map<String, Serializable> context,
-                                            RunEnvironment runEnv, ExecutionRuntimeServices executionRuntimeServices,String desc) {
+    public void sendBindingInputsEvent(List<Input> inputs, final Map<String, Serializable> context,RunEnvironment runEnv,
+                                       ExecutionRuntimeServices executionRuntimeServices,String desc,String nodeName,
+                                       LanguageEventData.levelName levelName) {
         Map<String,Serializable> inputsForEvent = new HashMap<>();
         for(Input input: inputs){
             String inputName = input.getName();
@@ -34,7 +35,8 @@ public abstract class AbstractSteps {
                 inputsForEvent.put(inputName, inputValue);
             }
         }
-        fireEvent(executionRuntimeServices, runEnv, EVENT_INPUT_END, desc, Pair.of(BOUND_INPUTS, (Serializable)inputsForEvent));
+        fireEvent(executionRuntimeServices, runEnv, EVENT_INPUT_END, desc, Pair.of(BOUND_INPUTS,
+                (Serializable)inputsForEvent),Pair.of(levelName.toString(),nodeName));
     }
 
     protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment, Map<String, Serializable> currentContext, Map<String, Serializable> callArguments) {

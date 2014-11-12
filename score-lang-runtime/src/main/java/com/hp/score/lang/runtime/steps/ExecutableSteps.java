@@ -11,17 +11,19 @@ import com.hp.score.lang.runtime.bindings.OutputsBinding;
 import com.hp.score.lang.runtime.bindings.ResultsBinding;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.hp.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static com.hp.score.lang.entities.ScoreLangConstants.*;
-import static com.hp.score.lang.runtime.events.LanguageEventData.*;
+import static com.hp.score.lang.runtime.events.LanguageEventData.RETURN_VALUES;
+import static com.hp.score.lang.runtime.events.LanguageEventData.levelName;
 
 /**
  * User: stoneo
@@ -71,7 +73,8 @@ public class ExecutableSteps extends AbstractSteps {
 
         updateCallArgumentsAndPushContextToStack(runEnv, operationContext, actionArguments);
 
-        sendBindingInputsEvent(operationInputs, operationContext, runEnv, executionRuntimeServices,"Post Input binding for operation/flow");
+        sendBindingInputsEvent(operationInputs, operationContext, runEnv, executionRuntimeServices,
+                "Post Input binding for operation/flow","", levelName.OP_NAME); //todo - fill the op/flow name...
     }
 
     /**
