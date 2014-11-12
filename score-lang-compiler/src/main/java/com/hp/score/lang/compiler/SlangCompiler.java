@@ -86,6 +86,9 @@ public class SlangCompiler {
                 Validate.notEmpty(operationName, "When compiling an operation you must specify its name");
                 List<CompiledExecutable> compilesOperations = compileOperations(slangFile.getOperations(), dependenciesByNamespace);
                 executable = Lambda.selectFirst(compilesOperations, having(on(CompiledExecutable.class).getName(), equalTo(operationName)));
+                if (executable == null) {
+                    throw new RuntimeException("Operation with name: " + operationName + " wasn't found in file: " + source.getName());
+                }
                 executionPlan = executionPlanBuilder.createOperationExecutionPlan((CompiledOperation) executable);
                 break;
             case FLOW:
