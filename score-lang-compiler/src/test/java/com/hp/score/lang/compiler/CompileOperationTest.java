@@ -28,7 +28,9 @@ import com.hp.score.lang.compiler.configuration.SlangCompilerSpringConfig;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.entities.bindings.Input;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -42,6 +44,9 @@ import java.util.List;
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
 public class CompileOperationTest {
 
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     @Autowired
     private SlangCompiler compiler;
 
@@ -51,6 +56,15 @@ public class CompileOperationTest {
         ExecutionPlan executionPlan = compiler.compile(new File(resource.toURI()), "test_op", null).getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 3, executionPlan.getSteps().size());
+    }
+
+    @Test
+    public void wrongOperationName() throws Exception {
+        URL resource = getClass().getResource("/operation.yaml");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("operation.yaml");
+        exception.expectMessage("blah");
+        compiler.compile(new File(resource.toURI()), "blah", null).getExecutionPlan();
     }
 
     @Test
