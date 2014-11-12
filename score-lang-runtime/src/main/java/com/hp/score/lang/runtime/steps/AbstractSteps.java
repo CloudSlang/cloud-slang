@@ -36,7 +36,7 @@ public abstract class AbstractSteps {
             }
         }
         fireEvent(executionRuntimeServices, runEnv, EVENT_INPUT_END, desc, Pair.of(BOUND_INPUTS,
-                (Serializable)inputsForEvent),Pair.of(levelName.toString(),nodeName));
+                (Serializable)inputsForEvent),Pair.of(levelName.name(),nodeName));
     }
 
     protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment, Map<String, Serializable> currentContext, Map<String, Serializable> callArguments) {

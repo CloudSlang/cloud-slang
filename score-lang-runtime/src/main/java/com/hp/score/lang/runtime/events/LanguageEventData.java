@@ -32,7 +32,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     public static final String OUTPUTS = "OUTPUTS";
 
     public enum levelName{
-        TASK_NAME,OP_NAME;
+        TASK_NAME,EXECUTABLE_NAME;
     }
 
     public static final String ENCRYPTED_VALUE = "*****";

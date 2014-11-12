@@ -73,7 +73,7 @@ public class ExecutableStepsTest {
 
     @Test
     public void testStart() throws Exception {
-        executableSteps.startExecutable(new ArrayList<Input>(), new RunEnvironment(), new HashMap<String, Serializable>(), new ExecutionRuntimeServices());
+        executableSteps.startExecutable(new ArrayList<Input>(), new RunEnvironment(), new HashMap<String, Serializable>(), new ExecutionRuntimeServices(),"");
     }
 
     @Test
@@ -85,7 +85,7 @@ public class ExecutableStepsTest {
         resultMap.put("input1",5);
 
         when(inputsBinding.bindInputs(anyMap(),eq(inputs))).thenReturn(resultMap);
-        executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Serializable>(), new ExecutionRuntimeServices());
+        executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Serializable>(), new ExecutionRuntimeServices(),"");
 
         Map<String,Serializable> opContext = runEnv.getStack().popContext();
         Assert.assertTrue(opContext.containsKey("input1"));
@@ -107,7 +107,7 @@ public class ExecutableStepsTest {
         resultMap.put("input2", 3);
 
         when(inputsBinding.bindInputs(anyMap(),eq(inputs))).thenReturn(resultMap);
-        executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Serializable>(), runtimeServices);
+        executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Serializable>(), runtimeServices,"dockerizeStep");
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 
         Assert.assertFalse(events.isEmpty());
@@ -123,6 +123,9 @@ public class ExecutableStepsTest {
         Map<String,Serializable> inputsBounded = (Map<String,Serializable>)eventData.get(LanguageEventData.BOUND_INPUTS);
         Assert.assertEquals(5, inputsBounded.get("input1"));
         Assert.assertEquals(LanguageEventData.ENCRYPTED_VALUE,inputsBounded.get("input2"));
+
+        Assert.assertTrue(eventData.containsKey(LanguageEventData.levelName.EXECUTABLE_NAME.name()));
+        Assert.assertEquals("dockerizeStep",eventData.get(LanguageEventData.levelName.EXECUTABLE_NAME.name()));
     }
 
     @Test
@@ -135,10 +138,16 @@ public class ExecutableStepsTest {
         String boundResult = "SUCCESS";
 
         when(resultsBinding.resolveResult(anyMapOf(String.class, String.class), eq(results), isNull(String.class))).thenReturn(boundResult);
-        executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), results, new ExecutionRuntimeServices());
+        executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), results, new ExecutionRuntimeServices(),"");
 
         ReturnValues returnValues= runEnv.removeReturnValues();
         Assert.assertTrue(returnValues.getResult().equals(boundResult));
+    }
+
+
+    @Test
+    public void testFinishExecutableEvents() throws Exception {
+        //todo...
     }
 
     @Configuration

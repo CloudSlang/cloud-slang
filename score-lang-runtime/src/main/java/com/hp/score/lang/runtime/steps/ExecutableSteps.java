@@ -45,7 +45,8 @@ public class ExecutableSteps extends AbstractSteps {
     public void startExecutable(@Param(OPERATION_INPUTS_KEY) List<Input> operationInputs,
                                 @Param(RUN_ENV) RunEnvironment runEnv,
                                 @Param(USER_INPUTS_KEY) HashMap<String, Serializable> userInputs,
-                                @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
+                                @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
+                                @Param(NODE_NAME_KEY) String executableName) {
 
         System.out.println("=================");
         System.out.println(" startExecutable ");
@@ -74,7 +75,7 @@ public class ExecutableSteps extends AbstractSteps {
         updateCallArgumentsAndPushContextToStack(runEnv, operationContext, actionArguments);
 
         sendBindingInputsEvent(operationInputs, operationContext, runEnv, executionRuntimeServices,
-                "Post Input binding for operation/flow","", levelName.OP_NAME); //todo - fill the op/flow name...
+                "Post Input binding for operation/flow",executableName, levelName.EXECUTABLE_NAME);
     }
 
     /**
@@ -88,7 +89,8 @@ public class ExecutableSteps extends AbstractSteps {
     public void finishExecutable(@Param(RUN_ENV) RunEnvironment runEnv,
                                  @Param(EXECUTABLE_OUTPUTS_KEY) List<Output> executableOutputs,
                                  @Param(EXECUTABLE_RESULTS_KEY) List<Result> executableResults,
-                                 @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
+                                 @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
+                                 @Param(NODE_NAME_KEY) String executableName) {
 
         System.out.println("===============");
         System.out.println(" finishExecutable ");
@@ -98,7 +100,7 @@ public class ExecutableSteps extends AbstractSteps {
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_START, "Output binding started",
                 Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable) executableOutputs),
                 Pair.of(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable)executableResults),
-                Pair.of("actionReturnValues", actionReturnValues));
+                Pair.of("actionReturnValues", actionReturnValues),Pair.of(levelName.EXECUTABLE_NAME.toString(),executableName));
 
         // Resolving the result of the operation/flow
         String result = resultsBinding.resolveResult(actionReturnValues.getOutputs(), executableResults, actionReturnValues.getResult());
@@ -109,7 +111,8 @@ public class ExecutableSteps extends AbstractSteps {
 
         ReturnValues returnValues = new ReturnValues(operationReturnOutputs, result);
         runEnv.putReturnValues(returnValues);
-        fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_END, "Output binding finished", Pair.of(RETURN_VALUES, returnValues));
+        fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_END, "Output binding finished",
+                Pair.of(RETURN_VALUES, returnValues),Pair.of(levelName.EXECUTABLE_NAME.toString(),executableName));
         runEnv.getExecutionPath().up();
         printReturnValues(returnValues);
     }
