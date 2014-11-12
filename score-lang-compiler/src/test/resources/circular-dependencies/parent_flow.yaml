@@ -1,8 +1,8 @@
-namespace: user.flows.circualr
+namespace: user.flows.circular
 
 imports:
   ops: user.ops
-  flows: user.flows.circualr
+  flows: user.flows.circular
 
 flow:
   name: parent_flow

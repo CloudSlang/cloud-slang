@@ -1,4 +1,4 @@
-namespace: user.flows.circualr
+namespace: user.flows.circular
 
 imports:
   ops: user.ops

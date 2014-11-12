@@ -23,8 +23,10 @@ package com.hp.score.lang.compiler;
  */
 
 import com.hp.score.api.ExecutionPlan;
+import com.hp.score.api.ExecutionStep;
 import com.hp.score.lang.compiler.configuration.SlangCompilerSpringConfig;
 import com.hp.score.lang.entities.CompilationArtifact;
+import com.hp.score.lang.entities.ScoreLangConstants;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -126,6 +128,24 @@ public class CompileDependenciesTest {
         exception.expectMessage(containsString("directory"));
 
         compiler.compileFlow(new File(dir), null);
+    }
+
+    @Test
+    public void subFlowRefId() throws Exception {
+        URI flow = getClass().getResource("/circular-dependencies/parent_flow.yaml").toURI();
+        URI child_flow = getClass().getResource("/circular-dependencies/child_flow.yaml").toURI();
+        URI operation = getClass().getResource("/operation.yaml").toURI();
+        List<File> path = new ArrayList<>();
+        path.add(new File(child_flow));
+        path.add(new File(operation));
+
+        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
+        ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
+        Assert.assertNotNull(executionPlan);
+        Assert.assertEquals("different number of dependencies than expected", 5, compilationArtifact.getDependencies().size());
+        ExecutionStep secondTaskStartStep = executionPlan.getStep(4L);
+        String refId = (String) secondTaskStartStep.getNavigationData().get(ScoreLangConstants.REF_ID);
+        Assert.assertEquals("refId is not as expected", "user.flows.circular.child_flow", refId);
     }
 
     @Test
