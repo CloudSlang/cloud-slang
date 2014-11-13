@@ -8,17 +8,22 @@ flow:
   name: parent_flow
   inputs:
     - input1
+    - city:
+        required: false
   workflow:
-    CheckWeather:
+    Task1:
       do:
         ops.check_Weather:
-          - city: input_1
+          - city: -> city if city is not None else input1
       publish:
-        - weather
+        - kuku: weather
+      navigate:
+        KUKU: Task2
 
-    SubFlow:
+    Task2:
       do:
         flows.child_flow:
+          - input1: -> kuku
       publish:
         - val_output
   results:
