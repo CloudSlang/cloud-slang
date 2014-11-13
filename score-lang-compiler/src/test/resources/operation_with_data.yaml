@@ -4,21 +4,21 @@ operations:
   - test_op_2:
       inputs:
         - input1
-        - input2: ->input2
+        - input2: -> input2
         - input3:
             default: value3
-        - input4: ->'value4' if input3 == value3 else None
+        - input4: -> 'value4' if input3 == value3 else None
         - input5:
             required: yes
             encrypted: true
         - input6:
-            default: ->1 + 5
+            default: -> 1 + 5
             required: False
         - input7: 77
         - input8:
-            default: ->input6
+            default: -> input6
         - input9:
-            default: ->input6
+            default: -> input6
             override: true
         - input10:
             default: -> input5
