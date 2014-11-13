@@ -1,5 +1,7 @@
 package com.hp.score.lang.cli;
 
+import com.hp.score.lang.compiler.SlangCompiler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
@@ -15,6 +17,9 @@ import java.util.Map;
 
 @Component
 public class SlangCLI implements CommandMarker{
+
+   @Autowired
+   private SlangCompiler compiler;
 
     private static final String currently = "You are currently running Score version: ";
     private static final String scoreVersion = "0.1.229"; //todo get version
