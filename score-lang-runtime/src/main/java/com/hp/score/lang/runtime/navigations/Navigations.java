@@ -31,7 +31,7 @@ public class Navigations {
 	public Long navigate(
             @Param(RUN_ENV) RunEnvironment runEnv,
             @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
-            @Param(REF_ID) String subFlowId,
+            @Param(REF_ID) String refId,
 		    @Param(ExecutionParametersConsts.RUNNING_EXECUTION_PLAN_ID) Long RUNNING_EXECUTION_PLAN_ID,
             @Param(NEXT_STEP_ID_KEY) Long nextStepId) {
 
@@ -44,12 +44,12 @@ public class Navigations {
 		if(nextStepPosition != null) {
 			return nextStepPosition;
 		}
-		if(subFlowId != null) {
+		if(refId != null) {
 			ParentFlowStack stack = runEnv.getParentFlowStack();
 			stack.pushParentFlowData(new ParentFlowData(RUNNING_EXECUTION_PLAN_ID, nextStepId));
-			Long subFlowRunningExecutionPlanId = executionRuntimeServices.getSubFlowRunningExecutionPlan(subFlowId);
+			Long subFlowRunningExecutionPlanId = executionRuntimeServices.getSubFlowRunningExecutionPlan(refId);
 			executionRuntimeServices.requestToChangeExecutionPlan(subFlowRunningExecutionPlanId);
-			return executionRuntimeServices.getSubFlowBeginStep(subFlowId);
+			return executionRuntimeServices.getSubFlowBeginStep(refId);
 		}
 		if(nextStepId == null && !runEnv.getParentFlowStack().isEmpty()) {
 			ParentFlowData parentFlowData = runEnv.getParentFlowStack().popParentFlowData();

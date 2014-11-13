@@ -33,6 +33,7 @@ import com.hp.score.lang.compiler.utils.ExecutionPlanBuilder;
 import com.hp.score.lang.compiler.utils.NamespaceBuilder;
 import com.hp.score.lang.compiler.utils.YamlParser;
 import com.hp.score.lang.entities.CompilationArtifact;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -126,7 +127,7 @@ public class SlangCompiler {
                         }
                         break;
                     default:
-                        throw new RuntimeException("dependency: " + slangFile.getNamespace() + " is not a flow and not an operation");
+                        throw new RuntimeException("Dependency: " + slangFile.getNamespace() + " is not a flow and not an operation");
                 }
             }
         }
@@ -144,6 +145,9 @@ public class SlangCompiler {
 
     private CompiledExecutable compileFlow(Map<String, Object> flowRawData, TreeMap<String, List<SlangFile>> dependenciesByNamespace) {
         String flowName = (String) flowRawData.get(SlangTextualKeys.FLOW_NAME_KEY);
+        if (StringUtils.isBlank(flowName)) {
+            throw new RuntimeException("Flow must have a name");
+        }
         return executableBuilder.compileExecutable(flowName, flowRawData, dependenciesByNamespace, SlangFile.Type.FLOW);
     }
 

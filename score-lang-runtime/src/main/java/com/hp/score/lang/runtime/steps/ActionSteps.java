@@ -49,9 +49,6 @@ public class ActionSteps extends AbstractSteps {
                          @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                          @Param(PYTHON_SCRIPT_KEY) String python_script) {
 
-        System.out.println("================================");
-        System.out.println("doAction");
-        System.out.println("================================");
         Map<String, String> returnValue = new HashMap<>();
         Map<String, Serializable> callArguments = runEnv.removeCallArguments();
         fireEvent(executionRuntimeServices, runEnv, EVENT_ACTION_START, "Preparing to run action " + actionType, Pair.of(CALL_ARGUMENTS, (Serializable)callArguments));
@@ -76,7 +73,6 @@ public class ActionSteps extends AbstractSteps {
         ReturnValues returnValues = new ReturnValues(returnValue, null);
         runEnv.putReturnValues(returnValues);
         fireEvent(executionRuntimeServices, runEnv, EVENT_ACTION_END, "Action performed", Pair.of(RETURN_VALUES, returnValues));
-        printReturnValues(returnValues);
 
     }
 

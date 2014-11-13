@@ -50,9 +50,6 @@ public class TaskSteps extends AbstractSteps {
                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                           @Param(ScoreLangConstants.NODE_NAME_KEY) String taskName) {
 
-        System.out.println("===========");
-        System.out.println(" beginTask ");
-        System.out.println("===========");
         runEnv.getExecutionPath().forward();
         runEnv.removeCallArguments();
         runEnv.removeReturnValues();
@@ -75,10 +72,6 @@ public class TaskSteps extends AbstractSteps {
                         @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                         @Param(ScoreLangConstants.NODE_NAME_KEY) String taskName) {
 
-        System.out.println("=========");
-        System.out.println(" endTask ");
-        System.out.println("=========");
-
         Map<String, Serializable> flowContext = runEnv.getStack().popContext();
 
         ReturnValues operationReturnValues = runEnv.removeReturnValues();
@@ -90,7 +83,6 @@ public class TaskSteps extends AbstractSteps {
         Map<String, String> publishValues = outputsBinding.bindOutputs(null, operationReturnValues.getOutputs(), taskPublishValues);
 
         flowContext.putAll(publishValues);
-        printMap(flowContext, "flowContext");
 
         //todo: hook
 
@@ -101,8 +93,6 @@ public class TaskSteps extends AbstractSteps {
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_END, "Output binding finished",
                 Pair.of(RETURN_VALUES, returnValues), Pair.of("nextPosition", nextPosition),
                 Pair.of(LanguageEventData.levelName.TASK_NAME.name(),taskName));
-        printReturnValues(returnValues);
-        System.out.println("next position: " + nextPosition);
 
         runEnv.getStack().pushContext(flowContext);
     }

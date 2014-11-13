@@ -19,17 +19,16 @@ package com.hp.score.lang.compiler.utils;/*
 
 import ch.lambdaj.Lambda;
 import com.hp.score.api.ExecutionPlan;
+import com.hp.score.api.ExecutionStep;
 import com.hp.score.lang.compiler.domain.CompiledFlow;
 import com.hp.score.lang.compiler.domain.CompiledOperation;
 import com.hp.score.lang.compiler.domain.CompiledTask;
 import com.hp.score.lang.entities.bindings.Result;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
@@ -71,76 +70,51 @@ public class ExecutionPlanBuilder {
         executionPlan.setBeginStep(stepsIndex);
         //flow start step
         executionPlan.addStep(stepFactory.createStartStep(stepsIndex++, compiledFlow.getPreExecActionData(),
-                compiledFlow.getInputs(),compiledFlow.getName()));
+                compiledFlow.getInputs(), compiledFlow.getName()));
         //flow end step
         executionPlan.addStep(stepFactory.createEndStep(FLOW_END_STEP_INDEX, compiledFlow.getPostExecActionData(),
                 compiledFlow.getOutputs(), compiledFlow.getResults(), compiledFlow.getName()));
 
-        Map<String, Long> tasksReferences = new HashMap<>();
+        Map<String, Long> taskReferences = new HashMap<>();
         for (Result result : compiledFlow.getResults()) {
-            tasksReferences.put(result.getName(), FLOW_END_STEP_INDEX);
+            taskReferences.put(result.getName(), FLOW_END_STEP_INDEX);
         }
 
         List<CompiledTask> compiledTasks = compiledFlow.getCompiledWorkflow().getCompiledTasks();
-        for (CompiledTask compiledTask : compiledTasks) {
-            if (tasksReferences.get(compiledTask.getName()) != null) {
-                continue;
-            }
-            stepsIndex = buildTaskExecutionSteps(executionPlan, stepsIndex, tasksReferences, compiledTask, compiledTasks);
+
+        if (CollectionUtils.isEmpty(compiledTasks)) {
+            throw new RuntimeException("Flow: " + compiledFlow.getName() + " has no tasks");
         }
-//        executionPlan.addSteps(recursivelyBuildTaskExecutionSteps(compiledTasks.get(0), stepsIndex, tasksReferences, dependenciesByNamespace, compiledTasks));
+
+        List<ExecutionStep> taskExecutionSteps = buildTaskExecutionSteps(compiledTasks.get(0), stepsIndex, taskReferences, compiledTasks);
+        executionPlan.addSteps(taskExecutionSteps);
 
         return executionPlan;
     }
 
-    private Long buildTaskExecutionSteps(ExecutionPlan executionPlan, Long stepsIndex, Map<String, Long> tasksReferences,
-                                         CompiledTask compiledTask, List<CompiledTask> compiledTasks) {
+    private List<ExecutionStep> buildTaskExecutionSteps(CompiledTask compiledTask, Long currentId,
+                                                        Map<String, Long> taskReferences, List<CompiledTask> compiledTasks) {
+        List<ExecutionStep> taskExecutionSteps = new ArrayList<>();
         String taskName = compiledTask.getName();
         //Begin Task
-        tasksReferences.put(taskName, stepsIndex);
-        executionPlan.addStep(stepFactory.createBeginTaskStep(stepsIndex++, compiledTask.getPreTaskActionData(),
+        taskReferences.put(taskName, currentId);
+        taskExecutionSteps.add(stepFactory.createBeginTaskStep(currentId++, compiledTask.getPreTaskActionData(),
                 compiledTask.getRefId(), taskName));
-        Long endTaskIndex = stepsIndex++;
+        Long endTaskId = currentId++;
 
         //End Task
-        Map<String, Long> navigationValues = new LinkedHashMap<>();
+        Map<String, Long> navigationValues = new HashMap<>();
         for (Map.Entry<String, String> entry : compiledTask.getNavigationStrings().entrySet()) {
-            if (tasksReferences.get(entry.getValue()) == null) {
-                CompiledTask nextTaskToCompile = Lambda.selectFirst(compiledTasks,
-                        having(on(CompiledTask.class).getName(), equalTo(entry.getValue())));
-                stepsIndex = buildTaskExecutionSteps(executionPlan, stepsIndex, tasksReferences, nextTaskToCompile, compiledTasks);
+            String nextStepName = entry.getValue();
+            if (taskReferences.get(nextStepName) == null) {
+                CompiledTask nextTaskToCompile = Lambda.selectFirst(compiledTasks, having(on(CompiledTask.class).getName(), equalTo(nextStepName)));
+                taskExecutionSteps.addAll(buildTaskExecutionSteps(nextTaskToCompile, currentId, taskReferences, compiledTasks));
             }
-            navigationValues.put(entry.getKey(), tasksReferences.get(entry.getValue()));
+            navigationValues.put(entry.getKey(), taskReferences.get(nextStepName));
         }
-        executionPlan.addStep(stepFactory.createFinishTaskStep(endTaskIndex, compiledTask.getPostTaskActionData(),
+        taskExecutionSteps.add(stepFactory.createFinishTaskStep(endTaskId, compiledTask.getPostTaskActionData(),
                 navigationValues, taskName));
-        return stepsIndex;
-        //todo do we have tasks that no one ref to?
+        return taskExecutionSteps;
     }
-
-//
-//    private List<ExecutionStep> recursivelyBuildTaskExecutionSteps(CompiledTask compiledTask,
-//                                                    Long stepsIndex, Map<String, Long> tasksReferences,
-//                                                    TreeMap<String, List<SlangFile>> dependenciesByNamespace, List<CompiledTask> compiledTasks) {
-//        List<ExecutionStep> taskExecutionSteps = new ArrayList<>();
-//
-//        //Begin Task
-//        Map<String, Serializable> preTaskActionData = compiledTask.getPreTaskActionData();
-//        String refId = resolveRefId(compiledTask.getRefId(), dependenciesByNamespace);
-//        tasksReferences.put(compiledTask.getName(), stepsIndex);
-//        taskExecutionSteps.add(stepFactory.createBeginTaskStep(stepsIndex++, preTaskActionData, refId));
-//
-//        //End Task
-//        Map<String, Long> navigationValues = new LinkedHashMap<>();
-//        for (Map.Entry<String, String> entry : compiledTask.getNavigationStrings().entrySet()) {
-//            if (tasksReferences.get(entry.getValue()) == null) {
-//                CompiledTask nextTaskToCompile = Lambda.selectFirst(compiledTasks, having(on(CompiledTask.class).getName(), equalTo(entry.getValue())));
-//                taskExecutionSteps.addAll(recursivelyBuildTaskExecutionSteps(nextTaskToCompile, stepsIndex, tasksReferences, dependenciesByNamespace, compiledTasks));
-//            }
-//            navigationValues.put(entry.getKey(), tasksReferences.get(entry.getValue()));
-//        }
-//        taskExecutionSteps.add(stepFactory.createFinishTaskStep(stepsIndex, compiledTask.getPostTaskActionData(), navigationValues));
-//        return taskExecutionSteps;
-//    }
 
 }

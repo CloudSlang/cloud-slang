@@ -49,7 +49,7 @@ public interface ScoreLangConstants {
     String TASK_INPUTS_KEY = "taskInputs";
     String TASK_PUBLISH_KEY = "taskPublishValues";
     String TASK_NAVIGATION_KEY = "taskNavigationValues";
-    String REF_ID = "subFlowId";
+    String REF_ID = "refId";
 
 
 	String EVENT_STEP_ERROR = "EVENT_STEP_ERROR";

@@ -78,13 +78,13 @@ public class ExecutionStepFactory {
     }
 
     public ExecutionStep createStartStep(Long index, Map<String, Serializable> preExecutableData, List<Input>
-            execInputs,String stepName) {
+            execInputs, String executableName) {
         Validate.notNull(preExecutableData, "preExecutableData is null");
         Validate.notNull(execInputs, "Executable inputs are null");
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.OPERATION_INPUTS_KEY, (Serializable) execInputs);
         actionData.put(ScoreLangConstants.HOOKS, (Serializable) preExecutableData);
-        actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
+        actionData.put(ScoreLangConstants.NODE_NAME_KEY, executableName);
         return createGeneralStep(index, OPERATION_STEPS_CLASS, "startExecutable", ++index, actionData);
     }
 
@@ -103,7 +103,7 @@ public class ExecutionStepFactory {
     }
 
     public ExecutionStep createEndStep(Long index, Map<String, Serializable> postExecutableData,
-                                       List<Output> outputs, List<Result> results,String stepName) {
+                                       List<Output> outputs, List<Result> results, String executableName) {
         Validate.notNull(postExecutableData, "postExecutableData is null");
         Validate.notNull(outputs, "Executable outputs are null");
         Validate.notNull(results, "Executable results are null");
@@ -111,7 +111,7 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable) outputs);
         actionData.put(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable) results);
         actionData.put(ScoreLangConstants.HOOKS, (Serializable) postExecutableData);
-        actionData.put(ScoreLangConstants.NODE_NAME_KEY,stepName);
+        actionData.put(ScoreLangConstants.NODE_NAME_KEY, executableName);
         return createGeneralStep(index, OPERATION_STEPS_CLASS, "finishExecutable", null, actionData);
     }
 

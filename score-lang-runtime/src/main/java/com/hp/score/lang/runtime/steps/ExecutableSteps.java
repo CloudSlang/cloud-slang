@@ -48,9 +48,6 @@ public class ExecutableSteps extends AbstractSteps {
                                 @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                                 @Param(NODE_NAME_KEY) String executableName) {
 
-        System.out.println("=================");
-        System.out.println(" startExecutable ");
-        System.out.println("=================");
         runEnv.getExecutionPath().down();
 
         resolveGroups();
@@ -92,9 +89,6 @@ public class ExecutableSteps extends AbstractSteps {
                                  @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                                  @Param(NODE_NAME_KEY) String executableName) {
 
-        System.out.println("===============");
-        System.out.println(" finishExecutable ");
-        System.out.println("===============");
         Map<String, Serializable> operationContext = runEnv.getStack().popContext();
         ReturnValues actionReturnValues = runEnv.removeReturnValues();
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_START, "Output binding started",
@@ -114,7 +108,6 @@ public class ExecutableSteps extends AbstractSteps {
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_END, "Output binding finished",
                 Pair.of(RETURN_VALUES, returnValues),Pair.of(levelName.EXECUTABLE_NAME.toString(),executableName));
         runEnv.getExecutionPath().up();
-        printReturnValues(returnValues);
     }
 
     private void resolveGroups() {
