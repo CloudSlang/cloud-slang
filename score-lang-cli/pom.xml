@@ -14,30 +14,36 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <repositories>
-        <!-- see https://jira.springsource.org/browse/SHL-52 -->
-        <repository>
-            <id>ext-release-local</id>
-            <url>http://repo.springsource.org/simple/ext-release-local/</url>
-        </repository>
-    </repositories>
-
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.shell</groupId>
-                <artifactId>spring-shell</artifactId>
-                <version>1.0.0.RELEASE</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.shell</groupId>
             <artifactId>spring-shell</artifactId>
+            <version>1.0.0.RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>com.hp.score</groupId>
+            <artifactId>score-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>score-lang-compiler</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>score-lang-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.h2database</groupId>-->
+            <!--<artifactId>h2</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.hp.score</groupId>-->
+            <!--<artifactId>score-all</artifactId>-->
+            <!--<scope>compile</scope>-->
+        <!--</dependency>-->
     </dependencies>
 
     <build>
