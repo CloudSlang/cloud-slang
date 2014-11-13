@@ -161,11 +161,21 @@ public class InputsTransformerTest {
     }
 
     @Test
-    public void testLeadingAndTrailingSpaces() throws Exception {
+     public void testLeadingAndTrailingSpaces() throws Exception {
         List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
         Input input = inputs.get(10);
         Assert.assertEquals("input11", input.getName());
         Assert.assertEquals("5 + 6", input.getExpression());
+
+        Assert.assertNull(input.getDefaultValue());
+    }
+
+    @Test
+    public void testLeadingAndTrailingSpacesComplex() throws Exception {
+        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
+        Input input = inputs.get(11);
+        Assert.assertEquals("input12", input.getName());
+        Assert.assertEquals("\"mighty\" + ' max'   + varX", input.getExpression());
 
         Assert.assertNull(input.getDefaultValue());
     }

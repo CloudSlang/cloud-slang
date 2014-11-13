@@ -23,6 +23,8 @@ operations:
         - input10:
             default: -> input5
         - input11: ->  5 + 6
+        - input12: ->   "mighty" + ' max'   + varX
+
 
 
 
