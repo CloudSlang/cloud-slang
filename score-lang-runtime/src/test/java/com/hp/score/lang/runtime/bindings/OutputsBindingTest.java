@@ -95,7 +95,7 @@ public class OutputsBindingTest {
 
     //todo: do we want to throw an exception?
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
-    public void testMissingOperationOutputsNoExpression() throws Exception {
+    public void testOperationOutputsIllegalEvaluatedExpression() throws Exception {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, String> actionReturnValues = new HashMap<>();
         List<Output> outputs = Lists.newArrayList(createNoExpressionOutput("actionOutputKey1"));
@@ -117,6 +117,23 @@ public class OutputsBindingTest {
         Assert.assertEquals("Binding results are not as expected", expectedOutputs, result);
     }
 
+    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
+    public void testOperationOutputsWrongTypeExpression() throws Exception {
+        Map<String, Serializable> operationContext = prepareOperationContext();
+        Map<String, String> actionReturnValues = prepareActionReturnValues();
+        List<Output> outputs = Lists.newArrayList(createExpressionOutput("hostFromExpression", "1"));
+
+        outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
+    }
+
+    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
+    public void testMissingOperationOutputsNoExpression() throws Exception {
+        Map<String, Serializable> operationContext = prepareOperationContext();
+        Map<String, String> actionReturnValues = new HashMap<>();
+        List<Output> outputs = Lists.newArrayList(new Output("actionOutputKey1", null));
+
+        outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
+    }
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void testOperationOutputsInvalidExpression() throws Exception {
         Map<String, Serializable> operationContext = prepareOperationContext();
