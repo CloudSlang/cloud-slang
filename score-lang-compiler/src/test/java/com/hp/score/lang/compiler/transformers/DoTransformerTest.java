@@ -62,13 +62,23 @@ public class DoTransformerTest {
     }
 
     @Test
-    public void testTransform() throws Exception {
+    public void testTransformExpression() throws Exception {
         List<Input> inputs = (List<Input>) doTransformer.transform(doInputsMap);
         Assert.assertFalse(inputs.isEmpty());
-        Assert.assertEquals(1,inputs.size());
+        Assert.assertEquals(2,inputs.size());
         Input input = inputs.iterator().next();
         Assert.assertEquals("city",input.getName());
         Assert.assertEquals("city_name",input.getExpression());
+    }
+
+    @Test
+    public void testTransformConst() throws Exception {
+        List<Input> inputs = (List<Input>) doTransformer.transform(doInputsMap);
+        Assert.assertFalse(inputs.isEmpty());
+
+        Input input = inputs.get(1);
+        Assert.assertEquals("country",input.getName());
+        Assert.assertEquals("Israel",input.getDefaultValue());
     }
 
     @org.springframework.context.annotation.Configuration

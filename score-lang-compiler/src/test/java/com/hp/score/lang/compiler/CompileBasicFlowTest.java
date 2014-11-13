@@ -90,8 +90,9 @@ public class CompileBasicFlowTest {
         ExecutionStep beginTaskStep = executionPlan.getStep(2L);
         @SuppressWarnings("unchecked") List<Input> taskArguments = (List<Input>) beginTaskStep.getActionData().get(ScoreLangConstants.TASK_INPUTS_KEY);
         Assert.assertNotNull("arguments doesn't exist", taskArguments);
-        Assert.assertEquals("there is a different number of arguments than expected", 1, taskArguments.size());
+        Assert.assertEquals("there is a different number of arguments than expected", 2, taskArguments.size());
         Assert.assertEquals("city", taskArguments.get(0).getName());
+        Assert.assertEquals("country", taskArguments.get(1).getName());
         Assert.assertEquals("CheckWeather", beginTaskStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
 
         ExecutionStep FinishTaskSteps = executionPlan.getStep(3L);
