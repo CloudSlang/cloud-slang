@@ -13,6 +13,7 @@ import com.hp.score.lang.runtime.events.LanguageEventData;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.python.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +29,9 @@ import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -103,7 +106,7 @@ public class TaskStepsTest {
 
 
     @Test
-    public void testEndTask() throws Exception {
+    public void testEndTaskEvents() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String,String>(),""));
@@ -128,6 +131,24 @@ public class TaskStepsTest {
         eventData = (Map<String,Serializable>)outputEnd.getData();
         Assert.assertEquals("task1",eventData.get(LanguageEventData.levelName.TASK_NAME.name()));
 
+    }
+
+    @Test
+    public void testFinishExecutableWithPublish() throws Exception {
+        List<Output> possiblePublishValues = Lists.newArrayList(new Output("name", "name"));
+        RunEnvironment runEnv = new RunEnvironment();
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), null));
+        runEnv.getStack().pushContext(new HashMap<String, Serializable>());
+
+        Map<String, String> boundPublish = new HashMap<>();
+        boundPublish.put("name", "John");
+
+        when(outputsBinding.bindOutputs(isNull(Map.class), anyMapOf(String.class, String.class), eq(possiblePublishValues))).thenReturn(boundPublish);
+        taskSteps.endTask(runEnv, possiblePublishValues, new HashMap<String, Long>(), new ExecutionRuntimeServices(), "task1");
+
+        Map<String,Serializable> flowContext = runEnv.getStack().popContext();
+        Assert.assertTrue(flowContext.containsKey("name"));
+        Assert.assertEquals("John" ,flowContext.get("name"));
     }
 
     @Configuration

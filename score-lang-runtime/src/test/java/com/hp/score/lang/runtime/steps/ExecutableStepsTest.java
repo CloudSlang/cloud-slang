@@ -32,7 +32,6 @@ import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import com.hp.score.lang.runtime.events.LanguageEventData;
 import junit.framework.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.python.google.common.collect.Lists;
@@ -51,6 +50,11 @@ import java.util.List;
 import java.util.Map;
 
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
+import static com.hp.score.lang.entities.ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY;
+import static com.hp.score.lang.entities.ScoreLangConstants.EXECUTABLE_RESULTS_KEY;
+import static com.hp.score.lang.entities.ScoreLangConstants.SUCCESS_RESULT;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.eq;
@@ -70,6 +74,9 @@ public class ExecutableStepsTest {
 
     @Autowired
     private ResultsBinding resultsBinding;
+
+    @Autowired
+    private OutputsBinding outputsBinding;
 
     @Test
     public void testStart() throws Exception {
@@ -129,19 +136,88 @@ public class ExecutableStepsTest {
     }
 
     @Test
-    @Ignore
     public void testFinishExecutableWithResult() throws Exception {
-        List<Result> results = Lists.newArrayList(new Result("SUCCESS","true"));
+        List<Result> results = Lists.newArrayList(new Result(SUCCESS_RESULT,"true"));
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), null));
+        runEnv.getExecutionPath().down();
 
-        String boundResult = "SUCCESS";
-
-        when(resultsBinding.resolveResult(anyMapOf(String.class, String.class), eq(results), isNull(String.class))).thenReturn(boundResult);
+        when(resultsBinding.resolveResult(anyMapOf(String.class, String.class), eq(results), isNull(String.class))).thenReturn(SUCCESS_RESULT);
         executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), results, new ExecutionRuntimeServices(),"");
 
         ReturnValues returnValues= runEnv.removeReturnValues();
-        Assert.assertTrue(returnValues.getResult().equals(boundResult));
+        Assert.assertTrue(returnValues.getResult().equals(SUCCESS_RESULT));
+    }
+
+    @Test
+    public void testFinishExecutableWithOutput() throws Exception {
+        List<Output> possibleOutputs = Lists.newArrayList(new Output("name", "name"));
+        RunEnvironment runEnv = new RunEnvironment();
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), null));
+        runEnv.getExecutionPath().down();
+
+        Map<String, String> boundOutputs = new HashMap<>();
+        boundOutputs.put("name", "John");
+
+        when(outputsBinding.bindOutputs(isNull(Map.class), anyMapOf(String.class, String.class), eq(possibleOutputs))).thenReturn(boundOutputs);
+        executableSteps.finishExecutable(runEnv, possibleOutputs, new ArrayList<Result>(), new ExecutionRuntimeServices(),"");
+
+        ReturnValues returnValues= runEnv.removeReturnValues();
+        Map<String, String> outputs = returnValues.getOutputs();
+        Assert.assertEquals(1, outputs.size());
+        Assert.assertEquals("John", outputs.get("name"));
+    }
+
+    @Test
+    public void tesOutputsEvents(){
+        List<Output> possibleOutputs = Lists.newArrayList(new Output("name", "name"));
+        List<Result> possibleResults = Lists.newArrayList(new Result(SUCCESS_RESULT,"true"));
+        RunEnvironment runEnv = new RunEnvironment();
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), null));
+        runEnv.getExecutionPath().down();
+
+        Map<String, String> boundOutputs = new HashMap<>();
+        boundOutputs.put("name", "John");
+        String boundResult = SUCCESS_RESULT;
+
+        when(outputsBinding.bindOutputs(isNull(Map.class), anyMapOf(String.class, String.class), eq(possibleOutputs))).thenReturn(boundOutputs);
+        when(resultsBinding.resolveResult(anyMapOf(String.class, String.class), eq(possibleResults), isNull(String.class))).thenReturn(boundResult);
+
+        ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
+        executableSteps.finishExecutable(runEnv, possibleOutputs, possibleResults, runtimeServices,"task1");
+
+        Collection<ScoreEvent> events = runtimeServices.getEvents();
+
+        Assert.assertFalse(events.isEmpty());
+        ScoreEvent boundOutputEvent = null;
+        ScoreEvent startOutputEvent = null;
+        for(ScoreEvent event:events){
+            if(event.getEventType().equals(EVENT_OUTPUT_END)){
+                boundOutputEvent = event;
+            } else if(event.getEventType().equals(EVENT_OUTPUT_START)){
+                startOutputEvent = event;
+            }
+        }
+        Assert.assertNotNull(startOutputEvent);
+        Map<String,Serializable> eventData = (Map<String,Serializable>)startOutputEvent.getData();
+        Assert.assertTrue(eventData.containsKey(EXECUTABLE_OUTPUTS_KEY));
+        Assert.assertTrue(eventData.containsKey(EXECUTABLE_RESULTS_KEY));
+        List<Output> outputs= (List<Output>)eventData.get(EXECUTABLE_OUTPUTS_KEY);
+        List<Result> results= (List<Result>)eventData.get(EXECUTABLE_RESULTS_KEY);
+        Assert.assertEquals(possibleOutputs, outputs);
+        Assert.assertEquals(possibleResults, results);
+
+        Assert.assertNotNull(boundOutputEvent);
+        eventData = (Map<String,Serializable>)boundOutputEvent.getData();
+        Assert.assertTrue(eventData.containsKey(LanguageEventData.RETURN_VALUES));
+        ReturnValues returnValues= (ReturnValues)eventData.get(LanguageEventData.RETURN_VALUES);
+
+        Assert.assertEquals(1, returnValues.getOutputs().size());
+        Assert.assertEquals("John", returnValues.getOutputs().get("name"));
+        Assert.assertTrue(returnValues.getResult().equals(SUCCESS_RESULT));
+
+        Assert.assertTrue(eventData.containsKey(LanguageEventData.levelName.EXECUTABLE_NAME.name()));
+        Assert.assertEquals("task1",eventData.get(LanguageEventData.levelName.EXECUTABLE_NAME.name()));
     }
 
 
