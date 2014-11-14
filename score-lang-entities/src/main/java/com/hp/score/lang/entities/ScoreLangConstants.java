@@ -59,7 +59,7 @@ public interface ScoreLangConstants {
 	String EVENT_INPUT_START = "EVENT_INPUT_START";
 	String EVENT_INPUT_END = "EVENT_INPUT_END";
 	String EVENT_OUTPUT_START = "EVENT_OUTPUT_START";
-	String EVENT_OUTPUT_END = "EVENT_OUPUT_END";
+	String EVENT_OUTPUT_END = "EVENT_OUTPUT_END";
 
     // results
     String SUCCESS_RESULT = "SUCCESS";
