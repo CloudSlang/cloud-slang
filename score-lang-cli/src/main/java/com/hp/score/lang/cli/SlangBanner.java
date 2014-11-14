@@ -1,7 +1,11 @@
 package com.hp.score.lang.cli;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.shell.plugin.BannerProvider;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Date: 11/7/2014
@@ -9,18 +13,24 @@ import org.springframework.stereotype.Component;
  * @author lesant
  */
 @Component
-public class SlangBanner implements BannerProvider{
+public class SlangBanner implements BannerProvider {
 
     private static final String assistance = "Welcome to Slang. For assistance type help.";
-    private static final String banner = "  _________.__                  ________ \n" +
-            " /   _____/|  | _____    ____  /  _____/ \n" +
-            " \\_____  \\ |  | \\__  \\  /    \\/   \\  ___ \n" +
-            " /        \\|  |__/ __ \\|   |  \\    \\_\\  \\\n" +
-            "/_______  /|____(____  /___|  /\\______  /\n" +
-            "        \\/           \\/     \\/        \\/ ";
+
+    private static final String banner = "slangBanner.txt";
+
     @Override
     public String getBanner() {
-        return banner + "\n"+ SlangCLI.getVersion();
+        StringBuilder sb = new StringBuilder();
+        try (InputStream in = ClassLoader.getSystemResourceAsStream(banner)) {
+            sb.append(IOUtils.toString(in));
+        } catch (IOException e) {
+            sb.append("Slang");
+        }
+        sb.append(System.lineSeparator());
+        sb.append(SlangCLI.getVersion());
+
+        return sb.toString();
     }
 
     @Override
@@ -35,6 +45,6 @@ public class SlangBanner implements BannerProvider{
 
     @Override
     public String name() {
-        return "Slang " + getVersion() + " - SpringShell";
+        return "Slang-";
     }
 }

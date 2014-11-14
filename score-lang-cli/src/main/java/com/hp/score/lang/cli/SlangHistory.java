@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * @author lesant
  */
 @Component
-public class SlangHistory implements HistoryFileNameProvider{ //todo will we need it?
+public class SlangHistory implements HistoryFileNameProvider{
     private static final String historyFileName = "slang.log";
     private static final String name = "slang log";
     @Override
