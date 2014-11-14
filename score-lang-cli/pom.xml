@@ -16,44 +16,41 @@
 
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.shell</groupId>
-            <artifactId>spring-shell</artifactId>
-            <version>1.0.0.RELEASE</version>
-        </dependency>
+
+        <!-- score dependencies -->
         <dependency>
             <groupId>com.hp.score</groupId>
-            <artifactId>score-api</artifactId>
+            <artifactId>score-all</artifactId>
+            <scope>compile</scope>
         </dependency>
+
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>score-lang-compiler</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>score-lang-runtime</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>score-lang-compiler</artifactId>
+            <version>${project.version}</version>
         </dependency>
+        <!-- end of score dependencies -->
+
+        <!-- spring dependencies -->
         <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-all</artifactId>
-        <scope>test</scope>
+            <groupId>org.springframework.shell</groupId>
+            <artifactId>spring-shell</artifactId>
+            <version>1.0.0.RELEASE</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>com.h2database</groupId>-->
-            <!--<artifactId>h2</artifactId>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>com.hp.score</groupId>-->
-            <!--<artifactId>score-all</artifactId>-->
-            <!--<scope>compile</scope>-->
-        <!--</dependency>-->
+        <!-- end of spring dependencies -->
+
     </dependencies>
 
     <build>

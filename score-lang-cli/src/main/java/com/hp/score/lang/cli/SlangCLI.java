@@ -1,11 +1,13 @@
 package com.hp.score.lang.cli;
 
 import com.hp.score.api.TriggeringProperties;
+import com.hp.score.lang.cli.services.ScoreServices;
 import com.hp.score.lang.cli.utils.CompilerUtils;
 import com.hp.score.lang.compiler.SlangCompiler;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.runtime.env.RunEnvironment;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -32,6 +34,9 @@ public class SlangCLI implements CommandMarker {
     @Autowired
     private SlangCompiler compiler;
 
+    @Autowired
+    private ScoreServices scoreServices;
+
     private static final String currently = "You are currently running Score version: ";
     private static final String scoreVersion = "0.1.229"; //todo get version
 
@@ -43,7 +48,7 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = "D", mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, String> inputs) throws IOException {
 
         File file = CompilerUtils.getFile(filePath);
-        File operation = CompilerUtils.getFile("yaml/firstOperation.yaml"); //will solve with classpath
+        File operation = CompilerUtils.getFile("yaml/operation.yaml"); //will solve with classpath
 
         List<File> path = new ArrayList<>();
         path.add(operation);
@@ -51,7 +56,6 @@ public class SlangCLI implements CommandMarker {
         CompilationArtifact compilationArtifact = compiler.compileFlow(file, path);
 
         trigger(compilationArtifact, inputs);
-
     }
     private void trigger(CompilationArtifact compilationArtifact, Map<String, String> inputs){
         Map<String, Serializable> executionContext = new HashMap<>();
@@ -62,6 +66,8 @@ public class SlangCLI implements CommandMarker {
                 .create(compilationArtifact.getExecutionPlan())
                 .setDependencies(compilationArtifact.getDependencies())
                 .setContext(executionContext);
+
+        scoreServices.trigger(triggeringProperties);
     }
 
     @CliCommand(value = "slang -version", help = "Prints the score version used")

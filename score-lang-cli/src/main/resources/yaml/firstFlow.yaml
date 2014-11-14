@@ -10,8 +10,8 @@ flow:
   workflow:
     CheckWeather:
       do:
-        ops.test_op:
-          - city: input_1
+        ops.check_Weather:
+          - city: input1
       publish:
         - weather
       navigate:
