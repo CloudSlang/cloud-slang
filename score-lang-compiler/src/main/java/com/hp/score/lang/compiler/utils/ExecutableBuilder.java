@@ -52,6 +52,9 @@ public class ExecutableBuilder {
     private List<Transformer> transformers;
 
     public CompiledExecutable compileExecutable(String execName, Map<String, Object> executableRawData, TreeMap<String, List<SlangFile>> dependenciesByNamespace, SlangFile.Type type) {
+
+        Validate.notEmpty(executableRawData, "executable data for: " + execName + " is empty");
+
         Map<String, Serializable> preExecutableActionData = new HashMap<>();
         Map<String, Serializable> postExecutableActionData = new HashMap<>();
 
@@ -71,10 +74,16 @@ public class ExecutableBuilder {
 
         if (type == SlangFile.Type.FLOW) {
             @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> workFlowRawData = (LinkedHashMap<String, Map<String, Object>>) executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
+            if (MapUtils.isEmpty(workFlowRawData)){
+                throw new RuntimeException("flow: " + execName + " has no workflow data");
+            }
             CompiledWorkflow compiledWorkflow = compileWorkFlow(workFlowRawData, dependenciesByNamespace);
             return new CompiledFlow(preExecutableActionData, postExecutableActionData, compiledWorkflow, execName, inputs, outputs, results);
         } else {
             @SuppressWarnings("unchecked") Map<String, Object> actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
+            if (MapUtils.isEmpty(actionRawData)){
+                throw new RuntimeException("operation: " + execName + " has no action data");
+            }
             CompiledDoAction compiledDoAction = compileAction(actionRawData);
             return new CompiledOperation(preExecutableActionData, postExecutableActionData, compiledDoAction, execName, inputs, outputs, results);
         }
@@ -122,7 +131,10 @@ public class ExecutableBuilder {
         preTaskData.putAll(runTransformers(taskRawData, preTaskTransformers));
         postTaskData.putAll(runTransformers(taskRawData, postTaskTransformers));
 
-        @SuppressWarnings("unchecked") LinkedHashMap<String, Object> doRawData = (LinkedHashMap<String, Object>) taskRawData.get(SlangTextualKeys.DO_KEY);
+        @SuppressWarnings("unchecked") Map<String, Object> doRawData = (Map<String, Object>) taskRawData.get(SlangTextualKeys.DO_KEY);
+        if (MapUtils.isEmpty(doRawData)) {
+            throw new RuntimeException("task: " + taskName + " has no reference information");
+        }
         String refString = doRawData.keySet().iterator().next();
         String refId = resolveRefId(refString, dependenciesByNamespace);
 
@@ -178,7 +190,7 @@ public class ExecutableBuilder {
         String refIdSuffix = StringUtils.substringAfter(refIdString, ".");
         Map matchingExecutable = Lambda.selectFirst(executableList, hasKey(refIdSuffix));
         if (matchingExecutable == null) {
-            throw new RuntimeException("No executable was found in the path that for ref: " + refIdString);
+            throw new RuntimeException("No executable with name: " + refIdSuffix + " was found in the path that for ref: " + refIdString);
         }
         return slangFilesList.get(0).getNamespace() + "." + refIdSuffix;
     }
