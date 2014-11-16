@@ -28,9 +28,18 @@ public class CompilerHelper {
     @Autowired
     private SlangCompiler compiler;
 
-    private String[] SLANG_FILE_EXTENSIONS = {"yml","yaml"};
+    private String[] SLANG_FILE_EXTENSIONS = {"yml","yaml","py"};
 
+    /**
+     *
+     * @param filePath
+     * @param opName
+     * @param dependencies
+     * @return
+     * @throws IOException
+     */
     public CompilationArtifact compile(String filePath, String opName, String dependencies) throws IOException{
+        Validate.notNull(filePath,"filePath can not be null");
 
         List<File> dependenciesFilesList = new ArrayList<>();
         File file = new File(filePath);

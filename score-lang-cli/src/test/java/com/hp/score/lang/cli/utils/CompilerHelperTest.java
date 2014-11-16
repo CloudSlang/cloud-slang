@@ -1,17 +1,21 @@
 package com.hp.score.lang.cli.utils;
 
 
+import com.google.common.collect.Lists;
 import com.hp.score.lang.compiler.SlangCompiler;
-import com.hp.score.lang.compiler.SlangCompilerImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
+
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 
 /*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
@@ -38,12 +42,34 @@ public class CompilerHelperTest {
     @Autowired
     private CompilerHelper compilerHelper;
 
-    /*@Autowired(required = false)
-    private SlangCompiler slangCompiler;*/
+    @Autowired
+    private SlangCompiler slangCompiler;
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testFilePathWrong() throws Exception {
         compilerHelper.compile(null,null,null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFilePathNotFile() throws Exception {
+        compilerHelper.compile("xxx",null,null);
+    }
+
+    @Test
+    public void testFilePathValid() throws Exception {
+        String flowFilePath = getClass().getResource("/flow.yaml").getPath();
+        String opFilePath = getClass().getResource("/operation.yaml").getPath();
+        compilerHelper.compile(flowFilePath,null,null);
+        Mockito.verify(slangCompiler,times(1)).compile(new File(flowFilePath),null, Lists.newArrayList(new File(flowFilePath),new File(opFilePath)));
+    }
+
+    @Test
+    public void testFilePathValidWithOtherPathForDepdencies() throws Exception {
+        String flowFilePath = getClass().getResource("/flow.yaml").getPath();
+        String emptyFilePath = getClass().getResource("/flowsdir/").getPath();
+        String flow2FilePath = getClass().getResource("/flowsdir/flow2.yaml").getPath();
+        compilerHelper.compile(flowFilePath,null,emptyFilePath);
+        Mockito.verify(slangCompiler,times(1)).compile(new File(flowFilePath),null, Lists.newArrayList(new File(flow2FilePath)));
     }
 
 
