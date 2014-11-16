@@ -19,80 +19,87 @@ import java.util.Map;
  */
 public class LanguageEventData extends HashMap<String, Serializable> {
 
-    public static final String TYPE = "TYPE";
-    public static final String DESCRIPTION = "DESCRIPTION";
-    public static final String TIMESTAMP = "TIMESTAMP";
-    public static final String EXECUTIONID = "EXECUTIONID";
-    public static final String PATH = "PATH";
-    public static final String EXCEPTION = "EXCEPTION";
-    public static final String CALL_ARGUMENTS = "CALL_ARGUMENTS";
-    public static final String INPUTS = "INPUTS";
-    public static final String BOUND_INPUTS = "BOUND_INPUTS";
-    public static final String RETURN_VALUES = "RETURN_VALUES";
-    public static final String OUTPUTS = "OUTPUTS";
+	public static final String TYPE = "TYPE";
+	public static final String DESCRIPTION = "DESCRIPTION";
+	public static final String TIMESTAMP = "TIMESTAMP";
+	public static final String EXECUTIONID = "EXECUTIONID";
+	public static final String PATH = "PATH";
+	public static final String EXCEPTION = "EXCEPTION";
+	public static final String INPUTS = "INPUTS";
+	public static final String OUTPUTS = "OUTPUTS";
+	public static final String CALL_ARGUMENTS = "CALL_ARGUMENTS";
+	public static final String BOUND_INPUTS = "BOUND_INPUTS";
+	public static final String RETURN_VALUES = "RETURN_VALUES";
+	public static final String ENCRYPTED_VALUE = "*****";
+	private static final long serialVersionUID = 2885051907156304718L;
 
-    public enum levelName{
-        TASK_NAME,EXECUTABLE_NAME;
-    }
+	public enum levelName {
+		TASK_NAME,
+		EXECUTABLE_NAME;
+	}
 
-    public static final String ENCRYPTED_VALUE = "*****";
+	public String getEventType() {
+		return (String)get(TYPE);
+	}
 
-    private static final long serialVersionUID = 2885051907156304718L;
+	public void setEventType(String eventType) {
+		put(TYPE, eventType);
+	}
 
-    public String getEventType() {
-        return (String)get(TYPE);
-    }
+	public String getDescription() {
+		return (String)get(DESCRIPTION);
+	}
 
-    public void setEventType(String eventType) {
-        put(TYPE, eventType);
-    }
+	public void setDescription(String description) {
+		put(DESCRIPTION, description);
+	}
 
-    public String getDescription() {
-        return (String)get(DESCRIPTION);
-    }
+	public Date getTimeStamp() {
+		return (Date)get(TIMESTAMP);
+	}
 
-    public void setDescription(String description) {
-        put(DESCRIPTION, description);
-    }
+	public void setTimeStamp(Date timeStamp) {
+		put(TIMESTAMP, timeStamp);
+	}
 
-    public Date getTimeStamp() {
-        return (Date)get(TIMESTAMP);
-    }
+	public Long getExecutionId() {
+		return (Long)get(EXECUTIONID);
+	}
 
-    public void setTimeStamp(Date timeStamp) {
-        put(TIMESTAMP, timeStamp);
-    }
+	public void setExecutionId(Long executionId) {
+		put(EXECUTIONID, executionId);
+	}
 
-    public Long getExecutionId() {
-        return (Long)get(EXECUTIONID);
-    }
+	public String getPath() {
+		return (String)get(PATH);
+	}
 
-    public void setExecutionId(Long executionId) {
-        put(EXECUTIONID, executionId);
-    }
+	public void setPath(String path) {
+		put(PATH, path);
+	}
 
-    public String getPath() {
-        return (String)get(PATH);
-    }
+	public Exception getException() {
+		return (Exception)get(EXCEPTION);
+	}
 
-    public void setPath(String path) {
-        put(PATH, path);
-    }
+	public void setException(Exception ex) {
+		put(EXCEPTION, ex);
+	}
 
-    public Map<String, Serializable> getInputs() {
-        return (Map<String, Serializable>)get(INPUTS);
-    }
+	public Map<String, Serializable> getInputs() {
+		return (Map<String, Serializable>)get(INPUTS);
+	}
 
-    public void setInputs(Map<String, Serializable> inputs) {
-        put(INPUTS, (Serializable)inputs);
-    }
+	public void setInputs(Map<String, Serializable> inputs) {
+		put(INPUTS, (Serializable)inputs);
+	}
 
-    public Map<String, Serializable> getOutputs() {
-        return (Map<String, Serializable>) get(OUTPUTS);
-    }
+	public Map<String, Serializable> getOutputs() {
+		return (Map<String, Serializable>)get(OUTPUTS);
+	}
 
-    public void setOutputs(Map<String, Serializable> outputs) {
-        put(OUTPUTS, (Serializable) outputs);
-    }
+	public void setOutputs(Map<String, Serializable> outputs) {
+		put(OUTPUTS, (Serializable)outputs);
+	}
 
 }
