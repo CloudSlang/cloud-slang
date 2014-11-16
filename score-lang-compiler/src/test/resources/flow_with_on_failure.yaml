@@ -1,0 +1,40 @@
+namespace: user.ops
+
+imports:
+  ops: user.ops
+
+flow:
+  name: basic_flow
+  inputs:
+    - input1
+  workflow:
+    on_failure:
+      check_something:
+        do:
+          ops.test_op:
+            - city: a
+
+      send_mail:
+        do:
+          ops.test_op:
+        navigate:
+          SUCCESS: SUCCESS
+          FAILURE: FAILURE
+
+    first_task:
+      do:
+        ops.test_op:
+          - city: input_1
+      publish:
+        - weather
+
+    second_task:
+      do:
+        ops.test_op:
+          - city: input_1
+      navigate:
+        SUCCESS: SUCCESS
+        FAILURE: FAILURE  
+  results:
+    - SUCCESS
+    - FAILURE

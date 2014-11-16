@@ -31,6 +31,7 @@ public interface SlangTextualKeys {
     //flow
     String FLOW_NAME_KEY = "name";
     String WORKFLOW_KEY = "workflow";
+    String ON_FAILURE_KEY = "on_failure";
 
     //action
     String JAVA_ACTION = "java_action";

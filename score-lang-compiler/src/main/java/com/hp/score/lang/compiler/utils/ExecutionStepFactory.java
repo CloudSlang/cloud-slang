@@ -128,7 +128,7 @@ public class ExecutionStepFactory {
         step.setActionData(actionData);
 
         step.setNavigation(new ControlActionMetadata(NAVIGATION_ACTIONS_CLASS, SIMPLE_NAVIGATION_METHOD));
-        Map<String, Object> navigationData = new HashMap<>(2);
+        Map<String, Object> navigationData = new HashMap<>();
         navigationData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, nextStepId);
 
         step.setNavigationData(navigationData);

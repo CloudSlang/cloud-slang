@@ -17,20 +17,20 @@ package com.hp.score.lang.compiler.domain;/*
  * under the License.
 */
 
-import java.util.List;
+import java.util.Deque;
 
 /*
  * Created by orius123 on 06/11/14.
  */
 public class CompiledWorkflow {
 
-    private final List<CompiledTask> compiledTasks;
+    private final Deque<CompiledTask> compiledTasks;
 
-    public CompiledWorkflow(List<CompiledTask> compiledTasks) {
+    public CompiledWorkflow(Deque<CompiledTask> compiledTasks) {
         this.compiledTasks = compiledTasks;
     }
 
-    public List<CompiledTask> getCompiledTasks() {
+    public Deque<CompiledTask> getCompiledTasks() {
         return compiledTasks;
     }
 }
