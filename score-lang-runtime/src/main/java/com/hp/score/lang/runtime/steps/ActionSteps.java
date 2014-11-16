@@ -8,7 +8,6 @@ import com.hp.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.entities.ActionType;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
@@ -22,11 +21,23 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import static com.hp.score.lang.entities.ScoreLangConstants.*;
-import static com.hp.score.lang.runtime.events.LanguageEventData.*;
-import static com.hp.score.api.execution.ExecutionParametersConsts.*;
+import static com.hp.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static com.hp.score.lang.entities.ScoreLangConstants.ACTION_CLASS_KEY;
+import static com.hp.score.lang.entities.ScoreLangConstants.ACTION_METHOD_KEY;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_END;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_ERROR;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_START;
+import static com.hp.score.lang.entities.ScoreLangConstants.PYTHON_SCRIPT_KEY;
+import static com.hp.score.lang.entities.ScoreLangConstants.RUN_ENV;
+import static com.hp.score.lang.runtime.events.LanguageEventData.CALL_ARGUMENTS;
+import static com.hp.score.lang.runtime.events.LanguageEventData.EXCEPTION;
+import static com.hp.score.lang.runtime.events.LanguageEventData.RETURN_VALUES;
 
 /**
  * User: stoneo
@@ -51,7 +62,7 @@ public class ActionSteps extends AbstractSteps {
 
         Map<String, String> returnValue = new HashMap<>();
         Map<String, Serializable> callArguments = runEnv.removeCallArguments();
-        fireEvent(executionRuntimeServices, runEnv, EVENT_ACTION_START, "Preparing to run action " + actionType, Pair.of(CALL_ARGUMENTS, (Serializable)callArguments));
+        fireEvent(executionRuntimeServices, runEnv, EVENT_ACTION_START, "Preparing to run action " + actionType, Pair.of(CALL_ARGUMENTS, (Serializable) callArguments));
         try {
             switch (actionType) {
                 case JAVA:
@@ -63,7 +74,7 @@ public class ActionSteps extends AbstractSteps {
                 default:
                     break;
             }
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             fireEvent(executionRuntimeServices, runEnv, EVENT_ACTION_ERROR, ex.getMessage(), Pair.of(EXCEPTION, ex));
             logger.error(ex);
         }
@@ -83,43 +94,50 @@ public class ActionSteps extends AbstractSteps {
 
         Object[] actualParameters = extractMethodData(currentContext, nonSerializableExecutionData, className, methodName);
 
-        try {
-            return invokeActionMethod(className, methodName, actualParameters);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return invokeActionMethod(className, methodName, actualParameters);
     }
 
-    private Object[] extractMethodData(Map<String, Serializable> currentContext, Map<String, Object> nonSerializableExecutionData, String className, String methodName) {
+    private Object[] extractMethodData(Map<String, Serializable> currentContext,
+                                       Map<String, Object> nonSerializableExecutionData,
+                                       String className,
+                                       String methodName) {
 
         //get the Method object
-        Method actionMethod;
-        try {
-            actionMethod = getMethodByName(className, methodName);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
+        Method actionMethod = getMethodByName(className, methodName);
 
         //extract the parameters from execution context
         return resolveActionArguments(actionMethod, currentContext, nonSerializableExecutionData);
     }
 
 
-    private Map<String, String> invokeActionMethod(String className, String methodName, Object... parameters) throws Exception {
+    private Map<String, String> invokeActionMethod(String className, String methodName, Object... parameters) {
         Method actionMethod = getMethodByName(className, methodName);
-        Class actionClass = Class.forName(className);
-        Object returnObject = actionMethod.invoke(actionClass.newInstance(), parameters);
+        Class actionClass = getActionClass(className);
+        Object returnObject;
+        try {
+            returnObject = actionMethod.invoke(actionClass.newInstance(), parameters);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not invoke method " + methodName + " of class " + className, e);
+        }
         @SuppressWarnings("unchecked") Map<String, String> returnMap = (Map<String, String>) returnObject;
         if (returnMap == null) {
-            throw new Exception("Action method did not return Map<String,String>");
+            throw new RuntimeException("Action method did not return Map<String,String>");
         }
         return returnMap;
     }
 
-    private Method getMethodByName(String className, String methodName) throws ClassNotFoundException {
-        Class actionClass = Class.forName(className);
+    private Class getActionClass(String className) {
+        Class actionClass;
+        try {
+            actionClass = Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Class name " + className + " was not found", e);
+        }
+        return actionClass;
+    }
+
+    private Method getMethodByName(String className, String methodName)  {
+        Class actionClass = getActionClass(className);
         Method[] methods = actionClass.getDeclaredMethods();
         Method actionMethod = null;
         for (Method m : methods) {
