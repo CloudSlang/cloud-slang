@@ -1,81 +1,58 @@
-package com.hp.score.lang.entities.bindings;
 /*
- * Licensed to Hewlett-Packard Development Company, L.P. under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
-*/
+ * Licensed to Hewlett-Packard Development Company, L.P. under one or more contributor license agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the
+ * License.
+ */
+package com.hp.score.lang.entities.bindings;
 
 import java.io.Serializable;
 
-/*
- * Created by orius123 on 05/11/14.
+/**
+ * @author orius123
+ * @since 05/11/14.
+ * @version $Id$
  */
-public class Input implements Serializable{
+public class Input extends InOutParam {
 
-    private final String name;
+	private static final long serialVersionUID = -2411446962609754342L;
 
-    private final Serializable defaultValue;
+	private final Serializable defaultValue;
+	private final boolean encrypted;
+	private final boolean required;
+	private final boolean override;
 
-    private final String expression ;
+	public Input(String name, String expression) {
+		super(name, expression);
+		this.defaultValue = null;
+		this.encrypted = false;
+		this.required = true;
+		this.override = false;
+	}
 
-    private final boolean encrypted;
+	public Input(String name, String expression, Serializable defaultValue, boolean encrypted, boolean required, boolean override) {
+		super(name, expression);
+		this.defaultValue = defaultValue;
+		this.encrypted = encrypted;
+		this.required = required;
+		this.override = override;
+	}
 
-    private final boolean required;
+	public Serializable getDefaultValue() {
+		return defaultValue;
+	}
 
-    private final boolean override;
+	public boolean isEncrypted() {
+		return encrypted;
+	}
 
-    public Input(String name,String expression) {
-        this.name = name;
-        this.defaultValue = null;
-        this.expression = expression;
-        this.encrypted = false ;
-        this.required = true ;
-        this.override = false ;
-    }
+	public boolean isRequired() {
+		return required;
+	}
 
-    public Input(String name,String expression,Serializable defaultValue,boolean encrypted,boolean required,boolean override) {
-        this.name = name;
-        this.defaultValue = defaultValue;
-        this.expression = expression;
-        this.encrypted = encrypted ;
-        this.required = required ;
-        this.override = override ;
-    }
+	public boolean isOverride() {
+		return override;
+	}
 
-    public String getName() {
-        return name;
-    }
-
-    public Serializable getDefaultValue() {
-        return defaultValue;
-    }
-
-    public String getExpression() {
-        return expression;
-    }
-
-    public boolean isEncrypted() {
-        return encrypted;
-    }
-
-    public boolean isRequired() {
-        return required;
-    }
-
-    public boolean isOverride() {
-        return override;
-    }
 }
