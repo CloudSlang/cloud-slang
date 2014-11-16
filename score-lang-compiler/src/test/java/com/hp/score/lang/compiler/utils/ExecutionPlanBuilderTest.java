@@ -16,10 +16,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
@@ -123,7 +120,7 @@ public class ExecutionPlanBuilderTest {
     public void createSimpleFlow() throws Exception {
         Map<String, Serializable> preFlowActionData = new HashMap<>();
         Map<String, Serializable> postFlowActionData = new HashMap<>();
-        List<CompiledTask> compiledTasks = new ArrayList<>();
+        Deque<CompiledTask> compiledTasks = new LinkedList<>();
         CompiledTask compiledTask = createSimpleCompiledTask("taskName");
         compiledTasks.add(compiledTask);
         CompiledWorkflow compiledWorkflow = new CompiledWorkflow(compiledTasks);
@@ -154,7 +151,7 @@ public class ExecutionPlanBuilderTest {
 
     @Test
     public void createFlowWithTwoTasks() throws Exception {
-        List<CompiledTask> compiledTasks = new ArrayList<>();
+        Deque<CompiledTask> compiledTasks = new LinkedList<>();
         String secondTaskName = "2ndTask";
         HashMap<String, String> navigationStrings = new HashMap<>();
         navigationStrings.put(ScoreLangConstants.SUCCESS_RESULT, secondTaskName);
@@ -203,7 +200,7 @@ public class ExecutionPlanBuilderTest {
     public void createFlowWithNoTasksShouldThrowException() throws Exception {
         Map<String, Serializable> preFlowActionData = new HashMap<>();
         Map<String, Serializable> postFlowActionData = new HashMap<>();
-        ArrayList<CompiledTask> compiledTasks = new ArrayList<>();
+        Deque<CompiledTask> compiledTasks = new LinkedList<>();
         CompiledWorkflow compiledWorkflow = new CompiledWorkflow(compiledTasks);
         String flowName = "flowName";
         List<Input> inputs = new ArrayList<>();

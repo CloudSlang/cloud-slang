@@ -23,8 +23,10 @@ package com.hp.score.lang.compiler;
  */
 
 import com.hp.score.api.ExecutionPlan;
+import com.hp.score.api.ExecutionStep;
 import com.hp.score.lang.compiler.configuration.SlangCompilerSpringConfig;
 import com.hp.score.lang.entities.CompilationArtifact;
+import com.hp.score.lang.entities.ScoreLangConstants;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,17 +38,18 @@ import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
-public class CompileFlowWithMultipleStepsTest {
+public class CompileFlowWithOnFailureTest {
 
     @Autowired
     private SlangCompiler compiler;
 
     @Test
     public void testCompileFlowBasic() throws Exception {
-        URI flow = getClass().getResource("/flow_with_multiple_steps.yaml").toURI();
+        URI flow = getClass().getResource("/flow_with_on_failure.yaml").toURI();
         URI operation = getClass().getResource("/operation.yaml").toURI();
 
         List<File> path = new ArrayList<>();
@@ -58,5 +61,24 @@ public class CompileFlowWithMultipleStepsTest {
         Assert.assertEquals("there is a different number of steps than expected", 10, executionPlan.getSteps().size());
         Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());
         Assert.assertEquals("the dependencies size is not as expected", 3, compilationArtifact.getDependencies().size());
+        Assert.assertEquals("the inputs size is not as expected", 1, compilationArtifact.getInputs().size());
+
+        long firstOnFailureStep = 6L;
+        long endFlowStep = 0L;
+
+        ExecutionStep firstStep = executionPlan.getStep(3L);
+        Assert.assertEquals("first step didn't navigate to on failure", firstOnFailureStep, getNavigationData(firstStep));
+        ExecutionStep secondStep = executionPlan.getStep(5L);
+        Assert.assertEquals(endFlowStep, getNavigationData(secondStep));
+        ExecutionStep firstOnFailStep = executionPlan.getStep(7L);
+        Assert.assertEquals(endFlowStep, getNavigationData(firstOnFailStep));
+        ExecutionStep secondOnFailStep = executionPlan.getStep(9L);
+        Assert.assertEquals(endFlowStep, getNavigationData(secondOnFailStep));
+    }
+
+    private long getNavigationData(ExecutionStep firstStep) {
+        @SuppressWarnings("unchecked") Map<String, Long> navigationData =
+                (Map<String, Long>) firstStep.getActionData().get(ScoreLangConstants.TASK_NAVIGATION_KEY);
+        return navigationData.get(ScoreLangConstants.FAILURE_RESULT);
     }
 }

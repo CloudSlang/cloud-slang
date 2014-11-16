@@ -18,11 +18,14 @@
 */
 package com.hp.score.lang.runtime.steps;
 
-import com.hp.oo.sdk.content.annotations.Param;
+import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
+import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
+import com.hp.score.api.execution.ExecutionParametersConsts;
+import com.hp.score.events.ScoreEvent;
 import com.hp.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
-
+import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.python.util.PythonInterpreter;
@@ -32,15 +35,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import junit.framework.Assert;
-
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.hp.score.lang.entities.ActionType.JAVA;
 import static com.hp.score.lang.entities.ActionType.PYTHON;
-
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_END;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_ERROR;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -70,7 +73,7 @@ public class ActionStepsTest {
         Map<String, Object> nonSerializableExecutionData = new HashMap<>();
 
         //invoke doAction
-		actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ActionStepsTest.class.getName(), "doJavaSampleAction", executionRuntimeServicesMock, null);
+		actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(), "doJavaSampleAction", executionRuntimeServicesMock, null);
 
         //construct expected outputs
         Map<String, String> expectedOutputs = new HashMap<>();
@@ -86,6 +89,56 @@ public class ActionStepsTest {
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
+    public void doJavaActionWrongClassTest() {
+        //prepare doAction arguments
+        RunEnvironment runEnv = new RunEnvironment();
+        ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
+
+        //invoke doAction
+        actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, "MissingClassName", "doJavaSampleAction", runtimeServices, null);
+
+        Collection<ScoreEvent> events = runtimeServices.getEvents();
+
+        Assert.assertFalse(events.isEmpty());
+        ScoreEvent actionErrorEvent = null;
+        ScoreEvent actionEndEvent = null;
+        for(ScoreEvent event:events){
+            if(event.getEventType().equals(EVENT_ACTION_ERROR)){
+                actionErrorEvent = event;
+            } else if(event.getEventType().equals(EVENT_ACTION_END)){
+                actionEndEvent = event;
+            }
+        }
+        Assert.assertNotNull(actionErrorEvent);
+        Assert.assertNotNull(actionEndEvent);
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void doJavaActionWrongReturnTypeTest() {
+        //prepare doAction arguments
+        RunEnvironment runEnv = new RunEnvironment();
+        ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
+
+        //invoke doAction
+        actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, ContentTestActions.class.getName(), "doJavaActionWrongReturnType", runtimeServices, null);
+
+        Collection<ScoreEvent> events = runtimeServices.getEvents();
+
+        Assert.assertFalse(events.isEmpty());
+        ScoreEvent actionErrorEvent = null;
+        ScoreEvent actionEndEvent = null;
+        for(ScoreEvent event:events){
+            if(event.getEventType().equals(EVENT_ACTION_ERROR)){
+                actionErrorEvent = event;
+            } else if(event.getEventType().equals(EVENT_ACTION_END)){
+                actionEndEvent = event;
+            }
+        }
+        Assert.assertNotNull(actionErrorEvent);
+        Assert.assertNotNull(actionEndEvent);
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void doActionJavaMissingInputTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
@@ -97,7 +150,7 @@ public class ActionStepsTest {
         Map<String, Object> nonSerializableExecutionData = new HashMap<>();
 
         //invoke doAction
-        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ActionStepsTest.class.getName(), "doJavaSampleAction", executionRuntimeServicesMock, null);
+        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(), "doJavaSampleAction", executionRuntimeServicesMock, null);
 
         //construct expected outputs
         Map<String, String> expectedOutputs = new HashMap<>();
@@ -124,7 +177,7 @@ public class ActionStepsTest {
         Map<String, Object> nonSerializableExecutionData = new HashMap<>();
 
         //invoke doAction
-        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ActionStepsTest.class.getName(), "doJavaSampleAction_NOT_FOUND", executionRuntimeServicesMock, null);
+        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(), "doJavaSampleAction_NOT_FOUND", executionRuntimeServicesMock, null);
 
         //construct expected outputs
         Map<String, String> expectedOutputs = new HashMap<>();
@@ -149,7 +202,7 @@ public class ActionStepsTest {
         Map<String, Object> nonSerializableExecutionData = new HashMap<>();
 
         //invoke doAction
-        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ActionStepsTest.class.getName(), "doJavaActionMissingAnnotation", executionRuntimeServicesMock, null);
+        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(), "doJavaActionMissingAnnotation", executionRuntimeServicesMock, null);
 
         //construct expected outputs
         Map<String, String> expectedOutputs = new HashMap<>();
@@ -160,6 +213,97 @@ public class ActionStepsTest {
 
         //verify matching
         Assert.assertEquals("Java action output should be empty map", expectedOutputs, actualOutputs);
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void doJavaActionGetKeyFromNonSerializableSessionTest() {
+        //prepare doAction arguments
+        RunEnvironment runEnv = new RunEnvironment();
+        HashMap<String, Object> nonSerializableExecutionData = new HashMap<>();
+        GlobalSessionObject<ContentTestActions.NonSerializableObject> sessionObject = new GlobalSessionObject<>();
+        ContentTestActions.NonSerializableObject employee = new ContentTestActions.NonSerializableObject("John");
+        sessionObject.setResource(new ContentTestActions.NonSerializableSessionResource(employee));
+        nonSerializableExecutionData.put("name", sessionObject);
+
+        //invoke doAction
+        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(),
+                "getNameFromNonSerializableSession", executionRuntimeServicesMock, null);
+
+        Map<String, String> outputs = runEnv.removeReturnValues().getOutputs();
+        Assert.assertTrue(outputs.containsKey("name"));
+        Assert.assertEquals("John", outputs.get("name"));
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void doJavaActionGetNonExistingKeyFromNonSerializableSessionTest() {
+        //prepare doAction arguments
+        RunEnvironment runEnv = new RunEnvironment();
+        HashMap<String, Object> nonSerializableExecutionData = new HashMap<>();
+
+        //invoke doAction
+        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(),
+                "getNameFromNonSerializableSession", executionRuntimeServicesMock, null);
+
+        Map<String, String> outputs = runEnv.removeReturnValues().getOutputs();
+        Assert.assertTrue(outputs.containsKey("name"));
+        Assert.assertNull(outputs.get("name"));
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void doJavaActionGetKeyFromSerializableSessionTest() {
+        //prepare doAction arguments
+        RunEnvironment runEnv = new RunEnvironment();
+        Map<String, Serializable> initialCallArguments = new HashMap<>();
+        HashMap<String, Object> serializableExecutionData = new HashMap<>();
+        SerializableSessionObject sessionObject = new SerializableSessionObject();
+        sessionObject.setName("John");
+        serializableExecutionData.put("name", sessionObject);
+        initialCallArguments.put(ExecutionParametersConsts.SERIALIZABLE_SESSION_CONTEXT, serializableExecutionData);
+        runEnv.putCallArguments(initialCallArguments);
+
+        //invoke doAction
+        actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, ContentTestActions.class.getName(),
+                "getNameFromSerializableSession", executionRuntimeServicesMock, null);
+
+        Map<String, String> outputs = runEnv.removeReturnValues().getOutputs();
+        Assert.assertTrue(outputs.containsKey("name"));
+        Assert.assertEquals("John", outputs.get("name"));
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void doJavaActionGetNonExistingKeyFromSerializableSessionTest() {
+        //prepare doAction arguments
+        RunEnvironment runEnv = new RunEnvironment();
+        Map<String, Serializable> initialCallArguments = new HashMap<>();
+        HashMap<String, Object> serializableExecutionData = new HashMap<>();
+        initialCallArguments.put(ExecutionParametersConsts.SERIALIZABLE_SESSION_CONTEXT, serializableExecutionData);
+        runEnv.putCallArguments(initialCallArguments);
+
+        //invoke doAction
+        actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, ContentTestActions.class.getName(),
+                "getNameFromSerializableSession", executionRuntimeServicesMock, null);
+
+        Map<String, String> outputs = runEnv.removeReturnValues().getOutputs();
+        Assert.assertTrue(outputs.containsKey("name"));
+        Assert.assertNull(outputs.get("name"));
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void doJavaActionGetNonExistingKeyFromNonExistingSerializableSessionTest() {
+        //prepare doAction arguments
+        RunEnvironment runEnv = new RunEnvironment();
+        Map<String, Serializable> initialCallArguments = new HashMap<>();
+        runEnv.putCallArguments(initialCallArguments);
+
+        //invoke doAction
+        actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, ContentTestActions.class.getName(),
+                "getNameFromSerializableSession", executionRuntimeServicesMock, null);
+
+        Map<String, String> outputs = runEnv.removeReturnValues().getOutputs();
+        Assert.assertTrue(outputs.containsKey("name"));
+        Assert.assertNull(outputs.get("name"));
+
+        //todo: check that it was created
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -267,24 +411,6 @@ public class ActionStepsTest {
         Map<String, String> actionOutputs = runEnv.removeReturnValues().getOutputs();
         Map<String, String> expectedOutputs = new HashMap<>();
         Assert.assertEquals("Action should return empty map", expectedOutputs, actionOutputs);
-    }
-
-    @SuppressWarnings("unused")
-    public Map<String, String> doJavaSampleAction(
-            @Param("name") String name,
-            @Param("role") String role) {
-        Map<String, String> returnValues = new HashMap<>();
-        returnValues.put("name", name);
-        returnValues.put("role", role);
-        return returnValues;
-    }
-
-    @SuppressWarnings("unused")
-    public Map<String, String> doJavaActionMissingAnnotation(@Param("name") String name, String role) {
-        Map<String, String> returnValues = new HashMap<>();
-        returnValues.put("name", name);
-        returnValues.put("role", role);
-        return returnValues;
     }
 
     @Configuration

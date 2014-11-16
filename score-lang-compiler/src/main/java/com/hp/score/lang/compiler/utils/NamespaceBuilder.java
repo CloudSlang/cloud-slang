@@ -71,7 +71,7 @@ public class NamespaceBuilder {
         TreeMap<String, List<SlangFile>> namespaces = new TreeMap<>();
 
         //first we put the current file in the path
-        namespaces.put(slangFile.getNamespace(), Arrays.asList(slangFile));
+//        namespaces.put(slangFile.getNamespace(), Arrays.asList(slangFile));
 
         final List<String> yamlExtensions = Arrays.asList("yaml", "yml");
         Predicate<File> isYaml = new Predicate<File>() {

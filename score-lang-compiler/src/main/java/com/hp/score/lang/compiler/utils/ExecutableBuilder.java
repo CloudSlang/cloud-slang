@@ -77,7 +77,15 @@ public class ExecutableBuilder {
             if (MapUtils.isEmpty(workFlowRawData)){
                 throw new RuntimeException("flow: " + execName + " has no workflow data");
             }
-            CompiledWorkflow compiledWorkflow = compileWorkFlow(workFlowRawData, dependenciesByNamespace);
+
+            CompiledWorkflow onFailureWorkFlow = null;
+            @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> onFailureData =
+                    (LinkedHashMap) workFlowRawData.remove(SlangTextualKeys.ON_FAILURE_KEY);
+            if (MapUtils.isNotEmpty(onFailureData)) {
+                onFailureWorkFlow = compileWorkFlow(onFailureData, dependenciesByNamespace, null);
+            }
+
+            CompiledWorkflow compiledWorkflow = compileWorkFlow(workFlowRawData, dependenciesByNamespace, onFailureWorkFlow);
             return new CompiledFlow(preExecutableActionData, postExecutableActionData, compiledWorkflow, execName, inputs, outputs, results);
         } else {
             @SuppressWarnings("unchecked") Map<String, Object> actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
@@ -101,25 +109,36 @@ public class ExecutableBuilder {
         return new CompiledDoAction(actionData);
     }
 
-    private CompiledWorkflow compileWorkFlow(LinkedHashMap<String, Map<String, Object>> workFlowRawData, TreeMap<String, List<SlangFile>> dependenciesByNamespace) {
-        List<CompiledTask> compiledTasks = new ArrayList<>();
+    private CompiledWorkflow compileWorkFlow(LinkedHashMap<String, Map<String, Object>> workFlowRawData,
+                                             TreeMap<String, List<SlangFile>> dependenciesByNamespace,
+                                             CompiledWorkflow onFailureWorkFlow) {
+
+        Deque<CompiledTask> compiledTasks = new LinkedList<>();
+
 
         Validate.notEmpty(workFlowRawData, "Flow must have tasks in its workflow");
 
         PeekingIterator<Map.Entry<String, Map<String, Object>>> iterator = new PeekingIterator<>(workFlowRawData.entrySet().iterator());
 
+        String defaultFailureKey = onFailureWorkFlow != null ? onFailureWorkFlow.getCompiledTasks().getFirst().getName() : ScoreLangConstants.FAILURE_RESULT;
+
         while (iterator.hasNext()) {
             Map.Entry<String, Map<String, Object>> taskRawData = iterator.next();
             Map.Entry<String, Map<String, Object>> nextTaskData = iterator.peek();
             String followingTaskName = nextTaskData != null ? nextTaskData.getKey() : null;
-            CompiledTask compiledTask = compileTask(taskRawData.getKey(), taskRawData.getValue(), followingTaskName, dependenciesByNamespace);
+            CompiledTask compiledTask = compileTask(taskRawData.getKey(), taskRawData.getValue(), followingTaskName, dependenciesByNamespace, defaultFailureKey);
             compiledTasks.add(compiledTask);
+        }
+
+        if (onFailureWorkFlow != null){
+            compiledTasks.addAll(onFailureWorkFlow.getCompiledTasks());
         }
 
         return new CompiledWorkflow(compiledTasks);
     }
 
-    private CompiledTask compileTask(String taskName, Map<String, Object> taskRawData, String followingTaskName, TreeMap<String, List<SlangFile>> dependenciesByNamespace) {
+    private CompiledTask compileTask(String taskName, Map<String, Object> taskRawData, String followingTaskName,
+                                     TreeMap<String, List<SlangFile>> dependenciesByNamespace, String defaultFailureKey) {
         Map<String, Serializable> preTaskData = new HashMap<>();
         Map<String, Serializable> postTaskData = new HashMap<>();
 
@@ -144,7 +163,7 @@ public class ExecutableBuilder {
         if (MapUtils.isEmpty(navigationStrings)) {
             navigationStrings = new HashMap<>();
             navigationStrings.put(ScoreLangConstants.SUCCESS_RESULT, followingTaskName == null ? ScoreLangConstants.SUCCESS_RESULT : followingTaskName);
-            navigationStrings.put(ScoreLangConstants.FAILURE_RESULT, ScoreLangConstants.FAILURE_RESULT);
+            navigationStrings.put(ScoreLangConstants.FAILURE_RESULT, defaultFailureKey);
         }
 
         return new CompiledTask(taskName, preTaskData, postTaskData, navigationStrings, refId);

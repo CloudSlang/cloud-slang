@@ -44,6 +44,9 @@ public class ExecutionPlanBuilder {
     private ExecutionStepFactory stepFactory;
 
     private static final String SLANG_NAME = "slang";
+    private static final int NUMBER_OF_TASK_EXECUTION_STEPS = 2;
+    private static final long FLOW_END_STEP_ID = 0L;
+    private static final long FLOW_START_STEP_ID = 1L;
 
     public ExecutionPlan createOperationExecutionPlan(CompiledOperation compiledOp) {
         ExecutionPlan executionPlan = new ExecutionPlan();
@@ -64,43 +67,43 @@ public class ExecutionPlanBuilder {
         executionPlan.setName(compiledFlow.getName());
         executionPlan.setLanguage(SLANG_NAME);
 
-        final long FLOW_END_STEP_INDEX = 0L;
-
-        Long stepsIndex = 1L;
-        executionPlan.setBeginStep(stepsIndex);
+        executionPlan.setBeginStep(FLOW_START_STEP_ID);
         //flow start step
-        executionPlan.addStep(stepFactory.createStartStep(stepsIndex++, compiledFlow.getPreExecActionData(),
+        executionPlan.addStep(stepFactory.createStartStep(FLOW_START_STEP_ID, compiledFlow.getPreExecActionData(),
                 compiledFlow.getInputs(), compiledFlow.getName()));
         //flow end step
-        executionPlan.addStep(stepFactory.createEndStep(FLOW_END_STEP_INDEX, compiledFlow.getPostExecActionData(),
+        executionPlan.addStep(stepFactory.createEndStep(FLOW_END_STEP_ID, compiledFlow.getPostExecActionData(),
                 compiledFlow.getOutputs(), compiledFlow.getResults(), compiledFlow.getName()));
 
         Map<String, Long> taskReferences = new HashMap<>();
         for (Result result : compiledFlow.getResults()) {
-            taskReferences.put(result.getName(), FLOW_END_STEP_INDEX);
+            taskReferences.put(result.getName(), FLOW_END_STEP_ID);
         }
 
-        List<CompiledTask> compiledTasks = compiledFlow.getCompiledWorkflow().getCompiledTasks();
+        Deque<CompiledTask> compiledTasks = compiledFlow.getCompiledWorkflow().getCompiledTasks();
 
         if (CollectionUtils.isEmpty(compiledTasks)) {
             throw new RuntimeException("Flow: " + compiledFlow.getName() + " has no tasks");
         }
 
-        List<ExecutionStep> taskExecutionSteps = buildTaskExecutionSteps(compiledTasks.get(0), stepsIndex, taskReferences, compiledTasks);
+        List<ExecutionStep> taskExecutionSteps = buildTaskExecutionSteps(compiledTasks.getFirst(), taskReferences, compiledTasks);
         executionPlan.addSteps(taskExecutionSteps);
 
         return executionPlan;
     }
 
-    private List<ExecutionStep> buildTaskExecutionSteps(CompiledTask compiledTask, Long currentId,
-                                                        Map<String, Long> taskReferences, List<CompiledTask> compiledTasks) {
+    private List<ExecutionStep> buildTaskExecutionSteps(CompiledTask compiledTask,
+                                                        Map<String, Long> taskReferences, Deque<CompiledTask> compiledTasks) {
+
         List<ExecutionStep> taskExecutionSteps = new ArrayList<>();
+
         String taskName = compiledTask.getName();
+        Long currentId = getCurrentId(taskReferences);
+
         //Begin Task
         taskReferences.put(taskName, currentId);
         taskExecutionSteps.add(stepFactory.createBeginTaskStep(currentId++, compiledTask.getPreTaskActionData(),
                 compiledTask.getRefId(), taskName));
-        Long endTaskId = currentId++;
 
         //End Task
         Map<String, Long> navigationValues = new HashMap<>();
@@ -108,13 +111,18 @@ public class ExecutionPlanBuilder {
             String nextStepName = entry.getValue();
             if (taskReferences.get(nextStepName) == null) {
                 CompiledTask nextTaskToCompile = Lambda.selectFirst(compiledTasks, having(on(CompiledTask.class).getName(), equalTo(nextStepName)));
-                taskExecutionSteps.addAll(buildTaskExecutionSteps(nextTaskToCompile, currentId, taskReferences, compiledTasks));
+                taskExecutionSteps.addAll(buildTaskExecutionSteps(nextTaskToCompile, taskReferences, compiledTasks));
             }
             navigationValues.put(entry.getKey(), taskReferences.get(nextStepName));
         }
-        taskExecutionSteps.add(stepFactory.createFinishTaskStep(endTaskId, compiledTask.getPostTaskActionData(),
+        taskExecutionSteps.add(stepFactory.createFinishTaskStep(currentId, compiledTask.getPostTaskActionData(),
                 navigationValues, taskName));
         return taskExecutionSteps;
+    }
+
+    private Long getCurrentId(Map<String, Long> taskReferences) {
+        Long max = Lambda.max(taskReferences);
+        return max + NUMBER_OF_TASK_EXECUTION_STEPS;
     }
 
 }
