@@ -5,12 +5,10 @@ import com.hp.score.events.EventConstants;
 import com.hp.score.events.ScoreEvent;
 import com.hp.score.events.ScoreEventListener;
 import com.hp.score.lang.cli.services.ScoreServices;
-import com.hp.score.lang.cli.utils.CompilerUtils;
-import com.hp.score.lang.compiler.SlangCompiler;
+import com.hp.score.lang.cli.utils.CompilerHelper;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.runtime.env.RunEnvironment;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
@@ -19,20 +17,14 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_START;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_END;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_ERROR;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_START;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_STEP_ERROR;
+import static com.hp.score.lang.entities.ScoreLangConstants.*;
 
 /**
  * Date: 11/7/2014
@@ -44,10 +36,10 @@ import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_STEP_ERROR;
 public class SlangCLI implements CommandMarker {
 
     @Autowired
-    private SlangCompiler compiler;
+    private ScoreServices scoreServices;
 
     @Autowired
-    private ScoreServices scoreServices;
+    private CompilerHelper compilerHelper;
 
     private final static Logger logger = Logger.getLogger(SlangCLI.class);
     private static final String currently = "You are currently running Score version: ";
@@ -60,13 +52,8 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = "sp", mandatory = false, help = "System property file location") final String systemProperty,
             @CliOption(key = "D", mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, String> inputs) throws IOException {
 
-        File file = CompilerUtils.getFile(filePath);
-        File operation = CompilerUtils.getFile("yaml/operation.yaml"); //will solve with classpath
 
-        List<File> path = new ArrayList<>();
-        path.add(operation);
-
-        CompilationArtifact compilationArtifact = compiler.compileFlow(file, path);
+        CompilationArtifact compilationArtifact = compilerHelper.compile(filePath,null,classPath);
 
         trigger(compilationArtifact, inputs);
     }
@@ -107,6 +94,7 @@ public class SlangCLI implements CommandMarker {
     }
 
     private void trigger(CompilationArtifact compilationArtifact, Map<String, String> inputs) {
+        //todo - move this logic to ScoreServices...
         Map<String, Serializable> executionContext = new HashMap<>();
         executionContext.put(ScoreLangConstants.RUN_ENV, new RunEnvironment());
         executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable) inputs);
