@@ -18,6 +18,8 @@
 */
 package com.hp.score.lang.runtime.env;
 
+import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,10 +31,13 @@ import java.util.Map;
  */
 public class RunEnvironment implements Serializable{
 
-    private HashMap<String, Serializable> callArguments;
+    // Call arguments for the current step
+    private Map<String, Serializable> callArguments;
 
+    // Return values from the current step
     private ReturnValues returnValues;
 
+    // The position of the next step
     private Long nextStepPosition;
 
     // stack holding the contexts of the parent scopes
@@ -40,14 +45,20 @@ public class RunEnvironment implements Serializable{
 
     // stack of the parent flows data (fo the sub-flow use-case)
     private ParentFlowStack parentFlowStack;
+
     private ExecutionPath executionPath;
-//    LinkedHashMap<String, Serializable> systemProperties;
+
+    // Map holding serializable data that is common for the entire run.
+    // This is data that should be shred between different actions with the ability to change the data
+    private Map<String, SerializableSessionObject> serializableDataMap;
+
 
     public RunEnvironment() {
         contextStack = new ContextStack();
         parentFlowStack = new ParentFlowStack();
         callArguments = new HashMap<>();
         executionPath = new ExecutionPath();
+        serializableDataMap = new HashMap<>();
     }
 
     public ContextStack getStack(){
@@ -92,4 +103,7 @@ public class RunEnvironment implements Serializable{
         return this.executionPath;
     }
 
+    public Map<String, SerializableSessionObject> getSerializableDataMap() {
+        return serializableDataMap;
+    }
 }

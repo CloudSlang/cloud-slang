@@ -235,6 +235,28 @@ public class ActionStepsTest {
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
+    public void doJavaActionSetKeyOnNonSerializableSessionTest() {
+        //prepare doAction arguments
+        RunEnvironment runEnv = new RunEnvironment();
+        HashMap<String, Object> nonSerializableExecutionData = new HashMap<>();
+        GlobalSessionObject<ContentTestActions.NonSerializableObject> sessionObject = new GlobalSessionObject<>();
+        ContentTestActions.NonSerializableObject employee = new ContentTestActions.NonSerializableObject("John");
+        sessionObject.setResource(new ContentTestActions.NonSerializableSessionResource(employee));
+        nonSerializableExecutionData.put("name", sessionObject);
+        Map<String, Serializable> initialCallArguments = new HashMap<>();
+        initialCallArguments.put("value", "David");
+        runEnv.putCallArguments(initialCallArguments);
+
+        //invoke doAction
+        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(),
+                "setNameOnNonSerializableSession", executionRuntimeServicesMock, null);
+
+        Map<String, String> outputs = runEnv.removeReturnValues().getOutputs();
+        Assert.assertTrue(outputs.containsKey("name"));
+        Assert.assertEquals("David", outputs.get("name"));
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void doJavaActionGetNonExistingKeyFromNonSerializableSessionTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
@@ -254,11 +276,11 @@ public class ActionStepsTest {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
         Map<String, Serializable> initialCallArguments = new HashMap<>();
-        HashMap<String, Object> serializableExecutionData = new HashMap<>();
+        HashMap<String, SerializableSessionObject> serializableExecutionData = new HashMap<>();
         SerializableSessionObject sessionObject = new SerializableSessionObject();
         sessionObject.setName("John");
         serializableExecutionData.put("name", sessionObject);
-        initialCallArguments.put(ExecutionParametersConsts.SERIALIZABLE_SESSION_CONTEXT, serializableExecutionData);
+        runEnv.getSerializableDataMap().putAll(serializableExecutionData);
         runEnv.putCallArguments(initialCallArguments);
 
         //invoke doAction
@@ -299,11 +321,8 @@ public class ActionStepsTest {
         actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, ContentTestActions.class.getName(),
                 "getNameFromSerializableSession", executionRuntimeServicesMock, null);
 
-        Map<String, String> outputs = runEnv.removeReturnValues().getOutputs();
-        Assert.assertTrue(outputs.containsKey("name"));
-        Assert.assertNull(outputs.get("name"));
-
-        //todo: check that it was created
+        Map<String, SerializableSessionObject> serializableSessionMap = runEnv.getSerializableDataMap();
+        Assert.assertTrue(serializableSessionMap.containsKey("name"));
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)

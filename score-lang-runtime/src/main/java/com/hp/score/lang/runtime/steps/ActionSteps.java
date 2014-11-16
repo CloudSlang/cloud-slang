@@ -30,6 +30,7 @@ import java.util.Map;
 import static com.hp.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static com.hp.score.lang.entities.ScoreLangConstants.ACTION_CLASS_KEY;
 import static com.hp.score.lang.entities.ScoreLangConstants.ACTION_METHOD_KEY;
+import static com.hp.score.lang.entities.ScoreLangConstants.ACTION_TYPE;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_END;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_ERROR;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_START;
@@ -54,7 +55,7 @@ public class ActionSteps extends AbstractSteps {
 
     public void doAction(@Param(RUN_ENV) RunEnvironment runEnv,
                          @Param(ExecutionParametersConsts.NON_SERIALIZABLE_EXECUTION_DATA) Map<String, Object> nonSerializableExecutionData,
-                         ActionType actionType,
+                         @Param(ACTION_TYPE) ActionType actionType,
                          @Param(ACTION_CLASS_KEY) String className,
                          @Param(ACTION_METHOD_KEY) String methodName,
                          @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
@@ -62,11 +63,12 @@ public class ActionSteps extends AbstractSteps {
 
         Map<String, String> returnValue = new HashMap<>();
         Map<String, Serializable> callArguments = runEnv.removeCallArguments();
+        Map<String, SerializableSessionObject> serializableSessionData = runEnv.getSerializableDataMap();
         fireEvent(executionRuntimeServices, runEnv, EVENT_ACTION_START, "Preparing to run action " + actionType, Pair.of(CALL_ARGUMENTS, (Serializable) callArguments));
         try {
             switch (actionType) {
                 case JAVA:
-                    returnValue = runJavaAction(callArguments, nonSerializableExecutionData, className, methodName);
+                    returnValue = runJavaAction(serializableSessionData, callArguments, nonSerializableExecutionData, className, methodName);
                     break;
                 case PYTHON:
                     returnValue = prepareAndRunPythonAction(callArguments, python_script);
@@ -87,17 +89,19 @@ public class ActionSteps extends AbstractSteps {
 
     }
 
-    private Map<String, String> runJavaAction(Map<String, Serializable> currentContext,
+    private Map<String, String> runJavaAction(Map<String, SerializableSessionObject> serializableSessionData,
+                                              Map<String, Serializable> currentContext,
                                               Map<String, Object> nonSerializableExecutionData,
                                               String className,
                                               String methodName) {
 
-        Object[] actualParameters = extractMethodData(currentContext, nonSerializableExecutionData, className, methodName);
+        Object[] actualParameters = extractMethodData(serializableSessionData, currentContext, nonSerializableExecutionData, className, methodName);
 
         return invokeActionMethod(className, methodName, actualParameters);
     }
 
-    private Object[] extractMethodData(Map<String, Serializable> currentContext,
+    private Object[] extractMethodData(Map<String, SerializableSessionObject> serializableSessionData,
+                                       Map<String, Serializable> currentContext,
                                        Map<String, Object> nonSerializableExecutionData,
                                        String className,
                                        String methodName) {
@@ -106,7 +110,7 @@ public class ActionSteps extends AbstractSteps {
         Method actionMethod = getMethodByName(className, methodName);
 
         //extract the parameters from execution context
-        return resolveActionArguments(actionMethod, currentContext, nonSerializableExecutionData);
+        return resolveActionArguments(serializableSessionData, actionMethod, currentContext, nonSerializableExecutionData);
     }
 
 
@@ -148,7 +152,10 @@ public class ActionSteps extends AbstractSteps {
         return actionMethod;
     }
 
-    protected Object[] resolveActionArguments(Method actionMethod, Map<String, Serializable> currentContext, Map<String, Object> nonSerializableExecutionData) {
+    protected Object[] resolveActionArguments(Map<String, SerializableSessionObject> serializableSessionData,
+                                              Method actionMethod,
+                                              Map<String, Serializable> currentContext,
+                                              Map<String, Object> nonSerializableExecutionData) {
         List<Object> args = new ArrayList<>();
 
         int index = 0;
@@ -159,7 +166,7 @@ public class ActionSteps extends AbstractSteps {
                     if (actionMethod.getParameterTypes()[index - 1].equals(GlobalSessionObject.class)) {
                         handleNonSerializableSessionContextArgument(nonSerializableExecutionData, args, (Param) annotation);
                     } else if (actionMethod.getParameterTypes()[index - 1].equals(SerializableSessionObject.class)) {
-                        handleSerializableSessionContextArgument(currentContext, args, (Param) annotation);
+                        handleSerializableSessionContextArgument(serializableSessionData, args, (Param) annotation);
                     } else {
                         args.add(currentContext.get(((Param) annotation).value()));
                     }
@@ -182,18 +189,13 @@ public class ActionSteps extends AbstractSteps {
         args.add(nonSerializableSessionContextObject);
     }
 
-    private void handleSerializableSessionContextArgument(Map<String, Serializable> context, List<Object> args, Param annotation) {
+    private void handleSerializableSessionContextArgument(Map<String, SerializableSessionObject> serializableSessionData, List<Object> args, Param annotation) {
         String key = annotation.value();
-        Serializable serializableSessionMapValue = context.get(ExecutionParametersConsts.SERIALIZABLE_SESSION_CONTEXT);
-        if (serializableSessionMapValue == null) {
-            serializableSessionMapValue = new HashMap<String, Serializable>();
-            context.put(ExecutionParametersConsts.SERIALIZABLE_SESSION_CONTEXT, serializableSessionMapValue);
-        }
-        @SuppressWarnings("unchecked") Serializable serializableSessionContextObject = ((Map<String, Serializable>) serializableSessionMapValue).get(key);
+        SerializableSessionObject serializableSessionContextObject = serializableSessionData.get(key);
         if (serializableSessionContextObject == null) {
             serializableSessionContextObject = new SerializableSessionObject();
             //noinspection unchecked
-            ((Map<String, Serializable>) serializableSessionMapValue).put(key, serializableSessionContextObject);
+            serializableSessionData.put(key, serializableSessionContextObject);
         }
         args.add(serializableSessionContextObject);
     }

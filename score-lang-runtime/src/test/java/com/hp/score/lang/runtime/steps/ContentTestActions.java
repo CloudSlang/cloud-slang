@@ -43,6 +43,7 @@ public class ContentTestActions {
         return returnValues;
     }
 
+    @SuppressWarnings("unused")
     public void doJavaActionWrongReturnType(){
     }
 
@@ -62,6 +63,16 @@ public class ContentTestActions {
         if(sessionName != null && sessionName.get() != null){
             value = sessionName.get().getName();
         }
+        returnMap.put("name", value);
+        return returnMap;
+    }
+
+    @SuppressWarnings("unused")
+    public Map<String, String> setNameOnNonSerializableSession(@Param("name") GlobalSessionObject<NonSerializableObject> name,
+                                                               @Param("value") String value){
+        SessionResource<NonSerializableObject> sessionName = name.getResource();
+        Map<String, String> returnMap = new HashMap<>();
+        name.setResource(new NonSerializableSessionResource(new NonSerializableObject(value)));
         returnMap.put("name", value);
         return returnMap;
     }
