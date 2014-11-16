@@ -126,6 +126,8 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <useWildcardClassPath>true</useWildcardClassPath>
+                    <repositoryLayout>flat</repositoryLayout>
                     <programs>
                         <program>
                             <mainClass>org.springframework.shell.Bootstrap</mainClass>
