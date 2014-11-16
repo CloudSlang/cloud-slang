@@ -35,11 +35,12 @@ public class CompiledFlow extends CompiledExecutable {
     public CompiledFlow(Map<String, Serializable> preOpActionData,
                         Map<String, Serializable> postOpActionData,
                         CompiledWorkflow compiledWorkflow,
+                        String namespace,
                         String name,
                         List<Input> inputs,
                         List<Output> outputs,
                         List<Result> results) {
-        super(preOpActionData, postOpActionData, name, inputs, outputs, results);
+        super(preOpActionData, postOpActionData, namespace, name, inputs, outputs, results);
         this.compiledWorkflow = compiledWorkflow;
     }
 

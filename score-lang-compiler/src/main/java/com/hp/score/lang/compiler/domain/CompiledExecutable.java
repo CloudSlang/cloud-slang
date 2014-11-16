@@ -34,6 +34,7 @@ public abstract class CompiledExecutable {
 
     protected final Map<String, Serializable> preExecActionData;
     protected final Map<String, Serializable> postExecActionData;
+    protected final String namespace;
     protected final String name;
     protected final List<Input> inputs;
     protected final List<Output> outputs;
@@ -41,12 +42,14 @@ public abstract class CompiledExecutable {
 
     protected CompiledExecutable(Map<String, Serializable> preExecActionData,
                                  Map<String, Serializable> postExecActionData,
+                                 String namespace,
                                  String name,
                                  List<Input> inputs,
                                  List<Output> outputs,
                                  List<Result> results) {
         this.preExecActionData = preExecActionData;
         this.postExecActionData = postExecActionData;
+        this.namespace = namespace;
         this.name = name;
         this.inputs = inputs;
         this.outputs = outputs;
@@ -59,6 +62,14 @@ public abstract class CompiledExecutable {
 
     public Map<String, Serializable> getPostExecActionData() {
         return postExecActionData;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public String getId(){
+        return getNamespace() + "." + getName();
     }
 
     public String getName() {

@@ -56,7 +56,7 @@ public class ExecutableBuilderTest {
         Map<String, Object> executableRawData = new HashMap<>();
         executableRawData.put(SlangTextualKeys.WORKFLOW_KEY, tasksMap);
         CompiledFlow op1 = (CompiledFlow) executableBuilder.compileExecutable(
-                "flow1", executableRawData, dependenciesByNamespace, SlangFile.Type.FLOW);
+                "user.flows", "flow1", executableRawData, dependenciesByNamespace, SlangFile.Type.FLOW);
         Assert.assertNotNull(op1);
     }
 
@@ -70,7 +70,7 @@ public class ExecutableBuilderTest {
         Map<String, Object> executableRawData = new HashMap<>();
         executableRawData.put(SlangTextualKeys.ACTION_KEY, actionRawData);
         CompiledOperation op1 = (CompiledOperation) executableBuilder.compileExecutable(
-                "op1", executableRawData, new TreeMap<String, List<SlangFile>>(), SlangFile.Type.OPERATIONS);
+                "user.ops", "op1", executableRawData, new TreeMap<String, List<SlangFile>>(), SlangFile.Type.OPERATIONS);
         Assert.assertNotNull(op1);
     }
 

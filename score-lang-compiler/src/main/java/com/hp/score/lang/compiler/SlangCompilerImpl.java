@@ -87,7 +87,7 @@ public class SlangCompilerImpl implements SlangCompiler {
         switch (slangFile.getType()) {
             case OPERATIONS:
                 Validate.notEmpty(operationName, "When compiling an operation you must specify its name");
-                List<CompiledExecutable> compilesOperations = compileOperations(slangFile.getOperations(), dependenciesByNamespace);
+                List<CompiledExecutable> compilesOperations = compileOperations(slangFile, dependenciesByNamespace);
                 executable = Lambda.selectFirst(compilesOperations, having(on(CompiledExecutable.class).getName(), equalTo(operationName)));
                 if (executable == null) {
                     throw new RuntimeException("Operation with name: " + operationName + " wasn't found in file: " + source.getName());
@@ -95,14 +95,13 @@ public class SlangCompilerImpl implements SlangCompiler {
                 executionPlan = executionPlanBuilder.createOperationExecutionPlan((CompiledOperation) executable);
                 break;
             case FLOW:
-                executable = compileFlow(slangFile.getFlow(), dependenciesByNamespace);
+                executable = compileFlow(slangFile, dependenciesByNamespace);
                 executionPlan = executionPlanBuilder.createFlowExecutionPlan((CompiledFlow) executable);
                 break;
             default:
                 throw new RuntimeException("Nothing to compile");
 
         }
-        executionPlan.setFlowUuid(getFlowUuid(slangFile, executable));
         return new CompilationArtifact(executionPlan, dependencies, executable.getInputs());
     }
 
@@ -116,15 +115,13 @@ public class SlangCompilerImpl implements SlangCompiler {
             for (SlangFile slangFile : entry.getValue()) {
                 switch (slangFile.getType()) {
                     case FLOW:
-                        CompiledFlow compiledFLow = (CompiledFlow) compileFlow(slangFile.getFlow(), dependencies);
+                        CompiledFlow compiledFLow = (CompiledFlow) compileFlow(slangFile, dependencies);
                         ExecutionPlan flowExecutionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFLow);
-                        flowExecutionPlan.setFlowUuid(getFlowUuid(slangFile, compiledFLow));
                         compiledDependencies.put(flowExecutionPlan.getFlowUuid(), flowExecutionPlan);
                         break;
                     case OPERATIONS:
-                        for (CompiledExecutable compiledOperation : compileOperations(slangFile.getOperations(), dependencies)) {
+                        for (CompiledExecutable compiledOperation : compileOperations(slangFile, dependencies)) {
                             ExecutionPlan operationExecutionPlan = executionPlanBuilder.createOperationExecutionPlan((CompiledOperation) compiledOperation);
-                            operationExecutionPlan.setFlowUuid(getFlowUuid(slangFile, compiledOperation));
                             compiledDependencies.put(operationExecutionPlan.getFlowUuid(), operationExecutionPlan);
                         }
                         break;
@@ -136,26 +133,21 @@ public class SlangCompilerImpl implements SlangCompiler {
         return compiledDependencies;
     }
 
-    private List<CompiledExecutable> compileOperations(List<Map<String, Map<String, Object>>> operationsRawData, TreeMap<String, List<SlangFile>> dependenciesByNamespace) {
+    private List<CompiledExecutable> compileOperations(SlangFile slangfile, TreeMap<String, List<SlangFile>> dependenciesByNamespace) {
         List<CompiledExecutable> executables = new ArrayList<>();
-        for (Map<String, Map<String, Object>> operation : operationsRawData) {
+        for (Map<String, Map<String, Object>> operation : slangfile.getOperations()) {
             Map.Entry<String, Map<String, Object>> entry = operation.entrySet().iterator().next();
-            executables.add(executableBuilder.compileExecutable(entry.getKey(), entry.getValue(), dependenciesByNamespace, SlangFile.Type.OPERATIONS));
+            executables.add(executableBuilder.compileExecutable(slangfile.getNamespace(), entry.getKey(), entry.getValue(), dependenciesByNamespace, SlangFile.Type.OPERATIONS));
         }
         return executables;
     }
 
-    private CompiledExecutable compileFlow(Map<String, Object> flowRawData, TreeMap<String, List<SlangFile>> dependenciesByNamespace) {
+    private CompiledExecutable compileFlow(SlangFile slangfile, TreeMap<String, List<SlangFile>> dependenciesByNamespace) {
+        Map<String, Object> flowRawData = slangfile.getFlow();
         String flowName = (String) flowRawData.get(SlangTextualKeys.FLOW_NAME_KEY);
         if (StringUtils.isBlank(flowName)) {
             throw new RuntimeException("Flow must have a name");
         }
-        return executableBuilder.compileExecutable(flowName, flowRawData, dependenciesByNamespace, SlangFile.Type.FLOW);
+        return executableBuilder.compileExecutable(slangfile.getNamespace(), flowName, flowRawData, dependenciesByNamespace, SlangFile.Type.FLOW);
     }
-
-    private String getFlowUuid(SlangFile slangFile, CompiledExecutable compiledExecutable) {
-        return slangFile.getNamespace() + "." + compiledExecutable.getName();
-    }
-
-
 }

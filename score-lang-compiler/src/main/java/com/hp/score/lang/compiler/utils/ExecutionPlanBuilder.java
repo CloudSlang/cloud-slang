@@ -52,6 +52,8 @@ public class ExecutionPlanBuilder {
         ExecutionPlan executionPlan = new ExecutionPlan();
         executionPlan.setName(compiledOp.getName());
         executionPlan.setLanguage(SLANG_NAME);
+        executionPlan.setFlowUuid(compiledOp.getId());
+
         executionPlan.setBeginStep(1L);
 
         executionPlan.addStep(stepFactory.createStartStep(1L, compiledOp.getPreExecActionData(), compiledOp.getInputs(),
@@ -66,6 +68,7 @@ public class ExecutionPlanBuilder {
         ExecutionPlan executionPlan = new ExecutionPlan();
         executionPlan.setName(compiledFlow.getName());
         executionPlan.setLanguage(SLANG_NAME);
+        executionPlan.setFlowUuid(compiledFlow.getId());
 
         executionPlan.setBeginStep(FLOW_START_STEP_ID);
         //flow start step

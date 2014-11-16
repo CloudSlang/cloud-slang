@@ -51,7 +51,8 @@ public class ExecutableBuilder {
     @Autowired
     private List<Transformer> transformers;
 
-    public CompiledExecutable compileExecutable(String execName, Map<String, Object> executableRawData, TreeMap<String, List<SlangFile>> dependenciesByNamespace, SlangFile.Type type) {
+    public CompiledExecutable compileExecutable(String namespace, String execName, Map<String, Object> executableRawData,
+                                                TreeMap<String, List<SlangFile>> dependenciesByNamespace, SlangFile.Type type) {
 
         Validate.notEmpty(executableRawData, "executable data for: " + execName + " is empty");
 
@@ -74,7 +75,7 @@ public class ExecutableBuilder {
 
         if (type == SlangFile.Type.FLOW) {
             @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> workFlowRawData = (LinkedHashMap<String, Map<String, Object>>) executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
-            if (MapUtils.isEmpty(workFlowRawData)){
+            if (MapUtils.isEmpty(workFlowRawData)) {
                 throw new RuntimeException("flow: " + execName + " has no workflow data");
             }
 
@@ -86,14 +87,14 @@ public class ExecutableBuilder {
             }
 
             CompiledWorkflow compiledWorkflow = compileWorkFlow(workFlowRawData, dependenciesByNamespace, onFailureWorkFlow);
-            return new CompiledFlow(preExecutableActionData, postExecutableActionData, compiledWorkflow, execName, inputs, outputs, results);
+            return new CompiledFlow(preExecutableActionData, postExecutableActionData, compiledWorkflow, namespace, execName, inputs, outputs, results);
         } else {
             @SuppressWarnings("unchecked") Map<String, Object> actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
-            if (MapUtils.isEmpty(actionRawData)){
+            if (MapUtils.isEmpty(actionRawData)) {
                 throw new RuntimeException("operation: " + execName + " has no action data");
             }
             CompiledDoAction compiledDoAction = compileAction(actionRawData);
-            return new CompiledOperation(preExecutableActionData, postExecutableActionData, compiledDoAction, execName, inputs, outputs, results);
+            return new CompiledOperation(preExecutableActionData, postExecutableActionData, compiledDoAction, namespace, execName, inputs, outputs, results);
         }
     }
 
@@ -130,7 +131,7 @@ public class ExecutableBuilder {
             compiledTasks.add(compiledTask);
         }
 
-        if (onFailureWorkFlow != null){
+        if (onFailureWorkFlow != null) {
             compiledTasks.addAll(onFailureWorkFlow.getCompiledTasks());
         }
 

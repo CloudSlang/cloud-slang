@@ -97,12 +97,13 @@ public class ExecutionPlanBuilderTest {
         Map<String, Serializable> actionData = new HashMap<>();
         CompiledDoAction compiledDoAction = new CompiledDoAction(actionData);
         String operationName = "opName";
+        String opNamespace = "user.flows";
         List<Input> inputs = new ArrayList<>();
         List<Output> outputs = new ArrayList<>();
         List<Result> results = new ArrayList<>();
 
         CompiledOperation compiledOperation =
-                new CompiledOperation(preOpActionData, postOpActionData, compiledDoAction, operationName, inputs, outputs, results);
+                new CompiledOperation(preOpActionData, postOpActionData, compiledDoAction, opNamespace, operationName, inputs, outputs, results);
 
         mockStartStep(compiledOperation);
         when(stepFactory.createActionStep(eq(2L), same(actionData))).thenReturn(new ExecutionStep(2L));
@@ -125,6 +126,7 @@ public class ExecutionPlanBuilderTest {
         compiledTasks.add(compiledTask);
         CompiledWorkflow compiledWorkflow = new CompiledWorkflow(compiledTasks);
         String flowName = "flowName";
+        String flowNamespace = "user.flows";
         List<Input> inputs = new ArrayList<>();
         List<Output> outputs = new ArrayList<>();
         List<Result> results = defaultFlowResults();
@@ -134,7 +136,7 @@ public class ExecutionPlanBuilderTest {
         navigationValues.put(ScoreLangConstants.FAILURE_RESULT, 0L);
 
         CompiledFlow compiledFlow =
-                new CompiledFlow(preFlowActionData, postFlowActionData, compiledWorkflow, flowName, inputs, outputs, results);
+                new CompiledFlow(preFlowActionData, postFlowActionData, compiledWorkflow, flowNamespace, flowName, inputs, outputs, results);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow);
@@ -165,13 +167,14 @@ public class ExecutionPlanBuilderTest {
 
         CompiledWorkflow compiledWorkflow = new CompiledWorkflow(compiledTasks);
         String flowName = "flowName";
+        String flowNamespace = "user.flows";
         List<Input> inputs = new ArrayList<>();
         List<Output> outputs = new ArrayList<>();
         List<Result> results = defaultFlowResults();
 
 
         CompiledFlow compiledFlow =
-                new CompiledFlow(preFlowActionData, postFlowActionData, compiledWorkflow, flowName, inputs, outputs, results);
+                new CompiledFlow(preFlowActionData, postFlowActionData, compiledWorkflow, flowNamespace, flowName, inputs, outputs, results);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow);
@@ -203,12 +206,13 @@ public class ExecutionPlanBuilderTest {
         Deque<CompiledTask> compiledTasks = new LinkedList<>();
         CompiledWorkflow compiledWorkflow = new CompiledWorkflow(compiledTasks);
         String flowName = "flowName";
+        String flowNamespace = "user.flows";
         List<Input> inputs = new ArrayList<>();
         List<Output> outputs = new ArrayList<>();
         List<Result> results = new ArrayList<>();
 
         CompiledFlow compiledFlow =
-                new CompiledFlow(preFlowActionData, postFlowActionData, compiledWorkflow, flowName, inputs, outputs, results);
+                new CompiledFlow(preFlowActionData, postFlowActionData, compiledWorkflow, flowNamespace, flowName, inputs, outputs, results);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow);
