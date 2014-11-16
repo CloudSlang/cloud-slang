@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.io.File;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
 /*
@@ -64,12 +65,25 @@ public class CompilerHelperTest {
     }
 
     @Test
-    public void testFilePathValidWithOtherPathForDepdencies() throws Exception {
+     public void testFilePathValidWithOtherPathForDepdencies() throws Exception {
         String flowFilePath = getClass().getResource("/flow.yaml").getPath();
-        String emptyFilePath = getClass().getResource("/flowsdir/").getPath();
+        String folderPath = getClass().getResource("/flowsdir/").getPath();
         String flow2FilePath = getClass().getResource("/flowsdir/flow2.yaml").getPath();
-        compilerHelper.compile(flowFilePath,null,emptyFilePath);
+        compilerHelper.compile(flowFilePath,null,folderPath);
         Mockito.verify(slangCompiler,times(1)).compile(new File(flowFilePath),null, Lists.newArrayList(new File(flow2FilePath)));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidDirPathForDepdencies() throws Exception {
+        String flowFilePath = getClass().getResource("/flow.yaml").getPath();
+        String invalidDirPath = getClass().getResource("").getPath().concat("xxx");
+        compilerHelper.compile(flowFilePath,null,invalidDirPath);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidDirPathForDepdencies2() throws Exception {
+        String flowFilePath = getClass().getResource("/flow.yaml").getPath();
+        compilerHelper.compile(flowFilePath,null,flowFilePath);
     }
 
 
