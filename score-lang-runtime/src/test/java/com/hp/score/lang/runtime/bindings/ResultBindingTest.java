@@ -120,6 +120,15 @@ public class ResultBindingTest {
         resultsBinding.resolveResult(context, results, null);
     }
 
+    @Test(expected = RuntimeException.class)
+    public void testNoValidResultExpression() throws Exception {
+        List<Result> results = Lists.newArrayList(createResult(ScoreLangConstants.SUCCESS_RESULT, "int(status) == 1"),
+                createResult(ScoreLangConstants.FAILURE_RESULT, "int(status) == 0"));
+        HashMap<String, String> context = new HashMap<>();
+        context.put("status", "-1");
+        resultsBinding.resolveResult(context, results, null);
+    }
+
     @Test
     public void testPresetResult() throws Exception {
         List<Result> results = Lists.newArrayList(createEmptyResult(ScoreLangConstants.SUCCESS_RESULT),
