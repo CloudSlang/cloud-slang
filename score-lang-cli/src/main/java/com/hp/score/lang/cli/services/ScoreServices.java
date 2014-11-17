@@ -41,6 +41,7 @@ import java.util.Set;
  */
 @Service
 public class ScoreServices {
+    //TODO - change this to interface...
 
     @Autowired
     private Score score;
@@ -53,7 +54,6 @@ public class ScoreServices {
     }
 
     public Long trigger(CompilationArtifact compilationArtifact, Map<String, String> inputs) {
-        //todo - move this logic to ScoreServices...
         Map<String, Serializable> executionContext = new HashMap<>();
         executionContext.put(ScoreLangConstants.RUN_ENV, new RunEnvironment());
         executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable) inputs);
