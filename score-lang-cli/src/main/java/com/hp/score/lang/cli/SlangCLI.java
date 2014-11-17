@@ -49,7 +49,7 @@ public class SlangCLI implements CommandMarker {
     public void run(
             @CliOption(key = "f", mandatory = true, help = "Path to filename. e.g. slang run --f C:\\Slang\\flow.yaml") final String filePath,
             @CliOption(key = "cp", mandatory = false, help = "Classpath") final String classPath,
-            @CliOption(key = "sp", mandatory = false, help = "System property file location") final String systemProperty,
+            //@CliOption(key = "sp", mandatory = false, help = "System property file location") final String systemProperty,//not supported for now...
             @CliOption(key = "D", mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, String> inputs) throws IOException {
 
 
