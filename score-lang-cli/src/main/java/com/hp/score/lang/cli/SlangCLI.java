@@ -35,6 +35,9 @@ import static com.hp.score.lang.entities.ScoreLangConstants.*;
 @Component
 public class SlangCLI implements CommandMarker {
 
+    public static final String TRIGGERED_FLOW_MSG = "Triggered flow : ";
+    public static final String WITH_EXECUTION_ID_MSG = " , with execution id : ";
+
     @Autowired
     private ScoreServices scoreServices;
 
@@ -45,8 +48,8 @@ public class SlangCLI implements CommandMarker {
     private static final String currently = "You are currently running Score version: ";
     private static final String scoreVersion = "0.1.229"; //todo get version
 
-    @CliCommand(value = "slang run", help = "Runs a flow")
-    public void run(
+    @CliCommand(value = "run", help = "triggers a slang flow")
+    public String run(
             @CliOption(key = "f", mandatory = true, help = "Path to filename. e.g. slang run --f C:\\Slang\\flow.yaml") final String filePath,
             @CliOption(key = "cp", mandatory = false, help = "Classpath") final String classPath,
             //@CliOption(key = "sp", mandatory = false, help = "System property file location") final String systemProperty,//not supported for now...
@@ -55,7 +58,13 @@ public class SlangCLI implements CommandMarker {
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(filePath,null,classPath);
 
-        trigger(compilationArtifact, inputs);
+        Long id = trigger(compilationArtifact, inputs);
+
+        return triggerMsg(id,compilationArtifact.getExecutionPlan().getName());
+    }
+
+    private String triggerMsg(Long id, String flowName) {
+        return TRIGGERED_FLOW_MSG + flowName + WITH_EXECUTION_ID_MSG + id;
     }
 
     @CliCommand(value = "slang -version", help = "Prints the score version used")
@@ -93,7 +102,7 @@ public class SlangCLI implements CommandMarker {
         logger.info(("Event received: " + event.getEventType() + " Data is: " + event.getData()));
     }
 
-    private void trigger(CompilationArtifact compilationArtifact, Map<String, String> inputs) {
+    private Long trigger(CompilationArtifact compilationArtifact, Map<String, String> inputs) {
         //todo - move this logic to ScoreServices...
         Map<String, Serializable> executionContext = new HashMap<>();
         executionContext.put(ScoreLangConstants.RUN_ENV, new RunEnvironment());
@@ -104,6 +113,6 @@ public class SlangCLI implements CommandMarker {
                 .setDependencies(compilationArtifact.getDependencies())
                 .setContext(executionContext);
 
-        scoreServices.trigger(triggeringProperties);
+        return scoreServices.trigger(triggeringProperties);
     }
 }
