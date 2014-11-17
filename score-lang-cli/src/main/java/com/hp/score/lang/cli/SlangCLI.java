@@ -1,14 +1,11 @@
 package com.hp.score.lang.cli;
 
-import com.hp.score.api.TriggeringProperties;
 import com.hp.score.events.EventConstants;
 import com.hp.score.events.ScoreEvent;
 import com.hp.score.events.ScoreEventListener;
 import com.hp.score.lang.cli.services.ScoreServices;
 import com.hp.score.lang.cli.utils.CompilerHelper;
 import com.hp.score.lang.entities.CompilationArtifact;
-import com.hp.score.lang.entities.ScoreLangConstants;
-import com.hp.score.lang.runtime.env.RunEnvironment;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
@@ -18,8 +15,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -58,7 +53,7 @@ public class SlangCLI implements CommandMarker {
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(filePath,null,classPath);
 
-        Long id = trigger(compilationArtifact, inputs);
+        Long id = scoreServices.trigger(compilationArtifact, inputs);
 
         return triggerMsg(id,compilationArtifact.getExecutionPlan().getName());
     }
@@ -102,17 +97,4 @@ public class SlangCLI implements CommandMarker {
         logger.info(("Event received: " + event.getEventType() + " Data is: " + event.getData()));
     }
 
-    private Long trigger(CompilationArtifact compilationArtifact, Map<String, String> inputs) {
-        //todo - move this logic to ScoreServices...
-        Map<String, Serializable> executionContext = new HashMap<>();
-        executionContext.put(ScoreLangConstants.RUN_ENV, new RunEnvironment());
-        executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable) inputs);
-
-        TriggeringProperties triggeringProperties = TriggeringProperties
-                .create(compilationArtifact.getExecutionPlan())
-                .setDependencies(compilationArtifact.getDependencies())
-                .setContext(executionContext);
-
-        return scoreServices.trigger(triggeringProperties);
-    }
 }

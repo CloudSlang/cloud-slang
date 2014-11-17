@@ -23,9 +23,15 @@ import com.hp.score.api.TriggeringProperties;
 import com.hp.score.events.EventBus;
 import com.hp.score.events.ScoreEventListener;
 
+import com.hp.score.lang.entities.CompilationArtifact;
+import com.hp.score.lang.entities.ScoreLangConstants;
+import com.hp.score.lang.runtime.env.RunEnvironment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -42,12 +48,22 @@ public class ScoreServices {
     @Autowired
     private EventBus eventBus;
 
-    public Long trigger(TriggeringProperties triggeringProperties) {
-        return score.trigger(triggeringProperties);
-    }
-
     public void subscribe(ScoreEventListener eventHandler, Set<String> eventTypes) {
         eventBus.subscribe(eventHandler, eventTypes);
+    }
+
+    public Long trigger(CompilationArtifact compilationArtifact, Map<String, String> inputs) {
+        //todo - move this logic to ScoreServices...
+        Map<String, Serializable> executionContext = new HashMap<>();
+        executionContext.put(ScoreLangConstants.RUN_ENV, new RunEnvironment());
+        executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable) inputs);
+
+        TriggeringProperties triggeringProperties = TriggeringProperties
+                .create(compilationArtifact.getExecutionPlan())
+                .setDependencies(compilationArtifact.getDependencies())
+                .setContext(executionContext);
+
+        return score.trigger(triggeringProperties);
     }
 
 }
