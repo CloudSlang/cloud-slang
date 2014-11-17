@@ -21,8 +21,9 @@ package com.hp.score.lang.cli.services;
 import com.hp.score.api.Score;
 import com.hp.score.api.TriggeringProperties;
 import com.hp.score.events.EventBus;
+import com.hp.score.events.EventConstants;
+import com.hp.score.events.ScoreEvent;
 import com.hp.score.events.ScoreEventListener;
-
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.runtime.env.RunEnvironment;
@@ -31,8 +32,12 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_STEP_ERROR;
 
 /**
  * Date: 11/13/2014
@@ -53,6 +58,12 @@ public class ScoreServices {
         eventBus.subscribe(eventHandler, eventTypes);
     }
 
+    /**
+     * This method will trigger the flow in an Async matter.
+     * @param compilationArtifact
+     * @param inputs : flow inputs
+     * @return executionId
+     */
     public Long trigger(CompilationArtifact compilationArtifact, Map<String, String> inputs) {
         Map<String, Serializable> executionContext = new HashMap<>();
         executionContext.put(ScoreLangConstants.RUN_ENV, new RunEnvironment());
@@ -65,5 +76,58 @@ public class ScoreServices {
 
         return score.trigger(triggeringProperties);
     }
+
+    /**
+     * This method will trigger the flow in a synchronize matter, meaning only one flow can run at a time.
+     * @param compilationArtifact
+     * @param inputs : flow inputs
+     * @return executionId
+     */
+    public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, String> inputs){
+        //add start event
+        Set<String> handlerTypes = new HashSet<>();
+        handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
+        handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
+        handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
+        handlerTypes.add(EVENT_STEP_ERROR);
+
+        SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener();
+        eventBus.subscribe(scoreEventListener, handlerTypes);
+
+        Long executionId = trigger(compilationArtifact, inputs);
+
+        while(!scoreEventListener.isFlowFinished()){}//todo : need to add here sleep?
+
+        eventBus.unsubscribe(scoreEventListener);
+
+        return executionId;
+
+    }
+
+    private class SyncTriggerEventListener implements ScoreEventListener{
+
+        private AtomicBoolean flowFinished = new AtomicBoolean(false);
+
+        public boolean isFlowFinished() {
+            return flowFinished.get();
+        }
+
+        @Override
+        public void onEvent(ScoreEvent scoreEvent) throws InterruptedException {
+            switch (scoreEvent.getEventType()){
+                case EventConstants.SCORE_FINISHED_EVENT :
+                    System.out.println("Flow finished");//todo - improve msg here
+                    flowFinished.set(true); break;
+                case EventConstants.SCORE_ERROR_EVENT :
+                    System.out.println("Score Error Event"); break; //todo - improve msg here
+                case EventConstants.SCORE_FAILURE_EVENT :
+                    System.out.println("Flow finished with failure"); //todo - improve msg here
+                    flowFinished.set(true); break;
+                case ScoreLangConstants.EVENT_STEP_ERROR :
+                    System.out.println("Slang Step Error");break;
+            }
+        }
+    }
+
 
 }

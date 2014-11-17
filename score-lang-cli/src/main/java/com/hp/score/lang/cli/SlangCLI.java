@@ -6,6 +6,7 @@ import com.hp.score.events.ScoreEventListener;
 import com.hp.score.lang.cli.services.ScoreServices;
 import com.hp.score.lang.cli.utils.CompilerHelper;
 import com.hp.score.lang.entities.CompilationArtifact;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
@@ -32,12 +33,18 @@ public class SlangCLI implements CommandMarker {
 
     public static final String TRIGGERED_FLOW_MSG = "Triggered flow : ";
     public static final String WITH_EXECUTION_ID_MSG = " , with execution id : ";
+    public static final String FLOW_EXECUTION_TIME_TOOK = "Flow execution time took  ";
 
     @Autowired
     private ScoreServices scoreServices;
 
     @Autowired
     private CompilerHelper compilerHelper;
+
+    /**
+     * This global param holds the state of the CLI, if flows need to run in ASYNC or in SYNC manner.
+     */
+    private Boolean triggerAsync = false ;
 
     private final static Logger logger = Logger.getLogger(SlangCLI.class);
     private static final String currently = "You are currently running Score version: ";
@@ -53,8 +60,15 @@ public class SlangCLI implements CommandMarker {
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(filePath,null,classPath);
 
-        Long id = scoreServices.trigger(compilationArtifact, inputs);
-
+        Long id ;
+        if(!triggerAsync){
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            id = scoreServices.triggerSync(compilationArtifact, inputs);
+            stopWatch.stop();
+            return FLOW_EXECUTION_TIME_TOOK +stopWatch.toString() + WITH_EXECUTION_ID_MSG + id ;
+        }
+        id = scoreServices.trigger(compilationArtifact, inputs);
         return triggerMsg(id,compilationArtifact.getExecutionPlan().getName());
     }
 
