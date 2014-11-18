@@ -110,15 +110,17 @@ public class ExecutableSteps extends AbstractSteps {
         ReturnValues returnValues = new ReturnValues(operationReturnOutputs, result);
         runEnv.putReturnValues(returnValues);
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_END, "Output binding finished",
-                Pair.of(RETURN_VALUES, returnValues),Pair.of(levelName.EXECUTABLE_NAME.toString(),nodeName));
+                Pair.of(RETURN_VALUES, returnValues),
+                Pair.of(levelName.EXECUTABLE_NAME.toString(),nodeName));
 
         // If we have parent flow data on the stack, we pop it and request the score engine to switch to the parent
         // execution plan id once it can, and we set the next position that was stored there for the use of the navigation
         if(!runEnv.getParentFlowStack().isEmpty()) {
             handleNavigationToParent(runEnv, executionRuntimeServices);
         } else {
-            fireEvent(executionRuntimeServices, runEnv, EVENT_EXECUTABLE_FINISHED, "Execution finished running",
+            fireEvent(executionRuntimeServices, runEnv, EVENT_EXECUTION_FINISHED, "Execution finished running",
                     Pair.of(RESULT, returnValues.getResult()),
+                    Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable) operationReturnOutputs),
                     Pair.of(levelName.EXECUTABLE_NAME.toString(),nodeName));
         }
 

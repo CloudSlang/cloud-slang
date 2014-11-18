@@ -50,7 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_EXECUTABLE_FINISHED;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
@@ -235,7 +235,7 @@ public class ExecutableStepsTest {
                 boundOutputEvent = event;
             } else if(event.getEventType().equals(EVENT_OUTPUT_START)){
                 startOutputEvent = event;
-            } else if(event.getEventType().equals(EVENT_EXECUTABLE_FINISHED)){
+            } else if(event.getEventType().equals(EVENT_EXECUTION_FINISHED)){
                 executableFinishedEvent = event;
             }
         }
@@ -252,14 +252,14 @@ public class ExecutableStepsTest {
         eventData = (Map<String,Serializable>)boundOutputEvent.getData();
         Assert.assertTrue(eventData.containsKey(LanguageEventData.RETURN_VALUES));
         ReturnValues returnValues= (ReturnValues)eventData.get(LanguageEventData.RETURN_VALUES);
-        Assert.assertTrue(eventData.containsKey(LanguageEventData.levelName.EXECUTABLE_NAME.name()));
         Assert.assertEquals("task1",eventData.get(LanguageEventData.levelName.EXECUTABLE_NAME.name()));
 
         Assert.assertNotNull(executableFinishedEvent);
         eventData = (Map<String,Serializable>)executableFinishedEvent.getData();
-        Assert.assertTrue(eventData.containsKey(LanguageEventData.RESULT));
         String result = (String)eventData.get(LanguageEventData.RESULT);
+        Map<String, String> eventOutputs = (Map<String, String>)eventData.get(EXECUTABLE_OUTPUTS_KEY);
         Assert.assertEquals(SUCCESS_RESULT, result);
+        Assert.assertEquals(boundOutputs, eventOutputs);
 
         Assert.assertEquals(1, returnValues.getOutputs().size());
         Assert.assertEquals("John", returnValues.getOutputs().get("name"));
