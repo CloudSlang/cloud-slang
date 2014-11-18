@@ -92,7 +92,7 @@ public class SlangCLI implements CommandMarker {
         return triggerMsg(id,compilationArtifact.getExecutionPlan().getName());
     }
 
-    @CliCommand(value = "env", help = "Set environment var relevant to the CLI")//todo : change text here
+    @CliCommand(value = "env", help = "Set environment var relevant to the CLI")
     public String setEnvVar(
             @CliOption(key = "setAsync", mandatory = true, help = "set the async") final boolean switchAsync) throws IOException {
         triggerAsync = switchAsync ;
@@ -126,6 +126,7 @@ public class SlangCLI implements CommandMarker {
         handlerTypes.add(EVENT_OUTPUT_START);
         handlerTypes.add(EVENT_OUTPUT_END);
         handlerTypes.add(EVENT_STEP_ERROR);
+        handlerTypes.add(EVENT_EXECUTION_FINISHED);
         scoreServices.subscribe(new ScoreEventListener() {
             @Override
             public void onEvent(ScoreEvent event) {

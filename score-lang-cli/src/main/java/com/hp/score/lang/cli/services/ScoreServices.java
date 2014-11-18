@@ -27,6 +27,7 @@ import com.hp.score.events.ScoreEventListener;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.runtime.env.RunEnvironment;
+import com.hp.score.lang.runtime.events.LanguageEventData;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +40,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_STEP_ERROR;
 import static com.hp.score.lang.runtime.events.LanguageEventData.EXCEPTION;
+import static com.hp.score.lang.runtime.events.LanguageEventData.RESULT;
 import static org.fusesource.jansi.Ansi.ansi;
 
 /**
@@ -97,6 +100,7 @@ public class ScoreServices {
         handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
         handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
         handlerTypes.add(EVENT_STEP_ERROR);
+        handlerTypes.add(EVENT_EXECUTION_FINISHED);
 
         SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener();
         eventBus.subscribe(scoreEventListener, handlerTypes);
@@ -120,20 +124,28 @@ public class ScoreServices {
         }
 
         @Override
-        public void onEvent(ScoreEvent scoreEvent) throws InterruptedException {
+        public synchronized void onEvent(ScoreEvent scoreEvent) throws InterruptedException {
             Map<String,Serializable> data = (Map<String,Serializable>)scoreEvent.getData();
             switch (scoreEvent.getEventType()){
                 case EventConstants.SCORE_FINISHED_EVENT :
                     flowFinished.set(true); break;
                 case EventConstants.SCORE_ERROR_EVENT :
-                    printWithColor(Ansi.Color.RED,SCORE_ERROR_EVENT_MSG + data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " +
+                    printWithColor(Ansi.Color.RED, SCORE_ERROR_EVENT_MSG + data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " +
                             data.get(EventConstants.SCORE_ERROR_MSG)); break;
                 case EventConstants.SCORE_FAILURE_EVENT :
                     printWithColor(Ansi.Color.RED,FLOW_FINISHED_WITH_FAILURE_MSG);
                     flowFinished.set(true); break;
                 case ScoreLangConstants.EVENT_STEP_ERROR :
                     printWithColor(Ansi.Color.RED,SLANG_STEP_ERROR_MSG + data.get(EXCEPTION)); break;
+                case EVENT_EXECUTION_FINISHED :
+                    printFinishEvent(data); break;
             }
+        }
+
+        private void printFinishEvent(Map<String, Serializable> data) {
+            String flowResult = (String)data.get(RESULT);
+            String flowName = (String)data.get(LanguageEventData.levelName.EXECUTABLE_NAME.toString());
+            printWithColor(Ansi.Color.CYAN,"Flow : " + flowName + " finished with result : " + flowResult);
         }
 
         private void printWithColor(Ansi.Color color, String msg){
