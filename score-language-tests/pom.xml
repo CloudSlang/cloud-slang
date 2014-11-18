@@ -64,6 +64,11 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.hp.score.content</groupId>
+            <artifactId>score-ssh</artifactId>
+        </dependency>
+
     </dependencies>
 
 

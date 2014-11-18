@@ -166,6 +166,13 @@
             </dependency>
 
             <dependency>
+                <groupId>com.hp.score.content</groupId>
+                <artifactId>score-ssh</artifactId>
+                <version>0.0.3</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>com.hp.score</groupId>
                 <artifactId>score-all</artifactId>
                 <version>${score.version}</version>

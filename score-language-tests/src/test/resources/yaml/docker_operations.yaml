@@ -1,0 +1,26 @@
+namespace: user.ops
+
+operations:
+  - ssh_command:
+        inputs:
+          - host
+          - port
+          - username
+          - password
+          - privateKeyFile
+          - command
+          - arguments
+          - characterSet
+          - pty
+          - timeout
+          - closeSession
+          - globalSessionObject
+        action:
+          java_action:
+            className: com.hp.score.content.ssh.actions.SSHShellCommandAction
+            methodName: runSshShellCommand
+        outputs:
+          - returnResult: returnResult
+        results:
+          - SUCCESS
+          - FAILURE
