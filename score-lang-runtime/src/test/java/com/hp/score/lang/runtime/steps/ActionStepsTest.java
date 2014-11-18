@@ -106,7 +106,7 @@ public class ActionStepsTest {
         Assert.assertEquals(nextStepPosition, runEnv.removeNextStepPosition());
     }
 
-    @Test(timeout = DEFAULT_TIMEOUT)
+    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void doJavaActionWrongClassTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
@@ -131,7 +131,7 @@ public class ActionStepsTest {
         Assert.assertNotNull(actionEndEvent);
     }
 
-    @Test(timeout = DEFAULT_TIMEOUT)
+    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void doJavaActionWrongMethodTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
@@ -156,7 +156,7 @@ public class ActionStepsTest {
         Assert.assertNotNull(actionEndEvent);
     }
 
-    @Test(timeout = DEFAULT_TIMEOUT)
+    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void doJavaActionWithExceptionTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
@@ -181,7 +181,7 @@ public class ActionStepsTest {
         Assert.assertNotNull(actionEndEvent);
     }
 
-    @Test(timeout = DEFAULT_TIMEOUT)
+    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void doJavaActionWrongReturnTypeTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
@@ -233,7 +233,7 @@ public class ActionStepsTest {
         Assert.assertEquals("Java action outputs are not as expected", expectedOutputs, actualOutputs);
     }
 
-    @Test(timeout = DEFAULT_TIMEOUT)
+    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void doActionJavaMissingActionTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
@@ -258,7 +258,7 @@ public class ActionStepsTest {
         Assert.assertEquals("Java action output should be empty map", expectedOutputs, actualOutputs);
     }
 
-    @Test(timeout = DEFAULT_TIMEOUT)
+    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void doActionJavaMissingActionAnnotationTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
@@ -434,7 +434,7 @@ public class ActionStepsTest {
         Assert.assertEquals("Python action outputs are not as expected", expectedOutputs, actualOutputs);
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void doActionPythonMissingInputsTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
@@ -462,7 +462,7 @@ public class ActionStepsTest {
         Assert.assertEquals("Action should return empty map", expectedOutputs, actionOutputs);
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void doActionPythonEmptyScript() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
@@ -481,7 +481,7 @@ public class ActionStepsTest {
         Assert.assertEquals("Action should return empty map", expectedOutputs, actionOutputs);
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void doActionPythonMissingScript() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
