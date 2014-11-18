@@ -1,7 +1,7 @@
-namespace: user.flows
+namespace: docker.flows
 
 imports:
- ops: user.ops
+ ops: docker.ops
 
 flow:
   name: createDbContainer
@@ -12,7 +12,7 @@ flow:
   workflow:
     Task1:
       do:
-        ops.ssh_command:
+        ops.pull_container:
           - imageName: 'mysql'
           - host
           - username

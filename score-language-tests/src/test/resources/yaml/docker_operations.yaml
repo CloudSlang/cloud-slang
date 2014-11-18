@@ -1,7 +1,7 @@
-namespace: user.ops
+namespace: docker.ops
 
 operations:
-  - ssh_command:
+  - pull_container:
         inputs:
           - host
           - port : '22'
