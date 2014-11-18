@@ -27,6 +27,8 @@ import com.hp.score.events.ScoreEventListener;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.runtime.env.RunEnvironment;
+import org.fusesource.jansi.Ansi;
+import org.fusesource.jansi.AnsiConsole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +40,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_STEP_ERROR;
+import static com.hp.score.lang.runtime.events.LanguageEventData.EXCEPTION;
+import static org.fusesource.jansi.Ansi.ansi;
 
 /**
  * Date: 11/13/2014
@@ -46,6 +50,9 @@ import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_STEP_ERROR;
  */
 @Service
 public class ScoreServices {
+    public static final String SLANG_STEP_ERROR_MSG = "Slang Step Error : ";
+    public static final String SCORE_ERROR_EVENT_MSG = "Score Error Event :";
+    public static final String FLOW_FINISHED_WITH_FAILURE_MSG = "Flow finished with failure";
     //TODO - change this to interface...
 
     @Autowired
@@ -114,18 +121,23 @@ public class ScoreServices {
 
         @Override
         public void onEvent(ScoreEvent scoreEvent) throws InterruptedException {
+            Map<String,Serializable> data = (Map<String,Serializable>)scoreEvent.getData();
             switch (scoreEvent.getEventType()){
                 case EventConstants.SCORE_FINISHED_EVENT :
-                    System.out.println("Flow finished");//todo - improve msg here
                     flowFinished.set(true); break;
                 case EventConstants.SCORE_ERROR_EVENT :
-                    System.out.println("Score Error Event"); break; //todo - improve msg here
+                    printWithColor(Ansi.Color.RED,SCORE_ERROR_EVENT_MSG + data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " +
+                            data.get(EventConstants.SCORE_ERROR_MSG)); break;
                 case EventConstants.SCORE_FAILURE_EVENT :
-                    System.out.println("Flow finished with failure"); //todo - improve msg here
+                    printWithColor(Ansi.Color.RED,FLOW_FINISHED_WITH_FAILURE_MSG);
                     flowFinished.set(true); break;
                 case ScoreLangConstants.EVENT_STEP_ERROR :
-                    System.out.println("Slang Step Error");break;
+                    printWithColor(Ansi.Color.RED,SLANG_STEP_ERROR_MSG + data.get(EXCEPTION)); break;
             }
+        }
+
+        private void printWithColor(Ansi.Color color, String msg){
+            AnsiConsole.out().print(ansi().ansi().fg(color).a(msg).newline());
         }
     }
 
