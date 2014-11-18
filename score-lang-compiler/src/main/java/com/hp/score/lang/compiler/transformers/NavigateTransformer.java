@@ -37,7 +37,7 @@ public class NavigateTransformer implements Transformer<Map<String, Object>, Map
         }
         Map<String, String> navigationData = new HashMap<>();
         for (Map.Entry<String, Object> entry : rawData.entrySet()) {
-            //todo currently we support only string navigation
+            //todo currently we support only string navigation (no nested navigation)
             // - SUCCESS: some_task
             // the value of the navigation is the step to go to
             if (entry.getValue() instanceof String){

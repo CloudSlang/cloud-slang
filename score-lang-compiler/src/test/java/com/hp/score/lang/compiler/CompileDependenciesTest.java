@@ -29,7 +29,6 @@ import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -40,8 +39,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
@@ -56,10 +55,10 @@ public class CompileDependenciesTest {
     @Autowired
     private SlangCompiler compiler;
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = RuntimeException.class)
     public void emptyPathButThereAreImports() throws Exception {
         URI flow = getClass().getResource("/flow.yaml").toURI();
-        List<File> path = new ArrayList<>();
+        Set<File> path = new HashSet<>();
         compiler.compileFlow(new File(flow), path);
     }
 
@@ -73,7 +72,7 @@ public class CompileDependenciesTest {
     public void referenceDoesNoExistInPath() throws Exception {
         URI flow = getClass().getResource("/flow.yaml").toURI();
         URI operation = getClass().getResource("/operation_with_data.yaml").toURI();
-        List<File> path = new ArrayList<>();
+        Set<File> path = new HashSet<>();
         path.add(new File(operation));
 
         exception.expect(RuntimeException.class);
@@ -86,7 +85,7 @@ public class CompileDependenciesTest {
     public void importHasAKeyThatDoesNotExistInPath() throws Exception {
         URI flow = getClass().getResource("/flow.yaml").toURI();
         URI operation = getClass().getResource("/flow_with_data.yaml").toURI();
-        List<File> path = new ArrayList<>();
+        Set<File> path = new HashSet<>();
         path.add(new File(operation));
 
         exception.expect(RuntimeException.class);
@@ -100,7 +99,7 @@ public class CompileDependenciesTest {
         URI flow = getClass().getResource("/flow.yaml").toURI();
         URI notImportedOperation = getClass().getResource("/flow_with_data.yaml").toURI();
         URI importedOperation = getClass().getResource("/operation.yaml").toURI();
-        List<File> path = new ArrayList<>();
+        Set<File> path = new HashSet<>();
         path.add(new File(notImportedOperation));
         path.add(new File(importedOperation));
 
@@ -113,7 +112,7 @@ public class CompileDependenciesTest {
     public void pathHasDirectoriesInIt() throws Exception {
         URI flow = getClass().getResource("/flow.yaml").toURI();
         URI notImportedOperation = getClass().getResource("/").toURI();
-        List<File> path = new ArrayList<>();
+        Set<File> path = new HashSet<>();
         path.add(new File(notImportedOperation));
 
         CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
@@ -136,14 +135,14 @@ public class CompileDependenciesTest {
         URI flow = getClass().getResource("/circular-dependencies/parent_flow.yaml").toURI();
         URI child_flow = getClass().getResource("/circular-dependencies/child_flow.yaml").toURI();
         URI operation = getClass().getResource("/operation.yaml").toURI();
-        List<File> path = new ArrayList<>();
+        Set<File> path = new HashSet<>();
         path.add(new File(child_flow));
         path.add(new File(operation));
 
         CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull(executionPlan);
-        Assert.assertEquals("different number of dependencies than expected", 4, compilationArtifact.getDependencies().size());
+        Assert.assertEquals("different number of dependencies than expected", 2, compilationArtifact.getDependencies().size());
         ExecutionStep secondTaskStartStep = executionPlan.getStep(4L);
         String refId = (String) secondTaskStartStep.getActionData().get(ScoreLangConstants.REF_ID);
         Assert.assertEquals("refId is not as expected", "user.flows.circular.child_flow", refId);
@@ -154,27 +153,26 @@ public class CompileDependenciesTest {
         URI flow = getClass().getResource("/circular-dependencies/parent_flow.yaml").toURI();
         URI child_flow = getClass().getResource("/circular-dependencies/child_flow.yaml").toURI();
         URI operation = getClass().getResource("/operation.yaml").toURI();
-        List<File> path = new ArrayList<>();
+        Set<File> path = new HashSet<>();
         path.add(new File(child_flow));
         path.add(new File(operation));
         CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull(executionPlan);
-        Assert.assertEquals("different number of dependencies than expected", 4, compilationArtifact.getDependencies().size());
+        Assert.assertEquals("different number of dependencies than expected", 2, compilationArtifact.getDependencies().size());
     }
 
     @Test
-    @Ignore
     public void circularDependencies() throws Exception {
         URI flow = getClass().getResource("/circular-dependencies/parent_flow.yaml").toURI();
         URI child_flow = getClass().getResource("/circular-dependencies/circular_child_flow.yaml").toURI();
         URI operation = getClass().getResource("/operation.yaml").toURI();
-        List<File> path = new ArrayList<>();
+        Set<File> path = new HashSet<>();
         path.add(new File(child_flow));
         path.add(new File(operation));
         CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull(executionPlan);
+        Assert.assertEquals(3, compilationArtifact.getDependencies().size());
     }
-
 }

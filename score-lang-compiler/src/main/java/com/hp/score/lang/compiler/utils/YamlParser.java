@@ -21,6 +21,7 @@ package com.hp.score.lang.compiler.utils;
 /*
  * Created by orius123 on 05/11/14.
  */
+
 import com.hp.score.lang.compiler.domain.SlangFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,8 +40,9 @@ public class YamlParser {
         SlangFile slangFile;
         try (FileInputStream is = new FileInputStream(source)) {
             slangFile = yaml.loadAs(is, SlangFile.class);
+            slangFile.setFileName(source.getName());
         } catch (java.io.IOException e) {
-            throw new RuntimeException("There was a problem parsing the yaml file syntax for some reason", e);
+            throw new RuntimeException("There was a problem parsing the yaml file: " + source.getName() + " syntax for some reason", e);
         }
         return slangFile;
     }

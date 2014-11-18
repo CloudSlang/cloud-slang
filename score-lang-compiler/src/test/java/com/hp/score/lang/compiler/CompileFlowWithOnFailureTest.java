@@ -36,9 +36,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
@@ -52,7 +52,7 @@ public class CompileFlowWithOnFailureTest {
         URI flow = getClass().getResource("/flow_with_on_failure.yaml").toURI();
         URI operation = getClass().getResource("/operation.yaml").toURI();
 
-        List<File> path = new ArrayList<>();
+        Set<File> path = new HashSet<>();
         path.add(new File(operation));
 
         CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
@@ -60,7 +60,7 @@ public class CompileFlowWithOnFailureTest {
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 10, executionPlan.getSteps().size());
         Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());
-        Assert.assertEquals("the dependencies size is not as expected", 3, compilationArtifact.getDependencies().size());
+        Assert.assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
         Assert.assertEquals("the inputs size is not as expected", 1, compilationArtifact.getInputs().size());
 
         long firstOnFailureStep = 6L;

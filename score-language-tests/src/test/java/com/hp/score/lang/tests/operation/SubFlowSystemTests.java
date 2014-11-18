@@ -17,6 +17,7 @@ package com.hp.score.lang.tests.operation;/*
  * under the License.
 */
 
+import com.google.common.collect.Sets;
 import com.hp.score.events.EventConstants;
 import com.hp.score.events.ScoreEvent;
 import com.hp.score.lang.entities.CompilationArtifact;
@@ -26,10 +27,9 @@ import org.junit.Test;
 import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /*
  * Created by orius123 on 12/11/14.
@@ -42,7 +42,7 @@ public class SubFlowSystemTests extends SystemsTestsParent {
         URI subFlow = getClass().getResource("/yaml/sub-flow/child_flow.yaml").toURI();
         URI operations = getClass().getResource("/yaml/operation.yaml").toURI();
 
-        List<File> path = Arrays.asList(new File(subFlow), new File(operations));
+        Set<File> path = Sets.newHashSet(new File(subFlow), new File(operations));
         CompilationArtifact compilationArtifact = compiler.compileFlow(new File(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();

@@ -35,7 +35,6 @@ import com.hp.score.lang.runtime.events.LanguageEventData;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.python.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,11 +43,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.script.ScriptEngine;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
@@ -87,7 +82,7 @@ public class ExecutableStepsTest {
 
     @Test
     public void testStartWithInput() throws Exception {
-        List<Input> inputs = Lists.newArrayList(new Input("input1","input1"));
+        List<Input> inputs = Arrays.asList(new Input("input1", "input1"));
         RunEnvironment runEnv = new RunEnvironment();
 
         Map<String,Serializable> resultMap = new HashMap<>();
@@ -108,7 +103,7 @@ public class ExecutableStepsTest {
 
     @Test
     public void testBoundInputEvent(){
-        List<Input> inputs = Lists.newArrayList(new Input("input1","input1"),new Input("input2",null,3,true,true,true));
+        List<Input> inputs = Arrays.asList(new Input("input1", "input1"), new Input("input2", null, 3, true, true, true));
         RunEnvironment runEnv = new RunEnvironment();
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         Map<String,Serializable> resultMap = new HashMap<>();
@@ -139,7 +134,7 @@ public class ExecutableStepsTest {
 
     @Test
     public void testStartExecutableSetNextPosition() throws Exception {
-        List<Input> inputs = Lists.newArrayList();
+        List<Input> inputs = Arrays.asList();
         RunEnvironment runEnv = new RunEnvironment();
 
         Long nextStepPosition = 2L;
@@ -150,7 +145,7 @@ public class ExecutableStepsTest {
 
     @Test
     public void testFinishExecutableWithResult() throws Exception {
-        List<Result> results = Lists.newArrayList(new Result(SUCCESS_RESULT,"true"));
+        List<Result> results = Arrays.asList(new Result(SUCCESS_RESULT,"true"));
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), null));
         runEnv.getExecutionPath().down();
@@ -164,7 +159,7 @@ public class ExecutableStepsTest {
 
     @Test
     public void testFinishExecutableWithOutput() throws Exception {
-        List<Output> possibleOutputs = Lists.newArrayList(new Output("name", "name"));
+        List<Output> possibleOutputs = Arrays.asList(new Output("name", "name"));
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), null));
         runEnv.getExecutionPath().down();
@@ -208,8 +203,8 @@ public class ExecutableStepsTest {
     //todo: split to several methods
     @Test
     public void testFinishExecutableEvents(){
-        List<Output> possibleOutputs = Lists.newArrayList(new Output("name", "name"));
-        List<Result> possibleResults = Lists.newArrayList(new Result(SUCCESS_RESULT,"true"));
+        List<Output> possibleOutputs = Arrays.asList(new Output("name", "name"));
+        List<Result> possibleResults = Arrays.asList(new Result(SUCCESS_RESULT,"true"));
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), null));
         runEnv.getExecutionPath().down();

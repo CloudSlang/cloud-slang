@@ -34,8 +34,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
@@ -49,7 +49,7 @@ public class CompileFlowWithMultipleStepsTest {
         URI flow = getClass().getResource("/flow_with_multiple_steps.yaml").toURI();
         URI operation = getClass().getResource("/operation.yaml").toURI();
 
-        List<File> path = new ArrayList<>();
+        Set<File> path = new HashSet<>();
         path.add(new File(operation));
 
         CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);

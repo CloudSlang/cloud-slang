@@ -17,7 +17,6 @@ package com.hp.score.lang.compiler.utils;/*
  * under the License.
 */
 
-import ch.lambdaj.Lambda;
 import com.hp.score.lang.compiler.SlangTextualKeys;
 import com.hp.score.lang.compiler.domain.*;
 import com.hp.score.lang.compiler.transformers.Transformer;
@@ -25,7 +24,6 @@ import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.entities.bindings.Result;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.iterators.PeekingIterator;
@@ -34,13 +32,15 @@ import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.*;
 
+import static ch.lambdaj.Lambda.exists;
+import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
-import static org.hamcrest.Matchers.hasKey;
 
 /*
  * Created by orius123 on 09/11/14.
@@ -51,59 +51,88 @@ public class ExecutableBuilder {
     @Autowired
     private List<Transformer> transformers;
 
-    public CompiledExecutable compileExecutable(String namespace, String execName, Map<String, Object> executableRawData,
-                                                TreeMap<String, List<SlangFile>> dependenciesByNamespace, SlangFile.Type type) {
+    private List<Transformer> preExecTransformers;
+    private List<Transformer> postExecTransformers;
+    private List<String> execAdditionalKeywords;
 
-        Validate.notEmpty(executableRawData, "executable data for: " + execName + " is empty");
+    private List<Transformer> actionTransformers;
+
+    private List<Transformer> preTaskTransformers;
+    private List<Transformer> postTaskTransformers;
+    private List<String> TaskAdditionalKeyWords;
+
+    @PostConstruct
+    public void initScopedTransformersAndKeys() {
+        //executable transformers and keys
+        preExecTransformers = filterTransformers(Transformer.Scope.BEFORE_EXECUTABLE);
+        postExecTransformers = filterTransformers(Transformer.Scope.AFTER_EXECUTABLE);
+        execAdditionalKeywords = Arrays.asList(SlangTextualKeys.ACTION_KEY, SlangTextualKeys.WORKFLOW_KEY, SlangTextualKeys.FLOW_NAME_KEY);
+
+        //action transformers and keys
+        actionTransformers = filterTransformers(Transformer.Scope.ACTION);
+
+        //task transformers and keys
+        preTaskTransformers = filterTransformers(Transformer.Scope.BEFORE_TASK);
+        postTaskTransformers = filterTransformers(Transformer.Scope.AFTER_TASK);
+        TaskAdditionalKeyWords = Arrays.asList(SlangTextualKeys.DO_KEY, SlangTextualKeys.NAVIGATION_KEY);
+    }
+
+    private List<Transformer> filterTransformers(Transformer.Scope scope) {
+        return filter(having(on(Transformer.class).getScopes().contains(scope)), transformers);
+    }
+
+    public CompiledExecutable transformToExecutable(SlangFile slangFile, String execName, Map<String, Object> executableRawData) {
+
+        Validate.notEmpty(executableRawData, "Executable data for: " + execName + " is empty");
+        Validate.notNull(slangFile, "Slang File for " + execName + " is null");
 
         Map<String, Serializable> preExecutableActionData = new HashMap<>();
         Map<String, Serializable> postExecutableActionData = new HashMap<>();
 
-        List<Transformer> preExecTransformers = Lambda.filter(having(on(Transformer.class).getScopes().contains(Transformer.Scope.BEFORE_EXECUTABLE)), transformers);
-        List<Transformer> postExecTransformers = Lambda.filter(having(on(Transformer.class).getScopes().contains(Transformer.Scope.AFTER_EXECUTABLE)), transformers);
-
-        validateKeyWordsExits(executableRawData, ListUtils.union(preExecTransformers, postExecTransformers),
-                Arrays.asList(SlangTextualKeys.ACTION_KEY, SlangTextualKeys.WORKFLOW_KEY, SlangTextualKeys.FLOW_NAME_KEY));
+        validateKeyWordsExits(execName, executableRawData, ListUtils.union(preExecTransformers, postExecTransformers), execAdditionalKeywords);
 
         preExecutableActionData.putAll(runTransformers(executableRawData, preExecTransformers));
-
         postExecutableActionData.putAll(runTransformers(executableRawData, postExecTransformers));
 
         @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) preExecutableActionData.remove(SlangTextualKeys.INPUTS_KEY);
         @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) postExecutableActionData.remove(SlangTextualKeys.OUTPUTS_KEY);
         @SuppressWarnings("unchecked") List<Result> results = (List<Result>) postExecutableActionData.remove(SlangTextualKeys.RESULTS_KEY);
 
-        if (type == SlangFile.Type.FLOW) {
-            @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> workFlowRawData = (LinkedHashMap<String, Map<String, Object>>) executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
-            if (MapUtils.isEmpty(workFlowRawData)) {
-                throw new RuntimeException("flow: " + execName + " has no workflow data");
-            }
+        String namespace = slangFile.getNamespace();
 
-            CompiledWorkflow onFailureWorkFlow = null;
-            @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> onFailureData =
-                    (LinkedHashMap) workFlowRawData.remove(SlangTextualKeys.ON_FAILURE_KEY);
-            if (MapUtils.isNotEmpty(onFailureData)) {
-                onFailureWorkFlow = compileWorkFlow(onFailureData, dependenciesByNamespace, null);
-            }
+        switch (slangFile.getType()) {
+            case FLOW:
+                @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> workFlowRawData =
+                        (LinkedHashMap<String, Map<String, Object>>) executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
+                if (MapUtils.isEmpty(workFlowRawData)) {
+                    throw new RuntimeException("Flow: " + execName + " has no workflow data");
+                }
 
-            CompiledWorkflow compiledWorkflow = compileWorkFlow(workFlowRawData, dependenciesByNamespace, onFailureWorkFlow);
-            return new CompiledFlow(preExecutableActionData, postExecutableActionData, compiledWorkflow, namespace, execName, inputs, outputs, results);
-        } else {
-            @SuppressWarnings("unchecked") Map<String, Object> actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
-            if (MapUtils.isEmpty(actionRawData)) {
-                throw new RuntimeException("operation: " + execName + " has no action data");
-            }
-            CompiledDoAction compiledDoAction = compileAction(actionRawData);
-            return new CompiledOperation(preExecutableActionData, postExecutableActionData, compiledDoAction, namespace, execName, inputs, outputs, results);
+                CompiledWorkflow onFailureWorkFlow = null;
+                @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> onFailureData =
+                        (LinkedHashMap) workFlowRawData.remove(SlangTextualKeys.ON_FAILURE_KEY);
+                if (MapUtils.isNotEmpty(onFailureData)) {
+                    onFailureWorkFlow = compileWorkFlow(onFailureData, slangFile.getImports(), null);
+                }
+
+                CompiledWorkflow compiledWorkflow = compileWorkFlow(workFlowRawData, slangFile.getImports(), onFailureWorkFlow);
+                return new CompiledFlow(preExecutableActionData, postExecutableActionData, compiledWorkflow, namespace, execName, inputs, outputs, results);
+            case OPERATIONS:
+                @SuppressWarnings("unchecked") Map<String, Object> actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
+                if (MapUtils.isEmpty(actionRawData)) {
+                    throw new RuntimeException("Operation: " + execName + " has no action data");
+                }
+                CompiledDoAction compiledDoAction = compileAction(actionRawData);
+                return new CompiledOperation(preExecutableActionData, postExecutableActionData, compiledDoAction, namespace, execName, inputs, outputs, results);
+            default:
+                throw new RuntimeException("File: " + slangFile.getFileName() + " is not a flow type or operations");
         }
     }
 
     private CompiledDoAction compileAction(Map<String, Object> actionRawData) {
         Map<String, Serializable> actionData = new HashMap<>();
 
-        List<Transformer> actionTransformers = Lambda.filter(having(on(Transformer.class).getScopes().contains(Transformer.Scope.ACTION)), transformers);
-
-        validateKeyWordsExits(actionRawData, actionTransformers, null);
+        validateKeyWordsExits("action data", actionRawData, actionTransformers, null);
 
         actionData.putAll(runTransformers(actionRawData, actionTransformers));
 
@@ -111,11 +140,10 @@ public class ExecutableBuilder {
     }
 
     private CompiledWorkflow compileWorkFlow(LinkedHashMap<String, Map<String, Object>> workFlowRawData,
-                                             TreeMap<String, List<SlangFile>> dependenciesByNamespace,
+                                             Map<String, String> imports,
                                              CompiledWorkflow onFailureWorkFlow) {
 
         Deque<CompiledTask> compiledTasks = new LinkedList<>();
-
 
         Validate.notEmpty(workFlowRawData, "Flow must have tasks in its workflow");
 
@@ -127,7 +155,9 @@ public class ExecutableBuilder {
             Map.Entry<String, Map<String, Object>> taskRawData = iterator.next();
             Map.Entry<String, Map<String, Object>> nextTaskData = iterator.peek();
             String followingTaskName = nextTaskData != null ? nextTaskData.getKey() : null;
-            CompiledTask compiledTask = compileTask(taskRawData.getKey(), taskRawData.getValue(), followingTaskName, dependenciesByNamespace, defaultFailureKey);
+            String taskName = taskRawData.getKey();
+            Map<String, Object> taskRawDataValue = taskRawData.getValue();
+            CompiledTask compiledTask = compileTask(taskName, taskRawDataValue, followingTaskName, imports, defaultFailureKey);
             compiledTasks.add(compiledTask);
         }
 
@@ -139,24 +169,26 @@ public class ExecutableBuilder {
     }
 
     private CompiledTask compileTask(String taskName, Map<String, Object> taskRawData, String followingTaskName,
-                                     TreeMap<String, List<SlangFile>> dependenciesByNamespace, String defaultFailureKey) {
+                                     Map<String, String> imports, String defaultFailureKey) {
+
+        if (MapUtils.isEmpty(taskRawData)) {
+            throw new RuntimeException("Task: " + taskName + " has no data");
+        }
+
         Map<String, Serializable> preTaskData = new HashMap<>();
         Map<String, Serializable> postTaskData = new HashMap<>();
 
-        List<Transformer> preTaskTransformers = Lambda.filter(having(on(Transformer.class).getScopes().contains(Transformer.Scope.BEFORE_TASK)), transformers);
-        List<Transformer> postTaskTransformers = Lambda.filter(having(on(Transformer.class).getScopes().contains(Transformer.Scope.AFTER_TASK)), transformers);
-
-        validateKeyWordsExits(taskRawData, ListUtils.union(preTaskTransformers, postTaskTransformers), Arrays.asList(SlangTextualKeys.DO_KEY, SlangTextualKeys.NAVIGATION_KEY));
+        validateKeyWordsExits(taskName, taskRawData, ListUtils.union(preTaskTransformers, postTaskTransformers), TaskAdditionalKeyWords);
 
         preTaskData.putAll(runTransformers(taskRawData, preTaskTransformers));
         postTaskData.putAll(runTransformers(taskRawData, postTaskTransformers));
 
         @SuppressWarnings("unchecked") Map<String, Object> doRawData = (Map<String, Object>) taskRawData.get(SlangTextualKeys.DO_KEY);
         if (MapUtils.isEmpty(doRawData)) {
-            throw new RuntimeException("task: " + taskName + " has no reference information");
+            throw new RuntimeException("Task: " + taskName + " has no reference information");
         }
         String refString = doRawData.keySet().iterator().next();
-        String refId = resolveRefId(refString, dependenciesByNamespace);
+        String refId = resolveRefId(refString, imports);
 
         @SuppressWarnings("unchecked") Map<String, String> navigationStrings = (Map<String, String>) postTaskData.get(SlangTextualKeys.NAVIGATION_KEY);
 
@@ -168,6 +200,12 @@ public class ExecutableBuilder {
         }
 
         return new CompiledTask(taskName, preTaskData, postTaskData, navigationStrings, refId);
+    }
+
+    private String resolveRefId(String refIdString, Map<String, String> imports) {
+        String importAlias = StringUtils.substringBefore(refIdString, ".");
+        String refName = StringUtils.substringAfter(refIdString, ".");
+        return imports.get(importAlias) + "." + refName;
     }
 
     private Map<String, Serializable> runTransformers(Map<String, Object> rawData, List<Transformer> scopeTransformers) {
@@ -186,36 +224,7 @@ public class ExecutableBuilder {
         return transformedData;
     }
 
-    private String resolveRefId(String refIdString, TreeMap<String, List<SlangFile>> dependenciesByNamespace) {
-        String importAlias = StringUtils.substringBefore(refIdString, ".");
-        List<SlangFile> slangFilesList = dependenciesByNamespace.get(importAlias);
-        if (CollectionUtils.isEmpty(slangFilesList)) {
-            throw new RuntimeException("No file was found in the path for import: " + importAlias);
-        }
-        List<Map> executableList = new ArrayList<>();
-        for (SlangFile slangFile : slangFilesList) {
-            switch (slangFile.getType()) {
-                case OPERATIONS:
-                    executableList.addAll(slangFile.getOperations());
-                    break;
-                case FLOW:
-                    Map<Object, Object> flow = new HashMap<>();
-                    flow.put(slangFile.getFlow().get(SlangTextualKeys.FLOW_NAME_KEY), null);
-                    executableList.add(flow);
-                    break;
-                default:
-                    throw new RuntimeException("File: is not a flow and not an operation");
-            }
-        }
-        String refIdSuffix = StringUtils.substringAfter(refIdString, ".");
-        Map matchingExecutable = Lambda.selectFirst(executableList, hasKey(refIdSuffix));
-        if (matchingExecutable == null) {
-            throw new RuntimeException("No executable with name: " + refIdSuffix + " was found in the path that for ref: " + refIdString);
-        }
-        return slangFilesList.get(0).getNamespace() + "." + refIdSuffix;
-    }
-
-    private void validateKeyWordsExits(Map<String, Object> operationRawData, List<Transformer> allRelevantTransformers, List<String> additionalValidKeyWords) {
+    private void validateKeyWordsExits(String dataLogicalName, Map<String, Object> rawData, List<Transformer> allRelevantTransformers, List<String> additionalValidKeyWords) {
         Set<String> validKeywords = new HashSet<>();
 
         if (additionalValidKeyWords != null) {
@@ -226,9 +235,9 @@ public class ExecutableBuilder {
             validKeywords.add(keyToTransform(transformer));
         }
 
-        for (String key : operationRawData.keySet()) {
-            if (!(Lambda.exists(validKeywords, equalToIgnoringCase(key)))) {
-                throw new RuntimeException("No transformer were found for key: " + key);
+        for (String key : rawData.keySet()) {
+            if (!(exists(validKeywords, equalToIgnoringCase(key)))) {
+                throw new RuntimeException("No transformer were found for key: " + key + " at: " + dataLogicalName);
             }
         }
     }

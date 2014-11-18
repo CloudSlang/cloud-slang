@@ -68,7 +68,7 @@ public abstract class CompiledExecutable {
         return namespace;
     }
 
-    public String getId(){
+    public String getId() {
         return getNamespace() + "." + getName();
     }
 
@@ -87,4 +87,6 @@ public abstract class CompiledExecutable {
     public List<Result> getResults() {
         return results;
     }
+
+    public abstract String getType();
 }

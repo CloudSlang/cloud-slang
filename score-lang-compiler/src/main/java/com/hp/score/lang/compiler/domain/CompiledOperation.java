@@ -17,6 +17,7 @@ package com.hp.score.lang.compiler.domain;/*
  * under the License.
 */
 
+import com.hp.score.lang.compiler.SlangTextualKeys;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.entities.bindings.Result;
@@ -46,5 +47,9 @@ public class CompiledOperation extends CompiledExecutable {
 
     public CompiledDoAction getCompiledDoAction() {
         return compiledDoAction;
+    }
+
+    public String getType() {
+        return SlangTextualKeys.OPERATION_TYPE;
     }
 }

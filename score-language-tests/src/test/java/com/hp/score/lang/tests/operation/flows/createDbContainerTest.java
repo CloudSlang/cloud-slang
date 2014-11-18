@@ -18,6 +18,7 @@
 */
 package com.hp.score.lang.tests.operation.flows;
 
+import com.google.common.collect.Sets;
 import com.hp.score.events.EventConstants;
 import com.hp.score.events.ScoreEvent;
 import com.hp.score.lang.entities.CompilationArtifact;
@@ -29,10 +30,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Date: 11/17/2014
@@ -48,7 +46,7 @@ public class createDbContainerTest  extends SystemsTestsParent {
         URI resource = getClass().getResource("/yaml/createDbContainer.yaml").toURI();
         URI operations = getClass().getResource("/yaml/docker_operations.yaml").toURI();
 
-        List<File> path = Arrays.asList(new File(operations));
+        Set<File> path = Sets.newHashSet(new File(operations));
         CompilationArtifact compilationArtifact = compiler.compileFlow(new File(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();

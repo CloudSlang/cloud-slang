@@ -17,6 +17,7 @@ package com.hp.score.lang.compiler.domain;/*
  * under the License.
 */
 
+import com.hp.score.lang.compiler.SlangTextualKeys;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.entities.bindings.Result;
@@ -46,6 +47,10 @@ public class CompiledFlow extends CompiledExecutable {
 
     public CompiledWorkflow getCompiledWorkflow() {
         return compiledWorkflow;
+    }
+
+    public String getType() {
+        return SlangTextualKeys.FLOW_TYPE;
     }
 
 }

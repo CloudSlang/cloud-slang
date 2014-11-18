@@ -30,9 +30,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Date: 11/13/2014
@@ -47,33 +47,32 @@ public class CompilerHelper {
     @Autowired
     private SlangCompiler compiler;
 
-    private String[] SLANG_FILE_EXTENSIONS = {"yml","yaml","py"};
+    private String[] SLANG_FILE_EXTENSIONS = {"yml", "yaml", "py"};
 
     /**
-     *
      * @param filePath
      * @param opName
      * @param dependencies
      * @return
      * @throws IOException
      */
-    public CompilationArtifact compile(String filePath, String opName, String dependencies) throws IOException{
-        Validate.notNull(filePath,"filePath can not be null");
+    public CompilationArtifact compile(String filePath, String opName, String dependencies) throws IOException {
+        Validate.notNull(filePath, "filePath can not be null");
 
-        List<File> dependenciesFilesList = new ArrayList<>();
+        Set<File> dependenciesFilesSet = new HashSet<>();
         File file = new File(filePath);
-        Validate.isTrue(file.isFile(),"filePath must lead to a file");
+        Validate.isTrue(file.isFile(), "filePath must lead to a file");
 
-        if(StringUtils.isEmpty(dependencies)){
+        if (StringUtils.isEmpty(dependencies)) {
             dependencies = file.getParent();//default behavior is taking the parent dir
         }
-        if(dependencies != null){
+        if (dependencies != null) {
             Collection<File> dependenciesFiles = FileUtils.listFiles(new File(dependencies), SLANG_FILE_EXTENSIONS, false);
-            dependenciesFilesList.addAll(dependenciesFiles);
+            dependenciesFilesSet.addAll(dependenciesFiles);
         }
 
         //todo - support compile of op too?
-        CompilationArtifact compilationArtifact = compiler.compile(file,null,dependenciesFilesList);
+        CompilationArtifact compilationArtifact = compiler.compile(file, null, dependenciesFilesSet);
 
         return compilationArtifact;
     }

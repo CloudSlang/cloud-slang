@@ -14,7 +14,6 @@ import com.hp.score.lang.runtime.events.LanguageEventData;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.python.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -165,7 +164,7 @@ public class TaskStepsTest {
 
     @Test
     public void testEndTaskWithPublish() throws Exception {
-        List<Output> possiblePublishValues = Lists.newArrayList(new Output("name", "name"));
+        List<Output> possiblePublishValues = Arrays.asList(new Output("name", "name"));
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), null));
         runEnv.getStack().pushContext(new HashMap<String, Serializable>());

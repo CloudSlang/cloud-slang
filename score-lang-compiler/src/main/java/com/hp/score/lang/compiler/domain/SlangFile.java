@@ -31,6 +31,7 @@ public class SlangFile {
     private Map<String, Object> flow;
     private List<Map<String, Map<String, Object>>> operations;
     private String namespace;
+    private String fileName;
 
     public String getNamespace() {
         return namespace;
@@ -50,6 +51,14 @@ public class SlangFile {
 
     public Type getType() {
         return flow != null ? Type.FLOW : Type.OPERATIONS;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public enum Type {

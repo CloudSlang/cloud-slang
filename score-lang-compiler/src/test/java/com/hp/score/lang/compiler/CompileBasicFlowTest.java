@@ -39,9 +39,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
@@ -55,7 +56,7 @@ public class CompileBasicFlowTest {
         URI flow = getClass().getResource("/flow.yaml").toURI();
         URI operation = getClass().getResource("/operation.yaml").toURI();
 
-        List<File> path = new ArrayList<>();
+        Set<File> path = new HashSet<>();
         path.add(new File(operation));
 
         CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
@@ -63,7 +64,7 @@ public class CompileBasicFlowTest {
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
         Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());
-        Assert.assertEquals("the dependencies size is not as expected", 3, compilationArtifact.getDependencies().size());
+        Assert.assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
         Assert.assertEquals("the inputs size is not as expected", 1, compilationArtifact.getInputs().size());
     }
 
@@ -72,7 +73,7 @@ public class CompileBasicFlowTest {
         URI flow = getClass().getResource("/flow_with_data.yaml").toURI();
         URI operation = getClass().getResource("/operation.yaml").toURI();
 
-        List<File> path = new ArrayList<>();
+        Set<File> path = new HashSet<>();
         path.add(new File(operation));
 
         CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
@@ -80,7 +81,7 @@ public class CompileBasicFlowTest {
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
         Assert.assertEquals("execution plan name is different than expected", "SimpleFlow", executionPlan.getName());
-        Assert.assertEquals("the dependencies size is not as expected", 3, compilationArtifact.getDependencies().size());
+        Assert.assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
 
         ExecutionStep startStep = executionPlan.getStep(1L);
         @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) startStep.getActionData().get(ScoreLangConstants.OPERATION_INPUTS_KEY);
@@ -96,11 +97,12 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("CheckWeather", beginTaskStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
 
         ExecutionStep FinishTaskSteps = executionPlan.getStep(3L);
-        Object publish = FinishTaskSteps.getActionData().get(ScoreLangConstants.TASK_PUBLISH_KEY); //todo test
+        @SuppressWarnings("unchecked") List<Output> publish = (List<Output>) FinishTaskSteps.getActionData().get(ScoreLangConstants.TASK_PUBLISH_KEY);
         @SuppressWarnings("unchecked") Map<String, String> navigate = (Map<String, String>) FinishTaskSteps.getActionData().get(ScoreLangConstants.TASK_NAVIGATION_KEY);
         Assert.assertEquals("CheckWeather", FinishTaskSteps.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
 
         Assert.assertNotNull("publish don't exist", publish);
+        Assert.assertEquals("there is a different number of publish values than expected", 1, publish.size());
         Assert.assertNotNull("navigate don't exist", navigate);
         Assert.assertEquals("there is a different number of navigation values than expected", 2, navigate.size());
 

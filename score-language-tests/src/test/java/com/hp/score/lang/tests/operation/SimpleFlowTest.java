@@ -18,36 +18,36 @@
 */
 package com.hp.score.lang.tests.operation;
 
+import com.google.common.collect.Sets;
 import com.hp.score.events.EventConstants;
 import com.hp.score.events.ScoreEvent;
 import com.hp.score.lang.entities.CompilationArtifact;
-
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Date: 11/14/2014
+ * d
  *
  * @author Bonczidai Levente
  */
-public class SimpleFlowTest extends SystemsTestsParent{
+public class SimpleFlowTest extends SystemsTestsParent {
 
     private static final long DEFAULT_TIMEOUT = 20000;
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testCompileAndRunSubFlowBasic() throws Exception {
         URI resource = getClass().getResource("/yaml/simple_flow.yaml").toURI();
         URI operations = getClass().getResource("/yaml/operation.yaml").toURI();
 
-        List<File> path = Arrays.asList(new File(operations));
+        Set<File> path = Sets.newHashSet(new File(operations));
         CompilationArtifact compilationArtifact = compiler.compileFlow(new File(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();

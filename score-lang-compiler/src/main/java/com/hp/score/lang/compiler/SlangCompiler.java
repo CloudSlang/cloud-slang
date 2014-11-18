@@ -20,10 +20,10 @@ package com.hp.score.lang.compiler;/*
 import com.hp.score.lang.entities.CompilationArtifact;
 
 import java.io.File;
-import java.util.List;
+import java.util.Set;
 
 public interface SlangCompiler {
-    CompilationArtifact compileFlow(File source, List<File> path);
+    CompilationArtifact compileFlow(File source, Set<File> path);
 
-    CompilationArtifact compile(File source, String operationName, List<File> path);
+    CompilationArtifact compile(File source, String operationName, Set<File> path);
 }

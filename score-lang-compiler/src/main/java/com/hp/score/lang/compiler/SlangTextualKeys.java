@@ -27,6 +27,8 @@ public interface SlangTextualKeys {
     String RESULTS_KEY = "results";
     String INPUTS_KEY = "inputs";
     String OUTPUTS_KEY = "outputs";
+    String FLOW_TYPE = "flow";
+    String OPERATION_TYPE = "operation";
 
     //flow
     String FLOW_NAME_KEY = "name";
