@@ -18,13 +18,10 @@
 */
 package com.hp.score.lang.tests.operation.flows;
 
-import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
-import com.hp.score.content.ssh.entities.SSHConnection;
 import com.hp.score.events.EventConstants;
 import com.hp.score.events.ScoreEvent;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.tests.operation.SystemsTestsParent;
-
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -58,7 +55,6 @@ public class createDbContainerTest  extends SystemsTestsParent {
         userInputs.put("host", "16.60.169.142");
         userInputs.put("username", "root");
         userInputs.put("password", "Xy6stqZ");
-        userInputs.put("globalSessionObject",  new GlobalSessionObject<Map<String, SSHConnection>>()); //TODO: temporary solution - sync with orit
         ScoreEvent event = triggerOperation(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }

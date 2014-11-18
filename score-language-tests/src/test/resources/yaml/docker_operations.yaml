@@ -14,7 +14,6 @@ operations:
           - pty
           - timeout
           - closeSession
-          - globalSessionObject
         action:
           java_action:
             className: com.hp.score.content.ssh.actions.SSHShellCommandAction
