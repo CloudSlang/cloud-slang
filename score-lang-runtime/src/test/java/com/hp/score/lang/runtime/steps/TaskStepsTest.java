@@ -7,6 +7,7 @@ import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.runtime.bindings.InputsBinding;
 import com.hp.score.lang.runtime.bindings.OutputsBinding;
 import com.hp.score.lang.runtime.bindings.ScriptEvaluator;
+import com.hp.score.lang.runtime.env.ParentFlowData;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import com.hp.score.lang.runtime.events.LanguageEventData;
@@ -22,11 +23,19 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.script.ScriptEngine;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
+import static com.hp.score.lang.entities.ScoreLangConstants.FAILURE_RESULT;
+import static com.hp.score.lang.entities.ScoreLangConstants.SUCCESS_RESULT;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;
@@ -69,15 +78,35 @@ public class TaskStepsTest {
     @Test
     public void testBeginTaskEmptyInputs() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
-        taskSteps.beginTask(new ArrayList<Input>(),runEnv,new ExecutionRuntimeServices(),"task1");
+        taskSteps.beginTask(new ArrayList<Input>(),runEnv, createRuntimeServices(),"task1", 1L, 2L, "2");
         Map<String,Serializable> callArgs = runEnv.removeCallArguments();
         Assert.assertTrue(callArgs.isEmpty());
+    }
+
+    @Test
+    public void testBeginTaskSetNextPosition() throws Exception {
+        RunEnvironment runEnv = new RunEnvironment();
+        Long runningExecutionPlanId = 1L;
+        Long nextStepId = 2L;
+        Long subflowBeginStepId = 7L;
+        String refExecutionPlanId = "2";
+
+        HashMap<String, Long> runningPlansIds = new HashMap<>();
+        runningPlansIds.put(refExecutionPlanId, 111L);
+        HashMap<String, Long> beginStepsIds = new HashMap<>();
+        beginStepsIds.put(refExecutionPlanId, subflowBeginStepId);
+        ExecutionRuntimeServices runtimeServices = createRuntimeServicesWithSubflows(runningPlansIds, beginStepsIds);
+        taskSteps.beginTask(new ArrayList<Input>(), runEnv, runtimeServices, "task1", runningExecutionPlanId, nextStepId, refExecutionPlanId);
+
+        ParentFlowData parentFlowData = runEnv.getParentFlowStack().popParentFlowData();
+        Assert.assertEquals(runningExecutionPlanId, parentFlowData.getRunningExecutionPlanId());
+        Assert.assertEquals(nextStepId, parentFlowData.getPosition());
+        Assert.assertEquals(subflowBeginStepId, runEnv.removeNextStepPosition());
     }
 
     @Test(timeout = 3000L)
     public void testBeginTaskInputsEvents() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
-        ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         List<Input> inputs = Arrays.asList(new Input("input1", "input1"), new Input("input2", "input2"));
         Map<String,Serializable> resultMap = new HashMap<>();
         resultMap.put("input1",5);
@@ -85,7 +114,8 @@ public class TaskStepsTest {
 
         when(inputsBinding.bindInputs(anyMap(),eq(inputs))).thenReturn(resultMap);
 
-        taskSteps.beginTask(inputs,runEnv,runtimeServices,"task1");
+        ExecutionRuntimeServices runtimeServices = createRuntimeServices();
+        taskSteps.beginTask(inputs,runEnv,runtimeServices,"task1", 1L, 2L, "2");
         Map<String,Serializable> callArgs = runEnv.removeCallArguments();
         Assert.assertFalse(callArgs.isEmpty());
         Assert.assertEquals(5, callArgs.get("input1"));
@@ -108,13 +138,13 @@ public class TaskStepsTest {
     @Test
     public void testEndTaskEvents() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
-        ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String,String>(),""));
         runEnv.getStack().pushContext(new HashMap<String, Serializable>());
 
         when(outputsBinding.bindOutputs(anyMap(), anyMap(), anyList())).thenReturn(new HashMap<String, String>());
-        taskSteps.endTask(runEnv, new ArrayList<Output>(),new HashMap<String, Long>(),runtimeServices, "task1");
 
+        ExecutionRuntimeServices runtimeServices = createRuntimeServices();
+        taskSteps.endTask(runEnv, new ArrayList<Output>(),new HashMap<String, Long>(),runtimeServices, "task1");
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
         Assert.assertEquals(2,events.size());
@@ -134,7 +164,7 @@ public class TaskStepsTest {
     }
 
     @Test
-    public void testFinishExecutableWithPublish() throws Exception {
+    public void testEndTaskWithPublish() throws Exception {
         List<Output> possiblePublishValues = Lists.newArrayList(new Output("name", "name"));
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), null));
@@ -144,11 +174,40 @@ public class TaskStepsTest {
         boundPublish.put("name", "John");
 
         when(outputsBinding.bindOutputs(isNull(Map.class), anyMapOf(String.class, String.class), eq(possiblePublishValues))).thenReturn(boundPublish);
-        taskSteps.endTask(runEnv, possiblePublishValues, new HashMap<String, Long>(), new ExecutionRuntimeServices(), "task1");
+        taskSteps.endTask(runEnv, possiblePublishValues, new HashMap<String, Long>(), createRuntimeServices(), "task1");
 
         Map<String,Serializable> flowContext = runEnv.getStack().popContext();
         Assert.assertTrue(flowContext.containsKey("name"));
         Assert.assertEquals("John" ,flowContext.get("name"));
+    }
+
+    @Test
+    public void testEndTaskSetNextPosition() throws Exception {
+        RunEnvironment runEnv = new RunEnvironment();
+        String result = SUCCESS_RESULT;
+        runEnv.getStack().pushContext(new HashMap<String, Serializable>());
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), result));
+
+        Long nextStepPosition = 5L;
+
+        HashMap<String, Long> taskNavigationValues = new HashMap<>();
+        taskNavigationValues.put(SUCCESS_RESULT, nextStepPosition);
+        taskNavigationValues.put(FAILURE_RESULT, 1L);
+        taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues, createRuntimeServices(), "task1");
+
+        Assert.assertEquals(runEnv.removeNextStepPosition(), nextStepPosition);
+    }
+
+    private ExecutionRuntimeServices createRuntimeServices(){
+        ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
+        runtimeServices.setSubFlowsData(new HashMap<String, Long>(), new HashMap<String, Long>());
+        return runtimeServices;
+    }
+
+    private ExecutionRuntimeServices createRuntimeServicesWithSubflows(HashMap<String, Long> runningPlansIds, HashMap<String, Long> beginStepsIds) {
+        ExecutionRuntimeServices runtimeServices = createRuntimeServices();
+        runtimeServices.setSubFlowsData(runningPlansIds, beginStepsIds);
+        return runtimeServices;
     }
 
     @Configuration

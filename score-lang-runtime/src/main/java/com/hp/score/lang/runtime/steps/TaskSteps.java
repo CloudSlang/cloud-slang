@@ -8,11 +8,14 @@
 package com.hp.score.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
+import com.hp.score.api.execution.ExecutionParametersConsts;
 import com.hp.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.runtime.bindings.InputsBinding;
 import com.hp.score.lang.runtime.bindings.OutputsBinding;
+import com.hp.score.lang.runtime.env.ParentFlowData;
+import com.hp.score.lang.runtime.env.ParentFlowStack;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import com.hp.score.lang.runtime.events.LanguageEventData;
@@ -28,6 +31,7 @@ import java.util.Map;
 import static com.hp.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static com.hp.score.lang.entities.ScoreLangConstants.*;
 import static com.hp.score.lang.runtime.events.LanguageEventData.RETURN_VALUES;
+import static com.hp.score.lang.runtime.events.LanguageEventData.NEXT_STEP_POSITION;
 
 /**
  * User: stoneo
@@ -47,7 +51,10 @@ public class TaskSteps extends AbstractSteps {
     public void beginTask(@Param(TASK_INPUTS_KEY) List<Input> taskInputs,
                           @Param(RUN_ENV) RunEnvironment runEnv,
                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
-                          @Param(NODE_NAME_KEY) String nodeName) {
+                          @Param(NODE_NAME_KEY) String nodeName,
+                          @Param(ExecutionParametersConsts.RUNNING_EXECUTION_PLAN_ID) Long RUNNING_EXECUTION_PLAN_ID,
+                          @Param(NEXT_STEP_ID_KEY) Long nextStepId,
+                          @Param(REF_ID) String refId) {
 
         runEnv.getExecutionPath().forward();
         runEnv.removeCallArguments();
@@ -63,6 +70,13 @@ public class TaskSteps extends AbstractSteps {
                 nodeName, LanguageEventData.levelName.TASK_NAME);
 
         updateCallArgumentsAndPushContextToStack(runEnv, flowContext, operationArguments);
+
+        // request the score engine to switch to the execution plan of the given ref
+        requestSwitchToRefExecutableExecutionPlan(runEnv, executionRuntimeServices, RUNNING_EXECUTION_PLAN_ID, refId, nextStepId);
+
+        // We set the start step of the given ref as the next step to execute (in the new running execution plan that will be set)
+        runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
+
     }
 
     public void endTask(@Param(RUN_ENV) RunEnvironment runEnv,
@@ -85,20 +99,45 @@ public class TaskSteps extends AbstractSteps {
 
         //todo: hook
 
-        Long nextPosition = calculateNextPosition(operationReturnValues.getResult(), taskNavigationValues);
-        runEnv.putNextStepPosition(nextPosition);
+        // set the position of the next step - for the use of the navigation
+        Long nextPosition = setNextTaskPosition(runEnv, taskNavigationValues, operationReturnValues);
+
         ReturnValues returnValues = new ReturnValues(new HashMap<String, String>(), operationReturnValues.getResult());
         runEnv.putReturnValues(returnValues);
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_END, "Output binding finished",
-                Pair.of(RETURN_VALUES, returnValues), Pair.of("nextPosition", nextPosition),
+                Pair.of(RETURN_VALUES, returnValues),
+                Pair.of(NEXT_STEP_POSITION, nextPosition),
                 Pair.of(LanguageEventData.levelName.TASK_NAME.name(),nodeName));
 
         runEnv.getStack().pushContext(flowContext);
     }
 
-    private Long calculateNextPosition(String result, Map<String, Long> taskNavigationValues) {
-        //todo: implement
-        return taskNavigationValues.get(result);
+    private void requestSwitchToRefExecutableExecutionPlan(RunEnvironment runEnv,
+                                                           ExecutionRuntimeServices executionRuntimeServices,
+                                                           Long RUNNING_EXECUTION_PLAN_ID,
+                                                           String refId,
+                                                           Long nextStepId) {
+        // We create ParentFlowData object containing the current running execution plan id and
+        // the next step id to navigate to in the current execution plan,
+        // and we push it to the ParentFlowStack for future use (once we finish running the ref operation/flow)
+        ParentFlowStack stack = runEnv.getParentFlowStack();
+        stack.pushParentFlowData(new ParentFlowData(RUNNING_EXECUTION_PLAN_ID, nextStepId));
+        // We request the score engine to switch the execution plan to the one of the given refId once it can
+        Long subFlowRunningExecutionPlanId = executionRuntimeServices.getSubFlowRunningExecutionPlan(refId);
+        executionRuntimeServices.requestToChangeExecutionPlan(subFlowRunningExecutionPlanId);
+    }
+
+    /**
+     * Find in the navigation values the correct next step position, according to the operation result, and set it
+     * @param runEnv
+     * @param taskNavigationValues
+     * @param operationReturnValues
+     * @return the next step position
+     */
+    private Long setNextTaskPosition(RunEnvironment runEnv, Map<String, Long> taskNavigationValues, ReturnValues operationReturnValues) {
+        Long nextPosition = taskNavigationValues.get(operationReturnValues.getResult());
+        runEnv.putNextStepPosition(nextPosition);
+        return nextPosition;
     }
 
 }

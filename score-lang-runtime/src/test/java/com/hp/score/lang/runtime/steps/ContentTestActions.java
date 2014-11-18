@@ -48,6 +48,11 @@ public class ContentTestActions {
     }
 
     @SuppressWarnings("unused")
+    public void doJavaActionExceptionMethod(){
+        throw new RuntimeException("Error");
+    }
+
+    @SuppressWarnings("unused")
     public Map<String, String> doJavaActionMissingAnnotation(@Param("name") String name, String role) {
         Map<String, String> returnValues = new HashMap<>();
         returnValues.put("name", name);

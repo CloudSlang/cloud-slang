@@ -9,6 +9,7 @@ import com.hp.score.lang.entities.bindings.Result;
 import com.hp.score.lang.runtime.bindings.InputsBinding;
 import com.hp.score.lang.runtime.bindings.OutputsBinding;
 import com.hp.score.lang.runtime.bindings.ResultsBinding;
+import com.hp.score.lang.runtime.env.ParentFlowData;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import org.apache.commons.lang3.tuple.Pair;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 import static com.hp.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static com.hp.score.lang.entities.ScoreLangConstants.*;
+import static com.hp.score.lang.runtime.events.LanguageEventData.RESULT;
 import static com.hp.score.lang.runtime.events.LanguageEventData.RETURN_VALUES;
 import static com.hp.score.lang.runtime.events.LanguageEventData.levelName;
 
@@ -46,11 +48,10 @@ public class ExecutableSteps extends AbstractSteps {
                                 @Param(RUN_ENV) RunEnvironment runEnv,
                                 @Param(USER_INPUTS_KEY) HashMap<String, Serializable> userInputs,
                                 @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
-                                @Param(NODE_NAME_KEY) String nodeName) {
+                                @Param(NODE_NAME_KEY) String nodeName,
+                                @Param(NEXT_STEP_ID_KEY) Long nextStepId) {
 
         runEnv.getExecutionPath().down();
-
-        resolveGroups();
 
         Map<String, Serializable> callArguments = runEnv.removeCallArguments();
 
@@ -73,6 +74,9 @@ public class ExecutableSteps extends AbstractSteps {
 
         sendBindingInputsEvent(operationInputs, operationContext, runEnv, executionRuntimeServices,
                 "Post Input binding for operation/flow",nodeName, levelName.EXECUTABLE_NAME);
+
+        // put the next step position for the navigation
+        runEnv.putNextStepPosition(nextStepId);
     }
 
     /**
@@ -107,10 +111,24 @@ public class ExecutableSteps extends AbstractSteps {
         runEnv.putReturnValues(returnValues);
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_END, "Output binding finished",
                 Pair.of(RETURN_VALUES, returnValues),Pair.of(levelName.EXECUTABLE_NAME.toString(),nodeName));
+
+        // If we have parent flow data on the stack, we pop it and request the score engine to switch to the parent
+        // execution plan id once it can, and we set the next position that was stored there for the use of the navigation
+        if(!runEnv.getParentFlowStack().isEmpty()) {
+            handleNavigationToParent(runEnv, executionRuntimeServices);
+        } else {
+            fireEvent(executionRuntimeServices, runEnv, EVENT_EXECUTABLE_FINISHED, "Execution finished running",
+                    Pair.of(RESULT, returnValues.getResult()),
+                    Pair.of(levelName.EXECUTABLE_NAME.toString(),nodeName));
+        }
+
         runEnv.getExecutionPath().up();
     }
 
-    private void resolveGroups() {
+    private void handleNavigationToParent(RunEnvironment runEnv, ExecutionRuntimeServices executionRuntimeServices) {
+        ParentFlowData parentFlowData = runEnv.getParentFlowStack().popParentFlowData();
+        executionRuntimeServices.requestToChangeExecutionPlan(parentFlowData.getRunningExecutionPlanId());
+        runEnv.putNextStepPosition(parentFlowData.getPosition());
     }
 
 }

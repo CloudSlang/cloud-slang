@@ -27,9 +27,11 @@ public class LanguageEventData extends HashMap<String, Serializable> {
 	public static final String EXCEPTION = "EXCEPTION";
 	public static final String INPUTS = "INPUTS";
 	public static final String OUTPUTS = "OUTPUTS";
+    public static final String RESULT = "RESULT";
 	public static final String CALL_ARGUMENTS = "CALL_ARGUMENTS";
 	public static final String BOUND_INPUTS = "BOUND_INPUTS";
 	public static final String RETURN_VALUES = "RETURN_VALUES";
+    public static final String NEXT_STEP_POSITION = "nextPosition";
 	public static final String ENCRYPTED_VALUE = "*****";
 	private static final long serialVersionUID = 2885051907156304718L;
 

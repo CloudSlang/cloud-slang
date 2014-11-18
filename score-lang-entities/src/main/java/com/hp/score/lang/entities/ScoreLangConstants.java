@@ -51,7 +51,7 @@ public interface ScoreLangConstants {
     String TASK_NAVIGATION_KEY = "taskNavigationValues";
     String REF_ID = "refId";
 
-
+    // Events types
 	String EVENT_STEP_ERROR = "EVENT_STEP_ERROR";
 	String EVENT_ACTION_START = "EVENT_ACTION_START";
 	String EVENT_ACTION_END = "EVENT_ACTION_END";
@@ -60,6 +60,7 @@ public interface ScoreLangConstants {
 	String EVENT_INPUT_END = "EVENT_INPUT_END";
 	String EVENT_OUTPUT_START = "EVENT_OUTPUT_START";
 	String EVENT_OUTPUT_END = "EVENT_OUTPUT_END";
+    String EVENT_EXECUTABLE_FINISHED = "EVENT_EXECUTABLE_FINISHED";
 
     // results
     String SUCCESS_RESULT = "SUCCESS";

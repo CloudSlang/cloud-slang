@@ -55,13 +55,9 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.TASK_INPUTS_KEY, preTaskData.get(SlangTextualKeys.DO_KEY));
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, taskName);
-        ExecutionStep beginTaskStep = createGeneralStep(index, TASK_STEPS_CLASS, "beginTask", ++index, actionData);
-
-        HashMap<String, Object> navigationData = new HashMap<>(new HashMap<>(beginTaskStep.getNavigationData()));
-        navigationData.put(ScoreLangConstants.REF_ID, refId);
-        beginTaskStep.setNavigationData(navigationData);
-
-        return beginTaskStep;
+        actionData.put(ScoreLangConstants.REF_ID, refId);
+        actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
+        return createGeneralStep(index, TASK_STEPS_CLASS, "beginTask", actionData);
     }
 
     public ExecutionStep createFinishTaskStep(Long index, Map<String, Serializable> postTaskData,
@@ -72,7 +68,7 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.TASK_NAVIGATION_KEY, new HashMap<>(navigationValues));
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, taskName);
-        ExecutionStep finishTask = createGeneralStep(index, TASK_STEPS_CLASS, "endTask", ++index, actionData);
+        ExecutionStep finishTask = createGeneralStep(index, TASK_STEPS_CLASS, "endTask", actionData);
         finishTask.setNavigationData(null);
         return finishTask;
     }
@@ -85,7 +81,8 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.OPERATION_INPUTS_KEY, (Serializable) execInputs);
         actionData.put(ScoreLangConstants.HOOKS, (Serializable) preExecutableData);
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, executableName);
-        return createGeneralStep(index, OPERATION_STEPS_CLASS, "startExecutable", ++index, actionData);
+        actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
+        return createGeneralStep(index, OPERATION_STEPS_CLASS, "startExecutable", actionData);
     }
 
     public ExecutionStep createActionStep(Long index, Map<String, Serializable> actionRawData) {
@@ -99,7 +96,8 @@ public class ExecutionStepFactory {
         }
         actionData.putAll(actionRawData);
         actionData.put(ScoreLangConstants.ACTION_TYPE, actionType);
-        return createGeneralStep(index, ACTION_STEPS_CLASS, "doAction", ++index, actionData);
+        actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
+        return createGeneralStep(index, ACTION_STEPS_CLASS, "doAction", actionData);
     }
 
     public ExecutionStep createEndStep(Long index, Map<String, Serializable> postExecutableData,
@@ -112,7 +110,7 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable) results);
         actionData.put(ScoreLangConstants.HOOKS, (Serializable) postExecutableData);
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, executableName);
-        return createGeneralStep(index, OPERATION_STEPS_CLASS, "finishExecutable", null, actionData);
+        return createGeneralStep(index, OPERATION_STEPS_CLASS, "finishExecutable", actionData);
     }
 
 
@@ -120,7 +118,6 @@ public class ExecutionStepFactory {
             Long stepId,
             String actionClassName,
             String actionMethodName,
-            Long nextStepId,
             Map<String, Serializable> actionData) {
 
         ExecutionStep step = new ExecutionStep(stepId);
@@ -128,10 +125,7 @@ public class ExecutionStepFactory {
         step.setActionData(actionData);
 
         step.setNavigation(new ControlActionMetadata(NAVIGATION_ACTIONS_CLASS, SIMPLE_NAVIGATION_METHOD));
-        Map<String, Object> navigationData = new HashMap<>();
-        navigationData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, nextStepId);
-
-        step.setNavigationData(navigationData);
+        step.setNavigationData(new HashMap<String, Object>());
 
         return step;
     }

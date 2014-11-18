@@ -34,6 +34,7 @@ import static com.hp.score.lang.entities.ScoreLangConstants.ACTION_TYPE;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_END;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_ERROR;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_START;
+import static com.hp.score.lang.entities.ScoreLangConstants.NEXT_STEP_ID_KEY;
 import static com.hp.score.lang.entities.ScoreLangConstants.PYTHON_SCRIPT_KEY;
 import static com.hp.score.lang.entities.ScoreLangConstants.RUN_ENV;
 import static com.hp.score.lang.runtime.events.LanguageEventData.CALL_ARGUMENTS;
@@ -59,7 +60,8 @@ public class ActionSteps extends AbstractSteps {
                          @Param(ACTION_CLASS_KEY) String className,
                          @Param(ACTION_METHOD_KEY) String methodName,
                          @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
-                         @Param(PYTHON_SCRIPT_KEY) String python_script) {
+                         @Param(PYTHON_SCRIPT_KEY) String python_script,
+                         @Param(NEXT_STEP_ID_KEY) Long nextStepId) {
 
         Map<String, String> returnValue = new HashMap<>();
         Map<String, Serializable> callArguments = runEnv.removeCallArguments();
@@ -79,6 +81,7 @@ public class ActionSteps extends AbstractSteps {
         } catch (RuntimeException ex) {
             fireEvent(executionRuntimeServices, runEnv, EVENT_ACTION_ERROR, ex.getMessage(), Pair.of(EXCEPTION, ex));
             logger.error(ex);
+            //todo: throw exception
         }
 
         //todo: hook
@@ -87,6 +90,7 @@ public class ActionSteps extends AbstractSteps {
         runEnv.putReturnValues(returnValues);
         fireEvent(executionRuntimeServices, runEnv, EVENT_ACTION_END, "Action performed", Pair.of(RETURN_VALUES, returnValues));
 
+        runEnv.putNextStepPosition(nextStepId);
     }
 
     private Map<String, String> runJavaAction(Map<String, SerializableSessionObject> serializableSessionData,
@@ -108,6 +112,9 @@ public class ActionSteps extends AbstractSteps {
 
         //get the Method object
         Method actionMethod = getMethodByName(className, methodName);
+        if(actionMethod == null) {
+            throw new RuntimeException("Method " + methodName + " is not part of class " + className);
+        }
 
         //extract the parameters from execution context
         return resolveActionArguments(serializableSessionData, actionMethod, currentContext, nonSerializableExecutionData);
@@ -121,7 +128,7 @@ public class ActionSteps extends AbstractSteps {
         try {
             returnObject = actionMethod.invoke(actionClass.newInstance(), parameters);
         } catch (Exception e) {
-            throw new RuntimeException("Could not invoke method " + methodName + " of class " + className, e);
+            throw new RuntimeException("Invocation of method " + methodName + " of class " + className + " threw an exception", e);
         }
         @SuppressWarnings("unchecked") Map<String, String> returnMap = (Map<String, String>) returnObject;
         if (returnMap == null) {
