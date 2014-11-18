@@ -4,7 +4,7 @@ operations:
   - ssh_command:
         inputs:
           - host
-          - port
+          - port : '22'
           - username
           - password
           - privateKeyFile

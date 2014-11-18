@@ -15,7 +15,6 @@ flow:
         ops.ssh_command:
           - imageName: 'mysql'
           - host
-          - port: '22'
           - username
           - password
           - privateKeyFile: ''
