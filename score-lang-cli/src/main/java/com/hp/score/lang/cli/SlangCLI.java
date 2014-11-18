@@ -72,6 +72,13 @@ public class SlangCLI implements CommandMarker {
         return triggerMsg(id,compilationArtifact.getExecutionPlan().getName());
     }
 
+    @CliCommand(value = "env", help = "Set environment var relevant to the CLI")//todo : change text here
+    public String setEnvVar(
+            @CliOption(key = "setAsync", mandatory = true, help = "set the async") final boolean switchAsync) throws IOException {
+        triggerAsync = switchAsync ;
+        return "flow execution ASYNC execution was changed to : " + triggerAsync;
+    }
+
     private String triggerMsg(Long id, String flowName) {
         return TRIGGERED_FLOW_MSG + flowName + WITH_EXECUTION_ID_MSG + id;
     }
