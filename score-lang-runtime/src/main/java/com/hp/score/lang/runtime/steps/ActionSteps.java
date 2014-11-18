@@ -81,7 +81,7 @@ public class ActionSteps extends AbstractSteps {
         } catch (RuntimeException ex) {
             fireEvent(executionRuntimeServices, runEnv, EVENT_ACTION_ERROR, ex.getMessage(), Pair.of(EXCEPTION, ex));
             logger.error(ex);
-            //todo: throw exception
+            throw(ex);
         }
 
         //todo: hook
