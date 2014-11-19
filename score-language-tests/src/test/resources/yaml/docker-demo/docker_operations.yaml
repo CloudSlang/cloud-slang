@@ -4,12 +4,12 @@ operations:
   - pull_container:
         inputs:
           - host
-          - port : '22'
+          - port : "'22'"
           - username
           - password
-          - privateKeyFile
+          - privateKeyFile: "''"
           - command
-          - arguments
+          - arguments: "''"
           - characterSet
           - pty
           - timeout

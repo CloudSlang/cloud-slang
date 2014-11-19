@@ -43,8 +43,8 @@ public class createDbContainerTest  extends SystemsTestsParent {
     @Test(timeout = DEFAULT_TIMEOUT)
     @Ignore
     public void testCompileAndRunSubFlowBasic() throws Exception {
-        URI resource = getClass().getResource("/yaml/createDbContainer.yaml").toURI();
-        URI operations = getClass().getResource("/yaml/docker_operations.yaml").toURI();
+        URI resource = getClass().getResource("/yaml/docker-demo/createDbContainer.yaml").toURI();
+        URI operations = getClass().getResource("/yaml/docker-demo/docker_operations.yaml").toURI();
 
         Set<File> path = Sets.newHashSet(new File(operations));
         CompilationArtifact compilationArtifact = compiler.compileFlow(new File(resource), path);

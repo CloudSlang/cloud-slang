@@ -17,11 +17,9 @@ flow:
           - host
           - username
           - password
-          - privateKeyFile: ''
-          - command: 'docker pull ' + imageName
-          - arguments: ''
+          - command: "'docker pull ' + imageName"
           - characterSet: "'UTF-8'"
-          - pty:"'false'"
+          - pty: "'false'"
           - timeout: "'30000000'"
           - closeSession: "'false'"
       publish:
