@@ -47,6 +47,14 @@
 			<scope>runtime</scope>
 		</dependency>
 
+
+        <!-- content dep -->
+        <dependency>
+            <groupId>com.hp.score.content</groupId>
+            <artifactId>score-ssh</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
 		<!-- test -->
 		<dependency>
 			<groupId>org.mockito</groupId>
