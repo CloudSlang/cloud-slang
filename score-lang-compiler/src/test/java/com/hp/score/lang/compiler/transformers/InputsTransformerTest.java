@@ -87,7 +87,7 @@ public class InputsTransformerTest {
         List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
         Input input = inputs.get(2);
         Assert.assertEquals("input3", input.getName());
-        Assert.assertEquals("value3", input.getDefaultValue());
+        Assert.assertEquals("str('value3')", input.getExpression());
     }
 
     @Test
@@ -123,7 +123,7 @@ public class InputsTransformerTest {
         List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
         Input input = inputs.get(6);
         Assert.assertEquals("input7", input.getName());
-        Assert.assertEquals(77, input.getDefaultValue());
+        Assert.assertEquals("77", input.getExpression());
         Assert.assertEquals(false, input.isEncrypted());
         Assert.assertEquals(true, input.isRequired());
     }
@@ -147,7 +147,6 @@ public class InputsTransformerTest {
         Assert.assertTrue(input.isOverride());
         Assert.assertFalse(input.isEncrypted());
         Assert.assertTrue(input.isRequired());
-        Assert.assertNull(input.getDefaultValue());
     }
 
     @Test
@@ -156,8 +155,6 @@ public class InputsTransformerTest {
         Input input = inputs.get(9);
         Assert.assertEquals("input10", input.getName());
         Assert.assertEquals("input5", input.getExpression());
-
-        Assert.assertNull(input.getDefaultValue());
     }
 
     @Test
@@ -166,8 +163,6 @@ public class InputsTransformerTest {
         Input input = inputs.get(10);
         Assert.assertEquals("input11", input.getName());
         Assert.assertEquals("5 + 6", input.getExpression());
-
-        Assert.assertNull(input.getDefaultValue());
     }
 
     @Test
@@ -175,9 +170,7 @@ public class InputsTransformerTest {
         List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
         Input input = inputs.get(11);
         Assert.assertEquals("input12", input.getName());
-        Assert.assertEquals("\"mighty\" + ' max'   + varX", input.getExpression());
-
-        Assert.assertNull(input.getDefaultValue());
+        Assert.assertEquals("\"mighty\" + \" max\"   + varX", input.getExpression());
     }
 
     @org.springframework.context.annotation.Configuration

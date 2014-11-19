@@ -12,7 +12,7 @@ flow:
       check_something:
         do:
           ops.test_op:
-            - city: a
+            - city: str('a')
 
       send_mail:
         do:
@@ -24,14 +24,14 @@ flow:
     first_task:
       do:
         ops.test_op:
-          - city: input_1
+          - city: str('input_1')
       publish:
         - weather
 
     second_task:
       do:
         ops.test_op:
-          - city: input_1
+          - city: str('input_1')
       navigate:
         SUCCESS: SUCCESS
         FAILURE: FAILURE  

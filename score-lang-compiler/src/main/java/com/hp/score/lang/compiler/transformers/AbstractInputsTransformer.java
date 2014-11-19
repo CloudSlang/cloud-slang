@@ -20,7 +20,6 @@ package com.hp.score.lang.compiler.transformers;
 
 import com.hp.score.lang.compiler.SlangTextualKeys;
 import com.hp.score.lang.entities.bindings.Input;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -34,22 +33,17 @@ public abstract class AbstractInputsTransformer {
             return (createRefInput((String) rawInput));
         } else if (rawInput instanceof Map) {
             Map.Entry entry = (Map.Entry) ((Map) rawInput).entrySet().iterator().next();
-            // - some_input: some_expression
-            // the value of the input is an expression we need to evaluate at runtime
-            if (entry.getValue() instanceof String && isExpression((String)entry.getValue())) {
-                return (createInlineExpressionInput(entry));
-            }
             // - some_inputs:
             //      property1: value1
             //      property2: value2
             // this is the verbose way of defining inputs with all of the properties available
-            else if (entry.getValue() instanceof Map) {
+            if (entry.getValue() instanceof Map) {
                 return (createPropInput(entry));
             }
-            //inline const:
-            // - input1: 77
-            else if(entry.getValue() instanceof Serializable){
-                return (createInlineDefaultValueInput((String) entry.getKey(), (Serializable) entry.getValue()));
+            // - some_input: some_expression
+            // the value of the input is an expression we need to evaluate at runtime
+            else {
+                return (createInlineExpressionInput(entry));
             }
         }
         throw new RuntimeException("Could not transform Input : "+ rawInput);
@@ -61,44 +55,24 @@ public abstract class AbstractInputsTransformer {
         boolean encrypted = prop.containsKey(SlangTextualKeys.ENCRYPTED_KEY) && ((boolean) prop.get(SlangTextualKeys.ENCRYPTED_KEY));
         boolean override = prop.containsKey(SlangTextualKeys.OVERRIDE_KEY) && ((boolean) prop.get(SlangTextualKeys.OVERRIDE_KEY));
 
-        Serializable valueProp = prop.containsKey(SlangTextualKeys.DEFAULT_KEY) ? (prop.get(SlangTextualKeys.DEFAULT_KEY)) : null;
+        String expressionProp = prop.containsKey(SlangTextualKeys.DEFAULT_KEY) ? (prop.get(SlangTextualKeys.DEFAULT_KEY).toString()) : null;
 
-        return createPropInput(entry.getKey(), required, encrypted, valueProp, override);
+        return createPropInput(entry.getKey(), required, encrypted, expressionProp, override);
     }
 
-    private Input createPropInput(String inputName, boolean required,boolean encrypted, Serializable value,
+    private Input createPropInput(String inputName, boolean required,boolean encrypted, String expression,
                                   boolean override){
-        String expression = null;
-        Serializable defaultValue = null;
-        if(isExpression(value)){
-            expression = extractExpression((String)value);
-        }
-        else if(value != null){
-            defaultValue = value;
-        }
-        else{
+        if(expression == null) {
             expression = inputName ;
         }
-        return new Input(inputName, expression, defaultValue, encrypted, required, override);
+        return new Input(inputName, expression, encrypted, required, override);
     }
 
-    private String extractExpression(String defaultProp) {
-        return StringUtils.removeStart(defaultProp, SlangTextualKeys.EXPRESSION_PREFIX_KEY).trim();
-    }
-
-    private boolean isExpression(Serializable defaultValue) {
-        return (defaultValue instanceof String) && StringUtils.startsWith((String)defaultValue,SlangTextualKeys.EXPRESSION_PREFIX_KEY);
-    }
-
-    private Input createInlineExpressionInput(Map.Entry<String, String> entry) {
-        return createPropInput(entry.getKey() , true, false, entry.getValue(), false);
+    private Input createInlineExpressionInput(Map.Entry<String, Object> entry) {
+        return createPropInput(entry.getKey() , true, false, entry.getValue().toString(), false);
     }
 
     private Input createRefInput(String rawInput) {
         return new Input(rawInput, rawInput);
-    }
-
-    private Input createInlineDefaultValueInput(String inputName, Serializable value){
-        return new Input(inputName,null,value,false,true, false);
     }
 }

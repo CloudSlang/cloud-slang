@@ -78,7 +78,7 @@ public class DoTransformerTest {
 
         Input input = inputs.get(1);
         Assert.assertEquals("country",input.getName());
-        Assert.assertEquals("Israel",input.getDefaultValue());
+        Assert.assertEquals("str('Israel')",input.getExpression());
     }
 
     @org.springframework.context.annotation.Configuration

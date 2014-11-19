@@ -47,7 +47,7 @@ public class OperationSystemTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = compiler.compile(new File(resource.toURI()), "test_op", null);
         //Trigger ExecutionPlan
         Map<String, Serializable> userInputs = new HashMap<>();
-        ScoreEvent event = triggerOperation(compilationArtifact, userInputs);
+        ScoreEvent event = trigger(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 
@@ -62,7 +62,7 @@ public class OperationSystemTest extends SystemsTestsParent {
 
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("input1", "value1");
-        ScoreEvent event = triggerOperation(compilationArtifact, userInputs);
+        ScoreEvent event = trigger(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 
@@ -77,7 +77,7 @@ public class OperationSystemTest extends SystemsTestsParent {
         userInputs.put("input2", "value2");
         userInputs.put("input4", "value4");
         userInputs.put("input5", "value5");
-        ScoreEvent event = triggerOperation(compilationArtifact, userInputs);
+        ScoreEvent event = trigger(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 }

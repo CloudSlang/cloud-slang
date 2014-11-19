@@ -75,7 +75,7 @@ public class CompileOperationTest {
         ExecutionStep startStep = executionPlan.getStep(1L);
         @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) startStep.getActionData().get(ScoreLangConstants.OPERATION_INPUTS_KEY);
         Assert.assertNotNull("inputs doesn't exist", inputs);
-        Assert.assertEquals("there is a different number of inputs than expected", 12, inputs.size());
+        Assert.assertEquals("there is a different number of inputs than expected", 13, inputs.size());
 
         ExecutionStep actionStep = executionPlan.getStep(2L);
         String script = (String) actionStep.getActionData().get(ScoreLangConstants.PYTHON_SCRIPT_KEY);

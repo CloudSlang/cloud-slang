@@ -48,7 +48,6 @@ public interface SlangTextualKeys {
 
     //inputs
     String DEFAULT_KEY = "default";
-    String EXPRESSION_PREFIX_KEY = "->";
     String REQUIRED_KEY = "required";
     String ENCRYPTED_KEY = "encrypted";
     String OVERRIDE_KEY = "override";

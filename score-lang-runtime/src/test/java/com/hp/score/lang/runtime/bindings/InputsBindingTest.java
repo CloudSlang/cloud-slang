@@ -23,6 +23,7 @@ import com.hp.score.lang.entities.bindings.Input;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.python.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -53,7 +54,7 @@ public class InputsBindingTest {
 
     @Test
     public void testDefaultValue() throws Exception {
-        List<Input> inputs = Arrays.asList(createDefaultValueInput("value"));
+        List<Input> inputs = Lists.newArrayList(createDefaultValueInput("str('value')"));
         Map<String,Serializable> result = inputsBinding.bindInputs(new HashMap<String,Serializable>(),inputs);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
@@ -62,7 +63,7 @@ public class InputsBindingTest {
 
     @Test
     public void testDefaultValueInt() throws Exception {
-        List<Input> inputs = Arrays.asList(createDefaultValueInput(2));
+        List<Input> inputs = Lists.newArrayList(createDefaultValueInput("2"));
         Map<String,Serializable> result = inputsBinding.bindInputs(new HashMap<String,Serializable>(),inputs);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
@@ -71,7 +72,7 @@ public class InputsBindingTest {
 
     @Test
     public void testTwoInputs() throws Exception {
-        List<Input> inputs = Arrays.asList(new Input("input2",null,"yyy",false,false,false),createDefaultValueInput("zzz"));
+        List<Input> inputs =  Arrays.asList(new Input("input2","'yyy'",false,false,false),createDefaultValueInput("'zzz'"));
         Map<String,Serializable> result = inputsBinding.bindInputs(new HashMap<String,Serializable>(),inputs);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
@@ -84,7 +85,7 @@ public class InputsBindingTest {
     public void testInputRef() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
         context.put("inputX","xxx");
-        List<Input> inputs = Arrays.asList(new Input("input1","inputX"));
+        List<Input> inputs =  Arrays.asList(new Input("input1","str(inputX)"));
         Map<String,Serializable> result = inputsBinding.bindInputs(context,inputs);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
@@ -124,7 +125,7 @@ public class InputsBindingTest {
     public void testDefaultValueVsEmptyRef() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
 
-        Input refInput = new Input("input1","NotExistent","val",false,false,false);
+        Input refInput = new Input("input1","str('val')",false,false,false);
         List<Input> inputs = Arrays.asList(refInput);
 
         Map<String,Serializable> result = inputsBinding.bindInputs(context,inputs);
@@ -139,7 +140,7 @@ public class InputsBindingTest {
     public void testAssignFromAndExpr() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",3);
-        Input input = new Input("input1","5+7",null,false,false,false);
+        Input input = new Input("input1","5+7",false,false,false);
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = inputsBinding.bindInputs(context,inputs);
@@ -155,7 +156,7 @@ public class InputsBindingTest {
     public void testAssignFromAndConst() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",3);
-        Input input = new Input("input1",null,5,false,false,false);
+        Input input = new Input("input1","5",false,false,false);
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = inputsBinding.bindInputs(context,inputs);
@@ -168,7 +169,7 @@ public class InputsBindingTest {
     public void testComplexExpr() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",3);
-        Input input = new Input("input2"," input1 + 3 * 2 ",null,false,false,false);
+        Input input = new Input("input2"," input1 + 3 * 2 ",false,false,false);
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = inputsBinding.bindInputs(context,inputs);
@@ -183,7 +184,7 @@ public class InputsBindingTest {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input2",3);
         context.put("input1",5);
-        Input input = new Input("input1","input2",null,false,false,false);
+        Input input = new Input("input1","input2",false,false,false);
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = inputsBinding.bindInputs(context,inputs);
@@ -198,7 +199,7 @@ public class InputsBindingTest {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input2",3);
         context.put("input1",5);
-        Input input = new Input("input1","input2",null,false,false,true);
+        Input input = new Input("input1","input2",false,false,true);
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = inputsBinding.bindInputs(context,inputs);
@@ -214,7 +215,7 @@ public class InputsBindingTest {
     public void testOverrideAssignFrom2() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",5);
-        Input input = new Input("input1",null,3,false,false,true);
+        Input input = new Input("input1","3",false,false,true);
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = inputsBinding.bindInputs(context,inputs);
@@ -228,7 +229,7 @@ public class InputsBindingTest {
     public void testOverrideAssignFrom3() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",5);
-        Input input = new Input("input1",null,null,false,false,true);
+        Input input = new Input("input1",null,false,false,true);
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = inputsBinding.bindInputs(context,inputs);
@@ -242,7 +243,7 @@ public class InputsBindingTest {
     public void testOverrideFalse() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",5);
-        Input input = new Input("input1",null,6,false,false,false);
+        Input input = new Input("input1","6",false,false,false);
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = inputsBinding.bindInputs(context,inputs);
@@ -256,7 +257,7 @@ public class InputsBindingTest {
     public void testExpressionWithWrongRef() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
 
-        Input input = new Input("input1","input2",null,false,false,false);
+        Input input = new Input("input1","input2",false,false,false);
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = inputsBinding.bindInputs(context,inputs);
@@ -270,7 +271,7 @@ public class InputsBindingTest {
     public void testInputAssignFromAnotherInput() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
 
-        Input input1 = new Input("input1",null,5,false,false,false);
+        Input input1 = new Input("input1","5",false,false,false);
         Input input2 = new Input("input2","input1");
         List<Input> inputs = Arrays.asList(input1,input2);
 
@@ -290,7 +291,7 @@ public class InputsBindingTest {
         Map<String,Serializable> context = new HashMap<>();
         context.put("varX",5);
 
-        Input input1 = new Input("input1",null,5,false,false,false);
+        Input input1 = new Input("input1","5",false,false,false);
         Input input2 = new Input("input2","input1 + 5 + varX");
         List<Input> inputs = Arrays.asList(input1,input2);
 
@@ -310,7 +311,7 @@ public class InputsBindingTest {
         Map<String,Serializable> context = new HashMap<>();
         context.put("varX","roles");
 
-        Input input1 = new Input("input1","\"mighty\" + ' max '   + varX",null,false,false,false);
+        Input input1 = new Input("input1","\"mighty\" + ' max '   + varX",false,false,false);
         List<Input> inputs = Arrays.asList(input1);
 
         Map<String,Serializable> result = inputsBinding.bindInputs(context,inputs);
@@ -323,8 +324,8 @@ public class InputsBindingTest {
     }
 
 
-    private Input createDefaultValueInput(Serializable value){
-        return new Input("input1",null,value,false,false,false);
+    private Input createDefaultValueInput(String value){
+        return new Input("input1",value,false,false,false);
     }
 
     @Configuration

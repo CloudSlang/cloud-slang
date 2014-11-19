@@ -7,8 +7,6 @@
  */
 package com.hp.score.lang.entities.bindings;
 
-import java.io.Serializable;
-
 /**
  * @author orius123
  * @since 05/11/14.
@@ -18,29 +16,22 @@ public class Input extends InOutParam {
 
 	private static final long serialVersionUID = -2411446962609754342L;
 
-	private final Serializable defaultValue;
 	private final boolean encrypted;
 	private final boolean required;
 	private final boolean override;
 
 	public Input(String name, String expression) {
 		super(name, expression);
-		this.defaultValue = null;
 		this.encrypted = false;
 		this.required = true;
 		this.override = false;
 	}
 
-	public Input(String name, String expression, Serializable defaultValue, boolean encrypted, boolean required, boolean override) {
+	public Input(String name, String expression, boolean encrypted, boolean required, boolean override) {
 		super(name, expression);
-		this.defaultValue = defaultValue;
 		this.encrypted = encrypted;
 		this.required = required;
 		this.override = override;
-	}
-
-	public Serializable getDefaultValue() {
-		return defaultValue;
 	}
 
 	public boolean isEncrypted() {

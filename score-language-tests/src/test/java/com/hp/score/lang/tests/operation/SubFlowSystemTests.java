@@ -47,7 +47,7 @@ public class SubFlowSystemTests extends SystemsTestsParent {
 
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("input1", "value1");
-        ScoreEvent event = triggerOperation(compilationArtifact, userInputs);
+        ScoreEvent event = trigger(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 }

@@ -72,10 +72,6 @@ public class InputsBinding {
             value = context.get(inputName);
         }
 
-        if(value == null && input.getDefaultValue() != null){
-            value = input.getDefaultValue();
-        }
-
         if(value == null && StringUtils.isNotEmpty(input.getExpression())){
             Map<String,Serializable> scriptContext = new HashMap<>(context); //we do not want to change original context map
             scriptContext.putAll(targetContext);//so you can resolve previous inputs already binded

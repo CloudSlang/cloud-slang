@@ -82,7 +82,7 @@ public class ExecutableStepsTest {
 
     @Test
     public void testStartWithInput() throws Exception {
-        List<Input> inputs = Arrays.asList(new Input("input1", "input1"));
+        List<Input> inputs = Arrays.asList(new Input("input1","input1"));
         RunEnvironment runEnv = new RunEnvironment();
 
         Map<String,Serializable> resultMap = new HashMap<>();
@@ -103,7 +103,7 @@ public class ExecutableStepsTest {
 
     @Test
     public void testBoundInputEvent(){
-        List<Input> inputs = Arrays.asList(new Input("input1", "input1"), new Input("input2", null, 3, true, true, true));
+        List<Input> inputs = Arrays.asList(new Input("input1","input1"),new Input("input2", "3", true, true, true));
         RunEnvironment runEnv = new RunEnvironment();
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         Map<String,Serializable> resultMap = new HashMap<>();

@@ -13,17 +13,17 @@ flow:
     Task1:
       do:
         ops.pull_container:
-          - imageName: 'mysql'
+          - imageName: "'mysql'"
           - host
           - username
           - password
           - privateKeyFile: ''
-          - command: -> 'docker pull ' + imageName
+          - command: 'docker pull ' + imageName
           - arguments: ''
-          - characterSet: 'UTF-8'
-          - pty: 'false'
-          - timeout: '30000000'
-          - closeSession: 'false'
+          - characterSet: "'UTF-8'"
+          - pty:"'false'"
+          - timeout: "'30000000'"
+          - closeSession: "'false'"
       publish:
         - returnResult: returnResult
   results:

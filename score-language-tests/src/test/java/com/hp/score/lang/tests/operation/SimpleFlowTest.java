@@ -23,6 +23,7 @@ import com.hp.score.events.EventConstants;
 import com.hp.score.events.ScoreEvent;
 import com.hp.score.lang.entities.CompilationArtifact;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -43,7 +44,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
     private static final long DEFAULT_TIMEOUT = 20000;
 
     @Test(timeout = DEFAULT_TIMEOUT)
-    public void testCompileAndRunSubFlowBasic() throws Exception {
+    public void testCompileAndRunSimpleFlowBasic() throws Exception {
         URI resource = getClass().getResource("/yaml/simple_flow.yaml").toURI();
         URI operations = getClass().getResource("/yaml/operation.yaml").toURI();
 
@@ -53,8 +54,22 @@ public class SimpleFlowTest extends SystemsTestsParent {
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("input1", "-2");
         userInputs.put("time_zone_as_string", "+2");
-        ScoreEvent event = triggerOperation(compilationArtifact, userInputs);
+        ScoreEvent event = trigger(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
+    @Ignore
+    public void testSimpleFlowOutputsAndResults() throws Exception {
+//        URI resource = getClass().getResource("/yaml/bind_params_flow.yaml").toURI();
+//        URI operations = getClass().getResource("/yaml/operation.yaml").toURI();
+//
+//        Set<File> path = Sets.newHashSet(new File(operations));
+//        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(resource), path);
+//
+//        Map<String, Serializable> userInputs = new HashMap<>();
+//        ScoreEvent event = trigger(compilationArtifact, userInputs);
+//        Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 
 }

@@ -13,14 +13,14 @@ flow:
     Task1:
       do:
         ops.get_time_zone:
-          - time_zone_as_string: -> time_zone_as_string if time_zone_as_string is not None else input1
+          - time_zone_as_string: time_zone_as_string if time_zone_as_string is not None else input1
       publish:
         - time_zone: time_zone
 
     Task2:
       do:
         ops.compute_daylight_time_zone:
-          - time_zone_as_string: -> time_zone
+          - time_zone_as_string: time_zone
       publish:
         - daylight_time_zone: daylight_time_zone
   results:

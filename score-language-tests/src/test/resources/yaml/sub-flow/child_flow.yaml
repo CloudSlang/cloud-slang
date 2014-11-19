@@ -6,7 +6,7 @@ imports:
 flow:
   name: child_flow
   inputs:
-    - input1: value
+    - input1: "'value'"
   workflow:
     CheckWeather:
       do:

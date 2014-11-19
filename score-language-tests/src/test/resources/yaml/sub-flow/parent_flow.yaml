@@ -14,7 +14,7 @@ flow:
     Task1:
       do:
         ops.check_Weather:
-          - city: -> city if city is not None else input1
+          - city: city if city is not None else input1
       publish:
         - kuku: weather
       navigate:
@@ -23,7 +23,7 @@ flow:
     Task2:
       do:
         flows.child_flow:
-          - input1: -> kuku
+          - input1: kuku
       publish:
         - val_output
   results:

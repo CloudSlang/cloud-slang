@@ -60,7 +60,7 @@ public class SystemsTestsParent {
 
     private LinkedBlockingQueue<ScoreEvent> queue = new LinkedBlockingQueue<>();
 
-    protected ScoreEvent triggerOperation(CompilationArtifact compilationArtifact, Map<String, Serializable> userInputs) throws InterruptedException {
+    protected ScoreEvent trigger(CompilationArtifact compilationArtifact, Map<String, Serializable> userInputs) throws InterruptedException {
         Map<String, Serializable> executionContext = createExecutionContext(userInputs);
 
         TriggeringProperties triggeringProperties = TriggeringProperties
