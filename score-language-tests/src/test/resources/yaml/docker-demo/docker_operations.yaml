@@ -22,7 +22,7 @@ operations:
         outputs:
           - returnResult: returnResult
         results:
-          - SUCCESS
+          - SUCCESS : returnCode == 0
           - FAILURE
   - create_container:
         inputs:
@@ -46,6 +46,6 @@ operations:
         outputs:
           - dbContainerName: returnResult
         results:
-          - SUCCESS
+          - SUCCESS : returnCode == 0
           - FAILURE
 

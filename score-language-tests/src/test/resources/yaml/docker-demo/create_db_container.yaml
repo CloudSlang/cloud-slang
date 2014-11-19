@@ -10,7 +10,7 @@ flow:
     - username
     - password
   workflow:
-    Pull_MySql_Image:
+    pull_mysql_image:
       do:
         ops.pull_container:
           - imageName: "'mysql'"
@@ -20,7 +20,7 @@ flow:
 
       publish:
         - returnResult: returnResult
-    Create_MySql_Container:
+    create_mysql_container:
       do:
         ops.create_container:
           - imageID: "'mysql'"
