@@ -3,17 +3,18 @@ namespace: docker.ops
 operations:
   - pull_container:
         inputs:
+          - imageName
           - host
-          - port : "'22'"
+          - port: "'22'"
           - username
           - password
           - privateKeyFile: "''"
-          - command
+          - command: "'docker pull ' + imageName"
           - arguments: "''"
-          - characterSet
-          - pty
-          - timeout
-          - closeSession
+          - characterSet : "'UTF-8'"
+          - pty: "'false'"
+          - timeout: "'30000000'"
+          - closeSession: "'false'"
         action:
           java_action:
             className: com.hp.score.content.ssh.actions.SSHShellCommandAction
@@ -23,3 +24,28 @@ operations:
         results:
           - SUCCESS
           - FAILURE
+  - create_container:
+        inputs:
+          - imageID
+          - containerName
+          - cmdParams
+          - host
+          - port: "'22'"
+          - username
+          - password
+          - privateKeyFile: "''"
+          - command: "'docker run --name ' + containerName + ' ' +cmdParams + ' -d ' + imageID"
+          - characterSet: "'UTF-8'"
+          - pty: "'false'"
+          - timeout: "'90000'"
+          - closeSession: "'false'"
+        action:
+          java_action:
+            className: com.hp.score.content.ssh.actions.SSHShellCommandAction
+            methodName: runSshShellCommand
+        outputs:
+          - dbContainerName: returnResult
+        results:
+          - SUCCESS
+          - FAILURE
+

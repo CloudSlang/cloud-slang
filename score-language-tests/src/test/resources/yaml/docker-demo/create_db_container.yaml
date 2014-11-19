@@ -10,20 +10,27 @@ flow:
     - username
     - password
   workflow:
-    Task1:
+    Pull_MySql_Image:
       do:
         ops.pull_container:
           - imageName: "'mysql'"
           - host
           - username
           - password
-          - command: "'docker pull ' + imageName"
-          - characterSet: "'UTF-8'"
-          - pty: "'false'"
-          - timeout: "'30000000'"
-          - closeSession: "'false'"
+
       publish:
         - returnResult: returnResult
+    Create_MySql_Container:
+      do:
+        ops.create_container:
+          - imageID: "'mysql'"
+          - containerName: "'mysqldb'"
+          - cmdParams: "'-e MYSQL_ROOT_PASSWORD=pass -e MYSQL_DATABASE=boot -e MYSQL_USER=user -e MYSQL_PASSWORD=pass'"
+          - host
+          - username
+          - password
+
+
   results:
     - SUCCESS
     - FAILURE
