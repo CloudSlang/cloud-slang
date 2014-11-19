@@ -66,8 +66,9 @@ public class SlangCLI implements CommandMarker {
     private Boolean triggerAsync = false ;
 
     private final static Logger logger = Logger.getLogger(SlangCLI.class);
+
     private static final String currently = "You are currently running Score version: ";
-    private static final String scoreVersion = "0.1.229"; //todo get version
+    private static final String SCORE_VERSION = "0.1.229"; //todo get version
 
     @CliCommand(value = "run", help = "triggers a slang flow")
     public String run(
@@ -122,11 +123,11 @@ public class SlangCLI implements CommandMarker {
 
     @CliCommand(value = "slang -version", help = "Prints the score version used")
     public String version() {
-        return currently + scoreVersion;
+        return currently + SCORE_VERSION;
     }
 
     public static String getVersion() {
-        return scoreVersion;
+        return SCORE_VERSION;
     }
 
     @PostConstruct
