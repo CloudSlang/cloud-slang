@@ -89,15 +89,15 @@ public class OutputsBindingTest {
         Assert.assertEquals("Binding results are not as expected", expectedOutputs, result);
     }
 
-    //todo: do we want to throw an exception? - (NO!!!!! - MEIR)
-    /*@Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testOperationOutputsIllegalEvaluatedExpression() throws Exception {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, String> actionReturnValues = new HashMap<>();
         List<Output> outputs = Arrays.asList(createNoExpressionOutput("actionOutputKey1"));
 
-        outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
-    }*/
+        Map<String, String> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
+        Assert.assertEquals("Binding results are not as expected", 0, result.size());
+    }
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testOperationOutputsExpression() throws Exception {
@@ -130,15 +130,15 @@ public class OutputsBindingTest {
 
         outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
     }
-    //todo: do we want to throw an exception? - (NO!!!!! - MEIR)
-    /*@Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testOperationOutputsInvalidExpression() throws Exception {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, String> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(fromInputs[SHOULD_BE_STRING])"));
 
-        outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
-    }*/
+        Map<String, String> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
+        Assert.assertEquals("Binding results are not as expected", 0, result.size());
+    }
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testOperationOutputsMixed() throws Exception {
