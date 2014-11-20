@@ -102,7 +102,12 @@ public class TaskSteps extends AbstractSteps {
         // set the position of the next step - for the use of the navigation
         Long nextPosition = setNextTaskPosition(runEnv, taskNavigationValues, operationReturnValues);
 
-        ReturnValues returnValues = new ReturnValues(new HashMap<String, String>(), operationReturnValues.getResult());
+        HashMap<String, String> outputs = new HashMap<>();//todo - is this the right solution?
+        for (Map.Entry<String, Serializable> entry : flowContext.entrySet()) {
+            outputs.put(entry.getKey(), String.valueOf(entry.getValue()));
+        }
+
+        ReturnValues returnValues = new ReturnValues(outputs, operationReturnValues.getResult());
         runEnv.putReturnValues(returnValues);
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_END, "Output binding finished",
                 Pair.of(RETURN_VALUES, returnValues),
