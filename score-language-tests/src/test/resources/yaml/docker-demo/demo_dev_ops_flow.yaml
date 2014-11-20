@@ -1,0 +1,25 @@
+namespace: docker.flows
+
+imports:
+ ops: docker.ops
+ flows: docker.flows
+
+flow:
+  name: demo_dev_ops_flow
+  inputs:
+    - host
+    - username
+    - password
+  workflow:
+    pull_mysql_image:
+      do:
+        flows.create_db_container:
+          - host
+          - username
+          - password
+      publish:
+              - dbIp : dbIp
+
+  results:
+    - SUCCESS
+    - FAILURE
