@@ -22,7 +22,7 @@ operations:
         outputs:
           - returnResult: returnResult
         results:
-          - SUCCESS : returnCode == '0'
+          - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
           - FAILURE
   - create_container:
         inputs:
@@ -45,7 +45,6 @@ operations:
             methodName: runSshShellCommand
         outputs:
           - dbContainerName: returnResult
-          - errorPrint : STDERR
         results:
           - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
           - FAILURE
@@ -71,6 +70,6 @@ operations:
           outputs:
             - dbIp: returnResult
           results:
-            - SUCCESS : returnCode == '0'
+            - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
             - FAILURE
 
