@@ -4,7 +4,7 @@ imports:
  ops: docker.ops
 
 flow:
-  name: createDbContainer
+  name: create_db_container
   inputs:
     - host
     - username
