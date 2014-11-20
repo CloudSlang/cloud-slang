@@ -3,6 +3,7 @@ namespace: docker.flows
 imports:
  ops: docker.ops
  flows: docker.flows
+ email: email.ops
 
 flow:
   name: demo_dev_ops_flow
@@ -19,6 +20,15 @@ flow:
           - password
       publish:
               - dbIp : dbIp
+
+    on_failure:
+      send_error_mail:
+        do:
+          email.send_mail:
+            - to_mail: "'xxx'"
+
+        navigate:
+          FAILURE: FAILURE
 
   results:
     - SUCCESS

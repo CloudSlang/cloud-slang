@@ -1,0 +1,12 @@
+namespace: email.ops
+
+operations:
+  - send_mail:
+        inputs:
+          - to_mail
+        action:
+          python_script: 'print "You Got mail"'
+        results:
+          - SUCCESS
+          - FAILURE
+
