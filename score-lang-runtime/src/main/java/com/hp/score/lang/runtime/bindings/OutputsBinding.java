@@ -71,8 +71,6 @@ public class OutputsBinding {
                         } catch (ClassCastException ex) {
                             throw new RuntimeException("The output expression " + outputExpr + " does not return String value", ex);
                         }
-                    } else {
-                        throw new RuntimeException("The output expression " + outputExpr + " is illegal");
                     }
                 } else {
                     throw new RuntimeException("Output: " + outputKey + " has no expression");

@@ -45,8 +45,9 @@ operations:
             methodName: runSshShellCommand
         outputs:
           - dbContainerName: returnResult
+          - errorPrint : STDERR
         results:
-          - SUCCESS : returnCode == '0'
+          - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
           - FAILURE
   - get_container_ip:
           inputs:
