@@ -12,7 +12,7 @@ flow:
     - username
     - password
   workflow:
-    pull_mysql_image:
+    create_db_container:
       do:
         flows.create_db_container:
           - host
@@ -20,6 +20,15 @@ flow:
           - password
       publish:
               - dbIp : dbIp
+
+    pull_app_image:
+          do:
+            ops.pull_image:
+              - imageName: "'meirwa/spring-boot-tomcat-mysql-app'"
+              - host
+              - username
+              - password
+          publish:
 
     on_failure:
       send_error_mail:

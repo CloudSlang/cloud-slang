@@ -12,7 +12,7 @@ flow:
   workflow:
     pull_mysql_image:
       do:
-        ops.pull_container:
+        ops.pull_image:
           - imageName: "'mysql'"
           - host
           - username
