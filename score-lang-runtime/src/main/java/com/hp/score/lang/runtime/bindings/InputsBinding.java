@@ -58,7 +58,7 @@ public class InputsBinding {
         Serializable value = resolveValue(inputName, input, context, targetContext);
 
         if(input.isRequired() && value == null) {
-            throw new RuntimeException("Input with name :"+ inputName + " is Required, but value is empty");
+            throw new RuntimeException("Input with name :"+ inputName + " is Required, but value is empty");// todo : add stepName here?
         }
 
         targetContext.put(inputName,value);

@@ -25,7 +25,13 @@ flow:
         ops.create_container:
           - imageID: "'mysql'"
           - containerName: "'mysqldb'"
-          - cmdParams: "'-e MYSQL_ROOT_PASSWORD=pass -e MYSQL_DATABASE=boot -e MYSQL_USER=user -e MYSQL_PASSWORD=pass'"
+          - host
+          - username
+          - password
+    get_db_ip:
+      do:
+        ops.get_container_ip:
+          - containerName: "'mysqldb'"
           - host
           - username
           - password

@@ -22,13 +22,13 @@ operations:
         outputs:
           - returnResult: returnResult
         results:
-          - SUCCESS : returnCode == 0
+          - SUCCESS : returnCode == '0'
           - FAILURE
   - create_container:
         inputs:
           - imageID
           - containerName
-          - cmdParams
+          - cmdParams: "'-e MYSQL_ROOT_PASSWORD=pass -e MYSQL_DATABASE=boot -e MYSQL_USER=user -e MYSQL_PASSWORD=pass'"
           - host
           - port: "'22'"
           - username
@@ -46,6 +46,30 @@ operations:
         outputs:
           - dbContainerName: returnResult
         results:
-          - SUCCESS : returnCode == 0
+          - SUCCESS : returnCode == '0'
           - FAILURE
+  - get_container_ip:
+          inputs:
+            - containerName
+            - cmdParams: "''"
+            - host
+            - port: "'22'"
+            - username
+            - password
+            - privateKeyFile: "''"
+            - command: >
+                "docker inspect --format '{{ .NetworkSettings.IPAddress }}' " + containerName
+            - characterSet: "'UTF-8'"
+            - pty: "'false'"
+            - timeout: "'90000'"
+            - closeSession: "'false'"
+          action:
+            java_action:
+              className: com.hp.score.content.ssh.actions.SSHShellCommandAction
+              methodName: runSshShellCommand
+          outputs:
+            - dbIp: returnResult
+          results:
+            - SUCCESS : returnCode == '0'
+            - FAILURE
 

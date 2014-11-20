@@ -24,6 +24,7 @@ import com.hp.score.events.ScoreEvent;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.tests.operation.SystemsTestsParent;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -39,8 +40,8 @@ import java.util.*;
 public class createDbContainerTest  extends SystemsTestsParent {
     private static final long DEFAULT_TIMEOUT = 50000;
 
-    @Test(timeout = DEFAULT_TIMEOUT)
-    //@Ignore
+    @Test
+    @Ignore
     public void testCompileAndRunSubFlowBasic() throws Exception {
         URI resource = getClass().getResource("/yaml/docker-demo/create_db_container.yaml").toURI();
         URI operations = getClass().getResource("/yaml/docker-demo/docker_operations.yaml").toURI();
