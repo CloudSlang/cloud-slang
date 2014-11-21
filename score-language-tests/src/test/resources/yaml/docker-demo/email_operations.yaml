@@ -3,9 +3,26 @@ namespace: email.ops
 operations:
   - send_mail:
         inputs:
-          - to_mail
+          - hostname
+          - port
+          - from
+          - to
+          - cc: "''"
+          - bcc: "''"
+          - subject
+          - body
+          - htmlEmail: "'true'"
+          - readReceipt: "'false'"
+          - attachments: "''"
+          - username: "''"
+          - password: "''"
+          - characterSet: "'UTF-8'"
+          - contentTransferEncoding: "'base64'"
+          - delimiter: "''"
         action:
-          python_script: 'print "You Got mail"'
+          java_action:
+            className: org.eclipse.score.content.mail.actions.SendMailAction
+            methodName: execute
         results:
           - SUCCESS
           - FAILURE

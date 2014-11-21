@@ -47,7 +47,12 @@ flow:
       send_error_mail:
         do:
           email.send_mail:
-            - to_mail: "'xxx'"
+            - hostname: "'smtp-americas.hp.com'"
+            - port: "'25'"
+            - from: "'tudor-andrei.lesan@hp.com'"
+            - to: "'tudor-andrei.lesan@hp.com'"
+            - subject: "'test'"
+            - body: "'hello'"
 
         navigate:
           FAILURE: FAILURE
