@@ -8,20 +8,20 @@ imports:
 flow:
   name: demo_dev_ops_flow
   inputs:
-    - host
-    - username
-    - password
-    - hostname
-    - port
-    - from
-    - to
+    - dockerHost
+    - dockerUsername
+    - dockerPassword
+    - emailHost
+    - emailPort
+    - emailSender
+    - emailRecipient
   workflow:
     create_db_container:
       do:
         flows.create_db_container:
-          - host
-          - username
-          - password
+          - host: "dockerHost"
+          - username: "dockerUsername"
+          - password: "dockerPassword"
       publish:
               - dbIp : dbIp
               - errorMessage: errorMessage
@@ -30,9 +30,9 @@ flow:
           do:
             ops.pull_image:
               - imageName: "'meirwa/spring-boot-tomcat-mysql-app'"
-              - host
-              - username
-              - password
+              - host: "dockerHost"
+              - username: "dockerUsername"
+              - password: "dockerPassword"
           publish:
               - errorMessage: STDERR
 
@@ -43,9 +43,9 @@ flow:
               - dbContainerName: "'mysqldb'"
               - imageName: "'meirwa/spring-boot-tomcat-mysql-app'"
               - containerName: "'spring-boot-tomcat-mysql-app'"
-              - host
-              - username
-              - password
+              - host: "dockerHost"
+              - username: "dockerUsername"
+              - password: "dockerPassword"
           publish:
                   - containerID : containerID
                   - errorMessage: STDERR
@@ -54,10 +54,10 @@ flow:
       send_error_mail:
         do:
           email.send_mail:
-            - hostname
-            - port
-            - from
-            - to
+            - hostname: "emailHost"
+            - port: "emailPort"
+            - from: "emailSender"
+            - to: "emailRecipient"
             - subject: "'Flow failure'"
             - body: "errorMessage"
 

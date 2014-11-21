@@ -45,13 +45,13 @@ public class DevOpsDemoTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = compiler.compileFlow(new File(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("host", "16.60.169.142");
-        userInputs.put("username", "root");
-        userInputs.put("password", "Xy6stqZ");
-        userInputs.put("hostname", "smtp-americas.hp.com");
-        userInputs.put("port", "25");
-        userInputs.put("from", "levente.bonczidai@hp.com");
-        userInputs.put("to", "levente.bonczidai@hp.com");
+        userInputs.put("dockerHost", "16.60.169.142");
+        userInputs.put("dockerUsername", "root");
+        userInputs.put("dockerPassword", "Xy6stqZ");
+        userInputs.put("emailHost", "smtp-americas.hp.com");
+        userInputs.put("emailPort", "25");
+        userInputs.put("emailSender", "levente.bonczidai@hp.com");
+        userInputs.put("emailRecipient", "levente.bonczidai@hp.com");
         ScoreEvent event = trigger(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
