@@ -165,11 +165,6 @@
                 <version>1.4</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.hp.score.content</groupId>
-                <artifactId>score-ssh</artifactId>
-                <version>0.0.3</version>
-            </dependency>
 
             <dependency>
                 <groupId>com.hp.score</groupId>
@@ -178,6 +173,19 @@
                 <scope>test</scope>
             </dependency>
             <!--end of score dependencies-->
+
+            <!--score content dependencies-->
+            <dependency>
+                <groupId>org.eclipse.score.content</groupId>
+                <artifactId>score-ssh</artifactId>
+                <version>0.0.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.score.content</groupId>
+                <artifactId>score-mail</artifactId>
+                <version>0.0.1</version>
+            </dependency>
+            <!--end of score content dependencies-->
 
             <dependency>
                 <groupId>log4j</groupId>

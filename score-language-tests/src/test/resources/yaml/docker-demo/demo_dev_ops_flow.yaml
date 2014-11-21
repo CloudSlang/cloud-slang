@@ -30,6 +30,19 @@ flow:
               - password
           publish:
 
+    start_linked_container:
+          do:
+            ops.start_linked_container:
+              - dbContainerIp: "dbIp"
+              - dbContainerName: "'mysqldb'"
+              - imageName: "'meirwa/spring-boot-tomcat-mysql-app'"
+              - containerName: "'spring-boot-tomcat-mysql-app'"
+              - host
+              - username
+              - password
+          publish:
+                  - containerID : containerID
+
     on_failure:
       send_error_mail:
         do:

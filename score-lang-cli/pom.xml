@@ -50,10 +50,16 @@
 
         <!-- content dep -->
         <dependency>
-            <groupId>com.hp.score.content</groupId>
+            <groupId>org.eclipse.score.content</groupId>
             <artifactId>score-ssh</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.score.content</groupId>
+            <artifactId>score-mail</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
 
 		<!-- test -->
 		<dependency>
