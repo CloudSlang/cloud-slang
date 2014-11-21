@@ -21,6 +21,7 @@ operations:
             methodName: runSshShellCommand
         outputs:
           - returnResult: returnResult
+          - STDERR: STDERR
         results:
           - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
           - FAILURE
@@ -45,6 +46,7 @@ operations:
             methodName: runSshShellCommand
         outputs:
           - dbContainerID: returnResult
+          - STDERR: STDERR
         results:
           - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
           - FAILURE
@@ -69,6 +71,7 @@ operations:
               methodName: runSshShellCommand
           outputs:
             - dbIp: returnResult[:-1]
+            - STDERR: STDERR
           results:
             - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
             - FAILURE
@@ -95,6 +98,7 @@ operations:
               methodName: runSshShellCommand
           outputs:
             - containerID: returnResult
+            - STDERR: STDERR
           results:
             - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
             - FAILURE

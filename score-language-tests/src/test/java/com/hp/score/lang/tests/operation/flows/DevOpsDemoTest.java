@@ -48,6 +48,10 @@ public class DevOpsDemoTest extends SystemsTestsParent {
         userInputs.put("host", "16.60.169.142");
         userInputs.put("username", "root");
         userInputs.put("password", "Xy6stqZ");
+        userInputs.put("hostname", "smtp-americas.hp.com");
+        userInputs.put("port", "25");
+        userInputs.put("from", "levente.bonczidai@hp.com");
+        userInputs.put("to", "levente.bonczidai@hp.com");
         ScoreEvent event = trigger(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }

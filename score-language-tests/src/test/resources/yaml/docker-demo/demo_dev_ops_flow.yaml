@@ -11,6 +11,10 @@ flow:
     - host
     - username
     - password
+    - hostname
+    - port
+    - from
+    - to
   workflow:
     create_db_container:
       do:
@@ -20,6 +24,7 @@ flow:
           - password
       publish:
               - dbIp : dbIp
+              - errorMessage: errorMessage
 
     pull_app_image:
           do:
@@ -29,6 +34,7 @@ flow:
               - username
               - password
           publish:
+              - errorMessage: STDERR
 
     start_linked_container:
           do:
@@ -42,17 +48,18 @@ flow:
               - password
           publish:
                   - containerID : containerID
+                  - errorMessage: STDERR
 
     on_failure:
       send_error_mail:
         do:
           email.send_mail:
-            - hostname: "'smtp-americas.hp.com'"
-            - port: "'25'"
-            - from: "'tudor-andrei.lesan@hp.com'"
-            - to: "'tudor-andrei.lesan@hp.com'"
-            - subject: "'test'"
-            - body: "'hello'"
+            - hostname
+            - port
+            - from
+            - to
+            - subject: "'Flow failure'"
+            - body: "errorMessage"
 
         navigate:
           FAILURE: FAILURE
