@@ -29,6 +29,12 @@
 			<artifactId>spring-shell</artifactId>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>jline</groupId>
+			<artifactId>jline</artifactId>
+			<version>2.12</version>
+			<scope>compile</scope>
+		</dependency>
 
 		<!-- runtime -->
 		<dependency>
