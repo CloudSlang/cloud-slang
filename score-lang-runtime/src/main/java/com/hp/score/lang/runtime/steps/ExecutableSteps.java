@@ -22,9 +22,18 @@ import java.util.List;
 import java.util.Map;
 
 import static com.hp.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
-import static com.hp.score.lang.entities.ScoreLangConstants.*;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
+import static com.hp.score.lang.entities.ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY;
+import static com.hp.score.lang.entities.ScoreLangConstants.EXECUTABLE_RESULTS_KEY;
+import static com.hp.score.lang.entities.ScoreLangConstants.NEXT_STEP_ID_KEY;
+import static com.hp.score.lang.entities.ScoreLangConstants.NODE_NAME_KEY;
+import static com.hp.score.lang.entities.ScoreLangConstants.OPERATION_INPUTS_KEY;
+import static com.hp.score.lang.entities.ScoreLangConstants.RUN_ENV;
+import static com.hp.score.lang.entities.ScoreLangConstants.USER_INPUTS_KEY;
+import static com.hp.score.lang.runtime.events.LanguageEventData.OUTPUTS;
 import static com.hp.score.lang.runtime.events.LanguageEventData.RESULT;
-import static com.hp.score.lang.runtime.events.LanguageEventData.RETURN_VALUES;
 import static com.hp.score.lang.runtime.events.LanguageEventData.levelName;
 
 /**
@@ -101,7 +110,7 @@ public class ExecutableSteps extends AbstractSteps {
                 Pair.of("actionReturnValues", actionReturnValues),Pair.of(levelName.EXECUTABLE_NAME.toString(),nodeName));
 
         // Resolving the result of the operation/flow
-        String result = resultsBinding.resolveResult(actionReturnValues.getOutputs(), executableResults, actionReturnValues.getResult());
+        String result = resultsBinding.resolveResult(operationContext, actionReturnValues.getOutputs(), executableResults, actionReturnValues.getResult());
 
         Map<String, String> operationReturnOutputs = outputsBinding.bindOutputs(operationContext, actionReturnValues.getOutputs(), executableOutputs);
 
@@ -110,7 +119,8 @@ public class ExecutableSteps extends AbstractSteps {
         ReturnValues returnValues = new ReturnValues(operationReturnOutputs, result);
         runEnv.putReturnValues(returnValues);
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_END, "Output binding finished",
-                Pair.of(RETURN_VALUES, returnValues),
+                Pair.of(OUTPUTS, (Serializable) operationReturnOutputs),
+                Pair.of(RESULT, returnValues.getResult()),
                 Pair.of(levelName.EXECUTABLE_NAME.toString(),nodeName));
 
         // If we have parent flow data on the stack, we pop it and request the score engine to switch to the parent
@@ -120,7 +130,7 @@ public class ExecutableSteps extends AbstractSteps {
         } else {
             fireEvent(executionRuntimeServices, runEnv, EVENT_EXECUTION_FINISHED, "Execution finished running",
                     Pair.of(RESULT, returnValues.getResult()),
-                    Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable) operationReturnOutputs),
+                    Pair.of(OUTPUTS, (Serializable) operationReturnOutputs),
                     Pair.of(levelName.EXECUTABLE_NAME.toString(),nodeName));
         }
 

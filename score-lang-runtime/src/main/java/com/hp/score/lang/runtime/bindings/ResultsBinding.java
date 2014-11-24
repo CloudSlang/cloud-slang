@@ -20,12 +20,17 @@ package com.hp.score.lang.runtime.bindings;
 
 import com.hp.score.lang.entities.bindings.Result;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.hp.score.lang.entities.ScoreLangConstants.BIND_OUTPUT_FROM_INPUTS_KEY;
 
 /**
  * User: stoneo
@@ -48,12 +53,14 @@ public class ResultsBinding {
      * 3. One or more of the results contains an illegal expression - not evaluated to true\false value
      * 4. No result was resolved - none of the results expression returned true
      *
+     * @param inputs the executable's inputs
      * @param context the run context
      * @param possibleResults list of all the possible Result objects of the executable
      * @param presetResult a given result name. Will be not null only in the case of resolving a result of a flow
      * @return the resolved result name
      */
-    public String resolveResult(Map<String, String> context,
+    public String resolveResult(Map<String, Serializable> inputs,
+                                Map<String, String> context,
                                 List<Result> possibleResults,
                                 String presetResult) {
 
@@ -83,8 +90,20 @@ public class ResultsBinding {
             if(StringUtils.isEmpty(expression)) {
                 return result.getName();
             }
+            //construct script context
+            Map<String, Serializable> scriptContext = new HashMap<>();
+            //put action outputs
+            scriptContext.putAll(context);
+            //put executable inputs as a map
+            if(MapUtils.isNotEmpty(inputs)) {
+                scriptContext.put(BIND_OUTPUT_FROM_INPUTS_KEY, (Serializable) inputs);
+            }
+
             try {
-                Boolean evaluatedResult = (Boolean) scriptEvaluator.evalExpr(expression, context);
+                Boolean evaluatedResult = (Boolean) scriptEvaluator.evalExpr(expression, scriptContext);
+                if(evaluatedResult == null){
+                    throw new RuntimeException("Expression of the operation result: " + expression + " cannot be evaluated correctly to true or false value");
+                }
                 if(evaluatedResult) {
                     return result.getName();
                 }

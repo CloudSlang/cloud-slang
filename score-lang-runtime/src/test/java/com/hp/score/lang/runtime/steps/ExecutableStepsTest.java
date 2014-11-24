@@ -150,7 +150,7 @@ public class ExecutableStepsTest {
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), null));
         runEnv.getExecutionPath().down();
 
-        when(resultsBinding.resolveResult(anyMapOf(String.class, String.class), eq(results), isNull(String.class))).thenReturn(SUCCESS_RESULT);
+        when(resultsBinding.resolveResult(isNull(Map.class), anyMapOf(String.class, String.class), eq(results), isNull(String.class))).thenReturn(SUCCESS_RESULT);
         executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), results, new ExecutionRuntimeServices(),"");
 
         ReturnValues returnValues= runEnv.removeReturnValues();
@@ -214,7 +214,7 @@ public class ExecutableStepsTest {
         String boundResult = SUCCESS_RESULT;
 
         when(outputsBinding.bindOutputs(isNull(Map.class), anyMapOf(String.class, String.class), eq(possibleOutputs))).thenReturn(boundOutputs);
-        when(resultsBinding.resolveResult(anyMapOf(String.class, String.class), eq(possibleResults), isNull(String.class))).thenReturn(boundResult);
+        when(resultsBinding.resolveResult(isNull(Map.class), anyMapOf(String.class, String.class), eq(possibleResults), isNull(String.class))).thenReturn(boundResult);
 
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         executableSteps.finishExecutable(runEnv, possibleOutputs, possibleResults, runtimeServices,"task1");
@@ -245,20 +245,20 @@ public class ExecutableStepsTest {
 
         Assert.assertNotNull(boundOutputEvent);
         eventData = (Map<String,Serializable>)boundOutputEvent.getData();
-        Assert.assertTrue(eventData.containsKey(LanguageEventData.RETURN_VALUES));
-        ReturnValues returnValues= (ReturnValues)eventData.get(LanguageEventData.RETURN_VALUES);
+        Assert.assertTrue(eventData.containsKey(LanguageEventData.OUTPUTS));
+        Map<String, String> returnOutputs= (Map<String, String>)eventData.get(LanguageEventData.OUTPUTS);
+        String returnResult= (String)eventData.get(LanguageEventData.RESULT);
         Assert.assertEquals("task1",eventData.get(LanguageEventData.levelName.EXECUTABLE_NAME.name()));
+        Assert.assertEquals(1, returnOutputs.size());
+        Assert.assertEquals("John", returnOutputs.get("name"));
+        Assert.assertTrue(returnResult.equals(SUCCESS_RESULT));
 
         Assert.assertNotNull(executableFinishedEvent);
         eventData = (Map<String,Serializable>)executableFinishedEvent.getData();
         String result = (String)eventData.get(LanguageEventData.RESULT);
-        Map<String, String> eventOutputs = (Map<String, String>)eventData.get(EXECUTABLE_OUTPUTS_KEY);
+        Map<String, String> eventOutputs = (Map<String, String>)eventData.get(LanguageEventData.OUTPUTS);
         Assert.assertEquals(SUCCESS_RESULT, result);
         Assert.assertEquals(boundOutputs, eventOutputs);
-
-        Assert.assertEquals(1, returnValues.getOutputs().size());
-        Assert.assertEquals("John", returnValues.getOutputs().get("name"));
-        Assert.assertTrue(returnValues.getResult().equals(SUCCESS_RESULT));
 
     }
 

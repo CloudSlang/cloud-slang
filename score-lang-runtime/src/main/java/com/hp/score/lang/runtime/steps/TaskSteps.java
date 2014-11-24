@@ -29,9 +29,18 @@ import java.util.List;
 import java.util.Map;
 
 import static com.hp.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
-import static com.hp.score.lang.entities.ScoreLangConstants.*;
-import static com.hp.score.lang.runtime.events.LanguageEventData.RETURN_VALUES;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
+import static com.hp.score.lang.entities.ScoreLangConstants.NEXT_STEP_ID_KEY;
+import static com.hp.score.lang.entities.ScoreLangConstants.NODE_NAME_KEY;
+import static com.hp.score.lang.entities.ScoreLangConstants.REF_ID;
+import static com.hp.score.lang.entities.ScoreLangConstants.RUN_ENV;
+import static com.hp.score.lang.entities.ScoreLangConstants.TASK_INPUTS_KEY;
+import static com.hp.score.lang.entities.ScoreLangConstants.TASK_NAVIGATION_KEY;
+import static com.hp.score.lang.entities.ScoreLangConstants.TASK_PUBLISH_KEY;
 import static com.hp.score.lang.runtime.events.LanguageEventData.NEXT_STEP_POSITION;
+import static com.hp.score.lang.runtime.events.LanguageEventData.OUTPUTS;
+import static com.hp.score.lang.runtime.events.LanguageEventData.RESULT;
 
 /**
  * User: stoneo
@@ -110,7 +119,8 @@ public class TaskSteps extends AbstractSteps {
         ReturnValues returnValues = new ReturnValues(outputs, operationReturnValues.getResult());
         runEnv.putReturnValues(returnValues);
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_END, "Output binding finished",
-                Pair.of(RETURN_VALUES, returnValues),
+                Pair.of(OUTPUTS, (Serializable) publishValues),
+                Pair.of(RESULT, returnValues.getResult()),
                 Pair.of(NEXT_STEP_POSITION, nextPosition),
                 Pair.of(LanguageEventData.levelName.TASK_NAME.name(),nodeName));
 
