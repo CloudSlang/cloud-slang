@@ -1,0 +1,25 @@
+namespace: user.flows
+
+imports:
+  ops: user.ops
+
+flow:
+  name: flow_using_global_session
+  inputs:
+    - object_value
+  workflow:
+    set_session_object:
+      do:
+        ops.set_global_session_object:
+          - value: object_value
+
+    get_session_object:
+      do:
+        ops.get_global_session_object:
+          - value: object_value
+      publish:
+        - object_value: session_object_value
+
+  results:
+    - SUCCESS
+    - FAILURE

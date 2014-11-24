@@ -41,3 +41,28 @@ operations:
         results:
           - SUCCESS: 1 == 1
 
+  - set_global_session_object:
+      inputs:
+        - value
+      action:
+        java_action:
+          className: com.hp.score.lang.tests.operation.actions.LangTestActions
+          methodName: setConnectionOnNonSerializableSession
+      outputs:
+        - session_object_value: value
+
+  - get_global_session_object:
+      inputs:
+        - value
+      action:
+        java_action:
+          className: com.hp.score.lang.tests.operation.actions.LangTestActions
+          methodName: getConnectionFromNonSerializableSession
+      outputs:
+        - session_object_value: connection
+      results:
+        - SUCCESS: connection == fromInputs['value']
+        - FAILURE
+
+
+

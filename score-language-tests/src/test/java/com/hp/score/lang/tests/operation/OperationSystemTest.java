@@ -43,7 +43,7 @@ public class OperationSystemTest extends SystemsTestsParent {
 
     @Test
     public void testCompileAndRunOperationBasic() throws Exception {
-        URL resource = getClass().getResource("/yaml/operation.yaml");
+        URL resource = getClass().getResource("/yaml/simple_operations.yaml");
         CompilationArtifact compilationArtifact = compiler.compile(new File(resource.toURI()), "test_op", null);
         //Trigger ExecutionPlan
         Map<String, Serializable> userInputs = new HashMap<>();
@@ -55,7 +55,7 @@ public class OperationSystemTest extends SystemsTestsParent {
     public void testCompileAndRunSubFlowBasic() throws Exception {
         URI resource = getClass().getResource("/yaml/sub-flow/parent_flow.yaml").toURI();
         URI subFlow = getClass().getResource("/yaml/sub-flow/child_flow.yaml").toURI();
-        URI operations = getClass().getResource("/yaml/operation.yaml").toURI();
+        URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
 
         Set<File> path = Sets.newHashSet(new File(subFlow), new File(operations));
         CompilationArtifact compilationArtifact = compiler.compileFlow(new File(resource), path);

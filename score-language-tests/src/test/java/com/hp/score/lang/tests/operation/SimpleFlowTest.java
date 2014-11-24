@@ -23,7 +23,6 @@ import com.hp.score.events.EventConstants;
 import com.hp.score.events.ScoreEvent;
 import com.hp.score.lang.entities.CompilationArtifact;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -46,7 +45,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testCompileAndRunSimpleFlowBasic() throws Exception {
         URI resource = getClass().getResource("/yaml/simple_flow.yaml").toURI();
-        URI operations = getClass().getResource("/yaml/operation.yaml").toURI();
+        URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
 
         Set<File> path = Sets.newHashSet(new File(operations));
         CompilationArtifact compilationArtifact = compiler.compileFlow(new File(resource), path);
@@ -58,18 +57,19 @@ public class SimpleFlowTest extends SystemsTestsParent {
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 
-    @Test(timeout = DEFAULT_TIMEOUT)
-    @Ignore
-    public void testSimpleFlowOutputsAndResults() throws Exception {
-//        URI resource = getClass().getResource("/yaml/bind_params_flow.yaml").toURI();
-//        URI operations = getClass().getResource("/yaml/operation.yaml").toURI();
-//
-//        Set<File> path = Sets.newHashSet(new File(operations));
-//        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(resource), path);
-//
-//        Map<String, Serializable> userInputs = new HashMap<>();
-//        ScoreEvent event = trigger(compilationArtifact, userInputs);
-//        Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
+
+    @Test
+    public void testFlowWithGlobalSession() throws Exception {
+        URI resource = getClass().getResource("/yaml/flow_using_global_session.yaml").toURI();
+        URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
+
+        Set<File> path = Sets.newHashSet(new File(operations));
+        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(resource), path);
+
+        Map<String, Serializable> userInputs = new HashMap<>();
+        userInputs.put("object_value", "SessionValue");
+        ScoreEvent event = trigger(compilationArtifact, userInputs);
+        Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 
 }

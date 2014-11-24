@@ -100,6 +100,7 @@ public class SystemsTestsParent {
         handlerTypes.add(EVENT_OUTPUT_START);
         handlerTypes.add(EVENT_OUTPUT_END);
         handlerTypes.add(EVENT_STEP_ERROR);
+        handlerTypes.add(EVENT_EXECUTION_FINISHED);
         eventBus.subscribe(new ScoreEventListener() {
 
             @Override
