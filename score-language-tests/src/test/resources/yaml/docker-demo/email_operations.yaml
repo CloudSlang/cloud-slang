@@ -24,6 +24,6 @@ operations:
             className: org.eclipse.score.content.mail.actions.SendMailAction
             methodName: execute
         results:
-          - SUCCESS
+          - SUCCESS: returnCode == '0'
           - FAILURE
 
