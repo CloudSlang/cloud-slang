@@ -156,14 +156,21 @@ public class ActionStepsTest {
         Assert.assertNotNull(actionEndEvent);
     }
 
-    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void doJavaActionWithExceptionTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
 
-        //invoke doAction
-        actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, ContentTestActions.class.getName(), "doJavaActionExceptionMethod", runtimeServices, null, 2L);
+        boolean exceptionThrown = false;
+        try {
+            //invoke doAction
+            actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, ContentTestActions.class.getName(), "doJavaActionExceptionMethod", runtimeServices, null, 2L);
+        } catch (RuntimeException ex){
+            exceptionThrown = true;
+        }
+
+        Assert.assertTrue(exceptionThrown);
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 
@@ -178,7 +185,7 @@ public class ActionStepsTest {
             }
         }
         Assert.assertNotNull(actionErrorEvent);
-        Assert.assertNotNull(actionEndEvent);
+        Assert.assertNull(actionEndEvent);
     }
 
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
