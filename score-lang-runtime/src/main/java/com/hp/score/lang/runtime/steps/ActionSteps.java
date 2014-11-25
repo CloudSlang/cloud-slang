@@ -166,16 +166,33 @@ public class ActionSteps extends AbstractSteps {
         List<Object> args = new ArrayList<>();
 
         int index = 0;
+        Class[] parameterTypes = actionMethod.getParameterTypes();
         for (Annotation[] annotations : actionMethod.getParameterAnnotations()) {
             index++;
             for (Annotation annotation : annotations) {
                 if (annotation instanceof Param) {
-                    if (actionMethod.getParameterTypes()[index - 1].equals(GlobalSessionObject.class)) {
+                    if (parameterTypes[index - 1].equals(GlobalSessionObject.class)) {
                         handleNonSerializableSessionContextArgument(nonSerializableExecutionData, args, (Param) annotation);
-                    } else if (actionMethod.getParameterTypes()[index - 1].equals(SerializableSessionObject.class)) {
+                    } else if (parameterTypes[index - 1].equals(SerializableSessionObject.class)) {
                         handleSerializableSessionContextArgument(serializableSessionData, args, (Param) annotation);
                     } else {
-                        args.add(currentContext.get(((Param) annotation).value()));
+                        String parameterName = ((Param) annotation).value();
+                        Serializable value = currentContext.get(parameterName);
+                        Class parameterClass =  parameterTypes[index - 1];
+                        if (parameterClass.isInstance(value) || value == null) {
+                            args.add(value);
+                        } else {
+                            StringBuilder exceptionMessageBuilder = new StringBuilder();
+                            exceptionMessageBuilder.append("Parameter type mismatch for action ");
+                            exceptionMessageBuilder.append(actionMethod.getName());
+                            exceptionMessageBuilder.append(" of class ");
+                            exceptionMessageBuilder.append(actionMethod.getDeclaringClass().getName());
+                            exceptionMessageBuilder.append(". Parameter ");
+                            exceptionMessageBuilder.append(parameterName);
+                            exceptionMessageBuilder.append(" expects type ");
+                            exceptionMessageBuilder.append(parameterClass.getName());
+                            throw new RuntimeException(exceptionMessageBuilder.toString());
+                        }
                     }
                 }
             }

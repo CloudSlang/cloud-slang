@@ -44,6 +44,14 @@ public class ContentTestActions {
     }
 
     @SuppressWarnings("unused")
+    public Map<String, String> doJavaNumberAsString(
+            @Param("port") String port) {
+        Map<String, String> returnValues = new HashMap<>();
+        returnValues.put("port", port);
+        return returnValues;
+    }
+
+    @SuppressWarnings("unused")
     public void doJavaActionWrongReturnType(){
     }
 

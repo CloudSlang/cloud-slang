@@ -241,6 +241,20 @@ public class ActionStepsTest {
     }
 
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
+    public void doJavaActionParameterTypeMismatch() {
+        //prepare doAction arguments
+        RunEnvironment runEnv = new RunEnvironment();
+        Map<String, Serializable> initialCallArguments = new HashMap<>();
+        initialCallArguments.put("port", 5); //should be string
+        runEnv.putCallArguments(initialCallArguments);
+
+        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
+
+        //invoke doAction
+        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(), "doJavaNumberAsString", executionRuntimeServicesMock, null, 2L);
+    }
+
+    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void doActionJavaMissingActionTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
@@ -463,10 +477,24 @@ public class ActionStepsTest {
 
         //invoke doAction
         actionSteps.doAction(runEnv, nonSerializableExecutionData, PYTHON, "", "", executionRuntimeServicesMock, userPythonScript, 2L);
+    }
 
-        Map<String, String> actionOutputs = runEnv.removeReturnValues().getOutputs();
-        Map<String, String> expectedOutputs = new HashMap<>();
-        Assert.assertEquals("Action should return empty map", expectedOutputs, actionOutputs);
+    @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
+    public void doActionPythonInputTypeMismatchTest() {
+        //prepare doAction arguments
+        RunEnvironment runEnv = new RunEnvironment();
+        //missing inputs
+        Map<String, Serializable> initialCallArguments = new HashMap<>();
+        initialCallArguments.put("port", 8080); //should be string
+        runEnv.putCallArguments(initialCallArguments);
+
+        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
+
+        //expects port as string
+        String userPythonScript = "print('localhost:' + port)";
+
+        //invoke doAction
+        actionSteps.doAction(runEnv, nonSerializableExecutionData, PYTHON, "", "", executionRuntimeServicesMock, userPythonScript, 2L);
     }
 
     @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
@@ -482,10 +510,6 @@ public class ActionStepsTest {
 
         //invoke doAction
         actionSteps.doAction(runEnv, nonSerializableExecutionData, PYTHON, "", "", executionRuntimeServicesMock, "", 2L);
-
-        Map<String, String> actionOutputs = runEnv.removeReturnValues().getOutputs();
-        Map<String, String> expectedOutputs = new HashMap<>();
-        Assert.assertEquals("Action should return empty map", expectedOutputs, actionOutputs);
     }
 
     @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
@@ -501,10 +525,6 @@ public class ActionStepsTest {
 
         //invoke doAction
         actionSteps.doAction(runEnv, nonSerializableExecutionData, PYTHON, "", "", executionRuntimeServicesMock, null, 2L);
-
-        Map<String, String> actionOutputs = runEnv.removeReturnValues().getOutputs();
-        Map<String, String> expectedOutputs = new HashMap<>();
-        Assert.assertEquals("Action should return empty map", expectedOutputs, actionOutputs);
     }
 
     @Configuration
