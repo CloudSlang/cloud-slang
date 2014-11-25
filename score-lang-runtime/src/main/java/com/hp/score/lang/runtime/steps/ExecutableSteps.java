@@ -75,7 +75,9 @@ public class ExecutableSteps extends AbstractSteps {
         actionArguments.putAll(operationContext);
 
         //done with the user inputs, don't want it to be available in next startExecutable steps..
-        userInputs.clear();
+        if(userInputs != null) {
+            userInputs.clear();
+        }
 
         //todo: hook
 
