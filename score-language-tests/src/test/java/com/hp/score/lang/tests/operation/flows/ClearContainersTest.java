@@ -1,4 +1,4 @@
-package com.hp.score.lang.tests.operation.flows;/*
+/*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,12 +16,14 @@ package com.hp.score.lang.tests.operation.flows;/*
  * specific language governing permissions and limitations
  * under the License.
 */
+package com.hp.score.lang.tests.operation.flows;
 
 import com.google.common.collect.Sets;
 import com.hp.score.events.EventConstants;
 import com.hp.score.events.ScoreEvent;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.tests.operation.SystemsTestsParent;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -33,12 +35,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class DevOpsDemoTest extends SystemsTestsParent {
+/**
+ * Date: 11/21/2014
+ *
+ * @author Bonczidai Levente
+ */
+public class ClearContainersTest  extends SystemsTestsParent {
 
     @Test
     @Ignore
     public void testCompileAndRunFlow() throws Exception {
-        URI resource = getClass().getResource("/yaml/docker-demo/demo_dev_ops_flow.yaml").toURI();
+        URI resource = getClass().getResource("/yaml/docker-demo/clear_container.yaml").toURI();
         URI operations = getClass().getResource("/yaml/docker-demo/").toURI();
 
         Set<File> path = Sets.newHashSet(new File(operations));
@@ -46,14 +53,12 @@ public class DevOpsDemoTest extends SystemsTestsParent {
 
         //TODO: remove default values for inputs
         Map<String, Serializable> userInputs = new HashMap<>();
+        userInputs.put("containerID", "f2676086c7ae");
         userInputs.put("dockerHost", "16.60.169.142");
         userInputs.put("dockerUsername", "root");
         userInputs.put("dockerPassword", "Xy6stqZ");
-        userInputs.put("emailHost", "smtp-americas.hp.com");
-        userInputs.put("emailPort", "25");
-        userInputs.put("emailSender", "levente.bonczidai@hp.com");
-        userInputs.put("emailRecipient", "levente.bonczidai@hp.com");
         ScoreEvent event = trigger(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 }
+

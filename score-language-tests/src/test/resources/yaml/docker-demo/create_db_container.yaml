@@ -18,7 +18,7 @@ flow:
           - username
           - password
       publish:
-          - errorMessage: STDERR
+          - errorMessage
 
     create_mysql_container:
       do:
@@ -29,7 +29,7 @@ flow:
           - username
           - password
       publish:
-          - errorMessage: STDERR
+          - errorMessage
 
     get_db_ip:
       do:
@@ -40,11 +40,11 @@ flow:
           - password
       publish:
         - dbIp : dbIp
-        - errorMessage: STDERR
+        - errorMessage
 
   outputs:
     - dbIp : dbIp
-    - errorMessage: errorMessage
+    - errorMessage
   results:
     - SUCCESS
     - FAILURE

@@ -1,0 +1,38 @@
+namespace: docker.flows
+
+imports:
+ ops: docker.ops
+
+flow:
+  name: clear_containers
+  inputs:
+    - containerID
+    - dockerHost
+    - dockerUsername
+    - dockerPassword
+  workflow:
+    stop_container:
+      do:
+        ops.stop_container:
+          - containerID: containerID
+          - host: dockerHost
+          - username: dockerUsername
+          - password: dockerPassword
+      publish:
+          - errorMessage
+
+    delete_container:
+      do:
+        ops.delete_container:
+          - containerID: containerID
+          - host: dockerHost
+          - username: dockerUsername
+          - password: dockerPassword
+      publish:
+          - errorMessage
+
+  outputs:
+    - errorMessage
+  results:
+    - SUCCESS
+    - FAILURE

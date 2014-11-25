@@ -21,7 +21,7 @@ operations:
             methodName: runSshShellCommand
         outputs:
           - returnResult: returnResult
-          - STDERR: STDERR
+          - errorMessage: STDERR if returnCode == '0' else returnResult + '<br>' + exception
         results:
           - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
           - FAILURE
@@ -36,6 +36,7 @@ operations:
           - password
           - privateKeyFile: "''"
           - command: "'docker run --name ' + containerName + ' ' +cmdParams + ' -d ' + imageID"
+          - arguments: "''"
           - characterSet: "'UTF-8'"
           - pty: "'false'"
           - timeout: "'90000'"
@@ -46,7 +47,7 @@ operations:
             methodName: runSshShellCommand
         outputs:
           - dbContainerID: returnResult
-          - STDERR: STDERR
+          - errorMessage: STDERR if returnCode == '0' else returnResult + '<br>' + exception
         results:
           - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
           - FAILURE
@@ -61,6 +62,7 @@ operations:
             - privateKeyFile: "''"
             - command: >
                 "docker inspect --format '{{ .NetworkSettings.IPAddress }}' " + containerName
+            - arguments: "''"
             - characterSet: "'UTF-8'"
             - pty: "'false'"
             - timeout: "'90000'"
@@ -71,7 +73,7 @@ operations:
               methodName: runSshShellCommand
           outputs:
             - dbIp: returnResult[:-1]
-            - STDERR: STDERR
+            - errorMessage: STDERR if returnCode == '0' else returnResult + '<br>' + exception
           results:
             - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
             - FAILURE
@@ -87,6 +89,7 @@ operations:
             - username
             - password
             - privateKeyFile: "''"
+            - arguments: "''"
             - command: "'docker run --name ' + containerName + ' ' + cmdParams + ' -d ' + imageName"
             - characterSet: "'UTF-8'"
             - pty: "'false'"
@@ -98,7 +101,57 @@ operations:
               methodName: runSshShellCommand
           outputs:
             - containerID: returnResult
-            - STDERR: STDERR
+            - errorMessage: STDERR if returnCode == '0' else returnResult + '<br>' + exception
+          results:
+            - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
+            - FAILURE
+  - stop_container:
+          inputs:
+            - containerID
+            - cmdParams: "''"
+            - host
+            - port: "'22'"
+            - username
+            - password
+            - privateKeyFile: "''"
+            - arguments: "''"
+            - command: "'docker stop ' + cmdParams + ' ' + containerID"
+            - characterSet: "'UTF-8'"
+            - pty: "'false'"
+            - timeout: "'90000'"
+            - closeSession: "'false'"
+          action:
+            java_action:
+              className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
+              methodName: runSshShellCommand
+          outputs:
+            - containerID: returnResult
+            - errorMessage: STDERR if returnCode == '0' else returnResult + '<br>' + exception
+          results:
+            - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
+            - FAILURE
+  - delete_container:
+          inputs:
+            - containerID
+            - cmdParams: "''"
+            - host
+            - port: "'22'"
+            - username
+            - password
+            - privateKeyFile: "''"
+            - arguments: "''"
+            - command: "'docker rm ' + cmdParams + ' ' + containerID"
+            - characterSet: "'UTF-8'"
+            - pty: "'false'"
+            - timeout: "'90000'"
+            - closeSession: "'false'"
+          action:
+            java_action:
+              className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
+              methodName: runSshShellCommand
+          outputs:
+            - containerID: returnResult
+            - errorMessage: STDERR if returnCode == '0' else returnResult + '<br>' + exception
           results:
             - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
             - FAILURE
