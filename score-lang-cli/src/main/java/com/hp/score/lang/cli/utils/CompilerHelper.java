@@ -47,7 +47,7 @@ public class CompilerHelper {
     @Autowired
     private SlangCompiler compiler;
 
-    private String[] SLANG_FILE_EXTENSIONS = {"yml", "yaml", "py"};
+    private String[] SLANG_FILE_EXTENSIONS = {"yml", "yaml", "py","sl"};
 
     /**
      * @param filePath
