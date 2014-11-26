@@ -29,7 +29,7 @@ operations:
         inputs:
           - imageID
           - containerName
-          - cmdParams: "'-e MYSQL_ROOT_PASSWORD=pass -e MYSQL_DATABASE=boot -e MYSQL_USER=user -e MYSQL_PASSWORD=pass'"
+          - cmdParams
           - host
           - port: "'22'"
           - username
@@ -83,14 +83,15 @@ operations:
             - dbContainerName
             - imageName
             - containerName
-            - cmdParams: "'--link ' + dbContainerName + ':mysql -e DB_URL=' + dbContainerIp + ' -p 8080:8080'"
+            - linkParams
+            - cmdParams
             - host
             - port: "'22'"
             - username
             - password
             - privateKeyFile: "''"
             - arguments: "''"
-            - command: "'docker run --name ' + containerName + ' ' + cmdParams + ' -d ' + imageName"
+            - command: "'docker run --name ' + containerName + ' --link ' + linkParams + ' ' + cmdParams + ' -d ' + imageName"
             - characterSet: "'UTF-8'"
             - pty: "'false'"
             - timeout: "'90000'"

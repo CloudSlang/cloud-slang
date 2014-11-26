@@ -51,8 +51,8 @@ public class DevOpsDemoTest extends SystemsTestsParent {
         userInputs.put("dockerPassword", "Xy6stqZ");
         userInputs.put("emailHost", "smtp-americas.hp.com");
         userInputs.put("emailPort", "25");
-        userInputs.put("emailSender", "levente.bonczidai@hp.com");
-        userInputs.put("emailRecipient", "levente.bonczidai@hp.com");
+        userInputs.put("emailSender", "tudor-andrei.lesan@hp.com");
+        userInputs.put("emailRecipient", "tudor-andrei.lesan@hp.com");
         ScoreEvent event = trigger(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }

@@ -43,6 +43,8 @@ flow:
               - dbContainerName: "'mysqldb'"
               - imageName: "'meirwa/spring-boot-tomcat-mysql-app'"
               - containerName: "'spring-boot-tomcat-mysql-app'"
+              - linkParams: "dbContainerName + ':mysql'"
+              - cmdParams: "'-e DB_URL=' + dbContainerIp + ' -p 8080:8080'"
               - host: dockerHost
               - username: dockerUsername
               - password: dockerPassword
