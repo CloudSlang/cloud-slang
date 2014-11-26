@@ -21,7 +21,7 @@ operations:
             methodName: runSshShellCommand
         outputs:
           - returnResult: returnResult
-          - errorMessage: STDERR if returnCode == '0' else returnResult + '<br>' + exception
+          - errorMessage: STDERR if returnCode == '0' else returnResult
         results:
           - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
           - FAILURE
@@ -47,7 +47,7 @@ operations:
             methodName: runSshShellCommand
         outputs:
           - dbContainerID: returnResult
-          - errorMessage: STDERR if returnCode == '0' else returnResult + '<br>' + exception
+          - errorMessage: STDERR if returnCode == '0' else returnResult
         results:
           - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
           - FAILURE
@@ -73,7 +73,7 @@ operations:
               methodName: runSshShellCommand
           outputs:
             - dbIp: returnResult[:-1]
-            - errorMessage: STDERR if returnCode == '0' else returnResult + '<br>' + exception
+            - errorMessage: STDERR if returnCode == '0' else returnResult
           results:
             - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
             - FAILURE
@@ -101,7 +101,7 @@ operations:
               methodName: runSshShellCommand
           outputs:
             - containerID: returnResult
-            - errorMessage: STDERR if returnCode == '0' else returnResult + '<br>' + exception
+            - errorMessage: STDERR if returnCode == '0' else returnResult
           results:
             - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
             - FAILURE
@@ -126,7 +126,7 @@ operations:
               methodName: runSshShellCommand
           outputs:
             - containerID: returnResult
-            - errorMessage: STDERR if returnCode == '0' else returnResult + '<br>' + exception
+            - errorMessage: STDERR if returnCode == '0' else returnResult
           results:
             - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
             - FAILURE
@@ -151,7 +151,7 @@ operations:
               methodName: runSshShellCommand
           outputs:
             - containerID: returnResult
-            - errorMessage: STDERR if returnCode == '0' else returnResult + '<br>' + exception
+            - errorMessage: STDERR if returnCode == '0' else returnResult
           results:
             - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
             - FAILURE

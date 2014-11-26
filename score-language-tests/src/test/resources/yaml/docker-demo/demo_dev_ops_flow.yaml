@@ -59,7 +59,7 @@ flow:
             - from: emailSender
             - to: emailRecipient
             - subject: "'Flow failure'"
-            - body: errorMessage
+            - body: "'Operation failed with the following error:<br>' + errorMessage"
         navigate:
           SUCCESS: FAILURE
           FAILURE: FAILURE
