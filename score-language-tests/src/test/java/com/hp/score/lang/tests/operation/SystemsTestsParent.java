@@ -73,7 +73,7 @@ public class SystemsTestsParent {
         ScoreEvent event;
         do {
             event = queue.take();
-            Assert.assertNotSame("Error event has been thrown during execution", EVENT_STEP_ERROR, event.getEventType());
+            Assert.assertNotSame("Error event has been thrown during execution", SLANG_EXECUTION_EXCEPTION, event.getEventType());
             System.out.println("Event received: " + event.getEventType() + " Data is: " + event.getData());
         } while(!EventConstants.SCORE_FINISHED_EVENT.equals(event.getEventType()));
         return event;
@@ -99,7 +99,7 @@ public class SystemsTestsParent {
         handlerTypes.add(EVENT_INPUT_END);
         handlerTypes.add(EVENT_OUTPUT_START);
         handlerTypes.add(EVENT_OUTPUT_END);
-        handlerTypes.add(EVENT_STEP_ERROR);
+        handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
         handlerTypes.add(EVENT_EXECUTION_FINISHED);
         eventBus.subscribe(new ScoreEventListener() {
 

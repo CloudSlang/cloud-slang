@@ -41,7 +41,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_STEP_ERROR;
+import static com.hp.score.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
 import static com.hp.score.lang.runtime.events.LanguageEventData.EXCEPTION;
 import static com.hp.score.lang.runtime.events.LanguageEventData.RESULT;
 import static org.fusesource.jansi.Ansi.ansi;
@@ -53,7 +53,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  */
 @Service
 public class ScoreServices {
-    public static final String SLANG_STEP_ERROR_MSG = "Slang Step Error : ";
+    public static final String SLANG_STEP_ERROR_MSG = "Slang Error : ";
     public static final String SCORE_ERROR_EVENT_MSG = "Score Error Event :";
     public static final String FLOW_FINISHED_WITH_FAILURE_MSG = "Flow finished with failure";
     //TODO - change this to interface...
@@ -99,7 +99,7 @@ public class ScoreServices {
         handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
         handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
         handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
-        handlerTypes.add(EVENT_STEP_ERROR);
+        handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
         handlerTypes.add(EVENT_EXECUTION_FINISHED);
 
         SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener();
@@ -135,7 +135,7 @@ public class ScoreServices {
                 case EventConstants.SCORE_FAILURE_EVENT :
                     printWithColor(Ansi.Color.RED,FLOW_FINISHED_WITH_FAILURE_MSG);
                     flowFinished.set(true); break;
-                case ScoreLangConstants.EVENT_STEP_ERROR :
+                case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
                     printWithColor(Ansi.Color.RED,SLANG_STEP_ERROR_MSG + data.get(EXCEPTION)); break;
                 case EVENT_EXECUTION_FINISHED :
                     printFinishEvent(data); break;

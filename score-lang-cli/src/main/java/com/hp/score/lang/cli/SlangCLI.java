@@ -143,7 +143,7 @@ public class SlangCLI implements CommandMarker {
         handlerTypes.add(EVENT_INPUT_END);
         handlerTypes.add(EVENT_OUTPUT_START);
         handlerTypes.add(EVENT_OUTPUT_END);
-        handlerTypes.add(EVENT_STEP_ERROR);
+        handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
         handlerTypes.add(EVENT_EXECUTION_FINISHED);
         scoreServices.subscribe(new ScoreEventListener() {
             @Override

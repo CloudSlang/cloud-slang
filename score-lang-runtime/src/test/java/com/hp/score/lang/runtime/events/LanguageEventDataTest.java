@@ -7,19 +7,17 @@
  */
 package com.hp.score.lang.runtime.events;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.HashMap;
 
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_STEP_ERROR;
+import static com.hp.score.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
 import static com.hp.score.lang.runtime.events.LanguageEventData.DESCRIPTION;
 import static com.hp.score.lang.runtime.events.LanguageEventData.EXCEPTION;
 import static com.hp.score.lang.runtime.events.LanguageEventData.EXECUTIONID;
@@ -28,6 +26,7 @@ import static com.hp.score.lang.runtime.events.LanguageEventData.OUTPUTS;
 import static com.hp.score.lang.runtime.events.LanguageEventData.PATH;
 import static com.hp.score.lang.runtime.events.LanguageEventData.TIMESTAMP;
 import static com.hp.score.lang.runtime.events.LanguageEventData.TYPE;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author moradi
@@ -55,7 +54,7 @@ public class LanguageEventDataTest {
 	 */
 	@Test
 	public void testEventType() {
-		String eventType = EVENT_STEP_ERROR;
+		String eventType = SLANG_EXECUTION_EXCEPTION;
 		eventData.setEventType(eventType);
 		assertEquals(eventType, eventData.getEventType());
 		assertEquals(eventType, eventData.get(TYPE));

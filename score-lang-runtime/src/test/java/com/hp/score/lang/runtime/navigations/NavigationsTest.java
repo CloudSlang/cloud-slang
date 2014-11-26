@@ -32,7 +32,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Collection;
 
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_STEP_ERROR;
+import static com.hp.score.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
 
 /**
  * User: stoneo
@@ -75,7 +75,7 @@ public class NavigationsTest {
         Assert.assertFalse(events.isEmpty());
         ScoreEvent stepErrorEvent = null;
         for(ScoreEvent event:events){
-            if(event.getEventType().equals(EVENT_STEP_ERROR)){
+            if(event.getEventType().equals(SLANG_EXECUTION_EXCEPTION)){
                 stepErrorEvent = event;
             }
         }

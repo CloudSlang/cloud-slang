@@ -14,7 +14,7 @@ import com.hp.score.lang.runtime.steps.AbstractSteps;
 import org.apache.commons.lang3.tuple.Pair;
 
 import static com.hp.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_STEP_ERROR;
+import static com.hp.score.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
 import static com.hp.score.lang.entities.ScoreLangConstants.RUN_ENV;
 import static com.hp.score.lang.runtime.events.LanguageEventData.EXCEPTION;
 
@@ -38,7 +38,7 @@ public class Navigations {
 
         // If we have an error key stored, we fire an error event and return null as the next position
 		if(executionRuntimeServices.hasStepErrorKey()) {
-			AbstractSteps.fireEvent(executionRuntimeServices, runEnv, EVENT_STEP_ERROR, "Error detected during step",
+			AbstractSteps.fireEvent(executionRuntimeServices, runEnv, SLANG_EXECUTION_EXCEPTION, "Error detected during step",
 				Pair.of(EXCEPTION, new RuntimeException(executionRuntimeServices.getStepErrorKey())));
 			return null;
 		}
