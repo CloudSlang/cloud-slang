@@ -55,7 +55,7 @@ public class ExecutableSteps extends AbstractSteps {
 
     public void startExecutable(@Param(OPERATION_INPUTS_KEY) List<Input> operationInputs,
                                 @Param(RUN_ENV) RunEnvironment runEnv,
-                                @Param(USER_INPUTS_KEY) HashMap<String, Serializable> userInputs,
+                                @Param(USER_INPUTS_KEY) Map<String, ? extends Serializable> userInputs,
                                 @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                                 @Param(NODE_NAME_KEY) String nodeName,
                                 @Param(NEXT_STEP_ID_KEY) Long nextStepId) {

@@ -22,6 +22,8 @@ import com.google.common.collect.Sets;
 import com.hp.score.events.EventConstants;
 import com.hp.score.events.ScoreEvent;
 import com.hp.score.lang.entities.CompilationArtifact;
+
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,6 +33,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 /**
  * Date: 11/14/2014
@@ -43,20 +46,14 @@ public class SimpleFlowTest extends SystemsTestsParent {
     private static final long DEFAULT_TIMEOUT = 20000;
 
     @Test(timeout = DEFAULT_TIMEOUT)
-    public void testCompileAndRunSimpleFlowBasic() throws Exception {
-        URI resource = getClass().getResource("/yaml/simple_flow.yaml").toURI();
-        URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
-
-        Set<File> path = Sets.newHashSet(new File(operations));
-        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(resource), path);
-
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("input1", "-2");
-        userInputs.put("time_zone_as_string", "+2");
-        ScoreEvent event = trigger(compilationArtifact, userInputs);
-        Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
+    public void testSimpleFlowBasic() throws Exception {
+		compileAndRunSimpleFlow(Pair.of("input1", "-2"),Pair.of("time_zone_as_string", "+2"));
     }
 
+	@Test(timeout = DEFAULT_TIMEOUT)
+	public void testSimpleFlowNavigation() throws Exception {
+		compileAndRunSimpleFlow(Pair.of("input1", -999));
+	}
 
     @Test
     public void testFlowWithGlobalSession() throws Exception {
@@ -71,5 +68,19 @@ public class SimpleFlowTest extends SystemsTestsParent {
         ScoreEvent event = trigger(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
+
+	@SafeVarargs
+	private final void compileAndRunSimpleFlow(Map.Entry<String, ? extends Serializable>... inputs) throws Exception {
+		URI flow = getClass().getResource("/yaml/simple_flow.yaml").toURI();
+		URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
+		Set<File> path = Sets.newHashSet(new File(operations));
+		CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
+		HashMap<String, Serializable> userInputs = new HashMap<>();
+        for (Entry<String, ? extends Serializable> input : inputs) {
+            userInputs.put(input.getKey(), input.getValue());
+        }
+		ScoreEvent event = trigger(compilationArtifact, userInputs);
+		Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
+	}
 
 }

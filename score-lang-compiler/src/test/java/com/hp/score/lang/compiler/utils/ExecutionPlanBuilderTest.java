@@ -3,10 +3,12 @@ package com.hp.score.lang.compiler.utils;
 import com.hp.score.api.ExecutionPlan;
 import com.hp.score.api.ExecutionStep;
 import com.hp.score.lang.compiler.domain.*;
+import com.hp.score.lang.entities.ResultNavigation;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.entities.bindings.Result;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -19,6 +21,7 @@ import java.io.Serializable;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.when;
@@ -77,10 +80,10 @@ public class ExecutionPlanBuilderTest {
         when(stepFactory.createEndStep(eq(stepId), same(postExecActionData), same(outputs), same(results), same(execName))).thenReturn(new ExecutionStep(stepId));
     }
 
-    private void mockFinishTask(Long stepId, CompiledTask compiledTask, Map<String, Long> navigationValues) {
+    private void mockFinishTask(Long stepId, CompiledTask compiledTask) {
         Map<String, Serializable> postTaskActionData = compiledTask.getPostTaskActionData();
         String taskName = compiledTask.getName();
-        when(stepFactory.createFinishTaskStep(eq(stepId), same(postTaskActionData), eq(navigationValues), same(taskName))).thenReturn(new ExecutionStep(stepId));
+        when(stepFactory.createFinishTaskStep(eq(stepId), same(postTaskActionData), anyMapOf(String.class, ResultNavigation.class), same(taskName))).thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockBeginTask(Long stepId, CompiledTask compiledTask) {
@@ -131,18 +134,13 @@ public class ExecutionPlanBuilderTest {
         List<Output> outputs = new ArrayList<>();
         List<Result> results = defaultFlowResults();
 
-        Map<String, Long> navigationValues = new HashMap<>();
-        navigationValues.put(ScoreLangConstants.SUCCESS_RESULT, 0L);
-        navigationValues.put(ScoreLangConstants.FAILURE_RESULT, 0L);
-
         CompiledFlow compiledFlow =
                 new CompiledFlow(preFlowActionData, postFlowActionData, compiledWorkflow, flowNamespace, flowName, inputs, outputs, results);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow);
-
         mockBeginTask(2L, compiledTask);
-        mockFinishTask(3L, compiledTask, navigationValues);
+        mockFinishTask(3L, compiledTask);
         ExecutionPlan executionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFlow);
 
         assertEquals("different number of execution steps than expected", 4, executionPlan.getSteps().size());
@@ -179,18 +177,10 @@ public class ExecutionPlanBuilderTest {
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow);
 
-        Map<String, Long> firstNavigationValues = new HashMap<>();
-        firstNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, 4L);
-        firstNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, 0L);
-
-        Map<String, Long> secondNavigationValues = new HashMap<>();
-        secondNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, 0L);
-        secondNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, 0L);
-
         mockBeginTask(2L, firstCompiledTask);
-        mockFinishTask(3L, firstCompiledTask, firstNavigationValues);
+        mockFinishTask(3L, firstCompiledTask);
         mockBeginTask(4L, secondCompiledTask);
-        mockFinishTask(5L, secondCompiledTask, secondNavigationValues);
+        mockFinishTask(5L, secondCompiledTask);
         ExecutionPlan executionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFlow);
 
         assertEquals("different number of execution steps than expected", 6, executionPlan.getSteps().size());

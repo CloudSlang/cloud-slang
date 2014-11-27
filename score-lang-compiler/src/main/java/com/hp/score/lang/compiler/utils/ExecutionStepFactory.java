@@ -22,10 +22,12 @@ import com.hp.score.api.ControlActionMetadata;
 import com.hp.score.api.ExecutionStep;
 import com.hp.score.lang.compiler.SlangTextualKeys;
 import com.hp.score.lang.entities.ActionType;
+import com.hp.score.lang.entities.ResultNavigation;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.entities.bindings.Result;
+
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.Validate;
 import org.springframework.stereotype.Component;
@@ -61,7 +63,7 @@ public class ExecutionStepFactory {
     }
 
     public ExecutionStep createFinishTaskStep(Long index, Map<String, Serializable> postTaskData,
-                                              Map<String, Long> navigationValues, String taskName) {
+                                              Map<String, ResultNavigation> navigationValues, String taskName) {
         Validate.notNull(postTaskData, "postTaskData is null");
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.TASK_PUBLISH_KEY, postTaskData.get(SlangTextualKeys.PUBLISH_KEY));

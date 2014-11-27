@@ -2,6 +2,7 @@ package com.hp.score.lang.runtime.steps;
 
 import com.hp.score.events.ScoreEvent;
 import com.hp.score.lang.ExecutionRuntimeServices;
+import com.hp.score.lang.entities.ResultNavigation;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.runtime.bindings.InputsBinding;
@@ -11,7 +12,9 @@ import com.hp.score.lang.runtime.env.ParentFlowData;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import com.hp.score.lang.runtime.events.LanguageEventData;
+
 import junit.framework.Assert;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.script.ScriptEngine;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +39,7 @@ import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
 import static com.hp.score.lang.entities.ScoreLangConstants.FAILURE_RESULT;
 import static com.hp.score.lang.entities.ScoreLangConstants.SUCCESS_RESULT;
+
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;
@@ -143,7 +148,7 @@ public class TaskStepsTest {
         when(outputsBinding.bindOutputs(anyMap(), anyMap(), anyList())).thenReturn(new HashMap<String, String>());
 
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
-        taskSteps.endTask(runEnv, new ArrayList<Output>(),new HashMap<String, Long>(),runtimeServices, "task1");
+        taskSteps.endTask(runEnv, new ArrayList<Output>(),new HashMap<String, ResultNavigation>(),runtimeServices, "task1");
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
         Assert.assertEquals(2,events.size());
@@ -173,7 +178,7 @@ public class TaskStepsTest {
         boundPublish.put("name", "John");
 
         when(outputsBinding.bindOutputs(isNull(Map.class), anyMapOf(String.class, String.class), eq(possiblePublishValues))).thenReturn(boundPublish);
-        taskSteps.endTask(runEnv, possiblePublishValues, new HashMap<String, Long>(), createRuntimeServices(), "task1");
+        taskSteps.endTask(runEnv, possiblePublishValues, new HashMap<String, ResultNavigation>(), createRuntimeServices(), "task1");
 
         Map<String,Serializable> flowContext = runEnv.getStack().popContext();
         Assert.assertTrue(flowContext.containsKey("name"));
@@ -189,9 +194,13 @@ public class TaskStepsTest {
 
         Long nextStepPosition = 5L;
 
-        HashMap<String, Long> taskNavigationValues = new HashMap<>();
-        taskNavigationValues.put(SUCCESS_RESULT, nextStepPosition);
-        taskNavigationValues.put(FAILURE_RESULT, 1L);
+        HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
+        ResultNavigation successNavigation = new ResultNavigation();
+        successNavigation.setNextStepId(nextStepPosition);
+        taskNavigationValues.put(SUCCESS_RESULT, successNavigation);
+        ResultNavigation failureNavigation = new ResultNavigation();
+        failureNavigation.setNextStepId(1);
+        taskNavigationValues.put(FAILURE_RESULT, failureNavigation);
         taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues, createRuntimeServices(), "task1");
 
         Assert.assertEquals(runEnv.removeNextStepPosition(), nextStepPosition);

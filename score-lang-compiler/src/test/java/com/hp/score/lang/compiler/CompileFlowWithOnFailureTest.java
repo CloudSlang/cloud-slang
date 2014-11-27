@@ -26,7 +26,9 @@ import com.hp.score.api.ExecutionPlan;
 import com.hp.score.api.ExecutionStep;
 import com.hp.score.lang.compiler.configuration.SlangCompilerSpringConfig;
 import com.hp.score.lang.entities.CompilationArtifact;
+import com.hp.score.lang.entities.ResultNavigation;
 import com.hp.score.lang.entities.ScoreLangConstants;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -76,9 +78,10 @@ public class CompileFlowWithOnFailureTest {
         Assert.assertEquals(endFlowStep, getNavigationData(secondOnFailStep));
     }
 
-    private long getNavigationData(ExecutionStep firstStep) {
-        @SuppressWarnings("unchecked") Map<String, Long> navigationData =
-                (Map<String, Long>) firstStep.getActionData().get(ScoreLangConstants.TASK_NAVIGATION_KEY);
-        return navigationData.get(ScoreLangConstants.FAILURE_RESULT);
-    }
+	private long getNavigationData(ExecutionStep firstStep) {
+		@SuppressWarnings("unchecked")
+		Map<String, ResultNavigation> navigationData = (Map<String, ResultNavigation>)firstStep.getActionData().get(ScoreLangConstants.TASK_NAVIGATION_KEY);
+		return navigationData.get(ScoreLangConstants.FAILURE_RESULT).getNextStepId();
+	}
+
 }

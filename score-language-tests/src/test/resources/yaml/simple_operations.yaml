@@ -27,7 +27,8 @@ operations:
       outputs:
         - time_zone: time_zone_as_int
       results:
-        - SUCCESS: 1 == 1
+        - NEGATIVE: int(time_zone_as_int) < 0
+        - SUCCESS
 
   - compute_daylight_time_zone:
         inputs:

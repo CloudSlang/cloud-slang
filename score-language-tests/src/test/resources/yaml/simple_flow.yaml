@@ -16,6 +16,9 @@ flow:
           - time_zone_as_string: time_zone_as_string if time_zone_as_string is not None else input1
       publish:
         - time_zone: time_zone
+      navigate:
+        SUCCESS: SUCCESS
+        NEGATIVE: FAILURE
 
     Task2:
       do:

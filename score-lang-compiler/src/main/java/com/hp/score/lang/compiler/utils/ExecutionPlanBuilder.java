@@ -18,12 +18,15 @@ package com.hp.score.lang.compiler.utils;/*
 */
 
 import ch.lambdaj.Lambda;
+
 import com.hp.score.api.ExecutionPlan;
 import com.hp.score.api.ExecutionStep;
 import com.hp.score.lang.compiler.domain.CompiledFlow;
 import com.hp.score.lang.compiler.domain.CompiledOperation;
 import com.hp.score.lang.compiler.domain.CompiledTask;
+import com.hp.score.lang.entities.ResultNavigation;
 import com.hp.score.lang.entities.bindings.Result;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,6 +35,7 @@ import java.util.*;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
+
 import static org.hamcrest.Matchers.equalTo;
 
 /*
@@ -109,14 +113,18 @@ public class ExecutionPlanBuilder {
                 compiledTask.getRefId(), taskName));
 
         //End Task
-        Map<String, Long> navigationValues = new HashMap<>();
+        Map<String, ResultNavigation> navigationValues = new HashMap<>();
         for (Map.Entry<String, String> entry : compiledTask.getNavigationStrings().entrySet()) {
             String nextStepName = entry.getValue();
             if (taskReferences.get(nextStepName) == null) {
                 CompiledTask nextTaskToCompile = Lambda.selectFirst(compiledTasks, having(on(CompiledTask.class).getName(), equalTo(nextStepName)));
                 taskExecutionSteps.addAll(buildTaskExecutionSteps(nextTaskToCompile, taskReferences, compiledTasks));
             }
-            navigationValues.put(entry.getKey(), taskReferences.get(nextStepName));
+			long nextStepId = taskReferences.get(nextStepName);
+			ResultNavigation navigation = new ResultNavigation();
+			navigation.setNextStepId(nextStepId);
+			if(FLOW_END_STEP_ID == nextStepId) navigation.setPresetResult(nextStepName);
+			navigationValues.put(entry.getKey(), navigation);
         }
         taskExecutionSteps.add(stepFactory.createFinishTaskStep(currentId, compiledTask.getPostTaskActionData(),
                 navigationValues, taskName));

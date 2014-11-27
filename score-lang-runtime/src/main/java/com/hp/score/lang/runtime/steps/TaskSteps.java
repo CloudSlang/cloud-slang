@@ -10,6 +10,7 @@ package com.hp.score.lang.runtime.steps;
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.score.api.execution.ExecutionParametersConsts;
 import com.hp.score.lang.ExecutionRuntimeServices;
+import com.hp.score.lang.entities.ResultNavigation;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.runtime.bindings.InputsBinding;
@@ -19,6 +20,7 @@ import com.hp.score.lang.runtime.env.ParentFlowStack;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import com.hp.score.lang.runtime.events.LanguageEventData;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -90,7 +92,7 @@ public class TaskSteps extends AbstractSteps {
 
     public void endTask(@Param(RUN_ENV) RunEnvironment runEnv,
                         @Param(TASK_PUBLISH_KEY) List<Output> taskPublishValues,
-                        @Param(TASK_NAVIGATION_KEY) Map<String, Long> taskNavigationValues,
+                        @Param(TASK_NAVIGATION_KEY) Map<String, ResultNavigation> taskNavigationValues,
                         @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                         @Param(NODE_NAME_KEY) String nodeName) {
 
@@ -108,16 +110,24 @@ public class TaskSteps extends AbstractSteps {
 
         //todo: hook
 
-        // set the position of the next step - for the use of the navigation
-        Long nextPosition = setNextTaskPosition(runEnv, taskNavigationValues, operationReturnValues);
+		// set the position of the next step - for the use of the navigation
+		// Find in the navigation values the correct next step position, according to the operation result, and set it
+		ResultNavigation navigation = taskNavigationValues.get(operationReturnValues.getResult());
+		Long nextPosition = null;
+		String presetResult = null;
+		if(navigation != null) {
+			nextPosition = navigation.getNextStepId();
+			presetResult = navigation.getPresetResult();
+		}
+		runEnv.putNextStepPosition(nextPosition);
 
-        HashMap<String, String> outputs = new HashMap<>();//todo - is this the right solution?
-        for (Map.Entry<String, Serializable> entry : flowContext.entrySet()) {
-            outputs.put(entry.getKey(), String.valueOf(entry.getValue()));
-        }
+		HashMap<String, String> outputs = new HashMap<>();// todo - is this the right solution?
+		for(Map.Entry<String, Serializable> entry : flowContext.entrySet()) {
+			outputs.put(entry.getKey(), String.valueOf(entry.getValue()));
+		}
 
-        ReturnValues returnValues = new ReturnValues(outputs, operationReturnValues.getResult());
-        runEnv.putReturnValues(returnValues);
+		ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : operationReturnValues.getResult());
+		runEnv.putReturnValues(returnValues);
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_END, "Output binding finished",
                 Pair.of(OUTPUTS, (Serializable) publishValues),
                 Pair.of(RESULT, returnValues.getResult()),
@@ -140,19 +150,6 @@ public class TaskSteps extends AbstractSteps {
         // We request the score engine to switch the execution plan to the one of the given refId once it can
         Long subFlowRunningExecutionPlanId = executionRuntimeServices.getSubFlowRunningExecutionPlan(refId);
         executionRuntimeServices.requestToChangeExecutionPlan(subFlowRunningExecutionPlanId);
-    }
-
-    /**
-     * Find in the navigation values the correct next step position, according to the operation result, and set it
-     * @param runEnv
-     * @param taskNavigationValues
-     * @param operationReturnValues
-     * @return the next step position
-     */
-    private Long setNextTaskPosition(RunEnvironment runEnv, Map<String, Long> taskNavigationValues, ReturnValues operationReturnValues) {
-        Long nextPosition = taskNavigationValues.get(operationReturnValues.getResult());
-        runEnv.putNextStepPosition(nextPosition);
-        return nextPosition;
     }
 
 }
