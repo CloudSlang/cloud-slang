@@ -25,6 +25,7 @@ import com.hp.score.lang.entities.CompilationArtifact;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -46,6 +47,8 @@ public class CompilerHelper {
 
     @Autowired
     private SlangCompiler compiler;
+
+    private final static Logger logger = Logger.getLogger(CompilerHelper.class);
 
     private String[] SLANG_FILE_EXTENSIONS = {"yml", "yaml", "py","sl"};
 
@@ -72,7 +75,13 @@ public class CompilerHelper {
         }
 
         //todo - support compile of op too?
-        CompilationArtifact compilationArtifact = compiler.compile(file, null, dependenciesFilesSet);
+        CompilationArtifact compilationArtifact = null;
+        try {
+            compilationArtifact = compiler.compile(file, null, dependenciesFilesSet);
+        } catch (Exception e) {
+            logger.error("Failed compilation for file : "+file.getName() + " ,Exception is : " + e.getMessage());
+            throw e;
+        }
 
         return compilationArtifact;
     }
