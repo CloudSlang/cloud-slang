@@ -28,6 +28,7 @@ import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import com.hp.score.lang.runtime.events.LanguageEventData;
+import org.apache.commons.lang.StringUtils;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,6 +102,7 @@ public class ScoreServices {
         handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
         handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
         handlerTypes.add(EVENT_EXECUTION_FINISHED);
+        handlerTypes.add(ScoreLangConstants.EVENT_INPUT_END);
 
         SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener();
         eventBus.subscribe(scoreEventListener, handlerTypes);
@@ -137,6 +139,12 @@ public class ScoreServices {
                     flowFinished.set(true); break;
                 case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
                     printWithColor(Ansi.Color.RED,SLANG_STEP_ERROR_MSG + data.get(EXCEPTION)); break;
+                case ScoreLangConstants.EVENT_INPUT_END:
+                    String taskName = (String)data.get(LanguageEventData.levelName.TASK_NAME.name());
+                    if(StringUtils.isNotEmpty(taskName)){
+                        printWithColor(Ansi.Color.YELLOW,taskName);
+                    }
+                    break;
                 case EVENT_EXECUTION_FINISHED :
                     printFinishEvent(data); break;
             }
