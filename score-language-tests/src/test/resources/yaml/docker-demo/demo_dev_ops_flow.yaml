@@ -4,6 +4,7 @@ imports:
  ops: docker.ops
  flows: docker.flows
  email: email.ops
+ app_test: app_test.ops
 
 flow:
   name: demo_dev_ops_flow
@@ -51,6 +52,15 @@ flow:
           publish:
                   - containerID : containerID
                   - errorMessage
+
+    verify_app_is_up:
+        do:
+          app_test.verify_app_is_up:
+            - host: dockerHost
+            - port: "'8080'"
+            - max_seconds_to_wait: 20
+        publish:
+            - errorMessage
 
     on_failure:
       send_error_mail:
