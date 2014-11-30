@@ -53,7 +53,7 @@ flow:
                   - containerID : containerID
                   - errorMessage
 
-    verify_app_is_up:
+    test_application:
         do:
           app_test.verify_app_is_up:
             - host: dockerHost
