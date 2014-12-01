@@ -30,6 +30,7 @@ import org.apache.commons.collections4.iterators.PeekingIterator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -212,16 +213,32 @@ public class ExecutableBuilder {
         Map<String, Serializable> transformedData = new HashMap<>();
         for (Transformer transformer : scopeTransformers) {
             String key = keyToTransform(transformer);
+            Object value = rawData.get(key);
             try {
-                @SuppressWarnings("unchecked") Object value = transformer.transform(rawData.get(key));
-                transformedData.put(key, (Serializable) value);
+                @SuppressWarnings("unchecked") Object transformedValue = transformer.transform(value);
+                transformedData.put(key, (Serializable) transformedValue);
             } catch (ClassCastException e) {
-                String message = "\nFailed casting for transformer: " + transformer.getClass().getName() + " with key: " + key + "\n" +
-                        "Raw data is: " + rawData.toString();
+                Class transformerType = getTransformerFromType(transformer);
+                if (value instanceof Map && transformerType.equals(List.class)) {
+                    throw new RuntimeException("Key: '" + key + "' expected a list but got a map\n" +
+                            "By the Yaml spec lists properties are marked with a '- ' (dash followed by a space)");
+                }
+                if (value instanceof List && transformerType.equals(Map.class)) {
+                    throw new RuntimeException("Key: '" + key + "' expected a map but got a list\n" +
+                            "By the Yaml spec maps properties are NOT marked with a '- ' (dash followed by a space)");
+                }
+                String message = "\nFailed casting for key: " + key +
+                        "Raw data is: " + key + " : " +rawData.get(key).toString() +
+                        "\n Transformer is: " + transformer.getClass().getName();
                 throw new RuntimeException(message, e);
             }
         }
         return transformedData;
+    }
+
+    private Class getTransformerFromType(Transformer transformer){
+        ResolvableType resolvableType = ResolvableType.forClass(Transformer.class, transformer.getClass());
+        return resolvableType.getGeneric(0).resolve();
     }
 
     private void validateKeyWordsExits(String dataLogicalName, Map<String, Object> rawData, List<Transformer> allRelevantTransformers, List<String> additionalValidKeyWords) {

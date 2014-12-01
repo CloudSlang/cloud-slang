@@ -16,25 +16,19 @@ import java.io.Serializable;
  */
 public class ResultNavigation implements Serializable {
 
-	private static final long serialVersionUID = 6702145332302329804L;
+	private final long nextStepId;
+	private final String presetResult;
 
-	private long nextStepId;
-	private String presetResult;
+    public ResultNavigation(long nextStepId, String presetResult) {
+        this.nextStepId = nextStepId;
+        this.presetResult = presetResult;
+    }
 
-	public long getNextStepId() {
+    public long getNextStepId() {
 		return this.nextStepId;
-	}
-
-	public void setNextStepId(long nextStepId) {
-		this.nextStepId = nextStepId;
 	}
 
 	public String getPresetResult() {
 		return this.presetResult;
 	}
-
-	public void setPresetResult(String presetResult) {
-		this.presetResult = presetResult;
-	}
-
 }

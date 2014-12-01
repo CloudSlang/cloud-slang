@@ -121,10 +121,8 @@ public class ExecutionPlanBuilder {
                 taskExecutionSteps.addAll(buildTaskExecutionSteps(nextTaskToCompile, taskReferences, compiledTasks));
             }
 			long nextStepId = taskReferences.get(nextStepName);
-			ResultNavigation navigation = new ResultNavigation();
-			navigation.setNextStepId(nextStepId);
-			if(FLOW_END_STEP_ID == nextStepId) navigation.setPresetResult(nextStepName);
-			navigationValues.put(entry.getKey(), navigation);
+			String presetResult = (FLOW_END_STEP_ID == nextStepId) ? nextStepName : null;
+			navigationValues.put(entry.getKey(), new ResultNavigation(nextStepId, presetResult));
         }
         taskExecutionSteps.add(stepFactory.createFinishTaskStep(currentId, compiledTask.getPostTaskActionData(),
                 navigationValues, taskName));

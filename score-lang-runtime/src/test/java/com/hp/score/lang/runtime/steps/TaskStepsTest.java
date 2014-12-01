@@ -195,11 +195,9 @@ public class TaskStepsTest {
         Long nextStepPosition = 5L;
 
         HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
-        ResultNavigation successNavigation = new ResultNavigation();
-        successNavigation.setNextStepId(nextStepPosition);
+        ResultNavigation successNavigation = new ResultNavigation(nextStepPosition, null);
         taskNavigationValues.put(SUCCESS_RESULT, successNavigation);
-        ResultNavigation failureNavigation = new ResultNavigation();
-        failureNavigation.setNextStepId(1);
+        ResultNavigation failureNavigation = new ResultNavigation(1, null);
         taskNavigationValues.put(FAILURE_RESULT, failureNavigation);
         taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues, createRuntimeServices(), "task1");
 
