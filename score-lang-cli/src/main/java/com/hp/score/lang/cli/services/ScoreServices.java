@@ -158,6 +158,8 @@ public class ScoreServices {
 
         private void printWithColor(Ansi.Color color, String msg){
             AnsiConsole.out().print(ansi().ansi().fg(color).a(msg).newline());
+            AnsiConsole.out().print(ansi().ansi().fg(Ansi.Color.WHITE));
+
         }
     }
 
