@@ -24,43 +24,43 @@ flow:
           - username: dockerUsername
           - password: dockerPassword
       publish:
-              - dbIp : dbIp
-              - errorMessage
+        - db_IP: dbIp
+        - errorMessage
 
     pull_app_image:
-          do:
-            ops.pull_image:
-              - imageName: "'meirwa/spring-boot-tomcat-mysql-app'"
-              - host: dockerHost
-              - username: dockerUsername
-              - password: dockerPassword
-          publish:
-              - errorMessage
+      do:
+        ops.pull_image:
+          - imageName: "'meirwa/spring-boot-tomcat-mysql-app'"
+          - host: dockerHost
+          - username: dockerUsername
+          - password: dockerPassword
+      publish:
+        - errorMessage
 
     start_linked_container:
-          do:
-            ops.start_linked_container:
-              - dbContainerIp: dbIp
-              - dbContainerName: "'mysqldb'"
-              - imageName: "'meirwa/spring-boot-tomcat-mysql-app'"
-              - containerName: "'spring-boot-tomcat-mysql-app'"
-              - linkParams: "dbContainerName + ':mysql'"
-              - cmdParams: "'-e DB_URL=' + dbContainerIp + ' -p 8080:8080'"
-              - host: dockerHost
-              - username: dockerUsername
-              - password: dockerPassword
-          publish:
-                  - containerID : containerID
-                  - errorMessage
+      do:
+        ops.start_linked_container:
+          - dbContainerIp: db_IP
+          - dbContainerName: "'mysqldb'"
+          - imageName: "'meirwa/spring-boot-tomcat-mysql-app'"
+          - containerName: "'spring-boot-tomcat-mysql-app'"
+          - linkParams: "dbContainerName + ':mysql'"
+          - cmdParams: "'-e DB_URL=' + dbContainerIp + ' -p 8080:8080'"
+          - host: dockerHost
+          - username: dockerUsername
+          - password: dockerPassword
+      publish:
+        - containerID
+        - errorMessage
 
     test_application:
-        do:
-          app_test.verify_app_is_up:
-            - host: dockerHost
-            - port: "'8080'"
-            - max_seconds_to_wait: 20
-        publish:
-            - errorMessage
+      do:
+        app_test.verify_app_is_up:
+          - host: dockerHost
+          - port: "'8080'"
+          - max_seconds_to_wait: 20
+      publish:
+        - errorMessage
 
     on_failure:
       send_error_mail:
@@ -75,7 +75,3 @@ flow:
         navigate:
           SUCCESS: FAILURE
           FAILURE: FAILURE
-
-  results:
-    - SUCCESS
-    - FAILURE

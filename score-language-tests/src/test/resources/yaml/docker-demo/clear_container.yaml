@@ -19,7 +19,7 @@ flow:
           - username: dockerUsername
           - password: dockerPassword
       publish:
-          - errorMessage
+        - errorMessage
 
     delete_container:
       do:
@@ -29,10 +29,7 @@ flow:
           - username: dockerUsername
           - password: dockerPassword
       publish:
-          - errorMessage
+        - errorMessage
 
   outputs:
     - errorMessage
-  results:
-    - SUCCESS
-    - FAILURE

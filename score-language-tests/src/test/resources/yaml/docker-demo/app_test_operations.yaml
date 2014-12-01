@@ -2,31 +2,31 @@ namespace: app_test.ops
 
 operations:
   - verify_app_is_up:
-        inputs:
-          - host
-          - port
-          - max_seconds_to_wait
-        action:
-          python_script: |
-            import urllib2
-            import time
-            url = "http://" + host + ":" + port
-            count = 0
-            returnResult = False
-            while (( count < max_seconds_to_wait ) and ( not returnResult )):
-              try:
-                result = urllib2.urlopen(url)
-              except Exception :
-                 count = count + 1
-                 time.sleep(1)
-              else:
-                  code = result.getcode()
-                  count = max_seconds_to_wait
-                  if code == 200 :
-                    returnResult = True
-        outputs:
-            - errorMessage: "'Application is not Up , after ' + count + ' attempts to ping .'"
-        results:
-          - SUCCESS: returnResult == 'True'
-          - FAILURE
+      inputs:
+        - host
+        - port
+        - max_seconds_to_wait
+      action:
+        python_script: |
+          import urllib2
+          import time
+          url = "http://" + host + ":" + port
+          count = 0
+          returnResult = False
+          while (( count < max_seconds_to_wait ) and ( not returnResult )):
+            try:
+              result = urllib2.urlopen(url)
+            except Exception :
+               count = count + 1
+               time.sleep(1)
+            else:
+                code = result.getcode()
+                count = max_seconds_to_wait
+                if code == 200 :
+                  returnResult = True
+      outputs:
+        - errorMessage: "'Application is not Up , after ' + count + ' attempts to ping .'"
+      results:
+        - SUCCESS: returnResult == 'True'
+        - FAILURE
 

@@ -2,157 +2,157 @@ namespace: docker.ops
 
 operations:
   - pull_image:
-        inputs:
-          - imageName
-          - host
-          - port: "'22'"
-          - username
-          - password
-          - privateKeyFile: "''"
-          - command: "'docker pull ' + imageName"
-          - arguments: "''"
-          - characterSet : "'UTF-8'"
-          - pty: "'false'"
-          - timeout: "'30000000'"
-          - closeSession: "'false'"
-        action:
-          java_action:
-            className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
-            methodName: runSshShellCommand
-        outputs:
-          - returnResult: returnResult
-          - errorMessage: STDERR if returnCode == '0' else returnResult
-        results:
-          - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
-          - FAILURE
+      inputs:
+        - imageName
+        - host
+        - port: "'22'"
+        - username
+        - password
+        - privateKeyFile: "''"
+        - command: "'docker pull ' + imageName"
+        - arguments: "''"
+        - characterSet : "'UTF-8'"
+        - pty: "'false'"
+        - timeout: "'30000000'"
+        - closeSession: "'false'"
+      action:
+        java_action:
+          className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
+          methodName: runSshShellCommand
+      outputs:
+        - returnResult: returnResult
+        - errorMessage: STDERR if returnCode == '0' else returnResult
+      results:
+        - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
+        - FAILURE
   - create_container:
-        inputs:
-          - imageID
-          - containerName
-          - cmdParams
-          - host
-          - port: "'22'"
-          - username
-          - password
-          - privateKeyFile: "''"
-          - command: "'docker run --name ' + containerName + ' ' +cmdParams + ' -d ' + imageID"
-          - arguments: "''"
-          - characterSet: "'UTF-8'"
-          - pty: "'false'"
-          - timeout: "'90000'"
-          - closeSession: "'false'"
-        action:
-          java_action:
-            className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
-            methodName: runSshShellCommand
-        outputs:
-          - dbContainerID: returnResult
-          - errorMessage: STDERR if returnCode == '0' else returnResult
-        results:
-          - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
-          - FAILURE
+      inputs:
+        - imageID
+        - containerName
+        - cmdParams
+        - host
+        - port: "'22'"
+        - username
+        - password
+        - privateKeyFile: "''"
+        - command: "'docker run --name ' + containerName + ' ' +cmdParams + ' -d ' + imageID"
+        - arguments: "''"
+        - characterSet: "'UTF-8'"
+        - pty: "'false'"
+        - timeout: "'90000'"
+        - closeSession: "'false'"
+      action:
+        java_action:
+          className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
+          methodName: runSshShellCommand
+      outputs:
+        - dbContainerID: returnResult
+        - errorMessage: STDERR if returnCode == '0' else returnResult
+      results:
+        - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
+        - FAILURE
   - get_container_ip:
-          inputs:
-            - containerName
-            - cmdParams: "''"
-            - host
-            - port: "'22'"
-            - username
-            - password
-            - privateKeyFile: "''"
-            - command: >
-                "docker inspect --format '{{ .NetworkSettings.IPAddress }}' " + containerName
-            - arguments: "''"
-            - characterSet: "'UTF-8'"
-            - pty: "'false'"
-            - timeout: "'90000'"
-            - closeSession: "'false'"
-          action:
-            java_action:
-              className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
-              methodName: runSshShellCommand
-          outputs:
-            - dbIp: returnResult[:-1]
-            - errorMessage: STDERR if returnCode == '0' else returnResult
-          results:
-            - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
-            - FAILURE
+      inputs:
+        - containerName
+        - cmdParams: "''"
+        - host
+        - port: "'22'"
+        - username
+        - password
+        - privateKeyFile: "''"
+        - command: >
+            "docker inspect --format '{{ .NetworkSettings.IPAddress }}' " + containerName
+        - arguments: "''"
+        - characterSet: "'UTF-8'"
+        - pty: "'false'"
+        - timeout: "'90000'"
+        - closeSession: "'false'"
+      action:
+        java_action:
+          className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
+          methodName: runSshShellCommand
+      outputs:
+        - dbIp: returnResult[:-1]
+        - errorMessage: STDERR if returnCode == '0' else returnResult
+      results:
+        - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
+        - FAILURE
   - start_linked_container:
-          inputs:
-            - dbContainerIp
-            - dbContainerName
-            - imageName
-            - containerName
-            - linkParams
-            - cmdParams
-            - host
-            - port: "'22'"
-            - username
-            - password
-            - privateKeyFile: "''"
-            - arguments: "''"
-            - command: "'docker run --name ' + containerName + ' --link ' + linkParams + ' ' + cmdParams + ' -d ' + imageName"
-            - characterSet: "'UTF-8'"
-            - pty: "'false'"
-            - timeout: "'90000'"
-            - closeSession: "'false'"
-          action:
-            java_action:
-              className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
-              methodName: runSshShellCommand
-          outputs:
-            - containerID: returnResult
-            - errorMessage: STDERR if returnCode == '0' else returnResult
-          results:
-            - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
-            - FAILURE
+      inputs:
+        - dbContainerIp
+        - dbContainerName
+        - imageName
+        - containerName
+        - linkParams
+        - cmdParams
+        - host
+        - port: "'22'"
+        - username
+        - password
+        - privateKeyFile: "''"
+        - arguments: "''"
+        - command: "'docker run --name ' + containerName + ' --link ' + linkParams + ' ' + cmdParams + ' -d ' + imageName"
+        - characterSet: "'UTF-8'"
+        - pty: "'false'"
+        - timeout: "'90000'"
+        - closeSession: "'false'"
+      action:
+        java_action:
+          className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
+          methodName: runSshShellCommand
+      outputs:
+        - containerID: returnResult
+        - errorMessage: STDERR if returnCode == '0' else returnResult
+      results:
+        - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
+        - FAILURE
   - stop_container:
-          inputs:
-            - containerID
-            - cmdParams: "''"
-            - host
-            - port: "'22'"
-            - username
-            - password
-            - privateKeyFile: "''"
-            - arguments: "''"
-            - command: "'docker stop ' + cmdParams + ' ' + containerID"
-            - characterSet: "'UTF-8'"
-            - pty: "'false'"
-            - timeout: "'90000'"
-            - closeSession: "'false'"
-          action:
-            java_action:
-              className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
-              methodName: runSshShellCommand
-          outputs:
-            - containerID: returnResult
-            - errorMessage: STDERR if returnCode == '0' else returnResult
-          results:
-            - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
-            - FAILURE
+      inputs:
+        - containerID
+        - cmdParams: "''"
+        - host
+        - port: "'22'"
+        - username
+        - password
+        - privateKeyFile: "''"
+        - arguments: "''"
+        - command: "'docker stop ' + cmdParams + ' ' + containerID"
+        - characterSet: "'UTF-8'"
+        - pty: "'false'"
+        - timeout: "'90000'"
+        - closeSession: "'false'"
+      action:
+        java_action:
+          className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
+          methodName: runSshShellCommand
+      outputs:
+        - containerID: returnResult
+        - errorMessage: STDERR if returnCode == '0' else returnResult
+      results:
+        - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
+        - FAILURE
   - delete_container:
-          inputs:
-            - containerID
-            - cmdParams: "''"
-            - host
-            - port: "'22'"
-            - username
-            - password
-            - privateKeyFile: "''"
-            - arguments: "''"
-            - command: "'docker rm ' + cmdParams + ' ' + containerID"
-            - characterSet: "'UTF-8'"
-            - pty: "'false'"
-            - timeout: "'90000'"
-            - closeSession: "'false'"
-          action:
-            java_action:
-              className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
-              methodName: runSshShellCommand
-          outputs:
-            - containerID: returnResult
-            - errorMessage: STDERR if returnCode == '0' else returnResult
-          results:
-            - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
-            - FAILURE
+      inputs:
+        - containerID
+        - cmdParams: "''"
+        - host
+        - port: "'22'"
+        - username
+        - password
+        - privateKeyFile: "''"
+        - arguments: "''"
+        - command: "'docker rm ' + cmdParams + ' ' + containerID"
+        - characterSet: "'UTF-8'"
+        - pty: "'false'"
+        - timeout: "'90000'"
+        - closeSession: "'false'"
+      action:
+        java_action:
+          className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
+          methodName: runSshShellCommand
+      outputs:
+        - containerID: returnResult
+        - errorMessage: STDERR if returnCode == '0' else returnResult
+      results:
+        - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
+        - FAILURE
