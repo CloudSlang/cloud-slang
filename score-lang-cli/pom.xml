@@ -36,6 +36,12 @@
 			<scope>compile</scope>
 		</dependency>
 
+        <!-- liquibase : this is only for fixing liquibase logging issue  -->
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+        </dependency>
+
 		<!-- runtime -->
 		<dependency>
 			<groupId>com.hp.score</groupId>
