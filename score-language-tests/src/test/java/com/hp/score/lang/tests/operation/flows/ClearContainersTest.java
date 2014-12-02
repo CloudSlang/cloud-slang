@@ -45,7 +45,7 @@ public class ClearContainersTest  extends SystemsTestsParent {
     @Test
     @Ignore
     public void testCompileAndRunFlow() throws Exception {
-        URI resource = getClass().getResource("/yaml/docker-demo/clear_container.yaml").toURI();
+        URI resource = getClass().getResource("/yaml/docker-demo/clear_containers_flow.yaml").toURI();
         URI operations = getClass().getResource("/yaml/docker-demo/").toURI();
 
         Set<File> path = Sets.newHashSet(new File(operations));
@@ -53,7 +53,8 @@ public class ClearContainersTest  extends SystemsTestsParent {
 
         //TODO: remove default values for inputs
         Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("containerID", "f2676086c7ae");
+        userInputs.put("dbContainerID", "6b7fe3d1a777");
+        userInputs.put("linkedContainerID", "7791d3f881f2");
         userInputs.put("dockerHost", "16.60.169.142");
         userInputs.put("dockerUsername", "root");
         userInputs.put("dockerPassword", "Xy6stqZ");

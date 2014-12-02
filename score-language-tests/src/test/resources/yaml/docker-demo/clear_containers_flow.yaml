@@ -1,0 +1,35 @@
+namespace: docker.flows
+
+imports:
+ ops: docker.ops
+ flows: docker.flows
+ email: email.ops
+
+flow:
+  name: clear_containers_flow
+  inputs:
+    - dbContainerID
+    - linkedContainerID
+    - dockerHost
+    - dockerUsername
+    - dockerPassword
+  workflow:
+    clear_db_container:
+      do:
+        flows.clear_container:
+          - containerID: "linkedContainerID"
+          - dockerHost: "dockerHost"
+          - dockerUsername: "dockerUsername"
+          - dockerPassword: "dockerPassword"
+    clear_linked_container:
+      do:
+        flows.clear_container:
+          - containerID: "dbContainerID"
+          - dockerHost: "dockerHost"
+          - dockerUsername: "dockerUsername"
+          - dockerPassword: "dockerPassword"
+  outputs:
+    - errorMessage
+  results:
+    - SUCCESS
+    - FAILURE

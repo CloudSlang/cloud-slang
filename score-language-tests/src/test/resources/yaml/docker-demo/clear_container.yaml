@@ -4,7 +4,7 @@ imports:
  ops: docker.ops
 
 flow:
-  name: clear_containers
+  name: clear_container
   inputs:
     - containerID
     - dockerHost
