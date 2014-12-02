@@ -71,6 +71,11 @@
             <artifactId>score-mail</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.score.content</groupId>
+            <artifactId>score-http-client</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
 
 		<!-- test -->

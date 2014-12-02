@@ -49,7 +49,7 @@ operations:
         - dbContainerID: returnResult
         - errorMessage: STDERR if returnCode == '0' else returnResult
       results:
-        - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
+        - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
         - FAILURE
   - get_container_ip:
       inputs:
@@ -104,7 +104,7 @@ operations:
         - containerID: returnResult
         - errorMessage: STDERR if returnCode == '0' else returnResult
       results:
-        - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
+        - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
         - FAILURE
   - stop_container:
       inputs:
@@ -129,7 +129,7 @@ operations:
         - containerID: returnResult
         - errorMessage: STDERR if returnCode == '0' else returnResult
       results:
-        - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
+        - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
         - FAILURE
   - delete_container:
       inputs:
@@ -154,5 +154,5 @@ operations:
         - containerID: returnResult
         - errorMessage: STDERR if returnCode == '0' else returnResult
       results:
-        - SUCCESS : returnCode == '0' and (not 'Error response from daemon' in STDERR)
+        - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
         - FAILURE

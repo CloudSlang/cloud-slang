@@ -1,0 +1,18 @@
+namespace: rest.ops
+
+operations:
+  - ping_application:
+      inputs:
+        - url
+        - method:
+            default: "'get'"
+            override: true
+      action:
+        java_action:
+          className: org.eclipse.score.content.httpclient.HttpClientAction
+          methodName: execute
+      outputs:
+        - returnResult: returnResult
+      results:
+        - SUCCESS : returnCode == '0'
+        - FAILURE
