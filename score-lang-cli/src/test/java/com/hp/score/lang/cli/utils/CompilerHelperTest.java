@@ -102,7 +102,7 @@ public class CompilerHelperTest {
 
         @Bean
         public CompilerHelper compilerHelper() {
-            return new CompilerHelper();
+            return new CompilerHelperImpl();
         }
 
     }
