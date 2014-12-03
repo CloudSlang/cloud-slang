@@ -24,7 +24,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <packaging>pom</packaging>
-    <name>com.hp.score.lang:score-language</name>
     <description>A DSL for writing flows</description>
     <url>https://github.com/HPSoftware/score-language</url>
     <licenses>
@@ -162,10 +161,8 @@
             <dependency>
                 <groupId>com.hp.score.sdk</groupId>
                 <artifactId>score-content-sdk</artifactId>
-                <version>1.4</version>
+                <version>1.5</version>
             </dependency>
-
-
             <dependency>
                 <groupId>com.hp.score</groupId>
                 <artifactId>score-all</artifactId>
