@@ -133,12 +133,14 @@ public class ScoreServices {
                     flowFinished.set(true); break;
                 case EventConstants.SCORE_ERROR_EVENT :
                     printWithColor(Ansi.Color.RED, SCORE_ERROR_EVENT_MSG + data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " +
-                            data.get(EventConstants.SCORE_ERROR_MSG)); break;
+                            data.get(EventConstants.SCORE_ERROR_MSG));
+                    break;
                 case EventConstants.SCORE_FAILURE_EVENT :
                     printWithColor(Ansi.Color.RED,FLOW_FINISHED_WITH_FAILURE_MSG);
                     flowFinished.set(true); break;
                 case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
-                    printWithColor(Ansi.Color.RED,SLANG_STEP_ERROR_MSG + data.get(EXCEPTION)); break;
+                    printWithColor(Ansi.Color.RED,SLANG_STEP_ERROR_MSG + data.get(EXCEPTION));
+                    break;
                 case ScoreLangConstants.EVENT_INPUT_END:
                     String taskName = (String)data.get(LanguageEventData.levelName.TASK_NAME.name());
                     if(StringUtils.isNotEmpty(taskName)){
