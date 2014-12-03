@@ -18,12 +18,12 @@
 */
 package com.hp.score.lang.cli.services;
 
-import com.hp.score.api.Score;
-import com.hp.score.api.TriggeringProperties;
-import com.hp.score.events.EventBus;
-import com.hp.score.events.EventConstants;
-import com.hp.score.events.ScoreEvent;
-import com.hp.score.events.ScoreEventListener;
+import org.eclipse.score.api.Score;
+import org.eclipse.score.api.TriggeringProperties;
+import org.eclipse.score.events.EventBus;
+import org.eclipse.score.events.EventConstants;
+import org.eclipse.score.events.ScoreEvent;
+import org.eclipse.score.events.ScoreEventListener;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.runtime.env.RunEnvironment;

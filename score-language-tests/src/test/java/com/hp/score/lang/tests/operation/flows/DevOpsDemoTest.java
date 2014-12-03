@@ -1,4 +1,4 @@
-package com.hp.score.lang.tests.operation.flows;/*
+/*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,10 +16,11 @@ package com.hp.score.lang.tests.operation.flows;/*
  * specific language governing permissions and limitations
  * under the License.
 */
+package com.hp.score.lang.tests.operation.flows;
 
 import com.google.common.collect.Sets;
-import com.hp.score.events.EventConstants;
-import com.hp.score.events.ScoreEvent;
+import org.eclipse.score.events.EventConstants;
+import org.eclipse.score.events.ScoreEvent;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.tests.operation.SystemsTestsParent;
 import org.junit.Assert;

@@ -1,4 +1,3 @@
-package com.hp.score.lang.compiler;
 /*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,14 +16,11 @@ package com.hp.score.lang.compiler;
  * specific language governing permissions and limitations
  * under the License.
 */
-
-/*
- * Created by orius123 on 05/11/14.
- */
+package com.hp.score.lang.compiler;
 
 import ch.lambdaj.Lambda;
 import ch.lambdaj.function.convert.Converter;
-import com.hp.score.api.ExecutionPlan;
+import org.eclipse.score.api.ExecutionPlan;
 import com.hp.score.lang.compiler.domain.CompiledExecutable;
 import com.hp.score.lang.compiler.domain.CompiledFlow;
 import com.hp.score.lang.compiler.domain.CompiledOperation;
@@ -48,6 +44,9 @@ import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
 import static org.hamcrest.Matchers.equalTo;
 
+/*
+ * Created by orius123 on 05/11/14.
+ */
 @Component
 public class SlangCompilerImpl implements SlangCompiler {
 

@@ -20,9 +20,9 @@ package com.hp.score.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
-import com.hp.score.api.execution.ExecutionParametersConsts;
-import com.hp.score.events.ScoreEvent;
-import com.hp.score.lang.ExecutionRuntimeServices;
+import org.eclipse.score.api.execution.ExecutionParametersConsts;
+import org.eclipse.score.events.ScoreEvent;
+import org.eclipse.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import junit.framework.Assert;

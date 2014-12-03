@@ -1,5 +1,3 @@
-package com.hp.score.lang.cli;
-
 /*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,11 @@ package com.hp.score.lang.cli;
  * specific language governing permissions and limitations
  * under the License.
 */
+package com.hp.score.lang.cli;
 
-
-import com.hp.score.events.EventConstants;
-import com.hp.score.events.ScoreEvent;
-import com.hp.score.events.ScoreEventListener;
+import org.eclipse.score.events.EventConstants;
+import org.eclipse.score.events.ScoreEvent;
+import org.eclipse.score.events.ScoreEventListener;
 import com.hp.score.lang.cli.services.ScoreServices;
 import com.hp.score.lang.cli.utils.CompilerHelper;
 import com.hp.score.lang.entities.CompilationArtifact;

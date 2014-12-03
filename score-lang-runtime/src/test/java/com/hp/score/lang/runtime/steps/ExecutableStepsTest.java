@@ -1,5 +1,3 @@
-package com.hp.score.lang.runtime.steps;
-
 /*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,10 @@ package com.hp.score.lang.runtime.steps;
  * specific language governing permissions and limitations
  * under the License.
 */
+package com.hp.score.lang.runtime.steps;
 
-import com.hp.score.events.ScoreEvent;
-import com.hp.score.lang.ExecutionRuntimeServices;
+import org.eclipse.score.events.ScoreEvent;
+import org.eclipse.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.entities.bindings.Result;

@@ -1,4 +1,4 @@
-package com.hp.score.lang.tests.operation;/*
+/*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,17 +16,19 @@ package com.hp.score.lang.tests.operation;/*
  * specific language governing permissions and limitations
  * under the License.
 */
+package com.hp.score.lang.tests.operation;
 
-import com.hp.score.api.Score;
-import com.hp.score.api.TriggeringProperties;
-import com.hp.score.events.EventBus;
-import com.hp.score.events.EventConstants;
-import com.hp.score.events.ScoreEvent;
-import com.hp.score.events.ScoreEventListener;
+import org.eclipse.score.api.Score;
+import org.eclipse.score.api.TriggeringProperties;
+import org.eclipse.score.events.EventBus;
+import org.eclipse.score.events.EventConstants;
+import org.eclipse.score.events.ScoreEvent;
+import org.eclipse.score.events.ScoreEventListener;
 import com.hp.score.lang.compiler.SlangCompiler;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.runtime.env.RunEnvironment;
+
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +64,6 @@ public class SystemsTestsParent {
 
     protected ScoreEvent trigger(CompilationArtifact compilationArtifact, Map<String, Serializable> userInputs) throws InterruptedException {
         Map<String, Serializable> executionContext = createExecutionContext(userInputs);
-
         TriggeringProperties triggeringProperties = TriggeringProperties
                 .create(compilationArtifact.getExecutionPlan())
                 .setDependencies(compilationArtifact.getDependencies())

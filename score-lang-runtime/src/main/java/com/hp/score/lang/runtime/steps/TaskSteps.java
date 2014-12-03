@@ -8,8 +8,8 @@
 package com.hp.score.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
-import com.hp.score.api.execution.ExecutionParametersConsts;
-import com.hp.score.lang.ExecutionRuntimeServices;
+import org.eclipse.score.api.execution.ExecutionParametersConsts;
+import org.eclipse.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.entities.ResultNavigation;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Output;
@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.hp.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static org.eclipse.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
 import static com.hp.score.lang.entities.ScoreLangConstants.NEXT_STEP_ID_KEY;

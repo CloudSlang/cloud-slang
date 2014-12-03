@@ -36,10 +36,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-        <score.version>0.1.229</score.version>
+        <score.group>org.eclipse.score</score.group>
+        <score.version>0.1.240</score.version>
         <spring.version>4.0.0.RELEASE</spring.version>
-
         <gpg.skip>true</gpg.skip>
     </properties>
 
@@ -153,21 +152,20 @@
         <dependencies>
             <!--score dependencies-->
             <dependency>
-                <groupId>com.hp.score</groupId>
+                <groupId>${score.group}</groupId>
                 <artifactId>score-api</artifactId>
                 <version>${score.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>${score.group}</groupId>
+                <artifactId>score-all</artifactId>
+                <version>${score.version}</version>
+                <scope>test</scope>
+            </dependency>
             <dependency>
                 <groupId>com.hp.score.sdk</groupId>
                 <artifactId>score-content-sdk</artifactId>
                 <version>1.5</version>
-            </dependency>
-            <dependency>
-                <groupId>com.hp.score</groupId>
-                <artifactId>score-all</artifactId>
-                <version>${score.version}</version>
-                <scope>test</scope>
             </dependency>
             <!--end of score dependencies-->
 

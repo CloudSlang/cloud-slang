@@ -1,4 +1,3 @@
-package com.hp.score.lang.compiler.utils;
 /*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,9 +16,10 @@ package com.hp.score.lang.compiler.utils;
  * specific language governing permissions and limitations
  * under the License.
 */
+package com.hp.score.lang.compiler.utils;
 
-import com.hp.score.api.ControlActionMetadata;
-import com.hp.score.api.ExecutionStep;
+import org.eclipse.score.api.ControlActionMetadata;
+import org.eclipse.score.api.ExecutionStep;
 import com.hp.score.lang.compiler.SlangTextualKeys;
 import com.hp.score.lang.entities.ActionType;
 import com.hp.score.lang.entities.ResultNavigation;

@@ -1,4 +1,3 @@
-package com.hp.score.lang.compiler;
 /*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,13 +16,10 @@ package com.hp.score.lang.compiler;
  * specific language governing permissions and limitations
  * under the License.
 */
+package com.hp.score.lang.compiler;
 
-/*
- * Created by orius123 on 05/11/14.
- */
-
-import com.hp.score.api.ExecutionPlan;
-import com.hp.score.api.ExecutionStep;
+import org.eclipse.score.api.ExecutionPlan;
+import org.eclipse.score.api.ExecutionStep;
 import com.hp.score.lang.compiler.configuration.SlangCompilerSpringConfig;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.ScoreLangConstants;
@@ -45,6 +41,9 @@ import java.util.Set;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
+/*
+ * Created by orius123 on 05/11/14.
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
 public class CompileDependenciesTest {

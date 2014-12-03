@@ -1,4 +1,4 @@
-package com.hp.score.lang.compiler.utils;/*
+/*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,11 +16,12 @@ package com.hp.score.lang.compiler.utils;/*
  * specific language governing permissions and limitations
  * under the License.
 */
+package com.hp.score.lang.compiler.utils;
 
 import ch.lambdaj.Lambda;
 
-import com.hp.score.api.ExecutionPlan;
-import com.hp.score.api.ExecutionStep;
+import org.eclipse.score.api.ExecutionPlan;
+import org.eclipse.score.api.ExecutionStep;
 import com.hp.score.lang.compiler.domain.CompiledFlow;
 import com.hp.score.lang.compiler.domain.CompiledOperation;
 import com.hp.score.lang.compiler.domain.CompiledTask;

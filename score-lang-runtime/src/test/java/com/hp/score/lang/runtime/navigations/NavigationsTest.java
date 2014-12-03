@@ -1,4 +1,3 @@
-package com.hp.score.lang.runtime.navigations;
 /*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,9 +16,10 @@ package com.hp.score.lang.runtime.navigations;
  * specific language governing permissions and limitations
  * under the License.
 */
+package com.hp.score.lang.runtime.navigations;
 
-import com.hp.score.events.ScoreEvent;
-import com.hp.score.lang.ExecutionRuntimeServices;
+import org.eclipse.score.events.ScoreEvent;
+import org.eclipse.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import junit.framework.Assert;
 import org.junit.Test;

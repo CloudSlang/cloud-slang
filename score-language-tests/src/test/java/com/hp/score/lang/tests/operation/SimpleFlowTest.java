@@ -19,8 +19,8 @@
 package com.hp.score.lang.tests.operation;
 
 import com.google.common.collect.Sets;
-import com.hp.score.events.EventConstants;
-import com.hp.score.events.ScoreEvent;
+import org.eclipse.score.events.EventConstants;
+import org.eclipse.score.events.ScoreEvent;
 import com.hp.score.lang.entities.CompilationArtifact;
 
 import org.apache.commons.lang3.tuple.Pair;

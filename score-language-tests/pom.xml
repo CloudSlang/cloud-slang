@@ -38,7 +38,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.hp.score</groupId>
+            <groupId>${score.group}</groupId>
             <artifactId>score-all</artifactId>
         </dependency>
 

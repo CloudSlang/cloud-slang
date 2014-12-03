@@ -1,4 +1,4 @@
-package com.hp.score.lang.entities;/*
+/*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,8 +16,9 @@ package com.hp.score.lang.entities;/*
  * specific language governing permissions and limitations
  * under the License.
 */
+package com.hp.score.lang.entities;
 
-import com.hp.score.api.ExecutionPlan;
+import org.eclipse.score.api.ExecutionPlan;
 import com.hp.score.lang.entities.bindings.Input;
 
 import java.util.List;
