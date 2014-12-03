@@ -160,7 +160,6 @@
                 <groupId>${score.group}</groupId>
                 <artifactId>score-all</artifactId>
                 <version>${score.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.hp.score.sdk</groupId>
@@ -453,6 +452,8 @@
         <module>score-lang-entities</module>
         <module>score-lang-cli</module>
         <module>score-language-tests</module>
+        <module>score-lang-all</module>
+        <!--<module>score-lang-api</module>-->
     </modules>
 
 

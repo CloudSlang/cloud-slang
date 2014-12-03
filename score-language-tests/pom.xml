@@ -33,7 +33,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>score-lang-runtime</artifactId>
+            <artifactId>score-lang-all</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -58,23 +58,24 @@
         </dependency>
 
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>score-lang-compiler</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.eclipse.score.content</groupId>
+            <artifactId>score-ssh</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.score.content</groupId>
-            <artifactId>score-ssh</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.score.content</groupId>
             <artifactId>score-mail</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.eclipse.score.content</groupId>
             <artifactId>score-http-client</artifactId>
         </dependency>
+
+        <!--<dependency>-->
+            <!--<groupId>com.google.guava</groupId>-->
+            <!--<artifactId>guava</artifactId>-->
+        <!--</dependency>-->
 
     </dependencies>
 
