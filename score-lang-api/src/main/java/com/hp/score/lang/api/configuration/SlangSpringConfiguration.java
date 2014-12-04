@@ -1,4 +1,4 @@
-package com.hp.score.lang.configuration;
+package com.hp.score.lang.api.configuration;
 /*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,8 +18,11 @@ package com.hp.score.lang.configuration;
  * under the License.
 */
 
+import com.hp.score.lang.api.Slang;
+import com.hp.score.lang.api.SlangImpl;
 import com.hp.score.lang.compiler.configuration.SlangCompilerSpringConfig;
 import com.hp.score.lang.runtime.configuration.SlangRuntimeSpringConfig;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
 /**
@@ -30,4 +33,8 @@ import org.springframework.context.annotation.Import;
 @Import({SlangRuntimeSpringConfig.class, SlangCompilerSpringConfig.class})
 public class SlangSpringConfiguration {
 
+    @Bean
+    public Slang slang() {
+        return new SlangImpl();
+    }
 }

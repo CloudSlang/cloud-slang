@@ -33,7 +33,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>score-lang-all</artifactId>
+            <artifactId>score-lang-api</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -71,11 +71,6 @@
             <groupId>org.eclipse.score.content</groupId>
             <artifactId>score-http-client</artifactId>
         </dependency>
-
-        <!--<dependency>-->
-            <!--<groupId>com.google.guava</groupId>-->
-            <!--<artifactId>guava</artifactId>-->
-        <!--</dependency>-->
 
     </dependencies>
 

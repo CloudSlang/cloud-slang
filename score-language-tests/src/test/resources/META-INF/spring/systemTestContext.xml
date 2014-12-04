@@ -7,7 +7,7 @@
                         http://www.eclipse.org/schema/score
                         http://www.eclipse.org/schema/score/score.xsd">
 
-    <bean class="com.hp.score.lang.configuration.SlangSpringConfiguration"/>
+    <bean class="com.hp.score.lang.api.configuration.SlangSpringConfiguration"/>
 
     <score:engine />
 
