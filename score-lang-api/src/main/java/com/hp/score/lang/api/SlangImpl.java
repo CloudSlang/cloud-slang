@@ -70,15 +70,16 @@ public class SlangImpl implements Slang{
         Set<File> dependencyFiles = new HashSet<>();
         if (dependencies != null) {
             for(String dependency : dependencies) {
-                Validate.isTrue(file.isFile(), "dependency path must lead to a file");
-                dependencyFiles.add(new File(dependency));
+                File dependencyFile = new File(dependency);
+                Validate.isTrue(dependencyFile.isFile(), "dependency path must lead to a file");
+                dependencyFiles.add(dependencyFile);
             }
         }
         try {
             return compiler.compile(file, operationName, dependencyFiles);
         } catch (Exception e) {
             logger.error("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage());
-            throw e;
+            throw new RuntimeException(e);
         }
     }
 
@@ -89,6 +90,7 @@ public class SlangImpl implements Slang{
 
     @Override
     public Long run(CompilationArtifact compilationArtifact, Map<String, String> runInputs) {
+        Validate.notNull(compilationArtifact, "Compilation artifact can not be null");
         if(runInputs == null){
             runInputs = new HashMap<>();
         }
@@ -132,19 +134,12 @@ public class SlangImpl implements Slang{
 
     @Override
     public void subscribeOnAllEvents(ScoreEventListener eventListener) {
-        Set<String> eventTypes = getAllEventTypes();
-        eventBus.subscribe(eventListener, eventTypes);
+        subscribeOnEvents(eventListener, getAllEventTypes());
     }
 
     @Override
     public void subscribeOnAllEvents() {
-        Set<String> eventTypes = getAllEventTypes();
-        subscribeOnEvents(new ScoreEventListener() {
-            @Override
-            public void onEvent(ScoreEvent event) {
-                logger.info(event.getEventType() + " : " + event.getData());
-            }
-        }, eventTypes);
+        subscribeOnEvents(getAllEventTypes());
     }
 
     private Set<String> getAllEventTypes() {
