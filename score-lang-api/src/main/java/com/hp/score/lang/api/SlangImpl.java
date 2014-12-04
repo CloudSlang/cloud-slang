@@ -27,9 +27,11 @@ import org.apache.log4j.Logger;
 import org.eclipse.score.api.Score;
 import org.eclipse.score.api.TriggeringProperties;
 import org.eclipse.score.events.EventBus;
+import org.eclipse.score.events.EventConstants;
 import org.eclipse.score.events.ScoreEvent;
 import org.eclipse.score.events.ScoreEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import static com.hp.score.lang.entities.ScoreLangConstants.*;
 
 import java.io.File;
 import java.io.Serializable;
@@ -126,6 +128,43 @@ public class SlangImpl implements Slang{
                 logger.info(event.getEventType() + " : " + event.getData());
             }
         }, eventTypes);
+    }
 
+    @Override
+    public void subscribeOnAllEvents(ScoreEventListener eventListener) {
+        Set<String> eventTypes = getAllEventTypes();
+        eventBus.subscribe(eventListener, eventTypes);
+    }
+
+    @Override
+    public void subscribeOnAllEvents() {
+        Set<String> eventTypes = getAllEventTypes();
+        subscribeOnEvents(new ScoreEventListener() {
+            @Override
+            public void onEvent(ScoreEvent event) {
+                logger.info(event.getEventType() + " : " + event.getData());
+            }
+        }, eventTypes);
+    }
+
+    private Set<String> getAllEventTypes() {
+        Set<String> eventTypes = new HashSet<>();
+        eventTypes.add(EventConstants.SCORE_FINISHED_EVENT);
+        eventTypes.add(EventConstants.SCORE_BRANCH_FAILURE_EVENT);
+        eventTypes.add(EventConstants.SCORE_FINISHED_BRANCH_EVENT);
+        eventTypes.add(EventConstants.SCORE_NO_WORKER_FAILURE_EVENT);
+        eventTypes.add(EventConstants.SCORE_PAUSED_EVENT);
+        eventTypes.add(EventConstants.SCORE_ERROR_EVENT);
+        eventTypes.add(EventConstants.SCORE_FAILURE_EVENT);
+        eventTypes.add(SLANG_EXECUTION_EXCEPTION);
+        eventTypes.add(EVENT_ACTION_START);
+        eventTypes.add(EVENT_ACTION_END);
+        eventTypes.add(EVENT_ACTION_ERROR);
+        eventTypes.add(EVENT_INPUT_START);
+        eventTypes.add(EVENT_INPUT_END);
+        eventTypes.add(EVENT_OUTPUT_START);
+        eventTypes.add(EVENT_OUTPUT_END);
+        eventTypes.add(EVENT_EXECUTION_FINISHED);
+        return eventTypes;
     }
 }

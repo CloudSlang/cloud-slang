@@ -91,4 +91,16 @@ public interface Slang {
      * @param eventTypes set of types of events to subscribe to
      */
     public void subscribeOnEvents(Set<String> eventTypes);
+
+    /**
+     * Subscribe on all of the events of score & slang
+     * @param eventListener listener for the events
+     */
+    public void subscribeOnAllEvents(ScoreEventListener eventListener);
+
+    /**
+     * Subscribe on all of the events of score & slang and print events data to the log
+     */
+    public void subscribeOnAllEvents();
+
 }
