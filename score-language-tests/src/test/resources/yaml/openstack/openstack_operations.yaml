@@ -1,0 +1,117 @@
+namespace: openstack.ops
+
+operations:
+  - get_authentication:
+      inputs:
+        - host
+        - identityPort
+        - username
+        - password
+        - url:
+            default: "'http://'+ host + ':' + identityPort + '/v2.0/tokens'"
+            override: true
+        - body:
+            default: |
+             "'{\"auth\": {\"tenantName\": \"demo\",\"passwordCredentials\": {\"username\":\"' + username + '\", \"password\"' + password + '\"}}}'"
+            override: true
+        - method:
+            default: "'post'"
+            override: true
+        - contentType:
+            default: "'application/json'"
+            override: true
+      action:
+        java_action:
+          className: org.eclipse.score.content.httpclient.HttpClientAction
+          methodName: execute
+      outputs:
+        - returnResult: returnResult
+        - statusCode: statusCode
+        - errorMessage: STDERR if statusCode != '200' else returnResult
+      results:
+        - SUCCESS : statusCode == '200'
+        - FAILURE
+  - create_openstack_server:
+      inputs:
+        - host
+        - computePort
+        - token
+        - tenant
+        - headers:
+            default: "'X-AUTH-TOKEN:' + token"
+            override: true
+        - url:
+            default: "'http://'+ host + ':' + computePort + '/v2/' + tenant + '/servers'"
+            override: true
+        - body:
+            default: "'{\"server\": {\"name\": \"' + serverName + '\",\"imageRef\": \"' + imgRef + '\",\"flavorRef\":\"2\",\"max_count\":1,\"min_count\":1,\"security_groups\":[{\"name\": \"default\"}]}}'"
+            override: true
+        - contentType:
+            default: "'application/json'"
+            override: true
+        - method:
+            default: "'post'"
+            override: true
+      action:
+        java_action:
+          className: org.eclipse.score.content.httpclient.HttpClientAction
+          methodName: execute
+      outputs:
+        - returnResult: returnResult
+        - statusCode: statusCode
+        - errorMessage: STDERR if statusCode != '202' else returnResult
+      results:
+        - SUCCESS : statusCode == '202'
+        - FAILURE
+  - get_openstack_servers:
+      inputs:
+        - host
+        - computePort
+        - token
+        - tenant
+        - headers:
+            default: "'X-AUTH-TOKEN:' + token"
+            override: true
+        - url:
+            default: "'http://'+ host + ':' + computePort + '/v2/' + tenant + '/servers'"
+            override: true
+        - method:
+            default: "'get'"
+            override: true
+      action:
+        java_action:
+          className: org.eclipse.score.content.httpclient.HttpClientAction
+          methodName: execute
+      outputs:
+        - returnResult: returnResult
+        - statusCode: statusCode
+        - errorMessage: STDERR if statusCode != '202' else returnResult
+      results:
+        - SUCCESS : statusCode == '202'
+        - FAILURE
+  - delete_openstack_server:
+      inputs:
+        - host
+        - computePort
+        - token
+        - tenant
+        - serverID
+        - headers:
+            default: "'X-AUTH-TOKEN:' + token"
+        - url:
+            default: "'http://'+ host + ':' + computePort + '/v2/' + tenant + '/servers/' + serverID"
+            override: true
+        - method:
+            default: "'delete'"
+            override: true
+      action:
+        java_action:
+          className: org.eclipse.score.content.httpclient.HttpClientAction
+          methodName: execute
+      outputs:
+        - returnResult: returnResult
+        - statusCode: statusCode
+        - errorMessage: STDERR if returnCode != '0' else returnResult
+      results:
+        - SUCCESS : statusCode == '0'
+        - FAILURE

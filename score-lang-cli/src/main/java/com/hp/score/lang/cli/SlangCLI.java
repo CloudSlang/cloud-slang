@@ -74,7 +74,7 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = "cp", mandatory = false,
                     help = "Classpath , a file directory to flow dependencies, by default it will take flow file dir") final String classPath,
             //@CliOption(key = "sp", mandatory = false, help = "System property file location") final String systemProperty,//not supported for now...
-            @CliOption(key = "D", mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, String> inputs) throws IOException {
+            @CliOption(key = "i", mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, String> inputs) throws IOException {
 
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(filePath,null,classPath);
@@ -119,7 +119,7 @@ public class SlangCLI implements CommandMarker {
         return TRIGGERED_FLOW_MSG + flowName + WITH_EXECUTION_ID_MSG + id;
     }
 
-    @CliCommand(value = "slang -version", help = "Prints the score version used")
+    @CliCommand(value = "slang --version", help = "Prints the score version used")
     public String version() {
         return currently + SCORE_VERSION;
     }
