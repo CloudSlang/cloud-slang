@@ -18,24 +18,20 @@
 */
 package com.hp.score.lang.cli.services;
 
-import org.eclipse.score.api.Score;
-import org.eclipse.score.api.TriggeringProperties;
-import org.eclipse.score.events.EventBus;
+import com.hp.score.lang.api.Slang;
+import com.hp.score.lang.entities.CompilationArtifact;
+import com.hp.score.lang.entities.ScoreLangConstants;
+import com.hp.score.lang.runtime.events.LanguageEventData;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.score.events.EventConstants;
 import org.eclipse.score.events.ScoreEvent;
 import org.eclipse.score.events.ScoreEventListener;
-import com.hp.score.lang.entities.CompilationArtifact;
-import com.hp.score.lang.entities.ScoreLangConstants;
-import com.hp.score.lang.runtime.env.RunEnvironment;
-import com.hp.score.lang.runtime.events.LanguageEventData;
-import org.apache.commons.lang.StringUtils;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -60,13 +56,10 @@ public class ScoreServices {
     //TODO - change this to interface...
 
     @Autowired
-    private Score score;
-
-    @Autowired
-    private EventBus eventBus;
+    private Slang slang;
 
     public void subscribe(ScoreEventListener eventHandler, Set<String> eventTypes) {
-        eventBus.subscribe(eventHandler, eventTypes);
+        slang.subscribeOnEvents(eventHandler, eventTypes);
     }
 
     /**
@@ -75,17 +68,8 @@ public class ScoreServices {
      * @param inputs : flow inputs
      * @return executionId
      */
-    public Long trigger(CompilationArtifact compilationArtifact, Map<String, String> inputs) {
-        Map<String, Serializable> executionContext = new HashMap<>();
-        executionContext.put(ScoreLangConstants.RUN_ENV, new RunEnvironment());
-        executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable) inputs);
-
-        TriggeringProperties triggeringProperties = TriggeringProperties
-                .create(compilationArtifact.getExecutionPlan())
-                .setDependencies(compilationArtifact.getDependencies())
-                .setContext(executionContext);
-
-        return score.trigger(triggeringProperties);
+    public Long trigger(CompilationArtifact compilationArtifact, Map<String, Serializable> inputs) {
+        return slang.run(compilationArtifact, inputs);
     }
 
     /**
@@ -94,7 +78,7 @@ public class ScoreServices {
      * @param inputs : flow inputs
      * @return executionId
      */
-    public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, String> inputs){
+    public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, Serializable> inputs){
         //add start event
         Set<String> handlerTypes = new HashSet<>();
         handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
@@ -105,13 +89,13 @@ public class ScoreServices {
         handlerTypes.add(ScoreLangConstants.EVENT_INPUT_END);
 
         SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener();
-        eventBus.subscribe(scoreEventListener, handlerTypes);
+        slang.subscribeOnEvents(scoreEventListener, handlerTypes);
 
         Long executionId = trigger(compilationArtifact, inputs);
 
         while(!scoreEventListener.isFlowFinished()){}//todo : need to add here sleep?
 
-        eventBus.unsubscribe(scoreEventListener);
+        slang.unSubscribeOnEvents(scoreEventListener);
 
         return executionId;
 

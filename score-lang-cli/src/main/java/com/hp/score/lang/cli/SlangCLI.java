@@ -18,15 +18,15 @@
 */
 package com.hp.score.lang.cli;
 
-import org.eclipse.score.events.EventConstants;
-import org.eclipse.score.events.ScoreEvent;
-import org.eclipse.score.events.ScoreEventListener;
 import com.hp.score.lang.cli.services.ScoreServices;
 import com.hp.score.lang.cli.utils.CompilerHelper;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.bindings.Input;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
+import org.eclipse.score.events.EventConstants;
+import org.eclipse.score.events.ScoreEvent;
+import org.eclipse.score.events.ScoreEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -35,9 +35,22 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import static com.hp.score.lang.entities.ScoreLangConstants.*;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_END;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_ERROR;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_START;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_START;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
+import static com.hp.score.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
 
 /**
  * Date: 11/7/2014
@@ -74,7 +87,7 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = "cp", mandatory = false,
                     help = "Classpath , a file directory to flow dependencies, by default it will take flow file dir") final String classPath,
             //@CliOption(key = "sp", mandatory = false, help = "System property file location") final String systemProperty,//not supported for now...
-            @CliOption(key = "i", mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, String> inputs) throws IOException {
+            @CliOption(key = "i", mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, Serializable> inputs) throws IOException {
 
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(filePath,null,classPath);

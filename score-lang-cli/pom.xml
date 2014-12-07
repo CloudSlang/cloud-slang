@@ -14,16 +14,11 @@
 	</parent>
 
 	<dependencies>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>score-lang-runtime</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>score-lang-compiler</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>score-lang-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.shell</groupId>
 			<artifactId>spring-shell</artifactId>

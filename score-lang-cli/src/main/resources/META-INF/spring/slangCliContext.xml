@@ -26,8 +26,7 @@
                         http://www.eclipse.org/schema/score
                         http://www.eclipse.org/schema/score/score.xsd">
 
-    <bean class="com.hp.score.lang.runtime.configuration.SlangRuntimeSpringConfig"/>
-    <bean class="com.hp.score.lang.compiler.configuration.SlangCompilerSpringConfig"/>
+    <bean class="com.hp.score.lang.api.configuration.SlangSpringConfiguration"/>
 
     <score:engine />
 

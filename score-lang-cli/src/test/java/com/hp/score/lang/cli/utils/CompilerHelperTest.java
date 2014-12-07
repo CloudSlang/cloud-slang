@@ -2,7 +2,7 @@ package com.hp.score.lang.cli.utils;
 
 
 import com.google.common.collect.Sets;
-import com.hp.score.lang.compiler.SlangCompiler;
+import com.hp.score.lang.api.Slang;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +16,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.io.File;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 
 /*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
@@ -44,7 +43,7 @@ public class CompilerHelperTest {
     private CompilerHelper compilerHelper;
 
     @Autowired
-    private SlangCompiler slangCompiler;
+    private Slang slang;
 
     @Test(expected = IllegalArgumentException.class)
     public void testFilePathWrong() throws Exception {
@@ -58,7 +57,7 @@ public class CompilerHelperTest {
 
     @Before
     public void resetMocks() {
-        Mockito.reset(slangCompiler);
+        Mockito.reset(slang);
     }
 
     @Test
@@ -66,7 +65,7 @@ public class CompilerHelperTest {
         String flowFilePath = getClass().getResource("/flow.yaml").getPath();
         String opFilePath = getClass().getResource("/operation.yaml").getPath();
         compilerHelper.compile(flowFilePath, null, null);
-        Mockito.verify(slangCompiler, times(1)).compile(new File(flowFilePath), null, Sets.newHashSet(new File(flowFilePath), new File(opFilePath)));
+        Mockito.verify(slang).compile(new File(flowFilePath), Sets.newHashSet(new File(flowFilePath), new File(opFilePath)));
     }
 
     @Test
@@ -75,7 +74,7 @@ public class CompilerHelperTest {
         String folderPath = getClass().getResource("/flowsdir/").getPath();
         String flow2FilePath = getClass().getResource("/flowsdir/flow2.yaml").getPath();
         compilerHelper.compile(flowFilePath, null, folderPath);
-        Mockito.verify(slangCompiler, times(1)).compile(new File(flowFilePath), null, Sets.newHashSet(new File(flow2FilePath)));
+        Mockito.verify(slang).compile(new File(flowFilePath), Sets.newHashSet(new File(flow2FilePath)));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -96,8 +95,8 @@ public class CompilerHelperTest {
     static class Config {
 
         @Bean
-        public SlangCompiler compiler() {
-            return mock(SlangCompiler.class);
+        public Slang slang() {
+            return mock(Slang.class);
         }
 
         @Bean

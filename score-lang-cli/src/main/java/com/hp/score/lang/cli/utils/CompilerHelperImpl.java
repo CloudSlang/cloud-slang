@@ -20,7 +20,7 @@ package com.hp.score.lang.cli.utils;
 */
 
 
-import com.hp.score.lang.compiler.SlangCompiler;
+import com.hp.score.lang.api.Slang;
 import com.hp.score.lang.entities.CompilationArtifact;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
@@ -46,7 +46,7 @@ public class CompilerHelperImpl implements CompilerHelper{
     //todo - tests
 
     @Autowired
-    private SlangCompiler compiler;
+    private Slang slang;
 
     private final static Logger logger = Logger.getLogger(CompilerHelperImpl.class);
 
@@ -77,7 +77,7 @@ public class CompilerHelperImpl implements CompilerHelper{
         //todo - support compile of op too?
         CompilationArtifact compilationArtifact = null;
         try {
-            compilationArtifact = compiler.compile(file, null, dependenciesFilesSet);
+            compilationArtifact = slang.compile(file, dependenciesFilesSet);
         } catch (Exception e) {
             logger.error("Failed compilation for file : "+file.getName() + " ,Exception is : " + e.getMessage());
             throw e;
