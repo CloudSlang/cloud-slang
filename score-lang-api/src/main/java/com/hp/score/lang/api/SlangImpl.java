@@ -123,6 +123,11 @@ public class SlangImpl implements Slang{
     }
 
     @Override
+    public void unSubscribeOnEvents(ScoreEventListener eventListener) {
+        eventBus.unsubscribe(eventListener);
+    }
+
+    @Override
     public void subscribeOnEvents(Set<String> eventTypes) {
         subscribeOnEvents(new ScoreEventListener() {
             @Override

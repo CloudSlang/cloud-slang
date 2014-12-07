@@ -250,6 +250,13 @@ public class SlangImplTest {
     }
 
     @Test
+    public void testUnSubscribeOnEvents(){
+        ScoreEventListener eventListener = new EventListener();
+        slang.unSubscribeOnEvents(eventListener);
+        Mockito.verify(eventBus).unsubscribe(eventListener);
+    }
+
+    @Test
     public void testSubscribeOnAllEvents(){
         Slang mockSlang = Mockito.mock(SlangImpl.class);
         Mockito.doCallRealMethod().when(mockSlang).subscribeOnAllEvents();
