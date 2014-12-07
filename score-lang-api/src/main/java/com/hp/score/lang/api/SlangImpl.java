@@ -28,10 +28,8 @@ import org.eclipse.score.api.Score;
 import org.eclipse.score.api.TriggeringProperties;
 import org.eclipse.score.events.EventBus;
 import org.eclipse.score.events.EventConstants;
-import org.eclipse.score.events.ScoreEvent;
 import org.eclipse.score.events.ScoreEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import static com.hp.score.lang.entities.ScoreLangConstants.*;
 
 import java.io.File;
 import java.io.Serializable;
@@ -39,6 +37,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_END;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_ERROR;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_START;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_START;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
+import static com.hp.score.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
 
 /**
  * User: stoneo
@@ -60,19 +68,17 @@ public class SlangImpl implements Slang{
     private final static Logger logger = Logger.getLogger(SlangImpl.class);
 
     @Override
-    public CompilationArtifact compileOperation(String filePath, String operationName, Set<String> dependencies) {
+    public CompilationArtifact compileOperation(File file, String operationName, Set<File> dependencies) {
 
-        Validate.notNull(filePath, "filePath can not be null");
+        Validate.notNull(file, "File can not be null");
 
-        File file = new File(filePath);
-        Validate.isTrue(file.isFile(), "filePath must lead to a file");
+        Validate.isTrue(file.isFile(), "File must lead to a file");
 
         Set<File> dependencyFiles = new HashSet<>();
         if (dependencies != null) {
-            for(String dependency : dependencies) {
-                File dependencyFile = new File(dependency);
-                Validate.isTrue(dependencyFile.isFile(), "dependency path must lead to a file");
-                dependencyFiles.add(dependencyFile);
+            for(File dependency : dependencies) {
+                Validate.isTrue(dependency.isFile(), "dependency must lead to a file");
+                dependencyFiles.add(dependency);
             }
         }
         try {
@@ -84,12 +90,12 @@ public class SlangImpl implements Slang{
     }
 
     @Override
-    public CompilationArtifact compile(String filePath, Set<String> dependencies) {
-        return compileOperation(filePath, null, dependencies);
+    public CompilationArtifact compile(File file, Set<File> dependencies) {
+        return compileOperation(file, null, dependencies);
     }
 
     @Override
-    public Long run(CompilationArtifact compilationArtifact, Map<String, String> runInputs) {
+    public Long run(CompilationArtifact compilationArtifact, Map<String, Serializable> runInputs) {
         Validate.notNull(compilationArtifact, "Compilation artifact can not be null");
         if(runInputs == null){
             runInputs = new HashMap<>();
@@ -107,14 +113,14 @@ public class SlangImpl implements Slang{
     }
 
     @Override
-    public Long launchOperation(String filePath, String operationName, Set<String> dependencies, Map<String, String> runInputs) {
-        CompilationArtifact compilationArtifact = compileOperation(filePath, operationName, dependencies);
+    public Long compileAndRunOperation(File file, String operationName, Set<File> dependencies, Map<String, Serializable> runInputs) {
+        CompilationArtifact compilationArtifact = compileOperation(file, operationName, dependencies);
         return run(compilationArtifact, runInputs);
     }
 
     @Override
-    public Long launch(String filePath, Set<String> dependencies, Map<String, String> runInputs) {
-        return launchOperation(filePath, null, dependencies, runInputs);
+    public Long compileAndRun(File file, Set<File> dependencies, Map<String, Serializable> runInputs) {
+        return compileAndRunOperation(file, null, dependencies, runInputs);
     }
 
     @Override
@@ -128,23 +134,8 @@ public class SlangImpl implements Slang{
     }
 
     @Override
-    public void subscribeOnEvents(Set<String> eventTypes) {
-        subscribeOnEvents(new ScoreEventListener() {
-            @Override
-            public void onEvent(ScoreEvent event) {
-                logger.info(event.getEventType() + " : " + event.getData());
-            }
-        }, eventTypes);
-    }
-
-    @Override
     public void subscribeOnAllEvents(ScoreEventListener eventListener) {
         subscribeOnEvents(eventListener, getAllEventTypes());
-    }
-
-    @Override
-    public void subscribeOnAllEvents() {
-        subscribeOnEvents(getAllEventTypes());
     }
 
     private Set<String> getAllEventTypes() {

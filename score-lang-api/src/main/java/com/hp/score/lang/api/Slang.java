@@ -21,6 +21,8 @@ package com.hp.score.lang.api;
 import com.hp.score.lang.entities.CompilationArtifact;
 import org.eclipse.score.events.ScoreEventListener;
 
+import java.io.File;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,47 +39,47 @@ public interface Slang {
 
     /**
      * Compile a flow written in slang
-     * @param filePath the path of the slang file containing the flow
+     * @param file the path of the slang file containing the flow
      * @param dependencies a set of paths of the slang files of all the flow's dependencies
      * @return the compiled artifact of the flow
      */
-    public CompilationArtifact compile(String filePath, Set<String> dependencies);
+    public CompilationArtifact compile(File file, Set<File> dependencies);
 
     /**
      * Compile an operation written in slang
-     * @param filePath the path of the slang file containing the operation
+     * @param file the path of the slang file containing the operation
      * @param operationName the name of the operation to compile from the file
      * @param dependencies a set of paths of the slang files of all the operation's dependencies
      * @return the compiled artifact of the operation
      */
-    public CompilationArtifact compileOperation(String filePath, String operationName, Set<String> dependencies);
+    public CompilationArtifact compileOperation(File file, String operationName, Set<File> dependencies);
 
     /**
-     * Run a flow/operation written in slang
+     * Run a flow/operation written in slang already compiled to a compilationArtifact
      * @param compilationArtifact the compiled artifact of the flow
      * @param runInputs the inputs for the flow/operation run
      * @return the execution ID in score
      */
-    public Long run(CompilationArtifact compilationArtifact, Map<String, String> runInputs);
+    public Long run(CompilationArtifact compilationArtifact, Map<String, Serializable> runInputs);
 
     /**
      * Compile & run a flow written in slang
-     * @param filePath the path of the slang file containing the flow
+     * @param file the path of the slang file containing the flow
      * @param dependencies a set of paths of the slang files of all the flow's dependencies
      * @param runInputs the inputs for the flow run
      * @return the execution ID in score
      */
-    public Long launch(String filePath, Set<String> dependencies, Map<String, String> runInputs);
+    public Long compileAndRun(File file, Set<File> dependencies, Map<String, Serializable> runInputs);
 
     /**
      * Compile & run an operation written in slang
-     * @param filePath the path of the slang file containing the operation
+     * @param file the path of the slang file containing the operation
      * @param operationName the name of the operation to compile from the file
      * @param dependencies a set of paths of the slang files of all the operation's dependencies
      * @param runInputs the inputs for the operation run
      * @return the execution ID in score
      */
-    public Long launchOperation(String filePath, String operationName, Set<String> dependencies, Map<String, String> runInputs);
+    public Long compileAndRunOperation(File file, String operationName, Set<File> dependencies, Map<String, Serializable> runInputs);
 
     /**
      * Subscribe on events of score or slang
@@ -93,20 +95,8 @@ public interface Slang {
     public void unSubscribeOnEvents(ScoreEventListener eventListener);
 
     /**
-     * Subscribe on events of score or slang and print events data to the log
-     * @param eventTypes set of types of events to subscribe to
-     */
-    public void subscribeOnEvents(Set<String> eventTypes);
-
-    /**
      * Subscribe on all of the events of score & slang
      * @param eventListener listener for the events
      */
     public void subscribeOnAllEvents(ScoreEventListener eventListener);
-
-    /**
-     * Subscribe on all of the events of score & slang and print events data to the log
-     */
-    public void subscribeOnAllEvents();
-
 }
