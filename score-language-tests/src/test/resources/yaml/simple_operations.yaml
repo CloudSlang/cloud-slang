@@ -65,5 +65,33 @@ operations:
         - SUCCESS: connection == fromInputs['value']
         - FAILURE
 
+  - check_number:
+      inputs:
+        - number
+      action:
+        python_script: |
+          remainder = number % 2
+          isEven = remainder == 0
+          tooBig = number > 512
+      outputs:
+        - preprocessed_number: str(fromInputs['number'] * 3)
+      results:
+        - EVEN: isEven == 'True' and tooBig == 'False'
+        - ODD: isEven == 'False' and tooBig == 'False'
+        - FAILURE # report failure if the number is too big
 
+  - process_even_number:
+      inputs:
+        - even_number
+        - offset: 32
+      action:
+        python_script: |
+          processing_result = int(even_number) + offset
+          print 'Even number processed. Result= ' + str(processing_result)
 
+  - process_odd_number:
+      inputs:
+        - odd_number
+      action:
+        python_script:
+          print 'Odd number processed. Result= ' + str(odd_number)
