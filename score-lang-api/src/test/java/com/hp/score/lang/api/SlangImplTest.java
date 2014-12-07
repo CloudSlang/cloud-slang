@@ -32,7 +32,6 @@ import org.eclipse.score.events.ScoreEvent;
 import org.eclipse.score.events.ScoreEventListener;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -51,8 +50,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anySet;
+import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
@@ -81,17 +80,19 @@ public class SlangImplTest {
     private EventBus eventBus;
     private static final int ALL_EVENTS_SIZE = 16;
 
+    private CompilationArtifact emptyCompilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
+
     @Before
     public void init(){
-        Mockito.reset(score);
+        Mockito.reset(score, compiler);
     }
 
     // Tests for the compileOperation() method
 
     @Test
     public void testCompileOperation() throws IOException {
-        File tempFile = File.createTempFile("temp", null);
-        tempFile.deleteOnExit();
+        File tempFile = createTempFile();
+        Mockito.when(compiler.compile(any(File.class), anyString(), anySetOf(File.class))).thenReturn(emptyCompilationArtifact);
         CompilationArtifact compilationArtifact = slang.compileOperation(tempFile.getPath(), "op", new HashSet<String>());
         Assert.assertNotNull(compilationArtifact);
         Mockito.verify(compiler).compile(tempFile, "op", new HashSet<File>());
@@ -109,8 +110,8 @@ public class SlangImplTest {
 
     @Test
     public void testCompileOperationWithNullDependencies() throws IOException {
-        File tempFile = File.createTempFile("temp", null);
-        tempFile.deleteOnExit();
+        File tempFile = createTempFile();
+        Mockito.when(compiler.compile(any(File.class), anyString(), anySetOf(File.class))).thenReturn(emptyCompilationArtifact);
         CompilationArtifact compilationArtifact = slang.compileOperation(tempFile.getPath(), "op", null);
         Assert.assertNotNull(compilationArtifact);
         Mockito.verify(compiler).compile(tempFile, "op", new HashSet<File>());
@@ -118,12 +119,12 @@ public class SlangImplTest {
 
     @Test
     public void testCompileOperationWithDependencies() throws IOException {
-        File tempFile = File.createTempFile("temp", null);
-        tempFile.deleteOnExit();
+        File tempFile = createTempFile();
         File tempDependencyFile = File.createTempFile("tempDependency", null);
         tempDependencyFile.deleteOnExit();
         Set<String> dependencies = new HashSet<>();
         dependencies.add(tempDependencyFile.getPath());
+        Mockito.when(compiler.compile(any(File.class), anyString(), anySetOf(File.class))).thenReturn(emptyCompilationArtifact);
         CompilationArtifact compilationArtifact = slang.compileOperation(tempFile.getPath(), "op", dependencies);
         Assert.assertNotNull(compilationArtifact);
         Set<File> dependencyFiles = new HashSet<>();
@@ -133,8 +134,7 @@ public class SlangImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCompileOperationWithCorruptedDependencies() throws IOException {
-        File tempFile = File.createTempFile("temp", null);
-        tempFile.deleteOnExit();
+        File tempFile = createTempFile();
         Set<String> dependencies = new HashSet<>();
         dependencies.add("noFile");
         slang.compileOperation(tempFile.getPath(), "op", dependencies);
@@ -142,30 +142,32 @@ public class SlangImplTest {
 
     @Test
     public void testCompileOperationWithNoName() throws IOException {
-        File tempFile = File.createTempFile("temp", null);
-        tempFile.deleteOnExit();
+        File tempFile = createTempFile();
+        Mockito.when(compiler.compile(any(File.class), anyString(), anySetOf(File.class))).thenReturn(emptyCompilationArtifact);
         CompilationArtifact compilationArtifact = slang.compileOperation(tempFile.getPath(), null, new HashSet<String>());
         Assert.assertNotNull(compilationArtifact);
         Mockito.verify(compiler).compile(tempFile, null, new HashSet<File>());
     }
 
-    //todo: fix test
-    @Test
-    @Ignore
+    @Test(expected = Exception.class)
     public void testCompileOperationWithException() throws IOException {
-//        Mockito.doThrow(new Exception()).when(compiler.compile(any(File.class), anyString(), anySet()));
-        when(compiler.compile(any(File.class), anyString(), anySet())).thenThrow(new Exception());
+        Mockito.when(compiler.compile(any(File.class), anyString(), anySetOf(File.class))).thenThrow(Exception.class);
+        File tempFile = createTempFile();
+        slang.compileOperation(tempFile.getPath(), "op", new HashSet<String>());
+    }
+
+    private File createTempFile() throws IOException {
         File tempFile = File.createTempFile("temp", null);
         tempFile.deleteOnExit();
-        slang.compileOperation(tempFile.getPath(), "op", new HashSet<String>());
+        return tempFile;
     }
 
     // Tests for the compile() method
 
     @Test
     public void testCompile() throws IOException {
-        File tempFile = File.createTempFile("temp", null);
-        tempFile.deleteOnExit();
+        File tempFile = createTempFile();
+        Mockito.when(compiler.compile(any(File.class), anyString(), anySetOf(File.class))).thenReturn(emptyCompilationArtifact);
         CompilationArtifact compilationArtifact = slang.compile(tempFile.getPath(), new HashSet<String>());
         Assert.assertNotNull(compilationArtifact);
         Mockito.verify(compiler).compile(tempFile, null, new HashSet<File>());
@@ -204,11 +206,10 @@ public class SlangImplTest {
     @Test
     public void testLaunchOperation() throws IOException {
         Slang mockSlang = Mockito.mock(SlangImpl.class);
-        File tempFile = File.createTempFile("temp", null);
-        tempFile.deleteOnExit();
+        File tempFile = createTempFile();
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
         Mockito.when(mockSlang.compileOperation(tempFile.getPath(), "op", new HashSet<String>())).thenReturn(compilationArtifact);
-        when(mockSlang.launchOperation(anyString(), anyString(), anySet(), anyMap())).thenCallRealMethod();
+        when(mockSlang.launchOperation(anyString(), anyString(), anySetOf(String.class), anyMapOf(String.class,String.class))).thenCallRealMethod();
         Long id = mockSlang.launchOperation(tempFile.getPath(), "op", new HashSet<String>(), new HashMap<String, String>());
         Assert.assertNotNull(id);
         Mockito.verify(mockSlang).run(compilationArtifact, new HashMap<String, String>());
@@ -219,10 +220,9 @@ public class SlangImplTest {
     @Test
     public void testLaunch() throws IOException {
         Slang mockSlang = Mockito.mock(SlangImpl.class);
-        File tempFile = File.createTempFile("temp", null);
-        tempFile.deleteOnExit();
+        File tempFile = createTempFile();
 
-        when(mockSlang.launch(anyString(), anySet(), anyMap())).thenCallRealMethod();
+        when(mockSlang.launch(anyString(), anySetOf(String.class), anyMapOf(String.class,String.class))).thenCallRealMethod();
         Long id = mockSlang.launch(tempFile.getPath(), new HashSet<String>(), new HashMap<String, String>());
         Assert.assertNotNull(id);
         Mockito.verify(mockSlang).launchOperation(tempFile.getPath(), null, new HashSet<String>(), new HashMap<String, String>());
@@ -242,7 +242,7 @@ public class SlangImplTest {
     @Test
     public void testSubscribeOnEvents(){
         Slang mockSlang = Mockito.mock(SlangImpl.class);
-        Mockito.doCallRealMethod().when(mockSlang).subscribeOnEvents(anySet());
+        Mockito.doCallRealMethod().when(mockSlang).subscribeOnEvents(anySetOf(String.class));
         Set<String> eventTypes = new HashSet<>();
         eventTypes.add(EventConstants.SCORE_ERROR_EVENT);
         mockSlang.subscribeOnEvents(eventTypes);
@@ -297,8 +297,7 @@ public class SlangImplTest {
         public SlangCompiler compiler() {
             SlangCompiler compiler = mock(SlangCompiler.class);
             CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
-            Mockito.when(compiler.compile(any(File.class), anyString(), anySet())).thenReturn(compilationArtifact);
-            Mockito.when(compiler.compileFlow(any(File.class), anySet())).thenReturn(compilationArtifact);
+            Mockito.when(compiler.compileFlow(any(File.class), anySetOf(File.class))).thenReturn(compilationArtifact);
             return compiler;
         }
 
