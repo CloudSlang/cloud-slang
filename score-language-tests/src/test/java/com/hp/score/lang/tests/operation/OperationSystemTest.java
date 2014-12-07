@@ -18,20 +18,17 @@
 */
 package com.hp.score.lang.tests.operation;
 
-import com.google.common.collect.Sets;
+import com.hp.score.lang.entities.CompilationArtifact;
 import org.eclipse.score.events.EventConstants;
 import org.eclipse.score.events.ScoreEvent;
-import com.hp.score.lang.entities.CompilationArtifact;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.Serializable;
-import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * User: stoneo
@@ -44,7 +41,7 @@ public class OperationSystemTest extends SystemsTestsParent {
     @Test
     public void testCompileAndRunOperationBasic() throws Exception {
         URL resource = getClass().getResource("/yaml/simple_operations.yaml");
-        CompilationArtifact compilationArtifact = compiler.compile(new File(resource.toURI()), "test_op", null);
+        CompilationArtifact compilationArtifact = slang.compileOperation(new File(resource.toURI()), "test_op", null);
         //Trigger ExecutionPlan
         Map<String, Serializable> userInputs = new HashMap<>();
         ScoreEvent event = trigger(compilationArtifact, userInputs);
@@ -54,7 +51,7 @@ public class OperationSystemTest extends SystemsTestsParent {
     @Test
     public void testCompileAndRunOperationWithData() throws Exception {
         URL resource = getClass().getResource("/yaml/operation_with_data.yaml");
-        CompilationArtifact compilationArtifact = compiler.compile(new File(resource.toURI()), "test_op_2", null);
+        CompilationArtifact compilationArtifact = slang.compileOperation(new File(resource.toURI()), "test_op_2", null);
         //Trigger ExecutionPlan
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("input1", "value1");

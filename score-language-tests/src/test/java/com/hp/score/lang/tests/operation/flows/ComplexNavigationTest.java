@@ -21,7 +21,6 @@ package com.hp.score.lang.tests.operation.flows;
 import com.google.common.collect.Sets;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.tests.operation.SystemsTestsParent;
-
 import org.eclipse.score.events.EventConstants;
 import org.eclipse.score.events.ScoreEvent;
 import org.junit.Assert;
@@ -50,7 +49,7 @@ public class ComplexNavigationTest extends SystemsTestsParent{
         URI operationsPython = getClass().getResource("/yaml/simple_operations.yaml").toURI();
 
         Set<File> path = Sets.newHashSet(new File(operationsEmail), new File(operationsPython));
-        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(resource), path);
+        CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
 
         //TODO: remove default values for inputs
         Map<String, Serializable> userInputs = new HashMap<>();

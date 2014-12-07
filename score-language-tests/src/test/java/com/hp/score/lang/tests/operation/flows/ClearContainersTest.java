@@ -19,11 +19,10 @@
 package com.hp.score.lang.tests.operation.flows;
 
 import com.google.common.collect.Sets;
-import org.eclipse.score.events.EventConstants;
-import org.eclipse.score.events.ScoreEvent;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.tests.operation.SystemsTestsParent;
-
+import org.eclipse.score.events.EventConstants;
+import org.eclipse.score.events.ScoreEvent;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -49,7 +48,7 @@ public class ClearContainersTest  extends SystemsTestsParent {
         URI operations = getClass().getResource("/yaml/docker-demo/").toURI();
 
         Set<File> path = Sets.newHashSet(new File(operations));
-        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(resource), path);
+        CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
 
         //TODO: remove default values for inputs
         Map<String, Serializable> userInputs = new HashMap<>();

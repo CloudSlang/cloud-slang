@@ -18,17 +18,16 @@
 */
 package com.hp.score.lang.tests.operation;
 
-import org.eclipse.score.api.Score;
+import com.hp.score.lang.api.Slang;
+import com.hp.score.lang.entities.CompilationArtifact;
+import com.hp.score.lang.entities.ScoreLangConstants;
+import com.hp.score.lang.runtime.env.RunEnvironment;
+import com.hp.score.lang.runtime.env.RunEnvironment;
 import org.eclipse.score.api.TriggeringProperties;
 import org.eclipse.score.events.EventBus;
 import org.eclipse.score.events.EventConstants;
 import org.eclipse.score.events.ScoreEvent;
 import org.eclipse.score.events.ScoreEventListener;
-import com.hp.score.lang.compiler.SlangCompiler;
-import com.hp.score.lang.entities.CompilationArtifact;
-import com.hp.score.lang.entities.ScoreLangConstants;
-import com.hp.score.lang.runtime.env.RunEnvironment;
-
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +41,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static com.hp.score.lang.entities.ScoreLangConstants.*;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_END;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_ERROR;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_START;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_START;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
+import static com.hp.score.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
 
 /*
  * Created by orius123 on 12/11/14.
@@ -52,13 +59,10 @@ import static com.hp.score.lang.entities.ScoreLangConstants.*;
 public class SystemsTestsParent {
 
     @Autowired
-    protected SlangCompiler compiler;
-
-    @Autowired
     protected EventBus eventBus;
 
     @Autowired
-    protected Score score;
+    protected Slang slang;
 
     private LinkedBlockingQueue<ScoreEvent> queue = new LinkedBlockingQueue<>();
 
@@ -70,7 +74,7 @@ public class SystemsTestsParent {
                 .setContext(executionContext);
 
         registerHandlers();
-        score.trigger(triggeringProperties);
+        slang.run(compilationArtifact, userInputs);
         ScoreEvent event;
         do {
             event = queue.take();

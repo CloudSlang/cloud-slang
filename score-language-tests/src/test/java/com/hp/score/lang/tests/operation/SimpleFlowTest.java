@@ -19,11 +19,10 @@
 package com.hp.score.lang.tests.operation;
 
 import com.google.common.collect.Sets;
+import com.hp.score.lang.entities.CompilationArtifact;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.score.events.EventConstants;
 import org.eclipse.score.events.ScoreEvent;
-import com.hp.score.lang.entities.CompilationArtifact;
-
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,8 +31,8 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Date: 11/14/2014
@@ -61,7 +60,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
 
         Set<File> path = Sets.newHashSet(new File(operations));
-        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(resource), path);
+        CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("object_value", "SessionValue");
@@ -74,7 +73,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
 		URI flow = getClass().getResource("/yaml/simple_flow.yaml").toURI();
 		URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
 		Set<File> path = Sets.newHashSet(new File(operations));
-		CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
+		CompilationArtifact compilationArtifact = slang.compile(new File(flow), path);
 		HashMap<String, Serializable> userInputs = new HashMap<>();
         for (Entry<String, ? extends Serializable> input : inputs) {
             userInputs.put(input.getKey(), input.getValue());
