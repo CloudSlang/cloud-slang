@@ -18,8 +18,6 @@
 */
 package com.hp.score.lang.runtime.steps;
 
-import org.eclipse.score.events.ScoreEvent;
-import org.eclipse.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.entities.bindings.Result;
@@ -32,6 +30,8 @@ import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import com.hp.score.lang.runtime.events.LanguageEventData;
 import junit.framework.Assert;
+import org.eclipse.score.events.ScoreEvent;
+import org.eclipse.score.lang.ExecutionRuntimeServices;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.script.ScriptEngine;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_END;

@@ -10,14 +10,14 @@ package com.hp.score.lang.runtime.steps;
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
-import org.eclipse.score.api.execution.ExecutionParametersConsts;
-import org.eclipse.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.entities.ActionType;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
+import org.eclipse.score.api.execution.ExecutionParametersConsts;
+import org.eclipse.score.lang.ExecutionRuntimeServices;
 import org.python.core.PyModule;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static org.eclipse.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static com.hp.score.lang.entities.ScoreLangConstants.ACTION_CLASS_KEY;
 import static com.hp.score.lang.entities.ScoreLangConstants.ACTION_METHOD_KEY;
 import static com.hp.score.lang.entities.ScoreLangConstants.ACTION_TYPE;
@@ -47,6 +46,7 @@ import static com.hp.score.lang.entities.ScoreLangConstants.RUN_ENV;
 import static com.hp.score.lang.runtime.events.LanguageEventData.CALL_ARGUMENTS;
 import static com.hp.score.lang.runtime.events.LanguageEventData.EXCEPTION;
 import static com.hp.score.lang.runtime.events.LanguageEventData.RETURN_VALUES;
+import static org.eclipse.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
 /**
  * User: stoneo

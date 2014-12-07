@@ -20,7 +20,6 @@ package com.hp.score.lang.compiler;
 
 import ch.lambdaj.Lambda;
 import ch.lambdaj.function.convert.Converter;
-import org.eclipse.score.api.ExecutionPlan;
 import com.hp.score.lang.compiler.domain.CompiledExecutable;
 import com.hp.score.lang.compiler.domain.CompiledFlow;
 import com.hp.score.lang.compiler.domain.CompiledOperation;
@@ -33,11 +32,16 @@ import com.hp.score.lang.entities.CompilationArtifact;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.eclipse.score.api.ExecutionPlan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static ch.lambdaj.Lambda.convertMap;
 import static ch.lambdaj.Lambda.having;

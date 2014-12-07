@@ -18,7 +18,13 @@ package com.hp.score.lang.compiler.utils;/*
 */
 
 import com.hp.score.lang.compiler.SlangTextualKeys;
-import com.hp.score.lang.compiler.domain.*;
+import com.hp.score.lang.compiler.domain.CompiledDoAction;
+import com.hp.score.lang.compiler.domain.CompiledExecutable;
+import com.hp.score.lang.compiler.domain.CompiledFlow;
+import com.hp.score.lang.compiler.domain.CompiledOperation;
+import com.hp.score.lang.compiler.domain.CompiledTask;
+import com.hp.score.lang.compiler.domain.CompiledWorkflow;
+import com.hp.score.lang.compiler.domain.SlangFile;
 import com.hp.score.lang.compiler.transformers.Transformer;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.entities.bindings.Input;
@@ -35,7 +41,15 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static ch.lambdaj.Lambda.exists;
 import static ch.lambdaj.Lambda.filter;

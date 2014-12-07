@@ -7,15 +7,19 @@
  */
 package com.hp.score.lang.compiler.utils;
 
-import org.eclipse.score.api.ExecutionPlan;
-import org.eclipse.score.api.ExecutionStep;
-import com.hp.score.lang.compiler.domain.*;
+import com.hp.score.lang.compiler.domain.CompiledDoAction;
+import com.hp.score.lang.compiler.domain.CompiledExecutable;
+import com.hp.score.lang.compiler.domain.CompiledFlow;
+import com.hp.score.lang.compiler.domain.CompiledOperation;
+import com.hp.score.lang.compiler.domain.CompiledTask;
+import com.hp.score.lang.compiler.domain.CompiledWorkflow;
 import com.hp.score.lang.entities.ResultNavigation;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.entities.bindings.Result;
-
+import org.eclipse.score.api.ExecutionPlan;
+import org.eclipse.score.api.ExecutionStep;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -25,7 +29,12 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyMapOf;

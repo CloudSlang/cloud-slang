@@ -18,11 +18,11 @@
 */
 package com.hp.score.lang.compiler;
 
-import org.eclipse.score.api.ExecutionPlan;
-import org.eclipse.score.api.ExecutionStep;
 import com.hp.score.lang.compiler.configuration.SlangCompilerSpringConfig;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.ScoreLangConstants;
+import org.eclipse.score.api.ExecutionPlan;
+import org.eclipse.score.api.ExecutionStep;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Rule;

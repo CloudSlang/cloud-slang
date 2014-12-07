@@ -7,8 +7,6 @@
  */
 package com.hp.score.lang.runtime.steps;
 
-import org.eclipse.score.events.ScoreEvent;
-import org.eclipse.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.entities.ResultNavigation;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Output;
@@ -19,9 +17,9 @@ import com.hp.score.lang.runtime.env.ParentFlowData;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import com.hp.score.lang.runtime.events.LanguageEventData;
-
 import junit.framework.Assert;
-
+import org.eclipse.score.events.ScoreEvent;
+import org.eclipse.score.lang.ExecutionRuntimeServices;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +29,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.script.ScriptEngine;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +43,6 @@ import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
 import static com.hp.score.lang.entities.ScoreLangConstants.FAILURE_RESULT;
 import static com.hp.score.lang.entities.ScoreLangConstants.SUCCESS_RESULT;
-
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;

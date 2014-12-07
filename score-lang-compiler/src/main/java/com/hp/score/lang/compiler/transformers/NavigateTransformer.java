@@ -25,7 +25,11 @@ package com.hp.score.lang.compiler.transformers;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class NavigateTransformer implements Transformer<Map<String, Object>, Map<String, String>> {

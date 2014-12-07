@@ -19,24 +19,25 @@
 package com.hp.score.lang.compiler.utils;
 
 import ch.lambdaj.Lambda;
-
-import org.eclipse.score.api.ExecutionPlan;
-import org.eclipse.score.api.ExecutionStep;
 import com.hp.score.lang.compiler.domain.CompiledFlow;
 import com.hp.score.lang.compiler.domain.CompiledOperation;
 import com.hp.score.lang.compiler.domain.CompiledTask;
 import com.hp.score.lang.entities.ResultNavigation;
 import com.hp.score.lang.entities.bindings.Result;
-
 import org.apache.commons.collections4.CollectionUtils;
+import org.eclipse.score.api.ExecutionPlan;
+import org.eclipse.score.api.ExecutionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
-
 import static org.hamcrest.Matchers.equalTo;
 
 /*

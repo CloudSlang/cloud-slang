@@ -7,9 +7,9 @@
  */
 package com.hp.score.lang.entities.bindings;
 
-import java.io.Serializable;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import java.io.Serializable;
 
 /**
  * @author moradi

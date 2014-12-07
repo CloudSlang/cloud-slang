@@ -20,12 +20,12 @@ package com.hp.score.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
-import org.eclipse.score.api.execution.ExecutionParametersConsts;
-import org.eclipse.score.events.ScoreEvent;
-import org.eclipse.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import junit.framework.Assert;
+import org.eclipse.score.api.execution.ExecutionParametersConsts;
+import org.eclipse.score.events.ScoreEvent;
+import org.eclipse.score.lang.ExecutionRuntimeServices;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.python.util.PythonInterpreter;

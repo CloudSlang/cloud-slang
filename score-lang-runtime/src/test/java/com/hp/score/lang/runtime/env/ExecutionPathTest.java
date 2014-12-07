@@ -7,14 +7,13 @@
  */
 package com.hp.score.lang.runtime.env;
 
-import java.util.NoSuchElementException;
-
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import java.util.NoSuchElementException;
 
 import static com.hp.score.lang.runtime.env.ExecutionPath.PATH_SEPARATOR;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author moradi

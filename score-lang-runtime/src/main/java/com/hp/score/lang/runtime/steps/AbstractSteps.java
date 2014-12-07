@@ -7,12 +7,12 @@
  */
 package com.hp.score.lang.runtime.steps;
 
-import org.eclipse.score.lang.ExecutionRuntimeServices;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.runtime.env.ContextStack;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import com.hp.score.lang.runtime.events.LanguageEventData;
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.score.lang.ExecutionRuntimeServices;
 
 import java.io.Serializable;
 import java.util.Date;

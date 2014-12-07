@@ -7,13 +7,13 @@
  */
 package com.hp.score.lang.compiler.utils;
 
-import org.eclipse.score.api.ExecutionStep;
 import com.hp.score.lang.compiler.SlangTextualKeys;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.entities.bindings.Result;
 import junit.framework.Assert;
+import org.eclipse.score.api.ExecutionStep;
 import org.junit.Before;
 import org.junit.Test;
 

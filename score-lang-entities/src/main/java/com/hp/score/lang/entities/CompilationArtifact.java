@@ -18,8 +18,8 @@
 */
 package com.hp.score.lang.entities;
 
-import org.eclipse.score.api.ExecutionPlan;
 import com.hp.score.lang.entities.bindings.Input;
+import org.eclipse.score.api.ExecutionPlan;
 
 import java.util.List;
 import java.util.Map;
