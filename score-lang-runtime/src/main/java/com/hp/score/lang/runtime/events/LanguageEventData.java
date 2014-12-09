@@ -37,7 +37,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
 
 	public enum levelName {
 		TASK_NAME,
-		EXECUTABLE_NAME;
+		EXECUTABLE_NAME
 	}
 
 	public String getEventType() {
