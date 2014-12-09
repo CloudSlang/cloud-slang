@@ -45,6 +45,8 @@ import static com.hp.score.lang.entities.ScoreLangConstants.PYTHON_SCRIPT_KEY;
 import static com.hp.score.lang.entities.ScoreLangConstants.RUN_ENV;
 import static com.hp.score.lang.runtime.events.LanguageEventData.CALL_ARGUMENTS;
 import static com.hp.score.lang.runtime.events.LanguageEventData.EXCEPTION;
+import static com.hp.score.lang.runtime.events.LanguageEventData.OUTPUTS;
+import static com.hp.score.lang.runtime.events.LanguageEventData.RESULT;
 import static com.hp.score.lang.runtime.events.LanguageEventData.RETURN_VALUES;
 import static org.eclipse.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
@@ -95,7 +97,7 @@ public class ActionSteps extends AbstractSteps {
 
         ReturnValues returnValues = new ReturnValues(returnValue, null);
         runEnv.putReturnValues(returnValues);
-        fireEvent(executionRuntimeServices, runEnv, EVENT_ACTION_END, "Action performed", Pair.of(RETURN_VALUES, returnValues));
+        fireEvent(executionRuntimeServices, runEnv, EVENT_ACTION_END, "Action performed", Pair.of(RETURN_VALUES, (Serializable)returnValue));
 
         runEnv.putNextStepPosition(nextStepId);
     }
