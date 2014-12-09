@@ -113,7 +113,7 @@ public class DependenciesHelper {
                 CompiledExecutable matchingRef = Lambda.selectFirst(availableDependencies, having(on(CompiledExecutable.class).getId(), equalTo(refId)));
                 if (matchingRef == null) {
                     throw new RuntimeException("Reference: " + refId + " of task: " + task.getName() + " in flow: "
-                            + flow.getName() + "wasn't found in path");
+                            + flow.getName() + " wasn't found in path");
                 }
                 validateNavigation(task, matchingRef);
                 //first we put the reference on the map
