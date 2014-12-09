@@ -77,7 +77,6 @@ public class SlangImpl implements Slang{
         Set<File> dependencyFiles = new HashSet<>();
         if (dependencies != null) {
             for(File dependency : dependencies) {
-                Validate.isTrue(dependency.isFile(), "dependency must lead to a file");
                 dependencyFiles.add(dependency);
             }
         }
