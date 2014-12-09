@@ -34,23 +34,12 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_END;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_ERROR;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_START;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_START;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
-import static com.hp.score.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
+import static com.hp.score.lang.entities.ScoreLangConstants.*;
 
 /**
  * Date: 11/7/2014
@@ -74,7 +63,7 @@ public class SlangCLI implements CommandMarker {
     /**
      * This global param holds the state of the CLI, if flows need to run in ASYNC or in SYNC manner.
      */
-    private Boolean triggerAsync = false ;
+    private Boolean triggerAsync = false;
 
     private final static Logger logger = Logger.getLogger(SlangCLI.class);
 
@@ -83,45 +72,47 @@ public class SlangCLI implements CommandMarker {
 
     @CliCommand(value = "run", help = "triggers a slang flow")
     public String run(
-            @CliOption(key = "f", mandatory = true, help = "Path to filename. e.g. slang run --f C:\\Slang\\flow.yaml") final String filePath,
-            @CliOption(key = "cp", mandatory = false,
-                    help = "Classpath , a file directory to flow dependencies, by default it will take flow file dir") final String classPath,
+            @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. slang run --f C:\\Slang\\flow.yaml") final File file,
+            @CliOption(key = {"cp", "classpath"}, mandatory = false,
+                    help = "Classpath , a file directory to flow dependencies, by default it will take flow file dir") final File classPath,
             //@CliOption(key = "sp", mandatory = false, help = "System property file location") final String systemProperty,//not supported for now...
-            @CliOption(key = "i", mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, Serializable> inputs) throws IOException {
+            @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, Serializable> inputs) throws IOException {
 
 
-        CompilationArtifact compilationArtifact = compilerHelper.compile(filePath,null,classPath);
+        String classPathAbsolutePath = classPath != null ? classPath.getAbsolutePath() : null;
+        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, classPathAbsolutePath);
 
-        Long id ;
-        if(!triggerAsync){
+        Long id;
+        if (!triggerAsync) {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
             id = scoreServices.triggerSync(compilationArtifact, inputs);
             stopWatch.stop();
-            return FLOW_EXECUTION_TIME_TOOK +stopWatch.toString() + WITH_EXECUTION_ID_MSG + id ;
+            return FLOW_EXECUTION_TIME_TOOK + stopWatch.toString() + WITH_EXECUTION_ID_MSG + id;
         }
         id = scoreServices.trigger(compilationArtifact, inputs);
-        return triggerMsg(id,compilationArtifact.getExecutionPlan().getName());
+        return triggerMsg(id, compilationArtifact.getExecutionPlan().getName());
     }
 
     @CliCommand(value = "env", help = "Set environment var relevant to the CLI")
     public String setEnvVar(
             @CliOption(key = "setAsync", mandatory = true, help = "set the async") final boolean switchAsync) throws IOException {
-        triggerAsync = switchAsync ;
+        triggerAsync = switchAsync;
         return "flow execution ASYNC execution was changed to : " + triggerAsync;
     }
 
     @CliCommand(value = "inputs", help = "Get flow inputs")
     public List<String> getFlowInputs(
-            @CliOption(key = "f", mandatory = true, help = "Path to filename. e.g. slang run --f C:\\Slang\\flow.yaml") final String filePath,
-            @CliOption(key = "cp", mandatory = false,
-                    help = "Classpath, a file directory to flow dependencies, by default it will take flow file dir") final String classPath)
+            @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. slang inputs --f C:\\Slang\\flow.yaml") final File file,
+            @CliOption(key = {"cp", "classpath"}, mandatory = false,
+                    help = "Classpath, a file directory to flow dependencies, by default it will take flow file dir") final File classPath)
             throws IOException {
-        CompilationArtifact compilationArtifact = compilerHelper.compile(filePath,null,classPath);
+        String classPathAbsolutePath = classPath != null ? classPath.getAbsolutePath() : null;
+        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, classPathAbsolutePath);
         List<Input> inputs = compilationArtifact.getInputs();
         List<String> inputsResult = new ArrayList<>();
-        for(Input input:inputs){
-            if(!input.isOverride()){
+        for (Input input : inputs) {
+            if (!input.isOverride()) {
                 inputsResult.add(input.getName());
             }
         }

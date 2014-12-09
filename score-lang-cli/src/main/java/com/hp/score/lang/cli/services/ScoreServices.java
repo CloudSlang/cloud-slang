@@ -21,6 +21,7 @@ package com.hp.score.lang.cli.services;
 import com.hp.score.lang.api.Slang;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.ScoreLangConstants;
+import com.hp.score.lang.runtime.env.ExecutionPath;
 import com.hp.score.lang.runtime.events.LanguageEventData;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.score.events.EventConstants;
@@ -57,6 +58,7 @@ public class ScoreServices {
 
     @Autowired
     private Slang slang;
+    private final static String TASK_PATH_PREFIX = "- ";
 
     public void subscribe(ScoreEventListener eventHandler, Set<String> eventTypes) {
         slang.subscribeOnEvents(eventHandler, eventTypes);
@@ -64,7 +66,7 @@ public class ScoreServices {
 
     /**
      * This method will trigger the flow in an Async matter.
-     * @param compilationArtifact
+     * @param compilationArtifact the artifact to trigger
      * @param inputs : flow inputs
      * @return executionId
      */
@@ -74,7 +76,7 @@ public class ScoreServices {
 
     /**
      * This method will trigger the flow in a synchronize matter, meaning only one flow can run at a time.
-     * @param compilationArtifact
+     * @param compilationArtifact the artifact to trigger
      * @param inputs : flow inputs
      * @return executionId
      */
@@ -93,7 +95,11 @@ public class ScoreServices {
 
         Long executionId = trigger(compilationArtifact, inputs);
 
-        while(!scoreEventListener.isFlowFinished()){}//todo : need to add here sleep?
+        while(!scoreEventListener.isFlowFinished()){
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException ignore) {}
+        }
 
         slang.unSubscribeOnEvents(scoreEventListener);
 
@@ -111,28 +117,34 @@ public class ScoreServices {
 
         @Override
         public synchronized void onEvent(ScoreEvent scoreEvent) throws InterruptedException {
-            Map<String,Serializable> data = (Map<String,Serializable>)scoreEvent.getData();
+            @SuppressWarnings("unchecked") Map<String,Serializable> data = (Map<String,Serializable>)scoreEvent.getData();
             switch (scoreEvent.getEventType()){
                 case EventConstants.SCORE_FINISHED_EVENT :
-                    flowFinished.set(true); break;
+                    flowFinished.set(true);
+                    break;
                 case EventConstants.SCORE_ERROR_EVENT :
                     printWithColor(Ansi.Color.RED, SCORE_ERROR_EVENT_MSG + data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " +
                             data.get(EventConstants.SCORE_ERROR_MSG));
                     break;
                 case EventConstants.SCORE_FAILURE_EVENT :
                     printWithColor(Ansi.Color.RED,FLOW_FINISHED_WITH_FAILURE_MSG);
-                    flowFinished.set(true); break;
+                    flowFinished.set(true);
+                    break;
                 case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
                     printWithColor(Ansi.Color.RED,SLANG_STEP_ERROR_MSG + data.get(EXCEPTION));
                     break;
                 case ScoreLangConstants.EVENT_INPUT_END:
                     String taskName = (String)data.get(LanguageEventData.levelName.TASK_NAME.name());
                     if(StringUtils.isNotEmpty(taskName)){
-                        printWithColor(Ansi.Color.YELLOW,taskName);
+                        String path = (String) data.get(LanguageEventData.PATH);
+                        int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
+                        String prefix = StringUtils.repeat(TASK_PATH_PREFIX, matches);
+                        printWithColor(Ansi.Color.YELLOW, prefix + taskName);
                     }
                     break;
                 case EVENT_EXECUTION_FINISHED :
-                    printFinishEvent(data); break;
+                    printFinishEvent(data);
+                    break;
             }
         }
 
@@ -143,8 +155,8 @@ public class ScoreServices {
         }
 
         private void printWithColor(Ansi.Color color, String msg){
-            AnsiConsole.out().print(ansi().ansi().fg(color).a(msg).newline());
-            AnsiConsole.out().print(ansi().ansi().fg(Ansi.Color.WHITE));
+            AnsiConsole.out().print(ansi().fg(color).a(msg).newline());
+            AnsiConsole.out().print(ansi().fg(Ansi.Color.WHITE));
 
         }
     }
