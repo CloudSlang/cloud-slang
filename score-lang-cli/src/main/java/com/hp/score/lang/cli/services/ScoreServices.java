@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
 import static com.hp.score.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
+import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
 import static com.hp.score.lang.runtime.events.LanguageEventData.EXCEPTION;
 import static com.hp.score.lang.runtime.events.LanguageEventData.RESULT;
 import static org.fusesource.jansi.Ansi.ansi;
@@ -88,7 +89,7 @@ public class ScoreServices {
         handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
         handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
         handlerTypes.add(EVENT_EXECUTION_FINISHED);
-        handlerTypes.add(ScoreLangConstants.EVENT_INPUT_END);
+        handlerTypes.add(EVENT_INPUT_END);
 
         SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener();
         slang.subscribeOnEvents(scoreEventListener, handlerTypes);
