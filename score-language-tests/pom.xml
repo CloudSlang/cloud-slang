@@ -71,6 +71,10 @@
             <groupId>org.eclipse.score.content</groupId>
             <artifactId>score-http-client</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
 
     </dependencies>
 

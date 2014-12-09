@@ -1,0 +1,56 @@
+namespace: openstack.flows
+
+imports:
+ ops: openstack.ops
+ flows: openstack.flows
+
+flow:
+  name: delete_server_flow
+  inputs:
+    - host
+    - identityPort
+    - computePort
+    - username
+    - password
+    - serverName
+  workflow:
+    get_authentication:
+      do:
+        ops.get_authentication:
+          - host
+          - identityPort
+          - username
+          - password
+      publish:
+        - authentication: returnResult
+    parse_authentication:
+      do:
+        ops.parse_authentication:
+          - jsonAuthenticationResponse: authentication
+      publish:
+        - token
+        - tenant
+    get_servers:
+      do:
+        ops.get_openstack_servers:
+          - host
+          - computePort
+          - token
+          - tenant
+      publish:
+        - server_list: returnResult
+    get_server_id:
+      do:
+        ops.get_server_id:
+          - server_body: server_list
+          - deleteServerName: serverName
+      publish:
+        - serverID
+    delete_server:
+      do:
+        ops.delete_openstack_server:
+          - host
+          - computePort
+          - token
+          - tenant
+          - serverID

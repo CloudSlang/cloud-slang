@@ -11,8 +11,7 @@ operations:
             default: "'http://'+ host + ':' + identityPort + '/v2.0/tokens'"
             override: true
         - body:
-            default: |
-             "'{\"auth\": {\"tenantName\": \"demo\",\"passwordCredentials\": {\"username\":\"' + username + '\", \"password\"' + password + '\"}}}'"
+            default: "'{\"auth\": {\"tenantName\": \"demo\",\"passwordCredentials\": {\"username\": \"' + username + '\", \"password\": \"' + password + '\"}}}'"
             override: true
         - method:
             default: "'post'"
@@ -29,7 +28,22 @@ operations:
         - statusCode: statusCode
         - errorMessage: STDERR if statusCode != '200' else returnResult
       results:
-        - SUCCESS : statusCode == '200'
+        - SUCCESS: not 'Connection error' in returnResult
+        - FAILURE
+  - parse_authentication:
+      inputs:
+        - jsonAuthenticationResponse
+      action:
+        java_action:
+          className: com.hp.score.lang.tests.operation.actions.OpenstackUtils
+          methodName: parseAuthentication
+      outputs:
+        - token: parsedToken
+        - tenant: parsedTenant
+        - returnResult: returnResult
+        - returnCode: returnCode
+      results:
+        - SUCCESS : returnCode == '0'
         - FAILURE
   - create_openstack_server:
       inputs:
@@ -37,6 +51,8 @@ operations:
         - computePort
         - token
         - tenant
+        - serverName
+        - imgRef
         - headers:
             default: "'X-AUTH-TOKEN:' + token"
             override: true
@@ -44,7 +60,7 @@ operations:
             default: "'http://'+ host + ':' + computePort + '/v2/' + tenant + '/servers'"
             override: true
         - body:
-            default: "'{\"server\": {\"name\": \"' + serverName + '\",\"imageRef\": \"' + imgRef + '\",\"flavorRef\":\"2\",\"max_count\":1,\"min_count\":1,\"security_groups\":[{\"name\": \"default\"}]}}'"
+            default: "'{\"server\": { \"name\": \"' + serverName + '\" , \"imageRef\": \"' + imgRef + '\", \"flavorRef\":\"2\",\"max_count\":1,\"min_count\":1,\"security_groups\": [ {\"name\": \"default\"}] }}'"
             override: true
         - contentType:
             default: "'application/json'"
@@ -87,7 +103,7 @@ operations:
         - statusCode: statusCode
         - errorMessage: STDERR if statusCode != '202' else returnResult
       results:
-        - SUCCESS : statusCode == '202'
+        - SUCCESS
         - FAILURE
   - delete_openstack_server:
       inputs:
@@ -115,3 +131,20 @@ operations:
       results:
         - SUCCESS : statusCode == '0'
         - FAILURE
+  - get_server_id:
+        inputs:
+          - server_body
+          - deleteServerName
+        action:
+          python_script: |
+            import json
+            decoded = json.loads(server_body)
+            serverListJson = decoded['servers']
+            nrServers = len(serverListJson)
+            serverList = ''
+            for index in range(nrServers):
+              serverName = serverListJson[index]['name']
+              if serverName == deleteServerName:
+                serverID = serverListJson[index]['id']
+        outputs:
+          - serverID

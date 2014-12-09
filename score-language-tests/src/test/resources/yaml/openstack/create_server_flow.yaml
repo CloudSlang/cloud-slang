@@ -1,0 +1,45 @@
+namespace: openstack.flows
+
+imports:
+ ops: openstack.ops
+ flows: openstack.flows
+
+flow:
+  name: create_server_flow
+  inputs:
+    - host
+    - identityPort
+    - computePort
+    - imgRef
+    - username
+    - password
+    - serverName
+  workflow:
+    get_authentication:
+      do:
+        ops.get_authentication:
+          - host
+          - identityPort
+          - username
+          - password
+      publish:
+        - authentication: returnResult
+
+    parse_authentication:
+      do:
+        ops.parse_authentication:
+          - jsonAuthenticationResponse: authentication
+      publish:
+        - token
+        - tenant
+
+    create_server:
+      do:
+        ops.create_openstack_server:
+          - host
+          - computePort
+          - token
+          - tenant
+          - imgRef
+          - serverName
+

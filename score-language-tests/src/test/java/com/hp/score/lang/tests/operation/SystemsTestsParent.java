@@ -20,11 +20,6 @@ package com.hp.score.lang.tests.operation;
 
 import com.hp.score.lang.api.Slang;
 import com.hp.score.lang.entities.CompilationArtifact;
-import com.hp.score.lang.entities.ScoreLangConstants;
-import com.hp.score.lang.runtime.env.RunEnvironment;
-import com.hp.score.lang.runtime.env.RunEnvironment;
-import org.eclipse.score.api.TriggeringProperties;
-import org.eclipse.score.events.EventBus;
 import org.eclipse.score.events.EventConstants;
 import org.eclipse.score.events.ScoreEvent;
 import org.eclipse.score.events.ScoreEventListener;
@@ -35,21 +30,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_END;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_ERROR;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_START;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_START;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
-import static com.hp.score.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
+import static com.hp.score.lang.entities.ScoreLangConstants.*;
 
 /*
  * Created by orius123 on 12/11/14.
@@ -59,20 +45,11 @@ import static com.hp.score.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCE
 public class SystemsTestsParent {
 
     @Autowired
-    protected EventBus eventBus;
-
-    @Autowired
     protected Slang slang;
 
     private LinkedBlockingQueue<ScoreEvent> queue = new LinkedBlockingQueue<>();
 
     protected ScoreEvent trigger(CompilationArtifact compilationArtifact, Map<String, Serializable> userInputs) throws InterruptedException {
-        Map<String, Serializable> executionContext = createExecutionContext(userInputs);
-        TriggeringProperties triggeringProperties = TriggeringProperties
-                .create(compilationArtifact.getExecutionPlan())
-                .setDependencies(compilationArtifact.getDependencies())
-                .setContext(executionContext);
-
         registerHandlers();
         slang.run(compilationArtifact, userInputs);
         ScoreEvent event;
@@ -80,16 +57,8 @@ public class SystemsTestsParent {
             event = queue.take();
             Assert.assertNotSame("Error event has been thrown during execution", SLANG_EXECUTION_EXCEPTION, event.getEventType());
             System.out.println("Event received: " + event.getEventType() + " Data is: " + event.getData());
-        } while(!EventConstants.SCORE_FINISHED_EVENT.equals(event.getEventType()));
+        } while (!EventConstants.SCORE_FINISHED_EVENT.equals(event.getEventType()));
         return event;
-    }
-
-
-    private static Map<String, Serializable> createExecutionContext(Map<String, Serializable> userInputs) {
-        Map<String, Serializable> executionContext = new HashMap<>();
-        executionContext.put(ScoreLangConstants.RUN_ENV, new RunEnvironment());
-        executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable) userInputs);
-        return executionContext;
     }
 
     private void registerHandlers() {
@@ -106,13 +75,13 @@ public class SystemsTestsParent {
         handlerTypes.add(EVENT_OUTPUT_END);
         handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
         handlerTypes.add(EVENT_EXECUTION_FINISHED);
-        eventBus.subscribe(new ScoreEventListener() {
+        slang.subscribeOnEvents(new ScoreEventListener() {
 
             @Override
             public void onEvent(ScoreEvent event) {
                 try {
                     queue.put(event);
-                } catch(InterruptedException ignore) {}
+                } catch (InterruptedException ignore) {}
             }
         }, handlerTypes);
     }
