@@ -133,14 +133,6 @@ public class SlangImplTest {
         Mockito.verify(compiler).compile(tempFile, "op", dependencyFiles);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testCompileOperationWithCorruptedDependencies() throws IOException {
-        File tempFile = createTempFile();
-        Set<File> dependencies = new HashSet<>();
-        dependencies.add(new File("noFile"));
-        slang.compileOperation(tempFile, "op", dependencies);
-    }
-
     @Test
     public void testCompileOperationWithNoName() throws IOException {
         File tempFile = createTempFile();
