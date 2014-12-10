@@ -16,8 +16,5 @@ flow:
           - country: str('Israel')
       publish:
         - weather
-      navigate:
-        SUCCESS: SUCCESS
-        FAILURE: FAILURE
   outputs:
     - weather

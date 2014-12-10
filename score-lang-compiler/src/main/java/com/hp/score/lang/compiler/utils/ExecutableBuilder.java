@@ -21,7 +21,6 @@ import com.hp.score.lang.compiler.SlangTextualKeys;
 import com.hp.score.lang.compiler.model.*;
 import com.hp.score.lang.compiler.model.Executable;
 import com.hp.score.lang.compiler.transformers.Transformer;
-import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.entities.bindings.Result;
@@ -51,6 +50,8 @@ import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
+import static com.hp.score.lang.entities.ScoreLangConstants.FAILURE_RESULT;
+import static com.hp.score.lang.entities.ScoreLangConstants.SUCCESS_RESULT;
 
 /*
  * Created by orius123 on 09/11/14.
@@ -167,7 +168,7 @@ public class ExecutableBuilder {
         boolean isOnFailureDefined = onFailureWorkFlow != null;
 
         String defaultFailure = isOnFailureDefined ?
-                onFailureWorkFlow.getTasks().getFirst().getName() : ScoreLangConstants.FAILURE_RESULT;
+                onFailureWorkFlow.getTasks().getFirst().getName() : FAILURE_RESULT;
 
         while (iterator.hasNext()) {
             Map.Entry<String, Map<String, Object>> taskRawData = iterator.next();
@@ -178,7 +179,7 @@ public class ExecutableBuilder {
             if (nextTaskData != null) {
                 defaultSuccess = nextTaskData.getKey();
             } else {
-                defaultSuccess = onFailureSection ? ScoreLangConstants.FAILURE_RESULT : ScoreLangConstants.SUCCESS_RESULT;
+                defaultSuccess = onFailureSection ? FAILURE_RESULT : SUCCESS_RESULT;
             }
             Task task = compileTask(taskName, taskRawDataValue, defaultSuccess, imports, defaultFailure);
             tasks.add(task);
@@ -218,8 +219,8 @@ public class ExecutableBuilder {
         //default navigation
         if (MapUtils.isEmpty(navigationStrings)) {
             navigationStrings = new HashMap<>();
-            navigationStrings.put(ScoreLangConstants.SUCCESS_RESULT, defaultSuccess);
-            navigationStrings.put(ScoreLangConstants.FAILURE_RESULT, defaultFailure);
+            navigationStrings.put(SUCCESS_RESULT, defaultSuccess);
+            navigationStrings.put(FAILURE_RESULT, defaultFailure);
         }
 
         return new Task(taskName, preTaskData, postTaskData, navigationStrings, refId);

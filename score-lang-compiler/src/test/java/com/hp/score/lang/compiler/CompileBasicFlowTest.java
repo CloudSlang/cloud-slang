@@ -20,7 +20,7 @@ package com.hp.score.lang.compiler;
 
 import com.hp.score.lang.compiler.configuration.SlangCompilerSpringConfig;
 import com.hp.score.lang.entities.CompilationArtifact;
-import com.hp.score.lang.entities.ScoreLangConstants;
+import com.hp.score.lang.entities.ResultNavigation;
 import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.entities.bindings.Result;
@@ -39,6 +39,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.hp.score.lang.entities.ScoreLangConstants.*;
+
 
 /*
  * Created by orius123 on 05/11/14.
@@ -83,35 +86,40 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
 
         ExecutionStep startStep = executionPlan.getStep(1L);
-        @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) startStep.getActionData().get(ScoreLangConstants.OPERATION_INPUTS_KEY);
+        @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) startStep.getActionData().get(OPERATION_INPUTS_KEY);
         Assert.assertNotNull("inputs doesn't exist", inputs);
         Assert.assertEquals("there is a different number of inputs than expected", 1, inputs.size());
 
         ExecutionStep beginTaskStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") List<Input> taskArguments = (List<Input>) beginTaskStep.getActionData().get(ScoreLangConstants.TASK_INPUTS_KEY);
+        @SuppressWarnings("unchecked") List<Input> taskArguments = (List<Input>) beginTaskStep.getActionData().get(TASK_INPUTS_KEY);
         Assert.assertNotNull("arguments doesn't exist", taskArguments);
         Assert.assertEquals("there is a different number of arguments than expected", 2, taskArguments.size());
         Assert.assertEquals("city", taskArguments.get(0).getName());
         Assert.assertEquals("country", taskArguments.get(1).getName());
-        Assert.assertEquals("CheckWeather", beginTaskStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
+        Assert.assertEquals("CheckWeather", beginTaskStep.getActionData().get(NODE_NAME_KEY));
 
         ExecutionStep FinishTaskSteps = executionPlan.getStep(3L);
-        @SuppressWarnings("unchecked") List<Output> publish = (List<Output>) FinishTaskSteps.getActionData().get(ScoreLangConstants.TASK_PUBLISH_KEY);
-        @SuppressWarnings("unchecked") Map<String, String> navigate = (Map<String, String>) FinishTaskSteps.getActionData().get(ScoreLangConstants.TASK_NAVIGATION_KEY);
-        Assert.assertEquals("CheckWeather", FinishTaskSteps.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
+        @SuppressWarnings("unchecked") List<Output> publish = (List<Output>) FinishTaskSteps.getActionData().get(TASK_PUBLISH_KEY);
+        @SuppressWarnings("unchecked") Map<String, ResultNavigation> navigate =
+                (Map<String, ResultNavigation>) FinishTaskSteps.getActionData().get(TASK_NAVIGATION_KEY);
+        Assert.assertEquals("CheckWeather", FinishTaskSteps.getActionData().get(NODE_NAME_KEY));
 
         Assert.assertNotNull("publish don't exist", publish);
         Assert.assertEquals("there is a different number of publish values than expected", 1, publish.size());
         Assert.assertNotNull("navigate don't exist", navigate);
+        Assert.assertEquals("last step default success should go to flow success",
+                SUCCESS_RESULT, navigate.get(SUCCESS_RESULT).getPresetResult());
+        Assert.assertEquals("last step default failure should go to flow failure",
+                FAILURE_RESULT, navigate.get(FAILURE_RESULT).getPresetResult());
         Assert.assertEquals("there is a different number of navigation values than expected", 2, navigate.size());
 
 
         ExecutionStep endStep = executionPlan.getStep(0L);
-        @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY);
+        @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) endStep.getActionData().get(EXECUTABLE_OUTPUTS_KEY);
         Assert.assertNotNull("outputs don't exist", outputs);
         Assert.assertEquals("there is a different number of outputs than expected", 1, outputs.size());
 
-        @SuppressWarnings("unchecked") List<Result> results = (List<Result>) endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_RESULTS_KEY);
+        @SuppressWarnings("unchecked") List<Result> results = (List<Result>) endStep.getActionData().get(EXECUTABLE_RESULTS_KEY);
         Assert.assertNotNull("results don't exist", results);
         Assert.assertEquals("there is a different number of results values than expected", 2, results.size());
     }
