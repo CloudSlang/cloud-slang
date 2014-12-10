@@ -1,4 +1,4 @@
-package com.hp.score.lang.compiler.domain;/*
+package com.hp.score.lang.compiler.model;/*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -23,7 +23,7 @@ import java.util.Map;
 /*
  * Created by orius123 on 06/11/14.
  */
-public class CompiledTask {
+public class Task {
 
     private final String name;
     private final Map<String, Serializable> preTaskActionData;
@@ -31,7 +31,7 @@ public class CompiledTask {
     private final Map<String, String> navigationStrings;
     private final String refId;
 
-    public CompiledTask(String name, Map<String, Serializable> preTaskActionData, Map<String, Serializable> postTaskActionData, Map<String, String> navigationStrings, String refId) {
+    public Task(String name, Map<String, Serializable> preTaskActionData, Map<String, Serializable> postTaskActionData, Map<String, String> navigationStrings, String refId) {
         this.name = name;
         this.preTaskActionData = preTaskActionData;
         this.postTaskActionData = postTaskActionData;

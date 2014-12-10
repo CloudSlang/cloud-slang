@@ -1,4 +1,4 @@
-package com.hp.score.lang.compiler.domain;/*
+package com.hp.score.lang.compiler.model;/*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -29,28 +29,27 @@ import java.util.Map;
 /*
  * Created by orius123 on 09/11/14.
  */
-public class CompiledFlow extends CompiledExecutable {
+public class Operation extends Executable {
 
-    private final CompiledWorkflow compiledWorkflow;
+    private final Action action;
 
-    public CompiledFlow(Map<String, Serializable> preOpActionData,
-                        Map<String, Serializable> postOpActionData,
-                        CompiledWorkflow compiledWorkflow,
-                        String namespace,
-                        String name,
-                        List<Input> inputs,
-                        List<Output> outputs,
-                        List<Result> results) {
+    public Operation(Map<String, Serializable> preOpActionData,
+                     Map<String, Serializable> postOpActionData,
+                     Action action,
+                     String namespace,
+                     String name,
+                     List<Input> inputs,
+                     List<Output> outputs,
+                     List<Result> results) {
         super(preOpActionData, postOpActionData, namespace, name, inputs, outputs, results);
-        this.compiledWorkflow = compiledWorkflow;
+        this.action = action;
     }
 
-    public CompiledWorkflow getCompiledWorkflow() {
-        return compiledWorkflow;
+    public Action getAction() {
+        return action;
     }
 
     public String getType() {
-        return SlangTextualKeys.FLOW_TYPE;
+        return SlangTextualKeys.OPERATION_TYPE;
     }
-
 }

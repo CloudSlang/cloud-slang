@@ -20,10 +20,9 @@ package com.hp.score.lang.compiler;
 
 import ch.lambdaj.Lambda;
 import ch.lambdaj.function.convert.Converter;
-import com.hp.score.lang.compiler.domain.CompiledExecutable;
-import com.hp.score.lang.compiler.domain.CompiledFlow;
-import com.hp.score.lang.compiler.domain.CompiledOperation;
-import com.hp.score.lang.compiler.domain.SlangFile;
+import com.hp.score.lang.compiler.model.*;
+import com.hp.score.lang.compiler.model.Operation;
+import com.hp.score.lang.compiler.model.Executable;
 import com.hp.score.lang.compiler.utils.DependenciesHelper;
 import com.hp.score.lang.compiler.utils.ExecutableBuilder;
 import com.hp.score.lang.compiler.utils.ExecutionPlanBuilder;
@@ -81,9 +80,9 @@ public class SlangCompilerImpl implements SlangCompiler {
         SlangFile slangFile = yamlParser.loadSlangFile(source);
 
         //than we transform those maps to model objects
-        CompiledExecutable executable = transformToExecutable(operationName, slangFile);
+        Executable executable = transformToExecutable(operationName, slangFile);
 
-        Map<String, CompiledExecutable> filteredDependencies = new HashMap<>();
+        Map<String, Executable> filteredDependencies = new HashMap<>();
         //we handle dependencies only if the file has imports
         boolean hasDependencies = MapUtils.isNotEmpty(slangFile.getImports())
                 && executable.getType().equals(SlangTextualKeys.FLOW_TYPE);
@@ -91,10 +90,10 @@ public class SlangCompilerImpl implements SlangCompiler {
             Validate.noNullElements(path, "File that was requested to compile has imports but no path was given");
 
             //we transform also all of the files in the given path to model objects
-            Map<String, CompiledExecutable> pathExecutables = transformDependencies(path);
+            Map<String, Executable> pathExecutables = transformDependencies(path);
 
             //we add the current executable since a dependency can require it
-            List<CompiledExecutable> availableExecutables = new ArrayList<>(pathExecutables.values());
+            List<Executable> availableExecutables = new ArrayList<>(pathExecutables.values());
             availableExecutables.add(executable);
 
             //than we match the references to the actual dependencies
@@ -105,9 +104,9 @@ public class SlangCompilerImpl implements SlangCompiler {
         ExecutionPlan executionPlan = compileToExecutionPlan(executable);
 
         //and also create execution plans for all other dependencies
-        Map<String, ExecutionPlan> dependencies = convertMap(filteredDependencies, new Converter<CompiledExecutable, ExecutionPlan>() {
+        Map<String, ExecutionPlan> dependencies = convertMap(filteredDependencies, new Converter<Executable, ExecutionPlan>() {
             @Override
-            public ExecutionPlan convert(CompiledExecutable compiledExecutable) {
+            public ExecutionPlan convert(Executable compiledExecutable) {
                 return compileToExecutionPlan(compiledExecutable);
             }
         });
@@ -116,17 +115,17 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     /**
-     * Transforms all of the slang files in the given path to {@link com.hp.score.lang.compiler.domain.CompiledExecutable}
+     * Transforms all of the slang files in the given path to {@link com.hp.score.lang.compiler.model.Executable}
      *
      * @param path the path
-     * @return a map of {@link com.hp.score.lang.compiler.domain.CompiledExecutable} with their ids as key
+     * @return a map of {@link com.hp.score.lang.compiler.model.Executable} with their ids as key
      */
-    private Map<String, CompiledExecutable> transformDependencies(Set<File> path) {
+    private Map<String, Executable> transformDependencies(Set<File> path) {
         //we filter only the slang files from the path
         List<File> filteredPath = dependenciesHelper.fetchSlangFiles(path);
 
         //we transform and add all of the dependencies to a list of executable
-        List<CompiledExecutable> executables = new ArrayList<>();
+        List<Executable> executables = new ArrayList<>();
         for (File file : filteredPath) {
             SlangFile slangFile = yamlParser.loadSlangFile(file);
             switch (slangFile.getType()) {
@@ -142,27 +141,27 @@ public class SlangCompilerImpl implements SlangCompiler {
         }
 
         //we put the dependencies in a map with their id as key
-        Map<String, CompiledExecutable> compiledExecutableMap = new HashMap<>();
-        for (CompiledExecutable executable : executables) {
+        Map<String, Executable> compiledExecutableMap = new HashMap<>();
+        for (Executable executable : executables) {
             compiledExecutableMap.put(executable.getId(), executable);
         }
         return compiledExecutableMap;
     }
 
     /**
-     * Utility method that cast a {@link com.hp.score.lang.compiler.domain.CompiledExecutable} to its subtype
+     * Utility method that cast a {@link com.hp.score.lang.compiler.model.Executable} to its subtype
      * and create an {@link com.hp.score.api.ExecutionPlan} for it
      *
      * @param executable the executable to create an {@link com.hp.score.api.ExecutionPlan} for
-     * @return {@link com.hp.score.api.ExecutionPlan} of the given {@link com.hp.score.lang.compiler.domain.CompiledExecutable}
+     * @return {@link com.hp.score.api.ExecutionPlan} of the given {@link com.hp.score.lang.compiler.model.Executable}
      */
-    private ExecutionPlan compileToExecutionPlan(CompiledExecutable executable) {
+    private ExecutionPlan compileToExecutionPlan(Executable executable) {
         ExecutionPlan executionPlan;
 
         if (executable.getType().equals(SlangTextualKeys.OPERATION_TYPE)) {
-            executionPlan = executionPlanBuilder.createOperationExecutionPlan((CompiledOperation) executable);
+            executionPlan = executionPlanBuilder.createOperationExecutionPlan((Operation) executable);
         } else if (executable.getType().equals(SlangTextualKeys.FLOW_TYPE)) {
-            executionPlan = executionPlanBuilder.createFlowExecutionPlan((CompiledFlow) executable);
+            executionPlan = executionPlanBuilder.createFlowExecutionPlan((Flow) executable);
         } else {
             throw new RuntimeException("Executable: " + executable.getName() + " is not a flow and not an operation");
         }
@@ -170,24 +169,24 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     /**
-     * Utility method that transform a {@link com.hp.score.lang.compiler.domain.SlangFile}
-     * into a {@link com.hp.score.lang.compiler.domain.CompiledExecutable}
+     * Utility method that transform a {@link com.hp.score.lang.compiler.model.SlangFile}
+     * into a {@link com.hp.score.lang.compiler.model.Executable}
      * also handles operations files
      *
-     * @param operationName the name of the operation to transform from the {@link com.hp.score.lang.compiler.domain.SlangFile}
+     * @param operationName the name of the operation to transform from the {@link com.hp.score.lang.compiler.model.SlangFile}
      * @param slangFile     the file to transform
-     * @return {@link com.hp.score.lang.compiler.domain.CompiledExecutable}  of the requested flow/operation
+     * @return {@link com.hp.score.lang.compiler.model.Executable}  of the requested flow/operation
      */
-    private CompiledExecutable transformToExecutable(String operationName, SlangFile slangFile) {
-        CompiledExecutable executable;
+    private Executable transformToExecutable(String operationName, SlangFile slangFile) {
+        Executable executable;
 
         switch (slangFile.getType()) {
             case OPERATIONS:
                 Validate.notEmpty(operationName, "File: " + slangFile.getFileName() + " is operations file " +
                         "you must specify the operation name requested for compiling");
-                List<CompiledExecutable> compilesOperations = transformOperations(slangFile);
+                List<Executable> compilesOperations = transformOperations(slangFile);
                 // match the requested operation from all the operations in the file
-                executable = Lambda.selectFirst(compilesOperations, having(on(CompiledExecutable.class).getName(), equalTo(operationName)));
+                executable = Lambda.selectFirst(compilesOperations, having(on(Executable.class).getName(), equalTo(operationName)));
                 if (executable == null) {
                     throw new RuntimeException("Operation with name: " + operationName + " wasn't found in file: " + slangFile.getFileName());
                 }
@@ -202,13 +201,13 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     /**
-     * transform an operations {@link com.hp.score.lang.compiler.domain.SlangFile} to a List of {@link com.hp.score.lang.compiler.domain.CompiledExecutable}
+     * transform an operations {@link com.hp.score.lang.compiler.model.SlangFile} to a List of {@link com.hp.score.lang.compiler.model.Executable}
      *
      * @param slangFile the file to transform the operations from
-     * @return List of {@link com.hp.score.lang.compiler.domain.CompiledExecutable} representing the operations in the file
+     * @return List of {@link com.hp.score.lang.compiler.model.Executable} representing the operations in the file
      */
-    private List<CompiledExecutable> transformOperations(SlangFile slangFile) {
-        List<CompiledExecutable> executables = new ArrayList<>();
+    private List<Executable> transformOperations(SlangFile slangFile) {
+        List<Executable> executables = new ArrayList<>();
         for (Map<String, Map<String, Object>> operation : slangFile.getOperations()) {
             Map.Entry<String, Map<String, Object>> entry = operation.entrySet().iterator().next();
             String operationName = entry.getKey();
@@ -219,12 +218,12 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     /**
-     * transform an flow {@link com.hp.score.lang.compiler.domain.SlangFile} to a {@link com.hp.score.lang.compiler.domain.CompiledExecutable}
+     * transform an flow {@link com.hp.score.lang.compiler.model.SlangFile} to a {@link com.hp.score.lang.compiler.model.Executable}
      *
      * @param slangFile the file to transform the flow from
-     * @return {@link com.hp.score.lang.compiler.domain.CompiledExecutable} representing the flow in the file
+     * @return {@link com.hp.score.lang.compiler.model.Executable} representing the flow in the file
      */
-    private CompiledExecutable transformFlow(SlangFile slangFile) {
+    private Executable transformFlow(SlangFile slangFile) {
         Map<String, Object> flowRawData = slangFile.getFlow();
         String flowName = (String) flowRawData.get(SlangTextualKeys.FLOW_NAME_KEY);
         if (StringUtils.isBlank(flowName)) {

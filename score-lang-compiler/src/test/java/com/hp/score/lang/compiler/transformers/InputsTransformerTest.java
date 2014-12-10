@@ -19,7 +19,7 @@ package com.hp.score.lang.compiler.transformers;
  * under the License.
 */
 
-import com.hp.score.lang.compiler.domain.SlangFile;
+import com.hp.score.lang.compiler.model.SlangFile;
 import com.hp.score.lang.compiler.utils.YamlParser;
 import com.hp.score.lang.entities.bindings.Input;
 import junit.framework.Assert;

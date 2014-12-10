@@ -18,13 +18,8 @@ package com.hp.score.lang.compiler.utils;/*
 */
 
 import com.hp.score.lang.compiler.SlangTextualKeys;
-import com.hp.score.lang.compiler.domain.CompiledDoAction;
-import com.hp.score.lang.compiler.domain.CompiledExecutable;
-import com.hp.score.lang.compiler.domain.CompiledFlow;
-import com.hp.score.lang.compiler.domain.CompiledOperation;
-import com.hp.score.lang.compiler.domain.CompiledTask;
-import com.hp.score.lang.compiler.domain.CompiledWorkflow;
-import com.hp.score.lang.compiler.domain.SlangFile;
+import com.hp.score.lang.compiler.model.*;
+import com.hp.score.lang.compiler.model.Executable;
 import com.hp.score.lang.compiler.transformers.Transformer;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.entities.bindings.Input;
@@ -96,7 +91,7 @@ public class ExecutableBuilder {
         return filter(having(on(Transformer.class).getScopes().contains(scope)), transformers);
     }
 
-    public CompiledExecutable transformToExecutable(SlangFile slangFile, String execName, Map<String, Object> executableRawData) {
+    public Executable transformToExecutable(SlangFile slangFile, String execName, Map<String, Object> executableRawData) {
 
         Validate.notEmpty(executableRawData, "Executable data for: " + execName + " is empty");
         Validate.notNull(slangFile, "Slang File for " + execName + " is null");
@@ -124,45 +119,45 @@ public class ExecutableBuilder {
                     throw new RuntimeException("Flow: " + execName + " has no workflow data");
                 }
 
-                CompiledWorkflow onFailureWorkFlow = null;
+                Workflow onFailureWorkFlow = null;
                 @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> onFailureData =
                         (LinkedHashMap) workFlowRawData.remove(SlangTextualKeys.ON_FAILURE_KEY);
                 if (MapUtils.isNotEmpty(onFailureData)) {
                     onFailureWorkFlow = compileWorkFlow(onFailureData, imports, null, true);
                 }
 
-                CompiledWorkflow compiledWorkflow = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false);
+                Workflow workflow = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false);
 
-                return new CompiledFlow(preExecutableActionData, postExecutableActionData, compiledWorkflow, namespace, execName, inputs, outputs, results);
+                return new Flow(preExecutableActionData, postExecutableActionData, workflow, namespace, execName, inputs, outputs, results);
 
             case OPERATIONS:
                 @SuppressWarnings("unchecked") Map<String, Object> actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
                 if (MapUtils.isEmpty(actionRawData)) {
                     throw new RuntimeException("Operation: " + execName + " has no action data");
                 }
-                CompiledDoAction compiledDoAction = compileAction(actionRawData);
-                return new CompiledOperation(preExecutableActionData, postExecutableActionData, compiledDoAction, namespace, execName, inputs, outputs, results);
+                Action action = compileAction(actionRawData);
+                return new Operation(preExecutableActionData, postExecutableActionData, action, namespace, execName, inputs, outputs, results);
             default:
                 throw new RuntimeException("File: " + slangFile.getFileName() + " is not a flow type or operations");
         }
     }
 
-    private CompiledDoAction compileAction(Map<String, Object> actionRawData) {
+    private Action compileAction(Map<String, Object> actionRawData) {
         Map<String, Serializable> actionData = new HashMap<>();
 
         validateKeyWordsExits("action data", actionRawData, actionTransformers, null);
 
         actionData.putAll(runTransformers(actionRawData, actionTransformers));
 
-        return new CompiledDoAction(actionData);
+        return new Action(actionData);
     }
 
-    private CompiledWorkflow compileWorkFlow(LinkedHashMap<String, Map<String, Object>> workFlowRawData,
+    private Workflow compileWorkFlow(LinkedHashMap<String, Map<String, Object>> workFlowRawData,
                                              Map<String, String> imports,
-                                             CompiledWorkflow onFailureWorkFlow,
+                                             Workflow onFailureWorkFlow,
                                              boolean onFailureSection) {
 
-        Deque<CompiledTask> compiledTasks = new LinkedList<>();
+        Deque<Task> tasks = new LinkedList<>();
 
         Validate.notEmpty(workFlowRawData, "Flow must have tasks in its workflow");
 
@@ -172,7 +167,7 @@ public class ExecutableBuilder {
         boolean isOnFailureDefined = onFailureWorkFlow != null;
 
         String defaultFailure = isOnFailureDefined ?
-                onFailureWorkFlow.getCompiledTasks().getFirst().getName() : ScoreLangConstants.FAILURE_RESULT;
+                onFailureWorkFlow.getTasks().getFirst().getName() : ScoreLangConstants.FAILURE_RESULT;
 
         while (iterator.hasNext()) {
             Map.Entry<String, Map<String, Object>> taskRawData = iterator.next();
@@ -185,18 +180,18 @@ public class ExecutableBuilder {
             } else {
                 defaultSuccess = onFailureSection ? ScoreLangConstants.FAILURE_RESULT : ScoreLangConstants.SUCCESS_RESULT;
             }
-            CompiledTask compiledTask = compileTask(taskName, taskRawDataValue, defaultSuccess, imports, defaultFailure);
-            compiledTasks.add(compiledTask);
+            Task task = compileTask(taskName, taskRawDataValue, defaultSuccess, imports, defaultFailure);
+            tasks.add(task);
         }
 
         if (isOnFailureDefined) {
-            compiledTasks.addAll(onFailureWorkFlow.getCompiledTasks());
+            tasks.addAll(onFailureWorkFlow.getTasks());
         }
 
-        return new CompiledWorkflow(compiledTasks);
+        return new Workflow(tasks);
     }
 
-    private CompiledTask compileTask(String taskName, Map<String, Object> taskRawData, String defaultSuccess,
+    private Task compileTask(String taskName, Map<String, Object> taskRawData, String defaultSuccess,
                                      Map<String, String> imports, String defaultFailure) {
 
         if (MapUtils.isEmpty(taskRawData)) {
@@ -227,7 +222,7 @@ public class ExecutableBuilder {
             navigationStrings.put(ScoreLangConstants.FAILURE_RESULT, defaultFailure);
         }
 
-        return new CompiledTask(taskName, preTaskData, postTaskData, navigationStrings, refId);
+        return new Task(taskName, preTaskData, postTaskData, navigationStrings, refId);
     }
 
     private String resolveRefId(String refIdString, Map<String, String> imports) {

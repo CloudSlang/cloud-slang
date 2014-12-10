@@ -22,7 +22,7 @@ package com.hp.score.lang.compiler.utils;
  * Created by orius123 on 05/11/14.
  */
 
-import com.hp.score.lang.compiler.domain.SlangFile;
+import com.hp.score.lang.compiler.model.SlangFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;

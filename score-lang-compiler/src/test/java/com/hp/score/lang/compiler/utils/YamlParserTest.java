@@ -1,6 +1,6 @@
 package com.hp.score.lang.compiler.utils;
 
-import com.hp.score.lang.compiler.domain.SlangFile;
+import com.hp.score.lang.compiler.model.SlangFile;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

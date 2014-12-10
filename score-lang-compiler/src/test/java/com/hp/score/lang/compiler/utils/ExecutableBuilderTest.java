@@ -1,10 +1,9 @@
 package com.hp.score.lang.compiler.utils;
 
 import com.hp.score.lang.compiler.SlangTextualKeys;
-import com.hp.score.lang.compiler.domain.CompiledFlow;
-import com.hp.score.lang.compiler.domain.CompiledOperation;
-import com.hp.score.lang.compiler.domain.CompiledTask;
-import com.hp.score.lang.compiler.domain.SlangFile;
+import com.hp.score.lang.compiler.model.*;
+import com.hp.score.lang.compiler.model.Flow;
+import com.hp.score.lang.compiler.model.Operation;
 import com.hp.score.lang.compiler.transformers.Transformer;
 import org.junit.Assert;
 import org.junit.Before;
@@ -218,13 +217,13 @@ public class ExecutableBuilderTest {
         executableRawData.put(SlangTextualKeys.WORKFLOW_KEY, workFlowData);
 
         String flowName = "flow1";
-        CompiledFlow flow = (CompiledFlow) executableBuilder.transformToExecutable(mockSlangFile, flowName, executableRawData);
+        Flow flow = (Flow) executableBuilder.transformToExecutable(mockSlangFile, flowName, executableRawData);
         Assert.assertEquals(SlangTextualKeys.FLOW_TYPE, flow.getType());
         Assert.assertEquals(flowName, flow.getName());
-        Deque<CompiledTask> compiledTasks = flow.getCompiledWorkflow().getCompiledTasks();
-        Assert.assertEquals(1, compiledTasks.size());
-        Assert.assertEquals(taskName, compiledTasks.getFirst().getName());
-        Assert.assertEquals(refId, compiledTasks.getFirst().getRefId());
+        Deque<Task> tasks = flow.getWorkflow().getTasks();
+        Assert.assertEquals(1, tasks.size());
+        Assert.assertEquals(taskName, tasks.getFirst().getName());
+        Assert.assertEquals(refId, tasks.getFirst().getRefId());
 
     }
 
@@ -240,7 +239,7 @@ public class ExecutableBuilderTest {
         exception.expectMessage(operationName);
         exception.expectMessage(key);
 
-        CompiledOperation op = (CompiledOperation) executableBuilder.transformToExecutable(mockSlangFile, operationName, executableRawData);
+        Operation op = (Operation) executableBuilder.transformToExecutable(mockSlangFile, operationName, executableRawData);
         Assert.assertNotNull(op);
     }
 
@@ -292,10 +291,10 @@ public class ExecutableBuilderTest {
         executableRawData.put(SlangTextualKeys.ACTION_KEY, actionRawData);
 
         String operationName = "op1";
-        CompiledOperation op = (CompiledOperation) executableBuilder.transformToExecutable(mockSlangFile, operationName, executableRawData);
+        Operation op = (Operation) executableBuilder.transformToExecutable(mockSlangFile, operationName, executableRawData);
         Assert.assertNotNull(op);
         Assert.assertEquals(operationName, op.getName());
-        Assert.assertNotNull(operationName, op.getCompiledDoAction().getActionData());
+        Assert.assertNotNull(operationName, op.getAction().getActionData());
     }
 
     @Configuration

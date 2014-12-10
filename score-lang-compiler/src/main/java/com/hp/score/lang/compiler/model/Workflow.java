@@ -1,4 +1,4 @@
-package com.hp.score.lang.compiler.domain;/*
+package com.hp.score.lang.compiler.model;/*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -22,15 +22,15 @@ import java.util.Deque;
 /*
  * Created by orius123 on 06/11/14.
  */
-public class CompiledWorkflow {
+public class Workflow {
 
-    private final Deque<CompiledTask> compiledTasks;
+    private final Deque<Task> tasks;
 
-    public CompiledWorkflow(Deque<CompiledTask> compiledTasks) {
-        this.compiledTasks = compiledTasks;
+    public Workflow(Deque<Task> tasks) {
+        this.tasks = tasks;
     }
 
-    public Deque<CompiledTask> getCompiledTasks() {
-        return compiledTasks;
+    public Deque<Task> getTasks() {
+        return tasks;
     }
 }

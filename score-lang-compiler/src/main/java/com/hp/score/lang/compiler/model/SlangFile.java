@@ -1,4 +1,4 @@
-package com.hp.score.lang.compiler.domain;
+package com.hp.score.lang.compiler.model;
 /*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file

@@ -1,4 +1,4 @@
-package com.hp.score.lang.compiler.domain;
+package com.hp.score.lang.compiler.model;
 /*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
@@ -30,7 +30,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public abstract class CompiledExecutable {
+public abstract class Executable {
 
     protected final Map<String, Serializable> preExecActionData;
     protected final Map<String, Serializable> postExecActionData;
@@ -40,13 +40,13 @@ public abstract class CompiledExecutable {
     protected final List<Output> outputs;
     protected final List<Result> results;
 
-    protected CompiledExecutable(Map<String, Serializable> preExecActionData,
-                                 Map<String, Serializable> postExecActionData,
-                                 String namespace,
-                                 String name,
-                                 List<Input> inputs,
-                                 List<Output> outputs,
-                                 List<Result> results) {
+    protected Executable(Map<String, Serializable> preExecActionData,
+                         Map<String, Serializable> postExecActionData,
+                         String namespace,
+                         String name,
+                         List<Input> inputs,
+                         List<Output> outputs,
+                         List<Result> results) {
         this.preExecActionData = preExecActionData;
         this.postExecActionData = postExecActionData;
         this.namespace = namespace;

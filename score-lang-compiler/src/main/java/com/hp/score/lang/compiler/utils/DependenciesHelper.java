@@ -24,9 +24,9 @@ package com.hp.score.lang.compiler.utils;
 
 import ch.lambdaj.Lambda;
 import com.hp.score.lang.compiler.SlangTextualKeys;
-import com.hp.score.lang.compiler.domain.CompiledExecutable;
-import com.hp.score.lang.compiler.domain.CompiledFlow;
-import com.hp.score.lang.compiler.domain.CompiledTask;
+import com.hp.score.lang.compiler.model.Executable;
+import com.hp.score.lang.compiler.model.Flow;
+import com.hp.score.lang.compiler.model.Task;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
@@ -96,21 +96,21 @@ public class DependenciesHelper {
      * @param availableDependencies the executables to match from
      * @return a map of a the executables that were successfully matched
      */
-    public Map<String, CompiledExecutable> matchReferences(CompiledExecutable executable, Collection<CompiledExecutable> availableDependencies) {
+    public Map<String, Executable> matchReferences(Executable executable, Collection<Executable> availableDependencies) {
         Validate.isTrue(executable.getType().equals(SlangTextualKeys.FLOW_TYPE), "Executable: " + executable.getId() + " is not a flow, therefore it has no references");
-        Map<String, CompiledExecutable> resolvedDependencies = new HashMap<>();
-        return fetchFlowReferences((CompiledFlow) executable, availableDependencies, resolvedDependencies);
+        Map<String, Executable> resolvedDependencies = new HashMap<>();
+        return fetchFlowReferences((Flow) executable, availableDependencies, resolvedDependencies);
     }
 
-    private Map<String, CompiledExecutable> fetchFlowReferences(CompiledFlow flow,
-                                                                Collection<CompiledExecutable> availableDependencies,
-                                                                Map<String, CompiledExecutable> resolvedDependencies) {
-        Deque<CompiledTask> tasks = flow.getCompiledWorkflow().getCompiledTasks();
-        for (CompiledTask task : tasks) {
+    private Map<String, Executable> fetchFlowReferences(Flow flow,
+                                                                Collection<Executable> availableDependencies,
+                                                                Map<String, Executable> resolvedDependencies) {
+        Deque<Task> tasks = flow.getWorkflow().getTasks();
+        for (Task task : tasks) {
             String refId = task.getRefId();
             //if it is already in the references we do nothing
             if (resolvedDependencies.get(refId) == null) {
-                CompiledExecutable matchingRef = Lambda.selectFirst(availableDependencies, having(on(CompiledExecutable.class).getId(), equalTo(refId)));
+                Executable matchingRef = Lambda.selectFirst(availableDependencies, having(on(Executable.class).getId(), equalTo(refId)));
                 if (matchingRef == null) {
                     throw new RuntimeException("Reference: " + refId + " of task: " + task.getName() + " in flow: "
                             + flow.getName() + " wasn't found in path");
@@ -120,14 +120,14 @@ public class DependenciesHelper {
                 resolvedDependencies.put(matchingRef.getId(), matchingRef);
                 if (matchingRef.getType().equals(SlangTextualKeys.FLOW_TYPE)) {
                     //if it is a flow  we recursively
-                    resolvedDependencies.putAll(fetchFlowReferences((CompiledFlow) matchingRef, availableDependencies, resolvedDependencies));
+                    resolvedDependencies.putAll(fetchFlowReferences((Flow) matchingRef, availableDependencies, resolvedDependencies));
                 }
             }
         }
         return resolvedDependencies;
     }
 
-    private void validateNavigation(CompiledTask task, CompiledExecutable matchingRef) {
+    private void validateNavigation(Task task, Executable matchingRef) {
         Validate.notEmpty(matchingRef.getResults());
         Validate.notEmpty(task.getNavigationStrings());
     }
