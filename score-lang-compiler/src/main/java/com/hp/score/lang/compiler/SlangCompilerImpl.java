@@ -150,10 +150,10 @@ public class SlangCompilerImpl implements SlangCompiler {
 
     /**
      * Utility method that cast a {@link com.hp.score.lang.compiler.model.Executable} to its subtype
-     * and create an {@link com.hp.score.api.ExecutionPlan} for it
+     * and create an {@link org.eclipse.score.api.ExecutionPlan} for it
      *
-     * @param executable the executable to create an {@link com.hp.score.api.ExecutionPlan} for
-     * @return {@link com.hp.score.api.ExecutionPlan} of the given {@link com.hp.score.lang.compiler.model.Executable}
+     * @param executable the executable to create an {@link org.eclipse.score.api.ExecutionPlan} for
+     * @return {@link org.eclipse.score.api.ExecutionPlan} of the given {@link com.hp.score.lang.compiler.model.Executable}
      */
     private ExecutionPlan compileToExecutionPlan(Executable executable) {
         ExecutionPlan executionPlan;
