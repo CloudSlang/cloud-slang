@@ -17,9 +17,6 @@ flow:
       send_mail:
         do:
           ops.test_op:
-        navigate:
-          SUCCESS: SUCCESS
-          FAILURE: FAILURE
 
     first_task:
       do:
@@ -34,7 +31,4 @@ flow:
           - city: str('input_1')
       navigate:
         SUCCESS: SUCCESS
-        FAILURE: FAILURE  
-  results:
-    - SUCCESS
-    - FAILURE
+        FAILURE: FAILURE

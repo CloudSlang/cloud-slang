@@ -48,7 +48,7 @@ public class CompileFlowWithOnFailureTest {
     private SlangCompiler compiler;
 
     @Test
-    public void testCompileFlowBasic() throws Exception {
+    public void testCompileOnFailureBasic() throws Exception {
         URI flow = getClass().getResource("/flow_with_on_failure.yaml").toURI();
         URI operation = getClass().getResource("/operation.yaml").toURI();
 
@@ -67,19 +67,29 @@ public class CompileFlowWithOnFailureTest {
         long endFlowStep = 0L;
 
         ExecutionStep firstStep = executionPlan.getStep(3L);
-        Assert.assertEquals("first step didn't navigate to on failure", firstOnFailureStep, getNavigationData(firstStep));
+        Assert.assertEquals("first step didn't navigate to on failure", firstOnFailureStep, getFailureNavigationStepId(firstStep));
         ExecutionStep secondStep = executionPlan.getStep(5L);
-        Assert.assertEquals(endFlowStep, getNavigationData(secondStep));
+        Assert.assertEquals(endFlowStep, getFailureNavigationStepId(secondStep));
         ExecutionStep firstOnFailStep = executionPlan.getStep(7L);
-        Assert.assertEquals(endFlowStep, getNavigationData(firstOnFailStep));
+        Assert.assertEquals(endFlowStep, getFailureNavigationStepId(firstOnFailStep));
         ExecutionStep secondOnFailStep = executionPlan.getStep(9L);
-        Assert.assertEquals(endFlowStep, getNavigationData(secondOnFailStep));
+        Assert.assertEquals(endFlowStep, getFailureNavigationStepId(secondOnFailStep));
+        Map<String, ResultNavigation> secondOnFailStepNavigationMap = getNavigationMap(secondOnFailStep);
+        ResultNavigation secondOnFailStepResultSuccessNavigation =
+                secondOnFailStepNavigationMap.get(ScoreLangConstants.SUCCESS_RESULT);
+        Assert.assertEquals("on failure success should navigate to failure",
+                ScoreLangConstants.FAILURE_RESULT, secondOnFailStepResultSuccessNavigation.getPresetResult());
     }
 
-	private long getNavigationData(ExecutionStep firstStep) {
-		@SuppressWarnings("unchecked")
-		Map<String, ResultNavigation> navigationData = (Map<String, ResultNavigation>)firstStep.getActionData().get(ScoreLangConstants.TASK_NAVIGATION_KEY);
-		return navigationData.get(ScoreLangConstants.FAILURE_RESULT).getNextStepId();
+	private long getFailureNavigationStepId(ExecutionStep firstStep) {
+        Map<String, ResultNavigation> navigationData = getNavigationMap(firstStep);
+        return navigationData.get(ScoreLangConstants.FAILURE_RESULT).getNextStepId();
 	}
+
+    private Map<String, ResultNavigation> getNavigationMap(ExecutionStep firstStep) {
+        @SuppressWarnings("unchecked") Map<String, ResultNavigation> stringResultNavigationMap =
+                (Map<String, ResultNavigation>) firstStep.getActionData().get(ScoreLangConstants.TASK_NAVIGATION_KEY);
+        return stringResultNavigationMap;
+    }
 
 }

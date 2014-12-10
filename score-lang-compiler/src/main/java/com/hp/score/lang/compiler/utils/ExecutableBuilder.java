@@ -114,6 +114,7 @@ public class ExecutableBuilder {
         @SuppressWarnings("unchecked") List<Result> results = (List<Result>) postExecutableActionData.remove(SlangTextualKeys.RESULTS_KEY);
 
         String namespace = slangFile.getNamespace();
+        Map<String, String> imports = slangFile.getImports();
 
         switch (slangFile.getType()) {
             case FLOW:
@@ -127,11 +128,13 @@ public class ExecutableBuilder {
                 @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> onFailureData =
                         (LinkedHashMap) workFlowRawData.remove(SlangTextualKeys.ON_FAILURE_KEY);
                 if (MapUtils.isNotEmpty(onFailureData)) {
-                    onFailureWorkFlow = compileWorkFlow(onFailureData, slangFile.getImports(), null);
+                    onFailureWorkFlow = compileWorkFlow(onFailureData, imports, null, true);
                 }
 
-                CompiledWorkflow compiledWorkflow = compileWorkFlow(workFlowRawData, slangFile.getImports(), onFailureWorkFlow);
+                CompiledWorkflow compiledWorkflow = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false);
+
                 return new CompiledFlow(preExecutableActionData, postExecutableActionData, compiledWorkflow, namespace, execName, inputs, outputs, results);
+
             case OPERATIONS:
                 @SuppressWarnings("unchecked") Map<String, Object> actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
                 if (MapUtils.isEmpty(actionRawData)) {
@@ -156,35 +159,45 @@ public class ExecutableBuilder {
 
     private CompiledWorkflow compileWorkFlow(LinkedHashMap<String, Map<String, Object>> workFlowRawData,
                                              Map<String, String> imports,
-                                             CompiledWorkflow onFailureWorkFlow) {
+                                             CompiledWorkflow onFailureWorkFlow,
+                                             boolean onFailureSection) {
 
         Deque<CompiledTask> compiledTasks = new LinkedList<>();
 
         Validate.notEmpty(workFlowRawData, "Flow must have tasks in its workflow");
 
-        PeekingIterator<Map.Entry<String, Map<String, Object>>> iterator = new PeekingIterator<>(workFlowRawData.entrySet().iterator());
+        PeekingIterator<Map.Entry<String, Map<String, Object>>> iterator =
+                new PeekingIterator<>(workFlowRawData.entrySet().iterator());
 
-        String defaultFailureKey = onFailureWorkFlow != null ? onFailureWorkFlow.getCompiledTasks().getFirst().getName() : ScoreLangConstants.FAILURE_RESULT;
+        boolean isOnFailureDefined = onFailureWorkFlow != null;
+
+        String defaultFailure = isOnFailureDefined ?
+                onFailureWorkFlow.getCompiledTasks().getFirst().getName() : ScoreLangConstants.FAILURE_RESULT;
 
         while (iterator.hasNext()) {
             Map.Entry<String, Map<String, Object>> taskRawData = iterator.next();
             Map.Entry<String, Map<String, Object>> nextTaskData = iterator.peek();
-            String followingTaskName = nextTaskData != null ? nextTaskData.getKey() : null;
             String taskName = taskRawData.getKey();
             Map<String, Object> taskRawDataValue = taskRawData.getValue();
-            CompiledTask compiledTask = compileTask(taskName, taskRawDataValue, followingTaskName, imports, defaultFailureKey);
+            String defaultSuccess;
+            if (nextTaskData != null) {
+                defaultSuccess = nextTaskData.getKey();
+            } else {
+                defaultSuccess = onFailureSection ? ScoreLangConstants.FAILURE_RESULT : ScoreLangConstants.SUCCESS_RESULT;
+            }
+            CompiledTask compiledTask = compileTask(taskName, taskRawDataValue, defaultSuccess, imports, defaultFailure);
             compiledTasks.add(compiledTask);
         }
 
-        if (onFailureWorkFlow != null) {
+        if (isOnFailureDefined) {
             compiledTasks.addAll(onFailureWorkFlow.getCompiledTasks());
         }
 
         return new CompiledWorkflow(compiledTasks);
     }
 
-    private CompiledTask compileTask(String taskName, Map<String, Object> taskRawData, String followingTaskName,
-                                     Map<String, String> imports, String defaultFailureKey) {
+    private CompiledTask compileTask(String taskName, Map<String, Object> taskRawData, String defaultSuccess,
+                                     Map<String, String> imports, String defaultFailure) {
 
         if (MapUtils.isEmpty(taskRawData)) {
             throw new RuntimeException("Task: " + taskName + " has no data");
@@ -210,8 +223,8 @@ public class ExecutableBuilder {
         //default navigation
         if (MapUtils.isEmpty(navigationStrings)) {
             navigationStrings = new HashMap<>();
-            navigationStrings.put(ScoreLangConstants.SUCCESS_RESULT, followingTaskName == null ? ScoreLangConstants.SUCCESS_RESULT : followingTaskName);
-            navigationStrings.put(ScoreLangConstants.FAILURE_RESULT, defaultFailureKey);
+            navigationStrings.put(ScoreLangConstants.SUCCESS_RESULT, defaultSuccess);
+            navigationStrings.put(ScoreLangConstants.FAILURE_RESULT, defaultFailure);
         }
 
         return new CompiledTask(taskName, preTaskData, postTaskData, navigationStrings, refId);
