@@ -30,7 +30,6 @@ import org.apache.commons.collections4.iterators.PeekingIterator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -38,18 +37,14 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import static ch.lambdaj.Lambda.exists;
 import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
-import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static com.hp.score.lang.entities.ScoreLangConstants.FAILURE_RESULT;
 import static com.hp.score.lang.entities.ScoreLangConstants.SUCCESS_RESULT;
 
@@ -61,6 +56,9 @@ public class ExecutableBuilder {
 
     @Autowired
     private List<Transformer> transformers;
+
+    @Autowired
+    private TransformersHandler transformersHandler;
 
     private List<Transformer> preExecTransformers;
     private List<Transformer> postExecTransformers;
@@ -77,7 +75,8 @@ public class ExecutableBuilder {
         //executable transformers and keys
         preExecTransformers = filterTransformers(Transformer.Scope.BEFORE_EXECUTABLE);
         postExecTransformers = filterTransformers(Transformer.Scope.AFTER_EXECUTABLE);
-        execAdditionalKeywords = Arrays.asList(SlangTextualKeys.ACTION_KEY, SlangTextualKeys.WORKFLOW_KEY, SlangTextualKeys.FLOW_NAME_KEY);
+        execAdditionalKeywords = Arrays.asList(
+                SlangTextualKeys.ACTION_KEY, SlangTextualKeys.WORKFLOW_KEY, SlangTextualKeys.FLOW_NAME_KEY);
 
         //action transformers and keys
         actionTransformers = filterTransformers(Transformer.Scope.ACTION);
@@ -100,10 +99,11 @@ public class ExecutableBuilder {
         Map<String, Serializable> preExecutableActionData = new HashMap<>();
         Map<String, Serializable> postExecutableActionData = new HashMap<>();
 
-        validateKeyWordsExits(execName, executableRawData, ListUtils.union(preExecTransformers, postExecTransformers), execAdditionalKeywords);
+        transformersHandler.validateKeyWords(execName, executableRawData,
+                ListUtils.union(preExecTransformers, postExecTransformers), execAdditionalKeywords);
 
-        preExecutableActionData.putAll(runTransformers(executableRawData, preExecTransformers));
-        postExecutableActionData.putAll(runTransformers(executableRawData, postExecTransformers));
+        preExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, preExecTransformers));
+        postExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, postExecTransformers));
 
         @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) preExecutableActionData.remove(SlangTextualKeys.INPUTS_KEY);
         @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) postExecutableActionData.remove(SlangTextualKeys.OUTPUTS_KEY);
@@ -146,9 +146,9 @@ public class ExecutableBuilder {
     private Action compileAction(Map<String, Object> actionRawData) {
         Map<String, Serializable> actionData = new HashMap<>();
 
-        validateKeyWordsExits("action data", actionRawData, actionTransformers, null);
+        transformersHandler.validateKeyWords("action data", actionRawData, actionTransformers, null);
 
-        actionData.putAll(runTransformers(actionRawData, actionTransformers));
+        actionData.putAll(transformersHandler.runTransformers(actionRawData, actionTransformers));
 
         return new Action(actionData);
     }
@@ -202,10 +202,10 @@ public class ExecutableBuilder {
         Map<String, Serializable> preTaskData = new HashMap<>();
         Map<String, Serializable> postTaskData = new HashMap<>();
 
-        validateKeyWordsExits(taskName, taskRawData, ListUtils.union(preTaskTransformers, postTaskTransformers), TaskAdditionalKeyWords);
+        transformersHandler.validateKeyWords(taskName, taskRawData, ListUtils.union(preTaskTransformers, postTaskTransformers), TaskAdditionalKeyWords);
 
-        preTaskData.putAll(runTransformers(taskRawData, preTaskTransformers));
-        postTaskData.putAll(runTransformers(taskRawData, postTaskTransformers));
+        preTaskData.putAll(transformersHandler.runTransformers(taskRawData, preTaskTransformers));
+        postTaskData.putAll(transformersHandler.runTransformers(taskRawData, postTaskTransformers));
 
         @SuppressWarnings("unchecked") Map<String, Object> doRawData = (Map<String, Object>) taskRawData.get(SlangTextualKeys.DO_KEY);
         if (MapUtils.isEmpty(doRawData)) {
@@ -230,66 +230,5 @@ public class ExecutableBuilder {
         String importAlias = StringUtils.substringBefore(refIdString, ".");
         String refName = StringUtils.substringAfter(refIdString, ".");
         return imports.get(importAlias) + "." + refName;
-    }
-
-    private Map<String, Serializable> runTransformers(Map<String, Object> rawData, List<Transformer> scopeTransformers) {
-        Map<String, Serializable> transformedData = new HashMap<>();
-        for (Transformer transformer : scopeTransformers) {
-            String key = keyToTransform(transformer);
-            Object value = rawData.get(key);
-            try {
-                @SuppressWarnings("unchecked") Object transformedValue = transformer.transform(value);
-                transformedData.put(key, (Serializable) transformedValue);
-            } catch (ClassCastException e) {
-                Class transformerType = getTransformerFromType(transformer);
-                if (value instanceof Map && transformerType.equals(List.class)) {
-                    throw new RuntimeException("Key: '" + key + "' expected a list but got a map\n" +
-                            "By the Yaml spec lists properties are marked with a '- ' (dash followed by a space)");
-                }
-                if (value instanceof List && transformerType.equals(Map.class)) {
-                    throw new RuntimeException("Key: '" + key + "' expected a map but got a list\n" +
-                            "By the Yaml spec maps properties are NOT marked with a '- ' (dash followed by a space)");
-                }
-                String message = "\nFailed casting for key: " + key +
-                        "Raw data is: " + key + " : " +rawData.get(key).toString() +
-                        "\n Transformer is: " + transformer.getClass().getName();
-                throw new RuntimeException(message, e);
-            }
-        }
-        return transformedData;
-    }
-
-    private Class getTransformerFromType(Transformer transformer){
-        ResolvableType resolvableType = ResolvableType.forClass(Transformer.class, transformer.getClass());
-        return resolvableType.getGeneric(0).resolve();
-    }
-
-    private void validateKeyWordsExits(String dataLogicalName, Map<String, Object> rawData, List<Transformer> allRelevantTransformers, List<String> additionalValidKeyWords) {
-        Set<String> validKeywords = new HashSet<>();
-
-        if (additionalValidKeyWords != null) {
-            validKeywords.addAll(additionalValidKeyWords);
-        }
-
-        for (Transformer transformer : allRelevantTransformers) {
-            validKeywords.add(keyToTransform(transformer));
-        }
-
-        for (String key : rawData.keySet()) {
-            if (!(exists(validKeywords, equalToIgnoringCase(key)))) {
-                throw new RuntimeException("No transformer were found for key: " + key + " at: " + dataLogicalName);
-            }
-        }
-    }
-
-    private String keyToTransform(Transformer transformer) {
-        String key;
-        if (transformer.keyToTransform() != null) {
-            key = transformer.keyToTransform();
-        } else {
-            String simpleClassName = transformer.getClass().getSimpleName();
-            key = simpleClassName.substring(0, simpleClassName.indexOf("Transformer"));
-        }
-        return key.toLowerCase();
     }
 }

@@ -308,5 +308,10 @@ public class ExecutableBuilderTest {
         public Transformer transformer() {
             return Mockito.mock(Transformer.class);
         }
+
+        @Bean
+        public TransformersHandler transformersHandler(){
+            return new TransformersHandler();
+        }
     }
 }
