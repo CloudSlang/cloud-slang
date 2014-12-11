@@ -22,6 +22,7 @@ import com.hp.score.lang.entities.CompilationArtifact;
 import java.io.File;
 import java.util.Set;
 
+//todo: Eliya - add JavaDoc
 public interface SlangCompiler {
     CompilationArtifact compileFlow(File source, Set<File> path);
 

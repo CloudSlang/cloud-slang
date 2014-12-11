@@ -24,6 +24,7 @@ package com.hp.score.lang.compiler.transformers;
 
 import java.util.List;
 
+//TODO: Eliya - add Java Doc
 public interface Transformer<F, T> {
 
     T transform(F rawData);
