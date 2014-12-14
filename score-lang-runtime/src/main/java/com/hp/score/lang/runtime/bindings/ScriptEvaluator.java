@@ -1,4 +1,3 @@
-package com.hp.score.lang.runtime.bindings;
 /*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,6 +16,7 @@ package com.hp.score.lang.runtime.bindings;
  * specific language governing permissions and limitations
  * under the License.
 */
+package com.hp.score.lang.runtime.bindings;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +30,15 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * User: stoneo
- * Date: 06/11/2014
- * Time: 08:59
+ * @author stoneo
+ * @since 06/11/2014
+ * @version $Id$
  */
 @Component
 public class ScriptEvaluator {
 
+	private static final String TRUE = "true";
+	private static final String FALSE = "false";
     private static final Logger logger = Logger.getLogger(ScriptEvaluator.class);
 
     @Autowired
@@ -47,6 +49,8 @@ public class ScriptEvaluator {
         for(Map.Entry<String, ? extends Serializable> entry:context.entrySet()){
             scriptContext.setAttribute(entry.getKey(), entry.getValue(), ScriptContext.ENGINE_SCOPE);
         }
+		if(scriptContext.getAttribute(TRUE) == null) scriptContext.setAttribute(TRUE, Boolean.TRUE, ScriptContext.ENGINE_SCOPE);
+		if(scriptContext.getAttribute(FALSE) == null) scriptContext.setAttribute(FALSE, Boolean.FALSE, ScriptContext.ENGINE_SCOPE);
         try {
             return (Serializable)engine.eval(expr,scriptContext);
         } catch (ScriptException e) {
@@ -56,4 +60,5 @@ public class ScriptEvaluator {
         }
         return null;
     }
+
 }

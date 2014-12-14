@@ -1,5 +1,3 @@
-package com.hp.score.lang.runtime.bindings;
-
 /*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package com.hp.score.lang.runtime.bindings;
  * specific language governing permissions and limitations
  * under the License.
 */
+package com.hp.score.lang.runtime.bindings;
 
 import com.hp.score.lang.entities.bindings.Input;
 import org.junit.Assert;
@@ -69,6 +68,15 @@ public class InputsBindingTest {
         Assert.assertTrue(result.containsKey("input1"));
         Assert.assertEquals(2, result.get("input1"));
     }
+
+	@Test
+	public void testDefaultValueBoolean() throws Exception {
+		List<Input> inputs = Arrays.asList(new Input("input1", "true"), new Input("input2", "false"), new Input("input3", "str('phrase cantaining true and false')"));
+		Map<String, Serializable> result = inputsBinding.bindInputs(new HashMap<String, Serializable>(), inputs);
+		Assert.assertTrue((boolean)result.get("input1"));
+		Assert.assertFalse((boolean)result.get("input2"));
+		Assert.assertEquals("phrase cantaining true and false", result.get("input3"));
+	}
 
     @Test
     public void testTwoInputs() throws Exception {
