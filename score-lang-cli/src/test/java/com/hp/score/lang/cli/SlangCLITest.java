@@ -50,13 +50,10 @@ import static org.mockito.Mockito.when;
 public class SlangCLITest {
 
     private final static String[] CONTEXT_PATH = { "classpath*:/META-INF/spring/test-spring-shell-plugin.xml" };
-    private final static String FLOW_PATH_SLAH = "C:/flow.yaml";
-    private final static String FLOW_PATH_BACKSLASH = "C:\\flow.yaml";
-    private final static String INVALID_FLOW_PATH = "C:/flow_I_DONT_EXIST.yaml";
-    private final static String DEPENDENCIES_PATH_SLASH = "C:/flowsdir/";
+    private final static String FLOW_PATH_SLAH = "C:\\\\Users\\\\bonczida\\\\Documents\\\\Score_related\\\\score-language\\\\score-lang-cli\\\\src\\\\test\\\\resources\\\\flow.yaml";
+    private final static String FLOW_PATH_BACKSLASH = "C:\\Users\\bonczida\\Documents\\Score_related\\score-language\\score-lang-cli\\src\\test\\resources\\flow.yaml";
+    private final static String DEPENDENCIES_PATH_SLASH = "C:\\\\flowsdir\\\\";
     private final static String DEPENDENCIES_PATH_BACKSLASH = "C:\\flowsdir";
-    private final static String INVALID_DEPENDENCIES_PATH_SLAH = "C:/flowsdir_I_DONT_EXIST/";
-    private final static String INVALID_DEPENDENCIES_PATH_BACKSLASH = "C:\\flowsdir_I_DONT_EXIST";
     private static final long DEFAULT_TIMEOUT = 10000;
     private JLineShellComponent shell;
     private SlangCLI slangCLI;
@@ -76,7 +73,7 @@ public class SlangCLITest {
         slangCLI.setEnvVar(false);
     }
 
-    @Test //(timeout = DEFAULT_TIMEOUT)
+    @Test (timeout = DEFAULT_TIMEOUT)
     public void testRunValidFilePathSync() throws URISyntaxException, IOException {
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
         long executionID = 1;
@@ -115,13 +112,6 @@ public class SlangCLITest {
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
-    public void testRunInvalidFilePath() throws URISyntaxException, IOException {
-        shell.executeCommand("run --f " + INVALID_FLOW_PATH);
-
-        verify(compilerHelperMock).compile(INVALID_FLOW_PATH.replace('/', '\\'), null, null);
-    }
-
-    @Test (timeout = DEFAULT_TIMEOUT)
     public void testRunValidWithOtherPathForDependencies() throws URISyntaxException, IOException {
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
         long executionID = 1;
@@ -133,20 +123,6 @@ public class SlangCLITest {
 
         verify(compilerHelperMock).compile(FLOW_PATH_BACKSLASH, null, DEPENDENCIES_PATH_BACKSLASH);
         verify(ScoreServicesMock).triggerSync(eq(compilationArtifact), anyMapOf(String.class, Serializable.class));
-
-        Assert.assertEquals("method threw exception", null, cr.getException());
-        Assert.assertEquals("success should be true", true, cr.isSuccess());
-    }
-
-    @Test (timeout = DEFAULT_TIMEOUT)
-    public void testRunInvalidWithOtherPathForDependencies() throws URISyntaxException, IOException {
-        CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
-
-        when(compilerHelperMock.compile(FLOW_PATH_BACKSLASH, null, INVALID_DEPENDENCIES_PATH_SLAH)).thenReturn(compilationArtifact);
-
-        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_SLAH + " --cp " + INVALID_DEPENDENCIES_PATH_SLAH);
-
-        verify(compilerHelperMock).compile(FLOW_PATH_BACKSLASH, null, INVALID_DEPENDENCIES_PATH_BACKSLASH);
 
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
