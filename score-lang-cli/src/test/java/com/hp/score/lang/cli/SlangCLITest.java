@@ -78,7 +78,7 @@ public class SlangCLITest {
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
         long executionID = 1;
 
-        when(compilerHelperMock.compile(FLOW_PATH_BACKSLASH, null, null)).thenReturn(compilationArtifact);
+        when(compilerHelperMock.compile(endsWith(FLOW_PATH_BACKSLASH), isNull(String.class), isNull(String.class))).thenReturn(compilationArtifact);
         when(ScoreServicesMock.triggerSync(eq(compilationArtifact), anyMapOf(String.class, Serializable.class))).thenReturn(executionID);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_SLAH);
@@ -100,7 +100,7 @@ public class SlangCLITest {
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
         long executionID = 1;
 
-        when(compilerHelperMock.compile(FLOW_PATH_BACKSLASH, null, null)).thenReturn(compilationArtifact);
+        when(compilerHelperMock.compile(endsWith(FLOW_PATH_BACKSLASH), isNull(String.class), isNull(String.class))).thenReturn(compilationArtifact);
         when(ScoreServicesMock.trigger(eq(compilationArtifact), anyMapOf(String.class, Serializable.class))).thenReturn(executionID);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_SLAH);
@@ -118,7 +118,7 @@ public class SlangCLITest {
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
         long executionID = 1;
 
-        when(compilerHelperMock.compile(FLOW_PATH_BACKSLASH, null, DEPENDENCIES_PATH_BACKSLASH)).thenReturn(compilationArtifact);
+        when(compilerHelperMock.compile(endsWith(FLOW_PATH_BACKSLASH), isNull(String.class), endsWith(DEPENDENCIES_PATH_BACKSLASH))).thenReturn(compilationArtifact);
         when(ScoreServicesMock.triggerSync(eq(compilationArtifact), anyMapOf(String.class, Serializable.class))).thenReturn(executionID);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_SLAH + " --cp " + DEPENDENCIES_PATH_SLASH);
@@ -139,7 +139,7 @@ public class SlangCLITest {
         inputsMap.put("input1", "value1");
         inputsMap.put("input2", "value2");
 
-        when(compilerHelperMock.compile(FLOW_PATH_BACKSLASH, null, null)).thenReturn(compilationArtifact);
+        when(compilerHelperMock.compile(endsWith(FLOW_PATH_BACKSLASH), isNull(String.class), isNull(String.class))).thenReturn(compilationArtifact);
         when(ScoreServicesMock.triggerSync(eq(compilationArtifact), eq(inputsMap))).thenReturn(executionID);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_SLAH + " " + inputsString);
@@ -163,7 +163,7 @@ public class SlangCLITest {
         inputsMap.put("input1", "value1");
         inputsMap.put("input2", "value2");
 
-        when(compilerHelperMock.compile(FLOW_PATH_BACKSLASH, null, null)).thenReturn(compilationArtifact);
+        when(compilerHelperMock.compile(endsWith(FLOW_PATH_BACKSLASH), isNull(String.class), isNull(String.class))).thenReturn(compilationArtifact);
         when(ScoreServicesMock.trigger(eq(compilationArtifact), eq(inputsMap))).thenReturn(executionID);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_SLAH + " " + inputsString);
@@ -199,7 +199,7 @@ public class SlangCLITest {
         List<Input> inputsList = Lists.newArrayList(new Input("input1", "expression1"), new Input("input2", "expression2"));
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), inputsList);
 
-        when(compilerHelperMock.compile(FLOW_PATH_BACKSLASH, null, null)).thenReturn(compilationArtifact);
+        when(compilerHelperMock.compile(endsWith(FLOW_PATH_BACKSLASH), isNull(String.class), isNull(String.class))).thenReturn(compilationArtifact);
 
         CommandResult cr = shell.executeCommand("inputs --f " + FLOW_PATH_SLAH);
 
@@ -215,7 +215,7 @@ public class SlangCLITest {
         List<Input> inputsList = Lists.newArrayList(new Input("input1", "expression1"),new Input("input_override", "expression_override", false, true, true) , new Input("input2", "expression2"));
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), inputsList);
 
-        when(compilerHelperMock.compile(FLOW_PATH_BACKSLASH, null, null)).thenReturn(compilationArtifact);
+        when(compilerHelperMock.compile(endsWith(FLOW_PATH_BACKSLASH), isNull(String.class), isNull(String.class))).thenReturn(compilationArtifact);
 
         CommandResult cr = shell.executeCommand("inputs --f " + FLOW_PATH_SLAH);
 
