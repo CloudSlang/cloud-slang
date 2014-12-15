@@ -50,10 +50,13 @@ import static org.mockito.Mockito.when;
 public class SlangCLITest {
 
     private final static String[] CONTEXT_PATH = { "classpath*:/META-INF/spring/test-spring-shell-plugin.xml" };
-    private final static String FLOW_PATH = "/flow.yaml";
+    private final static String FLOW_PATH_SLAH = "C:/flow.yaml";
+    private final static String FLOW_PATH_BACKSLASH = "C:\\flow.yaml";
     private final static String INVALID_FLOW_PATH = "C:/flow_I_DONT_EXIST.yaml";
-    private final static String DEPENDENCIES_PATH = "/flowsdir/";
-    private final static String INVALID_DEPENDENCIES_PATH = "C:/flowsdir_I_DONT_EXIST/";
+    private final static String DEPENDENCIES_PATH_SLASH = "C:/flowsdir/";
+    private final static String DEPENDENCIES_PATH_BACKSLASH = "C:\\flowsdir";
+    private final static String INVALID_DEPENDENCIES_PATH_SLAH = "C:/flowsdir_I_DONT_EXIST/";
+    private final static String INVALID_DEPENDENCIES_PATH_BACKSLASH = "C:\\flowsdir_I_DONT_EXIST";
     private static final long DEFAULT_TIMEOUT = 10000;
     private JLineShellComponent shell;
     private SlangCLI slangCLI;
@@ -73,21 +76,17 @@ public class SlangCLITest {
         slangCLI.setEnvVar(false);
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test //(timeout = DEFAULT_TIMEOUT)
     public void testRunValidFilePathSync() throws URISyntaxException, IOException {
-        String flowPathWithSlash = getClass().getResource(FLOW_PATH).getPath();
-        flowPathWithSlash = flowPathWithSlash.substring(1, flowPathWithSlash.length()); // remove leading slash
-        // replace '/' with backslash '\'
-        String flowPathWithBackSlash = flowPathWithSlash.replace('/', '\\');
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
         long executionID = 1;
 
-        when(compilerHelperMock.compile(flowPathWithBackSlash, null, null)).thenReturn(compilationArtifact);
+        when(compilerHelperMock.compile(FLOW_PATH_BACKSLASH, null, null)).thenReturn(compilationArtifact);
         when(ScoreServicesMock.triggerSync(eq(compilationArtifact), anyMapOf(String.class, Serializable.class))).thenReturn(executionID);
 
-        CommandResult cr = shell.executeCommand("run --f " + flowPathWithSlash);
+        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_SLAH);
 
-        verify(compilerHelperMock).compile(flowPathWithBackSlash, null, null);
+        verify(compilerHelperMock).compile(FLOW_PATH_BACKSLASH, null, null);
         verify(ScoreServicesMock).triggerSync(eq(compilationArtifact), anyMapOf(String.class, Serializable.class));
 
         Assert.assertEquals("method threw exception", null, cr.getException());
@@ -99,19 +98,15 @@ public class SlangCLITest {
         //set async mode
         slangCLI.setEnvVar(true);
 
-        String flowPathWithSlash = getClass().getResource(FLOW_PATH).getPath();
-        flowPathWithSlash = flowPathWithSlash.substring(1, flowPathWithSlash.length()); // remove leading slash
-        // replace '/' with backslash '\'
-        String flowPathWithBackSlash = flowPathWithSlash.replace('/', '\\');
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
         long executionID = 1;
 
-        when(compilerHelperMock.compile(flowPathWithBackSlash, null, null)).thenReturn(compilationArtifact);
+        when(compilerHelperMock.compile(FLOW_PATH_BACKSLASH, null, null)).thenReturn(compilationArtifact);
         when(ScoreServicesMock.trigger(eq(compilationArtifact), anyMapOf(String.class, Serializable.class))).thenReturn(executionID);
 
-        CommandResult cr = shell.executeCommand("run --f " + flowPathWithSlash);
+        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_SLAH);
 
-        verify(compilerHelperMock).compile(flowPathWithBackSlash, null, null);
+        verify(compilerHelperMock).compile(FLOW_PATH_BACKSLASH, null, null);
         verify(ScoreServicesMock).trigger(eq(compilationArtifact), anyMapOf(String.class, Serializable.class));
 
         Assert.assertEquals("method result mismatch", SlangCLI.triggerAsyncMsg(executionID, compilationArtifact.getExecutionPlan().getName()), cr.getResult());
@@ -128,21 +123,15 @@ public class SlangCLITest {
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testRunValidWithOtherPathForDependencies() throws URISyntaxException, IOException {
-        String flowPathWithSlash = getClass().getResource(FLOW_PATH).getPath();
-        flowPathWithSlash = flowPathWithSlash.substring(1, flowPathWithSlash.length()); // remove leading slash
-        String flowPathWithBackSlash = flowPathWithSlash.replace('/', '\\');
-        String dependenciesPathWithSlash = getClass().getResource(DEPENDENCIES_PATH).getPath();
-        dependenciesPathWithSlash = dependenciesPathWithSlash.substring(1, dependenciesPathWithSlash.length() - 1); // remove leading and trailing slash
-        String dependenciesPathWithBackSlash = dependenciesPathWithSlash.replace('/', '\\');
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
         long executionID = 1;
 
-        when(compilerHelperMock.compile(flowPathWithBackSlash, null, dependenciesPathWithBackSlash)).thenReturn(compilationArtifact);
+        when(compilerHelperMock.compile(FLOW_PATH_BACKSLASH, null, DEPENDENCIES_PATH_BACKSLASH)).thenReturn(compilationArtifact);
         when(ScoreServicesMock.triggerSync(eq(compilationArtifact), anyMapOf(String.class, Serializable.class))).thenReturn(executionID);
 
-        CommandResult cr = shell.executeCommand("run --f " + flowPathWithSlash + " --cp " + dependenciesPathWithSlash);
+        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_SLAH + " --cp " + DEPENDENCIES_PATH_SLASH);
 
-        verify(compilerHelperMock).compile(flowPathWithBackSlash, null, dependenciesPathWithBackSlash);
+        verify(compilerHelperMock).compile(FLOW_PATH_BACKSLASH, null, DEPENDENCIES_PATH_BACKSLASH);
         verify(ScoreServicesMock).triggerSync(eq(compilationArtifact), anyMapOf(String.class, Serializable.class));
 
         Assert.assertEquals("method threw exception", null, cr.getException());
@@ -151,19 +140,13 @@ public class SlangCLITest {
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testRunInvalidWithOtherPathForDependencies() throws URISyntaxException, IOException {
-        String flowPathWithSlash = getClass().getResource(FLOW_PATH).getPath();
-        flowPathWithSlash = flowPathWithSlash.substring(1, flowPathWithSlash.length()); // remove leading slash
-        String flowPathWithBackSlash = flowPathWithSlash.replace('/', '\\');
-        String dependenciesPathWithSlash = INVALID_DEPENDENCIES_PATH;
-        dependenciesPathWithSlash = dependenciesPathWithSlash.substring(0, dependenciesPathWithSlash.length() - 1); // remove trailing slash
-        String dependenciesPathWithBackSlash = dependenciesPathWithSlash.replace('/', '\\');
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
 
-        when(compilerHelperMock.compile(flowPathWithBackSlash, null, dependenciesPathWithBackSlash)).thenReturn(compilationArtifact);
+        when(compilerHelperMock.compile(FLOW_PATH_BACKSLASH, null, INVALID_DEPENDENCIES_PATH_SLAH)).thenReturn(compilationArtifact);
 
-        CommandResult cr = shell.executeCommand("run --f " + flowPathWithSlash + " --cp " + dependenciesPathWithSlash);
+        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_SLAH + " --cp " + INVALID_DEPENDENCIES_PATH_SLAH);
 
-        verify(compilerHelperMock).compile(flowPathWithBackSlash, null, dependenciesPathWithBackSlash);
+        verify(compilerHelperMock).compile(FLOW_PATH_BACKSLASH, null, INVALID_DEPENDENCIES_PATH_BACKSLASH);
 
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
@@ -171,10 +154,6 @@ public class SlangCLITest {
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testRunSyncWithInputs() throws URISyntaxException, IOException {
-        String flowPathWithSlash = getClass().getResource(FLOW_PATH).getPath();
-        flowPathWithSlash = flowPathWithSlash.substring(1, flowPathWithSlash.length()); // remove leading slash
-        // replace '/' with backslash '\'
-        String flowPathWithBackSlash = flowPathWithSlash.replace('/', '\\');
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
         long executionID = 1;
         String inputsString = "--i input1=value1,input2=value2";
@@ -182,12 +161,12 @@ public class SlangCLITest {
         inputsMap.put("input1", "value1");
         inputsMap.put("input2", "value2");
 
-        when(compilerHelperMock.compile(flowPathWithBackSlash, null, null)).thenReturn(compilationArtifact);
+        when(compilerHelperMock.compile(FLOW_PATH_BACKSLASH, null, null)).thenReturn(compilationArtifact);
         when(ScoreServicesMock.triggerSync(eq(compilationArtifact), eq(inputsMap))).thenReturn(executionID);
 
-        CommandResult cr = shell.executeCommand("run --f " + flowPathWithSlash + " " + inputsString);
+        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_SLAH + " " + inputsString);
 
-        verify(compilerHelperMock).compile(flowPathWithBackSlash, null, null);
+        verify(compilerHelperMock).compile(FLOW_PATH_BACKSLASH, null, null);
         verify(ScoreServicesMock).triggerSync(eq(compilationArtifact), eq(inputsMap));
 
         Assert.assertEquals("method threw exception", null, cr.getException());
@@ -199,10 +178,6 @@ public class SlangCLITest {
         //set async mode
         slangCLI.setEnvVar(true);
 
-        String flowPathWithSlash = getClass().getResource(FLOW_PATH).getPath();
-        flowPathWithSlash = flowPathWithSlash.substring(1, flowPathWithSlash.length()); // remove leading slash
-        // replace '/' with backslash '\'
-        String flowPathWithBackSlash = flowPathWithSlash.replace('/', '\\');
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
         long executionID = 1;
         String inputsString = "--i input1=value1,input2=value2";
@@ -210,12 +185,12 @@ public class SlangCLITest {
         inputsMap.put("input1", "value1");
         inputsMap.put("input2", "value2");
 
-        when(compilerHelperMock.compile(flowPathWithBackSlash, null, null)).thenReturn(compilationArtifact);
+        when(compilerHelperMock.compile(FLOW_PATH_BACKSLASH, null, null)).thenReturn(compilationArtifact);
         when(ScoreServicesMock.trigger(eq(compilationArtifact), eq(inputsMap))).thenReturn(executionID);
 
-        CommandResult cr = shell.executeCommand("run --f " + flowPathWithSlash + " " + inputsString);
+        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_SLAH + " " + inputsString);
 
-        verify(compilerHelperMock).compile(flowPathWithBackSlash, null, null);
+        verify(compilerHelperMock).compile(FLOW_PATH_BACKSLASH, null, null);
         verify(ScoreServicesMock).trigger(eq(compilationArtifact), eq(inputsMap));
 
         Assert.assertEquals("method result mismatch", SlangCLI.triggerAsyncMsg(executionID, compilationArtifact.getExecutionPlan().getName()), cr.getResult());
@@ -243,18 +218,14 @@ public class SlangCLITest {
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testGetFlowInputs() throws URISyntaxException, IOException {
-        String flowPathWithSlash = getClass().getResource(FLOW_PATH).getPath();
-        flowPathWithSlash = flowPathWithSlash.substring(1, flowPathWithSlash.length()); // remove leading slash
-        // replace '/' with backslash '\'
-        String flowPathWithBackSlash = flowPathWithSlash.replace('/', '\\');
         List<Input> inputsList = Lists.newArrayList(new Input("input1", "expression1"), new Input("input2", "expression2"));
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), inputsList);
 
-        when(compilerHelperMock.compile(flowPathWithBackSlash, null, null)).thenReturn(compilationArtifact);
+        when(compilerHelperMock.compile(FLOW_PATH_BACKSLASH, null, null)).thenReturn(compilationArtifact);
 
-        CommandResult cr = shell.executeCommand("inputs --f " + flowPathWithSlash);
+        CommandResult cr = shell.executeCommand("inputs --f " + FLOW_PATH_SLAH);
 
-        verify(compilerHelperMock).compile(flowPathWithBackSlash, null, null);
+        verify(compilerHelperMock).compile(FLOW_PATH_BACKSLASH, null, null);
 
         Assert.assertEquals("input list mismatch", Lists.newArrayList("input1", "input2"), cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
@@ -263,18 +234,14 @@ public class SlangCLITest {
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testGetFlowInputsWithOverride() throws URISyntaxException, IOException {
-        String flowPathWithSlash = getClass().getResource(FLOW_PATH).getPath();
-        flowPathWithSlash = flowPathWithSlash.substring(1, flowPathWithSlash.length()); // remove leading slash
-        // replace '/' with backslash '\'
-        String flowPathWithBackSlash = flowPathWithSlash.replace('/', '\\');
         List<Input> inputsList = Lists.newArrayList(new Input("input1", "expression1"),new Input("input_override", "expression_override", false, true, true) , new Input("input2", "expression2"));
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), inputsList);
 
-        when(compilerHelperMock.compile(flowPathWithBackSlash, null, null)).thenReturn(compilationArtifact);
+        when(compilerHelperMock.compile(FLOW_PATH_BACKSLASH, null, null)).thenReturn(compilationArtifact);
 
-        CommandResult cr = shell.executeCommand("inputs --f " + flowPathWithSlash);
+        CommandResult cr = shell.executeCommand("inputs --f " + FLOW_PATH_SLAH);
 
-        verify(compilerHelperMock).compile(flowPathWithBackSlash, null, null);
+        verify(compilerHelperMock).compile(FLOW_PATH_BACKSLASH, null, null);
 
         Assert.assertEquals("input list mismatch", Lists.newArrayList("input1", "input2"), cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
