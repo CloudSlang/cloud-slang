@@ -16,23 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
 */
-package com.hp.score.lang.cli.services;
+package com.hp.score.lang.cli.configuration;
 
-import com.hp.score.lang.entities.CompilationArtifact;
+import com.hp.score.lang.cli.services.ScoreServices;
+import com.hp.score.lang.cli.services.ScoreServicesImpl;
+import com.hp.score.lang.cli.utils.CompilerHelper;
+import com.hp.score.lang.cli.utils.CompilerHelperImpl;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
-import org.eclipse.score.events.ScoreEventListener;
+import java.io.IOException;
 
-import java.io.Serializable;
-import java.util.Map;
-import java.util.Set;
+import static org.mockito.Mockito.mock;
 
 /**
  * Date: 12/9/2014
  *
  * @author Bonczidai Levente
  */
-public interface ScoreServices {
-    void subscribe(ScoreEventListener eventHandler, Set<String> eventTypes);
-    Long trigger(CompilationArtifact compilationArtifact, Map<String, Serializable> inputs);
-    Long triggerSync(CompilationArtifact compilationArtifact, Map<String, Serializable> inputs);
+@Configuration
+@ComponentScan( "com.hp.score.lang.cli" )
+public class SlangCLITestConfig {
+
+    @Bean
+    public ScoreServices scoreServices() {
+        return mock(ScoreServicesImpl.class);
+    }
+
+    @Bean
+    public CompilerHelper compilerHelper() throws IOException {
+        return mock(CompilerHelperImpl.class);
+    }
+
 }

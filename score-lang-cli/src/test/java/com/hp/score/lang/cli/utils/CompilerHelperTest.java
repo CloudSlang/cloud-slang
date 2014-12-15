@@ -69,7 +69,7 @@ public class CompilerHelperTest {
     }
 
     @Test
-    public void testFilePathValidWithOtherPathForDepdencies() throws Exception {
+    public void testFilePathValidWithOtherPathForDependencies() throws Exception {
         String flowFilePath = getClass().getResource("/flow.yaml").getPath();
         String folderPath = getClass().getResource("/flowsdir/").getPath();
         String flow2FilePath = getClass().getResource("/flowsdir/flow2.yaml").getPath();
@@ -78,14 +78,14 @@ public class CompilerHelperTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testInvalidDirPathForDepdencies() throws Exception {
+    public void testInvalidDirPathForDependencies() throws Exception {
         String flowFilePath = getClass().getResource("/flow.yaml").getPath();
         String invalidDirPath = getClass().getResource("").getPath().concat("xxx");
         compilerHelper.compile(flowFilePath, null, invalidDirPath);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testInvalidDirPathForDepdencies2() throws Exception {
+    public void testInvalidDirPathForDependencies2() throws Exception {
         String flowFilePath = getClass().getResource("/flow.yaml").getPath();
         compilerHelper.compile(flowFilePath, null, flowFilePath);
     }

@@ -78,7 +78,6 @@ public class SlangCLI implements CommandMarker {
             //@CliOption(key = "sp", mandatory = false, help = "System property file location") final String systemProperty,//not supported for now...
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, Serializable> inputs) throws IOException {
 
-
         String classPathAbsolutePath = classPath != null ? classPath.getAbsolutePath() : null;
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, classPathAbsolutePath);
 
@@ -88,17 +87,17 @@ public class SlangCLI implements CommandMarker {
             stopWatch.start();
             id = scoreServices.triggerSync(compilationArtifact, inputs);
             stopWatch.stop();
-            return FLOW_EXECUTION_TIME_TOOK + stopWatch.toString() + WITH_EXECUTION_ID_MSG + id;
+            return triggerSyncMsg(id, stopWatch.toString());
         }
         id = scoreServices.trigger(compilationArtifact, inputs);
-        return triggerMsg(id, compilationArtifact.getExecutionPlan().getName());
+        return triggerAsyncMsg(id, compilationArtifact.getExecutionPlan().getName());
     }
 
     @CliCommand(value = "env", help = "Set environment var relevant to the CLI")
     public String setEnvVar(
             @CliOption(key = "setAsync", mandatory = true, help = "set the async") final boolean switchAsync) throws IOException {
         triggerAsync = switchAsync;
-        return "flow execution ASYNC execution was changed to : " + triggerAsync;
+        return setEnvMessage(triggerAsync);
     }
 
     @CliCommand(value = "inputs", help = "Get flow inputs")
@@ -119,13 +118,21 @@ public class SlangCLI implements CommandMarker {
         return inputsResult;
     }
 
-    private String triggerMsg(Long id, String flowName) {
-        return TRIGGERED_FLOW_MSG + flowName + WITH_EXECUTION_ID_MSG + id;
-    }
-
     @CliCommand(value = "slang --version", help = "Prints the score version used")
     public String version() {
         return currently + SCORE_VERSION;
+    }
+
+    public static String triggerSyncMsg(Long id, String duration) {
+        return FLOW_EXECUTION_TIME_TOOK + duration + WITH_EXECUTION_ID_MSG + id;
+    }
+
+    public static String triggerAsyncMsg(Long id, String flowName) {
+        return TRIGGERED_FLOW_MSG + flowName + WITH_EXECUTION_ID_MSG + id;
+    }
+
+    public static String setEnvMessage(boolean triggerAsync) {
+        return "flow execution ASYNC execution was changed to : " + triggerAsync;
     }
 
     public static String getVersion() {
@@ -158,5 +165,4 @@ public class SlangCLI implements CommandMarker {
     private void logEvent(ScoreEvent event) {
         logger.info(("Event received: " + event.getEventType() + " Data is: " + event.getData()));
     }
-
 }
