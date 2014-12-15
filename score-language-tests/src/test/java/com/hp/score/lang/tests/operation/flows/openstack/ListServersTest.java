@@ -16,11 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
 */
-package com.hp.score.lang.tests.operation.flows;
+package com.hp.score.lang.tests.operation.flows.openstack;
 
 import com.google.common.collect.Sets;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.tests.operation.SystemsTestsParent;
+
 import org.eclipse.score.events.EventConstants;
 import org.eclipse.score.events.ScoreEvent;
 import org.junit.Assert;
@@ -35,29 +36,28 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Date: 12/4/2014
+ * Date: 12/5/2014
  *
  * @author Bonczidai Levente
  */
-public class ComplexNavigationTest extends SystemsTestsParent{
+public class ListServersTest  extends SystemsTestsParent{
 
     @Test
     @Ignore
     public void testCompileAndRunFlow() throws Exception {
-        URI resource = getClass().getResource("/yaml/flow_complex_navigation.yaml").toURI();
-        URI operationsEmail = getClass().getResource("/yaml/docker-demo/").toURI();
-        URI operationsPython = getClass().getResource("/yaml/simple_operations.yaml").toURI();
+        URI resource = getClass().getResource("/yaml/openstack/flow_list_servers.yaml").toURI();
+        URI operations = getClass().getResource("/yaml/openstack/").toURI();
 
-        Set<File> path = Sets.newHashSet(new File(operationsEmail), new File(operationsPython));
+        Set<File> path = Sets.newHashSet(new File(operations));
         CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
 
         //TODO: remove default values for inputs
         Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("userNumber", 12);
-        userInputs.put("emailHost", "smtp-americas.hp.com");
-        userInputs.put("emailPort", "25");
-        userInputs.put("emailSender", "sender@hp.com");
-        userInputs.put("emailRecipient", "receiver@hp.com");
+        userInputs.put("openstackHost", "16.77.58.96");
+        userInputs.put("openstackIdentityPort", "5000");
+        userInputs.put("openstackComputePort", "8774");
+        userInputs.put("openstackUsername", "demo");
+        userInputs.put("openstackPassword", "B33f34t3r");
         ScoreEvent event = trigger(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }

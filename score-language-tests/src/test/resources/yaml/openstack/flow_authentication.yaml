@@ -1,0 +1,34 @@
+namespace: openstack.flows
+
+imports:
+ ops: openstack.ops
+
+flow:
+  name: authentication
+  inputs:
+    - openstackHost
+    - openstackIdentityPort
+    - openstackUsername
+    - openstackPassword
+  workflow:
+    get_token:
+      do:
+        ops.get_authentication:
+          - host: openstackHost
+          - identityPort: openstackIdentityPort
+          - username: openstackUsername
+          - password: openstackPassword
+      publish:
+        - response_body: returnResult
+
+    parse_authentication:
+      do:
+        ops.parse_authentication:
+          - jsonAuthenticationResponse: response_body
+      publish:
+        - token
+        - tenant
+
+  outputs:
+    - token
+    - tenant

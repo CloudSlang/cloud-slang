@@ -95,3 +95,31 @@ operations:
       action:
         python_script:
           print 'Odd number processed. Result= ' + str(odd_number)
+
+  - send_email_mock:
+      inputs:
+         - hostname
+         - port
+         - sender
+         - recipient
+         - subject
+         - body
+      action:
+        python_script: |
+          print 'Send email mock'
+          print 'hostname: ' + hostname
+          print 'port: ' + port
+          print 'sender: ' + sender
+          print 'recipient: ' + recipient
+          print 'subject: ' + subject
+          print 'body: ' + body
+
+  - produce_default_navigation:
+      inputs:
+        - navigationType
+      action:
+        python_script:
+          print 'Producing default navigation based on input'
+      results:
+        - SUCCESS: navigationType == 'success'
+        - FAILURE: 1 == 1

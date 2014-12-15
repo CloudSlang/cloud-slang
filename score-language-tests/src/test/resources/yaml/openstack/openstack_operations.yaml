@@ -131,20 +131,36 @@ operations:
       results:
         - SUCCESS : statusCode == '0'
         - FAILURE
+  - extract_servers:
+      inputs:
+        - server_body
+      action:
+        python_script: |
+          import json
+          decoded = json.loads(server_body)
+          serverListJson = decoded['servers']
+          nrServers = len(serverListJson)
+          serverList = ''
+          for index in range(nrServers):
+          	serverName = serverListJson[index]['name']
+          	serverList = serverList + serverName + ','
+          serverList = serverList[:-1]
+      outputs:
+        - serverList
   - get_server_id:
-        inputs:
-          - server_body
-          - deleteServerName
-        action:
-          python_script: |
-            import json
-            decoded = json.loads(server_body)
-            serverListJson = decoded['servers']
-            nrServers = len(serverListJson)
-            serverList = ''
-            for index in range(nrServers):
-              serverName = serverListJson[index]['name']
-              if serverName == deleteServerName:
-                serverID = serverListJson[index]['id']
-        outputs:
-          - serverID
+       inputs:
+         - server_body
+         - deleteServerName
+       action:
+         python_script: |
+           import json
+           decoded = json.loads(server_body)
+           serverListJson = decoded['servers']
+           nrServers = len(serverListJson)
+           serverList = ''
+           for index in range(nrServers):
+             serverName = serverListJson[index]['name']
+             if serverName == deleteServerName:
+               serverID = serverListJson[index]['id']
+       outputs:
+         - serverID

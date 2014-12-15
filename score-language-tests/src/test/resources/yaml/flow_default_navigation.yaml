@@ -1,0 +1,39 @@
+namespace: user.flows
+
+imports:
+ ops: user.ops
+
+flow:
+  name: navigation_flow
+  inputs:
+    - navigationType
+    - emailHost
+    - emailPort
+    - emailSender
+    - emailRecipient
+  workflow:
+    produce_default_navigation:
+      do:
+        ops.produce_default_navigation:
+          - navigationType
+
+    check_Weather: # default navigation here on success
+      do:
+        ops.check_Weather:
+          - city: "'AwesomeCity'"
+      navigate:
+        SUCCESS: SUCCESS # end flow with success result
+
+    on_failure: # default navigation here on failure
+      send_error_mail:
+        do:
+          ops.send_email_mock:
+            - hostname: emailHost
+            - port: emailPort
+            - sender: emailSender
+            - recipient: emailRecipient
+            - subject: "'Flow failure'"
+            - body: "'Default failure navigation here'"
+        navigate:
+          SUCCESS: FAILURE # end flow with failure result
+          FAILURE: FAILURE

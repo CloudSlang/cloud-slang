@@ -1,0 +1,45 @@
+namespace: openstack.flows
+
+imports:
+ ops: openstack.ops
+ flows: openstack.flows
+
+flow:
+  name: list_servers
+  inputs:
+    - openstackHost
+    - openstackIdentityPort
+    - openstackComputePort
+    - openstackUsername
+    - openstackPassword
+  workflow:
+    authentication:
+      do:
+        flows.authentication:
+          - openstackHost
+          - openstackIdentityPort
+          - openstackUsername
+          - openstackPassword
+      publish:
+        - token
+        - tenant
+
+    get_openstack_servers:
+      do:
+        ops.get_openstack_servers:
+          - host: openstackHost
+          - computePort: openstackComputePort
+          - token
+          - tenant
+      publish:
+        - responseBody: returnResult
+
+    extract_servers:
+          do:
+            ops.extract_servers:
+              - server_body: responseBody
+          publish:
+            - serverList
+
+  outputs:
+    - serverList

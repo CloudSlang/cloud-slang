@@ -2,7 +2,6 @@ namespace: user.flows
 
 imports:
  ops: user.ops
- email: email.ops
 
 flow:
   name: navigation_flow
@@ -41,11 +40,11 @@ flow:
     on_failure: # you can also use this step for default navigation in failure case
       send_error_mail: # or refer it by the task name
         do:
-          email.send_mail:
+          ops.send_email_mock:
             - hostname: emailHost
             - port: emailPort
-            - from: emailSender
-            - to: emailRecipient
+            - sender: emailSender
+            - recipient: emailRecipient
             - subject: "'Flow failure'"
             - body: "'Wrong number: ' + str(userNumber)"
         navigate:

@@ -20,6 +20,7 @@ package com.hp.score.lang.tests.operation;
 
 import com.hp.score.lang.api.Slang;
 import com.hp.score.lang.entities.CompilationArtifact;
+import com.hp.score.lang.runtime.events.LanguageEventData;
 import org.eclipse.score.events.EventConstants;
 import org.eclipse.score.events.ScoreEvent;
 import org.eclipse.score.events.ScoreEventListener;
@@ -30,9 +31,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static com.hp.score.lang.entities.ScoreLangConstants.*;
@@ -48,6 +47,7 @@ public class SystemsTestsParent {
     protected Slang slang;
 
     private LinkedBlockingQueue<ScoreEvent> queue = new LinkedBlockingQueue<>();
+    private List<ScoreEvent> taskEvents;
 
     protected ScoreEvent trigger(CompilationArtifact compilationArtifact, Map<String, Serializable> userInputs) throws InterruptedException {
         registerHandlers();
@@ -55,10 +55,44 @@ public class SystemsTestsParent {
         ScoreEvent event;
         do {
             event = queue.take();
-            Assert.assertNotSame("Error event has been thrown during execution", SLANG_EXECUTION_EXCEPTION, event.getEventType());
+            Assert.assertNotSame("Error event has been thrown during execution with data: " + event.getData(), SLANG_EXECUTION_EXCEPTION, event.getEventType());
             System.out.println("Event received: " + event.getEventType() + " Data is: " + event.getData());
         } while (!EventConstants.SCORE_FINISHED_EVENT.equals(event.getEventType()));
         return event;
+    }
+
+    protected void startTaskMonitoring() {
+        taskEvents = new ArrayList<>();
+
+        Set<String> handlerTypes = new HashSet<>();
+        handlerTypes.add(EVENT_INPUT_END);
+        slang.subscribeOnEvents(new ScoreEventListener() {
+            @Override
+            public void onEvent(ScoreEvent event) {
+                LanguageEventData eventData = (LanguageEventData) event.getData();
+                String taskKey = LanguageEventData.levelName.TASK_NAME.name();
+                if (eventData.containsKey(taskKey)) {
+                    // register only tasks, not operations
+                    taskEvents.add(event);
+                }
+            }
+        }, handlerTypes);
+    }
+
+    protected void verifyTaskOrder(List<String> expectedTasks) {
+        List<String> actualTasks = extractTasks();
+        Assert.assertEquals("task order not as expected", expectedTasks, actualTasks);
+    }
+
+    private List<String> extractTasks() {
+        List<String> taskList = new ArrayList<>();
+        for (ScoreEvent event: taskEvents) {
+            LanguageEventData eventData = (LanguageEventData) event.getData();
+            String taskKey = LanguageEventData.levelName.TASK_NAME.name();
+            String taskName = (String) eventData.get(taskKey);
+            taskList.add(taskName);
+        }
+        return taskList;
     }
 
     private void registerHandlers() {
@@ -85,4 +119,5 @@ public class SystemsTestsParent {
             }
         }, handlerTypes);
     }
+
 }
