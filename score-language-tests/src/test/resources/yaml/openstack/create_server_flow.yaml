@@ -15,24 +15,18 @@ flow:
     - password
     - serverName
   workflow:
-    get_authentication:
+    authentication:
       do:
-        ops.get_authentication:
-          - host
-          - identityPort
-          - username
-          - password
-      publish:
-        - authentication: returnResult
-
-    parse_authentication:
-      do:
-        ops.parse_authentication:
-          - jsonAuthenticationResponse: authentication
+        flows.authentication:
+          - openstackHost: host
+          - openstackIdentityPort: identityPort
+          - openstackUsername: username
+          - openstackPassword: password
       publish:
         - token
         - tenant
-
+        - returnResult
+        - errorMessage
     create_server:
       do:
         ops.create_openstack_server:
@@ -42,4 +36,11 @@ flow:
           - tenant
           - imgRef
           - serverName
+      publish:
+        - returnResult
+        - errorMessage
+  outputs:
+    - returnResult
+    - errorMessage
+
 

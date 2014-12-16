@@ -1,0 +1,29 @@
+namespace: email.ops
+
+operations:
+  - send_mail:
+      inputs:
+        - hostname
+        - port
+        - from
+        - to
+        - cc: "''"
+        - bcc: "''"
+        - subject
+        - body
+        - htmlEmail: "'true'"
+        - readReceipt: "'false'"
+        - attachments: "''"
+        - username: "''"
+        - password: "''"
+        - characterSet: "'UTF-8'"
+        - contentTransferEncoding: "'base64'"
+        - delimiter: "''"
+      action:
+        java_action:
+          className: org.eclipse.score.content.mail.actions.SendMailAction
+          methodName: execute
+      results:
+        - SUCCESS: returnCode == '0'
+        - FAILURE
+

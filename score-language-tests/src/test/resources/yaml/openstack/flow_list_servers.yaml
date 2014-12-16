@@ -23,6 +23,8 @@ flow:
       publish:
         - token
         - tenant
+        - returnResult
+        - errorMessage
 
     get_openstack_servers:
       do:
@@ -33,6 +35,8 @@ flow:
           - tenant
       publish:
         - responseBody: returnResult
+        - returnResult
+        - errorMessage
 
     extract_servers:
           do:
@@ -40,6 +44,9 @@ flow:
               - server_body: responseBody
           publish:
             - serverList
+            - errorMessage
 
   outputs:
     - serverList
+    - returnResult
+    - errorMessage

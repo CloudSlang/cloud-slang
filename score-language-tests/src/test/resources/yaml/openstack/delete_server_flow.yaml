@@ -14,22 +14,18 @@ flow:
     - password
     - serverName
   workflow:
-    get_authentication:
+    authentication:
       do:
-        ops.get_authentication:
-          - host
-          - identityPort
-          - username
-          - password
-      publish:
-        - authentication: returnResult
-    parse_authentication:
-      do:
-        ops.parse_authentication:
-          - jsonAuthenticationResponse: authentication
+        flows.authentication:
+          - openstackHost: host
+          - openstackIdentityPort: identityPort
+          - openstackUsername: username
+          - openstackPassword: password
       publish:
         - token
         - tenant
+        - returnResult
+        - errorMessage
     get_servers:
       do:
         ops.get_openstack_servers:
@@ -39,6 +35,8 @@ flow:
           - tenant
       publish:
         - server_list: returnResult
+        - returnResult
+        - errorMessage
     get_server_id:
       do:
         ops.get_server_id:
@@ -46,6 +44,8 @@ flow:
           - deleteServerName: serverName
       publish:
         - serverID
+        - returnResult
+        - errorMessage
     delete_server:
       do:
         ops.delete_openstack_server:
@@ -54,3 +54,9 @@ flow:
           - token
           - tenant
           - serverID
+      publish:
+        - returnResult
+        - errorMessage
+  outputs:
+    - returnResult
+    - errorMessage

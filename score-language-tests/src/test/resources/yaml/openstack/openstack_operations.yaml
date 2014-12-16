@@ -24,11 +24,12 @@ operations:
           className: org.eclipse.score.content.httpclient.HttpClientAction
           methodName: execute
       outputs:
-        - returnResult: returnResult
-        - statusCode: statusCode
-        - errorMessage: STDERR if statusCode != '200' else returnResult
+        - returnResult
+        - statusCode
+        - returnCode
+        - errorMessage: returnResult if returnCode == '-1' or statusCode != 200 else ''
       results:
-        - SUCCESS: not 'Connection error' in returnResult
+        - SUCCESS: returnCode != '-1' and statusCode == '200'
         - FAILURE
   - parse_authentication:
       inputs:
@@ -45,6 +46,35 @@ operations:
       results:
         - SUCCESS : returnCode == '0'
         - FAILURE
+  - python_parse_authentication:
+      inputs:
+        - jsonAuthenticationResponse
+      action:
+        python_script: |
+          try:
+            import json
+            decoded = json.loads(jsonAuthenticationResponse)
+            accessJson = decoded['access']
+            tokenJson = accessJson['token']
+            token = tokenJson['id']
+            tenantJson = tokenJson['tenant']
+            tenant = tenantJson['id']
+            returnCode = '0'
+            returnResult = 'Parsing successful.'
+          except:
+            returnCode = '-1'
+            returnResult = 'Parsing error.'
+      outputs:
+        - token
+        - tenant
+        - returnCode
+        - returnResult
+        - errorMessage: returnResult if returnCode == '-1' else ''
+      results:
+        - SUCCESS: returnCode == '0'
+        - FAILURE
+
+
   - create_openstack_server:
       inputs:
         - host
@@ -75,7 +105,7 @@ operations:
       outputs:
         - returnResult: returnResult
         - statusCode: statusCode
-        - errorMessage: STDERR if statusCode != '202' else returnResult
+        - errorMessage: returnResult if statusCode != '202' else ''
       results:
         - SUCCESS : statusCode == '202'
         - FAILURE
@@ -101,9 +131,9 @@ operations:
       outputs:
         - returnResult: returnResult
         - statusCode: statusCode
-        - errorMessage: STDERR if statusCode != '202' else returnResult
+        - errorMessage: returnResult if statusCode != '202' else ''
       results:
-        - SUCCESS
+        - SUCCESS : statusCode == '200'
         - FAILURE
   - delete_openstack_server:
       inputs:
@@ -127,40 +157,109 @@ operations:
       outputs:
         - returnResult: returnResult
         - statusCode: statusCode
-        - errorMessage: STDERR if returnCode != '0' else returnResult
+        - errorMessage: returnResult if statusCode != '204' else ''
       results:
-        - SUCCESS : statusCode == '0'
+        - SUCCESS : statusCode == '204'
         - FAILURE
   - extract_servers:
       inputs:
         - server_body
       action:
         python_script: |
-          import json
-          decoded = json.loads(server_body)
-          serverListJson = decoded['servers']
-          nrServers = len(serverListJson)
-          serverList = ''
-          for index in range(nrServers):
-          	serverName = serverListJson[index]['name']
-          	serverList = serverList + serverName + ','
-          serverList = serverList[:-1]
+          try:
+            import json
+            decoded = json.loads(server_body)
+            serverListJson = decoded['servers']
+            nrServers = len(serverListJson)
+            serverList = ''
+            for index in range(nrServers):
+              serverName = serverListJson[index]['name']
+              serverList = serverList + serverName + ','
+            serverList = serverList[:-1]
+            returnCode = '0'
+            returnResult = 'Parsing successful.'
+          except:
+            returnCode = '-1'
+            returnResult = 'Parsing error.'
       outputs:
         - serverList
+        - returnResult
+        - returnCode
+        - errorMessage: returnResult if returnCode == '-1' else ''
   - get_server_id:
-       inputs:
-         - server_body
-         - deleteServerName
-       action:
-         python_script: |
-           import json
-           decoded = json.loads(server_body)
-           serverListJson = decoded['servers']
-           nrServers = len(serverListJson)
-           serverList = ''
-           for index in range(nrServers):
-             serverName = serverListJson[index]['name']
-             if serverName == deleteServerName:
-               serverID = serverListJson[index]['id']
-       outputs:
-         - serverID
+        inputs:
+          - server_body
+          - deleteServerName
+        action:
+          python_script: |
+            try:
+              import json
+              decoded = json.loads(server_body)
+              serverListJson = decoded['servers']
+              nrServers = len(serverListJson)
+              serverList = ''
+              for index in range(nrServers):
+                serverName = serverListJson[index]['name']
+                if serverName == deleteServerName:
+                  serverID = serverListJson[index]['id']
+              returnCode = '0'
+              returnResult = 'Parsing successful.'
+            except:
+              returnCode = '-1'
+              returnResult = 'Parsing error.'
+
+        outputs:
+          - serverID
+          - returnResult
+          - returnCode
+          - errorMessage: returnResult if returnCode == '-1' else ''
+
+  - string_occurrence_counter:
+        inputs:
+          - container
+          - toFind
+          - ignoreCase
+        action:
+          python_script: |
+            try:
+              if ignoreCase == 'true':
+                container.lower()
+                toFind.lower()
+              occurrence = container.count(toFind)
+              returnCode = '0'
+              if occurrence == 0:
+                returnResult = 'Server was not created'
+              else:
+                returnResult = occurrence
+            except:
+              returnCode = '-1'
+              returnResult = 'String occurrence error.'
+        outputs:
+          - occurrence
+          - returnResult
+          - returnCode
+          - errorMessage: returnResult if occurrence == '0'  else ''
+        results:
+          - SUCCESS: occurrence >= '1'
+          - FAILURE
+
+  - check_server:
+        inputs:
+          - serverName
+          - serverList
+          - container: serverList
+          - toFind: serverName
+          - ignoreCase: "'true'"
+        action:
+          java_action:
+            className: com.hp.score.lang.tests.operation.actions.StringOccurrenceCounter
+            methodName: execute
+        outputs:
+          - occurrences: returnResult
+          - returnCode: returnCode
+          - returnResult
+          - errorMessage: returnResult if returnCode == '-1' else ''
+        results:
+          - SUCCESS : returnResult == '1' and returnCode == '0'
+          - FAILURE
+

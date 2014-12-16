@@ -20,15 +20,20 @@ flow:
           - password: openstackPassword
       publish:
         - response_body: returnResult
+        - returnCode
+        - errorMessage
 
     parse_authentication:
       do:
-        ops.parse_authentication:
+        ops.python_parse_authentication:
           - jsonAuthenticationResponse: response_body
       publish:
         - token
         - tenant
+        - errorMessage
 
   outputs:
     - token
     - tenant
+    - returnResult: response_body
+    - errorMessage
