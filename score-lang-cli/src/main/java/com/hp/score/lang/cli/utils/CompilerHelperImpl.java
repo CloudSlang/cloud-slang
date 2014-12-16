@@ -20,11 +20,11 @@ package com.hp.score.lang.cli.utils;
 */
 
 
+import com.google.common.collect.Lists;
 import com.hp.score.lang.api.Slang;
 import com.hp.score.lang.entities.CompilationArtifact;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -43,7 +44,6 @@ import java.util.Set;
 
 @Component
 public class CompilerHelperImpl implements CompilerHelper{
-    //todo - tests
 
     @Autowired
     private Slang slang;
@@ -59,18 +59,19 @@ public class CompilerHelperImpl implements CompilerHelper{
      * @return
      * @throws IOException
      */
-    public CompilationArtifact compile(String filePath, String opName, String dependencies) throws IOException {
+    public CompilationArtifact compile(String filePath, String opName, List<String> dependencies) throws IOException {
         Validate.notNull(filePath, "filePath can not be null");
 
         Set<File> dependenciesFilesSet = new HashSet<>();
         File file = new File(filePath);
         Validate.isTrue(file.isFile(), "filePath must lead to a file");
 
-        if (StringUtils.isEmpty(dependencies)) {
-            dependencies = file.getParent();//default behavior is taking the parent dir
+        if (dependencies == null || dependencies.isEmpty()) {
+            dependencies = Lists.newArrayList(file.getParent()); //default behavior is taking the parent dir
         }
-        if (dependencies != null) {
-            Collection<File> dependenciesFiles = FileUtils.listFiles(new File(dependencies), SLANG_FILE_EXTENSIONS, false);
+
+        for (String dependency:dependencies) {
+            Collection<File> dependenciesFiles = FileUtils.listFiles(new File(dependency), SLANG_FILE_EXTENSIONS, false);
             dependenciesFilesSet.addAll(dependenciesFiles);
         }
 
@@ -85,6 +86,5 @@ public class CompilerHelperImpl implements CompilerHelper{
 
         return compilationArtifact;
     }
-
 
 }

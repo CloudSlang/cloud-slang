@@ -21,7 +21,8 @@ package com.hp.score.lang.cli.utils;
 
 import com.hp.score.lang.entities.CompilationArtifact;
 import java.io.IOException;
+import java.util.List;
 
 public interface CompilerHelper {
-    public CompilationArtifact compile(String filePath, String opName, String dependencies) throws IOException;
+    public CompilationArtifact compile(String filePath, String opName, List<String> dependencies) throws IOException;
 }

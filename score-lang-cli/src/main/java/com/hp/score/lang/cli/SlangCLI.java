@@ -18,6 +18,7 @@
 */
 package com.hp.score.lang.cli;
 
+import com.google.common.collect.Lists;
 import com.hp.score.lang.cli.services.ScoreServices;
 import com.hp.score.lang.cli.utils.CompilerHelper;
 import com.hp.score.lang.entities.CompilationArtifact;
@@ -74,12 +75,11 @@ public class SlangCLI implements CommandMarker {
     public String run(
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. slang run --f C:\\Slang\\flow.yaml") final File file,
             @CliOption(key = {"cp", "classpath"}, mandatory = false,
-                    help = "Classpath , a file directory to flow dependencies, by default it will take flow file dir") final File classPath,
+                    help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final String classPath,
             //@CliOption(key = "sp", mandatory = false, help = "System property file location") final String systemProperty,//not supported for now...
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, Serializable> inputs) throws IOException {
 
-        String classPathAbsolutePath = classPath != null ? classPath.getAbsolutePath() : null;
-        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, classPathAbsolutePath);
+        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, prepareDependencyList(classPath));
 
         Long id;
         if (!triggerAsync) {
@@ -104,10 +104,9 @@ public class SlangCLI implements CommandMarker {
     public List<String> getFlowInputs(
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. slang inputs --f C:\\Slang\\flow.yaml") final File file,
             @CliOption(key = {"cp", "classpath"}, mandatory = false,
-                    help = "Classpath, a file directory to flow dependencies, by default it will take flow file dir") final File classPath)
+                    help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final String classPath)
             throws IOException {
-        String classPathAbsolutePath = classPath != null ? classPath.getAbsolutePath() : null;
-        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, classPathAbsolutePath);
+        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, prepareDependencyList(classPath));
         List<Input> inputs = compilationArtifact.getInputs();
         List<String> inputsResult = new ArrayList<>();
         for (Input input : inputs) {
@@ -165,4 +164,14 @@ public class SlangCLI implements CommandMarker {
     private void logEvent(ScoreEvent event) {
         logger.info(("Event received: " + event.getEventType() + " Data is: " + event.getData()));
     }
+
+    private List<String> prepareDependencyList(String classPath) {
+        List<String> dependencyList = null;
+        if (classPath != null) {
+            String[] paths = classPath.split(",");
+            dependencyList = Lists.newArrayList(paths);
+        }
+        return dependencyList;
+    }
+
 }

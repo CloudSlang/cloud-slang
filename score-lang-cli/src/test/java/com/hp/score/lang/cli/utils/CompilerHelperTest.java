@@ -1,6 +1,7 @@
 package com.hp.score.lang.cli.utils;
 
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.hp.score.lang.api.Slang;
 import org.junit.Before;
@@ -73,7 +74,7 @@ public class CompilerHelperTest {
         String flowFilePath = getClass().getResource("/flow.yaml").getPath();
         String folderPath = getClass().getResource("/flowsdir/").getPath();
         String flow2FilePath = getClass().getResource("/flowsdir/flow2.yaml").getPath();
-        compilerHelper.compile(flowFilePath, null, folderPath);
+        compilerHelper.compile(flowFilePath, null, Lists.newArrayList(folderPath));
         Mockito.verify(slang).compile(new File(flowFilePath), Sets.newHashSet(new File(flow2FilePath)));
     }
 
@@ -81,13 +82,13 @@ public class CompilerHelperTest {
     public void testInvalidDirPathForDependencies() throws Exception {
         String flowFilePath = getClass().getResource("/flow.yaml").getPath();
         String invalidDirPath = getClass().getResource("").getPath().concat("xxx");
-        compilerHelper.compile(flowFilePath, null, invalidDirPath);
+        compilerHelper.compile(flowFilePath, null, Lists.newArrayList(invalidDirPath));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidDirPathForDependencies2() throws Exception {
         String flowFilePath = getClass().getResource("/flow.yaml").getPath();
-        compilerHelper.compile(flowFilePath, null, flowFilePath);
+        compilerHelper.compile(flowFilePath, null, Lists.newArrayList(flowFilePath));
     }
 
 
@@ -105,6 +106,5 @@ public class CompilerHelperTest {
         }
 
     }
-
 
 }
