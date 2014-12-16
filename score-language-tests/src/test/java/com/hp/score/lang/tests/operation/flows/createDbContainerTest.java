@@ -46,7 +46,7 @@ public class createDbContainerTest  extends SystemsTestsParent {
     @Ignore
     public void testCompileAndRunSubFlowBasic() throws Exception {
         URI resource = getClass().getResource("/yaml/docker-demo/create_db_container.yaml").toURI();
-        URI operations = getClass().getResource("/yaml/docker-demo/docker_operations.yaml").toURI();
+        URI operations = getClass().getResource("/yaml/docker-demo/").toURI();
 
         Set<File> path = Sets.newHashSet(new File(operations));
         CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);

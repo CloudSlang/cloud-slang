@@ -75,11 +75,12 @@ public class SlangCLI implements CommandMarker {
     public String run(
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. slang run --f C:\\Slang\\flow.yaml") final File file,
             @CliOption(key = {"cp", "classpath"}, mandatory = false,
-                    help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final String classPath,
+                    help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath,
             //@CliOption(key = "sp", mandatory = false, help = "System property file location") final String systemProperty,//not supported for now...
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, Serializable> inputs) throws IOException {
 
-        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, prepareDependencyList(classPath));
+
+        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, classPath);
 
         Long id;
         if (!triggerAsync) {
