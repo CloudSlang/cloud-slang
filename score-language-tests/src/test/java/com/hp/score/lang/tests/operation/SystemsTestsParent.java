@@ -83,6 +83,10 @@ public class SystemsTestsParent {
         List<String> actualTasks = extractTasks();
         Assert.assertEquals("task order not as expected", expectedTasks, actualTasks);
     }
+    protected void verifyResults(List<String> expectedResults) {
+        List<String> actualTasks = extractResults();
+        Assert.assertEquals("results not as expected", expectedResults, actualTasks);
+    }
 
     private List<String> extractTasks() {
         List<String> taskList = new ArrayList<>();
@@ -119,5 +123,31 @@ public class SystemsTestsParent {
             }
         }, handlerTypes);
     }
+    protected void startOperationMonitoring() {
+        taskEvents = new ArrayList<>();
 
+        Set<String> handlerTypes = new HashSet<>();
+        handlerTypes.add(EVENT_OUTPUT_END);
+        slang.subscribeOnEvents(new ScoreEventListener() {
+            @Override
+            public void onEvent(ScoreEvent event) {
+                LanguageEventData eventData = (LanguageEventData) event.getData();
+                String taskKey = LanguageEventData.levelName.TASK_NAME.name();
+                if (!eventData.containsKey(taskKey)) {
+                    // register only tasks, not operations
+                    taskEvents.add(event);
+                }
+            }
+        }, handlerTypes);
+    }
+    private List<String> extractResults() {
+        List<String> results = new ArrayList<>();
+        for (ScoreEvent event:taskEvents) {
+            LanguageEventData eventData = (LanguageEventData) event.getData();
+            String resultKey = LanguageEventData.RESULT;
+            String result = (String) eventData.get(resultKey);
+            results.add(result);
+        }
+        return results;
+    }
 }

@@ -1,0 +1,18 @@
+namespace: system.flows
+
+imports:
+ ops: system.ops
+ flows: system.flows
+
+flow:
+  name: data_flow
+  inputs:
+    - myMessage
+    - tryToChangeMessage
+  workflow:
+    data_flow_check:
+      do:
+        ops.data_flow_op:
+          - opMessage: myMessage
+          - unchangableMessage: tryToChangeMessage
+

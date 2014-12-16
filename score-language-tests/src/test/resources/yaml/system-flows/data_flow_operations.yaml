@@ -1,0 +1,26 @@
+namespace: system.ops
+
+operations:
+  - data_flow_op:
+      inputs:
+        - opMessage
+        - unchangableMessage:
+            default:  str('defaultString')
+            override: true
+        - message: opMessage
+
+      action:
+        python_script: |
+          if message != 'hello world':
+            returnCode = '-1'
+          elif unchangableMessage != 'defaultString':
+            returnCode = '-1'
+          else:
+            returnCode = '0'
+      outputs:
+        - returnCode
+      results:
+        - SUCCESS: returnCode == '0'
+        - FAILURE
+
+
