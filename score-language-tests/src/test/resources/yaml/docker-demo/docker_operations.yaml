@@ -156,3 +156,29 @@ operations:
       results:
         - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
         - FAILURE
+  - exec_proc_in_container:
+        inputs:
+          - containerID
+          - cmdParams: "''"
+          - host
+          - port: "'22'"
+          - username
+          - password
+          - privateKeyFile: "''"
+          - arguments: "''"
+          - execCmd: "''"
+          - command: "'docker exec ' + cmdParams + ' ' + containerID + execCmd"
+          - characterSet: "'UTF-8'"
+          - pty: "'false'"
+          - timeout: "'90000'"
+          - closeSession: "'false'"
+        action:
+          java_action:
+            className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
+            methodName: runSshShellCommand
+        outputs:
+          - result: returnResult
+          - errorMessage: STDERR if returnCode == '0' else returnResult
+        results:
+          - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
+          - FAILURE
