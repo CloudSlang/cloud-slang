@@ -47,13 +47,13 @@ public class DevOpsDemoTest extends SystemsTestsParent {
 
         //TODO: remove default values for inputs
         Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("dockerHost", "16.60.169.142");
-        userInputs.put("dockerUsername", "root");
-        userInputs.put("dockerPassword", "Xy6stqZ");
-        userInputs.put("emailHost", "smtp-americas.hp.com");
-        userInputs.put("emailPort", "25");
-        userInputs.put("emailSender", "tudor-andrei.lesan@hp.com");
-        userInputs.put("emailRecipient", "tudor-andrei.lesan@hp.com");
+        userInputs.put("dockerHost", "{{ dockerHost }}");
+        userInputs.put("dockerUsername", "{{ dockerUsername }}");
+        userInputs.put("dockerPassword", "{{ dockerPassword }}");
+        userInputs.put("emailHost", "{{ emailHost }}");
+        userInputs.put("emailPort", "{{ emailPort }}");
+        userInputs.put("emailSender", "{{ emailSender }}");
+        userInputs.put("emailRecipient", "{{ emailRecipient }}");
         ScoreEvent event = trigger(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }

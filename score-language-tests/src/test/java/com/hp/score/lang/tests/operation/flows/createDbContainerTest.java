@@ -40,7 +40,6 @@ import java.util.Set;
  * @author Bonczidai Levente
  */
 public class createDbContainerTest  extends SystemsTestsParent {
-    private static final long DEFAULT_TIMEOUT = 50000;
 
     @Test
     @Ignore
@@ -52,9 +51,9 @@ public class createDbContainerTest  extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("host", "16.60.169.142");
-        userInputs.put("username", "root");
-        userInputs.put("password", "Xy6stqZ");
+        userInputs.put("host", "{{ host }}");
+        userInputs.put("username", "{{ username }}");
+        userInputs.put("password", "{{ password }}");
         ScoreEvent event = trigger(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }

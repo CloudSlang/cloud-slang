@@ -52,11 +52,11 @@ public class ClearContainersTest  extends SystemsTestsParent {
 
         //TODO: remove default values for inputs
         Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("dbContainerID", "6b7fe3d1a777");
-        userInputs.put("linkedContainerID", "7791d3f881f2");
-        userInputs.put("dockerHost", "16.60.169.142");
-        userInputs.put("dockerUsername", "root");
-        userInputs.put("dockerPassword", "Xy6stqZ");
+        userInputs.put("dbContainerID", "{{ dbContainerID }}");
+        userInputs.put("linkedContainerID", "{{ linkedContainerID }}");
+        userInputs.put("dockerHost", "{{ dockerHost }}");
+        userInputs.put("dockerUsername", "{{ dockerUsername }}");
+        userInputs.put("dockerPassword", "{{ dockerPassword }}");
         ScoreEvent event = trigger(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
