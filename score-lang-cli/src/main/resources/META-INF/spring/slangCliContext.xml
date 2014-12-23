@@ -26,7 +26,7 @@
                         http://www.openscore.org/schema/score
                         http://www.openscore.org/schema/score.xsd">
 
-    <bean class="com.hp.score.lang.api.configuration.SlangSpringConfiguration"/>
+    <bean class="org.openscore.lang.api.configuration.SlangSpringConfiguration"/>
 
     <score:engine />
 

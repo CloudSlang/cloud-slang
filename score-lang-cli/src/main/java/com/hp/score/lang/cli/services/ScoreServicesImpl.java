@@ -18,7 +18,7 @@
 */
 package com.hp.score.lang.cli.services;
 
-import com.hp.score.lang.api.Slang;
+import org.openscore.lang.api.Slang;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.runtime.env.ExecutionPath;

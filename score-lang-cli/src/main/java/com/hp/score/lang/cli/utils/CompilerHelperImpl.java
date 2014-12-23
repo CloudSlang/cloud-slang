@@ -21,7 +21,7 @@ package com.hp.score.lang.cli.utils;
 
 
 import com.google.common.collect.Lists;
-import com.hp.score.lang.api.Slang;
+import org.openscore.lang.api.Slang;
 import com.hp.score.lang.entities.CompilationArtifact;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;

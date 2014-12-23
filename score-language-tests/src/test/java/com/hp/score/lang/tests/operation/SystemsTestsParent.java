@@ -18,7 +18,7 @@
 */
 package com.hp.score.lang.tests.operation;
 
-import com.hp.score.lang.api.Slang;
+import org.openscore.lang.api.Slang;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.runtime.events.LanguageEventData;
 import org.openscore.events.EventConstants;
