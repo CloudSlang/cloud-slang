@@ -1,5 +1,3 @@
-package com.hp.score.lang.cli.utils;
-
 /*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,23 @@ package com.hp.score.lang.cli.utils;
  * specific language governing permissions and limitations
  * under the License.
 */
+package org.openscore.cli.services;
 
 import com.hp.score.lang.entities.CompilationArtifact;
-import java.io.IOException;
-import java.util.List;
 
-public interface CompilerHelper {
-    public CompilationArtifact compile(String filePath, String opName, List<String> dependencies) throws IOException;
+import org.openscore.events.ScoreEventListener;
+
+import java.io.Serializable;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * Date: 12/9/2014
+ *
+ * @author Bonczidai Levente
+ */
+public interface ScoreServices {
+    void subscribe(ScoreEventListener eventHandler, Set<String> eventTypes);
+    Long trigger(CompilationArtifact compilationArtifact, Map<String, Serializable> inputs);
+    Long triggerSync(CompilationArtifact compilationArtifact, Map<String, Serializable> inputs);
 }

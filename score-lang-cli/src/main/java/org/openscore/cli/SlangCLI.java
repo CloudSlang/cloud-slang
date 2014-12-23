@@ -16,11 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
 */
-package com.hp.score.lang.cli;
+package org.openscore.cli;
 
 import com.google.common.collect.Lists;
-import com.hp.score.lang.cli.services.ScoreServices;
-import com.hp.score.lang.cli.utils.CompilerHelper;
+import org.openscore.cli.services.ScoreServices;
+import org.openscore.cli.utils.CompilerHelper;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.bindings.Input;
 import org.apache.commons.lang.time.StopWatch;

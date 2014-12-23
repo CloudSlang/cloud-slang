@@ -3,6 +3,8 @@ package com.hp.score.lang.cli.utils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.openscore.cli.utils.CompilerHelper;
+import org.openscore.cli.utils.CompilerHelperImpl;
 import org.openscore.lang.api.Slang;
 import org.junit.Before;
 import org.junit.Test;

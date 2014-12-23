@@ -5,23 +5,20 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the
  * License.
  */
-package com.hp.score.lang.cli;
+package org.openscore.cli;
 
-import org.springframework.core.annotation.Order;
-import org.springframework.shell.plugin.PromptProvider;
-import org.springframework.stereotype.Component;
+import org.springframework.shell.plugin.NamedProvider;
 
 /**
- * Date: 11/7/2014
- * @author lesant
+ * @author moradi
+ * @since 18/11/2014
+ * @version $Id$
  */
-@Component
-@Order(Integer.MIN_VALUE)
-public class SlangPrompt extends SlangNamedProvider implements PromptProvider {
+public abstract class SlangNamedProvider implements NamedProvider {
 
 	@Override
-	public String getPrompt() {
-		return "slang>";
+	public String getProviderName() {
+		return "Slang";
 	}
 
 }

@@ -18,10 +18,10 @@
 */
 package com.hp.score.lang.cli.configuration;
 
-import com.hp.score.lang.cli.services.ScoreServices;
-import com.hp.score.lang.cli.services.ScoreServicesImpl;
-import com.hp.score.lang.cli.utils.CompilerHelper;
-import com.hp.score.lang.cli.utils.CompilerHelperImpl;
+import org.openscore.cli.services.ScoreServices;
+import org.openscore.cli.services.ScoreServicesImpl;
+import org.openscore.cli.utils.CompilerHelper;
+import org.openscore.cli.utils.CompilerHelperImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
