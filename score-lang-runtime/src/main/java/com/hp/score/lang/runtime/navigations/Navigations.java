@@ -11,12 +11,12 @@ import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import com.hp.score.lang.runtime.steps.AbstractSteps;
 import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.score.lang.ExecutionRuntimeServices;
+import org.openscore.lang.ExecutionRuntimeServices;
 
 import static com.hp.score.lang.entities.ScoreLangConstants.RUN_ENV;
 import static com.hp.score.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
 import static com.hp.score.lang.runtime.events.LanguageEventData.EXCEPTION;
-import static org.eclipse.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static org.openscore.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
 /**
  * @author stoneo

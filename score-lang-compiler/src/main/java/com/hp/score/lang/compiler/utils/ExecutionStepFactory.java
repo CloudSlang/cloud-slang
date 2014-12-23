@@ -27,8 +27,8 @@ import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.entities.bindings.Result;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.Validate;
-import org.eclipse.score.api.ControlActionMetadata;
-import org.eclipse.score.api.ExecutionStep;
+import org.openscore.api.ControlActionMetadata;
+import org.openscore.api.ExecutionStep;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;

@@ -19,8 +19,8 @@ import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import com.hp.score.lang.runtime.events.LanguageEventData;
 import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.score.api.execution.ExecutionParametersConsts;
-import org.eclipse.score.lang.ExecutionRuntimeServices;
+import org.openscore.api.execution.ExecutionParametersConsts;
+import org.openscore.lang.ExecutionRuntimeServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,7 +41,7 @@ import static com.hp.score.lang.entities.ScoreLangConstants.TASK_PUBLISH_KEY;
 import static com.hp.score.lang.runtime.events.LanguageEventData.NEXT_STEP_POSITION;
 import static com.hp.score.lang.runtime.events.LanguageEventData.OUTPUTS;
 import static com.hp.score.lang.runtime.events.LanguageEventData.RESULT;
-import static org.eclipse.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static org.openscore.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
 /**
  * User: stoneo

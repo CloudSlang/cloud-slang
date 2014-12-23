@@ -31,7 +31,7 @@ import com.hp.score.lang.entities.CompilationArtifact;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
-import org.eclipse.score.api.ExecutionPlan;
+import org.openscore.api.ExecutionPlan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -150,10 +150,10 @@ public class SlangCompilerImpl implements SlangCompiler {
 
     /**
      * Utility method that cast a {@link com.hp.score.lang.compiler.model.Executable} to its subtype
-     * and create an {@link org.eclipse.score.api.ExecutionPlan} for it
+     * and create an {@link org.openscore.api.ExecutionPlan} for it
      *
-     * @param executable the executable to create an {@link org.eclipse.score.api.ExecutionPlan} for
-     * @return {@link org.eclipse.score.api.ExecutionPlan} of the given {@link com.hp.score.lang.compiler.model.Executable}
+     * @param executable the executable to create an {@link org.openscore.api.ExecutionPlan} for
+     * @return {@link org.openscore.api.ExecutionPlan} of the given {@link com.hp.score.lang.compiler.model.Executable}
      */
     private ExecutionPlan compileToExecutionPlan(Executable executable) {
         ExecutionPlan executionPlan;

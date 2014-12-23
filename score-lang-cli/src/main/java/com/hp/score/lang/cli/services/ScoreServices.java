@@ -20,7 +20,7 @@ package com.hp.score.lang.cli.services;
 
 import com.hp.score.lang.entities.CompilationArtifact;
 
-import org.eclipse.score.events.ScoreEventListener;
+import org.openscore.events.ScoreEventListener;
 
 import java.io.Serializable;
 import java.util.Map;

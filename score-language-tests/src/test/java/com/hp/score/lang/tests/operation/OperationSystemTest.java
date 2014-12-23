@@ -19,8 +19,8 @@
 package com.hp.score.lang.tests.operation;
 
 import com.hp.score.lang.entities.CompilationArtifact;
-import org.eclipse.score.events.EventConstants;
-import org.eclipse.score.events.ScoreEvent;
+import org.openscore.events.EventConstants;
+import org.openscore.events.ScoreEvent;
 import org.junit.Assert;
 import org.junit.Test;
 

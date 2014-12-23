@@ -20,8 +20,8 @@ package com.hp.score.lang.runtime.navigations;
 
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import junit.framework.Assert;
-import org.eclipse.score.events.ScoreEvent;
-import org.eclipse.score.lang.ExecutionRuntimeServices;
+import org.openscore.events.ScoreEvent;
+import org.openscore.lang.ExecutionRuntimeServices;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

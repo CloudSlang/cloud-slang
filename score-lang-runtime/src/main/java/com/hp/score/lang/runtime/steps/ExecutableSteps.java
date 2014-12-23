@@ -12,7 +12,7 @@ import com.hp.score.lang.runtime.env.ParentFlowData;
 import com.hp.score.lang.runtime.env.ReturnValues;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.score.lang.ExecutionRuntimeServices;
+import org.openscore.lang.ExecutionRuntimeServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +34,7 @@ import static com.hp.score.lang.entities.ScoreLangConstants.USER_INPUTS_KEY;
 import static com.hp.score.lang.runtime.events.LanguageEventData.OUTPUTS;
 import static com.hp.score.lang.runtime.events.LanguageEventData.RESULT;
 import static com.hp.score.lang.runtime.events.LanguageEventData.levelName;
-import static org.eclipse.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static org.openscore.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
 /**
  * User: stoneo

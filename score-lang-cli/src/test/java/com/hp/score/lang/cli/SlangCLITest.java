@@ -23,7 +23,7 @@ import com.hp.score.lang.cli.services.ScoreServices;
 import com.hp.score.lang.cli.utils.CompilerHelper;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.bindings.Input;
-import org.eclipse.score.api.ExecutionPlan;
+import org.openscore.api.ExecutionPlan;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

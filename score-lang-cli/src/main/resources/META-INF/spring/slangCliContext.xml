@@ -20,11 +20,11 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:score="http://www.eclipse.org/schema/score"
+       xmlns:score="http://www.openscore.org/schema/score"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                         http://www.springframework.org/schema/beans/spring-beans.xsd
-                        http://www.eclipse.org/schema/score
-                        http://www.eclipse.org/schema/score/score.xsd">
+                        http://www.openscore.org/schema/score
+                        http://www.openscore.org/schema/score.xsd">
 
     <bean class="com.hp.score.lang.api.configuration.SlangSpringConfiguration"/>
 

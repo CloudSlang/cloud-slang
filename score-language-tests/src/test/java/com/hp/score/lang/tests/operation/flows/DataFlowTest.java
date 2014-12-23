@@ -23,8 +23,8 @@ import com.google.common.collect.Sets;
 import com.hp.score.lang.entities.CompilationArtifact;
 import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.tests.operation.SystemsTestsParent;
-import org.eclipse.score.events.EventConstants;
-import org.eclipse.score.events.ScoreEvent;
+import org.openscore.events.EventConstants;
+import org.openscore.events.ScoreEvent;
 import org.junit.Assert;
 import org.junit.Test;
 

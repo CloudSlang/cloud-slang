@@ -24,11 +24,11 @@ import com.hp.score.lang.entities.ScoreLangConstants;
 import com.hp.score.lang.runtime.env.RunEnvironment;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
-import org.eclipse.score.api.Score;
-import org.eclipse.score.api.TriggeringProperties;
-import org.eclipse.score.events.EventBus;
-import org.eclipse.score.events.EventConstants;
-import org.eclipse.score.events.ScoreEventListener;
+import org.openscore.api.Score;
+import org.openscore.api.TriggeringProperties;
+import org.openscore.events.EventBus;
+import org.openscore.events.EventConstants;
+import org.openscore.events.ScoreEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;

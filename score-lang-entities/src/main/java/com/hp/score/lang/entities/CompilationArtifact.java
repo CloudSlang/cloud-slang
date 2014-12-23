@@ -19,7 +19,7 @@
 package com.hp.score.lang.entities;
 
 import com.hp.score.lang.entities.bindings.Input;
-import org.eclipse.score.api.ExecutionPlan;
+import org.openscore.api.ExecutionPlan;
 
 import java.util.List;
 import java.util.Map;

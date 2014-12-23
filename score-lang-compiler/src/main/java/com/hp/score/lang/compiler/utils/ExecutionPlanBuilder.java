@@ -25,8 +25,8 @@ import com.hp.score.lang.compiler.model.Task;
 import com.hp.score.lang.entities.ResultNavigation;
 import com.hp.score.lang.entities.bindings.Result;
 import org.apache.commons.collections4.CollectionUtils;
-import org.eclipse.score.api.ExecutionPlan;
-import org.eclipse.score.api.ExecutionStep;
+import org.openscore.api.ExecutionPlan;
+import org.openscore.api.ExecutionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

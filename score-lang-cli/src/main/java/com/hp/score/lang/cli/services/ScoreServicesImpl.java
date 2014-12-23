@@ -25,9 +25,9 @@ import com.hp.score.lang.runtime.env.ExecutionPath;
 import com.hp.score.lang.runtime.events.LanguageEventData;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.score.events.EventConstants;
-import org.eclipse.score.events.ScoreEvent;
-import org.eclipse.score.events.ScoreEventListener;
+import org.openscore.events.EventConstants;
+import org.openscore.events.ScoreEvent;
+import org.openscore.events.ScoreEventListener;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 import org.springframework.beans.factory.annotation.Autowired;

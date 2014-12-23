@@ -13,7 +13,7 @@ import com.hp.score.lang.entities.bindings.Input;
 import com.hp.score.lang.entities.bindings.Output;
 import com.hp.score.lang.entities.bindings.Result;
 import junit.framework.Assert;
-import org.eclipse.score.api.ExecutionStep;
+import org.openscore.api.ExecutionStep;
 import org.junit.Before;
 import org.junit.Test;
 

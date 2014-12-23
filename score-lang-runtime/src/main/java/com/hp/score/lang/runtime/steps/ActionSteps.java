@@ -16,8 +16,8 @@ import com.hp.score.lang.runtime.env.RunEnvironment;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-import org.eclipse.score.api.execution.ExecutionParametersConsts;
-import org.eclipse.score.lang.ExecutionRuntimeServices;
+import org.openscore.api.execution.ExecutionParametersConsts;
+import org.openscore.lang.ExecutionRuntimeServices;
 import org.python.core.PyModule;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
@@ -48,7 +48,7 @@ import static com.hp.score.lang.runtime.events.LanguageEventData.EXCEPTION;
 import static com.hp.score.lang.runtime.events.LanguageEventData.OUTPUTS;
 import static com.hp.score.lang.runtime.events.LanguageEventData.RESULT;
 import static com.hp.score.lang.runtime.events.LanguageEventData.RETURN_VALUES;
-import static org.eclipse.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static org.openscore.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
 /**
  * User: stoneo
