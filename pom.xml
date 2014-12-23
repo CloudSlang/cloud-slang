@@ -154,7 +154,7 @@
             <dependency>
                 <groupId>com.hp.score.sdk</groupId>
                 <artifactId>score-content-sdk</artifactId>
-                <version>1.5</version>
+                <version>1.6</version>
             </dependency>
             <!--end of score dependencies-->
 
