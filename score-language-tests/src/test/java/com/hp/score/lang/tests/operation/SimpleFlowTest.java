@@ -19,7 +19,7 @@
 package com.hp.score.lang.tests.operation;
 
 import com.google.common.collect.Sets;
-import com.hp.score.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.CompilationArtifact;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openscore.events.EventConstants;
 import org.openscore.events.ScoreEvent;

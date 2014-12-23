@@ -18,7 +18,7 @@
 */
 package org.openscore.cli.services;
 
-import com.hp.score.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.CompilationArtifact;
 
 import org.openscore.events.ScoreEventListener;
 

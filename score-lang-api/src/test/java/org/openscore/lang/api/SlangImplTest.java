@@ -19,10 +19,10 @@ package org.openscore.lang.api;
 */
 
 import ch.lambdaj.function.matcher.Predicate;
-import com.hp.score.lang.compiler.SlangCompiler;
-import com.hp.score.lang.entities.CompilationArtifact;
-import com.hp.score.lang.entities.ScoreLangConstants;
-import com.hp.score.lang.entities.bindings.Input;
+import org.openscore.lang.compiler.SlangCompiler;
+import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.ScoreLangConstants;
+import org.openscore.lang.entities.bindings.Input;
 import org.openscore.api.ExecutionPlan;
 import org.openscore.api.Score;
 import org.openscore.api.TriggeringProperties;

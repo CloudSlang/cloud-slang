@@ -19,10 +19,10 @@
 package org.openscore.cli.services;
 
 import org.openscore.lang.api.Slang;
-import com.hp.score.lang.entities.CompilationArtifact;
-import com.hp.score.lang.entities.ScoreLangConstants;
-import com.hp.score.lang.runtime.env.ExecutionPath;
-import com.hp.score.lang.runtime.events.LanguageEventData;
+import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.ScoreLangConstants;
+import org.openscore.lang.runtime.env.ExecutionPath;
+import org.openscore.lang.runtime.events.LanguageEventData;
 
 import org.apache.commons.lang.StringUtils;
 import org.openscore.events.EventConstants;
@@ -39,11 +39,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
-import static com.hp.score.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
-import static com.hp.score.lang.runtime.events.LanguageEventData.EXCEPTION;
-import static com.hp.score.lang.runtime.events.LanguageEventData.RESULT;
+import static org.openscore.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
+import static org.openscore.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
+import static org.openscore.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
+import static org.openscore.lang.runtime.events.LanguageEventData.EXCEPTION;
+import static org.openscore.lang.runtime.events.LanguageEventData.RESULT;
 
 import static org.fusesource.jansi.Ansi.ansi;
 

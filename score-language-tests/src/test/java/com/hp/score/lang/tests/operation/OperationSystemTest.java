@@ -18,7 +18,7 @@
 */
 package com.hp.score.lang.tests.operation;
 
-import com.hp.score.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.events.EventConstants;
 import org.openscore.events.ScoreEvent;
 import org.junit.Assert;

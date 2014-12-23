@@ -21,8 +21,8 @@ package org.openscore.cli;
 import com.google.common.collect.Lists;
 import org.openscore.cli.services.ScoreServices;
 import org.openscore.cli.utils.CompilerHelper;
-import com.hp.score.lang.entities.CompilationArtifact;
-import com.hp.score.lang.entities.bindings.Input;
+import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.bindings.Input;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.openscore.events.EventConstants;
@@ -39,8 +39,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
-
-import static com.hp.score.lang.entities.ScoreLangConstants.*;
 
 /**
  * Date: 11/7/2014

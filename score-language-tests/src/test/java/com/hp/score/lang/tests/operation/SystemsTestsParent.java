@@ -19,8 +19,8 @@
 package com.hp.score.lang.tests.operation;
 
 import org.openscore.lang.api.Slang;
-import com.hp.score.lang.entities.CompilationArtifact;
-import com.hp.score.lang.runtime.events.LanguageEventData;
+import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.runtime.events.LanguageEventData;
 import org.openscore.events.EventConstants;
 import org.openscore.events.ScoreEvent;
 import org.openscore.events.ScoreEventListener;
@@ -33,8 +33,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import static com.hp.score.lang.entities.ScoreLangConstants.*;
 
 /*
  * Created by orius123 on 12/11/14.

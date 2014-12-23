@@ -19,7 +19,7 @@
 package com.hp.score.lang.tests.operation.flows;
 
 import com.google.common.collect.Sets;
-import com.hp.score.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.CompilationArtifact;
 import com.hp.score.lang.tests.operation.SystemsTestsParent;
 
 import org.openscore.events.EventConstants;

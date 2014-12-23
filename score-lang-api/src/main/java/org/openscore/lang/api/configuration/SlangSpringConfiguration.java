@@ -20,8 +20,8 @@ package org.openscore.lang.api.configuration;
 
 import org.openscore.lang.api.Slang;
 import org.openscore.lang.api.SlangImpl;
-import com.hp.score.lang.compiler.configuration.SlangCompilerSpringConfig;
-import com.hp.score.lang.runtime.configuration.SlangRuntimeSpringConfig;
+import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
+import org.openscore.lang.runtime.configuration.SlangRuntimeSpringConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 

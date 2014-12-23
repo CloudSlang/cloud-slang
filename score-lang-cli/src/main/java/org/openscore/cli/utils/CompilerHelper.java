@@ -19,7 +19,7 @@ package org.openscore.cli.utils;
  * under the License.
 */
 
-import com.hp.score.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.CompilationArtifact;
 import java.io.IOException;
 import java.util.List;
 

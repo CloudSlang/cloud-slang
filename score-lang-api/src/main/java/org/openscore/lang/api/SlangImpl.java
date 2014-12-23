@@ -18,10 +18,10 @@ package org.openscore.lang.api;
  * under the License.
 */
 
-import com.hp.score.lang.compiler.SlangCompiler;
-import com.hp.score.lang.entities.CompilationArtifact;
-import com.hp.score.lang.entities.ScoreLangConstants;
-import com.hp.score.lang.runtime.env.RunEnvironment;
+import org.openscore.lang.compiler.SlangCompiler;
+import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.ScoreLangConstants;
+import org.openscore.lang.runtime.env.RunEnvironment;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.openscore.api.Score;
@@ -38,15 +38,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_END;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_ERROR;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_ACTION_START;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_INPUT_START;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
-import static com.hp.score.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
-import static com.hp.score.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
+import static org.openscore.lang.entities.ScoreLangConstants.EVENT_ACTION_END;
+import static org.openscore.lang.entities.ScoreLangConstants.EVENT_ACTION_ERROR;
+import static org.openscore.lang.entities.ScoreLangConstants.EVENT_ACTION_START;
+import static org.openscore.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
+import static org.openscore.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
+import static org.openscore.lang.entities.ScoreLangConstants.EVENT_INPUT_START;
+import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
+import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
+import static org.openscore.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
 
 /**
  * User: stoneo

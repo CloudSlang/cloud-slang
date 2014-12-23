@@ -22,7 +22,7 @@ package org.openscore.cli.utils;
 
 import com.google.common.collect.Lists;
 import org.openscore.lang.api.Slang;
-import com.hp.score.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.CompilationArtifact;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
