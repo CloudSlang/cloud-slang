@@ -8,7 +8,7 @@
 	<artifactId>score-lang-cli</artifactId>
 
 	<parent>
-		<groupId>com.hp.score.lang</groupId>
+		<groupId>org.openscore.lang</groupId>
 		<artifactId>score-language</artifactId>
 		<version>0.1.2-SNAPSHOT</version>
 	</parent>
