@@ -48,17 +48,17 @@
         </dependency>
 
         <dependency>
-            <groupId>org.eclipse.score.content</groupId>
+            <groupId>org.openscore.content</groupId>
             <artifactId>score-ssh</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.eclipse.score.content</groupId>
+            <groupId>org.openscore.content</groupId>
             <artifactId>score-mail</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.eclipse.score.content</groupId>
+            <groupId>org.openscore.content</groupId>
             <artifactId>score-http-client</artifactId>
         </dependency>
         <dependency>

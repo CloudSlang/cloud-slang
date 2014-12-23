@@ -17,7 +17,7 @@ operations:
         - closeSession: "'false'"
       action:
         java_action:
-          className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
+          className: org.openscore.content.ssh.actions.SSHShellCommandAction
           methodName: runSshShellCommand
       outputs:
         - returnResult: returnResult
@@ -43,7 +43,7 @@ operations:
         - closeSession: "'false'"
       action:
         java_action:
-          className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
+          className: org.openscore.content.ssh.actions.SSHShellCommandAction
           methodName: runSshShellCommand
       outputs:
         - dbContainerID: returnResult
@@ -69,7 +69,7 @@ operations:
         - closeSession: "'false'"
       action:
         java_action:
-          className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
+          className: org.openscore.content.ssh.actions.SSHShellCommandAction
           methodName: runSshShellCommand
       outputs:
         - dbIp: returnResult[:-1]
@@ -98,7 +98,7 @@ operations:
         - closeSession: "'false'"
       action:
         java_action:
-          className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
+          className: org.openscore.content.ssh.actions.SSHShellCommandAction
           methodName: runSshShellCommand
       outputs:
         - containerID: returnResult
@@ -123,7 +123,7 @@ operations:
         - closeSession: "'false'"
       action:
         java_action:
-          className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
+          className: org.openscore.content.ssh.actions.SSHShellCommandAction
           methodName: runSshShellCommand
       outputs:
         - containerID: returnResult
@@ -148,7 +148,7 @@ operations:
         - closeSession: "'false'"
       action:
         java_action:
-          className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
+          className: org.openscore.content.ssh.actions.SSHShellCommandAction
           methodName: runSshShellCommand
       outputs:
         - containerID: returnResult
@@ -174,7 +174,7 @@ operations:
           - closeSession: "'false'"
         action:
           java_action:
-            className: org.eclipse.score.content.ssh.actions.SSHShellCommandAction
+            className: org.openscore.content.ssh.actions.SSHShellCommandAction
             methodName: runSshShellCommand
         outputs:
           - result: returnResult

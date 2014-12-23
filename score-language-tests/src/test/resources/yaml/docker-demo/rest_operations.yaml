@@ -9,7 +9,7 @@ operations:
             override: true
       action:
         java_action:
-          className: org.eclipse.score.content.httpclient.HttpClientAction
+          className: org.openscore.content.httpclient.HttpClientAction
           methodName: execute
       outputs:
         - returnResult: returnResult

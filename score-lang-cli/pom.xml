@@ -61,17 +61,17 @@
 
         <!-- content dep -->
         <dependency>
-            <groupId>org.eclipse.score.content</groupId>
+            <groupId>org.openscore.content</groupId>
             <artifactId>score-ssh</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.score.content</groupId>
+            <groupId>org.openscore.content</groupId>
             <artifactId>score-mail</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.score.content</groupId>
+            <groupId>org.openscore.content</groupId>
             <artifactId>score-http-client</artifactId>
             <scope>runtime</scope>
         </dependency>

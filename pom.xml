@@ -160,19 +160,19 @@
 
             <!--score content dependencies-->
             <dependency>
-                <groupId>org.eclipse.score.content</groupId>
+                <groupId>org.openscore.content</groupId>
                 <artifactId>score-ssh</artifactId>
-                <version>0.0.4</version>
+                <version>0.0.7</version>
             </dependency>
             <dependency>
-                <groupId>org.eclipse.score.content</groupId>
+                <groupId>org.openscore.content</groupId>
                 <artifactId>score-mail</artifactId>
-                <version>0.0.1</version>
+                <version>0.0.3</version>
             </dependency>
             <dependency>
-                <groupId>org.eclipse.score.content</groupId>
+                <groupId>org.openscore.content</groupId>
                 <artifactId>score-http-client</artifactId>
-                <version>0.1.38</version>
+                <version>0.1.40</version>
             </dependency>
             <!--end of score content dependencies-->
 
