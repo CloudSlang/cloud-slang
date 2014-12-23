@@ -16,49 +16,49 @@
  * specific language governing permissions and limitations
  * under the License.
 */
-package com.hp.score.lang.tests.operation;
+package org.openscore.lang.tests.operation.flows;
 
+import com.google.common.collect.Sets;
 import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.tests.operation.SystemsTestsParent;
 import org.openscore.events.EventConstants;
 import org.openscore.events.ScoreEvent;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.Serializable;
-import java.net.URL;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * User: stoneo
- * Date: 11/11/2014
- * Time: 11:55
+ * Date: 11/21/2014
+ *
+ * @author Bonczidai Levente
  */
-
-public class OperationSystemTest extends SystemsTestsParent {
-
-    @Test
-    public void testCompileAndRunOperationBasic() throws Exception {
-        URL resource = getClass().getResource("/yaml/simple_operations.yaml");
-        CompilationArtifact compilationArtifact = slang.compileOperation(new File(resource.toURI()), "test_op", null);
-        //Trigger ExecutionPlan
-        Map<String, Serializable> userInputs = new HashMap<>();
-        ScoreEvent event = trigger(compilationArtifact, userInputs);
-        Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
-    }
+public class ClearContainersTest  extends SystemsTestsParent {
 
     @Test
-    public void testCompileAndRunOperationWithData() throws Exception {
-        URL resource = getClass().getResource("/yaml/operation_with_data.yaml");
-        CompilationArtifact compilationArtifact = slang.compileOperation(new File(resource.toURI()), "test_op_2", null);
-        //Trigger ExecutionPlan
+    @Ignore
+    public void testCompileAndRunFlow() throws Exception {
+        URI resource = getClass().getResource("/yaml/docker-demo/clear_containers_flow.yaml").toURI();
+        URI operations = getClass().getResource("/yaml/docker-demo/").toURI();
+
+        Set<File> path = Sets.newHashSet(new File(operations));
+        CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
+
+        //TODO: remove default values for inputs
         Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("input1", "value1");
-        userInputs.put("input2", "value2");
-        userInputs.put("input4", "value4");
-        userInputs.put("input5", "value5");
+        userInputs.put("dbContainerID", "{{ dbContainerID }}");
+        userInputs.put("linkedContainerID", "{{ linkedContainerID }}");
+        userInputs.put("dockerHost", "{{ dockerHost }}");
+        userInputs.put("dockerUsername", "{{ dockerUsername }}");
+        userInputs.put("dockerPassword", "{{ dockerPassword }}");
         ScoreEvent event = trigger(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 }
+

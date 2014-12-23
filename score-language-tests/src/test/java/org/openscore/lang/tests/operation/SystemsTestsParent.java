@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
 */
-package com.hp.score.lang.tests.operation;
+package org.openscore.lang.tests.operation;
 
 import org.openscore.lang.api.Slang;
 import org.openscore.lang.entities.CompilationArtifact;

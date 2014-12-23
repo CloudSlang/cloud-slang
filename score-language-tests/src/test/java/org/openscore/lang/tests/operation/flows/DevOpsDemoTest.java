@@ -16,11 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
 */
-package com.hp.score.lang.tests.operation.flows;
+package org.openscore.lang.tests.operation.flows;
 
 import com.google.common.collect.Sets;
 import org.openscore.lang.entities.CompilationArtifact;
-import com.hp.score.lang.tests.operation.SystemsTestsParent;
+import org.openscore.lang.tests.operation.SystemsTestsParent;
 import org.openscore.events.EventConstants;
 import org.openscore.events.ScoreEvent;
 import org.junit.Assert;
@@ -34,28 +34,27 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Date: 11/17/2014
- *
- * @author Bonczidai Levente
- */
-public class createDbContainerTest  extends SystemsTestsParent {
+public class DevOpsDemoTest extends SystemsTestsParent {
 
     @Test
     @Ignore
-    public void testCompileAndRunSubFlowBasic() throws Exception {
-        URI resource = getClass().getResource("/yaml/docker-demo/create_db_container.yaml").toURI();
+    public void testCompileAndRunFlow() throws Exception {
+        URI resource = getClass().getResource("/yaml/docker-demo/demo_dev_ops_flow.yaml").toURI();
         URI operations = getClass().getResource("/yaml/docker-demo/").toURI();
 
         Set<File> path = Sets.newHashSet(new File(operations));
         CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
 
+        //TODO: remove default values for inputs
         Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("host", "{{ host }}");
-        userInputs.put("username", "{{ username }}");
-        userInputs.put("password", "{{ password }}");
+        userInputs.put("dockerHost", "{{ dockerHost }}");
+        userInputs.put("dockerUsername", "{{ dockerUsername }}");
+        userInputs.put("dockerPassword", "{{ dockerPassword }}");
+        userInputs.put("emailHost", "{{ emailHost }}");
+        userInputs.put("emailPort", "{{ emailPort }}");
+        userInputs.put("emailSender", "{{ emailSender }}");
+        userInputs.put("emailRecipient", "{{ emailRecipient }}");
         ScoreEvent event = trigger(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
-
 }

@@ -17,12 +17,12 @@
  * under the License.
 */
 
-package com.hp.score.lang.tests.operation.flows;
+package org.openscore.lang.tests.operation.flows;
 
 import com.google.common.collect.Sets;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.ScoreLangConstants;
-import com.hp.score.lang.tests.operation.SystemsTestsParent;
+import org.openscore.lang.tests.operation.SystemsTestsParent;
 import org.openscore.events.EventConstants;
 import org.openscore.events.ScoreEvent;
 import org.junit.Assert;
