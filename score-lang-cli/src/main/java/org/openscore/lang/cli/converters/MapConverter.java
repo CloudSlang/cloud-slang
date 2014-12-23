@@ -1,3 +1,5 @@
+package org.openscore.lang.cli.converters;
+
 /*
  * Licensed to Hewlett-Packard Development Company, L.P. under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,7 +19,6 @@
  * under the License.
 */
 
-package org.openscore.cli.converters;
 
 import org.springframework.shell.core.Completion;
 import org.springframework.shell.core.Converter;
@@ -25,34 +26,42 @@ import org.springframework.shell.core.MethodTarget;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Created by lesant on 12/16/2014.
+ * Date: 11/11/2014
+ *
+ * @author lesant
  */
+
 @Component
-public class ListConverter implements Converter<List<String>> {
+public class MapConverter implements Converter<Map<String, String>> {
     @Override
     public boolean supports(Class<?> type, String optionContext) {
-        return List.class.isAssignableFrom(type);
+        return Map.class.isAssignableFrom(type);
     }
 
     @Override
-    public List<String> convertFromText(String value, Class<?> targetType, String optionContext) {
+    public Map<String, String> convertFromText(String value, Class<?> targetType, String optionContext) {
         String[] values = StringUtils.commaDelimitedListToStringArray(value);
-        List<String> list = new ArrayList<>();
-        for (String v : values){
-             list.add(v);
+        Map<String, String> map = new HashMap<>();
+
+        for (String v : values) {
+            String[] keyValue = StringUtils.delimitedListToStringArray(v, "=");
+            if (keyValue.length == 2) {
+                map.put(keyValue[0], keyValue[1]);
+            } else {
+                throw new RuntimeException("Input should be in a key=value comma separated format, e.g. key1=val1,key2=val2 etc.");
+            }
         }
-        return list;
+
+        return map;
     }
 
     @Override
     public boolean getAllPossibleValues(List<Completion> completions, Class<?> targetType, String existingData, String optionContext, MethodTarget target) {
         return true;
     }
-
-
-
 }

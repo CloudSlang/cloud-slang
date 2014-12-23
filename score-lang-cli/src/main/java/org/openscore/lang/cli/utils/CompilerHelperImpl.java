@@ -1,4 +1,4 @@
-package org.openscore.cli.utils;
+package org.openscore.lang.cli.utils;
 
 /*
  * Licensed to Hewlett-Packard Development Company, L.P. under one

@@ -20,6 +20,7 @@ package org.openscore.lang.tests.operation;
 
 import org.openscore.lang.api.Slang;
 import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.runtime.events.LanguageEventData;
 import org.openscore.events.EventConstants;
 import org.openscore.events.ScoreEvent;
@@ -53,7 +54,7 @@ public class SystemsTestsParent {
         ScoreEvent event;
         do {
             event = queue.take();
-            Assert.assertNotSame("Error event has been thrown during execution with data: " + event.getData(), SLANG_EXECUTION_EXCEPTION, event.getEventType());
+            Assert.assertNotSame("Error event has been thrown during execution with data: " + event.getData(), ScoreLangConstants.SLANG_EXECUTION_EXCEPTION, event.getEventType());
             System.out.println("Event received: " + event.getEventType() + " Data is: " + event.getData());
         } while (!EventConstants.SCORE_FINISHED_EVENT.equals(event.getEventType()));
         return event;
@@ -63,7 +64,7 @@ public class SystemsTestsParent {
         taskEvents = new ArrayList<>();
 
         Set<String> handlerTypes = new HashSet<>();
-        handlerTypes.add(EVENT_INPUT_END);
+        handlerTypes.add(ScoreLangConstants.EVENT_INPUT_END);
         slang.subscribeOnEvents(new ScoreEventListener() {
             @Override
             public void onEvent(ScoreEvent event) {
@@ -102,15 +103,15 @@ public class SystemsTestsParent {
         handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
         handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
         handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
-        handlerTypes.add(EVENT_ACTION_START);
-        handlerTypes.add(EVENT_ACTION_END);
-        handlerTypes.add(EVENT_ACTION_ERROR);
-        handlerTypes.add(EVENT_INPUT_START);
-        handlerTypes.add(EVENT_INPUT_END);
-        handlerTypes.add(EVENT_OUTPUT_START);
-        handlerTypes.add(EVENT_OUTPUT_END);
-        handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
-        handlerTypes.add(EVENT_EXECUTION_FINISHED);
+        handlerTypes.add(ScoreLangConstants.EVENT_ACTION_START);
+        handlerTypes.add(ScoreLangConstants.EVENT_ACTION_END);
+        handlerTypes.add(ScoreLangConstants.EVENT_ACTION_ERROR);
+        handlerTypes.add(ScoreLangConstants.EVENT_INPUT_START);
+        handlerTypes.add(ScoreLangConstants.EVENT_INPUT_END);
+        handlerTypes.add(ScoreLangConstants.EVENT_OUTPUT_START);
+        handlerTypes.add(ScoreLangConstants.EVENT_OUTPUT_END);
+        handlerTypes.add(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION);
+        handlerTypes.add(ScoreLangConstants.EVENT_EXECUTION_FINISHED);
         slang.subscribeOnEvents(new ScoreEventListener() {
 
             @Override
@@ -125,7 +126,7 @@ public class SystemsTestsParent {
         taskEvents = new ArrayList<>();
 
         Set<String> handlerTypes = new HashSet<>();
-        handlerTypes.add(EVENT_OUTPUT_END);
+        handlerTypes.add(ScoreLangConstants.EVENT_OUTPUT_END);
         slang.subscribeOnEvents(new ScoreEventListener() {
             @Override
             public void onEvent(ScoreEvent event) {

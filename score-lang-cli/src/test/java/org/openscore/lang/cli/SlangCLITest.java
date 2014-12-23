@@ -19,9 +19,8 @@
 package org.openscore.lang.cli;
 
 import com.google.common.collect.Lists;
-import org.openscore.cli.SlangCLI;
-import org.openscore.cli.services.ScoreServices;
-import org.openscore.cli.utils.CompilerHelper;
+import org.openscore.lang.cli.services.ScoreServices;
+import org.openscore.lang.cli.utils.CompilerHelper;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.api.ExecutionPlan;

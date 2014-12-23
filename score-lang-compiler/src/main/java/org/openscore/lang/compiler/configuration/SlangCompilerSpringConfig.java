@@ -28,7 +28,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
 @Configuration
-@ComponentScan("com.hp.score.lang.compiler")
+@ComponentScan("org.openscore.lang.compiler")
 public class SlangCompilerSpringConfig {
 
     @Bean

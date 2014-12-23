@@ -28,7 +28,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 @Configuration
-@ComponentScan("com.hp.score.lang.runtime")
+@ComponentScan("org.openscore.lang.runtime")
 public class SlangRuntimeSpringConfig {
 
     @Bean

@@ -16,12 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
 */
-package org.openscore.cli;
+package org.openscore.lang.cli;
 
 import com.google.common.collect.Lists;
-import org.openscore.cli.services.ScoreServices;
-import org.openscore.cli.utils.CompilerHelper;
+import org.openscore.lang.cli.services.ScoreServices;
+import org.openscore.lang.cli.utils.CompilerHelper;
 import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Input;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
@@ -143,15 +144,15 @@ public class SlangCLI implements CommandMarker {
         handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
         handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
         handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
-        handlerTypes.add(EVENT_ACTION_START);
-        handlerTypes.add(EVENT_ACTION_END);
-        handlerTypes.add(EVENT_ACTION_ERROR);
-        handlerTypes.add(EVENT_INPUT_START);
-        handlerTypes.add(EVENT_INPUT_END);
-        handlerTypes.add(EVENT_OUTPUT_START);
-        handlerTypes.add(EVENT_OUTPUT_END);
-        handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
-        handlerTypes.add(EVENT_EXECUTION_FINISHED);
+        handlerTypes.add(ScoreLangConstants.EVENT_ACTION_START);
+        handlerTypes.add(ScoreLangConstants.EVENT_ACTION_END);
+        handlerTypes.add(ScoreLangConstants.EVENT_ACTION_ERROR);
+        handlerTypes.add(ScoreLangConstants.EVENT_INPUT_START);
+        handlerTypes.add(ScoreLangConstants.EVENT_INPUT_END);
+        handlerTypes.add(ScoreLangConstants.EVENT_OUTPUT_START);
+        handlerTypes.add(ScoreLangConstants.EVENT_OUTPUT_END);
+        handlerTypes.add(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION);
+        handlerTypes.add(ScoreLangConstants.EVENT_EXECUTION_FINISHED);
         scoreServices.subscribe(new ScoreEventListener() {
             @Override
             public void onEvent(ScoreEvent event) {

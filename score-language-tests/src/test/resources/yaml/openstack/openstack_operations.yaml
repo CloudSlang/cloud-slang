@@ -36,7 +36,7 @@ operations:
         - jsonAuthenticationResponse
       action:
         java_action:
-          className: com.hp.score.lang.tests.operation.actions.OpenstackUtils
+          className: org.openscore.lang.tests.operation.actions.OpenstackUtils
           methodName: parseAuthentication
       outputs:
         - token: parsedToken
@@ -252,7 +252,7 @@ operations:
           - ignoreCase: "'true'"
         action:
           java_action:
-            className: com.hp.score.lang.tests.operation.actions.StringOccurrenceCounter
+            className: org.openscore.lang.tests.operation.actions.StringOccurrenceCounter
             methodName: execute
         outputs:
           - occurrences: returnResult

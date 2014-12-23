@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
 */
-package org.openscore.cli.services;
+package org.openscore.lang.cli.services;
 
 import org.openscore.lang.api.Slang;
 import org.openscore.lang.entities.CompilationArtifact;

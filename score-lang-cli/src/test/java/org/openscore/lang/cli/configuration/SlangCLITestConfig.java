@@ -18,10 +18,10 @@
 */
 package org.openscore.lang.cli.configuration;
 
-import org.openscore.cli.services.ScoreServices;
-import org.openscore.cli.services.ScoreServicesImpl;
-import org.openscore.cli.utils.CompilerHelper;
-import org.openscore.cli.utils.CompilerHelperImpl;
+import org.openscore.lang.cli.services.ScoreServices;
+import org.openscore.lang.cli.services.ScoreServicesImpl;
+import org.openscore.lang.cli.utils.CompilerHelper;
+import org.openscore.lang.cli.utils.CompilerHelperImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.mock;
  * @author Bonczidai Levente
  */
 @Configuration
-@ComponentScan( "com.hp.score.lang.cli" )
+@ComponentScan( "org.openscore.lang.cli" )
 public class SlangCLITestConfig {
 
     @Bean

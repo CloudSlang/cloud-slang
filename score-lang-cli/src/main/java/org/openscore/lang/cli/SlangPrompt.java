@@ -5,24 +5,23 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the
  * License.
  */
-package org.openscore.cli;
+package org.openscore.lang.cli;
 
 import org.springframework.core.annotation.Order;
-import org.springframework.shell.plugin.HistoryFileNameProvider;
+import org.springframework.shell.plugin.PromptProvider;
 import org.springframework.stereotype.Component;
 
 /**
+ * Date: 11/7/2014
  * @author lesant
- * @since 11/07/2014
- * @version $Id$
  */
 @Component
 @Order(Integer.MIN_VALUE)
-public class SlangHistory extends SlangNamedProvider implements HistoryFileNameProvider {
+public class SlangPrompt extends SlangNamedProvider implements PromptProvider {
 
 	@Override
-	public String getHistoryFileName() {
-		return "slang-cli.history";
+	public String getPrompt() {
+		return "slang>";
 	}
 
 }
