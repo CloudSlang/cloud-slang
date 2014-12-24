@@ -8,10 +8,13 @@
 *
 *******************************************************************************/
 
-package org.openscore.lang.tests.operation;
+
+package org.openscore.lang.systemtests.flows;
 
 import com.google.common.collect.Sets;
 import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.ScoreLangConstants;
+import org.openscore.lang.systemtests.SystemsTestsParent;
 import org.openscore.events.EventConstants;
 import org.openscore.events.ScoreEvent;
 import org.junit.Assert;
@@ -20,27 +23,38 @@ import org.junit.Test;
 import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-/*
- * Created by orius123 on 12/11/14.
+
+/**
+ * Date: 12/11/2014
+ *
+ * @author lesant
  */
-public class SubFlowSystemTests extends SystemsTestsParent {
+public class DataFlowTest extends SystemsTestsParent {
 
     @Test
-    public void testCompileAndRunSubFlowBasic() throws Exception {
-        URI resource = getClass().getResource("/yaml/sub-flow/parent_flow.yaml").toURI();
-        URI subFlow = getClass().getResource("/yaml/sub-flow/child_flow.yaml").toURI();
-        URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
+    public void testDataFlow() throws Exception {
+        startOperationMonitoring();
+        URI resource = getClass().getResource("/yaml/system-flows/data_flow.yaml").toURI();
+        URI operations = getClass().getResource("/yaml/system-flows/").toURI();
 
-        Set<File> path = Sets.newHashSet(new File(subFlow), new File(operations));
+        Set<File> path = Sets.newHashSet(new File(operations));
         CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
 
+
         Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("input1", "value1");
+        userInputs.put("myMessage", "hello world");
+        userInputs.put("tryToChangeMessage", "changed");
+
         ScoreEvent event = trigger(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
+
+        List<String> expectedResults = new ArrayList<>();
+
+        expectedResults.add(ScoreLangConstants.SUCCESS_RESULT);
+        expectedResults.add(ScoreLangConstants.SUCCESS_RESULT);
+
+        verifyResults(expectedResults);
     }
 }

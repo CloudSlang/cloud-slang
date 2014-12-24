@@ -8,7 +8,7 @@
 *
 *******************************************************************************/
 
-package org.openscore.lang.tests.operation.actions;
+package org.openscore.lang.systemtests.actions;
 
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.oo.sdk.content.plugin.GlobalSessionObject;

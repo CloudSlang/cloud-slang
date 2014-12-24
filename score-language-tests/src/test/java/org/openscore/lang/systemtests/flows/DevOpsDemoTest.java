@@ -8,11 +8,11 @@
 *
 *******************************************************************************/
 
-package org.openscore.lang.tests.operation.flows;
+package org.openscore.lang.systemtests.flows;
 
 import com.google.common.collect.Sets;
 import org.openscore.lang.entities.CompilationArtifact;
-import org.openscore.lang.tests.operation.SystemsTestsParent;
+import org.openscore.lang.systemtests.SystemsTestsParent;
 import org.openscore.events.EventConstants;
 import org.openscore.events.ScoreEvent;
 import org.junit.Assert;
@@ -26,17 +26,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Date: 11/21/2014
- *
- * @author Bonczidai Levente
- */
-public class ClearContainersTest  extends SystemsTestsParent {
+public class DevOpsDemoTest extends SystemsTestsParent {
 
     @Test
     @Ignore
     public void testCompileAndRunFlow() throws Exception {
-        URI resource = getClass().getResource("/yaml/docker-demo/clear_containers_flow.yaml").toURI();
+        URI resource = getClass().getResource("/yaml/docker-demo/demo_dev_ops_flow.yaml").toURI();
         URI operations = getClass().getResource("/yaml/docker-demo/").toURI();
 
         Set<File> path = Sets.newHashSet(new File(operations));
@@ -44,13 +39,14 @@ public class ClearContainersTest  extends SystemsTestsParent {
 
         //TODO: remove default values for inputs
         Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("dbContainerID", "{{ dbContainerID }}");
-        userInputs.put("linkedContainerID", "{{ linkedContainerID }}");
         userInputs.put("dockerHost", "{{ dockerHost }}");
         userInputs.put("dockerUsername", "{{ dockerUsername }}");
         userInputs.put("dockerPassword", "{{ dockerPassword }}");
+        userInputs.put("emailHost", "{{ emailHost }}");
+        userInputs.put("emailPort", "{{ emailPort }}");
+        userInputs.put("emailSender", "{{ emailSender }}");
+        userInputs.put("emailRecipient", "{{ emailRecipient }}");
         ScoreEvent event = trigger(compilationArtifact, userInputs);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 }
-
