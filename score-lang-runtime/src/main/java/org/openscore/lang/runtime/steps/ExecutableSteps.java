@@ -1,6 +1,7 @@
 package org.openscore.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
+
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
@@ -8,6 +9,7 @@ import org.openscore.lang.entities.bindings.Result;
 import org.openscore.lang.runtime.bindings.InputsBinding;
 import org.openscore.lang.runtime.bindings.OutputsBinding;
 import org.openscore.lang.runtime.bindings.ResultsBinding;
+import org.openscore.lang.runtime.env.ExecutionPath;
 import org.openscore.lang.runtime.env.ParentFlowData;
 import org.openscore.lang.runtime.env.ReturnValues;
 import org.openscore.lang.runtime.env.RunEnvironment;
@@ -59,9 +61,7 @@ public class ExecutableSteps extends AbstractSteps {
                                 @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                                 @Param(NODE_NAME_KEY) String nodeName,
                                 @Param(NEXT_STEP_ID_KEY) Long nextStepId) {
-
-        runEnv.getExecutionPath().down();
-
+		runEnv.getExecutionPath().down();
         Map<String, Serializable> callArguments = runEnv.removeCallArguments();
 
         if(userInputs != null) {
@@ -103,7 +103,9 @@ public class ExecutableSteps extends AbstractSteps {
                                  @Param(EXECUTABLE_RESULTS_KEY) List<Result> executableResults,
                                  @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                                  @Param(NODE_NAME_KEY) String nodeName) {
-
+		ExecutionPath executionPath = runEnv.getExecutionPath();
+		executionPath.up();
+		if(executionPath.getDepth() < 1) executionPath.down(); // In case we're at top level
         Map<String, Serializable> operationContext = runEnv.getStack().popContext();
         ReturnValues actionReturnValues = runEnv.removeReturnValues();
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_START, "Output binding started",
@@ -135,8 +137,6 @@ public class ExecutableSteps extends AbstractSteps {
                     Pair.of(OUTPUTS, (Serializable) operationReturnOutputs),
                     Pair.of(levelName.EXECUTABLE_NAME.toString(),nodeName));
         }
-
-        runEnv.getExecutionPath().up();
     }
 
     private void handleNavigationToParent(RunEnvironment runEnv, ExecutionRuntimeServices executionRuntimeServices) {
