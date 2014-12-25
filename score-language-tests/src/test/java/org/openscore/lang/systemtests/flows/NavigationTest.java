@@ -8,11 +8,11 @@
 *
 *******************************************************************************/
 
-package org.openscore.lang.tests.operation.flows;
+package org.openscore.lang.systemtests.flows;
 
 import com.google.common.collect.Sets;
 import org.openscore.lang.entities.CompilationArtifact;
-import org.openscore.lang.tests.operation.SystemsTestsParent;
+import org.openscore.lang.systemtests.SystemsTestsParent;
 
 import org.openscore.events.EventConstants;
 import org.openscore.events.ScoreEvent;

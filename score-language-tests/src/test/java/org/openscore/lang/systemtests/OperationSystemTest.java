@@ -8,7 +8,7 @@
 *
 *******************************************************************************/
 
-package org.openscore.lang.tests.operation;
+package org.openscore.lang.systemtests;
 
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.events.EventConstants;

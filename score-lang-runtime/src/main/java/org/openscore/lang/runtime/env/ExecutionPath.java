@@ -44,6 +44,10 @@ public class ExecutionPath implements Serializable {
 		return position;
 	}
 
+	public int getDepth() {
+		return parentPositions.size();
+	}
+
 	public String getCurrentPath() {
 		StringBuilder result = new StringBuilder();
 		for(Iterator<Integer> iterator = parentPositions.descendingIterator(); iterator.hasNext();) {

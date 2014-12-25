@@ -47,7 +47,7 @@ operations:
         - value
       action:
         java_action:
-          className: org.openscore.lang.tests.operation.actions.LangTestActions
+          className: org.openscore.lang.systemtests.actions.LangTestActions
           methodName: setConnectionOnNonSerializableSession
       outputs:
         - session_object_value: value
@@ -57,7 +57,7 @@ operations:
         - value
       action:
         java_action:
-          className: org.openscore.lang.tests.operation.actions.LangTestActions
+          className: org.openscore.lang.systemtests.actions.LangTestActions
           methodName: getConnectionFromNonSerializableSession
       outputs:
         - session_object_value: connection

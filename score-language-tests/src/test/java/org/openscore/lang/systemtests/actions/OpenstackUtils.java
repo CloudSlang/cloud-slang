@@ -8,7 +8,7 @@
 *
 *******************************************************************************/
 
-package org.openscore.lang.tests.operation.actions;
+package org.openscore.lang.systemtests.actions;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -20,7 +20,6 @@ import com.hp.oo.sdk.content.annotations.Response;
 import com.hp.oo.sdk.content.plugin.ActionMetadata.MatchType;
 import com.hp.oo.sdk.content.plugin.ActionMetadata.ResponseType;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +38,6 @@ public class OpenstackUtils {
 	public static final String FAILED_CODE = "-1";
 
 	public static final String JSON_AUTHENTICATION_RESPONSE_KEY= "jsonAuthenticationResponse";
-	private final static Logger logger = Logger.getLogger(OpenstackUtils.class);
 
 	/**
 	 * Parses authentication response to get the Tenant and Token and puts them
@@ -84,9 +82,7 @@ public class OpenstackUtils {
             } else {
                 results.put(RETURN_CODE, FAILED_CODE);
             }
-        }catch(Exception e){
-
-        }
+        } catch(Exception ignored){}
         return results;
 	}
 
