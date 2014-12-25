@@ -1,0 +1,28 @@
+namespace: linux.ops
+
+operations:
+  - check_linux_disk_space:
+      inputs:
+        - host
+        - port: "'22'"
+        - username
+        - password
+        - privateKeyFile: "''"
+        - command: |
+            'df -Pkh | grep -v "Filesystem"'
+        - arguments: "''"
+        - characterSet : "'UTF-8'"
+        - pty: "'false'"
+        - timeout: "'30000000'"
+        - closeSession: "'false'"
+      action:
+        java_action:
+          className: org.openscore.content.ssh.actions.SSHShellCommandAction
+          methodName: runSshShellCommand
+      outputs:
+        - response: STDOUT
+        - diskSpace:
+      results:
+        - SUCCESS
+        - FAILURE
+
