@@ -14,11 +14,10 @@ package org.openscore.lang.systemtests.flows;
 import com.google.common.collect.Sets;
 import org.junit.Assert;
 import org.junit.Test;
-import org.openscore.events.EventConstants;
-import org.openscore.events.ScoreEvent;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.ScoreLangConstants;
+import org.openscore.lang.systemtests.PathData;
 import org.openscore.lang.systemtests.SystemsTestsParent;
 
 import java.io.Serializable;
@@ -35,7 +34,6 @@ public class DataFlowTest extends SystemsTestsParent {
 
     @Test
     public void testDataFlow() throws Exception {
-        startOperationMonitoring();
         URI resource = getClass().getResource("/yaml/system-flows/data_flow.yaml").toURI();
         URI operations = getClass().getResource("/yaml/system-flows/data_flow_operations.yaml").toURI();
 
@@ -48,14 +46,10 @@ public class DataFlowTest extends SystemsTestsParent {
         userInputs.put("myMessage", "hello world");
         userInputs.put("tryToChangeMessage", "changed");
 
-        ScoreEvent event = trigger(compilationArtifact, userInputs);
-        Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
+        Map<String, PathData> tasks = triggerWithData(compilationArtifact, userInputs);
 
-        List<String> expectedResults = new ArrayList<>();
-
-        expectedResults.add(ScoreLangConstants.SUCCESS_RESULT);
-        expectedResults.add(ScoreLangConstants.SUCCESS_RESULT);
-
-        verifyResults(expectedResults);
+        Assert.assertEquals(3, tasks.size());
+        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, tasks.get("0/0").getResult());
+        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, tasks.get("0/1").getResult());
     }
 }
