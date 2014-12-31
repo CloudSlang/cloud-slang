@@ -15,7 +15,7 @@
 
     <packaging>pom</packaging>
     <description>A DSL for writing flows</description>
-    <url>https://github.com/HPSoftware/score-language</url>
+    <url>https://github.com/openscore/score-language</url>
     <licenses>
         <license>
             <name>The Apache License, Version 2.0</name>
@@ -33,9 +33,9 @@
     </properties>
 
     <scm>
-        <connection>scm:git:https://github.com/HPSoftware/score-language.git</connection>
-        <developerConnection>scm:git:git@github.com:HPSoftware/score-language.git</developerConnection>
-        <url>https://github.com/HPSoftware/score-language.git</url>
+        <connection>scm:git:https://github.com/openscore/score-language.git</connection>
+        <developerConnection>scm:git:git@github.com:openscore/score-language.git</developerConnection>
+        <url>https://github.com/openscore/score-language.git</url>
         <tag>master</tag>
     </scm>
 
