@@ -12,15 +12,15 @@
 package org.openscore.lang.systemtests.flows;
 
 import com.google.common.collect.Sets;
+import org.junit.Assert;
+import org.junit.Test;
+import org.openscore.events.EventConstants;
+import org.openscore.events.ScoreEvent;
+import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.systemtests.SystemsTestsParent;
-import org.openscore.events.EventConstants;
-import org.openscore.events.ScoreEvent;
-import org.junit.Assert;
-import org.junit.Test;
 
-import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.*;
@@ -37,10 +37,11 @@ public class DataFlowTest extends SystemsTestsParent {
     public void testDataFlow() throws Exception {
         startOperationMonitoring();
         URI resource = getClass().getResource("/yaml/system-flows/data_flow.yaml").toURI();
-        URI operations = getClass().getResource("/yaml/system-flows/").toURI();
+        URI operations = getClass().getResource("/yaml/system-flows/data_flow_operations.yaml").toURI();
 
-        Set<File> path = Sets.newHashSet(new File(operations));
-        CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
+        SlangSource dep = SlangSource.fromFile(operations);
+        Set<SlangSource> path = Sets.newHashSet(dep);
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
 
         Map<String, Serializable> userInputs = new HashMap<>();

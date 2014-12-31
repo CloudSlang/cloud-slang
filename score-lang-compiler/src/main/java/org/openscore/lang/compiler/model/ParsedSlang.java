@@ -17,13 +17,15 @@ package org.openscore.lang.compiler.model;
 import java.util.List;
 import java.util.Map;
 
-public class SlangFile {
+public class ParsedSlang {
 
     private Map<String, String> imports;
     private Map<String, Object> flow;
     private List<Map<String, Map<String, Object>>> operations;
     private String namespace;
-    private String fileName;
+    private String name;
+
+    //todo add constructor?
 
     public String getNamespace() {
         return namespace;
@@ -45,12 +47,12 @@ public class SlangFile {
         return flow != null ? Type.FLOW : Type.OPERATIONS;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getName() {
+        return name;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public enum Type {

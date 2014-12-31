@@ -14,13 +14,12 @@ package org.openscore.lang.compiler.utils;
  * Created by orius123 on 05/11/14.
  */
 
-import org.openscore.lang.compiler.model.SlangFile;
+import org.apache.commons.lang3.Validate;
+import org.openscore.lang.compiler.SlangSource;
+import org.openscore.lang.compiler.model.ParsedSlang;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
-
-import java.io.File;
-import java.io.FileInputStream;
 
 @Component
 public class YamlParser {
@@ -28,15 +27,17 @@ public class YamlParser {
     @Autowired
     private Yaml yaml;
 
-    public SlangFile loadSlangFile(File source) {
-        SlangFile slangFile;
-        try (FileInputStream is = new FileInputStream(source)) {
-            slangFile = yaml.loadAs(is, SlangFile.class);
-            slangFile.setFileName(source.getName());
-        } catch (java.io.IOException e) {
-            throw new RuntimeException("There was a problem parsing the yaml file: " + source.getName() + " syntax for some reason", e);
+    public ParsedSlang parse(SlangSource source) {
+
+        Validate.notEmpty(source.getSource(), "Source cannot be empty");
+
+        try {
+            ParsedSlang parsedSlang = yaml.loadAs(source.getSource(), ParsedSlang.class);
+            parsedSlang.setName(source.getName());
+            return parsedSlang;
+        } catch (Throwable e) {
+            throw new RuntimeException("There was a problem parsing the yaml source: " + source.getName() + " syntax for some reason", e);
         }
-        return slangFile;
     }
 
 }

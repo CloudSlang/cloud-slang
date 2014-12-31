@@ -11,12 +11,11 @@ package org.openscore.lang.compiler;/*******************************************
 
 import org.openscore.lang.entities.CompilationArtifact;
 
-import java.io.File;
 import java.util.Set;
 
 //todo: Eliya - add JavaDoc
 public interface SlangCompiler {
-    CompilationArtifact compileFlow(File source, Set<File> path);
+    CompilationArtifact compileFlow(SlangSource source, Set<SlangSource> path);
 
-    CompilationArtifact compile(File source, String operationName, Set<File> path);
+    CompilationArtifact compile(SlangSource source, String operationName, Set<SlangSource> path);
 }

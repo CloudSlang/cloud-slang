@@ -15,6 +15,7 @@ import org.openscore.lang.api.SlangImpl;
 import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
 import org.openscore.lang.runtime.configuration.SlangRuntimeSpringConfig;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
@@ -22,6 +23,7 @@ import org.springframework.context.annotation.Import;
  * Date: 03/12/2014
  * Time: 10:39
  */
+@Configuration
 @Import({SlangRuntimeSpringConfig.class, SlangCompilerSpringConfig.class})
 public class SlangSpringConfiguration {
 

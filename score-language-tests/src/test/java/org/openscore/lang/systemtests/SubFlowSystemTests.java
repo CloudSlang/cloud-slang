@@ -11,13 +11,13 @@
 package org.openscore.lang.systemtests;
 
 import com.google.common.collect.Sets;
-import org.openscore.lang.entities.CompilationArtifact;
-import org.openscore.events.EventConstants;
-import org.openscore.events.ScoreEvent;
 import org.junit.Assert;
 import org.junit.Test;
+import org.openscore.events.EventConstants;
+import org.openscore.events.ScoreEvent;
+import org.openscore.lang.compiler.SlangSource;
+import org.openscore.lang.entities.CompilationArtifact;
 
-import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
@@ -35,8 +35,10 @@ public class SubFlowSystemTests extends SystemsTestsParent {
         URI subFlow = getClass().getResource("/yaml/sub-flow/child_flow.yaml").toURI();
         URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
 
-        Set<File> path = Sets.newHashSet(new File(subFlow), new File(operations));
-        CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
+        SlangSource subFlowDep = SlangSource.fromFile(subFlow);
+        SlangSource operationsDep = SlangSource.fromFile(operations);
+        Set<SlangSource> path = Sets.newHashSet(subFlowDep, operationsDep);
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("input1", "value1");

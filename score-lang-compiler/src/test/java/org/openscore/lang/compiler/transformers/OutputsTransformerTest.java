@@ -10,18 +10,18 @@
 
 package org.openscore.lang.compiler.transformers;
 
-import org.openscore.lang.compiler.SlangTextualKeys;
-import org.openscore.lang.compiler.model.SlangFile;
-import org.openscore.lang.compiler.utils.YamlParser;
-import org.openscore.lang.entities.bindings.Output;
-
 import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openscore.lang.compiler.SlangSource;
+import org.openscore.lang.compiler.SlangTextualKeys;
+import org.openscore.lang.compiler.model.ParsedSlang;
+import org.openscore.lang.compiler.utils.YamlParser;
+import org.openscore.lang.entities.bindings.Output;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
@@ -39,37 +39,37 @@ import java.util.Map;
  * @author Bonczidai Levente
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes=OutputsTransformerTest.Configuration.class)
+@ContextConfiguration(classes=OutputsTransformerTest.Config.class)
 public class OutputsTransformerTest {
 
     private static final long DEFAULT_TIMEOUT = 10000;
 
     @Autowired
-    private Transformer outputTransformer;
+    private OutputsTransformer outputTransformer;
 
     @Autowired
     private YamlParser yamlParser;
 
-    private Object outputsMap;
+    private List outputsMap;
 
     @Before
     public void init() throws URISyntaxException {
         URL resource = getClass().getResource("/operation_with_data.yaml");
-        SlangFile file = yamlParser.loadSlangFile(new File(resource.toURI()));
+        ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
         Map op = file.getOperations().iterator().next();
-        Map<String, Object> opProp = (Map) op.get("test_op_2");
-        outputsMap = opProp.get(SlangTextualKeys.OUTPUTS_KEY);
+        Map opProp = (Map) op.get("test_op_2");
+        outputsMap = (List) opProp.get(SlangTextualKeys.OUTPUTS_KEY);
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testTransform() throws Exception {
-        List<Output> outputs = (List<Output>) outputTransformer.transform(outputsMap);
+        @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
         Assert.assertFalse(outputs.isEmpty());
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testNoExpression() throws Exception {
-        List<Output> outputs = (List<Output>) outputTransformer.transform(outputsMap);
+        @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
         Output output = outputs.get(3);
         Assert.assertEquals("output4", output.getName());
         Assert.assertEquals("output4", output.getExpression());
@@ -77,7 +77,7 @@ public class OutputsTransformerTest {
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testExpressionKeyFromActionReturnValues() throws Exception {
-        List<Output> outputs = (List<Output>) outputTransformer.transform(outputsMap);
+        @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
         Output output = outputs.get(0);
         Assert.assertEquals("output1", output.getName());
         Assert.assertEquals("input1", output.getExpression());
@@ -85,14 +85,14 @@ public class OutputsTransformerTest {
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testInputExpression() throws Exception {
-        List<Output> outputs = (List<Output>) outputTransformer.transform(outputsMap);
+        @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
         Output output = outputs.get(2);
         Assert.assertEquals("output3", output.getName());
         Assert.assertEquals("fromInputs['input1']", output.getExpression());
     }
 
-    @org.springframework.context.annotation.Configuration
-    public static class Configuration {
+    @Configuration
+    public static class Config {
 
         @Bean
         public Yaml yaml() {
@@ -103,12 +103,11 @@ public class OutputsTransformerTest {
 
         @Bean
         public YamlParser yamlParser() {
-            YamlParser yamlParser = new YamlParser();
-            return yamlParser;
+            return new YamlParser();
         }
 
         @Bean
-        public Transformer outputTransformer() {
+        public OutputsTransformer outputTransformer() {
             return new OutputsTransformer();
         }
 

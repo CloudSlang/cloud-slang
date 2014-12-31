@@ -28,7 +28,7 @@ public class InputsTransformer extends AbstractInputsTransformer implements Tran
 
     /**
      * Transforms a list of inputs in (raw data form) to Input objects.
-     * @param rawData : inputs as described in Yaml file.
+     * @param rawData : inputs as described in Yaml source.
      * @return : list of inputs after transformation.
      */
     @Override

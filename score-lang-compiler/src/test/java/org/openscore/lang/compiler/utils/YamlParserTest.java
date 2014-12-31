@@ -1,6 +1,5 @@
 package org.openscore.lang.compiler.utils;
 
-import org.openscore.lang.compiler.model.SlangFile;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -9,10 +8,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.openscore.lang.compiler.utils.YamlParser;
+import org.openscore.lang.compiler.SlangSource;
+import org.openscore.lang.compiler.model.ParsedSlang;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -33,9 +32,16 @@ public class YamlParserTest {
 
     @Test
     public void throwExceptionWhenFileIsNotValid() throws Exception {
-        Mockito.when(yaml.loadAs(any(InputStream.class), eq(SlangFile.class))).thenThrow(IOException.class);
+        Mockito.when(yaml.loadAs(any(InputStream.class), eq(ParsedSlang.class))).thenThrow(IOException.class);
         exception.expect(RuntimeException.class);
         exception.expectMessage("syntax");
-        yamlParser.loadSlangFile(new File(""));
+        yamlParser.parse(new SlangSource("a", "b"));
+    }
+
+    @Test
+    public void throwExceptionWhenSourceIsEmpty() throws Exception {
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("empty");
+        yamlParser.parse(new SlangSource("", null));
     }
 }

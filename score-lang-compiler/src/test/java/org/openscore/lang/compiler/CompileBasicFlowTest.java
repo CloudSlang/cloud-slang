@@ -10,23 +10,22 @@
 
 package org.openscore.lang.compiler;
 
-import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
-import org.openscore.lang.entities.CompilationArtifact;
-import org.openscore.lang.entities.ResultNavigation;
-import org.openscore.lang.entities.bindings.Input;
-import org.openscore.lang.entities.bindings.Output;
-import org.openscore.lang.entities.bindings.Result;
-import org.openscore.api.ExecutionPlan;
-import org.openscore.api.ExecutionStep;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openscore.api.ExecutionPlan;
+import org.openscore.api.ExecutionStep;
+import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
+import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.ResultNavigation;
+import org.openscore.lang.entities.ScoreLangConstants;
+import org.openscore.lang.entities.bindings.Input;
+import org.openscore.lang.entities.bindings.Output;
+import org.openscore.lang.entities.bindings.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.openscore.lang.entities.ScoreLangConstants;
 
-import java.io.File;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
@@ -49,10 +48,10 @@ public class CompileBasicFlowTest {
         URI flow = getClass().getResource("/flow.yaml").toURI();
         URI operation = getClass().getResource("/operation.yaml").toURI();
 
-        Set<File> path = new HashSet<>();
-        path.add(new File(operation));
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
 
-        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
+        CompilationArtifact compilationArtifact = compiler.compileFlow(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
@@ -66,10 +65,10 @@ public class CompileBasicFlowTest {
         URI flow = getClass().getResource("/flow_with_data.yaml").toURI();
         URI operation = getClass().getResource("/operation.yaml").toURI();
 
-        Set<File> path = new HashSet<>();
-        path.add(new File(operation));
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
 
-        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
+        CompilationArtifact compilationArtifact = compiler.compileFlow(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());

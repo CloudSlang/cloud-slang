@@ -11,16 +11,15 @@
 package org.openscore.lang.systemtests.flows;
 
 import com.google.common.collect.Sets;
-import org.openscore.lang.entities.CompilationArtifact;
-import org.openscore.lang.systemtests.SystemsTestsParent;
-
-import org.openscore.events.EventConstants;
-import org.openscore.events.ScoreEvent;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openscore.events.EventConstants;
+import org.openscore.events.ScoreEvent;
+import org.openscore.lang.compiler.SlangSource;
+import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.systemtests.SystemsTestsParent;
 
-import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.*;
@@ -43,8 +42,9 @@ public class NavigationTest extends SystemsTestsParent {
         URI resource = getClass().getResource("/yaml/flow_complex_navigation.yaml").toURI();
         URI operationsPython = getClass().getResource("/yaml/simple_operations.yaml").toURI();
 
-        Set<File> path = Sets.newHashSet(new File(operationsPython));
-        CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
+        SlangSource operationsSource = SlangSource.fromFile(operationsPython);
+        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("userNumber", 12);
@@ -67,8 +67,9 @@ public class NavigationTest extends SystemsTestsParent {
         URI resource = getClass().getResource("/yaml/flow_complex_navigation.yaml").toURI();
         URI operationsPython = getClass().getResource("/yaml/simple_operations.yaml").toURI();
 
-        Set<File> path = Sets.newHashSet(new File(operationsPython));
-        CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
+        SlangSource operationsSource = SlangSource.fromFile(operationsPython);
+        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("userNumber", 13);
@@ -91,8 +92,9 @@ public class NavigationTest extends SystemsTestsParent {
         URI resource = getClass().getResource("/yaml/flow_complex_navigation.yaml").toURI();
         URI operationsPython = getClass().getResource("/yaml/simple_operations.yaml").toURI();
 
-        Set<File> path = Sets.newHashSet(new File(operationsPython));
-        CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
+        SlangSource operationsSource = SlangSource.fromFile(operationsPython);
+        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("userNumber", 1024);
@@ -115,8 +117,9 @@ public class NavigationTest extends SystemsTestsParent {
         URI resource = getClass().getResource("/yaml/flow_default_navigation.yaml").toURI();
         URI operationsPython = getClass().getResource("/yaml/simple_operations.yaml").toURI();
 
-        Set<File> path = Sets.newHashSet(new File(operationsPython));
-        CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
+        SlangSource operationsSource = SlangSource.fromFile(operationsPython);
+        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("navigationType", "success");
@@ -139,8 +142,9 @@ public class NavigationTest extends SystemsTestsParent {
         URI resource = getClass().getResource("/yaml/flow_default_navigation.yaml").toURI();
         URI operationsPython = getClass().getResource("/yaml/simple_operations.yaml").toURI();
 
-        Set<File> path = Sets.newHashSet(new File(operationsPython));
-        CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
+        SlangSource operationsSource = SlangSource.fromFile(operationsPython);
+        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("navigationType", "failure");

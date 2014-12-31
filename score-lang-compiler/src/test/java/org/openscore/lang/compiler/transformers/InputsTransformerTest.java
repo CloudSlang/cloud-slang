@@ -11,15 +11,17 @@ package org.openscore.lang.compiler.transformers;
 *******************************************************************************/
 
 
-import org.openscore.lang.compiler.model.SlangFile;
-import org.openscore.lang.compiler.utils.YamlParser;
-import org.openscore.lang.entities.bindings.Input;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openscore.lang.compiler.SlangSource;
+import org.openscore.lang.compiler.model.ParsedSlang;
+import org.openscore.lang.compiler.utils.YamlParser;
+import org.openscore.lang.entities.bindings.Input;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
@@ -32,35 +34,35 @@ import java.util.List;
 import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
+@ContextConfiguration(classes = InputsTransformerTest.Config.class)
 public class InputsTransformerTest {
 
     @Autowired
-    private Transformer inputTransformer;
+    private InputsTransformer inputTransformer;
 
     @Autowired
     private YamlParser yamlParser;
 
-    private Object inputsMap;
+    private List inputsMap;
 
     @Before
     public void init() throws URISyntaxException {
         URL resource = getClass().getResource("/operation_with_data.yaml");
-        SlangFile file = yamlParser.loadSlangFile(new File(resource.toURI()));
+        ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
         Map op = file.getOperations().iterator().next();
-        Map<String, Object> opProp = (Map) op.get("test_op_2");
-        inputsMap = opProp.get("inputs");
+        Map opProp = (Map) op.get("test_op_2");
+        inputsMap = (List) opProp.get("inputs");
     }
 
     @Test
     public void testTransform() throws Exception {
-        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Assert.assertFalse(inputs.isEmpty());
     }
 
     @Test
     public void testSimpleRefInput() throws Exception {
-        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(0);
         Assert.assertEquals("input1", input.getName());
         Assert.assertEquals("input1", input.getExpression());
@@ -68,7 +70,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testExplicitRefInput() throws Exception {
-        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(1);
         Assert.assertEquals("input2", input.getName());
         Assert.assertEquals("input2", input.getExpression());
@@ -76,7 +78,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testDefaultValueInput() throws Exception {
-        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(2);
         Assert.assertEquals("input3", input.getName());
         Assert.assertEquals("str('value3')", input.getExpression());
@@ -84,7 +86,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testInlineExprInput() throws Exception {
-        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(3);
         Assert.assertEquals("input4", input.getName());
         Assert.assertEquals("'value4' if input3 == value3 else None", input.getExpression());
@@ -92,7 +94,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testReqEncInput() throws Exception {
-        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(4);
         Assert.assertEquals("input5", input.getName());
         Assert.assertEquals("input5", input.getExpression());
@@ -102,7 +104,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testDefaultExprReqInput() throws Exception {
-        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(5);
         Assert.assertEquals("input6", input.getName());
         Assert.assertEquals("1 + 5", input.getExpression());
@@ -112,7 +114,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testInlineConstInput() throws Exception {
-        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(6);
         Assert.assertEquals("input7", input.getName());
         Assert.assertEquals("77", input.getExpression());
@@ -122,7 +124,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testDefaultExprRefInput() throws Exception {
-        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(7);
         Assert.assertEquals("input8", input.getName());
         Assert.assertEquals("input6", input.getExpression());
@@ -132,7 +134,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testOverrideInput() throws Exception {
-        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(8);
         Assert.assertEquals("input9", input.getName());
         Assert.assertEquals("input6", input.getExpression());
@@ -143,7 +145,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testLeadingSpaces() throws Exception {
-        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(9);
         Assert.assertEquals("input10", input.getName());
         Assert.assertEquals("input5", input.getExpression());
@@ -151,7 +153,7 @@ public class InputsTransformerTest {
 
     @Test
      public void testLeadingAndTrailingSpaces() throws Exception {
-        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(10);
         Assert.assertEquals("input11", input.getName());
         Assert.assertEquals("5 + 6", input.getExpression());
@@ -159,14 +161,14 @@ public class InputsTransformerTest {
 
     @Test
     public void testLeadingAndTrailingSpacesComplex() throws Exception {
-        List<Input> inputs = (List<Input>) inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(11);
         Assert.assertEquals("input12", input.getName());
         Assert.assertEquals("\"mighty\" + \" max\"   + varX", input.getExpression());
     }
 
-    @org.springframework.context.annotation.Configuration
-    public static class Configuration {
+    @Configuration
+    public static class Config {
 
         @Bean
         public Yaml yaml() {
@@ -177,12 +179,11 @@ public class InputsTransformerTest {
 
         @Bean
         public YamlParser yamlParser() {
-            YamlParser yamlParser = new YamlParser();
-            return yamlParser;
+            return new YamlParser();
         }
 
         @Bean
-        public Transformer inputTransformer() {
+        public InputsTransformer inputTransformer() {
             return new InputsTransformer();
         }
 

@@ -12,26 +12,23 @@ package org.openscore.lang.compiler;
 
 import ch.lambdaj.Lambda;
 import ch.lambdaj.function.convert.Converter;
-import org.openscore.lang.compiler.model.*;
-import org.openscore.lang.compiler.utils.DependenciesHelper;
-import org.openscore.lang.compiler.utils.ExecutableBuilder;
-import org.openscore.lang.compiler.utils.ExecutionPlanBuilder;
-import org.openscore.lang.compiler.utils.YamlParser;
-import org.openscore.lang.entities.CompilationArtifact;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.openscore.api.ExecutionPlan;
 import org.openscore.lang.compiler.model.Executable;
+import org.openscore.lang.compiler.model.Flow;
+import org.openscore.lang.compiler.model.Operation;
+import org.openscore.lang.compiler.model.ParsedSlang;
+import org.openscore.lang.compiler.utils.DependenciesHelper;
+import org.openscore.lang.compiler.utils.ExecutableBuilder;
+import org.openscore.lang.compiler.utils.ExecutionPlanBuilder;
+import org.openscore.lang.compiler.utils.YamlParser;
+import org.openscore.lang.entities.CompilationArtifact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static ch.lambdaj.Lambda.convertMap;
 import static ch.lambdaj.Lambda.having;
@@ -57,28 +54,27 @@ public class SlangCompilerImpl implements SlangCompiler {
     private YamlParser yamlParser;
 
     @Override
-    public CompilationArtifact compileFlow(File source, Set<File> path) {
+    public CompilationArtifact compileFlow(SlangSource source, Set<SlangSource> path) {
         return compile(source, null, path);
     }
 
     @Override
-    public CompilationArtifact compile(File source, String operationName, Set<File> path) {
+    public CompilationArtifact compile(SlangSource source, String operationName, Set<SlangSource> path) {
 
-        Validate.notNull(source, "You must supply a file to compile");
-        Validate.isTrue(!source.isDirectory(), "Source file can't be a directory");
+        Validate.notNull(source, "You must supply a source to compile");
 
         //first thing we parse the yaml file into java maps
-        SlangFile slangFile = yamlParser.loadSlangFile(source);
+        ParsedSlang parsedSlang = yamlParser.parse(source);
 
         //than we transform those maps to model objects
-        Executable executable = transformToExecutable(operationName, slangFile);
+        Executable executable = transformToExecutable(operationName, parsedSlang);
 
         Map<String, Executable> filteredDependencies = new HashMap<>();
         //we handle dependencies only if the file has imports
-        boolean hasDependencies = MapUtils.isNotEmpty(slangFile.getImports())
+        boolean hasDependencies = MapUtils.isNotEmpty(parsedSlang.getImports())
                 && executable.getType().equals(SlangTextualKeys.FLOW_TYPE);
         if (hasDependencies) {
-            Validate.noNullElements(path, "File that was requested to compile has imports but no path was given");
+            Validate.noNullElements(path, "Source that was requested to compile has imports but no path was given");
 
             //we transform also all of the files in the given path to model objects
             Map<String, Executable> pathExecutables = transformDependencies(path);
@@ -111,23 +107,21 @@ public class SlangCompilerImpl implements SlangCompiler {
      * @param path the path
      * @return a map of {@link org.openscore.lang.compiler.model.Executable} with their ids as key
      */
-    private Map<String, Executable> transformDependencies(Set<File> path) {
-        //we filter only the slang files from the path
-        List<File> filteredPath = dependenciesHelper.fetchSlangFiles(path);
+    private Map<String, Executable> transformDependencies(Set<SlangSource> path) {
 
         //we transform and add all of the dependencies to a list of executable
         List<Executable> executables = new ArrayList<>();
-        for (File file : filteredPath) {
-            SlangFile slangFile = yamlParser.loadSlangFile(file);
-            switch (slangFile.getType()) {
+        for (SlangSource source : path) {
+            ParsedSlang parsedSlang = yamlParser.parse(source);
+            switch (parsedSlang.getType()) {
                 case FLOW:
-                    executables.add(transformFlow(slangFile));
+                    executables.add(transformFlow(parsedSlang));
                     break;
                 case OPERATIONS:
-                    executables.addAll(transformOperations(slangFile));
+                    executables.addAll(transformOperations(parsedSlang));
                     break;
                 default:
-                    throw new RuntimeException("File: " + file.getName() + " is not of flow type or operations");
+                    throw new RuntimeException("Source: " + source.getName() + " is not of flow type or operations");
             }
         }
 
@@ -160,66 +154,66 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     /**
-     * Utility method that transform a {@link org.openscore.lang.compiler.model.SlangFile}
+     * Utility method that transform a {@link org.openscore.lang.compiler.model.ParsedSlang}
      * into a {@link org.openscore.lang.compiler.model.Executable}
      * also handles operations files
      *
-     * @param operationName the name of the operation to transform from the {@link org.openscore.lang.compiler.model.SlangFile}
-     * @param slangFile     the file to transform
+     * @param operationName the name of the operation to transform from the {@link org.openscore.lang.compiler.model.ParsedSlang}
+     * @param parsedSlang the source to transform
      * @return {@link org.openscore.lang.compiler.model.Executable}  of the requested flow/operation
      */
-    private Executable transformToExecutable(String operationName, SlangFile slangFile) {
+    private Executable transformToExecutable(String operationName, ParsedSlang parsedSlang) {
         Executable executable;
 
-        switch (slangFile.getType()) {
+        switch (parsedSlang.getType()) {
             case OPERATIONS:
-                Validate.notEmpty(operationName, "File: " + slangFile.getFileName() + " is operations file " +
+                Validate.notEmpty(operationName, "Source: " + parsedSlang.getName() + " is operations source " +
                         "you must specify the operation name requested for compiling");
-                List<Executable> compilesOperations = transformOperations(slangFile);
-                // match the requested operation from all the operations in the file
+                List<Executable> compilesOperations = transformOperations(parsedSlang);
+                // match the requested operation from all the operations in the source
                 executable = Lambda.selectFirst(compilesOperations, having(on(Executable.class).getName(), equalTo(operationName)));
                 if (executable == null) {
-                    throw new RuntimeException("Operation with name: " + operationName + " wasn't found in file: " + slangFile.getFileName());
+                    throw new RuntimeException("Operation with name: " + operationName + " wasn't found in source: " + parsedSlang.getName());
                 }
                 break;
             case FLOW:
-                executable = transformFlow(slangFile);
+                executable = transformFlow(parsedSlang);
                 break;
             default:
-                throw new RuntimeException("File: " + slangFile.getFileName() + " is not of flow type or operations");
+                throw new RuntimeException("source: " + parsedSlang.getName() + " is not of flow type or operations");
         }
         return executable;
     }
 
     /**
-     * transform an operations {@link org.openscore.lang.compiler.model.SlangFile} to a List of {@link org.openscore.lang.compiler.model.Executable}
+     * transform an operations {@link org.openscore.lang.compiler.model.ParsedSlang} to a List of {@link org.openscore.lang.compiler.model.Executable}
      *
-     * @param slangFile the file to transform the operations from
-     * @return List of {@link org.openscore.lang.compiler.model.Executable} representing the operations in the file
+     * @param parsedSlang the source to transform the operations from
+     * @return List of {@link org.openscore.lang.compiler.model.Executable} representing the operations in the source
      */
-    private List<Executable> transformOperations(SlangFile slangFile) {
+    private List<Executable> transformOperations(ParsedSlang parsedSlang) {
         List<Executable> executables = new ArrayList<>();
-        for (Map<String, Map<String, Object>> operation : slangFile.getOperations()) {
+        for (Map<String, Map<String, Object>> operation : parsedSlang.getOperations()) {
             Map.Entry<String, Map<String, Object>> entry = operation.entrySet().iterator().next();
             String operationName = entry.getKey();
             Map<String, Object> operationRawData = entry.getValue();
-            executables.add(executableBuilder.transformToExecutable(slangFile, operationName, operationRawData));
+            executables.add(executableBuilder.transformToExecutable(parsedSlang, operationName, operationRawData));
         }
         return executables;
     }
 
     /**
-     * transform an flow {@link org.openscore.lang.compiler.model.SlangFile} to a {@link org.openscore.lang.compiler.model.Executable}
+     * transform an flow {@link org.openscore.lang.compiler.model.ParsedSlang} to a {@link org.openscore.lang.compiler.model.Executable}
      *
-     * @param slangFile the file to transform the flow from
-     * @return {@link org.openscore.lang.compiler.model.Executable} representing the flow in the file
+     * @param parsedSlang the source to transform the flow from
+     * @return {@link org.openscore.lang.compiler.model.Executable} representing the flow in the source
      */
-    private Executable transformFlow(SlangFile slangFile) {
-        Map<String, Object> flowRawData = slangFile.getFlow();
+    private Executable transformFlow(ParsedSlang parsedSlang) {
+        Map<String, Object> flowRawData = parsedSlang.getFlow();
         String flowName = (String) flowRawData.get(SlangTextualKeys.FLOW_NAME_KEY);
         if (StringUtils.isBlank(flowName)) {
-            throw new RuntimeException("Flow in file: " + slangFile.getFileName() + "have no name");
+            throw new RuntimeException("Flow in source: " + parsedSlang.getName() + "have no name");
         }
-        return executableBuilder.transformToExecutable(slangFile, flowName, flowRawData);
+        return executableBuilder.transformToExecutable(parsedSlang, flowName, flowRawData);
     }
 }

@@ -9,11 +9,6 @@ package org.openscore.lang.api;
 *
 *******************************************************************************/
 
-
-import org.openscore.lang.compiler.SlangCompiler;
-import org.openscore.lang.entities.CompilationArtifact;
-import org.openscore.lang.entities.ScoreLangConstants;
-import org.openscore.lang.runtime.env.RunEnvironment;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.openscore.api.Score;
@@ -21,15 +16,21 @@ import org.openscore.api.TriggeringProperties;
 import org.openscore.events.EventBus;
 import org.openscore.events.EventConstants;
 import org.openscore.events.ScoreEventListener;
+import org.openscore.lang.compiler.SlangCompiler;
+import org.openscore.lang.compiler.SlangSource;
+import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.ScoreLangConstants;
+import org.openscore.lang.runtime.env.RunEnvironment;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static ch.lambdaj.Lambda.filter;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.openscore.lang.entities.ScoreLangConstants.EVENT_ACTION_END;
 import static org.openscore.lang.entities.ScoreLangConstants.EVENT_ACTION_ERROR;
 import static org.openscore.lang.entities.ScoreLangConstants.EVENT_ACTION_START;
@@ -45,8 +46,7 @@ import static org.openscore.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXC
  * Date: 03/12/2014
  * Time: 15:20
  */
-public class SlangImpl implements Slang{
-
+public class SlangImpl implements Slang {
 
     @Autowired
     private SlangCompiler compiler;
@@ -60,29 +60,22 @@ public class SlangImpl implements Slang{
     private final static Logger logger = Logger.getLogger(SlangImpl.class);
 
     @Override
-    public CompilationArtifact compileOperation(File file, String operationName, Set<File> dependencies) {
+    public CompilationArtifact compileOperation(SlangSource source, String operationName, Set<SlangSource> dependencies) {
 
-        Validate.notNull(file, "File can not be null");
+        Validate.notNull(source, "Source can not be null");
+        Set<SlangSource> dependencySources = new HashSet<>(filter(notNullValue(), dependencies));
 
-        Validate.isTrue(file.isFile(), "File must lead to a file");
-
-        Set<File> dependencyFiles = new HashSet<>();
-        if (dependencies != null) {
-            for(File dependency : dependencies) {
-                dependencyFiles.add(dependency);
-            }
-        }
         try {
-            return compiler.compile(file, operationName, dependencyFiles);
+            return compiler.compile(source, operationName, dependencySources);
         } catch (Exception e) {
-            logger.error("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage());
+            logger.error("Failed compilation for source : " + source.getName() + " ,Exception is : " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public CompilationArtifact compile(File file, Set<File> dependencies) {
-        return compileOperation(file, null, dependencies);
+    public CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencies) {
+        return compileOperation(source, null, dependencies);
     }
 
     @Override
@@ -104,14 +97,14 @@ public class SlangImpl implements Slang{
     }
 
     @Override
-    public Long compileAndRunOperation(File file, String operationName, Set<File> dependencies, Map<String, Serializable> runInputs) {
-        CompilationArtifact compilationArtifact = compileOperation(file, operationName, dependencies);
+    public Long compileAndRunOperation(SlangSource source, String operationName, Set<SlangSource> dependencies, Map<String, Serializable> runInputs) {
+        CompilationArtifact compilationArtifact = compileOperation(source, operationName, dependencies);
         return run(compilationArtifact, runInputs);
     }
 
     @Override
-    public Long compileAndRun(File file, Set<File> dependencies, Map<String, Serializable> runInputs) {
-        return compileAndRunOperation(file, null, dependencies, runInputs);
+    public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, Serializable> runInputs) {
+        return compileAndRunOperation(source, null, dependencies, runInputs);
     }
 
     @Override

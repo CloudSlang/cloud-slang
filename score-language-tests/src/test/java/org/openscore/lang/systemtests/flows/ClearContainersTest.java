@@ -11,6 +11,7 @@
 package org.openscore.lang.systemtests.flows;
 
 import com.google.common.collect.Sets;
+import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.systemtests.SystemsTestsParent;
 import org.openscore.events.EventConstants;
@@ -19,7 +20,6 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
@@ -27,10 +27,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Date: 11/21/2014
- *
- * @author Bonczidai Levente
- */
+* Date: 11/21/2014
+*
+* @author Bonczidai Levente
+*/
 public class ClearContainersTest  extends SystemsTestsParent {
 
     @Test
@@ -39,8 +39,8 @@ public class ClearContainersTest  extends SystemsTestsParent {
         URI resource = getClass().getResource("/yaml/docker-demo/clear_containers_flow.yaml").toURI();
         URI operations = getClass().getResource("/yaml/docker-demo/").toURI();
 
-        Set<File> path = Sets.newHashSet(new File(operations));
-        CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         //TODO: remove default values for inputs
         Map<String, Serializable> userInputs = new HashMap<>();

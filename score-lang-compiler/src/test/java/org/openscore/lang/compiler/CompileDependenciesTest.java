@@ -10,22 +10,21 @@
 
 package org.openscore.lang.compiler;
 
-import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
-import org.openscore.lang.entities.CompilationArtifact;
-import org.openscore.lang.entities.ScoreLangConstants;
-import org.openscore.api.ExecutionPlan;
-import org.openscore.api.ExecutionStep;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.openscore.api.ExecutionPlan;
+import org.openscore.api.ExecutionStep;
+import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
+import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.ScoreLangConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.File;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
@@ -49,40 +48,40 @@ public class CompileDependenciesTest {
     @Test(expected = RuntimeException.class)
     public void emptyPathButThereAreImports() throws Exception {
         URI flow = getClass().getResource("/flow.yaml").toURI();
-        Set<File> path = new HashSet<>();
-        compiler.compileFlow(new File(flow), path);
+        Set<SlangSource> path = new HashSet<>();
+        compiler.compileFlow(SlangSource.fromFile(flow), path);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullPathButThereAreImports() throws Exception {
         URI flow = getClass().getResource("/flow.yaml").toURI();
-        compiler.compileFlow(new File(flow), null);
+        compiler.compileFlow(SlangSource.fromFile(flow), null);
     }
 
     @Test
     public void referenceDoesNoExistInPath() throws Exception {
         URI flow = getClass().getResource("/flow.yaml").toURI();
         URI operation = getClass().getResource("/operation_with_data.yaml").toURI();
-        Set<File> path = new HashSet<>();
-        path.add(new File(operation));
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
 
         exception.expect(RuntimeException.class);
         exception.expectMessage(containsString("ops.test_op"));
 
-        compiler.compileFlow(new File(flow), path);
+        compiler.compileFlow(SlangSource.fromFile(flow), path);
     }
 
     @Test
     public void importHasAKeyThatDoesNotExistInPath() throws Exception {
         URI flow = getClass().getResource("/flow.yaml").toURI();
         URI operation = getClass().getResource("/flow_with_data.yaml").toURI();
-        Set<File> path = new HashSet<>();
-        path.add(new File(operation));
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
 
         exception.expect(RuntimeException.class);
         exception.expectMessage(containsString("ops"));
 
-        compiler.compileFlow(new File(flow), path);
+        compiler.compileFlow(SlangSource.fromFile(flow), path);
     }
 
     @Test
@@ -90,23 +89,11 @@ public class CompileDependenciesTest {
         URI flow = getClass().getResource("/flow.yaml").toURI();
         URI notImportedOperation = getClass().getResource("/flow_with_data.yaml").toURI();
         URI importedOperation = getClass().getResource("/operation.yaml").toURI();
-        Set<File> path = new HashSet<>();
-        path.add(new File(notImportedOperation));
-        path.add(new File(importedOperation));
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(notImportedOperation));
+        path.add(SlangSource.fromFile(importedOperation));
 
-        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
-        Assert.assertThat(compilationArtifact.getDependencies(), Matchers.<String, ExecutionPlan>hasKey("user.ops.test_op"));
-        Assert.assertThat(compilationArtifact.getDependencies(), not(Matchers.<String, ExecutionPlan>hasKey("slang.sample.flows.SimpleFlow")));
-    }
-
-    @Test
-    public void pathHasDirectoriesInIt() throws Exception {
-        URI flow = getClass().getResource("/flow.yaml").toURI();
-        URI notImportedOperation = getClass().getResource("/").toURI();
-        Set<File> path = new HashSet<>();
-        path.add(new File(notImportedOperation));
-
-        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
+        CompilationArtifact compilationArtifact = compiler.compileFlow(SlangSource.fromFile(flow), path);
         Assert.assertThat(compilationArtifact.getDependencies(), Matchers.<String, ExecutionPlan>hasKey("user.ops.test_op"));
         Assert.assertThat(compilationArtifact.getDependencies(), not(Matchers.<String, ExecutionPlan>hasKey("slang.sample.flows.SimpleFlow")));
     }
@@ -116,9 +103,9 @@ public class CompileDependenciesTest {
         URI dir = getClass().getResource("/").toURI();
 
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage(containsString("directory"));
+        exception.expectMessage(containsString("directories"));
 
-        compiler.compileFlow(new File(dir), null);
+        compiler.compileFlow(SlangSource.fromFile(dir), null);
     }
 
     @Test
@@ -126,11 +113,11 @@ public class CompileDependenciesTest {
         URI flow = getClass().getResource("/circular-dependencies/parent_flow.yaml").toURI();
         URI child_flow = getClass().getResource("/circular-dependencies/child_flow.yaml").toURI();
         URI operation = getClass().getResource("/operation.yaml").toURI();
-        Set<File> path = new HashSet<>();
-        path.add(new File(child_flow));
-        path.add(new File(operation));
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(child_flow));
+        path.add(SlangSource.fromFile(operation));
 
-        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
+        CompilationArtifact compilationArtifact = compiler.compileFlow(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull(executionPlan);
         Assert.assertEquals("different number of dependencies than expected", 2, compilationArtifact.getDependencies().size());
@@ -144,10 +131,10 @@ public class CompileDependenciesTest {
         URI flow = getClass().getResource("/circular-dependencies/parent_flow.yaml").toURI();
         URI child_flow = getClass().getResource("/circular-dependencies/child_flow.yaml").toURI();
         URI operation = getClass().getResource("/operation.yaml").toURI();
-        Set<File> path = new HashSet<>();
-        path.add(new File(child_flow));
-        path.add(new File(operation));
-        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(child_flow));
+        path.add(SlangSource.fromFile(operation));
+        CompilationArtifact compilationArtifact = compiler.compileFlow(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull(executionPlan);
         Assert.assertEquals("different number of dependencies than expected", 2, compilationArtifact.getDependencies().size());
@@ -158,10 +145,10 @@ public class CompileDependenciesTest {
         URI flow = getClass().getResource("/circular-dependencies/parent_flow.yaml").toURI();
         URI child_flow = getClass().getResource("/circular-dependencies/circular_child_flow.yaml").toURI();
         URI operation = getClass().getResource("/operation.yaml").toURI();
-        Set<File> path = new HashSet<>();
-        path.add(new File(child_flow));
-        path.add(new File(operation));
-        CompilationArtifact compilationArtifact = compiler.compileFlow(new File(flow), path);
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(child_flow));
+        path.add(SlangSource.fromFile(operation));
+        CompilationArtifact compilationArtifact = compiler.compileFlow(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull(executionPlan);
         Assert.assertEquals(3, compilationArtifact.getDependencies().size());

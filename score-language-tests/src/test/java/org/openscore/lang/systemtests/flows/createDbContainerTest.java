@@ -11,15 +11,15 @@
 package org.openscore.lang.systemtests.flows;
 
 import com.google.common.collect.Sets;
-import org.openscore.lang.entities.CompilationArtifact;
-import org.openscore.lang.systemtests.SystemsTestsParent;
-import org.openscore.events.EventConstants;
-import org.openscore.events.ScoreEvent;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openscore.events.EventConstants;
+import org.openscore.events.ScoreEvent;
+import org.openscore.lang.compiler.SlangSource;
+import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.systemtests.SystemsTestsParent;
 
-import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
@@ -27,10 +27,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Date: 11/17/2014
- *
- * @author Bonczidai Levente
- */
+* Date: 11/17/2014
+*
+* @author Bonczidai Levente
+*/
 public class createDbContainerTest  extends SystemsTestsParent {
 
     @Test
@@ -39,8 +39,8 @@ public class createDbContainerTest  extends SystemsTestsParent {
         URI resource = getClass().getResource("/yaml/docker-demo/create_db_container.yaml").toURI();
         URI operations = getClass().getResource("/yaml/docker-demo/").toURI();
 
-        Set<File> path = Sets.newHashSet(new File(operations));
-        CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("host", "{{ host }}");

@@ -11,13 +11,14 @@ package org.openscore.lang.cli.utils;
 *******************************************************************************/
 
 
-
+import ch.lambdaj.function.convert.Converter;
 import com.google.common.collect.Lists;
-import org.openscore.lang.api.Slang;
-import org.openscore.lang.entities.CompilationArtifact;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
+import org.openscore.lang.api.Slang;
+import org.openscore.lang.compiler.SlangSource;
+import org.openscore.lang.entities.CompilationArtifact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static ch.lambdaj.Lambda.convert;
+import static org.openscore.lang.compiler.SlangSource.fromFile;
 
 /**
  * Date: 11/13/2014
@@ -44,17 +48,11 @@ public class CompilerHelperImpl implements CompilerHelper{
 
     private String[] SLANG_FILE_EXTENSIONS = {"yml", "yaml", "py","sl"};
 
-    /**
-     * @param filePath
-     * @param opName
-     * @param dependencies
-     * @return
-     * @throws IOException
-     */
+    //tot add javadoc
     public CompilationArtifact compile(String filePath, String opName, List<String> dependencies) throws IOException {
         Validate.notNull(filePath, "filePath can not be null");
 
-        Set<File> dependenciesFilesSet = new HashSet<>();
+        Set<SlangSource> depsSources = new HashSet<>();
         File file = new File(filePath);
         Validate.isTrue(file.isFile(), "filePath must lead to a file");
 
@@ -64,19 +62,21 @@ public class CompilerHelperImpl implements CompilerHelper{
 
         for (String dependency:dependencies) {
             Collection<File> dependenciesFiles = FileUtils.listFiles(new File(dependency), SLANG_FILE_EXTENSIONS, false);
-            dependenciesFilesSet.addAll(dependenciesFiles);
+            depsSources.addAll(convert(dependenciesFiles, new Converter<File, SlangSource>() {
+                @Override
+                public SlangSource convert(File from) {
+                    return fromFile(from);
+                }
+            }));
         }
 
-        //todo - support compile of op too?
-        CompilationArtifact compilationArtifact = null;
         try {
-            compilationArtifact = slang.compile(file, dependenciesFilesSet);
+            //todo - support compile of op too?
+            return slang.compile(fromFile(file), depsSources);
         } catch (Exception e) {
             logger.error("Failed compilation for file : "+file.getName() + " ,Exception is : " + e.getMessage());
             throw e;
         }
-
-        return compilationArtifact;
     }
 
 }

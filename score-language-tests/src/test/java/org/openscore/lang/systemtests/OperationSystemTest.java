@@ -10,13 +10,13 @@
 
 package org.openscore.lang.systemtests;
 
-import org.openscore.lang.entities.CompilationArtifact;
-import org.openscore.events.EventConstants;
-import org.openscore.events.ScoreEvent;
 import org.junit.Assert;
 import org.junit.Test;
+import org.openscore.events.EventConstants;
+import org.openscore.events.ScoreEvent;
+import org.openscore.lang.compiler.SlangSource;
+import org.openscore.lang.entities.CompilationArtifact;
 
-import java.io.File;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.HashMap;
@@ -33,7 +33,7 @@ public class OperationSystemTest extends SystemsTestsParent {
     @Test
     public void testCompileAndRunOperationBasic() throws Exception {
         URL resource = getClass().getResource("/yaml/simple_operations.yaml");
-        CompilationArtifact compilationArtifact = slang.compileOperation(new File(resource.toURI()), "test_op", null);
+        CompilationArtifact compilationArtifact = slang.compileOperation(SlangSource.fromFile(resource.toURI()), "test_op", null);
         //Trigger ExecutionPlan
         Map<String, Serializable> userInputs = new HashMap<>();
         ScoreEvent event = trigger(compilationArtifact, userInputs);
@@ -43,7 +43,7 @@ public class OperationSystemTest extends SystemsTestsParent {
     @Test
     public void testCompileAndRunOperationWithData() throws Exception {
         URL resource = getClass().getResource("/yaml/operation_with_data.yaml");
-        CompilationArtifact compilationArtifact = slang.compileOperation(new File(resource.toURI()), "test_op_2", null);
+        CompilationArtifact compilationArtifact = slang.compileOperation(SlangSource.fromFile(resource.toURI()), "test_op_2", null);
         //Trigger ExecutionPlan
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("input1", "value1");

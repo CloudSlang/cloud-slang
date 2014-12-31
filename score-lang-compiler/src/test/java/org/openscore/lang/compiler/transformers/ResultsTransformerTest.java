@@ -10,16 +10,17 @@ package org.openscore.lang.compiler.transformers;
 *******************************************************************************/
 
 
-import org.openscore.lang.compiler.SlangTextualKeys;
-import org.openscore.lang.compiler.model.SlangFile;
-import org.openscore.lang.compiler.utils.YamlParser;
-import org.openscore.lang.entities.ScoreLangConstants;
-import org.openscore.lang.entities.bindings.Result;
 import junit.framework.Assert;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openscore.lang.compiler.SlangSource;
+import org.openscore.lang.compiler.SlangTextualKeys;
+import org.openscore.lang.compiler.model.ParsedSlang;
+import org.openscore.lang.compiler.utils.YamlParser;
+import org.openscore.lang.entities.ScoreLangConstants;
+import org.openscore.lang.entities.bindings.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -61,7 +62,7 @@ public class ResultsTransformerTest {
 
     private List getResultsFromOperationFile(String fileName, String operationName) throws URISyntaxException {
         URL resource = getClass().getResource(fileName);
-        SlangFile file = yamlParser.loadSlangFile(new File(resource.toURI()));
+        ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
         Map<String, Map<String, Object>> op = file.getOperations().iterator().next();
         Map<String, Object> operationWithData = op.get(operationName);
         return (List) operationWithData.get(SlangTextualKeys.RESULTS_KEY);

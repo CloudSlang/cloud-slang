@@ -15,24 +15,17 @@ package org.openscore.lang.compiler.utils;
  */
 
 import ch.lambdaj.Lambda;
+import org.apache.commons.lang.Validate;
 import org.openscore.lang.compiler.SlangTextualKeys;
 import org.openscore.lang.compiler.model.Executable;
 import org.openscore.lang.compiler.model.Flow;
 import org.openscore.lang.compiler.model.Task;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.Validate;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
@@ -40,48 +33,6 @@ import static org.hamcrest.Matchers.equalTo;
 
 @Component
 public class DependenciesHelper {
-
-    /**
-     * fetches all of the slang files from the given path
-     *
-     * @param path the path to look in
-     * @return a List of {@link java.io.File} that has slang extensions
-     */
-    public List<File> fetchSlangFiles(Set<File> path) {
-        return filterFiles(path, Arrays.asList(System.getProperty("slang.extensions", "yaml,yml,sl").split(",")));
-    }
-
-//    /**
-//     * fetches all of the script files from the given path
-//     *
-//     * @param path the path to look in
-//     * @return a List of {@link java.io.File} that has script extensions (currently only python)
-//     */
-//    public List<File> fetchScriptFiles(Set<File> path) {
-//        return filterFiles(path, Arrays.asList(System.getProperty("script.extensions", "py").split(",")));
-//    }
-
-    /**
-     * filter a path by extension
-     *
-     * @param path       the path to look in
-     * @param extensions List of String to filter by
-     * @return a List of {@link java.io.File} that has the requested extensions
-     */
-    private List<File> filterFiles(Set<File> path, List<String> extensions) {
-        List<File> filteredClassPath = new ArrayList<>();
-        for (File file : path) {
-            if (file.isDirectory()) {
-                filteredClassPath.addAll(FileUtils.listFiles(file, extensions.toArray(new String[extensions.size()]), true));
-            } else {
-                if (extensions.contains(FilenameUtils.getExtension(file.getAbsolutePath()))) {
-                    filteredClassPath.add(file);
-                }
-            }
-        }
-        return filteredClassPath;
-    }
-
     /**
      * recursive matches executables with their references
      *

@@ -9,29 +9,23 @@ package org.openscore.lang.compiler.utils;/*************************************
 *******************************************************************************/
 
 
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.collections4.iterators.PeekingIterator;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.openscore.lang.compiler.SlangTextualKeys;
 import org.openscore.lang.compiler.model.*;
 import org.openscore.lang.compiler.transformers.Transformer;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
 import org.openscore.lang.entities.bindings.Result;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.collections4.iterators.PeekingIterator;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
@@ -82,10 +76,10 @@ public class ExecutableBuilder {
         return filter(having(on(Transformer.class).getScopes().contains(scope)), transformers);
     }
 
-    public Executable transformToExecutable(SlangFile slangFile, String execName, Map<String, Object> executableRawData) {
+    public Executable transformToExecutable(ParsedSlang parsedSlang, String execName, Map<String, Object> executableRawData) {
 
         Validate.notEmpty(executableRawData, "Executable data for: " + execName + " is empty");
-        Validate.notNull(slangFile, "Slang File for " + execName + " is null");
+        Validate.notNull(parsedSlang, "Slang source for " + execName + " is null");
 
         Map<String, Serializable> preExecutableActionData = new HashMap<>();
         Map<String, Serializable> postExecutableActionData = new HashMap<>();
@@ -100,10 +94,10 @@ public class ExecutableBuilder {
         @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) postExecutableActionData.remove(SlangTextualKeys.OUTPUTS_KEY);
         @SuppressWarnings("unchecked") List<Result> results = (List<Result>) postExecutableActionData.remove(SlangTextualKeys.RESULTS_KEY);
 
-        String namespace = slangFile.getNamespace();
-        Map<String, String> imports = slangFile.getImports();
+        String namespace = parsedSlang.getNamespace();
+        Map<String, String> imports = parsedSlang.getImports();
 
-        switch (slangFile.getType()) {
+        switch (parsedSlang.getType()) {
             case FLOW:
                 @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> workFlowRawData =
                         (LinkedHashMap<String, Map<String, Object>>) executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
@@ -130,7 +124,7 @@ public class ExecutableBuilder {
                 Action action = compileAction(actionRawData);
                 return new Operation(preExecutableActionData, postExecutableActionData, action, namespace, execName, inputs, outputs, results);
             default:
-                throw new RuntimeException("File: " + slangFile.getFileName() + " is not a flow type or operations");
+                throw new RuntimeException("Source: " + parsedSlang.getName() + " is not of flow type or operations");
         }
     }
 

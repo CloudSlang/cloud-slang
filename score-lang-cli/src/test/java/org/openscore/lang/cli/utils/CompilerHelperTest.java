@@ -3,18 +3,19 @@ package org.openscore.lang.cli.utils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.openscore.lang.api.Slang;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.openscore.lang.api.Slang;
+import org.openscore.lang.compiler.SlangSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.File;
+import java.net.URL;
 
 import static org.mockito.Mockito.mock;
 
@@ -55,19 +56,21 @@ public class CompilerHelperTest {
 
     @Test
     public void testFilePathValid() throws Exception {
-        String flowFilePath = getClass().getResource("/flow.yaml").getPath();
-        String opFilePath = getClass().getResource("/operation.yaml").getPath();
-        compilerHelper.compile(flowFilePath, null, null);
-        Mockito.verify(slang).compile(new File(flowFilePath), Sets.newHashSet(new File(flowFilePath), new File(opFilePath)));
+        URL flowFilePath = getClass().getResource("/flow.yaml");
+        URL opFilePath = getClass().getResource("/operation.yaml");
+        compilerHelper.compile(flowFilePath.getPath(), null, null);
+        Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath.toURI()),
+                Sets.newHashSet(SlangSource.fromFile(flowFilePath.toURI()), SlangSource.fromFile(opFilePath.toURI())));
     }
 
     @Test
     public void testFilePathValidWithOtherPathForDependencies() throws Exception {
-        String flowFilePath = getClass().getResource("/flow.yaml").getPath();
-        String folderPath = getClass().getResource("/flowsdir/").getPath();
-        String flow2FilePath = getClass().getResource("/flowsdir/flow2.yaml").getPath();
-        compilerHelper.compile(flowFilePath, null, Lists.newArrayList(folderPath));
-        Mockito.verify(slang).compile(new File(flowFilePath), Sets.newHashSet(new File(flow2FilePath)));
+        URL flowFilePath = getClass().getResource("/flow.yaml");
+        URL folderPath = getClass().getResource("/flowsdir/");
+        URL flow2FilePath = getClass().getResource("/flowsdir/flow2.yaml");
+        compilerHelper.compile(flowFilePath.getPath(), null, Lists.newArrayList(folderPath.getPath()));
+        Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath.toURI()),
+                Sets.newHashSet(SlangSource.fromFile(flow2FilePath.toURI())));
     }
 
     @Test(expected = IllegalArgumentException.class)

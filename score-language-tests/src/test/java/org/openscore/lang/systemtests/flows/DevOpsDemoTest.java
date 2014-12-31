@@ -11,15 +11,15 @@
 package org.openscore.lang.systemtests.flows;
 
 import com.google.common.collect.Sets;
-import org.openscore.lang.entities.CompilationArtifact;
-import org.openscore.lang.systemtests.SystemsTestsParent;
-import org.openscore.events.EventConstants;
-import org.openscore.events.ScoreEvent;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openscore.events.EventConstants;
+import org.openscore.events.ScoreEvent;
+import org.openscore.lang.compiler.SlangSource;
+import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.systemtests.SystemsTestsParent;
 
-import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
@@ -34,10 +34,10 @@ public class DevOpsDemoTest extends SystemsTestsParent {
         URI resource = getClass().getResource("/yaml/docker-demo/demo_dev_ops_flow.yaml").toURI();
         URI operations = getClass().getResource("/yaml/docker-demo/").toURI();
 
-        Set<File> path = Sets.newHashSet(new File(operations));
-        CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
+        SlangSource operationsSource = SlangSource.fromFile(operations);
+        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        //TODO: remove default values for inputs
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("dockerHost", "{{ dockerHost }}");
         userInputs.put("dockerUsername", "{{ dockerUsername }}");

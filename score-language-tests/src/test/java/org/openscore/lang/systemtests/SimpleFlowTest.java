@@ -11,14 +11,14 @@
 package org.openscore.lang.systemtests;
 
 import com.google.common.collect.Sets;
-import org.openscore.lang.entities.CompilationArtifact;
 import org.apache.commons.lang3.tuple.Pair;
-import org.openscore.events.EventConstants;
-import org.openscore.events.ScoreEvent;
 import org.junit.Assert;
 import org.junit.Test;
+import org.openscore.events.EventConstants;
+import org.openscore.events.ScoreEvent;
+import org.openscore.lang.compiler.SlangSource;
+import org.openscore.lang.entities.CompilationArtifact;
 
-import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
@@ -51,8 +51,9 @@ public class SimpleFlowTest extends SystemsTestsParent {
         URI resource = getClass().getResource("/yaml/flow_using_global_session.yaml").toURI();
         URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
 
-        Set<File> path = Sets.newHashSet(new File(operations));
-        CompilationArtifact compilationArtifact = slang.compile(new File(resource), path);
+        SlangSource operationsSource = SlangSource.fromFile(operations);
+        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("object_value", "SessionValue");
@@ -64,8 +65,9 @@ public class SimpleFlowTest extends SystemsTestsParent {
 	private final void compileAndRunSimpleFlow(Map.Entry<String, ? extends Serializable>... inputs) throws Exception {
 		URI flow = getClass().getResource("/yaml/simple_flow.yaml").toURI();
 		URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
-		Set<File> path = Sets.newHashSet(new File(operations));
-		CompilationArtifact compilationArtifact = slang.compile(new File(flow), path);
+        SlangSource operationsSource = SlangSource.fromFile(operations);
+        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+		CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
 		HashMap<String, Serializable> userInputs = new HashMap<>();
         for (Entry<String, ? extends Serializable> input : inputs) {
             userInputs.put(input.getKey(), input.getValue());
