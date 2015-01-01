@@ -22,13 +22,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static com.google.common.collect.Sets.newHashSet;
-import static org.openscore.events.EventConstants.*;
 import static org.openscore.lang.entities.ScoreLangConstants.*;
 
 public class TriggerFlows {
 
     private final static HashSet<String> FINISHED_EVENT =
-            newHashSet(SCORE_FINISHED_EVENT, SCORE_FAILURE_EVENT, SLANG_EXECUTION_EXCEPTION);
+            newHashSet(EVENT_EXECUTION_FINISHED, SLANG_EXECUTION_EXCEPTION);
 
     private final static HashSet<String> TASK_EVENTS =
             newHashSet(EVENT_INPUT_END, EVENT_OUTPUT_END);
@@ -36,10 +35,8 @@ public class TriggerFlows {
     @Autowired
     private Slang slang;
 
-    private BlockingQueue<ScoreEvent> finishEvent;
-
     public ScoreEvent runSync(CompilationArtifact compilationArtifact, Map<String, Serializable> userInputs) {
-        finishEvent = new LinkedBlockingQueue<>();
+        final BlockingQueue<ScoreEvent> finishEvent = new LinkedBlockingQueue<>(1);
         ScoreEventListener finishListener = new ScoreEventListener() {
             @Override
             public void onEvent(ScoreEvent event) throws InterruptedException {
@@ -64,11 +61,6 @@ public class TriggerFlows {
         slang.subscribeOnEvents(listener, TASK_EVENTS);
 
         runSync(compilationArtifact, userInputs);
-
-//        //Damn ugly workaround for unknown events sync issues.
-//        try {
-//            Thread.sleep(2000);
-//        } catch (InterruptedException ignored) {}
 
         Map<String, PathData> tasks = listener.aggregate();
 
