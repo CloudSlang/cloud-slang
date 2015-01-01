@@ -65,10 +65,10 @@ public class TriggerFlows {
 
         runSync(compilationArtifact, userInputs);
 
-        //Damn ugly workaround for events sync issues.
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException ignored) {}
+//        //Damn ugly workaround for unknown events sync issues.
+//        try {
+//            Thread.sleep(2000);
+//        } catch (InterruptedException ignored) {}
 
         Map<String, PathData> tasks = listener.aggregate();
 
