@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>org.openscore.lang</groupId>
 		<artifactId>score-language</artifactId>
-		<version>0.1.2</version>
+		<version>0.1.3-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
