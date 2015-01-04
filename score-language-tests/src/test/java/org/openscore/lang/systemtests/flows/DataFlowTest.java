@@ -17,7 +17,7 @@ import org.junit.Test;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.ScoreLangConstants;
-import org.openscore.lang.systemtests.PathData;
+import org.openscore.lang.systemtests.StepData;
 import org.openscore.lang.systemtests.SystemsTestsParent;
 
 import java.io.Serializable;
@@ -46,7 +46,7 @@ public class DataFlowTest extends SystemsTestsParent {
         userInputs.put("myMessage", "hello world");
         userInputs.put("tryToChangeMessage", "changed");
 
-        Map<String, PathData> tasks = triggerWithData(compilationArtifact, userInputs);
+        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
 
         Assert.assertEquals(3, tasks.size());
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, tasks.get("0/0").getResult());

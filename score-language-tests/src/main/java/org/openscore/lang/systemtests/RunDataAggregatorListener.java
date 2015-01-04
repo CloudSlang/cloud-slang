@@ -42,43 +42,41 @@ public class RunDataAggregatorListener implements ScoreEventListener {
         events.add(languageEvent);
     }
 
-    public Map<String, PathData> aggregate() {
+    public Map<String, StepData> aggregate() {
 
-        Map<String, PathData> tasksData = new HashMap<>();
+        Map<String, StepData> stepsData = new HashMap<>();
 
         Group<LanguageEventData> groups = group(events, by(on(LanguageEventData.class).getPath()));
 
-        for (Group<LanguageEventData> value : groups.subgroups()) {
-            PathData pathData = buildTaskData(value.findAll());
-            if (pathData != null) {
-                tasksData.put(pathData.getPath(), pathData);
-            }
+        for (Group<LanguageEventData> subGroup : groups.subgroups()) {
+            StepData stepData = buildStepData(subGroup.findAll());
+            stepsData.put(stepData.getPath(), stepData);
         }
 
-        return tasksData;
+        return stepsData;
     }
 
-    private PathData buildTaskData(List<LanguageEventData> data) {
+    private StepData buildStepData(List<LanguageEventData> data) {
 
-        Map<String, LanguageEventData> taskEvents = map(data, new Converter<LanguageEventData, String>() {
+        Map<String, LanguageEventData> stepEvents = map(data, new Converter<LanguageEventData, String>() {
             @Override
             public String convert(LanguageEventData from) {
                 return from.getEventType();
             }
         });
 
-        LanguageEventData inputsEvent = taskEvents.get(EVENT_INPUT_END);
-        LanguageEventData outputsEvent = taskEvents.get(EVENT_OUTPUT_END);
+        LanguageEventData inputsEvent = stepEvents.get(EVENT_INPUT_END);
+        LanguageEventData outputsEvent = stepEvents.get(EVENT_OUTPUT_END);
 
         String path = inputsEvent.getPath();
-        String taskName = inputsEvent.get(TASK_NAME) != null ? (String) inputsEvent.get(TASK_NAME)
+        String stepName = inputsEvent.get(TASK_NAME) != null ? (String) inputsEvent.get(TASK_NAME)
                 : (String) inputsEvent.get(EXECUTABLE_NAME);
         Map<String, Serializable> inputs = inputsEvent.getInputs();
 
         Map<String, Serializable> outputs = outputsEvent == null ? null : outputsEvent.getOutputs();
         String result = outputsEvent == null ? null : (String) outputsEvent.get(LanguageEventData.RESULT);
 
-        return new PathData(path, taskName, inputs, outputs, result);
+        return new StepData(path, stepName, inputs, outputs, result);
     }
 
 }

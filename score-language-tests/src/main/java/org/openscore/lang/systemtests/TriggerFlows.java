@@ -29,7 +29,7 @@ public class TriggerFlows {
     private final static HashSet<String> FINISHED_EVENT =
             newHashSet(EVENT_EXECUTION_FINISHED, SLANG_EXECUTION_EXCEPTION);
 
-    private final static HashSet<String> TASK_EVENTS =
+    private final static HashSet<String> STEP_EVENTS =
             newHashSet(EVENT_INPUT_END, EVENT_OUTPUT_END);
 
     @Autowired
@@ -56,13 +56,13 @@ public class TriggerFlows {
         }
     }
 
-    public Map<String, PathData> run(CompilationArtifact compilationArtifact, Map<String, Serializable> userInputs) {
+    public Map<String, StepData> runWithData(CompilationArtifact compilationArtifact, Map<String, Serializable> userInputs) {
         RunDataAggregatorListener listener = new RunDataAggregatorListener();
-        slang.subscribeOnEvents(listener, TASK_EVENTS);
+        slang.subscribeOnEvents(listener, STEP_EVENTS);
 
         runSync(compilationArtifact, userInputs);
 
-        Map<String, PathData> tasks = listener.aggregate();
+        Map<String, StepData> tasks = listener.aggregate();
 
         slang.unSubscribeOnEvents(listener);
 

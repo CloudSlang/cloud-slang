@@ -38,8 +38,8 @@ public class SystemsTestsParent {
         return triggerFlows.runSync(compilationArtifact, userInputs);
     }
 
-    public Map<String, PathData> triggerWithData(
+    public Map<String, StepData> triggerWithData(
             CompilationArtifact compilationArtifact, Map<String, Serializable> userInputs) {
-        return triggerFlows.run(compilationArtifact, userInputs);
+        return triggerFlows.runWithData(compilationArtifact, userInputs);
     }
 }

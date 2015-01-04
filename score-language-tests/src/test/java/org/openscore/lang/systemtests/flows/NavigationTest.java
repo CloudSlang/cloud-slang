@@ -15,7 +15,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.entities.CompilationArtifact;
-import org.openscore.lang.systemtests.PathData;
+import org.openscore.lang.systemtests.StepData;
 import org.openscore.lang.systemtests.SystemsTestsParent;
 
 import java.io.Serializable;
@@ -46,7 +46,7 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailSender", "user@host.com");
         userInputs.put("emailRecipient", "user@host.com");
 
-        Map<String, PathData> tasks = triggerWithData(compilationArtifact, userInputs);
+        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
 
         Assert.assertEquals(5, tasks.size());
         Assert.assertEquals("check_number", tasks.get("0/1").getName());
@@ -70,7 +70,7 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailSender", "user@host.com");
         userInputs.put("emailRecipient", "user@host.com");
 
-        Map<String, PathData> tasks = triggerWithData(compilationArtifact, userInputs);
+        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
 
         Assert.assertEquals(5, tasks.size());
         Assert.assertEquals("check_number", tasks.get("0/1").getName());
@@ -94,7 +94,7 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailSender", "user@host.com");
         userInputs.put("emailRecipient", "user@host.com");
 
-        Map<String, PathData> tasks = triggerWithData(compilationArtifact, userInputs);
+        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
 
         Assert.assertEquals(5, tasks.size());
         Assert.assertEquals("check_number", tasks.get("0/1").getName());
@@ -118,7 +118,7 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailSender", "user@host.com");
         userInputs.put("emailRecipient", "user@host.com");
 
-        Map<String, PathData> tasks = triggerWithData(compilationArtifact, userInputs);
+        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
 
         Assert.assertEquals(5, tasks.size());
         Assert.assertEquals("produce_default_navigation", tasks.get("0/1").getName());
@@ -142,7 +142,7 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailSender", "user@host.com");
         userInputs.put("emailRecipient", "user@host.com");
 
-        Map<String, PathData> tasks = triggerWithData(compilationArtifact, userInputs);
+        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
 
         Assert.assertEquals(5, tasks.size());
         Assert.assertEquals("produce_default_navigation", tasks.get("0/1").getName());
