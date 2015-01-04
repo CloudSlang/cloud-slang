@@ -21,4 +21,6 @@
 
     <score:worker uuid="-1"/>
 
+    <bean class="org.openscore.lang.systemtests.TriggerFlows"/>
+
 </beans>
