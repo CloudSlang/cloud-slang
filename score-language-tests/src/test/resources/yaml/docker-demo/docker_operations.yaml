@@ -211,14 +211,35 @@ operations:
         - FAILURE
   - get_used_images:
       inputs:
-        - all_containers_ids
         - host
         - port: "'22'"
         - username
         - password
         - privateKeyFile: "''"
         - command: >
-            "docker inspect --format='{{.Config.Image}}' " + all_containers_ids
+            "docker ps -a | awk '{print $2}'"
+        - arguments: "''"
+        - characterSet : "'UTF-8'"
+        - pty: "'false'"
+        - timeout: "'30000000'"
+        - closeSession: "'false'"
+      action:
+        java_action:
+          className: org.openscore.content.ssh.actions.SSHShellCommandAction
+          methodName: runSshShellCommand
+      outputs:
+        - imageList: returnResult.replace("\n"," ").replace("ID ","")
+      results:
+        - SUCCESS
+        - FAILURE
+  - get_all_images:
+      inputs:
+        - host
+        - port: "'22'"
+        - username
+        - password
+        - privateKeyFile: "''"
+        - command: "docker images -q"
         - arguments: "''"
         - characterSet : "'UTF-8'"
         - pty: "'false'"
