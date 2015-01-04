@@ -18,4 +18,6 @@ public interface SlangCompiler {
     CompilationArtifact compileFlow(SlangSource source, Set<SlangSource> path);
 
     CompilationArtifact compile(SlangSource source, String operationName, Set<SlangSource> path);
+
+    //SlangPreCompiledMetaData preCompile(SlangSource source);
 }
