@@ -1,3 +1,10 @@
+#   (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+#   All rights reserved. This program and the accompanying materials
+#   are made available under the terms of the Apache License v2.0 which accompany this distribution.
+#
+#   The Apache License is available at
+#   http://www.apache.org/licenses/LICENSE-2.0
+
 namespace: docker.ops
 
 operations:
@@ -155,6 +162,76 @@ operations:
         - errorMessage: STDERR if returnCode == '0' else returnResult
       results:
         - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
+        - FAILURE
+  - clear_docker_images:
+      inputs:
+        - host
+        - port: "'22'"
+        - username
+        - password
+        - images
+        - privateKeyFile: "''"
+        - command: "'docker rmi ' + images"
+        - arguments: "''"
+        - characterSet : "'UTF-8'"
+        - pty: "'false'"
+        - timeout: "'30000000'"
+        - closeSession: "'false'"
+      action:
+        java_action:
+          className: org.openscore.content.ssh.actions.SSHShellCommandAction
+          methodName: runSshShellCommand
+      outputs:
+        - response: STDOUT
+      results:
+        - SUCCESS
+        - FAILURE
+  - get_all_containers:
+      inputs:
+        - host
+        - port: "'22'"
+        - username
+        - password
+        - privateKeyFile: "''"
+        - command: "'docker ps -aq'"
+        - arguments: "''"
+        - characterSet : "'UTF-8'"
+        - pty: "'false'"
+        - timeout: "'30000000'"
+        - closeSession: "'false'"
+      action:
+        java_action:
+          className: org.openscore.content.ssh.actions.SSHShellCommandAction
+          methodName: runSshShellCommand
+      outputs:
+        - all_containers_ids: returnResult.strip().replace("\n"," ")
+        - errorMessage: STDERR if returnCode == '0' else returnResult
+      results:
+        - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
+        - FAILURE
+  - get_used_images:
+      inputs:
+        - all_containers_ids
+        - host
+        - port: "'22'"
+        - username
+        - password
+        - privateKeyFile: "''"
+        - command: >
+            "docker inspect --format='{{.Config.Image}}' " + all_containers_ids
+        - arguments: "''"
+        - characterSet : "'UTF-8'"
+        - pty: "'false'"
+        - timeout: "'30000000'"
+        - closeSession: "'false'"
+      action:
+        java_action:
+          className: org.openscore.content.ssh.actions.SSHShellCommandAction
+          methodName: runSshShellCommand
+      outputs:
+        - imageList: returnResult.replace("\n"," ")
+      results:
+        - SUCCESS
         - FAILURE
   - exec_proc_in_container:
         inputs:

@@ -32,4 +32,25 @@ operations:
       results:
         - SUCCESS
         - FAILURE
-
+  - validate_linux_machine_ssh_access :
+        inputs:
+          - host
+          - port: "'22'"
+          - username
+          - password
+          - privateKeyFile: "''"
+          - command: ''
+          - arguments: "''"
+          - characterSet : "'UTF-8'"
+          - pty: "'false'"
+          - timeout: "'30000000'"
+          - closeSession: "'false'"
+        action:
+          java_action:
+            className: org.openscore.content.ssh.actions.SSHShellCommandAction
+            methodName: runSshShellCommand
+        outputs:
+          - response: STDOUT
+        results:
+          - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
+          - FAILURE
