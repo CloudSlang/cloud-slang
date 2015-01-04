@@ -14,10 +14,10 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
-import org.openscore.events.EventConstants;
 import org.openscore.events.ScoreEvent;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.ScoreLangConstants;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -58,7 +58,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("object_value", "SessionValue");
         ScoreEvent event = trigger(compilationArtifact, userInputs);
-        Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
+        Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 
 	@SafeVarargs
@@ -73,7 +73,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
             userInputs.put(input.getKey(), input.getValue());
         }
 		ScoreEvent event = trigger(compilationArtifact, userInputs);
-		Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
+		Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
 	}
 
 }
