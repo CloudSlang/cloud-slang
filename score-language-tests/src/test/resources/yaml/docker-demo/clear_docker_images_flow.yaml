@@ -45,13 +45,13 @@ flow:
         - used_images_list: used_images_list
     substract_used_images:
       do:
-        lists.substract_sets:
+        lists.subtract_sets:
           - set_1: all_images_list
           - set_1_delimiter: "' '"
           - set_2: used_images_list
           - set_2_delimiter: "' '"
           - result_set_delimiter: "' '"
       publish:
-        - used_images_list: used_images_list
+        - images_list_safe_to_delete: result_set
   outputs:
-    - all_images_list
+    - images_list_safe_to_delete

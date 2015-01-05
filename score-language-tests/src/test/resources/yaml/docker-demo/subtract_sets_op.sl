@@ -7,14 +7,14 @@
 
 ####################################################
 #
-#   This operation will substract set2 from set1, meanning return result will be : set1 - set2
+#   This operation will subtract set2 from set1, meanning return result will be : set1 - set2
 #
 ####################################################
 namespace: lists.manipulation
 
 
 operations:
-  - substract_sets:
+  - subtract_sets:
       inputs:
         - set_1
         - set_1_delimiter
@@ -25,13 +25,10 @@ operations:
         python_script: |
           arr_list_1 = set_1.split(set_1_delimiter)
           arr_list_2 = set_2.split(set_2_delimiter)
-          print arr_list_1;
-          print arr_list_2;
 
-          result_set =  set(arr_list_1) - set(arr_list_2)
-          print result_set
+          result =  set(arr_list_1) - set(arr_list_2)
 
-
+          result_set = result_set_delimiter.join(result)
       outputs:
         - result_set
       results:
