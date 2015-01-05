@@ -239,7 +239,8 @@ operations:
         - username
         - password
         - privateKeyFile: "''"
-        - command: "docker images -q"
+        - command: >
+            "docker images | awk '{print $1 \":\" $2}'"
         - arguments: "''"
         - characterSet : "'UTF-8'"
         - pty: "'false'"
