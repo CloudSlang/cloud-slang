@@ -12,10 +12,10 @@ package org.openscore.lang.systemtests;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.openscore.events.EventConstants;
 import org.openscore.events.ScoreEvent;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.ScoreLangConstants;
 
 import java.io.Serializable;
 import java.net.URL;
@@ -37,7 +37,7 @@ public class OperationSystemTest extends SystemsTestsParent {
         //Trigger ExecutionPlan
         Map<String, Serializable> userInputs = new HashMap<>();
         ScoreEvent event = trigger(compilationArtifact, userInputs);
-        Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
+        Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 
     @Test
@@ -51,6 +51,6 @@ public class OperationSystemTest extends SystemsTestsParent {
         userInputs.put("input4", "value4");
         userInputs.put("input5", "value5");
         ScoreEvent event = trigger(compilationArtifact, userInputs);
-        Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
+        Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 }

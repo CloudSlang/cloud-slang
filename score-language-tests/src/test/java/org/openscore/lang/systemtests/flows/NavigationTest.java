@@ -12,12 +12,10 @@ package org.openscore.lang.systemtests.flows;
 
 import com.google.common.collect.Sets;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.openscore.events.EventConstants;
-import org.openscore.events.ScoreEvent;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.systemtests.StepData;
 import org.openscore.lang.systemtests.SystemsTestsParent;
 
 import java.io.Serializable;
@@ -30,11 +28,6 @@ import java.util.*;
  * @author Bonczidai Levente
  */
 public class NavigationTest extends SystemsTestsParent {
-
-    @Before
-    public void before() {
-        startTaskMonitoring();
-    }
 
     @Test
     public void testComplexNavigationEvenNumber() throws Exception {
@@ -52,13 +45,12 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailPort", "25");
         userInputs.put("emailSender", "user@host.com");
         userInputs.put("emailRecipient", "user@host.com");
-        ScoreEvent event = trigger(compilationArtifact, userInputs);
-        Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
 
-        List<String> expectedTasks = new ArrayList<>();
-        expectedTasks.add("check_number");
-        expectedTasks.add("process_even_number");
-        verifyTaskOrder(expectedTasks);
+        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
+
+        Assert.assertEquals(5, tasks.size());
+        Assert.assertEquals("check_number", tasks.get("0/1").getName());
+        Assert.assertEquals("process_even_number", tasks.get("0/2").getName());
     }
 
     @Test
@@ -77,13 +69,12 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailPort", "25");
         userInputs.put("emailSender", "user@host.com");
         userInputs.put("emailRecipient", "user@host.com");
-        ScoreEvent event = trigger(compilationArtifact, userInputs);
-        Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
 
-        List<String> expectedTasks = new ArrayList<>();
-        expectedTasks.add("check_number");
-        expectedTasks.add("process_odd_number");
-        verifyTaskOrder(expectedTasks);
+        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
+
+        Assert.assertEquals(5, tasks.size());
+        Assert.assertEquals("check_number", tasks.get("0/1").getName());
+        Assert.assertEquals("process_odd_number", tasks.get("0/2").getName());
     }
 
     @Test
@@ -102,13 +93,12 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailPort", "25");
         userInputs.put("emailSender", "user@host.com");
         userInputs.put("emailRecipient", "user@host.com");
-        ScoreEvent event = trigger(compilationArtifact, userInputs);
-        Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
 
-        List<String> expectedTasks = new ArrayList<>();
-        expectedTasks.add("check_number");
-        expectedTasks.add("send_error_mail");
-        verifyTaskOrder(expectedTasks);
+        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
+
+        Assert.assertEquals(5, tasks.size());
+        Assert.assertEquals("check_number", tasks.get("0/1").getName());
+        Assert.assertEquals("send_error_mail", tasks.get("0/2").getName());
     }
 
     @Test
@@ -127,13 +117,12 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailPort", "25");
         userInputs.put("emailSender", "user@host.com");
         userInputs.put("emailRecipient", "user@host.com");
-        ScoreEvent event = trigger(compilationArtifact, userInputs);
-        Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
 
-        List<String> expectedTasks = new ArrayList<>();
-        expectedTasks.add("produce_default_navigation");
-        expectedTasks.add("check_Weather");
-        verifyTaskOrder(expectedTasks);
+        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
+
+        Assert.assertEquals(5, tasks.size());
+        Assert.assertEquals("produce_default_navigation", tasks.get("0/1").getName());
+        Assert.assertEquals("check_Weather", tasks.get("0/2").getName());
     }
 
     @Test
@@ -152,12 +141,11 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailPort", "25");
         userInputs.put("emailSender", "user@host.com");
         userInputs.put("emailRecipient", "user@host.com");
-        ScoreEvent event = trigger(compilationArtifact, userInputs);
-        Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
 
-        List<String> expectedTasks = new ArrayList<>();
-        expectedTasks.add("produce_default_navigation");
-        expectedTasks.add("send_error_mail");
-        verifyTaskOrder(expectedTasks);
+        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
+
+        Assert.assertEquals(5, tasks.size());
+        Assert.assertEquals("produce_default_navigation", tasks.get("0/1").getName());
+        Assert.assertEquals("send_error_mail", tasks.get("0/2").getName());
     }
 }

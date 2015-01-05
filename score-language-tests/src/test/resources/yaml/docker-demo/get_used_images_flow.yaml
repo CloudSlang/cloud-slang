@@ -24,18 +24,9 @@ flow:
               - host: dockerHost
               - username: dockerUsername
               - password: dockerPassword
-    all_containers:
-      do:
-        ops.get_all_containers:
-          - host: dockerHost
-          - username: dockerUsername
-          - password: dockerPassword
-      publish:
-        - all_containers_ids: all_containers_ids
     get_used_images:
       do:
         ops.get_used_images:
-          - all_containers_ids
           - host: dockerHost
           - username: dockerUsername
           - password: dockerPassword
