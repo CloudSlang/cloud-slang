@@ -11,6 +11,7 @@ imports:
  ops: docker.ops
  flows: docker.maintenance.flows
  linux_ops: linux.ops
+ lists: lists.manipulation
 
 flow:
   name: clear_docker_images_flow
@@ -40,6 +41,16 @@ flow:
           - dockerHost
           - dockerUsername
           - dockerPassword
+      publish:
+        - used_images_list: used_images_list
+    substract_used_images:
+      do:
+        lists.substract_sets:
+          - set_1: all_images_list
+          - set_1_delimiter: "' '"
+          - set_2: used_images_list
+          - set_2_delimiter: "' '"
+          - result_set_delimiter: "' '"
       publish:
         - used_images_list: used_images_list
   outputs:

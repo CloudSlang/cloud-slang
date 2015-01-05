@@ -251,7 +251,7 @@ operations:
           className: org.openscore.content.ssh.actions.SSHShellCommandAction
           methodName: runSshShellCommand
       outputs:
-        - imageList: returnResult.replace("\n"," ").replace("<none>:<none> ","")
+        - imageList: returnResult.replace("\n"," ").replace("<none>:<none> ","").replace("REPOSITORY:TAG ","")
       results:
         - SUCCESS
         - FAILURE
