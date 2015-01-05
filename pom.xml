@@ -160,17 +160,17 @@
 
             <!--score content dependencies-->
             <dependency>
-                <groupId>org.openscore.content</groupId>
+                <groupId>io.openscore.content</groupId>
                 <artifactId>score-ssh</artifactId>
                 <version>0.0.11</version>
             </dependency>
             <dependency>
-                <groupId>org.openscore.content</groupId>
+                <groupId>io.openscore.content</groupId>
                 <artifactId>score-mail</artifactId>
                 <version>0.0.6</version>
             </dependency>
             <dependency>
-                <groupId>org.openscore.content</groupId>
+                <groupId>io.openscore.content</groupId>
                 <artifactId>score-http-client</artifactId>
                 <version>0.1.44</version>
             </dependency>
