@@ -34,5 +34,13 @@ flow:
           - password: dockerPassword
       publish:
         - all_images_list: imageList
+    get_used_images:
+      do:
+        flows.get_used_images_flow:
+          - dockerHost
+          - dockerUsername
+          - dockerPassword
+      publish:
+        - used_images_list: used_images_list
   outputs:
     - all_images_list
