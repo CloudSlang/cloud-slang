@@ -17,7 +17,7 @@ operations:
       action:
         python_script: 'print "weather thing"'
       outputs:
-        - weather: 'great!!'
+        - weather: '"great!!"'
         - temperature: 30
       results:
         - SUCCESS: 1 == 1

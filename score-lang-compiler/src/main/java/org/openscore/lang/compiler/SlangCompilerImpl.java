@@ -20,6 +20,7 @@ import org.openscore.lang.compiler.model.Executable;
 import org.openscore.lang.compiler.model.Flow;
 import org.openscore.lang.compiler.model.Operation;
 import org.openscore.lang.compiler.model.ParsedSlang;
+import org.openscore.lang.compiler.model.SlangPreCompiledMetaData;
 import org.openscore.lang.compiler.utils.DependenciesHelper;
 import org.openscore.lang.compiler.utils.ExecutableBuilder;
 import org.openscore.lang.compiler.utils.ExecutionPlanBuilder;
@@ -28,7 +29,11 @@ import org.openscore.lang.entities.CompilationArtifact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static ch.lambdaj.Lambda.convertMap;
 import static ch.lambdaj.Lambda.having;
@@ -216,4 +221,32 @@ public class SlangCompilerImpl implements SlangCompiler {
         }
         return executableBuilder.transformToExecutable(parsedSlang, flowName, flowRawData);
     }
+
+    @Override
+    public SlangPreCompiledMetaData preCompileFlow(SlangSource source) {
+        return preCompile(null, source);
+    }
+
+    @Override
+    public SlangPreCompiledMetaData preCompile(String operationName, SlangSource source) {
+
+        Validate.notNull(source, "You must supply a source to compile");
+
+        //first thing we parse the yaml file into java maps
+        ParsedSlang parsedSlang = yamlParser.parse(source);
+
+        //than we transform those maps to model objects
+        Executable executable = transformToExecutable(operationName, parsedSlang);
+
+        Map<String, SlangPreCompiledMetaData.SlangFileType> dependencies;
+        boolean hasDependencies = MapUtils.isNotEmpty(parsedSlang.getImports());
+        if(!hasDependencies){
+            dependencies = new HashMap<>();
+        } else{
+            dependencies = dependenciesHelper.fetchDependenciesNonRecursive(executable);
+        }
+
+        return new SlangPreCompiledMetaData(executable, dependencies);
+    }
+
 }

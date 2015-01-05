@@ -19,6 +19,7 @@ import org.apache.commons.lang.Validate;
 import org.openscore.lang.compiler.SlangTextualKeys;
 import org.openscore.lang.compiler.model.Executable;
 import org.openscore.lang.compiler.model.Flow;
+import org.openscore.lang.compiler.model.SlangPreCompiledMetaData;
 import org.openscore.lang.compiler.model.Task;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +44,23 @@ public class DependenciesHelper {
         Validate.isTrue(executable.getType().equals(SlangTextualKeys.FLOW_TYPE), "Executable: " + executable.getId() + " is not a flow, therefore it has no references");
         Map<String, Executable> resolvedDependencies = new HashMap<>();
         return fetchFlowReferences((Flow) executable, availableDependencies, resolvedDependencies);
+    }
+
+    /**
+     * Fetch the first level of the dependencies of the executable (non recursively)
+     * @param executable the Executable object for which we want to fetch the dependencies
+     * @return a set of dependencies. For each one we give a pair of its type and full name
+     */
+    public Map<String, SlangPreCompiledMetaData.SlangFileType> fetchDependenciesNonRecursive(Executable executable){
+        Map<String, SlangPreCompiledMetaData.SlangFileType> dependencies = new HashMap<>();
+        if(executable.getType().equals(SlangTextualKeys.FLOW_TYPE)){
+            Deque<Task> tasks = ((Flow) executable).getWorkflow().getTasks();
+            for (Task task : tasks) {
+                String refId = task.getRefId();
+                dependencies.put(refId, SlangPreCompiledMetaData.SlangFileType.EXECUTABLE);
+            }
+        }
+        return dependencies;
     }
 
     private Map<String, Executable> fetchFlowReferences(Flow flow,
