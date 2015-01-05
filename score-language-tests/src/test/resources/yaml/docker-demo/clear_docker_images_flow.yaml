@@ -53,5 +53,14 @@ flow:
           - result_set_delimiter: "' '"
       publish:
         - images_list_safe_to_delete: result_set
+    delete_images:
+      do:
+        ops.clear_docker_images:
+          - host: dockerHost
+          - username: dockerUsername
+          - password: dockerPassword
+          - images: images_list_safe_to_delete
+      publish:
+        - response
   outputs:
     - images_list_safe_to_delete
