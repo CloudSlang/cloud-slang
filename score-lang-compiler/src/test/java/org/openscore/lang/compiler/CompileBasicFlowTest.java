@@ -16,6 +16,8 @@ import org.junit.runner.RunWith;
 import org.openscore.api.ExecutionPlan;
 import org.openscore.api.ExecutionStep;
 import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
+import org.openscore.lang.compiler.model.Executable;
+import org.openscore.lang.compiler.model.SlangFileType;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.ScoreLangConstants;
@@ -113,5 +115,25 @@ public class CompileBasicFlowTest {
         Assert.assertNotNull("results don't exist", results);
         Assert.assertEquals("there is a different number of results values than expected", 2, results.size());
     }
+
+    @Test
+    public void testPreCompileFlowBasic() throws Exception {
+        URI flowUri = getClass().getResource("/flow.yaml").toURI();
+        List<Executable> preCompiledFlow = compiler.preCompile(SlangSource.fromFile(flowUri));
+        Executable flow = preCompiledFlow.get(0);
+
+        Assert.assertNotNull("Pre-Compiled meta-data is null", flow);
+        Assert.assertEquals("Flow name is wrong", "basic_flow", flow.getName());
+        Assert.assertEquals("Flow namespace is wrong", "user.ops", flow.getNamespace());
+        Assert.assertEquals("There is a different number of flow inputs than expected", 1, flow.getInputs().size());
+        Assert.assertEquals("There is a different number of flow outputs than expected", 0, flow.getOutputs().size());
+        Assert.assertEquals("There is a different number of flow results than expected", 2, flow.getResults().size());
+        Map<String, SlangFileType> dependencies = flow.getDependencies();
+        Assert.assertEquals("There is a different number of flow dependencies than expected", 1, dependencies.size());
+        Map.Entry<String, SlangFileType> dependency = dependencies.entrySet().iterator().next();
+        Assert.assertEquals("There is a different number of flow inputs than expected", SlangFileType.EXECUTABLE, dependency.getValue());
+        Assert.assertEquals("The flow dependency full name is wrong", "user.ops.test_op", dependency.getKey());
+    }
+
 
 }

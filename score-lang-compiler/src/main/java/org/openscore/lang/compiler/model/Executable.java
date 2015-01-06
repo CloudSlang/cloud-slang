@@ -31,6 +31,7 @@ public abstract class Executable {
     protected final List<Input> inputs;
     protected final List<Output> outputs;
     protected final List<Result> results;
+    protected final Map<String, SlangFileType> dependencies;
 
     protected Executable(Map<String, Serializable> preExecActionData,
                          Map<String, Serializable> postExecActionData,
@@ -38,7 +39,8 @@ public abstract class Executable {
                          String name,
                          List<Input> inputs,
                          List<Output> outputs,
-                         List<Result> results) {
+                         List<Result> results,
+                         Map<String, SlangFileType> dependencies) {
         this.preExecActionData = preExecActionData;
         this.postExecActionData = postExecActionData;
         this.namespace = namespace;
@@ -46,6 +48,7 @@ public abstract class Executable {
         this.inputs = inputs;
         this.outputs = outputs;
         this.results = results;
+        this.dependencies = dependencies;
     }
 
     public Map<String, Serializable> getPreExecActionData() {
@@ -78,6 +81,10 @@ public abstract class Executable {
 
     public List<Result> getResults() {
         return results;
+    }
+
+    public Map<String, SlangFileType> getDependencies() {
+        return dependencies;
     }
 
     public abstract String getType();

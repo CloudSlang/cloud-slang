@@ -15,6 +15,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openscore.api.ExecutionPlan;
 import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
+import org.openscore.lang.compiler.model.Executable;
+import org.openscore.lang.compiler.model.SlangFileType;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -22,6 +24,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URI;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /*
@@ -49,4 +53,22 @@ public class CompileFlowWithMultipleStepsTest {
         Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());
         Assert.assertEquals("the dependencies size is not as expected", 3, compilationArtifact.getDependencies().size());
     }
+
+    @Test
+    public void testPreCompileFlowBasic() throws Exception {
+        URI flowUri = getClass().getResource("/flow_with_multiple_steps.yaml").toURI();
+        List<Executable> preCompiledFlow = compiler.preCompile(SlangSource.fromFile(flowUri));
+        Executable flow = preCompiledFlow.get(0);
+
+        Assert.assertNotNull("Pre-Compiled meta-data is null", flow);
+        Assert.assertEquals("Flow name is wrong", "basic_flow", flow.getName());
+        Assert.assertEquals("Flow namespace is wrong", "user.ops", flow.getNamespace());
+        Assert.assertEquals("There is a different number of flow inputs than expected", 0, flow.getInputs().size());
+        Assert.assertEquals("There is a different number of flow outputs than expected", 0, flow.getOutputs().size());
+        Assert.assertEquals("There is a different number of flow results than expected", 2, flow.getResults().size());
+        Map<String, SlangFileType> dependencies = flow.getDependencies();
+        Assert.assertEquals("There is a different number of flow dependencies than expected", 3, dependencies.size());
+    }
+
+
 }
