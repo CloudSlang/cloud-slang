@@ -21,19 +21,22 @@ public class Input extends InOutParam {
 	private final boolean encrypted;
 	private final boolean required;
 	private final boolean override;
+	private final String variableName;
 
-	public Input(String name, String expression) {
-		super(name, expression);
-		this.encrypted = false;
-		this.required = true;
-		this.override = false;
-	}
-
-	public Input(String name, String expression, boolean encrypted, boolean required, boolean override) {
+	public Input(String name, String expression, boolean encrypted, boolean required, boolean override, String variableName) {
 		super(name, expression);
 		this.encrypted = encrypted;
 		this.required = required;
 		this.override = override;
+		this.variableName = variableName;
+	}
+
+	public Input(String name, String expression) {
+		this(name, expression, false, true, false, null);
+	}
+
+	public Input(Input input, String fqvn) {
+		this(input.getName(), input.getExpression(), input.isEncrypted(), input.isRequired(), input.isOverride(), fqvn);
 	}
 
 	public boolean isEncrypted() {
@@ -46,6 +49,10 @@ public class Input extends InOutParam {
 
 	public boolean isOverride() {
 		return override;
+	}
+
+	public String getVariableName() {
+		return this.variableName;
 	}
 
 }

@@ -20,6 +20,7 @@ public interface ScoreLangConstants {
     String RUN_ENV = "runEnv";
     String HOOKS = "hooks";
     String NODE_NAME_KEY = "nodeName";
+//    String NAMESPACE_ALIASES = "namespaceAliases";
 
     //action scope
     String ACTION_CLASS_KEY = "className";
@@ -31,7 +32,7 @@ public interface ScoreLangConstants {
     String NEXT_STEP_ID_KEY = "nextStepId";
 
     //operation scope
-    String OPERATION_INPUTS_KEY = "operationInputs";
+    String EXECUTABLE_INPUTS_KEY = "executableInputs";
     String BIND_OUTPUT_FROM_INPUTS_KEY = "fromInputs";
     String USER_INPUTS_KEY = "userInputs";
     String EXECUTABLE_OUTPUTS_KEY = "executableOutputs";

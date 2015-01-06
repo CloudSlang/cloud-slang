@@ -65,7 +65,7 @@ public class ScoreServicesImpl implements ScoreServices{
      * @return executionId
      */
     public Long trigger(CompilationArtifact compilationArtifact, Map<String, Serializable> inputs) {
-        return slang.run(compilationArtifact, inputs);
+        return slang.run(compilationArtifact, inputs, null);
     }
 
     /**

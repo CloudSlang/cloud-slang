@@ -46,7 +46,7 @@ public class createDbContainerTest  extends SystemsTestsParent {
         userInputs.put("host", "{{ host }}");
         userInputs.put("username", "{{ username }}");
         userInputs.put("password", "{{ password }}");
-        ScoreEvent event = trigger(compilationArtifact, userInputs);
+        ScoreEvent event = trigger(compilationArtifact, userInputs, null);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 

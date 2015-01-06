@@ -1,7 +1,13 @@
 namespace: user.ops
 
+imports:
+  vars: test.env.vars
+
 operations:
   - test_op:
+      inputs:
+        - alla:
+            variable: vars.alla
       action:
         python_script: 'print "hello world"'
 

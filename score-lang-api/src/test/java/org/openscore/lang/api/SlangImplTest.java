@@ -159,7 +159,7 @@ public class SlangImplTest {
     @Test
     public void testRun(){
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
-        Long executionId = slang.run(compilationArtifact, new HashMap<String, Serializable>());
+        Long executionId = slang.run(compilationArtifact, new HashMap<String, Serializable>(), null);
         Assert.assertNotNull(executionId);
 
         ArgumentCaptor<TriggeringProperties> argumentCaptor = ArgumentCaptor.forClass(TriggeringProperties.class);
@@ -173,13 +173,13 @@ public class SlangImplTest {
     @Test
     public void testRunWithNullInputs(){
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
-        Long executionId = slang.run(compilationArtifact, null);
+        Long executionId = slang.run(compilationArtifact, null, null);
         Assert.assertNotNull(executionId);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testRunWithNullCompilationArtifact(){
-        slang.run(null, new HashMap<String, Serializable>());
+        slang.run(null, new HashMap<String, Serializable>(), null);
     }
 
     // tests for compileAndRunOperation() method
@@ -193,7 +193,7 @@ public class SlangImplTest {
         when(mockSlang.compileAndRunOperation(any(SlangSource.class), anyString(), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class))).thenCallRealMethod();
         Long id = mockSlang.compileAndRunOperation(tempFile, "op", new HashSet<SlangSource>(), new HashMap<String, Serializable>());
         Assert.assertNotNull(id);
-        Mockito.verify(mockSlang).run(compilationArtifact, new HashMap<String, Serializable>());
+        Mockito.verify(mockSlang).run(compilationArtifact, new HashMap<String, Serializable>(), null);
     }
 
     //tests for compileAndRun() method

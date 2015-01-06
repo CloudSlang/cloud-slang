@@ -47,17 +47,19 @@ public class CompileBasicFlowTest {
     public void testCompileFlowBasic() throws Exception {
         URI flow = getClass().getResource("/flow.yaml").toURI();
         URI operation = getClass().getResource("/operation.yaml").toURI();
-
+//URI params = getClass().getResource("/vars.yaml").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
-
+//path.add(SlangSource.fromFile(params));
         CompilationArtifact compilationArtifact = compiler.compileFlow(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
+System.out.println(executionPlan);
+System.out.println(compilationArtifact.getDependencies());
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
         Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());
         Assert.assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
-        Assert.assertEquals("the inputs size is not as expected", 1, compilationArtifact.getInputs().size());
+        Assert.assertEquals("the inputs size is not as expected", 2, compilationArtifact.getInputs().size());
     }
 
     @Test
@@ -76,7 +78,7 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
 
         ExecutionStep startStep = executionPlan.getStep(1L);
-        @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) startStep.getActionData().get(ScoreLangConstants.OPERATION_INPUTS_KEY);
+        @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) startStep.getActionData().get(ScoreLangConstants.EXECUTABLE_INPUTS_KEY);
         Assert.assertNotNull("inputs doesn't exist", inputs);
         Assert.assertEquals("there is a different number of inputs than expected", 1, inputs.size());
 

@@ -34,15 +34,13 @@ public class SubFlowSystemTests extends SystemsTestsParent {
         URI resource = getClass().getResource("/yaml/sub-flow/parent_flow.yaml").toURI();
         URI subFlow = getClass().getResource("/yaml/sub-flow/child_flow.yaml").toURI();
         URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
-
-        SlangSource subFlowDep = SlangSource.fromFile(subFlow);
-        SlangSource operationsDep = SlangSource.fromFile(operations);
-        Set<SlangSource> path = Sets.newHashSet(subFlowDep, operationsDep);
+URI operations2 = getClass().getResource("/yaml/sub-flow/simple_operations.yaml").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(subFlow), SlangSource.fromFile(operations), SlangSource.fromFile(operations2));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("input1", "value1");
-        ScoreEvent event = trigger(compilationArtifact, userInputs);
+        ScoreEvent event = trigger(compilationArtifact, userInputs, null);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 }

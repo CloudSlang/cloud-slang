@@ -1,13 +1,12 @@
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package org.openscore.lang.api;
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
 
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
@@ -30,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static ch.lambdaj.Lambda.filter;
+
 import static org.hamcrest.Matchers.notNullValue;
 import static org.openscore.lang.entities.ScoreLangConstants.EVENT_ACTION_END;
 import static org.openscore.lang.entities.ScoreLangConstants.EVENT_ACTION_ERROR;
@@ -48,16 +48,14 @@ import static org.openscore.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXC
  */
 public class SlangImpl implements Slang {
 
+    private final static Logger logger = Logger.getLogger(SlangImpl.class);
+
     @Autowired
     private SlangCompiler compiler;
-
     @Autowired
     private Score score;
-
     @Autowired
     private EventBus eventBus;
-
-    private final static Logger logger = Logger.getLogger(SlangImpl.class);
 
     @Override
     public CompilationArtifact compileOperation(SlangSource source, String operationName, Set<SlangSource> dependencies) {
@@ -78,34 +76,37 @@ public class SlangImpl implements Slang {
         return compileOperation(source, null, dependencies);
     }
 
-    @Override
-    public Long run(CompilationArtifact compilationArtifact, Map<String, Serializable> runInputs) {
-        Validate.notNull(compilationArtifact, "Compilation artifact can not be null");
-        if(runInputs == null){
-            runInputs = new HashMap<>();
-        }
-        Map<String, Serializable> executionContext = new HashMap<>();
-        executionContext.put(ScoreLangConstants.RUN_ENV, new RunEnvironment());
-        executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable) runInputs);
+	@Override
+	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> variables) {
+		Validate.notNull(compilationArtifact, "Compilation artifact can not be null");
+		if(runInputs == null) {
+			runInputs = new HashMap<>();
+		}
+		Map<String, Serializable> executionContext = new HashMap<>();
+		RunEnvironment runEnv = new RunEnvironment();
+		if(variables != null) runEnv.getVariables().putAll(variables);
+		executionContext.put(ScoreLangConstants.RUN_ENV, runEnv);
+		executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable)runInputs);
+		TriggeringProperties triggeringProperties = TriggeringProperties.create(compilationArtifact.getExecutionPlan()).setDependencies(compilationArtifact.getDependencies())
+			.setContext(executionContext);
+		return score.trigger(triggeringProperties);
+	}
 
-        TriggeringProperties triggeringProperties = TriggeringProperties
-                .create(compilationArtifact.getExecutionPlan())
-                .setDependencies(compilationArtifact.getDependencies())
-                .setContext(executionContext);
+	@Override
+	public Long compileAndRunOperation(SlangSource source, String operationName, Set<SlangSource> dependencies, Map<String, Serializable> runInputs) {
+		CompilationArtifact compilationArtifact = compileOperation(source, operationName, dependencies);
+		return run(compilationArtifact, runInputs, null);
+	}
 
-        return score.trigger(triggeringProperties);
-    }
+	@Override
+	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, Serializable> runInputs) {
+		return compileAndRunOperation(source, null, dependencies, runInputs);
+	}
 
-    @Override
-    public Long compileAndRunOperation(SlangSource source, String operationName, Set<SlangSource> dependencies, Map<String, Serializable> runInputs) {
-        CompilationArtifact compilationArtifact = compileOperation(source, operationName, dependencies);
-        return run(compilationArtifact, runInputs);
-    }
-
-    @Override
-    public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, Serializable> runInputs) {
-        return compileAndRunOperation(source, null, dependencies, runInputs);
-    }
+	@Override
+	public Map<String, ? extends Serializable> loadVariables(SlangSource... sources) {
+		return compiler.loadVariables(sources);
+	}
 
     @Override
     public void subscribeOnEvents(ScoreEventListener eventListener, Set<String> eventTypes) {
@@ -142,4 +143,5 @@ public class SlangImpl implements Slang {
         eventTypes.add(EVENT_EXECUTION_FINISHED);
         return eventTypes;
     }
+
 }

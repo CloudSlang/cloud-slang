@@ -46,7 +46,7 @@ public class DataFlowTest extends SystemsTestsParent {
         userInputs.put("myMessage", "hello world");
         userInputs.put("tryToChangeMessage", "changed");
 
-        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
+        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs, null);
 
         Assert.assertEquals(3, tasks.size());
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, tasks.get("0/0").getResult());

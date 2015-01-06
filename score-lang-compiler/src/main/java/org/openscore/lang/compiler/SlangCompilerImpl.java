@@ -12,6 +12,7 @@ package org.openscore.lang.compiler;
 
 import ch.lambdaj.Lambda;
 import ch.lambdaj.function.convert.Converter;
+
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
@@ -28,11 +29,13 @@ import org.openscore.lang.entities.CompilationArtifact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.*;
 
 import static ch.lambdaj.Lambda.convertMap;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
+
 import static org.hamcrest.Matchers.equalTo;
 
 /*
@@ -101,6 +104,22 @@ public class SlangCompilerImpl implements SlangCompiler {
         return new CompilationArtifact(executionPlan, dependencies, executable.getInputs());
     }
 
+	@Override
+	public Map<String, ? extends Serializable> loadVariables(SlangSource... sources) {
+		Validate.notNull(sources, "You must supply a source to load");
+		Map<String, Serializable> result = new HashMap<>();
+		for(SlangSource source : sources) {
+			ParsedSlang parsedSlang = yamlParser.parse(source);
+			Map<String, ? extends Serializable> variables = parsedSlang.getVariables();
+			Validate.notNull(variables, "No variables specified");
+			String namespace = parsedSlang.getNamespace();
+			for(Map.Entry<String, ? extends Serializable> entry : variables.entrySet()) {
+				result.put(namespace + "." + entry.getKey(), entry.getValue());
+			}
+		}
+		return result;
+	}
+
     /**
      * Transforms all of the slang files in the given path to {@link org.openscore.lang.compiler.model.Executable}
      *
@@ -119,6 +138,8 @@ public class SlangCompilerImpl implements SlangCompiler {
                     break;
                 case OPERATIONS:
                     executables.addAll(transformOperations(parsedSlang));
+                    break;
+                case VARIABLES:
                     break;
                 default:
                     throw new RuntimeException("Source: " + source.getName() + " is not of flow type or operations");

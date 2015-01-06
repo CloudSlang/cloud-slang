@@ -11,11 +11,22 @@ package org.openscore.lang.compiler;/*******************************************
 
 import org.openscore.lang.entities.CompilationArtifact;
 
+import java.io.Serializable;
+import java.util.Map;
 import java.util.Set;
 
 //todo: Eliya - add JavaDoc
 public interface SlangCompiler {
-    CompilationArtifact compileFlow(SlangSource source, Set<SlangSource> path);
+
+	CompilationArtifact compileFlow(SlangSource source, Set<SlangSource> path);
 
     CompilationArtifact compile(SlangSource source, String operationName, Set<SlangSource> path);
+
+    /**
+     * Load variable sources written in slang and map them to fully qualified names
+     * @param sources the slang sources containing the variables
+     * @return map containing all of the variables with fully qualified keys
+     */
+    Map<String, ? extends Serializable> loadVariables(SlangSource... sources);
+
 }

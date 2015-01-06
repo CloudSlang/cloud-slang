@@ -47,12 +47,8 @@ public abstract class AbstractSteps {
     protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment, Map<String, Serializable> currentContext, Map<String, Serializable> callArguments) {
         ContextStack contextStack = runEnvironment.getStack();
         contextStack.pushContext(currentContext);
-        updateCallArguments(runEnvironment, callArguments);
-    }
-
-    private void updateCallArguments(RunEnvironment runEnvironment, Map<String, Serializable> newContext) {
         //TODO: put a deep clone of the new context
-        runEnvironment.putCallArguments(newContext);
+        runEnvironment.putCallArguments(callArguments);
     }
 
     @SafeVarargs

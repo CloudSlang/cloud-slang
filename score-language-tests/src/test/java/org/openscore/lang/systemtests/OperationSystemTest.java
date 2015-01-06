@@ -36,7 +36,7 @@ public class OperationSystemTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compileOperation(SlangSource.fromFile(resource.toURI()), "test_op", null);
         //Trigger ExecutionPlan
         Map<String, Serializable> userInputs = new HashMap<>();
-        ScoreEvent event = trigger(compilationArtifact, userInputs);
+        ScoreEvent event = trigger(compilationArtifact, userInputs, null);
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 
@@ -50,7 +50,7 @@ public class OperationSystemTest extends SystemsTestsParent {
         userInputs.put("input2", "value2");
         userInputs.put("input4", "value4");
         userInputs.put("input5", "value5");
-        ScoreEvent event = trigger(compilationArtifact, userInputs);
+        ScoreEvent event = trigger(compilationArtifact, userInputs, null);
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 }

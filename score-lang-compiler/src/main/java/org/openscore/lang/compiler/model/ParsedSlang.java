@@ -14,6 +14,7 @@ package org.openscore.lang.compiler.model;
  * Created by orius123 on 05/11/14.
  */
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ public class ParsedSlang {
     private Map<String, String> imports;
     private Map<String, Object> flow;
     private List<Map<String, Map<String, Object>>> operations;
+    private Map<String, ? extends Serializable> variables;
     private String namespace;
     private String name;
 
@@ -43,8 +45,14 @@ public class ParsedSlang {
         return operations;
     }
 
+    public Map<String, ? extends Serializable> getVariables() {
+        return variables;
+    }
+
     public Type getType() {
-        return flow != null ? Type.FLOW : Type.OPERATIONS;
+        if(flow != null) return Type.FLOW;
+        if(variables != null) return Type.VARIABLES;
+        return Type.OPERATIONS;
     }
 
     public String getName() {
@@ -55,7 +63,8 @@ public class ParsedSlang {
         this.name = name;
     }
 
-    public enum Type {
-        FLOW, OPERATIONS
+    public static enum Type {
+        FLOW, OPERATIONS, VARIABLES
     }
+
 }
