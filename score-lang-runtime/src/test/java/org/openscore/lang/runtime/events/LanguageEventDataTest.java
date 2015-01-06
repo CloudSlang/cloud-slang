@@ -14,17 +14,16 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openscore.lang.runtime.events.LanguageEventData;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 
 import static org.openscore.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
+import static org.openscore.lang.runtime.events.LanguageEventData.BOUND_INPUTS;
 import static org.openscore.lang.runtime.events.LanguageEventData.DESCRIPTION;
 import static org.openscore.lang.runtime.events.LanguageEventData.EXCEPTION;
 import static org.openscore.lang.runtime.events.LanguageEventData.EXECUTIONID;
-import static org.openscore.lang.runtime.events.LanguageEventData.INPUTS;
 import static org.openscore.lang.runtime.events.LanguageEventData.OUTPUTS;
 import static org.openscore.lang.runtime.events.LanguageEventData.PATH;
 import static org.openscore.lang.runtime.events.LanguageEventData.TIMESTAMP;
@@ -134,7 +133,7 @@ public class LanguageEventDataTest {
 		};
 		eventData.setInputs(inputs);
 		assertEquals(inputs, eventData.getInputs());
-		assertEquals(inputs, eventData.get(INPUTS));
+		assertEquals(inputs, eventData.get(BOUND_INPUTS));
 	}
 
 	/**
