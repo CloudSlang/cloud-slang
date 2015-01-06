@@ -8,8 +8,7 @@ package org.openscore.lang.compiler;/*******************************************
 *
 *******************************************************************************/
 
-
-import org.openscore.lang.compiler.model.SlangPreCompiledMetaData;
+import org.openscore.lang.compiler.model.Executable;
 import org.openscore.lang.entities.CompilationArtifact;
 
 import java.util.Set;
@@ -20,7 +19,7 @@ public interface SlangCompiler {
 
     CompilationArtifact compile(SlangSource source, String operationName, Set<SlangSource> path);
 
-    SlangPreCompiledMetaData preCompileFlow(SlangSource source);
+    Executable preCompileFlow(SlangSource source);
 
-    SlangPreCompiledMetaData preCompile(String operationName, SlangSource source);
+    Executable preCompile(String operationName, SlangSource source);
 }

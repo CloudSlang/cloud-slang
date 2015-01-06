@@ -32,8 +32,9 @@ public class Flow extends Executable {
                 String name,
                 List<Input> inputs,
                 List<Output> outputs,
-                List<Result> results) {
-        super(preOpActionData, postOpActionData, namespace, name, inputs, outputs, results);
+                List<Result> results,
+                Map<String, SlangFileType> dependencies) {
+        super(preOpActionData, postOpActionData, namespace, name, inputs, outputs, results, dependencies);
         this.workflow = workflow;
     }
 

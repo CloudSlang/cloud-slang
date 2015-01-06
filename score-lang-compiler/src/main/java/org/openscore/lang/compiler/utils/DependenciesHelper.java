@@ -18,13 +18,11 @@ import ch.lambdaj.Lambda;
 import org.apache.commons.lang.Validate;
 import org.openscore.lang.compiler.SlangTextualKeys;
 import org.openscore.lang.compiler.model.Executable;
-import org.openscore.lang.compiler.model.Flow;
-import org.openscore.lang.compiler.model.SlangPreCompiledMetaData;
+import org.openscore.lang.compiler.model.SlangFileType;
 import org.openscore.lang.compiler.model.Task;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,45 +41,29 @@ public class DependenciesHelper {
     public Map<String, Executable> matchReferences(Executable executable, Collection<Executable> availableDependencies) {
         Validate.isTrue(executable.getType().equals(SlangTextualKeys.FLOW_TYPE), "Executable: " + executable.getId() + " is not a flow, therefore it has no references");
         Map<String, Executable> resolvedDependencies = new HashMap<>();
-        return fetchFlowReferences((Flow) executable, availableDependencies, resolvedDependencies);
+        return fetchFlowReferences(executable, availableDependencies, resolvedDependencies);
     }
 
-    /**
-     * Fetch the first level of the dependencies of the executable (non recursively)
-     * @param executable the Executable object for which we want to fetch the dependencies
-     * @return a set of dependencies. For each one we give a pair of its type and full name
-     */
-    public Map<String, SlangPreCompiledMetaData.SlangFileType> fetchDependenciesNonRecursive(Executable executable){
-        Map<String, SlangPreCompiledMetaData.SlangFileType> dependencies = new HashMap<>();
-        if(executable.getType().equals(SlangTextualKeys.FLOW_TYPE)){
-            Deque<Task> tasks = ((Flow) executable).getWorkflow().getTasks();
-            for (Task task : tasks) {
-                String refId = task.getRefId();
-                dependencies.put(refId, SlangPreCompiledMetaData.SlangFileType.EXECUTABLE);
-            }
-        }
-        return dependencies;
-    }
-
-    private Map<String, Executable> fetchFlowReferences(Flow flow,
+    private Map<String, Executable> fetchFlowReferences(Executable executable,
                                                                 Collection<Executable> availableDependencies,
                                                                 Map<String, Executable> resolvedDependencies) {
-        Deque<Task> tasks = flow.getWorkflow().getTasks();
-        for (Task task : tasks) {
-            String refId = task.getRefId();
+        Map<String, SlangFileType> dependencies = executable.getDependencies();
+        for (String refId : dependencies.keySet()) {
             //if it is already in the references we do nothing
             if (resolvedDependencies.get(refId) == null) {
                 Executable matchingRef = Lambda.selectFirst(availableDependencies, having(on(Executable.class).getId(), equalTo(refId)));
                 if (matchingRef == null) {
-                    throw new RuntimeException("Reference: " + refId + " of task: " + task.getName() + " in flow: "
-                            + flow.getName() + " wasn't found in path");
+                    throw new RuntimeException("Reference: " + refId + " in executable: "
+                            + executable.getName() + " wasn't found in path");
                 }
-                validateNavigation(task, matchingRef);
+                //todo: where is the place to put this navigation?
+//                validateNavigation(task, matchingRef);
+
                 //first we put the reference on the map
                 resolvedDependencies.put(matchingRef.getId(), matchingRef);
                 if (matchingRef.getType().equals(SlangTextualKeys.FLOW_TYPE)) {
                     //if it is a flow  we recursively
-                    resolvedDependencies.putAll(fetchFlowReferences((Flow) matchingRef, availableDependencies, resolvedDependencies));
+                    resolvedDependencies.putAll(fetchFlowReferences(matchingRef, availableDependencies, resolvedDependencies));
                 }
             }
         }

@@ -18,7 +18,8 @@ import org.junit.runner.RunWith;
 import org.openscore.api.ExecutionPlan;
 import org.openscore.api.ExecutionStep;
 import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
-import org.openscore.lang.compiler.model.SlangPreCompiledMetaData;
+import org.openscore.lang.compiler.model.Executable;
+import org.openscore.lang.compiler.model.SlangFileType;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Input;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,14 +88,14 @@ public class CompileOperationTest {
     @Test
     public void testPreCompileOperationBasic() throws Exception {
         URL resource = getClass().getResource("/operation.yaml");
-        SlangPreCompiledMetaData preCompiledMetaData = compiler.preCompile("check_Weather", SlangSource.fromFile(resource.toURI()));
+        Executable preCompiledMetaData = compiler.preCompile("check_Weather", SlangSource.fromFile(resource.toURI()));
         Assert.assertNotNull("preCompiledMetaData is null", preCompiledMetaData);
         Assert.assertEquals("Operation name is wrong", "check_Weather", preCompiledMetaData.getName());
         Assert.assertEquals("Operation namespace is wrong", "user.ops", preCompiledMetaData.getNamespace());
         Assert.assertEquals("There is a different number of operation inputs than expected", 1, preCompiledMetaData.getInputs().size());
         Assert.assertEquals("There is a different number of operation outputs than expected", 1, preCompiledMetaData.getOutputs().size());
         Assert.assertEquals("There is a different number of operation results than expected", 1, preCompiledMetaData.getResults().size());
-        Map<String, SlangPreCompiledMetaData.SlangFileType> dependencies = preCompiledMetaData.getDependencies();
+        Map<String, SlangFileType> dependencies = preCompiledMetaData.getDependencies();
         Assert.assertEquals("There is a different number of operation dependencies than expected", 0, dependencies.size());
     }
 

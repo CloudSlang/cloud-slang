@@ -16,7 +16,8 @@ import org.junit.runner.RunWith;
 import org.openscore.api.ExecutionPlan;
 import org.openscore.api.ExecutionStep;
 import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
-import org.openscore.lang.compiler.model.SlangPreCompiledMetaData;
+import org.openscore.lang.compiler.model.Executable;
+import org.openscore.lang.compiler.model.SlangFileType;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.ScoreLangConstants;
@@ -118,7 +119,7 @@ public class CompileBasicFlowTest {
     @Test
     public void testPreCompileFlowBasic() throws Exception {
         URI flow = getClass().getResource("/flow.yaml").toURI();
-        SlangPreCompiledMetaData preCompiledMetaData = compiler.preCompileFlow(SlangSource.fromFile(flow));
+        Executable preCompiledMetaData = compiler.preCompileFlow(SlangSource.fromFile(flow));
 
         Assert.assertNotNull("Pre-Compiled meta-data is null", preCompiledMetaData);
         Assert.assertEquals("Flow name is wrong", "basic_flow", preCompiledMetaData.getName());
@@ -126,10 +127,10 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("There is a different number of flow inputs than expected", 1, preCompiledMetaData.getInputs().size());
         Assert.assertEquals("There is a different number of flow outputs than expected", 0, preCompiledMetaData.getOutputs().size());
         Assert.assertEquals("There is a different number of flow results than expected", 2, preCompiledMetaData.getResults().size());
-        Map<String, SlangPreCompiledMetaData.SlangFileType> dependencies = preCompiledMetaData.getDependencies();
+        Map<String, SlangFileType> dependencies = preCompiledMetaData.getDependencies();
         Assert.assertEquals("There is a different number of flow dependencies than expected", 1, dependencies.size());
-        Map.Entry<String, SlangPreCompiledMetaData.SlangFileType> dependency = dependencies.entrySet().iterator().next();
-        Assert.assertEquals("There is a different number of flow inputs than expected", SlangPreCompiledMetaData.SlangFileType.EXECUTABLE, dependency.getValue());
+        Map.Entry<String, SlangFileType> dependency = dependencies.entrySet().iterator().next();
+        Assert.assertEquals("There is a different number of flow inputs than expected", SlangFileType.EXECUTABLE, dependency.getValue());
         Assert.assertEquals("The flow dependency full name is wrong", "user.ops.test_op", dependency.getKey());
     }
 

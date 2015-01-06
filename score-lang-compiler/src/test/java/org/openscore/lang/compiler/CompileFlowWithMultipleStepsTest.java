@@ -15,7 +15,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openscore.api.ExecutionPlan;
 import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
-import org.openscore.lang.compiler.model.SlangPreCompiledMetaData;
+import org.openscore.lang.compiler.model.Executable;
+import org.openscore.lang.compiler.model.SlangFileType;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -55,7 +56,7 @@ public class CompileFlowWithMultipleStepsTest {
     @Test
     public void testPreCompileFlowBasic() throws Exception {
         URI flow = getClass().getResource("/flow_with_multiple_steps.yaml").toURI();
-        SlangPreCompiledMetaData preCompiledMetaData = compiler.preCompileFlow(SlangSource.fromFile(flow));
+        Executable preCompiledMetaData = compiler.preCompileFlow(SlangSource.fromFile(flow));
 
         Assert.assertNotNull("Pre-Compiled meta-data is null", preCompiledMetaData);
         Assert.assertEquals("Flow name is wrong", "basic_flow", preCompiledMetaData.getName());
@@ -63,7 +64,7 @@ public class CompileFlowWithMultipleStepsTest {
         Assert.assertEquals("There is a different number of flow inputs than expected", 0, preCompiledMetaData.getInputs().size());
         Assert.assertEquals("There is a different number of flow outputs than expected", 0, preCompiledMetaData.getOutputs().size());
         Assert.assertEquals("There is a different number of flow results than expected", 2, preCompiledMetaData.getResults().size());
-        Map<String, SlangPreCompiledMetaData.SlangFileType> dependencies = preCompiledMetaData.getDependencies();
+        Map<String, SlangFileType> dependencies = preCompiledMetaData.getDependencies();
         Assert.assertEquals("There is a different number of flow dependencies than expected", 3, dependencies.size());
     }
 

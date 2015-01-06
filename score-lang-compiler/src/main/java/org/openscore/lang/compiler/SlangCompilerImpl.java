@@ -20,7 +20,6 @@ import org.openscore.lang.compiler.model.Executable;
 import org.openscore.lang.compiler.model.Flow;
 import org.openscore.lang.compiler.model.Operation;
 import org.openscore.lang.compiler.model.ParsedSlang;
-import org.openscore.lang.compiler.model.SlangPreCompiledMetaData;
 import org.openscore.lang.compiler.utils.DependenciesHelper;
 import org.openscore.lang.compiler.utils.ExecutableBuilder;
 import org.openscore.lang.compiler.utils.ExecutionPlanBuilder;
@@ -66,17 +65,11 @@ public class SlangCompilerImpl implements SlangCompiler {
     @Override
     public CompilationArtifact compile(SlangSource source, String operationName, Set<SlangSource> path) {
 
-        Validate.notNull(source, "You must supply a source to compile");
-
-        //first thing we parse the yaml file into java maps
-        ParsedSlang parsedSlang = yamlParser.parse(source);
-
-        //than we transform those maps to model objects
-        Executable executable = transformToExecutable(operationName, parsedSlang);
+        Executable executable = preCompile(operationName, source);
 
         Map<String, Executable> filteredDependencies = new HashMap<>();
         //we handle dependencies only if the file has imports
-        boolean hasDependencies = MapUtils.isNotEmpty(parsedSlang.getImports())
+        boolean hasDependencies = MapUtils.isNotEmpty(executable.getDependencies())
                 && executable.getType().equals(SlangTextualKeys.FLOW_TYPE);
         if (hasDependencies) {
             Validate.noNullElements(path, "Source that was requested to compile has imports but no path was given");
@@ -223,30 +216,19 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     @Override
-    public SlangPreCompiledMetaData preCompileFlow(SlangSource source) {
+    public Executable preCompileFlow(SlangSource source) {
         return preCompile(null, source);
     }
 
     @Override
-    public SlangPreCompiledMetaData preCompile(String operationName, SlangSource source) {
-
+    public Executable preCompile(String operationName, SlangSource source) {
         Validate.notNull(source, "You must supply a source to compile");
 
         //first thing we parse the yaml file into java maps
         ParsedSlang parsedSlang = yamlParser.parse(source);
 
         //than we transform those maps to model objects
-        Executable executable = transformToExecutable(operationName, parsedSlang);
-
-        Map<String, SlangPreCompiledMetaData.SlangFileType> dependencies;
-        boolean hasDependencies = MapUtils.isNotEmpty(parsedSlang.getImports());
-        if(!hasDependencies){
-            dependencies = new HashMap<>();
-        } else{
-            dependencies = dependenciesHelper.fetchDependenciesNonRecursive(executable);
-        }
-
-        return new SlangPreCompiledMetaData(executable, dependencies);
+        return transformToExecutable(operationName, parsedSlang);
     }
 
 }
