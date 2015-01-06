@@ -1,13 +1,12 @@
-package org.openscore.lang.compiler.utils;/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
-
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+package org.openscore.lang.compiler.utils;
 
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -96,7 +95,7 @@ public class ExecutableBuilder {
 
         String namespace = parsedSlang.getNamespace();
         Map<String, String> imports = parsedSlang.getImports();
-        inputs = resolveVariables(inputs, imports);
+        resolveVariables(inputs, imports);
         switch (parsedSlang.getType()) {
             case FLOW:
                 @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> workFlowRawData =
@@ -192,7 +191,7 @@ public class ExecutableBuilder {
         preTaskData.putAll(transformersHandler.runTransformers(taskRawData, preTaskTransformers));
         postTaskData.putAll(transformersHandler.runTransformers(taskRawData, postTaskTransformers));
         List<Input> inputs = (List<Input>)preTaskData.get(SlangTextualKeys.DO_KEY);
-        preTaskData.put(SlangTextualKeys.DO_KEY, (Serializable)resolveVariables(inputs, imports));
+        resolveVariables(inputs, imports);
         @SuppressWarnings("unchecked") Map<String, Object> doRawData = (Map<String, Object>) taskRawData.get(SlangTextualKeys.DO_KEY);
         if (MapUtils.isEmpty(doRawData)) {
             throw new RuntimeException("Task: " + taskName + " has no reference information");
@@ -212,26 +211,23 @@ public class ExecutableBuilder {
         return new Task(taskName, preTaskData, postTaskData, navigationStrings, refId);
     }
 
-	private List<Input> resolveVariables(List<Input> inputs, Map<String, String> imports) {
-		if(inputs == null) return null;
-		List<Input> result = new ArrayList<>();
+	private static void resolveVariables(List<Input> inputs, Map<String, String> imports) {
+		if(inputs == null) return;
 		for(Input input : inputs) {
 			String variableName = input.getVariableName();
 			if(variableName != null) {
 				variableName = resolveRefId(variableName, imports);
-				input = new Input(input, variableName);
+				input.setVariableName(variableName);
 			}
-			result.add(input);
 		}
-		return result;
 	}
 
-    private String resolveRefId(String refIdString, Map<String, String> imports) {
-        String alias = StringUtils.substringBefore(refIdString, ".");
+	private static String resolveRefId(String refIdString, Map<String, String> imports) {
+		String alias = StringUtils.substringBefore(refIdString, ".");
 		Validate.notNull(imports, "No imports specified");
-        if(!imports.containsKey(alias)) throw new RuntimeException("Unresovled alias: " + alias);
-        String refName = StringUtils.substringAfter(refIdString, ".");
-        return imports.get(alias) + "." + refName;
-    }
+		if(!imports.containsKey(alias)) throw new RuntimeException("Unresovled alias: " + alias);
+		String refName = StringUtils.substringAfter(refIdString, ".");
+		return imports.get(alias) + "." + refName;
+	}
 
 }

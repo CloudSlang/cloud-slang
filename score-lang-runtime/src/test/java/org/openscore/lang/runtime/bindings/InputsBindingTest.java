@@ -1,13 +1,12 @@
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
-
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ */
 package org.openscore.lang.runtime.bindings;
 
 import org.openscore.lang.entities.bindings.Input;
@@ -22,8 +21,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class InputsBindingTest {
 
     @Test
     public void testDefaultValue() throws Exception {
-        List<Input> inputs = Arrays.asList(createDefaultValueInput("str('value')"));
+		List<Input> inputs = Arrays.asList(new Input("input1", "str('value')"));
         Map<String,Serializable> result = bindInputs(inputs);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
@@ -53,7 +54,7 @@ public class InputsBindingTest {
 
     @Test
     public void testDefaultValueInt() throws Exception {
-        List<Input> inputs = Arrays.asList(createDefaultValueInput("2"));
+        List<Input> inputs = Arrays.asList(new Input("input1", "2"));
         Map<String,Serializable> result = bindInputs(inputs);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
@@ -71,7 +72,7 @@ public class InputsBindingTest {
 
     @Test
     public void testTwoInputs() throws Exception {
-        List<Input> inputs =  Arrays.asList(new Input("input2","'yyy'",false,false,false, null),createDefaultValueInput("'zzz'"));
+		List<Input> inputs = Arrays.asList(new Input("input2", "'yyy'"), new Input("input1", "'zzz'"));
         Map<String,Serializable> result = bindInputs(inputs);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
@@ -124,7 +125,7 @@ public class InputsBindingTest {
     public void testDefaultValueVsEmptyRef() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
 
-        Input refInput = new Input("input1","str('val')",false,false,false, null);
+		Input refInput = new Input("input1", "str('val')");
         List<Input> inputs = Arrays.asList(refInput);
 
         Map<String,Serializable> result = bindInputs(inputs, context);
@@ -139,7 +140,7 @@ public class InputsBindingTest {
     public void testAssignFromAndExpr() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",3);
-        Input input = new Input("input1","5+7",false,false,false, null);
+		Input input = new Input("input1", "5+7");
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = bindInputs(inputs, context);
@@ -155,7 +156,7 @@ public class InputsBindingTest {
     public void testAssignFromAndConst() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",3);
-        Input input = new Input("input1","5",false,false,false, null);
+		Input input = new Input("input1", "5");
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = bindInputs(inputs, context);
@@ -168,7 +169,7 @@ public class InputsBindingTest {
     public void testComplexExpr() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",3);
-        Input input = new Input("input2"," input1 + 3 * 2 ",false,false,false, null);
+		Input input = new Input("input2", " input1 + 3 * 2 ");
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = bindInputs(inputs, context);
@@ -183,7 +184,7 @@ public class InputsBindingTest {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input2",3);
         context.put("input1",5);
-        Input input = new Input("input1","input2",false,false,false, null);
+		Input input = new Input("input1", "input2");
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = bindInputs(inputs, context);
@@ -198,7 +199,7 @@ public class InputsBindingTest {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input2",3);
         context.put("input1",5);
-        Input input = new Input("input1","input2",false,false,true, null);
+		Input input = new Input("input1", "input2", false, false, true, null);
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = bindInputs(inputs, context);
@@ -214,7 +215,7 @@ public class InputsBindingTest {
     public void testOverrideAssignFrom2() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",5);
-        Input input = new Input("input1","3",false,false,true, null);
+		Input input = new Input("input1", "3", false, false, true, null);
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = bindInputs(inputs, context);
@@ -228,7 +229,7 @@ public class InputsBindingTest {
     public void testOverrideAssignFrom3() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",5);
-        Input input = new Input("input1",null,false,false,true, null);
+		Input input = new Input("input1", null, false, false, true, null);
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = bindInputs(inputs, context);
@@ -242,7 +243,7 @@ public class InputsBindingTest {
     public void testOverrideFalse() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",5);
-        Input input = new Input("input1","6",false,false,false, null);
+		Input input = new Input("input1", "6");
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = bindInputs(inputs, context);
@@ -256,7 +257,7 @@ public class InputsBindingTest {
     public void testExpressionWithWrongRef() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
 
-        Input input = new Input("input1","input2",false,false,false, null);
+		Input input = new Input("input1", "input2", false, false, false, null);
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = bindInputs(inputs, context);
@@ -270,7 +271,7 @@ public class InputsBindingTest {
     public void testInputAssignFromAnotherInput() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
 
-        Input input1 = new Input("input1","5",false,false,false, null);
+		Input input1 = new Input("input1", "5");
         Input input2 = new Input("input2","input1");
         List<Input> inputs = Arrays.asList(input1,input2);
 
@@ -290,7 +291,7 @@ public class InputsBindingTest {
         Map<String,Serializable> context = new HashMap<>();
         context.put("varX",5);
 
-        Input input1 = new Input("input1","5",false,false,false, null);
+		Input input1 = new Input("input1", "5");
         Input input2 = new Input("input2","input1 + 5 + varX");
         List<Input> inputs = Arrays.asList(input1,input2);
 
@@ -310,7 +311,7 @@ public class InputsBindingTest {
         Map<String,Serializable> context = new HashMap<>();
         context.put("varX","roles");
 
-        Input input1 = new Input("input1","\"mighty\" + ' max '   + varX",false,false,false, null);
+		Input input1 = new Input("input1", "\"mighty\" + ' max '   + varX");
         List<Input> inputs = Arrays.asList(input1);
 
         Map<String,Serializable> result = bindInputs(inputs, context);
@@ -322,12 +323,60 @@ public class InputsBindingTest {
         Assert.assertEquals("orig context should not change",1,context.size());
     }
 
-    private Input createDefaultValueInput(String value){
-        return new Input("input1", value, false, false, false, null);
-    }
+	@Test
+	public void testVariable() throws Exception {
+		String in = "input1";
+		String fqvn = "docker.env.vars.port";
+		List<Input> inputs = Arrays.asList(new Input(in, null, false, true, false, fqvn));
+		Map<String, Serializable> result = bindInputs(inputs, new HashMap<String, Serializable>(), Collections.singletonMap(fqvn, 22));
+		Assert.assertFalse(result.isEmpty());
+		Assert.assertEquals(1, result.size());
+		Assert.assertTrue(result.containsKey(in));
+		Assert.assertEquals(22, result.get(in));
+	}
 
-	private Map<String, Serializable> bindInputs(List<Input> inputs, Map<String, Serializable> context) {
-		return inputsBinding.bindInputs(inputs, context, null);
+	@Test
+	public void testVariableMissing() throws Exception {
+		String in = "input1";
+		String fqvn = "docker.env.vars.port";
+		List<Input> inputs = Arrays.asList(new Input(in, null, false, false, false, fqvn));
+		Map<String, Serializable> result = bindInputs(inputs, new HashMap<String, Serializable>());
+		Assert.assertFalse(result.isEmpty());
+		Assert.assertEquals(1, result.size());
+		Assert.assertTrue(result.containsKey(in));
+		Assert.assertEquals(null, result.get(in));
+	}
+
+	@Test
+	public void testVariableContext() throws Exception {
+		String in = "input1";
+		String fqvn = "docker.env.vars.port";
+		List<Input> inputs = Arrays.asList(new Input(in, null, false, true, false, fqvn));
+		Map<String, Serializable> result = bindInputs(inputs, Collections.singletonMap(in, 23), Collections.singletonMap(fqvn, 22));
+		Assert.assertFalse(result.isEmpty());
+		Assert.assertEquals(1, result.size());
+		Assert.assertTrue(result.containsKey(in));
+		Assert.assertEquals(23, result.get(in));
+	}
+
+	@Test
+	public void testVariableOverride() throws Exception {
+		String in = "input1";
+		String fqvn = "docker.env.vars.port";
+		List<Input> inputs = Arrays.asList(new Input(in, null, false, true, true, fqvn));
+		Map<String, Serializable> result = bindInputs(inputs, Collections.singletonMap(in, 23), Collections.singletonMap(fqvn, 22));
+		Assert.assertFalse(result.isEmpty());
+		Assert.assertEquals(1, result.size());
+		Assert.assertTrue(result.containsKey(in));
+		Assert.assertEquals(22, result.get(in));
+	}
+
+	private Map<String, Serializable> bindInputs(List<Input> inputs, Map<String, ? extends Serializable> context, Map<String, ? extends Serializable> variables) {
+		return inputsBinding.bindInputs(inputs, context, variables);
+	}
+
+	private Map<String, Serializable> bindInputs(List<Input> inputs, Map<String, ? extends Serializable> context) {
+		return bindInputs(inputs, context, null);
 	}
 
 	private Map<String, Serializable> bindInputs(List<Input> inputs) {

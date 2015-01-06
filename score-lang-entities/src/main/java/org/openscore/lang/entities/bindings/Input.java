@@ -1,12 +1,11 @@
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package org.openscore.lang.entities.bindings;
 
 /**
@@ -21,7 +20,7 @@ public class Input extends InOutParam {
 	private final boolean encrypted;
 	private final boolean required;
 	private final boolean override;
-	private final String variableName;
+	private String variableName;
 
 	public Input(String name, String expression, boolean encrypted, boolean required, boolean override, String variableName) {
 		super(name, expression);
@@ -33,10 +32,6 @@ public class Input extends InOutParam {
 
 	public Input(String name, String expression) {
 		this(name, expression, false, true, false, null);
-	}
-
-	public Input(Input input, String fqvn) {
-		this(input.getName(), input.getExpression(), input.isEncrypted(), input.isRequired(), input.isOverride(), fqvn);
 	}
 
 	public boolean isEncrypted() {
@@ -53,6 +48,10 @@ public class Input extends InOutParam {
 
 	public String getVariableName() {
 		return this.variableName;
+	}
+
+	public void setVariableName(String variableName) {
+		this.variableName = variableName;
 	}
 
 }

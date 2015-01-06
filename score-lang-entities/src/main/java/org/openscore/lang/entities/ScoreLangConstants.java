@@ -1,13 +1,11 @@
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
-
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package org.openscore.lang.entities;
 
 /**
@@ -20,7 +18,6 @@ public interface ScoreLangConstants {
     String RUN_ENV = "runEnv";
     String HOOKS = "hooks";
     String NODE_NAME_KEY = "nodeName";
-//    String NAMESPACE_ALIASES = "namespaceAliases";
 
     //action scope
     String ACTION_CLASS_KEY = "className";
