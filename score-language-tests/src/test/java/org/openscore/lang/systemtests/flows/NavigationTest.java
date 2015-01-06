@@ -49,8 +49,8 @@ public class NavigationTest extends SystemsTestsParent {
         Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
 
         Assert.assertEquals(5, tasks.size());
-        Assert.assertEquals("check_number", tasks.get("0/1").getName());
-        Assert.assertEquals("process_even_number", tasks.get("0/2").getName());
+        Assert.assertEquals("check_number", tasks.get(FIRST_STEP_PATH).getName());
+        Assert.assertEquals("process_even_number", tasks.get(SECOND_STEP_KEY).getName());
     }
 
     @Test
@@ -72,9 +72,8 @@ public class NavigationTest extends SystemsTestsParent {
 
         Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
 
-        Assert.assertEquals(5, tasks.size());
-        Assert.assertEquals("check_number", tasks.get("0/1").getName());
-        Assert.assertEquals("process_odd_number", tasks.get("0/2").getName());
+        Assert.assertEquals("check_number", tasks.get(FIRST_STEP_PATH).getName());
+        Assert.assertEquals("process_odd_number", tasks.get(SECOND_STEP_KEY).getName());
     }
 
     @Test
@@ -96,9 +95,8 @@ public class NavigationTest extends SystemsTestsParent {
 
         Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
 
-        Assert.assertEquals(5, tasks.size());
-        Assert.assertEquals("check_number", tasks.get("0/1").getName());
-        Assert.assertEquals("send_error_mail", tasks.get("0/2").getName());
+        Assert.assertEquals("check_number", tasks.get(FIRST_STEP_PATH).getName());
+        Assert.assertEquals("send_error_mail", tasks.get(SECOND_STEP_KEY).getName());
     }
 
     @Test
@@ -120,9 +118,8 @@ public class NavigationTest extends SystemsTestsParent {
 
         Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
 
-        Assert.assertEquals(5, tasks.size());
-        Assert.assertEquals("produce_default_navigation", tasks.get("0/1").getName());
-        Assert.assertEquals("check_Weather", tasks.get("0/2").getName());
+        Assert.assertEquals("produce_default_navigation", tasks.get(FIRST_STEP_PATH).getName());
+        Assert.assertEquals("check_Weather", tasks.get(SECOND_STEP_KEY).getName());
     }
 
     @Test
@@ -144,8 +141,7 @@ public class NavigationTest extends SystemsTestsParent {
 
         Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
 
-        Assert.assertEquals(5, tasks.size());
-        Assert.assertEquals("produce_default_navigation", tasks.get("0/1").getName());
-        Assert.assertEquals("send_error_mail", tasks.get("0/2").getName());
+        Assert.assertEquals("produce_default_navigation", tasks.get(FIRST_STEP_PATH).getName());
+        Assert.assertEquals("send_error_mail", tasks.get(SECOND_STEP_KEY).getName());
     }
 }

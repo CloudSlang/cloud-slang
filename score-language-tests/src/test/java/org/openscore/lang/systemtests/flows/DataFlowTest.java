@@ -48,8 +48,7 @@ public class DataFlowTest extends SystemsTestsParent {
 
         Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
 
-        Assert.assertEquals(3, tasks.size());
-        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, tasks.get("0/0").getResult());
-        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, tasks.get("0/1").getResult());
+        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, tasks.get(EXEC_START_PATH).getResult());
+        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, tasks.get(FIRST_STEP_PATH).getResult());
     }
 }
