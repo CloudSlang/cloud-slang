@@ -12,6 +12,7 @@
 package org.openscore.lang.systemtests.flows;
 
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openscore.lang.compiler.SlangSource;
@@ -46,9 +47,35 @@ public class DataFlowTest extends SystemsTestsParent {
         userInputs.put("myMessage", "hello world");
         userInputs.put("tryToChangeMessage", "changed");
 
-        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs);
 
-        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, tasks.get(EXEC_START_PATH).getResult());
-        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, tasks.get(FIRST_STEP_PATH).getResult());
+        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, steps.get(EXEC_START_PATH).getResult());
+        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, steps.get(FIRST_STEP_PATH).getResult());
+    }
+
+    @Test
+    public void testBindingsFlow() throws Exception {
+        URI resource = getClass().getResource("/yaml/system-flows/bindings_flow.yaml").toURI();
+        URI operations = getClass().getResource("/yaml/system-flows/bindings_flow_operations.yaml").toURI();
+
+        SlangSource dep = SlangSource.fromFile(operations);
+        Set<SlangSource> path = Sets.newHashSet(dep);
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Map<String, Serializable> userInputs = new HashMap<>();
+        userInputs.put("base_input", ">");
+
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs);
+
+        Map<String, Serializable> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
+        String final_output = (String) flowOutputs.get("final_output");
+        Assert.assertEquals("some of the inputs or outputs were not bound correctly",
+                13, final_output.length());
+        Assert.assertEquals("some of the inputs were not bound correctly",
+                6, StringUtils.countMatches(final_output, ">"));
+        Assert.assertEquals("some of the outputs were not bound correctly",
+                5, StringUtils.countMatches(final_output, "<"));
+        Assert.assertEquals("some of the results were not bound correctly",
+                2, StringUtils.countMatches(final_output, "|"));
     }
 }
