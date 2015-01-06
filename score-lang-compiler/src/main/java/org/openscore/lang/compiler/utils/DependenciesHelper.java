@@ -19,7 +19,6 @@ import org.apache.commons.lang.Validate;
 import org.openscore.lang.compiler.SlangTextualKeys;
 import org.openscore.lang.compiler.model.Executable;
 import org.openscore.lang.compiler.model.SlangFileType;
-import org.openscore.lang.compiler.model.Task;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -56,8 +55,6 @@ public class DependenciesHelper {
                     throw new RuntimeException("Reference: " + refId + " in executable: "
                             + executable.getName() + " wasn't found in path");
                 }
-                //todo: where is the place to put this navigation?
-//                validateNavigation(task, matchingRef);
 
                 //first we put the reference on the map
                 resolvedDependencies.put(matchingRef.getId(), matchingRef);
@@ -68,10 +65,5 @@ public class DependenciesHelper {
             }
         }
         return resolvedDependencies;
-    }
-
-    private void validateNavigation(Task task, Executable matchingRef) {
-        Validate.notEmpty(matchingRef.getResults());
-        Validate.notEmpty(task.getNavigationStrings());
     }
 }

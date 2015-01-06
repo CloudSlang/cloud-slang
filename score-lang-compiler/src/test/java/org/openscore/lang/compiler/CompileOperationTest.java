@@ -10,6 +10,7 @@
 
 package org.openscore.lang.compiler;
 
+import ch.lambdaj.Lambda;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,6 +30,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+
+import static ch.lambdaj.Lambda.having;
+import static ch.lambdaj.Lambda.on;
+import static org.hamcrest.Matchers.equalTo;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -88,14 +93,16 @@ public class CompileOperationTest {
     @Test
     public void testPreCompileOperationBasic() throws Exception {
         URL resource = getClass().getResource("/operation.yaml");
-        Executable preCompiledMetaData = compiler.preCompile("check_Weather", SlangSource.fromFile(resource.toURI()));
-        Assert.assertNotNull("preCompiledMetaData is null", preCompiledMetaData);
-        Assert.assertEquals("Operation name is wrong", "check_Weather", preCompiledMetaData.getName());
-        Assert.assertEquals("Operation namespace is wrong", "user.ops", preCompiledMetaData.getNamespace());
-        Assert.assertEquals("There is a different number of operation inputs than expected", 1, preCompiledMetaData.getInputs().size());
-        Assert.assertEquals("There is a different number of operation outputs than expected", 1, preCompiledMetaData.getOutputs().size());
-        Assert.assertEquals("There is a different number of operation results than expected", 1, preCompiledMetaData.getResults().size());
-        Map<String, SlangFileType> dependencies = preCompiledMetaData.getDependencies();
+        List<Executable> preCompiledOperations = compiler.preCompile(SlangSource.fromFile(resource.toURI()));
+        Executable operation = Lambda.selectFirst(preCompiledOperations, having(on(Executable.class).getName(), equalTo("check_Weather")));
+
+        Assert.assertNotNull("preCompiledMetaData is null", operation);
+        Assert.assertEquals("Operation name is wrong", "check_Weather", operation.getName());
+        Assert.assertEquals("Operation namespace is wrong", "user.ops", operation.getNamespace());
+        Assert.assertEquals("There is a different number of operation inputs than expected", 1, operation.getInputs().size());
+        Assert.assertEquals("There is a different number of operation outputs than expected", 1, operation.getOutputs().size());
+        Assert.assertEquals("There is a different number of operation results than expected", 1, operation.getResults().size());
+        Map<String, SlangFileType> dependencies = operation.getDependencies();
         Assert.assertEquals("There is a different number of operation dependencies than expected", 0, dependencies.size());
     }
 

@@ -24,6 +24,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URI;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,16 +56,17 @@ public class CompileFlowWithMultipleStepsTest {
 
     @Test
     public void testPreCompileFlowBasic() throws Exception {
-        URI flow = getClass().getResource("/flow_with_multiple_steps.yaml").toURI();
-        Executable preCompiledMetaData = compiler.preCompileFlow(SlangSource.fromFile(flow));
+        URI flowUri = getClass().getResource("/flow_with_multiple_steps.yaml").toURI();
+        List<Executable> preCompiledFlow = compiler.preCompile(SlangSource.fromFile(flowUri));
+        Executable flow = preCompiledFlow.get(0);
 
-        Assert.assertNotNull("Pre-Compiled meta-data is null", preCompiledMetaData);
-        Assert.assertEquals("Flow name is wrong", "basic_flow", preCompiledMetaData.getName());
-        Assert.assertEquals("Flow namespace is wrong", "user.ops", preCompiledMetaData.getNamespace());
-        Assert.assertEquals("There is a different number of flow inputs than expected", 0, preCompiledMetaData.getInputs().size());
-        Assert.assertEquals("There is a different number of flow outputs than expected", 0, preCompiledMetaData.getOutputs().size());
-        Assert.assertEquals("There is a different number of flow results than expected", 2, preCompiledMetaData.getResults().size());
-        Map<String, SlangFileType> dependencies = preCompiledMetaData.getDependencies();
+        Assert.assertNotNull("Pre-Compiled meta-data is null", flow);
+        Assert.assertEquals("Flow name is wrong", "basic_flow", flow.getName());
+        Assert.assertEquals("Flow namespace is wrong", "user.ops", flow.getNamespace());
+        Assert.assertEquals("There is a different number of flow inputs than expected", 0, flow.getInputs().size());
+        Assert.assertEquals("There is a different number of flow outputs than expected", 0, flow.getOutputs().size());
+        Assert.assertEquals("There is a different number of flow results than expected", 2, flow.getResults().size());
+        Map<String, SlangFileType> dependencies = flow.getDependencies();
         Assert.assertEquals("There is a different number of flow dependencies than expected", 3, dependencies.size());
     }
 

@@ -115,7 +115,7 @@ public class ExecutableBuilder {
 
                 Workflow workflow = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false);
                 //todo: add sys vars dependencies?
-                dependencies = fetchTasksDependenciesNonRecursive(workflow);
+                dependencies = fetchDirectTasksDependencies(workflow);
                 return new Flow(preExecutableActionData, postExecutableActionData, workflow, namespace, execName, inputs, outputs, results, dependencies);
 
             case OPERATIONS:
@@ -223,10 +223,10 @@ public class ExecutableBuilder {
 
     /**
      * Fetch the first level of the dependencies of the executable (non recursively)
-     * @param workflow
+     * @param workflow the workflow of the flow
      * @return a map of dependencies. Key - dependency full name, value - type
      */
-    private Map<String, SlangFileType> fetchTasksDependenciesNonRecursive(Workflow workflow){
+    private Map<String, SlangFileType> fetchDirectTasksDependencies(Workflow workflow){
         Map<String, SlangFileType> dependencies = new HashMap<>();
         Deque<Task> tasks = workflow.getTasks();
         for (Task task : tasks) {
