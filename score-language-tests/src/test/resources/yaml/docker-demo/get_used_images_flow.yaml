@@ -9,6 +9,7 @@ namespace: docker.maintenance.flows
 
 imports:
  ops: docker.ops
+ linux_ops: linux.ops
 
 flow:
   name: get_used_images_flow
@@ -20,7 +21,7 @@ flow:
   workflow:
     validate_linux_machine_ssh_access:
           do:
-            ops.get_all_containers:
+            linux_ops.validate_linux_machine_ssh_access:
               - host: dockerHost
               - username: dockerUsername
               - password: dockerPassword

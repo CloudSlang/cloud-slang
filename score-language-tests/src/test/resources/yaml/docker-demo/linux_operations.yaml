@@ -39,7 +39,7 @@ operations:
           - username
           - password
           - privateKeyFile: "''"
-          - command: ''
+          - command: "' '"
           - arguments: "''"
           - characterSet : "'UTF-8'"
           - pty: "'false'"
