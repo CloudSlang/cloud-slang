@@ -1,0 +1,62 @@
+#   (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+#   All rights reserved. This program and the accompanying materials
+#   are made available under the terms of the Apache License v2.0 which accompany this distribution.
+#
+#   The Apache License is available at
+#   http://www.apache.org/licenses/LICENSE-2.0
+
+namespace: docker.maintenance.flows
+
+imports:
+ docker_ops: docker.maintenance.ops
+ linux_ops: linux.ops
+
+flow:
+  name: get_mysql_status
+
+  inputs:
+    - dockerHost
+    - dockerUsername
+    - dockerPassword
+    - containerID
+    - mysqlUsername
+    - mysqlPassword
+
+  workflow:
+    validate_linux_machine_ssh_access:
+          do:
+            linux_ops.validate_linux_machine_ssh_access:
+              - host: dockerHost
+              - username: dockerUsername
+              - password: dockerPassword
+          publish:
+              - errorMessage
+
+    check_mysql_is_up:
+          do:
+            docker_ops.check_mysql_is_up:
+              - containerID
+              - host: dockerHost
+              - username: dockerUsername
+              - password: dockerPassword
+              - mysqlUsername
+              - mysqlPassword
+          publish:
+            - errorMessage
+
+    get_mysql_status:
+          do:
+            docker_ops.get_mysql_status:
+              - containerID
+              - host: dockerHost
+              - username: dockerUsername
+              - password: dockerPassword
+              - mysqlUsername
+              - mysqlPassword
+          publish:
+              - status
+              - errorMessage
+
+  outputs:
+    - status
+    - errorMessage
