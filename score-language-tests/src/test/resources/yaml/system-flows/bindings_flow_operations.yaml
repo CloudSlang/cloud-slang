@@ -5,20 +5,21 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: system.flows
+namespace: system.ops
 
-imports:
- ops: system.ops
+operations:
+  - binding_flow_op:
+      inputs:
+        - base_input
+        - bound_input:
+            default: base_input + ">"
 
-flow:
-  name: data_flow
-  inputs:
-    - myMessage
-    - tryToChangeMessage
-  workflow:
-    data_flow_check:
-      do:
-        ops.data_flow_op:
-          - opMessage: myMessage
-          - unchangableMessage: tryToChangeMessage
+      action:
+        python_script: |
+          bound_result = bound_input + "|"
+      outputs:
+        - bound_output: bound_result + "<"
+      results:
+        - SUCCESS
+
 
