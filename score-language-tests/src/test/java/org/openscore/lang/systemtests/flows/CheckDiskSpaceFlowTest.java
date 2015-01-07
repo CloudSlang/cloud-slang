@@ -55,7 +55,10 @@ public class CheckDiskSpaceFlowTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-
+        userInputs.put("dockerHost", "{{ dockerHost }}");
+        userInputs.put("dockerUsername", "{{ dockerUsername }}");
+        userInputs.put("dockerPassword", "{{ dockerPassword }}");
+        userInputs.put("percentage", "65%");
 
         Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
 
