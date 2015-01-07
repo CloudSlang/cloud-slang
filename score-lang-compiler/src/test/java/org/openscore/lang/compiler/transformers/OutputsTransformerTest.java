@@ -12,7 +12,9 @@ package org.openscore.lang.compiler.transformers;
 
 import junit.framework.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.compiler.SlangTextualKeys;
@@ -50,6 +52,9 @@ public class OutputsTransformerTest {
     @Autowired
     private YamlParser yamlParser;
 
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     private List outputsMap;
 
     @Before
@@ -84,11 +89,24 @@ public class OutputsTransformerTest {
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
-    public void testInputExpression() throws Exception {
+    public void testInputExpression() {
         @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
         Output output = outputs.get(2);
         Assert.assertEquals("output3", output.getName());
         Assert.assertEquals("fromInputs['input1']", output.getExpression());
+    }
+
+    @Test (timeout = DEFAULT_TIMEOUT)
+    public void testInvalidOutputType() throws Exception{
+        URL resource = getClass().getResource("/operation_with_invalid_outputs.yaml");
+        ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
+        Map op = file.getOperations().iterator().next();
+        Map opProp = (Map) op.get("wrong_output_op");
+        List<Object> outputsMap = (List<Object>) opProp.get(SlangTextualKeys.OUTPUTS_KEY);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("output1");
+        exception.expectMessage("3");
+        outputTransformer.transform(outputsMap);
     }
 
     @Configuration
