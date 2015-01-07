@@ -37,6 +37,7 @@ import java.util.Set;
 public class CheckDiskSpaceFlowTest extends SystemsTestsParent {
 
     @Test
+    @Ignore
     public void testCompileAndRunFlow() throws Exception {
 
         URI resource = getClass().getResource("/yaml/docker-demo/diskspace_health_check_flow.yaml").toURI();
@@ -54,10 +55,7 @@ public class CheckDiskSpaceFlowTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("dockerHost", "16.59.57.244");
-        userInputs.put("dockerUsername", "root");
-        userInputs.put("dockerPassword", "Xy6stqZ");
-        userInputs.put("percentage", "65%");
+
 
         Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs);
 
