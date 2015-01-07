@@ -5,6 +5,8 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
+
+#for get_all_images - command: "docker images | awk '{print $1 \":\" $2}'"
 namespace: docker.ops
 
 operations:
@@ -240,7 +242,7 @@ operations:
         - password
         - privateKeyFile: "''"
         - command: >
-            "docker images | awk '{print $1 \":\" $2}'"
+            "docker images -f \"dangling=true\" -q"
         - arguments: "''"
         - characterSet : "'UTF-8'"
         - pty: "'false'"

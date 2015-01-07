@@ -7,7 +7,7 @@
 
 ####################################################
 #
-#   This operation will subtract set2 from set1, meanning return result will be : set1 - set2
+#   This operation will subtract set2 from set1, meaning return result will be : set1 - set2
 #
 ####################################################
 namespace: lists.manipulation

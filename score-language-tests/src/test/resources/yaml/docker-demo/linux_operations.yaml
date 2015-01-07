@@ -4,7 +4,7 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-
+#| awk 'NR==1{print $5}'
 namespace: linux.ops
 
 operations:
@@ -16,7 +16,7 @@ operations:
         - password
         - privateKeyFile: "''"
         - command: |
-            'df -Pkh | grep -v "Filesystem"'
+            'df -Pkh | grep -v "Filesystem" | awk \'NR==1{print $5}\''
         - arguments: "''"
         - characterSet : "'UTF-8'"
         - pty: "'false'"
@@ -27,8 +27,7 @@ operations:
           className: org.openscore.content.ssh.actions.SSHShellCommandAction
           methodName: runSshShellCommand
       outputs:
-        - response: STDOUT
-        - diskSpace:
+        - diskSpace: STDOUT.replace("\n", "")
       results:
         - SUCCESS
         - FAILURE
@@ -53,4 +52,18 @@ operations:
           - response: STDOUT
         results:
           - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
+          - FAILURE
+  - check_availability:
+        inputs:
+          - diskSpace
+          - percentage
+        action:
+          python_script: |
+            diskSpaceNr = diskSpace.replace("%", "")
+            percentageNr = percentage.replace("%", "")
+        outputs:
+          - diskSpaceNr
+          - percentageNr
+        results:
+          - SUCCESS: diskSpaceNr < percentageNr
           - FAILURE

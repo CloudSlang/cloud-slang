@@ -1,0 +1,50 @@
+namespace: docker.flows
+
+imports:
+ ops: docker.ops
+ linux: linux.ops
+ flows: docker.maintenance.flows
+
+flow:
+  name: diskspace_heath_check_flow
+  inputs:
+    - dockerHost
+    - dockerUsername
+    - dockerPassword
+    - percentage
+
+  workflow:
+    validate_linux_machine_ssh_access:
+      do:
+        linux.validate_linux_machine_ssh_access:
+          - host: dockerHost
+          - username: dockerUsername
+          - password: dockerPassword
+    check_disk_space:
+      do:
+        linux.check_linux_disk_space:
+          - host: dockerHost
+          - username: dockerUsername
+          - password: dockerPassword
+      publish:
+        - diskSpace
+    check_availability:
+      do:
+        linux.check_availability:
+          - diskSpace
+          - percentage
+      navigate:
+        SUCCESS: SUCCESS
+        FAILURE: clear_docker_images
+    clear_docker_images:
+      do:
+        flows.clear_docker_images_flow:
+          - dockerHost
+          - dockerUsername
+          - dockerPassword
+      publish:
+        - images_list_safe_to_delete
+      navigate:
+        SUCCESS: SUCCESS
+        FAILURE: FAILURE
+
