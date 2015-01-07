@@ -1,16 +1,15 @@
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
-
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package org.openscore.lang.cli;
 
 import com.google.common.collect.Lists;
+
 import org.openscore.lang.cli.services.ScoreServices;
 import org.openscore.lang.cli.utils.CompilerHelper;
 import org.openscore.lang.entities.CompilationArtifact;
@@ -28,17 +27,17 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
 /**
- * Date: 11/7/2014
- *
  * @author lesant
+ * @since 11/07/2014
+ * @version $Id$
  */
-
 @Component
 public class SlangCLI implements CommandMarker {
 
@@ -65,23 +64,21 @@ public class SlangCLI implements CommandMarker {
     @CliCommand(value = "run", help = "triggers a slang flow")
     public String run(
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. slang run --f C:\\Slang\\flow.yaml") final File file,
-            @CliOption(key = {"cp", "classpath"}, mandatory = false,
-                    help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath,
-            //@CliOption(key = "sp", mandatory = false, help = "System property file location") final String systemProperty,//not supported for now...
-            @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, Serializable> inputs) throws IOException {
-
+            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath,
+            @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, Serializable> inputs,
+            @CliOption(key = {"vf", "variable-file"}, mandatory = false, help = "comma separated list of variable file locations") final List<String> variableFiles) throws IOException {
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, classPath);
-
+        Map<String, ? extends Serializable> variables = compilerHelper.loadVariables(variableFiles);
         Long id;
         if (!triggerAsync) {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            id = scoreServices.triggerSync(compilationArtifact, inputs);
+            id = scoreServices.triggerSync(compilationArtifact, inputs, variables);
             stopWatch.stop();
             return triggerSyncMsg(id, stopWatch.toString());
         }
-        id = scoreServices.trigger(compilationArtifact, inputs);
+        id = scoreServices.trigger(compilationArtifact, inputs, variables);
         return triggerAsyncMsg(id, compilationArtifact.getExecutionPlan().getName());
     }
 
