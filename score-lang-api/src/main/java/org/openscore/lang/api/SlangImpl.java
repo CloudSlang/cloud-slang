@@ -42,9 +42,9 @@ import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
 import static org.openscore.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
 
 /**
- * User: stoneo
- * Date: 03/12/2014
- * Time: 15:20
+ * @author stoneo
+ * @since 03/12/2014
+ * @version $Id$
  */
 public class SlangImpl implements Slang {
 
@@ -93,14 +93,15 @@ public class SlangImpl implements Slang {
 	}
 
 	@Override
-	public Long compileAndRunOperation(SlangSource source, String operationName, Set<SlangSource> dependencies, Map<String, Serializable> runInputs) {
+	public Long compileAndRunOperation(SlangSource source, String operationName, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs,
+		Map<String, ? extends Serializable> variables) {
 		CompilationArtifact compilationArtifact = compileOperation(source, operationName, dependencies);
-		return run(compilationArtifact, runInputs, null);
+		return run(compilationArtifact, runInputs, variables);
 	}
 
 	@Override
-	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, Serializable> runInputs) {
-		return compileAndRunOperation(source, null, dependencies, runInputs);
+	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> variables) {
+		return compileAndRunOperation(source, null, dependencies, runInputs, variables);
 	}
 
 	@Override

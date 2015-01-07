@@ -17,13 +17,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * User: stoneo
- * Date: 03/12/2014
- * Time: 11:28
- */
-
-/**
  * API for using slang
+ *
+ * @author stoneo
+ * @since 03/12/2014
+ * @version $Id$
  */
 public interface Slang {
 
@@ -53,14 +51,15 @@ public interface Slang {
 	 */
 	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> variables);
 
-    /**
-     * Compile & run a flow written in slang
-     * @param source the slang source containing the flow
-     * @param dependencies a set of slang sources of all the flow's dependencies
-     * @param runInputs the inputs for the flow run
-     * @return the execution ID in score
-     */
-    public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, Serializable> runInputs);
+	/**
+	 * Compile & run a flow written in slang
+	 * @param source the slang source containing the flow
+	 * @param dependencies a set of slang sources of all the flow's dependencies
+	 * @param runInputs the inputs for the flow run
+	 * @param variables the variables for the flow/operation run
+	 * @return the execution ID in score
+	 */
+	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> variables);
 
 	/**
 	 * Compile & run an operation written in slang
@@ -68,9 +67,11 @@ public interface Slang {
 	 * @param operationName the name of the operation to compile from the source
 	 * @param dependencies a set of slang sources of all the operation's dependencies
 	 * @param runInputs the inputs for the operation run
+	 * @param variables the variables for the flow/operation run
 	 * @return the execution ID in score
 	 */
-	public Long compileAndRunOperation(SlangSource source, String operationName, Set<SlangSource> dependencies, Map<String, Serializable> runInputs);
+	public Long compileAndRunOperation(SlangSource source, String operationName, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs,
+		Map<String, ? extends Serializable> variables);
 
 	/**
 	 * Load variable sources written in slang and map them to fully qualified names

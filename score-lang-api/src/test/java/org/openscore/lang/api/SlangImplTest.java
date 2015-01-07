@@ -190,8 +190,8 @@ public class SlangImplTest {
         SlangSource tempFile = createTempFile();
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
         Mockito.when(mockSlang.compileOperation(tempFile, "op", new HashSet<SlangSource>())).thenReturn(compilationArtifact);
-        when(mockSlang.compileAndRunOperation(any(SlangSource.class), anyString(), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class))).thenCallRealMethod();
-        Long id = mockSlang.compileAndRunOperation(tempFile, "op", new HashSet<SlangSource>(), new HashMap<String, Serializable>());
+        when(mockSlang.compileAndRunOperation(any(SlangSource.class), anyString(), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class))).thenCallRealMethod();
+        Long id = mockSlang.compileAndRunOperation(tempFile, "op", new HashSet<SlangSource>(), new HashMap<String, Serializable>(), null);
         Assert.assertNotNull(id);
         Mockito.verify(mockSlang).run(compilationArtifact, new HashMap<String, Serializable>(), null);
     }
@@ -203,10 +203,10 @@ public class SlangImplTest {
         Slang mockSlang = Mockito.mock(SlangImpl.class);
         SlangSource tempFile = createTempFile();
 
-        when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class))).thenCallRealMethod();
-        Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>());
+        when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class))).thenCallRealMethod();
+        Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), null);
         Assert.assertNotNull(id);
-        Mockito.verify(mockSlang).compileAndRunOperation(tempFile, null, new HashSet<SlangSource>(), new HashMap<String, Serializable>());
+        Mockito.verify(mockSlang).compileAndRunOperation(tempFile, null, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), null);
     }
 
     // tests for subscribeOnEvents() method
