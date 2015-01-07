@@ -96,6 +96,7 @@ public class ExecutableBuilder {
         String namespace = parsedSlang.getNamespace();
         Map<String, String> imports = parsedSlang.getImports();
         resolveVariables(inputs, imports);
+        Map<String, SlangFileType> dependencies;
         switch (parsedSlang.getType()) {
             case FLOW:
                 @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> workFlowRawData =
@@ -112,8 +113,9 @@ public class ExecutableBuilder {
                 }
 
                 Workflow workflow = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false);
-
-                return new Flow(preExecutableActionData, postExecutableActionData, workflow, namespace, execName, inputs, outputs, results);
+                //todo: add sys vars dependencies?
+                dependencies = fetchDirectTasksDependencies(workflow);
+                return new Flow(preExecutableActionData, postExecutableActionData, workflow, namespace, execName, inputs, outputs, results, dependencies);
 
             case OPERATIONS:
                 @SuppressWarnings("unchecked") Map<String, Object> actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
@@ -121,7 +123,9 @@ public class ExecutableBuilder {
                     throw new RuntimeException("Operation: " + execName + " has no action data");
                 }
                 Action action = compileAction(actionRawData);
-                return new Operation(preExecutableActionData, postExecutableActionData, action, namespace, execName, inputs, outputs, results);
+                //todo: add sys vars dependencies?
+                dependencies = new HashMap<>();
+                return new Operation(preExecutableActionData, postExecutableActionData, action, namespace, execName, inputs, outputs, results, dependencies);
             default:
                 throw new RuntimeException("Source: " + parsedSlang.getName() + " is not of flow type or operations");
         }
@@ -229,5 +233,20 @@ public class ExecutableBuilder {
 		String refName = StringUtils.substringAfter(refIdString, ".");
 		return imports.get(alias) + "." + refName;
 	}
+
+    /**
+     * Fetch the first level of the dependencies of the executable (non recursively)
+     * @param workflow the workflow of the flow
+     * @return a map of dependencies. Key - dependency full name, value - type
+     */
+    private Map<String, SlangFileType> fetchDirectTasksDependencies(Workflow workflow){
+        Map<String, SlangFileType> dependencies = new HashMap<>();
+        Deque<Task> tasks = workflow.getTasks();
+        for (Task task : tasks) {
+            String refId = task.getRefId();
+            dependencies.put(refId, SlangFileType.EXECUTABLE);
+        }
+        return dependencies;
+    }
 
 }

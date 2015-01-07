@@ -27,7 +27,6 @@ public class LanguageEventData extends HashMap<String, Serializable> {
 	public static final String EXECUTIONID = "EXECUTIONID";
 	public static final String PATH = "PATH";
 	public static final String EXCEPTION = "EXCEPTION";
-	public static final String INPUTS = "INPUTS";
 	public static final String OUTPUTS = "OUTPUTS";
     public static final String RESULT = "RESULT";
 	public static final String CALL_ARGUMENTS = "CALL_ARGUMENTS";
@@ -91,11 +90,11 @@ public class LanguageEventData extends HashMap<String, Serializable> {
 	}
 
 	public Map<String, Serializable> getInputs() {
-		return (Map<String, Serializable>)get(INPUTS);
+		return (Map<String, Serializable>)get(BOUND_INPUTS);
 	}
 
 	public void setInputs(Map<String, Serializable> inputs) {
-		put(INPUTS, (Serializable)inputs);
+		put(BOUND_INPUTS, (Serializable)inputs);
 	}
 
 	public Map<String, Serializable> getOutputs() {

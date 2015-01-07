@@ -119,7 +119,7 @@ public class ExecutionPlanBuilderTest {
         List<Result> results = new ArrayList<>();
 
         Operation compiledOperation =
-                new Operation(preOpActionData, postOpActionData, action, opNamespace, operationName, inputs, outputs, results);
+                new Operation(preOpActionData, postOpActionData, action, opNamespace, operationName, inputs, outputs, results, null);
 
         mockStartStep(compiledOperation);
         when(stepFactory.createActionStep(eq(2L), same(actionData))).thenReturn(new ExecutionStep(2L));
@@ -148,7 +148,7 @@ public class ExecutionPlanBuilderTest {
         List<Result> results = defaultFlowResults();
 
         Flow compiledFlow =
-                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results);
+                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow);
@@ -185,7 +185,7 @@ public class ExecutionPlanBuilderTest {
 
 
         Flow compiledFlow =
-                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results);
+                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow);
@@ -215,7 +215,7 @@ public class ExecutionPlanBuilderTest {
         List<Result> results = new ArrayList<>();
 
         Flow compiledFlow =
-                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results);
+                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow);

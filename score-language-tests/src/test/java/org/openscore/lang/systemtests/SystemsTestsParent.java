@@ -28,6 +28,10 @@ import java.util.Map;
 @ContextConfiguration(locations = "classpath:/META-INF/spring/systemTestContext.xml")
 public class SystemsTestsParent {
 
+    protected static final String EXEC_START_PATH = "0/0";
+    protected static final String FIRST_STEP_PATH = "0/1";
+    protected static final String SECOND_STEP_KEY = "0/2";
+
     @Autowired
     protected Slang slang;
     @Autowired
