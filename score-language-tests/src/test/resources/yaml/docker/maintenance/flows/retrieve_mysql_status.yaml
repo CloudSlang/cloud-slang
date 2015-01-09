@@ -5,6 +5,26 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
+##################################################################################################################################################
+# This flow retrieves the MySQL server status from a docker container.
+# Inputs:
+#    - containerID - ID of the docker container that runs MySQL
+#    - host - docker machine host
+#    - username - docker machine username
+#    - password - docker machine password
+#    - mysqlUsername - MySQL instance username
+#    - mysqlPassword - MySQL instance password
+#
+# Outputs:
+#    - status - status of the MySQL server
+#    - additionalInformation - in case something went wrong during the flow, this may contain additional information about the problem
+#    - errorMessage - message that describes the error, may contain the STDERR of the machine or the cause of an exception
+#
+# Results:
+#    - SUCCESS
+#    - FAILURE
+##################################################################################################################################################
+
 namespace: docker.maintenance.flows
 
 imports:
@@ -12,13 +32,13 @@ imports:
  linux_ops: linux.ops
 
 flow:
-  name: get_mysql_status
+  name: retrieve_mysql_status
 
   inputs:
+    - containerID
     - dockerHost
     - dockerUsername
     - dockerPassword
-    - containerID
     - mysqlUsername
     - mysqlPassword
 
@@ -30,6 +50,7 @@ flow:
               - username: dockerUsername
               - password: dockerPassword
           publish:
+              - additionalInformation: "''" # initialize here as a flow variable
               - errorMessage
 
     check_mysql_is_up:
@@ -42,6 +63,7 @@ flow:
               - mysqlUsername
               - mysqlPassword
           publish:
+            - additionalInformation
             - errorMessage
 
     get_mysql_status:
@@ -59,4 +81,5 @@ flow:
 
   outputs:
     - status
+    - additionalInformation
     - errorMessage

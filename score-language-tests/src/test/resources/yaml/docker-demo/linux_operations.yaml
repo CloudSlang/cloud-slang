@@ -28,7 +28,7 @@ operations:
           methodName: runSshShellCommand
       outputs:
         - response: STDOUT
-        - diskSpace:
+        - diskSpace
       results:
         - SUCCESS
         - FAILURE

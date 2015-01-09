@@ -5,13 +5,31 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
+##################################################################################################################################################
+# This operation retrieves the MySQL server status.
+# Inputs:
+#    - containerID - ID of the docker container that runs MySQL
+#    - host - docker machine host
+#    - username - docker machine username
+#    - password - docker machine password
+#    - mysqlUsername - MySQL instance username
+#    - mysqlPassword - MySQL instance password
+#
+# Outputs:
+#    - status - status of the MySQL server
+#    - errorMessage - contains the STDERR of the machine if the shh action was executed successfully, the cause of the exception otherwise
+#
+# Results:
+#    - SUCCESS - the action was executed successfully and STDERR of the machine contains no errors
+#    - FAILURE
+##################################################################################################################################################
+
 namespace: docker.maintenance.ops
 
 operations:
   - get_mysql_status:
         inputs:
           - containerID
-          - cmdParams: "'-i'"
           - host
           - port: "'22'"
           - username
@@ -21,7 +39,7 @@ operations:
           - mysqlUsername
           - mysqlPassword
           - execCmd: "'mysqladmin -u ' + mysqlUsername + ' -p' + mysqlPassword + ' status'"
-          - command: "'docker exec ' + cmdParams + ' ' + containerID + ' ' + execCmd"
+          - command: "'docker exec ' + containerID + ' ' + execCmd"
           - characterSet: "'UTF-8'"
           - pty: "'false'"
           - timeout: "'90000'"
@@ -31,7 +49,6 @@ operations:
             className: org.openscore.content.ssh.actions.SSHShellCommandAction
             methodName: runSshShellCommand
         outputs:
-          - command: fromInputs['command'] # TODO: remove this output
           - status: returnResult
           - errorMessage: STDERR if returnCode == '0' else returnResult
         results:

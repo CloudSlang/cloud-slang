@@ -5,6 +5,25 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
+##################################################################################################################################################
+# This flow retrieves the MySQL server status and notifies the user by sending an email that contains the status or the possible errors.
+# Inputs:
+#    - containerID - ID of the docker container that runs MySQL
+#    - host - docker machine host
+#    - username - docker machine username
+#    - password - docker machine password
+#    - mysqlUsername - MySQL instance username
+#    - mysqlPassword - MySQL instance password
+#    - emailHost - email server host
+#    - emailPort - email server port
+#    - emailSender - email sender
+#    - emailRecipient - email recipient
+#
+# Results:
+#    - SUCCESS
+#    - FAILURE
+##################################################################################################################################################
+
 namespace: docker.maintenance.flows
 
 imports:
@@ -15,10 +34,10 @@ flow:
   name: report_mysql_status
 
   inputs:
+    - containerID
     - dockerHost
     - dockerUsername
     - dockerPassword
-    - containerID
     - mysqlUsername
     - mysqlPassword
     - emailHost
@@ -29,7 +48,7 @@ flow:
   workflow:
     get_mysql_status:
           do:
-            docker_flows.get_mysql_status:
+            docker_flows.retrieve_mysql_status:
                 - dockerHost
                 - dockerUsername
                 - dockerPassword
@@ -38,6 +57,7 @@ flow:
                 - mysqlPassword
           publish:
             - status
+            - additionalInformation
             - errorMessage
 
     send_status_mail:
@@ -62,7 +82,7 @@ flow:
                 - from: emailSender
                 - to: emailRecipient
                 - subject: "'MySQL Server Status on ' + dockerHost"
-                - body: "'The MySQL server status checking on host ' + dockerHost + ' ended with the following error message: ' + errorMessage"
+                - body: "'The MySQL server status checking on host ' + dockerHost + ' ended with the following error message: ' + errorMessage + ' and additional information: ' + additionalInformation"
         navigate:
           SUCCESS: FAILURE
           FAILURE: FAILURE
