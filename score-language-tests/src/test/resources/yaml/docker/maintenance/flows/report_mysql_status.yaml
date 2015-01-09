@@ -46,7 +46,7 @@ flow:
     - emailRecipient
 
   workflow:
-    get_mysql_status:
+    retrieve_mysql_status:
           do:
             docker_flows.retrieve_mysql_status:
                 - dockerHost
@@ -56,7 +56,14 @@ flow:
                 - mysqlUsername
                 - mysqlPassword
           publish:
-            - status
+            - uptime
+            - threads
+            - questions
+            - slowQueries
+            - opens
+            - flushTables
+            - openTables
+            - queriesPerSecondAVG
             - additionalInformation
             - errorMessage
 
@@ -65,10 +72,11 @@ flow:
             email.send_mail:
                 - hostname: emailHost
                 - port: emailPort
+                - htmlEmail: "'false'"
                 - from: emailSender
                 - to: emailRecipient
                 - subject: "'MySQL Server Status on ' + dockerHost"
-                - body: "'The MySQL server status on host ' + dockerHost + ' is detected as: ' + status"
+                - body: "'The MySQL server status on host ' + dockerHost + ' is detected as:\\nUptime: ' + uptime + '\\nThreads: ' + threads + '\\nQuestions: ' + questions + '\\nSlow queries: ' + slowQueries + '\\nOpens: ' + opens + '\\nFlush tables: ' + flushTables + '\\nOpen tables: ' + openTables + '\\nQueries per second avg: ' + queriesPerSecondAVG"
           navigate:
             SUCCESS: SUCCESS
             FAILURE: FAILURE
