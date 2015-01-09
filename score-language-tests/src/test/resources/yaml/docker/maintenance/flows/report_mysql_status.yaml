@@ -76,7 +76,11 @@ flow:
                 - from: emailSender
                 - to: emailRecipient
                 - subject: "'MySQL Server Status on ' + dockerHost"
-                - body: "'The MySQL server status on host ' + dockerHost + ' is detected as:\\nUptime: ' + uptime + '\\nThreads: ' + threads + '\\nQuestions: ' + questions + '\\nSlow queries: ' + slowQueries + '\\nOpens: ' + opens + '\\nFlush tables: ' + flushTables + '\\nOpen tables: ' + openTables + '\\nQueries per second avg: ' + queriesPerSecondAVG"
+                - body: >
+                     'The MySQL server status on host ' + dockerHost + ' is detected as:\nUptime: ' + uptime
+                     + '\nThreads: ' + threads + '\nQuestions: ' + questions + '\nSlow queries: ' + slowQueries
+                     + '\nOpens: ' + opens + '\nFlush tables: ' + flushTables + '\nOpen tables: ' + openTables
+                     + '\nQueries per second avg: ' + queriesPerSecondAVG
           navigate:
             SUCCESS: SUCCESS
             FAILURE: FAILURE
@@ -90,7 +94,9 @@ flow:
                 - from: emailSender
                 - to: emailRecipient
                 - subject: "'MySQL Server Status on ' + dockerHost"
-                - body: "'The MySQL server status checking on host ' + dockerHost + ' ended with the following error message: ' + errorMessage + ' and additional information: ' + additionalInformation"
+                - body: >
+                    'The MySQL server status checking on host ' + dockerHost + ' ended with the following error message: '
+                    + errorMessage + ' and additional information: ' + additionalInformation
         navigate:
           SUCCESS: FAILURE
           FAILURE: FAILURE
