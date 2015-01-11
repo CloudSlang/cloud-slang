@@ -47,7 +47,7 @@ public class DataFlowTest extends SystemsTestsParent {
         userInputs.put("myMessage", "hello world");
         userInputs.put("tryToChangeMessage", "changed");
 
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs);
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, null);
 
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, steps.get(EXEC_START_PATH).getResult());
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, steps.get(FIRST_STEP_PATH).getResult());
@@ -65,7 +65,7 @@ public class DataFlowTest extends SystemsTestsParent {
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("base_input", ">");
 
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs);
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, null);
 
         Map<String, Serializable> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
         String final_output = (String) flowOutputs.get("final_output");

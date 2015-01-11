@@ -51,10 +51,22 @@ public class CompileOperationTest {
     @Test
     public void testCompileOperationBasic() throws Exception {
         URL resource = getClass().getResource("/operation.yaml");
+//URL vars = getClass().getResource("/variables.yaml");
+//ExecutionPlan executionPlan = compiler.compile(SlangSource.fromFile(resource.toURI()), "test_op", Collections.singleton(SlangSource.fromFile(vars.toURI()))).getExecutionPlan();
         ExecutionPlan executionPlan = compiler.compile(SlangSource.fromFile(resource.toURI()), "test_op", null).getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 3, executionPlan.getSteps().size());
     }
+
+	@Test
+	public void testCompileOperationMissingImport() throws Exception {
+		URL resource = getClass().getResource("/operation_mi.yaml");
+//URL vars = getClass().getResource("/variables.yaml");
+//ExecutionPlan executionPlan = compiler.compile(SlangSource.fromFile(resource.toURI()), "test_op", Collections.singleton(SlangSource.fromFile(vars.toURI()))).getExecutionPlan();
+		exception.expect(RuntimeException.class);
+		exception.expectMessage("import");
+		compiler.compile(SlangSource.fromFile(resource.toURI()), "test_op", null).getExecutionPlan();
+	}
 
     @Test
     public void wrongOperationName() throws Exception {
@@ -71,7 +83,7 @@ public class CompileOperationTest {
         ExecutionPlan executionPlan = compiler.compile(SlangSource.fromFile(resource.toURI()), "test_op_2", null).getExecutionPlan();
 
         ExecutionStep startStep = executionPlan.getStep(1L);
-        @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) startStep.getActionData().get(ScoreLangConstants.OPERATION_INPUTS_KEY);
+        @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) startStep.getActionData().get(ScoreLangConstants.EXECUTABLE_INPUTS_KEY);
         Assert.assertNotNull("inputs doesn't exist", inputs);
         Assert.assertEquals("there is a different number of inputs than expected", 13, inputs.size());
 

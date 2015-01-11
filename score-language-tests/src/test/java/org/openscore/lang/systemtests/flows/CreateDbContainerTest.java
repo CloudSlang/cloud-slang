@@ -31,11 +31,11 @@ import java.util.Set;
 *
 * @author Bonczidai Levente
 */
-public class createDbContainerTest  extends SystemsTestsParent {
+public class CreateDbContainerTest  extends SystemsTestsParent {
 
     @Test
     @Ignore
-    public void testCompileAndRunSubFlowBasic() throws Exception {
+    public void testCreateDbContainer() throws Exception {
         URI resource = getClass().getResource("/yaml/docker-demo/create_db_container.yaml").toURI();
         URI operations = getClass().getResource("/yaml/docker-demo/").toURI();
 
@@ -46,7 +46,7 @@ public class createDbContainerTest  extends SystemsTestsParent {
         userInputs.put("host", "{{ host }}");
         userInputs.put("username", "{{ username }}");
         userInputs.put("password", "{{ password }}");
-        ScoreEvent event = trigger(compilationArtifact, userInputs);
+        ScoreEvent event = trigger(compilationArtifact, userInputs, null);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 

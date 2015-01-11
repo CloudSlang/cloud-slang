@@ -9,12 +9,18 @@ namespace: user.flows
 
 imports:
   ops: user.ops
+  vars: test.env.vars
 
 flow:
   name: child_flow
   inputs:
     - input1: "'value'"
   workflow:
+    Task0:
+      do:
+        ops.get_time_zone:
+          - time_zone_as_string:
+              variable: vars.port
     CheckWeather:
       do:
         ops.test_op:
