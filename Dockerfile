@@ -1,0 +1,12 @@
+############################################################
+# Dockerfile to build score slang container image
+# Based on Ubuntu with pre-installed java
+############################################################
+
+FROM java:openjdk-7-jdk
+
+MAINTAINER Meir Wahnon
+
+RUN apt-get update
+
+RUN apt-get install maven -y
