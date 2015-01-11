@@ -11,6 +11,7 @@
 package org.openscore.lang.cli;
 
 import com.google.common.collect.Lists;
+
 import org.openscore.lang.cli.services.ScoreServices;
 import org.openscore.lang.cli.utils.CompilerHelper;
 import org.openscore.lang.entities.CompilationArtifact;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -123,7 +125,7 @@ public class SlangCLITest {
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
-    public void testRunSyncWithInputs() throws URISyntaxException, IOException {
+    public void testRunSyncWithInputs() throws Exception {
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
         long executionID = 1;
         String inputsString = "--i input1=value1,input2=value2";
@@ -144,7 +146,7 @@ public class SlangCLITest {
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
-    public void testRunAsyncWithInputs() throws URISyntaxException, IOException {
+    public void testRunAsyncWithInputs() throws Exception {
         //set async mode
         slangCLI.setEnvVar(true);
 
@@ -167,6 +169,24 @@ public class SlangCLITest {
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
+
+	@Test(timeout = DEFAULT_TIMEOUT)
+	public void testRunSyncWithVariables() throws Exception {
+		CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
+		long executionID = 1;
+
+		when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(String.class), isNull(List.class))).thenReturn(compilationArtifact);
+		when(ScoreServicesMock.triggerSync(eq(compilationArtifact), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class))).thenReturn(executionID);
+
+		CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_SLAH + " --vf " + FLOW_PATH_SLAH);
+
+		verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(String.class), isNull(List.class));
+		verify(compilerHelperMock).loadVariables(Arrays.asList(FLOW_PATH_BACKSLASH));
+		verify(ScoreServicesMock).triggerSync(eq(compilationArtifact), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class));
+
+		Assert.assertEquals("method threw exception", null, cr.getException());
+		Assert.assertEquals("success should be true", true, cr.isSuccess());
+	}
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testSetEnvVarTrue() {

@@ -9,6 +9,7 @@
 package org.openscore.lang.api;
 
 import ch.lambdaj.function.matcher.Predicate;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +28,7 @@ import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Input;
+import org.openscore.lang.runtime.env.RunEnvironment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +39,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -155,15 +158,18 @@ public class SlangImplTest {
     @Test
     public void testRun(){
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
-        Long executionId = slang.run(compilationArtifact, new HashMap<String, Serializable>(), null);
+		String fqvn = "docker.env.vars.port";
+        Long executionId = slang.run(compilationArtifact, new HashMap<String, Serializable>(), Collections.singletonMap(fqvn, 22));
         Assert.assertNotNull(executionId);
 
         ArgumentCaptor<TriggeringProperties> argumentCaptor = ArgumentCaptor.forClass(TriggeringProperties.class);
         Mockito.verify(score).trigger(argumentCaptor.capture());
 
         TriggeringProperties triggeringProperties = argumentCaptor.getValue();
-        Assert.assertTrue(triggeringProperties.getContext().containsKey(ScoreLangConstants.RUN_ENV));
+        RunEnvironment runEnv = (RunEnvironment)triggeringProperties.getContext().get(ScoreLangConstants.RUN_ENV);
+        Assert.assertNotNull(runEnv);
         Assert.assertTrue(triggeringProperties.getContext().containsKey(ScoreLangConstants.USER_INPUTS_KEY));
+        Assert.assertTrue(runEnv.getVariables().containsKey(fqvn));
     }
 
     @Test
@@ -203,6 +209,13 @@ public class SlangImplTest {
         Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
         Assert.assertNotNull(id);
         Mockito.verify(mockSlang).compileAndRunOperation(tempFile, null, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
+    }
+
+    @Test
+    public void testLoadVariables(){
+        SlangSource source = new SlangSource("source", "name");
+        slang.loadVariables(source);
+        Mockito.verify(compiler).loadVariables(source);
     }
 
     // tests for subscribeOnEvents() method
