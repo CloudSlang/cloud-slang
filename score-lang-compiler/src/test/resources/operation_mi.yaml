@@ -1,0 +1,9 @@
+namespace: user.ops
+
+operations:
+  - test_op:
+      inputs:
+        - alla:
+            variable: vars.alla
+      action:
+        python_script: 'print "hello world"'

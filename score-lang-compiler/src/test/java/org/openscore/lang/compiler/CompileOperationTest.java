@@ -28,7 +28,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -52,12 +51,22 @@ public class CompileOperationTest {
     @Test
     public void testCompileOperationBasic() throws Exception {
         URL resource = getClass().getResource("/operation.yaml");
-//URL vars = getClass().getResource("/vars.yaml");
+//URL vars = getClass().getResource("/variables.yaml");
 //ExecutionPlan executionPlan = compiler.compile(SlangSource.fromFile(resource.toURI()), "test_op", Collections.singleton(SlangSource.fromFile(vars.toURI()))).getExecutionPlan();
         ExecutionPlan executionPlan = compiler.compile(SlangSource.fromFile(resource.toURI()), "test_op", null).getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 3, executionPlan.getSteps().size());
     }
+
+	@Test
+	public void testCompileOperationMissingImport() throws Exception {
+		URL resource = getClass().getResource("/operation_mi.yaml");
+//URL vars = getClass().getResource("/variables.yaml");
+//ExecutionPlan executionPlan = compiler.compile(SlangSource.fromFile(resource.toURI()), "test_op", Collections.singleton(SlangSource.fromFile(vars.toURI()))).getExecutionPlan();
+		exception.expect(RuntimeException.class);
+		exception.expectMessage("import");
+		compiler.compile(SlangSource.fromFile(resource.toURI()), "test_op", null).getExecutionPlan();
+	}
 
     @Test
     public void wrongOperationName() throws Exception {
