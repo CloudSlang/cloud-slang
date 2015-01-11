@@ -8,7 +8,7 @@
         The Apache License is available at
         http://www.apache.org/licenses/LICENSE-2.0
     -->
-    <groupId>org.openscore.lang</groupId>
+    <groupId>io.openscore.lang</groupId>
     <artifactId>score-language</artifactId>
     <version>0.1.5-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>

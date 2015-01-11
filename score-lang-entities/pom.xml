@@ -12,7 +12,7 @@
 	<artifactId>score-lang-entities</artifactId>
 
 	<parent>
-		<groupId>org.openscore.lang</groupId>
+		<groupId>io.openscore.lang</groupId>
 		<artifactId>score-language</artifactId>
 		<version>0.1.5-SNAPSHOT</version>
 	</parent>
