@@ -19,21 +19,21 @@ operations:
           import time
           url = "http://" + host + ":" + port
           count = 0
-          returnResult = False
-          while (( count < max_seconds_to_wait ) and ( not returnResult )):
-            try:
-              result = urllib2.urlopen(url)
-            except Exception :
-               count = count + 1
-               time.sleep(1)
-            else:
-                code = result.getcode()
-                count = max_seconds_to_wait
-                if code == 200 :
-                  returnResult = True
+          successfulRequest = False
+          finished = False
+          while (( count < max_seconds_to_wait ) and ( not finished )):
+              try:
+                result = urllib2.urlopen(url)
+              except Exception :
+                 count = count + 1
+                 time.sleep(1)
+              else:
+                  finished = True
+                  code = result.getcode()
+                  if code == 200 :
+                    successfulRequest = True
       outputs:
         - errorMessage: "'Application is not Up , after ' + count + ' attempts to ping .'"
       results:
-        - SUCCESS: returnResult == 'True'
+        - SUCCESS: successfulRequest == 'True'
         - FAILURE
-
