@@ -24,7 +24,6 @@
 #    - flushTables - The number of flush-*, refresh, and reload commands the server has executed.
 #    - openTables - The number of tables that currently are open.
 #    - queriesPerSecondAVG - an average value of the number of queries in a second
-#    - additionalInformation - in case something went wrong during the flow, this may contain additional information about the problem
 #    - errorMessage - message that describes the error, may contain the STDERR of the machine or the cause of an exception
 #
 # Results:
@@ -57,7 +56,6 @@ flow:
               - username: dockerUsername
               - password: dockerPassword
           publish:
-              - additionalInformation: "''" # initialize here as a flow variable
               - errorMessage
 
     check_mysql_is_up:
@@ -70,7 +68,6 @@ flow:
               - mysqlUsername
               - mysqlPassword
           publish:
-            - additionalInformation
             - errorMessage
 
     get_mysql_status:
@@ -102,5 +99,4 @@ flow:
     - flushTables
     - openTables
     - queriesPerSecondAVG
-    - additionalInformation
     - errorMessage

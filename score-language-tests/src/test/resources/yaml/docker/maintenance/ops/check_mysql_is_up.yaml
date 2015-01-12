@@ -16,12 +16,11 @@
 #    - mysqlPassword - MySQL instance password
 #
 # Outputs:
-#    - additionalInformation - supplies additional information about the shh operation by returning the returnResult of the action
 #    - errorMessage - contains the STDERR of the machine if the shh action was executed successfully, the cause of the exception otherwise
 #
 # Results:
 #    - SUCCESS - the action was executed successfully and the MySQL server state is alive
-#    - FAILURE - some problem occurred, more information in the errorMessage and additionalInformation outputs
+#    - FAILURE - some problem occurred, more information in the errorMessage output
 ##################################################################################################################################################
 
 namespace: docker.maintenance.ops
@@ -67,7 +66,6 @@ operations:
             className: org.openscore.content.ssh.actions.SSHShellCommandAction
             methodName: runSshShellCommand
         outputs:
-          - additionalInformation: returnResult
           - errorMessage:  STDERR if returnCode == '0' else returnResult
         results:
           - SUCCESS : returnCode == '0' and returnResult == 'mysqld is alive\n'
