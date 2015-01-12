@@ -21,3 +21,7 @@ this project includes the CLI to trigger flows.
 #### Documentation :
 
 All documentation is available on the [openscore website](http://www.openscore.io/#/docs)
+
+#### Get Involved
+
+Contact us at [here](mailto:support@openscore.io)
