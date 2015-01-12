@@ -9,9 +9,9 @@
 # This flow retrieves the MySQL server status from a docker container.
 # Inputs:
 #    - containerID - ID of the docker container that runs MySQL
-#    - host - docker machine host
-#    - username - docker machine username
-#    - password - docker machine password
+#    - dockerHost - docker machine host
+#    - dockerUsername - docker machine username
+#    - dockerPassword - docker machine password
 #    - mysqlUsername - MySQL instance username
 #    - mysqlPassword - MySQL instance password
 #
