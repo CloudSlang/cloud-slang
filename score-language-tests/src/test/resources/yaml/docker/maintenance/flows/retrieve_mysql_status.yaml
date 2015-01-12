@@ -1,0 +1,106 @@
+#   (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+#   All rights reserved. This program and the accompanying materials
+#   are made available under the terms of the Apache License v2.0 which accompany this distribution.
+#
+#   The Apache License is available at
+#   http://www.apache.org/licenses/LICENSE-2.0
+
+##################################################################################################################################################
+# This flow retrieves the MySQL server status from a docker container.
+# Inputs:
+#    - containerID - ID of the docker container that runs MySQL
+#    - host - docker machine host
+#    - username - docker machine username
+#    - password - docker machine password
+#    - mysqlUsername - MySQL instance username
+#    - mysqlPassword - MySQL instance password
+#
+# Outputs:
+#    - uptime - The number of seconds the MySQL server has been running.
+#    - threads - The number of active threads (clients).
+#    - questions - The number of questions (queries) from clients since the server was started.
+#    - slowQueries - The number of queries that have taken more than long_query_time(MySQL system variable) seconds
+#    - opens - The number of tables the server has opened.
+#    - flushTables - The number of flush-*, refresh, and reload commands the server has executed.
+#    - openTables - The number of tables that currently are open.
+#    - queriesPerSecondAVG - an average value of the number of queries in a second
+#    - additionalInformation - in case something went wrong during the flow, this may contain additional information about the problem
+#    - errorMessage - message that describes the error, may contain the STDERR of the machine or the cause of an exception
+#
+# Results:
+#    - SUCCESS
+#    - FAILURE
+##################################################################################################################################################
+
+namespace: docker.maintenance.flows
+
+imports:
+ docker_ops: docker.maintenance.ops
+ linux_ops: linux.ops
+
+flow:
+  name: retrieve_mysql_status
+
+  inputs:
+    - containerID
+    - dockerHost
+    - dockerUsername
+    - dockerPassword
+    - mysqlUsername
+    - mysqlPassword
+
+  workflow:
+    validate_linux_machine_ssh_access:
+          do:
+            linux_ops.validate_linux_machine_ssh_access:
+              - host: dockerHost
+              - username: dockerUsername
+              - password: dockerPassword
+          publish:
+              - additionalInformation: "''" # initialize here as a flow variable
+              - errorMessage
+
+    check_mysql_is_up:
+          do:
+            docker_ops.check_mysql_is_up:
+              - containerID
+              - host: dockerHost
+              - username: dockerUsername
+              - password: dockerPassword
+              - mysqlUsername
+              - mysqlPassword
+          publish:
+            - additionalInformation
+            - errorMessage
+
+    get_mysql_status:
+          do:
+            docker_ops.get_mysql_status:
+              - containerID
+              - host: dockerHost
+              - username: dockerUsername
+              - password: dockerPassword
+              - mysqlUsername
+              - mysqlPassword
+          publish:
+              - uptime
+              - threads
+              - questions
+              - slowQueries
+              - opens
+              - flushTables
+              - openTables
+              - queriesPerSecondAVG
+              - errorMessage
+
+  outputs:
+    - uptime
+    - threads
+    - questions
+    - slowQueries
+    - opens
+    - flushTables
+    - openTables
+    - queriesPerSecondAVG
+    - additionalInformation
+    - errorMessage
