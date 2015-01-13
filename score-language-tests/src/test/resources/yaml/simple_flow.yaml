@@ -9,6 +9,7 @@ namespace: user.flows
 
 imports:
   ops: user.ops
+  vars: test.env.vars
 
 flow:
   name: simple_flow
@@ -16,11 +17,15 @@ flow:
     - input1
     - time_zone_as_string:
         required: false
+    - host:
+        variable: vars.host
   workflow:
     Task1:
       do:
         ops.get_time_zone:
           - time_zone_as_string: time_zone_as_string if time_zone_as_string is not None else input1
+          - port:
+              variable: vars.port
       publish:
         - time_zone: time_zone
       navigate:

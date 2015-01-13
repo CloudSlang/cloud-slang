@@ -39,7 +39,7 @@ public class RunEnvironment implements Serializable{
     private ParentFlowStack parentFlowStack;
 
     private ExecutionPath executionPath;
-
+    private final Map<String, Serializable> variables;
     // Map holding serializable data that is common for the entire run.
     // This is data that should be shred between different actions with the ability to change the data
     private Map<String, SerializableSessionObject> serializableDataMap;
@@ -51,6 +51,7 @@ public class RunEnvironment implements Serializable{
         callArguments = new HashMap<>();
         executionPath = new ExecutionPath();
         serializableDataMap = new HashMap<>();
+        variables = new HashMap<>();
     }
 
     public ContextStack getStack(){
@@ -93,6 +94,10 @@ public class RunEnvironment implements Serializable{
 
     public ExecutionPath getExecutionPath() {
         return this.executionPath;
+    }
+
+    public Map<String, Serializable> getVariables() {
+        return variables;
     }
 
     public Map<String, SerializableSessionObject> getSerializableDataMap() {

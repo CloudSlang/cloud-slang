@@ -1,16 +1,15 @@
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package org.openscore.lang.api;
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
-
 
 import ch.lambdaj.function.matcher.Predicate;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +28,7 @@ import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Input;
+import org.openscore.lang.runtime.env.RunEnvironment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,13 +39,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * User: stoneo
@@ -159,27 +158,30 @@ public class SlangImplTest {
     @Test
     public void testRun(){
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
-        Long executionId = slang.run(compilationArtifact, new HashMap<String, Serializable>());
+		String fqvn = "docker.env.vars.port";
+        Long executionId = slang.run(compilationArtifact, new HashMap<String, Serializable>(), Collections.singletonMap(fqvn, 22));
         Assert.assertNotNull(executionId);
 
         ArgumentCaptor<TriggeringProperties> argumentCaptor = ArgumentCaptor.forClass(TriggeringProperties.class);
         Mockito.verify(score).trigger(argumentCaptor.capture());
 
         TriggeringProperties triggeringProperties = argumentCaptor.getValue();
-        Assert.assertTrue(triggeringProperties.getContext().containsKey(ScoreLangConstants.RUN_ENV));
+        RunEnvironment runEnv = (RunEnvironment)triggeringProperties.getContext().get(ScoreLangConstants.RUN_ENV);
+        Assert.assertNotNull(runEnv);
         Assert.assertTrue(triggeringProperties.getContext().containsKey(ScoreLangConstants.USER_INPUTS_KEY));
+        Assert.assertTrue(runEnv.getVariables().containsKey(fqvn));
     }
 
     @Test
     public void testRunWithNullInputs(){
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
-        Long executionId = slang.run(compilationArtifact, null);
+        Long executionId = slang.run(compilationArtifact, null, null);
         Assert.assertNotNull(executionId);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testRunWithNullCompilationArtifact(){
-        slang.run(null, new HashMap<String, Serializable>());
+        slang.run(null, new HashMap<String, Serializable>(), null);
     }
 
     // tests for compileAndRunOperation() method
@@ -190,10 +192,10 @@ public class SlangImplTest {
         SlangSource tempFile = createTempFile();
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
         Mockito.when(mockSlang.compileOperation(tempFile, "op", new HashSet<SlangSource>())).thenReturn(compilationArtifact);
-        when(mockSlang.compileAndRunOperation(any(SlangSource.class), anyString(), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class))).thenCallRealMethod();
-        Long id = mockSlang.compileAndRunOperation(tempFile, "op", new HashSet<SlangSource>(), new HashMap<String, Serializable>());
+        Mockito.when(mockSlang.compileAndRunOperation(any(SlangSource.class), anyString(), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class))).thenCallRealMethod();
+        Long id = mockSlang.compileAndRunOperation(tempFile, "op", new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
         Assert.assertNotNull(id);
-        Mockito.verify(mockSlang).run(compilationArtifact, new HashMap<String, Serializable>());
+        Mockito.verify(mockSlang).run(compilationArtifact, new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
     }
 
     //tests for compileAndRun() method
@@ -203,10 +205,17 @@ public class SlangImplTest {
         Slang mockSlang = Mockito.mock(SlangImpl.class);
         SlangSource tempFile = createTempFile();
 
-        when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class))).thenCallRealMethod();
-        Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>());
+        Mockito.when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class))).thenCallRealMethod();
+        Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
         Assert.assertNotNull(id);
-        Mockito.verify(mockSlang).compileAndRunOperation(tempFile, null, new HashSet<SlangSource>(), new HashMap<String, Serializable>());
+        Mockito.verify(mockSlang).compileAndRunOperation(tempFile, null, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
+    }
+
+    @Test
+    public void testLoadVariables(){
+        SlangSource source = new SlangSource("source", "name");
+        slang.loadVariables(source);
+        Mockito.verify(compiler).loadVariables(source);
     }
 
     // tests for subscribeOnEvents() method
@@ -260,7 +269,7 @@ public class SlangImplTest {
 
         @Bean
         public SlangCompiler compiler() {
-            SlangCompiler compiler = mock(SlangCompiler.class);
+            SlangCompiler compiler = Mockito.mock(SlangCompiler.class);
             CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
             Mockito.when(compiler.compileFlow(any(SlangSource.class), anySetOf(SlangSource.class))).thenReturn(compilationArtifact);
             return compiler;
@@ -268,12 +277,12 @@ public class SlangImplTest {
 
         @Bean
         public Score score(){
-            return mock(Score.class);
+            return Mockito.mock(Score.class);
         }
 
         @Bean
         public EventBus eventBus(){
-            return mock(EventBus.class);
+            return Mockito.mock(EventBus.class);
         }
     }
 }

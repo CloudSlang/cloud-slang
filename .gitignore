@@ -1,8 +1,11 @@
 target/
 output/
 build/
-.idea/
 *.class
 *.log
+.idea/
 *.ipr
 *.iml
+.settings/
+.project
+.classpath

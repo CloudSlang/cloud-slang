@@ -7,6 +7,9 @@
 
 namespace: user.ops
 
+imports:
+  vars: test.env.vars
+
 operations:
   - test_op:
       action:
@@ -27,6 +30,8 @@ operations:
   - get_time_zone:
       inputs:
         - time_zone_as_string
+        - alla:
+            variable: vars.alla
       action:
         python_script: |
             time_zone_as_int = int(time_zone_as_string)

@@ -103,7 +103,7 @@ public class TaskStepsTest {
         resultMap.put("input1",5);
         resultMap.put("input2",3);
 
-        when(inputsBinding.bindInputs(anyMap(),eq(inputs))).thenReturn(resultMap);
+        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anyMap())).thenReturn(resultMap);
 
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
         taskSteps.beginTask(inputs,runEnv,runtimeServices,"task1", 1L, 2L, "2");

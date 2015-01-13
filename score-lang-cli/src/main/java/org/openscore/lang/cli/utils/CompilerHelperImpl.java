@@ -1,18 +1,18 @@
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package org.openscore.lang.cli.utils;
 
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
-
-
 import ch.lambdaj.function.convert.Converter;
+
 import com.google.common.collect.Lists;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
@@ -24,20 +24,22 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static ch.lambdaj.Lambda.convert;
+
 import static org.openscore.lang.compiler.SlangSource.fromFile;
 
 /**
- * Date: 11/13/2014
- *
  * @author lesant
+ * @since 11/13/2014
+ * @version $Id$
  */
-
 @Component
 public class CompilerHelperImpl implements CompilerHelper{
 
@@ -78,5 +80,15 @@ public class CompilerHelperImpl implements CompilerHelper{
             throw e;
         }
     }
+
+	@Override
+	public Map<String, ? extends Serializable> loadVariables(List<String> variableFiles) {
+		if(CollectionUtils.isEmpty(variableFiles)) return null;
+		SlangSource[] sources = new SlangSource[variableFiles.size()];
+		for(int i = 0; i < variableFiles.size(); i++) {
+			sources[i] = SlangSource.fromFile(new File(variableFiles.get(i)));
+		}
+		return slang.loadVariables(sources);
+	}
 
 }
