@@ -25,3 +25,12 @@ All documentation is available on the [openscore website](http://www.openscore.i
 #### Get Involved
 
 Contact us at [here](mailto:support@openscore.io)
+
+#### Building and Testing from Source
+
+score project uses Maven for build and test.
+
+1. ```git clone``` the source code
+2. ```mvn clean install```
+3. Run CLI executable from score-lang-cli\target\appassembler\bin 
+
