@@ -13,7 +13,9 @@ package org.openscore.lang.systemtests;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.openscore.events.ScoreEvent;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.entities.CompilationArtifact;
@@ -35,6 +37,9 @@ import java.util.Set;
 public class SimpleFlowTest extends SystemsTestsParent {
 
     private static final long DEFAULT_TIMEOUT = 20000;
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testSimpleFlowBasic() throws Exception {
@@ -76,4 +81,31 @@ public class SimpleFlowTest extends SystemsTestsParent {
 		Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
 	}
 
+    @Test
+    public void testFlowWithWrongNavigation() throws Exception {
+        URI resource = getClass().getResource("/yaml/flow_with_navigation_to_missing_task.sl").toURI();
+        URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
+
+        SlangSource operationsSource = SlangSource.fromFile(operations);
+        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Task1");
+        exception.expectMessage("Task2");
+        exception.expectMessage("navigation");
+        slang.compile(SlangSource.fromFile(resource), path);
+    }
+
+    @Test
+    public void testFlowWithNavigationToMissingDefaultResults() throws Exception {
+        URI resource = getClass().getResource("/yaml/flow_with_navigation_to_missing_default_results.sl").toURI();
+        URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
+
+        SlangSource operationsSource = SlangSource.fromFile(operations);
+        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Task1");
+        exception.expectMessage("SUCCESS");
+        exception.expectMessage("navigation");
+        slang.compile(SlangSource.fromFile(resource), path);
+    }
 }
