@@ -38,9 +38,6 @@ public class SimpleFlowTest extends SystemsTestsParent {
 
     private static final long DEFAULT_TIMEOUT = 20000;
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testSimpleFlowBasic() throws Exception {
 		compileAndRunSimpleFlow(Pair.of("input1", "-2"),Pair.of("time_zone_as_string", "+2"));
@@ -83,31 +80,17 @@ public class SimpleFlowTest extends SystemsTestsParent {
 		Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
 	}
 
-    @Test
-    public void testFlowWithWrongNavigation() throws Exception {
-        URI resource = getClass().getResource("/yaml/flow_with_navigation_to_missing_task.sl").toURI();
-        URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
-
-        SlangSource operationsSource = SlangSource.fromFile(operations);
-        Set<SlangSource> path = Sets.newHashSet(operationsSource);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Task1");
-        exception.expectMessage("Task2");
-        exception.expectMessage("navigation");
-        slang.compile(SlangSource.fromFile(resource), path);
-    }
-
-    @Test
-    public void testFlowWithNavigationToMissingDefaultResults() throws Exception {
-        URI resource = getClass().getResource("/yaml/flow_with_navigation_to_missing_default_results.sl").toURI();
-        URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
-
-        SlangSource operationsSource = SlangSource.fromFile(operations);
-        Set<SlangSource> path = Sets.newHashSet(operationsSource);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Task1");
-        exception.expectMessage("SUCCESS");
-        exception.expectMessage("navigation");
-        slang.compile(SlangSource.fromFile(resource), path);
-    }
+//    @Test
+//    public void testFlowWithMissingNavigationFromOperationResult() throws Exception {
+//        URI resource = getClass().getResource("/yaml/flow_with_missing_navigation_from_op_result.sl").toURI();
+//        URI operations = getClass().getResource("/yaml/operation_with_custom_result.sl").toURI();
+//
+//        SlangSource operationsSource = SlangSource.fromFile(operations);
+//        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+////        exception.expect(RuntimeException.class);
+////        exception.expectMessage("Task1");
+////        exception.expectMessage("SUCCESS");
+////        exception.expectMessage("navigation");
+//        slang.compile(SlangSource.fromFile(resource), path);
+//    }
 }

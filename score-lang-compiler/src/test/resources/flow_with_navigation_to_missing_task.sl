@@ -15,6 +15,6 @@ flow:
   workflow:
     Task1:
       do:
-        ops.test_op:
+        ops.java_op:
       navigate:
         SUCCESS: Task2
