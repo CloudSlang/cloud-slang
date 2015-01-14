@@ -96,13 +96,13 @@ public class TaskSteps extends AbstractSteps {
 
         Map<String, Serializable> flowContext = runEnv.getStack().popContext();
 
-        ReturnValues operationReturnValues = runEnv.removeReturnValues();
+        ReturnValues executableReturnValues = runEnv.removeReturnValues();
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_START, "Output binding started",
                 Pair.of(TASK_PUBLISH_KEY, (Serializable) taskPublishValues),
                 Pair.of(TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues),
-                Pair.of("operationReturnValues", operationReturnValues),Pair.of(LanguageEventData.levelName.TASK_NAME.name(),nodeName));
+                Pair.of("operationReturnValues", executableReturnValues),Pair.of(LanguageEventData.levelName.TASK_NAME.name(),nodeName));
 
-        Map<String, String> publishValues = outputsBinding.bindOutputs(null, operationReturnValues.getOutputs(), taskPublishValues);
+        Map<String, String> publishValues = outputsBinding.bindOutputs(null, executableReturnValues.getOutputs(), taskPublishValues);
 
         flowContext.putAll(publishValues);
 
@@ -110,13 +110,14 @@ public class TaskSteps extends AbstractSteps {
 
 		// set the position of the next step - for the use of the navigation
 		// Find in the navigation values the correct next step position, according to the operation result, and set it
-		ResultNavigation navigation = taskNavigationValues.get(operationReturnValues.getResult());
-		Long nextPosition = null;
-		String presetResult = null;
-		if(navigation != null) {
-			nextPosition = navigation.getNextStepId();
-			presetResult = navigation.getPresetResult();
-		}
+		ResultNavigation navigation = taskNavigationValues.get(executableReturnValues.getResult());
+		if(navigation == null) {
+            // We should always have the executable response mapped to a navigation by the task. If not, this is an error
+            throw new RuntimeException("Task: " + nodeName + " has no matching navigation for the executable result: " + executableReturnValues.getResult() );
+        }
+
+        Long nextPosition = navigation.getNextStepId();
+        String presetResult = navigation.getPresetResult();
 		runEnv.putNextStepPosition(nextPosition);
 
 		HashMap<String, String> outputs = new HashMap<>();// todo - is this the right solution?
@@ -124,7 +125,7 @@ public class TaskSteps extends AbstractSteps {
 			outputs.put(entry.getKey(), String.valueOf(entry.getValue()));
 		}
 
-		ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : operationReturnValues.getResult());
+		ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : executableReturnValues.getResult());
 		runEnv.putReturnValues(returnValues);
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_END, "Output binding finished",
                 Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
