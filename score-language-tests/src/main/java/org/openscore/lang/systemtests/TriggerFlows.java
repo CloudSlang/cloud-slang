@@ -13,6 +13,7 @@ import org.openscore.events.ScoreEvent;
 import org.openscore.events.ScoreEventListener;
 import org.openscore.lang.api.Slang;
 import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.runtime.events.LanguageEventData;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
@@ -36,7 +37,7 @@ public class TriggerFlows {
     private Slang slang;
 
     public ScoreEvent runSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> variables) {
-        final BlockingQueue<ScoreEvent> finishEvent = new LinkedBlockingQueue<>(1);
+        final BlockingQueue<ScoreEvent> finishEvent = new LinkedBlockingQueue<>();
         ScoreEventListener finishListener = new ScoreEventListener() {
             @Override
             public void onEvent(ScoreEvent event) throws InterruptedException {
@@ -49,6 +50,10 @@ public class TriggerFlows {
 
         try {
             ScoreEvent event = finishEvent.take();
+            if (event.getEventType().equals(SLANG_EXECUTION_EXCEPTION)){
+                LanguageEventData languageEvent = (LanguageEventData) event.getData();
+                throw new RuntimeException((String) languageEvent.get(LanguageEventData.EXCEPTION));
+            }
             slang.unSubscribeOnEvents(finishListener);
             return event;
         } catch (InterruptedException e) {
