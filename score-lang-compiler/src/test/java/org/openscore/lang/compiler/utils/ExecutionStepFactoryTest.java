@@ -43,8 +43,8 @@ public class ExecutionStepFactoryTest {
     public void testCreateStartStepPutInputsUnderTheRightKey() throws Exception {
         ArrayList<Input> execInputs = new ArrayList<>();
         ExecutionStep startStep = factory.createStartStep(1L, new HashMap<String, Serializable>(), execInputs,"");
-        Assert.assertNotNull("inputs key is null", startStep.getActionData().get(ScoreLangConstants.OPERATION_INPUTS_KEY));
-        Assert.assertSame("inputs are not set under their key", execInputs, startStep.getActionData().get(ScoreLangConstants.OPERATION_INPUTS_KEY));
+        Assert.assertNotNull("inputs key is null", startStep.getActionData().get(ScoreLangConstants.EXECUTABLE_INPUTS_KEY));
+        Assert.assertSame("inputs are not set under their key", execInputs, startStep.getActionData().get(ScoreLangConstants.EXECUTABLE_INPUTS_KEY));
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -112,6 +112,9 @@ public class ExecutionPlanBuilder {
             String nextStepName = entry.getValue();
             if (taskReferences.get(nextStepName) == null) {
                 Task nextTaskToCompile = Lambda.selectFirst(tasks, having(on(Task.class).getName(), equalTo(nextStepName)));
+                if(nextTaskToCompile == null){
+                    throw new RuntimeException("Failed to compile task: " + taskName + ". The task/result name: " + entry.getValue() + " of navigation: " + entry.getKey() + " -> " + entry.getValue() + " is missing");
+                }
                 taskExecutionSteps.addAll(buildTaskExecutionSteps(nextTaskToCompile, taskReferences, tasks));
             }
 			long nextStepId = taskReferences.get(nextStepName);

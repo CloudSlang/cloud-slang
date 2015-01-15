@@ -4,33 +4,19 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-
-namespace: user.flows
+namespace: user.ops
 
 imports:
   ops: user.ops
-  flows: user.flows
 
 flow:
-  name: parent_flow
-  inputs:
-    - input1
-    - city:
-        required: false
+  name: basic_flow
+
   workflow:
     Task1:
       do:
-        ops.check_Weather:
-          - city: city if city is not None else input1
-      publish:
-        - kuku: weather
+        ops.print_custom_result_op:
 
-    Task2:
-      do:
-        flows.child_flow:
-          - input1: kuku
-      publish:
-        - val_output
   results:
     - SUCCESS
     - FAILURE

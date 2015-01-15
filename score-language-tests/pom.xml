@@ -12,8 +12,8 @@
 
     <parent>
         <artifactId>score-language</artifactId>
-        <groupId>org.openscore.lang</groupId>
-        <version>0.1.4-SNAPSHOT</version>
+        <groupId>io.openscore.lang</groupId>
+        <version>0.1.6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

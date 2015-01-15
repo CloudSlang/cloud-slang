@@ -1,0 +1,56 @@
+#   (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+#   All rights reserved. This program and the accompanying materials
+#   are made available under the terms of the Apache License v2.0 which accompany this distribution.
+#
+#   The Apache License is available at
+#   http://www.apache.org/licenses/LICENSE-2.0
+
+##################################################################################################################################################
+# This operation checks if the MySQL server is up, meaning its state is alive.
+# Inputs:
+#    - containerID - ID of the docker container that runs MySQL
+#    - host - docker machine host
+#    - username - docker machine username
+#    - password - docker machine password
+#    - mysqlUsername - MySQL instance username
+#    - mysqlPassword - MySQL instance password
+#
+# Outputs:
+#    - additionalInformation - supplies additional information about the shh operation by returning the returnResult of the action
+#    - errorMessage - contains the STDERR of the machine if the shh action was executed successfully, the cause of the exception otherwise
+#
+# Results:
+#    - SUCCESS - the action was executed successfully and the MySQL server state is alive
+#    - FAILURE - some problem occurred, more information in the errorMessage and additionalInformation outputs
+##################################################################################################################################################
+
+namespace: docker.maintenance.ops
+
+operations:
+  - check_mysql_is_up:
+        inputs:
+          - containerID
+          - host
+          - port: "'22'"
+          - username
+          - password
+          - privateKeyFile: "''"
+          - arguments: "''"
+          - mysqlUsername
+          - mysqlPassword
+          - execCmd: "'mysqladmin -u ' + mysqlUsername + ' -p' + mysqlPassword + ' ping'"
+          - command: "'docker exec ' + containerID + ' ' + execCmd"
+          - characterSet: "'UTF-8'"
+          - pty: "'false'"
+          - timeout: "'90000'"
+          - closeSession: "'false'"
+        action:
+          java_action:
+            className: org.openscore.content.ssh.actions.SSHShellCommandAction
+            methodName: runSshShellCommand
+        outputs:
+          - additionalInformation: returnResult
+          - errorMessage:  STDERR if returnCode == '0' else returnResult
+        results:
+          - SUCCESS : returnCode == '0' and returnResult == 'mysqld is alive\n'
+          - FAILURE

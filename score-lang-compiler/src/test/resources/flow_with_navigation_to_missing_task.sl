@@ -4,25 +4,17 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-
-namespace: user.flows
+namespace: user.ops
 
 imports:
   ops: user.ops
-  vars: test.env.vars
 
 flow:
-  name: child_flow
-  inputs:
-    - input1: "'value'"
+  name: wrong_navigation_flow
+
   workflow:
-    Task0:
+    Task1:
       do:
-        ops.get_time_zone:
-          - time_zone_as_string:
-              variable: vars.port
-    CheckWeather:
-      do:
-        ops.test_op:
-  outputs:
-    - val_output: fromInputs['input1']
+        ops.java_op:
+      navigate:
+        SUCCESS: Task2

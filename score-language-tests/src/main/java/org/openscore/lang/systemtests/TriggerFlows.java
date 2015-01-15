@@ -13,6 +13,7 @@ import org.openscore.events.ScoreEvent;
 import org.openscore.events.ScoreEventListener;
 import org.openscore.lang.api.Slang;
 import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.runtime.events.LanguageEventData;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
@@ -35,8 +36,8 @@ public class TriggerFlows {
     @Autowired
     private Slang slang;
 
-    public ScoreEvent runSync(CompilationArtifact compilationArtifact, Map<String, Serializable> userInputs) {
-        final BlockingQueue<ScoreEvent> finishEvent = new LinkedBlockingQueue<>(1);
+    public ScoreEvent runSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> variables) {
+        final BlockingQueue<ScoreEvent> finishEvent = new LinkedBlockingQueue<>();
         ScoreEventListener finishListener = new ScoreEventListener() {
             @Override
             public void onEvent(ScoreEvent event) throws InterruptedException {
@@ -45,10 +46,14 @@ public class TriggerFlows {
         };
         slang.subscribeOnEvents(finishListener, FINISHED_EVENT);
 
-        slang.run(compilationArtifact, userInputs);
+        slang.run(compilationArtifact, userInputs, variables);
 
         try {
             ScoreEvent event = finishEvent.take();
+            if (event.getEventType().equals(SLANG_EXECUTION_EXCEPTION)){
+                LanguageEventData languageEvent = (LanguageEventData) event.getData();
+                throw new RuntimeException((String) languageEvent.get(LanguageEventData.EXCEPTION));
+            }
             slang.unSubscribeOnEvents(finishListener);
             return event;
         } catch (InterruptedException e) {
@@ -56,11 +61,11 @@ public class TriggerFlows {
         }
     }
 
-    public Map<String, StepData> runWithData(CompilationArtifact compilationArtifact, Map<String, Serializable> userInputs) {
+    public Map<String, StepData> runWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> variables) {
         RunDataAggregatorListener listener = new RunDataAggregatorListener();
         slang.subscribeOnEvents(listener, STEP_EVENTS);
 
-        runSync(compilationArtifact, userInputs);
+        runSync(compilationArtifact, userInputs, variables);
 
         Map<String, StepData> tasks = listener.aggregate();
 

@@ -28,7 +28,7 @@ operations:
           methodName: runSshShellCommand
       outputs:
         - response: STDOUT
-        - diskSpace:
+        - diskSpace
       results:
         - SUCCESS
         - FAILURE
@@ -51,6 +51,7 @@ operations:
             methodName: runSshShellCommand
         outputs:
           - response: STDOUT
+          - errorMessage: STDERR if returnCode == '0' else returnResult
         results:
           - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
           - FAILURE

@@ -13,7 +13,9 @@ package org.openscore.lang.systemtests;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.openscore.events.ScoreEvent;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.entities.CompilationArtifact;
@@ -33,6 +35,9 @@ import java.util.Set;
  * @author Bonczidai Levente
  */
 public class SimpleFlowTest extends SystemsTestsParent {
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     private static final long DEFAULT_TIMEOUT = 20000;
 
@@ -57,7 +62,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
 
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("object_value", "SessionValue");
-        ScoreEvent event = trigger(compilationArtifact, userInputs);
+        ScoreEvent event = trigger(compilationArtifact, userInputs, null);
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 
@@ -66,14 +71,30 @@ public class SimpleFlowTest extends SystemsTestsParent {
 		URI flow = getClass().getResource("/yaml/simple_flow.yaml").toURI();
 		URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
         SlangSource operationsSource = SlangSource.fromFile(operations);
+		URI vars = getClass().getResource("/yaml/simple_variables.yaml").toURI();
+		SlangSource varsSource = SlangSource.fromFile(vars);
         Set<SlangSource> path = Sets.newHashSet(operationsSource);
 		CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
 		HashMap<String, Serializable> userInputs = new HashMap<>();
         for (Entry<String, ? extends Serializable> input : inputs) {
             userInputs.put(input.getKey(), input.getValue());
         }
-		ScoreEvent event = trigger(compilationArtifact, userInputs);
+		ScoreEvent event = trigger(compilationArtifact, userInputs, slang.loadVariables(varsSource));
 		Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
 	}
 
+    @Test
+    public void testFlowWithMissingNavigationFromOperationResult() throws Exception {
+        URI resource = getClass().getResource("/yaml/flow_with_missing_navigation_from_op_result.sl").toURI();
+        URI operations = getClass().getResource("/yaml/operation_with_custom_result.sl").toURI();
+
+        SlangSource operationsSource = SlangSource.fromFile(operations);
+        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Task1");
+        exception.expectMessage("CUSTOM");
+        exception.expectMessage("navigation");
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        trigger(compilationArtifact, new HashMap<String, Serializable>(), null);
+    }
 }

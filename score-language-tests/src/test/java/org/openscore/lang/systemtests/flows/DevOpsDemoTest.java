@@ -46,7 +46,7 @@ public class DevOpsDemoTest extends SystemsTestsParent {
         userInputs.put("emailPort", "{{ emailPort }}");
         userInputs.put("emailSender", "{{ emailSender }}");
         userInputs.put("emailRecipient", "{{ emailRecipient }}");
-        ScoreEvent event = trigger(compilationArtifact, userInputs);
+        ScoreEvent event = trigger(compilationArtifact, userInputs, null);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 }
