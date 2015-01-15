@@ -63,7 +63,7 @@ public class CompilerHelperImpl implements CompilerHelper{
         }
 
         for (String dependency:dependencies) {
-            Collection<File> dependenciesFiles = FileUtils.listFiles(new File(dependency), SLANG_FILE_EXTENSIONS, false);
+            Collection<File> dependenciesFiles = FileUtils.listFiles(new File(dependency), SLANG_FILE_EXTENSIONS, true);
             depsSources.addAll(convert(dependenciesFiles, new Converter<File, SlangSource>() {
                 @Override
                 public SlangSource convert(File from) {
