@@ -24,7 +24,7 @@
 #    - flushTables - The number of flush-*, refresh, and reload commands the server has executed.
 #    - openTables - The number of tables that currently are open.
 #    - queriesPerSecondAVG - an average value of the number of queries in a second
-#    - errorMessage - message that describes the error, may contain the STDERR of the machine or the cause of an exception
+#    - errorMessage - possible error message, may contain the STDERR of the machine or the cause of an exception
 #
 # Results:
 #    - SUCCESS
