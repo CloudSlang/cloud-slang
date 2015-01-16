@@ -8,7 +8,7 @@
 ##################################################################################################################################################
 # This operation checks if the MySQL server is up, meaning its state is alive.
 # Inputs:
-#    - containerID - ID of the docker container that runs MySQL
+#    - container - name or ID of the docker container that runs MySQL
 #    - host - docker machine host
 #    - username - docker machine username
 #    - password - docker machine password
@@ -28,7 +28,7 @@ namespace: docker.maintenance.ops
 operations:
   - check_mysql_is_up:
         inputs:
-          - containerID
+          - container
           - host
           - port:
                 default: "'22'"
@@ -47,7 +47,7 @@ operations:
                 default: "'mysqladmin -u ' + mysqlUsername + ' -p' + mysqlPassword + ' ping'"
                 override: true
           - command:
-                default: "'docker exec ' + containerID + ' ' + execCmd"
+                default: "'docker exec ' + container + ' ' + execCmd"
                 override: true
           - characterSet:
                 default: "'UTF-8'"

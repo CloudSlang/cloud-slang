@@ -8,7 +8,7 @@
 ##################################################################################################################################################
 # This flow retrieves the MySQL server status from a docker container.
 # Inputs:
-#    - containerID - ID of the docker container that runs MySQL
+#    - container - name or ID of the docker container that runs MySQL
 #    - dockerHost - docker machine host
 #    - dockerUsername - docker machine username
 #    - dockerPassword - docker machine password
@@ -41,7 +41,7 @@ flow:
   name: retrieve_mysql_status
 
   inputs:
-    - containerID
+    - container
     - dockerHost
     - dockerUsername
     - dockerPassword
@@ -61,7 +61,7 @@ flow:
     check_mysql_is_up:
           do:
             docker_ops.check_mysql_is_up:
-              - containerID
+              - container
               - host: dockerHost
               - username: dockerUsername
               - password: dockerPassword
@@ -73,7 +73,7 @@ flow:
     get_mysql_status:
           do:
             docker_ops.get_mysql_status:
-              - containerID
+              - container
               - host: dockerHost
               - username: dockerUsername
               - password: dockerPassword

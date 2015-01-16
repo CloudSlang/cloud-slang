@@ -8,7 +8,7 @@
 ##################################################################################################################################################
 # This operation retrieves the MySQL server status.
 # Inputs:
-#    - containerID - ID of the docker container that runs MySQL
+#    - container - name or ID of the docker container that runs MySQL
 #    - host - docker machine host
 #    - username - docker machine username
 #    - password - docker machine password
@@ -36,7 +36,7 @@ namespace: docker.maintenance.ops
 operations:
   - get_mysql_status:
         inputs:
-          - containerID
+          - container
           - host
           - port:
                 default: "'22'"
@@ -55,7 +55,7 @@ operations:
                 default: "'mysqladmin -u ' + mysqlUsername + ' -p' + mysqlPassword + ' status'"
                 override: true
           - command:
-                default: "'docker exec ' + containerID + ' ' + execCmd"
+                default: "'docker exec ' + container + ' ' + execCmd"
                 override: true
           - characterSet:
                 default: "'UTF-8'"
