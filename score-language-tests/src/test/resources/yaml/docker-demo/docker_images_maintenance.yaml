@@ -28,7 +28,7 @@ imports:
  util: util.ops
 
 flow:
-  name: diskspace_health_check_flow
+  name: docker_images_maintenance
   inputs:
     - dockerHost
     - dockerUsername
