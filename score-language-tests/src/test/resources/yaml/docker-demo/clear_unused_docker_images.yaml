@@ -1,0 +1,61 @@
+#   (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+#   All rights reserved. This program and the accompanying materials
+#   are made available under the terms of the Apache License v2.0 which accompany this distribution.
+#
+#   The Apache License is available at
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+####################################################
+#   This flow will delete unused docker images
+#   Inputs:
+#       - dockerHost
+#       - dockerUsername
+#       - dockerPassword
+#       - percentage
+#   Outputs:
+#       - errorMessage
+#   Results:
+#       - SUCCESS
+#       - FAILURE
+####################################################
+
+namespace: docker.maintenance.flows
+
+imports:
+ ops: docker.ops
+ linux: linux.ops
+ flows: docker.maintenance.flows
+ util: util.ops
+
+flow:
+  name: clear_unused_docker_images
+  inputs:
+    - dockerHost
+    - dockerUsername
+    - dockerPassword
+  workflow:
+     clear_docker_images:
+        do:
+          flows.clear_docker_images_flow:
+            - dockerHost
+            - dockerUsername
+            - dockerPassword
+        publish:
+          - images_list_safe_to_delete
+          - amount_of_images_deleted
+          - used_images_list
+     clear_docker_dangling_images:
+        do:
+          flows.clear_docker_dangling_images_flow:
+            - dockerHost
+            - dockerUsername
+            - dockerPassword
+            - usedImages: used_images_list
+        publish:
+          - dangling_images_list_safe_to_delete
+          - amount_of_dangling_images_deleted
+  outputs:
+    - amount_of_images_deleted
+    - amount_of_dangling_images_deleted
+    - dangling_images_list_safe_to_delete
+    - images_list_safe_to_delete

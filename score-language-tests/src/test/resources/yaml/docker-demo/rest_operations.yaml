@@ -10,10 +10,8 @@
 #   This operation will do a simple GET request
 #
 ####################################################
-namespace: lists.manipulation
-
-
 namespace: rest.ops
+
 
 operations:
   - ping_application:

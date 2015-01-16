@@ -1,12 +1,13 @@
-namespace: docker.flows
+namespace: docker.maintenance.flows
 
 imports:
  ops: docker.ops
  linux: linux.ops
  flows: docker.maintenance.flows
+ util: util.ops
 
 flow:
-  name: diskspace_heath_check_flow
+  name: diskspace_health_check_flow
   inputs:
     - dockerHost
     - dockerUsername
@@ -30,21 +31,11 @@ flow:
         - diskSpace
     check_availability:
       do:
-        linux.check_availability:
+        util.less_than_percentage:
           - diskSpace
           - percentage
       navigate:
         SUCCESS: SUCCESS
-        FAILURE: clear_docker_images
-    clear_docker_images:
-      do:
-        flows.clear_docker_images_flow:
-          - dockerHost
-          - dockerUsername
-          - dockerPassword
-      publish:
-        - images_list_safe_to_delete
-      navigate:
-        SUCCESS: SUCCESS
         FAILURE: FAILURE
+
 

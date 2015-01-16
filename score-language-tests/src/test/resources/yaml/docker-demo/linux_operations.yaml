@@ -16,7 +16,7 @@ operations:
         - password
         - privateKeyFile: "''"
         - command: |
-            'df -Pkh | grep -v "Filesystem" | awk \'NR==1{print $5}\''
+            'df -kh | grep -v "Filesystem" | awk \'NR==1{print $5}\'' #-Pkh
         - arguments: "''"
         - characterSet : "'UTF-8'"
         - pty: "'false'"
@@ -52,18 +52,4 @@ operations:
           - response: STDOUT
         results:
           - SUCCESS : returnCode == '0' and (not 'Error' in STDERR)
-          - FAILURE
-  - check_availability:
-        inputs:
-          - diskSpace
-          - percentage
-        action:
-          python_script: |
-            diskSpaceNr = diskSpace.replace("%", "")
-            percentageNr = percentage.replace("%", "")
-        outputs:
-          - diskSpaceNr
-          - percentageNr
-        results:
-          - SUCCESS: diskSpaceNr < percentageNr
           - FAILURE

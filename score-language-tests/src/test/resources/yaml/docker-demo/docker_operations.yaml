@@ -7,6 +7,7 @@
 
 
 #for get_all_images - command: "docker images | awk '{print $1 \":\" $2}'"
+
 namespace: docker.ops
 
 operations:
@@ -242,7 +243,7 @@ operations:
         - password
         - privateKeyFile: "''"
         - command: >
-            "docker images -f \"dangling=true\" -q"
+            "docker images | awk '{print $1 \":\" $2}'"
         - arguments: "''"
         - characterSet : "'UTF-8'"
         - pty: "'false'"
@@ -257,6 +258,29 @@ operations:
       results:
         - SUCCESS
         - FAILURE
+  - get_dangling_images:
+        inputs:
+          - host
+          - port: "'22'"
+          - username
+          - password
+          - privateKeyFile: "''"
+          - command: >
+              "docker images -f \"dangling=true\" -q"
+          - arguments: "''"
+          - characterSet : "'UTF-8'"
+          - pty: "'false'"
+          - timeout: "'30000000'"
+          - closeSession: "'false'"
+        action:
+          java_action:
+            className: org.openscore.content.ssh.actions.SSHShellCommandAction
+            methodName: runSshShellCommand
+        outputs:
+          - danglingImageList: returnResult
+        results:
+          - SUCCESS
+          - FAILURE
   - exec_proc_in_container:
         inputs:
           - containerID
