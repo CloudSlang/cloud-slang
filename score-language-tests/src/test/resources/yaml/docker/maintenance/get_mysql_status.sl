@@ -31,7 +31,7 @@
 #    - FAILURE
 ##################################################################################################################################################
 
-namespace: docker.maintenance.ops
+namespace: docker.maintenance
 
 operations:
   - get_mysql_status:

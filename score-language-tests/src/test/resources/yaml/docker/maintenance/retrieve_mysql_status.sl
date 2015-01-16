@@ -31,10 +31,10 @@
 #    - FAILURE
 ##################################################################################################################################################
 
-namespace: docker.maintenance.flows
+namespace: docker.maintenance
 
 imports:
- docker_ops: docker.maintenance.ops
+ docker: docker.maintenance
  linux_ops: linux.ops
 
 flow:
@@ -60,7 +60,7 @@ flow:
 
     check_mysql_is_up:
           do:
-            docker_ops.check_mysql_is_up:
+            docker.check_mysql_is_up:
               - container
               - host: dockerHost
               - username: dockerUsername
@@ -72,7 +72,7 @@ flow:
 
     get_mysql_status:
           do:
-            docker_ops.get_mysql_status:
+            docker.get_mysql_status:
               - container
               - host: dockerHost
               - username: dockerUsername

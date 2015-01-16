@@ -24,10 +24,10 @@
 #    - FAILURE
 ##################################################################################################################################################
 
-namespace: docker.maintenance.flows
+namespace: docker.maintenance
 
 imports:
- docker_flows: docker.maintenance.flows
+ docker: docker.maintenance
  email: email.ops
 
 flow:
@@ -48,7 +48,7 @@ flow:
   workflow:
     retrieve_mysql_status:
           do:
-            docker_flows.retrieve_mysql_status:
+            docker.retrieve_mysql_status:
                 - dockerHost
                 - dockerUsername
                 - dockerPassword

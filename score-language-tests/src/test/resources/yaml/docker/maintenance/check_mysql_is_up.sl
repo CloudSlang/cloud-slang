@@ -23,7 +23,7 @@
 #    - FAILURE - some problem occurred, more information in the errorMessage output
 ##################################################################################################################################################
 
-namespace: docker.maintenance.ops
+namespace: docker.maintenance
 
 operations:
   - check_mysql_is_up:
