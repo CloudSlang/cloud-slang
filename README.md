@@ -27,6 +27,12 @@ Contact us at [here](mailto:support@openscore.io).
 
 #### Building and Testing from Source
 
+###### Pre-Requisite:
+
+1. maven version >=3.2.3
+
+2. Java >=7
+
 The score project uses Maven to build and test.
 
 1. ```git clone``` the source code
