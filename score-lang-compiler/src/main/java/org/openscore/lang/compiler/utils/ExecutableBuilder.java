@@ -166,8 +166,14 @@ public class ExecutableBuilder {
             Map.Entry<String, Map<String, Object>> taskRawData = iterator.next();
             Map.Entry<String, Map<String, Object>> nextTaskData = iterator.peek();
             String taskName = taskRawData.getKey();
-            Map<String, Object> taskRawDataValue = taskRawData.getValue();
-            String defaultSuccess;
+            Map<String, Object> taskRawDataValue;
+            try {
+                taskRawDataValue = taskRawData.getValue();
+            } catch (ClassCastException ex){
+                throw new RuntimeException("Task: " + taskName + " syntax is illegal.\nBelow task name, there should be a map of values in the format:\ndo:\n\top_name:");
+            }
+
+           String defaultSuccess;
             if (nextTaskData != null) {
                 defaultSuccess = nextTaskData.getKey();
             } else {
@@ -196,8 +202,12 @@ public class ExecutableBuilder {
 
         transformersHandler.validateKeyWords(taskName, taskRawData, ListUtils.union(preTaskTransformers, postTaskTransformers), TaskAdditionalKeyWords);
 
-        preTaskData.putAll(transformersHandler.runTransformers(taskRawData, preTaskTransformers));
-        postTaskData.putAll(transformersHandler.runTransformers(taskRawData, postTaskTransformers));
+        try {
+            preTaskData.putAll(transformersHandler.runTransformers(taskRawData, preTaskTransformers));
+            postTaskData.putAll(transformersHandler.runTransformers(taskRawData, postTaskTransformers));
+        } catch (Exception ex){
+            throw new RuntimeException("Task: " + taskName + " syntax is illegal.\n" + ex.getMessage(), ex);
+        }
         List<Input> inputs = (List<Input>)preTaskData.get(SlangTextualKeys.DO_KEY);
         resolveVariables(inputs, imports);
         @SuppressWarnings("unchecked") Map<String, Object> doRawData = (Map<String, Object>) taskRawData.get(SlangTextualKeys.DO_KEY);
