@@ -38,13 +38,13 @@ public class SlangBanner extends SlangNamedProvider implements BannerProvider {
 			sb.append("Slang");
 		}
 		sb.append(System.lineSeparator());
-		sb.append(SlangCLI.getVersion());
+		sb.append(getVersion());
 		return sb.toString();
 	}
 
 	@Override
 	public String getVersion() {
-		return SlangCLI.getVersion();
+		return SlangCLI.SCORE_VERSION;
 	}
 
 	@Override

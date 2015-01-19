@@ -30,6 +30,7 @@ import javax.annotation.PostConstruct;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.*;
 
@@ -44,6 +45,9 @@ public class SlangCLI implements CommandMarker {
     public static final String TRIGGERED_FLOW_MSG = "Triggered flow : ";
     public static final String WITH_EXECUTION_ID_MSG = " , with execution id : ";
     public static final String FLOW_EXECUTION_TIME_TOOK = "Flow execution time took  ";
+    public static final String PROPERTIES_PATH = "/application.properties";
+    public static final String SCORE_VERSION_KEY = "score.version";
+    public static final String SCORE_VERSION = extractScoreVersion();
 
     @Autowired
     private ScoreServices scoreServices;
@@ -59,7 +63,6 @@ public class SlangCLI implements CommandMarker {
     private final static Logger logger = Logger.getLogger(SlangCLI.class);
 
     private static final String currently = "You are currently running Score version: ";
-    private static final String SCORE_VERSION = "0.1.229"; //todo get version
 
     @CliCommand(value = "run", help = "triggers a slang flow")
     public String run(
@@ -123,10 +126,6 @@ public class SlangCLI implements CommandMarker {
         return "flow execution ASYNC execution was changed to : " + triggerAsync;
     }
 
-    public static String getVersion() {
-        return SCORE_VERSION;
-    }
-
     @PostConstruct
     private void registerEventHandlers() {
         Set<String> handlerTypes = new HashSet<>();
@@ -161,6 +160,24 @@ public class SlangCLI implements CommandMarker {
             dependencyList = Lists.newArrayList(paths);
         }
         return dependencyList;
+    }
+
+    private static String extractScoreVersion()
+    {
+        String scoreVersion = "Score version could not be retrieved";
+        try (InputStream propertiesInputStream = SlangCLI.class.getResourceAsStream(PROPERTIES_PATH)) {
+            scoreVersion = extractProperty(propertiesInputStream, SCORE_VERSION_KEY);
+        } catch (IOException e) {
+            logger.error(e);
+        }
+        return scoreVersion;
+    }
+
+    private static String extractProperty(InputStream inputStream, String property) throws IOException {
+        Properties properties = new Properties();
+        properties.load(inputStream);
+        String scoreVersion = properties.getProperty(property);
+        return scoreVersion;
     }
 
 }
