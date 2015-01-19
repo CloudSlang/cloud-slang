@@ -206,7 +206,7 @@ public class ExecutableBuilder {
             preTaskData.putAll(transformersHandler.runTransformers(taskRawData, preTaskTransformers));
             postTaskData.putAll(transformersHandler.runTransformers(taskRawData, postTaskTransformers));
         } catch (Exception ex){
-            throw new RuntimeException("Task: " + taskName + " syntax is illegal.\n" + ex.getMessage(), ex);
+            throw new RuntimeException("For task: " + taskName + " syntax is illegal.\n" + ex.getMessage(), ex);
         }
         List<Input> inputs = (List<Input>)preTaskData.get(SlangTextualKeys.DO_KEY);
         resolveVariables(inputs, imports);
