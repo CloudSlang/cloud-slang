@@ -126,6 +126,7 @@
 				<configuration>
 					<repositoryLayout>flat</repositoryLayout>
 					<repositoryName>lib</repositoryName>
+                    <assembleDirectory>target/slang</assembleDirectory>
 					<useWildcardClassPath>true</useWildcardClassPath>
 					<programs>
 						<program>
