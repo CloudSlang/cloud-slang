@@ -7,7 +7,7 @@ Slang is a YAML based language for writing human-readable workflows for score. T
 
 #### Getting started:
 
-Pre-Requisite: Java JRE >=7
+###### Pre-Requisite: Java JRE >=7
 
 1. Download the slang zip from [here](https://github.com/openscore/score-language/releases/download/slang-CLI-0.2/slang.zip).
 2. Unzip it.
