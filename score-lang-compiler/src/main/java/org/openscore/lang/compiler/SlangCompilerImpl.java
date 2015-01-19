@@ -128,17 +128,21 @@ public class SlangCompilerImpl implements SlangCompiler {
         List<Executable> executables = new ArrayList<>();
         for (SlangSource source : path) {
             ParsedSlang parsedSlang = yamlParser.parse(source);
-            switch (parsedSlang.getType()) {
-                case FLOW:
-                    executables.add(transformFlow(parsedSlang));
-                    break;
-                case OPERATIONS:
-                    executables.addAll(transformOperations(parsedSlang));
-                    break;
-                case VARIABLES:
-                    break;
-                default:
-                    throw new RuntimeException("Source: " + source.getName() + " is not of flow type or operations");
+            try {
+                switch (parsedSlang.getType()) {
+                    case FLOW:
+                        executables.add(transformFlow(parsedSlang));
+                        break;
+                    case OPERATIONS:
+                        executables.addAll(transformOperations(parsedSlang));
+                        break;
+                    case VARIABLES:
+                        break;
+                    default:
+                        throw new RuntimeException("Source: " + source.getName() + " is not of flow type or operations");
+                }
+            } catch (Throwable ex){
+                throw new RuntimeException("Error compiling file: " + source.getName() + ". " + ex.getMessage(), ex);
             }
         }
 
@@ -206,7 +210,12 @@ public class SlangCompilerImpl implements SlangCompiler {
         for (Map<String, Map<String, Object>> operation : parsedSlang.getOperations()) {
             Map.Entry<String, Map<String, Object>> entry = operation.entrySet().iterator().next();
             String operationName = entry.getKey();
-            Map<String, Object> operationRawData = entry.getValue();
+            Map<String, Object> operationRawData;
+            try {
+                operationRawData = entry.getValue();
+            } catch (ClassCastException ex){
+                throw new RuntimeException("Operation: " + operationName + " syntax is illegal. Below operation name, there should be a map of values.");
+            }
             executables.add(executableBuilder.transformToExecutable(parsedSlang, operationName, operationRawData));
         }
         return executables;
