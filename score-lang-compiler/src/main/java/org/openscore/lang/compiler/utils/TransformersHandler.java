@@ -44,7 +44,7 @@ public class TransformersHandler {
                     throw new RuntimeException("Under property: '" + key + "' there should be a map of values, but instead there is a list.\n" +
                             "By the Yaml spec maps properties are NOT marked with a '- ' (dash followed by a space)");
                 }
-                if (value instanceof String && transformerType.equals(LinkedHashMap.class)) {
+                if (value instanceof String && transformerType.equals(Map.class)) {
                     throw new RuntimeException("Under property: '" + key + "' there should be a map of values, but instead there is a string.");
                 }
                 if (value instanceof String && transformerType.equals(List.class)) {
