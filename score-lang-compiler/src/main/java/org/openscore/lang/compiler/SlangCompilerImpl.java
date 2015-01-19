@@ -73,7 +73,7 @@ public class SlangCompilerImpl implements SlangCompiler {
         boolean hasDependencies = MapUtils.isNotEmpty(executable.getDependencies())
                 && executable.getType().equals(SlangTextualKeys.FLOW_TYPE);
         if (hasDependencies) {
-            Validate.noNullElements(path, "Source that was requested to compile has imports but no path was given");
+            Validate.notEmpty(path, "Source " + source.getName() + " has dependencies but no path was given to the compiler");
 
             //we transform also all of the files in the given path to model objects
             Map<String, Executable> pathExecutables = transformDependencies(path);
@@ -222,7 +222,7 @@ public class SlangCompilerImpl implements SlangCompiler {
         Map<String, Object> flowRawData = parsedSlang.getFlow();
         String flowName = (String) flowRawData.get(SlangTextualKeys.FLOW_NAME_KEY);
         if (StringUtils.isBlank(flowName)) {
-            throw new RuntimeException("Flow in source: " + parsedSlang.getName() + "have no name");
+            throw new RuntimeException("Flow in source: " + parsedSlang.getName() + " has no name");
         }
         return executableBuilder.transformToExecutable(parsedSlang, flowName, flowRawData);
     }
@@ -234,8 +234,12 @@ public class SlangCompilerImpl implements SlangCompiler {
         //first thing we parse the yaml file into java maps
         ParsedSlang parsedSlang = yamlParser.parse(source);
 
-        //than we transform those maps to model objects
-        return transformToExecutables(parsedSlang);
+        try {
+            //then we transform those maps to model objects
+            return transformToExecutables(parsedSlang);
+        } catch (Throwable ex){
+            throw new RuntimeException("Error compiling source: " + source.getName() + ". " + ex.getMessage(), ex);
+        }
     }
 
     private Executable transformToExecutable(SlangSource source, String operationName){
