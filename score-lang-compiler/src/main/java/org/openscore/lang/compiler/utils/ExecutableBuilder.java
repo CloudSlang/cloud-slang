@@ -77,7 +77,7 @@ public class ExecutableBuilder {
 
     public Executable transformToExecutable(ParsedSlang parsedSlang, String execName, Map<String, Object> executableRawData) {
 
-        Validate.notEmpty(executableRawData, "Executable data for: " + execName + " is empty");
+        Validate.notEmpty(executableRawData, "Error compiling " + parsedSlang.getName() + ". Executable data for: " + execName + " is empty");
         Validate.notNull(parsedSlang, "Slang source for " + execName + " is null");
 
         Map<String, Serializable> preExecutableActionData = new HashMap<>();
@@ -99,10 +99,14 @@ public class ExecutableBuilder {
         Map<String, SlangFileType> dependencies;
         switch (parsedSlang.getType()) {
             case FLOW:
+
+                if(!executableRawData.containsKey(SlangTextualKeys.WORKFLOW_KEY)){
+                    throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + execName + " has no workflow property");
+                }
                 @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> workFlowRawData =
                         (LinkedHashMap<String, Map<String, Object>>) executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
                 if (MapUtils.isEmpty(workFlowRawData)) {
-                    throw new RuntimeException("Flow: " + execName + " has no workflow data");
+                    throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + execName + " has no workflow data");
                 }
 
                 Workflow onFailureWorkFlow = null;
@@ -118,16 +122,16 @@ public class ExecutableBuilder {
                 return new Flow(preExecutableActionData, postExecutableActionData, workflow, namespace, execName, inputs, outputs, results, dependencies);
 
             case OPERATIONS:
-                @SuppressWarnings("unchecked") Map<String, Object> actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
+                Map<String, Object> actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
                 if (MapUtils.isEmpty(actionRawData)) {
-                    throw new RuntimeException("Operation: " + execName + " has no action data");
+                    throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Operation: " + execName + " has no action data");
                 }
                 Action action = compileAction(actionRawData);
                 //todo: add sys vars dependencies?
                 dependencies = new HashMap<>();
                 return new Operation(preExecutableActionData, postExecutableActionData, action, namespace, execName, inputs, outputs, results, dependencies);
             default:
-                throw new RuntimeException("Source: " + parsedSlang.getName() + " is not of flow type or operations");
+                throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". It is not of flow or operations type");
         }
     }
 
@@ -228,7 +232,7 @@ public class ExecutableBuilder {
 
 	private static String resolveRefId(String refIdString, Map<String, String> imports) {
 		String alias = StringUtils.substringBefore(refIdString, ".");
-		Validate.notNull(imports, "No imports specified");
+		Validate.notNull(imports, "No imports specified for source: " + refIdString);
 		if(!imports.containsKey(alias)) throw new RuntimeException("Unresovled alias: " + alias);
 		String refName = StringUtils.substringAfter(refIdString, ".");
 		return imports.get(alias) + "." + refName;
