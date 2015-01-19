@@ -29,7 +29,7 @@ Contact us at [here](mailto:support@openscore.io).
 
 #### Building and Testing from Source
 
-###### Pre-Requisite:
+###### Pre-Requisites:
 
 1. maven version >= 3.0.3
 2. Java JDK version >= 7
