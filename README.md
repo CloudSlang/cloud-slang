@@ -29,7 +29,7 @@ Contact us at [here](mailto:support@openscore.io).
 
 ###### Pre-Requisite:
 
-1. maven version >=3.2.3
+1. maven version >=3.0.3
 
 2. Java >=7
 
