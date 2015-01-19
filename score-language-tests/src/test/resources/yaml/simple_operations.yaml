@@ -8,7 +8,7 @@
 namespace: user.ops
 
 imports:
-  vars: test.env.vars
+  props: test.sys.props
 
 operations:
   - test_op:
@@ -31,7 +31,7 @@ operations:
       inputs:
         - time_zone_as_string
         - alla:
-            variable: vars.alla
+            systemProperty: props.alla
       action:
         python_script: |
             time_zone_as_int = int(time_zone_as_string)

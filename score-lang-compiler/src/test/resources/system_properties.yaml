@@ -1,6 +1,6 @@
-namespace: test.env.vars
+namespace: test.sys.props
 
-variables:
+systemProperties:
   host: localhost
   port: 22
   alla: balla

@@ -53,10 +53,8 @@ public class CompileBasicFlowTest {
     public void testCompileFlowBasic() throws Exception {
         URI flow = getClass().getResource("/flow.yaml").toURI();
         URI operation = getClass().getResource("/operation.yaml").toURI();
-//URI vars = getClass().getResource("/variables.yaml").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
-//path.add(SlangSource.fromFile(vars));
         CompilationArtifact compilationArtifact = compiler.compileFlow(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
@@ -140,13 +138,13 @@ public class CompileBasicFlowTest {
     }
 
 	@Test
-	public void testLoadVariables() throws Exception {
+	public void testLoadSystemProperties() throws Exception {
 		Map<String, Serializable> expected = new HashMap<>();
-		expected.put("test.env.vars.host", "localhost");
-		expected.put("test.env.vars.port", 22);
-		expected.put("test.env.vars.alla", "balla");
-		URI vars = getClass().getResource("/variables.yaml").toURI();
-		Map<String, ? extends Serializable> result = compiler.loadVariables(SlangSource.fromFile(vars));
+		expected.put("test.sys.props.host", "localhost");
+		expected.put("test.sys.props.port", 22);
+		expected.put("test.sys.props.alla", "balla");
+		URI systemProperties = getClass().getResource("/system_properties.yaml").toURI();
+		Map<String, ? extends Serializable> result = compiler.loadSystemProperties(SlangSource.fromFile(systemProperties));
 		Assert.assertNotNull(result);
 		Assert.assertEquals(expected, result);
 	}

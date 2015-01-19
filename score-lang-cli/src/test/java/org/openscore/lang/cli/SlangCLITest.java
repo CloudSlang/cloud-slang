@@ -171,17 +171,17 @@ public class SlangCLITest {
     }
 
 	@Test(timeout = DEFAULT_TIMEOUT)
-	public void testRunSyncWithVariables() throws Exception {
+	public void testRunSyncWithSystemProperties() throws Exception {
 		CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
 		long executionID = 1;
 
 		when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(String.class), isNull(List.class))).thenReturn(compilationArtifact);
 		when(ScoreServicesMock.triggerSync(eq(compilationArtifact), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class))).thenReturn(executionID);
 
-		CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_SLAH + " --vf " + FLOW_PATH_SLAH);
+		CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_SLAH + " --spf " + FLOW_PATH_SLAH);
 
 		verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(String.class), isNull(List.class));
-		verify(compilerHelperMock).loadVariables(Arrays.asList(FLOW_PATH_BACKSLASH));
+		verify(compilerHelperMock).loadSystemProperties(Arrays.asList(FLOW_PATH_BACKSLASH));
 		verify(ScoreServicesMock).triggerSync(eq(compilationArtifact), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class));
 
 		Assert.assertEquals("method threw exception", null, cr.getException());
