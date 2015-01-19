@@ -34,7 +34,7 @@ Contact us at [here](mailto:support@openscore.io).
 1. maven version >= 3.0.3
 2. Java JDK version >= 7
 
-The score project uses Maven to build and test.
+###### Steps:
 
 1. ```git clone``` the source code
 2. ```mvn clean install```
