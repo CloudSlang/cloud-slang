@@ -8,10 +8,10 @@
 ##################################################################################################################################################
 # This flow retrieves the MySQL server status from a docker container.
 # Inputs:
-#    - containerID - ID of the docker container that runs MySQL
-#    - host - docker machine host
-#    - username - docker machine username
-#    - password - docker machine password
+#    - container - name or ID of the docker container that runs MySQL
+#    - dockerHost - docker machine host
+#    - dockerUsername - docker machine username
+#    - dockerPassword - docker machine password
 #    - mysqlUsername - MySQL instance username
 #    - mysqlPassword - MySQL instance password
 #
@@ -24,25 +24,24 @@
 #    - flushTables - The number of flush-*, refresh, and reload commands the server has executed.
 #    - openTables - The number of tables that currently are open.
 #    - queriesPerSecondAVG - an average value of the number of queries in a second
-#    - additionalInformation - in case something went wrong during the flow, this may contain additional information about the problem
-#    - errorMessage - message that describes the error, may contain the STDERR of the machine or the cause of an exception
+#    - errorMessage - possible error message, may contain the STDERR of the machine or the cause of an exception
 #
 # Results:
 #    - SUCCESS
 #    - FAILURE
 ##################################################################################################################################################
 
-namespace: docker.maintenance.flows
+namespace: docker.maintenance
 
 imports:
- docker_ops: docker.maintenance.ops
+ docker: docker.maintenance
  linux_ops: linux.ops
 
 flow:
   name: retrieve_mysql_status
 
   inputs:
-    - containerID
+    - container
     - dockerHost
     - dockerUsername
     - dockerPassword
@@ -57,26 +56,24 @@ flow:
               - username: dockerUsername
               - password: dockerPassword
           publish:
-              - additionalInformation: "''" # initialize here as a flow variable
               - errorMessage
 
     check_mysql_is_up:
           do:
-            docker_ops.check_mysql_is_up:
-              - containerID
+            docker.check_mysql_is_up:
+              - container
               - host: dockerHost
               - username: dockerUsername
               - password: dockerPassword
               - mysqlUsername
               - mysqlPassword
           publish:
-            - additionalInformation
             - errorMessage
 
     get_mysql_status:
           do:
-            docker_ops.get_mysql_status:
-              - containerID
+            docker.get_mysql_status:
+              - container
               - host: dockerHost
               - username: dockerUsername
               - password: dockerPassword
@@ -102,5 +99,4 @@ flow:
     - flushTables
     - openTables
     - queriesPerSecondAVG
-    - additionalInformation
     - errorMessage

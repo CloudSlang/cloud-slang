@@ -8,10 +8,10 @@
 ##################################################################################################################################################
 # This flow retrieves the MySQL server status and notifies the user by sending an email that contains the status or the possible errors.
 # Inputs:
-#    - containerID - ID of the docker container that runs MySQL
-#    - host - docker machine host
-#    - username - docker machine username
-#    - password - docker machine password
+#    - container - name or ID of the docker container that runs MySQL
+#    - dockerHost - docker machine host
+#    - dockerUsername - docker machine username
+#    - dockerPassword - docker machine password
 #    - mysqlUsername - MySQL instance username
 #    - mysqlPassword - MySQL instance password
 #    - emailHost - email server host
@@ -24,17 +24,17 @@
 #    - FAILURE
 ##################################################################################################################################################
 
-namespace: docker.maintenance.flows
+namespace: docker.maintenance
 
 imports:
- docker_flows: docker.maintenance.flows
+ docker: docker.maintenance
  email: email.ops
 
 flow:
   name: report_mysql_status
 
   inputs:
-    - containerID
+    - container
     - dockerHost
     - dockerUsername
     - dockerPassword
@@ -48,11 +48,11 @@ flow:
   workflow:
     retrieve_mysql_status:
           do:
-            docker_flows.retrieve_mysql_status:
+            docker.retrieve_mysql_status:
                 - dockerHost
                 - dockerUsername
                 - dockerPassword
-                - containerID
+                - container
                 - mysqlUsername
                 - mysqlPassword
           publish:
@@ -64,7 +64,6 @@ flow:
             - flushTables
             - openTables
             - queriesPerSecondAVG
-            - additionalInformation
             - errorMessage
 
     send_status_mail:
@@ -95,9 +94,8 @@ flow:
                 - to: emailRecipient
                 - subject: "'MySQL Server Status on ' + dockerHost"
                 - body: >
-                    'The MySQL server status checking on host ' + dockerHost + ' ended with the following error message: '
-                    + errorMessage + ' and additional information: ' + additionalInformation
+                    'The MySQL server status checking on host ' + dockerHost
+                    + ' ended with the following error message: ' + errorMessage
         navigate:
           SUCCESS: FAILURE
           FAILURE: FAILURE
-

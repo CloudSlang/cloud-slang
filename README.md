@@ -7,6 +7,8 @@ Slang is a YAML based language for writing human-readable workflows for score. T
 
 #### Getting started:
 
+###### Pre-Requisite: Java JRE >= 7
+
 1. Download the slang zip from [here](https://github.com/openscore/score-language/releases/download/slang-CLI-0.2/slang.zip).
 2. Unzip it.
 3. Go to the folder /slang/appassembler/bin/
@@ -27,7 +29,12 @@ Contact us at [here](mailto:support@openscore.io).
 
 #### Building and Testing from Source
 
-The score project uses Maven to build and test.
+###### Pre-Requisites:
+
+1. maven version >= 3.0.3
+2. Java JDK version >= 7
+
+###### Steps:
 
 1. ```git clone``` the source code
 2. ```mvn clean install```
