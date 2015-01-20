@@ -122,7 +122,13 @@ public class ExecutableBuilder {
                 return new Flow(preExecutableActionData, postExecutableActionData, workflow, namespace, execName, inputs, outputs, results, dependencies);
 
             case OPERATIONS:
-                Map<String, Object> actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
+                Map<String, Object> actionRawData;
+                try{
+                   actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
+                } catch (ClassCastException ex){
+                    throw new RuntimeException("Operation: " + execName + " syntax is illegal.\nBelow 'action' property there should be a map of values such as: 'python_script:' or 'java_action:'");
+                }
+
                 if (MapUtils.isEmpty(actionRawData)) {
                     throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Operation: " + execName + " has no action data");
                 }
