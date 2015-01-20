@@ -1,6 +1,6 @@
 namespace: test.sys.props
 
-systemProperties:
+system_properties:
   host: localhost
   port: 22
   alla: balla

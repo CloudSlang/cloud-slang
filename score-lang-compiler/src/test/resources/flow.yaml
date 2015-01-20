@@ -9,14 +9,14 @@ flow:
   inputs:
     - input1
     - host:
-        systemProperty: props.host
+        system_property: props.host
   workflow:
     CheckWeather:
       do:
         ops.test_op:
           - city: str('input_1')
           - port:
-              systemProperty: props.port
+              system_property: props.port
       publish:
         - weather
       navigate:

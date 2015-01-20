@@ -31,7 +31,7 @@ operations:
       inputs:
         - time_zone_as_string
         - alla:
-            systemProperty: props.alla
+            system_property: props.alla
       action:
         python_script: |
             time_zone_as_int = int(time_zone_as_string)

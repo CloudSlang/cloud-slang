@@ -23,7 +23,7 @@ public class ParsedSlang {
     private Map<String, String> imports;
     private Map<String, Object> flow;
     private List<Map<String, Map<String, Object>>> operations;
-    private Map<String, ? extends Serializable> systemProperties;
+    private Map<String, ? extends Serializable> system_properties;
     private String namespace;
     private String name;
 
@@ -46,12 +46,12 @@ public class ParsedSlang {
     }
 
     public Map<String, ? extends Serializable> getSystemProperties() {
-        return systemProperties;
+        return system_properties;
     }
 
     public Type getType() {
         if(flow != null) return Type.FLOW;
-        if(systemProperties != null) return Type.SYSTEM_PROPERTIES;
+        if(system_properties != null) return Type.SYSTEM_PROPERTIES;
         return Type.OPERATIONS;
     }
 

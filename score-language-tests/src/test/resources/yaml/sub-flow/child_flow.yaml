@@ -20,7 +20,7 @@ flow:
       do:
         ops.get_time_zone:
           - time_zone_as_string:
-              systemProperty: props.port
+              system_property: props.port
     CheckWeather:
       do:
         ops.test_op:

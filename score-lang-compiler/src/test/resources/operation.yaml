@@ -7,7 +7,7 @@ operations:
   - test_op:
       inputs:
         - alla:
-            systemProperty: props.alla
+            system_property: props.alla
       action:
         python_script: 'print "hello world"'
 
