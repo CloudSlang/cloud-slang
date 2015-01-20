@@ -105,7 +105,7 @@ public class ExecutableBuilder {
                 }
                 LinkedHashMap<String, Map<String, Object>> workFlowRawData;
                 try{
-                    workFlowRawData = (LinkedHashMap<String, Map<String, Object>>) executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
+                    workFlowRawData = (LinkedHashMap) executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
                 } catch (ClassCastException ex){
                     throw new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'workflow' property there should be a map of tasks and not a list");
                 }
@@ -114,8 +114,12 @@ public class ExecutableBuilder {
                 }
 
                 Workflow onFailureWorkFlow = null;
-                @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> onFailureData =
-                        (LinkedHashMap) workFlowRawData.remove(SlangTextualKeys.ON_FAILURE_KEY);
+                LinkedHashMap<String, Map<String, Object>> onFailureData;
+                try{
+                    onFailureData = (LinkedHashMap) workFlowRawData.remove(SlangTextualKeys.ON_FAILURE_KEY);
+                } catch (ClassCastException ex){
+                    throw new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a map of tasks and not a list");
+                }
                 if (MapUtils.isNotEmpty(onFailureData)) {
                     onFailureWorkFlow = compileWorkFlow(onFailureData, imports, null, true);
                 }
