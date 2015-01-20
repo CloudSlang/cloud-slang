@@ -103,8 +103,12 @@ public class ExecutableBuilder {
                 if(!executableRawData.containsKey(SlangTextualKeys.WORKFLOW_KEY)){
                     throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + execName + " has no workflow property");
                 }
-                @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> workFlowRawData =
-                        (LinkedHashMap<String, Map<String, Object>>) executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
+                LinkedHashMap<String, Map<String, Object>> workFlowRawData;
+                try{
+                    workFlowRawData = (LinkedHashMap<String, Map<String, Object>>) executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
+                } catch (ClassCastException ex){
+                    throw new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'workflow' property there should be a map of tasks and not a list");
+                }
                 if (MapUtils.isEmpty(workFlowRawData)) {
                     throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + execName + " has no workflow data");
                 }
@@ -126,7 +130,7 @@ public class ExecutableBuilder {
                 try{
                    actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
                 } catch (ClassCastException ex){
-                    throw new RuntimeException("Operation: " + execName + " syntax is illegal.\nBelow 'action' property there should be a map of values such as: 'python_script:' or 'java_action:'");
+                    throw new RuntimeException("Operation: '" + execName + "' syntax is illegal.\nBelow 'action' property there should be a map of values such as: 'python_script:' or 'java_action:'");
                 }
 
                 if (MapUtils.isEmpty(actionRawData)) {
