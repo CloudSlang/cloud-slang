@@ -34,7 +34,7 @@ public class YamlParser {
         try {
             ParsedSlang parsedSlang = yaml.loadAs(source.getSource(), ParsedSlang.class);
             if(parsedSlang == null) {
-                throw new RuntimeException("Source " + source.getName() + " is not a YAML file");
+                throw new RuntimeException("Source " + source.getName() + " does not contain YAML content");
             }
             parsedSlang.setName(source.getName());
             return parsedSlang;

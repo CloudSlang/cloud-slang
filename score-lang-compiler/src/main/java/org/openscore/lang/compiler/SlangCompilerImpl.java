@@ -74,6 +74,7 @@ public class SlangCompilerImpl implements SlangCompiler {
                 && executable.getType().equals(SlangTextualKeys.FLOW_TYPE);
         if (hasDependencies) {
             Validate.notEmpty(path, "Source " + source.getName() + " has dependencies but no path was given to the compiler");
+            Validate.noNullElements(path, "Source " + source.getName() + " has empty dependencies");
 
             //we transform also all of the files in the given path to model objects
             Map<String, Executable> pathExecutables = transformDependencies(path);
@@ -142,7 +143,7 @@ public class SlangCompilerImpl implements SlangCompiler {
                         throw new RuntimeException("Source: " + source.getName() + " is not of flow type or operations");
                 }
             } catch (Throwable ex){
-                throw new RuntimeException("Error compiling file: " + source.getName() + ". " + ex.getMessage(), ex);
+                throw new RuntimeException("Error compiling source: " + source.getName() + ". " + ex.getMessage(), ex);
             }
         }
 
