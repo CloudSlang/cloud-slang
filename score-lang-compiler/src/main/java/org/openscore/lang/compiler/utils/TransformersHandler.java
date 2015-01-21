@@ -37,16 +37,21 @@ public class TransformersHandler {
             } catch (ClassCastException e) {
                 Class transformerType = getTransformerFromType(transformer);
                 if (value instanceof Map && transformerType.equals(List.class)) {
-                    throw new RuntimeException("Key: '" + key + "' expected a list but got a map\n" +
+                    throw new RuntimeException("Under property: '" + key + "' there should be a list of values, but instead there is a map.\n" +
                             "By the Yaml spec lists properties are marked with a '- ' (dash followed by a space)");
                 }
                 if (value instanceof List && transformerType.equals(Map.class)) {
-                    throw new RuntimeException("Key: '" + key + "' expected a map but got a list\n" +
+                    throw new RuntimeException("Under property: '" + key + "' there should be a map of values, but instead there is a list.\n" +
                             "By the Yaml spec maps properties are NOT marked with a '- ' (dash followed by a space)");
                 }
-                String message = "\nFailed casting for key: " + key +
-                        "Raw data is: " + key + " : " +rawData.get(key).toString() +
-                        "\n Transformer is: " + transformer.getClass().getName();
+                if (value instanceof String && transformerType.equals(Map.class)) {
+                    throw new RuntimeException("Under property: '" + key + "' there should be a map of values, but instead there is a string.");
+                }
+                if (value instanceof String && transformerType.equals(List.class)) {
+                    throw new RuntimeException("Under property: '" + key + "' there should be a list of values, but instead there is a string.");
+                }
+                String message = "Data for property: " + key + " -> " + rawData.get(key).toString() + " is illegal."+
+                        "\n Transformer is: " + transformer.getClass().getSimpleName();
                 throw new RuntimeException(message, e);
             }
         }
@@ -71,7 +76,7 @@ public class TransformersHandler {
 
         for (String key : rawData.keySet()) {
             if (!(exists(validKeywords, equalToIgnoringCase(key)))) {
-                throw new RuntimeException("No transformer were found for key: " + key + " at: " + dataLogicalName);
+                throw new RuntimeException("Property: " + key + " at: " + dataLogicalName + " is illegal");
             }
         }
     }

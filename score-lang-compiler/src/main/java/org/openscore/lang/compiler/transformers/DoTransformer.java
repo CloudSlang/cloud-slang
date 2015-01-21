@@ -14,22 +14,21 @@ package org.openscore.lang.compiler.transformers;
  * Created by orius123 on 05/11/14.
  */
 
-import org.openscore.lang.entities.bindings.Input;
 import org.apache.commons.collections4.MapUtils;
+import org.openscore.lang.entities.bindings.Input;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 
 @Component
-public class DoTransformer extends AbstractInputsTransformer implements Transformer<LinkedHashMap<String, List>, List<Input>> {
+public class DoTransformer extends AbstractInputsTransformer implements Transformer<Map<String, List>, List<Input>> {
 
     @Override
-    public List<Input> transform(LinkedHashMap<String, List> rawData) {
+    public List<Input> transform(Map<String, List> rawData) {
         //todo handle also String type
         List<Input> result = new ArrayList<>();
         if (MapUtils.isEmpty(rawData)) {

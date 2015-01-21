@@ -52,7 +52,8 @@ public class ParsedSlang {
     public Type getType() {
         if(flow != null) return Type.FLOW;
         if(system_properties != null) return Type.SYSTEM_PROPERTIES;
-        return Type.OPERATIONS;
+        if(operations != null) return Type.OPERATIONS;
+        throw new RuntimeException("Source " + name + " has no " + Type.FLOW.key() + "/" + Type.OPERATIONS.key() + "/" + Type.SYSTEM_PROPERTIES.key +" property");
     }
 
     public String getName() {
@@ -64,7 +65,19 @@ public class ParsedSlang {
     }
 
     public static enum Type {
-        FLOW, OPERATIONS, SYSTEM_PROPERTIES
+        FLOW("flow"),
+        OPERATIONS("operations"),
+        SYSTEM_PROPERTIES("system_properties");
+
+        private String key;
+
+        Type(String key){
+            this.key = key;
+        }
+
+        public String key(){
+            return key;
+        }
     }
 
 }
