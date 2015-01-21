@@ -1,6 +1,0 @@
-namespace: test.env.vars
-
-variables:
-  host: localhost
-  port: 22
-  alla: balla

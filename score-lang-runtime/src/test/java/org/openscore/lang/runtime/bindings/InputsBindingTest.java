@@ -324,11 +324,11 @@ public class InputsBindingTest {
     }
 
 	@Test
-	public void testVariable() throws Exception {
+	public void testSystemProperty() throws Exception {
 		String in = "input1";
-		String fqvn = "docker.env.vars.port";
-		List<Input> inputs = Arrays.asList(new Input(in, null, false, true, false, fqvn));
-		Map<String, Serializable> result = bindInputs(inputs, new HashMap<String, Serializable>(), Collections.singletonMap(fqvn, 22));
+		String fqspn = "docker.sys.props.port";
+		List<Input> inputs = Arrays.asList(new Input(in, null, false, true, false, fqspn));
+		Map<String, Serializable> result = bindInputs(inputs, new HashMap<String, Serializable>(), Collections.singletonMap(fqspn, 22));
 		Assert.assertFalse(result.isEmpty());
 		Assert.assertEquals(1, result.size());
 		Assert.assertTrue(result.containsKey(in));
@@ -336,10 +336,10 @@ public class InputsBindingTest {
 	}
 
 	@Test
-	public void testVariableMissing() throws Exception {
+	public void testSystemPropertyMissing() throws Exception {
 		String in = "input1";
-		String fqvn = "docker.env.vars.port";
-		List<Input> inputs = Arrays.asList(new Input(in, null, false, false, false, fqvn));
+		String fqspn = "docker.sys.props.port";
+		List<Input> inputs = Arrays.asList(new Input(in, null, false, false, false, fqspn));
 		Map<String, Serializable> result = bindInputs(inputs, new HashMap<String, Serializable>());
 		Assert.assertFalse(result.isEmpty());
 		Assert.assertEquals(1, result.size());
@@ -348,11 +348,11 @@ public class InputsBindingTest {
 	}
 
 	@Test
-	public void testVariableContext() throws Exception {
+	public void testSystemPropertyContext() throws Exception {
 		String in = "input1";
-		String fqvn = "docker.env.vars.port";
-		List<Input> inputs = Arrays.asList(new Input(in, null, false, true, false, fqvn));
-		Map<String, Serializable> result = bindInputs(inputs, Collections.singletonMap(in, 23), Collections.singletonMap(fqvn, 22));
+		String fqspn = "docker.sys.props.port";
+		List<Input> inputs = Arrays.asList(new Input(in, null, false, true, false, fqspn));
+		Map<String, Serializable> result = bindInputs(inputs, Collections.singletonMap(in, 23), Collections.singletonMap(fqspn, 22));
 		Assert.assertFalse(result.isEmpty());
 		Assert.assertEquals(1, result.size());
 		Assert.assertTrue(result.containsKey(in));
@@ -360,19 +360,19 @@ public class InputsBindingTest {
 	}
 
 	@Test
-	public void testVariableOverride() throws Exception {
+	public void testSystemPropertyOverride() throws Exception {
 		String in = "input1";
-		String fqvn = "docker.env.vars.port";
-		List<Input> inputs = Arrays.asList(new Input(in, null, false, true, true, fqvn));
-		Map<String, Serializable> result = bindInputs(inputs, Collections.singletonMap(in, 23), Collections.singletonMap(fqvn, 22));
+		String fqspn = "docker.sys.props.port";
+		List<Input> inputs = Arrays.asList(new Input(in, null, false, true, true, fqspn));
+		Map<String, Serializable> result = bindInputs(inputs, Collections.singletonMap(in, 23), Collections.singletonMap(fqspn, 22));
 		Assert.assertFalse(result.isEmpty());
 		Assert.assertEquals(1, result.size());
 		Assert.assertTrue(result.containsKey(in));
 		Assert.assertEquals(22, result.get(in));
 	}
 
-	private Map<String, Serializable> bindInputs(List<Input> inputs, Map<String, ? extends Serializable> context, Map<String, ? extends Serializable> variables) {
-		return inputsBinding.bindInputs(inputs, context, variables);
+	private Map<String, Serializable> bindInputs(List<Input> inputs, Map<String, ? extends Serializable> context, Map<String, ? extends Serializable> systemProperties) {
+		return inputsBinding.bindInputs(inputs, context, systemProperties);
 	}
 
 	private Map<String, Serializable> bindInputs(List<Input> inputs, Map<String, ? extends Serializable> context) {

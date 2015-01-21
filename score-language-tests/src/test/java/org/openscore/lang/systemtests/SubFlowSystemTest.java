@@ -40,9 +40,9 @@ public class SubFlowSystemTest extends SystemsTestsParent {
 
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("input1", "value1");
-		URI vars = getClass().getResource("/yaml/simple_variables.yaml").toURI();
-		SlangSource varsSource = SlangSource.fromFile(vars);
-        ScoreEvent event = trigger(compilationArtifact, userInputs, slang.loadVariables(varsSource));
+		URI systemProperties = getClass().getResource("/yaml/system_properties.yaml").toURI();
+		SlangSource systemPropertiesSource = SlangSource.fromFile(systemProperties);
+        ScoreEvent event = trigger(compilationArtifact, userInputs, slang.loadSystemProperties(systemPropertiesSource));
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 

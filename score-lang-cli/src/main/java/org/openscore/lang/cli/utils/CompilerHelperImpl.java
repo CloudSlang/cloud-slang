@@ -82,13 +82,13 @@ public class CompilerHelperImpl implements CompilerHelper{
     }
 
 	@Override
-	public Map<String, ? extends Serializable> loadVariables(List<String> variableFiles) {
-		if(CollectionUtils.isEmpty(variableFiles)) return null;
-		SlangSource[] sources = new SlangSource[variableFiles.size()];
-		for(int i = 0; i < variableFiles.size(); i++) {
-			sources[i] = SlangSource.fromFile(new File(variableFiles.get(i)));
+	public Map<String, ? extends Serializable> loadSystemProperties(List<String> systemPropertyFiles) {
+		if(CollectionUtils.isEmpty(systemPropertyFiles)) return null;
+		SlangSource[] sources = new SlangSource[systemPropertyFiles.size()];
+		for(int i = 0; i < systemPropertyFiles.size(); i++) {
+			sources[i] = SlangSource.fromFile(new File(systemPropertyFiles.get(i)));
 		}
-		return slang.loadVariables(sources);
+		return slang.loadSystemProperties(sources);
 	}
 
 }

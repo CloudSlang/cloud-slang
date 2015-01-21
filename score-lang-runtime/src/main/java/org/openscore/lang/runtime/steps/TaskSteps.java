@@ -71,7 +71,7 @@ public class TaskSteps extends AbstractSteps {
 
         Map<String, Serializable> flowContext = runEnv.getStack().popContext();
 
-        Map<String, Serializable> operationArguments = inputsBinding.bindInputs(taskInputs, flowContext, runEnv.getVariables());
+        Map<String, Serializable> operationArguments = inputsBinding.bindInputs(taskInputs, flowContext, runEnv.getSystemProperties());
 
         //todo: hook
 

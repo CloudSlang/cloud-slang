@@ -51,8 +51,6 @@ public class CompileOperationTest {
     @Test
     public void testCompileOperationBasic() throws Exception {
         URL resource = getClass().getResource("/operation.yaml");
-//URL vars = getClass().getResource("/variables.yaml");
-//ExecutionPlan executionPlan = compiler.compile(SlangSource.fromFile(resource.toURI()), "test_op", Collections.singleton(SlangSource.fromFile(vars.toURI()))).getExecutionPlan();
         ExecutionPlan executionPlan = compiler.compile(SlangSource.fromFile(resource.toURI()), "test_op", null).getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 3, executionPlan.getSteps().size());
@@ -61,8 +59,6 @@ public class CompileOperationTest {
 	@Test
 	public void testCompileOperationMissingImport() throws Exception {
 		URL resource = getClass().getResource("/operation_mi.yaml");
-//URL vars = getClass().getResource("/variables.yaml");
-//ExecutionPlan executionPlan = compiler.compile(SlangSource.fromFile(resource.toURI()), "test_op", Collections.singleton(SlangSource.fromFile(vars.toURI()))).getExecutionPlan();
 		exception.expect(RuntimeException.class);
 		exception.expectMessage("import");
 		compiler.compile(SlangSource.fromFile(resource.toURI()), "test_op", null).getExecutionPlan();

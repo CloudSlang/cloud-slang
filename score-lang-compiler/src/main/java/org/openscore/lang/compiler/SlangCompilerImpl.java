@@ -101,15 +101,15 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
 	@Override
-	public Map<String, ? extends Serializable> loadVariables(SlangSource... sources) {
+	public Map<String, ? extends Serializable> loadSystemProperties(SlangSource... sources) {
 		Validate.notNull(sources, "You must supply a source to load");
 		Map<String, Serializable> result = new HashMap<>();
 		for(SlangSource source : sources) {
 			ParsedSlang parsedSlang = yamlParser.parse(source);
-			Map<String, ? extends Serializable> variables = parsedSlang.getVariables();
-			Validate.notNull(variables, "No variables specified");
+			Map<String, ? extends Serializable> systemProperties = parsedSlang.getSystemProperties();
+			Validate.notNull(systemProperties, "No system properties specified");
 			String namespace = parsedSlang.getNamespace();
-			for(Map.Entry<String, ? extends Serializable> entry : variables.entrySet()) {
+			for(Map.Entry<String, ? extends Serializable> entry : systemProperties.entrySet()) {
 				result.put(namespace + "." + entry.getKey(), entry.getValue());
 			}
 		}
@@ -135,7 +135,7 @@ public class SlangCompilerImpl implements SlangCompiler {
                 case OPERATIONS:
                     executables.addAll(transformOperations(parsedSlang));
                     break;
-                case VARIABLES:
+                case SYSTEM_PROPERTIES:
                     break;
                 default:
                     throw new RuntimeException("Source: " + source.getName() + " is not of flow type or operations");

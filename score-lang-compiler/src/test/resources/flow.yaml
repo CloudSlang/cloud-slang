@@ -2,21 +2,21 @@ namespace: user.ops
 
 imports:
   ops: user.ops
-  vars: test.env.vars
+  props: test.sys.props
 
 flow:
   name: basic_flow
   inputs:
     - input1
     - host:
-        variable: vars.host
+        system_property: props.host
   workflow:
     CheckWeather:
       do:
         ops.test_op:
           - city: str('input_1')
           - port:
-              variable: vars.port
+              system_property: props.port
       publish:
         - weather
       navigate:

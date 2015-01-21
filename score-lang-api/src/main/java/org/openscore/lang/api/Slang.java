@@ -46,20 +46,20 @@ public interface Slang {
 	 * Run a flow/operation written in slang already compiled to a compilationArtifact
 	 * @param compilationArtifact the compiled artifact of the flow
 	 * @param runInputs the inputs for the flow/operation run
-	 * @param variables the variables for the flow/operation run
+	 * @param systemProperties the system properties for the flow/operation run
 	 * @return the execution ID in score
 	 */
-	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> variables);
+	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties);
 
 	/**
 	 * Compile & run a flow written in slang
 	 * @param source the slang source containing the flow
 	 * @param dependencies a set of slang sources of all the flow's dependencies
 	 * @param runInputs the inputs for the flow run
-	 * @param variables the variables for the flow/operation run
+	 * @param systemProperties the system properties for the flow/operation run
 	 * @return the execution ID in score
 	 */
-	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> variables);
+	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties);
 
 	/**
 	 * Compile & run an operation written in slang
@@ -67,18 +67,18 @@ public interface Slang {
 	 * @param operationName the name of the operation to compile from the source
 	 * @param dependencies a set of slang sources of all the operation's dependencies
 	 * @param runInputs the inputs for the operation run
-	 * @param variables the variables for the flow/operation run
+	 * @param systemProperties the system properties for the flow/operation run
 	 * @return the execution ID in score
 	 */
 	public Long compileAndRunOperation(SlangSource source, String operationName, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs,
-		Map<String, ? extends Serializable> variables);
+		Map<String, ? extends Serializable> systemProperties);
 
 	/**
-	 * Load variable sources written in slang and map them to fully qualified names
-	 * @param sources the slang sources containing the variables
-	 * @return map containing all of the variables with fully qualified keys
+	 * Load system property sources written in slang and map them to fully qualified names
+	 * @param sources the slang sources containing the system properties
+	 * @return map containing all of the system properties with fully qualified keys
 	 */
-	public Map<String, ? extends Serializable> loadVariables(SlangSource... sources);
+	public Map<String, ? extends Serializable> loadSystemProperties(SlangSource... sources);
 
     /**
      * Subscribe on events of score or slang

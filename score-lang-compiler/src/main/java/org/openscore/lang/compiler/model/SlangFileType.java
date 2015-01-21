@@ -6,6 +6,6 @@ package org.openscore.lang.compiler.model;
 public enum SlangFileType {
 
     EXECUTABLE,
-    SYSTEM_VARIABLE
+    SYSTEM_PROPERTIES
 
 }

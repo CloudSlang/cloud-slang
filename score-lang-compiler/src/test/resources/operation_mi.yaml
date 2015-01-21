@@ -4,6 +4,6 @@ operations:
   - test_op:
       inputs:
         - alla:
-            variable: vars.alla
+            system_property: props.alla
       action:
         python_script: 'print "hello world"'

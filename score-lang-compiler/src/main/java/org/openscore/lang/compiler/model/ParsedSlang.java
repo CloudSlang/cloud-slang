@@ -23,7 +23,7 @@ public class ParsedSlang {
     private Map<String, String> imports;
     private Map<String, Object> flow;
     private List<Map<String, Map<String, Object>>> operations;
-    private Map<String, ? extends Serializable> variables;
+    private Map<String, ? extends Serializable> system_properties;
     private String namespace;
     private String name;
 
@@ -45,13 +45,13 @@ public class ParsedSlang {
         return operations;
     }
 
-    public Map<String, ? extends Serializable> getVariables() {
-        return variables;
+    public Map<String, ? extends Serializable> getSystemProperties() {
+        return system_properties;
     }
 
     public Type getType() {
         if(flow != null) return Type.FLOW;
-        if(variables != null) return Type.VARIABLES;
+        if(system_properties != null) return Type.SYSTEM_PROPERTIES;
         return Type.OPERATIONS;
     }
 
@@ -64,7 +64,7 @@ public class ParsedSlang {
     }
 
     public static enum Type {
-        FLOW, OPERATIONS, VARIABLES
+        FLOW, OPERATIONS, SYSTEM_PROPERTIES
     }
 
 }
