@@ -71,15 +71,15 @@ public class SimpleFlowTest extends SystemsTestsParent {
 		URI flow = getClass().getResource("/yaml/simple_flow.yaml").toURI();
 		URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
         SlangSource operationsSource = SlangSource.fromFile(operations);
-		URI vars = getClass().getResource("/yaml/simple_variables.yaml").toURI();
-		SlangSource varsSource = SlangSource.fromFile(vars);
+		URI systemProperties = getClass().getResource("/yaml/system_properties.yaml").toURI();
+		SlangSource systemPropertiesSource = SlangSource.fromFile(systemProperties);
         Set<SlangSource> path = Sets.newHashSet(operationsSource);
 		CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
 		HashMap<String, Serializable> userInputs = new HashMap<>();
         for (Entry<String, ? extends Serializable> input : inputs) {
             userInputs.put(input.getKey(), input.getValue());
         }
-		ScoreEvent event = trigger(compilationArtifact, userInputs, slang.loadVariables(varsSource));
+		ScoreEvent event = trigger(compilationArtifact, userInputs, slang.loadSystemProperties(systemPropertiesSource));
 		Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
 	}
 

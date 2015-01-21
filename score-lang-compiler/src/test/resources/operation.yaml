@@ -1,13 +1,13 @@
 namespace: user.ops
 
 imports:
-  vars: test.env.vars
+  props: test.sys.props
 
 operations:
   - test_op:
       inputs:
         - alla:
-            variable: vars.alla
+            system_property: props.alla
       action:
         python_script: 'print "hello world"'
 

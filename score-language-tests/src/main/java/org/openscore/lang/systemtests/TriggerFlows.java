@@ -36,7 +36,7 @@ public class TriggerFlows {
     @Autowired
     private Slang slang;
 
-    public ScoreEvent runSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> variables) {
+    public ScoreEvent runSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> systemProperties) {
         final BlockingQueue<ScoreEvent> finishEvent = new LinkedBlockingQueue<>();
         ScoreEventListener finishListener = new ScoreEventListener() {
             @Override
@@ -46,7 +46,7 @@ public class TriggerFlows {
         };
         slang.subscribeOnEvents(finishListener, FINISHED_EVENT);
 
-        slang.run(compilationArtifact, userInputs, variables);
+        slang.run(compilationArtifact, userInputs, systemProperties);
 
         try {
             ScoreEvent event = finishEvent.take();
@@ -61,11 +61,11 @@ public class TriggerFlows {
         }
     }
 
-    public Map<String, StepData> runWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> variables) {
+    public Map<String, StepData> runWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> systemProperties) {
         RunDataAggregatorListener listener = new RunDataAggregatorListener();
         slang.subscribeOnEvents(listener, STEP_EVENTS);
 
-        runSync(compilationArtifact, userInputs, variables);
+        runSync(compilationArtifact, userInputs, systemProperties);
 
         Map<String, StepData> tasks = listener.aggregate();
 

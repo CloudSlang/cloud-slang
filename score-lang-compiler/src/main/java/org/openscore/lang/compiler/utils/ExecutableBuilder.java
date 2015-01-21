@@ -95,7 +95,7 @@ public class ExecutableBuilder {
 
         String namespace = parsedSlang.getNamespace();
         Map<String, String> imports = parsedSlang.getImports();
-        resolveVariables(inputs, imports);
+        resolveSystemProperties(inputs, imports);
         Map<String, SlangFileType> dependencies;
         switch (parsedSlang.getType()) {
             case FLOW:
@@ -125,7 +125,7 @@ public class ExecutableBuilder {
                 }
 
                 Workflow workflow = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false);
-                //todo: add sys vars dependencies?
+                //todo: add system properties dependencies?
                 dependencies = fetchDirectTasksDependencies(workflow);
                 return new Flow(preExecutableActionData, postExecutableActionData, workflow, namespace, execName, inputs, outputs, results, dependencies);
 
@@ -141,7 +141,7 @@ public class ExecutableBuilder {
                     throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Operation: " + execName + " has no action data");
                 }
                 Action action = compileAction(actionRawData);
-                //todo: add sys vars dependencies?
+                //todo: add system properties dependencies?
                 dependencies = new HashMap<>();
                 return new Operation(preExecutableActionData, postExecutableActionData, action, namespace, execName, inputs, outputs, results, dependencies);
             default:
@@ -223,7 +223,7 @@ public class ExecutableBuilder {
             throw new RuntimeException("For task: " + taskName + " syntax is illegal.\n" + ex.getMessage(), ex);
         }
         List<Input> inputs = (List<Input>)preTaskData.get(SlangTextualKeys.DO_KEY);
-        resolveVariables(inputs, imports);
+        resolveSystemProperties(inputs, imports);
         @SuppressWarnings("unchecked") Map<String, Object> doRawData = (Map<String, Object>) taskRawData.get(SlangTextualKeys.DO_KEY);
         if (MapUtils.isEmpty(doRawData)) {
             throw new RuntimeException("Task: " + taskName + " has no reference information");
@@ -243,13 +243,13 @@ public class ExecutableBuilder {
         return new Task(taskName, preTaskData, postTaskData, navigationStrings, refId);
     }
 
-	private static void resolveVariables(List<Input> inputs, Map<String, String> imports) {
+	private static void resolveSystemProperties(List<Input> inputs, Map<String, String> imports) {
 		if(inputs == null) return;
 		for(Input input : inputs) {
-			String variableName = input.getVariableName();
-			if(variableName != null) {
-				variableName = resolveRefId(variableName, imports);
-				input.setVariableName(variableName);
+			String systemPropertyName = input.getSystemPropertyName();
+			if(systemPropertyName != null) {
+				systemPropertyName = resolveRefId(systemPropertyName, imports);
+				input.setSystemPropertyName(systemPropertyName);
 			}
 		}
 	}

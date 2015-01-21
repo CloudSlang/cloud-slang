@@ -31,10 +31,10 @@ public interface SlangCompiler {
     List<Executable> preCompile(SlangSource source);
 
     /**
-     * Load variable sources written in slang and map them to fully qualified names
-     * @param sources the slang sources containing the variables
-     * @return map containing all of the variables with fully qualified keys
+     * Load system property sources written in slang and map them to fully qualified names
+     * @param sources the slang sources containing the system properties
+     * @return map containing all of the system properties with fully qualified keys
      */
-    Map<String, ? extends Serializable> loadVariables(SlangSource... sources);
+    Map<String, ? extends Serializable> loadSystemProperties(SlangSource... sources);
 
 }

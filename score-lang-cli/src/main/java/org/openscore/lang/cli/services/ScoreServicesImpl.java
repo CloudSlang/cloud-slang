@@ -61,8 +61,8 @@ public class ScoreServicesImpl implements ScoreServices{
      * @return executionId
      */
     @Override
-	public Long trigger(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> variables) {
-        return slang.run(compilationArtifact, inputs, variables);
+	public Long trigger(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties) {
+        return slang.run(compilationArtifact, inputs, systemProperties);
     }
 
     /**
@@ -72,7 +72,7 @@ public class ScoreServicesImpl implements ScoreServices{
      * @return executionId
      */
     @Override
-	public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> variables){
+	public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties){
         //add start event
         Set<String> handlerTypes = new HashSet<>();
         handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
@@ -85,7 +85,7 @@ public class ScoreServicesImpl implements ScoreServices{
         SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener();
         slang.subscribeOnEvents(scoreEventListener, handlerTypes);
 
-        Long executionId = trigger(compilationArtifact, inputs, variables);
+        Long executionId = trigger(compilationArtifact, inputs, systemProperties);
 
         while(!scoreEventListener.isFlowFinished()){
             try {

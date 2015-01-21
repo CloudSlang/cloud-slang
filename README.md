@@ -38,5 +38,5 @@ Contact us at [here](mailto:support@openscore.io).
 
 1. ```git clone``` the source code
 2. ```mvn clean install```
-3. Run the CLI executable from score-lang-cli\target\appassembler\bin 
+3. Run the CLI executable from score-lang-cli\target\slang\bin 
 

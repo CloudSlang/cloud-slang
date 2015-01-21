@@ -58,7 +58,7 @@ public class ExecutableSteps extends AbstractSteps {
         if(userInputs != null) {
             callArguments.putAll(userInputs);
         }
-        Map<String, Serializable> executableContext = inputsBinding.bindInputs(executableInputs, callArguments, runEnv.getVariables());
+        Map<String, Serializable> executableContext = inputsBinding.bindInputs(executableInputs, callArguments, runEnv.getSystemProperties());
 
         Map<String, Serializable> actionArguments = new HashMap<>();
 

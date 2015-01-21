@@ -46,7 +46,7 @@ public abstract class AbstractInputsTransformer {
 
 	private static Input createPropInput(Map.Entry<String, Map<String, Serializable>> entry) {
 		Map<String, Serializable> props = entry.getValue();
-		List<String> knownKeys = Arrays.asList(REQUIRED_KEY, ENCRYPTED_KEY, OVERRIDE_KEY, DEFAULT_KEY, VARIABLE_KEY);
+		List<String> knownKeys = Arrays.asList(REQUIRED_KEY, ENCRYPTED_KEY, OVERRIDE_KEY, DEFAULT_KEY, SYSTEM_PROPERTY_KEY);
 		for(String key : props.keySet()) {
 			if(!knownKeys.contains(key)) {
 				logger.warn("key: " + key + " in input: " + entry.getKey() + " is not a known property");
@@ -57,8 +57,8 @@ public abstract class AbstractInputsTransformer {
 		boolean override = props.containsKey(OVERRIDE_KEY) && (boolean)props.get(OVERRIDE_KEY);
 		String inputName = entry.getKey();
 		String expression = props.containsKey(DEFAULT_KEY) ? props.get(DEFAULT_KEY).toString() : inputName;
-		String variableName = (String)props.get(VARIABLE_KEY);
-		return new Input(inputName, expression, encrypted, required, override, variableName);
+		String systemPropertyName = (String)props.get(SYSTEM_PROPERTY_KEY);
+		return new Input(inputName, expression, encrypted, required, override, systemPropertyName);
 	}
 
 }

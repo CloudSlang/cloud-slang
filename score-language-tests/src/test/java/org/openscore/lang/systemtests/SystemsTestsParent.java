@@ -37,12 +37,12 @@ public class SystemsTestsParent {
     @Autowired
     protected TriggerFlows triggerFlows;
 
-    protected ScoreEvent trigger(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> variables) {
-        return triggerFlows.runSync(compilationArtifact, userInputs, variables);
+    protected ScoreEvent trigger(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> systemProperties) {
+        return triggerFlows.runSync(compilationArtifact, userInputs, systemProperties);
     }
 
-	public Map<String, StepData> triggerWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> variables) {
-		return triggerFlows.runWithData(compilationArtifact, userInputs, variables);
+	public Map<String, StepData> triggerWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> systemProperties) {
+		return triggerFlows.runWithData(compilationArtifact, userInputs, systemProperties);
 	}
 
 }

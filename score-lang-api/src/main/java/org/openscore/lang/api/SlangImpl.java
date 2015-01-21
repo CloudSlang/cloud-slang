@@ -77,14 +77,13 @@ public class SlangImpl implements Slang {
     }
 
 	@Override
-	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> variables) {
+	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties) {
 		Validate.notNull(compilationArtifact, "Compilation artifact can not be null");
 		if(runInputs == null) {
 			runInputs = new HashMap<>();
 		}
 		Map<String, Serializable> executionContext = new HashMap<>();
-		RunEnvironment runEnv = new RunEnvironment();
-		if(variables != null) runEnv.getVariables().putAll(variables);
+		RunEnvironment runEnv = new RunEnvironment(systemProperties);
 		executionContext.put(ScoreLangConstants.RUN_ENV, runEnv);
 		executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable)runInputs);
 		TriggeringProperties triggeringProperties = TriggeringProperties.create(compilationArtifact.getExecutionPlan()).setDependencies(compilationArtifact.getDependencies())
@@ -94,19 +93,19 @@ public class SlangImpl implements Slang {
 
 	@Override
 	public Long compileAndRunOperation(SlangSource source, String operationName, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs,
-		Map<String, ? extends Serializable> variables) {
+		Map<String, ? extends Serializable> systemProperties) {
 		CompilationArtifact compilationArtifact = compileOperation(source, operationName, dependencies);
-		return run(compilationArtifact, runInputs, variables);
+		return run(compilationArtifact, runInputs, systemProperties);
 	}
 
 	@Override
-	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> variables) {
-		return compileAndRunOperation(source, null, dependencies, runInputs, variables);
+	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties) {
+		return compileAndRunOperation(source, null, dependencies, runInputs, systemProperties);
 	}
 
 	@Override
-	public Map<String, ? extends Serializable> loadVariables(SlangSource... sources) {
-		return compiler.loadVariables(sources);
+	public Map<String, ? extends Serializable> loadSystemProperties(SlangSource... sources) {
+		return compiler.loadSystemProperties(sources);
 	}
 
     @Override
