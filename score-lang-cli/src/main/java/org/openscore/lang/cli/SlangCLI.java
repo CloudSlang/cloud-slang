@@ -21,6 +21,7 @@ import org.openscore.events.EventConstants;
 import org.openscore.events.ScoreEvent;
 import org.openscore.events.ScoreEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
@@ -30,7 +31,6 @@ import javax.annotation.PostConstruct;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.*;
 
@@ -45,9 +45,8 @@ public class SlangCLI implements CommandMarker {
     public static final String TRIGGERED_FLOW_MSG = "Triggered flow : ";
     public static final String WITH_EXECUTION_ID_MSG = " , with execution id : ";
     public static final String FLOW_EXECUTION_TIME_TOOK = "Flow execution time took  ";
-    public static final String PROPERTIES_PATH = "/application.properties";
-    public static final String SCORE_VERSION_KEY = "score.version";
-    public static final String SCORE_VERSION = extractScoreVersion();
+    private static final String CURRENTLY = "You are CURRENTLY running Slang version: ";
+    private final static Logger logger = Logger.getLogger(SlangCLI.class);
 
     @Autowired
     private ScoreServices scoreServices;
@@ -55,14 +54,13 @@ public class SlangCLI implements CommandMarker {
     @Autowired
     private CompilerHelper compilerHelper;
 
+    @Value("${slang.version}")
+    private String slangVersion;
+
     /**
      * This global param holds the state of the CLI, if flows need to run in ASYNC or in SYNC manner.
      */
     private Boolean triggerAsync = false;
-
-    private final static Logger logger = Logger.getLogger(SlangCLI.class);
-
-    private static final String currently = "You are currently running Score version: ";
 
     @CliCommand(value = "run", help = "triggers a slang flow")
     public String run(
@@ -109,9 +107,13 @@ public class SlangCLI implements CommandMarker {
         return inputsResult;
     }
 
-    @CliCommand(value = "slang --version", help = "Prints the score version used")
+    @CliCommand(value = "slang --version", help = "Prints the slang version used")
     public String version() {
-        return currently + SCORE_VERSION;
+        return CURRENTLY + slangVersion;
+    }
+
+    public String getSlangVersion() {
+        return slangVersion;
     }
 
     public static String triggerSyncMsg(Long id, String duration) {
@@ -160,24 +162,6 @@ public class SlangCLI implements CommandMarker {
             dependencyList = Lists.newArrayList(paths);
         }
         return dependencyList;
-    }
-
-    private static String extractScoreVersion()
-    {
-        String scoreVersion = "Score version could not be retrieved";
-        try (InputStream propertiesInputStream = SlangCLI.class.getResourceAsStream(PROPERTIES_PATH)) {
-            scoreVersion = extractProperty(propertiesInputStream, SCORE_VERSION_KEY);
-        } catch (IOException e) {
-            logger.error(e);
-        }
-        return scoreVersion;
-    }
-
-    private static String extractProperty(InputStream inputStream, String property) throws IOException {
-        Properties properties = new Properties();
-        properties.load(inputStream);
-        String scoreVersion = properties.getProperty(property);
-        return scoreVersion;
     }
 
 }
