@@ -94,9 +94,9 @@ public class SlangCLI implements CommandMarker {
     public List<String> getFlowInputs(
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. slang inputs --f C:\\Slang\\flow.yaml") final File file,
             @CliOption(key = {"cp", "classpath"}, mandatory = false,
-                    help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final String classPath)
+                    help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath)
             throws IOException {
-        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, prepareDependencyList(classPath));
+        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, classPath);
         List<Input> inputs = compilationArtifact.getInputs();
         List<String> inputsResult = new ArrayList<>();
         for (Input input : inputs) {
@@ -153,15 +153,6 @@ public class SlangCLI implements CommandMarker {
 
     private void logEvent(ScoreEvent event) {
         logger.info(("Event received: " + event.getEventType() + " Data is: " + event.getData()));
-    }
-
-    private List<String> prepareDependencyList(String classPath) {
-        List<String> dependencyList = null;
-        if (classPath != null) {
-            String[] paths = classPath.split(",");
-            dependencyList = Lists.newArrayList(paths);
-        }
-        return dependencyList;
     }
 
 }
