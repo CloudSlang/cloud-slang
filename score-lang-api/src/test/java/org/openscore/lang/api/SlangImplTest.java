@@ -158,8 +158,8 @@ public class SlangImplTest {
     @Test
     public void testRun(){
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
-		String fqvn = "docker.env.vars.port";
-        Long executionId = slang.run(compilationArtifact, new HashMap<String, Serializable>(), Collections.singletonMap(fqvn, 22));
+		String fqspn = "docker.sys.props.port";
+        Long executionId = slang.run(compilationArtifact, new HashMap<String, Serializable>(), Collections.singletonMap(fqspn, 22));
         Assert.assertNotNull(executionId);
 
         ArgumentCaptor<TriggeringProperties> argumentCaptor = ArgumentCaptor.forClass(TriggeringProperties.class);
@@ -169,7 +169,7 @@ public class SlangImplTest {
         RunEnvironment runEnv = (RunEnvironment)triggeringProperties.getContext().get(ScoreLangConstants.RUN_ENV);
         Assert.assertNotNull(runEnv);
         Assert.assertTrue(triggeringProperties.getContext().containsKey(ScoreLangConstants.USER_INPUTS_KEY));
-        Assert.assertTrue(runEnv.getVariables().containsKey(fqvn));
+        Assert.assertTrue(runEnv.getSystemProperties().containsKey(fqspn));
     }
 
     @Test
@@ -212,10 +212,10 @@ public class SlangImplTest {
     }
 
     @Test
-    public void testLoadVariables(){
+    public void testLoadSystemProperties(){
         SlangSource source = new SlangSource("source", "name");
-        slang.loadVariables(source);
-        Mockito.verify(compiler).loadVariables(source);
+        slang.loadSystemProperties(source);
+        Mockito.verify(compiler).loadSystemProperties(source);
     }
 
     // tests for subscribeOnEvents() method

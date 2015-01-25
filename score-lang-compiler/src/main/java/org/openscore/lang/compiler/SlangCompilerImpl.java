@@ -73,7 +73,8 @@ public class SlangCompilerImpl implements SlangCompiler {
         boolean hasDependencies = MapUtils.isNotEmpty(executable.getDependencies())
                 && executable.getType().equals(SlangTextualKeys.FLOW_TYPE);
         if (hasDependencies) {
-            Validate.noNullElements(path, "Source that was requested to compile has imports but no path was given");
+            Validate.notEmpty(path, "Source " + source.getName() + " has dependencies but no path was given to the compiler");
+            Validate.noNullElements(path, "Source " + source.getName() + " has empty dependencies");
 
             //we transform also all of the files in the given path to model objects
             Map<String, Executable> pathExecutables = transformDependencies(path);
@@ -101,15 +102,15 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
 	@Override
-	public Map<String, ? extends Serializable> loadVariables(SlangSource... sources) {
+	public Map<String, ? extends Serializable> loadSystemProperties(SlangSource... sources) {
 		Validate.notNull(sources, "You must supply a source to load");
 		Map<String, Serializable> result = new HashMap<>();
 		for(SlangSource source : sources) {
 			ParsedSlang parsedSlang = yamlParser.parse(source);
-			Map<String, ? extends Serializable> variables = parsedSlang.getVariables();
-			Validate.notNull(variables, "No variables specified");
+			Map<String, ? extends Serializable> systemProperties = parsedSlang.getSystemProperties();
+			Validate.notNull(systemProperties, "No system properties specified");
 			String namespace = parsedSlang.getNamespace();
-			for(Map.Entry<String, ? extends Serializable> entry : variables.entrySet()) {
+			for(Map.Entry<String, ? extends Serializable> entry : systemProperties.entrySet()) {
 				result.put(namespace + "." + entry.getKey(), entry.getValue());
 			}
 		}
@@ -128,17 +129,21 @@ public class SlangCompilerImpl implements SlangCompiler {
         List<Executable> executables = new ArrayList<>();
         for (SlangSource source : path) {
             ParsedSlang parsedSlang = yamlParser.parse(source);
-            switch (parsedSlang.getType()) {
-                case FLOW:
-                    executables.add(transformFlow(parsedSlang));
-                    break;
-                case OPERATIONS:
-                    executables.addAll(transformOperations(parsedSlang));
-                    break;
-                case VARIABLES:
-                    break;
-                default:
-                    throw new RuntimeException("Source: " + source.getName() + " is not of flow type or operations");
+            try {
+                switch (parsedSlang.getType()) {
+                    case FLOW:
+                        executables.add(transformFlow(parsedSlang));
+                        break;
+                    case OPERATIONS:
+                        executables.addAll(transformOperations(parsedSlang));
+                        break;
+                    case SYSTEM_PROPERTIES:
+                        break;
+                    default:
+                        throw new RuntimeException("Source: " + source.getName() + " is not of flow type or operations");
+                }
+            } catch (Throwable ex){
+                throw new RuntimeException("Error compiling source: " + source.getName() + ". " + ex.getMessage(), ex);
             }
         }
 
@@ -206,7 +211,12 @@ public class SlangCompilerImpl implements SlangCompiler {
         for (Map<String, Map<String, Object>> operation : parsedSlang.getOperations()) {
             Map.Entry<String, Map<String, Object>> entry = operation.entrySet().iterator().next();
             String operationName = entry.getKey();
-            Map<String, Object> operationRawData = entry.getValue();
+            Map<String, Object> operationRawData;
+            try {
+                operationRawData = entry.getValue();
+            } catch (ClassCastException ex){
+                throw new RuntimeException("Operation: " + operationName + " syntax is illegal. Below operation name, there should be a map of values.");
+            }
             executables.add(executableBuilder.transformToExecutable(parsedSlang, operationName, operationRawData));
         }
         return executables;
@@ -222,7 +232,7 @@ public class SlangCompilerImpl implements SlangCompiler {
         Map<String, Object> flowRawData = parsedSlang.getFlow();
         String flowName = (String) flowRawData.get(SlangTextualKeys.FLOW_NAME_KEY);
         if (StringUtils.isBlank(flowName)) {
-            throw new RuntimeException("Flow in source: " + parsedSlang.getName() + "have no name");
+            throw new RuntimeException("Flow in source: " + parsedSlang.getName() + " has no name");
         }
         return executableBuilder.transformToExecutable(parsedSlang, flowName, flowRawData);
     }
@@ -234,8 +244,12 @@ public class SlangCompilerImpl implements SlangCompiler {
         //first thing we parse the yaml file into java maps
         ParsedSlang parsedSlang = yamlParser.parse(source);
 
-        //than we transform those maps to model objects
-        return transformToExecutables(parsedSlang);
+        try {
+            //then we transform those maps to model objects
+            return transformToExecutables(parsedSlang);
+        } catch (Throwable ex){
+            throw new RuntimeException("Error compiling source: " + source.getName() + ". " + ex.getMessage(), ex);
+        }
     }
 
     private Executable transformToExecutable(SlangSource source, String operationName){

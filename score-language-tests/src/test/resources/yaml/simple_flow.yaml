@@ -9,7 +9,7 @@ namespace: user.flows
 
 imports:
   ops: user.ops
-  vars: test.env.vars
+  props: test.sys.props
 
 flow:
   name: simple_flow
@@ -18,14 +18,14 @@ flow:
     - time_zone_as_string:
         required: false
     - host:
-        variable: vars.host
+        system_property: props.host
   workflow:
     Task1:
       do:
         ops.get_time_zone:
           - time_zone_as_string: time_zone_as_string if time_zone_as_string is not None else input1
           - port:
-              variable: vars.port
+              system_property: props.port
       publish:
         - time_zone: time_zone
       navigate:

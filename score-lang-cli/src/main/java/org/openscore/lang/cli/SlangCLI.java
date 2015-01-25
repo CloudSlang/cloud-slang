@@ -66,19 +66,19 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. slang run --f C:\\Slang\\flow.yaml") final File file,
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath,
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, Serializable> inputs,
-            @CliOption(key = {"vf", "variable-file"}, mandatory = false, help = "comma separated list of variable file locations") final List<String> variableFiles) throws IOException {
+            @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = "comma separated list of system property file locations") final List<String> systemPropertyFiles) throws IOException {
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, classPath);
-        Map<String, ? extends Serializable> variables = compilerHelper.loadVariables(variableFiles);
+        Map<String, ? extends Serializable> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
         Long id;
         if (!triggerAsync) {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            id = scoreServices.triggerSync(compilationArtifact, inputs, variables);
+            id = scoreServices.triggerSync(compilationArtifact, inputs, systemProperties);
             stopWatch.stop();
             return triggerSyncMsg(id, stopWatch.toString());
         }
-        id = scoreServices.trigger(compilationArtifact, inputs, variables);
+        id = scoreServices.trigger(compilationArtifact, inputs, systemProperties);
         return triggerAsyncMsg(id, compilationArtifact.getExecutionPlan().getName());
     }
 

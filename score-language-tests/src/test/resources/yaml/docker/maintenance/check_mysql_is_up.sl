@@ -8,7 +8,7 @@
 ##################################################################################################################################################
 # This operation checks if the MySQL server is up, meaning its state is alive.
 # Inputs:
-#    - containerID - ID of the docker container that runs MySQL
+#    - container - name or ID of the docker container that runs MySQL
 #    - host - docker machine host
 #    - username - docker machine username
 #    - password - docker machine password
@@ -16,40 +16,56 @@
 #    - mysqlPassword - MySQL instance password
 #
 # Outputs:
-#    - additionalInformation - supplies additional information about the shh operation by returning the returnResult of the action
 #    - errorMessage - contains the STDERR of the machine if the shh action was executed successfully, the cause of the exception otherwise
 #
 # Results:
 #    - SUCCESS - the action was executed successfully and the MySQL server state is alive
-#    - FAILURE - some problem occurred, more information in the errorMessage and additionalInformation outputs
+#    - FAILURE - some problem occurred, more information in the errorMessage output
 ##################################################################################################################################################
 
-namespace: docker.maintenance.ops
+namespace: docker.maintenance
 
 operations:
   - check_mysql_is_up:
         inputs:
-          - containerID
+          - container
           - host
-          - port: "'22'"
+          - port:
+                default: "'22'"
+                override: true
           - username
           - password
-          - privateKeyFile: "''"
-          - arguments: "''"
+          - privateKeyFile:
+                default: "''"
+                override: true
+          - arguments:
+                default: "''"
+                override: true
           - mysqlUsername
           - mysqlPassword
-          - execCmd: "'mysqladmin -u ' + mysqlUsername + ' -p' + mysqlPassword + ' ping'"
-          - command: "'docker exec ' + containerID + ' ' + execCmd"
-          - characterSet: "'UTF-8'"
-          - pty: "'false'"
-          - timeout: "'90000'"
-          - closeSession: "'false'"
+          - execCmd:
+                default: "'mysqladmin -u ' + mysqlUsername + ' -p' + mysqlPassword + ' ping'"
+                override: true
+          - command:
+                default: "'docker exec ' + container + ' ' + execCmd"
+                override: true
+          - characterSet:
+                default: "'UTF-8'"
+                override: true
+          - pty:
+                default: "'false'"
+                override: true
+          - timeout:
+                default: "'90000'"
+                override: true
+          - closeSession:
+                default: "'false'"
+                override: true
         action:
           java_action:
             className: org.openscore.content.ssh.actions.SSHShellCommandAction
             methodName: runSshShellCommand
         outputs:
-          - additionalInformation: returnResult
           - errorMessage:  STDERR if returnCode == '0' else returnResult
         results:
           - SUCCESS : returnCode == '0' and returnResult == 'mysqld is alive\n'

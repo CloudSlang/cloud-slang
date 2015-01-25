@@ -19,6 +19,6 @@ public interface CompilerHelper {
 
 	public CompilationArtifact compile(String filePath, String opName, List<String> dependencies) throws IOException;
 
-	public Map<String, ? extends Serializable> loadVariables(List<String> variableFiles);
+	public Map<String, ? extends Serializable> loadSystemProperties(List<String> systemPropertyFiles);
 
 }

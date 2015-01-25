@@ -77,7 +77,7 @@ public class ExecutableBuilder {
 
     public Executable transformToExecutable(ParsedSlang parsedSlang, String execName, Map<String, Object> executableRawData) {
 
-        Validate.notEmpty(executableRawData, "Executable data for: " + execName + " is empty");
+        Validate.notEmpty(executableRawData, "Error compiling " + parsedSlang.getName() + ". Executable data for: " + execName + " is empty");
         Validate.notNull(parsedSlang, "Slang source for " + execName + " is null");
 
         Map<String, Serializable> preExecutableActionData = new HashMap<>();
@@ -95,39 +95,57 @@ public class ExecutableBuilder {
 
         String namespace = parsedSlang.getNamespace();
         Map<String, String> imports = parsedSlang.getImports();
-        resolveVariables(inputs, imports);
+        resolveSystemProperties(inputs, imports);
         Map<String, SlangFileType> dependencies;
         switch (parsedSlang.getType()) {
             case FLOW:
-                @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> workFlowRawData =
-                        (LinkedHashMap<String, Map<String, Object>>) executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
+
+                if(!executableRawData.containsKey(SlangTextualKeys.WORKFLOW_KEY)){
+                    throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + execName + " has no workflow property");
+                }
+                LinkedHashMap<String, Map<String, Object>> workFlowRawData;
+                try{
+                    workFlowRawData = (LinkedHashMap) executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
+                } catch (ClassCastException ex){
+                    throw new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'workflow' property there should be a map of tasks and not a list");
+                }
                 if (MapUtils.isEmpty(workFlowRawData)) {
-                    throw new RuntimeException("Flow: " + execName + " has no workflow data");
+                    throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + execName + " has no workflow data");
                 }
 
                 Workflow onFailureWorkFlow = null;
-                @SuppressWarnings("unchecked") LinkedHashMap<String, Map<String, Object>> onFailureData =
-                        (LinkedHashMap) workFlowRawData.remove(SlangTextualKeys.ON_FAILURE_KEY);
+                LinkedHashMap<String, Map<String, Object>> onFailureData;
+                try{
+                    onFailureData = (LinkedHashMap) workFlowRawData.remove(SlangTextualKeys.ON_FAILURE_KEY);
+                } catch (ClassCastException ex){
+                    throw new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a map of tasks and not a list");
+                }
                 if (MapUtils.isNotEmpty(onFailureData)) {
                     onFailureWorkFlow = compileWorkFlow(onFailureData, imports, null, true);
                 }
 
                 Workflow workflow = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false);
-                //todo: add sys vars dependencies?
+                //todo: add system properties dependencies?
                 dependencies = fetchDirectTasksDependencies(workflow);
                 return new Flow(preExecutableActionData, postExecutableActionData, workflow, namespace, execName, inputs, outputs, results, dependencies);
 
             case OPERATIONS:
-                @SuppressWarnings("unchecked") Map<String, Object> actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
+                Map<String, Object> actionRawData;
+                try{
+                   actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
+                } catch (ClassCastException ex){
+                    throw new RuntimeException("Operation: '" + execName + "' syntax is illegal.\nBelow 'action' property there should be a map of values such as: 'python_script:' or 'java_action:'");
+                }
+
                 if (MapUtils.isEmpty(actionRawData)) {
-                    throw new RuntimeException("Operation: " + execName + " has no action data");
+                    throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Operation: " + execName + " has no action data");
                 }
                 Action action = compileAction(actionRawData);
-                //todo: add sys vars dependencies?
+                //todo: add system properties dependencies?
                 dependencies = new HashMap<>();
                 return new Operation(preExecutableActionData, postExecutableActionData, action, namespace, execName, inputs, outputs, results, dependencies);
             default:
-                throw new RuntimeException("Source: " + parsedSlang.getName() + " is not of flow type or operations");
+                throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". It is not of flow or operations type");
         }
     }
 
@@ -162,8 +180,14 @@ public class ExecutableBuilder {
             Map.Entry<String, Map<String, Object>> taskRawData = iterator.next();
             Map.Entry<String, Map<String, Object>> nextTaskData = iterator.peek();
             String taskName = taskRawData.getKey();
-            Map<String, Object> taskRawDataValue = taskRawData.getValue();
-            String defaultSuccess;
+            Map<String, Object> taskRawDataValue;
+            try {
+                taskRawDataValue = taskRawData.getValue();
+            } catch (ClassCastException ex){
+                throw new RuntimeException("Task: " + taskName + " syntax is illegal.\nBelow task name, there should be a map of values in the format:\ndo:\n\top_name:");
+            }
+
+           String defaultSuccess;
             if (nextTaskData != null) {
                 defaultSuccess = nextTaskData.getKey();
             } else {
@@ -192,10 +216,14 @@ public class ExecutableBuilder {
 
         transformersHandler.validateKeyWords(taskName, taskRawData, ListUtils.union(preTaskTransformers, postTaskTransformers), TaskAdditionalKeyWords);
 
-        preTaskData.putAll(transformersHandler.runTransformers(taskRawData, preTaskTransformers));
-        postTaskData.putAll(transformersHandler.runTransformers(taskRawData, postTaskTransformers));
+        try {
+            preTaskData.putAll(transformersHandler.runTransformers(taskRawData, preTaskTransformers));
+            postTaskData.putAll(transformersHandler.runTransformers(taskRawData, postTaskTransformers));
+        } catch (Exception ex){
+            throw new RuntimeException("For task: " + taskName + " syntax is illegal.\n" + ex.getMessage(), ex);
+        }
         List<Input> inputs = (List<Input>)preTaskData.get(SlangTextualKeys.DO_KEY);
-        resolveVariables(inputs, imports);
+        resolveSystemProperties(inputs, imports);
         @SuppressWarnings("unchecked") Map<String, Object> doRawData = (Map<String, Object>) taskRawData.get(SlangTextualKeys.DO_KEY);
         if (MapUtils.isEmpty(doRawData)) {
             throw new RuntimeException("Task: " + taskName + " has no reference information");
@@ -215,20 +243,20 @@ public class ExecutableBuilder {
         return new Task(taskName, preTaskData, postTaskData, navigationStrings, refId);
     }
 
-	private static void resolveVariables(List<Input> inputs, Map<String, String> imports) {
+	private static void resolveSystemProperties(List<Input> inputs, Map<String, String> imports) {
 		if(inputs == null) return;
 		for(Input input : inputs) {
-			String variableName = input.getVariableName();
-			if(variableName != null) {
-				variableName = resolveRefId(variableName, imports);
-				input.setVariableName(variableName);
+			String systemPropertyName = input.getSystemPropertyName();
+			if(systemPropertyName != null) {
+				systemPropertyName = resolveRefId(systemPropertyName, imports);
+				input.setSystemPropertyName(systemPropertyName);
 			}
 		}
 	}
 
 	private static String resolveRefId(String refIdString, Map<String, String> imports) {
 		String alias = StringUtils.substringBefore(refIdString, ".");
-		Validate.notNull(imports, "No imports specified");
+		Validate.notNull(imports, "No imports specified for source: " + refIdString);
 		if(!imports.containsKey(alias)) throw new RuntimeException("Unresovled alias: " + alias);
 		String refName = StringUtils.substringAfter(refIdString, ".");
 		return imports.get(alias) + "." + refName;
