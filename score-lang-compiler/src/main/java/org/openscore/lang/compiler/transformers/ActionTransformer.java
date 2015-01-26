@@ -25,7 +25,7 @@ public class ActionTransformer implements Transformer<Map<String, Object>, Strin
 
     @Override
     public String transform(Map<String, Object> rawData) {
-        return "hello";
+        return "";
     }
 
     @Override
