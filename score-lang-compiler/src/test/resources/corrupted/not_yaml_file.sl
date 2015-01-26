@@ -4,15 +4,3 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-
-namespace: user.flows.circular
-
-imports:
-  flows: user.flows.circular
-
-flow:
-  name: child_flow
-  workflow:
-    CheckWeather:
-      do:
-        flows.parent_flow:

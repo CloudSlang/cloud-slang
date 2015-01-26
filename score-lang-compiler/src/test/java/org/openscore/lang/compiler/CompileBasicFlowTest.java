@@ -9,9 +9,7 @@
 package org.openscore.lang.compiler;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.openscore.api.ExecutionPlan;
 import org.openscore.api.ExecutionStep;
@@ -45,9 +43,6 @@ public class CompileBasicFlowTest {
 
     @Autowired
     private SlangCompiler compiler;
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testCompileFlowBasic() throws Exception {
@@ -148,34 +143,5 @@ public class CompileBasicFlowTest {
 		Assert.assertNotNull(result);
 		Assert.assertEquals(expected, result);
 	}
-
-
-    @Test
-    public void testFlowWithWrongNavigation() throws Exception {
-        URI resource = getClass().getResource("/flow_with_navigation_to_missing_task.sl").toURI();
-        URI operations = getClass().getResource("/operation.yaml").toURI();
-
-        Set<SlangSource> path = new HashSet<>();
-        path.add(SlangSource.fromFile(operations));
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Task1");
-        exception.expectMessage("Task2");
-        exception.expectMessage("navigation");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
-    }
-
-    @Test
-    public void testFlowWithNavigationToMissingDefaultResults() throws Exception {
-        URI resource = getClass().getResource("/flow_with_navigation_to_missing_default_results.sl").toURI();
-        URI operations = getClass().getResource("/operation.yaml").toURI();
-
-        Set<SlangSource> path = new HashSet<>();
-        path.add(SlangSource.fromFile(operations));
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Task1");
-        exception.expectMessage("SUCCESS");
-        exception.expectMessage("navigation");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
-    }
 
 }
