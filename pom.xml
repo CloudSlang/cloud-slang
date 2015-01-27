@@ -172,6 +172,11 @@
                 <artifactId>score-http-client</artifactId>
                 <version>0.1.44</version>
             </dependency>
+            <dependency>
+                <groupId>io.openscore.content</groupId>
+                <artifactId>score-social-networks</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
             <!--end of score content dependencies-->
 
             <dependency>
@@ -453,7 +458,7 @@
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-release-plugin</artifactId>
               <version>2.5</version>
-            </plugin>		 
+            </plugin>
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-deploy-plugin</artifactId>
