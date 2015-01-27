@@ -9,13 +9,13 @@ Slang is a YAML based language for writing human-readable workflows for score. T
 
 ###### Pre-Requisite: Java JRE >= 7
 
-1. Download the slang zip from [here](https://github.com/openscore/score-language/releases/download/slang-CLI-0.2/slang.zip).
+1. Download the slang zip from [here](https://github.com/openscore/score-language/releases/download/slang-CLI-v0.2.1/score-lang-cli.zip).
 2. Unzip it.
 3. Go to the folder /slang/appassembler/bin/
 4. Run the executable :
   - For Windows : slang.bat 
   - For Linux : bash slang
-5. Run the Docker example flow:  run --f ../../docker-demo-flows/demo_dev_ops_flow.yaml  --inputs dockerHost=[*dockerHost*],dockerUsername=[*dockerHostUser*],dockerPassword=[*dockerHostPasword*],emailHost=[*emailHost*],emailPort=[*Emailport*],emailSender=[*EmailSender*],emailRecipient=[*EmailRecipient*]
+5. Run the Docker example flow:  run --f ../content/org/openscore/slang/docker/containers/demo_dev_ops.sl  --cp ../content/  --inputs dockerHost=[*dockerHost*],dockerUsername=[*dockerHostUser*],dockerPassword=[*dockerHostPasword*],emailHost=[*emailHost*],emailPort=[*Emailport*],emailSender=[*EmailSender*],emailRecipient=[*EmailRecipient*]
 
 
 
