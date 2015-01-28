@@ -17,6 +17,6 @@ WORKDIR /app-src/
 
 RUN mvn package
 
-WORKDIR score-lang-cli/target/appassembler/bin/
+WORKDIR score-lang-cli/target/slang/bin/
 
 CMD ["sh","slang"]
