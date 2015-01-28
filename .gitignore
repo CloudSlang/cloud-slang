@@ -6,6 +6,7 @@ build/
 .idea/
 *.ipr
 *.iml
+*.history
 .settings/
 .project
 .classpath
