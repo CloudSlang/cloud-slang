@@ -1,0 +1,41 @@
+namespace: docker.maintenance.flows
+
+imports:
+ ops: docker.ops
+ linux: linux.ops
+ flows: docker.maintenance.flows
+ util: util.ops
+
+flow:
+  name: diskspace_health_check_flow
+  inputs:
+    - dockerHost
+    - dockerUsername
+    - dockerPassword
+    - percentage
+
+  workflow:
+    validate_linux_machine_ssh_access:
+      do:
+        linux.validate_linux_machine_ssh_access:
+          - host: dockerHost
+          - username: dockerUsername
+          - password: dockerPassword
+    check_disk_space:
+      do:
+        linux.check_linux_disk_space:
+          - host: dockerHost
+          - username: dockerUsername
+          - password: dockerPassword
+      publish:
+        - diskSpace
+    check_availability:
+      do:
+        util.less_than_percentage:
+          - diskSpace
+          - percentage
+      navigate:
+        SUCCESS: SUCCESS
+        FAILURE: FAILURE
+
+

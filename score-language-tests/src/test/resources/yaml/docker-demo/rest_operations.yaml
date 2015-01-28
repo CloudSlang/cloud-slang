@@ -5,7 +5,13 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
+####################################################
+#
+#   This operation will do a simple GET request
+#
+####################################################
 namespace: rest.ops
+
 
 operations:
   - ping_application:
