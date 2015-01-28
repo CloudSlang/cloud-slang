@@ -1,0 +1,60 @@
+#   (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+#   All rights reserved. This program and the accompanying materials
+#   are made available under the terms of the Apache License v2.0 which accompany this distribution.
+#
+#   The Apache License is available at
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+####################################################
+#   This flow will delete unused docker images if diskspace is greater than a given value
+#   Inputs:
+#       - dockerHost
+#       - dockerUsername
+#       - dockerPassword
+#       - percentage
+#   Outputs:
+#       - errorMessage
+#   Results:
+#       - SUCCESS
+#       - FAILURE
+####################################################
+
+namespace: docker.flows
+
+imports:
+ ops: docker.ops
+ linux: linux.ops
+ flows: docker.maintenance.flows
+ util: util.ops
+
+flow:
+  name: docker_images_maintenance
+  inputs:
+    - dockerHost
+    - dockerUsername
+    - dockerPassword
+    - percentage
+  workflow:
+    check_diskspace:
+      do:
+        flows.diskspace_health_check_flow:
+          - dockerHost
+          - dockerUsername
+          - dockerPassword
+          - percentage
+      navigate:
+        SUCCESS: SUCCESS
+        FAILURE: clear_unused_docker_images
+    clear_unused_docker_images:
+      do:
+        flows.clear_unused_docker_images:
+          - dockerHost
+          - dockerUsername
+          - dockerPassword
+      publish:
+        - amount_of_images_deleted
+        - amount_of_dangling_images_deleted
+        - dangling_images_list_safe_to_delete
+        - images_list_safe_to_delete
+  outputs:
+    - removedImagesNr: str(int(amount_of_images_deleted) + int(amount_of_dangling_images_deleted))
