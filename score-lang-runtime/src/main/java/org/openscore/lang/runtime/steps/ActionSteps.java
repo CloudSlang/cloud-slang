@@ -12,15 +12,16 @@ package org.openscore.lang.runtime.steps;
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
-import org.openscore.lang.entities.ActionType;
-import org.openscore.lang.runtime.env.ReturnValues;
-import org.openscore.lang.runtime.env.RunEnvironment;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.openscore.api.execution.ExecutionParametersConsts;
 import org.openscore.lang.ExecutionRuntimeServices;
+import org.openscore.lang.entities.ActionType;
+import org.openscore.lang.runtime.env.ReturnValues;
+import org.openscore.lang.runtime.env.RunEnvironment;
 import org.openscore.lang.runtime.events.LanguageEventData;
+import org.python.core.PyException;
 import org.python.core.PyModule;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
@@ -37,6 +38,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static org.openscore.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static org.openscore.lang.entities.ScoreLangConstants.ACTION_CLASS_KEY;
 import static org.openscore.lang.entities.ScoreLangConstants.ACTION_METHOD_KEY;
 import static org.openscore.lang.entities.ScoreLangConstants.ACTION_TYPE;
@@ -46,7 +48,6 @@ import static org.openscore.lang.entities.ScoreLangConstants.EVENT_ACTION_START;
 import static org.openscore.lang.entities.ScoreLangConstants.NEXT_STEP_ID_KEY;
 import static org.openscore.lang.entities.ScoreLangConstants.PYTHON_SCRIPT_KEY;
 import static org.openscore.lang.entities.ScoreLangConstants.RUN_ENV;
-import static org.openscore.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
 /**
  * User: stoneo
@@ -247,7 +248,11 @@ public class ActionSteps extends AbstractSteps {
     private synchronized Map<String, String> runPythonAction(Map<String, Serializable> callArguments,
                                                              String script) {
 
-        executePythonScript(interpreter, script, callArguments);
+        try {
+            executePythonScript(interpreter, script, callArguments);
+        } catch (PyException e) {
+            throw new RuntimeException("Error executing python script: " + e, e);
+        }
         Iterator<PyObject> localsIterator = interpreter.getLocals().asIterable().iterator();
         HashMap<String, String> returnValue = new HashMap<>();
         while (localsIterator.hasNext()) {

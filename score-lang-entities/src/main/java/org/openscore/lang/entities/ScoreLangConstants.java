@@ -1,13 +1,11 @@
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
-
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package org.openscore.lang.entities;
 
 /**
@@ -31,7 +29,7 @@ public interface ScoreLangConstants {
     String NEXT_STEP_ID_KEY = "nextStepId";
 
     //operation scope
-    String OPERATION_INPUTS_KEY = "operationInputs";
+    String EXECUTABLE_INPUTS_KEY = "executableInputs";
     String BIND_OUTPUT_FROM_INPUTS_KEY = "fromInputs";
     String USER_INPUTS_KEY = "userInputs";
     String EXECUTABLE_OUTPUTS_KEY = "executableOutputs";

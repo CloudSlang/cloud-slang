@@ -31,17 +31,20 @@ public class AbstractOutputsTransformer {
             return outputs;
         }
         for (Object rawOutput : rawData) {
-            //- some_output
-            //this is our default behavior that if the user specifies only a key, the key is also the ref we look for
-            if (rawOutput instanceof String) {
-                outputs.add(createRefOutput((String) rawOutput));
-            } else if (rawOutput instanceof Map) {
-                @SuppressWarnings("unchecked") Map.Entry<String, ?> entry = (Map.Entry<String, ?>) (((Map) rawOutput).entrySet()).iterator().next();
+            if (rawOutput instanceof Map) {
+                @SuppressWarnings("unchecked") Map.Entry<String, ?> entry = (Map.Entry<String, ?>) (((Map) rawOutput).entrySet()).iterator()
+                                                                                                                                 .next();
                 // - some_output: some_expression
                 // the value of the input is an expression we need to evaluate at runtime
                 if (entry.getValue() instanceof String) {
-                    outputs.add(createExpressionOutput(entry.getKey(), (String)entry.getValue()));
+                    outputs.add(createExpressionOutput(entry.getKey(), (String) entry.getValue()));
+                } else {
+                    throw new RuntimeException("The value of outputs and publish parameters must be an expression. For: " + entry.getKey() + " the value: " + entry.getValue() + " is not supported");
                 }
+            } else {
+                //- some_output
+                //this is our default behavior that if the user specifies only a key, the key is also the ref we look for
+                outputs.add(createRefOutput((String) rawOutput));
             }
         }
         return outputs;

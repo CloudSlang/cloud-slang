@@ -23,16 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.openscore.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
-import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
-import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
-import static org.openscore.lang.entities.ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY;
-import static org.openscore.lang.entities.ScoreLangConstants.EXECUTABLE_RESULTS_KEY;
-import static org.openscore.lang.entities.ScoreLangConstants.NEXT_STEP_ID_KEY;
-import static org.openscore.lang.entities.ScoreLangConstants.NODE_NAME_KEY;
-import static org.openscore.lang.entities.ScoreLangConstants.OPERATION_INPUTS_KEY;
-import static org.openscore.lang.entities.ScoreLangConstants.RUN_ENV;
-import static org.openscore.lang.entities.ScoreLangConstants.USER_INPUTS_KEY;
+import static org.openscore.lang.entities.ScoreLangConstants.*;
 import static org.openscore.lang.runtime.events.LanguageEventData.OUTPUTS;
 import static org.openscore.lang.runtime.events.LanguageEventData.RESULT;
 import static org.openscore.lang.runtime.events.LanguageEventData.levelName;
@@ -55,7 +46,7 @@ public class ExecutableSteps extends AbstractSteps {
     @Autowired
     private OutputsBinding outputsBinding;
 
-    public void startExecutable(@Param(OPERATION_INPUTS_KEY) List<Input> operationInputs,
+    public void startExecutable(@Param(EXECUTABLE_INPUTS_KEY) List<Input> executableInputs,
                                 @Param(RUN_ENV) RunEnvironment runEnv,
                                 @Param(USER_INPUTS_KEY) Map<String, ? extends Serializable> userInputs,
                                 @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
@@ -67,12 +58,12 @@ public class ExecutableSteps extends AbstractSteps {
         if(userInputs != null) {
             callArguments.putAll(userInputs);
         }
-        Map<String, Serializable>  operationContext = inputsBinding.bindInputs(callArguments,operationInputs);
+        Map<String, Serializable> executableContext = inputsBinding.bindInputs(executableInputs, callArguments, runEnv.getSystemProperties());
 
         Map<String, Serializable> actionArguments = new HashMap<>();
 
         //todo: clone action context before updating
-        actionArguments.putAll(operationContext);
+        actionArguments.putAll(executableContext);
 
         //done with the user inputs, don't want it to be available in next startExecutable steps..
         if(userInputs != null) {
@@ -81,9 +72,9 @@ public class ExecutableSteps extends AbstractSteps {
 
         //todo: hook
 
-        updateCallArgumentsAndPushContextToStack(runEnv, operationContext, actionArguments);
+        updateCallArgumentsAndPushContextToStack(runEnv, executableContext, actionArguments);
 
-        sendBindingInputsEvent(operationInputs, operationContext, runEnv, executionRuntimeServices,
+        sendBindingInputsEvent(executableInputs, executableContext, runEnv, executionRuntimeServices,
                 "Post Input binding for operation/flow",nodeName, levelName.EXECUTABLE_NAME);
 
         // put the next step position for the navigation

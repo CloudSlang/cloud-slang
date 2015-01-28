@@ -24,8 +24,6 @@ flow:
           - city: city if city is not None else input1
       publish:
         - kuku: weather
-      navigate:
-        KUKU: Task2
 
     Task2:
       do:

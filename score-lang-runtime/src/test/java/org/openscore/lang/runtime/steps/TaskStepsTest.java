@@ -9,6 +9,8 @@
 *******************************************************************************/
 package org.openscore.lang.runtime.steps;
 
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
@@ -66,6 +68,9 @@ public class TaskStepsTest {
     @Autowired
     private OutputsBinding outputsBinding;
 
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     @Test
     public void testBeginTaskEmptyInputs() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
@@ -103,7 +108,7 @@ public class TaskStepsTest {
         resultMap.put("input1",5);
         resultMap.put("input2",3);
 
-        when(inputsBinding.bindInputs(anyMap(),eq(inputs))).thenReturn(resultMap);
+        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anyMap())).thenReturn(resultMap);
 
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
         taskSteps.beginTask(inputs,runEnv,runtimeServices,"task1", 1L, 2L, "2");
@@ -129,13 +134,15 @@ public class TaskStepsTest {
     @Test
     public void testEndTaskEvents() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
-        runEnv.putReturnValues(new ReturnValues(new HashMap<String,String>(),""));
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String,String>(),SUCCESS_RESULT));
         runEnv.getStack().pushContext(new HashMap<String, Serializable>());
 
         when(outputsBinding.bindOutputs(anyMap(), anyMap(), anyList())).thenReturn(new HashMap<String, String>());
 
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
-        taskSteps.endTask(runEnv, new ArrayList<Output>(),new HashMap<String, ResultNavigation>(),runtimeServices, "task1");
+        HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
+        taskNavigationValues.put(SUCCESS_RESULT, new ResultNavigation(0, SUCCESS_RESULT));
+        taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,runtimeServices, "task1");
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
         Assert.assertEquals(2,events.size());
@@ -158,14 +165,16 @@ public class TaskStepsTest {
     public void testEndTaskWithPublish() throws Exception {
         List<Output> possiblePublishValues = Arrays.asList(new Output("name", "name"));
         RunEnvironment runEnv = new RunEnvironment();
-        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), null));
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), SUCCESS_RESULT));
         runEnv.getStack().pushContext(new HashMap<String, Serializable>());
 
         Map<String, String> boundPublish = new HashMap<>();
         boundPublish.put("name", "John");
 
         when(outputsBinding.bindOutputs(isNull(Map.class), anyMapOf(String.class, String.class), eq(possiblePublishValues))).thenReturn(boundPublish);
-        taskSteps.endTask(runEnv, possiblePublishValues, new HashMap<String, ResultNavigation>(), createRuntimeServices(), "task1");
+        HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
+        taskNavigationValues.put(SUCCESS_RESULT, new ResultNavigation(0, SUCCESS_RESULT));
+        taskSteps.endTask(runEnv, possiblePublishValues, taskNavigationValues, createRuntimeServices(), "task1");
 
         Map<String,Serializable> flowContext = runEnv.getStack().popContext();
         Assert.assertTrue(flowContext.containsKey("name"));
@@ -189,6 +198,27 @@ public class TaskStepsTest {
         taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues, createRuntimeServices(), "task1");
 
         Assert.assertEquals(runEnv.removeNextStepPosition(), nextStepPosition);
+    }
+
+    @Test
+    public void testEndTaskMissingNavigationForExecutableResult() throws Exception {
+        RunEnvironment runEnv = new RunEnvironment();
+        String result = "CUSTOM";
+        runEnv.getStack().pushContext(new HashMap<String, Serializable>());
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), result));
+
+        Long nextStepPosition = 5L;
+
+        HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
+        ResultNavigation successNavigation = new ResultNavigation(nextStepPosition, null);
+        taskNavigationValues.put(SUCCESS_RESULT, successNavigation);
+        ResultNavigation failureNavigation = new ResultNavigation(1, null);
+        taskNavigationValues.put(FAILURE_RESULT, failureNavigation);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Task1");
+        exception.expectMessage("CUSTOM");
+        exception.expectMessage("navigation");
+        taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues, createRuntimeServices(), "Task1");
     }
 
     private ExecutionRuntimeServices createRuntimeServices(){

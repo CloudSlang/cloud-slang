@@ -49,7 +49,7 @@ public class ClearContainersTest  extends SystemsTestsParent {
         userInputs.put("dockerHost", "{{ dockerHost }}");
         userInputs.put("dockerUsername", "{{ dockerUsername }}");
         userInputs.put("dockerPassword", "{{ dockerPassword }}");
-        ScoreEvent event = trigger(compilationArtifact, userInputs);
+        ScoreEvent event = trigger(compilationArtifact, userInputs, null);
         Assert.assertEquals(EventConstants.SCORE_FINISHED_EVENT, event.getEventType());
     }
 }

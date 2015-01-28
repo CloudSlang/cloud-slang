@@ -34,16 +34,15 @@ public class SystemsTestsParent {
 
     @Autowired
     protected Slang slang;
-
     @Autowired
     protected TriggerFlows triggerFlows;
 
-    protected ScoreEvent trigger(CompilationArtifact compilationArtifact, Map<String, Serializable> userInputs) {
-        return triggerFlows.runSync(compilationArtifact, userInputs);
+    protected ScoreEvent trigger(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> systemProperties) {
+        return triggerFlows.runSync(compilationArtifact, userInputs, systemProperties);
     }
 
-    public Map<String, StepData> triggerWithData(
-            CompilationArtifact compilationArtifact, Map<String, Serializable> userInputs) {
-        return triggerFlows.runWithData(compilationArtifact, userInputs);
-    }
+	public Map<String, StepData> triggerWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> systemProperties) {
+		return triggerFlows.runWithData(compilationArtifact, userInputs, systemProperties);
+	}
+
 }

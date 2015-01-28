@@ -58,9 +58,11 @@ public class CompilerHelperTest {
     public void testFilePathValid() throws Exception {
         URL flowFilePath = getClass().getResource("/flow.yaml");
         URL opFilePath = getClass().getResource("/operation.yaml");
+        URL flow2FilePath = getClass().getResource("/flowsdir/flow2.yaml");
         compilerHelper.compile(flowFilePath.getPath(), null, null);
         Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath.toURI()),
-                Sets.newHashSet(SlangSource.fromFile(flowFilePath.toURI()), SlangSource.fromFile(opFilePath.toURI())));
+                Sets.newHashSet(SlangSource.fromFile(flowFilePath.toURI()),SlangSource.fromFile(flow2FilePath.toURI()),
+                        SlangSource.fromFile(opFilePath.toURI())));
     }
 
     @Test

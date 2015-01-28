@@ -9,10 +9,11 @@ package org.openscore.lang.compiler.transformers;
 *
 *******************************************************************************/
 
-
 import junit.framework.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.compiler.SlangTextualKeys;
@@ -50,6 +51,9 @@ public class PublishTransformerTest {
     @Autowired
     private YamlParser yamlParser;
 
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     private List publishMap;
 
     @Before
@@ -83,6 +87,19 @@ public class PublishTransformerTest {
         Assert.assertEquals("temperature", publish.getExpression());
     }
 
+
+    @Test (timeout = DEFAULT_TIMEOUT)
+    public void testInvalidOutputType() throws Exception{
+        URL resource = getClass().getResource("/flow_with_invalid_publish_from_task.yaml");
+        ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
+        Map flow = (Map)file.getFlow().get(SlangTextualKeys.WORKFLOW_KEY);
+        Map task = (Map)flow.get("CheckWeather");
+        List<Object> publishMap = (List<Object>) task.get(SlangTextualKeys.PUBLISH_KEY);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("weather");
+        exception.expectMessage("3");
+        publishTransformer.transform(publishMap);
+    }
     @Configuration
     public static class Config {
 

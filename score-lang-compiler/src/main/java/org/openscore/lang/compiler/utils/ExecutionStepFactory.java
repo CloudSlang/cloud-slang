@@ -71,7 +71,7 @@ public class ExecutionStepFactory {
         Validate.notNull(preExecutableData, "preExecutableData is null");
         Validate.notNull(execInputs, "Executable inputs are null");
         Map<String, Serializable> actionData = new HashMap<>();
-        actionData.put(ScoreLangConstants.OPERATION_INPUTS_KEY, (Serializable) execInputs);
+        actionData.put(ScoreLangConstants.EXECUTABLE_INPUTS_KEY, (Serializable) execInputs);
         actionData.put(ScoreLangConstants.HOOKS, (Serializable) preExecutableData);
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, executableName);
         actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);

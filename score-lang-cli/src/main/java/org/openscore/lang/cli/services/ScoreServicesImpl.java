@@ -1,13 +1,11 @@
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
-
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package org.openscore.lang.cli.services;
 
 import org.openscore.lang.api.Slang;
@@ -15,7 +13,6 @@ import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.runtime.env.ExecutionPath;
 import org.openscore.lang.runtime.events.LanguageEventData;
-
 import org.apache.commons.lang.StringUtils;
 import org.openscore.events.EventConstants;
 import org.openscore.events.ScoreEvent;
@@ -36,13 +33,12 @@ import static org.openscore.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXC
 import static org.openscore.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
 import static org.openscore.lang.runtime.events.LanguageEventData.EXCEPTION;
 import static org.openscore.lang.runtime.events.LanguageEventData.RESULT;
-
 import static org.fusesource.jansi.Ansi.ansi;
 
 /**
- * Date: 11/13/2014
- *
  * @author Bonczidai Levente
+ * @since 11/13/2014
+ * @version $Id$
  */
 @Service
 public class ScoreServicesImpl implements ScoreServices{
@@ -64,8 +60,9 @@ public class ScoreServicesImpl implements ScoreServices{
      * @param inputs : flow inputs
      * @return executionId
      */
-    public Long trigger(CompilationArtifact compilationArtifact, Map<String, Serializable> inputs) {
-        return slang.run(compilationArtifact, inputs);
+    @Override
+	public Long trigger(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties) {
+        return slang.run(compilationArtifact, inputs, systemProperties);
     }
 
     /**
@@ -74,7 +71,8 @@ public class ScoreServicesImpl implements ScoreServices{
      * @param inputs : flow inputs
      * @return executionId
      */
-    public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, Serializable> inputs){
+    @Override
+	public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties){
         //add start event
         Set<String> handlerTypes = new HashSet<>();
         handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
@@ -87,18 +85,15 @@ public class ScoreServicesImpl implements ScoreServices{
         SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener();
         slang.subscribeOnEvents(scoreEventListener, handlerTypes);
 
-        Long executionId = trigger(compilationArtifact, inputs);
+        Long executionId = trigger(compilationArtifact, inputs, systemProperties);
 
         while(!scoreEventListener.isFlowFinished()){
             try {
                 Thread.sleep(200);
             } catch (InterruptedException ignore) {}
         }
-
         slang.unSubscribeOnEvents(scoreEventListener);
-
         return executionId;
-
     }
 
     private class SyncTriggerEventListener implements ScoreEventListener{
@@ -154,6 +149,5 @@ public class ScoreServicesImpl implements ScoreServices{
 
         }
     }
-
 
 }

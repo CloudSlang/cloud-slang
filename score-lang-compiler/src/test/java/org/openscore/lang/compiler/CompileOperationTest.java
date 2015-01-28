@@ -56,6 +56,14 @@ public class CompileOperationTest {
         Assert.assertEquals("there is a different number of steps than expected", 3, executionPlan.getSteps().size());
     }
 
+	@Test
+	public void testCompileOperationMissingImport() throws Exception {
+		URL resource = getClass().getResource("/operation_mi.yaml");
+		exception.expect(RuntimeException.class);
+		exception.expectMessage("import");
+		compiler.compile(SlangSource.fromFile(resource.toURI()), "test_op", null).getExecutionPlan();
+	}
+
     @Test
     public void wrongOperationName() throws Exception {
         URL resource = getClass().getResource("/operation.yaml");
@@ -71,7 +79,7 @@ public class CompileOperationTest {
         ExecutionPlan executionPlan = compiler.compile(SlangSource.fromFile(resource.toURI()), "test_op_2", null).getExecutionPlan();
 
         ExecutionStep startStep = executionPlan.getStep(1L);
-        @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) startStep.getActionData().get(ScoreLangConstants.OPERATION_INPUTS_KEY);
+        @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) startStep.getActionData().get(ScoreLangConstants.EXECUTABLE_INPUTS_KEY);
         Assert.assertNotNull("inputs doesn't exist", inputs);
         Assert.assertEquals("there is a different number of inputs than expected", 13, inputs.size());
 
@@ -100,7 +108,7 @@ public class CompileOperationTest {
         Assert.assertEquals("Operation name is wrong", "check_Weather", operation.getName());
         Assert.assertEquals("Operation namespace is wrong", "user.ops", operation.getNamespace());
         Assert.assertEquals("There is a different number of operation inputs than expected", 1, operation.getInputs().size());
-        Assert.assertEquals("There is a different number of operation outputs than expected", 1, operation.getOutputs().size());
+        Assert.assertEquals("There is a different number of operation outputs than expected", 2, operation.getOutputs().size());
         Assert.assertEquals("There is a different number of operation results than expected", 1, operation.getResults().size());
         Map<String, SlangFileType> dependencies = operation.getDependencies();
         Assert.assertEquals("There is a different number of operation dependencies than expected", 0, dependencies.size());

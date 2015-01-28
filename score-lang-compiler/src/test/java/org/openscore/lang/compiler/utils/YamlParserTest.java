@@ -34,7 +34,7 @@ public class YamlParserTest {
     public void throwExceptionWhenFileIsNotValid() throws Exception {
         Mockito.when(yaml.loadAs(any(InputStream.class), eq(ParsedSlang.class))).thenThrow(IOException.class);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("syntax");
+        exception.expectMessage("parsing");
         yamlParser.parse(new SlangSource("a", "b"));
     }
 

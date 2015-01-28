@@ -30,24 +30,23 @@ public class InputsBinding {
 
     /**
      * Binds the inputs to a new result map
-     * @param context : initial context
      * @param inputs : the inputs to bind
+     * @param context : initial context
      * @return : a new map with all inputs resolved (does not include initial context)
      */
-    public Map<String,Serializable> bindInputs(Map<String,Serializable> context,
-                                               List<Input> inputs){
+    public Map<String,Serializable> bindInputs(List<Input> inputs, Map<String, ? extends Serializable> context, Map<String, ? extends Serializable> systemProperties) {
         Map<String,Serializable> resultContext = new HashMap<>();
         Map<String,Serializable> srcContext = new HashMap<>(context); //we do not want to change original context map
         for(Input input : inputs){
-            bindInput(input,srcContext,resultContext);
+            bindInput(input, srcContext, resultContext, systemProperties);
         }
         return resultContext;
     }
 
-    private void bindInput(Input input, Map<String,Serializable> context,Map<String,Serializable> targetContext) {
+    private void bindInput(Input input, Map<String, ? extends Serializable> context, Map<String, Serializable> targetContext, Map<String, ? extends Serializable> systemProperties) {
         String inputName = input.getName();
         Validate.notEmpty(inputName);
-        Serializable value = resolveValue(inputName, input, context, targetContext);
+        Serializable value = resolveValue(input, context, targetContext, systemProperties);
 
         if(input.isRequired() && value == null) {
             throw new RuntimeException("Input with name : "+ inputName + " is Required, but value is empty");// todo : add stepName here?
@@ -56,14 +55,12 @@ public class InputsBinding {
         targetContext.put(inputName,value);
     }
 
-    private Serializable resolveValue(String inputName, Input input, Map<String, Serializable> context,
-                                      Map<String, Serializable> targetContext) {
+    private Serializable resolveValue(Input input, Map<String, ? extends Serializable> context, Map<String, ? extends Serializable> targetContext, Map<String, ? extends Serializable> systemProperties) {
         Serializable value = null;
-
-        if(context.containsKey(inputName) && !input.isOverride()){
-            value = context.get(inputName);
-        }
-
+        String inputName = input.getName();
+        if(context.containsKey(inputName) && !input.isOverride()) value = context.get(inputName);
+        String fqspn = input.getSystemPropertyName();
+        if(value == null && fqspn != null && systemProperties != null) value = systemProperties.get(fqspn);
         if(value == null && StringUtils.isNotEmpty(input.getExpression())){
             Map<String,Serializable> scriptContext = new HashMap<>(context); //we do not want to change original context map
             scriptContext.putAll(targetContext);//so you can resolve previous inputs already binded
@@ -71,9 +68,7 @@ public class InputsBinding {
             String expr = input.getExpression();
             value = scriptEvaluator.evalExpr(expr, scriptContext);
         }
-
         return value;
     }
-
 
 }

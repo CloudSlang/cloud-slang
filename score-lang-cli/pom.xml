@@ -12,9 +12,9 @@
 	<artifactId>score-lang-cli</artifactId>
 
 	<parent>
-		<groupId>org.openscore.lang</groupId>
+		<groupId>io.openscore.lang</groupId>
 		<artifactId>score-language</artifactId>
-		<version>0.1.4-SNAPSHOT</version>
+		<version>0.1.9-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
@@ -126,6 +126,7 @@
 				<configuration>
 					<repositoryLayout>flat</repositoryLayout>
 					<repositoryName>lib</repositoryName>
+                    <assembleDirectory>target/slang</assembleDirectory>
 					<useWildcardClassPath>true</useWildcardClassPath>
 					<programs>
 						<program>
