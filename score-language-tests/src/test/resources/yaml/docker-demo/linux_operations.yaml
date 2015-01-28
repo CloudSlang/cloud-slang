@@ -4,7 +4,7 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-#| awk 'NR==1{print $5}'
+
 namespace: linux.ops
 
 operations:
@@ -16,7 +16,7 @@ operations:
         - password
         - privateKeyFile: "''"
         - command: |
-            'df -kh | grep -v "Filesystem" | awk \'NR==1{print $5}\'' #-Pkh
+            'df -Pkh | grep -v "Filesystem"'
         - arguments: "''"
         - characterSet : "'UTF-8'"
         - pty: "'false'"
@@ -27,7 +27,8 @@ operations:
           className: org.openscore.content.ssh.actions.SSHShellCommandAction
           methodName: runSshShellCommand
       outputs:
-        - diskSpace: STDOUT.replace("\n", "")
+        - response: STDOUT
+        - diskSpace
       results:
         - SUCCESS
         - FAILURE
