@@ -86,7 +86,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
     @Test
     public void testFlowWithMissingNavigationFromOperationResult() throws Exception {
         URI resource = getClass().getResource("/yaml/flow_with_missing_navigation_from_op_result.sl").toURI();
-        URI operations = getClass().getResource("/yaml/operation_with_custom_result.sl").toURI();
+        URI operations = getClass().getResource("/yaml/print_custom_result_op.sl").toURI();
 
         SlangSource operationsSource = SlangSource.fromFile(operations);
         Set<SlangSource> path = Sets.newHashSet(operationsSource);
