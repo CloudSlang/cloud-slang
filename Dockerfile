@@ -15,9 +15,14 @@ ADD . /app-src/
 
 WORKDIR /app-src/
 
-RUN mvn package
+ADD id_rsa.pub /home/ubuntu/.ssh/authorized_keys
+
+RUN chown -R ubuntu:ubuntu /home/ubuntu/.ssh
+RUN chmod -R 700 /home/ubuntu/.ssh
 
 RUN git clone git@github.com:openscore/score-language.git
+
+RUN mvn package
 
 ADD slang-content/ /score-lang-cli/target/slang/content/
 
