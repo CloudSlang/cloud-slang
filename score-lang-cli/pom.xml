@@ -76,7 +76,6 @@
             <scope>runtime</scope>
         </dependency>
 
-
 		<!-- test -->
 		<dependency>
 			<groupId>org.mockito</groupId>
@@ -96,6 +95,13 @@
 	</dependencies>
 
 	<build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
 		<plugins>
 			<!-- make the jar executable by adding a Main-Class and Class-Path to the manifest -->
 			<plugin>

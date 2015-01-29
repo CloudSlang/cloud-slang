@@ -8,26 +8,24 @@
  */
 package org.openscore.lang.cli;
 
-import com.google.common.collect.Lists;
-
-import org.openscore.lang.cli.services.ScoreServices;
-import org.openscore.lang.cli.utils.CompilerHelper;
-import org.openscore.lang.entities.CompilationArtifact;
-import org.openscore.lang.entities.ScoreLangConstants;
-import org.openscore.lang.entities.bindings.Input;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.openscore.events.EventConstants;
 import org.openscore.events.ScoreEvent;
 import org.openscore.events.ScoreEventListener;
+import org.openscore.lang.cli.services.ScoreServices;
+import org.openscore.lang.cli.utils.CompilerHelper;
+import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.ScoreLangConstants;
+import org.openscore.lang.entities.bindings.Input;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -44,6 +42,8 @@ public class SlangCLI implements CommandMarker {
     public static final String TRIGGERED_FLOW_MSG = "Triggered flow : ";
     public static final String WITH_EXECUTION_ID_MSG = " , with execution id : ";
     public static final String FLOW_EXECUTION_TIME_TOOK = "Flow execution time took  ";
+    private static final String CURRENTLY = "You are CURRENTLY running Slang version: ";
+    private final static Logger logger = Logger.getLogger(SlangCLI.class);
 
     @Autowired
     private ScoreServices scoreServices;
@@ -51,15 +51,13 @@ public class SlangCLI implements CommandMarker {
     @Autowired
     private CompilerHelper compilerHelper;
 
+    @Value("${slang.version}")
+    private String slangVersion;
+
     /**
      * This global param holds the state of the CLI, if flows need to run in ASYNC or in SYNC manner.
      */
     private Boolean triggerAsync = false;
-
-    private final static Logger logger = Logger.getLogger(SlangCLI.class);
-
-    private static final String currently = "You are currently running Score version: ";
-    private static final String SCORE_VERSION = "0.1.229"; //todo get version
 
     @CliCommand(value = "run", help = "triggers a slang flow")
     public String run(
@@ -93,9 +91,9 @@ public class SlangCLI implements CommandMarker {
     public List<String> getFlowInputs(
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. slang inputs --f C:\\Slang\\flow.yaml") final File file,
             @CliOption(key = {"cp", "classpath"}, mandatory = false,
-                    help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final String classPath)
+                    help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath)
             throws IOException {
-        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, prepareDependencyList(classPath));
+        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, classPath);
         List<Input> inputs = compilationArtifact.getInputs();
         List<String> inputsResult = new ArrayList<>();
         for (Input input : inputs) {
@@ -106,9 +104,9 @@ public class SlangCLI implements CommandMarker {
         return inputsResult;
     }
 
-    @CliCommand(value = "slang --version", help = "Prints the score version used")
+    @CliCommand(value = "slang --version", help = "Prints the slang version used")
     public String version() {
-        return currently + SCORE_VERSION;
+        return CURRENTLY + slangVersion;
     }
 
     public static String triggerSyncMsg(Long id, String duration) {
@@ -121,10 +119,6 @@ public class SlangCLI implements CommandMarker {
 
     public static String setEnvMessage(boolean triggerAsync) {
         return "flow execution ASYNC execution was changed to : " + triggerAsync;
-    }
-
-    public static String getVersion() {
-        return SCORE_VERSION;
     }
 
     @PostConstruct
@@ -152,15 +146,6 @@ public class SlangCLI implements CommandMarker {
 
     private void logEvent(ScoreEvent event) {
         logger.info(("Event received: " + event.getEventType() + " Data is: " + event.getData()));
-    }
-
-    private List<String> prepareDependencyList(String classPath) {
-        List<String> dependencyList = null;
-        if (classPath != null) {
-            String[] paths = classPath.split(",");
-            dependencyList = Lists.newArrayList(paths);
-        }
-        return dependencyList;
     }
 
 }

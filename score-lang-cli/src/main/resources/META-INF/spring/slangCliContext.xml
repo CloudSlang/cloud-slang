@@ -21,12 +21,17 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:score="http://www.openscore.org/schema/score"
+       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                         http://www.springframework.org/schema/beans/spring-beans.xsd
                         http://www.openscore.org/schema/score
-                        http://www.openscore.org/schema/score.xsd">
+                        http://www.openscore.org/schema/score.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context.xsd">
 
     <bean class="org.openscore.lang.api.configuration.SlangSpringConfiguration"/>
+
+    <context:property-placeholder location="application.properties"/>
 
     <score:engine />
 
