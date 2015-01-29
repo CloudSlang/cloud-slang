@@ -11,16 +11,11 @@ RUN apt-get update
 
 RUN apt-get install maven -y
 
-RUN mkdir -p /root/.ssh
-ADD url_for_id_rsa /root/.ssh/id_rsa
-RUN chmod 700 /root/.ssh/id_rsa
-RUN echo "Host github.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
-
 ADD . /app-src/
 
 WORKDIR /app-src/
 
-RUN git clone git@github.com:openscore/score-language.git
+RUN git clone http://github.com/openscore/slang-content.git
 
 RUN mvn package
 
