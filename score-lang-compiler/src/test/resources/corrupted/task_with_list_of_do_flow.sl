@@ -4,17 +4,10 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-namespace: user.ops
-
-imports:
-  ops: user.ops
+namespace: org.openscore
 
 flow:
-  name: wrong_navigation_flow
-
+  name: task_list_of_do
   workflow:
-    Task1:
-      do:
-        ops.java_op:
-      navigate:
-        SUCCESS: Task2
+    task1:
+      - do:
