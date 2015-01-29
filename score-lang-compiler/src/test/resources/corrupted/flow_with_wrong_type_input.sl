@@ -10,8 +10,10 @@ imports:
   ops: org.openscore
 
 flow:
-  name: task_missing_ref
+  name: flow_with_wrong_type_input
+  inputs:
+    - 3
   workflow:
     task1:
       do:
-        ops.missing_op:
+        ops.op1:

@@ -10,8 +10,9 @@ imports:
   ops: org.openscore
 
 flow:
-  name: task_missing_ref
+  name: task_with_illegal_navigate_type
   workflow:
     task1:
       do:
-        ops.missing_op:
+        ops.op1:
+      navigate: 3

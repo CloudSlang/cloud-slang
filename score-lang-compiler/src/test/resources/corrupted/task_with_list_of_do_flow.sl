@@ -6,12 +6,8 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 namespace: org.openscore
 
-imports:
-  ops: org.openscore
-
 flow:
-  name: task_list_of_ref
+  name: task_list_of_do
   workflow:
     task1:
-      do:
-        - ops.op1:
+      - do:

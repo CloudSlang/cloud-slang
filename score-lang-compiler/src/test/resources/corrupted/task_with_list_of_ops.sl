@@ -6,12 +6,9 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 namespace: org.openscore
 
-imports:
-  ops: org.openscore
-
 flow:
-  name: task_missing_ref
+  name: task_with_list_of_ops
   workflow:
     task1:
       do:
-        ops.missing_op:
+        - ops.op1:

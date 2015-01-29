@@ -10,8 +10,12 @@ imports:
   ops: org.openscore
 
 flow:
-  name: task_missing_ref
+  name: on_failure_with_task_list
   workflow:
     task1:
       do:
-        ops.missing_op:
+        ops.op1:
+    on_failure:
+      - task2:
+          do:
+            ops.op1

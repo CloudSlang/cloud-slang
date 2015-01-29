@@ -7,11 +7,12 @@
 namespace: org.openscore
 
 imports:
-  ops: org.openscore
+  flows: org.openscore
 
 flow:
-  name: task_missing_ref
+  name: parent_flow_to_missing_name_flow
+
   workflow:
-    task1:
+    missing_name_subflow:
       do:
-        ops.missing_op:
+        flows.no_task_data:
