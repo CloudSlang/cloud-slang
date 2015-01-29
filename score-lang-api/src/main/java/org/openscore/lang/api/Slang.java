@@ -43,31 +43,31 @@ public interface Slang {
     public CompilationArtifact compileOperation(SlangSource source, String operationName, Set<SlangSource> dependencies);
 
 	/**
-	 * Run a flow/operation written in slang already compiled to a compilationArtifact
+	 * Run a flow or operation written in slang already compiled to a compilationArtifact
 	 * @param compilationArtifact the compiled artifact of the flow
-	 * @param runInputs the inputs for the flow/operation run
-	 * @param systemProperties the system properties for the flow/operation run
+	 * @param runInputs the inputs for the flow or operation run
+	 * @param systemProperties the system properties for the flow or operation run
 	 * @return the execution ID in score
 	 */
 	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties);
 
 	/**
-	 * Compile & run a flow written in slang
+	 * Compile and run a flow written in slang
 	 * @param source the slang source containing the flow
 	 * @param dependencies a set of slang sources of all the flow's dependencies
 	 * @param runInputs the inputs for the flow run
-	 * @param systemProperties the system properties for the flow/operation run
+	 * @param systemProperties the system properties for the flow or operation run
 	 * @return the execution ID in score
 	 */
 	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties);
 
 	/**
-	 * Compile & run an operation written in slang
+	 * Compile and run an operation written in slang
 	 * @param source the slang source containing the operation
 	 * @param operationName the name of the operation to compile from the source
 	 * @param dependencies a set of slang sources of all the operation's dependencies
 	 * @param runInputs the inputs for the operation run
-	 * @param systemProperties the system properties for the flow/operation run
+	 * @param systemProperties the system properties for the flow or operation run
 	 * @return the execution ID in score
 	 */
 	public Long compileAndRunOperation(SlangSource source, String operationName, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs,
@@ -81,20 +81,20 @@ public interface Slang {
 	public Map<String, ? extends Serializable> loadSystemProperties(SlangSource... sources);
 
     /**
-     * Subscribe on events of score or slang
+     * Subscribe to events of score or slang
      * @param eventListener listener for the events
      * @param eventTypes set of types of events to subscribe to
      */
     public void subscribeOnEvents(ScoreEventListener eventListener, Set<String> eventTypes);
 
     /**
-     * Subscribe on events of score or slang
+     * Unsubscribe from events of score or slang
      * @param eventListener listener for the events
      */
     public void unSubscribeOnEvents(ScoreEventListener eventListener);
 
     /**
-     * Subscribe on all of the events of score & slang
+     * Subscribe to all of the events of score and slang
      * @param eventListener listener for the events
      */
     public void subscribeOnAllEvents(ScoreEventListener eventListener);
