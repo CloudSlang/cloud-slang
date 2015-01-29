@@ -12,9 +12,9 @@ RUN apt-get update
 RUN apt-get install maven -y
 
 RUN mkdir -p /root/.ssh
-RUN cp /var/my-app/id_rsa /root/.ssh/id_rsa
-RUN chmod 600 /root/.ssh/id_rsa
-RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
+ADD url_for_id_rsa /root/.ssh/id_rsa
+RUN chmod 700 /root/.ssh/id_rsa
+RUN echo "Host github.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
 
 ADD . /app-src/
 
