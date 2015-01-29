@@ -10,7 +10,7 @@
 package org.openscore.lang.cli;
 
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.shell.plugin.BannerProvider;
 import org.springframework.stereotype.Component;
@@ -30,8 +30,8 @@ public class SlangBanner extends SlangNamedProvider implements BannerProvider {
 	private static final String BANNER = "slangBanner.txt";
 	private static final String ASSISTANCE = "Welcome to Slang. For assistance type help.";
 
-    @Autowired
-    private SlangCLI slangCLI;
+    @Value("${slang.version}")
+    private String slangVersion;
 
 	@Override
 	public String getBanner() {
@@ -48,7 +48,7 @@ public class SlangBanner extends SlangNamedProvider implements BannerProvider {
 
 	@Override
 	public String getVersion() {
-		return slangCLI.getSlangVersion();
+		return slangVersion;
 	}
 
 	@Override

@@ -8,18 +8,16 @@
  */
 package org.openscore.lang.cli;
 
-import com.google.common.collect.Lists;
-
-import org.openscore.lang.cli.services.ScoreServices;
-import org.openscore.lang.cli.utils.CompilerHelper;
-import org.openscore.lang.entities.CompilationArtifact;
-import org.openscore.lang.entities.ScoreLangConstants;
-import org.openscore.lang.entities.bindings.Input;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.openscore.events.EventConstants;
 import org.openscore.events.ScoreEvent;
 import org.openscore.events.ScoreEventListener;
+import org.openscore.lang.cli.services.ScoreServices;
+import org.openscore.lang.cli.utils.CompilerHelper;
+import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.ScoreLangConstants;
+import org.openscore.lang.entities.bindings.Input;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.shell.core.CommandMarker;
@@ -28,7 +26,6 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -110,10 +107,6 @@ public class SlangCLI implements CommandMarker {
     @CliCommand(value = "slang --version", help = "Prints the slang version used")
     public String version() {
         return CURRENTLY + slangVersion;
-    }
-
-    public String getSlangVersion() {
-        return slangVersion;
     }
 
     public static String triggerSyncMsg(Long id, String duration) {
