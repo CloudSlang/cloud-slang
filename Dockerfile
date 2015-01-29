@@ -11,14 +11,14 @@ RUN apt-get update
 
 RUN apt-get install maven -y
 
+RUN mkdir -p /root/.ssh
+RUN cp /var/my-app/id_rsa /root/.ssh/id_rsa
+RUN chmod 600 /root/.ssh/id_rsa
+RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
+
 ADD . /app-src/
 
 WORKDIR /app-src/
-
-ADD id_rsa.pub /home/ubuntu/.ssh/authorized_keys
-
-RUN chown -R ubuntu:ubuntu /home/ubuntu/.ssh
-RUN chmod -R 700 /home/ubuntu/.ssh
 
 RUN git clone git@github.com:openscore/score-language.git
 
