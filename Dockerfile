@@ -8,12 +8,6 @@ FROM java:openjdk-7-jdk
 MAINTAINER Meir Wahnon
 
 RUN apt-get update
-RUN apt-get -y install git
-
-RUN mkdir -p /root/.ssh
-RUN cp /var/my-app/id_rsa /root/.ssh/id_rsa
-RUN chmod 600 /root/.ssh/id_rsa
-RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
 
 RUN apt-get install maven -y
 
