@@ -4,24 +4,13 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-
-namespace: slang.sample.flows
-
-imports:
-  ops: user.ops
+namespace: org.openscore
 
 flow:
-  name: SimpleFlow
+  name: missing_imports
   inputs:
-  - city_name
-
+    - input1
   workflow:
-    CheckWeather:
+    task1:
       do:
-        ops.check_Weather:
-          - city: city_name
-          - country: str('Israel')
-      publish:
-        - weather
-  outputs:
-    - weather
+        ops.op1:

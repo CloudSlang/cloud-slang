@@ -40,7 +40,7 @@ public class NavigationTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("userNumber", 12);
+        userInputs.put("userNumber", "12");
         userInputs.put("emailHost", "emailHost");
         userInputs.put("emailPort", "25");
         userInputs.put("emailSender", "user@host.com");
@@ -64,7 +64,7 @@ public class NavigationTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("userNumber", 13);
+        userInputs.put("userNumber", "13");
         userInputs.put("emailHost", "emailHost");
         userInputs.put("emailPort", "25");
         userInputs.put("emailSender", "user@host.com");
@@ -87,7 +87,7 @@ public class NavigationTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("userNumber", 1024);
+        userInputs.put("userNumber", "1024");
         userInputs.put("emailHost", "emailHost");
         userInputs.put("emailPort", "25");
         userInputs.put("emailSender", "user@host.com");

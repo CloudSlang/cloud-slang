@@ -82,11 +82,11 @@ operations:
         - number
       action:
         python_script: |
-          remainder = number % 2
+          remainder = int(number) % 2
           isEven = remainder == 0
-          tooBig = number > 512
+          tooBig = int(number) > 512
       outputs:
-        - preprocessed_number: str(fromInputs['number'] * 3)
+        - preprocessed_number: str(int(fromInputs['number']) * 3)
       results:
         - EVEN: isEven == 'True' and tooBig == 'False'
         - ODD: isEven == 'False' and tooBig == 'False'
