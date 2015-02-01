@@ -19,7 +19,7 @@ RUN git clone http://github.com/openscore/slang-content.git
 
 RUN mvn package
 
-RUN mkdir /score-lang-cli/target/slang/content/
+RUN mkdir -p /score-lang-cli/target/slang/content/
 
 RUN cp -r /slang-content/* /score-lang-cli/target/slang/content
 
