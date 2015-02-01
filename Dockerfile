@@ -21,7 +21,7 @@ RUN mvn package
 
 RUN mkdir /score-lang-cli/target/slang/content/
 
-RUN cp -R slang-content/ /score-lang-cli/target/slang/content/
+RUN cp -r /slang-content/* /score-lang-cli/target/slang/content
 
 WORKDIR score-lang-cli/target/slang/bin/
 
