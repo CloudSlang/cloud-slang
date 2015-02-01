@@ -11,7 +11,7 @@ Slang is a YAML based language for writing human-readable workflows for score. T
 
 1. Download the slang zip from [here](https://github.com/openscore/score-language/releases/download/slang-CLI-v0.2.1/score-lang-cli.zip).
 2. Unzip it.
-3. Go to the folder /slang/appassembler/bin/
+3. Go to the folder /slang/bin/
 4. Run the executable :
   - For Windows : slang.bat 
   - For Linux : bash slang
