@@ -16,7 +16,7 @@ operations:
         - city:
             system_property: props.city
             default: "'Bangkok'"
-            override: true
+            overridable: false
         - weather:
             system_property: props.weather
             default: "'hot'"

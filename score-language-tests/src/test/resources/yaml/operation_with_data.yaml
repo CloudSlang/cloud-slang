@@ -26,7 +26,7 @@ operations:
             default: input6
         - input9:
             default: input6
-            override: true
+            overridable: false
         - input10:
             default: true
             required: False

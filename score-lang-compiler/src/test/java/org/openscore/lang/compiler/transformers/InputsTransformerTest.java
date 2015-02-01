@@ -138,7 +138,7 @@ public class InputsTransformerTest {
         Input input = inputs.get(8);
         Assert.assertEquals("input9", input.getName());
         Assert.assertEquals("input6", input.getExpression());
-        Assert.assertTrue(input.isOverride());
+        Assert.assertFalse(input.isOverridable());
         Assert.assertFalse(input.isEncrypted());
         Assert.assertTrue(input.isRequired());
     }

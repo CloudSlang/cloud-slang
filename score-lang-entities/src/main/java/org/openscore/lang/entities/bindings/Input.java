@@ -19,19 +19,19 @@ public class Input extends InOutParam {
 
 	private final boolean encrypted;
 	private final boolean required;
-	private final boolean override;
+	private final boolean overridable;
 	private String systemPropertyName;
 
-	public Input(String name, String expression, boolean encrypted, boolean required, boolean override, String systemPropertyName) {
+	public Input(String name, String expression, boolean encrypted, boolean required, boolean overridable, String systemPropertyName) {
 		super(name, expression);
 		this.encrypted = encrypted;
 		this.required = required;
-		this.override = override;
+		this.overridable = overridable;
 		this.systemPropertyName = systemPropertyName;
 	}
 
 	public Input(String name, String expression) {
-		this(name, expression, false, true, false, null);
+		this(name, expression, false, true, true, null);
 	}
 
 	public boolean isEncrypted() {
@@ -42,8 +42,8 @@ public class Input extends InOutParam {
 		return required;
 	}
 
-	public boolean isOverride() {
-		return override;
+	public boolean isOverridable() {
+		return overridable;
 	}
 
 	public String getSystemPropertyName() {
