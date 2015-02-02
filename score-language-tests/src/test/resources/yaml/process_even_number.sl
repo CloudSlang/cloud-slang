@@ -4,9 +4,18 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-namespace: org.openscore
+
+namespace: user.ops
+
+imports:
+  props: test.sys.props
 
 operation:
-  name: operation_with_list_of_action_types
+  name: process_even_number
+  inputs:
+    - even_number
+    - offset: 32
   action:
-    - python_script: 'print "hello world"'
+    python_script: |
+      processing_result = int(even_number) + offset
+      print 'Even number processed. Result= ' + str(processing_result)

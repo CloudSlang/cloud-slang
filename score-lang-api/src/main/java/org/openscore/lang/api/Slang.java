@@ -26,25 +26,16 @@ import java.util.Set;
 public interface Slang {
 
     /**
-     * Compile a flow written in slang
+     * Compile a flow/operation written in slang
      * @param source the slang source containing the flow
-     * @param dependencies a set of slang sources of of all the flow's dependencies
+     * @param dependencies a set of slang sources of of all the flow/operation's dependencies
      * @return the compiled artifact of the flow
      */
     public CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencies);
 
-    /**
-     * Compile an operation written in slang
-     * @param source the slang source containing the operation
-     * @param operationName the name of the operation to compile from the source
-     * @param dependencies a set of slang sources of all the operation's dependencies
-     * @return the compiled artifact of the operation
-     */
-    public CompilationArtifact compileOperation(SlangSource source, String operationName, Set<SlangSource> dependencies);
-
 	/**
 	 * Run a flow or operation written in slang already compiled to a compilationArtifact
-	 * @param compilationArtifact the compiled artifact of the flow
+	 * @param compilationArtifact the compiled artifact of the flow/operation
 	 * @param runInputs the inputs for the flow or operation run
 	 * @param systemProperties the system properties for the flow or operation run
 	 * @return the execution ID in score
@@ -52,26 +43,14 @@ public interface Slang {
 	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties);
 
 	/**
-	 * Compile and run a flow written in slang
-	 * @param source the slang source containing the flow
-	 * @param dependencies a set of slang sources of all the flow's dependencies
-	 * @param runInputs the inputs for the flow run
+	 * Compile and run a flow/operation written in slang
+	 * @param source the slang source containing the flow/operation
+	 * @param dependencies a set of slang sources of all the flow/operation's dependencies
+	 * @param runInputs the inputs for the flow/operation run
 	 * @param systemProperties the system properties for the flow or operation run
 	 * @return the execution ID in score
 	 */
 	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties);
-
-	/**
-	 * Compile and run an operation written in slang
-	 * @param source the slang source containing the operation
-	 * @param operationName the name of the operation to compile from the source
-	 * @param dependencies a set of slang sources of all the operation's dependencies
-	 * @param runInputs the inputs for the operation run
-	 * @param systemProperties the system properties for the flow or operation run
-	 * @return the execution ID in score
-	 */
-	public Long compileAndRunOperation(SlangSource source, String operationName, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs,
-		Map<String, ? extends Serializable> systemProperties);
 
 	/**
 	 * Load system property sources written in slang and map them to fully qualified names

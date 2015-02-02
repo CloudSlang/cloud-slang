@@ -47,11 +47,10 @@ public class InputsTransformerTest {
 
     @Before
     public void init() throws URISyntaxException {
-        URL resource = getClass().getResource("/operation_with_data.yaml");
+        URL resource = getClass().getResource("/operation_with_data.sl");
         ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
-        Map op = file.getOperations().iterator().next();
-        Map opProp = (Map) op.get("test_op_2");
-        inputsMap = (List) opProp.get("inputs");
+        Map op = file.getOperation();
+        inputsMap = (List) op.get("inputs");
     }
 
     @Test

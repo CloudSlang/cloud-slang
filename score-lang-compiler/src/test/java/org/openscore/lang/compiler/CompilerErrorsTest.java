@@ -44,7 +44,7 @@ public class CompilerErrorsTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Source");
         exception.expectMessage("empty");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -55,7 +55,7 @@ public class CompilerErrorsTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Source");
         exception.expectMessage("YAML");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -64,15 +64,15 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("flow/operations/system_properties");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        exception.expectMessage("flow/operation/system_properties");
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
 
     @Test
     public void testFlowWithWrongNavigation() throws Exception {
         URI resource = getClass().getResource("/corrupted/flow_with_navigation_to_missing_task.sl").toURI();
-        URI operations = getClass().getResource("/operation.yaml").toURI();
+        URI operations = getClass().getResource("/java_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
@@ -80,13 +80,13 @@ public class CompilerErrorsTest {
         exception.expectMessage("Task1");
         exception.expectMessage("Task2");
         exception.expectMessage("navigation");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
     public void testFlowWithNavigationToMissingDefaultResults() throws Exception {
         URI resource = getClass().getResource("/corrupted/flow_with_navigation_to_missing_default_results.sl").toURI();
-        URI operations = getClass().getResource("/operation.yaml").toURI();
+        URI operations = getClass().getResource("/java_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
@@ -94,7 +94,7 @@ public class CompilerErrorsTest {
         exception.expectMessage("Task1");
         exception.expectMessage("SUCCESS");
         exception.expectMessage("navigation");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class CompilerErrorsTest {
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("imports");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class CompilerErrorsTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("alias");
         exception.expectMessage("ops");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -125,7 +125,7 @@ public class CompilerErrorsTest {
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("name");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -137,7 +137,7 @@ public class CompilerErrorsTest {
         exception.expectMessage("inputs");
         exception.expectMessage("list");
         exception.expectMessage("string");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -149,7 +149,7 @@ public class CompilerErrorsTest {
         exception.expectMessage("inputs");
         exception.expectMessage("list");
         exception.expectMessage("map");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -160,7 +160,7 @@ public class CompilerErrorsTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Input");
         exception.expectMessage("3");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -172,7 +172,7 @@ public class CompilerErrorsTest {
         exception.expectMessage("no_workflow");
         exception.expectMessage("workflow");
         exception.expectMessage("property");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -184,7 +184,7 @@ public class CompilerErrorsTest {
         exception.expectMessage("no_workflow");
         exception.expectMessage("workflow");
         exception.expectMessage("data");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -195,7 +195,7 @@ public class CompilerErrorsTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("task1");
         exception.expectMessage("data");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -207,7 +207,7 @@ public class CompilerErrorsTest {
         exception.expectMessage("tasks_type_list");
         exception.expectMessage("map");
         exception.expectMessage("list");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -219,7 +219,7 @@ public class CompilerErrorsTest {
         exception.expectMessage("on_failure_with_task_list");
         exception.expectMessage("map");
         exception.expectMessage("list");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -230,7 +230,7 @@ public class CompilerErrorsTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("task1");
         exception.expectMessage("reference");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -243,7 +243,7 @@ public class CompilerErrorsTest {
         exception.expectMessage("map");
         exception.expectMessage("list");
         exception.expectMessage("-");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -255,13 +255,13 @@ public class CompilerErrorsTest {
         exception.expectMessage("task1");
         exception.expectMessage("map");
         exception.expectMessage("do:");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
     public void testFlowWithMissingRefInPath() throws Exception {
         URI resource = getClass().getResource("/flow.yaml").toURI();
-        URI op = getClass().getResource("/operation_with_data.yaml").toURI();
+        URI op = getClass().getResource("/operation_with_data.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(op));
@@ -269,7 +269,7 @@ public class CompilerErrorsTest {
         exception.expectMessage("Reference");
         exception.expectMessage("test_op");
         exception.expectMessage("basic_flow");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -281,7 +281,7 @@ public class CompilerErrorsTest {
         exception.expectMessage("operation_with_no_action_data");
         exception.expectMessage("action");
         exception.expectMessage("data");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -292,7 +292,7 @@ public class CompilerErrorsTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("operation_with_list_of_actions");
         exception.expectMessage("map");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -304,7 +304,7 @@ public class CompilerErrorsTest {
         exception.expectMessage("operation_with_list_of_action_types");
         exception.expectMessage("'action'");
         exception.expectMessage("'python_script:'");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -317,7 +317,7 @@ public class CompilerErrorsTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("no_task_data_flow.sl");
         exception.expectMessage("Error");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -329,7 +329,7 @@ public class CompilerErrorsTest {
         exception.expectMessage("'navigate'");
         exception.expectMessage("map");
         exception.expectMessage("string");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
@@ -341,6 +341,6 @@ public class CompilerErrorsTest {
         exception.expectMessage("task1");
         exception.expectMessage("navigate");
         exception.expectMessage("3");
-        compiler.compileFlow(SlangSource.fromFile(resource), path);
+        compiler.compile(SlangSource.fromFile(resource), path);
     }
 }

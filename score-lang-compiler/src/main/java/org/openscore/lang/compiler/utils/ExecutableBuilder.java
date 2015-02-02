@@ -60,7 +60,7 @@ public class ExecutableBuilder {
         preExecTransformers = filterTransformers(Transformer.Scope.BEFORE_EXECUTABLE);
         postExecTransformers = filterTransformers(Transformer.Scope.AFTER_EXECUTABLE);
         execAdditionalKeywords = Arrays.asList(
-                SlangTextualKeys.ACTION_KEY, SlangTextualKeys.WORKFLOW_KEY, SlangTextualKeys.FLOW_NAME_KEY);
+                SlangTextualKeys.ACTION_KEY, SlangTextualKeys.WORKFLOW_KEY, SlangTextualKeys.EXECUTABLE_NAME_KEY);
 
         //action transformers and keys
         actionTransformers = filterTransformers(Transformer.Scope.ACTION);
@@ -129,7 +129,7 @@ public class ExecutableBuilder {
                 dependencies = fetchDirectTasksDependencies(workflow);
                 return new Flow(preExecutableActionData, postExecutableActionData, workflow, namespace, execName, inputs, outputs, results, dependencies);
 
-            case OPERATIONS:
+            case OPERATION:
                 Map<String, Object> actionRawData;
                 try{
                    actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);

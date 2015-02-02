@@ -26,7 +26,7 @@ import java.util.Map;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:/META-INF/spring/systemTestContext.xml")
-public class SystemsTestsParent {
+public abstract class SystemsTestsParent {
 
     protected static final String EXEC_START_PATH = "0/0";
     protected static final String FIRST_STEP_PATH = "0/1";

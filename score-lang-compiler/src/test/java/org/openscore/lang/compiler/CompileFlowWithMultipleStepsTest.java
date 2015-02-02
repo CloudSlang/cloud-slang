@@ -24,7 +24,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URI;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,12 +40,16 @@ public class CompileFlowWithMultipleStepsTest {
     @Test
     public void testCompileFlowBasic() throws Exception {
         URI flow = getClass().getResource("/flow_with_multiple_steps.yaml").toURI();
-        URI operation = getClass().getResource("/operation.yaml").toURI();
+        URI operation1 = getClass().getResource("/test_op.sl").toURI();
+        URI operation2 = getClass().getResource("/java_op.sl").toURI();
+        URI operation3 = getClass().getResource("/check_Weather.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
-        path.add(SlangSource.fromFile(operation));
+        path.add(SlangSource.fromFile(operation1));
+        path.add(SlangSource.fromFile(operation2));
+        path.add(SlangSource.fromFile(operation3));
 
-        CompilationArtifact compilationArtifact = compiler.compileFlow(SlangSource.fromFile(flow), path);
+        CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 10, executionPlan.getSteps().size());
@@ -57,8 +60,7 @@ public class CompileFlowWithMultipleStepsTest {
     @Test
     public void testPreCompileFlowBasic() throws Exception {
         URI flowUri = getClass().getResource("/flow_with_multiple_steps.yaml").toURI();
-        List<Executable> preCompiledFlow = compiler.preCompile(SlangSource.fromFile(flowUri));
-        Executable flow = preCompiledFlow.get(0);
+        Executable flow = compiler.preCompile(SlangSource.fromFile(flowUri));
 
         Assert.assertNotNull("Pre-Compiled meta-data is null", flow);
         Assert.assertEquals("Flow name is wrong", "basic_flow", flow.getName());

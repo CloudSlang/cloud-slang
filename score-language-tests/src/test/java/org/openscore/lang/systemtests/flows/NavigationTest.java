@@ -33,10 +33,15 @@ public class NavigationTest extends SystemsTestsParent {
     public void testComplexNavigationEvenNumber() throws Exception {
 
         URI resource = getClass().getResource("/yaml/flow_complex_navigation.yaml").toURI();
-        URI operationsPython = getClass().getResource("/yaml/simple_operations.yaml").toURI();
+        URI operation1Python = getClass().getResource("/yaml/check_number.sl").toURI();
+        URI operation2Python = getClass().getResource("/yaml/process_even_number.sl").toURI();
+        URI operation3Python = getClass().getResource("/yaml/process_odd_number.sl").toURI();
+        URI operation4Python = getClass().getResource("/yaml/send_email_mock.sl").toURI();
 
-        SlangSource operationsSource = SlangSource.fromFile(operationsPython);
-        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1Python),
+                SlangSource.fromFile(operation2Python),
+                SlangSource.fromFile(operation3Python),
+                SlangSource.fromFile(operation4Python));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
@@ -57,10 +62,15 @@ public class NavigationTest extends SystemsTestsParent {
     public void testComplexNavigationOddNumber() throws Exception {
 
         URI resource = getClass().getResource("/yaml/flow_complex_navigation.yaml").toURI();
-        URI operationsPython = getClass().getResource("/yaml/simple_operations.yaml").toURI();
+        URI operation1Python = getClass().getResource("/yaml/check_number.sl").toURI();
+        URI operation2Python = getClass().getResource("/yaml/process_even_number.sl").toURI();
+        URI operation3Python = getClass().getResource("/yaml/process_odd_number.sl").toURI();
+        URI operation4Python = getClass().getResource("/yaml/send_email_mock.sl").toURI();
 
-        SlangSource operationsSource = SlangSource.fromFile(operationsPython);
-        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1Python),
+                                                SlangSource.fromFile(operation2Python),
+                                                SlangSource.fromFile(operation3Python),
+                                                SlangSource.fromFile(operation4Python));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
@@ -80,10 +90,15 @@ public class NavigationTest extends SystemsTestsParent {
     public void testComplexNavigationFailure() throws Exception {
 
         URI resource = getClass().getResource("/yaml/flow_complex_navigation.yaml").toURI();
-        URI operationsPython = getClass().getResource("/yaml/simple_operations.yaml").toURI();
+        URI operation1Python = getClass().getResource("/yaml/check_number.sl").toURI();
+        URI operation2Python = getClass().getResource("/yaml/process_even_number.sl").toURI();
+        URI operation3Python = getClass().getResource("/yaml/process_odd_number.sl").toURI();
+        URI operation4Python = getClass().getResource("/yaml/send_email_mock.sl").toURI();
 
-        SlangSource operationsSource = SlangSource.fromFile(operationsPython);
-        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1Python),
+                SlangSource.fromFile(operation2Python),
+                SlangSource.fromFile(operation3Python),
+                SlangSource.fromFile(operation4Python));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
@@ -103,10 +118,11 @@ public class NavigationTest extends SystemsTestsParent {
     public void testDefaultSuccessNavigation() throws Exception {
 
         URI resource = getClass().getResource("/yaml/flow_default_navigation.yaml").toURI();
-        URI operationsPython = getClass().getResource("/yaml/simple_operations.yaml").toURI();
+        URI operationPython = getClass().getResource("/yaml/produce_default_navigation.sl").toURI();
+        URI operation2Python = getClass().getResource("/yaml/send_email_mock.sl").toURI();
+        URI operation3Python = getClass().getResource("/yaml/check_Weahther.sl").toURI();
 
-        SlangSource operationsSource = SlangSource.fromFile(operationsPython);
-        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operationPython), SlangSource.fromFile(operation2Python), SlangSource.fromFile(operation3Python));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
@@ -126,10 +142,11 @@ public class NavigationTest extends SystemsTestsParent {
     public void testDefaultOnFailureNavigation() throws Exception {
 
         URI resource = getClass().getResource("/yaml/flow_default_navigation.yaml").toURI();
-        URI operationsPython = getClass().getResource("/yaml/simple_operations.yaml").toURI();
+        URI operationPython = getClass().getResource("/yaml/produce_default_navigation.sl").toURI();
+        URI operation2Python = getClass().getResource("/yaml/send_email_mock.sl").toURI();
+        URI operation3Python = getClass().getResource("/yaml/check_Weahther.sl").toURI();
 
-        SlangSource operationsSource = SlangSource.fromFile(operationsPython);
-        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operationPython), SlangSource.fromFile(operation2Python), SlangSource.fromFile(operation3Python));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();

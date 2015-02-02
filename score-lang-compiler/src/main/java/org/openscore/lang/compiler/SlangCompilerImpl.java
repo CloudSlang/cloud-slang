@@ -8,9 +8,7 @@
  */
 package org.openscore.lang.compiler;
 
-import ch.lambdaj.Lambda;
 import ch.lambdaj.function.convert.Converter;
-
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
@@ -35,10 +33,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static ch.lambdaj.Lambda.convertMap;
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
-
-import static org.hamcrest.Matchers.equalTo;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -59,14 +53,9 @@ public class SlangCompilerImpl implements SlangCompiler {
     private YamlParser yamlParser;
 
     @Override
-    public CompilationArtifact compileFlow(SlangSource source, Set<SlangSource> path) {
-        return compile(source, null, path);
-    }
+    public CompilationArtifact compile(SlangSource source, Set<SlangSource> path) {
 
-    @Override
-    public CompilationArtifact compile(SlangSource source, String operationName, Set<SlangSource> path) {
-
-        Executable executable = transformToExecutable(source, operationName);
+        Executable executable = preCompile(source);
 
         Map<String, Executable> filteredDependencies = new HashMap<>();
         //we handle dependencies only if the file has imports
@@ -126,16 +115,16 @@ public class SlangCompilerImpl implements SlangCompiler {
     private Map<String, Executable> transformDependencies(Set<SlangSource> path) {
 
         //we transform and add all of the dependencies to a list of executable
-        List<Executable> executables = new ArrayList<>();
+        List<Executable> dependenciesExecutables = new ArrayList<>();
         for (SlangSource source : path) {
             ParsedSlang parsedSlang = yamlParser.parse(source);
             try {
                 switch (parsedSlang.getType()) {
                     case FLOW:
-                        executables.add(transformFlow(parsedSlang));
+                        dependenciesExecutables.add(transformFlow(parsedSlang));
                         break;
-                    case OPERATIONS:
-                        executables.addAll(transformOperations(parsedSlang));
+                    case OPERATION:
+                        dependenciesExecutables.add(transformOperation(parsedSlang));
                         break;
                     case SYSTEM_PROPERTIES:
                         break;
@@ -148,11 +137,11 @@ public class SlangCompilerImpl implements SlangCompiler {
         }
 
         //we put the dependencies in a map with their id as key
-        Map<String, Executable> compiledExecutableMap = new HashMap<>();
-        for (Executable executable : executables) {
-            compiledExecutableMap.put(executable.getId(), executable);
+        Map<String, Executable> dependenciesExecutableMap = new HashMap<>();
+        for (Executable executable : dependenciesExecutables) {
+            dependenciesExecutableMap.put(executable.getId(), executable);
         }
-        return compiledExecutableMap;
+        return dependenciesExecutableMap;
     }
 
     /**
@@ -183,43 +172,30 @@ public class SlangCompilerImpl implements SlangCompiler {
      * @param parsedSlang the source to transform
      * @return List of {@link org.openscore.lang.compiler.model.Executable}  of the requested flow/operations
      */
-    private List<Executable> transformToExecutables(ParsedSlang parsedSlang) {
-        List<Executable> executables;
-
+    private Executable transformToExecutable(ParsedSlang parsedSlang) {
         switch (parsedSlang.getType()) {
-            case OPERATIONS:
-                executables = transformOperations(parsedSlang);
-                break;
+            case OPERATION:
+                return transformOperation(parsedSlang);
             case FLOW:
-                executables = new ArrayList<>();
-                executables.add(transformFlow(parsedSlang));
-                break;
+                return transformFlow(parsedSlang);
             default:
                 throw new RuntimeException("source: " + parsedSlang.getName() + " is not of flow type or operations");
         }
-        return executables;
     }
 
     /**
-     * transform an operations {@link org.openscore.lang.compiler.model.ParsedSlang} to a List of {@link org.openscore.lang.compiler.model.Executable}
+     * transform an operation {@link org.openscore.lang.compiler.model.ParsedSlang} to a List of {@link org.openscore.lang.compiler.model.Executable}
      *
      * @param parsedSlang the source to transform the operations from
-     * @return List of {@link org.openscore.lang.compiler.model.Executable} representing the operations in the source
+     * @return {@link org.openscore.lang.compiler.model.Executable} representing the operation in the source
      */
-    private List<Executable> transformOperations(ParsedSlang parsedSlang) {
-        List<Executable> executables = new ArrayList<>();
-        for (Map<String, Map<String, Object>> operation : parsedSlang.getOperations()) {
-            Map.Entry<String, Map<String, Object>> entry = operation.entrySet().iterator().next();
-            String operationName = entry.getKey();
-            Map<String, Object> operationRawData;
-            try {
-                operationRawData = entry.getValue();
-            } catch (ClassCastException ex){
-                throw new RuntimeException("Operation: " + operationName + " syntax is illegal. Below operation name, there should be a map of values.");
-            }
-            executables.add(executableBuilder.transformToExecutable(parsedSlang, operationName, operationRawData));
+    private Executable transformOperation(ParsedSlang parsedSlang) {
+        Map<String, Object> operationRawData = parsedSlang.getOperation();
+        String operationName = (String) operationRawData.get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
+        if (StringUtils.isBlank(operationName)) {
+            throw new RuntimeException("Operation in source: " + parsedSlang.getName() + " has no name");
         }
-        return executables;
+        return executableBuilder.transformToExecutable(parsedSlang, operationName, operationRawData);
     }
 
     /**
@@ -230,7 +206,7 @@ public class SlangCompilerImpl implements SlangCompiler {
      */
     private Executable transformFlow(ParsedSlang parsedSlang) {
         Map<String, Object> flowRawData = parsedSlang.getFlow();
-        String flowName = (String) flowRawData.get(SlangTextualKeys.FLOW_NAME_KEY);
+        String flowName = (String) flowRawData.get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
         if (StringUtils.isBlank(flowName)) {
             throw new RuntimeException("Flow in source: " + parsedSlang.getName() + " has no name");
         }
@@ -238,7 +214,7 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     @Override
-    public List<Executable> preCompile(SlangSource source) {
+    public Executable preCompile(SlangSource source) {
         Validate.notNull(source, "You must supply a source to compile");
 
         //first thing we parse the yaml file into java maps
@@ -246,25 +222,9 @@ public class SlangCompilerImpl implements SlangCompiler {
 
         try {
             //then we transform those maps to model objects
-            return transformToExecutables(parsedSlang);
+            return transformToExecutable(parsedSlang);
         } catch (Throwable ex){
             throw new RuntimeException("Error compiling source: " + source.getName() + ". " + ex.getMessage(), ex);
         }
-    }
-
-    private Executable transformToExecutable(SlangSource source, String operationName){
-        List<Executable> preCompiledExecutables = preCompile(source);
-
-        Executable executable;
-        if(operationName != null) {
-            // match the requested operation from all the operations in the source
-            executable = Lambda.selectFirst(preCompiledExecutables, having(on(Executable.class).getName(), equalTo(operationName)));
-            if (executable == null) {
-                throw new RuntimeException("Operation with name: " + operationName + " wasn't found in source: " + source.getName());
-            }
-        } else {
-            executable = preCompiledExecutables.get(0);
-        }
-        return executable;
     }
 }

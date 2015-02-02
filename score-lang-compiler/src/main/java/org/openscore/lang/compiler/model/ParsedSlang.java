@@ -15,14 +15,13 @@ package org.openscore.lang.compiler.model;
  */
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 public class ParsedSlang {
 
     private Map<String, String> imports;
     private Map<String, Object> flow;
-    private List<Map<String, Map<String, Object>>> operations;
+    private Map<String, Object> operation;
     private Map<String, ? extends Serializable> system_properties;
     private String namespace;
     private String name;
@@ -41,8 +40,8 @@ public class ParsedSlang {
         return imports;
     }
 
-    public List<Map<String, Map<String, Object>>> getOperations() {
-        return operations;
+    public Map<String, Object> getOperation() {
+        return operation;
     }
 
     public Map<String, ? extends Serializable> getSystemProperties() {
@@ -52,8 +51,8 @@ public class ParsedSlang {
     public Type getType() {
         if(flow != null) return Type.FLOW;
         if(system_properties != null) return Type.SYSTEM_PROPERTIES;
-        if(operations != null) return Type.OPERATIONS;
-        throw new RuntimeException("Source " + name + " has no " + Type.FLOW.key() + "/" + Type.OPERATIONS.key() + "/" + Type.SYSTEM_PROPERTIES.key +" property");
+        if(operation != null) return Type.OPERATION;
+        throw new RuntimeException("Source " + name + " has no " + Type.FLOW.key() + "/" + Type.OPERATION.key() + "/" + Type.SYSTEM_PROPERTIES.key +" property");
     }
 
     public String getName() {
@@ -66,7 +65,7 @@ public class ParsedSlang {
 
     public static enum Type {
         FLOW("flow"),
-        OPERATIONS("operations"),
+        OPERATION("operation"),
         SYSTEM_PROPERTIES("system_properties");
 
         private String key;

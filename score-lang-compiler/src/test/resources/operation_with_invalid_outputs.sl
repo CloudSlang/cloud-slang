@@ -5,21 +5,15 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: system.ops
+namespace: user.ops
 
-operations:
-  - binding_flow_op:
-      inputs:
-        - base_input
-        - bound_input:
-            default: base_input + ">"
-
-      action:
-        python_script: |
-          bound_result = bound_input + "|"
-      outputs:
-        - bound_output: bound_result + "<"
-      results:
-        - SUCCESS
-
+operation:
+  name: operation_with_invalid_outputs
+  inputs:
+    - input1
+  action:
+    python_script: |
+            print input1
+  outputs:
+    - output1: 3
 

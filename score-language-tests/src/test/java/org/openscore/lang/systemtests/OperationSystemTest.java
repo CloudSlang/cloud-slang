@@ -32,8 +32,8 @@ public class OperationSystemTest extends SystemsTestsParent {
 
     @Test
     public void testCompileAndRunOperationBasic() throws Exception {
-        URL resource = getClass().getResource("/yaml/simple_operations.yaml");
-        CompilationArtifact compilationArtifact = slang.compileOperation(SlangSource.fromFile(resource.toURI()), "test_op", null);
+        URL resource = getClass().getResource("/yaml/test_op.sl");
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), null);
         //Trigger ExecutionPlan
         Map<String, Serializable> userInputs = new HashMap<>();
         ScoreEvent event = trigger(compilationArtifact, userInputs, null);
@@ -42,8 +42,8 @@ public class OperationSystemTest extends SystemsTestsParent {
 
     @Test
     public void testCompileAndRunOperationWithData() throws Exception {
-        URL resource = getClass().getResource("/yaml/operation_with_data.yaml");
-        CompilationArtifact compilationArtifact = slang.compileOperation(SlangSource.fromFile(resource.toURI()), "test_op_2", null);
+        URL resource = getClass().getResource("/yaml/test_op_2.sl");
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()),null);
         //Trigger ExecutionPlan
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("input1", "value1");

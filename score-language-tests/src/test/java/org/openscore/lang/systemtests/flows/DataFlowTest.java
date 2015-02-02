@@ -36,7 +36,7 @@ public class DataFlowTest extends SystemsTestsParent {
     @Test
     public void testDataFlow() throws Exception {
         URI resource = getClass().getResource("/yaml/system-flows/data_flow.yaml").toURI();
-        URI operations = getClass().getResource("/yaml/system-flows/data_flow_operations.yaml").toURI();
+        URI operations = getClass().getResource("/yaml/system-flows/data_flow_op.sl").toURI();
 
         SlangSource dep = SlangSource.fromFile(operations);
         Set<SlangSource> path = Sets.newHashSet(dep);
@@ -56,7 +56,7 @@ public class DataFlowTest extends SystemsTestsParent {
     @Test
     public void testBindingsFlow() throws Exception {
         URI resource = getClass().getResource("/yaml/system-flows/bindings_flow.yaml").toURI();
-        URI operations = getClass().getResource("/yaml/system-flows/bindings_flow_operations.yaml").toURI();
+        URI operations = getClass().getResource("/yaml/system-flows/binding_flow_op.sl").toURI();
 
         SlangSource dep = SlangSource.fromFile(operations);
         Set<SlangSource> path = Sets.newHashSet(dep);

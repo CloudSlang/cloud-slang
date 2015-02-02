@@ -4,9 +4,22 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-namespace: org.openscore
+
+namespace: system.ops
 
 operation:
-  name: operation_with_list_of_action_types
+  name: binding_flow_op
+  inputs:
+    - base_input
+    - bound_input:
+        default: base_input + ">"
+
   action:
-    - python_script: 'print "hello world"'
+    python_script: |
+      bound_result = bound_input + "|"
+  outputs:
+    - bound_output: bound_result + "<"
+  results:
+    - SUCCESS
+
+
