@@ -170,7 +170,7 @@ public class SlangCompilerImpl implements SlangCompiler {
      * also handles operations files
      *
      * @param parsedSlang the source to transform
-     * @return List of {@link org.openscore.lang.compiler.model.Executable}  of the requested flow/operations
+     * @return List of {@link org.openscore.lang.compiler.model.Executable}  of the requested flow or operation
      */
     private Executable transformToExecutable(ParsedSlang parsedSlang) {
         switch (parsedSlang.getType()) {

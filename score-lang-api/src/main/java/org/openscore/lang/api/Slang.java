@@ -26,16 +26,16 @@ import java.util.Set;
 public interface Slang {
 
     /**
-     * Compile a flow/operation written in slang
+     * Compile a flow or operation written in slang
      * @param source the slang source containing the flow
-     * @param dependencies a set of slang sources of of all the flow/operation's dependencies
+     * @param dependencies a set of slang sources of of all the flow or operation's dependencies
      * @return the compiled artifact of the flow
      */
     public CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencies);
 
 	/**
 	 * Run a flow or operation written in slang already compiled to a compilationArtifact
-	 * @param compilationArtifact the compiled artifact of the flow/operation
+	 * @param compilationArtifact the compiled artifact of the flow or operation
 	 * @param runInputs the inputs for the flow or operation run
 	 * @param systemProperties the system properties for the flow or operation run
 	 * @return the execution ID in score
@@ -43,10 +43,10 @@ public interface Slang {
 	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties);
 
 	/**
-	 * Compile and run a flow/operation written in slang
-	 * @param source the slang source containing the flow/operation
-	 * @param dependencies a set of slang sources of all the flow/operation's dependencies
-	 * @param runInputs the inputs for the flow/operation run
+	 * Compile and run a flow or operation written in slang
+	 * @param source the slang source containing the flow or operation
+	 * @param dependencies a set of slang sources of all the flow or operation's dependencies
+	 * @param runInputs the inputs for the flow or operation run
 	 * @param systemProperties the system properties for the flow or operation run
 	 * @return the execution ID in score
 	 */
