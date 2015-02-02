@@ -114,5 +114,27 @@ public class CompileOperationTest {
         Assert.assertEquals("There is a different number of operation dependencies than expected", 0, dependencies.size());
     }
 
+    @Test
+    public void testCompileOperationMissingClassName() throws Exception {
+        URL resource = getClass().getResource("/invalid_syntax/operation_missing_className.yaml");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("className");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), "missing_class_name", null).getExecutionPlan();
+    }
 
+    @Test
+    public void testCompileOperationMissingMethodName() throws Exception {
+        URL resource = getClass().getResource("/invalid_syntax/operation_missing_methodName.yaml");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("methodName");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), "missing_method_name", null).getExecutionPlan();
+    }
+
+    @Test
+    public void testCompileOperationInvalidActionProperty() throws Exception {
+        URL resource = getClass().getResource("/invalid_syntax/operation_invalid_action_property.yaml");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("IDontBelongHere");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), "invalid_action_property", null).getExecutionPlan();
+    }
 }
