@@ -47,10 +47,10 @@ public class CompileBasicFlowTest {
     @Test
     public void testCompileFlowBasic() throws Exception {
         URI flow = getClass().getResource("/flow.yaml").toURI();
-        URI operation = getClass().getResource("/operation.yaml").toURI();
+        URI operation = getClass().getResource("/test_op.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
-        CompilationArtifact compilationArtifact = compiler.compileFlow(SlangSource.fromFile(flow), path);
+        CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
@@ -62,12 +62,12 @@ public class CompileBasicFlowTest {
     @Test
     public void testCompileFlowWithData() throws Exception {
         URI flow = getClass().getResource("/flow_with_data.yaml").toURI();
-        URI operation = getClass().getResource("/operation.yaml").toURI();
+        URI operation = getClass().getResource("/check_Weather.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
 
-        CompilationArtifact compilationArtifact = compiler.compileFlow(SlangSource.fromFile(flow), path);
+        CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
@@ -116,8 +116,7 @@ public class CompileBasicFlowTest {
     @Test
     public void testPreCompileFlowBasic() throws Exception {
         URI flowUri = getClass().getResource("/flow.yaml").toURI();
-        List<Executable> preCompiledFlow = compiler.preCompile(SlangSource.fromFile(flowUri));
-        Executable flow = preCompiledFlow.get(0);
+        Executable flow = compiler.preCompile(SlangSource.fromFile(flowUri));
 
         Assert.assertNotNull("Pre-Compiled meta-data is null", flow);
         Assert.assertEquals("Flow name is wrong", "basic_flow", flow.getName());

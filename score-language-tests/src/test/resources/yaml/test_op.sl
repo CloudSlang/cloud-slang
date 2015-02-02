@@ -7,13 +7,10 @@
 
 namespace: user.ops
 
-operations:
-  - wrong_output_op:
-      inputs:
-        - input1
-      action:
-        python_script: |
-                print input1
-      outputs:
-        - output1: 3
+imports:
+  props: test.sys.props
 
+operation:
+  name: test_op
+  action:
+    python_script: 'print "hello world"'

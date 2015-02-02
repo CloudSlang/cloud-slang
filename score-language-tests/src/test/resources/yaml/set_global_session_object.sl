@@ -4,9 +4,19 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-namespace: org.openscore
+
+namespace: user.ops
+
+imports:
+  props: test.sys.props
 
 operation:
-  name: operation_with_list_of_action_types
+  name: set_global_session_object
+  inputs:
+    - value
   action:
-    - python_script: 'print "hello world"'
+    java_action:
+      className: org.openscore.lang.systemtests.actions.LangTestActions
+      methodName: setConnectionOnNonSerializableSession
+  outputs:
+    - session_object_value: value

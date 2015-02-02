@@ -58,22 +58,17 @@ public class SlangImpl implements Slang {
     private EventBus eventBus;
 
     @Override
-    public CompilationArtifact compileOperation(SlangSource source, String operationName, Set<SlangSource> dependencies) {
+    public CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencies) {
 
         Validate.notNull(source, "Source can not be null");
         Set<SlangSource> dependencySources = new HashSet<>(filter(notNullValue(), dependencies));
 
         try {
-            return compiler.compile(source, operationName, dependencySources);
+            return compiler.compile(source, dependencySources);
         } catch (Exception e) {
             logger.error("Failed compilation for source : " + source.getName() + " ,Exception is : " + e.getMessage());
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencies) {
-        return compileOperation(source, null, dependencies);
     }
 
 	@Override
@@ -92,15 +87,10 @@ public class SlangImpl implements Slang {
 	}
 
 	@Override
-	public Long compileAndRunOperation(SlangSource source, String operationName, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs,
+	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs,
 		Map<String, ? extends Serializable> systemProperties) {
-		CompilationArtifact compilationArtifact = compileOperation(source, operationName, dependencies);
+		CompilationArtifact compilationArtifact = compile(source, dependencies);
 		return run(compilationArtifact, runInputs, systemProperties);
-	}
-
-	@Override
-	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties) {
-		return compileAndRunOperation(source, null, dependencies, runInputs, systemProperties);
 	}
 
 	@Override

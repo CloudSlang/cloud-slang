@@ -75,82 +75,55 @@ public class SlangImplTest {
         Mockito.reset(score, compiler);
     }
 
-    // Tests for the compileOperation() method
 
     @Test
-    public void testCompileOperation() throws IOException {
+    public void testCompile() throws IOException {
         SlangSource tempFile = createTempFile();
-        Mockito.when(compiler.compile(any(SlangSource.class), anyString(), anySetOf(SlangSource.class))).thenReturn(emptyCompilationArtifact);
-        CompilationArtifact compilationArtifact = slang.compileOperation(tempFile, "op", new HashSet<SlangSource>());
+        Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class))).thenReturn(emptyCompilationArtifact);
+        CompilationArtifact compilationArtifact = slang.compile(tempFile, new HashSet<SlangSource>());
         Assert.assertNotNull(compilationArtifact);
-        Mockito.verify(compiler).compile(tempFile, "op", new HashSet<SlangSource>());
-   }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testCompileOperationWithNoFilePath(){
-        slang.compileOperation(null, "op", new HashSet<SlangSource>());
+        Mockito.verify(compiler).compile(tempFile, new HashSet<SlangSource>());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCompileOperationWithCorruptedFilePath(){
-        slang.compileOperation(SlangSource.fromFile(new File("/")), "op", new HashSet<SlangSource>());
+    public void testCompileWithNoFilePath(){
+        slang.compile(null, new HashSet<SlangSource>());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCompileWithCorruptedFilePath(){
+        slang.compile(SlangSource.fromFile(new File("/")), new HashSet<SlangSource>());
     }
 
     @Test
-    public void testCompileOperationWithNullDependencies() throws IOException {
+    public void testCompileWithNullDependencies() throws IOException {
         SlangSource tempFile = createTempFile();
-        Mockito.when(compiler.compile(any(SlangSource.class), anyString(), anySetOf(SlangSource.class))).thenReturn(emptyCompilationArtifact);
-        CompilationArtifact compilationArtifact = slang.compileOperation(tempFile, "op", null);
+        Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class))).thenReturn(emptyCompilationArtifact);
+        CompilationArtifact compilationArtifact = slang.compile(tempFile, null);
         Assert.assertNotNull(compilationArtifact);
-        Mockito.verify(compiler).compile(tempFile, "op", new HashSet<SlangSource>());
+        Mockito.verify(compiler).compile(tempFile, new HashSet<SlangSource>());
     }
 
     @Test
-    public void testCompileOperationWithDependencies() throws IOException {
+    public void testCompileWithDependencies() throws IOException {
         SlangSource tempFile = createTempFile();
         File tempDependencyFile = File.createTempFile("tempDependency", null);
         tempDependencyFile.deleteOnExit();
         Set<SlangSource> dependencies = new HashSet<>();
         dependencies.add(SlangSource.fromFile(tempDependencyFile));
-        Mockito.when(compiler.compile(any(SlangSource.class), anyString(), anySetOf(SlangSource.class))).thenReturn(emptyCompilationArtifact);
-        CompilationArtifact compilationArtifact = slang.compileOperation(tempFile, "op", dependencies);
+        Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class))).thenReturn(emptyCompilationArtifact);
+        CompilationArtifact compilationArtifact = slang.compile(tempFile, dependencies);
         Assert.assertNotNull(compilationArtifact);
         Set<SlangSource> dependencyFiles = new HashSet<>();
         dependencyFiles.add(SlangSource.fromFile(tempDependencyFile));
-        Mockito.verify(compiler).compile(tempFile, "op", dependencyFiles);
-    }
-
-    @Test
-    public void testCompileOperationWithNoName() throws IOException {
-        SlangSource tempFile = createTempFile();
-        Mockito.when(compiler.compile(any(SlangSource.class), anyString(), anySetOf(SlangSource.class))).thenReturn(emptyCompilationArtifact);
-        CompilationArtifact compilationArtifact = slang.compileOperation(tempFile, null, new HashSet<SlangSource>());
-        Assert.assertNotNull(compilationArtifact);
-        Mockito.verify(compiler).compile(tempFile, null, new HashSet<SlangSource>());
+        Mockito.verify(compiler).compile(tempFile, dependencyFiles);
     }
 
     @Test(expected = Exception.class)
     public void testCompileOperationWithException() throws IOException {
-        Mockito.when(compiler.compile(any(SlangSource.class), anyString(), anySetOf(SlangSource.class))).thenThrow(Exception.class);
+        Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class))).thenThrow(Exception.class);
         SlangSource tempFile = createTempFile();
-        slang.compileOperation(tempFile, "op", new HashSet<SlangSource>());
-    }
-
-    private SlangSource createTempFile() throws IOException {
-        File tempFile = File.createTempFile("temp", null);
-        tempFile.deleteOnExit();
-        return SlangSource.fromFile(tempFile);
-    }
-
-    // Tests for the compile() method
-
-    @Test
-    public void testCompile() throws IOException {
-        SlangSource tempFile = createTempFile();
-        Mockito.when(compiler.compile(any(SlangSource.class), anyString(), anySetOf(SlangSource.class))).thenReturn(emptyCompilationArtifact);
-        CompilationArtifact compilationArtifact = slang.compile(tempFile, new HashSet<SlangSource>());
-        Assert.assertNotNull(compilationArtifact);
-        Mockito.verify(compiler).compile(tempFile, null, new HashSet<SlangSource>());
+        slang.compile(tempFile, new HashSet<SlangSource>());
     }
 
     // tests for run() method
@@ -184,21 +157,19 @@ public class SlangImplTest {
         slang.run(null, new HashMap<String, Serializable>(), null);
     }
 
-    // tests for compileAndRunOperation() method
+    // tests for compileAndRun() method
 
     @Test
     public void testLaunchOperation() throws IOException {
         Slang mockSlang = Mockito.mock(SlangImpl.class);
         SlangSource tempFile = createTempFile();
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
-        Mockito.when(mockSlang.compileOperation(tempFile, "op", new HashSet<SlangSource>())).thenReturn(compilationArtifact);
-        Mockito.when(mockSlang.compileAndRunOperation(any(SlangSource.class), anyString(), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class))).thenCallRealMethod();
-        Long id = mockSlang.compileAndRunOperation(tempFile, "op", new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
+        Mockito.when(mockSlang.compile(tempFile, new HashSet<SlangSource>())).thenReturn(compilationArtifact);
+        Mockito.when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class))).thenCallRealMethod();
+        Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
         Assert.assertNotNull(id);
         Mockito.verify(mockSlang).run(compilationArtifact, new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
     }
-
-    //tests for compileAndRun() method
 
     @Test
     public void testLaunch() throws IOException {
@@ -208,7 +179,7 @@ public class SlangImplTest {
         Mockito.when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class))).thenCallRealMethod();
         Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
         Assert.assertNotNull(id);
-        Mockito.verify(mockSlang).compileAndRunOperation(tempFile, null, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
+        Mockito.verify(mockSlang).compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
     }
 
     @Test
@@ -259,6 +230,12 @@ public class SlangImplTest {
     }
 
 
+    private SlangSource createTempFile() throws IOException {
+        File tempFile = File.createTempFile("temp", null);
+        tempFile.deleteOnExit();
+        return SlangSource.fromFile(tempFile);
+    }
+
     @Configuration
     static class Config {
 
@@ -271,7 +248,7 @@ public class SlangImplTest {
         public SlangCompiler compiler() {
             SlangCompiler compiler = Mockito.mock(SlangCompiler.class);
             CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
-            Mockito.when(compiler.compileFlow(any(SlangSource.class), anySetOf(SlangSource.class))).thenReturn(compilationArtifact);
+            Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class))).thenReturn(compilationArtifact);
             return compiler;
         }
 

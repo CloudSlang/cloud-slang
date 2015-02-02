@@ -7,9 +7,18 @@
 
 namespace: user.ops
 
+imports:
+  props: test.sys.props
+
 operation:
-  name: print_custom_result_op
+  name: compute_daylight_time_zone
+  inputs:
+    - time_zone_as_string
   action:
-    python_script: 'print "hello world"'
+    python_script: |
+        daylight_time_zone = int(time_zone_as_string) + 1
+        print 'daylight time zone is: ' + str(daylight_time_zone)
+  outputs:
+    - daylight_time_zone: daylight_time_zone
   results:
-    - CUSTOM: 1==1
+    - SUCCESS: 1 == 1

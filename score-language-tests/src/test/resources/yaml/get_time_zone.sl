@@ -7,9 +7,21 @@
 
 namespace: user.ops
 
+imports:
+  props: test.sys.props
+
 operation:
-  name: print_custom_result_op
+  name: get_time_zone
+  inputs:
+    - time_zone_as_string
+    - alla:
+        system_property: props.alla
   action:
-    python_script: 'print "hello world"'
+    python_script: |
+        time_zone_as_int = int(time_zone_as_string)
+        print 'time zone is: ' + str(time_zone_as_int)
+  outputs:
+    - time_zone: time_zone_as_int
   results:
-    - CUSTOM: 1==1
+    - NEGATIVE: int(time_zone_as_int) < 0
+    - SUCCESS
