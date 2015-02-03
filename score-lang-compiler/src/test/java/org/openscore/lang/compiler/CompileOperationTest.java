@@ -137,4 +137,29 @@ public class CompileOperationTest {
         exception.expectMessage("IDontBelongHere");
         compiler.compile(SlangSource.fromFile(resource.toURI()), "invalid_action_property", null).getExecutionPlan();
     }
+
+    @Test
+    public void testCompileOperationMultipleActionTypes() throws Exception {
+        URL resource = getClass().getResource("/invalid_syntax/operation_action_multiple_types.yaml");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("java action");
+        exception.expectMessage("python script");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), "operation_action_multiple_types", null).getExecutionPlan();
+    }
+
+    @Test
+    public void testCompileOperationMissingActionProperties() throws Exception {
+        URL resource = getClass().getResource("/invalid_syntax/operation_missing_action_properties.yaml");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Invalid action data");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), "missing_action_properties", null).getExecutionPlan();
+    }
+
+    @Test
+    public void testCompileOperationMissingPythonScript() throws Exception {
+        URL resource = getClass().getResource("/invalid_syntax/operation_missing_python_script.yaml");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Invalid action data");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), "missing_python_script", null).getExecutionPlan();
+    }
 }

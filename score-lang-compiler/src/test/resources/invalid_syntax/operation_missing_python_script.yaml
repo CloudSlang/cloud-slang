@@ -1,0 +1,6 @@
+namespace: user.ops
+
+operations:
+    - missing_python_script:
+        action:
+          python_script:

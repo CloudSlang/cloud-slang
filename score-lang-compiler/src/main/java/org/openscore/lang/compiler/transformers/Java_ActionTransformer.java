@@ -43,7 +43,7 @@ public class Java_ActionTransformer implements Transformer<Map<String, String>, 
                 }
             }
 
-            if (expectedKeySet.size() != 0) {
+            if (!expectedKeySet.isEmpty()) {
                 throw new RuntimeException("The following keys for java action are missing: " + StringUtils.join(expectedKeySet, ","));
             }
         }

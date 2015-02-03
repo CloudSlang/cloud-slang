@@ -5,5 +5,5 @@ operations:
         action:
           java_action:
             className: com.hp.thing
-            #methodName: someMethod
+            methodName: someMethod
             IDontBelongHere: blah

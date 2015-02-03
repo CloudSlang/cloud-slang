@@ -10,6 +10,7 @@
 
 package org.openscore.lang.compiler.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openscore.lang.compiler.SlangTextualKeys;
 import org.openscore.lang.entities.ActionType;
 import org.openscore.lang.entities.ResultNavigation;
@@ -81,12 +82,27 @@ public class ExecutionStepFactory {
     public ExecutionStep createActionStep(Long index, Map<String, Serializable> actionRawData) {
         Validate.notNull(actionRawData, "actionData is null");
         Map<String, Serializable> actionData = new HashMap<>();
+        ActionType actionType;
+
         @SuppressWarnings("unchecked") Map<String, String> javaActionData = (Map<String, String>) actionRawData.remove(SlangTextualKeys.JAVA_ACTION);
-        ActionType actionType = ActionType.PYTHON;
-        if (MapUtils.isNotEmpty(javaActionData)) {
+        @SuppressWarnings("unchecked") String pythonScript = (String) actionRawData.get(ScoreLangConstants.PYTHON_SCRIPT_KEY);
+        boolean javaActionFound = MapUtils.isNotEmpty(javaActionData);
+        boolean pythonScriptFound = StringUtils.isNotEmpty(pythonScript);
+
+        if (javaActionFound && pythonScriptFound) {
+            throw new RuntimeException("Both java action and python script found in action data");
+        }
+
+        if (javaActionFound) {
             actionType = ActionType.JAVA;
             actionData.putAll(javaActionData);
+        } else  if (pythonScriptFound) {
+            actionType = ActionType.PYTHON;
+        } else {
+            // java action or python script data is missing
+            throw new RuntimeException("Invalid action data");
         }
+
         actionData.putAll(actionRawData);
         actionData.put(ScoreLangConstants.ACTION_TYPE, actionType);
         actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
@@ -105,7 +121,6 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, executableName);
         return createGeneralStep(index, OPERATION_STEPS_CLASS, "finishExecutable", actionData);
     }
-
 
     private ExecutionStep createGeneralStep(
             Long stepId,
