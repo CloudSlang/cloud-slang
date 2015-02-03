@@ -1,6 +1,6 @@
 namespace: user.ops
 
-operations:
-    - missing_action_properties:
-        action:
-          java_action:
+operation:
+  name: missing_action_properties
+  action:
+    java_action:
