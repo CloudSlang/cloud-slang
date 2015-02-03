@@ -147,4 +147,12 @@ public class CompileOperationTest {
         exception.expectMessage("Invalid action data");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
+
+    @Test
+    public void testCompileOperationInvalidType() throws Exception {
+        URL resource = getClass().getResource("/invalid_syntax/operation_action_invalid_type.yaml");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("workflow");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+    }
 }
