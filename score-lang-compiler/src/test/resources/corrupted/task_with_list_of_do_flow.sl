@@ -4,12 +4,10 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
+namespace: org.openscore
 
-namespace: user.ops
-
-operations:
-  - print_custom_result_op:
-      action:
-        python_script: 'print "hello world"'
-      results:
-        - CUSTOM: 1==1
+flow:
+  name: task_list_of_do
+  workflow:
+    task1:
+      - do:

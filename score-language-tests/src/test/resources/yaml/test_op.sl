@@ -4,17 +4,13 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
+
 namespace: user.ops
 
 imports:
-  ops: user.ops
+  props: test.sys.props
 
-flow:
-  name: wrong_navigation_flow
-
-  workflow:
-    Task1:
-      do:
-        ops.java_op:
-      navigate:
-        SUCCESS: Task2
+operation:
+  name: test_op
+  action:
+    python_script: 'print "hello world"'

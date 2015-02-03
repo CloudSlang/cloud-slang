@@ -4,22 +4,15 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
+namespace: org.openscore
 
-namespace: system.ops
+imports:
+  flows: org.openscore
 
-operations:
-  - binding_flow_op:
-      inputs:
-        - base_input
-        - bound_input:
-            default: base_input + ">"
+flow:
+  name: parent_flow_to_missing_name_flow
 
-      action:
-        python_script: |
-          bound_result = bound_input + "|"
-      outputs:
-        - bound_output: bound_result + "<"
-      results:
-        - SUCCESS
-
-
+  workflow:
+    missing_name_subflow:
+      do:
+        flows.no_task_data:

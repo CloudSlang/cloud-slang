@@ -4,21 +4,19 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
+
 namespace: user.ops
 
 imports:
-  ops: user.ops
+  props: test.sys.props
 
-flow:
-  name: wrong_navigation_flow
-
-  workflow:
-    Task1:
-      do:
-        ops.java_op:
-      navigate:
-        SUCCESS: SUCCESS
-        FAILURE: FAILURE
-
-  results:
-    - FAILURE
+operation:
+  name: set_global_session_object
+  inputs:
+    - value
+  action:
+    java_action:
+      className: org.openscore.lang.systemtests.actions.LangTestActions
+      methodName: setConnectionOnNonSerializableSession
+  outputs:
+    - session_object_value: value
