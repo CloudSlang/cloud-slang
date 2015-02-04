@@ -56,16 +56,15 @@ public class ResultsTransformerTest {
 
     @Before
     public void init() throws URISyntaxException {
-        resultsMapOpWithData = getResultsFromOperationFile("/operation_with_data.yaml", "test_op_2");
-        resultsMapOpNoData = getResultsFromOperationFile("/operation.yaml", "test_op");
+        resultsMapOpWithData = getResultsFromOperationFile("/operation_with_data.sl");
+        resultsMapOpNoData = getResultsFromOperationFile("/test_op.sl");
     }
 
-    private List getResultsFromOperationFile(String fileName, String operationName) throws URISyntaxException {
+    private List getResultsFromOperationFile(String fileName) throws URISyntaxException {
         URL resource = getClass().getResource(fileName);
         ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
-        Map<String, Map<String, Object>> op = file.getOperations().iterator().next();
-        Map<String, Object> operationWithData = op.get(operationName);
-        return (List) operationWithData.get(SlangTextualKeys.RESULTS_KEY);
+        Map<String, Object> op = file.getOperation();
+        return (List) op.get(SlangTextualKeys.RESULTS_KEY);
     }
 
     @Test

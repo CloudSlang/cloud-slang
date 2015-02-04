@@ -4,9 +4,15 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-namespace: org.openscore
+
+namespace: user.ops
+
+imports:
+  props: test.sys.props
 
 operation:
-  name: operation_with_list_of_action_types
+  name: java_op
   action:
-    - python_script: 'print "hello world"'
+    java_action:
+      className: com.hp.thing
+      methodName: someMethod

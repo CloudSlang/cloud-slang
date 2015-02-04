@@ -51,7 +51,7 @@ public class ExecutableBuilderTest {
 
     private ParsedSlang mockOperationsSlangFile() {
         ParsedSlang parsedSlang = Mockito.mock(ParsedSlang.class);
-        Mockito.when(parsedSlang.getType()).thenReturn(ParsedSlang.Type.OPERATIONS);
+        Mockito.when(parsedSlang.getType()).thenReturn(ParsedSlang.Type.OPERATION);
         Mockito.when(parsedSlang.getName()).thenReturn(FILE_NAME);
         return parsedSlang;
     }

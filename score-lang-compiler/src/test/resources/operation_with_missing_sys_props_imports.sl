@@ -4,9 +4,13 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-namespace: org.openscore
+
+namespace: user.ops
 
 operation:
-  name: operation_with_list_of_action_types
+  name: operation_with_missing_sys_props_imports
+  inputs:
+    - alla:
+        system_property: props.alla
   action:
-    - python_script: 'print "hello world"'
+    python_script: 'print "hello world"'

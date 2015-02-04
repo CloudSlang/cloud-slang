@@ -59,11 +59,10 @@ public class OutputsTransformerTest {
 
     @Before
     public void init() throws URISyntaxException {
-        URL resource = getClass().getResource("/operation_with_data.yaml");
+        URL resource = getClass().getResource("/operation_with_data.sl");
         ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
-        Map op = file.getOperations().iterator().next();
-        Map opProp = (Map) op.get("test_op_2");
-        outputsMap = (List) opProp.get(SlangTextualKeys.OUTPUTS_KEY);
+        Map op = file.getOperation();
+        outputsMap = (List) op.get(SlangTextualKeys.OUTPUTS_KEY);
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
@@ -98,11 +97,10 @@ public class OutputsTransformerTest {
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testInvalidOutputType() throws Exception{
-        URL resource = getClass().getResource("/operation_with_invalid_outputs.yaml");
+        URL resource = getClass().getResource("/operation_with_invalid_outputs.sl");
         ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
-        Map op = file.getOperations().iterator().next();
-        Map opProp = (Map) op.get("wrong_output_op");
-        List<Object> outputsMap = (List<Object>) opProp.get(SlangTextualKeys.OUTPUTS_KEY);
+        Map op = file.getOperation();
+        List<Object> outputsMap = (List<Object>) op.get(SlangTextualKeys.OUTPUTS_KEY);
         exception.expect(RuntimeException.class);
         exception.expectMessage("output1");
         exception.expectMessage("3");

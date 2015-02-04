@@ -7,9 +7,19 @@
 
 namespace: user.ops
 
+imports:
+  props: test.sys.props
+
 operation:
-  name: print_custom_result_op
+  name: get_global_session_object
+  inputs:
+    - value
   action:
-    python_script: 'print "hello world"'
+    java_action:
+      className: org.openscore.lang.systemtests.actions.LangTestActions
+      methodName: getConnectionFromNonSerializableSession
+  outputs:
+    - session_object_value: connection
   results:
-    - CUSTOM: 1==1
+    - SUCCESS: connection == fromInputs['value']
+    - FAILURE

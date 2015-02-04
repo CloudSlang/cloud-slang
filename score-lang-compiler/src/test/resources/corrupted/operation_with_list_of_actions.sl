@@ -6,7 +6,7 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 namespace: org.openscore
 
-operations:
-  - operation_with_list_of_actions:
-     - action:
-         python_script: 'print "hello world"'
+operation:
+  name: operation_with_list_of_actions
+  - action:
+      python_script: 'print "hello world"'

@@ -6,6 +6,6 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 namespace: org.openscore
 
-operations:
-  - operation_with_no_action_data.sl:
-     action:
+operation:
+  name: operation_with_no_action_data
+  action:
