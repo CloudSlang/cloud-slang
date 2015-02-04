@@ -42,7 +42,7 @@ public interface SlangTextualKeys {
     String DEFAULT_KEY = "default";
     String REQUIRED_KEY = "required";
     String ENCRYPTED_KEY = "encrypted";
-    String OVERRIDE_KEY = "override";
+    String OVERRIDABLE_KEY = "overridable";
     String SYSTEM_PROPERTY_KEY = "system_property";
 
 }

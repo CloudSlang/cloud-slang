@@ -40,8 +40,8 @@ import java.util.*;
 public class SlangCLI implements CommandMarker {
 
     public static final String TRIGGERED_FLOW_MSG = "Triggered flow : ";
-    public static final String WITH_EXECUTION_ID_MSG = " , with execution id : ";
-    public static final String FLOW_EXECUTION_TIME_TOOK = "Flow execution time took  ";
+    public static final String WITH_EXECUTION_ID_MSG = "Execution id: ";
+    public static final String FLOW_EXECUTION_TIME_TOOK = ", duration: ";
     private static final String CURRENTLY = "You are CURRENTLY running Slang version: ";
     private final static Logger logger = Logger.getLogger(SlangCLI.class);
 
@@ -97,7 +97,7 @@ public class SlangCLI implements CommandMarker {
         List<Input> inputs = compilationArtifact.getInputs();
         List<String> inputsResult = new ArrayList<>();
         for (Input input : inputs) {
-            if (!input.isOverride()) {
+            if (input.isOverridable()) {
                 inputsResult.add(input.getName());
             }
         }
@@ -110,7 +110,7 @@ public class SlangCLI implements CommandMarker {
     }
 
     public static String triggerSyncMsg(Long id, String duration) {
-        return FLOW_EXECUTION_TIME_TOOK + duration + WITH_EXECUTION_ID_MSG + id;
+        return WITH_EXECUTION_ID_MSG + id + FLOW_EXECUTION_TIME_TOOK + duration;
     }
 
     public static String triggerAsyncMsg(Long id, String flowName) {
