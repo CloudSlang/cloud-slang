@@ -13,14 +13,14 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.openscore.api.ExecutionPlan;
-import org.openscore.lang.compiler.model.Executable;
-import org.openscore.lang.compiler.model.Flow;
-import org.openscore.lang.compiler.model.Operation;
-import org.openscore.lang.compiler.model.ParsedSlang;
-import org.openscore.lang.compiler.utils.DependenciesHelper;
-import org.openscore.lang.compiler.utils.ExecutableBuilder;
-import org.openscore.lang.compiler.utils.ExecutionPlanBuilder;
-import org.openscore.lang.compiler.utils.YamlParser;
+import org.openscore.lang.compiler.modeller.model.Executable;
+import org.openscore.lang.compiler.modeller.model.Flow;
+import org.openscore.lang.compiler.modeller.model.Operation;
+import org.openscore.lang.compiler.parser.model.ParsedSlang;
+import org.openscore.lang.compiler.modeller.DependenciesHelper;
+import org.openscore.lang.compiler.modeller.ExecutableBuilder;
+import org.openscore.lang.compiler.execplancompiler.ExecutionPlanBuilder;
+import org.openscore.lang.compiler.parser.YamlParser;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -107,10 +107,10 @@ public class SlangCompilerImpl implements SlangCompiler {
 	}
 
     /**
-     * Transforms all of the slang files in the given path to {@link org.openscore.lang.compiler.model.Executable}
+     * Transforms all of the slang files in the given path to {@link org.openscore.lang.compiler.modeller.model.Executable}
      *
      * @param path the path
-     * @return a map of {@link org.openscore.lang.compiler.model.Executable} with their ids as key
+     * @return a map of {@link org.openscore.lang.compiler.modeller.model.Executable} with their ids as key
      */
     private Map<String, Executable> transformDependencies(Set<SlangSource> path) {
 
@@ -145,11 +145,11 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     /**
-     * Utility method that cast a {@link org.openscore.lang.compiler.model.Executable} to its subtype
+     * Utility method that cast a {@link org.openscore.lang.compiler.modeller.model.Executable} to its subtype
      * and create an {@link org.openscore.api.ExecutionPlan} for it
      *
      * @param executable the executable to create an {@link org.openscore.api.ExecutionPlan} for
-     * @return {@link org.openscore.api.ExecutionPlan} of the given {@link org.openscore.lang.compiler.model.Executable}
+     * @return {@link org.openscore.api.ExecutionPlan} of the given {@link org.openscore.lang.compiler.modeller.model.Executable}
      */
     private ExecutionPlan compileToExecutionPlan(Executable executable) {
         ExecutionPlan executionPlan;
@@ -165,12 +165,12 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     /**
-     * Utility method that transform a {@link org.openscore.lang.compiler.model.ParsedSlang}
-     * into a list of {@link org.openscore.lang.compiler.model.Executable}
+     * Utility method that transform a {@link org.openscore.lang.compiler.parser.model.ParsedSlang}
+     * into a list of {@link org.openscore.lang.compiler.modeller.model.Executable}
      * also handles operations files
      *
      * @param parsedSlang the source to transform
-     * @return List of {@link org.openscore.lang.compiler.model.Executable}  of the requested flow or operation
+     * @return List of {@link org.openscore.lang.compiler.modeller.model.Executable}  of the requested flow or operation
      */
     private Executable transformToExecutable(ParsedSlang parsedSlang) {
         switch (parsedSlang.getType()) {
@@ -184,10 +184,10 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     /**
-     * transform an operation {@link org.openscore.lang.compiler.model.ParsedSlang} to a List of {@link org.openscore.lang.compiler.model.Executable}
+     * transform an operation {@link org.openscore.lang.compiler.parser.model.ParsedSlang} to a List of {@link org.openscore.lang.compiler.modeller.model.Executable}
      *
      * @param parsedSlang the source to transform the operations from
-     * @return {@link org.openscore.lang.compiler.model.Executable} representing the operation in the source
+     * @return {@link org.openscore.lang.compiler.modeller.model.Executable} representing the operation in the source
      */
     private Executable transformOperation(ParsedSlang parsedSlang) {
         Map<String, Object> operationRawData = parsedSlang.getOperation();
@@ -199,10 +199,10 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     /**
-     * transform an flow {@link org.openscore.lang.compiler.model.ParsedSlang} to a {@link org.openscore.lang.compiler.model.Executable}
+     * transform an flow {@link org.openscore.lang.compiler.parser.model.ParsedSlang} to a {@link org.openscore.lang.compiler.modeller.model.Executable}
      *
      * @param parsedSlang the source to transform the flow from
-     * @return {@link org.openscore.lang.compiler.model.Executable} representing the flow in the source
+     * @return {@link org.openscore.lang.compiler.modeller.model.Executable} representing the flow in the source
      */
     private Executable transformFlow(ParsedSlang parsedSlang) {
         Map<String, Object> flowRawData = parsedSlang.getFlow();

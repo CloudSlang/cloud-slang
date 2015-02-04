@@ -9,7 +9,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openscore.lang.compiler.SlangSource;
-import org.openscore.lang.compiler.model.ParsedSlang;
+import org.openscore.lang.compiler.parser.model.ParsedSlang;
+import org.openscore.lang.compiler.parser.YamlParser;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;

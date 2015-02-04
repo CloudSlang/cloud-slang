@@ -8,7 +8,7 @@
  */
 package org.openscore.lang.compiler;
 
-import org.openscore.lang.compiler.model.Executable;
+import org.openscore.lang.compiler.modeller.model.Executable;
 import org.openscore.lang.entities.CompilationArtifact;
 
 import java.io.Serializable;

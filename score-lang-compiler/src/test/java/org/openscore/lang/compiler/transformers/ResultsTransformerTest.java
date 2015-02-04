@@ -9,7 +9,6 @@ package org.openscore.lang.compiler.transformers;
 *
 *******************************************************************************/
 
-
 import junit.framework.Assert;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Before;
@@ -17,8 +16,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.compiler.SlangTextualKeys;
-import org.openscore.lang.compiler.model.ParsedSlang;
-import org.openscore.lang.compiler.utils.YamlParser;
+import org.openscore.lang.compiler.modeller.transformers.ResultsTransformer;
+import org.openscore.lang.compiler.parser.YamlParser;
+import org.openscore.lang.compiler.parser.model.ParsedSlang;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Result;
 import org.springframework.beans.factory.annotation.Autowired;

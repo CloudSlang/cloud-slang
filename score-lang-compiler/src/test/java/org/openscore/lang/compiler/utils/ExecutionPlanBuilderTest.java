@@ -9,7 +9,14 @@
 *******************************************************************************/
 package org.openscore.lang.compiler.utils;
 
-import org.openscore.lang.compiler.model.*;
+import org.openscore.lang.compiler.execplancompiler.ExecutionPlanBuilder;
+import org.openscore.lang.compiler.execplancompiler.ExecutionStepFactory;
+import org.openscore.lang.compiler.modeller.model.Action;
+import org.openscore.lang.compiler.modeller.model.Executable;
+import org.openscore.lang.compiler.modeller.model.Flow;
+import org.openscore.lang.compiler.modeller.model.Operation;
+import org.openscore.lang.compiler.modeller.model.Task;
+import org.openscore.lang.compiler.modeller.model.Workflow;
 import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Input;
