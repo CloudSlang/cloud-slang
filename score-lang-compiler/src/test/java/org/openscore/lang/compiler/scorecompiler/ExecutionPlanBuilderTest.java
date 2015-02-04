@@ -7,10 +7,10 @@
 * http://www.apache.org/licenses/LICENSE-2.0
 *
 *******************************************************************************/
-package org.openscore.lang.compiler.utils;
+package org.openscore.lang.compiler.scorecompiler;
 
-import org.openscore.lang.compiler.execplancompiler.ExecutionPlanBuilder;
-import org.openscore.lang.compiler.execplancompiler.ExecutionStepFactory;
+import org.openscore.lang.compiler.scorecompiler.ExecutionPlanBuilder;
+import org.openscore.lang.compiler.scorecompiler.ExecutionStepFactory;
 import org.openscore.lang.compiler.modeller.model.Action;
 import org.openscore.lang.compiler.modeller.model.Executable;
 import org.openscore.lang.compiler.modeller.model.Flow;

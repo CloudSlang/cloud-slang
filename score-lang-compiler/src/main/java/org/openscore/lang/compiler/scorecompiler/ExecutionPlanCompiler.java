@@ -1,4 +1,4 @@
-package org.openscore.lang.compiler.execplancompiler;
+package org.openscore.lang.compiler.scorecompiler;
 
 import org.openscore.lang.compiler.modeller.model.Executable;
 import org.openscore.lang.entities.CompilationArtifact;

@@ -1,12 +1,10 @@
-package org.openscore.lang.compiler.utils;
+package org.openscore.lang.compiler.modeller;
 
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.openscore.lang.compiler.SlangTextualKeys;
-import org.openscore.lang.compiler.modeller.ExecutableBuilder;
-import org.openscore.lang.compiler.modeller.TransformersHandler;
 import org.openscore.lang.compiler.modeller.model.Flow;
 import org.openscore.lang.compiler.modeller.model.Operation;
 import org.openscore.lang.compiler.parser.model.ParsedSlang;

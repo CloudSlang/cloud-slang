@@ -1,4 +1,4 @@
-package org.openscore.lang.compiler.transformers;
+package org.openscore.lang.compiler.modeller.transformers;
 
 import junit.framework.Assert;
 import org.junit.Before;
@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.compiler.SlangTextualKeys;
-import org.openscore.lang.compiler.modeller.transformers.DoTransformer;
 import org.openscore.lang.compiler.parser.model.ParsedSlang;
 import org.openscore.lang.compiler.parser.YamlParser;
 import org.openscore.lang.entities.bindings.Input;

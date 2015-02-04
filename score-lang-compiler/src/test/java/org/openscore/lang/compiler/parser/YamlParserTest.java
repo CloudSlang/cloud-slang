@@ -1,4 +1,4 @@
-package org.openscore.lang.compiler.utils;
+package org.openscore.lang.compiler.parser;
 
 import org.junit.Rule;
 import org.junit.Test;

@@ -8,7 +8,7 @@
 *
 *******************************************************************************/
 
-package org.openscore.lang.compiler.execplancompiler;
+package org.openscore.lang.compiler.scorecompiler;
 
 import ch.lambdaj.Lambda;
 import org.openscore.lang.compiler.modeller.model.Flow;

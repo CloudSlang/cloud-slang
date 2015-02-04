@@ -8,7 +8,7 @@
 *
 *******************************************************************************/
 
-package org.openscore.lang.compiler.execplancompiler;
+package org.openscore.lang.compiler.scorecompiler;
 
 import org.openscore.lang.compiler.SlangTextualKeys;
 import org.openscore.lang.entities.ActionType;

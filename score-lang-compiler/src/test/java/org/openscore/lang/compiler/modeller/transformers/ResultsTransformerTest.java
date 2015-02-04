@@ -1,4 +1,4 @@
-package org.openscore.lang.compiler.transformers;
+package org.openscore.lang.compiler.modeller.transformers;
 /*******************************************************************************
 * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
 * All rights reserved. This program and the accompanying materials
@@ -16,7 +16,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.compiler.SlangTextualKeys;
-import org.openscore.lang.compiler.modeller.transformers.ResultsTransformer;
 import org.openscore.lang.compiler.parser.YamlParser;
 import org.openscore.lang.compiler.parser.model.ParsedSlang;
 import org.openscore.lang.entities.ScoreLangConstants;

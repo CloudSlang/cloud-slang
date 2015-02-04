@@ -7,10 +7,10 @@
 * http://www.apache.org/licenses/LICENSE-2.0
 *
 *******************************************************************************/
-package org.openscore.lang.compiler.utils;
+package org.openscore.lang.compiler.scorecompiler;
 
 import org.openscore.lang.compiler.SlangTextualKeys;
-import org.openscore.lang.compiler.execplancompiler.ExecutionStepFactory;
+import org.openscore.lang.compiler.scorecompiler.ExecutionStepFactory;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;

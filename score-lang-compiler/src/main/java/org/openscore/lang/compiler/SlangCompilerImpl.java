@@ -19,7 +19,7 @@ import org.openscore.lang.compiler.modeller.model.Operation;
 import org.openscore.lang.compiler.parser.model.ParsedSlang;
 import org.openscore.lang.compiler.modeller.DependenciesHelper;
 import org.openscore.lang.compiler.modeller.ExecutableBuilder;
-import org.openscore.lang.compiler.execplancompiler.ExecutionPlanBuilder;
+import org.openscore.lang.compiler.scorecompiler.ExecutionPlanBuilder;
 import org.openscore.lang.compiler.parser.YamlParser;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.springframework.beans.factory.annotation.Autowired;
