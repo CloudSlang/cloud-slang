@@ -11,14 +11,20 @@ package org.openscore.lang.compiler.modeller;
 import org.openscore.lang.compiler.modeller.model.Executable;
 import org.openscore.lang.compiler.parser.model.ParsedSlang;
 
-/**
+/*
  * Created by stoneo on 2/2/2015.
  */
+
+/**
+ * Slang modeller - transforms a parsed slang file into the Slang model - an Executable object
+ */
 public interface SlangModeller {
+
     /**
-     * Pre-compile a Slang file into a list of Executables
+     * Pre-compile a Slang file into an Executable
      * @param parsedSlang the parsed Slang source file
-     * @return a list of Executable objects, containing either a flow or a list of all the operations in the file
+     * @return an Executable object, containing either a flow or an operations in the file
+     *          Returns null if the source contains Slang system properties
      */
     public Executable createModel(ParsedSlang parsedSlang);
 }

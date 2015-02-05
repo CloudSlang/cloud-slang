@@ -1,3 +1,11 @@
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package org.openscore.lang.compiler.modeller;
 
 import org.apache.commons.lang.StringUtils;
@@ -10,9 +18,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-/**
+/*
  * Created by stoneo on 2/2/2015.
  */
+
 @Component
 public class SlangModellerImpl implements SlangModeller{
 
@@ -25,9 +34,9 @@ public class SlangModellerImpl implements SlangModeller{
 
         try {
             //then we transform those maps to model objects
-            return transformToExecutable(parsedSlang);
+            return createExecutable(parsedSlang);
         } catch (Throwable ex){
-            throw new RuntimeException("Error compiling source: " + parsedSlang.getName() + ". " + ex.getMessage(), ex);
+            throw new RuntimeException("Error transforming source: " + parsedSlang.getName() + " to a Slang model. " + ex.getMessage(), ex);
         }
     }
 
@@ -39,12 +48,14 @@ public class SlangModellerImpl implements SlangModeller{
      * @param parsedSlang the source to transform
      * @return List of {@link org.openscore.lang.compiler.modeller.model.Executable}  of the requested flow or operation
      */
-    private Executable transformToExecutable(ParsedSlang parsedSlang) {
+    private Executable createExecutable(ParsedSlang parsedSlang) {
         switch (parsedSlang.getType()) {
             case OPERATION:
-                return transformOperation(parsedSlang);
+                return transformToOperation(parsedSlang);
             case FLOW:
-                return transformFlow(parsedSlang);
+                return transformToFlow(parsedSlang);
+            case SYSTEM_PROPERTIES:
+                return null;
             default:
                 throw new RuntimeException("source: " + parsedSlang.getName() + " is not of flow type or operations");
         }
@@ -56,13 +67,9 @@ public class SlangModellerImpl implements SlangModeller{
      * @param parsedSlang the source to transform the operations from
      * @return {@link org.openscore.lang.compiler.modeller.model.Executable} representing the operation in the source
      */
-    private Executable transformOperation(ParsedSlang parsedSlang) {
-        Map<String, Object> operationRawData = parsedSlang.getOperation();
-        String operationName = (String) operationRawData.get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
-        if (StringUtils.isBlank(operationName)) {
-            throw new RuntimeException("Operation in source: " + parsedSlang.getName() + " has no name");
-        }
-        return executableBuilder.transformToExecutable(parsedSlang, operationName, operationRawData);
+    private Executable transformToOperation(ParsedSlang parsedSlang) {
+        Map<String, Object> rawData = parsedSlang.getOperation();
+        return transformToExecutable(parsedSlang, rawData);
     }
 
     /**
@@ -71,13 +78,16 @@ public class SlangModellerImpl implements SlangModeller{
      * @param parsedSlang the source to transform the flow from
      * @return {@link org.openscore.lang.compiler.modeller.model.Executable} representing the flow in the source
      */
-    private Executable transformFlow(ParsedSlang parsedSlang) {
-        Map<String, Object> flowRawData = parsedSlang.getFlow();
-        String flowName = (String) flowRawData.get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
-        if (StringUtils.isBlank(flowName)) {
-            throw new RuntimeException("Flow in source: " + parsedSlang.getName() + " has no name");
-        }
-        return executableBuilder.transformToExecutable(parsedSlang, flowName, flowRawData);
+    private Executable transformToFlow(ParsedSlang parsedSlang) {
+        Map<String, Object> rawData = parsedSlang.getFlow();
+        return transformToExecutable(parsedSlang, rawData);
     }
 
+    private Executable transformToExecutable(ParsedSlang parsedSlang, Map<String, Object> rawData) {
+        String executableName = (String) rawData.get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
+        if (StringUtils.isBlank(executableName)) {
+            throw new RuntimeException("Executable in source: " + parsedSlang.getName() + " has no name");
+        }
+        return executableBuilder.transformToExecutable(parsedSlang, executableName, rawData);
+    }
 }

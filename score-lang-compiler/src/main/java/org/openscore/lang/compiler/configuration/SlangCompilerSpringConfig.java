@@ -13,6 +13,10 @@ package org.openscore.lang.compiler.configuration;
 /*
  * Created by orius123 on 05/11/14.
  */
+import org.openscore.lang.compiler.modeller.SlangModeller;
+import org.openscore.lang.compiler.modeller.SlangModellerImpl;
+import org.openscore.lang.compiler.scorecompiler.ScoreCompiler;
+import org.openscore.lang.compiler.scorecompiler.ScoreCompilerImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +32,11 @@ public class SlangCompilerSpringConfig {
         Yaml yaml = new Yaml();
         yaml.setBeanAccess(BeanAccess.FIELD);
         return yaml;
+    }
+
+    @Bean
+    public ScoreCompiler scoreCompiler(){
+        return new ScoreCompilerImpl();
     }
 
 }
