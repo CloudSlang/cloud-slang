@@ -15,15 +15,21 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
-//todo: Eliya - add JavaDoc
 public interface SlangCompiler {
 
+    /**
+     * Compile a Slang source & its path to a CompilationArtifact object
+     * @param source the slang source file
+     * @param path a set of slang sources containing the source dependencies
+     * @return the compiled CompilationArtifact
+     */
     CompilationArtifact compile(SlangSource source, Set<SlangSource> path);
 
     /**
-     * Pre-compile a Slang file into a list of Executables
+     * Pre-compile a Slang source into an Executable
      * @param source the slang source file
-     * @return a list of Executable objects, containing either a flow or a list of all the operations in the file
+     * @return an Executable object, containing either a flow or operation in the file.
+     *          Returns null if the source contains Slang system properties
      */
     Executable preCompile(SlangSource source);
 
