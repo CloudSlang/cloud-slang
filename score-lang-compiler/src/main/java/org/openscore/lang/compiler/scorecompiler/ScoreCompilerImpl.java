@@ -90,7 +90,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         } else if (executable.getType().equals(SlangTextualKeys.FLOW_TYPE)) {
             executionPlan = executionPlanBuilder.createFlowExecutionPlan((Flow) executable);
         } else {
-            throw new RuntimeException("Executable: " + executable.getName() + " is not a flow and not an operation");
+            throw new RuntimeException("Executable: " + executable.getName() + " cannot be compiled to an ExecutionPlan since it is not a flow and not an operation");
         }
         return executionPlan;
     }

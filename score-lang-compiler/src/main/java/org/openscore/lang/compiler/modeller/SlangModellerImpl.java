@@ -33,56 +33,27 @@ public class SlangModellerImpl implements SlangModeller{
         Validate.notNull(parsedSlang, "You must supply a parsed Slang source to compile");
 
         try {
-            //then we transform those maps to model objects
-            return createExecutable(parsedSlang);
+            switch (parsedSlang.getType()) {
+                case OPERATION:
+                    return transformToExecutable(parsedSlang, parsedSlang.getOperation());
+                case FLOW:
+                    return transformToExecutable(parsedSlang, parsedSlang.getFlow());
+                case SYSTEM_PROPERTIES:
+                    return null;
+                default:
+                    throw new RuntimeException("Source: " + parsedSlang.getName() + " is not of flow type or operations");
+            }
         } catch (Throwable ex){
             throw new RuntimeException("Error transforming source: " + parsedSlang.getName() + " to a Slang model. " + ex.getMessage(), ex);
         }
     }
 
     /**
-     * Utility method that transform a {@link org.openscore.lang.compiler.parser.model.ParsedSlang}
-     * into a list of {@link org.openscore.lang.compiler.modeller.model.Executable}
-     * also handles operations files
-     *
-     * @param parsedSlang the source to transform
-     * @return List of {@link org.openscore.lang.compiler.modeller.model.Executable}  of the requested flow or operation
-     */
-    private Executable createExecutable(ParsedSlang parsedSlang) {
-        switch (parsedSlang.getType()) {
-            case OPERATION:
-                return transformToOperation(parsedSlang);
-            case FLOW:
-                return transformToFlow(parsedSlang);
-            case SYSTEM_PROPERTIES:
-                return null;
-            default:
-                throw new RuntimeException("source: " + parsedSlang.getName() + " is not of flow type or operations");
-        }
-    }
-
-    /**
-     * transform an operation {@link org.openscore.lang.compiler.parser.model.ParsedSlang} to a List of {@link org.openscore.lang.compiler.modeller.model.Executable}
+     * transform a parsed slang source {@link org.openscore.lang.compiler.parser.model.ParsedSlang} to an {@link org.openscore.lang.compiler.modeller.model.Executable}
      *
      * @param parsedSlang the source to transform the operations from
-     * @return {@link org.openscore.lang.compiler.modeller.model.Executable} representing the operation in the source
+     * @return {@link org.openscore.lang.compiler.modeller.model.Executable} representing the operation or flow in the source
      */
-    private Executable transformToOperation(ParsedSlang parsedSlang) {
-        Map<String, Object> rawData = parsedSlang.getOperation();
-        return transformToExecutable(parsedSlang, rawData);
-    }
-
-    /**
-     * transform an flow {@link org.openscore.lang.compiler.parser.model.ParsedSlang} to a {@link org.openscore.lang.compiler.modeller.model.Executable}
-     *
-     * @param parsedSlang the source to transform the flow from
-     * @return {@link org.openscore.lang.compiler.modeller.model.Executable} representing the flow in the source
-     */
-    private Executable transformToFlow(ParsedSlang parsedSlang) {
-        Map<String, Object> rawData = parsedSlang.getFlow();
-        return transformToExecutable(parsedSlang, rawData);
-    }
-
     private Executable transformToExecutable(ParsedSlang parsedSlang, Map<String, Object> rawData) {
         String executableName = (String) rawData.get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
         if (StringUtils.isBlank(executableName)) {
