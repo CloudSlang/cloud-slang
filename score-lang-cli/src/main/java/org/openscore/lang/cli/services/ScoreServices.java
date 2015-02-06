@@ -24,4 +24,5 @@ public interface ScoreServices {
     void subscribe(ScoreEventListener eventHandler, Set<String> eventTypes);
     Long trigger(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties);
     Long triggerSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties);
+    Long triggerSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties, boolean quiet);
 }

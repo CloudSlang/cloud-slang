@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.openscore.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
 import static org.openscore.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
 import static org.openscore.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
+import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
 import static org.openscore.lang.runtime.events.LanguageEventData.EXCEPTION;
 import static org.openscore.lang.runtime.events.LanguageEventData.RESULT;
 import static org.fusesource.jansi.Ansi.ansi;
@@ -95,11 +96,47 @@ public class ScoreServicesImpl implements ScoreServices{
         slang.unSubscribeOnEvents(scoreEventListener);
         return executionId;
     }
+    @Override
+    public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties, boolean isQuiet){
+        //add start event
+        Set<String> handlerTypes = new HashSet<>();
+        if(isQuiet == true){
+            handlerTypes.add(EVENT_OUTPUT_END);
+            handlerTypes.add(EVENT_EXECUTION_FINISHED);
+        }
+        else {
+            handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
+            handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
+            handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
+            handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
+            handlerTypes.add(EVENT_EXECUTION_FINISHED);
+            handlerTypes.add(EVENT_INPUT_END);
+        }
+
+        SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener(isQuiet);
+        slang.subscribeOnEvents(scoreEventListener, handlerTypes);
+
+        Long executionId = trigger(compilationArtifact, inputs, systemProperties);
+
+        while(!scoreEventListener.isFlowFinished()){
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException ignore) {}
+        }
+        slang.unSubscribeOnEvents(scoreEventListener);
+        return executionId;
+    }
 
     private class SyncTriggerEventListener implements ScoreEventListener{
+        private SyncTriggerEventListener(boolean quietListener) {
+            this.quietListener = quietListener;
+        }
+        private SyncTriggerEventListener() {
+
+        }
 
         private AtomicBoolean flowFinished = new AtomicBoolean(false);
-
+        private boolean quietListener;
         public boolean isFlowFinished() {
             return flowFinished.get();
         }
@@ -131,7 +168,34 @@ public class ScoreServicesImpl implements ScoreServices{
                         printWithColor(Ansi.Color.YELLOW, prefix + taskName);
                     }
                     break;
+                case ScoreLangConstants.EVENT_OUTPUT_END:
+                    if(quietListener){
+                        if(data.containsKey(LanguageEventData.OUTPUTS) && data.containsKey(LanguageEventData.PATH) && data.get(LanguageEventData.PATH).equals("0/0")) {
+
+                            @SuppressWarnings("unchecked") Map<String, String> outputs = (Map<String, String>) data.get(LanguageEventData.OUTPUTS);
+                            if (outputs != null){
+                                if (!outputs.keySet().isEmpty()){
+                                    for (String key : outputs.keySet()) {
+                                        if(outputs.get(key).length() > 30){
+                                            String truncatedOutputValue = outputs.get(key).substring(0, 30) + "..";
+                                            outputs.put(key, truncatedOutputValue);
+                                        }
+                                        if (StringUtils.isEmpty(outputs.get(key))){
+                                            outputs.put(key, "(empty)");
+                                        }
+                                        outputs.put(key, outputs.get(key).replace("\n", " "));
+
+                                        printWithColor(Ansi.Color.GREEN, key + " = " + outputs.get(key));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
                 case EVENT_EXECUTION_FINISHED :
+                   if (!flowFinished.get()){
+                        flowFinished.set(true);
+                    }
                     printFinishEvent(data);
                     break;
             }
