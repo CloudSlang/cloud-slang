@@ -30,6 +30,6 @@ public interface ScoreCompiler {
      * @param path a set of executables containing the source dependencies
      * @return the compiled CompilationArtifact
      */
-    public CompilationArtifact compile(Executable source, Set<Executable> path);
+    CompilationArtifact compile(Executable source, Set<Executable> path);
 
 }
