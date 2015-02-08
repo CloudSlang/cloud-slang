@@ -14,10 +14,9 @@ package org.openscore.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
-import org.openscore.lang.compiler.modeller.transformers.Transformer;
+import org.apache.commons.collections4.CollectionUtils;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Result;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
