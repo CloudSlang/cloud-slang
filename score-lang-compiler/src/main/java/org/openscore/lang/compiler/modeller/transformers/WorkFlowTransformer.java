@@ -14,7 +14,6 @@ package org.openscore.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
-import org.openscore.lang.compiler.modeller.transformers.Transformer;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
