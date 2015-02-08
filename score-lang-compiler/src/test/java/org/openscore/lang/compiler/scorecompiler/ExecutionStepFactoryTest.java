@@ -10,6 +10,7 @@
 package org.openscore.lang.compiler.scorecompiler;
 
 import org.openscore.lang.compiler.SlangTextualKeys;
+import org.openscore.lang.compiler.modeller.model.LoopStatement;
 import org.openscore.lang.compiler.scorecompiler.ExecutionStepFactory;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Input;
@@ -46,6 +47,18 @@ public class ExecutionStepFactoryTest {
         ExecutionStep startStep = factory.createStartStep(1L, new HashMap<String, Serializable>(), execInputs,"");
         Assert.assertNotNull("inputs key is null", startStep.getActionData().get(ScoreLangConstants.EXECUTABLE_INPUTS_KEY));
         Assert.assertSame("inputs are not set under their key", execInputs, startStep.getActionData().get(ScoreLangConstants.EXECUTABLE_INPUTS_KEY));
+    }
+
+    @Test
+    public void testCreateStartStepPutForUnderTheRightKey() throws Exception {
+        LoopStatement statement = new LoopStatement("1", "2");
+        HashMap<String, Serializable> preTaskData = new HashMap<>();
+        preTaskData.put(ScoreLangConstants.FOR_KEY, statement);
+        ExecutionStep startStep = factory.createBeginTaskStep(1L, preTaskData, "", "");
+        LoopStatement actualStatement = (LoopStatement) startStep.getActionData()
+                                 .get(ScoreLangConstants.FOR_KEY);
+        Assert.assertNotNull("for key is null", actualStatement);
+        Assert.assertSame("inputs are not set under their key", statement, actualStatement);
     }
 
     @Test(expected = IllegalArgumentException.class)
