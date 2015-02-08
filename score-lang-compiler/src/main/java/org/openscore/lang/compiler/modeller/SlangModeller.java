@@ -26,5 +26,5 @@ public interface SlangModeller {
      * @return an Executable object, containing either a flow or an operations in the file
      *          Returns null if the source contains Slang system properties
      */
-    public Executable createModel(ParsedSlang parsedSlang);
+    Executable createModel(ParsedSlang parsedSlang);
 }
