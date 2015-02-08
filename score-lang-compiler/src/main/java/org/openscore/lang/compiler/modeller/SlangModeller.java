@@ -16,15 +16,16 @@ import org.openscore.lang.compiler.parser.model.ParsedSlang;
  */
 
 /**
- * Slang modeller - transforms a parsed slang file into the Slang model - an Executable object
+ * Slang modeller - transforms a {@link org.openscore.lang.compiler.parser.model.ParsedSlang} source into
+ * the Slang model - an {@link org.openscore.lang.compiler.modeller.model.Executable} object
  */
 public interface SlangModeller {
 
     /**
-     * Pre-compile a Slang file into an Executable
-     * @param parsedSlang the parsed Slang source file
-     * @return an Executable object, containing either a flow or an operations in the file
-     *          Returns null if the source contains Slang system properties
+     * Pre-compile a Slang source into an {@link org.openscore.lang.compiler.modeller.model.Executable}
+     * @param parsedSlang the {@link org.openscore.lang.compiler.parser.model.ParsedSlang} source
+     * @return an {@link org.openscore.lang.compiler.modeller.model.Executable} object, containing either a flow
+*               or an operations in the file. Returns null if the source contains Slang system properties
      */
     Executable createModel(ParsedSlang parsedSlang);
 }
