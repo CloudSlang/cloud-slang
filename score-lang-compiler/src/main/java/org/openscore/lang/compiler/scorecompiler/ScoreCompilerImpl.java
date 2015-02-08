@@ -83,16 +83,14 @@ public class ScoreCompilerImpl implements ScoreCompiler{
      * @return {@link org.openscore.api.ExecutionPlan} of the given {@link org.openscore.lang.compiler.modeller.model.Executable}
      */
     private ExecutionPlan compileToExecutionPlan(Executable executable) {
-        ExecutionPlan executionPlan;
 
-        if (executable.getType().equals(SlangTextualKeys.OPERATION_TYPE)) {
-            executionPlan = executionPlanBuilder.createOperationExecutionPlan((Operation) executable);
-        } else if (executable.getType().equals(SlangTextualKeys.FLOW_TYPE)) {
-            executionPlan = executionPlanBuilder.createFlowExecutionPlan((Flow) executable);
-        } else {
-            throw new RuntimeException("Executable: " + executable.getName() + " cannot be compiled to an ExecutionPlan since it is not a flow and not an operation");
+        switch (executable.getType()){
+            case SlangTextualKeys.OPERATION_TYPE:
+                return executionPlanBuilder.createOperationExecutionPlan((Operation) executable);
+            case SlangTextualKeys.FLOW_TYPE:
+                return executionPlanBuilder.createFlowExecutionPlan((Flow) executable);
+            default:
+                throw new RuntimeException("Executable: " + executable.getName() + " cannot be compiled to an ExecutionPlan since it is not a flow and not an operation");
         }
-        return executionPlan;
     }
-
 }
