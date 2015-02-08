@@ -75,7 +75,7 @@ public class TransformersHandler {
 
         for (String key : rawData.keySet()) {
             if (!(exists(validKeywords, equalToIgnoringCase(key)))) {
-                throw new RuntimeException("Property: " + key + " at: " + dataLogicalName + " is illegal");
+                throw new RuntimeException("Property: \'" + key + "\' at: \'" + dataLogicalName + "\' is illegal");
             }
         }
     }
