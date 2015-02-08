@@ -9,20 +9,21 @@
  *******************************************************************************/
 package org.openscore.lang.compiler;
 
-import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openscore.api.ExecutionPlan;
 import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
-import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.compiler.modeller.model.Executable;
+import org.openscore.lang.compiler.modeller.model.Flow;
+import org.openscore.lang.compiler.modeller.model.LoopStatement;
+import org.openscore.lang.compiler.modeller.model.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.Serializable;
 import java.net.URI;
-import java.util.HashSet;
-import java.util.Set;
+
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
@@ -31,17 +32,19 @@ public class CompileLoopsFlowTest {
     @Autowired
     private SlangCompiler compiler;
 
-    @Ignore
     @Test
     public void testCompileFlowBasic() throws Exception {
         URI flow = getClass().getResource("/loops/simple_loop.sl").toURI();
-        URI operation = getClass().getResource("/loops/print.sl").toURI();
-        Set<SlangSource> path = new HashSet<>();
-        path.add(SlangSource.fromFile(operation));
-        CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
-        ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
-        Assert.assertNotNull("execution plan is null", executionPlan);
-        Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
+        Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
+        assertNotNull("executable is null", executable);
+        Task task = ((Flow) executable).getWorkflow()
+                                        .getTasks()
+                                        .getFirst();
+        assertTrue(task.getPreTaskActionData().containsKey("for"));
+        LoopStatement forStatement = (LoopStatement) task.getPreTaskActionData()
+                                .get("for");
+        assertEquals("values", forStatement.getCollectionExpression());
+        assertEquals("value", forStatement.getVarName());
     }
 
 }

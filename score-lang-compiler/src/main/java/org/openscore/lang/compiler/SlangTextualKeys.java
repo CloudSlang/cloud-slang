@@ -35,6 +35,7 @@ public interface SlangTextualKeys {
 
     //task
     String DO_KEY = "do";
+    String LOOP_KEY = "loop";
     String PUBLISH_KEY = "publish";
     String NAVIGATION_KEY = "navigate";
 
