@@ -18,17 +18,20 @@ import java.util.Set;
  */
 
 /**
- * Score Compiler - compiles Slang Executable model to a CompilationArtifact
- * CompilationArtifact is an object holding an ExecutionPlan - compilation result of a workflow
+ * Score Compiler - compiles Slang {@link org.openscore.lang.compiler.modeller.model.Executable} model
+ * to a {@link org.openscore.lang.entities.CompilationArtifact}
+ * {@link org.openscore.lang.entities.CompilationArtifact} is an object holding an {@link org.openscore.api.ExecutionPlan}:
+ * compilation result of a workflow
  * in the score format. This object can be run on score engine.
  */
 public interface ScoreCompiler {
 
     /**
-     * Compile an Executable & its path to a CompilationArtifact object
-     * @param source the executable source
-     * @param path a set of executables containing the source dependencies
-     * @return the compiled CompilationArtifact
+     * Compile an {@link org.openscore.lang.compiler.modeller.model.Executable} and its path
+     * to a {@link org.openscore.lang.entities.CompilationArtifact} object
+     * @param source the {@link org.openscore.lang.compiler.modeller.model.Executable} source
+     * @param path a set of {@link org.openscore.lang.compiler.modeller.model.Executable}s containing the source dependencies
+     * @return the compiled {@link org.openscore.lang.entities.CompilationArtifact}
      */
     CompilationArtifact compile(Executable source, Set<Executable> path);
 
