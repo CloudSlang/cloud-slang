@@ -8,6 +8,7 @@
  */
 package org.openscore.lang.compiler;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
 import org.openscore.lang.compiler.modeller.SlangModeller;
 import org.openscore.lang.compiler.modeller.model.Executable;
@@ -46,7 +47,7 @@ public class SlangCompilerImpl implements SlangCompiler {
 
         //we transform also all of the files in the given path to model objects
         Set<Executable> pathExecutables = new HashSet<>();
-        if(path != null && !path.isEmpty()) {
+        if(CollectionUtils.isNotEmpty(path)) {
             for (SlangSource pathSource : path) {
                 pathExecutables.add(preCompile(pathSource));
             }
