@@ -16,11 +16,15 @@ import java.io.Serializable;
 
 public class LoopStatement implements Serializable{
 
+    public enum Type {
+        FOR, WHILE
+    }
+
     private final String varName;
     private final String collectionExpression;
-    private final String type;
+    private final Type type;
 
-    public LoopStatement(String varName, String collectionExpression, String type) {
+    public LoopStatement(String varName, String collectionExpression, Type type) {
         this.varName = varName;
         this.collectionExpression = collectionExpression;
         this.type = type;
@@ -34,7 +38,7 @@ public class LoopStatement implements Serializable{
         return collectionExpression;
     }
 
-    public String getType() {
+    public Type getType() {
         return type;
     }
 
@@ -50,6 +54,7 @@ public class LoopStatement implements Serializable{
         return new EqualsBuilder()
                 .append(varName, that.varName)
                 .append(collectionExpression, that.collectionExpression)
+                .append(type, that.type)
                 .isEquals();
     }
 
@@ -58,6 +63,7 @@ public class LoopStatement implements Serializable{
         return new HashCodeBuilder()
                 .append(varName)
                 .append(collectionExpression)
+                .append(type)
                 .toHashCode();
     }
 }

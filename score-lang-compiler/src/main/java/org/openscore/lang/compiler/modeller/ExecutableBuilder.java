@@ -35,8 +35,7 @@ import java.util.*;
 import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
-import static org.openscore.lang.entities.ScoreLangConstants.FAILURE_RESULT;
-import static org.openscore.lang.entities.ScoreLangConstants.SUCCESS_RESULT;
+import static org.openscore.lang.entities.ScoreLangConstants.*;
 import static org.openscore.lang.compiler.SlangTextualKeys.*;
 import static org.openscore.lang.compiler.modeller.transformers.Transformer.*;
 

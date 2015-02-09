@@ -40,7 +40,7 @@ public interface ScoreLangConstants {
     String TASK_PUBLISH_KEY = "taskPublishValues";
     String TASK_NAVIGATION_KEY = "taskNavigationValues";
     String REF_ID = "refId";
-    String FOR_KEY = "for";
+    String LOOP_KEY = "loop";
 
     // Events types
 	String SLANG_EXECUTION_EXCEPTION = "SLANG_EXECUTION_EXCEPTION";

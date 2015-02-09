@@ -15,7 +15,7 @@ import org.openscore.api.ExecutionPlan;
 import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
 import org.openscore.lang.compiler.modeller.model.Executable;
 import org.openscore.lang.compiler.modeller.model.Flow;
-import org.openscore.lang.compiler.modeller.model.LoopStatement;
+import org.openscore.lang.entities.LoopStatement;
 import org.openscore.lang.compiler.modeller.model.Task;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.ScoreLangConstants;
@@ -47,11 +47,12 @@ public class CompileLoopsFlowTest {
         Task task = ((Flow) executable).getWorkflow()
                                         .getTasks()
                                         .getFirst();
-        assertTrue(task.getPreTaskActionData().containsKey(ScoreLangConstants.FOR_KEY));
+        assertTrue(task.getPreTaskActionData().containsKey(SlangTextualKeys.FOR_KEY));
         LoopStatement forStatement = (LoopStatement) task.getPreTaskActionData()
-                                .get(ScoreLangConstants.FOR_KEY);
+                                .get(SlangTextualKeys.FOR_KEY);
         assertEquals("values", forStatement.getCollectionExpression());
         assertEquals("value", forStatement.getVarName());
+        assertEquals(LoopStatement.Type.FOR, forStatement.getType());
     }
 
     @Test
@@ -66,10 +67,11 @@ public class CompileLoopsFlowTest {
         assertNotNull("executionPlan is null", executionPlan);
         Map<String, ?> actionData = executionPlan.getStep(2L)
                                                  .getActionData();
-        assertTrue(actionData.containsKey(ScoreLangConstants.FOR_KEY));
-        LoopStatement forStatement = (LoopStatement) actionData.get(ScoreLangConstants.FOR_KEY);
+        assertTrue(actionData.containsKey(ScoreLangConstants.LOOP_KEY));
+        LoopStatement forStatement = (LoopStatement) actionData.get(ScoreLangConstants.LOOP_KEY);
         assertEquals("values", forStatement.getCollectionExpression());
         assertEquals("value", forStatement.getVarName());
+        assertEquals(LoopStatement.Type.FOR, forStatement.getType());
 
     }
 

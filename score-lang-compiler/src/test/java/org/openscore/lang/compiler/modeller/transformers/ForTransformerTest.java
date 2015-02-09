@@ -3,7 +3,7 @@ package org.openscore.lang.compiler.modeller.transformers;
 import junit.framework.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.openscore.lang.compiler.modeller.model.LoopStatement;
+import org.openscore.lang.entities.LoopStatement;
 
 public class ForTransformerTest {
 

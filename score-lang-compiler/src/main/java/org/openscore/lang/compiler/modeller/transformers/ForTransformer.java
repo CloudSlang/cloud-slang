@@ -10,7 +10,7 @@
 package org.openscore.lang.compiler.modeller.transformers;
 
 import org.apache.commons.lang.StringUtils;
-import org.openscore.lang.compiler.modeller.model.LoopStatement;
+import org.openscore.lang.entities.LoopStatement;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -27,7 +27,7 @@ public class ForTransformer implements Transformer<String, LoopStatement>{
         String[] strings = rawData.split(Pattern.quote(" in "));
         String varName = strings[0].trim();
         String collectionExpression = strings[1].trim();
-        return new LoopStatement(varName, collectionExpression);
+        return new LoopStatement(varName, collectionExpression, LoopStatement.Type.FOR);
     }
 
     @Override
