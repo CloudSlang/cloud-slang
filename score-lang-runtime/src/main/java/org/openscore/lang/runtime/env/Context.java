@@ -16,7 +16,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
-public class Context {
+public class Context implements Serializable{
 
     private final Map<String, Serializable> variables;
 
@@ -32,14 +32,10 @@ public class Context {
         return Collections.unmodifiableMap(variables);
     }
 
-
-
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         Context that = (Context) o;
 
