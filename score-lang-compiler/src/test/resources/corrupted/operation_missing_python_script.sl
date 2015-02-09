@@ -8,6 +8,6 @@
 namespace: user.ops
 
 operation:
-  name: missing_python_script
+  name: operation_missing_python_script
   action:
     python_script:

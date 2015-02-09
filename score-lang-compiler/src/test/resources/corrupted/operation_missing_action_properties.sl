@@ -1,7 +1,6 @@
 namespace: user.ops
 
 operation:
-  name: missing_class_name:
+  name: operation_missing_action_properties
   action:
     java_action:
-      methodName: someMethod

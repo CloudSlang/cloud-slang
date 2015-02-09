@@ -101,7 +101,7 @@ public class CompileOperationTest {
 
     @Test
     public void testCompileOperationMissingClassName() throws Exception {
-        URL resource = getClass().getResource("/invalid_syntax/operation_missing_className.yaml");
+        URL resource = getClass().getResource("/corrupted/operation_missing_className.sl");
         exception.expect(RuntimeException.class);
         exception.expectMessage("className");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
@@ -109,7 +109,7 @@ public class CompileOperationTest {
 
     @Test
     public void testCompileOperationMissingMethodName() throws Exception {
-        URL resource = getClass().getResource("/invalid_syntax/operation_missing_methodName.yaml");
+        URL resource = getClass().getResource("/corrupted/operation_missing_methodName.sl");
         exception.expect(RuntimeException.class);
         exception.expectMessage("methodName");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
@@ -117,7 +117,7 @@ public class CompileOperationTest {
 
     @Test
     public void testCompileOperationInvalidActionProperty() throws Exception {
-        URL resource = getClass().getResource("/invalid_syntax/operation_invalid_action_property.yaml");
+        URL resource = getClass().getResource("/corrupted/operation_invalid_action_property.sl");
         exception.expect(RuntimeException.class);
         exception.expectMessage("IDontBelongHere");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
@@ -125,7 +125,7 @@ public class CompileOperationTest {
 
     @Test
     public void testCompileOperationMultipleActionTypes() throws Exception {
-        URL resource = getClass().getResource("/invalid_syntax/operation_action_multiple_types.yaml");
+        URL resource = getClass().getResource("/corrupted/operation_action_multiple_types.sl");
         exception.expect(RuntimeException.class);
         exception.expectMessage("java action");
         exception.expectMessage("python script");
@@ -134,7 +134,7 @@ public class CompileOperationTest {
 
     @Test
     public void testCompileOperationMissingActionProperties() throws Exception {
-        URL resource = getClass().getResource("/invalid_syntax/operation_missing_action_properties.yaml");
+        URL resource = getClass().getResource("/corrupted/operation_missing_action_properties.sl");
         exception.expect(RuntimeException.class);
         exception.expectMessage("Invalid action data");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
@@ -142,7 +142,7 @@ public class CompileOperationTest {
 
     @Test
     public void testCompileOperationMissingPythonScript() throws Exception {
-        URL resource = getClass().getResource("/invalid_syntax/operation_missing_python_script.yaml");
+        URL resource = getClass().getResource("/corrupted/operation_missing_python_script.sl");
         exception.expect(RuntimeException.class);
         exception.expectMessage("Invalid action data");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
@@ -150,7 +150,7 @@ public class CompileOperationTest {
 
     @Test
     public void testCompileOperationInvalidType() throws Exception {
-        URL resource = getClass().getResource("/invalid_syntax/operation_action_invalid_type.yaml");
+        URL resource = getClass().getResource("/corrupted/operation_action_invalid_type.sl");
         exception.expect(RuntimeException.class);
         exception.expectMessage("workflow");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);

@@ -1,9 +1,7 @@
 namespace: user.ops
 
 operation:
-  name: invalid_action_property
+  name: operation_missing_method_name
   action:
     java_action:
       className: com.hp.thing
-      methodName: someMethod
-      IDontBelongHere: blah
