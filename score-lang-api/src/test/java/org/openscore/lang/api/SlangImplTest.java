@@ -34,14 +34,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.introspector.BeanAccess;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static org.mockito.Matchers.*;
@@ -182,12 +186,17 @@ public class SlangImplTest {
         Mockito.verify(mockSlang).compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
     }
 
-    @Test
-    public void testLoadSystemProperties(){
-        SlangSource source = new SlangSource("source", "name");
-        slang.loadSystemProperties(source);
-        Mockito.verify(compiler).loadSystemProperties(source);
-    }
+	@Test
+	public void testLoadSystemProperties() throws Exception {
+		Map<String, Serializable> expected = new HashMap<>();
+		expected.put("test.sys.props.host", "localhost");
+		expected.put("test.sys.props.port", 22);
+		expected.put("test.sys.props.alla", "balla");
+		URI systemProperties = getClass().getResource("/system_properties.yaml").toURI();
+		Map<String, ? extends Serializable> result = slang.loadSystemProperties(SlangSource.fromFile(systemProperties));
+		Assert.assertNotNull(result);
+		Assert.assertEquals(expected, result);
+	}
 
     // tests for subscribeOnEvents() method
 
@@ -243,6 +252,13 @@ public class SlangImplTest {
         public SlangImpl slang(){
             return new SlangImpl();
         }
+
+		@Bean
+		public Yaml yaml() {
+			Yaml yaml = new Yaml();
+			yaml.setBeanAccess(BeanAccess.FIELD);
+			return yaml;
+		}
 
         @Bean
         public SlangCompiler compiler() {

@@ -26,9 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.Serializable;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -130,17 +128,5 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("There is a different number of flow inputs than expected", SlangFileType.EXECUTABLE, dependency.getValue());
         Assert.assertEquals("The flow dependency full name is wrong", "user.ops.test_op", dependency.getKey());
     }
-
-	@Test
-	public void testLoadSystemProperties() throws Exception {
-		Map<String, Serializable> expected = new HashMap<>();
-		expected.put("test.sys.props.host", "localhost");
-		expected.put("test.sys.props.port", 22);
-		expected.put("test.sys.props.alla", "balla");
-		URI systemProperties = getClass().getResource("/system_properties.yaml").toURI();
-		Map<String, ? extends Serializable> result = compiler.loadSystemProperties(SlangSource.fromFile(systemProperties));
-		Assert.assertNotNull(result);
-		Assert.assertEquals(expected, result);
-	}
 
 }

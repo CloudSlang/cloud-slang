@@ -132,7 +132,6 @@ public class ExecutableBuilder {
                 }
 
                 Workflow workflow = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false);
-                //todo: add system properties dependencies?
                 dependencies = fetchDirectTasksDependencies(workflow);
                 return new Flow(preExecutableActionData, postExecutableActionData, workflow, namespace, execName, inputs, outputs, results, dependencies);
 
@@ -148,7 +147,6 @@ public class ExecutableBuilder {
                     throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Operation: " + execName + " has no action data");
                 }
                 Action action = compileAction(actionRawData);
-                //todo: add system properties dependencies?
                 dependencies = new HashMap<>();
                 return new Operation(preExecutableActionData, postExecutableActionData, action, namespace, execName, inputs, outputs, results, dependencies);
             default:

@@ -64,7 +64,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("flow/operation/system_properties");
+        exception.expectMessage("flow/operation");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 

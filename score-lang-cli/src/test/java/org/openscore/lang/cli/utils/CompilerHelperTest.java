@@ -1,5 +1,12 @@
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package org.openscore.lang.cli.utils;
-
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -18,16 +25,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.net.URL;
 
 import static org.mockito.Mockito.mock;
-
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = CompilerHelperTest.Config.class)
@@ -88,6 +85,12 @@ public class CompilerHelperTest {
         compilerHelper.compile(flowFilePath, null, Lists.newArrayList(flowFilePath));
     }
 
+    @Test
+    public void testLoadSystemProperties(){
+        SlangSource source = new SlangSource("source", "name");
+        slang.loadSystemProperties(source);
+        Mockito.verify(slang).loadSystemProperties(source);
+    }
 
     @Configuration
     static class Config {
