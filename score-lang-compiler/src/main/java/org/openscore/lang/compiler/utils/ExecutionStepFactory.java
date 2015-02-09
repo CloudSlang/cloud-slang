@@ -89,21 +89,17 @@ public class ExecutionStepFactory {
         boolean javaActionFound = MapUtils.isNotEmpty(javaActionData);
         boolean pythonScriptFound = StringUtils.isNotEmpty(pythonScript);
 
-        if (javaActionFound && pythonScriptFound) {
-            throw new RuntimeException("Both java action and python script found in action data");
-        }
-
         if (javaActionFound) {
             actionType = ActionType.JAVA;
             actionData.putAll(javaActionData);
         } else  if (pythonScriptFound) {
             actionType = ActionType.PYTHON;
+            actionData.putAll(actionRawData);
         } else {
             // java action or python script data is missing
             throw new RuntimeException("Invalid action data");
         }
 
-        actionData.putAll(actionRawData);
         actionData.put(ScoreLangConstants.ACTION_TYPE, actionType);
         actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
         return createGeneralStep(index, ACTION_STEPS_CLASS, "doAction", actionData);

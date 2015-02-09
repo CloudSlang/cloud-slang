@@ -127,8 +127,7 @@ public class CompileOperationTest {
     public void testCompileOperationMultipleActionTypes() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_action_multiple_types.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("java action");
-        exception.expectMessage("python script");
+        exception.expectMessage("Conflicting keys");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 
