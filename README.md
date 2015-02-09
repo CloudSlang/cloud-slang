@@ -40,8 +40,8 @@ Contact us at [here](mailto:support@openscore.io).
 2. ```mvn clean install```
 3. Run the CLI executable from score-lang-cli\target\slang\bin 
 
-# Another way of getting the score command line interface.
-# score-cli
+### Another way of getting the score command line interface.
+###### score-cli
 > The score command line interface.
 
 Install this globally and you'll have access to the `score` command anywhere on your system.
@@ -57,7 +57,7 @@ score
 
 Refer to [openscore](http://openscore.io) website for more information.
 
-# Prerequisite
+###### Pre-Requisites:
 Node.js & Java installed.
 
 score-cli page in the [NPM repository](https://www.npmjs.com/package/score-cli).
