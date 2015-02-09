@@ -15,6 +15,7 @@ import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
 import org.openscore.lang.runtime.bindings.InputsBinding;
 import org.openscore.lang.runtime.bindings.OutputsBinding;
+import org.openscore.lang.runtime.env.Context;
 import org.openscore.lang.runtime.env.ParentFlowData;
 import org.openscore.lang.runtime.env.ParentFlowStack;
 import org.openscore.lang.runtime.env.ReturnValues;
@@ -69,9 +70,10 @@ public class TaskSteps extends AbstractSteps {
         runEnv.removeCallArguments();
         runEnv.removeReturnValues();
 
-        Map<String, Serializable> flowContext = runEnv.getStack().popContext();
+        Context flowContext = runEnv.getStack().popContext();
+        Map<String, Serializable> flowVariables = flowContext == null ? null : flowContext.getImmutableViewOfVariables();
 
-        Map<String, Serializable> operationArguments = inputsBinding.bindInputs(taskInputs, flowContext, runEnv.getSystemProperties());
+        Map<String, Serializable> operationArguments = inputsBinding.bindInputs(taskInputs, flowVariables, runEnv.getSystemProperties());
 
         //todo: hook
 
@@ -94,7 +96,8 @@ public class TaskSteps extends AbstractSteps {
                         @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                         @Param(NODE_NAME_KEY) String nodeName) {
 
-        Map<String, Serializable> flowContext = runEnv.getStack().popContext();
+        Context flowContext = runEnv.getStack().popContext();
+        Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
 
         ReturnValues executableReturnValues = runEnv.removeReturnValues();
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_START, "Output binding started",
@@ -104,7 +107,7 @@ public class TaskSteps extends AbstractSteps {
 
         Map<String, String> publishValues = outputsBinding.bindOutputs(null, executableReturnValues.getOutputs(), taskPublishValues);
 
-        flowContext.putAll(publishValues);
+        flowContext.putVariables(publishValues);
 
         //todo: hook
 
@@ -121,7 +124,7 @@ public class TaskSteps extends AbstractSteps {
 		runEnv.putNextStepPosition(nextPosition);
 
 		HashMap<String, String> outputs = new HashMap<>();// todo - is this the right solution?
-		for(Map.Entry<String, Serializable> entry : flowContext.entrySet()) {
+		for(Map.Entry<String, Serializable> entry : flowVariables.entrySet()) {
 			outputs.put(entry.getKey(), String.valueOf(entry.getValue()));
 		}
 
