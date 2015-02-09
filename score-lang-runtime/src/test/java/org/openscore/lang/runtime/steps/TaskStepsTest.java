@@ -17,6 +17,7 @@ import org.openscore.lang.entities.bindings.Output;
 import org.openscore.lang.runtime.bindings.InputsBinding;
 import org.openscore.lang.runtime.bindings.OutputsBinding;
 import org.openscore.lang.runtime.bindings.ScriptEvaluator;
+import org.openscore.lang.runtime.env.Context;
 import org.openscore.lang.runtime.env.ParentFlowData;
 import org.openscore.lang.runtime.env.ReturnValues;
 import org.openscore.lang.runtime.env.RunEnvironment;
@@ -135,7 +136,8 @@ public class TaskStepsTest {
     public void testEndTaskEvents() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String,String>(),SUCCESS_RESULT));
-        runEnv.getStack().pushContext(new HashMap<String, Serializable>());
+        Context context = new Context(new HashMap<String, Serializable>());
+        runEnv.getStack().pushContext(context);
 
         when(outputsBinding.bindOutputs(anyMap(), anyMap(), anyList())).thenReturn(new HashMap<String, String>());
 
@@ -166,7 +168,8 @@ public class TaskStepsTest {
         List<Output> possiblePublishValues = Arrays.asList(new Output("name", "name"));
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), SUCCESS_RESULT));
-        runEnv.getStack().pushContext(new HashMap<String, Serializable>());
+        Context context = new Context(new HashMap<String, Serializable>());
+        runEnv.getStack().pushContext(context);
 
         Map<String, String> boundPublish = new HashMap<>();
         boundPublish.put("name", "John");
@@ -176,16 +179,17 @@ public class TaskStepsTest {
         taskNavigationValues.put(SUCCESS_RESULT, new ResultNavigation(0, SUCCESS_RESULT));
         taskSteps.endTask(runEnv, possiblePublishValues, taskNavigationValues, createRuntimeServices(), "task1");
 
-        Map<String,Serializable> flowContext = runEnv.getStack().popContext();
-        Assert.assertTrue(flowContext.containsKey("name"));
-        Assert.assertEquals("John" ,flowContext.get("name"));
+        Map<String,Serializable> flowVars = runEnv.getStack().popContext().getImmutableViewOfVariables();
+        Assert.assertTrue(flowVars.containsKey("name"));
+        Assert.assertEquals("John" ,flowVars.get("name"));
     }
 
     @Test
     public void testEndTaskSetNextPosition() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
         String result = SUCCESS_RESULT;
-        runEnv.getStack().pushContext(new HashMap<String, Serializable>());
+        Context context = new Context(new HashMap<String, Serializable>());
+        runEnv.getStack().pushContext(context);
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), result));
 
         Long nextStepPosition = 5L;
@@ -204,7 +208,8 @@ public class TaskStepsTest {
     public void testEndTaskMissingNavigationForExecutableResult() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
         String result = "CUSTOM";
-        runEnv.getStack().pushContext(new HashMap<String, Serializable>());
+        Context context = new Context(new HashMap<String, Serializable>());
+        runEnv.getStack().pushContext(context);
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), result));
 
         Long nextStepPosition = 5L;

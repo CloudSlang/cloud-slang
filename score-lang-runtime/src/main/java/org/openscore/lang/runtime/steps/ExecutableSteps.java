@@ -9,6 +9,7 @@ import org.openscore.lang.entities.bindings.Result;
 import org.openscore.lang.runtime.bindings.InputsBinding;
 import org.openscore.lang.runtime.bindings.OutputsBinding;
 import org.openscore.lang.runtime.bindings.ResultsBinding;
+import org.openscore.lang.runtime.env.Context;
 import org.openscore.lang.runtime.env.ExecutionPath;
 import org.openscore.lang.runtime.env.ParentFlowData;
 import org.openscore.lang.runtime.env.ReturnValues;
@@ -72,7 +73,7 @@ public class ExecutableSteps extends AbstractSteps {
 
         //todo: hook
 
-        updateCallArgumentsAndPushContextToStack(runEnv, executableContext, actionArguments);
+        updateCallArgumentsAndPushContextToStack(runEnv, new Context(executableContext), actionArguments);
 
         sendBindingInputsEvent(executableInputs, executableContext, runEnv, executionRuntimeServices,
                 "Post Input binding for operation/flow",nodeName, levelName.EXECUTABLE_NAME);
@@ -97,7 +98,8 @@ public class ExecutableSteps extends AbstractSteps {
 		ExecutionPath executionPath = runEnv.getExecutionPath();
 		executionPath.up();
 		if(executionPath.getDepth() < 1) executionPath.down(); // In case we're at top level
-        Map<String, Serializable> operationContext = runEnv.getStack().popContext();
+        Context operationContext = runEnv.getStack().popContext();
+        Map<String, Serializable> operationVariables = operationContext == null ? null : operationContext.getImmutableViewOfVariables();
         ReturnValues actionReturnValues = runEnv.removeReturnValues();
         fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_START, "Output binding started",
                 Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable) executableOutputs),
@@ -105,9 +107,9 @@ public class ExecutableSteps extends AbstractSteps {
                 Pair.of("actionReturnValues", actionReturnValues),Pair.of(levelName.EXECUTABLE_NAME.toString(),nodeName));
 
         // Resolving the result of the operation/flow
-        String result = resultsBinding.resolveResult(operationContext, actionReturnValues.getOutputs(), executableResults, actionReturnValues.getResult());
+        String result = resultsBinding.resolveResult(operationVariables, actionReturnValues.getOutputs(), executableResults, actionReturnValues.getResult());
 
-        Map<String, String> operationReturnOutputs = outputsBinding.bindOutputs(operationContext, actionReturnValues.getOutputs(), executableOutputs);
+        Map<String, String> operationReturnOutputs = outputsBinding.bindOutputs(operationVariables, actionReturnValues.getOutputs(), executableOutputs);
 
         //todo: hook
 
