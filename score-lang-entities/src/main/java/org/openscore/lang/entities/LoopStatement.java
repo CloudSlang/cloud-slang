@@ -7,7 +7,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-package org.openscore.lang.compiler.modeller.model;
+package org.openscore.lang.entities;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -18,10 +18,12 @@ public class LoopStatement implements Serializable{
 
     private final String varName;
     private final String collectionExpression;
+    private final String type;
 
-    public LoopStatement(String varName, String collectionExpression) {
+    public LoopStatement(String varName, String collectionExpression, String type) {
         this.varName = varName;
         this.collectionExpression = collectionExpression;
+        this.type = type;
     }
 
     public String getVarName() {
@@ -30,6 +32,10 @@ public class LoopStatement implements Serializable{
 
     public String getCollectionExpression() {
         return collectionExpression;
+    }
+
+    public String getType() {
+        return type;
     }
 
     @Override
