@@ -44,15 +44,15 @@ Contact us at [here](mailto:support@openscore.io).
 ###### score-cli
 > The score command line interface.
 
-Install this globally and you'll have access to the `score` command anywhere on your system.
+Install this globally and you'll have access to the `slang` command anywhere on your system.
 
 ```shell
 npm install -g score-cli
 ```
 
-Now you can just use the `score` command anywhere
+Now you can just use the `slang` command anywhere
 ```shell
-score
+slang
 ```
 
 Refer to [openscore](http://openscore.io) website for more information.
