@@ -58,7 +58,7 @@ public class InputsBinding {
     private Serializable resolveValue(Input input, Map<String, ? extends Serializable> context, Map<String, ? extends Serializable> targetContext, Map<String, ? extends Serializable> systemProperties) {
         Serializable value = null;
         String inputName = input.getName();
-        if(context.containsKey(inputName) && !input.isOverride()) value = context.get(inputName);
+        if(context.containsKey(inputName) && input.isOverridable()) value = context.get(inputName);
         String fqspn = input.getSystemPropertyName();
         if(value == null && fqspn != null && systemProperties != null) value = systemProperties.get(fqspn);
         if(value == null && StringUtils.isNotEmpty(input.getExpression())){
