@@ -125,9 +125,7 @@ public class ScoreServicesImpl implements ScoreServices{
                     String taskName = (String)data.get(LanguageEventData.levelName.TASK_NAME.name());
 
                     if(StringUtils.isNotEmpty(taskName)){
-                        String path = (String) data.get(LanguageEventData.PATH);
-                        int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
-                        String prefix = StringUtils.repeat(TASK_PATH_PREFIX, matches);
+                        String prefix = getPrefix(data);
                         printWithColor(Ansi.Color.YELLOW, prefix + taskName);
                     }
                     break;
@@ -146,9 +144,7 @@ public class ScoreServicesImpl implements ScoreServices{
 
                 @SuppressWarnings("unchecked") Map<String, String> outputs = (Map<String, String>) data.get(LanguageEventData.OUTPUTS);
 
-                String path = (String) data.get(LanguageEventData.PATH);
-                int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
-                String prefix = StringUtils.repeat(TASK_PATH_PREFIX, matches);
+                String prefix = getPrefix(data);
 
                 if (outputs != null) {
                     if (!outputs.keySet().isEmpty()) {
@@ -168,6 +164,12 @@ public class ScoreServicesImpl implements ScoreServices{
                     }
                 }
             }
+        }
+
+        private String getPrefix(Map<String, Serializable> data) {
+            String path = (String) data.get(LanguageEventData.PATH);
+            int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
+            return StringUtils.repeat(TASK_PATH_PREFIX, matches);
         }
 
         private void printFinishEvent(Map<String, Serializable> data) {
