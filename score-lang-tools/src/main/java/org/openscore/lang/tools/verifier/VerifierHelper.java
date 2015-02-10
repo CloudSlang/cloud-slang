@@ -12,7 +12,6 @@ package org.openscore.lang.tools.verifier;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
-import org.openscore.api.ExecutionPlan;
 import org.openscore.lang.compiler.SlangCompiler;
 import org.openscore.lang.compiler.modeller.model.Executable;
 import org.openscore.lang.compiler.modeller.model.SlangFileType;
@@ -47,11 +46,10 @@ public class VerifierHelper {
 
     private Map<String, Executable> slangModels = new HashMap<>();
 
-    private Map<String, ExecutionPlan> executionPlans = new HashMap<>();
+    private Map<String, CompilationArtifact> compiledArtifacts = new HashMap<>();
 
 
     public void createAllSlangModelsFromDirectory(String directoryPath) throws IOException {
-        log.info("Starting to compile all files under: " + directoryPath);
         Validate.notNull(directoryPath, "Directory path path can not be null");
         Collection<File> slangFiles = FileUtils.listFiles(new File(directoryPath), SLANG_FILE_EXTENSIONS, true);
         log.info("Start compiling all slang files under: " + directoryPath);
@@ -77,27 +75,21 @@ public class VerifierHelper {
         Collection<Executable> models = slangModels.values();
         for(Executable slangModel : models) {
             Set<Executable> dependenciesModels = getModelDependenciesRecursively(slangModel);
+            CompilationArtifact compiledSource = compiledArtifacts.get(slangModel.getName());
             try {
-                //todo: add optimization - do not compile stuff that is already compiled
-                CompilationArtifact compilationArtifact = scoreCompiler.compile(slangModel, dependenciesModels);
-                if(compilationArtifact != null){
+                if (compiledSource == null) {
+                    compiledSource = scoreCompiler.compile(slangModel, dependenciesModels);
                     log.info("Compiled: " + slangModel.getName() + " successfully");
-                    executionPlans.put(slangModel.getName(), compilationArtifact.getExecutionPlan());
-                    Map<String, ExecutionPlan> dependencies = compilationArtifact.getDependencies();
-                    if(dependencies != null){
-                        for(Map.Entry<String, ExecutionPlan> dependency : dependencies.entrySet()){
-                            executionPlans.put(dependency.getKey(), dependency.getValue());
-                        }
-                    }
+                    compiledArtifacts.put(slangModel.getName(), compiledSource);
                 } else {
-                    log.info("Failed to compile: " + slangModel.getName());
+                    log.error("Failed to compile: " + slangModel.getName());
                 }
             } catch (Exception e) {
                 log.error("Failed compiling Slang source: " + slangModel.getName() + ". Exception is : " + e.getMessage());
                 throw e;
             }
         }
-        if(executionPlans.size() != slangModels.size()){
+        if(compiledArtifacts.size() != slangModels.size()){
             log.warn("Out of: " + slangModels.size() + " slang models, we managed to compile only: " + slangModels.size());
         }
     }
