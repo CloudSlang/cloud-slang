@@ -23,6 +23,7 @@ import org.openscore.lang.compiler.modeller.model.Task;
 import org.openscore.lang.compiler.modeller.model.Workflow;
 import org.openscore.lang.compiler.parser.model.ParsedSlang;
 import org.openscore.lang.compiler.modeller.transformers.Transformer;
+import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
 import org.openscore.lang.entities.bindings.Result;
@@ -36,8 +37,6 @@ import java.util.*;
 import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
-import static org.openscore.lang.entities.ScoreLangConstants.FAILURE_RESULT;
-import static org.openscore.lang.entities.ScoreLangConstants.SUCCESS_RESULT;
 
 /*
  * Created by orius123 on 09/11/14.
@@ -73,7 +72,7 @@ public class ExecutableBuilder {
         //action transformers and keys
         actionTransformers = filterTransformers(Transformer.Scope.ACTION);
         //action keys excluding each other
-        actionTransformerConstraintGroups = Arrays.asList(Arrays.asList("python_script", "java_action"));
+        actionTransformerConstraintGroups = Arrays.asList(Arrays.asList(ScoreLangConstants.PYTHON_SCRIPT_KEY, SlangTextualKeys.JAVA_ACTION));
 
         //task transformers and keys
         preTaskTransformers = filterTransformers(Transformer.Scope.BEFORE_TASK);
@@ -184,7 +183,7 @@ public class ExecutableBuilder {
         boolean isOnFailureDefined = onFailureWorkFlow != null;
 
         String defaultFailure = isOnFailureDefined ?
-                onFailureWorkFlow.getTasks().getFirst().getName() : FAILURE_RESULT;
+                onFailureWorkFlow.getTasks().getFirst().getName() : ScoreLangConstants.FAILURE_RESULT;
 
         while (iterator.hasNext()) {
             Map.Entry<String, Map<String, Object>> taskRawData = iterator.next();
@@ -201,7 +200,7 @@ public class ExecutableBuilder {
             if (nextTaskData != null) {
                 defaultSuccess = nextTaskData.getKey();
             } else {
-                defaultSuccess = onFailureSection ? FAILURE_RESULT : SUCCESS_RESULT;
+                defaultSuccess = onFailureSection ? ScoreLangConstants.FAILURE_RESULT : ScoreLangConstants.SUCCESS_RESULT;
             }
             Task task = compileTask(taskName, taskRawDataValue, defaultSuccess, imports, defaultFailure);
             tasks.add(task);
@@ -246,8 +245,8 @@ public class ExecutableBuilder {
         //default navigation
         if (MapUtils.isEmpty(navigationStrings)) {
             navigationStrings = new HashMap<>();
-            navigationStrings.put(SUCCESS_RESULT, defaultSuccess);
-            navigationStrings.put(FAILURE_RESULT, defaultFailure);
+            navigationStrings.put(ScoreLangConstants.SUCCESS_RESULT, defaultSuccess);
+            navigationStrings.put(ScoreLangConstants.FAILURE_RESULT, defaultFailure);
         }
 
         return new Task(taskName, preTaskData, postTaskData, navigationStrings, refId);
