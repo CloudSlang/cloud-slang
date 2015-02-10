@@ -28,12 +28,12 @@ import static org.openscore.api.execution.ExecutionParametersConsts.EXECUTION_RU
 public class Navigations {
 
     /**
-     * Return the next step position to navigate to
-     * In case an error key was set in the runtime services, throw an error event & return null
+     * Returns the next step position to navigate to.
+     * In case an error key was set in the runtime services, throw an error event and return null.
      *
      * @param runEnv the run environment
      * @param executionRuntimeServices the runtime services
-     * @return the step id the score engine needs to navigate to next
+     * @return the step id the score engine needs to navigate to the next step
      */
 	public Long navigate(@Param(RUN_ENV) RunEnvironment runEnv,
                         @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices) {
