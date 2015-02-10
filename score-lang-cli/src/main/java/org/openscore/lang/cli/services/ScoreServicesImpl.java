@@ -70,37 +70,15 @@ public class ScoreServicesImpl implements ScoreServices{
      * This method will trigger the flow in a synchronize matter, meaning only one flow can run at a time.
      * @param compilationArtifact the artifact to trigger
      * @param inputs : flow inputs
+     * @param isQuiet: omits to print task names if set to true
      * @return executionId
      */
-    @Override
-	public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties){
-        //add start event
-        Set<String> handlerTypes = new HashSet<>();
-        handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
-        handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
-        handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
-        handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
-        handlerTypes.add(EVENT_EXECUTION_FINISHED);
-        handlerTypes.add(EVENT_INPUT_END);
 
-        SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener();
-        slang.subscribeOnEvents(scoreEventListener, handlerTypes);
-
-        Long executionId = trigger(compilationArtifact, inputs, systemProperties);
-
-        while(!scoreEventListener.isFlowFinished()){
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException ignore) {}
-        }
-        slang.unSubscribeOnEvents(scoreEventListener);
-        return executionId;
-    }
     @Override
     public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties, boolean isQuiet){
         //add start event
         Set<String> handlerTypes = new HashSet<>();
-        if(isQuiet == true){
+        if(isQuiet){
             handlerTypes.add(EVENT_OUTPUT_END);
             handlerTypes.add(EVENT_EXECUTION_FINISHED);
         }
@@ -130,9 +108,6 @@ public class ScoreServicesImpl implements ScoreServices{
     private class SyncTriggerEventListener implements ScoreEventListener{
         private SyncTriggerEventListener(boolean quietListener) {
             this.quietListener = quietListener;
-        }
-        private SyncTriggerEventListener() {
-
         }
 
         private AtomicBoolean flowFinished = new AtomicBoolean(false);
@@ -170,26 +145,7 @@ public class ScoreServicesImpl implements ScoreServices{
                     break;
                 case ScoreLangConstants.EVENT_OUTPUT_END:
                     if(quietListener){
-                        if(data.containsKey(LanguageEventData.OUTPUTS) && data.containsKey(LanguageEventData.PATH) && data.get(LanguageEventData.PATH).equals("0/0")) {
-
-                            @SuppressWarnings("unchecked") Map<String, String> outputs = (Map<String, String>) data.get(LanguageEventData.OUTPUTS);
-                            if (outputs != null){
-                                if (!outputs.keySet().isEmpty()){
-                                    for (String key : outputs.keySet()) {
-                                        if(outputs.get(key).length() > 30){
-                                            String truncatedOutputValue = outputs.get(key).substring(0, 30) + "..";
-                                            outputs.put(key, truncatedOutputValue);
-                                        }
-                                        if (StringUtils.isEmpty(outputs.get(key))){
-                                            outputs.put(key, "(empty)");
-                                        }
-                                        outputs.put(key, outputs.get(key).replace("\n", " "));
-
-                                        printWithColor(Ansi.Color.GREEN, key + " = " + outputs.get(key));
-                                    }
-                                }
-                            }
-                        }
+                        printFlowOutputs(data);
                     }
                     break;
                 case EVENT_EXECUTION_FINISHED :
@@ -198,6 +154,29 @@ public class ScoreServicesImpl implements ScoreServices{
                     }
                     printFinishEvent(data);
                     break;
+            }
+        }
+
+        private void printFlowOutputs(Map<String, Serializable> data) {
+            if(data.containsKey(LanguageEventData.OUTPUTS) && data.containsKey(LanguageEventData.PATH) && data.get(LanguageEventData.PATH).equals("0/0")) {
+
+                @SuppressWarnings("unchecked") Map<String, String> outputs = (Map<String, String>) data.get(LanguageEventData.OUTPUTS);
+                if (outputs != null){
+                    if (!outputs.keySet().isEmpty()){
+                        for (String key : outputs.keySet()) {
+                            if(outputs.get(key).length() > 30){
+                                String truncatedOutputValue = outputs.get(key).substring(0, 30) + "..";
+                                outputs.put(key, truncatedOutputValue);
+                            }
+                            if (StringUtils.isEmpty(outputs.get(key))){
+                                outputs.put(key, "(empty)");
+                            }
+                            outputs.put(key, outputs.get(key).replace("\n", " "));
+
+                            printWithColor(Ansi.Color.GREEN, key + " = " + outputs.get(key));
+                        }
+                    }
+                }
             }
         }
 
