@@ -8,28 +8,34 @@
  */
 package org.openscore.lang.compiler;
 
-import org.openscore.lang.compiler.model.Executable;
+import org.openscore.lang.compiler.modeller.model.Executable;
 import org.openscore.lang.entities.CompilationArtifact;
 
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
-//todo: Eliya - add JavaDoc
 public interface SlangCompiler {
 
+    /**
+     * Compile a Slang source and its path to a {@link org.openscore.lang.entities.CompilationArtifact} object
+     * @param source the slang source file
+     * @param path a set of slang sources containing the source dependencies
+     * @return the compiled {@link org.openscore.lang.entities.CompilationArtifact}
+     */
     CompilationArtifact compile(SlangSource source, Set<SlangSource> path);
 
     /**
-     * Pre-compile a Slang file into a list of Executables
-     * @param source the slang source file
-     * @return a list of Executable objects, containing either a flow or a list of all the operations in the file
+     * Pre-compile a Slang source into an {@link org.openscore.lang.compiler.modeller.model.Executable}
+     * @param source the {@link org.openscore.lang.compiler.SlangSource}
+     * @return an {@link org.openscore.lang.compiler.modeller.model.Executable} object, containing either a flow or operation in the file.
+     *          Returns null if the source contains Slang system properties
      */
     Executable preCompile(SlangSource source);
 
     /**
      * Load system property sources written in slang and map them to fully qualified names
-     * @param sources the slang sources containing the system properties
+     * @param sources the {@link org.openscore.lang.compiler.SlangSource}s containing the system properties
      * @return map containing all of the system properties with fully qualified keys
      */
     Map<String, ? extends Serializable> loadSystemProperties(SlangSource... sources);
