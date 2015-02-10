@@ -23,7 +23,7 @@ public interface SlangTextualKeys {
     String OPERATION_TYPE = "operation";
 
     //flow
-    String FLOW_NAME_KEY = "name";
+    String EXECUTABLE_NAME_KEY = "name";
     String WORKFLOW_KEY = "workflow";
     String ON_FAILURE_KEY = "on_failure";
 
@@ -42,7 +42,7 @@ public interface SlangTextualKeys {
     String DEFAULT_KEY = "default";
     String REQUIRED_KEY = "required";
     String ENCRYPTED_KEY = "encrypted";
-    String OVERRIDE_KEY = "override";
+    String OVERRIDABLE_KEY = "overridable";
     String SYSTEM_PROPERTY_KEY = "system_property";
 
 }

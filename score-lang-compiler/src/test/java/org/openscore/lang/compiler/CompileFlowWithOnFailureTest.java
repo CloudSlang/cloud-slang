@@ -41,12 +41,12 @@ public class CompileFlowWithOnFailureTest {
     @Test
     public void testCompileOnFailureBasic() throws Exception {
         URI flow = getClass().getResource("/flow_with_on_failure.yaml").toURI();
-        URI operation = getClass().getResource("/operation.yaml").toURI();
+        URI operation = getClass().getResource("/test_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
 
-        CompilationArtifact compilationArtifact = compiler.compileFlow(SlangSource.fromFile(flow), path);
+        CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 10, executionPlan.getSteps().size());

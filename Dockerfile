@@ -15,7 +15,13 @@ ADD . /app-src/
 
 WORKDIR /app-src/
 
+RUN git clone http://github.com/openscore/slang-content.git
+
 RUN mvn package
+
+RUN mkdir -p score-lang-cli/target/slang/content/
+
+RUN cp -r slang-content/* score-lang-cli/target/slang/content
 
 WORKDIR score-lang-cli/target/slang/bin/
 

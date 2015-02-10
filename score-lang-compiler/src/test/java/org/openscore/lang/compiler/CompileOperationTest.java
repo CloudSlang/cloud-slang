@@ -10,7 +10,6 @@
 
 package org.openscore.lang.compiler;
 
-import ch.lambdaj.Lambda;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,8 +18,8 @@ import org.junit.runner.RunWith;
 import org.openscore.api.ExecutionPlan;
 import org.openscore.api.ExecutionStep;
 import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
-import org.openscore.lang.compiler.model.Executable;
-import org.openscore.lang.compiler.model.SlangFileType;
+import org.openscore.lang.compiler.modeller.model.Executable;
+import org.openscore.lang.compiler.modeller.model.SlangFileType;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Input;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +29,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
-import static org.hamcrest.Matchers.equalTo;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -50,33 +45,24 @@ public class CompileOperationTest {
 
     @Test
     public void testCompileOperationBasic() throws Exception {
-        URL resource = getClass().getResource("/operation.yaml");
-        ExecutionPlan executionPlan = compiler.compile(SlangSource.fromFile(resource.toURI()), "test_op", null).getExecutionPlan();
+        URL resource = getClass().getResource("/test_op.sl");
+        ExecutionPlan executionPlan = compiler.compile(SlangSource.fromFile(resource.toURI()), null).getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 3, executionPlan.getSteps().size());
     }
 
 	@Test
 	public void testCompileOperationMissingImport() throws Exception {
-		URL resource = getClass().getResource("/operation_mi.yaml");
+		URL resource = getClass().getResource("/operation_with_missing_sys_props_imports.sl");
 		exception.expect(RuntimeException.class);
 		exception.expectMessage("import");
-		compiler.compile(SlangSource.fromFile(resource.toURI()), "test_op", null).getExecutionPlan();
+		compiler.compile(SlangSource.fromFile(resource.toURI()), null).getExecutionPlan();
 	}
 
     @Test
-    public void wrongOperationName() throws Exception {
-        URL resource = getClass().getResource("/operation.yaml");
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("operation.yaml");
-        exception.expectMessage("blah");
-        compiler.compile(SlangSource.fromFile(resource.toURI()), "blah", null).getExecutionPlan();
-    }
-
-    @Test
     public void testCompileOperationWithData() throws Exception {
-        URL resource = getClass().getResource("/operation_with_data.yaml");
-        ExecutionPlan executionPlan = compiler.compile(SlangSource.fromFile(resource.toURI()), "test_op_2", null).getExecutionPlan();
+        URL resource = getClass().getResource("/operation_with_data.sl");
+        ExecutionPlan executionPlan = compiler.compile(SlangSource.fromFile(resource.toURI()), null).getExecutionPlan();
 
         ExecutionStep startStep = executionPlan.getStep(1L);
         @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) startStep.getActionData().get(ScoreLangConstants.EXECUTABLE_INPUTS_KEY);
@@ -100,9 +86,8 @@ public class CompileOperationTest {
 
     @Test
     public void testPreCompileOperationBasic() throws Exception {
-        URL resource = getClass().getResource("/operation.yaml");
-        List<Executable> preCompiledOperations = compiler.preCompile(SlangSource.fromFile(resource.toURI()));
-        Executable operation = Lambda.selectFirst(preCompiledOperations, having(on(Executable.class).getName(), equalTo("check_Weather")));
+        URL resource = getClass().getResource("/check_Weather.sl");
+        Executable operation = compiler.preCompile(SlangSource.fromFile(resource.toURI()));
 
         Assert.assertNotNull("preCompiledMetaData is null", operation);
         Assert.assertEquals("Operation name is wrong", "check_Weather", operation.getName());

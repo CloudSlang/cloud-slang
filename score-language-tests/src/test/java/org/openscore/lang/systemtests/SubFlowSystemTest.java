@@ -34,8 +34,13 @@ public class SubFlowSystemTest extends SystemsTestsParent {
     public void testCompileAndRunSubFlowBasic() throws Exception {
         URI resource = getClass().getResource("/yaml/sub-flow/parent_flow.yaml").toURI();
         URI subFlow = getClass().getResource("/yaml/sub-flow/child_flow.yaml").toURI();
-        URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(subFlow), SlangSource.fromFile(operations));
+        URI operation1 = getClass().getResource("/yaml/test_op.sl").toURI();
+        URI operation2 = getClass().getResource("/yaml/check_Weahther.sl").toURI();
+        URI operation3 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(subFlow),
+                                                SlangSource.fromFile(operation1),
+                                                SlangSource.fromFile(operation2),
+                                                SlangSource.fromFile(operation3));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
