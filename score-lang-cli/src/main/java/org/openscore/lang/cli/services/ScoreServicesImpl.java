@@ -132,39 +132,41 @@ public class ScoreServicesImpl implements ScoreServices{
                     }
                     break;
                 case ScoreLangConstants.EVENT_OUTPUT_END:
-                    if(data.containsKey(LanguageEventData.OUTPUTS) && !data.containsKey(LanguageEventData.levelName.TASK_NAME.name())) {
-
-                        @SuppressWarnings("unchecked") Map<String, String> outputs = (Map<String, String>) data.get(LanguageEventData.OUTPUTS);
-
-                        String path = (String) data.get(LanguageEventData.PATH);
-                        int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
-                        String prefix = StringUtils.repeat(TASK_PATH_PREFIX, matches);
-
-                        if (outputs != null) {
-                            if (!outputs.keySet().isEmpty()) {
-                                printWithColor(Ansi.Color.WHITE, prefix + "Outputs:");
-                            }
-                            for (String key : outputs.keySet()) {
-                                if (outputs.get(key).length() > 30) {
-                                    String truncatedOutputValue = outputs.get(key).substring(0, 30) + "..";
-                                    outputs.put(key, truncatedOutputValue);
-                                }
-                                if (StringUtils.isEmpty(outputs.get(key))) {
-                                    outputs.put(key, "(empty)");
-                                }
-                                outputs.put(key, outputs.get(key).replace("\n", " "));
-
-                                printWithColor(Ansi.Color.WHITE, prefix + "  " + key + " = " + outputs.get(key));
-                            }
-                        }
-                    }
-
-
+                    printOutputs(data);
                     break;
 
                 case EVENT_EXECUTION_FINISHED :
                     printFinishEvent(data);
                     break;
+            }
+        }
+
+        private void printOutputs(Map<String, Serializable> data) {
+            if(data.containsKey(LanguageEventData.OUTPUTS) && !data.containsKey(LanguageEventData.levelName.TASK_NAME.name())) {
+
+                @SuppressWarnings("unchecked") Map<String, String> outputs = (Map<String, String>) data.get(LanguageEventData.OUTPUTS);
+
+                String path = (String) data.get(LanguageEventData.PATH);
+                int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
+                String prefix = StringUtils.repeat(TASK_PATH_PREFIX, matches);
+
+                if (outputs != null) {
+                    if (!outputs.keySet().isEmpty()) {
+                        printWithColor(Ansi.Color.WHITE, prefix + "Outputs:");
+                    }
+                    for (String key : outputs.keySet()) {
+                        if (outputs.get(key).length() > 30) {
+                            String truncatedOutputValue = outputs.get(key).substring(0, 30) + "..";
+                            outputs.put(key, truncatedOutputValue);
+                        }
+                        if (StringUtils.isEmpty(outputs.get(key))) {
+                            outputs.put(key, "(empty)");
+                        }
+                        outputs.put(key, outputs.get(key).replace("\n", " "));
+
+                        printWithColor(Ansi.Color.WHITE, prefix + "  " + key + " = " + outputs.get(key));
+                    }
+                }
             }
         }
 
