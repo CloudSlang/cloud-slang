@@ -14,14 +14,21 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Context implements Serializable{
 
     private final Map<String, Serializable> variables;
+    private final Map<String, Serializable> langVariables;
 
     public Context(Map<String, Serializable> variables) {
         this.variables = variables;
+        langVariables = new HashMap<>();
+    }
+
+    public void putVariable(String name, Serializable value) {
+        variables.put(name, value);
     }
 
     public void putVariables(Map<String, ? extends Serializable> newVariables) {
@@ -30,6 +37,10 @@ public class Context implements Serializable{
 
     public Map<String, Serializable> getImmutableViewOfVariables() {
         return Collections.unmodifiableMap(variables);
+    }
+
+    public Map<String, Serializable> getLangVariables() {
+        return langVariables;
     }
 
     @Override
@@ -41,6 +52,7 @@ public class Context implements Serializable{
 
         return new EqualsBuilder()
                 .append(variables, that.variables)
+                .append(langVariables, that.langVariables)
                 .isEquals();
     }
 
@@ -48,6 +60,7 @@ public class Context implements Serializable{
     public int hashCode() {
         return new HashCodeBuilder()
                 .append(variables)
+                .append(langVariables)
                 .toHashCode();
     }
 }
