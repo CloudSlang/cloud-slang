@@ -43,6 +43,7 @@ public class ScoreServicesImpl implements ScoreServices{
     public static final String SLANG_STEP_ERROR_MSG = "Slang Error : ";
     public static final String SCORE_ERROR_EVENT_MSG = "Score Error Event :";
     public static final String FLOW_FINISHED_WITH_FAILURE_MSG = "Flow finished with failure";
+    public static final int OUTPUT_VALUE_LIMIT = 40;
 
     @Autowired
     private Slang slang;
@@ -140,26 +141,22 @@ public class ScoreServicesImpl implements ScoreServices{
         }
 
         private void printOutputs(Map<String, Serializable> data) {
-            if(data.containsKey(LanguageEventData.OUTPUTS) && !data.containsKey(LanguageEventData.levelName.TASK_NAME.name())) {
+            if(data.containsKey(LanguageEventData.OUTPUTS) && data.containsKey(LanguageEventData.PATH) && data.get(LanguageEventData.PATH).equals("0/0")) {
 
                 @SuppressWarnings("unchecked") Map<String, String> outputs = (Map<String, String>) data.get(LanguageEventData.OUTPUTS);
 
                 String prefix = getPrefix(data);
 
-                if (outputs != null) {
-                    if (!outputs.keySet().isEmpty()) {
-                        printWithColor(Ansi.Color.WHITE, prefix + "Outputs:");
-                    }
+                if (outputs != null && !outputs.keySet().isEmpty()) {
+
+                    printWithColor(Ansi.Color.WHITE, prefix + "Outputs:");
+
                     for (String key : outputs.keySet()) {
-                        if (outputs.get(key).length() > 30) {
-                            String truncatedOutputValue = outputs.get(key).substring(0, 30) + "..";
-                            outputs.put(key, truncatedOutputValue);
-                        }
-                        if (StringUtils.isEmpty(outputs.get(key))) {
+                        String outputValue = outputs.get(key).replace("\n", " ");
+                        outputs.put(key, StringUtils.abbreviate(outputValue, 0, OUTPUT_VALUE_LIMIT));
+                        if (StringUtils.isEmpty(outputValue)) {
                             outputs.put(key, "(empty)");
                         }
-                        outputs.put(key, outputs.get(key).replace("\n", " "));
-
                         printWithColor(Ansi.Color.WHITE, prefix + "  " + key + " = " + outputs.get(key));
                     }
                 }
