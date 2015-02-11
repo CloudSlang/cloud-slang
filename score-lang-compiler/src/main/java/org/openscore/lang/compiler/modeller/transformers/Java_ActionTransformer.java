@@ -14,19 +14,40 @@ package org.openscore.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
-import org.openscore.lang.compiler.modeller.transformers.Transformer;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import static org.openscore.lang.entities.ScoreLangConstants.ACTION_CLASS_KEY;
+import static org.openscore.lang.entities.ScoreLangConstants.ACTION_METHOD_KEY;
 
 @Component
 public class Java_ActionTransformer implements Transformer<Map<String, String>, Map<String, String>> {
 
     @Override
     public Map<String, String> transform(Map<String, String> rawData) {
+        Set<String> expectedKeySet = new HashSet<>(Arrays.asList(ACTION_CLASS_KEY, ACTION_METHOD_KEY));
+
+        if (rawData != null) {
+            // validation case: there is at least one key under java_action property
+            Set<String> actualKeySet = rawData.keySet();
+
+            for (String key : actualKeySet) {
+                if (!expectedKeySet.remove(key)) {
+                    throw new RuntimeException("Invalid key for java action: " + key);
+                }
+            }
+
+            if (!expectedKeySet.isEmpty()) {
+                throw new RuntimeException("The following keys for java action are missing: " + StringUtils.join(expectedKeySet, ","));
+            }
+        }
+
         return rawData;
     }
 
