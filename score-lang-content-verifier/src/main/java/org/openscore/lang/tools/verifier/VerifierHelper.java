@@ -32,6 +32,10 @@ import static org.openscore.lang.compiler.SlangSource.fromFile;
 /*
  * Created by stoneo on 2/9/2015.
  */
+
+/**
+ * Verifies all files with extensions: .sl, .sl.yaml or .sl.yml in a given directory are valid
+ */
 public class VerifierHelper {
 
     @Autowired
@@ -48,8 +52,16 @@ public class VerifierHelper {
 
     private Map<String, CompilationArtifact> compiledArtifacts = new HashMap<>();
 
+    /**
+     * Transform all Slang files in given directory to Slang models, and store them
+     * @param directoryPath given directory containing all Slang files
+     */
+    public void verifyAllSlangFilesInDirAreValid(String directoryPath){
+        transformSlangFilesInDirToModels(directoryPath);
+        compileAllSlangModels();
+    }
 
-    public void createAllSlangModelsFromDirectory(String directoryPath) throws IOException {
+    private void transformSlangFilesInDirToModels(String directoryPath) {
         Validate.notNull(directoryPath, "Directory path path can not be null");
         Collection<File> slangFiles = FileUtils.listFiles(new File(directoryPath), SLANG_FILE_EXTENSIONS, true);
         log.info("Start compiling all slang files under: " + directoryPath);
@@ -71,7 +83,7 @@ public class VerifierHelper {
         }
     }
 
-    public void compileAllSlangModelsInDirectory() throws IOException {
+    private void compileAllSlangModels()  {
         Collection<Executable> models = slangModels.values();
         for(Executable slangModel : models) {
             try {

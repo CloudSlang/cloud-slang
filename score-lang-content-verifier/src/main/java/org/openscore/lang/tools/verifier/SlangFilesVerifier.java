@@ -23,12 +23,11 @@ public class SlangFilesVerifier {
         ApplicationContext context = new AnnotationConfigApplicationContext(VerifierSpringConfiguration.class);
         VerifierHelper verifierHelper = context.getBean(VerifierHelper.class);
         try {
-            verifierHelper.createAllSlangModelsFromDirectory(repositoryPath);
-            verifierHelper.compileAllSlangModelsInDirectory();
+            verifierHelper.verifyAllSlangFilesInDirAreValid(repositoryPath);
             System.out.println("SUCCESS: All slang files under directory: \"" + repositoryPath + "\" are valid.");
             System.exit(0);
         } catch (Exception e) {
-            System.out.println("FAILURE: Validation of slang files under directory: \"" + repositoryPath + "\" failed.\n" + e.getMessage());
+            System.out.println(e.getMessage() + "\n\nFAILURE: Validation of slang files under directory: \"" + repositoryPath + "\" failed.");
             System.exit(1);
         }
     }
