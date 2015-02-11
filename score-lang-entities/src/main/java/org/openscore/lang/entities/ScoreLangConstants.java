@@ -27,6 +27,7 @@ public interface ScoreLangConstants {
     String PYTHON_SCRIPT_KEY = "python_script";
     //navigation
     String NEXT_STEP_ID_KEY = "nextStepId";
+    String PREVIOUS_STEP_ID_KEY = "previousStepId";
 
     //operation scope
     String EXECUTABLE_INPUTS_KEY = "executableInputs";
