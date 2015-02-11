@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.openscore.lang.entities;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -25,6 +26,11 @@ public class LoopStatement implements Serializable{
     private final Type type;
 
     public LoopStatement(String varName, String collectionExpression, Type type) {
+        Validate.notBlank(varName, "var name cannot be empty");
+        Validate.notBlank(collectionExpression, "collection expression cannot be empty");
+        Validate.notNull(type, "type cannot be null");
+        //todo add tests
+
         this.varName = varName;
         this.collectionExpression = collectionExpression;
         this.type = type;

@@ -9,12 +9,18 @@
 *******************************************************************************/
 package org.openscore.lang.runtime.steps;
 
+import junit.framework.Assert;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.openscore.events.ScoreEvent;
+import org.openscore.lang.ExecutionRuntimeServices;
 import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
 import org.openscore.lang.runtime.bindings.InputsBinding;
+import org.openscore.lang.runtime.bindings.LoopsBinding;
 import org.openscore.lang.runtime.bindings.OutputsBinding;
 import org.openscore.lang.runtime.bindings.ScriptEvaluator;
 import org.openscore.lang.runtime.env.Context;
@@ -22,11 +28,6 @@ import org.openscore.lang.runtime.env.ParentFlowData;
 import org.openscore.lang.runtime.env.ReturnValues;
 import org.openscore.lang.runtime.env.RunEnvironment;
 import org.openscore.lang.runtime.events.LanguageEventData;
-import junit.framework.Assert;
-import org.openscore.events.ScoreEvent;
-import org.openscore.lang.ExecutionRuntimeServices;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,11 +44,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static org.openscore.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
-import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
-import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
-import static org.openscore.lang.entities.ScoreLangConstants.FAILURE_RESULT;
-import static org.openscore.lang.entities.ScoreLangConstants.SUCCESS_RESULT;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;
@@ -55,6 +51,11 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.openscore.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
+import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
+import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
+import static org.openscore.lang.entities.ScoreLangConstants.FAILURE_RESULT;
+import static org.openscore.lang.entities.ScoreLangConstants.SUCCESS_RESULT;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TaskStepsTest.Config.class)
@@ -72,17 +73,23 @@ public class TaskStepsTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
+    private RunEnvironment createRunEnvironment() {
+        RunEnvironment runEnvironment = new RunEnvironment();
+        runEnvironment.getStack().pushContext(new Context(new HashMap<String, Serializable>()));
+        return runEnvironment;
+    }
+
     @Test
     public void testBeginTaskEmptyInputs() throws Exception {
-        RunEnvironment runEnv = new RunEnvironment();
-        taskSteps.beginTask(new ArrayList<Input>(),runEnv, createRuntimeServices(),"task1", 1L, 2L, "2");
+        RunEnvironment runEnv = createRunEnvironment();
+        taskSteps.beginTask(new ArrayList<Input>(), null, runEnv, createRuntimeServices(),"task1", 1L, 2L, "2");
         Map<String,Serializable> callArgs = runEnv.removeCallArguments();
         Assert.assertTrue(callArgs.isEmpty());
     }
 
     @Test
     public void testBeginTaskSetNextPosition() throws Exception {
-        RunEnvironment runEnv = new RunEnvironment();
+        RunEnvironment runEnv = createRunEnvironment();
         Long runningExecutionPlanId = 1L;
         Long nextStepId = 2L;
         Long subflowBeginStepId = 7L;
@@ -93,7 +100,7 @@ public class TaskStepsTest {
         HashMap<String, Long> beginStepsIds = new HashMap<>();
         beginStepsIds.put(refExecutionPlanId, subflowBeginStepId);
         ExecutionRuntimeServices runtimeServices = createRuntimeServicesWithSubflows(runningPlansIds, beginStepsIds);
-        taskSteps.beginTask(new ArrayList<Input>(), runEnv, runtimeServices, "task1", runningExecutionPlanId, nextStepId, refExecutionPlanId);
+        taskSteps.beginTask(new ArrayList<Input>(), null, runEnv, runtimeServices, "task1", runningExecutionPlanId, nextStepId, refExecutionPlanId);
 
         ParentFlowData parentFlowData = runEnv.getParentFlowStack().popParentFlowData();
         Assert.assertEquals(runningExecutionPlanId, parentFlowData.getRunningExecutionPlanId());
@@ -103,7 +110,7 @@ public class TaskStepsTest {
 
     @Test(timeout = 3000L)
     public void testBeginTaskInputsEvents() throws Exception {
-        RunEnvironment runEnv = new RunEnvironment();
+        RunEnvironment runEnv = createRunEnvironment();
         List<Input> inputs = Arrays.asList(new Input("input1", "input1"), new Input("input2", "input2"));
         Map<String,Serializable> resultMap = new HashMap<>();
         resultMap.put("input1",5);
@@ -112,7 +119,7 @@ public class TaskStepsTest {
         when(inputsBinding.bindInputs(eq(inputs), anyMap(), anyMap())).thenReturn(resultMap);
 
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
-        taskSteps.beginTask(inputs,runEnv,runtimeServices,"task1", 1L, 2L, "2");
+        taskSteps.beginTask(inputs,null,runEnv,runtimeServices,"task1", 1L, 2L, "2");
         Map<String,Serializable> callArgs = runEnv.removeCallArguments();
         Assert.assertFalse(callArgs.isEmpty());
         Assert.assertEquals(5, callArgs.get("input1"));
@@ -131,10 +138,9 @@ public class TaskStepsTest {
         Assert.assertEquals(3,boundInputs.get("input2"));
     }
 
-
     @Test
     public void testEndTaskEvents() throws Exception {
-        RunEnvironment runEnv = new RunEnvironment();
+        RunEnvironment runEnv = createRunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String,String>(),SUCCESS_RESULT));
         Context context = new Context(new HashMap<String, Serializable>());
         runEnv.getStack().pushContext(context);
@@ -166,7 +172,7 @@ public class TaskStepsTest {
     @Test
     public void testEndTaskWithPublish() throws Exception {
         List<Output> possiblePublishValues = Arrays.asList(new Output("name", "name"));
-        RunEnvironment runEnv = new RunEnvironment();
+        RunEnvironment runEnv = createRunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), SUCCESS_RESULT));
         Context context = new Context(new HashMap<String, Serializable>());
         runEnv.getStack().pushContext(context);
@@ -186,7 +192,7 @@ public class TaskStepsTest {
 
     @Test
     public void testEndTaskSetNextPosition() throws Exception {
-        RunEnvironment runEnv = new RunEnvironment();
+        RunEnvironment runEnv = createRunEnvironment();
         String result = SUCCESS_RESULT;
         Context context = new Context(new HashMap<String, Serializable>());
         runEnv.getStack().pushContext(context);
@@ -206,7 +212,7 @@ public class TaskStepsTest {
 
     @Test
     public void testEndTaskMissingNavigationForExecutableResult() throws Exception {
-        RunEnvironment runEnv = new RunEnvironment();
+        RunEnvironment runEnv = createRunEnvironment();
         String result = "CUSTOM";
         Context context = new Context(new HashMap<String, Serializable>());
         runEnv.getStack().pushContext(context);
@@ -249,6 +255,11 @@ public class TaskStepsTest {
         @Bean
         public OutputsBinding outputsBinding() {
             return mock(OutputsBinding.class);
+        }
+
+        @Bean
+        public LoopsBinding loopsBinding() {
+            return mock(LoopsBinding.class);
         }
 
         @Bean

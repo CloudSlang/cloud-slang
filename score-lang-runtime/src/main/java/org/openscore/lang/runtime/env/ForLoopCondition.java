@@ -25,23 +25,21 @@ public class ForLoopCondition implements LoopCondition {
         this.iterator = iterator;
     }
 
-    public static ForLoopCondition create(Serializable serializable, String collectionExpression, String nodeName){
+    public static ForLoopCondition create(Serializable loopCollection){
         Iterator<? extends Serializable> iterator;
 
-        if (serializable instanceof Iterable) {
-            Iterable<Serializable> serializableIterable = (Iterable<Serializable>) serializable;
+        if (loopCollection instanceof Iterable) {
+            Iterable<Serializable> serializableIterable = (Iterable<Serializable>) loopCollection;
             iterator = serializableIterable.iterator();
-        } else if (serializable instanceof String) {
-            String[] strings = ((String) serializable).split(Pattern.quote(","));
+        } else if (loopCollection instanceof String) {
+            String[] strings = ((String) loopCollection).split(Pattern.quote(","));
             List<String> list = Arrays.asList(strings);
             iterator = list.iterator();
-        } else if (serializable instanceof PyObject) {
-            PyObject pyObject = (PyObject) serializable;
+        } else if (loopCollection instanceof PyObject) {
+            PyObject pyObject = (PyObject) loopCollection;
             iterator = pyObject.asIterable().iterator();
         } else {
-            throw new RuntimeException("collection expression: '" + collectionExpression + "' in the 'for' loop " +
-                    "in task: '" + nodeName + "' " +
-                    "doesn't return an iterable, other types are not supported");
+            return null;
         }
 
         return new ForLoopCondition(iterator);

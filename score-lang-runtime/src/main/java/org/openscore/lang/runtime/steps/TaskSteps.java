@@ -10,20 +10,24 @@
 package org.openscore.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
+import org.apache.commons.lang3.tuple.Pair;
+import org.openscore.api.execution.ExecutionParametersConsts;
+import org.openscore.lang.ExecutionRuntimeServices;
+import org.openscore.lang.entities.LoopStatement;
 import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
 import org.openscore.lang.runtime.bindings.InputsBinding;
+import org.openscore.lang.runtime.bindings.LoopsBinding;
 import org.openscore.lang.runtime.bindings.OutputsBinding;
 import org.openscore.lang.runtime.env.Context;
+import org.openscore.lang.runtime.env.ForLoopCondition;
+import org.openscore.lang.runtime.env.LoopCondition;
 import org.openscore.lang.runtime.env.ParentFlowData;
 import org.openscore.lang.runtime.env.ParentFlowStack;
 import org.openscore.lang.runtime.env.ReturnValues;
 import org.openscore.lang.runtime.env.RunEnvironment;
 import org.openscore.lang.runtime.events.LanguageEventData;
-import org.apache.commons.lang3.tuple.Pair;
-import org.openscore.api.execution.ExecutionParametersConsts;
-import org.openscore.lang.ExecutionRuntimeServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,8 +36,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.openscore.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
 import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
+import static org.openscore.lang.entities.ScoreLangConstants.LOOP_KEY;
 import static org.openscore.lang.entities.ScoreLangConstants.NEXT_STEP_ID_KEY;
 import static org.openscore.lang.entities.ScoreLangConstants.NODE_NAME_KEY;
 import static org.openscore.lang.entities.ScoreLangConstants.REF_ID;
@@ -41,7 +47,6 @@ import static org.openscore.lang.entities.ScoreLangConstants.RUN_ENV;
 import static org.openscore.lang.entities.ScoreLangConstants.TASK_INPUTS_KEY;
 import static org.openscore.lang.entities.ScoreLangConstants.TASK_NAVIGATION_KEY;
 import static org.openscore.lang.entities.ScoreLangConstants.TASK_PUBLISH_KEY;
-import static org.openscore.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
 /**
  * User: stoneo
@@ -57,8 +62,12 @@ public class TaskSteps extends AbstractSteps {
     @Autowired
     private OutputsBinding outputsBinding;
 
+    @Autowired
+    private LoopsBinding loopsBinding;
+
 
     public void beginTask(@Param(TASK_INPUTS_KEY) List<Input> taskInputs,
+                          @Param(LOOP_KEY) LoopStatement loopStatement,
                           @Param(RUN_ENV) RunEnvironment runEnv,
                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                           @Param(NODE_NAME_KEY) String nodeName,
@@ -71,8 +80,20 @@ public class TaskSteps extends AbstractSteps {
         runEnv.removeReturnValues();
 
         Context flowContext = runEnv.getStack().popContext();
-        Map<String, Serializable> flowVariables = flowContext == null ? null : flowContext.getImmutableViewOfVariables();
 
+        if (shouldHandleLoop(loopStatement)) {
+            LoopCondition loopCondition = loopsBinding.getOrCreateLoopCondition(loopStatement, flowContext, nodeName);
+            if (!loopCondition.hasMore()) {
+                runEnv.putNextStepPosition(nextStepId);
+                return;
+            }
+
+            if (loopCondition instanceof ForLoopCondition) {
+                loopsBinding.incrementForLoop(loopStatement.getVarName(), flowContext, (ForLoopCondition) loopCondition);
+            }
+        }
+
+        Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
         Map<String, Serializable> operationArguments = inputsBinding.bindInputs(taskInputs, flowVariables, runEnv.getSystemProperties());
 
         //todo: hook
@@ -88,6 +109,10 @@ public class TaskSteps extends AbstractSteps {
         // We set the start step of the given ref as the next step to execute (in the new running execution plan that will be set)
         runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
 
+    }
+
+    private boolean shouldHandleLoop(LoopStatement loopStatement) {
+        return loopStatement != null;
     }
 
     public void endTask(@Param(RUN_ENV) RunEnvironment runEnv,
