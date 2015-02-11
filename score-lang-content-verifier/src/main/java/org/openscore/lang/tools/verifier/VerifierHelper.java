@@ -42,6 +42,7 @@ public class VerifierHelper {
 
     private final static Logger log = Logger.getLogger(SlangFilesVerifier.class);
 
+    //todo: do we want to validate also yaml files?
     private String[] SLANG_FILE_EXTENSIONS = {"sl"};
 
     private Map<String, Executable> slangModels = new HashMap<>();
@@ -67,7 +68,7 @@ public class VerifierHelper {
             slangModels.put(getUniqueName(sourceModel), sourceModel);
         }
         if(slangFiles.size() != slangModels.size()){
-            log.warn("We found: " + slangFiles.size() + " .sl files in path: " + directoryPath + ". We managed to create slang models for only: " + slangModels.size());
+            throw new RuntimeException("We found: " + slangFiles.size() + " .sl files in path: " + directoryPath + ". We managed to create slang models for only: " + slangModels.size());
         }
     }
 
@@ -90,7 +91,7 @@ public class VerifierHelper {
             }
         }
         if(compiledArtifacts.size() != slangModels.size()){
-            log.warn("Out of: " + slangModels.size() + " slang models, we managed to compile only: " + slangModels.size());
+            throw new RuntimeException("Out of: " + slangModels.size() + " slang models, we managed to compile only: " + slangModels.size());
         }
     }
 
