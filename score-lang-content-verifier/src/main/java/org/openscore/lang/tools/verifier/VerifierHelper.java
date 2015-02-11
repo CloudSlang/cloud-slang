@@ -42,8 +42,7 @@ public class VerifierHelper {
 
     private final static Logger log = Logger.getLogger(SlangFilesVerifier.class);
 
-    //todo: do we want to validate also yaml files?
-    private String[] SLANG_FILE_EXTENSIONS = {"sl"};
+    private String[] SLANG_FILE_EXTENSIONS = {"sl", "sl.yaml", "sl.yml"};
 
     private Map<String, Executable> slangModels = new HashMap<>();
 
@@ -75,9 +74,9 @@ public class VerifierHelper {
     public void compileAllSlangModelsInDirectory() throws IOException {
         Collection<Executable> models = slangModels.values();
         for(Executable slangModel : models) {
-            Set<Executable> dependenciesModels = getModelDependenciesRecursively(slangModel);
-            CompilationArtifact compiledSource = compiledArtifacts.get(slangModel.getName());
             try {
+                Set<Executable> dependenciesModels = getModelDependenciesRecursively(slangModel);
+                CompilationArtifact compiledSource = compiledArtifacts.get(slangModel.getName());
                 if (compiledSource == null) {
                     compiledSource = scoreCompiler.compile(slangModel, dependenciesModels);
                     log.info("Compiled: " + slangModel.getName() + " successfully");
@@ -93,6 +92,9 @@ public class VerifierHelper {
         if(compiledArtifacts.size() != slangModels.size()){
             throw new RuntimeException("Out of: " + slangModels.size() + " slang models, we managed to compile only: " + slangModels.size());
         }
+        String successMessage = "Successfully finished Compilation of: " + compiledArtifacts.size() + " Slang files";
+        log.info(successMessage);
+        System.out.println(successMessage);
     }
 
     private Set<Executable> getModelDependenciesRecursively(Executable slangModel) {
@@ -100,6 +102,9 @@ public class VerifierHelper {
         Set<Executable> dependenciesModels = new HashSet<>();
         for (String dependencyName : sourceDependencies.keySet()) {
             Executable dependency = slangModels.get(dependencyName);
+            if(dependency == null){
+                throw new RuntimeException("Failed compiling slang source: " + slangModel.getName() + ". Missing dependency: " + dependencyName);
+            }
             dependenciesModels.add(dependency);
             dependenciesModels.addAll(getModelDependenciesRecursively(dependency));
         }
