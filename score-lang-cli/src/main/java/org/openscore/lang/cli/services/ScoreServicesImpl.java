@@ -46,6 +46,7 @@ public class ScoreServicesImpl implements ScoreServices{
     public static final String SLANG_STEP_ERROR_MSG = "Slang Error : ";
     public static final String SCORE_ERROR_EVENT_MSG = "Score Error Event :";
     public static final String FLOW_FINISHED_WITH_FAILURE_MSG = "Flow finished with failure";
+    public static final int OUTPUT_VALUE_LIMIT = 40;
 
     @Autowired
     private Slang slang;
@@ -89,9 +90,10 @@ public class ScoreServicesImpl implements ScoreServices{
             handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
             handlerTypes.add(EVENT_EXECUTION_FINISHED);
             handlerTypes.add(EVENT_INPUT_END);
+            handlerTypes.add(EVENT_OUTPUT_END);
         }
 
-        SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener(isQuiet);
+        SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener();
         slang.subscribeOnEvents(scoreEventListener, handlerTypes);
 
         Long executionId = trigger(compilationArtifact, inputs, systemProperties);
@@ -105,51 +107,44 @@ public class ScoreServicesImpl implements ScoreServices{
         return executionId;
     }
 
-    private class SyncTriggerEventListener implements ScoreEventListener{
-        private SyncTriggerEventListener(boolean quietListener) {
-            this.quietListener = quietListener;
-        }
+    private class SyncTriggerEventListener implements ScoreEventListener {
 
         private AtomicBoolean flowFinished = new AtomicBoolean(false);
-        private boolean quietListener;
+
         public boolean isFlowFinished() {
             return flowFinished.get();
         }
 
         @Override
         public synchronized void onEvent(ScoreEvent scoreEvent) throws InterruptedException {
-            @SuppressWarnings("unchecked") Map<String,Serializable> data = (Map<String,Serializable>)scoreEvent.getData();
-            switch (scoreEvent.getEventType()){
-                case EventConstants.SCORE_FINISHED_EVENT :
+            @SuppressWarnings("unchecked") Map<String, Serializable> data = (Map<String, Serializable>) scoreEvent.getData();
+            switch (scoreEvent.getEventType()) {
+                case EventConstants.SCORE_FINISHED_EVENT:
                     flowFinished.set(true);
                     break;
-                case EventConstants.SCORE_ERROR_EVENT :
+                case EventConstants.SCORE_ERROR_EVENT:
                     printWithColor(Ansi.Color.RED, SCORE_ERROR_EVENT_MSG + data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " +
                             data.get(EventConstants.SCORE_ERROR_MSG));
                     break;
-                case EventConstants.SCORE_FAILURE_EVENT :
-                    printWithColor(Ansi.Color.RED,FLOW_FINISHED_WITH_FAILURE_MSG);
+                case EventConstants.SCORE_FAILURE_EVENT:
+                    printWithColor(Ansi.Color.RED, FLOW_FINISHED_WITH_FAILURE_MSG);
                     flowFinished.set(true);
                     break;
                 case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
-                    printWithColor(Ansi.Color.RED,SLANG_STEP_ERROR_MSG + data.get(EXCEPTION));
+                    printWithColor(Ansi.Color.RED, SLANG_STEP_ERROR_MSG + data.get(EXCEPTION));
                     break;
                 case ScoreLangConstants.EVENT_INPUT_END:
                     String taskName = (String)data.get(LanguageEventData.levelName.TASK_NAME.name());
                     if(StringUtils.isNotEmpty(taskName)){
-                        String path = (String) data.get(LanguageEventData.PATH);
-                        int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
-                        String prefix = StringUtils.repeat(TASK_PATH_PREFIX, matches);
+                        String prefix = getPrefix(data);
                         printWithColor(Ansi.Color.YELLOW, prefix + taskName);
                     }
                     break;
                 case ScoreLangConstants.EVENT_OUTPUT_END:
-                    if(quietListener){
-                        printFlowOutputs(data);
-                    }
+                        printOutputs(data);
                     break;
-                case EVENT_EXECUTION_FINISHED :
-                   if (!flowFinished.get()){
+                case EVENT_EXECUTION_FINISHED:
+                    if (!flowFinished.get()) {
                         flowFinished.set(true);
                     }
                     printFinishEvent(data);
@@ -157,27 +152,33 @@ public class ScoreServicesImpl implements ScoreServices{
             }
         }
 
-        private void printFlowOutputs(Map<String, Serializable> data) {
-            if(data.containsKey(LanguageEventData.OUTPUTS) && data.containsKey(LanguageEventData.PATH) && data.get(LanguageEventData.PATH).equals("0/0")) {
+        private void printOutputs(Map<String, Serializable> data) {
+            if (data.containsKey(LanguageEventData.OUTPUTS) && data.containsKey(LanguageEventData.PATH) && data.get(LanguageEventData.PATH).equals("0/0")) {
 
                 @SuppressWarnings("unchecked") Map<String, String> outputs = (Map<String, String>) data.get(LanguageEventData.OUTPUTS);
-                if (outputs != null){
-                    if (!outputs.keySet().isEmpty()){
-                        for (String key : outputs.keySet()) {
-                            if(outputs.get(key).length() > 30){
-                                String truncatedOutputValue = outputs.get(key).substring(0, 30) + "..";
-                                outputs.put(key, truncatedOutputValue);
-                            }
-                            if (StringUtils.isEmpty(outputs.get(key))){
-                                outputs.put(key, "(empty)");
-                            }
-                            outputs.put(key, outputs.get(key).replace("\n", " "));
 
-                            printWithColor(Ansi.Color.GREEN, key + " = " + outputs.get(key));
+                String prefix = getPrefix(data);
+
+                if (outputs != null && !outputs.keySet().isEmpty()) {
+
+                    printWithColor(Ansi.Color.WHITE, prefix + "Outputs:");
+
+                    for (String key : outputs.keySet()) {
+                        String outputValue = outputs.get(key).replace("\n", " ");
+                        outputs.put(key, StringUtils.abbreviate(outputValue, 0, OUTPUT_VALUE_LIMIT));
+                        if (StringUtils.isEmpty(outputValue)) {
+                            outputs.put(key, "(empty)");
                         }
+                        printWithColor(Ansi.Color.WHITE, prefix + "  " + key + " = " + outputs.get(key));
                     }
                 }
             }
+        }
+
+        private String getPrefix(Map<String, Serializable> data) {
+            String path = (String) data.get(LanguageEventData.PATH);
+            int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
+            return StringUtils.repeat(TASK_PATH_PREFIX, matches);
         }
 
         private void printFinishEvent(Map<String, Serializable> data) {

@@ -65,7 +65,7 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath,
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, Serializable> inputs,
             @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = "comma separated list of system property file locations") final List<String> systemPropertyFiles,
-            @CliOption(key = {"log"}, mandatory = false, help = "info - shows just the flow output; debug - shows all steps") final String logValue) throws IOException {
+            @CliOption(key = {"", "q", "quiet"}, mandatory = false, help = "quiet", specifiedDefaultValue = "true",unspecifiedDefaultValue = "false") final Boolean quiet) throws IOException {
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, classPath);
         Map<String, ? extends Serializable> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
@@ -73,15 +73,9 @@ public class SlangCLI implements CommandMarker {
         if (!triggerAsync) {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            if(logValue == null || logValue.equals("DEBUG")) {
-                id = scoreServices.triggerSync(compilationArtifact, inputs, systemProperties, false);
-            }else if(logValue.equals("INFO")){
-                id = scoreServices.triggerSync(compilationArtifact, inputs, systemProperties, true);
-            }else{
-                return "Wrong value for --log. Valid: INFO, DEBUG.";
-            }
+            id = scoreServices.triggerSync(compilationArtifact, inputs, systemProperties, quiet);
             stopWatch.stop();
-            return (logValue == null || logValue.equals("DEBUG")) ? triggerAsyncMsg(id, compilationArtifact.getExecutionPlan().getName()) : "";
+            return (!quiet) ? triggerAsyncMsg(id, compilationArtifact.getExecutionPlan().getName()) : "";
         }
         id = scoreServices.trigger(compilationArtifact, inputs, systemProperties);
         return triggerAsyncMsg(id, compilationArtifact.getExecutionPlan().getName());

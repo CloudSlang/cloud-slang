@@ -68,23 +68,6 @@ public class SlangCLITest {
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
-    public void testRunNormalValidFilePathSync() throws URISyntaxException, IOException {
-        CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
-        long executionID = 1;
-
-        when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(String.class), isNull(List.class))).thenReturn(compilationArtifact);
-        when(ScoreServicesMock.triggerSync(eq(compilationArtifact), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class), eq(false))).thenReturn(executionID);
-
-        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --log DEBUG");
-
-        verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(String.class), isNull(List.class));
-        verify(ScoreServicesMock).triggerSync(eq(compilationArtifact), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class), eq(false));
-
-        Assert.assertEquals("method threw exception", null, cr.getException());
-        Assert.assertEquals("success should be true", true, cr.isSuccess());
-    }
-
-    @Test (timeout = DEFAULT_TIMEOUT)
     public void testRunQuietlyValidFilePathSync() throws URISyntaxException, IOException {
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
         long executionID = 1;
@@ -92,7 +75,7 @@ public class SlangCLITest {
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(String.class), isNull(List.class))).thenReturn(compilationArtifact);
         when(ScoreServicesMock.triggerSync(eq(compilationArtifact), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class), eq(true))).thenReturn(executionID);
 
-        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --log INFO");
+        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --q");
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(String.class), isNull(List.class));
         verify(ScoreServicesMock).triggerSync(eq(compilationArtifact), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class), eq(true));
