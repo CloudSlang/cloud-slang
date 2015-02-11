@@ -63,7 +63,7 @@ public class InputsBinding {
         if(value == null && fqspn != null && systemProperties != null) value = systemProperties.get(fqspn);
         if(value == null && StringUtils.isNotEmpty(input.getExpression())){
             Map<String,Serializable> scriptContext = new HashMap<>(context); //we do not want to change original context map
-            scriptContext.putAll(targetContext);//so you can resolve previous inputs already binded
+            scriptContext.putAll(targetContext);//so you can resolve previous inputs already bound
 
             String expr = input.getExpression();
             value = scriptEvaluator.evalExpr(expr, scriptContext);
