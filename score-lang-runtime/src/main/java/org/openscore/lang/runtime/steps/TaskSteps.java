@@ -68,7 +68,7 @@ public class TaskSteps extends AbstractSteps {
 
 
     public void beginTask(@Param(TASK_INPUTS_KEY) List<Input> taskInputs,
-                          @Param(LOOP_KEY) LoopStatement loopStatement,
+                          @Param(LOOP_KEY) LoopStatement loop,
                           @Param(RUN_ENV) RunEnvironment runEnv,
                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                           @Param(NODE_NAME_KEY) String nodeName,
@@ -83,8 +83,8 @@ public class TaskSteps extends AbstractSteps {
         Context flowContext = runEnv.getStack().popContext();
 
         //loops
-        if (loopStatementExist(loopStatement)) {
-            LoopCondition loopCondition = loopsBinding.getOrCreateLoopCondition(loopStatement, flowContext, nodeName);
+        if (loopStatementExist(loop)) {
+            LoopCondition loopCondition = loopsBinding.getOrCreateLoopCondition(loop, flowContext, nodeName);
             if (!loopCondition.hasMore()) {
                 runEnv.putNextStepPosition(nextStepId);
                 runEnv.getStack().pushContext(flowContext);
@@ -92,7 +92,7 @@ public class TaskSteps extends AbstractSteps {
             }
 
             if (loopCondition instanceof ForLoopCondition) {
-                loopsBinding.incrementForLoop(loopStatement.getVarName(), flowContext, (ForLoopCondition) loopCondition);
+                loopsBinding.incrementForLoop(loop.getVarName(), flowContext, (ForLoopCondition) loopCondition);
             }
         }
 

@@ -52,7 +52,6 @@ public class LoopsBinding {
         Serializable varValue = forLoopCondition.next();
         flowContext.putVariable(varName, varValue);
         logger.debug("name: " + varName + ", value: " + varValue);
-        System.out.println("name: " + varName + ", value: " + varValue);
     }
 
     private LoopCondition createLoopCondition(LoopStatement loopStatement, Context flowContext, String nodeName) {
