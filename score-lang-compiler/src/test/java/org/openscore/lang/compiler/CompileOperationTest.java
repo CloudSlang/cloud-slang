@@ -99,5 +99,59 @@ public class CompileOperationTest {
         Assert.assertEquals("There is a different number of operation dependencies than expected", 0, dependencies.size());
     }
 
+    @Test
+    public void testCompileOperationMissingClassName() throws Exception {
+        URL resource = getClass().getResource("/corrupted/operation_missing_class_name.sl");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("className");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+    }
 
+    @Test
+    public void testCompileOperationMissingMethodName() throws Exception {
+        URL resource = getClass().getResource("/corrupted/operation_missing_method_name.sl");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("methodName");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+    }
+
+    @Test
+    public void testCompileOperationInvalidActionProperty() throws Exception {
+        URL resource = getClass().getResource("/corrupted/operation_invalid_action_property.sl");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("IDontBelongHere");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+    }
+
+    @Test
+    public void testCompileOperationMultipleActionTypes() throws Exception {
+        URL resource = getClass().getResource("/corrupted/operation_action_multiple_types.sl");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Conflicting keys");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+    }
+
+    @Test
+    public void testCompileOperationMissingActionProperties() throws Exception {
+        URL resource = getClass().getResource("/corrupted/operation_missing_action_properties.sl");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Invalid action data");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+    }
+
+    @Test
+    public void testCompileOperationMissingPythonScript() throws Exception {
+        URL resource = getClass().getResource("/corrupted/operation_missing_python_script.sl");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Invalid action data");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+    }
+
+    @Test
+    public void testCompileOperationInvalidType() throws Exception {
+        URL resource = getClass().getResource("/corrupted/operation_action_invalid_type.sl");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("workflow");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+    }
 }

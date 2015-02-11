@@ -56,6 +56,7 @@ public class ExecutableBuilder {
     private List<String> execAdditionalKeywords = Arrays.asList(ACTION_KEY, WORKFLOW_KEY, EXECUTABLE_NAME_KEY);
 
     private List<Transformer> actionTransformers;
+    private List<List<String>> actionTransformerConstraintGroups;
 
     private List<Transformer> preTaskTransformers;
     private List<Transformer> postTaskTransformers;
@@ -67,8 +68,10 @@ public class ExecutableBuilder {
         preExecTransformers = filterTransformers(Scope.BEFORE_EXECUTABLE);
         postExecTransformers = filterTransformers(Scope.AFTER_EXECUTABLE);
 
-        //action transformers
+        //action transformers and keys
         actionTransformers = filterTransformers(Scope.ACTION);
+        //action keys excluding each other
+        actionTransformerConstraintGroups = Arrays.asList(Arrays.asList(PYTHON_SCRIPT_KEY, JAVA_ACTION));
 
         //task transformers
         preTaskTransformers = filterTransformers(Scope.BEFORE_TASK);
@@ -88,7 +91,7 @@ public class ExecutableBuilder {
         Map<String, Serializable> postExecutableActionData = new HashMap<>();
 
         transformersHandler.validateKeyWords(execName, executableRawData,
-                ListUtils.union(preExecTransformers, postExecTransformers), execAdditionalKeywords);
+                ListUtils.union(preExecTransformers, postExecTransformers), execAdditionalKeywords, null);
 
         preExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, preExecTransformers));
         postExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, postExecTransformers));
@@ -156,7 +159,7 @@ public class ExecutableBuilder {
     private Action compileAction(Map<String, Object> actionRawData) {
         Map<String, Serializable> actionData = new HashMap<>();
 
-        transformersHandler.validateKeyWords("action data", actionRawData, actionTransformers, null);
+        transformersHandler.validateKeyWords("action data", actionRawData, actionTransformers, null, actionTransformerConstraintGroups);
 
         actionData.putAll(transformersHandler.runTransformers(actionRawData, actionTransformers));
 
@@ -223,7 +226,7 @@ public class ExecutableBuilder {
         Map<String, Serializable> preTaskData = new HashMap<>();
         Map<String, Serializable> postTaskData = new HashMap<>();
 
-        transformersHandler.validateKeyWords(taskName, taskRawData, ListUtils.union(preTaskTransformers, postTaskTransformers), TaskAdditionalKeyWords);
+        transformersHandler.validateKeyWords(taskName, taskRawData, ListUtils.union(preTaskTransformers, postTaskTransformers), TaskAdditionalKeyWords, null);
 
         try {
             preTaskData.putAll(transformersHandler.runTransformers(taskRawData, preTaskTransformers));

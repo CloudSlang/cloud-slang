@@ -62,7 +62,12 @@ public class TransformersHandler {
         return resolvableType.getGeneric(0).resolve();
     }
 
-    public void validateKeyWords(String dataLogicalName, Map<String, Object> rawData, List<Transformer> allRelevantTransformers, List<String> additionalValidKeyWords) {
+    public void validateKeyWords(
+            String dataLogicalName,
+            Map<String, Object> rawData,
+            List<Transformer> allRelevantTransformers,
+            List<String> additionalValidKeyWords,
+            List<List<String>> constraintGroups) {
         Set<String> validKeywords = new HashSet<>();
 
         if (additionalValidKeyWords != null) {
@@ -73,9 +78,26 @@ public class TransformersHandler {
             validKeywords.add(keyToTransform(transformer));
         }
 
-        for (String key : rawData.keySet()) {
+        Set<String> rawDataKeySet = rawData.keySet();
+        for (String key : rawDataKeySet) {
             if (!(exists(validKeywords, equalToIgnoringCase(key)))) {
                 throw new RuntimeException("Property: \'" + key + "\' at: \'" + dataLogicalName + "\' is illegal");
+            }
+        }
+
+        if (constraintGroups != null) {
+            for (List<String> group : constraintGroups) {
+                boolean found = false;
+                for (String key : group) {
+                    if (rawDataKeySet.contains(key)) {
+                        if (found) {
+                            // one key from this group was already found in action data
+                            throw new RuntimeException("Conflicting keys at: " + dataLogicalName);
+                        } else {
+                            found = true;
+                        }
+                    }
+                }
             }
         }
     }
