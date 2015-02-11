@@ -101,7 +101,7 @@ public class CompileOperationTest {
 
     @Test
     public void testCompileOperationMissingClassName() throws Exception {
-        URL resource = getClass().getResource("/corrupted/operation_missing_className.sl");
+        URL resource = getClass().getResource("/corrupted/operation_missing_class_name.sl");
         exception.expect(RuntimeException.class);
         exception.expectMessage("className");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
@@ -109,7 +109,7 @@ public class CompileOperationTest {
 
     @Test
     public void testCompileOperationMissingMethodName() throws Exception {
-        URL resource = getClass().getResource("/corrupted/operation_missing_methodName.sl");
+        URL resource = getClass().getResource("/corrupted/operation_missing_method_name.sl");
         exception.expect(RuntimeException.class);
         exception.expectMessage("methodName");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
