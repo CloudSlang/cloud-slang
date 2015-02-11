@@ -150,7 +150,7 @@ public class TaskStepsTest {
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
         HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
         taskNavigationValues.put(SUCCESS_RESULT, new ResultNavigation(0, SUCCESS_RESULT));
-        taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,runtimeServices, "task1");
+        taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,runtimeServices, 1L, "task1");
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
         Assert.assertEquals(2,events.size());
@@ -183,7 +183,7 @@ public class TaskStepsTest {
         when(outputsBinding.bindOutputs(isNull(Map.class), anyMapOf(String.class, String.class), eq(possiblePublishValues))).thenReturn(boundPublish);
         HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
         taskNavigationValues.put(SUCCESS_RESULT, new ResultNavigation(0, SUCCESS_RESULT));
-        taskSteps.endTask(runEnv, possiblePublishValues, taskNavigationValues, createRuntimeServices(), "task1");
+        taskSteps.endTask(runEnv, possiblePublishValues, taskNavigationValues, createRuntimeServices(), 1L, "task1");
 
         Map<String,Serializable> flowVars = runEnv.getStack().popContext().getImmutableViewOfVariables();
         Assert.assertTrue(flowVars.containsKey("name"));
@@ -205,7 +205,7 @@ public class TaskStepsTest {
         taskNavigationValues.put(SUCCESS_RESULT, successNavigation);
         ResultNavigation failureNavigation = new ResultNavigation(1, null);
         taskNavigationValues.put(FAILURE_RESULT, failureNavigation);
-        taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues, createRuntimeServices(), "task1");
+        taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues, createRuntimeServices(), 1L, "task1");
 
         Assert.assertEquals(runEnv.removeNextStepPosition(), nextStepPosition);
     }
@@ -229,7 +229,7 @@ public class TaskStepsTest {
         exception.expectMessage("Task1");
         exception.expectMessage("CUSTOM");
         exception.expectMessage("navigation");
-        taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues, createRuntimeServices(), "Task1");
+        taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues, createRuntimeServices(), 1L, "Task1");
     }
 
     private ExecutionRuntimeServices createRuntimeServices(){

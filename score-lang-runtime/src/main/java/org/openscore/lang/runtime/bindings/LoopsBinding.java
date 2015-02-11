@@ -21,11 +21,12 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 import java.util.Map;
 
+import static org.openscore.lang.runtime.env.LoopCondition.LOOP_CONDITION_KEY;
+
 @Component
 public class LoopsBinding {
 
     private final Logger logger = Logger.getLogger(getClass());
-    private static final String LOOP_CONDITION_KEY = "loop.condition";
 
     @Autowired
     private ScriptEvaluator scriptEvaluator;

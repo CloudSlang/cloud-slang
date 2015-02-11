@@ -42,6 +42,7 @@ import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
 import static org.openscore.lang.entities.ScoreLangConstants.LOOP_KEY;
 import static org.openscore.lang.entities.ScoreLangConstants.NEXT_STEP_ID_KEY;
 import static org.openscore.lang.entities.ScoreLangConstants.NODE_NAME_KEY;
+import static org.openscore.lang.entities.ScoreLangConstants.PREVIOUS_STEP_ID_KEY;
 import static org.openscore.lang.entities.ScoreLangConstants.REF_ID;
 import static org.openscore.lang.entities.ScoreLangConstants.RUN_ENV;
 import static org.openscore.lang.entities.ScoreLangConstants.TASK_INPUTS_KEY;
@@ -81,10 +82,12 @@ public class TaskSteps extends AbstractSteps {
 
         Context flowContext = runEnv.getStack().popContext();
 
-        if (shouldHandleLoop(loopStatement)) {
+        //loops
+        if (loopStatementExist(loopStatement)) {
             LoopCondition loopCondition = loopsBinding.getOrCreateLoopCondition(loopStatement, flowContext, nodeName);
             if (!loopCondition.hasMore()) {
                 runEnv.putNextStepPosition(nextStepId);
+                runEnv.getStack().pushContext(flowContext);
                 return;
             }
 
@@ -111,7 +114,7 @@ public class TaskSteps extends AbstractSteps {
 
     }
 
-    private boolean shouldHandleLoop(LoopStatement loopStatement) {
+    private boolean loopStatementExist(LoopStatement loopStatement) {
         return loopStatement != null;
     }
 
@@ -119,6 +122,7 @@ public class TaskSteps extends AbstractSteps {
                         @Param(TASK_PUBLISH_KEY) List<Output> taskPublishValues,
                         @Param(TASK_NAVIGATION_KEY) Map<String, ResultNavigation> taskNavigationValues,
                         @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
+                        @Param(PREVIOUS_STEP_ID_KEY) Long previousStepId,
                         @Param(NODE_NAME_KEY) String nodeName) {
 
         Context flowContext = runEnv.getStack().popContext();
@@ -133,6 +137,17 @@ public class TaskSteps extends AbstractSteps {
         Map<String, String> publishValues = outputsBinding.bindOutputs(null, executableReturnValues.getOutputs(), taskPublishValues);
 
         flowContext.putVariables(publishValues);
+
+        //loops
+        Map<String, Serializable> langVariables = flowContext.getLangVariables();
+        if (langVariables.containsKey(LoopCondition.LOOP_CONDITION_KEY)){
+            LoopCondition loopCondition = (LoopCondition) langVariables.get(LoopCondition.LOOP_CONDITION_KEY);
+            if (loopCondition.hasMore()) {
+                runEnv.putNextStepPosition(previousStepId);
+                runEnv.getStack().pushContext(flowContext);
+                return;
+            }
+        }
 
         //todo: hook
 
