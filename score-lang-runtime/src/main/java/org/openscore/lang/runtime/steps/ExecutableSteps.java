@@ -82,7 +82,7 @@ public class ExecutableSteps extends AbstractSteps {
     }
 
     /**
-     * This method is executed by the finishExecutable execution step of an operation/flow
+     * This method is executed by the finishExecutable execution step of an operation or flow
      *
      * @param runEnv the run environment object
      * @param executableOutputs the operation outputs data

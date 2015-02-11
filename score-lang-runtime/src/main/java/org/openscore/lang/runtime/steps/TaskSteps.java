@@ -83,7 +83,7 @@ public class TaskSteps extends AbstractSteps {
         // request the score engine to switch to the execution plan of the given ref
         requestSwitchToRefExecutableExecutionPlan(runEnv, executionRuntimeServices, RUNNING_EXECUTION_PLAN_ID, refId, nextStepId);
 
-        // We set the start step of the given ref as the next step to execute (in the new running execution plan that will be set)
+        // set the start step of the given ref as the next step to execute (in the new running execution plan that will be set)
         runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
 
     }
@@ -109,10 +109,10 @@ public class TaskSteps extends AbstractSteps {
         //todo: hook
 
 		// set the position of the next step - for the use of the navigation
-		// Find in the navigation values the correct next step position, according to the operation result, and set it
+		// find in the navigation values the correct next step position, according to the operation result, and set it
 		ResultNavigation navigation = taskNavigationValues.get(executableReturnValues.getResult());
 		if(navigation == null) {
-            // We should always have the executable response mapped to a navigation by the task. If not, this is an error
+            // should always have the executable response mapped to a navigation by the task, if not, it is an error
             throw new RuntimeException("Task: " + nodeName + " has no matching navigation for the executable result: " + executableReturnValues.getResult() );
         }
 
@@ -141,12 +141,12 @@ public class TaskSteps extends AbstractSteps {
                                                            Long RUNNING_EXECUTION_PLAN_ID,
                                                            String refId,
                                                            Long nextStepId) {
-        // We create ParentFlowData object containing the current running execution plan id and
+        // create ParentFlowData object containing the current running execution plan id and
         // the next step id to navigate to in the current execution plan,
-        // and we push it to the ParentFlowStack for future use (once we finish running the ref operation/flow)
+        // and push it to the ParentFlowStack for future use (once we finish running the ref operation/flow)
         ParentFlowStack stack = runEnv.getParentFlowStack();
         stack.pushParentFlowData(new ParentFlowData(RUNNING_EXECUTION_PLAN_ID, nextStepId));
-        // We request the score engine to switch the execution plan to the one of the given refId once it can
+        // request the score engine to switch the execution plan to the one with the given refId once it can
         Long subFlowRunningExecutionPlanId = executionRuntimeServices.getSubFlowRunningExecutionPlan(refId);
         executionRuntimeServices.requestToChangeExecutionPlan(subFlowRunningExecutionPlanId);
     }
