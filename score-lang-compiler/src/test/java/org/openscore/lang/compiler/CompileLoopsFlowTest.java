@@ -15,16 +15,18 @@ import org.openscore.api.ExecutionPlan;
 import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
 import org.openscore.lang.compiler.modeller.model.Executable;
 import org.openscore.lang.compiler.modeller.model.Flow;
-import org.openscore.lang.entities.LoopStatement;
 import org.openscore.lang.compiler.modeller.model.Task;
 import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.LoopStatement;
 import org.openscore.lang.entities.ScoreLangConstants;
+import org.openscore.lang.entities.bindings.Output;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URI;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,6 +55,9 @@ public class CompileLoopsFlowTest {
         assertEquals("values", forStatement.getCollectionExpression());
         assertEquals("value", forStatement.getVarName());
         assertEquals(LoopStatement.Type.FOR, forStatement.getType());
+        @SuppressWarnings("unchecked") List<Output> actual = (List<Output>) task.getPostTaskActionData()
+                                  .get(SlangTextualKeys.PUBLISH_KEY);
+        assertEquals("\'a\'", actual.get(0).getExpression());
     }
 
     @Test

@@ -14,3 +14,5 @@ flow:
         do:
           ops.print:
             - text: value
+        publish:
+          - new_var: "'a'"
