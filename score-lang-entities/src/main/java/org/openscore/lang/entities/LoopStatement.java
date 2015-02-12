@@ -26,8 +26,8 @@ public class LoopStatement implements Serializable{
     private final Type type;
 
     public LoopStatement(String varName, String collectionExpression, Type type) {
-        Validate.notBlank(varName, "var name cannot be empty");
-        Validate.notBlank(collectionExpression, "collection expression cannot be empty");
+        Validate.notBlank(varName, "for loop var name cannot be empty");
+        Validate.notBlank(collectionExpression, "for loop collection expression cannot be empty");
         Validate.notNull(type, "type cannot be null");
         //todo add tests
 
