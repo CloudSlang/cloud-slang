@@ -20,8 +20,8 @@ import org.openscore.lang.compiler.modeller.model.Operation;
 import org.openscore.lang.compiler.modeller.model.SlangFileType;
 import org.openscore.lang.compiler.modeller.model.Task;
 import org.openscore.lang.compiler.modeller.model.Workflow;
-import org.openscore.lang.compiler.parser.model.ParsedSlang;
 import org.openscore.lang.compiler.modeller.transformers.Transformer;
+import org.openscore.lang.compiler.parser.model.ParsedSlang;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
 import org.openscore.lang.entities.bindings.Result;
@@ -30,14 +30,32 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
-import static org.openscore.lang.entities.ScoreLangConstants.*;
-import static org.openscore.lang.compiler.SlangTextualKeys.*;
-import static org.openscore.lang.compiler.modeller.transformers.Transformer.*;
+import static org.openscore.lang.compiler.SlangTextualKeys.ACTION_KEY;
+import static org.openscore.lang.compiler.SlangTextualKeys.DO_KEY;
+import static org.openscore.lang.compiler.SlangTextualKeys.EXECUTABLE_NAME_KEY;
+import static org.openscore.lang.compiler.SlangTextualKeys.INPUTS_KEY;
+import static org.openscore.lang.compiler.SlangTextualKeys.JAVA_ACTION;
+import static org.openscore.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
+import static org.openscore.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
+import static org.openscore.lang.compiler.SlangTextualKeys.OUTPUTS_KEY;
+import static org.openscore.lang.compiler.SlangTextualKeys.RESULTS_KEY;
+import static org.openscore.lang.compiler.SlangTextualKeys.WORKFLOW_KEY;
+import static org.openscore.lang.compiler.modeller.transformers.Transformer.Scope;
+import static org.openscore.lang.entities.ScoreLangConstants.FAILURE_RESULT;
+import static org.openscore.lang.entities.ScoreLangConstants.LOOP_KEY;
+import static org.openscore.lang.entities.ScoreLangConstants.PYTHON_SCRIPT_KEY;
+import static org.openscore.lang.entities.ScoreLangConstants.SUCCESS_RESULT;
 
 /*
  * Created by orius123 on 09/11/14.
@@ -193,7 +211,7 @@ public class ExecutableBuilder {
                 taskRawDataValue = taskRawData.getValue();
                 if (MapUtils.isNotEmpty(taskRawDataValue) && taskRawDataValue.containsKey(LOOP_KEY)) {
                     message = "Task: " + taskName + " syntax is illegal.\nBelow the 'loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
-                    taskRawDataValue = (Map<String, Object>) taskRawDataValue.get(LOOP_KEY);
+                    taskRawDataValue.putAll((Map<String, Object>) taskRawDataValue.remove(LOOP_KEY));
                 }
             } catch (ClassCastException ex){
                 throw new RuntimeException(message);

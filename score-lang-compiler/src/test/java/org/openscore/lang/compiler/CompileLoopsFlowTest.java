@@ -61,6 +61,25 @@ public class CompileLoopsFlowTest {
     }
 
     @Test
+    public void testPreCompileLoopWithCustomNavigationFlow() throws Exception {
+        URI flow = getClass().getResource("/loops/loop_with_custom_navigation.sl").toURI();
+        Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
+        assertNotNull("executable is null", executable);
+        Task task = ((Flow) executable).getWorkflow()
+                                       .getTasks()
+                                       .getFirst();
+        assertTrue(task.getPreTaskActionData().containsKey(SlangTextualKeys.FOR_KEY));
+        LoopStatement forStatement = (LoopStatement) task.getPreTaskActionData()
+                                                         .get(SlangTextualKeys.FOR_KEY);
+        assertEquals("values", forStatement.getCollectionExpression());
+        assertEquals("value", forStatement.getVarName());
+        assertEquals(LoopStatement.Type.FOR, forStatement.getType());
+        @SuppressWarnings("unchecked") Map<String, String> actual = (Map<String, String>) task.getPostTaskActionData()
+                                                                                .get(SlangTextualKeys.NAVIGATION_KEY);
+        assertEquals("print_other_values", actual.get(ScoreLangConstants.SUCCESS_RESULT));
+    }
+
+    @Test
     public void testCompileLoopFlow() throws Exception {
         URI flow = getClass().getResource("/loops/simple_loop.sl").toURI();
         URI operation = getClass().getResource("/loops/print.sl").toURI();
