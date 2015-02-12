@@ -11,6 +11,7 @@ package org.openscore.lang.compiler.scorecompiler;
 
 import org.openscore.lang.compiler.SlangTextualKeys;
 import org.openscore.lang.entities.LoopStatement;
+import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
@@ -58,6 +59,17 @@ public class ExecutionStepFactoryTest {
                                  .get(ScoreLangConstants.LOOP_KEY);
         Assert.assertNotNull("for key is null", actualStatement);
         Assert.assertSame("inputs are not set under their key", statement, actualStatement);
+    }
+
+    @Test
+    public void testCreateFinishTakStep(){
+        ExecutionStep finishTaskStep = factory.createFinishTaskStep(
+                1L,
+                new HashMap<String, Serializable>(),
+                new HashMap<String, ResultNavigation>(),
+                "taskName");
+        Assert.assertTrue(finishTaskStep.getActionData().containsKey(ScoreLangConstants.PREVIOUS_STEP_ID_KEY));
+
     }
 
     @Test(expected = IllegalArgumentException.class)
