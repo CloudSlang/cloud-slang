@@ -79,7 +79,7 @@ public class SlangCLI implements CommandMarker {
             return quiet ? StringUtils.EMPTY : triggerSyncMsg(id, compilationArtifact.getExecutionPlan().getName());
         }
         id = scoreServices.trigger(compilationArtifact, inputs, systemProperties);
-        return triggerAsyncMsg(id, compilationArtifact.getExecutionPlan().getName());
+        return quiet ? StringUtils.EMPTY : triggerAsyncMsg(id, compilationArtifact.getExecutionPlan().getName());
     }
 
     @CliCommand(value = "env", help = "Set environment var relevant to the CLI")
