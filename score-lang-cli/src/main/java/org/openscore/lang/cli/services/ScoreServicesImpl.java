@@ -94,7 +94,7 @@ public class ScoreServicesImpl implements ScoreServices{
         slang.unSubscribeOnEvents(scoreEventListener);
 
         String errorMessageFlowExecution = scoreEventListener.getErrorMessage();
-        if (!errorMessageFlowExecution.isEmpty()) {
+        if (StringUtils.isNotEmpty(errorMessageFlowExecution)) {
             // exception occurred during flow execution
             throw new RuntimeException(errorMessageFlowExecution);
         }
