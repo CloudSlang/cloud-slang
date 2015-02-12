@@ -8,6 +8,7 @@
  */
 package org.openscore.lang.cli;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.openscore.events.EventConstants;
@@ -75,7 +76,7 @@ public class SlangCLI implements CommandMarker {
             stopWatch.start();
             id = scoreServices.triggerSync(compilationArtifact, inputs, systemProperties, quiet);
             stopWatch.stop();
-            return (!quiet) ? triggerAsyncMsg(id, compilationArtifact.getExecutionPlan().getName()) : "";
+            return quiet ? StringUtils.EMPTY : triggerSyncMsg(id, compilationArtifact.getExecutionPlan().getName());
         }
         id = scoreServices.trigger(compilationArtifact, inputs, systemProperties);
         return triggerAsyncMsg(id, compilationArtifact.getExecutionPlan().getName());
