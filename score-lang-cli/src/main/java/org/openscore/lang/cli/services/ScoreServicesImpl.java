@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -147,18 +148,17 @@ public class ScoreServicesImpl implements ScoreServices{
             if(data.containsKey(LanguageEventData.OUTPUTS) && data.containsKey(LanguageEventData.PATH) && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
 
                 @SuppressWarnings("unchecked") Map<String, String> outputs = (Map<String, String>) data.get(LanguageEventData.OUTPUTS);
-
+                Map<String, String> modifiableOutputs = new HashMap<>();
+                modifiableOutputs.putAll(outputs);
                 if (MapUtils.isNotEmpty(outputs)) {
 
-                    printWithColor(Ansi.Color.WHITE, "- Outputs:");
-
                     for (String key : outputs.keySet()) {
-                        String outputValue = outputs.get(key).replace("\n", " ");
-                        outputs.put(key, StringUtils.abbreviate(outputValue, 0, OUTPUT_VALUE_LIMIT));
+                        String outputValue = modifiableOutputs.get(key).replace("\n", " ");
+                        modifiableOutputs.put(key, StringUtils.abbreviate(outputValue, 0, OUTPUT_VALUE_LIMIT));
                         if (StringUtils.isEmpty(outputValue)) {
-                            outputs.put(key, "(empty)");
+                            modifiableOutputs.put(key, "(empty)");
                         }
-                        printWithColor(Ansi.Color.WHITE, "   " + key + " = " + outputs.get(key));
+                        printWithColor(Ansi.Color.WHITE, "- " + key + " = " + modifiableOutputs.get(key));
                     }
                 }
             }
