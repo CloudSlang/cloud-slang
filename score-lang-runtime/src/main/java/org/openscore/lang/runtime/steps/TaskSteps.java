@@ -146,6 +146,8 @@ public class TaskSteps extends AbstractSteps {
                 runEnv.putNextStepPosition(previousStepId);
                 runEnv.getStack().pushContext(flowContext);
                 return;
+            } else {
+                flowContext.getLangVariables().remove(LoopCondition.LOOP_CONDITION_KEY);
             }
         }
 
