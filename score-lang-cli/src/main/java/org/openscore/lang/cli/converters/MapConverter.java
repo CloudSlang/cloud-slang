@@ -30,6 +30,9 @@ import java.util.Map;
 
 @Component
 public class MapConverter implements Converter<Map<String, String>> {
+
+    public static final String ESCAPE_EXPRESSION = "\\&^\\&";
+
     @Override
     public boolean supports(Class<?> type, String optionContext) {
         return Map.class.isAssignableFrom(type);
@@ -37,14 +40,14 @@ public class MapConverter implements Converter<Map<String, String>> {
 
     @Override
     public Map<String, String> convertFromText(String value, Class<?> targetType, String optionContext) {
-        value = value.replace("\\,", "\\&^\\&");
+        value = value.replace("\\,", ESCAPE_EXPRESSION);
         String[] values = StringUtils.commaDelimitedListToStringArray(value);
         Map<String, String> map = new HashMap<>();
 
         for (String v : values) {
             String[] keyValue = StringUtils.delimitedListToStringArray(v, "=");
             if (keyValue.length == 2) {
-                keyValue[1] = keyValue[1].replace("\\&^\\&", ",");
+                keyValue[1] = keyValue[1].replace(ESCAPE_EXPRESSION, ",");
                 map.put(keyValue[0], keyValue[1]);
             } else {
                 throw new RuntimeException("Input should be in a key=value comma separated format, e.g. key1=val1,key2=val2 etc.");
