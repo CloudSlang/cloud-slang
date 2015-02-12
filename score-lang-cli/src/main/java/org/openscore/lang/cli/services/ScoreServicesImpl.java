@@ -8,6 +8,7 @@
  */
 package org.openscore.lang.cli.services;
 
+import org.apache.commons.collections4.MapUtils;
 import org.openscore.lang.api.Slang;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.ScoreLangConstants;
@@ -43,7 +44,9 @@ public class ScoreServicesImpl implements ScoreServices{
     public static final String SLANG_STEP_ERROR_MSG = "Slang Error : ";
     public static final String SCORE_ERROR_EVENT_MSG = "Score Error Event :";
     public static final String FLOW_FINISHED_WITH_FAILURE_MSG = "Flow finished with failure";
+    public static final String EXEC_START_PATH = "0/0";
     public static final int OUTPUT_VALUE_LIMIT = 40;
+
 
     @Autowired
     private Slang slang;
@@ -141,15 +144,13 @@ public class ScoreServicesImpl implements ScoreServices{
         }
 
         private void printOutputs(Map<String, Serializable> data) {
-            if(data.containsKey(LanguageEventData.OUTPUTS) && data.containsKey(LanguageEventData.PATH) && data.get(LanguageEventData.PATH).equals("0/0")) {
+            if(data.containsKey(LanguageEventData.OUTPUTS) && data.containsKey(LanguageEventData.PATH) && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
 
                 @SuppressWarnings("unchecked") Map<String, String> outputs = (Map<String, String>) data.get(LanguageEventData.OUTPUTS);
 
-                String prefix = getPrefix(data);
+                if (MapUtils.isNotEmpty(outputs)) {
 
-                if (outputs != null && !outputs.keySet().isEmpty()) {
-
-                    printWithColor(Ansi.Color.WHITE, prefix + "Outputs:");
+                    printWithColor(Ansi.Color.WHITE, "- Outputs:");
 
                     for (String key : outputs.keySet()) {
                         String outputValue = outputs.get(key).replace("\n", " ");
@@ -157,7 +158,7 @@ public class ScoreServicesImpl implements ScoreServices{
                         if (StringUtils.isEmpty(outputValue)) {
                             outputs.put(key, "(empty)");
                         }
-                        printWithColor(Ansi.Color.WHITE, prefix + "  " + key + " = " + outputs.get(key));
+                        printWithColor(Ansi.Color.WHITE, "   " + key + " = " + outputs.get(key));
                     }
                 }
             }
