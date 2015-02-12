@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
@@ -24,9 +25,19 @@ public class ForTransformer implements Transformer<String, LoopStatement>{
         if (StringUtils.isEmpty(rawData)) {
             return null;
         }
-        String[] strings = rawData.split(Pattern.quote(" in "));
-        String varName = strings[0];
-        String collectionExpression = strings[1];
+        String inKeyword = " in ";
+        String regex = "^(\\s+)?(\\w+)\\s+(in)\\s+(\\w+)(\\s+)?$";
+        Pattern compile = Pattern.compile(regex);
+        Matcher matcher = compile.matcher(rawData);
+        String varName;
+        String collectionExpression;
+        if (matcher.find()) {
+            varName = matcher.group(2);
+            collectionExpression = matcher.group(4);
+        } else {
+            varName = StringUtils.substringBefore(rawData, inKeyword);
+            collectionExpression = StringUtils.substringAfter(rawData, inKeyword);
+        }
         return new LoopStatement(varName, collectionExpression, LoopStatement.Type.FOR);
     }
 

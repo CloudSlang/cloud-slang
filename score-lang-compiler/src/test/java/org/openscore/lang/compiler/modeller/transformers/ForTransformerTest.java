@@ -1,11 +1,15 @@
 package org.openscore.lang.compiler.modeller.transformers;
 
 import junit.framework.Assert;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.openscore.lang.entities.LoopStatement;
 
 public class ForTransformerTest {
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     private ForTransformer transformer = new ForTransformer();
 
@@ -23,13 +27,33 @@ public class ForTransformerTest {
         Assert.assertEquals("collection", statement.getCollectionExpression());
     }
 
-    @Ignore
-    //what do we expect?
     @Test
-    public void testMultipleIns() throws Exception {
-        LoopStatement statement = transformer.transform(" in   in  collection  ");
-        Assert.assertEquals("min", statement.getVarName());
-        Assert.assertEquals("collection", statement.getCollectionExpression());
+    public void testNoVarName() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("var name");
+        transformer.transform("  in  collection");
+    }
+
+    @Test
+    public void testVarNameContainInvalidChars() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("var name");
+        exception.expectMessage("invalid");
+        transformer.transform("x a  in  collection");
+    }
+
+    @Test
+    public void testNoCollectionExpression() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("collection expression");
+        transformer.transform("x in  ");
+    }
+
+    @Test
+    public void testMultipleInsAreTrimmed() throws Exception {
+        LoopStatement statement = transformer.transform(" in   in in ");
+        Assert.assertEquals("in", statement.getVarName());
+        Assert.assertEquals("in", statement.getCollectionExpression());
     }
 
     @Test
