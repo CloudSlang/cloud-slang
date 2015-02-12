@@ -25,8 +25,8 @@ public class ForTransformer implements Transformer<String, LoopStatement>{
             return null;
         }
         String[] strings = rawData.split(Pattern.quote(" in "));
-        String varName = strings[0].trim();
-        String collectionExpression = strings[1].trim();
+        String varName = strings[0];
+        String collectionExpression = strings[1];
         return new LoopStatement(varName, collectionExpression, LoopStatement.Type.FOR);
     }
 

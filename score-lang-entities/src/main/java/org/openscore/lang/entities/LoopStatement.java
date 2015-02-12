@@ -31,8 +31,8 @@ public class LoopStatement implements Serializable{
         Validate.notNull(type, "type cannot be null");
         //todo add tests
 
-        this.varName = varName;
-        this.collectionExpression = collectionExpression;
+        this.varName = varName.trim();
+        this.collectionExpression = collectionExpression.trim();
         this.type = type;
     }
 
