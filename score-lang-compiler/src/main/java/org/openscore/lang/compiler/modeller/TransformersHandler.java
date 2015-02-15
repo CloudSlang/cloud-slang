@@ -29,6 +29,9 @@ public class TransformersHandler {
         Map<String, Serializable> transformedData = new HashMap<>();
         for (Transformer transformer : scopeTransformers) {
             String key = keyToTransform(transformer);
+            if (!rawData.containsKey(key)) {
+                return null;
+            }
             Object value = rawData.get(key);
             try {
                 @SuppressWarnings("unchecked") Object transformedValue = transformer.transform(value);
