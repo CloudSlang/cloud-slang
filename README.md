@@ -11,7 +11,7 @@ Slang is a YAML based language for writing human-readable workflows for score. T
 
 1. Download the slang zip from [here](https://github.com/openscore/score-language/releases/download/slang-CLI-v0.2.1/score-lang-cli.zip).
 2. Unzip it.
-3. Go to the folder /slang/appassembler/bin/
+3. Go to the folder /slang/bin/
 4. Run the executable :
   - For Windows : slang.bat 
   - For Linux : bash slang
@@ -40,3 +40,24 @@ Contact us at [here](mailto:support@openscore.io).
 2. ```mvn clean install```
 3. Run the CLI executable from score-lang-cli\target\slang\bin 
 
+### Another way of getting the score command line interface.
+###### score-cli
+> The score command line interface.
+
+Install this globally and you'll have access to the `slang` command anywhere on your system.
+
+```shell
+npm install -g score-cli
+```
+
+Now you can just use the `slang` command anywhere
+```shell
+slang
+```
+
+Refer to [openscore](http://openscore.io) website for more information.
+
+###### Pre-Requisites:
+Node.js & Java installed.
+
+score-cli page in the [NPM repository](https://www.npmjs.com/package/score-cli).

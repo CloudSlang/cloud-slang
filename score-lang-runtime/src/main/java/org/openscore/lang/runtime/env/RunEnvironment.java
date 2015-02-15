@@ -32,16 +32,16 @@ public class RunEnvironment implements Serializable{
     // The position of the next step
     private Long nextStepPosition;
 
-    // stack holding the contexts of the parent scopes
+    // Stack holding the contexts of the parent scopes
     private ContextStack contextStack;
 
-    // stack of the parent flows data (fo the sub-flow use-case)
+    // Stack of the parent flow's data (for the sub-flow use-case)
     private ParentFlowStack parentFlowStack;
 
     private ExecutionPath executionPath;
     private final Map<String, ? extends Serializable> systemProperties;
-    // Map holding serializable data that is common for the entire run.
-    // This is data that should be shred between different actions with the ability to change the data
+    // Map holding serializable data that is common for the entire run
+    // This is data that should be shared between different actions with the ability to change the data
     private Map<String, SerializableSessionObject> serializableDataMap;
 
 

@@ -13,6 +13,7 @@ package org.openscore.lang.compiler.configuration;
 /*
  * Created by orius123 on 05/11/14.
  */
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -24,10 +25,9 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 public class SlangCompilerSpringConfig {
 
     @Bean
-    public Yaml yaml(){
+    public Yaml yaml() {
         Yaml yaml = new Yaml();
         yaml.setBeanAccess(BeanAccess.FIELD);
         return yaml;
     }
-
 }

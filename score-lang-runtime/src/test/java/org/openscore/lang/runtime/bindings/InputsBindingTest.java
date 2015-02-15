@@ -199,7 +199,7 @@ public class InputsBindingTest {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input2",3);
         context.put("input1",5);
-		Input input = new Input("input1", "input2", false, false, true, null);
+		Input input = new Input("input1", "input2", false, false, false, null);
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = bindInputs(inputs, context);
@@ -215,7 +215,7 @@ public class InputsBindingTest {
     public void testOverrideAssignFrom2() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",5);
-		Input input = new Input("input1", "3", false, false, true, null);
+		Input input = new Input("input1", "3", false, false, false, null);
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = bindInputs(inputs, context);
@@ -229,13 +229,13 @@ public class InputsBindingTest {
     public void testOverrideAssignFrom3() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",5);
-		Input input = new Input("input1", null, false, false, true, null);
+		Input input = new Input("input1", null, false, false, false, null);
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals("override disables the assignFrom func...",null, result.get("input1"));
+        Assert.assertEquals("overridable disables the assignFrom func...",null, result.get("input1"));
         Assert.assertEquals(1, result.size());
     }
 
@@ -257,7 +257,7 @@ public class InputsBindingTest {
     public void testExpressionWithWrongRef() throws Exception {
         Map<String,Serializable> context = new HashMap<>();
 
-		Input input = new Input("input1", "input2", false, false, false, null);
+		Input input = new Input("input1", "input2", false, false, true, null);
         List<Input> inputs = Arrays.asList(input);
 
         Map<String,Serializable> result = bindInputs(inputs, context);
@@ -327,7 +327,7 @@ public class InputsBindingTest {
 	public void testSystemProperty() throws Exception {
 		String in = "input1";
 		String fqspn = "docker.sys.props.port";
-		List<Input> inputs = Arrays.asList(new Input(in, null, false, true, false, fqspn));
+		List<Input> inputs = Arrays.asList(new Input(in, null, false, true, true, fqspn));
 		Map<String, Serializable> result = bindInputs(inputs, new HashMap<String, Serializable>(), Collections.singletonMap(fqspn, 22));
 		Assert.assertFalse(result.isEmpty());
 		Assert.assertEquals(1, result.size());
@@ -339,7 +339,7 @@ public class InputsBindingTest {
 	public void testSystemPropertyMissing() throws Exception {
 		String in = "input1";
 		String fqspn = "docker.sys.props.port";
-		List<Input> inputs = Arrays.asList(new Input(in, null, false, false, false, fqspn));
+		List<Input> inputs = Arrays.asList(new Input(in, null, false, false, true, fqspn));
 		Map<String, Serializable> result = bindInputs(inputs, new HashMap<String, Serializable>());
 		Assert.assertFalse(result.isEmpty());
 		Assert.assertEquals(1, result.size());
@@ -351,7 +351,7 @@ public class InputsBindingTest {
 	public void testSystemPropertyContext() throws Exception {
 		String in = "input1";
 		String fqspn = "docker.sys.props.port";
-		List<Input> inputs = Arrays.asList(new Input(in, null, false, true, false, fqspn));
+		List<Input> inputs = Arrays.asList(new Input(in, null, false, true, true, fqspn));
 		Map<String, Serializable> result = bindInputs(inputs, Collections.singletonMap(in, 23), Collections.singletonMap(fqspn, 22));
 		Assert.assertFalse(result.isEmpty());
 		Assert.assertEquals(1, result.size());
@@ -363,7 +363,7 @@ public class InputsBindingTest {
 	public void testSystemPropertyOverride() throws Exception {
 		String in = "input1";
 		String fqspn = "docker.sys.props.port";
-		List<Input> inputs = Arrays.asList(new Input(in, null, false, true, true, fqspn));
+		List<Input> inputs = Arrays.asList(new Input(in, null, false, true, false, fqspn));
 		Map<String, Serializable> result = bindInputs(inputs, Collections.singletonMap(in, 23), Collections.singletonMap(fqspn, 22));
 		Assert.assertFalse(result.isEmpty());
 		Assert.assertEquals(1, result.size());

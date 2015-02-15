@@ -54,10 +54,10 @@ public class SimpleFlowTest extends SystemsTestsParent {
     @Test
     public void testFlowWithGlobalSession() throws Exception {
         URI resource = getClass().getResource("/yaml/flow_using_global_session.yaml").toURI();
-        URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
+        URI operation1 = getClass().getResource("/yaml/set_global_session_object.sl").toURI();
+        URI operation2 = getClass().getResource("/yaml/get_global_session_object.sl").toURI();
 
-        SlangSource operationsSource = SlangSource.fromFile(operations);
-        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
@@ -69,11 +69,11 @@ public class SimpleFlowTest extends SystemsTestsParent {
 	@SafeVarargs
 	private final void compileAndRunSimpleFlow(Map.Entry<String, ? extends Serializable>... inputs) throws Exception {
 		URI flow = getClass().getResource("/yaml/simple_flow.yaml").toURI();
-		URI operations = getClass().getResource("/yaml/simple_operations.yaml").toURI();
-        SlangSource operationsSource = SlangSource.fromFile(operations);
+		URI operations1 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
+        URI operations2 = getClass().getResource("/yaml/comopute_daylight_time_zone.sl").toURI();
 		URI systemProperties = getClass().getResource("/yaml/system_properties.yaml").toURI();
 		SlangSource systemPropertiesSource = SlangSource.fromFile(systemProperties);
-        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
 		CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
 		HashMap<String, Serializable> userInputs = new HashMap<>();
         for (Entry<String, ? extends Serializable> input : inputs) {
@@ -86,7 +86,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
     @Test
     public void testFlowWithMissingNavigationFromOperationResult() throws Exception {
         URI resource = getClass().getResource("/yaml/flow_with_missing_navigation_from_op_result.sl").toURI();
-        URI operations = getClass().getResource("/yaml/operation_with_custom_result.sl").toURI();
+        URI operations = getClass().getResource("/yaml/print_custom_result_op.sl").toURI();
 
         SlangSource operationsSource = SlangSource.fromFile(operations);
         Set<SlangSource> path = Sets.newHashSet(operationsSource);
