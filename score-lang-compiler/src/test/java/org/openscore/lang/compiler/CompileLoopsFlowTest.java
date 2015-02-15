@@ -17,7 +17,7 @@ import org.openscore.lang.compiler.modeller.model.Executable;
 import org.openscore.lang.compiler.modeller.model.Flow;
 import org.openscore.lang.compiler.modeller.model.Task;
 import org.openscore.lang.entities.CompilationArtifact;
-import org.openscore.lang.entities.LoopStatement;
+import org.openscore.lang.entities.ForLoopStatement;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Output;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,11 +50,10 @@ public class CompileLoopsFlowTest {
                                         .getTasks()
                                         .getFirst();
         assertTrue(task.getPreTaskActionData().containsKey(SlangTextualKeys.FOR_KEY));
-        LoopStatement forStatement = (LoopStatement) task.getPreTaskActionData()
+        ForLoopStatement forStatement = (ForLoopStatement) task.getPreTaskActionData()
                                 .get(SlangTextualKeys.FOR_KEY);
         assertEquals("values", forStatement.getCollectionExpression());
         assertEquals("value", forStatement.getVarName());
-        assertEquals(LoopStatement.Type.FOR, forStatement.getType());
         @SuppressWarnings("unchecked") List<Output> actual = (List<Output>) task.getPostTaskActionData()
                                   .get(SlangTextualKeys.PUBLISH_KEY);
         assertEquals("\'a\'", actual.get(0).getExpression());
@@ -69,11 +68,10 @@ public class CompileLoopsFlowTest {
                                        .getTasks()
                                        .getFirst();
         assertTrue(task.getPreTaskActionData().containsKey(SlangTextualKeys.FOR_KEY));
-        LoopStatement forStatement = (LoopStatement) task.getPreTaskActionData()
+        ForLoopStatement forStatement = (ForLoopStatement) task.getPreTaskActionData()
                                                          .get(SlangTextualKeys.FOR_KEY);
         assertEquals("values", forStatement.getCollectionExpression());
         assertEquals("value", forStatement.getVarName());
-        assertEquals(LoopStatement.Type.FOR, forStatement.getType());
         @SuppressWarnings("unchecked") Map<String, String> actual = (Map<String, String>) task.getPostTaskActionData()
                                                                                 .get(SlangTextualKeys.NAVIGATION_KEY);
         assertEquals("print_other_values", actual.get(ScoreLangConstants.SUCCESS_RESULT));
@@ -92,10 +90,9 @@ public class CompileLoopsFlowTest {
         Map<String, ?> actionData = executionPlan.getStep(2L)
                                                  .getActionData();
         assertTrue(actionData.containsKey(ScoreLangConstants.LOOP_KEY));
-        LoopStatement forStatement = (LoopStatement) actionData.get(ScoreLangConstants.LOOP_KEY);
+        ForLoopStatement forStatement = (ForLoopStatement) actionData.get(ScoreLangConstants.LOOP_KEY);
         assertEquals("values", forStatement.getCollectionExpression());
         assertEquals("value", forStatement.getVarName());
-        assertEquals(LoopStatement.Type.FOR, forStatement.getType());
 
     }
 

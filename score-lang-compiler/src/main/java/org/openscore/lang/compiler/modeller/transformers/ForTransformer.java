@@ -10,7 +10,7 @@
 package org.openscore.lang.compiler.modeller.transformers;
 
 import org.apache.commons.lang.StringUtils;
-import org.openscore.lang.entities.LoopStatement;
+import org.openscore.lang.entities.ForLoopStatement;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -19,9 +19,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
-public class ForTransformer implements Transformer<String, LoopStatement>{
+public class ForTransformer implements Transformer<String, ForLoopStatement>{
     @Override
-    public LoopStatement transform(String rawData) {
+    public ForLoopStatement transform(String rawData) {
         if (StringUtils.isEmpty(rawData)) {
             return null;
         }
@@ -38,7 +38,7 @@ public class ForTransformer implements Transformer<String, LoopStatement>{
             varName = StringUtils.substringBefore(rawData, inKeyword);
             collectionExpression = StringUtils.substringAfter(rawData, inKeyword);
         }
-        return new LoopStatement(varName, collectionExpression, LoopStatement.Type.FOR);
+        return new ForLoopStatement(varName, collectionExpression);
     }
 
     @Override

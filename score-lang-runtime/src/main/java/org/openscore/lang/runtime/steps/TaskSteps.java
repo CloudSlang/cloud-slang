@@ -13,7 +13,7 @@ import com.hp.oo.sdk.content.annotations.Param;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openscore.api.execution.ExecutionParametersConsts;
 import org.openscore.lang.ExecutionRuntimeServices;
-import org.openscore.lang.entities.LoopStatement;
+import org.openscore.lang.entities.ForLoopStatement;
 import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
@@ -68,7 +68,7 @@ public class TaskSteps extends AbstractSteps {
 
 
     public void beginTask(@Param(TASK_INPUTS_KEY) List<Input> taskInputs,
-                          @Param(LOOP_KEY) LoopStatement loop,
+                          @Param(LOOP_KEY) ForLoopStatement loop,
                           @Param(RUN_ENV) RunEnvironment runEnv,
                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                           @Param(NODE_NAME_KEY) String nodeName,
@@ -114,8 +114,8 @@ public class TaskSteps extends AbstractSteps {
 
     }
 
-    private boolean loopStatementExist(LoopStatement loopStatement) {
-        return loopStatement != null;
+    private boolean loopStatementExist(ForLoopStatement forLoopStatement) {
+        return forLoopStatement != null;
     }
 
     public void endTask(@Param(RUN_ENV) RunEnvironment runEnv,

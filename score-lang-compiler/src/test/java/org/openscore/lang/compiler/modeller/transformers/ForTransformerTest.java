@@ -4,7 +4,7 @@ import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.openscore.lang.entities.LoopStatement;
+import org.openscore.lang.entities.ForLoopStatement;
 
 public class ForTransformerTest {
 
@@ -15,21 +15,21 @@ public class ForTransformerTest {
 
     @Test
     public void testValidStatement() throws Exception {
-        LoopStatement statement = transformer.transform("x in collection");
+        ForLoopStatement statement = transformer.transform("x in collection");
         Assert.assertEquals("x", statement.getVarName());
         Assert.assertEquals("collection", statement.getCollectionExpression());
     }
 
     @Test
     public void testValidStatementWithSpaces() throws Exception {
-        LoopStatement statement = transformer.transform("x in range(0, 9)");
+        ForLoopStatement statement = transformer.transform("x in range(0, 9)");
         Assert.assertEquals("x", statement.getVarName());
         Assert.assertEquals("range(0, 9)", statement.getCollectionExpression());
     }
 
     @Test
     public void testValidStatementAndTrim() throws Exception {
-        LoopStatement statement = transformer.transform(" min   in  collection  ");
+        ForLoopStatement statement = transformer.transform(" min   in  collection  ");
         Assert.assertEquals("min", statement.getVarName());
         Assert.assertEquals("collection", statement.getCollectionExpression());
     }
@@ -58,14 +58,14 @@ public class ForTransformerTest {
 
     @Test
     public void testMultipleInsAreTrimmed() throws Exception {
-        LoopStatement statement = transformer.transform(" in   in in ");
+        ForLoopStatement statement = transformer.transform(" in   in in ");
         Assert.assertEquals("in", statement.getVarName());
         Assert.assertEquals("in", statement.getCollectionExpression());
     }
 
     @Test
     public void testEmptyValue() throws Exception {
-        LoopStatement statement = transformer.transform("");
+        ForLoopStatement statement = transformer.transform("");
         Assert.assertNull(statement);
     }
 }

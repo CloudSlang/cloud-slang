@@ -1,7 +1,5 @@
 package org.openscore.lang.runtime.bindings;
 
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -9,9 +7,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.openscore.lang.entities.LoopStatement;
+import org.openscore.lang.entities.ForLoopStatement;
 import org.openscore.lang.runtime.env.Context;
-import org.openscore.lang.runtime.env.LoopCondition;
 
 import javax.script.ScriptEngine;
 import java.io.Serializable;
@@ -39,8 +36,8 @@ public class LoopsBindingTest {
     @Mock
     private ScriptEngine scriptEngine;
 
-    private LoopStatement createBasicForStatement() {
-        return new LoopStatement("x", "[1]", LoopStatement.Type.FOR);
+    private ForLoopStatement createBasicForStatement() {
+        return new ForLoopStatement("x", "[1]");
     }
 
     @Test

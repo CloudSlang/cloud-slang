@@ -16,27 +16,20 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
 
-public class LoopStatement implements Serializable{
-
-    public enum Type {
-        FOR, WHILE
-    }
+public class ForLoopStatement implements Serializable{
 
     private final String varName;
     private final String collectionExpression;
-    private final Type type;
 
-    public LoopStatement(String varName, String collectionExpression, Type type) {
+    public ForLoopStatement(String varName, String collectionExpression) {
         Validate.notBlank(varName, "for loop var name cannot be empty");
         Validate.notBlank(collectionExpression, "for loop collection expression cannot be empty");
-        Validate.notNull(type, "type cannot be null");
 
         this.varName = varName.trim();
         if (isContainInvalidChars(this.varName)) {
             throw new RuntimeException("for loop var name cannot contain invalid chars");
         }
         this.collectionExpression = collectionExpression.trim();
-        this.type = type;
     }
 
     private boolean isContainInvalidChars(String varName) {
@@ -51,10 +44,6 @@ public class LoopStatement implements Serializable{
         return collectionExpression;
     }
 
-    public Type getType() {
-        return type;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -62,12 +51,11 @@ public class LoopStatement implements Serializable{
         if (o == null || getClass() != o.getClass())
             return false;
 
-        LoopStatement that = (LoopStatement) o;
+        ForLoopStatement that = (ForLoopStatement) o;
 
         return new EqualsBuilder()
                 .append(varName, that.varName)
                 .append(collectionExpression, that.collectionExpression)
-                .append(type, that.type)
                 .isEquals();
     }
 
@@ -76,7 +64,6 @@ public class LoopStatement implements Serializable{
         return new HashCodeBuilder()
                 .append(varName)
                 .append(collectionExpression)
-                .append(type)
                 .toHashCode();
     }
 }

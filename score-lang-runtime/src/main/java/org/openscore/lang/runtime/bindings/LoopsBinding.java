@@ -11,7 +11,7 @@ package org.openscore.lang.runtime.bindings;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
-import org.openscore.lang.entities.LoopStatement;
+import org.openscore.lang.entities.ForLoopStatement;
 import org.openscore.lang.runtime.env.Context;
 import org.openscore.lang.runtime.env.ForLoopCondition;
 import org.openscore.lang.runtime.env.LoopCondition;
@@ -31,14 +31,15 @@ public class LoopsBinding {
     @Autowired
     private ScriptEvaluator scriptEvaluator;
 
-    public LoopCondition getOrCreateLoopCondition(LoopStatement loopStatement, Context flowContext, String nodeName) {
-        Validate.notNull(loopStatement, "loop statement cannot be null");
+    public LoopCondition getOrCreateLoopCondition(ForLoopStatement forLoopStatement, Context flowContext, String nodeName) {
+        Validate.notNull(forLoopStatement, "loop statement cannot be null");
         Validate.notNull(flowContext, "flow context cannot be null");
         Validate.notNull(nodeName, "node name cannot be null");
 
         Map<String, Serializable> langVariables = flowContext.getLangVariables();
         if (!langVariables.containsKey(LOOP_CONDITION_KEY)) {
-            LoopCondition loopCondition = createLoopCondition(loopStatement, flowContext, nodeName);
+            LoopCondition loopCondition = createForLoopCondition(
+                    forLoopStatement.getCollectionExpression(), flowContext, nodeName);
             langVariables.put(LOOP_CONDITION_KEY, loopCondition);
         }
         return (LoopCondition) langVariables.get(LOOP_CONDITION_KEY);
@@ -52,15 +53,6 @@ public class LoopsBinding {
         Serializable varValue = forLoopCondition.next();
         flowContext.putVariable(varName, varValue);
         logger.debug("name: " + varName + ", value: " + varValue);
-    }
-
-    private LoopCondition createLoopCondition(LoopStatement loopStatement, Context flowContext, String nodeName) {
-        switch (loopStatement.getType()) {
-            case FOR:
-                return createForLoopCondition(loopStatement.getCollectionExpression(), flowContext, nodeName);
-            default:
-                throw new RuntimeException("loop is not of 'for' type");
-        }
     }
 
     private LoopCondition createForLoopCondition(String collectionExpression, Context flowContext, String nodeName) {

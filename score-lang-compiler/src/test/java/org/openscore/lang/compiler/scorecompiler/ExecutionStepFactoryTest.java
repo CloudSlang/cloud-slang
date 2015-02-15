@@ -10,7 +10,7 @@
 package org.openscore.lang.compiler.scorecompiler;
 
 import org.openscore.lang.compiler.SlangTextualKeys;
-import org.openscore.lang.entities.LoopStatement;
+import org.openscore.lang.entities.ForLoopStatement;
 import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Input;
@@ -51,11 +51,11 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateStartStepPutForUnderTheRightKey() throws Exception {
-        LoopStatement statement = new LoopStatement("1", "2", LoopStatement.Type.FOR);
+        ForLoopStatement statement = new ForLoopStatement("1", "2");
         HashMap<String, Serializable> preTaskData = new HashMap<>();
         preTaskData.put(SlangTextualKeys.FOR_KEY, statement);
         ExecutionStep startStep = factory.createBeginTaskStep(1L, preTaskData, "", "");
-        LoopStatement actualStatement = (LoopStatement) startStep.getActionData()
+        ForLoopStatement actualStatement = (ForLoopStatement) startStep.getActionData()
                                  .get(ScoreLangConstants.LOOP_KEY);
         Assert.assertNotNull("for key is null", actualStatement);
         Assert.assertSame("inputs are not set under their key", statement, actualStatement);
