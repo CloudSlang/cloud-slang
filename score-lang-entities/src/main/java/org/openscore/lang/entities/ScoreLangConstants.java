@@ -42,7 +42,7 @@ public interface ScoreLangConstants {
     String TASK_NAVIGATION_KEY = "taskNavigationValues";
     String REF_ID = "refId";
     String LOOP_KEY = "loop";
-    String BREAK_LOOP_KEY = "breakLoop";
+    String BREAK_LOOP_KEY = "breakOn";
 
     // Events types
 	String SLANG_EXECUTION_EXCEPTION = "SLANG_EXECUTION_EXCEPTION";
