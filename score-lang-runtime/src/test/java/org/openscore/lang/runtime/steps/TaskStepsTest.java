@@ -9,13 +9,14 @@
 *******************************************************************************/
 package org.openscore.lang.runtime.steps;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.openscore.events.ScoreEvent;
 import org.openscore.lang.ExecutionRuntimeServices;
+import org.openscore.lang.entities.ForLoopStatement;
 import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
@@ -24,6 +25,8 @@ import org.openscore.lang.runtime.bindings.LoopsBinding;
 import org.openscore.lang.runtime.bindings.OutputsBinding;
 import org.openscore.lang.runtime.bindings.ScriptEvaluator;
 import org.openscore.lang.runtime.env.Context;
+import org.openscore.lang.runtime.env.ForLoopCondition;
+import org.openscore.lang.runtime.env.LoopCondition;
 import org.openscore.lang.runtime.env.ParentFlowData;
 import org.openscore.lang.runtime.env.ReturnValues;
 import org.openscore.lang.runtime.env.RunEnvironment;
@@ -47,9 +50,11 @@ import java.util.Map;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openscore.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
 import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
@@ -69,6 +74,9 @@ public class TaskStepsTest {
 
     @Autowired
     private OutputsBinding outputsBinding;
+
+    @Autowired
+    private LoopsBinding loopsBinding;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -230,6 +238,66 @@ public class TaskStepsTest {
         exception.expectMessage("CUSTOM");
         exception.expectMessage("navigation");
         taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues, createRuntimeServices(), 1L, "Task1");
+    }
+
+    /////////
+    //loops//
+    /////////
+
+    @Test
+    public void whenLoopKeyProvidedLoopConditionIsRequested(){
+        String collectionExpression = "collection";
+        ForLoopStatement statement = new ForLoopStatement("x", collectionExpression);
+        String nodeName = "task1";
+        Context context = new Context(new HashMap<String, Serializable>());
+        when(loopsBinding.getOrCreateLoopCondition(statement, context, nodeName))
+                .thenReturn(new ForLoopCondition(Arrays.asList("1", "2").iterator()));
+        RunEnvironment runEnv = new RunEnvironment();
+        runEnv.getStack().pushContext(context);
+        taskSteps.beginTask(new ArrayList<Input>(), statement, runEnv, createRuntimeServices(), nodeName, 1L, 2L, "2");
+        verify(loopsBinding).getOrCreateLoopCondition(statement, context, nodeName);
+    }
+
+    @Test
+    public void whenLoopConditionHasNoMoreNextStepIdSetToEndTask(){
+        String collectionExpression = "collection";
+        ForLoopStatement statement = new ForLoopStatement("x", collectionExpression);
+        String nodeName = "task1";
+        Context context = new Context(new HashMap<String, Serializable>());
+        LoopCondition mockLoopCondition = mock(LoopCondition.class);
+        when(mockLoopCondition.hasMore()).thenReturn(false);
+        when(loopsBinding.getOrCreateLoopCondition(statement, context, nodeName))
+                .thenReturn(mockLoopCondition);
+        RunEnvironment runEnv = new RunEnvironment();
+        runEnv.getStack().pushContext(context);
+        Long nextStepId = 2L;
+        ExecutionRuntimeServices runtimeServices = createRuntimeServices();
+        taskSteps.beginTask(new ArrayList<Input>(), statement, runEnv, runtimeServices, nodeName, 1L, nextStepId, "2");
+        Assert.assertEquals(nextStepId, runEnv.removeNextStepPosition());
+        Assert.assertEquals(context, runEnv.getStack().popContext());
+        Assert.assertNull(runtimeServices.pullRequestForChangingExecutionPlan());
+    }
+
+    @Test
+    public void whenLoopConditionHasMoreNextStepIdSetToEndTask(){
+        String collectionExpression = "collection";
+        ForLoopStatement statement = new ForLoopStatement("x", collectionExpression);
+        String nodeName = "task1";
+        Context context = new Context(new HashMap<String, Serializable>());
+        LoopCondition mockLoopCondition = mock(LoopCondition.class);
+        when(mockLoopCondition.hasMore()).thenReturn(true);
+        when(loopsBinding.getOrCreateLoopCondition(statement, context, nodeName))
+                .thenReturn(mockLoopCondition);
+        RunEnvironment runEnv = new RunEnvironment();
+        runEnv.getStack().pushContext(context);
+        Long nextStepId = 2L;
+        ExecutionRuntimeServices runtimeServices = mock(ExecutionRuntimeServices.class);
+        Long subflowFirstStepId = 11L;
+        when(runtimeServices.getSubFlowBeginStep(anyString())).thenReturn(subflowFirstStepId);
+        taskSteps.beginTask(new ArrayList<Input>(), statement, runEnv, runtimeServices, nodeName, 1L, nextStepId, "2");
+        Assert.assertEquals(subflowFirstStepId, runEnv.removeNextStepPosition());
+        Assert.assertEquals(context, runEnv.getStack().popContext());
+        Assert.assertNotNull(runtimeServices.pullRequestForChangingExecutionPlan());
     }
 
     private ExecutionRuntimeServices createRuntimeServices(){
