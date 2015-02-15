@@ -27,10 +27,10 @@ public class BreakTransformerTest {
     }
 
     @Test
-    public void testTransformWithEmptyListReturnDefault() throws Exception {
+    public void testTransformWithEmptyListReturnEmptyList() throws Exception {
         BreakTransformer breakTransformer = new BreakTransformer();
-        List<String> list = Arrays.asList(ScoreLangConstants.FAILURE_RESULT);
         List<String> returnValue = breakTransformer.transform(new ArrayList<String>());
-        Assert.assertEquals(list, returnValue);
+        List<String> expected = new ArrayList<>();
+        Assert.assertEquals(expected, returnValue);
     }
 }

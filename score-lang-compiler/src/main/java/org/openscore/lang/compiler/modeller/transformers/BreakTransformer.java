@@ -9,7 +9,6 @@
  *******************************************************************************/
 package org.openscore.lang.compiler.modeller.transformers;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +20,7 @@ public class BreakTransformer implements Transformer<List<String>, List<String>>
 
     @Override
     public List<String> transform(List<String> rawData) {
-        if (CollectionUtils.isEmpty(rawData)) {
+        if (rawData == null) {
             return Arrays.asList(ScoreLangConstants.FAILURE_RESULT);
         }
 
