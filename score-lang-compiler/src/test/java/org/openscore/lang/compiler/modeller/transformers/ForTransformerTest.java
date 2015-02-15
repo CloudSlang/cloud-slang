@@ -21,6 +21,13 @@ public class ForTransformerTest {
     }
 
     @Test
+    public void testValidStatementWithSpaces() throws Exception {
+        LoopStatement statement = transformer.transform("x in range(0, 9)");
+        Assert.assertEquals("x", statement.getVarName());
+        Assert.assertEquals("range(0, 9)", statement.getCollectionExpression());
+    }
+
+    @Test
     public void testValidStatementAndTrim() throws Exception {
         LoopStatement statement = transformer.transform(" min   in  collection  ");
         Assert.assertEquals("min", statement.getVarName());
