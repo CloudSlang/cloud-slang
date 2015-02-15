@@ -61,6 +61,7 @@ public class ExecutionStepFactory {
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.TASK_PUBLISH_KEY, postTaskData.get(SlangTextualKeys.PUBLISH_KEY));
         actionData.put(ScoreLangConstants.PREVIOUS_STEP_ID_KEY, index - 1);
+        actionData.put(ScoreLangConstants.BREAK_LOOP_KEY, postTaskData.get(SlangTextualKeys.BREAK_KEY));
         actionData.put(ScoreLangConstants.TASK_NAVIGATION_KEY, new HashMap<>(navigationValues));
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, taskName);
