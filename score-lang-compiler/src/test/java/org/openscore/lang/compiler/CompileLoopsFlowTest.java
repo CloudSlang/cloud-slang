@@ -25,6 +25,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -54,9 +55,25 @@ public class CompileLoopsFlowTest {
                                 .get(SlangTextualKeys.FOR_KEY);
         assertEquals("values", forStatement.getCollectionExpression());
         assertEquals("value", forStatement.getVarName());
-        @SuppressWarnings("unchecked") List<Output> actual = (List<Output>) task.getPostTaskActionData()
+        @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) task.getPostTaskActionData()
                                   .get(SlangTextualKeys.PUBLISH_KEY);
-        assertEquals("\'a\'", actual.get(0).getExpression());
+        assertEquals("\'a\'", outputs.get(0)
+                                    .getExpression());
+        assertEquals(Arrays.asList(ScoreLangConstants.FAILURE_RESULT),
+                task.getPostTaskActionData().get(SlangTextualKeys.BREAK_KEY));
+    }
+
+
+    @Test
+    public void testPreCompileLoopFlowWithBreak() throws Exception {
+        URI flow = getClass().getResource("/loops/loop_with_break.sl").toURI();
+        Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
+        assertNotNull("executable is null", executable);
+        Task task = ((Flow) executable).getWorkflow()
+                                       .getTasks()
+                                       .getFirst();
+        assertEquals(Arrays.asList(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.FAILURE_RESULT),
+                task.getPostTaskActionData().get(SlangTextualKeys.BREAK_KEY));
     }
 
     @Test
@@ -87,13 +104,33 @@ public class CompileLoopsFlowTest {
         assertNotNull("artifact is null", artifact);
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
         assertNotNull("executionPlan is null", executionPlan);
-        Map<String, ?> actionData = executionPlan.getStep(2L)
+        Map<String, ?> startTaskActionData = executionPlan.getStep(2L)
                                                  .getActionData();
-        assertTrue(actionData.containsKey(ScoreLangConstants.LOOP_KEY));
-        ForLoopStatement forStatement = (ForLoopStatement) actionData.get(ScoreLangConstants.LOOP_KEY);
+        assertTrue(startTaskActionData.containsKey(ScoreLangConstants.LOOP_KEY));
+        ForLoopStatement forStatement = (ForLoopStatement) startTaskActionData.get(ScoreLangConstants.LOOP_KEY);
         assertEquals("values", forStatement.getCollectionExpression());
         assertEquals("value", forStatement.getVarName());
 
+        Map<String, ?> endTaskActionData = executionPlan.getStep(3L)
+                                                          .getActionData();
+        assertEquals(Arrays.asList(ScoreLangConstants.FAILURE_RESULT),
+                endTaskActionData.get(ScoreLangConstants.BREAK_LOOP_KEY));
+    }
+
+    @Test
+    public void testCompileLoopFlowWithBreak() throws Exception {
+        URI flow = getClass().getResource("/loops/loop_with_break.sl").toURI();
+        URI operation = getClass().getResource("/loops/print.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+        CompilationArtifact artifact = compiler.compile(SlangSource.fromFile(flow), path);
+        assertNotNull("artifact is null", artifact);
+        ExecutionPlan executionPlan = artifact.getExecutionPlan();
+
+        Map<String, ?> endTaskActionData = executionPlan.getStep(3L)
+                                                          .getActionData();
+        assertEquals(Arrays.asList(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.FAILURE_RESULT),
+                endTaskActionData.get(ScoreLangConstants.BREAK_LOOP_KEY));
     }
 
 }
