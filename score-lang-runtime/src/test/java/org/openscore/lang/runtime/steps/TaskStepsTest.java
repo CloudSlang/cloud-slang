@@ -300,6 +300,60 @@ public class TaskStepsTest {
         Assert.assertNotNull(runtimeServices.pullRequestForChangingExecutionPlan());
     }
 
+    @Test
+    public void whenLoopConditionIsOfForTypeStartTaskWillIncrementIt(){
+        String collectionExpression = "collection";
+        ForLoopStatement statement = new ForLoopStatement("x", collectionExpression);
+        String nodeName = "task1";
+        Context context = new Context(new HashMap<String, Serializable>());
+        ForLoopCondition mockLoopCondition = mock(ForLoopCondition.class);
+        when(mockLoopCondition.hasMore()).thenReturn(true);
+        when(loopsBinding.getOrCreateLoopCondition(statement, context, nodeName))
+                .thenReturn(mockLoopCondition);
+        RunEnvironment runEnv = new RunEnvironment();
+        runEnv.getStack().pushContext(context);
+        taskSteps.beginTask(new ArrayList<Input>(), statement, runEnv, createRuntimeServices(), nodeName, 1L, 2L, "2");
+        verify(loopsBinding).incrementForLoop("x", context, mockLoopCondition);
+    }
+
+    @Test
+    public void whenLoopConditionHasMoreEndTaskSetNextPositionIdToBeginTask() throws Exception {
+        RunEnvironment runEnv = new RunEnvironment();
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), "SUCCESS"));
+        HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
+        taskNavigationValues.put("SUCCESS", new ResultNavigation(3L, "SUCCESS"));
+        Context context = new Context(new HashMap<String, Serializable>());
+        runEnv.getStack().pushContext(context);
+        LoopCondition mockLoopCondition = mock(LoopCondition.class);
+        context.getLangVariables().put(LoopCondition.LOOP_CONDITION_KEY, mockLoopCondition);
+        when(mockLoopCondition.hasMore()).thenReturn(true);
+
+        Long previousStepId = 1L;
+        taskSteps.endTask(runEnv, new ArrayList<Output>(),
+                taskNavigationValues, createRuntimeServices(), previousStepId, "taskName");
+
+        Assert.assertEquals(previousStepId, runEnv.removeNextStepPosition());
+        Assert.assertEquals(context, runEnv.getStack().popContext());
+    }
+
+    @Test
+    public void whenLoopConditionHasNoMoreEndTaskDeletesKeyFromLangVars() throws Exception {
+        RunEnvironment runEnv = new RunEnvironment();
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), "SUCCESS"));
+        HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
+        taskNavigationValues.put("SUCCESS", new ResultNavigation(3L, "SUCCESS"));
+        Context context = new Context(new HashMap<String, Serializable>());
+        runEnv.getStack().pushContext(context);
+        LoopCondition mockLoopCondition = mock(LoopCondition.class);
+        context.getLangVariables().put(LoopCondition.LOOP_CONDITION_KEY, mockLoopCondition);
+        when(mockLoopCondition.hasMore()).thenReturn(false);
+
+        taskSteps.endTask(runEnv, new ArrayList<Output>(),
+                taskNavigationValues, createRuntimeServices(), 1L, "taskName");
+
+        Assert.assertFalse(context.getLangVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
+    }
+
     private ExecutionRuntimeServices createRuntimeServices(){
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         runtimeServices.setSubFlowsData(new HashMap<String, Long>(), new HashMap<String, Long>());
