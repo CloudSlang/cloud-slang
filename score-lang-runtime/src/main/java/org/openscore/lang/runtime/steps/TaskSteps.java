@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.openscore.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static org.openscore.lang.entities.ScoreLangConstants.BREAK_LOOP_KEY;
 import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
 import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
 import static org.openscore.lang.entities.ScoreLangConstants.LOOP_KEY;
@@ -123,6 +124,7 @@ public class TaskSteps extends AbstractSteps {
                         @Param(TASK_NAVIGATION_KEY) Map<String, ResultNavigation> taskNavigationValues,
                         @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                         @Param(PREVIOUS_STEP_ID_KEY) Long previousStepId,
+                        @Param(BREAK_LOOP_KEY) List<String> breakOn,
                         @Param(NODE_NAME_KEY) String nodeName) {
 
         Context flowContext = runEnv.getStack().popContext();
@@ -142,7 +144,7 @@ public class TaskSteps extends AbstractSteps {
         Map<String, Serializable> langVariables = flowContext.getLangVariables();
         if (langVariables.containsKey(LoopCondition.LOOP_CONDITION_KEY)){
             LoopCondition loopCondition = (LoopCondition) langVariables.get(LoopCondition.LOOP_CONDITION_KEY);
-            if (loopCondition.hasMore()) {
+            if (!shouldBreakLoop(breakOn, executableReturnValues) && loopCondition.hasMore()) {
                 runEnv.putNextStepPosition(previousStepId);
                 runEnv.getStack().pushContext(flowContext);
                 return;
@@ -179,6 +181,10 @@ public class TaskSteps extends AbstractSteps {
                 Pair.of(LanguageEventData.levelName.TASK_NAME.name(),nodeName));
 
         runEnv.getStack().pushContext(flowContext);
+    }
+
+    private boolean shouldBreakLoop(List<String> breakOn, ReturnValues executableReturnValues) {
+        return breakOn.contains(executableReturnValues.getResult());
     }
 
     private void requestSwitchToRefExecutableExecutionPlan(RunEnvironment runEnv,
