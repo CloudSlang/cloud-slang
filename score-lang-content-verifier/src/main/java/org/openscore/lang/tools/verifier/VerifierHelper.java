@@ -62,7 +62,7 @@ public class VerifierHelper {
     }
 
     private void transformSlangFilesInDirToModels(String directoryPath) {
-        Validate.notNull(directoryPath, "Directory path path can not be null");
+        Validate.notNull(directoryPath, "You mut specify a path");
         Collection<File> slangFiles = FileUtils.listFiles(new File(directoryPath), SLANG_FILE_EXTENSIONS, true);
         log.info("Start compiling all slang files under: " + directoryPath);
         log.info(slangFiles.size() + " .sl files were found");
