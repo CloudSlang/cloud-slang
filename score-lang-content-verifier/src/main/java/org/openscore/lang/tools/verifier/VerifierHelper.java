@@ -48,21 +48,19 @@ public class VerifierHelper {
 
     private String[] SLANG_FILE_EXTENSIONS = {"sl", "sl.yaml", "sl.yml"};
 
-    private Map<String, Executable> slangModels = new HashMap<>();
-
-    private Map<String, CompilationArtifact> compiledArtifacts = new HashMap<>();
 
     /**
      * Transform all Slang files in given directory to Slang models, and store them
      * @param directoryPath given directory containing all Slang files
      */
     public void verifyAllSlangFilesInDirAreValid(String directoryPath){
-        transformSlangFilesInDirToModels(directoryPath);
-        compileAllSlangModels();
+        Map<String, Executable> slangModels = transformSlangFilesInDirToModels(directoryPath);
+        compileAllSlangModels(slangModels);
     }
 
-    private void transformSlangFilesInDirToModels(String directoryPath) {
+    private Map<String, Executable> transformSlangFilesInDirToModels(String directoryPath) {
         Validate.notNull(directoryPath, "You mut specify a path");
+        Map<String, Executable> slangModels = new HashMap<>();
         Collection<File> slangFiles = FileUtils.listFiles(new File(directoryPath), SLANG_FILE_EXTENSIONS, true);
         log.info("Start compiling all slang files under: " + directoryPath);
         log.info(slangFiles.size() + " .sl files were found");
@@ -81,13 +79,15 @@ public class VerifierHelper {
         if(slangFiles.size() != slangModels.size()){
             throw new RuntimeException("Found: " + slangFiles.size() + " .sl files in path: " + directoryPath + ". Managed to create slang models for only: " + slangModels.size());
         }
+        return slangModels;
     }
 
-    private void compileAllSlangModels()  {
+    private void compileAllSlangModels(Map<String, Executable> slangModels)  {
         Collection<Executable> models = slangModels.values();
+        Map<String, CompilationArtifact> compiledArtifacts = new HashMap<>();
         for(Executable slangModel : models) {
             try {
-                Set<Executable> dependenciesModels = getModelDependenciesRecursively(slangModel);
+                Set<Executable> dependenciesModels = getModelDependenciesRecursively(slangModels, slangModel);
                 CompilationArtifact compiledSource = compiledArtifacts.get(slangModel.getName());
                 if (compiledSource == null) {
                     compiledSource = scoreCompiler.compile(slangModel, dependenciesModels);
@@ -109,7 +109,7 @@ public class VerifierHelper {
         System.out.println(successMessage);
     }
 
-    private Set<Executable> getModelDependenciesRecursively(Executable slangModel) {
+    private Set<Executable> getModelDependenciesRecursively(Map<String, Executable> slangModels, Executable slangModel) {
         Map<String, SlangFileType> sourceDependencies = slangModel.getDependencies();
         Set<Executable> dependenciesModels = new HashSet<>();
         for (String dependencyName : sourceDependencies.keySet()) {
@@ -118,7 +118,7 @@ public class VerifierHelper {
                 throw new RuntimeException("Failed compiling slang source: " + slangModel.getName() + ". Missing dependency: " + dependencyName);
             }
             dependenciesModels.add(dependency);
-            dependenciesModels.addAll(getModelDependenciesRecursively(dependency));
+            dependenciesModels.addAll(getModelDependenciesRecursively(slangModels, dependency));
         }
         return dependenciesModels;
     }
