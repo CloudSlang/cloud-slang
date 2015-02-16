@@ -67,7 +67,7 @@ public class VerifierHelper {
         log.info("Start compiling all slang files under: " + directoryPath);
         log.info(slangFiles.size() + " .sl files were found");
         for(File slangFile: slangFiles){
-            Validate.isTrue(slangFile.isFile(), "filePath must lead to a file");
+            Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() + "\' must lead to a file");
             Executable sourceModel;
             try {
                 sourceModel = slangCompiler.preCompile(fromFile(slangFile));
