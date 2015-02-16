@@ -93,8 +93,6 @@ public class VerifierHelper {
                     compiledSource = scoreCompiler.compile(slangModel, dependenciesModels);
                     log.info("Compiled: " + slangModel.getName() + " successfully");
                     compiledArtifacts.put(slangModel.getName(), compiledSource);
-                } else {
-                    log.error("Failed to compile: " + slangModel.getName());
                 }
             } catch (Exception e) {
                 log.error("Failed compiling Slang source: " + slangModel.getName() + ". Exception is : " + e.getMessage());
