@@ -52,10 +52,11 @@ public class SlangContentVerifier {
     /**
      * Transform all Slang files in given directory to Slang models, and store them
      * @param directoryPath given directory containing all Slang files
+     * @return the number of valid Slang files in the given directory
      */
-    public void verifyAllSlangFilesInDirAreValid(String directoryPath){
+    public int verifyAllSlangFilesInDirAreValid(String directoryPath){
         Map<String, Executable> slangModels = transformSlangFilesInDirToModels(directoryPath);
-        compileAllSlangModels(slangModels);
+        return compileAllSlangModels(slangModels);
     }
 
     private Map<String, Executable> transformSlangFilesInDirToModels(String directoryPath) {
@@ -75,7 +76,7 @@ public class SlangContentVerifier {
                 throw e;
             }
             if(sourceModel != null) {
-                verifyStaticCode(slangFile, sourceModel);
+                staticSlangFileValidation(slangFile, sourceModel);
                 slangModels.put(getUniqueName(sourceModel), sourceModel);
             }
         }
@@ -85,7 +86,7 @@ public class SlangContentVerifier {
         return slangModels;
     }
 
-    private void compileAllSlangModels(Map<String, Executable> slangModels)  {
+    private int compileAllSlangModels(Map<String, Executable> slangModels)  {
         Collection<Executable> models = slangModels.values();
         Map<String, CompilationArtifact> compiledArtifacts = new HashMap<>();
         for(Executable slangModel : models) {
@@ -112,6 +113,7 @@ public class SlangContentVerifier {
         }
         String successMessage = "Successfully finished Compilation of: " + compiledArtifacts.size() + " Slang files";
         log.info(successMessage);
+        return compiledArtifacts.size();
     }
 
     private Set<Executable> getModelDependenciesRecursively(Map<String, Executable> slangModels, Executable slangModel) {
@@ -128,8 +130,22 @@ public class SlangContentVerifier {
         return dependenciesModels;
     }
 
-    private void verifyStaticCode(File slangFile, Executable executable){
-        // todo: implement
+    private void staticSlangFileValidation(File slangFile, Executable executable){
+        String executableNamespacePath = executable.getNamespace().replace('.', File.separatorChar);
+        String[] splitPath = slangFile.getAbsolutePath().split("\\Q" + File.separatorChar);
+        // Validate that the namespace matches the path of the file
+        String namespaceErrorMessage = "Namespace of slang source: " + executable.getName() + " is wrong.\nIt is currently \'" +
+                                    executable.getNamespace() + "\', but it should match the file path: \'" + slangFile.getPath() + "\'";
+        int indexOfLastFileSeparator = slangFile.getAbsolutePath().lastIndexOf(File.separatorChar);
+        String filePathWithoutFileName = slangFile.getAbsolutePath().substring(0, indexOfLastFileSeparator);
+        Validate.isTrue(filePathWithoutFileName.endsWith(executableNamespacePath), namespaceErrorMessage);
+
+        // Validate executable name is the same as the file name
+        String[] splitName = slangFile.getName().split("\\Q.");
+        String fileNameNoExtension = splitName[0];
+        String executableNameErrorMessage = "Name of flow or operation: \'" + executable.getName() +
+                                        "\' is invalid.\nIt should be identical to the file name: \'" + fileNameNoExtension + "\'";
+        Validate.isTrue(fileNameNoExtension.endsWith(executable.getName()), executableNameErrorMessage);
     }
 
     private String getUniqueName(Executable sourceModel) {
