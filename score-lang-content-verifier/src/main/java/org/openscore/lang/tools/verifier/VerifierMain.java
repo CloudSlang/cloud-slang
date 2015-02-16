@@ -35,6 +35,7 @@ public class VerifierMain {
             System.exit(0);
         } catch (Exception e) {
             System.out.println(e.getMessage() + "\n\nFAILURE: Validation of slang files under directory: \"" + repositoryPath + "\" failed.");
+            // TODO - do we want to through exception or exit with 1?
             System.exit(1);
         }
     }
