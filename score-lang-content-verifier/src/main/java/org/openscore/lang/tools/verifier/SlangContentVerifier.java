@@ -11,6 +11,7 @@ package org.openscore.lang.tools.verifier;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openscore.lang.compiler.SlangCompiler;
 import org.openscore.lang.compiler.modeller.model.Executable;
@@ -58,7 +59,8 @@ public class SlangContentVerifier {
     }
 
     private Map<String, Executable> transformSlangFilesInDirToModels(String directoryPath) {
-        Validate.notNull(directoryPath, "You mut specify a path");
+        Validate.notEmpty(directoryPath, "You must specify a path");
+        Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" + directoryPath + "\' does not lead to a directory");
         Map<String, Executable> slangModels = new HashMap<>();
         Collection<File> slangFiles = FileUtils.listFiles(new File(directoryPath), SLANG_FILE_EXTENSIONS, true);
         log.info("Start compiling all slang files under: " + directoryPath);
@@ -72,11 +74,13 @@ public class SlangContentVerifier {
                 log.error("Failed creating Slang ,models for directory: " + directoryPath + ". Exception is : " + e.getMessage());
                 throw e;
             }
-            verifyStaticCode(slangFile, sourceModel);
-            slangModels.put(getUniqueName(sourceModel), sourceModel);
+            if(sourceModel != null) {
+                verifyStaticCode(slangFile, sourceModel);
+                slangModels.put(getUniqueName(sourceModel), sourceModel);
+            }
         }
         if(slangFiles.size() != slangModels.size()){
-            throw new RuntimeException("Found: " + slangFiles.size() + " .sl files in path: " + directoryPath + ". Managed to create slang models for only: " + slangModels.size());
+            throw new RuntimeException("Some Slang files were not pre-compiled.\nFound: " + slangFiles.size() + " slang files in path: \'" + directoryPath + "\' But managed to create slang models for only: " + slangModels.size());
         }
         return slangModels;
     }
@@ -90,8 +94,12 @@ public class SlangContentVerifier {
                 CompilationArtifact compiledSource = compiledArtifacts.get(slangModel.getName());
                 if (compiledSource == null) {
                     compiledSource = scoreCompiler.compile(slangModel, dependenciesModels);
-                    log.info("Compiled: " + slangModel.getName() + " successfully");
-                    compiledArtifacts.put(slangModel.getName(), compiledSource);
+                    if(compiledSource != null) {
+                        log.info("Compiled: " + slangModel.getName() + " successfully");
+                        compiledArtifacts.put(slangModel.getName(), compiledSource);
+                    } else {
+                        log.error("Failed to compile source: " + slangModel.getName());
+                    }
                 }
             } catch (Exception e) {
                 log.error("Failed compiling Slang source: " + slangModel.getName() + ". Exception is : " + e.getMessage());
@@ -99,11 +107,11 @@ public class SlangContentVerifier {
             }
         }
         if(compiledArtifacts.size() != slangModels.size()){
-            throw new RuntimeException("Out of: " + slangModels.size() + " slang models, compiled only: " + slangModels.size());
+            throw new RuntimeException("Some Slang files were not compiled.\n" +
+                    "Found: " + slangModels.size() + " slang models, but managed to compile only: " + compiledArtifacts.size());
         }
         String successMessage = "Successfully finished Compilation of: " + compiledArtifacts.size() + " Slang files";
         log.info(successMessage);
-        System.out.println(successMessage);
     }
 
     private Set<Executable> getModelDependenciesRecursively(Map<String, Executable> slangModels, Executable slangModel) {
@@ -125,7 +133,14 @@ public class SlangContentVerifier {
     }
 
     private String getUniqueName(Executable sourceModel) {
-        return sourceModel.getNamespace() + "." + sourceModel.getName();
+        String uniqueName;
+        String namespace = sourceModel.getNamespace();
+        if(StringUtils.isNotEmpty(namespace)){
+            uniqueName = namespace + "." + sourceModel.getName();
+        } else {
+            uniqueName = sourceModel.getName();
+        }
+        return uniqueName;
     }
 
 }
