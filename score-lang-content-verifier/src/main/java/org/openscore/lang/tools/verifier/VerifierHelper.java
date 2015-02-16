@@ -79,7 +79,7 @@ public class VerifierHelper {
             slangModels.put(getUniqueName(sourceModel), sourceModel);
         }
         if(slangFiles.size() != slangModels.size()){
-            throw new RuntimeException("We found: " + slangFiles.size() + " .sl files in path: " + directoryPath + ". We managed to create slang models for only: " + slangModels.size());
+            throw new RuntimeException("Found: " + slangFiles.size() + " .sl files in path: " + directoryPath + ". Managed to create slang models for only: " + slangModels.size());
         }
     }
 
