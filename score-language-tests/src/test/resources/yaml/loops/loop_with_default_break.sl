@@ -4,7 +4,7 @@ imports:
   ops: loops
 
 flow:
-  name: loop_with_empty_break
+  name: loop_with_default_break
   inputs:
     - values: [1,2,3]
   workflow:
