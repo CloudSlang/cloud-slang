@@ -19,17 +19,18 @@ import java.io.File;
 /*
  * Created by stoneo on 1/11/2015.
  */
-public class SlangFilesVerifier {
+public class VerifierMain {
 
     public static void main(String[] args) {
         String repositoryPath = args[0];
+        //tODO: add tests for validity including os path separators ...
         Validate.notNull(repositoryPath, "You must pass a path to your repository");
         Validate.isTrue(new File(repositoryPath).isDirectory(), "Directory path argument \'" + repositoryPath + "\' does not lead to a directory");
 
         ApplicationContext context = new AnnotationConfigApplicationContext(VerifierSpringConfiguration.class);
-        VerifierHelper verifierHelper = context.getBean(VerifierHelper.class);
+        SlangContentVerifier slangContentVerifier = context.getBean(SlangContentVerifier.class);
         try {
-            verifierHelper.verifyAllSlangFilesInDirAreValid(repositoryPath);
+            slangContentVerifier.verifyAllSlangFilesInDirAreValid(repositoryPath);
             System.out.println("SUCCESS: All slang files under directory: \"" + repositoryPath + "\" are valid.");
             System.exit(0);
         } catch (Exception e) {

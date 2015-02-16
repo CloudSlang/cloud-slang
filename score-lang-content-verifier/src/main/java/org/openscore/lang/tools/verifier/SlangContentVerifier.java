@@ -20,7 +20,6 @@ import org.openscore.lang.entities.CompilationArtifact;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +35,7 @@ import static org.openscore.lang.compiler.SlangSource.fromFile;
 /**
  * Verifies all files with extensions: .sl, .sl.yaml or .sl.yml in a given directory are valid
  */
-public class VerifierHelper {
+public class SlangContentVerifier {
 
     @Autowired
     private SlangCompiler slangCompiler;
@@ -44,7 +43,7 @@ public class VerifierHelper {
     @Autowired
     private ScoreCompiler scoreCompiler;
 
-    private final static Logger log = Logger.getLogger(SlangFilesVerifier.class);
+    private final static Logger log = Logger.getLogger(VerifierMain.class);
 
     private String[] SLANG_FILE_EXTENSIONS = {"sl", "sl.yaml", "sl.yml"};
 
@@ -100,7 +99,7 @@ public class VerifierHelper {
             }
         }
         if(compiledArtifacts.size() != slangModels.size()){
-            throw new RuntimeException("Out of: " + slangModels.size() + " slang models, we managed to compile only: " + slangModels.size());
+            throw new RuntimeException("Out of: " + slangModels.size() + " slang models, compiled only: " + slangModels.size());
         }
         String successMessage = "Successfully finished Compilation of: " + compiledArtifacts.size() + " Slang files";
         log.info(successMessage);

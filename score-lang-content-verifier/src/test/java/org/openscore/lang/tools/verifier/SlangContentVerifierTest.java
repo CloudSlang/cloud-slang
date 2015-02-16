@@ -5,15 +5,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.openscore.lang.compiler.SlangCompiler;
-import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.compiler.scorecompiler.ScoreCompiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.net.URL;
 
 import static org.mockito.Mockito.mock;
 
@@ -31,8 +28,8 @@ import static org.mockito.Mockito.mock;
  * Created by stoneo on 2/11/2015.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = VerifierHelperTest.Config.class)
-public class VerifierHelperTest {
+@ContextConfiguration(classes = SlangContentVerifierTest.Config.class)
+public class SlangContentVerifierTest {
 
     @Autowired
     private SlangCompiler slangCompiler;
@@ -65,8 +62,8 @@ public class VerifierHelperTest {
         }
 
         @Bean
-        public VerifierHelper verifierHelper() {
-            return new VerifierHelper();
+        public SlangContentVerifier verifierHelper() {
+            return new SlangContentVerifier();
         }
 
     }

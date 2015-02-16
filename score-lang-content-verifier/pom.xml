@@ -44,7 +44,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.openscore.lang.tools.verifier.SlangFilesVerifier</mainClass>
+                            <mainClass>org.openscore.lang.tools.verifier.VerifierMain</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

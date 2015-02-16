@@ -10,7 +10,7 @@
 package org.openscore.lang.tools.verifier.configuration;
 
 import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
-import org.openscore.lang.tools.verifier.VerifierHelper;
+import org.openscore.lang.tools.verifier.SlangContentVerifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Import;
 @Import(SlangCompilerSpringConfig.class)
 public class VerifierSpringConfiguration {
     @Bean
-    public VerifierHelper verifierHelper(){
-        return new VerifierHelper();
+    public SlangContentVerifier verifierHelper(){
+        return new SlangContentVerifier();
     }
 }
