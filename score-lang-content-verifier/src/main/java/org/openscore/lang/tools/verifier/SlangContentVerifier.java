@@ -72,7 +72,7 @@ public class SlangContentVerifier {
             try {
                 sourceModel = slangCompiler.preCompile(fromFile(slangFile));
             } catch (Exception e) {
-                log.error("Failed creating Slang ,models for directory: " + directoryPath + ". Exception is : " + e.getMessage());
+                log.error("Failed creating Slang models for directory: " + directoryPath + ". Exception is : " + e.getMessage());
                 throw e;
             }
             if(sourceModel != null) {
@@ -131,6 +131,9 @@ public class SlangContentVerifier {
     }
 
     private void staticSlangFileValidation(File slangFile, Executable executable){
+        // Validate that the namespace is not empty
+        Validate.notEmpty(executable.getNamespace(), "Namespace of slang source: " + executable.getName() + " cannot be empty.");
+
         String executableNamespacePath = executable.getNamespace().replace('.', File.separatorChar);
         // Validate that the namespace matches the path of the file
         String namespaceErrorMessage = "Namespace of slang source: " + executable.getName() + " is wrong.\nIt is currently \'" +
@@ -144,18 +147,11 @@ public class SlangContentVerifier {
         String fileNameNoExtension = splitName[0];
         String executableNameErrorMessage = "Name of flow or operation: \'" + executable.getName() +
                                         "\' is invalid.\nIt should be identical to the file name: \'" + fileNameNoExtension + "\'";
-        Validate.isTrue(fileNameNoExtension.endsWith(executable.getName()), executableNameErrorMessage);
+        Validate.isTrue(fileNameNoExtension.equals(executable.getName()), executableNameErrorMessage);
     }
 
     private String getUniqueName(Executable sourceModel) {
-        String uniqueName;
-        String namespace = sourceModel.getNamespace();
-        if(StringUtils.isNotEmpty(namespace)){
-            uniqueName = namespace + "." + sourceModel.getName();
-        } else {
-            uniqueName = sourceModel.getName();
-        }
-        return uniqueName;
+        return sourceModel.getNamespace() + "." + sourceModel.getName();
     }
 
 }
