@@ -40,4 +40,12 @@ public interface SlangCompiler {
      */
     Map<String, ? extends Serializable> loadSystemProperties(SlangSource... sources);
 
+    /**
+     * Load input files sources written in slang and map them to fully qualified names
+     * @param sources the {@link org.openscore.lang.compiler.SlangSource}s containing the input files
+     * @return map containing all of the inputs with fully qualified keys
+     */
+    Map<String, Serializable> loadFileInputs(SlangSource... sources);
+
+
 }

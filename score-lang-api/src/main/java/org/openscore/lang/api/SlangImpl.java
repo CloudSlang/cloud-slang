@@ -99,6 +99,11 @@ public class SlangImpl implements Slang {
 	}
 
     @Override
+    public Map<String, Serializable> loadFileInputs(SlangSource... sources) {
+        return compiler.loadFileInputs(sources);
+    }
+
+    @Override
     public void subscribeOnEvents(ScoreEventListener eventListener, Set<String> eventTypes) {
         eventBus.subscribe(eventListener, eventTypes);
     }

@@ -21,4 +21,6 @@ public interface CompilerHelper {
 
 	public Map<String, ? extends Serializable> loadSystemProperties(List<String> systemPropertyFiles);
 
+    public Map<String, Serializable> loadInputsFromFile(List<String> inputFiles);
+
 }

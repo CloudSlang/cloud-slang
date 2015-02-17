@@ -21,6 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 @Component
 public class YamlParser {
 
@@ -42,5 +46,19 @@ public class YamlParser {
             throw new RuntimeException("There was a problem parsing the YAML source: " + source.getName() + ".\n" + e.getMessage(), e);
         }
     }
+    public Map<String, Serializable> parseInputFile(SlangSource source){
+        Validate.notEmpty(source.getSource(), "Source " + source.getName() + " cannot be empty");
+
+        try {
+            @SuppressWarnings("unchecked") Map<String,Serializable> inputs =  (Map<String, Serializable>)yaml.load(source.getSource());
+            if(inputs == null) {
+                throw new RuntimeException("Source " + source.getName() + " does not contain YAML content");
+            }
+            return inputs;
+        } catch (Throwable e) {
+            throw new RuntimeException("There was a problem parsing the YAML source: " + source.getName() + ".\n" + e.getMessage(), e);
+        }
+    }
+
 
 }

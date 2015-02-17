@@ -60,6 +60,13 @@ public interface Slang {
 	public Map<String, ? extends Serializable> loadSystemProperties(SlangSource... sources);
 
     /**
+     * Load input file sources written in slang and map them to fully qualified names
+     * @param sources the slang sources containing the inputs
+     * @return map containing all of the inputs with fully qualified keys
+     */
+    public Map<String, Serializable> loadFileInputs(SlangSource... sources);
+
+    /**
      * Subscribe to events of score or slang
      * @param eventListener listener for the events
      * @param eventTypes set of types of events to subscribe to

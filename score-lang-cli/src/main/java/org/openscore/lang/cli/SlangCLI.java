@@ -8,6 +8,7 @@
  */
 package org.openscore.lang.cli;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.openscore.events.EventConstants;
@@ -64,19 +65,30 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. slang run --f C:\\Slang\\flow.yaml") final File file,
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath,
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, Serializable> inputs,
+            @CliOption(key = {"fi", "file-inputs"}, mandatory = false, help = "comma separated list of input file locations") final List<String> inputFiles,
             @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = "comma separated list of system property file locations") final List<String> systemPropertyFiles) throws IOException {
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, classPath);
         Map<String, ? extends Serializable> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
+        Map<String, Serializable> fileInputs = compilerHelper.loadInputsFromFile(inputFiles);
+        Map<String, Serializable> mergedInputs = new HashMap<>();
+
+        if(MapUtils.isNotEmpty(fileInputs)){
+            mergedInputs.putAll(fileInputs);
+        }
+        if(MapUtils.isNotEmpty(inputs)){
+            mergedInputs.putAll(inputs);
+        }
+
         Long id;
         if (!triggerAsync) {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            id = scoreServices.triggerSync(compilationArtifact, inputs, systemProperties);
+            id = scoreServices.triggerSync(compilationArtifact, mergedInputs, systemProperties);
             stopWatch.stop();
             return triggerSyncMsg(id, stopWatch.toString());
         }
-        id = scoreServices.trigger(compilationArtifact, inputs, systemProperties);
+        id = scoreServices.trigger(compilationArtifact, mergedInputs, systemProperties);
         return triggerAsyncMsg(id, compilationArtifact.getExecutionPlan().getName());
     }
 

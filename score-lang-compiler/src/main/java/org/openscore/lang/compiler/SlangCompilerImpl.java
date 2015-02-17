@@ -71,6 +71,21 @@ public class SlangCompilerImpl implements SlangCompiler {
 		}
 		return result;
 	}
+    @Override
+    public Map<String, Serializable> loadFileInputs(SlangSource... sources) {
+        Validate.notNull(sources, "You must supply a source to load");
+        Map<String, Serializable> result = new HashMap<>();
+        for(SlangSource source : sources) {
+            Map<String, Serializable> fileInputs = yamlParser.parseInputFile(source);
+            Validate.notNull(fileInputs, "No file inputs specified");
+            for(Map.Entry<String, Serializable> entry : fileInputs.entrySet()) {
+                result.put(entry.getKey(), entry.getValue().toString());
+            }
+        }
+        return result;
+    }
+
+
 
     @Override
     public Executable preCompile(SlangSource source) {

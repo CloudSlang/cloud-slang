@@ -25,11 +25,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static ch.lambdaj.Lambda.convert;
 
@@ -49,6 +45,7 @@ public class CompilerHelperImpl implements CompilerHelper{
     private final static Logger logger = Logger.getLogger(CompilerHelperImpl.class);
 
     private String[] SLANG_FILE_EXTENSIONS = {"yml", "yaml", "py","sl"};
+    private String[] INPUT_FILE_EXTENSIONS = {"yml", "yaml"};
 
     //tot add javadoc
     public CompilationArtifact compile(String filePath, String opName, List<String> dependencies) throws IOException {
@@ -84,11 +81,24 @@ public class CompilerHelperImpl implements CompilerHelper{
 	@Override
 	public Map<String, ? extends Serializable> loadSystemProperties(List<String> systemPropertyFiles) {
 		if(CollectionUtils.isEmpty(systemPropertyFiles)) return null;
-		SlangSource[] sources = new SlangSource[systemPropertyFiles.size()];
-		for(int i = 0; i < systemPropertyFiles.size(); i++) {
-			sources[i] = SlangSource.fromFile(new File(systemPropertyFiles.get(i)));
-		}
+		SlangSource[] sources  = loadSources(systemPropertyFiles);
 		return slang.loadSystemProperties(sources);
 	}
+    @Override
+    public Map<String, Serializable> loadInputsFromFile(List<String> inputFiles){
+        if(CollectionUtils.isEmpty(inputFiles)) return null;
+        SlangSource[] sources = loadSources(inputFiles);
+        return slang.loadFileInputs(sources);
+
+    }
+
+    private SlangSource[] loadSources(List<String> files) {
+
+        SlangSource[] sources = new SlangSource[files.size()];
+        for(int i = 0; i < files.size(); i++){
+            sources[i] = SlangSource.fromFile(new File(files.get(i)));
+        }
+        return sources;
+    }
 
 }
