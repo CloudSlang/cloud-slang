@@ -20,26 +20,38 @@ import java.util.regex.Pattern;
 
 @Component
 public class ForTransformer implements Transformer<String, ForLoopStatement>{
+
+    private final static String FOR_REGEX = "^(\\s+)?(\\w+)\\s+(in)\\s+(\\w+)(\\s+)?$";
+    private final static String FOR_IN_KEYWORD= " in ";
+
     @Override
     public ForLoopStatement transform(String rawData) {
         if (StringUtils.isEmpty(rawData)) {
             return null;
         }
-        String inKeyword = " in ";
-        String regex = "^(\\s+)?(\\w+)\\s+(in)\\s+(\\w+)(\\s+)?$";
-        Pattern compile = Pattern.compile(regex);
-        Matcher matcher = compile.matcher(rawData);
+
+        Pattern regex = Pattern.compile(FOR_REGEX);
+        Matcher matcher = regex.matcher(rawData);
         String varName;
         String collectionExpression;
         if (matcher.find()) {
             varName = matcher.group(2);
             collectionExpression = matcher.group(4);
         } else {
-            varName = StringUtils.substringBefore(rawData, inKeyword);
-            collectionExpression = StringUtils.substringAfter(rawData, inKeyword);
+            varName = StringUtils.substringBefore(rawData, FOR_IN_KEYWORD);
+            collectionExpression = StringUtils.substringAfter(rawData, FOR_IN_KEYWORD);
         }
-        return new ForLoopStatement(varName, collectionExpression);
+        varName = varName.trim();
+        if (isContainInvalidChars(varName)) {
+            throw new RuntimeException("for loop var name cannot contain invalid chars");
+        }
+        return new ForLoopStatement(varName, collectionExpression.trim());
     }
+
+    private boolean isContainInvalidChars(String varName) {
+        return StringUtils.containsAny(varName, " \t\r\n\b");
+    }
+
 
     @Override
     public List<Scope> getScopes() {

@@ -9,13 +9,11 @@
  *******************************************************************************/
 package org.openscore.lang.runtime.env;
 
-import org.python.core.PyObject;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
-import java.util.regex.Pattern;
 
 public class ForLoopCondition implements LoopCondition {
 
@@ -25,26 +23,6 @@ public class ForLoopCondition implements LoopCondition {
         this.iterator = iterator;
     }
 
-    public static ForLoopCondition create(Serializable loopCollection){
-        Iterator<? extends Serializable> iterator;
-
-        if (loopCollection instanceof Iterable) {
-            Iterable<Serializable> serializableIterable = (Iterable<Serializable>) loopCollection;
-            iterator = serializableIterable.iterator();
-        } else if (loopCollection instanceof String) {
-            String[] strings = ((String) loopCollection).split(Pattern.quote(","));
-            List<String> list = Arrays.asList(strings);
-            iterator = list.iterator();
-        } else if (loopCollection instanceof PyObject) {
-            PyObject pyObject = (PyObject) loopCollection;
-            iterator = pyObject.asIterable().iterator();
-        } else {
-            return null;
-        }
-
-        return new ForLoopCondition(iterator);
-    }
-
     public Serializable next() {
         return iterator.next();
     }
@@ -52,5 +30,26 @@ public class ForLoopCondition implements LoopCondition {
     @Override
     public boolean hasMore() {
         return iterator.hasNext();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        ForLoopCondition that = (ForLoopCondition) o;
+
+        return new EqualsBuilder()
+                .append(this.iterator, that.iterator)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(iterator)
+                .toHashCode();
     }
 }

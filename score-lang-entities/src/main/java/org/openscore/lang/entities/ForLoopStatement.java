@@ -9,7 +9,6 @@
  *******************************************************************************/
 package org.openscore.lang.entities;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -25,15 +24,8 @@ public class ForLoopStatement implements Serializable{
         Validate.notBlank(varName, "for loop var name cannot be empty");
         Validate.notBlank(collectionExpression, "for loop collection expression cannot be empty");
 
-        this.varName = varName.trim();
-        if (isContainInvalidChars(this.varName)) {
-            throw new RuntimeException("for loop var name cannot contain invalid chars");
-        }
-        this.collectionExpression = collectionExpression.trim();
-    }
-
-    private boolean isContainInvalidChars(String varName) {
-        return StringUtils.containsAny(varName, " \t\r\n\b");
+        this.varName = varName;
+        this.collectionExpression = collectionExpression;
     }
 
     public String getVarName() {
