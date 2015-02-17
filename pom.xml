@@ -496,6 +496,7 @@
         <module>score-lang-cli</module>
         <module>score-language-tests</module>
         <module>score-lang-api</module>
+        <module>score-lang-content-verifier</module>
     </modules>
 
 </project>
