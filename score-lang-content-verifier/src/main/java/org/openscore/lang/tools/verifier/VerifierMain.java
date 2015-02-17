@@ -9,6 +9,7 @@
  *******************************************************************************/
 package org.openscore.lang.tools.verifier;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
 import org.openscore.lang.tools.verifier.configuration.VerifierSpringConfiguration;
 import org.springframework.context.ApplicationContext;
@@ -24,7 +25,9 @@ public class VerifierMain {
     public static void main(String[] args) {
         String repositoryPath = args[0];
         Validate.notNull(repositoryPath, "You must pass a path to your repository");
-        Validate.isTrue(new File(repositoryPath).isDirectory(), "Directory path argument \'" + repositoryPath + "\' does not lead to a directory");
+        repositoryPath = FilenameUtils.separatorsToSystem(repositoryPath);
+        Validate.isTrue(new File(repositoryPath).isDirectory(),
+                "Directory path argument \'" + repositoryPath + "\' does not lead to a directory");
 
         ApplicationContext context = new AnnotationConfigApplicationContext(VerifierSpringConfiguration.class);
         SlangContentVerifier slangContentVerifier = context.getBean(SlangContentVerifier.class);
