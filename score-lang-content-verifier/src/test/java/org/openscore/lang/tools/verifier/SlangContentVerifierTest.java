@@ -210,7 +210,7 @@ public class SlangContentVerifierTest {
         }
 
         @Bean
-        public ScoreCompiler slScoreCompiler() {
+        public ScoreCompiler scoreCompiler() {
             return mock(ScoreCompiler.class);
         }
 

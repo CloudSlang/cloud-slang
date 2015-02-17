@@ -132,7 +132,6 @@ public class SlangContentVerifier {
 
     private void staticSlangFileValidation(File slangFile, Executable executable){
         String executableNamespacePath = executable.getNamespace().replace('.', File.separatorChar);
-        String[] splitPath = slangFile.getAbsolutePath().split("\\Q" + File.separatorChar);
         // Validate that the namespace matches the path of the file
         String namespaceErrorMessage = "Namespace of slang source: " + executable.getName() + " is wrong.\nIt is currently \'" +
                                     executable.getNamespace() + "\', but it should match the file path: \'" + slangFile.getPath() + "\'";
