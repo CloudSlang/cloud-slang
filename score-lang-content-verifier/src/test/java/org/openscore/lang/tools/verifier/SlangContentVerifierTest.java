@@ -169,6 +169,38 @@ public class SlangContentVerifierTest {
         slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
     }
 
+    @Test
+    public void testInvalidNamespaceFlow() throws Exception {
+        URI resource = getClass().getResource("/no_dependencies").toURI();
+        Flow newExecutable = new Flow(null, null, null, "wrong.namespace", "", null, null, null, new HashMap<String, SlangFileType>());
+        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Namespace");
+        exception.expectMessage("wrong.namespace");
+        slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+    }
+
+    @Test
+    public void testInvalidFlowName() throws Exception {
+        URI resource = getClass().getResource("/no_dependencies").toURI();
+        Flow newExecutable = new Flow(null, null, null, "", "wrong_name", null, null, null, new HashMap<String, SlangFileType>());
+        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Name");
+        exception.expectMessage("wrong_name");
+        slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+    }
+
+    @Test
+    public void testValidFlowNameAndNamespace() throws Exception {
+        URI resource = getClass().getResource("/no_dependencies").toURI();
+        Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, null, new HashMap<String, SlangFileType>());
+        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
+        CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), null);
+        Mockito.when(scoreCompiler.compile(newExecutable, new HashSet<Executable>())).thenReturn(compilationArtifact);
+        slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+    }
+
     @Configuration
     static class Config {
 
