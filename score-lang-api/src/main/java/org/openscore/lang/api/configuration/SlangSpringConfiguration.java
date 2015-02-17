@@ -15,8 +15,6 @@ import org.openscore.lang.runtime.configuration.SlangRuntimeSpringConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.introspector.BeanAccess;
 
 /**
  * User: stoneo
@@ -31,12 +29,5 @@ public class SlangSpringConfiguration {
     public Slang slang() {
         return new SlangImpl();
     }
-
-	@Bean
-	public Yaml yaml() {
-		Yaml yaml = new Yaml();
-		yaml.setBeanAccess(BeanAccess.FIELD);
-		return yaml;
-	}
 
 }

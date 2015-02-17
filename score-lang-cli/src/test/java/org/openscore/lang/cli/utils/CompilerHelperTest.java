@@ -10,6 +10,8 @@ package org.openscore.lang.cli.utils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,8 +23,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.yaml.snakeyaml.Yaml;
 
+import java.io.Serializable;
+import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 
@@ -38,12 +46,12 @@ public class CompilerHelperTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testFilePathWrong() throws Exception {
-        compilerHelper.compile(null, null, null);
+        compilerHelper.compile(null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFilePathNotFile() throws Exception {
-        compilerHelper.compile("xxx", null, null);
+        compilerHelper.compile("xxx", null);
     }
 
     @Before
@@ -56,7 +64,7 @@ public class CompilerHelperTest {
         URL flowFilePath = getClass().getResource("/flow.yaml");
         URL opFilePath = getClass().getResource("/test_op.sl");
         URL flow2FilePath = getClass().getResource("/flowsdir/flow2.yaml");
-        compilerHelper.compile(flowFilePath.getPath(), null, null);
+        compilerHelper.compile(flowFilePath.getPath(), null);
         Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath.toURI()),
                 Sets.newHashSet(SlangSource.fromFile(flowFilePath.toURI()),SlangSource.fromFile(flow2FilePath.toURI()),
                         SlangSource.fromFile(opFilePath.toURI())));
@@ -67,7 +75,7 @@ public class CompilerHelperTest {
         URL flowFilePath = getClass().getResource("/flow.yaml");
         URL folderPath = getClass().getResource("/flowsdir/");
         URL flow2FilePath = getClass().getResource("/flowsdir/flow2.yaml");
-        compilerHelper.compile(flowFilePath.getPath(), null, Lists.newArrayList(folderPath.getPath()));
+        compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(folderPath.getPath()));
         Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath.toURI()),
                 Sets.newHashSet(SlangSource.fromFile(flow2FilePath.toURI())));
     }
@@ -76,21 +84,33 @@ public class CompilerHelperTest {
     public void testInvalidDirPathForDependencies() throws Exception {
         String flowFilePath = getClass().getResource("/flow.yaml").getPath();
         String invalidDirPath = getClass().getResource("").getPath().concat("xxx");
-        compilerHelper.compile(flowFilePath, null, Lists.newArrayList(invalidDirPath));
+        compilerHelper.compile(flowFilePath, Lists.newArrayList(invalidDirPath));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidDirPathForDependencies2() throws Exception {
         String flowFilePath = getClass().getResource("/flow.yaml").getPath();
-        compilerHelper.compile(flowFilePath, null, Lists.newArrayList(flowFilePath));
+        compilerHelper.compile(flowFilePath, Lists.newArrayList(flowFilePath));
     }
 
-    @Test
-    public void testLoadSystemProperties(){
-        SlangSource source = new SlangSource("source", "name");
-        slang.loadSystemProperties(source);
-        Mockito.verify(slang).loadSystemProperties(source);
-    }
+	@Test
+	public void testLoadSystemProperties() throws Exception {
+		Map<String, Serializable> expected = new HashMap<>();
+		expected.put("test.sys.props.host", "localhost");
+		expected.put("test.sys.props.port", 22);
+		expected.put("test.sys.props.alla", "balla");
+		URI systemProperties = getClass().getResource("/properties/system_properties.yaml").toURI();
+		Map<String, ? extends Serializable> result = compilerHelper.loadSystemProperties(Arrays.asList(systemProperties.getPath()));
+		Assert.assertNotNull(result);
+		Assert.assertEquals(expected, result);
+	}
+
+	@Test
+	public void testLoadSystemPropertiesImplicit() throws Exception {
+		Map<String, ? extends Serializable> result = compilerHelper.loadSystemProperties(null);
+		Assert.assertNotNull(result);
+		Assert.assertEquals(5, result.size());
+	}
 
     @Configuration
     static class Config {
@@ -104,6 +124,11 @@ public class CompilerHelperTest {
         public CompilerHelper compilerHelper() {
             return new CompilerHelperImpl();
         }
+
+		@Bean
+		public Yaml yaml() {
+			return new Yaml();
+		}
 
     }
 

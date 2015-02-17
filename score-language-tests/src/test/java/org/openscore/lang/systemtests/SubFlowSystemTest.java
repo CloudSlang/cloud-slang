@@ -1,13 +1,11 @@
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
-
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package org.openscore.lang.systemtests;
 
 import com.google.common.collect.Sets;
@@ -42,12 +40,13 @@ public class SubFlowSystemTest extends SystemsTestsParent {
                                                 SlangSource.fromFile(operation2),
                                                 SlangSource.fromFile(operation3));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
-
+		Map<String, Serializable> systemProperties = new HashMap<>();
+		systemProperties.put("test.sys.props.host", "localhost");
+		systemProperties.put("test.sys.props.port", 22);
+		systemProperties.put("test.sys.props.alla", "balla");
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("input1", "value1");
-		URI systemProperties = getClass().getResource("/yaml/system_properties.yaml").toURI();
-		SlangSource systemPropertiesSource = SlangSource.fromFile(systemProperties);
-        ScoreEvent event = trigger(compilationArtifact, userInputs, slang.loadSystemProperties(systemPropertiesSource));
+        ScoreEvent event = trigger(compilationArtifact, userInputs, systemProperties);
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 

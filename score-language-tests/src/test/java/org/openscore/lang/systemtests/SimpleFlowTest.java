@@ -1,16 +1,15 @@
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
-
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package org.openscore.lang.systemtests;
 
 import com.google.common.collect.Sets;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -30,8 +29,6 @@ import java.util.Set;
 
 /**
  * Date: 11/14/2014
- * d
- *
  * @author Bonczidai Levente
  */
 public class SimpleFlowTest extends SystemsTestsParent {
@@ -70,16 +67,18 @@ public class SimpleFlowTest extends SystemsTestsParent {
 	private final void compileAndRunSimpleFlow(Map.Entry<String, ? extends Serializable>... inputs) throws Exception {
 		URI flow = getClass().getResource("/yaml/simple_flow.yaml").toURI();
 		URI operations1 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
-        URI operations2 = getClass().getResource("/yaml/comopute_daylight_time_zone.sl").toURI();
-		URI systemProperties = getClass().getResource("/yaml/system_properties.yaml").toURI();
-		SlangSource systemPropertiesSource = SlangSource.fromFile(systemProperties);
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
+		URI operations2 = getClass().getResource("/yaml/comopute_daylight_time_zone.sl").toURI();
+		Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
 		CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
 		HashMap<String, Serializable> userInputs = new HashMap<>();
-        for (Entry<String, ? extends Serializable> input : inputs) {
-            userInputs.put(input.getKey(), input.getValue());
-        }
-		ScoreEvent event = trigger(compilationArtifact, userInputs, slang.loadSystemProperties(systemPropertiesSource));
+		for(Entry<String, ? extends Serializable> input : inputs) {
+			userInputs.put(input.getKey(), input.getValue());
+		}
+		Map<String, Serializable> systemProperties = new HashMap<>();
+		systemProperties.put("test.sys.props.host", "localhost");
+		systemProperties.put("test.sys.props.port", 22);
+		systemProperties.put("test.sys.props.alla", "balla");
+		ScoreEvent event = trigger(compilationArtifact, userInputs, systemProperties);
 		Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
 	}
 

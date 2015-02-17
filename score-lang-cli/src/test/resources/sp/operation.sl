@@ -10,8 +10,8 @@ namespace: user.ops
 imports:
   props: user.sys.props
 
-operations:
-  name: check_weather:
+operation:
+  name: check_weather
   inputs:
     - city:
         system_property: props.city
