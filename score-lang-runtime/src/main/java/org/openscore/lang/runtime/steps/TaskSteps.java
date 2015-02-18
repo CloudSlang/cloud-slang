@@ -136,7 +136,7 @@ public class TaskSteps extends AbstractSteps {
                 Pair.of(TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues),
                 Pair.of("operationReturnValues", executableReturnValues),Pair.of(LanguageEventData.levelName.TASK_NAME.name(),nodeName));
 
-        Map<String, String> publishValues = outputsBinding.bindOutputs(flowContext, executableReturnValues.getOutputs(), taskPublishValues);
+        Map<String, String> publishValues = outputsBinding.bindOutputs(flowVariables, executableReturnValues.getOutputs(), taskPublishValues);
 
         flowContext.putVariables(publishValues);
 
