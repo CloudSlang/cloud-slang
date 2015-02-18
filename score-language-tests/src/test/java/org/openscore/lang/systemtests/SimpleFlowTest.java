@@ -75,9 +75,9 @@ public class SimpleFlowTest extends SystemsTestsParent {
 			userInputs.put(input.getKey(), input.getValue());
 		}
 		Map<String, Serializable> systemProperties = new HashMap<>();
-		systemProperties.put("test.sys.props.host", "localhost");
-		systemProperties.put("test.sys.props.port", 22);
-		systemProperties.put("test.sys.props.alla", "balla");
+		systemProperties.put("user.sys.props.host", "localhost");
+		systemProperties.put("user.sys.props.port", 22);
+		systemProperties.put("user.sys.props.alla", "balla");
 		ScoreEvent event = trigger(compilationArtifact, userInputs, systemProperties);
 		Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
 	}

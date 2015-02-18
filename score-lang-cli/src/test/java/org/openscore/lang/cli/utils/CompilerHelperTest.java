@@ -96,9 +96,9 @@ public class CompilerHelperTest {
 	@Test
 	public void testLoadSystemProperties() throws Exception {
 		Map<String, Serializable> expected = new HashMap<>();
-		expected.put("test.sys.props.host", "localhost");
-		expected.put("test.sys.props.port", 22);
-		expected.put("test.sys.props.alla", "balla");
+		expected.put("user.sys.props.host", "localhost");
+		expected.put("user.sys.props.port", 22);
+		expected.put("user.sys.props.alla", "balla");
 		URI systemProperties = getClass().getResource("/properties/system_properties.yaml").toURI();
 		Map<String, ? extends Serializable> result = compilerHelper.loadSystemProperties(Arrays.asList(systemProperties.getPath()));
 		Assert.assertNotNull(result);

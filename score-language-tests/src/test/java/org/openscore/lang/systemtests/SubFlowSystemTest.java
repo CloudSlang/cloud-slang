@@ -41,9 +41,9 @@ public class SubFlowSystemTest extends SystemsTestsParent {
                                                 SlangSource.fromFile(operation3));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 		Map<String, Serializable> systemProperties = new HashMap<>();
-		systemProperties.put("test.sys.props.host", "localhost");
-		systemProperties.put("test.sys.props.port", 22);
-		systemProperties.put("test.sys.props.alla", "balla");
+		systemProperties.put("user.sys.props.host", "localhost");
+		systemProperties.put("user.sys.props.port", 22);
+		systemProperties.put("user.sys.props.alla", "balla");
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("input1", "value1");
         ScoreEvent event = trigger(compilationArtifact, userInputs, systemProperties);

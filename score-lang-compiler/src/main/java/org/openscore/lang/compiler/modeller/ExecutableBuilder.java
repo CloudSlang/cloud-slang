@@ -104,7 +104,7 @@ public class ExecutableBuilder {
 
         String namespace = parsedSlang.getNamespace();
         Map<String, String> imports = parsedSlang.getImports();
-        resolveSystemProperties(inputs, imports);
+//        resolveSystemProperties(inputs, imports);
         Map<String, SlangFileType> dependencies;
         switch (parsedSlang.getType()) {
             case FLOW:
@@ -230,7 +230,7 @@ public class ExecutableBuilder {
             throw new RuntimeException("For task: " + taskName + " syntax is illegal.\n" + ex.getMessage(), ex);
         }
         List<Input> inputs = (List<Input>)preTaskData.get(SlangTextualKeys.DO_KEY);
-        resolveSystemProperties(inputs, imports);
+//        resolveSystemProperties(inputs, imports);
         @SuppressWarnings("unchecked") Map<String, Object> doRawData = (Map<String, Object>) taskRawData.get(SlangTextualKeys.DO_KEY);
         if (MapUtils.isEmpty(doRawData)) {
             throw new RuntimeException("Task: " + taskName + " has no reference information");
@@ -250,16 +250,16 @@ public class ExecutableBuilder {
         return new Task(taskName, preTaskData, postTaskData, navigationStrings, refId);
     }
 
-	private static void resolveSystemProperties(List<Input> inputs, Map<String, String> imports) {
-		if(inputs == null) return;
-		for(Input input : inputs) {
-			String systemPropertyName = input.getSystemPropertyName();
-			if(systemPropertyName != null) {
-				systemPropertyName = resolveRefId(systemPropertyName, imports);
-				input.setSystemPropertyName(systemPropertyName);
-			}
-		}
-	}
+//	private static void resolveSystemProperties(List<Input> inputs, Map<String, String> imports) {
+//		if(inputs == null) return;
+//		for(Input input : inputs) {
+//			String systemPropertyName = input.getSystemPropertyName();
+//			if(systemPropertyName != null) {
+//				systemPropertyName = resolveRefId(systemPropertyName, imports);
+//				input.setSystemPropertyName(systemPropertyName);
+//			}
+//		}
+//	}
 
 	private static String resolveRefId(String refIdString, Map<String, String> imports) {
 		String alias = StringUtils.substringBefore(refIdString, ".");

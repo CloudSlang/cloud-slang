@@ -9,21 +9,20 @@ namespace: user.ops
 
 imports:
   ops: user.ops
-  props: test.sys.props
 
 flow:
   name: basic_flow
   inputs:
     - input1
     - host:
-        system_property: props.host
+        system_property: user.sys.props.host
   workflow:
     CheckWeather:
       do:
         ops.test_op:
           - city: str('input_1')
           - port:
-              system_property: props.port
+              system_property: user.sys.props.port
       publish:
         - weather
       navigate:

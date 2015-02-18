@@ -7,18 +7,15 @@
 
 namespace: user.ops
 
-imports:
-  props: user.sys.props
-
 operation:
   name: check_weather
   inputs:
     - city:
-        system_property: props.city
+        system_property: user.sys.props.city
         default: "'Bangkok'"
         overridable: false
     - weather:
-        system_property: props.weather
+        system_property: user.sys.props.weather
         default: "'hot'"
   action:
     python_script: 'print "The weather is " + weather + " in " + city'

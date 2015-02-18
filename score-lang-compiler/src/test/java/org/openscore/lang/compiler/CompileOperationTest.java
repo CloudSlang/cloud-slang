@@ -54,8 +54,6 @@ public class CompileOperationTest {
 	@Test
 	public void testCompileOperationMissingImport() throws Exception {
 		URL resource = getClass().getResource("/operation_with_missing_sys_props_imports.sl");
-		exception.expect(RuntimeException.class);
-		exception.expectMessage("import");
 		compiler.compile(SlangSource.fromFile(resource.toURI()), null).getExecutionPlan();
 	}
 
