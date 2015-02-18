@@ -52,11 +52,11 @@ public class CompilerHelperImpl implements CompilerHelper{
 
     //tot add javadoc
     public CompilationArtifact compile(String filePath, String opName, List<String> dependencies) throws IOException {
-        Validate.notNull(filePath, "filePath can not be null");
+        Validate.notNull(filePath, "File path can not be null");
 
         Set<SlangSource> depsSources = new HashSet<>();
         File file = new File(filePath);
-        Validate.isTrue(file.isFile(), "filePath must lead to a file");
+        Validate.isTrue(file.isFile(), "File: " + file.getName() + " was not found");
 
         if (dependencies == null || dependencies.isEmpty()) {
             dependencies = Lists.newArrayList(file.getParent()); //default behavior is taking the parent dir
