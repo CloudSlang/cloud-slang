@@ -11,7 +11,6 @@
 package org.openscore.lang.systemtests;
 
 import com.google.common.collect.Sets;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,13 +42,47 @@ public class SimpleFlowTest extends SystemsTestsParent {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testSimpleFlowBasic() throws Exception {
-		compileAndRunSimpleFlow(Pair.of("input1", "-2"),Pair.of("time_zone_as_string", "+2"));
+        Map<String, Serializable> inputs = new HashMap<>();
+        inputs.put("input1", "-2");
+        inputs.put("time_zone_as_string", "+2");
+		compileAndRunSimpleFlow(inputs);
     }
 
 	@Test(timeout = DEFAULT_TIMEOUT)
 	public void testSimpleFlowNavigation() throws Exception {
-		compileAndRunSimpleFlow(Pair.of("input1", -999));
+        Map<String, Serializable> inputs = new HashMap<>();
+        inputs.put("input1", -999);
+		compileAndRunSimpleFlow(inputs);
 	}
+
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void testSimpleFlowBasicMissingFlowInput() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("input1");
+        exception.expectMessage("Required");
+        compileAndRunSimpleFlow(new HashMap<String, Serializable>());
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void testSimpleFlowBasicMissingTaskInput() throws Exception {
+        URI flow = getClass().getResource("/yaml/simple_flow.yaml").toURI();
+        URI operations1 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
+        URI operations2 = getClass().getResource("/yaml/comopute_daylight_time_zone.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
+        Map<String, Serializable> userInputs = new HashMap<>();
+        userInputs.put("input1", "-2");
+        userInputs.put("time_zone_as_string", "+2");
+        userInputs.put("host", "hostName");
+        for (Map.Entry<String, ? extends Serializable> input : new HashMap<String, Serializable>().entrySet()) {
+            userInputs.put(input.getKey(), input.getValue());
+        }
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("port");
+        exception.expectMessage("Required");
+        ScoreEvent event = trigger(compilationArtifact, userInputs, new HashMap<String, Serializable>());
+        Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
+    }
 
     @Test
     public void testFlowWithGlobalSession() throws Exception {
@@ -66,8 +99,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 
-	@SafeVarargs
-	private final void compileAndRunSimpleFlow(Map.Entry<String, ? extends Serializable>... inputs) throws Exception {
+	private final void compileAndRunSimpleFlow(Map<String, Serializable> inputs) throws Exception {
 		URI flow = getClass().getResource("/yaml/simple_flow.yaml").toURI();
 		URI operations1 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
         URI operations2 = getClass().getResource("/yaml/comopute_daylight_time_zone.sl").toURI();
@@ -76,7 +108,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
 		CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
 		HashMap<String, Serializable> userInputs = new HashMap<>();
-        for (Entry<String, ? extends Serializable> input : inputs) {
+        for (Map.Entry<String, ? extends Serializable> input : inputs.entrySet()) {
             userInputs.put(input.getKey(), input.getValue());
         }
 		ScoreEvent event = trigger(compilationArtifact, userInputs, slang.loadSystemProperties(systemPropertiesSource));
