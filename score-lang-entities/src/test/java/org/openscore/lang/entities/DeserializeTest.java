@@ -1,6 +1,7 @@
 package org.openscore.lang.entities;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import org.junit.Test;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
@@ -13,16 +14,19 @@ import static org.junit.Assert.*;
 public class DeserializeTest {
 
     private ObjectMapper mapper = new ObjectMapper();
+    Gson gson = new Gson();
 
 
     private <T> void testToAndFromJson(Object objToTest, Class<T> type) throws IOException {
-        byte[] objAsBytes = mapper.writeValueAsBytes(objToTest);
-        T objAfterDeserialize = mapper.readValue(objAsBytes, type);
+        //jackson
+        String objAsString = mapper.writeValueAsString(objToTest);
+        T objAfterDeserialize = mapper.readValue(objAsString, type);
         assertEquals(objToTest, objAfterDeserialize);
 
-        String objAsString = mapper.writeValueAsString(objToTest);
-        objAfterDeserialize = mapper.readValue(objAsString, type);
-        assertEquals(objToTest, objAfterDeserialize);
+        //gson
+        String json = gson.toJson(objToTest);
+        T fromJson = gson.fromJson(json, type);
+        assertEquals(objToTest, fromJson);
     }
 
     @Test

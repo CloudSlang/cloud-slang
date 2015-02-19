@@ -8,8 +8,6 @@
  */
 package org.openscore.lang.entities.bindings;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -22,19 +20,13 @@ public class Input extends InOutParam {
 
 	private static final long serialVersionUID = -2411446962609754342L;
 
-	private final boolean encrypted;
-	private final boolean required;
-	private final boolean overridable;
+	private boolean encrypted;
+	private boolean required;
+	private boolean overridable;
 	private String systemPropertyName;
 
-    @JsonCreator
-	public Input(
-            @JsonProperty("name") String name,
-            @JsonProperty("expression") String expression,
-            @JsonProperty("encrypted") boolean encrypted,
-            @JsonProperty("required") boolean required,
-            @JsonProperty("overridable") boolean overridable,
-            @JsonProperty("systemPropertyName") String systemPropertyName) {
+	public Input(String name, String expression, boolean encrypted,
+            boolean required, boolean overridable, String systemPropertyName) {
 		super(name, expression);
 		this.encrypted = encrypted;
 		this.required = required;
@@ -45,6 +37,11 @@ public class Input extends InOutParam {
 	public Input(String name, String expression) {
 		this(name, expression, false, true, true, null);
 	}
+
+    /**
+     * only here to satisfy serialization libraries
+     */
+    private Input(){}
 
 	public boolean isEncrypted() {
 		return encrypted;

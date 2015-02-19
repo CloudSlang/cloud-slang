@@ -9,9 +9,6 @@
 *******************************************************************************/
 package org.openscore.lang.entities.bindings;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
  * @author stoneo
  * @since 06/11/2014
@@ -21,11 +18,13 @@ public class Result extends InOutParam {
 
 	private static final long serialVersionUID = -809266116566407854L;
 
-    @JsonCreator
-	public Result(
-            @JsonProperty("name") String name,
-            @JsonProperty("expression") String expression) {
+	public Result(String name, String expression) {
 		super(name, expression);
 	}
+
+    /**
+     * only here to satisfy serialization libraries
+     */
+    private Result(){}
 
 }

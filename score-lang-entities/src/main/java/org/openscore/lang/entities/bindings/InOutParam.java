@@ -24,13 +24,18 @@ public abstract class InOutParam implements Serializable {
 
 	private static final long serialVersionUID = -7712676295781864973L;
 
-	private final String name;
-	private final String expression;
+	private String name;
+	private String expression;
 
 	public InOutParam(String name, String expression) {
 		this.name = name;
 		this.expression = expression;
 	}
+
+    /**
+     * only here to satisfy serialization libraries
+     */
+    protected InOutParam(){}
 
 	public String getName() {
 		return name;

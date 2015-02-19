@@ -9,8 +9,6 @@
 *******************************************************************************/
 package org.openscore.lang.entities;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -23,16 +21,18 @@ import java.io.Serializable;
  */
 public class ResultNavigation implements Serializable {
 
-	private final long nextStepId;
-	private final String presetResult;
+	private long nextStepId;
+	private String presetResult;
 
-    @JsonCreator
-    public ResultNavigation(
-            @JsonProperty("nextStepId") long nextStepId,
-            @JsonProperty("presetResult") String presetResult) {
+    public ResultNavigation(long nextStepId, String presetResult) {
         this.nextStepId = nextStepId;
         this.presetResult = presetResult;
     }
+
+    /**
+     * only here to satisfy serialization libraries
+     */
+    private ResultNavigation(){}
 
     public long getNextStepId() {
 		return this.nextStepId;
