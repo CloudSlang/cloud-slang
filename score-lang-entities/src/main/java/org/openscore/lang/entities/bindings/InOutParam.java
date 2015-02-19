@@ -9,6 +9,8 @@
 *******************************************************************************/
 package org.openscore.lang.entities.bindings;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
@@ -43,4 +45,26 @@ public abstract class InOutParam implements Serializable {
 		return ToStringBuilder.reflectionToString(this);
 	}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        InOutParam that = (InOutParam) o;
+
+        return new EqualsBuilder()
+                .append(this.name, that.name)
+                .append(this.expression, that.expression)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(name)
+                .append(expression)
+                .toHashCode();
+    }
 }
