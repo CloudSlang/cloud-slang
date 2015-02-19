@@ -40,6 +40,7 @@ public class SubFlowSystemTest extends SystemsTestsParent {
                                                 SlangSource.fromFile(operation2),
                                                 SlangSource.fromFile(operation3));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        Assert.assertEquals("the system properties size is not as expected", 2, compilationArtifact.getSystemProperties().size());
 		Map<String, Serializable> systemProperties = new HashMap<>();
 		systemProperties.put("user.sys.props.host", "localhost");
 		systemProperties.put("user.sys.props.port", 22);

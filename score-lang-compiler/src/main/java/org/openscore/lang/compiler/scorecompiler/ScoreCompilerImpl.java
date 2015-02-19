@@ -9,6 +9,7 @@
 package org.openscore.lang.compiler.scorecompiler;
 
 import ch.lambdaj.function.convert.Converter;
+
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.Validate;
 import org.openscore.api.ExecutionPlan;
@@ -17,11 +18,14 @@ import org.openscore.lang.compiler.modeller.DependenciesHelper;
 import org.openscore.lang.compiler.modeller.model.Executable;
 import org.openscore.lang.compiler.modeller.model.Flow;
 import org.openscore.lang.compiler.modeller.model.Operation;
+import org.openscore.lang.compiler.modeller.model.Task;
 import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.bindings.Input;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -72,9 +76,10 @@ public class ScoreCompilerImpl implements ScoreCompiler{
                 return compileToExecutionPlan(compiledExecutable);
             }
         });
-
+        Collection<Executable> executables = new ArrayList<>(filteredDependencies.values());
+        executables.add(executable);
         executionPlan.setSubflowsUUIDs(new HashSet<>(dependencies.keySet()));
-        return new CompilationArtifact(executionPlan, dependencies, executable.getInputs());
+        return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemProperties(executables));
     }
 
     /**
@@ -95,4 +100,26 @@ public class ScoreCompilerImpl implements ScoreCompiler{
                 throw new RuntimeException("Executable: " + executable.getName() + " cannot be compiled to an ExecutionPlan since it is not a flow and not an operation");
         }
     }
+
+	private static Collection<Input> getSystemProperties(Collection<Executable> executables) {
+		Collection<Input> result = new ArrayList<>();
+		for(Executable executable : executables) {
+			result.addAll(getSystemProperties(executable.getInputs()));
+			if(executable instanceof Flow) {
+				for(Task task : ((Flow)executable).getWorkflow().getTasks()) {
+					result.addAll(getSystemProperties(task.getInputs()));
+				}
+			}
+		}
+		return result;
+	}
+
+	private static Collection<Input> getSystemProperties(List<Input> inputs) {
+		Collection<Input> result = new ArrayList<>();
+		for(Input input : inputs) {
+			if(input.getSystemPropertyName() != null) result.add(input);
+		}
+		return result;
+	}
+
 }

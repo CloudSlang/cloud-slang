@@ -70,6 +70,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
 		URI operations2 = getClass().getResource("/yaml/comopute_daylight_time_zone.sl").toURI();
 		Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
 		CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
+        Assert.assertEquals("the system properties size is not as expected", 3, compilationArtifact.getSystemProperties().size());
 		HashMap<String, Serializable> userInputs = new HashMap<>();
 		for(Entry<String, ? extends Serializable> input : inputs) {
 			userInputs.put(input.getKey(), input.getValue());

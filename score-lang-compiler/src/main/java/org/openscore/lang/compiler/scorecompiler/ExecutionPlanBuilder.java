@@ -103,7 +103,7 @@ public class ExecutionPlanBuilder {
 
         //Begin Task
         taskReferences.put(taskName, currentId);
-        taskExecutionSteps.add(stepFactory.createBeginTaskStep(currentId++, task.getPreTaskActionData(),
+        taskExecutionSteps.add(stepFactory.createBeginTaskStep(currentId++, task.getInputs(), task.getPreTaskActionData(),
                 task.getRefId(), taskName));
 
         //End Task

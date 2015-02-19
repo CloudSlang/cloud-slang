@@ -55,6 +55,7 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());
         Assert.assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
         Assert.assertEquals("the inputs size is not as expected", 2, compilationArtifact.getInputs().size());
+        Assert.assertEquals("the system properties size is not as expected", 3, compilationArtifact.getSystemProperties().size());
     }
 
     @Test
