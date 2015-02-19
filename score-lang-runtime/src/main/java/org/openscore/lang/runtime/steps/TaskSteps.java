@@ -10,6 +10,7 @@
 package org.openscore.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
+import org.apache.log4j.Logger;
 import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
@@ -56,6 +57,8 @@ public class TaskSteps extends AbstractSteps {
     @Autowired
     private OutputsBinding outputsBinding;
 
+    private static final Logger logger = Logger.getLogger(TaskSteps.class);
+
 
     public void beginTask(@Param(TASK_INPUTS_KEY) List<Input> taskInputs,
                           @Param(RUN_ENV) RunEnvironment runEnv,
@@ -64,28 +67,31 @@ public class TaskSteps extends AbstractSteps {
                           @Param(ExecutionParametersConsts.RUNNING_EXECUTION_PLAN_ID) Long RUNNING_EXECUTION_PLAN_ID,
                           @Param(NEXT_STEP_ID_KEY) Long nextStepId,
                           @Param(REF_ID) String refId) {
+        try{
+            runEnv.getExecutionPath().forward();
+            runEnv.removeCallArguments();
+            runEnv.removeReturnValues();
 
-        runEnv.getExecutionPath().forward();
-        runEnv.removeCallArguments();
-        runEnv.removeReturnValues();
+            Map<String, Serializable> flowContext = runEnv.getStack().popContext();
 
-        Map<String, Serializable> flowContext = runEnv.getStack().popContext();
+            Map<String, Serializable> operationArguments = inputsBinding.bindInputs(taskInputs, flowContext, runEnv.getSystemProperties());
 
-        Map<String, Serializable> operationArguments = inputsBinding.bindInputs(taskInputs, flowContext, runEnv.getSystemProperties());
+            //todo: hook
 
-        //todo: hook
+            sendBindingInputsEvent(taskInputs, operationArguments, runEnv, executionRuntimeServices, "Task inputs resolved",
+                    nodeName, LanguageEventData.levelName.TASK_NAME);
 
-        sendBindingInputsEvent(taskInputs, operationArguments, runEnv, executionRuntimeServices, "Task inputs resolved",
-                nodeName, LanguageEventData.levelName.TASK_NAME);
+            updateCallArgumentsAndPushContextToStack(runEnv, flowContext, operationArguments);
 
-        updateCallArgumentsAndPushContextToStack(runEnv, flowContext, operationArguments);
+            // request the score engine to switch to the execution plan of the given ref
+            requestSwitchToRefExecutableExecutionPlan(runEnv, executionRuntimeServices, RUNNING_EXECUTION_PLAN_ID, refId, nextStepId);
 
-        // request the score engine to switch to the execution plan of the given ref
-        requestSwitchToRefExecutableExecutionPlan(runEnv, executionRuntimeServices, RUNNING_EXECUTION_PLAN_ID, refId, nextStepId);
-
-        // set the start step of the given ref as the next step to execute (in the new running execution plan that will be set)
-        runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
-
+            // set the start step of the given ref as the next step to execute (in the new running execution plan that will be set)
+            runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
+        } catch (RuntimeException e){
+            logger.error("There was an error running the begin task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
+            throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
+        }
     }
 
     public void endTask(@Param(RUN_ENV) RunEnvironment runEnv,
@@ -94,46 +100,51 @@ public class TaskSteps extends AbstractSteps {
                         @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                         @Param(NODE_NAME_KEY) String nodeName) {
 
-        Map<String, Serializable> flowContext = runEnv.getStack().popContext();
+        try{
+            Map<String, Serializable> flowContext = runEnv.getStack().popContext();
 
-        ReturnValues executableReturnValues = runEnv.removeReturnValues();
-        fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_START, "Output binding started",
-                Pair.of(TASK_PUBLISH_KEY, (Serializable) taskPublishValues),
-                Pair.of(TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues),
-                Pair.of("operationReturnValues", executableReturnValues),Pair.of(LanguageEventData.levelName.TASK_NAME.name(),nodeName));
+            ReturnValues executableReturnValues = runEnv.removeReturnValues();
+            fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_START, "Output binding started",
+                    Pair.of(TASK_PUBLISH_KEY, (Serializable) taskPublishValues),
+                    Pair.of(TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues),
+                    Pair.of("operationReturnValues", executableReturnValues),Pair.of(LanguageEventData.levelName.TASK_NAME.name(),nodeName));
 
-        Map<String, String> publishValues = outputsBinding.bindOutputs(flowContext, executableReturnValues.getOutputs(), taskPublishValues);
+            Map<String, String> publishValues = outputsBinding.bindOutputs(flowContext, executableReturnValues.getOutputs(), taskPublishValues);
 
-        flowContext.putAll(publishValues);
+            flowContext.putAll(publishValues);
 
-        //todo: hook
+            //todo: hook
 
-		// set the position of the next step - for the use of the navigation
-		// find in the navigation values the correct next step position, according to the operation result, and set it
-		ResultNavigation navigation = taskNavigationValues.get(executableReturnValues.getResult());
-		if(navigation == null) {
-            // should always have the executable response mapped to a navigation by the task, if not, it is an error
-            throw new RuntimeException("Task: " + nodeName + " has no matching navigation for the executable result: " + executableReturnValues.getResult() );
+            // set the position of the next step - for the use of the navigation
+            // find in the navigation values the correct next step position, according to the operation result, and set it
+            ResultNavigation navigation = taskNavigationValues.get(executableReturnValues.getResult());
+            if(navigation == null) {
+                // should always have the executable response mapped to a navigation by the task, if not, it is an error
+                throw new RuntimeException("Task: " + nodeName + " has no matching navigation for the executable result: " + executableReturnValues.getResult() );
+            }
+
+            Long nextPosition = navigation.getNextStepId();
+            String presetResult = navigation.getPresetResult();
+            runEnv.putNextStepPosition(nextPosition);
+
+            HashMap<String, String> outputs = new HashMap<>();// todo - is this the right solution?
+            for(Map.Entry<String, Serializable> entry : flowContext.entrySet()) {
+                outputs.put(entry.getKey(), String.valueOf(entry.getValue()));
+            }
+
+            ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : executableReturnValues.getResult());
+            runEnv.putReturnValues(returnValues);
+            fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_END, "Output binding finished",
+                    Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
+                    Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
+                    Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition),
+                    Pair.of(LanguageEventData.levelName.TASK_NAME.name(),nodeName));
+
+            runEnv.getStack().pushContext(flowContext);
+        } catch (RuntimeException e){
+            logger.error("There was an error running the end task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
+            throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);
         }
-
-        Long nextPosition = navigation.getNextStepId();
-        String presetResult = navigation.getPresetResult();
-		runEnv.putNextStepPosition(nextPosition);
-
-		HashMap<String, String> outputs = new HashMap<>();// todo - is this the right solution?
-		for(Map.Entry<String, Serializable> entry : flowContext.entrySet()) {
-			outputs.put(entry.getKey(), String.valueOf(entry.getValue()));
-		}
-
-		ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : executableReturnValues.getResult());
-		runEnv.putReturnValues(returnValues);
-        fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_END, "Output binding finished",
-                Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
-                Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
-                Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition),
-                Pair.of(LanguageEventData.levelName.TASK_NAME.name(),nodeName));
-
-        runEnv.getStack().pushContext(flowContext);
     }
 
     private void requestSwitchToRefExecutableExecutionPlan(RunEnvironment runEnv,
