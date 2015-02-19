@@ -13,7 +13,7 @@ operation:
     - opMessage
     - unchangableMessage:
         default:  str('defaultString')
-        override: true
+        overridable: false
     - message: opMessage
 
   action:

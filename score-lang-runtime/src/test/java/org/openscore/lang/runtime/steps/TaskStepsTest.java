@@ -171,7 +171,9 @@ public class TaskStepsTest {
         Map<String, String> boundPublish = new HashMap<>();
         boundPublish.put("name", "John");
 
-        when(outputsBinding.bindOutputs(isNull(Map.class), anyMapOf(String.class, String.class), eq(possiblePublishValues))).thenReturn(boundPublish);
+        when(outputsBinding.bindOutputs(
+                anyMapOf(String.class, Serializable.class), anyMapOf(String.class, String.class), eq(possiblePublishValues)))
+                .thenReturn(boundPublish);
         HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
         taskNavigationValues.put(SUCCESS_RESULT, new ResultNavigation(0, SUCCESS_RESULT));
         taskSteps.endTask(runEnv, possiblePublishValues, taskNavigationValues, createRuntimeServices(), "task1");

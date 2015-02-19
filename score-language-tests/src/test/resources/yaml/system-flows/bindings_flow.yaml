@@ -23,7 +23,7 @@ flow:
         ops.binding_flow_op:
           - base_input:
               default: bound_input + ">"
-              override: true
+              overridable: false
       publish:
         - bound_input: bound_output + "<"
 
@@ -32,7 +32,7 @@ flow:
         ops.binding_flow_op:
           - base_input:
               default: bound_input + ">"
-              override: true
+              overridable: false
       publish:
         - bound_input: bound_output + "<"
 

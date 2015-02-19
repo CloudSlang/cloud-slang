@@ -99,7 +99,7 @@ public class ExecutableStepsTest {
 
     @Test
     public void testBoundInputEvent(){
-        List<Input> inputs = Arrays.asList(new Input("input1","input1"),new Input("input2", "3", true, true, true, null));
+        List<Input> inputs = Arrays.asList(new Input("input1","input1"),new Input("input2", "3", true, true, false, null));
         RunEnvironment runEnv = new RunEnvironment();
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         Map<String,Serializable> resultMap = new HashMap<>();
