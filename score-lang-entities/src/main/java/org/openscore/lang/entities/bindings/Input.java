@@ -20,7 +20,7 @@ public class Input extends InOutParam {
 	private final boolean encrypted;
 	private final boolean required;
 	private final boolean overridable;
-	private String systemPropertyName;
+	private final String systemPropertyName;
 
 	public Input(String name, String expression, boolean encrypted, boolean required, boolean overridable, String systemPropertyName) {
 		super(name, expression);
@@ -48,10 +48,6 @@ public class Input extends InOutParam {
 
 	public String getSystemPropertyName() {
 		return this.systemPropertyName;
-	}
-
-	public void setSystemPropertyName(String systemPropertyName) {
-		this.systemPropertyName = systemPropertyName;
 	}
 
 }
