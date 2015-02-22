@@ -10,7 +10,7 @@ package org.openscore.lang.compiler.scorecompiler;
 
 import ch.lambdaj.function.convert.Converter;
 
-import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
 import org.openscore.api.ExecutionPlan;
 import org.openscore.lang.compiler.SlangTextualKeys;
@@ -37,7 +37,6 @@ import static ch.lambdaj.Lambda.convertMap;
 /*
  * Created by stoneo on 2/2/2015.
  */
-
 @Component
 public class ScoreCompilerImpl implements ScoreCompiler{
 
@@ -52,7 +51,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
 
         Map<String, Executable> filteredDependencies = new HashMap<>();
         //we handle dependencies only if the file has imports
-        boolean hasDependencies = MapUtils.isNotEmpty(executable.getDependencies())
+        boolean hasDependencies = CollectionUtils.isNotEmpty(executable.getDependencies())
                 && executable.getType().equals(SlangTextualKeys.FLOW_TYPE);
         if (hasDependencies) {
             Validate.notEmpty(path, "Source " + executable.getName() + " has dependencies but no path was given to the compiler");

@@ -15,7 +15,6 @@ import org.openscore.api.ExecutionPlan;
 import org.openscore.api.ExecutionStep;
 import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
 import org.openscore.lang.compiler.modeller.model.Executable;
-import org.openscore.lang.compiler.modeller.model.SlangFileType;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.ScoreLangConstants;
@@ -123,11 +122,10 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("There is a different number of flow inputs than expected", 2, flow.getInputs().size());
         Assert.assertEquals("There is a different number of flow outputs than expected", 0, flow.getOutputs().size());
         Assert.assertEquals("There is a different number of flow results than expected", 2, flow.getResults().size());
-        Map<String, SlangFileType> dependencies = flow.getDependencies();
+        Set<String> dependencies = flow.getDependencies();
         Assert.assertEquals("There is a different number of flow dependencies than expected", 1, dependencies.size());
-        Map.Entry<String, SlangFileType> dependency = dependencies.entrySet().iterator().next();
-        Assert.assertEquals("There is a different number of flow inputs than expected", SlangFileType.EXECUTABLE, dependency.getValue());
-        Assert.assertEquals("The flow dependency full name is wrong", "user.ops.test_op", dependency.getKey());
+        String dependency = dependencies.iterator().next();
+        Assert.assertEquals("The flow dependency full name is wrong", "user.ops.test_op", dependency);
     }
 
 }

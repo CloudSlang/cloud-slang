@@ -1,13 +1,11 @@
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
-
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package org.openscore.lang.compiler;
 
 import org.junit.Assert;
@@ -19,7 +17,6 @@ import org.openscore.api.ExecutionPlan;
 import org.openscore.api.ExecutionStep;
 import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
 import org.openscore.lang.compiler.modeller.model.Executable;
-import org.openscore.lang.compiler.modeller.model.SlangFileType;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Input;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +25,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -93,8 +89,7 @@ public class CompileOperationTest {
         Assert.assertEquals("There is a different number of operation inputs than expected", 1, operation.getInputs().size());
         Assert.assertEquals("There is a different number of operation outputs than expected", 2, operation.getOutputs().size());
         Assert.assertEquals("There is a different number of operation results than expected", 1, operation.getResults().size());
-        Map<String, SlangFileType> dependencies = operation.getDependencies();
-        Assert.assertEquals("There is a different number of operation dependencies than expected", 0, dependencies.size());
+        Assert.assertEquals("There is a different number of operation dependencies than expected", 0, operation.getDependencies().size());
     }
 
     @Test
