@@ -8,6 +8,8 @@
  */
 package org.openscore.lang.entities;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.api.ExecutionPlan;
 
@@ -46,6 +48,16 @@ public class CompilationArtifact {
 
     public Collection<Input> getSystemProperties() {
         return systemProperties;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return EqualsBuilder.reflectionEquals(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
     }
 
 }

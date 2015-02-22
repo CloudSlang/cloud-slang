@@ -17,10 +17,10 @@ public class Input extends InOutParam {
 
 	private static final long serialVersionUID = -2411446962609754342L;
 
-	private final boolean encrypted;
-	private final boolean required;
-	private final boolean overridable;
-	private final String systemPropertyName;
+	private boolean encrypted;
+	private boolean required;
+	private boolean overridable;
+	private String systemPropertyName;
 
 	public Input(String name, String expression, boolean encrypted, boolean required, boolean overridable, String systemPropertyName) {
 		super(name, expression);
@@ -33,6 +33,12 @@ public class Input extends InOutParam {
 	public Input(String name, String expression) {
 		this(name, expression, false, true, true, null);
 	}
+
+	/**
+	 * only here to satisfy serialization libraries
+	 */
+	@SuppressWarnings("unused")
+	private Input() {}
 
 	public boolean isEncrypted() {
 		return encrypted;

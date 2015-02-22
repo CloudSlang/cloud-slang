@@ -9,6 +9,9 @@
 *******************************************************************************/
 package org.openscore.lang.entities;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.io.Serializable;
 
 /**
@@ -18,13 +21,18 @@ import java.io.Serializable;
  */
 public class ResultNavigation implements Serializable {
 
-	private final long nextStepId;
-	private final String presetResult;
+	private long nextStepId;
+	private String presetResult;
 
     public ResultNavigation(long nextStepId, String presetResult) {
         this.nextStepId = nextStepId;
         this.presetResult = presetResult;
     }
+
+    /**
+     * only here to satisfy serialization libraries
+     */
+    private ResultNavigation(){}
 
     public long getNextStepId() {
 		return this.nextStepId;
@@ -33,4 +41,27 @@ public class ResultNavigation implements Serializable {
 	public String getPresetResult() {
 		return this.presetResult;
 	}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        ResultNavigation that = (ResultNavigation) o;
+
+        return new EqualsBuilder()
+                .append(this.nextStepId, that.nextStepId)
+                .append(this.presetResult, that.presetResult)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(nextStepId)
+                .append(presetResult)
+                .toHashCode();
+    }
 }
