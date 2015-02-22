@@ -8,9 +8,6 @@
  */
 package org.openscore.lang.entities.bindings;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 /**
  * @author orius123
  * @since 05/11/14.
@@ -25,8 +22,7 @@ public class Input extends InOutParam {
 	private boolean overridable;
 	private String systemPropertyName;
 
-	public Input(String name, String expression, boolean encrypted,
-            boolean required, boolean overridable, String systemPropertyName) {
+	public Input(String name, String expression, boolean encrypted, boolean required, boolean overridable, String systemPropertyName) {
 		super(name, expression);
 		this.encrypted = encrypted;
 		this.required = required;
@@ -38,10 +34,11 @@ public class Input extends InOutParam {
 		this(name, expression, false, true, true, null);
 	}
 
-    /**
-     * only here to satisfy serialization libraries
-     */
-    private Input(){}
+	/**
+	 * only here to satisfy serialization libraries
+	 */
+	@SuppressWarnings("unused")
+	private Input() {}
 
 	public boolean isEncrypted() {
 		return encrypted;
@@ -59,36 +56,4 @@ public class Input extends InOutParam {
 		return this.systemPropertyName;
 	}
 
-	public void setSystemPropertyName(String systemPropertyName) {
-		this.systemPropertyName = systemPropertyName;
-	}
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-
-        Input that = (Input) o;
-
-        return new EqualsBuilder()
-                .appendSuper(super.equals(that))
-                .append(this.encrypted, that.encrypted)
-                .append(this.required, that.required)
-                .append(this.overridable, that.overridable)
-                .append(this.systemPropertyName, that.systemPropertyName)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .appendSuper(super.hashCode())
-                .append(encrypted)
-                .append(required)
-                .append(overridable)
-                .append(systemPropertyName)
-                .toHashCode();
-    }
 }

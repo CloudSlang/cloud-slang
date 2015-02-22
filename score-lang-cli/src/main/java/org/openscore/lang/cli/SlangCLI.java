@@ -66,7 +66,7 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, Serializable> inputs,
             @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = "comma separated list of system property file locations") final List<String> systemPropertyFiles) throws IOException {
 
-        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, classPath);
+        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
         Map<String, ? extends Serializable> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
         Long id;
         if (!triggerAsync) {
@@ -90,10 +90,9 @@ public class SlangCLI implements CommandMarker {
     @CliCommand(value = "inputs", help = "Get flow inputs")
     public List<String> getFlowInputs(
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. slang inputs --f C:\\Slang\\flow.yaml") final File file,
-            @CliOption(key = {"cp", "classpath"}, mandatory = false,
-                    help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath)
+            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath)
             throws IOException {
-        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, classPath);
+        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
         List<Input> inputs = compilationArtifact.getInputs();
         List<String> inputsResult = new ArrayList<>();
         for (Input input : inputs) {

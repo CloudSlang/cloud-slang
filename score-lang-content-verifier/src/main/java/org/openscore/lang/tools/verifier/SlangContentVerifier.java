@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
@@ -6,16 +6,14 @@
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- *******************************************************************************/
+ */
 package org.openscore.lang.tools.verifier;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openscore.lang.compiler.SlangCompiler;
 import org.openscore.lang.compiler.modeller.model.Executable;
-import org.openscore.lang.compiler.modeller.model.SlangFileType;
 import org.openscore.lang.compiler.scorecompiler.ScoreCompiler;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +30,6 @@ import static org.openscore.lang.compiler.SlangSource.fromFile;
 /*
  * Created by stoneo on 2/9/2015.
  */
-
 /**
  * Verifies all files with extensions: .sl, .sl.yaml or .sl.yml in a given directory are valid
  */
@@ -117,9 +114,8 @@ public class SlangContentVerifier {
     }
 
     private Set<Executable> getModelDependenciesRecursively(Map<String, Executable> slangModels, Executable slangModel) {
-        Map<String, SlangFileType> sourceDependencies = slangModel.getDependencies();
         Set<Executable> dependenciesModels = new HashSet<>();
-        for (String dependencyName : sourceDependencies.keySet()) {
+        for (String dependencyName : slangModel.getDependencies()) {
             Executable dependency = slangModels.get(dependencyName);
             if(dependency == null){
                 throw new RuntimeException("Failed compiling slang source: " + slangModel.getName() + ". Missing dependency: " + dependencyName);

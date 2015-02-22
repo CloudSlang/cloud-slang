@@ -1,13 +1,11 @@
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
-
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package org.openscore.lang.systemtests;
 
 import com.google.common.collect.Sets;
@@ -24,16 +22,20 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 /**
  * Date: 11/14/2014
- * d
- *
  * @author Bonczidai Levente
  */
 public class SimpleFlowTest extends SystemsTestsParent {
+
+	private static final Map<String, Serializable> SYS_PROPS = new HashMap<>();
+	static {
+		SYS_PROPS.put("user.sys.props.host", "localhost");
+		SYS_PROPS.put("user.sys.props.port", 22);
+		SYS_PROPS.put("user.sys.props.alla", "balla");
+	}
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -45,14 +47,14 @@ public class SimpleFlowTest extends SystemsTestsParent {
         Map<String, Serializable> inputs = new HashMap<>();
         inputs.put("input1", "-2");
         inputs.put("time_zone_as_string", "+2");
-		compileAndRunSimpleFlow(inputs);
+		compileAndRunSimpleFlow(inputs, SYS_PROPS);
     }
 
 	@Test(timeout = DEFAULT_TIMEOUT)
 	public void testSimpleFlowNavigation() throws Exception {
         Map<String, Serializable> inputs = new HashMap<>();
         inputs.put("input1", -999);
-		compileAndRunSimpleFlow(inputs);
+		compileAndRunSimpleFlow(inputs, SYS_PROPS);
 	}
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -60,7 +62,18 @@ public class SimpleFlowTest extends SystemsTestsParent {
         exception.expect(RuntimeException.class);
         exception.expectMessage("input1");
         exception.expectMessage("Required");
-        compileAndRunSimpleFlow(new HashMap<String, Serializable>());
+        compileAndRunSimpleFlow(new HashMap<String, Serializable>(), null);
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void testSimpleFlowBasicMissingSysProps() throws Exception {
+        Map<String, Serializable> inputs = new HashMap<>();
+        inputs.put("input1", "-2");
+        inputs.put("time_zone_as_string", "+2");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("host");
+        exception.expectMessage("Required");
+        compileAndRunSimpleFlow(inputs, null);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -99,19 +112,14 @@ public class SimpleFlowTest extends SystemsTestsParent {
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 
-	private final void compileAndRunSimpleFlow(Map<String, Serializable> inputs) throws Exception {
+	private final void compileAndRunSimpleFlow(Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties) throws Exception {
 		URI flow = getClass().getResource("/yaml/simple_flow.yaml").toURI();
 		URI operations1 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
-        URI operations2 = getClass().getResource("/yaml/comopute_daylight_time_zone.sl").toURI();
-		URI systemProperties = getClass().getResource("/yaml/system_properties.yaml").toURI();
-		SlangSource systemPropertiesSource = SlangSource.fromFile(systemProperties);
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
+		URI operations2 = getClass().getResource("/yaml/comopute_daylight_time_zone.sl").toURI();
+		Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
 		CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
-		HashMap<String, Serializable> userInputs = new HashMap<>();
-        for (Map.Entry<String, ? extends Serializable> input : inputs.entrySet()) {
-            userInputs.put(input.getKey(), input.getValue());
-        }
-		ScoreEvent event = trigger(compilationArtifact, userInputs, slang.loadSystemProperties(systemPropertiesSource));
+        Assert.assertEquals("the system properties size is not as expected", 3, compilationArtifact.getSystemProperties().size());
+		ScoreEvent event = trigger(compilationArtifact, inputs, systemProperties);
 		Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
 	}
 
