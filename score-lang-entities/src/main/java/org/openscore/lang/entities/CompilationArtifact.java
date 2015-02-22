@@ -10,6 +10,8 @@
 
 package org.openscore.lang.entities;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.api.ExecutionPlan;
 
@@ -41,5 +43,30 @@ public class CompilationArtifact {
 
     public List<Input> getInputs() {
         return inputs;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        CompilationArtifact that = (CompilationArtifact) o;
+
+        return new EqualsBuilder()
+                .append(this.executionPlan, that.executionPlan)
+                .append(this.dependencies, that.dependencies)
+                .append(this.inputs, that.inputs)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(executionPlan)
+                .append(dependencies)
+                .append(inputs)
+                .toHashCode();
     }
 }
