@@ -52,7 +52,7 @@ public class CompilerHelperImpl implements CompilerHelper{
 
     private static final Logger logger = Logger.getLogger(CompilerHelperImpl.class);
     private static final String[] SLANG_FILE_EXTENSIONS = {"yml", "yaml", "py", "sl"};
-    private static final String SP_DIR = "properties";
+    private static final String SP_DIR = "properties"; //TODO reconsider it after closing slang file extensions & some real usecases
     private static final String[] SP_EXT = {"yaml", "yml"};
 
     @Override
