@@ -10,6 +10,7 @@
 package org.openscore.lang.runtime.steps;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -52,10 +53,10 @@ import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.reset;
 import static org.openscore.lang.entities.ScoreLangConstants.EVENT_INPUT_END;
 import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
 import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_START;
@@ -85,6 +86,11 @@ public class TaskStepsTest {
         RunEnvironment runEnvironment = new RunEnvironment();
         runEnvironment.getStack().pushContext(new Context(new HashMap<String, Serializable>()));
         return runEnvironment;
+    }
+
+    @Before
+    public void init(){
+        reset(loopsBinding);
     }
 
     @Test
