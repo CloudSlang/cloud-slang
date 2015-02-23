@@ -212,9 +212,9 @@ public class CompilerErrorsTest {
         URI resource = getClass().getResource("/corrupted/no_task_data_flow.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
-//        exception.expect(RuntimeException.class);
-//        exception.expectMessage("task1");
-//        exception.expectMessage("data");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("task1");
+        exception.expectMessage("data");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 

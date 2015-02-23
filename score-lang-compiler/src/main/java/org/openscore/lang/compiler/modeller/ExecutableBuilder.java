@@ -195,12 +195,12 @@ public class ExecutableBuilder {
             Map<String, Map<String, Object>> taskRawData = iterator.next();
             Map<String, Map<String, Object>> nextTaskData = iterator.peek();
             String taskName = taskRawData.keySet().iterator().next();
-            Map<String, Object> taskRawDataValue = taskRawData.values().iterator().next();
-//            try {
-//                Map<String, Object>taskRawDataValue;
-//            } catch (ClassCastException ex){
-//                throw new RuntimeException("Task: " + taskName + " syntax is illegal.\nBelow task name, there should be a map of values in the format:\ndo:\n\top_name:");
-//            }
+            Map<String, Object> taskRawDataValue;
+            try {
+                taskRawDataValue = taskRawData.values().iterator().next();
+            } catch (ClassCastException ex){
+                throw new RuntimeException("Task: " + taskName + " syntax is illegal.\nBelow task name, there should be a map of values in the format:\ndo:\n\top_name:");
+            }
 
            String defaultSuccess;
             if (nextTaskData != null) {
@@ -219,12 +219,12 @@ public class ExecutableBuilder {
         return new Workflow(tasks);
     }
 
-    private Task compileTask(String taskName, Object taskRawData, String defaultSuccess,
+    private Task compileTask(String taskName, Map<String, Object> taskRawData, String defaultSuccess,
                                      Map<String, String> imports, String defaultFailure) {
 
-//        if (MapUtils.isEmpty(taskRawData)) {
-//            throw new RuntimeException("Task: " + taskName + " has no data");
-//        }
+        if (MapUtils.isEmpty(taskRawData)) {
+            throw new RuntimeException("Task: " + taskName + " has no data");
+        }
 
         Map<String, Serializable> preTaskData = new HashMap<>();
         Map<String, Serializable> postTaskData = new HashMap<>();
