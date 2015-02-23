@@ -9,7 +9,6 @@ namespace: user.flows
 
 imports:
   ops: user.ops
-  props: user.sys.props
 
 flow:
   name: basic_flow
