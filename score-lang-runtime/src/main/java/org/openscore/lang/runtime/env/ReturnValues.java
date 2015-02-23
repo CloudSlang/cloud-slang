@@ -14,10 +14,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public class ReturnValues implements Serializable{
 
-    private final HashMap<String, String> outputs;
+	private static final long serialVersionUID = -3647685319127999716L;
 
+	private final HashMap<String, String> outputs;
     private final String result;
 
     public ReturnValues(Map<String, String> outputs, String result) {
@@ -32,4 +35,10 @@ public class ReturnValues implements Serializable{
     public String getResult() {
         return result;
     }
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
+	}
+
 }
