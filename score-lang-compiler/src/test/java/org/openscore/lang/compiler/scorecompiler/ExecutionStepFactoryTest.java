@@ -54,7 +54,7 @@ public class ExecutionStepFactoryTest {
         ForLoopStatement statement = new ForLoopStatement("1", "2");
         HashMap<String, Serializable> preTaskData = new HashMap<>();
         preTaskData.put(SlangTextualKeys.FOR_KEY, statement);
-        ExecutionStep startStep = factory.createBeginTaskStep(1L, preTaskData, "", "");
+        ExecutionStep startStep = factory.createBeginTaskStep(1L, new ArrayList<Input>(), preTaskData, "", "");
         ForLoopStatement actualStatement = (ForLoopStatement) startStep.getActionData()
                                  .get(ScoreLangConstants.LOOP_KEY);
         Assert.assertNotNull("for key is null", actualStatement);
