@@ -16,9 +16,9 @@ flow:
     - myMessage
     - tryToChangeMessage
   workflow:
-    data_flow_check:
-      do:
-        ops.data_flow_op:
-          - opMessage: myMessage
-          - unchangableMessage: tryToChangeMessage
+    - data_flow_check:
+        do:
+          ops.data_flow_op:
+            - opMessage: myMessage
+            - unchangableMessage: tryToChangeMessage
 

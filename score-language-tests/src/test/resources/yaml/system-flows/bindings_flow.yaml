@@ -18,23 +18,23 @@ flow:
         default: base_input + ">"
 
   workflow:
-    Task_1:
-      do:
-        ops.binding_flow_op:
-          - base_input:
-              default: bound_input + ">"
-              overridable: false
-      publish:
-        - bound_input: bound_output + "<"
+    - Task_1:
+        do:
+          ops.binding_flow_op:
+            - base_input:
+                default: bound_input + ">"
+                overridable: false
+        publish:
+          - bound_input: bound_output + "<"
 
-    Task_2:
-      do:
-        ops.binding_flow_op:
-          - base_input:
-              default: bound_input + ">"
-              overridable: false
-      publish:
-        - bound_input: bound_output + "<"
+    - Task_2:
+        do:
+          ops.binding_flow_op:
+            - base_input:
+                default: bound_input + ">"
+                overridable: false
+        publish:
+          - bound_input: bound_output + "<"
 
   outputs:
     - final_output: bound_input + "<"
