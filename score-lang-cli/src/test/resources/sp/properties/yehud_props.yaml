@@ -5,8 +5,5 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: user.sys.props
-
-system_properties:
-  weather: sunny
-  city: Yehud
+user.sys.props.weather: sunny
+user.sys.props.city: Yehud

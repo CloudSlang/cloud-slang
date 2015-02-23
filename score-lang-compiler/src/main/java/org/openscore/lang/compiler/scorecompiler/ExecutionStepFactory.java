@@ -43,10 +43,10 @@ public class ExecutionStepFactory {
     private static final String SIMPLE_NAVIGATION_METHOD = "navigate";
 
 
-    public ExecutionStep createBeginTaskStep(Long index, Map<String, Serializable> preTaskData, String refId, String taskName) {
+    public ExecutionStep createBeginTaskStep(Long index, List<Input> inputs, Map<String, Serializable> preTaskData, String refId, String taskName) {
         Validate.notNull(preTaskData, "preTaskData is null");
         Map<String, Serializable> actionData = new HashMap<>();
-        actionData.put(ScoreLangConstants.TASK_INPUTS_KEY, preTaskData.get(SlangTextualKeys.DO_KEY));
+        actionData.put(ScoreLangConstants.TASK_INPUTS_KEY, (Serializable)inputs);
         actionData.put(ScoreLangConstants.LOOP_KEY, preTaskData.get(SlangTextualKeys.FOR_KEY));
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, taskName);

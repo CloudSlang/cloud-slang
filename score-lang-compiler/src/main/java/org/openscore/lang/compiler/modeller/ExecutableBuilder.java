@@ -17,7 +17,6 @@ import org.openscore.lang.compiler.modeller.model.Action;
 import org.openscore.lang.compiler.modeller.model.Executable;
 import org.openscore.lang.compiler.modeller.model.Flow;
 import org.openscore.lang.compiler.modeller.model.Operation;
-import org.openscore.lang.compiler.modeller.model.SlangFileType;
 import org.openscore.lang.compiler.modeller.model.Task;
 import org.openscore.lang.compiler.modeller.model.Workflow;
 import org.openscore.lang.compiler.modeller.transformers.Transformer;
@@ -29,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Deque;
@@ -37,6 +37,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 
 import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
@@ -120,8 +122,7 @@ public class ExecutableBuilder {
 
         String namespace = parsedSlang.getNamespace();
         Map<String, String> imports = parsedSlang.getImports();
-        resolveSystemProperties(inputs, imports);
-        Map<String, SlangFileType> dependencies;
+        Set<String> dependencies;
         switch (parsedSlang.getType()) {
             case FLOW:
 
@@ -150,7 +151,6 @@ public class ExecutableBuilder {
                 }
 
                 Workflow workflow = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false);
-                //todo: add system properties dependencies?
                 dependencies = fetchDirectTasksDependencies(workflow);
                 return new Flow(preExecutableActionData, postExecutableActionData, workflow, namespace, execName, inputs, outputs, results, dependencies);
 
@@ -166,8 +166,7 @@ public class ExecutableBuilder {
                     throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Operation: " + execName + " has no action data");
                 }
                 Action action = compileAction(actionRawData);
-                //todo: add system properties dependencies?
-                dependencies = new HashMap<>();
+                dependencies = new HashSet<>();
                 return new Operation(preExecutableActionData, postExecutableActionData, action, namespace, execName, inputs, outputs, results, dependencies);
             default:
                 throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". It is not of flow or operations type");
@@ -253,7 +252,6 @@ public class ExecutableBuilder {
             throw new RuntimeException("For task: " + taskName + " syntax is illegal.\n" + ex.getMessage(), ex);
         }
         List<Input> inputs = (List<Input>)preTaskData.get(DO_KEY);
-        resolveSystemProperties(inputs, imports);
         @SuppressWarnings("unchecked") Map<String, Object> doRawData = (Map<String, Object>) taskRawData.get(DO_KEY);
         if (MapUtils.isEmpty(doRawData)) {
             throw new RuntimeException("Task: \'" + taskName + "\' has no reference information");
@@ -270,19 +268,8 @@ public class ExecutableBuilder {
             navigationStrings.put(FAILURE_RESULT, defaultFailure);
         }
 
-        return new Task(taskName, preTaskData, postTaskData, navigationStrings, refId);
+        return new Task(taskName, preTaskData, postTaskData, inputs, navigationStrings, refId);
     }
-
-	private static void resolveSystemProperties(List<Input> inputs, Map<String, String> imports) {
-		if(inputs == null) return;
-		for(Input input : inputs) {
-			String systemPropertyName = input.getSystemPropertyName();
-			if(systemPropertyName != null) {
-				systemPropertyName = resolveRefId(systemPropertyName, imports);
-				input.setSystemPropertyName(systemPropertyName);
-			}
-		}
-	}
 
 	private static String resolveRefId(String refIdString, Map<String, String> imports) {
 		String alias = StringUtils.substringBefore(refIdString, ".");
@@ -297,12 +284,11 @@ public class ExecutableBuilder {
      * @param workflow the workflow of the flow
      * @return a map of dependencies. Key - dependency full name, value - type
      */
-    private Map<String, SlangFileType> fetchDirectTasksDependencies(Workflow workflow){
-        Map<String, SlangFileType> dependencies = new HashMap<>();
+    private Set<String> fetchDirectTasksDependencies(Workflow workflow){
+        Set<String> dependencies = new HashSet<>();
         Deque<Task> tasks = workflow.getTasks();
         for (Task task : tasks) {
-            String refId = task.getRefId();
-            dependencies.put(refId, SlangFileType.EXECUTABLE);
+            dependencies.add(task.getRefId());
         }
         return dependencies;
     }

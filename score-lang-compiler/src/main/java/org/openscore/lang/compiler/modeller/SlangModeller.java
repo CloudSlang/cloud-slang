@@ -24,8 +24,7 @@ public interface SlangModeller {
     /**
      * Pre-compile a Slang source into an {@link org.openscore.lang.compiler.modeller.model.Executable}
      * @param parsedSlang the {@link org.openscore.lang.compiler.parser.model.ParsedSlang} source
-     * @return an {@link org.openscore.lang.compiler.modeller.model.Executable} object, containing either a flow
-*               or an operations in the file. Returns null if the source contains Slang system properties
+     * @return an {@link org.openscore.lang.compiler.modeller.model.Executable} object, containing either a flow or an operations in the file
      */
     Executable createModel(ParsedSlang parsedSlang);
 }

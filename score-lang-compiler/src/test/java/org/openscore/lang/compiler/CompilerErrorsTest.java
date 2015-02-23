@@ -59,15 +59,35 @@ public class CompilerErrorsTest {
     }
 
     @Test
-    public void testNotOpFlowOrSysPropFile() throws Exception {
-        URI resource = getClass().getResource("/corrupted/no_op_flow_prop_file.sl").toURI();
-
+    public void testNotOpFlowFile() throws Exception {
+        URI resource = getClass().getResource("/corrupted/no_op_flow_file.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("flow/operation/system_properties");
+        exception.expectMessage("flow/operation");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
+	@Test
+	public void testSystemProperties() throws Exception {
+		URI systemProperties = getClass().getResource("/corrupted/system_properties.yaml").toURI();
+		Set<SlangSource> path = new HashSet<>();
+		exception.expect(RuntimeException.class);
+		exception.expectMessage("problem parsing");
+		compiler.compile(SlangSource.fromFile(systemProperties), path);
+	}
+
+    @Test
+    public void testSystemPropertiesAsDep() throws Exception {
+        URI flow = getClass().getResource("/flow.yaml").toURI();
+        URI operation = getClass().getResource("/test_op.sl").toURI();
+		URI systemProperties = getClass().getResource("/corrupted/system_properties.yaml").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+        path.add(SlangSource.fromFile(systemProperties));
+		exception.expect(RuntimeException.class);
+		exception.expectMessage("problem parsing");
+        compiler.compile(SlangSource.fromFile(flow), path);
+    }
 
     @Test
     public void testFlowWithWrongNavigation() throws Exception {

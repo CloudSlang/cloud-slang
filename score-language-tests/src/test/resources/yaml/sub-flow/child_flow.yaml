@@ -9,7 +9,6 @@ namespace: user.flows
 
 imports:
   ops: user.ops
-  props: test.sys.props
 
 flow:
   name: child_flow
@@ -20,7 +19,7 @@ flow:
       do:
         ops.get_time_zone:
           - time_zone_as_string:
-              system_property: props.port
+              system_property: user.sys.props.port
     CheckWeather:
       do:
         ops.test_op:

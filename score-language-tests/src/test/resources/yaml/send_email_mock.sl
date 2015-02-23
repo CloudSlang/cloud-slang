@@ -7,9 +7,6 @@
 
 namespace: user.ops
 
-imports:
-  props: test.sys.props
-
 operation:
   name: send_email_mock
   inputs:
