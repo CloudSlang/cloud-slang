@@ -13,12 +13,12 @@ flow:
   name: wrong_navigation_flow
 
   workflow:
-    Task1:
-      do:
-        ops.java_op:
-      navigate:
-        SUCCESS: SUCCESS
-        FAILURE: FAILURE
+    - Task1:
+        do:
+          ops.java_op:
+        navigate:
+          SUCCESS: SUCCESS
+          FAILURE: FAILURE
 
   results:
     - FAILURE

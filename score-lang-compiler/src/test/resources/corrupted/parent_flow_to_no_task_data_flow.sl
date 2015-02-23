@@ -13,6 +13,6 @@ flow:
   name: parent_flow_to_missing_name_flow
 
   workflow:
-    missing_name_subflow:
-      do:
-        flows.no_task_data:
+    - missing_name_subflow:
+        do:
+          flows.no_task_data:
