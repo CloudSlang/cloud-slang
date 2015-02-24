@@ -10,6 +10,7 @@
 package org.openscore.lang.runtime.steps;
 
 import org.openscore.lang.entities.bindings.Input;
+import org.openscore.lang.runtime.env.Context;
 import org.openscore.lang.runtime.env.ContextStack;
 import org.openscore.lang.runtime.env.RunEnvironment;
 import org.openscore.lang.runtime.events.LanguageEventData;
@@ -44,7 +45,7 @@ public abstract class AbstractSteps {
                 (Serializable) inputsForEvent), Pair.of(levelName.name(), nodeName));
     }
 
-    protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment, Map<String, Serializable> currentContext, Map<String, Serializable> callArguments) {
+    protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment, Context currentContext, Map<String, Serializable> callArguments) {
         ContextStack contextStack = runEnvironment.getStack();
         contextStack.pushContext(currentContext);
         //TODO: put a deep clone of the new context
