@@ -18,3 +18,4 @@ flow:
           ops.java_op:
         navigate:
           SUCCESS: Task2
+          FAILURE: FAILURE
