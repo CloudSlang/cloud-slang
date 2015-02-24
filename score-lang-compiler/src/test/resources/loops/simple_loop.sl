@@ -8,11 +8,11 @@ flow:
   inputs:
     - values: [1,2,3]
   workflow:
-    print_values:
-      loop:
-        for: value in values
-        do:
-          ops.print:
-            - text: value
-        publish:
-          - new_var: "'a'"
+    - print_values:
+        loop:
+          for: value in values
+          do:
+            ops.print:
+              - text: value
+          publish:
+            - new_var: "'a'"

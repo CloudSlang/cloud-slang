@@ -6,8 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.compiler.SlangTextualKeys;
-import org.openscore.lang.compiler.parser.model.ParsedSlang;
 import org.openscore.lang.compiler.parser.YamlParser;
+import org.openscore.lang.compiler.parser.model.ParsedSlang;
 import org.openscore.lang.entities.bindings.Input;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -52,9 +52,13 @@ public class DoTransformerTest {
         URL resource = getClass().getResource("/flow_with_data.yaml");
         File file = new File(resource.toURI());
         ParsedSlang parsedSlang = yamlParser.parse(SlangSource.fromFile(file));
-        Map flow = (Map) parsedSlang.getFlow().get(SlangTextualKeys.WORKFLOW_KEY);
-        Map task= (Map) flow.get("CheckWeather");
-        doInputsMap = (LinkedHashMap) task.get(SlangTextualKeys.DO_KEY);
+        List<Map<String, Map>> flow = (List<Map<String, Map>>) parsedSlang.getFlow().get(SlangTextualKeys.WORKFLOW_KEY);
+        for(Map<String, Map> task : flow){
+            if(task.keySet().iterator().next().equals("CheckWeather")){
+                doInputsMap = (LinkedHashMap) task.values().iterator().next().get(SlangTextualKeys.DO_KEY);
+                break;
+            }
+        }
     }
 
     @Test

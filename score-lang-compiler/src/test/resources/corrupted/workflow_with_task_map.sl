@@ -12,6 +12,6 @@ imports:
 flow:
   name: tasks_type_list
   workflow:
-    - task1:
-        do:
-          ops.op1:
+    task1:
+      do:
+        ops.op1:

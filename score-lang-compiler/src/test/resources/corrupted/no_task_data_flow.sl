@@ -12,4 +12,4 @@ imports:
 flow:
   name: no_task_data
   workflow:
-    task1:
+    - task1:
