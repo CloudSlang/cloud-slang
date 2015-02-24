@@ -378,4 +378,15 @@ public class CompilerErrorsTest {
         exception.expectMessage("3");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
+
+    @Test
+    public void testDuplicateTaskNamesInFlow() throws Exception {
+        URI resource = getClass().getResource("/corrupted/duplicate_task_name.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Task1");
+        exception.expectMessage("unique");
+        compiler.compile(SlangSource.fromFile(resource), path);
+    }
 }
