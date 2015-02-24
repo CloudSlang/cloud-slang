@@ -52,13 +52,6 @@ public interface Slang {
 	 */
 	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties);
 
-	/**
-	 * Load system property sources written in slang and map them to fully qualified names
-	 * @param sources the slang sources containing the system properties
-	 * @return map containing all of the system properties with fully qualified keys
-	 */
-	public Map<String, ? extends Serializable> loadSystemProperties(SlangSource... sources);
-
     /**
      * Subscribe to events of score or slang
      * @param eventListener listener for the events

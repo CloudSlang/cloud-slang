@@ -38,8 +38,6 @@ public class SlangModellerImpl implements SlangModeller{
                     return transformToExecutable(parsedSlang, parsedSlang.getOperation());
                 case FLOW:
                     return transformToExecutable(parsedSlang, parsedSlang.getFlow());
-                case SYSTEM_PROPERTIES:
-                    return null;
                 default:
                     throw new RuntimeException("Source: " + parsedSlang.getName() + " is not of flow type or operations");
             }

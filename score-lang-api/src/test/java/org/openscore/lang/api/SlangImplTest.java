@@ -55,6 +55,9 @@ import static org.mockito.Matchers.*;
 @ContextConfiguration(classes = SlangImplTest.Config.class)
 public class SlangImplTest {
 
+    static final CompilationArtifact emptyCompilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>(), new ArrayList<Input>());
+    private static final int ALL_EVENTS_SIZE = 16;
+
     @Autowired
     private Slang slang;
 
@@ -66,9 +69,6 @@ public class SlangImplTest {
 
     @Autowired
     private EventBus eventBus;
-    private static final int ALL_EVENTS_SIZE = 16;
-
-    private CompilationArtifact emptyCompilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
 
     @Before
     public void init(){
@@ -130,9 +130,8 @@ public class SlangImplTest {
 
     @Test
     public void testRun(){
-        CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
 		String fqspn = "docker.sys.props.port";
-        Long executionId = slang.run(compilationArtifact, new HashMap<String, Serializable>(), Collections.singletonMap(fqspn, 22));
+        Long executionId = slang.run(emptyCompilationArtifact, new HashMap<String, Serializable>(), Collections.singletonMap(fqspn, 22));
         Assert.assertNotNull(executionId);
 
         ArgumentCaptor<TriggeringProperties> argumentCaptor = ArgumentCaptor.forClass(TriggeringProperties.class);
@@ -147,8 +146,7 @@ public class SlangImplTest {
 
     @Test
     public void testRunWithNullInputs(){
-        CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
-        Long executionId = slang.run(compilationArtifact, null, null);
+        Long executionId = slang.run(emptyCompilationArtifact, null, null);
         Assert.assertNotNull(executionId);
     }
 
@@ -163,12 +161,11 @@ public class SlangImplTest {
     public void testLaunchOperation() throws IOException {
         Slang mockSlang = Mockito.mock(SlangImpl.class);
         SlangSource tempFile = createTempFile();
-        CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
-        Mockito.when(mockSlang.compile(tempFile, new HashSet<SlangSource>())).thenReturn(compilationArtifact);
+        Mockito.when(mockSlang.compile(tempFile, new HashSet<SlangSource>())).thenReturn(emptyCompilationArtifact);
         Mockito.when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class))).thenCallRealMethod();
         Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
         Assert.assertNotNull(id);
-        Mockito.verify(mockSlang).run(compilationArtifact, new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
+        Mockito.verify(mockSlang).run(emptyCompilationArtifact, new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
     }
 
     @Test
@@ -180,13 +177,6 @@ public class SlangImplTest {
         Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
         Assert.assertNotNull(id);
         Mockito.verify(mockSlang).compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
-    }
-
-    @Test
-    public void testLoadSystemProperties(){
-        SlangSource source = new SlangSource("source", "name");
-        slang.loadSystemProperties(source);
-        Mockito.verify(compiler).loadSystemProperties(source);
     }
 
     // tests for subscribeOnEvents() method
@@ -229,7 +219,6 @@ public class SlangImplTest {
         }
     }
 
-
     private SlangSource createTempFile() throws IOException {
         File tempFile = File.createTempFile("temp", null);
         tempFile.deleteOnExit();
@@ -247,8 +236,7 @@ public class SlangImplTest {
         @Bean
         public SlangCompiler compiler() {
             SlangCompiler compiler = Mockito.mock(SlangCompiler.class);
-            CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>());
-            Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class))).thenReturn(compilationArtifact);
+            Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class))).thenReturn(emptyCompilationArtifact);
             return compiler;
         }
 
@@ -262,4 +250,5 @@ public class SlangImplTest {
             return Mockito.mock(EventBus.class);
         }
     }
+
 }

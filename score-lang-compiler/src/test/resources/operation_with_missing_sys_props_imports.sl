@@ -11,6 +11,6 @@ operation:
   name: operation_with_missing_sys_props_imports
   inputs:
     - alla:
-        system_property: props.alla
+        system_property: user.sys.props.alla
   action:
     python_script: 'print "hello world"'
