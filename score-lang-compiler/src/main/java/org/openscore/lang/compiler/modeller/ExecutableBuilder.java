@@ -8,6 +8,7 @@
  */
 package org.openscore.lang.compiler.modeller;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.iterators.PeekingIterator;
@@ -117,7 +118,7 @@ public class ExecutableBuilder {
                 } catch (ClassCastException ex){
                     throw new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'workflow' property there should be a list of tasks and not a map");
                 }
-                if (workFlowRawData == null || workFlowRawData.size() == 0) {
+                if (CollectionUtils.isEmpty(workFlowRawData)) {
                     throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + execName + " has no workflow data");
                 }
 
@@ -133,7 +134,7 @@ public class ExecutableBuilder {
                         } catch (ClassCastException ex){
                             throw new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a list of tasks and not a map");
                         }
-                        if (onFailureData != null && onFailureData.size() > 0) {
+                        if (CollectionUtils.isNotEmpty(onFailureData)) {
                             onFailureWorkFlow = compileWorkFlow(onFailureData, imports, null, true);
                         }
                         tasksIterator.remove();
@@ -229,16 +230,16 @@ public class ExecutableBuilder {
         Map<String, Serializable> preTaskData = new HashMap<>();
         Map<String, Serializable> postTaskData = new HashMap<>();
 
-        transformersHandler.validateKeyWords(taskName, (Map<String, Object>)taskRawData, ListUtils.union(preTaskTransformers, postTaskTransformers), TaskAdditionalKeyWords, null);
+        transformersHandler.validateKeyWords(taskName, taskRawData, ListUtils.union(preTaskTransformers, postTaskTransformers), TaskAdditionalKeyWords, null);
 
         try {
-            preTaskData.putAll(transformersHandler.runTransformers((Map<String, Object>)taskRawData, preTaskTransformers));
-            postTaskData.putAll(transformersHandler.runTransformers((Map<String, Object>)taskRawData, postTaskTransformers));
+            preTaskData.putAll(transformersHandler.runTransformers(taskRawData, preTaskTransformers));
+            postTaskData.putAll(transformersHandler.runTransformers(taskRawData, postTaskTransformers));
         } catch (Exception ex){
             throw new RuntimeException("For task: " + taskName + " syntax is illegal.\n" + ex.getMessage(), ex);
         }
         List<Input> inputs = (List<Input>)preTaskData.remove(SlangTextualKeys.DO_KEY);
-        @SuppressWarnings("unchecked") Map<String, Object> doRawData = (Map<String, Object>) ((Map<String, Object>)taskRawData).get(SlangTextualKeys.DO_KEY);
+        @SuppressWarnings("unchecked") Map<String, Object> doRawData = (Map<String, Object>) taskRawData.get(SlangTextualKeys.DO_KEY);
         if (MapUtils.isEmpty(doRawData)) {
             throw new RuntimeException("Task: " + taskName + " has no reference information");
         }
