@@ -16,12 +16,12 @@ flow:
   - city_name
 
   workflow:
-    CheckWeather:
-      do:
-        ops.check_Weather:
-          - city: city_name
-          - country: str('Israel')
-      publish:
-        - weather : 3
+    - CheckWeather:
+        do:
+          ops.check_Weather:
+            - city: city_name
+            - country: str('Israel')
+        publish:
+          - weather : 3
   outputs:
     - weather

@@ -15,13 +15,13 @@ flow:
   inputs:
     - input1: "'value'"
   workflow:
-    Task0:
-      do:
-        ops.get_time_zone:
-          - time_zone_as_string:
-              system_property: user.sys.props.port
-    CheckWeather:
-      do:
-        ops.test_op:
+    - Task0:
+        do:
+          ops.get_time_zone:
+            - time_zone_as_string:
+                system_property: user.sys.props.port
+    - CheckWeather:
+        do:
+          ops.test_op:
   outputs:
     - val_output: fromInputs['input1']

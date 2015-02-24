@@ -9,5 +9,5 @@ namespace: org.openscore
 flow:
   name: task_list_of_do
   workflow:
-    task1:
-      - do:
+    - task1:
+        - do:

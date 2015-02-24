@@ -220,7 +220,7 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithTasksAsList() throws Exception {
-        URI resource = getClass().getResource("/corrupted/workflow_with_task_list_.sl").toURI();
+        URI resource = getClass().getResource("/corrupted/workflow_with_task_map.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
@@ -232,7 +232,7 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithOnFailureTasksAsList() throws Exception {
-        URI resource = getClass().getResource("/corrupted/on_failure_with_task_list.sl").toURI();
+        URI resource = getClass().getResource("/corrupted/on_failure_with_task_map.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);

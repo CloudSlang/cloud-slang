@@ -12,10 +12,10 @@ imports:
 flow:
   name: on_failure_with_task_list
   workflow:
-    task1:
-      do:
-        ops.op1:
-    on_failure:
-      - task2:
+    - task1:
+        do:
+          ops.op1:
+    - on_failure:
+        task2:
           do:
             ops.op1

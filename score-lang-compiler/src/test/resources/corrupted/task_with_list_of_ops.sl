@@ -9,6 +9,6 @@ namespace: org.openscore
 flow:
   name: task_with_list_of_ops
   workflow:
-    task1:
-      do:
-        - ops.op1:
+    - task1:
+        do:
+          - ops.op1:

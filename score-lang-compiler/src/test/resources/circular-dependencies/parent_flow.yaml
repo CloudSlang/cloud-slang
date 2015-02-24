@@ -14,19 +14,19 @@ imports:
 flow:
   name: parent_flow
   workflow:
-    CheckWeather:
-      do:
-        ops.test_op:
-          - city: "'input_1'"
-      publish:
-        - weather
+    - CheckWeather:
+        do:
+          ops.test_op:
+            - city: "'input_1'"
+        publish:
+          - weather
 
-    SubFlow:
-      do:
-        flows.child_flow:
-          - city: "'input_1'"
-      publish:
-        - weather
+    - SubFlow:
+        do:
+          flows.child_flow:
+            - city: "'input_1'"
+        publish:
+          - weather
   results:
     - SUCCESS
     - FAILURE

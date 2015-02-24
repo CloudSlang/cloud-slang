@@ -8,6 +8,7 @@
  */
 package org.openscore.lang.compiler.modeller;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.iterators.PeekingIterator;
@@ -19,8 +20,8 @@ import org.openscore.lang.compiler.modeller.model.Flow;
 import org.openscore.lang.compiler.modeller.model.Operation;
 import org.openscore.lang.compiler.modeller.model.Task;
 import org.openscore.lang.compiler.modeller.model.Workflow;
-import org.openscore.lang.compiler.modeller.transformers.Transformer;
 import org.openscore.lang.compiler.parser.model.ParsedSlang;
+import org.openscore.lang.compiler.modeller.transformers.Transformer;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
 import org.openscore.lang.entities.bindings.Result;
@@ -30,15 +31,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.*;
 
 import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
@@ -129,25 +122,34 @@ public class ExecutableBuilder {
                 if(!executableRawData.containsKey(WORKFLOW_KEY)){
                     throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + execName + " has no workflow property");
                 }
-                LinkedHashMap<String, Map<String, Object>> workFlowRawData;
+                List<Map<String, Map<String, Object>>> workFlowRawData;
                 try{
-                    workFlowRawData = (LinkedHashMap) executableRawData.get(WORKFLOW_KEY);
+                    workFlowRawData = (List) executableRawData.get(WORKFLOW_KEY);
                 } catch (ClassCastException ex){
-                    throw new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'workflow' property there should be a map of tasks and not a list");
+                    throw new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'workflow' property there should be a list of tasks and not a map");
                 }
-                if (MapUtils.isEmpty(workFlowRawData)) {
+                if (CollectionUtils.isEmpty(workFlowRawData)) {
                     throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + execName + " has no workflow data");
                 }
 
                 Workflow onFailureWorkFlow = null;
-                LinkedHashMap<String, Map<String, Object>> onFailureData;
-                try{
-                    onFailureData = (LinkedHashMap) workFlowRawData.remove(ON_FAILURE_KEY);
-                } catch (ClassCastException ex){
-                    throw new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a map of tasks and not a list");
-                }
-                if (MapUtils.isNotEmpty(onFailureData)) {
-                    onFailureWorkFlow = compileWorkFlow(onFailureData, imports, null, true);
+                List<Map<String, Map<String, Object>>> onFailureData;
+                Iterator<Map<String, Map<String, Object>>> tasksIterator = workFlowRawData.iterator();
+                while(tasksIterator.hasNext()){
+                    Map<String, Map<String, Object>> taskData = tasksIterator.next();
+                    String taskName = taskData.keySet().iterator().next();
+                    if(taskName.equals(ON_FAILURE_KEY)){
+                        try{
+                            onFailureData = (List<Map<String, Map<String, Object>>>)taskData.values().iterator().next();
+                        } catch (ClassCastException ex){
+                            throw new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a list of tasks and not a map");
+                        }
+                        if (CollectionUtils.isNotEmpty(onFailureData)) {
+                            onFailureWorkFlow = compileWorkFlow(onFailureData, imports, null, true);
+                        }
+                        tasksIterator.remove();
+                        break;
+                    }
                 }
 
                 Workflow workflow = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false);
@@ -183,7 +185,7 @@ public class ExecutableBuilder {
         return new Action(actionData);
     }
 
-    private Workflow compileWorkFlow(LinkedHashMap<String, Map<String, Object>> workFlowRawData,
+    private Workflow compileWorkFlow(List<Map<String, Map<String, Object>>> workFlowRawData,
                                              Map<String, String> imports,
                                              Workflow onFailureWorkFlow,
                                              boolean onFailureSection) {
@@ -192,8 +194,8 @@ public class ExecutableBuilder {
 
         Validate.notEmpty(workFlowRawData, "Flow must have tasks in its workflow");
 
-        PeekingIterator<Map.Entry<String, Map<String, Object>>> iterator =
-                new PeekingIterator<>(workFlowRawData.entrySet().iterator());
+        PeekingIterator<Map<String, Map<String, Object>>> iterator =
+                new PeekingIterator<>(workFlowRawData.iterator());
 
         boolean isOnFailureDefined = onFailureWorkFlow != null;
 
@@ -201,13 +203,13 @@ public class ExecutableBuilder {
                 onFailureWorkFlow.getTasks().getFirst().getName() : FAILURE_RESULT;
 
         while (iterator.hasNext()) {
-            Map.Entry<String, Map<String, Object>> taskRawData = iterator.next();
-            Map.Entry<String, Map<String, Object>> nextTaskData = iterator.peek();
-            String taskName = taskRawData.getKey();
+            Map<String, Map<String, Object>> taskRawData = iterator.next();
+            Map<String, Map<String, Object>> nextTaskData = iterator.peek();
+            String taskName = taskRawData.keySet().iterator().next();
             Map<String, Object> taskRawDataValue;
             String message = "Task: " + taskName + " syntax is illegal.\nBelow task name, there should be a map of values in the format:\ndo:\n\top_name:";
             try {
-                taskRawDataValue = taskRawData.getValue();
+                taskRawDataValue = taskRawData.values().iterator().next();
                 if (MapUtils.isNotEmpty(taskRawDataValue) && taskRawDataValue.containsKey(LOOP_KEY)) {
                     message = "Task: " + taskName + " syntax is illegal.\nBelow the 'loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
                     taskRawDataValue.putAll((Map<String, Object>) taskRawDataValue.remove(LOOP_KEY));
@@ -218,7 +220,7 @@ public class ExecutableBuilder {
 
             String defaultSuccess;
             if (nextTaskData != null) {
-                defaultSuccess = nextTaskData.getKey();
+                defaultSuccess = nextTaskData.keySet().iterator().next();
             } else {
                 defaultSuccess = onFailureSection ? FAILURE_RESULT : SUCCESS_RESULT;
             }
