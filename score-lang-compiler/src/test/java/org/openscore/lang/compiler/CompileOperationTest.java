@@ -1,13 +1,11 @@
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
-
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package org.openscore.lang.compiler;
 
 import org.junit.Assert;
@@ -19,7 +17,6 @@ import org.openscore.api.ExecutionPlan;
 import org.openscore.api.ExecutionStep;
 import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
 import org.openscore.lang.compiler.modeller.model.Executable;
-import org.openscore.lang.compiler.modeller.model.SlangFileType;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Input;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +25,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -54,8 +50,6 @@ public class CompileOperationTest {
 	@Test
 	public void testCompileOperationMissingImport() throws Exception {
 		URL resource = getClass().getResource("/operation_with_missing_sys_props_imports.sl");
-		exception.expect(RuntimeException.class);
-		exception.expectMessage("import");
 		compiler.compile(SlangSource.fromFile(resource.toURI()), null).getExecutionPlan();
 	}
 
@@ -95,9 +89,62 @@ public class CompileOperationTest {
         Assert.assertEquals("There is a different number of operation inputs than expected", 1, operation.getInputs().size());
         Assert.assertEquals("There is a different number of operation outputs than expected", 2, operation.getOutputs().size());
         Assert.assertEquals("There is a different number of operation results than expected", 1, operation.getResults().size());
-        Map<String, SlangFileType> dependencies = operation.getDependencies();
-        Assert.assertEquals("There is a different number of operation dependencies than expected", 0, dependencies.size());
+        Assert.assertEquals("There is a different number of operation dependencies than expected", 0, operation.getDependencies().size());
     }
 
+    @Test
+    public void testCompileOperationMissingClassName() throws Exception {
+        URL resource = getClass().getResource("/corrupted/operation_missing_class_name.sl");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("className");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+    }
 
+    @Test
+    public void testCompileOperationMissingMethodName() throws Exception {
+        URL resource = getClass().getResource("/corrupted/operation_missing_method_name.sl");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("methodName");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+    }
+
+    @Test
+    public void testCompileOperationInvalidActionProperty() throws Exception {
+        URL resource = getClass().getResource("/corrupted/operation_invalid_action_property.sl");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("IDontBelongHere");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+    }
+
+    @Test
+    public void testCompileOperationMultipleActionTypes() throws Exception {
+        URL resource = getClass().getResource("/corrupted/operation_action_multiple_types.sl");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Conflicting keys");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+    }
+
+    @Test
+    public void testCompileOperationMissingActionProperties() throws Exception {
+        URL resource = getClass().getResource("/corrupted/operation_missing_action_properties.sl");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Invalid action data");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+    }
+
+    @Test
+    public void testCompileOperationMissingPythonScript() throws Exception {
+        URL resource = getClass().getResource("/corrupted/operation_missing_python_script.sl");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Invalid action data");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+    }
+
+    @Test
+    public void testCompileOperationInvalidType() throws Exception {
+        URL resource = getClass().getResource("/corrupted/operation_action_invalid_type.sl");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("workflow");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+    }
 }

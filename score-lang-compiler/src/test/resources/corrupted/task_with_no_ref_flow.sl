@@ -12,5 +12,5 @@ imports:
 flow:
   name: task_no_ref
   workflow:
-    task1:
-      do:
+    - task1:
+        do:

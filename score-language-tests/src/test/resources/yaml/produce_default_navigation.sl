@@ -7,9 +7,6 @@
 
 namespace: user.ops
 
-imports:
-  props: test.sys.props
-
 operation:
   name: produce_default_navigation
   inputs:

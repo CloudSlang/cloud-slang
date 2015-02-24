@@ -4,14 +4,13 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-namespace: org.openscore
 
-imports:
-  ops: org.openscore
+namespace: user.ops
 
-flow:
-  name: tasks_type_list
-  workflow:
-    - task1:
-        do:
-          ops.op1:
+operation:
+  name: operation_invalid_action_property
+  action:
+    java_action:
+      className: com.hp.thing
+      methodName: someMethod
+      IDontBelongHere: blah

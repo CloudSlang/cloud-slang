@@ -12,7 +12,7 @@ imports:
 flow:
   name: task_with_string_navigate_value
   workflow:
-    task1:
-      do:
-        ops.op1:
-      navigate: "'hi'"
+    - task1:
+        do:
+          ops.op1:
+        navigate: "'hi'"

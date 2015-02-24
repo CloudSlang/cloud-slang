@@ -5,8 +5,10 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: user.sys.props
+namespace: user.ops
 
-system_properties:
-  weather: partly cloudy
-  city: Cluj
+operation:
+  name: operation_missing_class_name
+  action:
+    java_action:
+      methodName: someMethod

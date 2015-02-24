@@ -13,8 +13,8 @@ flow:
   name: wrong_navigation_flow
 
   workflow:
-    Task1:
-      do:
-        ops.java_op:
-      navigate:
-        SUCCESS: Task2
+    - Task1:
+        do:
+          ops.java_op:
+        navigate:
+          SUCCESS: Task2
