@@ -147,18 +147,15 @@ public class ScoreServicesImpl implements ScoreServices{
         private void printOutputs(Map<String, Serializable> data) {
             if(data.containsKey(LanguageEventData.OUTPUTS) && data.containsKey(LanguageEventData.PATH) && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
 
-                @SuppressWarnings("unchecked") Map<String, String> outputs = (Map<String, String>) data.get(LanguageEventData.OUTPUTS);
-                Map<String, String> modifiableOutputs = new HashMap<>();
-                modifiableOutputs.putAll(outputs);
+                @SuppressWarnings("unchecked") Map<String, String> outputs = new HashMap((Map<String, String>) data.get(LanguageEventData.OUTPUTS));
+                outputs.putAll(outputs);
                 if (MapUtils.isNotEmpty(outputs)) {
-
                     for (String key : outputs.keySet()) {
-                        String outputValue = modifiableOutputs.get(key).replace("\n", " ");
-                        modifiableOutputs.put(key, StringUtils.abbreviate(outputValue, 0, OUTPUT_VALUE_LIMIT));
-                        if (StringUtils.isEmpty(outputValue)) {
-                            modifiableOutputs.put(key, "(empty)");
+                        String outputValue = outputs.get(key);
+                        if(StringUtils.isNotEmpty(outputValue)) {
+                            outputs.put(key, StringUtils.abbreviate(outputValue, 0, OUTPUT_VALUE_LIMIT));
                         }
-                        printWithColor(Ansi.Color.WHITE, "- " + key + " = " + modifiableOutputs.get(key));
+                        printWithColor(Ansi.Color.WHITE, "- " + key + " = " + outputs.get(key));
                     }
                 }
             }
