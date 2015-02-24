@@ -10,7 +10,7 @@ imports:
   ops: org.openscore
 
 flow:
-  name: on_failure_with_task_list
+  name: on_failure_with_task_map
   workflow:
     - task1:
         do:

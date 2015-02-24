@@ -10,7 +10,7 @@ imports:
   ops: org.openscore
 
 flow:
-  name: tasks_type_list
+  name: workflow_with_task_map
   workflow:
     task1:
       do:

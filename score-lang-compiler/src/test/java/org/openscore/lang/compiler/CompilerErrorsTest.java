@@ -224,7 +224,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("tasks_type_list");
+        exception.expectMessage("workflow_with_task_map");
         exception.expectMessage("map");
         exception.expectMessage("list");
         compiler.compile(SlangSource.fromFile(resource), path);
@@ -236,7 +236,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("on_failure_with_task_list");
+        exception.expectMessage("on_failure_with_task_map");
         exception.expectMessage("map");
         exception.expectMessage("list");
         compiler.compile(SlangSource.fromFile(resource), path);
