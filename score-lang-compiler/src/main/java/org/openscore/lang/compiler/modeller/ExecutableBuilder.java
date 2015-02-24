@@ -202,10 +202,16 @@ public class ExecutableBuilder {
         String defaultFailure = isOnFailureDefined ?
                 onFailureWorkFlow.getTasks().getFirst().getName() : FAILURE_RESULT;
 
+        Set<String> taskNames = new HashSet<>();
+
         while (iterator.hasNext()) {
             Map<String, Map<String, Object>> taskRawData = iterator.next();
             Map<String, Map<String, Object>> nextTaskData = iterator.peek();
             String taskName = taskRawData.keySet().iterator().next();
+            if(taskNames.contains(taskName)){
+                throw new RuntimeException("Task name: \'" + taskName + "\' appears more than once in the workflow. Each task name in the workflow must be unique");
+            }
+            taskNames.add(taskName);
             Map<String, Object> taskRawDataValue;
             String message = "Task: " + taskName + " syntax is illegal.\nBelow task name, there should be a map of values in the format:\ndo:\n\top_name:";
             try {
