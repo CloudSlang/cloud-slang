@@ -10,6 +10,7 @@ import org.openscore.lang.entities.bindings.Result;
 import org.openscore.lang.runtime.bindings.InputsBinding;
 import org.openscore.lang.runtime.bindings.OutputsBinding;
 import org.openscore.lang.runtime.bindings.ResultsBinding;
+import org.openscore.lang.runtime.env.Context;
 import org.openscore.lang.runtime.env.ExecutionPath;
 import org.openscore.lang.runtime.env.ParentFlowData;
 import org.openscore.lang.runtime.env.ReturnValues;
@@ -77,7 +78,7 @@ public class ExecutableSteps extends AbstractSteps {
 
             //todo: hook
 
-            updateCallArgumentsAndPushContextToStack(runEnv, executableContext, actionArguments);
+            updateCallArgumentsAndPushContextToStack(runEnv, new Context(executableContext), actionArguments);
 
             sendBindingInputsEvent(executableInputs, executableContext, runEnv, executionRuntimeServices,
                     "Post Input binding for operation/flow", nodeName, levelName.EXECUTABLE_NAME);
@@ -103,21 +104,22 @@ public class ExecutableSteps extends AbstractSteps {
                                  @Param(EXECUTABLE_RESULTS_KEY) List<Result> executableResults,
                                  @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                                  @Param(NODE_NAME_KEY) String nodeName) {
-		try{
+		try {
             ExecutionPath executionPath = runEnv.getExecutionPath();
             executionPath.up();
-            if(executionPath.getDepth() < 1) executionPath.down(); // In case we're at top level
-            Map<String, Serializable> operationContext = runEnv.getStack().popContext();
+            if (executionPath.getDepth() < 1) executionPath.down(); // In case we're at top level
+            Context operationContext = runEnv.getStack().popContext();
+            Map<String, Serializable> operationVariables = operationContext == null ? null : operationContext.getImmutableViewOfVariables();
             ReturnValues actionReturnValues = runEnv.removeReturnValues();
             fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_START, "Output binding started",
                     Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable) executableOutputs),
-                    Pair.of(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable)executableResults),
-                    Pair.of("actionReturnValues", actionReturnValues),Pair.of(levelName.EXECUTABLE_NAME.toString(),nodeName));
+                    Pair.of(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable) executableResults),
+                    Pair.of("actionReturnValues", actionReturnValues), Pair.of(levelName.EXECUTABLE_NAME.toString(), nodeName));
 
             // Resolving the result of the operation/flow
-            String result = resultsBinding.resolveResult(operationContext, actionReturnValues.getOutputs(), executableResults, actionReturnValues.getResult());
+            String result = resultsBinding.resolveResult(operationVariables, actionReturnValues.getOutputs(), executableResults, actionReturnValues.getResult());
 
-            Map<String, String> operationReturnOutputs = outputsBinding.bindOutputs(operationContext, actionReturnValues.getOutputs(), executableOutputs);
+            Map<String, String> operationReturnOutputs = outputsBinding.bindOutputs(operationVariables, actionReturnValues.getOutputs(), executableOutputs);
 
             //todo: hook
 
@@ -126,17 +128,17 @@ public class ExecutableSteps extends AbstractSteps {
             fireEvent(executionRuntimeServices, runEnv, EVENT_OUTPUT_END, "Output binding finished",
                     Pair.of(OUTPUTS, (Serializable) operationReturnOutputs),
                     Pair.of(RESULT, returnValues.getResult()),
-                    Pair.of(levelName.EXECUTABLE_NAME.toString(),nodeName));
+                    Pair.of(levelName.EXECUTABLE_NAME.toString(), nodeName));
 
             // If we have parent flow data on the stack, we pop it and request the score engine to switch to the parent
             // execution plan id once it can, and we set the next position that was stored there for the use of the navigation
-            if(!runEnv.getParentFlowStack().isEmpty()) {
+            if (!runEnv.getParentFlowStack().isEmpty()) {
                 handleNavigationToParent(runEnv, executionRuntimeServices);
             } else {
                 fireEvent(executionRuntimeServices, runEnv, EVENT_EXECUTION_FINISHED, "Execution finished running",
                         Pair.of(RESULT, returnValues.getResult()),
                         Pair.of(OUTPUTS, (Serializable) operationReturnOutputs),
-                        Pair.of(levelName.EXECUTABLE_NAME.toString(),nodeName));
+                        Pair.of(levelName.EXECUTABLE_NAME.toString(), nodeName));
             }
         } catch (RuntimeException e){
             logger.error("There was an error running the finish executable execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
