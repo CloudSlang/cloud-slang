@@ -21,13 +21,9 @@ import java.util.regex.Pattern;
 @Component
 public class ForTransformer implements Transformer<String, ForLoopStatement>{
 
-    /**
-     * case: value in variable_name
-     */
+    // case: value in variable_name
     private final static String FOR_REGEX = "^(\\s+)?(\\w+)\\s+(in)\\s+(\\w+)(\\s+)?$";
-    /**
-     * case: (key value)
-     */
+    // case: (key value)
     private final static String KEY_VALUE_PAIR_REGEX = "^(\\s+)?(\\()(\\w+)( )(\\w+)(\\))(\\s+)?$";
     private final static String FOR_IN_KEYWORD= " in ";
 
