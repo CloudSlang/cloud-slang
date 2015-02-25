@@ -10,7 +10,7 @@ imports:
   opertions: org.openscore
 
 flow:
-  name: missing_alias
+  name: missing_dependency_alias_in_imports_flow
   inputs:
     - input1
   workflow:

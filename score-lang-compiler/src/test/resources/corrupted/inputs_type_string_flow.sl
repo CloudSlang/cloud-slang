@@ -10,7 +10,7 @@ imports:
   opertions: org.openscore
 
 flow:
-  name: inputs_type_string
+  name: inputs_type_string_flow
   inputs:
     input1
   workflow:

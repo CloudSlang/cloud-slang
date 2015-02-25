@@ -35,7 +35,7 @@ public class DependenciesHelper {
      * @return a map of a the executables that were successfully matched
      */
     public Map<String, Executable> matchReferences(Executable executable, Collection<Executable> availableDependencies) {
-        Validate.isTrue(executable.getType().equals(SlangTextualKeys.FLOW_TYPE), "Executable: " + executable.getId() + " is not a flow, therefore it has no references");
+        Validate.isTrue(executable.getType().equals(SlangTextualKeys.FLOW_TYPE), "Executable: \'" + executable.getId() + "\' is not a flow, therefore it has no references");
         Map<String, Executable> resolvedDependencies = new HashMap<>();
         return fetchFlowReferences(executable, availableDependencies, resolvedDependencies);
     }
@@ -48,8 +48,8 @@ public class DependenciesHelper {
             if (resolvedDependencies.get(refId) == null) {
                 Executable matchingRef = Lambda.selectFirst(availableDependencies, having(on(Executable.class).getId(), equalTo(refId)));
                 if (matchingRef == null) {
-                    throw new RuntimeException("Reference: " + refId + " in executable: "
-                            + executable.getName() + ", wasn't found in path");
+                    throw new RuntimeException("Reference: \'" + refId + "\' in executable: \'"
+                            + executable.getName() + "\', wasn't found in path");
                 }
 
                 //first we put the reference on the map

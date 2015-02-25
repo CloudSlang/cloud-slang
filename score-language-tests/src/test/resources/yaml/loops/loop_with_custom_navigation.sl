@@ -23,6 +23,7 @@ flow:
               - text: value
         navigate:
           SUCCESS: print_other_values
+          FAILURE: FAILURE
 
     - task_that_doesnt_run:
         do:
