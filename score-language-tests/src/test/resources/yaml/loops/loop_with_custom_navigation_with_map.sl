@@ -25,6 +25,7 @@ flow:
                 - text2: v
         navigate:
           SUCCESS: print_other_values
+          FAILURE: FAILURE
 
     - task_that_doesnt_run:
         do:
