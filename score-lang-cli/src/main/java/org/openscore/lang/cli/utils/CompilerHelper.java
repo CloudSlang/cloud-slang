@@ -26,6 +26,10 @@ public interface CompilerHelper {
 	 */
 	public Map<String, ? extends Serializable> loadSystemProperties(List<String> systemPropertyFiles) throws IOException;
 
-    public Map<String, Serializable> loadInputsFromFile(List<String> inputFiles);
-
+    /**
+     * Load input sources written in yaml and map them to fully qualified names
+     * @param inputFiles paths to the files containing the inputs
+     * @return map containing all of the inputs with fully qualified keys
+     */
+    public Map<String, Serializable> loadInputsFromFile(List<String> inputFiles) throws IOException;
 }

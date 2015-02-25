@@ -54,7 +54,8 @@ public class CompilerHelperImpl implements CompilerHelper{
     private static final String[] SLANG_FILE_EXTENSIONS = {"yml", "yaml", "py", "sl"};
     private static final String SP_DIR = "properties"; //TODO reconsider it after closing slang file extensions & some real usecases
     private static final String[] SP_EXT = {"yaml", "yml"};
-
+    private static final String[] INPUT_EXT = {"yaml", "yml"};
+    private static final String INPUT_DIR = "inputs";
     @Override
 	public CompilationArtifact compile(String filePath, List<String> dependencies) throws IOException {
         Validate.notNull(filePath, "File path can not be null");
@@ -67,6 +68,7 @@ public class CompilerHelperImpl implements CompilerHelper{
         for (String dependency:dependencies) {
             Collection<File> dependenciesFiles = FileUtils.listFiles(new File(dependency), SLANG_FILE_EXTENSIONS, true);
             dependenciesFiles = select(dependenciesFiles, having(on(File.class).getPath(), not(containsString(SP_DIR))));
+            dependenciesFiles = select(dependenciesFiles, having(on(File.class).getPath(), not(containsString(INPUT_DIR))));
             depsSources.addAll(convert(dependenciesFiles, new Converter<File, SlangSource>() {
                 @Override
                 public SlangSource convert(File from) {
@@ -84,23 +86,33 @@ public class CompilerHelperImpl implements CompilerHelper{
 
 	@Override
 	public Map<String, ? extends Serializable> loadSystemProperties(List<String> systemPropertyFiles) throws IOException {
-		if(CollectionUtils.isEmpty(systemPropertyFiles)) {
-			Collection<File> spFiles = FileUtils.listFiles(new File("."), SP_EXT, true);
-			spFiles = select(spFiles, having(on(File.class).getPath(), containsString(SP_DIR)));
-			systemPropertyFiles = convert(spFiles, new Converter<File, String>() {
-				@Override
-				public String convert(File from) {
-					return from.getPath();
-				}
-			});
-		}
-		if(CollectionUtils.isEmpty(systemPropertyFiles)) return null;
-		Map<String, Serializable> result = new HashMap<>();
-		for(String spFile : systemPropertyFiles) {
-			logger.info("Loading " + spFile);
-			result.putAll((Map<String, ? extends Serializable>)yaml.load(FileUtils.readFileToString(new File(spFile))));
-		}
-		return result;
+		return loadFiles(systemPropertyFiles, SP_EXT, SP_DIR);
 	}
+
+    @Override
+    public Map<String, Serializable> loadInputsFromFile(List<String> inputFiles) throws IOException {
+        return loadFiles(inputFiles, INPUT_EXT, INPUT_DIR);
+    }
+
+    private Map<String, Serializable> loadFiles(List<String> files, String[] extensions, String directory) throws IOException {
+        if(CollectionUtils.isEmpty(files)) {
+            Collection<File> implicitFiles = FileUtils.listFiles(new File("."), extensions, true);
+            implicitFiles = select(implicitFiles, having(on(File.class).getPath(), containsString(directory)));
+            files = convert(implicitFiles, new Converter<File, String>() {
+                @Override
+                public String convert(File from) {
+                    return from.getPath();
+                }
+            });
+        }
+
+        if(CollectionUtils.isEmpty(files)) return null;
+        Map<String, Serializable> result = new HashMap<>();
+        for(String inputFile : files) {
+            logger.info("Loading " + inputFile);
+            result.putAll((Map<String, ? extends Serializable>)yaml.load(FileUtils.readFileToString(new File(inputFile))));
+        }
+        return result;
+    }
 
 }

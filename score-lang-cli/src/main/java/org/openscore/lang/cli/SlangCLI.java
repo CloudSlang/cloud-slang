@@ -65,16 +65,16 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. slang run --f C:\\Slang\\flow.yaml") final File file,
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath,
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, Serializable> inputs,
-            @CliOption(key = {"fi", "file-inputs"}, mandatory = false, help = "comma separated list of input file locations") final List<String> inputFiles,
+            @CliOption(key = {"if", "input-file"}, mandatory = false, help = "comma separated list of input file locations") final List<String> inputFiles,
             @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = "comma separated list of system property file locations") final List<String> systemPropertyFiles) throws IOException {
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
         Map<String, ? extends Serializable> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
-        Map<String, Serializable> fileInputs = compilerHelper.loadInputsFromFile(inputFiles);
+        Map<String, Serializable> inputsFromFile = compilerHelper.loadInputsFromFile(inputFiles);
         Map<String, Serializable> mergedInputs = new HashMap<>();
 
-        if(MapUtils.isNotEmpty(fileInputs)){
-            mergedInputs.putAll(fileInputs);
+        if(MapUtils.isNotEmpty(inputsFromFile)){
+            mergedInputs.putAll(inputsFromFile);
         }
         if(MapUtils.isNotEmpty(inputs)){
             mergedInputs.putAll(inputs);
