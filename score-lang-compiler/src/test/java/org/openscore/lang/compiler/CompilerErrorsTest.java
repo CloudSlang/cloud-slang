@@ -90,7 +90,7 @@ public class CompilerErrorsTest {
     }
 
     @Test
-    public void testFlowWithWrongNavigation() throws Exception {
+    public void testFlowWithNavigationToMissingTask() throws Exception {
         URI resource = getClass().getResource("/corrupted/flow_with_navigation_to_missing_task.sl").toURI();
         URI operations = getClass().getResource("/java_op.sl").toURI();
 
@@ -113,6 +113,21 @@ public class CompilerErrorsTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Task1");
         exception.expectMessage("SUCCESS");
+        exception.expectMessage("navigation");
+        compiler.compile(SlangSource.fromFile(resource), path);
+    }
+
+    @Test
+    public void testFlowWithMissingNavigationFromOperationResult() throws Exception {
+        URI resource = getClass().getResource("/corrupted/task_with_missing_navigation_from_operation_result_flow.sl").toURI();
+        URI operations = getClass().getResource("/java_op.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operations));
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("task1");
+        exception.expectMessage("FAILURE");
+        exception.expectMessage("user.ops.java_op");
         exception.expectMessage("navigation");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
@@ -224,7 +239,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("tasks_type_list");
+        exception.expectMessage("workflow_with_task_map");
         exception.expectMessage("map");
         exception.expectMessage("list");
         compiler.compile(SlangSource.fromFile(resource), path);
@@ -236,7 +251,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("on_failure_with_task_list");
+        exception.expectMessage("on_failure_with_task_map");
         exception.expectMessage("map");
         exception.expectMessage("list");
         compiler.compile(SlangSource.fromFile(resource), path);
