@@ -17,15 +17,20 @@ import java.io.Serializable;
 
 public class ForLoopStatement implements Serializable{
 
+    public final static String KEY_VALUE_DELIMITER = " ";
+
     private final String varName;
     private final String collectionExpression;
+    private final Type type;
 
-    public ForLoopStatement(String varName, String collectionExpression) {
+    public ForLoopStatement(String varName, String collectionExpression, Type type) {
         Validate.notBlank(varName, "for loop var name cannot be empty");
         Validate.notBlank(collectionExpression, "for loop collection expression cannot be empty");
+        Validate.notNull(type, "Type cannot be null");
 
         this.varName = varName;
         this.collectionExpression = collectionExpression;
+        this.type = type;
     }
 
     public String getVarName() {
@@ -34,6 +39,10 @@ public class ForLoopStatement implements Serializable{
 
     public String getCollectionExpression() {
         return collectionExpression;
+    }
+
+    public Type getType() {
+        return type;
     }
 
     @Override
@@ -48,6 +57,7 @@ public class ForLoopStatement implements Serializable{
         return new EqualsBuilder()
                 .append(varName, that.varName)
                 .append(collectionExpression, that.collectionExpression)
+                .append(type, that.type)
                 .isEquals();
     }
 
@@ -56,6 +66,13 @@ public class ForLoopStatement implements Serializable{
         return new HashCodeBuilder()
                 .append(varName)
                 .append(collectionExpression)
+                .append(type)
                 .toHashCode();
     }
+
+    public static enum Type {
+        LIST,
+        MAP
+    }
+
 }

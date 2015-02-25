@@ -16,6 +16,7 @@ public class ForTransformerTest {
     @Test
     public void testValidStatement() throws Exception {
         ForLoopStatement statement = transformer.transform("x in collection");
+        Assert.assertEquals(ForLoopStatement.Type.LIST, statement.getType());
         Assert.assertEquals("x", statement.getVarName());
         Assert.assertEquals("collection", statement.getCollectionExpression());
     }
@@ -23,6 +24,7 @@ public class ForTransformerTest {
     @Test
     public void testValidStatementWithSpaces() throws Exception {
         ForLoopStatement statement = transformer.transform("x in range(0, 9)");
+        Assert.assertEquals(ForLoopStatement.Type.LIST, statement.getType());
         Assert.assertEquals("x", statement.getVarName());
         Assert.assertEquals("range(0, 9)", statement.getCollectionExpression());
     }
@@ -30,6 +32,7 @@ public class ForTransformerTest {
     @Test
     public void testValidStatementAndTrim() throws Exception {
         ForLoopStatement statement = transformer.transform(" min   in  collection  ");
+        Assert.assertEquals(ForLoopStatement.Type.LIST, statement.getType());
         Assert.assertEquals("min", statement.getVarName());
         Assert.assertEquals("collection", statement.getCollectionExpression());
     }
@@ -68,4 +71,44 @@ public class ForTransformerTest {
         ForLoopStatement statement = transformer.transform("");
         Assert.assertNull(statement);
     }
+
+    @Test
+    public void testValidMapStatement() throws Exception {
+        ForLoopStatement statement = transformer.transform("(k v) in collection");
+        Assert.assertEquals(ForLoopStatement.Type.MAP, statement.getType());
+        Assert.assertEquals("k v", statement.getVarName());
+        Assert.assertEquals("collection", statement.getCollectionExpression());
+    }
+
+    @Test
+    public void testValidMapStatementWithExpression() throws Exception {
+        ForLoopStatement statement = transformer.transform("(k v) in dictionary.items()");
+        Assert.assertEquals(ForLoopStatement.Type.MAP, statement.getType());
+        Assert.assertEquals("k v", statement.getVarName());
+        Assert.assertEquals("dictionary.items()", statement.getCollectionExpression());
+    }
+
+    @Test
+    public void testValidMapStatementAndTrim() throws Exception {
+        ForLoopStatement statement = transformer.transform(" (k v)   in  collection  ");
+        Assert.assertEquals(ForLoopStatement.Type.MAP, statement.getType());
+        Assert.assertEquals("k v", statement.getVarName());
+        Assert.assertEquals("collection", statement.getCollectionExpression());
+    }
+
+    @Test
+    public void testMapVarNameContainInvalidChars() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("var name");
+        exception.expectMessage("invalid");
+        transformer.transform("(k v m)  in  collection");
+    }
+
+    @Test
+    public void testMapNoCollectionExpression() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("collection expression");
+        transformer.transform("(k v) in  ");
+    }
+
 }

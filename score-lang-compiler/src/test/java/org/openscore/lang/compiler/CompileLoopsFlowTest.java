@@ -133,4 +133,93 @@ public class CompileLoopsFlowTest {
                 endTaskActionData.get(ScoreLangConstants.BREAK_LOOP_KEY));
     }
 
+    @Test
+    public void testPreCompileLoopFlowWithMap() throws Exception {
+        URI flow = getClass().getResource("/loops/simple_loop_with_map.sl").toURI();
+        Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
+        assertNotNull("executable is null", executable);
+        Task task = ((Flow) executable).getWorkflow()
+                .getTasks()
+                .getFirst();
+        assertTrue(task.getPreTaskActionData().containsKey(SlangTextualKeys.FOR_KEY));
+        ForLoopStatement forStatement = (ForLoopStatement) task.getPreTaskActionData()
+                .get(SlangTextualKeys.FOR_KEY);
+        assertEquals("person_map.items()", forStatement.getCollectionExpression());
+        assertEquals("k v", forStatement.getVarName());
+        @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) task.getPostTaskActionData()
+                .get(SlangTextualKeys.PUBLISH_KEY);
+        assertEquals("\'a\'", outputs.get(0)
+                .getExpression());
+        assertEquals(Arrays.asList(ScoreLangConstants.FAILURE_RESULT),
+                task.getPostTaskActionData().get(SlangTextualKeys.BREAK_KEY));
+    }
+
+    @Test
+    public void testPreCompileLoopFlowWithMapWithBreak() throws Exception {
+        URI flow = getClass().getResource("/loops/loop_with_break_with_map.sl").toURI();
+        Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
+        assertNotNull("executable is null", executable);
+        Task task = ((Flow) executable).getWorkflow()
+                .getTasks()
+                .getFirst();
+        assertEquals(Arrays.asList(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.FAILURE_RESULT),
+                task.getPostTaskActionData().get(SlangTextualKeys.BREAK_KEY));
+    }
+
+    @Test
+    public void testPreCompileLoopWithMapWithCustomNavigationFlow() throws Exception {
+        URI flow = getClass().getResource("/loops/loop_with_custom_navigation_with_map.sl").toURI();
+        Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
+        assertNotNull("executable is null", executable);
+        Task task = ((Flow) executable).getWorkflow()
+                .getTasks()
+                .getFirst();
+        assertTrue(task.getPreTaskActionData().containsKey(SlangTextualKeys.FOR_KEY));
+        ForLoopStatement forStatement = (ForLoopStatement) task.getPreTaskActionData()
+                .get(SlangTextualKeys.FOR_KEY);
+        assertEquals("person_map.items()", forStatement.getCollectionExpression());
+        assertEquals("k v", forStatement.getVarName());
+        @SuppressWarnings("unchecked") Map<String, String> actual = (Map<String, String>) task.getPostTaskActionData()
+                .get(SlangTextualKeys.NAVIGATION_KEY);
+        assertEquals("print_other_values", actual.get(ScoreLangConstants.SUCCESS_RESULT));
+    }
+
+    @Test
+    public void testCompileLoopWithMapFlow() throws Exception {
+        URI flow = getClass().getResource("/loops/simple_loop_with_map.sl").toURI();
+        URI operation = getClass().getResource("/loops/print.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+        CompilationArtifact artifact = compiler.compile(SlangSource.fromFile(flow), path);
+        assertNotNull("artifact is null", artifact);
+        ExecutionPlan executionPlan = artifact.getExecutionPlan();
+        assertNotNull("executionPlan is null", executionPlan);
+        Map<String, ?> startTaskActionData = executionPlan.getStep(2L)
+                .getActionData();
+        assertTrue(startTaskActionData.containsKey(ScoreLangConstants.LOOP_KEY));
+        ForLoopStatement forStatement = (ForLoopStatement) startTaskActionData.get(ScoreLangConstants.LOOP_KEY);
+        assertEquals("person_map.items()", forStatement.getCollectionExpression());
+        assertEquals("k v", forStatement.getVarName());
+
+        Map<String, ?> endTaskActionData = executionPlan.getStep(3L)
+                .getActionData();
+        assertEquals(Arrays.asList(ScoreLangConstants.FAILURE_RESULT),
+                endTaskActionData.get(ScoreLangConstants.BREAK_LOOP_KEY));
+    }
+
+    @Test
+    public void testCompileLoopFlowWithMapWithBreak() throws Exception {
+        URI flow = getClass().getResource("/loops/loop_with_break_with_map.sl").toURI();
+        URI operation = getClass().getResource("/loops/print.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+        CompilationArtifact artifact = compiler.compile(SlangSource.fromFile(flow), path);
+        assertNotNull("artifact is null", artifact);
+        ExecutionPlan executionPlan = artifact.getExecutionPlan();
+
+        Map<String, ?> endTaskActionData = executionPlan.getStep(3L)
+                .getActionData();
+        assertEquals(Arrays.asList(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.FAILURE_RESULT),
+                endTaskActionData.get(ScoreLangConstants.BREAK_LOOP_KEY));
+    }
 }

@@ -11,16 +11,18 @@ imports:
   ops: loops
 
 flow:
-  name: loop_with_custom_navigation
+  name: loop_with_custom_navigation_with_map
   inputs:
-    - values: [1,2]
+    - person_map: >
+        {'john': 1, 'jane': 2, 'peter': 'three'}
   workflow:
     - print_values:
         loop:
-          for: value in values
+          for: (k v) in person_map.items()
           do:
-            ops.print:
-              - text: value
+              ops.print:
+                - text: k
+                - text2: v
         navigate:
           SUCCESS: print_other_values
 

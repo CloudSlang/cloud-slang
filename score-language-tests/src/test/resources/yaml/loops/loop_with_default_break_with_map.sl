@@ -11,13 +11,14 @@ imports:
   ops: loops
 
 flow:
-  name: simple_loop
+  name: loop_with_default_break
   inputs:
-    - values: [1,2,3]
+    - person_map: >
+        {'john': 1, 'jane': 2, 'peter': 'three'}
   workflow:
     - print_values:
         loop:
-          for: value in values
+          for: (k v) in person_map.items()
           do:
-            ops.print:
-              - text: value
+            ops.operation_that_fails_when_value_is_2:
+              - text: v

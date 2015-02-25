@@ -259,7 +259,7 @@ public class TaskStepsTest {
     @Test
     public void whenLoopKeyProvidedLoopConditionIsRequested(){
         String collectionExpression = "collection";
-        ForLoopStatement statement = new ForLoopStatement("x", collectionExpression);
+        ForLoopStatement statement = new ForLoopStatement("x", collectionExpression, ForLoopStatement.Type.LIST);
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         when(loopsBinding.getOrCreateLoopCondition(statement, context, nodeName))
@@ -273,7 +273,7 @@ public class TaskStepsTest {
     @Test
     public void whenLoopConditionHasNoMoreNextStepIdSetToEndTask(){
         String collectionExpression = "collection";
-        ForLoopStatement statement = new ForLoopStatement("x", collectionExpression);
+        ForLoopStatement statement = new ForLoopStatement("x", collectionExpression, ForLoopStatement.Type.LIST);
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
@@ -293,7 +293,7 @@ public class TaskStepsTest {
     @Test
     public void whenLoopConditionHasMoreNextStepIdSetToEndTask(){
         String collectionExpression = "collection";
-        ForLoopStatement statement = new ForLoopStatement("x", collectionExpression);
+        ForLoopStatement statement = new ForLoopStatement("x", collectionExpression, ForLoopStatement.Type.LIST);
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
@@ -315,7 +315,7 @@ public class TaskStepsTest {
     @Test
     public void whenLoopConditionIsOfForTypeStartTaskWillIncrementIt(){
         String collectionExpression = "collection";
-        ForLoopStatement statement = new ForLoopStatement("x", collectionExpression);
+        ForLoopStatement statement = new ForLoopStatement("x", collectionExpression,ForLoopStatement.Type.LIST);
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         ForLoopCondition mockLoopCondition = mock(ForLoopCondition.class);
@@ -325,7 +325,7 @@ public class TaskStepsTest {
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.getStack().pushContext(context);
         taskSteps.beginTask(new ArrayList<Input>(), statement, runEnv, createRuntimeServices(), nodeName, 1L, 2L, "2");
-        verify(loopsBinding).incrementForLoop("x", context, mockLoopCondition);
+        verify(loopsBinding).incrementListForLoop("x", context, mockLoopCondition);
     }
 
     @Test

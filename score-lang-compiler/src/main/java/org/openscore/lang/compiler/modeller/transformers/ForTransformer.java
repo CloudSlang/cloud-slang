@@ -21,7 +21,14 @@ import java.util.regex.Pattern;
 @Component
 public class ForTransformer implements Transformer<String, ForLoopStatement>{
 
+    /**
+     * case: value in variable_name
+     */
     private final static String FOR_REGEX = "^(\\s+)?(\\w+)\\s+(in)\\s+(\\w+)(\\s+)?$";
+    /**
+     * case: (key value)
+     */
+    private final static String KEY_VALUE_PAIR_REGEX = "^(\\s+)?(\\()(\\w+)( )(\\w+)(\\))(\\s+)?$";
     private final static String FOR_IN_KEYWORD= " in ";
 
     @Override
@@ -30,22 +37,45 @@ public class ForTransformer implements Transformer<String, ForLoopStatement>{
             return null;
         }
 
-        Pattern regex = Pattern.compile(FOR_REGEX);
-        Matcher matcher = regex.matcher(rawData);
+        ForLoopStatement forLoopStatement;
         String varName;
         String collectionExpression;
-        if (matcher.find()) {
-            varName = matcher.group(2);
-            collectionExpression = matcher.group(4);
+
+        Pattern regexSimpleFor = Pattern.compile(FOR_REGEX);
+        Matcher matcherSimpleFor = regexSimpleFor.matcher(rawData);
+
+        if (matcherSimpleFor.find()) {
+            // case: value in variable_name
+            varName = matcherSimpleFor.group(2);
+            collectionExpression = matcherSimpleFor.group(4);
+            forLoopStatement = new ForLoopStatement(varName, collectionExpression, ForLoopStatement.Type.LIST);
         } else {
-            varName = StringUtils.substringBefore(rawData, FOR_IN_KEYWORD);
-            collectionExpression = StringUtils.substringAfter(rawData, FOR_IN_KEYWORD);
+            String beforeInKeyword = StringUtils.substringBefore(rawData, FOR_IN_KEYWORD);
+            collectionExpression = StringUtils.substringAfter(rawData, FOR_IN_KEYWORD).trim();
+
+            Pattern regexKeyValueFor = Pattern.compile(KEY_VALUE_PAIR_REGEX);
+            Matcher matcherKeyValueFor = regexKeyValueFor.matcher(beforeInKeyword);
+
+            if (matcherKeyValueFor.find()) {
+                // case: (key value)
+                String keyName = matcherKeyValueFor.group(3);
+                String valueName = matcherKeyValueFor.group(5);
+
+                forLoopStatement = new ForLoopStatement(
+                        keyName + ForLoopStatement.KEY_VALUE_DELIMITER + valueName,
+                        collectionExpression,
+                        ForLoopStatement.Type.MAP);
+            } else {
+                // case: value in expression_other_than_variable_name
+                varName = beforeInKeyword.trim();
+                if (isContainInvalidChars(varName)) {
+                    throw new RuntimeException("for loop var name cannot contain invalid chars");
+                }
+                forLoopStatement = new ForLoopStatement(varName, collectionExpression, ForLoopStatement.Type.LIST);
+            }
         }
-        varName = varName.trim();
-        if (isContainInvalidChars(varName)) {
-            throw new RuntimeException("for loop var name cannot contain invalid chars");
-        }
-        return new ForLoopStatement(varName, collectionExpression.trim());
+
+        return forLoopStatement;
     }
 
     private boolean isContainInvalidChars(String varName) {
@@ -62,4 +92,5 @@ public class ForTransformer implements Transformer<String, ForLoopStatement>{
     public String keyToTransform() {
         return null;
     }
+
 }

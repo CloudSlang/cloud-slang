@@ -10,6 +10,7 @@
 package org.openscore.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openscore.api.execution.ExecutionParametersConsts;
@@ -94,7 +95,17 @@ public class TaskSteps extends AbstractSteps {
                 }
 
                 if (loopCondition instanceof ForLoopCondition) {
-                    loopsBinding.incrementForLoop(loop.getVarName(), flowContext, (ForLoopCondition) loopCondition);
+                    ForLoopCondition forLoopCondition = (ForLoopCondition) loopCondition;
+                    String varName = loop.getVarName();
+
+                    if (loop.getType().equals(ForLoopStatement.Type.LIST)) {
+                        loopsBinding.incrementListForLoop(varName, flowContext, forLoopCondition);
+                    } else {
+                        String[] varNames = StringUtils.split(varName, ForLoopStatement.KEY_VALUE_DELIMITER);
+                        String keyName = varNames[0];
+                        String valueName = varNames[1];
+                        loopsBinding.incrementMapForLoop(keyName, valueName, flowContext, forLoopCondition);
+                    }
                 }
             }
 

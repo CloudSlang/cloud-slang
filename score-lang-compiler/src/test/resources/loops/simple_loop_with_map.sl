@@ -5,19 +5,21 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0namespace: loops
 
-namespace: loops
-
 imports:
   ops: loops
 
 flow:
-  name: simple_loop
+  name: simple_loop_with_map
   inputs:
-    - values: [1,2,3]
+    - person_map: >
+        {'john': 1, 'jane': 2, 'peter': 'three'}
   workflow:
     - print_values:
         loop:
-          for: value in values
+          for: (k v) in person_map.items()
           do:
             ops.print:
-              - text: value
+              - text: k
+              - text2: v
+          publish:
+            - new_var: "'a'"
