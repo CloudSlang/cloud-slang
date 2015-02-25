@@ -21,11 +21,13 @@ import org.openscore.lang.compiler.modeller.model.Operation;
 import org.openscore.lang.compiler.modeller.model.Task;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.bindings.Input;
+import org.openscore.lang.entities.bindings.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -63,6 +65,9 @@ public class ScoreCompilerImpl implements ScoreCompiler{
 
             //than we match the references to the actual dependencies
             filteredDependencies = dependenciesHelper.matchReferences(executable, availableExecutables);
+
+            // Validate that all the tasks of a flow have navigations for all the reference's results
+            validateAllDependenciesResultsHaveMatchingNavigations(executable, filteredDependencies);
         }
 
         //next we create an execution plan for the required executable
@@ -79,6 +84,38 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         executables.add(executable);
         executionPlan.setSubflowsUUIDs(new HashSet<>(dependencies.keySet()));
         return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemProperties(executables));
+    }
+
+    /**
+     * Validate that for all the tasks in the flow, all results from the referenced operation or flow have matching navigations
+     * If the given {@link org.openscore.lang.compiler.modeller.model.Executable} is an operation, the method does nothing
+     * Throws {@link java.lang.IllegalArgumentException} if:
+     *      - Any reference of the executable is missing
+     *      - There is a missing navigation for one of the tasks' references' results
+     *
+     * @param executable the flow to validate
+     * @param filteredDependencies a map holding for each reference name, its {@link org.openscore.lang.compiler.modeller.model.Executable} object
+     */
+    private void validateAllDependenciesResultsHaveMatchingNavigations(Executable executable, Map<String, Executable> filteredDependencies) {
+        if(executable.getType().equals(SlangTextualKeys.OPERATION_TYPE)){
+            return;
+        }
+        Flow flow = (Flow)executable;
+        Deque<Task> tasks = flow.getWorkflow().getTasks();
+        for(Task task : tasks){
+            Map<String, String> taskNavigations = task.getNavigationStrings();
+            String refId = task.getRefId();
+            Executable reference = filteredDependencies.get(refId);
+            Validate.notNull(reference, "Cannot compile flow: \'" + executable.getName() + "\' since for task: \'" + task.getName()
+                                        + "\', the dependency: \'" + refId + "\' is missing.");
+            List<Result> refResults = reference.getResults();
+            for(Result result : refResults){
+                String resultName = result.getName();
+                Validate.isTrue(taskNavigations.containsKey(resultName), "Cannot compile flow: \'" + executable.getName() +
+                                                "\' since for task: '" + task.getName() + "\"', the result \'" + resultName+
+                                                "\' of its dependency: \'"+ refId + "\' has no matching navigation");
+            }
+        }
     }
 
     /**
