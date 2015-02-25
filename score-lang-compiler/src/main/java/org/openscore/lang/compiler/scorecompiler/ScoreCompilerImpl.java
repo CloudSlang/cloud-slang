@@ -112,7 +112,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             for(Result result : refResults){
                 String resultName = result.getName();
                 Validate.isTrue(taskNavigations.containsKey(resultName), "Cannot compile flow: \'" + executable.getName() +
-                                                "\' since for task: '" + task.getName() + "\"', the result \'" + resultName+
+                                                "\' since for task: '" + task.getName() + "\', the result \'" + resultName+
                                                 "\' of its dependency: \'"+ refId + "\' has no matching navigation");
             }
         }

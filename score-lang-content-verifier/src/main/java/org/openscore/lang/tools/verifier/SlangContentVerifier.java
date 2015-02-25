@@ -69,8 +69,9 @@ public class SlangContentVerifier {
             try {
                 sourceModel = slangCompiler.preCompile(fromFile(slangFile));
             } catch (Exception e) {
-                log.error("Failed creating Slang models for directory: " + directoryPath + ". Exception is : " + e.getMessage());
-                throw e;
+                String errorMessage = "Failed creating Slang models for file: \'" + slangFile.getAbsoluteFile() + "\'.\n" + e.getMessage();
+                log.error(errorMessage);
+                throw new RuntimeException(errorMessage, e);
             }
             if(sourceModel != null) {
                 staticSlangFileValidation(slangFile, sourceModel);
@@ -78,7 +79,8 @@ public class SlangContentVerifier {
             }
         }
         if(slangFiles.size() != slangModels.size()){
-            throw new RuntimeException("Some Slang files were not pre-compiled.\nFound: " + slangFiles.size() + " slang files in path: \'" + directoryPath + "\' But managed to create slang models for only: " + slangModels.size());
+            throw new RuntimeException("Some Slang files were not pre-compiled.\nFound: " + slangFiles.size() +
+                    " slang files in path: \'" + directoryPath + "\' But managed to create slang models for only: " + slangModels.size());
         }
         return slangModels;
     }
@@ -93,15 +95,16 @@ public class SlangContentVerifier {
                 if (compiledSource == null) {
                     compiledSource = scoreCompiler.compile(slangModel, dependenciesModels);
                     if(compiledSource != null) {
-                        log.info("Compiled: " + slangModel.getName() + " successfully");
+                        log.info("Compiled: \'" + slangModel.getNamespace() + "." + slangModel.getName() + "\' successfully");
                         compiledArtifacts.put(slangModel.getName(), compiledSource);
                     } else {
-                        log.error("Failed to compile source: " + slangModel.getName());
+                        log.error("Failed to compile source: \'" + slangModel.getNamespace() + "." + slangModel.getName() + "\'");
                     }
                 }
             } catch (Exception e) {
-                log.error("Failed compiling Slang source: " + slangModel.getName() + ". Exception is : " + e.getMessage());
-                throw e;
+                String errorMessage = "Failed compiling Slang source: \'" + slangModel.getNamespace() + "." + slangModel.getName() + "\'.\n" + e.getMessage();
+                log.error(errorMessage);
+                throw new RuntimeException(errorMessage, e);
             }
         }
         if(compiledArtifacts.size() != slangModels.size()){
@@ -118,7 +121,8 @@ public class SlangContentVerifier {
         for (String dependencyName : slangModel.getDependencies()) {
             Executable dependency = slangModels.get(dependencyName);
             if(dependency == null){
-                throw new RuntimeException("Failed compiling slang source: " + slangModel.getName() + ". Missing dependency: " + dependencyName);
+                throw new RuntimeException("Failed compiling slang source: " + slangModel.getNamespace() + "." +
+                        slangModel.getName() + ". Missing dependency: " + dependencyName);
             }
             dependenciesModels.add(dependency);
             dependenciesModels.addAll(getModelDependenciesRecursively(slangModels, dependency));
@@ -128,12 +132,14 @@ public class SlangContentVerifier {
 
     private void staticSlangFileValidation(File slangFile, Executable executable){
         // Validate that the namespace is not empty
-        Validate.notEmpty(executable.getNamespace(), "Namespace of slang source: " + executable.getName() + " cannot be empty.");
+        Validate.notEmpty(executable.getNamespace(), "Error validating Slang file: \'" + slangFile.getAbsoluteFile() +
+                "\'. Namespace of slang source: \'" + executable.getName() + "\' cannot be empty.");
 
         String executableNamespacePath = executable.getNamespace().replace('.', File.separatorChar);
         // Validate that the namespace matches the path of the file
-        String namespaceErrorMessage = "Namespace of slang source: " + executable.getName() + " is wrong.\nIt is currently \'" +
-                                    executable.getNamespace() + "\', but it should match the file path: \'" + slangFile.getPath() + "\'";
+        String namespaceErrorMessage = "Error validating Slang file: \'" + slangFile.getAbsoluteFile() +
+                "\'. Namespace of slang source: " + executable.getName() + " is wrong.\nIt is currently \'" +
+                executable.getNamespace() + "\', but it should match the file path: \'" + slangFile.getPath() + "\'";
         int indexOfLastFileSeparator = slangFile.getAbsolutePath().lastIndexOf(File.separatorChar);
         String filePathWithoutFileName = slangFile.getAbsolutePath().substring(0, indexOfLastFileSeparator);
         Validate.isTrue(filePathWithoutFileName.endsWith(executableNamespacePath), namespaceErrorMessage);
@@ -141,8 +147,9 @@ public class SlangContentVerifier {
         // Validate executable name is the same as the file name
         String[] splitName = slangFile.getName().split("\\Q.");
         String fileNameNoExtension = splitName[0];
-        String executableNameErrorMessage = "Name of flow or operation: \'" + executable.getName() +
-                                        "\' is invalid.\nIt should be identical to the file name: \'" + fileNameNoExtension + "\'";
+        String executableNameErrorMessage = "Error validating Slang file: \'" + slangFile.getAbsoluteFile() +
+                "\'. Name of flow or operation: \'" + executable.getName() +
+                "\' is invalid.\nIt should be identical to the file name: \'" + fileNameNoExtension + "\'";
         Validate.isTrue(fileNameNoExtension.equals(executable.getName()), executableNameErrorMessage);
     }
 
