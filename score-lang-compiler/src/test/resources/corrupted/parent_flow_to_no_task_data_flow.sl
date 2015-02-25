@@ -10,9 +10,9 @@ imports:
   flows: org.openscore
 
 flow:
-  name: parent_flow_to_missing_name_flow
+  name: parent_flow_to_no_task_data_flow
 
   workflow:
-    missing_name_subflow:
-      do:
-        flows.no_task_data:
+    - missing_name_subflow:
+        do:
+          flows.no_task_data:

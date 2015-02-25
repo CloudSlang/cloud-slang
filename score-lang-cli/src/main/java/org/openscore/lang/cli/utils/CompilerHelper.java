@@ -17,9 +17,14 @@ import org.openscore.lang.entities.CompilationArtifact;
 
 public interface CompilerHelper {
 
-	public CompilationArtifact compile(String filePath, String opName, List<String> dependencies) throws IOException;
+	public CompilationArtifact compile(String filePath, List<String> dependencies) throws IOException;
 
-	public Map<String, ? extends Serializable> loadSystemProperties(List<String> systemPropertyFiles);
+	/**
+	 * Load system property sources written in yaml and map them to fully qualified names
+	 * @param systemPropertyFiles paths to the files containing the system properties
+	 * @return map containing all of the system properties with fully qualified keys
+	 */
+	public Map<String, ? extends Serializable> loadSystemProperties(List<String> systemPropertyFiles) throws IOException;
 
     public Map<String, Serializable> loadInputsFromFile(List<String> inputFiles);
 

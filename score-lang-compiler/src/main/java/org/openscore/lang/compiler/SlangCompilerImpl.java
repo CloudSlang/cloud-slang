@@ -19,10 +19,7 @@ import org.openscore.lang.entities.CompilationArtifact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /*
@@ -55,37 +52,6 @@ public class SlangCompilerImpl implements SlangCompiler {
 
         return scoreCompiler.compile(executable, pathExecutables);
     }
-
-	@Override
-	public Map<String, ? extends Serializable> loadSystemProperties(SlangSource... sources) {
-		Validate.notNull(sources, "You must supply a source to load");
-		Map<String, Serializable> result = new HashMap<>();
-		for(SlangSource source : sources) {
-			ParsedSlang parsedSlang = yamlParser.parse(source);
-			Map<String, ? extends Serializable> systemProperties = parsedSlang.getSystemProperties();
-			Validate.notNull(systemProperties, "No system properties specified");
-			String namespace = parsedSlang.getNamespace();
-			for(Map.Entry<String, ? extends Serializable> entry : systemProperties.entrySet()) {
-				result.put(namespace + "." + entry.getKey(), entry.getValue());
-			}
-		}
-		return result;
-	}
-    @Override
-    public Map<String, Serializable> loadFileInputs(SlangSource... sources) {
-        Validate.notNull(sources, "You must supply a source to load");
-        Map<String, Serializable> result = new HashMap<>();
-        for(SlangSource source : sources) {
-            Map<String, Serializable> fileInputs = yamlParser.parseInputFile(source);
-            Validate.notNull(fileInputs, "No file inputs specified");
-            for(Map.Entry<String, Serializable> entry : fileInputs.entrySet()) {
-                result.put(entry.getKey(), entry.getValue().toString());
-            }
-        }
-        return result;
-    }
-
-
 
     @Override
     public Executable preCompile(SlangSource source) {

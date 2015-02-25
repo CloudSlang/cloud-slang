@@ -93,11 +93,6 @@ public class SlangImpl implements Slang {
 		return run(compilationArtifact, runInputs, systemProperties);
 	}
 
-	@Override
-	public Map<String, ? extends Serializable> loadSystemProperties(SlangSource... sources) {
-		return compiler.loadSystemProperties(sources);
-	}
-
     @Override
     public Map<String, Serializable> loadFileInputs(SlangSource... sources) {
         return compiler.loadFileInputs(sources);

@@ -9,3 +9,4 @@ build/
 .settings/
 .project
 .classpath
+*.history

@@ -4,9 +4,16 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
+namespace: org.openscore
 
-namespace: user.sys.props
+imports:
+  ops: user.ops
 
-system_properties:
-  weather: partly cloudy
-  city: Cluj
+flow:
+  name: task_with_missing_navigation_from_operation_result_flow
+  workflow:
+    - task1:
+        do:
+          ops.java_op:
+        navigate:
+          SUCCESS: SUCCESS

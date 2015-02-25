@@ -10,7 +10,8 @@
 package org.openscore.lang.compiler.scorecompiler;
 
 import org.openscore.lang.compiler.SlangTextualKeys;
-import org.openscore.lang.compiler.scorecompiler.ExecutionStepFactory;
+import org.openscore.lang.entities.ForLoopStatement;
+import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
@@ -46,6 +47,30 @@ public class ExecutionStepFactoryTest {
         ExecutionStep startStep = factory.createStartStep(1L, new HashMap<String, Serializable>(), execInputs,"");
         Assert.assertNotNull("inputs key is null", startStep.getActionData().get(ScoreLangConstants.EXECUTABLE_INPUTS_KEY));
         Assert.assertSame("inputs are not set under their key", execInputs, startStep.getActionData().get(ScoreLangConstants.EXECUTABLE_INPUTS_KEY));
+    }
+
+    @Test
+    public void testCreateStartStepPutForUnderTheRightKey() throws Exception {
+        ForLoopStatement statement = new ForLoopStatement("1", "2");
+        HashMap<String, Serializable> preTaskData = new HashMap<>();
+        preTaskData.put(SlangTextualKeys.FOR_KEY, statement);
+        ExecutionStep startStep = factory.createBeginTaskStep(1L, new ArrayList<Input>(), preTaskData, "", "");
+        ForLoopStatement actualStatement = (ForLoopStatement) startStep.getActionData()
+                                 .get(ScoreLangConstants.LOOP_KEY);
+        Assert.assertNotNull("for key is null", actualStatement);
+        Assert.assertSame("inputs are not set under their key", statement, actualStatement);
+    }
+
+    @Test
+    public void testCreateFinishTakStep(){
+        ExecutionStep finishTaskStep = factory.createFinishTaskStep(
+                1L,
+                new HashMap<String, Serializable>(),
+                new HashMap<String, ResultNavigation>(),
+                "taskName");
+        Assert.assertTrue(finishTaskStep.getActionData().containsKey(ScoreLangConstants.PREVIOUS_STEP_ID_KEY));
+        Assert.assertTrue(finishTaskStep.getActionData().containsKey(ScoreLangConstants.BREAK_LOOP_KEY));
+
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -10,12 +10,12 @@ imports:
   ops: org.openscore
 
 flow:
-  name: on_failure_with_task_list
+  name: on_failure_with_task_map
   workflow:
-    task1:
-      do:
-        ops.op1:
-    on_failure:
-      - task2:
+    - task1:
+        do:
+          ops.op1:
+    - on_failure:
+        task2:
           do:
             ops.op1

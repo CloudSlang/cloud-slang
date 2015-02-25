@@ -10,10 +10,10 @@ imports:
   opertions: org.openscore
 
 flow:
-  name: missing_alias
+  name: missing_dependency_alias_in_imports_flow
   inputs:
     - input1
   workflow:
-    task1:
-      do:
-        ops.op1:
+    - task1:
+        do:
+          ops.op1:
