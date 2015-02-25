@@ -24,7 +24,7 @@ public class ForTransformer implements Transformer<String, ForLoopStatement>{
     // case: value in variable_name
     private final static String FOR_REGEX = "^(\\s+)?(\\w+)\\s+(in)\\s+(\\w+)(\\s+)?$";
     // case: (key value)
-    private final static String KEY_VALUE_PAIR_REGEX = "^(\\s+)?(\\()(\\w+)( )(\\w+)(\\))(\\s+)?$";
+    private final static String KEY_VALUE_PAIR_REGEX = "^(\\s+)?(\\w+)(, )(\\w+)(\\s+)?$";
     private final static String FOR_IN_KEYWORD= " in ";
 
     @Override
@@ -54,8 +54,8 @@ public class ForTransformer implements Transformer<String, ForLoopStatement>{
 
             if (matcherKeyValueFor.find()) {
                 // case: (key value)
-                String keyName = matcherKeyValueFor.group(3);
-                String valueName = matcherKeyValueFor.group(5);
+                String keyName = matcherKeyValueFor.group(2);
+                String valueName = matcherKeyValueFor.group(4);
 
                 forLoopStatement = new ForLoopStatement(
                         keyName + ForLoopStatement.KEY_VALUE_DELIMITER + valueName,

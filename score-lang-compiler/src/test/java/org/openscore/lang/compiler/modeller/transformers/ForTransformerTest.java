@@ -74,7 +74,7 @@ public class ForTransformerTest {
 
     @Test
     public void testValidMapStatement() throws Exception {
-        ForLoopStatement statement = transformer.transform("(k v) in collection");
+        ForLoopStatement statement = transformer.transform("k, v in collection");
         Assert.assertEquals(ForLoopStatement.Type.MAP, statement.getType());
         Assert.assertEquals("k v", statement.getVarName());
         Assert.assertEquals("collection", statement.getCollectionExpression());
@@ -82,7 +82,7 @@ public class ForTransformerTest {
 
     @Test
     public void testValidMapStatementWithExpression() throws Exception {
-        ForLoopStatement statement = transformer.transform("(k v) in dictionary.items()");
+        ForLoopStatement statement = transformer.transform("k, v in dictionary.items()");
         Assert.assertEquals(ForLoopStatement.Type.MAP, statement.getType());
         Assert.assertEquals("k v", statement.getVarName());
         Assert.assertEquals("dictionary.items()", statement.getCollectionExpression());
@@ -90,7 +90,7 @@ public class ForTransformerTest {
 
     @Test
     public void testValidMapStatementAndTrim() throws Exception {
-        ForLoopStatement statement = transformer.transform(" (k v)   in  collection  ");
+        ForLoopStatement statement = transformer.transform(" k, v   in  collection  ");
         Assert.assertEquals(ForLoopStatement.Type.MAP, statement.getType());
         Assert.assertEquals("k v", statement.getVarName());
         Assert.assertEquals("collection", statement.getCollectionExpression());
@@ -108,7 +108,7 @@ public class ForTransformerTest {
     public void testMapNoCollectionExpression() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage("collection expression");
-        transformer.transform("(k v) in  ");
+        transformer.transform("k, v in  ");
     }
 
 }

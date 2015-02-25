@@ -18,7 +18,7 @@ flow:
   workflow:
     - print_values:
         loop:
-          for: (k v) in person_map.items()
+          for: k, v in person_map.items()
           do:
               ops.print:
                 - text: k
