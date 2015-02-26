@@ -22,6 +22,7 @@ import org.springframework.shell.Bootstrap;
 import org.springframework.shell.core.CommandResult;
 import org.springframework.shell.core.JLineShellComponent;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -139,7 +140,26 @@ public class SlangCLITest {
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
 
-    @Test(timeout = DEFAULT_TIMEOUT)
+    @Test (timeout = DEFAULT_TIMEOUT)
+    public void testRunException() throws IOException {
+        RuntimeException exception = new RuntimeException("exception message");
+
+        when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
+        when(ScoreServicesMock.
+                triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class))).
+                thenThrow(exception);
+
+        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_SLAH);
+
+        // path may be processed as local in some environments
+        // in this case the local directory path is prepended to the actual path
+        verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH),  isNull(List.class));
+        verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class));
+
+        Assert.assertEquals("exception not as expected", exception, cr.getException());
+    }
+
+    @Test (timeout = DEFAULT_TIMEOUT)
     public void testRunAsyncWithInputs() throws Exception {
         //set async mode
         slangCLI.setEnvVar(true);

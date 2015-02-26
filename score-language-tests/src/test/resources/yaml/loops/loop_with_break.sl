@@ -18,6 +18,7 @@ flow:
             - CUSTOM
         navigate:
           CUSTOM: print_other_values
+          SUCCESS: task_that_doesnt_run
 
     - task_that_doesnt_run:
         do:

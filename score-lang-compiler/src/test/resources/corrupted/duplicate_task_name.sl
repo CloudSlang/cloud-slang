@@ -7,11 +7,21 @@
 namespace: org.openscore
 
 imports:
-  ops: org.openscore
+  ops: user.ops
 
 flow:
-  name: workflow_with_task_map
+  name: duplicate_task_name
+
   workflow:
-    task1:
-      do:
-        ops.op1:
+    - Task1:
+        do:
+          ops.java_op:
+        navigate:
+          SUCCESS: SUCCESS
+          FAILURE: FAILURE
+    - Task1:
+        do:
+          ops.java_op:
+        navigate:
+          SUCCESS: SUCCESS
+          FAILURE: FAILURE
