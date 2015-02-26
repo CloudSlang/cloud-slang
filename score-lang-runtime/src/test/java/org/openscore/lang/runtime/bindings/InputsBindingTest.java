@@ -82,6 +82,19 @@ public class InputsBindingTest {
     }
 
     @Test
+    public void testTwoInputs1() {
+        Input input1 = new Input("input1", "input1", false, false, true, null);
+        Input input2 = new Input("input2", "input1", false, false, true, null);
+        List<Input> inputs = Arrays.asList(input1, input2);
+        Map<String,Serializable> result = bindInputs(inputs);
+        Assert.assertFalse(result.isEmpty());
+        Assert.assertTrue(result.containsKey("input1"));
+        Assert.assertEquals(null, result.get("input1"));
+        Assert.assertTrue(result.containsKey("input2"));
+        Assert.assertEquals(null, result.get("input2"));
+    }
+
+    @Test
     public void testInputRef() {
         Map<String,Serializable> context = new HashMap<>();
         context.put("inputX","xxx");

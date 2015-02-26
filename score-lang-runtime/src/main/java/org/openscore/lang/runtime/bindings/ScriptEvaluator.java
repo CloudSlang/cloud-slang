@@ -46,11 +46,10 @@ public class ScriptEvaluator {
         try {
             return (Serializable)engine.eval(expr,scriptContext);
         } catch (ScriptException e) {
-            logger.debug("Error in running script expression or variable reference ,for expression: " + expr
-                    + " Script exception is: " + e.getMessage());
-            //todo - add event here?
+            throw new RuntimeException(
+                    "Error in running script expression or variable reference, for expression: "
+                    + expr + " Script exception is: \n" + e.getMessage(), e);
         }
-        return null;
     }
 
 }

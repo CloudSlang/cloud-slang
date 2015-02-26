@@ -58,13 +58,18 @@ public class InputsBinding {
     private Serializable resolveValue(Input input, Map<String, ? extends Serializable> context, Map<String, ? extends Serializable> targetContext, Map<String, ? extends Serializable> systemProperties) {
         Serializable value = null;
         String inputName = input.getName();
-        if(context.containsKey(inputName) && input.isOverridable()) value = context.get(inputName);
+
+        Map<String,Serializable> scriptContext = new HashMap<>(context); //we do not want to change original context map
+
+        if(input.isOverridable()) {
+            value = context.get(inputName);
+            scriptContext.put(inputName, value);
+        }
+
         String fqspn = input.getSystemPropertyName();
         if(value == null && fqspn != null && systemProperties != null) value = systemProperties.get(fqspn);
         if(value == null && StringUtils.isNotEmpty(input.getExpression())){
-            Map<String,Serializable> scriptContext = new HashMap<>(context); //we do not want to change original context map
             scriptContext.putAll(targetContext);//so you can resolve previous inputs already bound
-
             String expr = input.getExpression();
             value = scriptEvaluator.evalExpr(expr, scriptContext);
         }
