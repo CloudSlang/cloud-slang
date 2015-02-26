@@ -8,17 +8,15 @@
 namespace: user.ops
 
 operation:
-  name: check_number
+  name: java_action_serializable_op
   inputs:
-    - number
+    - string
   action:
-    python_script: |
-      remainder = int(number) % 2
-      isEven = remainder == 0
-      tooBig = int(number) > 512
+    java_action:
+      className: org.openscore.lang.systemtests.actions.LangTestActions
+      methodName: printAndReturnDur
   outputs:
-    - preprocessed_number: str(int(fromInputs['number']) * 3)
+    - dur
   results:
-    - EVEN: isEven and not tooBig
-    - ODD: not(isEven or tooBig)
-    - FAILURE # report failure if the number is too big
+    - SUCCESS: dur == 120
+    - FAILURE

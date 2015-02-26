@@ -5,20 +5,21 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: user.ops
+namespace: system.ops
 
 operation:
-  name: check_number
+  name: binding_flow_op
   inputs:
-    - number
+    - base_input
+    - bound_input:
+        default: base_input + 1
+
   action:
     python_script: |
-      remainder = int(number) % 2
-      isEven = remainder == 0
-      tooBig = int(number) > 512
+      bound_result = bound_input + 1
   outputs:
-    - preprocessed_number: str(int(fromInputs['number']) * 3)
+    - bound_output: bound_result + 1
   results:
-    - EVEN: isEven and not tooBig
-    - ODD: not(isEven or tooBig)
-    - FAILURE # report failure if the number is too big
+    - SUCCESS
+
+

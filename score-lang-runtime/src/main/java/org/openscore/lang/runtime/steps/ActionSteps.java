@@ -71,7 +71,7 @@ public class ActionSteps extends AbstractSteps {
                          @Param(PYTHON_SCRIPT_KEY) String python_script,
                          @Param(NEXT_STEP_ID_KEY) Long nextStepId) {
 
-        Map<String, String> returnValue = new HashMap<>();
+        Map<String, Serializable> returnValue = new HashMap<>();
         Map<String, Serializable> callArguments = runEnv.removeCallArguments();
         Map<String, SerializableSessionObject> serializableSessionData = runEnv.getSerializableDataMap();
         fireEvent(executionRuntimeServices, runEnv, EVENT_ACTION_START, "Preparing to run action " + actionType, Pair.of(LanguageEventData.CALL_ARGUMENTS, (Serializable) callArguments));
@@ -101,7 +101,7 @@ public class ActionSteps extends AbstractSteps {
         runEnv.putNextStepPosition(nextStepId);
     }
 
-    private Map<String, String> runJavaAction(Map<String, SerializableSessionObject> serializableSessionData,
+    private Map<String, Serializable> runJavaAction(Map<String, SerializableSessionObject> serializableSessionData,
                                               Map<String, Serializable> currentContext,
                                               Map<String, Object> nonSerializableExecutionData,
                                               String className,
@@ -129,7 +129,7 @@ public class ActionSteps extends AbstractSteps {
     }
 
 
-    private Map<String, String> invokeActionMethod(String className, String methodName, Object... parameters) {
+    private Map<String, Serializable> invokeActionMethod(String className, String methodName, Object... parameters) {
         Method actionMethod = getMethodByName(className, methodName);
         Class actionClass = getActionClass(className);
         Object returnObject;
@@ -138,7 +138,7 @@ public class ActionSteps extends AbstractSteps {
         } catch (Exception e) {
             throw new RuntimeException("Invocation of method " + methodName + " of class " + className + " threw an exception", e);
         }
-        @SuppressWarnings("unchecked") Map<String, String> returnMap = (Map<String, String>) returnObject;
+        @SuppressWarnings("unchecked") Map<String, Serializable> returnMap = (Map<String, Serializable>) returnObject;
         if (returnMap == null) {
             throw new RuntimeException("Action method did not return Map<String,String>");
         }
@@ -233,7 +233,7 @@ public class ActionSteps extends AbstractSteps {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, String> prepareAndRunPythonAction(
+    private Map<String, Serializable> prepareAndRunPythonAction(
             Map<String, Serializable> callArguments,
             String pythonScript) {
 
@@ -244,8 +244,8 @@ public class ActionSteps extends AbstractSteps {
         throw new RuntimeException("Python script not found in action data");
     }
 
-    //we need this method to be synchronized so we will ot have multiple scripts run in parallel on the same context
-    private synchronized Map<String, String> runPythonAction(Map<String, Serializable> callArguments,
+    //we need this method to be synchronized so we will not have multiple scripts run in parallel on the same context
+    private synchronized Map<String, Serializable> runPythonAction(Map<String, Serializable> callArguments,
                                                              String script) {
 
         try {
@@ -254,14 +254,14 @@ public class ActionSteps extends AbstractSteps {
             throw new RuntimeException("Error executing python script: " + e, e);
         }
         Iterator<PyObject> localsIterator = interpreter.getLocals().asIterable().iterator();
-        HashMap<String, String> returnValue = new HashMap<>();
+        Map<String, Serializable> returnValue = new HashMap<>();
         while (localsIterator.hasNext()) {
             String key = localsIterator.next().asString();
             PyObject value = interpreter.get(key);
             if ((key.startsWith("__") && key.endsWith("__")) || value instanceof PyModule) {
                 continue;
             }
-            returnValue.put(key, value.toString());
+            returnValue.put(key, (Serializable) value.__tojava__(Serializable.class));
         }
         cleanInterpreter(interpreter);
         return returnValue;
