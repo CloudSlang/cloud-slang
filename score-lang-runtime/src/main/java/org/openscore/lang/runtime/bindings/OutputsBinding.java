@@ -35,11 +35,11 @@ public class OutputsBinding {
     @Autowired
     ScriptEvaluator scriptEvaluator;
 
-    public Map<String, String> bindOutputs(Map<String, Serializable> inputs,
-                                           Map<String, String> actionReturnValues,
+    public Map<String, Serializable> bindOutputs(Map<String, Serializable> inputs,
+                                           Map<String, Serializable> actionReturnValues,
                                            List<Output> possibleOutputs) {
 
-        Map<String, String> outputs = new LinkedHashMap<>();
+        Map<String, Serializable> outputs = new LinkedHashMap<>();
         if (possibleOutputs != null) {
             for (Output output : possibleOutputs) {
                 String outputKey = output.getName();
@@ -59,9 +59,9 @@ public class OutputsBinding {
 
                     if (scriptResult != null) {
                         try {
-                            outputs.put(outputKey, (String) scriptResult);
+                            outputs.put(outputKey, scriptResult);
                         } catch (ClassCastException ex) {
-                            throw new RuntimeException("The output expression " + outputExpr + " does not return String value", ex);
+                            throw new RuntimeException("The output expression " + outputExpr + " does not return serializable value", ex);
                         }
                     }
                 } else {
