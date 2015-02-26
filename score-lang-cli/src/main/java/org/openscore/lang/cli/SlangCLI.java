@@ -71,14 +71,16 @@ public class SlangCLI implements CommandMarker {
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
         Map<String, ? extends Serializable> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
-        @SuppressWarnings("unchecked") Map<String, Serializable> mergedInputs = (Map<String, Serializable>) compilerHelper.loadInputsFromFile(inputFiles);
+        Map<String, ? extends Serializable> inputsFromFile = compilerHelper.loadInputsFromFile(inputFiles);
+        Map<String, Serializable> mergedInputs = new HashMap<>();
 
-        if(MapUtils.isEmpty(mergedInputs)){
-            mergedInputs = new HashMap<>();
+        if(MapUtils.isNotEmpty(inputsFromFile)){
+            mergedInputs.putAll(inputsFromFile);
         }
         if(MapUtils.isNotEmpty(inputs)) {
             mergedInputs.putAll(inputs);
         }
+
         Long id;
         if (!triggerAsync) {
             StopWatch stopWatch = new StopWatch();
