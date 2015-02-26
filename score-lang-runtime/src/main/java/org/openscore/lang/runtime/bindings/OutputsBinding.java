@@ -61,7 +61,7 @@ public class OutputsBinding {
                         try {
                             outputs.put(outputKey, scriptResult);
                         } catch (ClassCastException ex) {
-                            throw new RuntimeException("The output expression " + outputExpr + " does not return String value", ex);
+                            throw new RuntimeException("The output expression " + outputExpr + " does not return serializable value", ex);
                         }
                     }
                 } else {
