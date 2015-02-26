@@ -155,11 +155,11 @@ public class TaskStepsTest {
     @Test
     public void testEndTaskEvents() throws Exception {
         RunEnvironment runEnv = createRunEnvironment();
-        runEnv.putReturnValues(new ReturnValues(new HashMap<String,String>(),SUCCESS_RESULT));
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String,Serializable>(),SUCCESS_RESULT));
         Context context = new Context(new HashMap<String, Serializable>());
         runEnv.getStack().pushContext(context);
 
-        when(outputsBinding.bindOutputs(anyMap(), anyMap(), anyList())).thenReturn(new HashMap<String, String>());
+        when(outputsBinding.bindOutputs(anyMap(), anyMap(), anyList())).thenReturn(new HashMap<String, Serializable>());
 
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
         HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
@@ -188,15 +188,15 @@ public class TaskStepsTest {
     public void testEndTaskWithPublish() throws Exception {
         List<Output> possiblePublishValues = Arrays.asList(new Output("name", "name"));
         RunEnvironment runEnv = createRunEnvironment();
-        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), SUCCESS_RESULT));
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, Serializable>(), SUCCESS_RESULT));
         Context context = new Context(new HashMap<String, Serializable>());
         runEnv.getStack().pushContext(context);
 
-        Map<String, String> boundPublish = new HashMap<>();
+        Map<String, Serializable> boundPublish = new HashMap<>();
         boundPublish.put("name", "John");
 
         when(outputsBinding.bindOutputs(
-                anyMapOf(String.class, Serializable.class), anyMapOf(String.class, String.class), eq(possiblePublishValues)))
+                anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class), eq(possiblePublishValues)))
                 .thenReturn(boundPublish);
         HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
         taskNavigationValues.put(SUCCESS_RESULT, new ResultNavigation(0, SUCCESS_RESULT));
@@ -214,7 +214,7 @@ public class TaskStepsTest {
         String result = SUCCESS_RESULT;
         Context context = new Context(new HashMap<String, Serializable>());
         runEnv.getStack().pushContext(context);
-        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), result));
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, Serializable>(), result));
 
         Long nextStepPosition = 5L;
 
@@ -235,7 +235,7 @@ public class TaskStepsTest {
         String result = "CUSTOM";
         Context context = new Context(new HashMap<String, Serializable>());
         runEnv.getStack().pushContext(context);
-        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), result));
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, Serializable>(), result));
 
         Long nextStepPosition = 5L;
 
@@ -331,7 +331,7 @@ public class TaskStepsTest {
     @Test
     public void whenLoopConditionHasMoreEndTaskSetNextPositionIdToBeginTask() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
-        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), "SUCCESS"));
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, Serializable>(), "SUCCESS"));
         HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
         taskNavigationValues.put("SUCCESS", new ResultNavigation(3L, "SUCCESS"));
         Context context = new Context(new HashMap<String, Serializable>());
@@ -351,7 +351,7 @@ public class TaskStepsTest {
     @Test
     public void whenLoopConditionHasMoreButShouldBreakEndTaskDeletesKeyFromLangVars() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
-        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), SUCCESS_RESULT));
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, Serializable>(), SUCCESS_RESULT));
         HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
         Long nextStepId = 3L;
         taskNavigationValues.put(SUCCESS_RESULT, new ResultNavigation(nextStepId, SUCCESS_RESULT));
@@ -372,7 +372,7 @@ public class TaskStepsTest {
     @Test
     public void whenLoopConditionHasNoMoreEndTaskDeletesKeyFromLangVars() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
-        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), "SUCCESS"));
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, Serializable>(), "SUCCESS"));
         HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
         taskNavigationValues.put("SUCCESS", new ResultNavigation(3L, "SUCCESS"));
         Context context = new Context(new HashMap<String, Serializable>());

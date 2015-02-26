@@ -1,0 +1,41 @@
+#   (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+#   All rights reserved. This program and the accompanying materials
+#   are made available under the terms of the Apache License v2.0 which accompany this distribution.
+#
+#   The Apache License is available at
+#   http://www.apache.org/licenses/LICENSE-2.0
+
+namespace: system.flows
+
+imports:
+ ops: system.ops
+
+flow:
+  name: data_flow
+  inputs:
+    - base_input
+    - bound_input:
+        default: base_input + ">"
+
+  workflow:
+    - Task_1:
+        do:
+          ops.binding_flow_op:
+            - base_input:
+                default: bound_input + ">"
+                overridable: false
+        publish:
+          - bound_input: bound_output + "<"
+
+    - Task_2:
+        do:
+          ops.binding_flow_op:
+            - base_input:
+                default: bound_input + ">"
+                overridable: false
+        publish:
+          - bound_input: bound_output + "<"
+
+  outputs:
+    - final_output: bound_input + "<"
+

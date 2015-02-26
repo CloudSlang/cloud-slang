@@ -16,16 +16,16 @@ import java.util.Map;
 
 public class ReturnValues implements Serializable{
 
-    private final HashMap<String, String> outputs;
+    private final Map<String, Serializable> outputs;
 
     private final String result;
 
-    public ReturnValues(Map<String, String> outputs, String result) {
+    public ReturnValues(Map<String, Serializable> outputs, String result) {
         this.outputs = new HashMap<>(outputs);
         this.result = result;
     }
 
-    public Map<String, String> getOutputs() {
+    public Map<String, Serializable> getOutputs() {
         return outputs;
     }
 
