@@ -52,9 +52,8 @@ public class CompilerHelperImpl implements CompilerHelper{
 
     private static final Logger logger = Logger.getLogger(CompilerHelperImpl.class);
     private static final String[] SLANG_FILE_EXTENSIONS = {"yml", "yaml", "py", "sl"};
+    private static final String[] YAML_FILE_EXTENSIONS = {"yaml", "yml"};
     private static final String SP_DIR = "properties"; //TODO reconsider it after closing slang file extensions & some real usecases
-    private static final String[] SP_EXT = {"yaml", "yml"};
-    private static final String[] INPUT_EXT = {"yaml", "yml"};
     private static final String INPUT_DIR = "inputs";
     @Override
 	public CompilationArtifact compile(String filePath, List<String> dependencies) throws IOException {
@@ -86,15 +85,15 @@ public class CompilerHelperImpl implements CompilerHelper{
 
 	@Override
 	public Map<String, ? extends Serializable> loadSystemProperties(List<String> systemPropertyFiles) throws IOException {
-		return loadFiles(systemPropertyFiles, SP_EXT, SP_DIR);
+		return loadFiles(systemPropertyFiles, YAML_FILE_EXTENSIONS, SP_DIR);
 	}
 
     @Override
-    public Map<String, Serializable> loadInputsFromFile(List<String> inputFiles) throws IOException {
-        return loadFiles(inputFiles, INPUT_EXT, INPUT_DIR);
+    public Map<String, ? extends Serializable> loadInputsFromFile(List<String> inputFiles) throws IOException {
+        return loadFiles(inputFiles, YAML_FILE_EXTENSIONS, INPUT_DIR);
     }
 
-    private Map<String, Serializable> loadFiles(List<String> files, String[] extensions, String directory) throws IOException {
+    private Map<String, ? extends Serializable> loadFiles(List<String> files, String[] extensions, String directory) throws IOException {
         if(CollectionUtils.isEmpty(files)) {
             Collection<File> implicitFiles = FileUtils.listFiles(new File("."), extensions, true);
             implicitFiles = select(implicitFiles, having(on(File.class).getPath(), containsString(directory)));

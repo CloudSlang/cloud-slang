@@ -27,6 +27,7 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.print.attribute.Attribute;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -64,22 +65,20 @@ public class SlangCLI implements CommandMarker {
     public String run(
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. slang run --f C:\\Slang\\flow.yaml") final File file,
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath,
-            @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, Serializable> inputs,
+            @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String,? extends Serializable> inputs,
             @CliOption(key = {"if", "input-file"}, mandatory = false, help = "comma separated list of input file locations") final List<String> inputFiles,
             @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = "comma separated list of system property file locations") final List<String> systemPropertyFiles) throws IOException {
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
         Map<String, ? extends Serializable> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
-        Map<String, Serializable> inputsFromFile = compilerHelper.loadInputsFromFile(inputFiles);
-        Map<String, Serializable> mergedInputs = new HashMap<>();
+        @SuppressWarnings("unchecked") Map<String, Serializable> mergedInputs = (Map<String, Serializable>) compilerHelper.loadInputsFromFile(inputFiles);
 
-        if(MapUtils.isNotEmpty(inputsFromFile)){
-            mergedInputs.putAll(inputsFromFile);
+        if(MapUtils.isEmpty(mergedInputs)){
+            mergedInputs = new HashMap<>();
         }
-        if(MapUtils.isNotEmpty(inputs)){
+        if(MapUtils.isNotEmpty(inputs)) {
             mergedInputs.putAll(inputs);
         }
-
         Long id;
         if (!triggerAsync) {
             StopWatch stopWatch = new StopWatch();

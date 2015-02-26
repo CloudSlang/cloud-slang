@@ -31,5 +31,5 @@ public interface CompilerHelper {
      * @param inputFiles paths to the files containing the inputs
      * @return map containing all of the inputs with fully qualified keys
      */
-    public Map<String, Serializable> loadInputsFromFile(List<String> inputFiles) throws IOException;
+    public Map<String, ? extends Serializable> loadInputsFromFile(List<String> inputFiles) throws IOException;
 }
