@@ -114,15 +114,6 @@ public class SyncTriggerEventListener implements ScoreEventListener{
                     }
 
                 }
-//                for (String key : outputs.keySet()) {
-//                    String outputValue = outputs.get(key);
-//                    if(StringUtils.isEmpty(outputValue)){
-//                        outputs.remove(key);
-//                    }
-//                    else if(StringUtils.isNotEmpty(outputValue)) {
-//                        outputs.put(key, StringUtils.abbreviate(outputValue, 0, OUTPUT_VALUE_LIMIT));
-//                    }
-//                }
             }
             return outputs;
         }
