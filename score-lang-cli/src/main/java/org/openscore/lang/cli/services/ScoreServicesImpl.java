@@ -44,7 +44,6 @@ public class ScoreServicesImpl implements ScoreServices{
     public static final String SLANG_STEP_ERROR_MSG = "Slang Error : ";
     public static final String SCORE_ERROR_EVENT_MSG = "Score Error Event :";
     public static final String FLOW_FINISHED_WITH_FAILURE_MSG = "Flow finished with failure";
-    public static final int OUTPUT_VALUE_LIMIT = 40;
 
     @Autowired
     private Slang slang;
@@ -77,7 +76,6 @@ public class ScoreServicesImpl implements ScoreServices{
         //add start event
         Set<String> handlerTypes = new HashSet<>();
         if(isQuiet){
-            handlerTypes.add(EVENT_OUTPUT_END);
             handlerTypes.add(EVENT_EXECUTION_FINISHED);
         }
         else {
@@ -87,7 +85,6 @@ public class ScoreServicesImpl implements ScoreServices{
             handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
             handlerTypes.add(EVENT_EXECUTION_FINISHED);
             handlerTypes.add(EVENT_INPUT_END);
-            handlerTypes.add(EVENT_OUTPUT_END);
         }
 
         SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener();
@@ -151,38 +148,13 @@ public class ScoreServicesImpl implements ScoreServices{
                         printWithColor(Ansi.Color.YELLOW, prefix + taskName);
                     }
                     break;
-                case ScoreLangConstants.EVENT_OUTPUT_END:
-                        printOutputs(data);
-                    break;
+
                 case EVENT_EXECUTION_FINISHED:
                     if (!flowFinished.get()) {
                         flowFinished.set(true);
                     }
                     printFinishEvent(data);
                     break;
-            }
-        }
-
-        private void printOutputs(Map<String, Serializable> data) {
-            if (data.containsKey(LanguageEventData.OUTPUTS) && data.containsKey(LanguageEventData.PATH) && data.get(LanguageEventData.PATH).equals("0/0")) {
-
-                @SuppressWarnings("unchecked") Map<String, String> outputs = (Map<String, String>) data.get(LanguageEventData.OUTPUTS);
-
-                
-
-                if (outputs != null && !outputs.keySet().isEmpty()) {
-
-                    printWithColor(Ansi.Color.WHITE, prefix + "Outputs:");
-
-                    for (String key : outputs.keySet()) {
-                        String outputValue = outputs.get(key).replace("\n", " ");
-                        outputs.put(key, StringUtils.abbreviate(outputValue, 0, OUTPUT_VALUE_LIMIT));
-                        if (StringUtils.isEmpty(outputValue)) {
-                            outputs.put(key, "(empty)");
-                        }
-                        printWithColor(Ansi.Color.WHITE, prefix + "  " + key + " = " + outputs.get(key));
-                    }
-                }
             }
         }
 
