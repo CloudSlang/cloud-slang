@@ -29,13 +29,12 @@ public class TransformersHandler {
         Map<String, Serializable> transformedData = new HashMap<>();
         for (Transformer transformer : scopeTransformers) {
             String key = keyToTransform(transformer);
-            if (!rawData.containsKey(key)) {
-                return null;
-            }
             Object value = rawData.get(key);
             try {
                 @SuppressWarnings("unchecked") Object transformedValue = transformer.transform(value);
-                transformedData.put(key, (Serializable) transformedValue);
+                if (transformedValue != null) {
+                    transformedData.put(key, (Serializable) transformedValue);
+                }
             } catch (ClassCastException e) {
                 Class transformerType = getTransformerFromType(transformer);
                 if (value instanceof Map && transformerType.equals(List.class)) {
