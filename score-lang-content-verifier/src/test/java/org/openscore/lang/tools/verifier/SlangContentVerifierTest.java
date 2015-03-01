@@ -201,6 +201,37 @@ public class SlangContentVerifierTest {
         Assert.assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
     }
 
+    @Test
+    public void testValidFlowNamespaceWithAllValidCharsTypes() throws Exception {
+        URI resource = getClass().getResource("/no_dependencies-0123456789").toURI();
+        Flow executable = new Flow(null, null, null, "no_dependencies-0123456789", "empty_flow", null, null, null, new HashSet<String>());
+        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(executable);
+        Mockito.when(scoreCompiler.compile(executable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
+        int numberOfCompiledSlangFiles = slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+        Assert.assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
+    }
+
+    @Test
+    public void testValidFlowNamespaceCaseInsensitive() throws Exception {
+        URI resource = getClass().getResource("/no_dependencies").toURI();
+        Flow executable = new Flow(null, null, null, "No_Dependencies", "empty_flow", null, null, null, new HashSet<String>());
+        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(executable);
+        Mockito.when(scoreCompiler.compile(executable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
+        int numberOfCompiledSlangFiles = slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+        Assert.assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
+    }
+
+    @Test
+    public void testNamespaceWithInvalidCharsFlow() throws Exception {
+        URI resource = getClass().getResource("/invalid-chars$").toURI();
+        Flow newExecutable = new Flow(null, null, null, "invalid-chars$", "empty_flow", null, null, null, new HashSet<String>());
+        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("invalid-chars$");
+        exception.expectMessage("alphanumeric");
+        slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+    }
+
     @Configuration
     static class Config {
 
