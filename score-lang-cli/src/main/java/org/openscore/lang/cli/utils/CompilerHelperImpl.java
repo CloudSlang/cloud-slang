@@ -84,16 +84,16 @@ public class CompilerHelperImpl implements CompilerHelper{
     }
 
 	@Override
-	public Map<String, ? extends Serializable> loadSystemProperties(List<String> systemPropertyFiles) throws IOException {
+	public Map<String, ? extends Serializable> loadSystemProperties(List<String> systemPropertyFiles) {
 		return loadFiles(systemPropertyFiles, YAML_FILE_EXTENSIONS, SP_DIR);
 	}
 
     @Override
-    public Map<String, ? extends Serializable> loadInputsFromFile(List<String> inputFiles) throws IOException {
+    public Map<String, ? extends Serializable> loadInputsFromFile(List<String> inputFiles) {
         return loadFiles(inputFiles, YAML_FILE_EXTENSIONS, INPUT_DIR);
     }
 
-    private Map<String, ? extends Serializable> loadFiles(List<String> files, String[] extensions, String directory) throws IOException {
+    private Map<String, ? extends Serializable> loadFiles(List<String> files, String[] extensions, String directory) {
         if(CollectionUtils.isEmpty(files)) {
             Collection<File> implicitFiles = FileUtils.listFiles(new File("."), extensions, true);
             implicitFiles = select(implicitFiles, having(on(File.class).getPath(), containsString(directory)));
@@ -108,8 +108,13 @@ public class CompilerHelperImpl implements CompilerHelper{
         if(CollectionUtils.isEmpty(files)) return null;
         Map<String, Serializable> result = new HashMap<>();
         for(String inputFile : files) {
-            logger.info("Loading " + inputFile);
-            result.putAll((Map<String, ? extends Serializable>)yaml.load(FileUtils.readFileToString(new File(inputFile))));
+            logger.info("Loading file: " + inputFile);
+            try {
+				result.putAll((Map<String, ? extends Serializable>)yaml.load(FileUtils.readFileToString(new File(inputFile))));
+			} catch(IOException ex) {
+				logger.error("Error loading file: " + inputFile, ex);
+				throw new RuntimeException(ex);
+			}
         }
         return result;
     }
