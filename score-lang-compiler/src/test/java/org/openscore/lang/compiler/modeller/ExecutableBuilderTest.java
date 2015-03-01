@@ -85,9 +85,11 @@ public class ExecutableBuilderTest {
     public void emptyTaskThrowsException() throws Exception {
         ParsedSlang mockParsedSlang = mockFlowSlangFile();
         Map<String, Object> executableRawData = new HashMap<>();
-        LinkedHashMap<Object, Object> workFlowData = new LinkedHashMap<>();
+        List<Map<String, Object>> workFlowData = new ArrayList<>();
         String taskName = "task1";
-        workFlowData.put(taskName, new HashMap<>());
+        Map<String, Object> task = new HashMap<>();
+        task.put(taskName, new HashMap<>());
+        workFlowData.add(task);
         executableRawData.put(SlangTextualKeys.WORKFLOW_KEY, workFlowData);
 
         exception.expect(RuntimeException.class);
@@ -162,11 +164,13 @@ public class ExecutableBuilderTest {
         Mockito.when(transformer.getScopes()).thenReturn(Arrays.asList(Transformer.Scope.BEFORE_TASK));
         ParsedSlang mockParsedSlang = mockFlowSlangFile();
         Map<String, Object> executableRawData = new HashMap<>();
-        LinkedHashMap<Object, Object> workFlowData = new LinkedHashMap<>();
+        List<Map<String, Object>> workFlowData = new ArrayList<>();
         String taskName = "task1";
         Map<String, Object> taskRawData = new HashMap<>();
         taskRawData.put(keyword, 'b');
-        workFlowData.put(taskName, taskRawData);
+        Map<String, Object> task = new HashMap<>();
+        task.put(taskName, taskRawData);
+        workFlowData.add(task);
         executableRawData.put(SlangTextualKeys.WORKFLOW_KEY, workFlowData);
 
         exception.expect(RuntimeException.class);
@@ -179,12 +183,14 @@ public class ExecutableBuilderTest {
     public void taskWithEmptyDoEntranceThrowsException() throws Exception {
         ParsedSlang mockParsedSlang = mockFlowSlangFile();
         Map<String, Object> executableRawData = new HashMap<>();
-        LinkedHashMap<Object, Object> workFlowData = new LinkedHashMap<>();
+        List<Map<String, Object>> workFlowData = new ArrayList<>();
         Map<String, Object> taskRawData = new HashMap<>();
 
         taskRawData.put(SlangTextualKeys.DO_KEY, new HashMap<>());
         String taskName = "task1";
-        workFlowData.put(taskName, taskRawData);
+        Map<String, Object> task = new HashMap<>();
+        task.put(taskName, taskRawData);
+        workFlowData.add(task);
         executableRawData.put(SlangTextualKeys.WORKFLOW_KEY, workFlowData);
 
         exception.expect(RuntimeException.class);
@@ -198,7 +204,7 @@ public class ExecutableBuilderTest {
         ParsedSlang mockParsedSlang = mockFlowSlangFile();
 
         Map<String, Object> executableRawData = new HashMap<>();
-        LinkedHashMap<Object, Object> workFlowData = new LinkedHashMap<>();
+        List<Map<String, Object>> workFlowData = new ArrayList<>();
         Map<String, Object> taskRawData = new HashMap<>();
         Map<String, Object> doRawData = new HashMap<>();
 
@@ -206,7 +212,9 @@ public class ExecutableBuilderTest {
         doRawData.put(refId, new HashMap<>());
         taskRawData.put(SlangTextualKeys.DO_KEY, doRawData);
         String taskName = "task1";
-        workFlowData.put(taskName, taskRawData);
+        Map<String, Object> task = new HashMap<>();
+        task.put(taskName, taskRawData);
+        workFlowData.add(task);
         executableRawData.put(SlangTextualKeys.WORKFLOW_KEY, workFlowData);
 
         String flowName = "flow1";

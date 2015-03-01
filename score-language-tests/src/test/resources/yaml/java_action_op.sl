@@ -5,8 +5,19 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: user.sys.props
+namespace: user.ops
 
-system_properties:
-  weather: partly cloudy
-  city: Cluj
+operation:
+  name: java_action_test
+  inputs:
+    - host
+    - port
+  action:
+    java_action:
+      className: org.openscore.lang.systemtests.actions.LangTestActions
+      methodName: parseUrl
+  outputs:
+    - url
+  results:
+    - SUCCESS: url is not None
+    - FAILURE

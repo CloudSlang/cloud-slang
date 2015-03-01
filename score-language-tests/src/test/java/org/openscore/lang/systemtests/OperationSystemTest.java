@@ -11,13 +11,16 @@
 package org.openscore.lang.systemtests;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.openscore.events.ScoreEvent;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.ScoreLangConstants;
 
 import java.io.Serializable;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +32,9 @@ import java.util.Map;
  */
 
 public class OperationSystemTest extends SystemsTestsParent {
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testCompileAndRunOperationBasic() throws Exception {
@@ -52,5 +58,49 @@ public class OperationSystemTest extends SystemsTestsParent {
         userInputs.put("input5", "value5");
         ScoreEvent event = trigger(compilationArtifact, userInputs, null);
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
+    }
+    @Test
+    public void testCompileAndRunOperationWithDataMissingInput() throws Exception {
+        URL resource = getClass().getResource("/yaml/test_op_2.sl");
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()),null);
+        //Trigger ExecutionPlan
+        Map<String, Serializable> userInputs = new HashMap<>();
+        userInputs.put("input2", "value2");
+        userInputs.put("input4", "value4");
+        userInputs.put("input5", "value5");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("input1");
+        exception.expectMessage("Required");
+        ScoreEvent event = trigger(compilationArtifact, userInputs, null);
+        Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
+    }
+
+    @Test
+    public void testOperationWithJavaAction() throws Exception {
+        URI resource = getClass().getResource("/yaml/java_action_op.sl").toURI();
+
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), null);
+
+        Map<String, Serializable> userInputs = new HashMap<>();
+        userInputs.put("host", "localhost");
+        userInputs.put("port", "8080");
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null);
+        StepData execStepData = stepsData.get(EXEC_START_PATH);
+        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, execStepData.getResult());
+        Assert.assertEquals("http://localhost:8080", execStepData.getOutputs().get("url"));
+    }
+
+    @Test
+    public void testOperationWithJavaActionWithSerializableOutput() throws Exception {
+        URI resource = getClass().getResource("/yaml/java_action_serializable_op.sl").toURI();
+
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), null);
+
+        Map<String, Serializable> userInputs = new HashMap<>();
+        userInputs.put("string", "please print it");
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null);
+        StepData execStepData = stepsData.get(EXEC_START_PATH);
+        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, execStepData.getResult());
+        Assert.assertEquals(120, execStepData.getOutputs().get("dur"));
     }
 }

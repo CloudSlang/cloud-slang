@@ -7,10 +7,10 @@
 namespace: org.openscore
 
 flow:
-  name: missing_imports
+  name: missing_dependencies_imports_flow
   inputs:
     - input1
   workflow:
-    task1:
-      do:
-        ops.op1:
+    - task1:
+        do:
+          ops.op1:

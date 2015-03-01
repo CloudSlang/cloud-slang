@@ -10,7 +10,7 @@ imports:
   ops: org.openscore
 
 flow:
-  name: task_no_ref
+  name: task_with_no_ref_flow
   workflow:
-    task1:
-      do:
+    - task1:
+        do:

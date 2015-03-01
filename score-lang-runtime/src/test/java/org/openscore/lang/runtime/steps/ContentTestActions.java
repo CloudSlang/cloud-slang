@@ -15,6 +15,7 @@ import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import com.hp.oo.sdk.content.plugin.SessionResource;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,6 +40,14 @@ public class ContentTestActions {
     public Map<String, String> doJavaNumberAsString(
             @Param("port") String port) {
         Map<String, String> returnValues = new HashMap<>();
+        returnValues.put("port", port);
+        return returnValues;
+    }
+
+    @SuppressWarnings("unused")
+    public Map<String, Serializable> doJavaNumbersAction(
+            @Param("port") Integer port) {
+        Map<String, Serializable> returnValues = new HashMap<>();
         returnValues.put("port", port);
         return returnValues;
     }

@@ -7,15 +7,13 @@
 namespace: org.openscore
 
 imports:
-  ops: org.openscore
+  ops: user.ops
 
 flow:
-  name: on_failure_with_task_list
+  name: task_with_missing_navigation_from_operation_result_flow
   workflow:
-    task1:
-      do:
-        ops.op1:
-    on_failure:
-      - task2:
-          do:
-            ops.op1
+    - task1:
+        do:
+          ops.java_op:
+        navigate:
+          SUCCESS: SUCCESS

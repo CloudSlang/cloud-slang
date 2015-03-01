@@ -29,4 +29,5 @@ public class SlangSpringConfiguration {
     public Slang slang() {
         return new SlangImpl();
     }
+
 }

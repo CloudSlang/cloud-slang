@@ -78,4 +78,24 @@ public class DataFlowTest extends SystemsTestsParent {
         Assert.assertEquals("some of the results were not bound correctly",
                 2, StringUtils.countMatches(final_output, "|"));
     }
+
+    @Test
+    public void testBindingsFlowIntegers() throws Exception {
+        URI resource = getClass().getResource("/yaml/system-flows/bindings_flow_int.sl").toURI();
+        URI operations = getClass().getResource("/yaml/system-flows/binding_flow_int_op.sl").toURI();
+
+        SlangSource dep = SlangSource.fromFile(operations);
+        Set<SlangSource> path = Sets.newHashSet(dep);
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Map<String, Serializable> userInputs = new HashMap<>();
+        userInputs.put("base_input", 1);
+
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, null);
+
+        Map<String, Serializable> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
+        int final_output = (int) flowOutputs.get("final_output");
+        Assert.assertEquals("some of the inputs or outputs were not bound correctly",
+                13, final_output);
+    }
 }

@@ -52,7 +52,7 @@ public class ResultsBinding {
      * @return the resolved result name
      */
     public String resolveResult(Map<String, Serializable> inputs,
-                                Map<String, String> context,
+                                Map<String, Serializable> context,
                                 List<Result> possibleResults,
                                 String presetResult) {
 
@@ -92,7 +92,13 @@ public class ResultsBinding {
             }
 
             try {
-                Boolean evaluatedResult = (Boolean) scriptEvaluator.evalExpr(expression, scriptContext);
+                Serializable expressionResult = scriptEvaluator.evalExpr(expression, scriptContext);
+                Boolean evaluatedResult;
+                if (expressionResult instanceof Integer) {
+                    evaluatedResult = (Integer) expressionResult != 0;
+                } else {
+                    evaluatedResult = (Boolean) expressionResult;
+                }
                 if(evaluatedResult == null){
                     throw new RuntimeException("Expression of the operation result: " + expression + " cannot be evaluated correctly to true or false value");
                 }
