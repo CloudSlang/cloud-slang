@@ -87,9 +87,9 @@ public class ExecutableStepsTest {
         when(inputsBinding.bindInputs(eq(inputs), anyMap(), anyMap())).thenReturn(resultMap);
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Serializable>(), new ExecutionRuntimeServices(),"", 2L);
 
-        Map<String,Serializable> opContext = runEnv.getStack().popContext();
-        Assert.assertTrue(opContext.containsKey("input1"));
-        Assert.assertEquals(5,opContext.get("input1"));
+        Map<String,Serializable> opVars = runEnv.getStack().popContext().getImmutableViewOfVariables();
+        Assert.assertTrue(opVars.containsKey("input1"));
+        Assert.assertEquals(5, opVars.get("input1"));
 
         Map<String,Serializable> callArg = runEnv.removeCallArguments();
         Assert.assertEquals(1,callArg.size());
@@ -143,10 +143,10 @@ public class ExecutableStepsTest {
     public void testFinishExecutableWithResult() throws Exception {
         List<Result> results = Arrays.asList(new Result(SUCCESS_RESULT,"true"));
         RunEnvironment runEnv = new RunEnvironment();
-        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), null));
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, Serializable>(), null));
         runEnv.getExecutionPath().down();
 
-        when(resultsBinding.resolveResult(isNull(Map.class), anyMapOf(String.class, String.class), eq(results), isNull(String.class))).thenReturn(SUCCESS_RESULT);
+        when(resultsBinding.resolveResult(isNull(Map.class), anyMapOf(String.class, Serializable.class), eq(results), isNull(String.class))).thenReturn(SUCCESS_RESULT);
         executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), results, new ExecutionRuntimeServices(),"");
 
         ReturnValues returnValues= runEnv.removeReturnValues();
@@ -157,17 +157,17 @@ public class ExecutableStepsTest {
     public void testFinishExecutableWithOutput() throws Exception {
         List<Output> possibleOutputs = Arrays.asList(new Output("name", "name"));
         RunEnvironment runEnv = new RunEnvironment();
-        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), null));
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, Serializable>(), null));
         runEnv.getExecutionPath().down();
 
-        Map<String, String> boundOutputs = new HashMap<>();
+        Map<String, Serializable> boundOutputs = new HashMap<>();
         boundOutputs.put("name", "John");
 
-        when(outputsBinding.bindOutputs(isNull(Map.class), anyMapOf(String.class, String.class), eq(possibleOutputs))).thenReturn(boundOutputs);
+        when(outputsBinding.bindOutputs(isNull(Map.class), anyMapOf(String.class, Serializable.class), eq(possibleOutputs))).thenReturn(boundOutputs);
         executableSteps.finishExecutable(runEnv, possibleOutputs, new ArrayList<Result>(), new ExecutionRuntimeServices(),"");
 
         ReturnValues returnValues= runEnv.removeReturnValues();
-        Map<String, String> outputs = returnValues.getOutputs();
+        Map<String, Serializable> outputs = returnValues.getOutputs();
         Assert.assertEquals(1, outputs.size());
         Assert.assertEquals("John", outputs.get("name"));
     }
@@ -175,7 +175,7 @@ public class ExecutableStepsTest {
     @Test
     public void testFinishExecutableSetNextPositionToParentFlow() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
-        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), null));
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, Serializable>(), null));
         runEnv.getExecutionPath().down();
         Long parentFirstStepPosition = 2L;
         runEnv.getParentFlowStack().pushParentFlowData(new ParentFlowData(111L, parentFirstStepPosition));
@@ -188,7 +188,7 @@ public class ExecutableStepsTest {
     @Test
     public void testFinishExecutableSetNextPositionNoParentFlow() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
-        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), null));
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, Serializable>(), null));
         runEnv.getExecutionPath().down();
 
         executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), new ArrayList<Result>(), new ExecutionRuntimeServices(), "");
@@ -202,15 +202,15 @@ public class ExecutableStepsTest {
         List<Output> possibleOutputs = Arrays.asList(new Output("name", "name"));
         List<Result> possibleResults = Arrays.asList(new Result(SUCCESS_RESULT,"true"));
         RunEnvironment runEnv = new RunEnvironment();
-        runEnv.putReturnValues(new ReturnValues(new HashMap<String, String>(), null));
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, Serializable>(), null));
         runEnv.getExecutionPath().down();
 
-        Map<String, String> boundOutputs = new HashMap<>();
+        Map<String, Serializable> boundOutputs = new HashMap<>();
         boundOutputs.put("name", "John");
         String boundResult = SUCCESS_RESULT;
 
-        when(outputsBinding.bindOutputs(isNull(Map.class), anyMapOf(String.class, String.class), eq(possibleOutputs))).thenReturn(boundOutputs);
-        when(resultsBinding.resolveResult(isNull(Map.class), anyMapOf(String.class, String.class), eq(possibleResults), isNull(String.class))).thenReturn(boundResult);
+        when(outputsBinding.bindOutputs(isNull(Map.class), anyMapOf(String.class, Serializable.class), eq(possibleOutputs))).thenReturn(boundOutputs);
+        when(resultsBinding.resolveResult(isNull(Map.class), anyMapOf(String.class, Serializable.class), eq(possibleResults), isNull(String.class))).thenReturn(boundResult);
 
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         executableSteps.finishExecutable(runEnv, possibleOutputs, possibleResults, runtimeServices,"task1");

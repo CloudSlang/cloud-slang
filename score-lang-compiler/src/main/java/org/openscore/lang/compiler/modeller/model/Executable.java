@@ -1,18 +1,12 @@
-package org.openscore.lang.compiler.modeller.model;
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
-
-
 /*
- * Created by orius123 on 05/11/14.
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
+package org.openscore.lang.compiler.modeller.model;
 
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
@@ -21,7 +15,11 @@ import org.openscore.lang.entities.bindings.Result;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+/*
+ * Created by orius123 on 05/11/14.
+ */
 public abstract class Executable {
 
     protected final Map<String, Serializable> preExecActionData;
@@ -31,7 +29,7 @@ public abstract class Executable {
     protected final List<Input> inputs;
     protected final List<Output> outputs;
     protected final List<Result> results;
-    protected final Map<String, SlangFileType> dependencies;
+    protected final Set<String> dependencies;
 
     protected Executable(Map<String, Serializable> preExecActionData,
                          Map<String, Serializable> postExecActionData,
@@ -40,7 +38,7 @@ public abstract class Executable {
                          List<Input> inputs,
                          List<Output> outputs,
                          List<Result> results,
-                         Map<String, SlangFileType> dependencies) {
+                         Set<String> dependencies) {
         this.preExecActionData = preExecActionData;
         this.postExecActionData = postExecActionData;
         this.namespace = namespace;
@@ -83,9 +81,10 @@ public abstract class Executable {
         return results;
     }
 
-    public Map<String, SlangFileType> getDependencies() {
+    public Set<String> getDependencies() {
         return dependencies;
     }
 
     public abstract String getType();
+
 }

@@ -15,27 +15,27 @@ flow:
   inputs:
     - input1
   workflow:
-    on_failure:
-      check_something:
+    - on_failure:
+        - check_something:
+            do:
+              ops.test_op:
+                - city: str('a')
+
+        - send_mail:
+            do:
+              ops.test_op:
+
+    - first_task:
         do:
           ops.test_op:
-            - city: str('a')
+            - city: str('input_1')
+        publish:
+          - weather
 
-      send_mail:
+    - second_task:
         do:
           ops.test_op:
-
-    first_task:
-      do:
-        ops.test_op:
-          - city: str('input_1')
-      publish:
-        - weather
-
-    second_task:
-      do:
-        ops.test_op:
-          - city: str('input_1')
-      navigate:
-        SUCCESS: SUCCESS
-        FAILURE: FAILURE
+            - city: str('input_1')
+        navigate:
+          SUCCESS: SUCCESS
+          FAILURE: FAILURE

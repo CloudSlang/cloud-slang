@@ -7,15 +7,12 @@
 
 namespace: user.ops
 
-imports:
-  props: test.sys.props
-
 operation:
   name: get_time_zone
   inputs:
     - time_zone_as_string
     - alla:
-        system_property: props.alla
+        system_property: user.sys.props.alla
   action:
     python_script: |
         time_zone_as_int = int(time_zone_as_string)

@@ -1,28 +1,23 @@
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package org.openscore.lang.compiler.parser.model;
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
 
+import java.util.Map;
 
 /*
  * Created by orius123 on 05/11/14.
  */
-
-import java.io.Serializable;
-import java.util.Map;
-
 public class ParsedSlang {
 
     private Map<String, String> imports;
     private Map<String, Object> flow;
     private Map<String, Object> operation;
-    private Map<String, ? extends Serializable> system_properties;
     private String namespace;
     private String name;
 
@@ -44,15 +39,10 @@ public class ParsedSlang {
         return operation;
     }
 
-    public Map<String, ? extends Serializable> getSystemProperties() {
-        return system_properties;
-    }
-
     public Type getType() {
         if(flow != null) return Type.FLOW;
-        if(system_properties != null) return Type.SYSTEM_PROPERTIES;
         if(operation != null) return Type.OPERATION;
-        throw new RuntimeException("Source " + name + " has no " + Type.FLOW.key() + "/" + Type.OPERATION.key() + "/" + Type.SYSTEM_PROPERTIES.key +" property");
+        throw new RuntimeException("Source " + name + " has no " + Type.FLOW.key() + "/" + Type.OPERATION.key() + " property");
     }
 
     public String getName() {
@@ -65,8 +55,7 @@ public class ParsedSlang {
 
     public static enum Type {
         FLOW("flow"),
-        OPERATION("operation"),
-        SYSTEM_PROPERTIES("system_properties");
+        OPERATION("operation");
 
         private String key;
 

@@ -10,7 +10,8 @@
 package org.openscore.lang.compiler.scorecompiler;
 
 import org.openscore.lang.compiler.SlangTextualKeys;
-import org.openscore.lang.compiler.scorecompiler.ExecutionStepFactory;
+import org.openscore.lang.entities.ForLoopStatement;
+import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
@@ -48,6 +49,30 @@ public class ExecutionStepFactoryTest {
         Assert.assertSame("inputs are not set under their key", execInputs, startStep.getActionData().get(ScoreLangConstants.EXECUTABLE_INPUTS_KEY));
     }
 
+    @Test
+    public void testCreateStartStepPutForUnderTheRightKey() throws Exception {
+        ForLoopStatement statement = new ForLoopStatement("1", "2");
+        HashMap<String, Serializable> preTaskData = new HashMap<>();
+        preTaskData.put(SlangTextualKeys.FOR_KEY, statement);
+        ExecutionStep startStep = factory.createBeginTaskStep(1L, new ArrayList<Input>(), preTaskData, "", "");
+        ForLoopStatement actualStatement = (ForLoopStatement) startStep.getActionData()
+                                 .get(ScoreLangConstants.LOOP_KEY);
+        Assert.assertNotNull("for key is null", actualStatement);
+        Assert.assertSame("inputs are not set under their key", statement, actualStatement);
+    }
+
+    @Test
+    public void testCreateFinishTakStep(){
+        ExecutionStep finishTaskStep = factory.createFinishTaskStep(
+                1L,
+                new HashMap<String, Serializable>(),
+                new HashMap<String, ResultNavigation>(),
+                "taskName");
+        Assert.assertTrue(finishTaskStep.getActionData().containsKey(ScoreLangConstants.PREVIOUS_STEP_ID_KEY));
+        Assert.assertTrue(finishTaskStep.getActionData().containsKey(ScoreLangConstants.BREAK_LOOP_KEY));
+
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testCreateStartStepWithNullData() throws Exception {
         factory.createStartStep(1L, null, new ArrayList<Input>(),"");
@@ -58,10 +83,9 @@ public class ExecutionStepFactoryTest {
         factory.createStartStep(1L, new HashMap<String, Serializable>(), null,"");
     }
 
-    @Test
-    public void testCreateActionStep() throws Exception {
-        ExecutionStep actionStep = factory.createActionStep(1L, new HashMap<String, Serializable>());
-        Assert.assertNotNull("step should not be null", actionStep);
+    @Test (expected = RuntimeException.class)
+    public void testCreateActionStepWithEmptyData() throws Exception {
+        factory.createActionStep(1L, new HashMap<String, Serializable>());
     }
 
     @Test
@@ -73,6 +97,15 @@ public class ExecutionStepFactoryTest {
         ExecutionStep actionStep = factory.createActionStep(1L, actionRawData);
         Assert.assertNotNull("step should not be null", actionStep);
         Assert.assertEquals(actionStep.getActionData().get("key"), "value");
+    }
+
+    @Test
+    public void testCreatePythonActionStep() throws Exception {
+        HashMap<String, Serializable> actionRawData = new HashMap<>();
+        actionRawData.put(ScoreLangConstants.PYTHON_SCRIPT_KEY, "print 'Hi there'");
+        ExecutionStep actionStep = factory.createActionStep(1L, actionRawData);
+        Assert.assertNotNull("step should not be null", actionStep);
+        Assert.assertEquals(actionStep.getActionData().get(ScoreLangConstants.PYTHON_SCRIPT_KEY), "print 'Hi there'");
     }
 
     @Test(expected = IllegalArgumentException.class)

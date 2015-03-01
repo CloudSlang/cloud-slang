@@ -8,6 +8,7 @@
  */
 package org.openscore.lang.cli;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
@@ -64,17 +65,28 @@ public class SlangCLI implements CommandMarker {
     public String run(
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. slang run --f C:\\Slang\\flow.yaml") final File file,
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath,
-            @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String, Serializable> inputs,
+            @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String,? extends Serializable> inputs,
+            @CliOption(key = {"if", "input-file"}, mandatory = false, help = "comma separated list of input file locations") final List<String> inputFiles,
             @CliOption(key = {"", "q", "quiet"}, mandatory = false, help = "quiet", specifiedDefaultValue = "true",unspecifiedDefaultValue = "false") final Boolean quiet,
             @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = "comma separated list of system property file locations") final List<String> systemPropertyFiles) throws IOException {
 
-        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, classPath);
+        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
         Map<String, ? extends Serializable> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
+        Map<String, ? extends Serializable> inputsFromFile = compilerHelper.loadInputsFromFile(inputFiles);
+        Map<String, Serializable> mergedInputs = new HashMap<>();
+
+        if(MapUtils.isNotEmpty(inputsFromFile)){
+            mergedInputs.putAll(inputsFromFile);
+        }
+        if(MapUtils.isNotEmpty(inputs)) {
+            mergedInputs.putAll(inputs);
+        }
+
         Long id;
         if (!triggerAsync) {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            id = scoreServices.triggerSync(compilationArtifact, inputs, systemProperties, quiet);
+            id = scoreServices.triggerSync(compilationArtifact, mergedInputs, systemProperties, quiet);
             stopWatch.stop();
             return quiet ? StringUtils.EMPTY : triggerSyncMsg(id, compilationArtifact.getExecutionPlan().getName());
         }
@@ -92,10 +104,9 @@ public class SlangCLI implements CommandMarker {
     @CliCommand(value = "inputs", help = "Get flow inputs")
     public List<String> getFlowInputs(
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. slang inputs --f C:\\Slang\\flow.yaml") final File file,
-            @CliOption(key = {"cp", "classpath"}, mandatory = false,
-                    help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath)
+            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath)
             throws IOException {
-        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), null, classPath);
+        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
         List<Input> inputs = compilationArtifact.getInputs();
         List<String> inputsResult = new ArrayList<>();
         for (Input input : inputs) {

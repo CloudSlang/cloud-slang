@@ -15,6 +15,7 @@ import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import com.hp.oo.sdk.content.plugin.SessionResource;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,10 +41,10 @@ public class LangTestActions {
     }
 
     @SuppressWarnings("unused")
-    public Map<String, String> printAndReturnDur(@Param("string")String string){
+    public Map<String, Serializable> printAndReturnDur(@Param("string")String string){
         System.out.println(string);
-        HashMap<String, String> outputs = new HashMap<>();
-        outputs.put("dur", "120 ms");
+        HashMap<String, Serializable> outputs = new HashMap<>();
+        outputs.put("dur", 120);
         return outputs;
     }
 

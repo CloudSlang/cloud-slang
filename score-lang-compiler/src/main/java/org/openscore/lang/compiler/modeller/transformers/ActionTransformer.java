@@ -30,7 +30,7 @@ public class ActionTransformer implements Transformer<Map<String, Object>, Strin
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Scope.ACTION);
+        return Arrays.asList();
     }
 
     @Override

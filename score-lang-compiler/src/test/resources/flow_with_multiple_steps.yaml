@@ -13,40 +13,40 @@ imports:
 flow:
   name: basic_flow
   workflow:
-    CheckWeather:
-      do:
-        ops.test_op:
-          - city: str('input_1')
-      publish:
-        - weather
+    - CheckWeather:
+        do:
+          ops.test_op:
+            - city: str('input_1')
+        publish:
+          - weather
 
-    RealCheckWeather:
-      do:
-        ops.java_op:
-          - city: str('input_1')
-      publish:
-        - weather
-      navigate:
-        SUCCESS: RealRealCheckWeather
-        FAILURE: FAILURE
+    - RealCheckWeather:
+        do:
+          ops.java_op:
+            - city: str('input_1')
+        publish:
+          - weather
+        navigate:
+          SUCCESS: RealRealCheckWeather
+          FAILURE: FAILURE
 
-    RealRealCheckWeather:
-      do:
-        ops.check_Weather:
-          - city: str('input_1')
-      publish:
-        - weather
-        - temp: temperature
-      navigate:
-        SUCCESS: SUCCESS
-        FAILURE: NotRealCheckWeather
+    - RealRealCheckWeather:
+        do:
+          ops.check_Weather:
+            - city: str('input_1')
+        publish:
+          - weather
+          - temp: temperature
+        navigate:
+          SUCCESS: SUCCESS
+          FAILURE: NotRealCheckWeather
 
-    NotRealCheckWeather:
-      do:
-        ops.check_Weather:
-          - city: str('input_1')
-      publish:
-        - weather
+    - NotRealCheckWeather:
+        do:
+          ops.check_Weather:
+            - city: str('input_1')
+        publish:
+          - weather
 
   results:
     - SUCCESS

@@ -4,9 +4,14 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
+namespace: org.openscore
 
-namespace: user.sys.props
+imports:
+  ops: org.openscore
 
-system_properties:
-  weather: partly cloudy
-  city: Cluj
+flow:
+  name: workflow_with_task_map
+  workflow:
+    task1:
+      do:
+        ops.op1:

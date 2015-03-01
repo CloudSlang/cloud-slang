@@ -7,9 +7,6 @@
 
 namespace: user.ops
 
-imports:
-  props: test.sys.props
-
 operation:
   name: process_even_number
   inputs:

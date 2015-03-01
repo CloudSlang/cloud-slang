@@ -7,9 +7,6 @@
 
 namespace: user.ops
 
-imports:
-  props: test.sys.props
-
 operation:
   name: compute_daylight_time_zone
   inputs:

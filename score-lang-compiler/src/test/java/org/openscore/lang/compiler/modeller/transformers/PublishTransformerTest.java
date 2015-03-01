@@ -31,6 +31,7 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -60,9 +61,13 @@ public class PublishTransformerTest {
     public void init() throws URISyntaxException {
         URL resource = getClass().getResource("/flow_with_multiple_steps.yaml");
         ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
-        Map flow = (Map)file.getFlow().get(SlangTextualKeys.WORKFLOW_KEY);
-        Map task = (Map)flow.get("RealRealCheckWeather");
-        publishMap = (List) task.get(SlangTextualKeys.PUBLISH_KEY);
+        List<Map<String, Map>> flow = (List<Map<String, Map>>) file.getFlow().get(SlangTextualKeys.WORKFLOW_KEY);
+        for(Map<String, Map> task : flow){
+            if(task.keySet().iterator().next().equals("RealRealCheckWeather")){
+                publishMap = (List) task.values().iterator().next().get(SlangTextualKeys.PUBLISH_KEY);
+                break;
+            }
+        }
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -92,9 +97,14 @@ public class PublishTransformerTest {
     public void testInvalidOutputType() throws Exception{
         URL resource = getClass().getResource("/flow_with_invalid_publish_from_task.yaml");
         ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
-        Map flow = (Map)file.getFlow().get(SlangTextualKeys.WORKFLOW_KEY);
-        Map task = (Map)flow.get("CheckWeather");
-        List<Object> publishMap = (List<Object>) task.get(SlangTextualKeys.PUBLISH_KEY);
+        List<Map<String, Map>> flow = (List<Map<String, Map>>) file.getFlow().get(SlangTextualKeys.WORKFLOW_KEY);
+        List<Object> publishMap = new ArrayList<>();
+        for(Map<String, Map> task : flow){
+            if(task.keySet().iterator().next().equals("CheckWeather")){
+                publishMap = (List) task.values().iterator().next().get(SlangTextualKeys.PUBLISH_KEY);
+                break;
+            }
+        }
         exception.expect(RuntimeException.class);
         exception.expectMessage("weather");
         exception.expectMessage("3");

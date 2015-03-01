@@ -22,4 +22,9 @@ public class Output extends InOutParam {
 		super(name, expression);
 	}
 
+    /**
+     * only here to satisfy serialization libraries
+     */
+    private Output(){}
+
 }

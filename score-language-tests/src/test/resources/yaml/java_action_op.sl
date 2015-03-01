@@ -4,18 +4,20 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-namespace: org.openscore
 
-imports:
-  ops: org.openscore
+namespace: user.ops
 
-flow:
-  name: on_failure_with_task_list
-  workflow:
-    task1:
-      do:
-        ops.op1:
-    on_failure:
-      - task2:
-          do:
-            ops.op1
+operation:
+  name: java_action_test
+  inputs:
+    - host
+    - port
+  action:
+    java_action:
+      className: org.openscore.lang.systemtests.actions.LangTestActions
+      methodName: parseUrl
+  outputs:
+    - url
+  results:
+    - SUCCESS: url is not None
+    - FAILURE
