@@ -266,18 +266,14 @@ public class InputsBindingTest {
         Assert.assertEquals(1, result.size());
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testExpressionWithWrongRef() {
         Map<String,Serializable> context = new HashMap<>();
 
 		Input input = new Input("input1", "input2", false, false, true, null);
         List<Input> inputs = Arrays.asList(input);
 
-        Map<String,Serializable> result = bindInputs(inputs, context);
-        Assert.assertFalse(result.isEmpty());
-        Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(null, result.get("input1"));
-        Assert.assertEquals(1, result.size());
+        bindInputs(inputs, context);
     }
 
     @Test

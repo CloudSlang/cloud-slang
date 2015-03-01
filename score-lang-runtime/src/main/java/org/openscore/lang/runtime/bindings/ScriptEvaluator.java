@@ -31,7 +31,6 @@ public class ScriptEvaluator {
 
 	private static final String TRUE = "true";
 	private static final String FALSE = "false";
-    private static final Logger logger = Logger.getLogger(ScriptEvaluator.class);
 
     @Autowired
     private ScriptEngine engine;
@@ -46,9 +45,10 @@ public class ScriptEvaluator {
         try {
             return (Serializable)engine.eval(expr,scriptContext);
         } catch (ScriptException e) {
+            ScriptException scriptException =  new ScriptException(e);
             throw new RuntimeException(
-                    "Error in running script expression or variable reference, for expression: "
-                    + expr + " Script exception is: \n" + e.getMessage(), e);
+                    "Error in running script expression or variable reference, for expression: '"
+                    + expr + "', Script exception is: \n" + scriptException.getMessage(), scriptException);
         }
     }
 

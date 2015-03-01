@@ -46,7 +46,13 @@ public class InputsBinding {
     private void bindInput(Input input, Map<String, ? extends Serializable> context, Map<String, Serializable> targetContext, Map<String, ? extends Serializable> systemProperties) {
         String inputName = input.getName();
         Validate.notEmpty(inputName);
-        Serializable value = resolveValue(input, context, targetContext, systemProperties);
+        Serializable value;
+        try {
+            value = resolveValue(input, context, targetContext, systemProperties);
+        } catch (Throwable t) {
+            throw new RuntimeException("Error binding input: '" + inputName + "', error is: \n" + t.getMessage(), t);
+        }
+
 
         if(input.isRequired() && value == null) {
             throw new RuntimeException("Input with name: \'"+ inputName + "\' is Required, but value is empty");
