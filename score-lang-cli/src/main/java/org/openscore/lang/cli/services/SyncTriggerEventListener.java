@@ -99,17 +99,18 @@ public class SyncTriggerEventListener implements ScoreEventListener{
     }
 
     public static Map<String, String> extractOutputs(Map<String, Serializable> data) {
-        if(data.containsKey(LanguageEventData.OUTPUTS) && data.containsKey(LanguageEventData.PATH) && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
+        if(data.containsKey(LanguageEventData.OUTPUTS)
+                && data.containsKey(LanguageEventData.PATH)
+                && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
 
-            @SuppressWarnings("unchecked") Map<String, String> outputs = new HashMap((Map<String, String>) data.get(LanguageEventData.OUTPUTS));
+            @SuppressWarnings("unchecked") Map<String, String> outputs = (Map<String, String>) data.get(LanguageEventData.OUTPUTS);
             if (MapUtils.isNotEmpty(outputs)) {
                 Iterator<Map.Entry<String,String>> iterator = outputs.entrySet().iterator();
                 while (iterator.hasNext()) {
                     Map.Entry<String,String> output = iterator.next();
                     if(StringUtils.isEmpty(output.getValue())){
                         iterator.remove();
-                    }
-                    else if(StringUtils.isNotEmpty(output.getValue())) {
+                    } else {
                         outputs.put(output.getKey(), StringUtils.abbreviate(output.getValue(), 0, OUTPUT_VALUE_LIMIT));
                     }
 
@@ -120,13 +121,13 @@ public class SyncTriggerEventListener implements ScoreEventListener{
         return new HashMap<>();
     }
 
-    public void printFinishEvent(Map<String, Serializable> data) {
+    private void printFinishEvent(Map<String, Serializable> data) {
         String flowResult = (String)data.get(RESULT);
         String flowName = (String)data.get(LanguageEventData.levelName.EXECUTABLE_NAME.toString());
         printWithColor(Ansi.Color.CYAN,"Flow : " + flowName + " finished with result : " + flowResult);
     }
 
-    public void printWithColor(Ansi.Color color, String msg){
+    private void printWithColor(Ansi.Color color, String msg){
         AnsiConsole.out().print(ansi().fg(color).a(msg).newline());
         AnsiConsole.out().print(ansi().fg(Ansi.Color.WHITE));
 
