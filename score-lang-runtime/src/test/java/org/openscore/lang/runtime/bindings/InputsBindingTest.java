@@ -82,7 +82,7 @@ public class InputsBindingTest {
     }
 
     @Test
-    public void testTwoInputs1() {
+    public void testAssignFromInput() {
         Input input1 = new Input("input1", "input1", false, false, true, null);
         Input input2 = new Input("input2", "input1", false, false, true, null);
         List<Input> inputs = Arrays.asList(input1, input2);

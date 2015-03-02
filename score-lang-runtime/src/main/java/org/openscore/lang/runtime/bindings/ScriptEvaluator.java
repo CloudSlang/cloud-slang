@@ -10,7 +10,6 @@
 
 package org.openscore.lang.runtime.bindings;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,7 +42,7 @@ public class ScriptEvaluator {
 		if(scriptContext.getAttribute(TRUE) == null) scriptContext.setAttribute(TRUE, Boolean.TRUE, ScriptContext.ENGINE_SCOPE);
 		if(scriptContext.getAttribute(FALSE) == null) scriptContext.setAttribute(FALSE, Boolean.FALSE, ScriptContext.ENGINE_SCOPE);
         try {
-            return (Serializable)engine.eval(expr,scriptContext);
+            return (Serializable) engine.eval(expr,scriptContext);
         } catch (ScriptException e) {
             ScriptException scriptException =  new ScriptException(e);
             throw new RuntimeException(
