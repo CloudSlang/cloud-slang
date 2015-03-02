@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.openscore.lang.compiler.SlangSource.fromFile;
 
@@ -131,19 +133,12 @@ public class SlangContentVerifier {
     }
 
     private void staticSlangFileValidation(File slangFile, Executable executable){
-        // Validate that the namespace is not empty
-        Validate.notEmpty(executable.getNamespace(), "Error validating Slang file: \'" + slangFile.getAbsoluteFile() +
-                "\'. Namespace of slang source: \'" + executable.getName() + "\' cannot be empty.");
+        validateNamespace(slangFile, executable);
 
-        String executableNamespacePath = executable.getNamespace().replace('.', File.separatorChar);
-        // Validate that the namespace matches the path of the file
-        String namespaceErrorMessage = "Error validating Slang file: \'" + slangFile.getAbsoluteFile() +
-                "\'. Namespace of slang source: " + executable.getName() + " is wrong.\nIt is currently \'" +
-                executable.getNamespace() + "\', but it should match the file path: \'" + slangFile.getPath() + "\'";
-        int indexOfLastFileSeparator = slangFile.getAbsolutePath().lastIndexOf(File.separatorChar);
-        String filePathWithoutFileName = slangFile.getAbsolutePath().substring(0, indexOfLastFileSeparator);
-        Validate.isTrue(filePathWithoutFileName.endsWith(executableNamespacePath), namespaceErrorMessage);
+        validateExecutableName(slangFile, executable);
+    }
 
+    private void validateExecutableName(File slangFile, Executable executable) {
         // Validate executable name is the same as the file name
         String[] splitName = slangFile.getName().split("\\Q.");
         String fileNameNoExtension = splitName[0];
@@ -151,6 +146,27 @@ public class SlangContentVerifier {
                 "\'. Name of flow or operation: \'" + executable.getName() +
                 "\' is invalid.\nIt should be identical to the file name: \'" + fileNameNoExtension + "\'";
         Validate.isTrue(fileNameNoExtension.equals(executable.getName()), executableNameErrorMessage);
+    }
+
+    private void validateNamespace(File slangFile, Executable executable) {
+        // Validate that the namespace is not empty
+        String namespace = executable.getNamespace();
+        Validate.notEmpty(namespace, "Error validating Slang file: \'" + slangFile.getAbsoluteFile() +
+                "\'. Namespace of slang source: \'" + executable.getName() + "\' cannot be empty.");
+
+        // Validate that the namespace matches the path of the file
+        String executableNamespacePath = namespace.replace('.', File.separatorChar);
+        String namespaceErrorMessage = "Error validating Slang file: \'" + slangFile.getAbsoluteFile() +
+                "\'. Namespace of slang source: " + executable.getName() + " is wrong.\nIt is currently \'" +
+                namespace + "\', but it should match the file path: \'" + slangFile.getPath() + "\'";
+        int indexOfLastFileSeparator = slangFile.getAbsolutePath().lastIndexOf(File.separatorChar);
+        String filePathWithoutFileName = slangFile.getAbsolutePath().substring(0, indexOfLastFileSeparator);
+        Validate.isTrue(filePathWithoutFileName.toLowerCase().endsWith(executableNamespacePath.toLowerCase()), namespaceErrorMessage);
+
+        // Validate that the namespace is composed only of abc letters, _ or -
+        Pattern pattern = Pattern.compile("^[\\w-\\.]+$");
+        Matcher matcher = pattern.matcher(namespace);
+        Validate.isTrue(matcher.matches(), "Namespace: " + namespace + " is invalid. It can contain only alphanumeric characters, underscore or hyphen");
     }
 
     private String getUniqueName(Executable sourceModel) {

@@ -105,6 +105,24 @@ public class CompilerHelperTest {
 		Assert.assertEquals(expected, result);
 	}
 
+    @Test
+    public void testLoadInputsFromFile() throws Exception {
+        Map<String, Serializable> expected = new HashMap<>();
+        expected.put("host", "localhost");
+        expected.put("port", "22");
+        URI inputsFromFile = getClass().getResource("/inputs/inputs.yaml").toURI();
+        Map<String, ? extends Serializable> result = compilerHelper.loadInputsFromFile(Arrays.asList(inputsFromFile.getPath()));
+        Assert.assertNotNull(result);
+        Assert.assertEquals(expected, result);
+    }
+
+    @Test
+    public void testLoadInputsFromFileImplicit() throws Exception {
+        Map<String, ? extends Serializable> result = compilerHelper.loadInputsFromFile(null);
+        Assert.assertNotNull(result);
+        Assert.assertEquals(2, result.size());
+    }
+
 	@Test
 	public void testLoadSystemPropertiesImplicit() throws Exception {
 		Map<String, ? extends Serializable> result = compilerHelper.loadSystemProperties(null);
