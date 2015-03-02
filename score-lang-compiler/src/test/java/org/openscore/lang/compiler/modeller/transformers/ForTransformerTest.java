@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.openscore.lang.entities.ForLoopStatement;
 
+import java.io.Serializable;
+
 public class ForTransformerTest {
 
     @Rule
@@ -81,6 +83,22 @@ public class ForTransformerTest {
     }
 
     @Test
+    public void testValidMapStatementSpaceBeforeComma() throws Exception {
+        ForLoopStatement statement = transformer.transform("k ,v in collection");
+        Assert.assertEquals(ForLoopStatement.Type.MAP, statement.getType());
+        Assert.assertEquals("k v", statement.getVarName());
+        Assert.assertEquals("collection", statement.getCollectionExpression());
+    }
+
+    @Test
+    public void testValidMapStatementWithoutSpaceAfterComma() throws Exception {
+        ForLoopStatement statement = transformer.transform("k,v in collection");
+        Assert.assertEquals(ForLoopStatement.Type.MAP, statement.getType());
+        Assert.assertEquals("k v", statement.getVarName());
+        Assert.assertEquals("collection", statement.getCollectionExpression());
+    }
+
+    @Test
     public void testValidMapStatementWithExpression() throws Exception {
         ForLoopStatement statement = transformer.transform("k, v in dictionary.items()");
         Assert.assertEquals(ForLoopStatement.Type.MAP, statement.getType());
@@ -91,6 +109,14 @@ public class ForTransformerTest {
     @Test
     public void testValidMapStatementAndTrim() throws Exception {
         ForLoopStatement statement = transformer.transform(" k, v   in  collection  ");
+        Assert.assertEquals(ForLoopStatement.Type.MAP, statement.getType());
+        Assert.assertEquals("k v", statement.getVarName());
+        Assert.assertEquals("collection", statement.getCollectionExpression());
+    }
+
+    @Test
+    public void testValidMapStatementAndTrimMultipleWhitSpaces() throws Exception {
+        ForLoopStatement statement = transformer.transform("   k,    v     in  collection  ");
         Assert.assertEquals(ForLoopStatement.Type.MAP, statement.getType());
         Assert.assertEquals("k v", statement.getVarName());
         Assert.assertEquals("collection", statement.getCollectionExpression());
