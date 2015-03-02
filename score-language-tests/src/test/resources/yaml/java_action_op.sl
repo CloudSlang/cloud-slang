@@ -8,17 +8,16 @@
 namespace: user.ops
 
 operation:
-  name: check_number
+  name: java_action_test
   inputs:
-    - number
+    - host
+    - port
   action:
-    python_script: |
-      remainder = int(number) % 2
-      isEven = remainder == 0
-      tooBig = int(number) > 512
+    java_action:
+      className: org.openscore.lang.systemtests.actions.LangTestActions
+      methodName: parseUrl
   outputs:
-    - preprocessed_number: str(int(fromInputs['number']) * 3)
+    - url
   results:
-    - EVEN: isEven and not tooBig
-    - ODD: not(isEven or tooBig)
-    - FAILURE # report failure if the number is too big
+    - SUCCESS: url is not None
+    - FAILURE

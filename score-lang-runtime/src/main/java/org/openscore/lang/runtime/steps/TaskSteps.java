@@ -152,7 +152,7 @@ public class TaskSteps extends AbstractSteps {
                     Pair.of(TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues),
                     Pair.of("operationReturnValues", executableReturnValues), Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName));
 
-            Map<String, String> publishValues = outputsBinding.bindOutputs(flowVariables, executableReturnValues.getOutputs(), taskPublishValues);
+            Map<String, Serializable> publishValues = outputsBinding.bindOutputs(flowVariables, executableReturnValues.getOutputs(), taskPublishValues);
 
             flowContext.putVariables(publishValues);
 
@@ -183,10 +183,7 @@ public class TaskSteps extends AbstractSteps {
             String presetResult = navigation.getPresetResult();
             runEnv.putNextStepPosition(nextPosition);
 
-            HashMap<String, String> outputs = new HashMap<>();// todo - is this the right solution?
-            for (Map.Entry<String, Serializable> entry : flowVariables.entrySet()) {
-                outputs.put(entry.getKey(), String.valueOf(entry.getValue()));
-            }
+            HashMap<String, Serializable> outputs = new HashMap<>(flowVariables);
 
             ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : executableReturnValues.getResult());
             runEnv.putReturnValues(returnValues);
