@@ -88,7 +88,7 @@ public class OutputsBindingTest {
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void testOperationOutputsIllegalEvaluatedExpression() throws Exception {
         Map<String, Serializable> operationContext = prepareOperationContext();
-        Map<String, String> actionReturnValues = new HashMap<>();
+        Map<String, Serializable> actionReturnValues = new HashMap<>();
         List<Output> outputs = Arrays.asList(createNoExpressionOutput("actionOutputKey1"));
 
         outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
