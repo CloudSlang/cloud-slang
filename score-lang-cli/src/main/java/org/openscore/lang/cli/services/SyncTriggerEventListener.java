@@ -85,7 +85,7 @@ public class SyncTriggerEventListener implements ScoreEventListener{
                 }
                 break;
             case ScoreLangConstants.EVENT_OUTPUT_END:
-                Map<String, String> outputs = extractOutputs(data);
+                Map<String, Serializable> outputs = extractOutputs(data);
 
                 for (String key : outputs.keySet()) {
                     printWithColor(Ansi.Color.WHITE, "- " + key + " = " + outputs.get(key));
@@ -98,22 +98,21 @@ public class SyncTriggerEventListener implements ScoreEventListener{
         }
     }
 
-    public static Map<String, String> extractOutputs(Map<String, Serializable> data) {
+    public static Map<String, Serializable> extractOutputs(Map<String, Serializable> data) {
         if(data.containsKey(LanguageEventData.OUTPUTS)
                 && data.containsKey(LanguageEventData.PATH)
                 && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
 
-            @SuppressWarnings("unchecked") Map<String, String> outputs = (Map<String, String>) data.get(LanguageEventData.OUTPUTS);
+            @SuppressWarnings("unchecked") Map<String, Serializable> outputs = (Map<String, Serializable>) data.get(LanguageEventData.OUTPUTS);
             if (MapUtils.isNotEmpty(outputs)) {
-                Iterator<Map.Entry<String,String>> iterator = outputs.entrySet().iterator();
+                Iterator<Map.Entry<String,Serializable>> iterator = outputs.entrySet().iterator();
                 while (iterator.hasNext()) {
-                    Map.Entry<String,String> output = iterator.next();
-                    if(StringUtils.isEmpty(output.getValue())){
+                    Map.Entry<String,Serializable> output = iterator.next();
+                    if(StringUtils.isEmpty(output.getValue().toString())){
                         iterator.remove();
                     } else {
-                        outputs.put(output.getKey(), StringUtils.abbreviate(output.getValue(), 0, OUTPUT_VALUE_LIMIT));
+                        outputs.put(output.getKey(), StringUtils.abbreviate(output.getValue().toString(), 0, OUTPUT_VALUE_LIMIT));
                     }
-
                 }
             }
             return outputs;

@@ -45,7 +45,7 @@ public class SyncTriggerEventListenerTest {
     public static final String ABBREVIATED_RESULT = "result that is too long will be abbre...";
 
     Map<String, Serializable> data;
-    Map<String, String> outputs, expectedFilteredOutputs, actualFilteredOutputs;
+    Map<String, Serializable> outputs, expectedFilteredOutputs, actualFilteredOutputs;
 
     @Before
     public void before() throws Exception {
