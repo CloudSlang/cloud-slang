@@ -27,7 +27,7 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import javax.print.attribute.Attribute;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
