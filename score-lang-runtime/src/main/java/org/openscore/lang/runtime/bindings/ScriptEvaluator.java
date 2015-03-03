@@ -10,7 +10,6 @@
 
 package org.openscore.lang.runtime.bindings;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +30,6 @@ public class ScriptEvaluator {
 
 	private static final String TRUE = "true";
 	private static final String FALSE = "false";
-    private static final Logger logger = Logger.getLogger(ScriptEvaluator.class);
 
     @Autowired
     private ScriptEngine engine;
@@ -44,13 +42,13 @@ public class ScriptEvaluator {
 		if(scriptContext.getAttribute(TRUE) == null) scriptContext.setAttribute(TRUE, Boolean.TRUE, ScriptContext.ENGINE_SCOPE);
 		if(scriptContext.getAttribute(FALSE) == null) scriptContext.setAttribute(FALSE, Boolean.FALSE, ScriptContext.ENGINE_SCOPE);
         try {
-            return (Serializable)engine.eval(expr,scriptContext);
+            return (Serializable) engine.eval(expr,scriptContext);
         } catch (ScriptException e) {
-            logger.debug("Error in running script expression or variable reference ,for expression: " + expr
-                    + " Script exception is: " + e.getMessage());
-            //todo - add event here?
+            ScriptException scriptException =  new ScriptException(e);
+            throw new RuntimeException(
+                    "Error in running script expression or variable reference, for expression: '"
+                    + expr + "', Script exception is: \n" + scriptException.getMessage(), scriptException);
         }
-        return null;
     }
 
 }
