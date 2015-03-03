@@ -45,16 +45,17 @@ import static org.hamcrest.Matchers.*;
 @Component
 public class CompilerHelperImpl implements CompilerHelper{
 
-    @Autowired
-    private Slang slang;
-    @Autowired
-    private Yaml yaml;
-
     private static final Logger logger = Logger.getLogger(CompilerHelperImpl.class);
     private static final String[] SLANG_FILE_EXTENSIONS = {"yml", "yaml", "py", "sl"};
     private static final String[] YAML_FILE_EXTENSIONS = {"yaml", "yml"};
     private static final String SP_DIR = "properties"; //TODO reconsider it after closing slang file extensions & some real usecases
     private static final String INPUT_DIR = "inputs";
+
+    @Autowired
+    private Slang slang;
+    @Autowired
+    private Yaml yaml;
+
     @Override
 	public CompilationArtifact compile(String filePath, List<String> dependencies) throws IOException {
         Validate.notNull(filePath, "File path can not be null");
@@ -84,16 +85,16 @@ public class CompilerHelperImpl implements CompilerHelper{
     }
 
 	@Override
-	public Map<String, ? extends Serializable> loadSystemProperties(List<String> systemPropertyFiles) throws IOException {
+	public Map<String, ? extends Serializable> loadSystemProperties(List<String> systemPropertyFiles) {
 		return loadFiles(systemPropertyFiles, YAML_FILE_EXTENSIONS, SP_DIR);
 	}
 
     @Override
-    public Map<String, ? extends Serializable> loadInputsFromFile(List<String> inputFiles) throws IOException {
+    public Map<String, ? extends Serializable> loadInputsFromFile(List<String> inputFiles) {
         return loadFiles(inputFiles, YAML_FILE_EXTENSIONS, INPUT_DIR);
     }
 
-    private Map<String, ? extends Serializable> loadFiles(List<String> files, String[] extensions, String directory) throws IOException {
+    private Map<String, ? extends Serializable> loadFiles(List<String> files, String[] extensions, String directory) {
         if(CollectionUtils.isEmpty(files)) {
             Collection<File> implicitFiles = FileUtils.listFiles(new File("."), extensions, true);
             implicitFiles = select(implicitFiles, having(on(File.class).getPath(), containsString(directory)));
@@ -104,13 +105,17 @@ public class CompilerHelperImpl implements CompilerHelper{
                 }
             });
         }
-
         if(CollectionUtils.isEmpty(files)) return null;
         Map<String, Serializable> result = new HashMap<>();
-        for(String inputFile : files) {
-            logger.info("Loading " + inputFile);
-            result.putAll((Map<String, ? extends Serializable>)yaml.load(FileUtils.readFileToString(new File(inputFile))));
-        }
+		for(String inputFile : files) {
+			logger.info("Loading file: " + inputFile);
+			try {
+				result.putAll((Map<String, ? extends Serializable>)yaml.load(FileUtils.readFileToString(new File(inputFile))));
+			} catch(IOException ex) {
+				logger.error("Error loading file: " + inputFile, ex);
+				throw new RuntimeException(ex);
+			}
+		}
         return result;
     }
 

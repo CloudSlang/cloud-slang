@@ -112,7 +112,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 
-	private final void compileAndRunSimpleFlow(Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties) throws Exception {
+	private void compileAndRunSimpleFlow(Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties) throws Exception {
 		URI flow = getClass().getResource("/yaml/simple_flow.yaml").toURI();
 		URI operations1 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
 		URI operations2 = getClass().getResource("/yaml/comopute_daylight_time_zone.sl").toURI();

@@ -62,7 +62,12 @@ public class LoopsBinding {
 
     private LoopCondition createForLoopCondition(String collectionExpression, Context flowContext, String nodeName) {
         Map<String, Serializable> variables = flowContext.getImmutableViewOfVariables();
-        Serializable evalResult = scriptEvaluator.evalExpr(collectionExpression, variables);
+        Serializable evalResult;
+        try {
+            evalResult = scriptEvaluator.evalExpr(collectionExpression, variables);
+        } catch (Throwable t) {
+            throw new RuntimeException("Error evaluating for loop expression in task '" + nodeName + "', error is: \n" + t.getMessage(), t);
+        }
         ForLoopCondition forLoopCondition = createForLoopCondition(evalResult);
         if (forLoopCondition == null) {
             throw new RuntimeException("collection expression: '" + collectionExpression + "' in the 'for' loop " +

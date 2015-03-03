@@ -13,7 +13,9 @@ import com.google.common.collect.Sets;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.openscore.lang.api.Slang;
@@ -39,9 +41,10 @@ public class CompilerHelperTest {
 
     @Autowired
     private CompilerHelper compilerHelper;
-
     @Autowired
     private Slang slang;
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test(expected = IllegalArgumentException.class)
     public void testFilePathWrong() throws Exception {
@@ -105,6 +108,20 @@ public class CompilerHelperTest {
 		Assert.assertEquals(expected, result);
 	}
 
+	@Test
+	public void testLoadSystemPropertiesImplicit() throws Exception {
+		Map<String, ? extends Serializable> result = compilerHelper.loadSystemProperties(null);
+		Assert.assertNotNull(result);
+		Assert.assertEquals(5, result.size());
+	}
+
+	@Test
+	public void testLoadSystemPropertiesWrongPath() throws Exception {
+		expectedException.expect(RuntimeException.class);
+		expectedException.expectMessage("does not exist");
+		compilerHelper.loadSystemProperties(Arrays.asList("abc", "def"));
+	}
+
     @Test
     public void testLoadInputsFromFile() throws Exception {
         Map<String, Serializable> expected = new HashMap<>();
@@ -122,13 +139,6 @@ public class CompilerHelperTest {
         Assert.assertNotNull(result);
         Assert.assertEquals(2, result.size());
     }
-
-	@Test
-	public void testLoadSystemPropertiesImplicit() throws Exception {
-		Map<String, ? extends Serializable> result = compilerHelper.loadSystemProperties(null);
-		Assert.assertNotNull(result);
-		Assert.assertEquals(5, result.size());
-	}
 
     @Configuration
     static class Config {
