@@ -93,6 +93,7 @@ public class SyncTriggerEventListener implements ScoreEventListener{
                 break;
 
             case EVENT_EXECUTION_FINISHED :
+                flowFinished.set(true);
                 printFinishEvent(data);
                 break;
         }

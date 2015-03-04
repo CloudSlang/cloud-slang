@@ -61,6 +61,7 @@ public class ScoreServicesImpl implements ScoreServices{
         Set<String> handlerTypes = new HashSet<>();
         if(isQuiet){
             handlerTypes.add(EVENT_EXECUTION_FINISHED);
+            handlerTypes.add(EVENT_OUTPUT_END);
         }
         else {
             handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
@@ -92,64 +93,4 @@ public class ScoreServicesImpl implements ScoreServices{
 
         return executionId;
     }
-
-    private class SyncTriggerEventListener implements ScoreEventListener{
-
-        private AtomicBoolean flowFinished = new AtomicBoolean(false);
-        private AtomicReference<String> errorMessage = new AtomicReference<>("");
-
-        public boolean isFlowFinished() {
-            return flowFinished.get();
-        }
-
-        public String getErrorMessage() {
-            return errorMessage.get();
-        }
-
-        @Override
-        public synchronized void onEvent(ScoreEvent scoreEvent) throws InterruptedException {
-            @SuppressWarnings("unchecked") Map<String,Serializable> data = (Map<String,Serializable>)scoreEvent.getData();
-            switch (scoreEvent.getEventType()){
-                case EventConstants.SCORE_FINISHED_EVENT :
-                    flowFinished.set(true);
-                    break;
-                case EventConstants.SCORE_ERROR_EVENT :
-                    errorMessage.set(SCORE_ERROR_EVENT_MSG + data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " +
-                            data.get(EventConstants.SCORE_ERROR_MSG));
-                    break;
-                case EventConstants.SCORE_FAILURE_EVENT :
-                    printWithColor(Ansi.Color.RED,FLOW_FINISHED_WITH_FAILURE_MSG);
-                    flowFinished.set(true);
-                    break;
-                case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
-                    errorMessage.set(SLANG_STEP_ERROR_MSG + data.get(EXCEPTION));
-                    break;
-                case ScoreLangConstants.EVENT_INPUT_END:
-                    String taskName = (String)data.get(LanguageEventData.levelName.TASK_NAME.name());
-                    if(StringUtils.isNotEmpty(taskName)){
-                        String path = (String) data.get(LanguageEventData.PATH);
-                        int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
-                        String prefix = StringUtils.repeat(TASK_PATH_PREFIX, matches);
-                        printWithColor(Ansi.Color.YELLOW, prefix + taskName);
-                    }
-                    break;
-                case EVENT_EXECUTION_FINISHED :
-                    printFinishEvent(data);
-                    break;
-            }
-        }
-
-        private void printFinishEvent(Map<String, Serializable> data) {
-            String flowResult = (String)data.get(RESULT);
-            String flowName = (String)data.get(LanguageEventData.levelName.EXECUTABLE_NAME.toString());
-            printWithColor(Ansi.Color.CYAN,"Flow : " + flowName + " finished with result : " + flowResult);
-        }
-
-        private void printWithColor(Ansi.Color color, String msg){
-            AnsiConsole.out().print(ansi().fg(color).a(msg).newline());
-            AnsiConsole.out().print(ansi().fg(Ansi.Color.WHITE));
-
-        }
-    }
-
 }
