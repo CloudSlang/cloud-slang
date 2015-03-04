@@ -9,16 +9,10 @@
 package org.openscore.lang.cli.services;
 
 import org.apache.commons.lang.StringUtils;
-import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.AnsiConsole;
 import org.openscore.events.EventConstants;
-import org.openscore.events.ScoreEvent;
 import org.openscore.events.ScoreEventListener;
 import org.openscore.lang.api.Slang;
 import org.openscore.lang.entities.CompilationArtifact;
-import org.openscore.lang.entities.ScoreLangConstants;
-import org.openscore.lang.runtime.env.ExecutionPath;
-import org.openscore.lang.runtime.events.LanguageEventData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +20,8 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
-import static org.fusesource.jansi.Ansi.ansi;
 import static org.openscore.lang.entities.ScoreLangConstants.*;
-import static org.openscore.lang.runtime.events.LanguageEventData.EXCEPTION;
-import static org.openscore.lang.runtime.events.LanguageEventData.RESULT;
 
 /**
  * @author Bonczidai Levente
@@ -41,13 +30,9 @@ import static org.openscore.lang.runtime.events.LanguageEventData.RESULT;
  */
 @Service
 public class ScoreServicesImpl implements ScoreServices{
-    public static final String SLANG_STEP_ERROR_MSG = "Slang Error : ";
-    public static final String SCORE_ERROR_EVENT_MSG = "Score Error Event :";
-    public static final String FLOW_FINISHED_WITH_FAILURE_MSG = "Flow finished with failure";
 
     @Autowired
     private Slang slang;
-    private final static String TASK_PATH_PREFIX = "- ";
 
     public void subscribe(ScoreEventListener eventHandler, Set<String> eventTypes) {
         slang.subscribeOnEvents(eventHandler, eventTypes);
@@ -68,7 +53,6 @@ public class ScoreServicesImpl implements ScoreServices{
      * This method will trigger the flow in a synchronize matter, meaning only one flow can run at a time.
      * @param compilationArtifact the artifact to trigger
      * @param inputs : flow inputs
-     * @param isQuiet: omits to print task names if set to true
      * @return executionId
      */
     @Override
@@ -85,8 +69,9 @@ public class ScoreServicesImpl implements ScoreServices{
             handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
             handlerTypes.add(EVENT_EXECUTION_FINISHED);
             handlerTypes.add(EVENT_INPUT_END);
+            handlerTypes.add(EVENT_OUTPUT_END);
         }
-
+        
         SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener();
         slang.subscribeOnEvents(scoreEventListener, handlerTypes);
 
@@ -108,7 +93,7 @@ public class ScoreServicesImpl implements ScoreServices{
         return executionId;
     }
 
-    private class SyncTriggerEventListener implements ScoreEventListener {
+    private class SyncTriggerEventListener implements ScoreEventListener{
 
         private AtomicBoolean flowFinished = new AtomicBoolean(false);
         private AtomicReference<String> errorMessage = new AtomicReference<>("");
@@ -123,17 +108,17 @@ public class ScoreServicesImpl implements ScoreServices{
 
         @Override
         public synchronized void onEvent(ScoreEvent scoreEvent) throws InterruptedException {
-            @SuppressWarnings("unchecked") Map<String, Serializable> data = (Map<String, Serializable>) scoreEvent.getData();
-            switch (scoreEvent.getEventType()) {
-                case EventConstants.SCORE_FINISHED_EVENT:
+            @SuppressWarnings("unchecked") Map<String,Serializable> data = (Map<String,Serializable>)scoreEvent.getData();
+            switch (scoreEvent.getEventType()){
+                case EventConstants.SCORE_FINISHED_EVENT :
                     flowFinished.set(true);
                     break;
                 case EventConstants.SCORE_ERROR_EVENT :
                     errorMessage.set(SCORE_ERROR_EVENT_MSG + data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " +
                             data.get(EventConstants.SCORE_ERROR_MSG));
                     break;
-                case EventConstants.SCORE_FAILURE_EVENT:
-                    printWithColor(Ansi.Color.RED, FLOW_FINISHED_WITH_FAILURE_MSG);
+                case EventConstants.SCORE_FAILURE_EVENT :
+                    printWithColor(Ansi.Color.RED,FLOW_FINISHED_WITH_FAILURE_MSG);
                     flowFinished.set(true);
                     break;
                 case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
@@ -148,11 +133,7 @@ public class ScoreServicesImpl implements ScoreServices{
                         printWithColor(Ansi.Color.YELLOW, prefix + taskName);
                     }
                     break;
-
-                case EVENT_EXECUTION_FINISHED:
-                    if (!flowFinished.get()) {
-                        flowFinished.set(true);
-                    }
+                case EVENT_EXECUTION_FINISHED :
                     printFinishEvent(data);
                     break;
             }

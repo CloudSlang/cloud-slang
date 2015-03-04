@@ -160,7 +160,7 @@
             <dependency>
                 <groupId>io.openscore.content</groupId>
                 <artifactId>score-ssh</artifactId>
-                <version>0.0.13</version>
+                <version>0.0.20</version>
             </dependency>
             <dependency>
                 <groupId>io.openscore.content</groupId>
