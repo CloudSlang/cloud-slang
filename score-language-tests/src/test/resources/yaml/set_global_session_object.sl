@@ -15,5 +15,3 @@ operation:
     java_action:
       className: org.openscore.lang.systemtests.actions.LangTestActions
       methodName: setConnectionOnNonSerializableSession
-  outputs:
-    - session_object_value: value

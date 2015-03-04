@@ -54,8 +54,13 @@ public class OutputsBinding {
                         scriptContext.put(BIND_OUTPUT_FROM_INPUTS_KEY, (Serializable) inputs);
                     }
 
+                    Serializable scriptResult;
+                    try {
+                        scriptResult = scriptEvaluator.evalExpr(outputExpr, scriptContext);
+                    } catch (Throwable t) {
+                        throw new RuntimeException("Error binding output: '" + output.getName() + "', error is: \n" + t.getMessage(), t);
+                    }
                     //evaluate expression
-                    Serializable scriptResult = scriptEvaluator.evalExpr(outputExpr, scriptContext);
 
                     if (scriptResult != null) {
                         try {

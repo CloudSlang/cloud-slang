@@ -85,14 +85,13 @@ public class OutputsBindingTest {
         Assert.assertEquals("Binding results are not as expected", expectedOutputs, result);
     }
 
-    @Test(timeout = DEFAULT_TIMEOUT)
+    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void testOperationOutputsIllegalEvaluatedExpression() throws Exception {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = new HashMap<>();
         List<Output> outputs = Arrays.asList(createNoExpressionOutput("actionOutputKey1"));
 
-        Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
-        Assert.assertEquals("Binding results are not as expected", 0, result.size());
+        outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -117,14 +116,13 @@ public class OutputsBindingTest {
 
         outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
     }
-    @Test(timeout = DEFAULT_TIMEOUT)
+    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void testOperationOutputsInvalidExpression() throws Exception {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(fromInputs[SHOULD_BE_STRING])"));
 
-        Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
-        Assert.assertEquals("Binding results are not as expected", 0, result.size());
+        outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
