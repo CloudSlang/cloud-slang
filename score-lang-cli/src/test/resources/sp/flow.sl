@@ -18,12 +18,12 @@ flow:
     - my_weather:
         required: false
   workflow:
-    CheckWeather:
-      do:
-        ops.check_weather:
-          - city:
-              required: false
-              default: my_city
-          - weather:
-              required: false
-              default: my_weather
+    - CheckWeather:
+        do:
+          ops.check_weather:
+            - city:
+                required: false
+                default: my_city
+            - weather:
+                required: false
+                default: my_weather
