@@ -44,7 +44,7 @@ public class InputsBindingTest {
     }
 
     @Test
-    public void testDefaultValue() throws Exception {
+    public void testDefaultValue() {
 		List<Input> inputs = Arrays.asList(new Input("input1", "str('value')"));
         Map<String,Serializable> result = bindInputs(inputs);
         Assert.assertFalse(result.isEmpty());
@@ -53,7 +53,7 @@ public class InputsBindingTest {
     }
 
     @Test
-    public void testDefaultValueInt() throws Exception {
+    public void testDefaultValueInt(){
         List<Input> inputs = Arrays.asList(new Input("input1", "2"));
         Map<String,Serializable> result = bindInputs(inputs);
         Assert.assertFalse(result.isEmpty());
@@ -62,7 +62,7 @@ public class InputsBindingTest {
     }
 
 	@Test
-	public void testDefaultValueBoolean() throws Exception {
+	public void testDefaultValueBoolean() {
 		List<Input> inputs = Arrays.asList(new Input("input1", "true"), new Input("input2", "false"), new Input("input3", "str('phrase cantaining true and false')"));
 		Map<String, Serializable> result = bindInputs(inputs);
 		Assert.assertTrue((boolean)result.get("input1"));
@@ -71,7 +71,7 @@ public class InputsBindingTest {
 	}
 
     @Test
-    public void testTwoInputs() throws Exception {
+    public void testTwoInputs() {
 		List<Input> inputs = Arrays.asList(new Input("input2", "'yyy'"), new Input("input1", "'zzz'"));
         Map<String,Serializable> result = bindInputs(inputs);
         Assert.assertFalse(result.isEmpty());
@@ -82,7 +82,20 @@ public class InputsBindingTest {
     }
 
     @Test
-    public void testInputRef() throws Exception {
+    public void testAssignFromInput() {
+        Input input1 = new Input("input1", "input1", false, false, true, null);
+        Input input2 = new Input("input2", "input1", false, false, true, null);
+        List<Input> inputs = Arrays.asList(input1, input2);
+        Map<String,Serializable> result = bindInputs(inputs);
+        Assert.assertFalse(result.isEmpty());
+        Assert.assertTrue(result.containsKey("input1"));
+        Assert.assertEquals(null, result.get("input1"));
+        Assert.assertTrue(result.containsKey("input2"));
+        Assert.assertEquals(null, result.get("input2"));
+    }
+
+    @Test
+    public void testInputRef() {
         Map<String,Serializable> context = new HashMap<>();
         context.put("inputX","xxx");
         List<Input> inputs =  Arrays.asList(new Input("input1","str(inputX)"));
@@ -95,7 +108,7 @@ public class InputsBindingTest {
     }
 
     @Test
-    public void testInputScriptEval() throws Exception {
+    public void testInputScriptEval() {
         Map<String,Serializable> context = new HashMap<>();
         context.put("valX",5);
         Input scriptInput = new Input("input1","3 + valX");
@@ -109,7 +122,7 @@ public class InputsBindingTest {
     }
 
     @Test
-    public void testInputScriptEval2() throws Exception {
+    public void testInputScriptEval2() {
         Map<String,Serializable> context = new HashMap<>();
         context.put("valB","b");
         context.put("valC","c");
@@ -122,7 +135,7 @@ public class InputsBindingTest {
     }
 
     @Test
-    public void testDefaultValueVsEmptyRef() throws Exception {
+    public void testDefaultValueVsEmptyRef() {
         Map<String,Serializable> context = new HashMap<>();
 
 		Input refInput = new Input("input1", "str('val')");
@@ -137,7 +150,7 @@ public class InputsBindingTest {
     }
 
     @Test
-    public void testAssignFromAndExpr() throws Exception {
+    public void testAssignFromAndExpr() {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",3);
 		Input input = new Input("input1", "5+7");
@@ -153,7 +166,7 @@ public class InputsBindingTest {
     }
 
     @Test
-    public void testAssignFromAndConst() throws Exception {
+    public void testAssignFromAndConst() {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",3);
 		Input input = new Input("input1", "5");
@@ -166,7 +179,7 @@ public class InputsBindingTest {
     }
 
     @Test
-    public void testComplexExpr() throws Exception {
+    public void testComplexExpr(){
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",3);
 		Input input = new Input("input2", " input1 + 3 * 2 ");
@@ -180,7 +193,7 @@ public class InputsBindingTest {
     }
 
     @Test
-    public void testAssignFromVsRef() throws Exception {
+    public void testAssignFromVsRef(){
         Map<String,Serializable> context = new HashMap<>();
         context.put("input2",3);
         context.put("input1",5);
@@ -195,7 +208,7 @@ public class InputsBindingTest {
     }
 
     @Test
-    public void testOverrideAssignFrom() throws Exception {
+    public void testOverrideAssignFrom(){
         Map<String,Serializable> context = new HashMap<>();
         context.put("input2",3);
         context.put("input1",5);
@@ -212,7 +225,7 @@ public class InputsBindingTest {
     }
 
     @Test
-    public void testOverrideAssignFrom2() throws Exception {
+    public void testOverrideAssignFrom2(){
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",5);
 		Input input = new Input("input1", "3", false, false, false, null);
@@ -226,7 +239,7 @@ public class InputsBindingTest {
     }
 
     @Test
-    public void testOverrideAssignFrom3() throws Exception {
+    public void testOverrideAssignFrom3() {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",5);
 		Input input = new Input("input1", null, false, false, false, null);
@@ -240,7 +253,7 @@ public class InputsBindingTest {
     }
 
     @Test
-    public void testOverrideFalse() throws Exception {
+    public void testOverrideFalse() {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",5);
 		Input input = new Input("input1", "6");
@@ -253,22 +266,18 @@ public class InputsBindingTest {
         Assert.assertEquals(1, result.size());
     }
 
-    @Test
-    public void testExpressionWithWrongRef() throws Exception {
+    @Test(expected = RuntimeException.class)
+    public void testExpressionWithWrongRef() {
         Map<String,Serializable> context = new HashMap<>();
 
 		Input input = new Input("input1", "input2", false, false, true, null);
         List<Input> inputs = Arrays.asList(input);
 
-        Map<String,Serializable> result = bindInputs(inputs, context);
-        Assert.assertFalse(result.isEmpty());
-        Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(null, result.get("input1"));
-        Assert.assertEquals(1, result.size());
+        bindInputs(inputs, context);
     }
 
     @Test
-    public void testInputAssignFromAnotherInput() throws Exception {
+    public void testInputAssignFromAnotherInput() {
         Map<String,Serializable> context = new HashMap<>();
 
 		Input input1 = new Input("input1", "5");
@@ -287,7 +296,7 @@ public class InputsBindingTest {
     }
 
     @Test
-    public void testComplexExpressionInput() throws Exception {
+    public void testComplexExpressionInput() {
         Map<String,Serializable> context = new HashMap<>();
         context.put("varX",5);
 
@@ -307,7 +316,7 @@ public class InputsBindingTest {
     }
 
     @Test
-    public void testComplexExpression2Input() throws Exception {
+    public void testComplexExpression2Input() {
         Map<String,Serializable> context = new HashMap<>();
         context.put("varX","roles");
 
@@ -324,7 +333,7 @@ public class InputsBindingTest {
     }
 
 	@Test
-	public void testSystemProperty() throws Exception {
+	public void testSystemProperty() {
 		String in = "input1";
 		String fqspn = "docker.sys.props.port";
 		List<Input> inputs = Arrays.asList(new Input(in, null, false, true, true, fqspn));
@@ -336,7 +345,7 @@ public class InputsBindingTest {
 	}
 
 	@Test
-	public void testSystemPropertyMissing() throws Exception {
+	public void testSystemPropertyMissing() {
 		String in = "input1";
 		String fqspn = "docker.sys.props.port";
 		List<Input> inputs = Arrays.asList(new Input(in, null, false, false, true, fqspn));
@@ -348,7 +357,7 @@ public class InputsBindingTest {
 	}
 
 	@Test
-	public void testSystemPropertyContext() throws Exception {
+	public void testSystemPropertyContext() {
 		String in = "input1";
 		String fqspn = "docker.sys.props.port";
 		List<Input> inputs = Arrays.asList(new Input(in, null, false, true, true, fqspn));
@@ -360,7 +369,7 @@ public class InputsBindingTest {
 	}
 
 	@Test
-	public void testSystemPropertyOverride() throws Exception {
+	public void testSystemPropertyOverride() {
 		String in = "input1";
 		String fqspn = "docker.sys.props.port";
 		List<Input> inputs = Arrays.asList(new Input(in, null, false, true, false, fqspn));

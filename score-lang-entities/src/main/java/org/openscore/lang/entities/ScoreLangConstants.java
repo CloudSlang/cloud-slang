@@ -27,6 +27,7 @@ public interface ScoreLangConstants {
     String PYTHON_SCRIPT_KEY = "python_script";
     //navigation
     String NEXT_STEP_ID_KEY = "nextStepId";
+    String PREVIOUS_STEP_ID_KEY = "previousStepId";
 
     //operation scope
     String EXECUTABLE_INPUTS_KEY = "executableInputs";
@@ -40,6 +41,8 @@ public interface ScoreLangConstants {
     String TASK_PUBLISH_KEY = "taskPublishValues";
     String TASK_NAVIGATION_KEY = "taskNavigationValues";
     String REF_ID = "refId";
+    String LOOP_KEY = "loop";
+    String BREAK_LOOP_KEY = "breakOn";
 
     // Events types
 	String SLANG_EXECUTION_EXCEPTION = "SLANG_EXECUTION_EXCEPTION";

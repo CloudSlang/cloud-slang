@@ -11,7 +11,6 @@
 package org.openscore.lang.runtime.env;
 
 import java.io.Serializable;
-import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -21,13 +20,13 @@ import java.util.Stack;
  */
 public class ContextStack implements Serializable {
 
-    private Stack<Map<String, Serializable>> stack = new Stack<>();
+    private Stack<Context> stack = new Stack<>();
 
-    public void pushContext(Map<String, Serializable> newContext){
+    public void pushContext(Context newContext){
         stack.push(newContext);
     }
 
-    public Map<String, Serializable> popContext(){
+    public Context popContext(){
         if(stack.empty())
             return null;
         return stack.pop();

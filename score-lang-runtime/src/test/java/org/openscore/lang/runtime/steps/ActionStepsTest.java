@@ -14,7 +14,7 @@ import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import org.openscore.lang.runtime.env.ReturnValues;
 import org.openscore.lang.runtime.env.RunEnvironment;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.openscore.api.execution.ExecutionParametersConsts;
 import org.openscore.events.ScoreEvent;
 import org.openscore.lang.ExecutionRuntimeServices;
@@ -74,7 +74,7 @@ public class ActionStepsTest {
 
         //extract actual outputs
         ReturnValues actualReturnValues = runEnv.removeReturnValues();
-        Map<String, String> actualOutputs = actualReturnValues.getOutputs();
+        Map<String, Serializable> actualOutputs = actualReturnValues.getOutputs();
 
         //verify matching
         Assert.assertEquals("Java action outputs are not as expected", expectedOutputs, actualOutputs);
@@ -226,7 +226,7 @@ public class ActionStepsTest {
 
         //extract actual outputs
         ReturnValues actualReturnValues = runEnv.removeReturnValues();
-        Map<String, String> actualOutputs = actualReturnValues.getOutputs();
+        Map<String, Serializable> actualOutputs = actualReturnValues.getOutputs();
 
         //verify matching
         Assert.assertEquals("Java action outputs are not as expected", expectedOutputs, actualOutputs);
@@ -244,6 +244,22 @@ public class ActionStepsTest {
 
         //invoke doAction
         actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(), "doJavaNumberAsString", executionRuntimeServicesMock, null, 2L);
+    }
+
+    @Test
+    public void doJavaActionParameterAndReturnTypeInteger() {
+        //prepare doAction arguments
+        RunEnvironment runEnv = new RunEnvironment();
+        Map<String, Serializable> initialCallArguments = new HashMap<>();
+        initialCallArguments.put("port", 5);
+        runEnv.putCallArguments(initialCallArguments);
+
+        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
+
+        //invoke doAction
+        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(), "doJavaNumbersAction", executionRuntimeServicesMock, null, 2L);
+        ReturnValues returnValues = runEnv.removeReturnValues();
+        Assert.assertEquals(5, returnValues.getOutputs().get("port"));
     }
 
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
@@ -265,7 +281,7 @@ public class ActionStepsTest {
 
         //extract actual outputs
         ReturnValues actualReturnValues = runEnv.removeReturnValues();
-        Map<String, String> actualOutputs = actualReturnValues.getOutputs();
+        Map<String, Serializable> actualOutputs = actualReturnValues.getOutputs();
 
         //verify matching
         Assert.assertEquals("Java action output should be empty map", expectedOutputs, actualOutputs);
@@ -290,7 +306,7 @@ public class ActionStepsTest {
 
         //extract actual outputs
         ReturnValues actualReturnValues = runEnv.removeReturnValues();
-        Map<String, String> actualOutputs = actualReturnValues.getOutputs();
+        Map<String, Serializable> actualOutputs = actualReturnValues.getOutputs();
 
         //verify matching
         Assert.assertEquals("Java action output should be empty map", expectedOutputs, actualOutputs);
@@ -310,7 +326,7 @@ public class ActionStepsTest {
         actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(),
                 "getNameFromNonSerializableSession", executionRuntimeServicesMock, null, 2L);
 
-        Map<String, String> outputs = runEnv.removeReturnValues().getOutputs();
+        Map<String, Serializable> outputs = runEnv.removeReturnValues().getOutputs();
         Assert.assertTrue(outputs.containsKey("name"));
         Assert.assertEquals("John", outputs.get("name"));
     }
@@ -332,7 +348,7 @@ public class ActionStepsTest {
         actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(),
                 "setNameOnNonSerializableSession", executionRuntimeServicesMock, null, 2L);
 
-        Map<String, String> outputs = runEnv.removeReturnValues().getOutputs();
+        Map<String, Serializable> outputs = runEnv.removeReturnValues().getOutputs();
         Assert.assertTrue(outputs.containsKey("name"));
         Assert.assertEquals("David", outputs.get("name"));
     }
@@ -347,7 +363,7 @@ public class ActionStepsTest {
         actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(),
                 "getNameFromNonSerializableSession", executionRuntimeServicesMock, null, 2L);
 
-        Map<String, String> outputs = runEnv.removeReturnValues().getOutputs();
+        Map<String, Serializable> outputs = runEnv.removeReturnValues().getOutputs();
         Assert.assertTrue(outputs.containsKey("name"));
         Assert.assertNull(outputs.get("name"));
     }
@@ -368,7 +384,7 @@ public class ActionStepsTest {
         actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, ContentTestActions.class.getName(),
                 "getNameFromSerializableSession", executionRuntimeServicesMock, null, 2L);
 
-        Map<String, String> outputs = runEnv.removeReturnValues().getOutputs();
+        Map<String, Serializable> outputs = runEnv.removeReturnValues().getOutputs();
         Assert.assertTrue(outputs.containsKey("name"));
         Assert.assertEquals("John", outputs.get("name"));
     }
@@ -386,7 +402,7 @@ public class ActionStepsTest {
         actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, ContentTestActions.class.getName(),
                 "getNameFromSerializableSession", executionRuntimeServicesMock, null, 2L);
 
-        Map<String, String> outputs = runEnv.removeReturnValues().getOutputs();
+        Map<String, Serializable> outputs = runEnv.removeReturnValues().getOutputs();
         Assert.assertTrue(outputs.containsKey("name"));
         Assert.assertNull(outputs.get("name"));
     }
@@ -406,7 +422,7 @@ public class ActionStepsTest {
         Assert.assertTrue(serializableSessionMap.containsKey("name"));
     }
 
-    @Test(timeout = DEFAULT_TIMEOUT)
+    @Test
     public void doActionPythonTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
@@ -432,16 +448,16 @@ public class ActionStepsTest {
         actionSteps.doAction(runEnv, nonSerializableExecutionData, PYTHON, "", "", executionRuntimeServicesMock, userPythonScript, 2L);
 
         //construct expected outputs
-        Map<String, String> expectedOutputs = new HashMap<>();
+        Map<String, Serializable> expectedOutputs = new HashMap<>();
         expectedOutputs.put("host", "localhost");
-        expectedOutputs.put("port", "8081");
+        expectedOutputs.put("port", 8081);
         expectedOutputs.put("url", "http://localhost:8080");
         expectedOutputs.put("url2", "http://localhost:8080/oo");
         expectedOutputs.put("another", "just a string");
 
         //extract actual outputs
         ReturnValues actualReturnValues = runEnv.removeReturnValues();
-        Map<String, String> actualOutputs = actualReturnValues.getOutputs();
+        Map<String, Serializable> actualOutputs = actualReturnValues.getOutputs();
 
         //verify matching
         Assert.assertEquals("Python action outputs are not as expected", expectedOutputs, actualOutputs);

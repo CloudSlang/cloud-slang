@@ -7,13 +7,10 @@
 
 namespace: user.ops
 
-imports:
-  props: test.sys.props
-
 operation:
   name: test_op
   inputs:
     - alla:
-        system_property: props.alla
+        system_property: user.sys.props.alla
   action:
     python_script: 'print "hello world"'

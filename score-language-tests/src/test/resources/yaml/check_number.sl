@@ -7,9 +7,6 @@
 
 namespace: user.ops
 
-imports:
-  props: test.sys.props
-
 operation:
   name: check_number
   inputs:
@@ -22,6 +19,6 @@ operation:
   outputs:
     - preprocessed_number: str(int(fromInputs['number']) * 3)
   results:
-    - EVEN: isEven == 'True' and tooBig == 'False'
-    - ODD: isEven == 'False' and tooBig == 'False'
+    - EVEN: isEven and not tooBig
+    - ODD: not(isEven or tooBig)
     - FAILURE # report failure if the number is too big

@@ -13,15 +13,15 @@ imports:
 flow:
   name: child_flow
   workflow:
-    CheckWeather:
-      do:
-        ops.test_op:
-          - city: "'input_1'"
-      publish:
-        - weather
-      navigate:
-        SUCCESS: SUCCESS
-        FAILURE: FAILURE
+    - CheckWeather:
+        do:
+          ops.test_op:
+            - city: "'input_1'"
+        publish:
+          - weather
+        navigate:
+          SUCCESS: SUCCESS
+          FAILURE: FAILURE
   results:
     - SUCCESS
     - FAILURE

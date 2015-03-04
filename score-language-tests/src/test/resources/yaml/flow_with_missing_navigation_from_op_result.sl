@@ -13,9 +13,9 @@ flow:
   name: basic_flow
 
   workflow:
-    Task1:
-      do:
-        ops.print_custom_result_op:
+    - Task1:
+        do:
+          ops.print_custom_result_op:
 
   results:
     - SUCCESS

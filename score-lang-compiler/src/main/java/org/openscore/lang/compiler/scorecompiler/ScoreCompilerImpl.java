@@ -9,7 +9,8 @@
 package org.openscore.lang.compiler.scorecompiler;
 
 import ch.lambdaj.function.convert.Converter;
-import org.apache.commons.collections4.MapUtils;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
 import org.openscore.api.ExecutionPlan;
 import org.openscore.lang.compiler.SlangTextualKeys;
@@ -17,12 +18,18 @@ import org.openscore.lang.compiler.modeller.DependenciesHelper;
 import org.openscore.lang.compiler.modeller.model.Executable;
 import org.openscore.lang.compiler.modeller.model.Flow;
 import org.openscore.lang.compiler.modeller.model.Operation;
+import org.openscore.lang.compiler.modeller.model.Task;
 import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.entities.bindings.Input;
+import org.openscore.lang.entities.bindings.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +39,6 @@ import static ch.lambdaj.Lambda.convertMap;
 /*
  * Created by stoneo on 2/2/2015.
  */
-
 @Component
 public class ScoreCompilerImpl implements ScoreCompiler{
 
@@ -47,7 +53,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
 
         Map<String, Executable> filteredDependencies = new HashMap<>();
         //we handle dependencies only if the file has imports
-        boolean hasDependencies = MapUtils.isNotEmpty(executable.getDependencies())
+        boolean hasDependencies = CollectionUtils.isNotEmpty(executable.getDependencies())
                 && executable.getType().equals(SlangTextualKeys.FLOW_TYPE);
         if (hasDependencies) {
             Validate.notEmpty(path, "Source " + executable.getName() + " has dependencies but no path was given to the compiler");
@@ -59,6 +65,9 @@ public class ScoreCompilerImpl implements ScoreCompiler{
 
             //than we match the references to the actual dependencies
             filteredDependencies = dependenciesHelper.matchReferences(executable, availableExecutables);
+
+            // Validate that all the tasks of a flow have navigations for all the reference's results
+            validateAllDependenciesResultsHaveMatchingNavigations(executable, filteredDependencies);
         }
 
         //next we create an execution plan for the required executable
@@ -71,8 +80,42 @@ public class ScoreCompilerImpl implements ScoreCompiler{
                 return compileToExecutionPlan(compiledExecutable);
             }
         });
+        Collection<Executable> executables = new ArrayList<>(filteredDependencies.values());
+        executables.add(executable);
+        executionPlan.setSubflowsUUIDs(new HashSet<>(dependencies.keySet()));
+        return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemProperties(executables));
+    }
 
-        return new CompilationArtifact(executionPlan, dependencies, executable.getInputs());
+    /**
+     * Validate that for all the tasks in the flow, all results from the referenced operation or flow have matching navigations
+     * If the given {@link org.openscore.lang.compiler.modeller.model.Executable} is an operation, the method does nothing
+     * Throws {@link java.lang.IllegalArgumentException} if:
+     *      - Any reference of the executable is missing
+     *      - There is a missing navigation for one of the tasks' references' results
+     *
+     * @param executable the flow to validate
+     * @param filteredDependencies a map holding for each reference name, its {@link org.openscore.lang.compiler.modeller.model.Executable} object
+     */
+    private void validateAllDependenciesResultsHaveMatchingNavigations(Executable executable, Map<String, Executable> filteredDependencies) {
+        if(executable.getType().equals(SlangTextualKeys.OPERATION_TYPE)){
+            return;
+        }
+        Flow flow = (Flow)executable;
+        Deque<Task> tasks = flow.getWorkflow().getTasks();
+        for(Task task : tasks){
+            Map<String, String> taskNavigations = task.getNavigationStrings();
+            String refId = task.getRefId();
+            Executable reference = filteredDependencies.get(refId);
+            Validate.notNull(reference, "Cannot compile flow: \'" + executable.getName() + "\' since for task: \'" + task.getName()
+                                        + "\', the dependency: \'" + refId + "\' is missing.");
+            List<Result> refResults = reference.getResults();
+            for(Result result : refResults){
+                String resultName = result.getName();
+                Validate.isTrue(taskNavigations.containsKey(resultName), "Cannot compile flow: \'" + executable.getName() +
+                                                "\' since for task: '" + task.getName() + "\', the result \'" + resultName+
+                                                "\' of its dependency: \'"+ refId + "\' has no matching navigation");
+            }
+        }
     }
 
     /**
@@ -93,4 +136,26 @@ public class ScoreCompilerImpl implements ScoreCompiler{
                 throw new RuntimeException("Executable: " + executable.getName() + " cannot be compiled to an ExecutionPlan since it is not a flow and not an operation");
         }
     }
+
+	private static Collection<Input> getSystemProperties(Collection<Executable> executables) {
+		Collection<Input> result = new ArrayList<>();
+		for(Executable executable : executables) {
+			result.addAll(getSystemProperties(executable.getInputs()));
+			if(executable instanceof Flow) {
+				for(Task task : ((Flow)executable).getWorkflow().getTasks()) {
+					result.addAll(getSystemProperties(task.getInputs()));
+				}
+			}
+		}
+		return result;
+	}
+
+	private static Collection<Input> getSystemProperties(List<Input> inputs) {
+		Collection<Input> result = new ArrayList<>();
+		for(Input input : inputs) {
+			if(input.getSystemPropertyName() != null) result.add(input);
+		}
+		return result;
+	}
+
 }

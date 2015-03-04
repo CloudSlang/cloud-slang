@@ -41,9 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.same;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -65,18 +63,12 @@ public class ExecutionPlanBuilderTest {
         return createSimpleCompiledTask(taskName, navigationStrings);
     }
 
-    private Task createSimpleCompiledTask(String taskName, Map<String, String> navigationStrings) {
-        Map<String, Serializable> preTaskActionData = new HashMap<>();
-        Map<String, Serializable> postTaskActionData = new HashMap<>();
-        String refId = "refId";
-        return new Task(
-                taskName,
-                preTaskActionData,
-                postTaskActionData,
-                navigationStrings,
-                refId
-        );
-    }
+	private Task createSimpleCompiledTask(String taskName, Map<String, String> navigationStrings) {
+		Map<String, Serializable> preTaskActionData = new HashMap<>();
+		Map<String, Serializable> postTaskActionData = new HashMap<>();
+		String refId = "refId";
+		return new Task(taskName, preTaskActionData, postTaskActionData, null, navigationStrings, refId);
+	}
 
     private List<Result> defaultFlowResults() {
         List<Result> results = new ArrayList<>();
@@ -110,7 +102,7 @@ public class ExecutionPlanBuilderTest {
         Map<String, Serializable> preTaskActionData = task.getPreTaskActionData();
         String refId = task.getRefId();
         String name = task.getName();
-        when(stepFactory.createBeginTaskStep(eq(stepId), same(preTaskActionData), same(refId), same(name))).thenReturn(new ExecutionStep(stepId));
+        when(stepFactory.createBeginTaskStep(eq(stepId), anyListOf(Input.class), same(preTaskActionData), same(refId), same(name))).thenReturn(new ExecutionStep(stepId));
     }
 
     @Test

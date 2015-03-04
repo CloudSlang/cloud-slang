@@ -7,7 +7,7 @@
 namespace: org.openscore
 
 flow:
-  name: task_list_of_do
+  name: task_with_list_of_do_flow
   workflow:
-    task1:
-      - do:
+    - task1:
+        - do:

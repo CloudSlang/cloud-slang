@@ -10,10 +10,10 @@ imports:
   opertions: org.openscore
 
 flow:
-  name: inputs_type_string
+  name: inputs_type_string_flow
   inputs:
     input1
   workflow:
-    task1:
-      do:
-        ops.op1:
+    - task1:
+        do:
+          ops.op1:

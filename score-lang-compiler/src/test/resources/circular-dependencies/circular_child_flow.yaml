@@ -13,6 +13,6 @@ imports:
 flow:
   name: child_flow
   workflow:
-    CheckWeather:
-      do:
-        flows.parent_flow:
+    - CheckWeather:
+        do:
+          flows.parent_flow:

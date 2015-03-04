@@ -7,9 +7,6 @@
 
 namespace: user.ops
 
-imports:
-  props: test.sys.props
-
 operation:
   name: set_global_session_object
   inputs:
@@ -18,5 +15,3 @@ operation:
     java_action:
       className: org.openscore.lang.systemtests.actions.LangTestActions
       methodName: setConnectionOnNonSerializableSession
-  outputs:
-    - session_object_value: value

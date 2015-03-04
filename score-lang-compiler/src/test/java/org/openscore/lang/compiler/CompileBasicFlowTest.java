@@ -15,7 +15,6 @@ import org.openscore.api.ExecutionPlan;
 import org.openscore.api.ExecutionStep;
 import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
 import org.openscore.lang.compiler.modeller.model.Executable;
-import org.openscore.lang.compiler.modeller.model.SlangFileType;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.ScoreLangConstants;
@@ -26,9 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.Serializable;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +54,7 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());
         Assert.assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
         Assert.assertEquals("the inputs size is not as expected", 2, compilationArtifact.getInputs().size());
+        Assert.assertEquals("the system properties size is not as expected", 3, compilationArtifact.getSystemProperties().size());
     }
 
     @Test
@@ -124,23 +122,10 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("There is a different number of flow inputs than expected", 2, flow.getInputs().size());
         Assert.assertEquals("There is a different number of flow outputs than expected", 0, flow.getOutputs().size());
         Assert.assertEquals("There is a different number of flow results than expected", 2, flow.getResults().size());
-        Map<String, SlangFileType> dependencies = flow.getDependencies();
+        Set<String> dependencies = flow.getDependencies();
         Assert.assertEquals("There is a different number of flow dependencies than expected", 1, dependencies.size());
-        Map.Entry<String, SlangFileType> dependency = dependencies.entrySet().iterator().next();
-        Assert.assertEquals("There is a different number of flow inputs than expected", SlangFileType.EXECUTABLE, dependency.getValue());
-        Assert.assertEquals("The flow dependency full name is wrong", "user.ops.test_op", dependency.getKey());
+        String dependency = dependencies.iterator().next();
+        Assert.assertEquals("The flow dependency full name is wrong", "user.ops.test_op", dependency);
     }
-
-	@Test
-	public void testLoadSystemProperties() throws Exception {
-		Map<String, Serializable> expected = new HashMap<>();
-		expected.put("test.sys.props.host", "localhost");
-		expected.put("test.sys.props.port", 22);
-		expected.put("test.sys.props.alla", "balla");
-		URI systemProperties = getClass().getResource("/system_properties.yaml").toURI();
-		Map<String, ? extends Serializable> result = compiler.loadSystemProperties(SlangSource.fromFile(systemProperties));
-		Assert.assertNotNull(result);
-		Assert.assertEquals(expected, result);
-	}
 
 }
