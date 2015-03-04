@@ -75,6 +75,11 @@
             <artifactId>score-http-client</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>io.openscore.content</groupId>
+            <artifactId>score-social-networks</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
 		<!-- test -->
 		<dependency>
