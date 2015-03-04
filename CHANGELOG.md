@@ -9,6 +9,7 @@
 	+ System Properties - Inputs can declare a `system_property` property to receive values from a system properties file. 
 + DSL improvements
 	+ Outputs - Support all serializable types, not just strings.
+	+ Python - Support 3rd party Python libraries.
 + DSL syntax changes
 	+ Operations - Aligned to flow structure with one operation per file and `name` property 
 	+ Tasks - Changed from maps to list of tasks.
