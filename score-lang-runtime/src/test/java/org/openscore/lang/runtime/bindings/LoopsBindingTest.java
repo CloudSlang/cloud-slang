@@ -1,5 +1,6 @@
 package org.openscore.lang.runtime.bindings;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -8,7 +9,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openscore.lang.entities.ForLoopStatement;
+import org.openscore.lang.entities.ListForLoopStatement;
 import org.openscore.lang.runtime.env.Context;
+import org.openscore.lang.runtime.env.ForLoopCondition;
+import org.openscore.lang.runtime.env.LoopCondition;
+import org.python.core.PyInteger;
+import org.python.core.PyString;
+import org.python.core.PyTuple;
 
 import javax.script.ScriptEngine;
 import java.io.Serializable;
@@ -37,7 +44,7 @@ public class LoopsBindingTest {
     private ScriptEngine scriptEngine;
 
     private ForLoopStatement createBasicForStatement() {
-        return new ForLoopStatement("x", "[1]");
+        return new ListForLoopStatement("x", "[1]");
     }
 
     @Test
@@ -48,7 +55,7 @@ public class LoopsBindingTest {
         HashMap<String, Serializable> langVars = new HashMap<>();
         when(context.getLangVariables()).thenReturn(langVars);
         loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, "node");
-//        Assert.assertEquals(true, true);
+        Assert.assertEquals(true, context.getLangVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
     }
 
     @Test(expected = RuntimeException.class)
@@ -67,11 +74,42 @@ public class LoopsBindingTest {
 
     @Test
     public void whenValueIsThereItWillBeReturned() throws Exception {
-
+        Context context = mock(Context.class);
+        when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Serializable.class)))
+                .thenReturn(new ArrayList<>());
+        HashMap<String, Serializable> langVars = new HashMap<>();
+        ForLoopCondition forLoopCondition = mock(ForLoopCondition.class);
+        langVars.put(LoopCondition.LOOP_CONDITION_KEY, forLoopCondition);
+        when(context.getLangVariables()).thenReturn(langVars);
+        loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, "node");
+        Assert.assertEquals(true, context.getLangVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
+        Assert.assertEquals(forLoopCondition, context.getLangVariables().get(LoopCondition.LOOP_CONDITION_KEY));
     }
 
     @Test
-    public void testIncrementForLoop() throws Exception {
+    public void testIncrementListForLoop() throws Exception {
+        Serializable nextValue = "1";
+        Context context = mock(Context.class);
+        ForLoopCondition forLoopCondition = mock(ForLoopCondition.class);
+        when(forLoopCondition.next()).thenReturn(nextValue);
 
+        loopsBinding.incrementListForLoop("varName", context, forLoopCondition);
+
+        verify(forLoopCondition).next();
+        verify(context).putVariable("varName", nextValue);
+    }
+
+    @Test
+    public void testIncrementMapForLoop() throws Exception {
+        PyTuple tuple = new PyTuple(new PyString("john"), new PyInteger(1));
+        Context context = mock(Context.class);
+        ForLoopCondition forLoopCondition = mock(ForLoopCondition.class);
+        when(forLoopCondition.next()).thenReturn(tuple);
+
+        loopsBinding.incrementMapForLoop("k", "v", context, forLoopCondition);
+
+        verify(forLoopCondition).next();
+        verify(context).putVariable("k", "john");
+        verify(context).putVariable("v", 1);
     }
 }
