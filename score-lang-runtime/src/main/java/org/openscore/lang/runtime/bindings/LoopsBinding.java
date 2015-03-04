@@ -12,6 +12,7 @@ package org.openscore.lang.runtime.bindings;
 import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
 import org.openscore.lang.entities.ForLoopStatement;
+import org.openscore.lang.entities.MapForLoopStatement;
 import org.openscore.lang.runtime.env.Context;
 import org.openscore.lang.runtime.env.ForLoopCondition;
 import org.openscore.lang.runtime.env.LoopCondition;
@@ -45,8 +46,7 @@ public class LoopsBinding {
 
         Map<String, Serializable> langVariables = flowContext.getLangVariables();
         if (!langVariables.containsKey(LOOP_CONDITION_KEY)) {
-            LoopCondition loopCondition = createForLoopCondition(
-                    forLoopStatement.getCollectionExpression(), flowContext, nodeName, forLoopStatement.getType());
+            LoopCondition loopCondition = createForLoopCondition(forLoopStatement, flowContext, nodeName);
             langVariables.put(LOOP_CONDITION_KEY, loopCondition);
         }
         return (LoopCondition) langVariables.get(LOOP_CONDITION_KEY);
@@ -78,10 +78,23 @@ public class LoopsBinding {
         logger.debug("value name: " + keyName + ", value: " + valueFromIteration);
     }
 
-    private LoopCondition createForLoopCondition(String collectionExpression, Context flowContext, String nodeName, ForLoopStatement.Type type) {
+    private LoopCondition createForLoopCondition(ForLoopStatement forLoopStatement, Context flowContext, String nodeName) {
         Map<String, Serializable> variables = flowContext.getImmutableViewOfVariables();
-        Serializable evalResult = scriptEvaluator.evalExpr(collectionExpression, variables);
-        ForLoopCondition forLoopCondition = createForLoopCondition(evalResult, collectionExpression, type);
+        Serializable evalResult;
+        String collectionExpression = forLoopStatement.getCollectionExpression();
+        try {
+            evalResult = scriptEvaluator.evalExpr(collectionExpression, variables);
+        } catch (Throwable t) {
+            throw new RuntimeException("Error evaluating for loop expression in task '" + nodeName + "', error is: \n" + t.getMessage(), t);
+        }
+
+        if ((forLoopStatement instanceof MapForLoopStatement) && !(evalResult instanceof PyList)) {
+            throw new RuntimeException(
+                    "Invalid expression for iterating maps: " + collectionExpression
+                    + "\nValid format is: map.items()");
+        }
+
+        ForLoopCondition forLoopCondition = createForLoopCondition(evalResult);
         if (forLoopCondition == null) {
             throw new RuntimeException("collection expression: '" + collectionExpression + "' in the 'for' loop " +
                     "in task: '" + nodeName + "' " +
@@ -90,14 +103,8 @@ public class LoopsBinding {
         return forLoopCondition;
     }
 
-    private ForLoopCondition createForLoopCondition(Serializable loopCollection, String collectionExpression, ForLoopStatement.Type type){
+    private ForLoopCondition createForLoopCondition(Serializable loopCollection){
         Iterator<? extends Serializable> iterator;
-
-        if (type.equals(ForLoopStatement.Type.MAP) && !(loopCollection instanceof PyList)) {
-            throw new RuntimeException(
-                    "Invalid expression for iterating maps: " + collectionExpression
-                    + "\nValid format is: map.items()");
-        }
 
         if (loopCollection instanceof Iterable) {
             Iterable<Serializable> serializableIterable = (Iterable<Serializable>) loopCollection;

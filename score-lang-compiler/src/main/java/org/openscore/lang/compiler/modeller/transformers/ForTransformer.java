@@ -11,6 +11,8 @@ package org.openscore.lang.compiler.modeller.transformers;
 
 import org.apache.commons.lang.StringUtils;
 import org.openscore.lang.entities.ForLoopStatement;
+import org.openscore.lang.entities.ListForLoopStatement;
+import org.openscore.lang.entities.MapForLoopStatement;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -44,7 +46,7 @@ public class ForTransformer implements Transformer<String, ForLoopStatement>{
             // case: value in variable_name
             varName = matcherSimpleFor.group(2);
             collectionExpression = matcherSimpleFor.group(4);
-            forLoopStatement = new ForLoopStatement(varName, collectionExpression, ForLoopStatement.Type.LIST);
+            forLoopStatement = new ListForLoopStatement(varName, collectionExpression);
         } else {
             String beforeInKeyword = StringUtils.substringBefore(rawData, FOR_IN_KEYWORD);
             collectionExpression = StringUtils.substringAfter(rawData, FOR_IN_KEYWORD).trim();
@@ -53,21 +55,21 @@ public class ForTransformer implements Transformer<String, ForLoopStatement>{
             Matcher matcherKeyValueFor = regexKeyValueFor.matcher(beforeInKeyword);
 
             if (matcherKeyValueFor.find()) {
-                // case: (key value)
+                // case: key, value
                 String keyName = matcherKeyValueFor.group(2);
                 String valueName = matcherKeyValueFor.group(6);
 
-                forLoopStatement = new ForLoopStatement(
-                        keyName + ForLoopStatement.KEY_VALUE_DELIMITER + valueName,
-                        collectionExpression,
-                        ForLoopStatement.Type.MAP);
+                forLoopStatement = new MapForLoopStatement(
+                        keyName,
+                        valueName,
+                        collectionExpression);
             } else {
                 // case: value in expression_other_than_variable_name
                 varName = beforeInKeyword.trim();
                 if (isContainInvalidChars(varName)) {
                     throw new RuntimeException("for loop var name cannot contain invalid chars");
                 }
-                forLoopStatement = new ForLoopStatement(varName, collectionExpression, ForLoopStatement.Type.LIST);
+                forLoopStatement = new ListForLoopStatement(varName, collectionExpression);
             }
         }
 

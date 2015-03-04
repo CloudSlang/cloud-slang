@@ -10,12 +10,13 @@
 package org.openscore.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openscore.api.execution.ExecutionParametersConsts;
 import org.openscore.lang.ExecutionRuntimeServices;
 import org.openscore.lang.entities.ForLoopStatement;
+import org.openscore.lang.entities.ListForLoopStatement;
+import org.openscore.lang.entities.MapForLoopStatement;
 import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
@@ -96,14 +97,16 @@ public class TaskSteps extends AbstractSteps {
 
                 if (loopCondition instanceof ForLoopCondition) {
                     ForLoopCondition forLoopCondition = (ForLoopCondition) loopCondition;
-                    String varName = loop.getVarName();
 
-                    if (loop.getType().equals(ForLoopStatement.Type.LIST)) {
+                    if (loop instanceof ListForLoopStatement) {
+                        // normal iteration
+                        String varName = ((ListForLoopStatement) loop).getVarName();
                         loopsBinding.incrementListForLoop(varName, flowContext, forLoopCondition);
                     } else {
-                        String[] varNames = StringUtils.split(varName, ForLoopStatement.KEY_VALUE_DELIMITER);
-                        String keyName = varNames[0];
-                        String valueName = varNames[1];
+                        // map iteration
+                        MapForLoopStatement mapForLoopStatement = (MapForLoopStatement) loop;
+                        String keyName = mapForLoopStatement.getKeyName();
+                        String valueName = mapForLoopStatement.getValueName();
                         loopsBinding.incrementMapForLoop(keyName, valueName, flowContext, forLoopCondition);
                     }
                 }

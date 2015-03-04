@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openscore.lang.entities.ForLoopStatement;
+import org.openscore.lang.entities.ListForLoopStatement;
 import org.openscore.lang.runtime.env.Context;
 import org.openscore.lang.runtime.env.ForLoopCondition;
 import org.openscore.lang.runtime.env.LoopCondition;
@@ -43,7 +44,7 @@ public class LoopsBindingTest {
     private ScriptEngine scriptEngine;
 
     private ForLoopStatement createBasicForStatement() {
-        return new ForLoopStatement("x", "[1]", ForLoopStatement.Type.LIST);
+        return new ListForLoopStatement("x", "[1]");
     }
 
     @Test
