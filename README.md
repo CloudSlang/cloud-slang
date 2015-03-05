@@ -3,7 +3,7 @@ score-language (Slang)
 
 Slang is a YAML based language for writing human-readable workflows for score. This project includes the CLI to trigger flows.
 
-[![Build Status](https://travis-ci.org/openscore/score-language.svg)](https://travis-ci.org/openscore/score-language)
+[![Build Status](https://travis-ci.org/openscore/score-language.svg?branch=master)](https://travis-ci.org/openscore/score-language)
 
 #### Getting started:
 
