@@ -11,7 +11,7 @@ http://www.apache.org/licenses/LICENSE-2.0
     <parent>
         <artifactId>score-language</artifactId>
         <groupId>io.openscore.lang</groupId>
-        <version>0.1.16</version>
+        <version>0.1.17-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
