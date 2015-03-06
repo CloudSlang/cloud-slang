@@ -10,7 +10,7 @@
     -->
     <groupId>io.openscore.lang</groupId>
     <artifactId>score-language</artifactId>
-    <version>0.1.14-SNAPSHOT</version>
+    <version>0.1.17-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A DSL for writing flows</description>
@@ -33,7 +33,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <score.group>io.openscore</score.group>
-        <score.version>0.1.251</score.version>
+        <score.version>0.1.266</score.version>
         <spring.version>4.0.8.RELEASE</spring.version>
     </properties>
 
@@ -152,7 +152,7 @@
             <dependency>
                 <groupId>com.hp.score.sdk</groupId>
                 <artifactId>score-content-sdk</artifactId>
-                <version>1.5</version>
+                <version>1.10.6</version>
             </dependency>
             <!--end of score dependencies-->
 
@@ -160,17 +160,17 @@
             <dependency>
                 <groupId>io.openscore.content</groupId>
                 <artifactId>score-ssh</artifactId>
-                <version>0.0.20</version>
+                <version>0.0.22</version>
             </dependency>
             <dependency>
                 <groupId>io.openscore.content</groupId>
                 <artifactId>score-mail</artifactId>
-                <version>0.0.6</version>
+                <version>0.0.10</version>
             </dependency>
             <dependency>
                 <groupId>io.openscore.content</groupId>
                 <artifactId>score-http-client</artifactId>
-                <version>0.1.44</version>
+                <version>0.1.57</version>
             </dependency>
             <!--end of score content dependencies-->
 

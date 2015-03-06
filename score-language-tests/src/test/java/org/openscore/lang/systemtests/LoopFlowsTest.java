@@ -61,10 +61,6 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Assert.assertEquals("print_other_values", thirdTask.getName());
     }
 
-    private List<String> getTasksOnly(Map<String, StepData> stepsData) {
-        return filter(not(endsWith(ExecutionPath.PATH_SEPARATOR + "0")), stepsData.keySet());
-    }
-
     @Test
     public void testFlowWithLoopsWithDefaultBreak() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/loop_with_default_break.sl").toURI();
@@ -110,4 +106,84 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Assert.assertEquals("print_other_values", thirdTask.getName());
     }
 
+    @Test
+    public void testFlowWithMapLoops() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/simple_loop_with_map.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/print.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null);
+        StepData firstTask = stepsData.get(FIRST_STEP_PATH);
+        StepData secondTask = stepsData.get(SECOND_STEP_KEY);
+        StepData thirdTask = stepsData.get(THIRD_STEP_KEY);
+        Assert.assertTrue(firstTask.getInputs().containsValue(1));
+        Assert.assertTrue(secondTask.getInputs().containsValue(2));
+        Assert.assertTrue(thirdTask.getInputs().containsValue("three"));
+    }
+
+    @Test
+    public void testFlowWithMapLoopsWithCustomNavigation() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/loop_with_custom_navigation_with_map.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/print.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null);
+        StepData thirdTask = stepsData.get(FOURTH_STEP_KEY);
+        Assert.assertEquals("print_other_values", thirdTask.getName());
+    }
+
+    @Test
+    public void testFlowWithMapLoopsWithDefaultBreak() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/loop_with_default_break_with_map.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/operation_that_fails_when_value_is_2.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null);
+        List<String> actualTasks = getTasksOnly(stepsData);
+        Assert.assertEquals(2, actualTasks.size());
+    }
+
+    @Test
+    public void testFlowWithMapLoopsWithEmptyBreak() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/loop_with_empty_break_with_map.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/operation_that_fails_when_value_is_2.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null);
+        List<String> actualTasks = getTasksOnly(stepsData);
+        Assert.assertEquals(3, actualTasks.size());
+    }
+
+    @Test
+    public void testFlowWithMapLoopsWithBreak() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/loop_with_break_with_map.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/operation_that_goes_to_custom_when_value_is_2.sl").toURI();
+        URI operation2 = getClass().getResource("/yaml/loops/print.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null);
+        List<String> actualTasks = getTasksOnly(stepsData);
+        Assert.assertEquals(3, actualTasks.size());
+        StepData thirdTask = stepsData.get(THIRD_STEP_KEY);
+        Assert.assertEquals("print_other_values", thirdTask.getName());
+    }
+
+    private List<String> getTasksOnly(Map<String, StepData> stepsData) {
+        return filter(not(endsWith(ExecutionPath.PATH_SEPARATOR + "0")), stepsData.keySet());
+    }
 }

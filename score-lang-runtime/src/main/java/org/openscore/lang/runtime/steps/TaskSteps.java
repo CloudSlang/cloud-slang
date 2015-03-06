@@ -15,6 +15,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.openscore.api.execution.ExecutionParametersConsts;
 import org.openscore.lang.ExecutionRuntimeServices;
 import org.openscore.lang.entities.ForLoopStatement;
+import org.openscore.lang.entities.ListForLoopStatement;
+import org.openscore.lang.entities.MapForLoopStatement;
 import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
@@ -94,7 +96,19 @@ public class TaskSteps extends AbstractSteps {
                 }
 
                 if (loopCondition instanceof ForLoopCondition) {
-                    loopsBinding.incrementForLoop(loop.getVarName(), flowContext, (ForLoopCondition) loopCondition);
+                    ForLoopCondition forLoopCondition = (ForLoopCondition) loopCondition;
+
+                    if (loop instanceof ListForLoopStatement) {
+                        // normal iteration
+                        String varName = ((ListForLoopStatement) loop).getVarName();
+                        loopsBinding.incrementListForLoop(varName, flowContext, forLoopCondition);
+                    } else {
+                        // map iteration
+                        MapForLoopStatement mapForLoopStatement = (MapForLoopStatement) loop;
+                        String keyName = mapForLoopStatement.getKeyName();
+                        String valueName = mapForLoopStatement.getValueName();
+                        loopsBinding.incrementMapForLoop(keyName, valueName, flowContext, forLoopCondition);
+                    }
                 }
             }
 
