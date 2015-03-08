@@ -22,7 +22,7 @@ When a pull request fails testing, the author is expected to update the pull req
 At least one review from a maintainer is required for all patches (even patches from maintainers).
 
 
-## Developer’s Certificate of Origin
+## Developer's Certificate of Origin
 
 All contributions must include acceptance of the DCO:
 
@@ -74,7 +74,9 @@ For legal reasons, no anonymous or pseudonymous contributions are accepted.
 We encourage and support contributions from the community. No fix is too small. We strive to process all pull requests as soon as possible and with constructive feedback. If your pull request is not accepted at first, please try again after addressing the feedback you received.
 To make a pull request you will need a GitHub account. For help, see GitHub's documentation on forking and pull requests. (https://help.github.com/articles/using-pull-requests/ )
 
-Normally, all pull requests must include tests that test your change. Occasionally, a change will be very difficult to test. In those cases, please include a note in your commit message explaining why tests are not included.
+Pull requests that fix bugs or introduce new features must include tests that test your change in addition to passing all current tests. Please do not submit pull requests if tests fail. See existing tests for examples of how to properly compose your own tests. 
+
+Occasionally, a change will be very difficult to test. In those cases, please include a detailed note in your commit message explaining why tests are not included.
 
 
 ##Conduct
