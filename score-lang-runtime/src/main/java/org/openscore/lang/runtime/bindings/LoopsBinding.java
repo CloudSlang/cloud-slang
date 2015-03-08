@@ -24,8 +24,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -104,22 +102,20 @@ public class LoopsBinding {
     }
 
     private ForLoopCondition createForLoopCondition(Serializable loopCollection){
-        Iterator<? extends Serializable> iterator;
+        Iterable<? extends Serializable> iterable;
 
         if (loopCollection instanceof Iterable) {
-            Iterable<Serializable> serializableIterable = (Iterable<Serializable>) loopCollection;
-            iterator = serializableIterable.iterator();
+            iterable = (Iterable<Serializable>) loopCollection;
         } else if (loopCollection instanceof String) {
             String[] strings = ((String) loopCollection).split(Pattern.quote(","));
-            List<String> list = Arrays.asList(strings);
-            iterator = list.iterator();
+            iterable = Arrays.asList(strings);
         } else if (loopCollection instanceof PyObject) {
             PyObject pyObject = (PyObject) loopCollection;
-            iterator = pyObject.asIterable().iterator();
+            iterable = pyObject.asIterable();
         } else {
             return null;
         }
 
-        return new ForLoopCondition(iterator);
+        return new ForLoopCondition(iterable);
     }
 }

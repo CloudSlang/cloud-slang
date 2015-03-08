@@ -13,23 +13,22 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
-import java.util.Iterator;
 
 public class ForLoopCondition implements LoopCondition {
 
-    private final Iterator<? extends Serializable> iterator;
+    private final Iterable<? extends Serializable> iterable;
 
-    public ForLoopCondition(Iterator<? extends Serializable> iterator) {
-        this.iterator = iterator;
+    public ForLoopCondition(Iterable<? extends Serializable> iterable) {
+        this.iterable = iterable;
     }
 
     public Serializable next() {
-        return iterator.next();
+        return iterable.iterator().next();
     }
 
     @Override
     public boolean hasMore() {
-        return iterator.hasNext();
+        return iterable.iterator().hasNext();
     }
 
     @Override
@@ -42,14 +41,14 @@ public class ForLoopCondition implements LoopCondition {
         ForLoopCondition that = (ForLoopCondition) o;
 
         return new EqualsBuilder()
-                .append(this.iterator, that.iterator)
+                .append(this.iterable, that.iterable)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-                .append(iterator)
+                .append(iterable)
                 .toHashCode();
     }
 }

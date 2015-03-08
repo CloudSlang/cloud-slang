@@ -268,7 +268,7 @@ public class TaskStepsTest {
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         when(loopsBinding.getOrCreateLoopCondition(statement, context, nodeName))
-                .thenReturn(new ForLoopCondition(Arrays.asList("1", "2").iterator()));
+                .thenReturn(new ForLoopCondition(Arrays.asList("1", "2")));
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.getStack().pushContext(context);
         taskSteps.beginTask(new ArrayList<Input>(), statement, runEnv, createRuntimeServices(), nodeName, 1L, 2L, "2");
