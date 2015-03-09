@@ -120,7 +120,7 @@ public class NavigationTest extends SystemsTestsParent {
         URI resource = getClass().getResource("/yaml/flow_default_navigation.yaml").toURI();
         URI operationPython = getClass().getResource("/yaml/produce_default_navigation.sl").toURI();
         URI operation2Python = getClass().getResource("/yaml/send_email_mock.sl").toURI();
-        URI operation3Python = getClass().getResource("/yaml/check_Weahther.sl").toURI();
+        URI operation3Python = getClass().getResource("/yaml/check_weather.sl").toURI();
 
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operationPython), SlangSource.fromFile(operation2Python), SlangSource.fromFile(operation3Python));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
@@ -135,7 +135,7 @@ public class NavigationTest extends SystemsTestsParent {
         Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs, null);
 
         Assert.assertEquals("produce_default_navigation", tasks.get(FIRST_STEP_PATH).getName());
-        Assert.assertEquals("check_Weather", tasks.get(SECOND_STEP_KEY).getName());
+        Assert.assertEquals("check_weather", tasks.get(SECOND_STEP_KEY).getName());
     }
 
     @Test
@@ -144,7 +144,7 @@ public class NavigationTest extends SystemsTestsParent {
         URI resource = getClass().getResource("/yaml/flow_default_navigation.yaml").toURI();
         URI operationPython = getClass().getResource("/yaml/produce_default_navigation.sl").toURI();
         URI operation2Python = getClass().getResource("/yaml/send_email_mock.sl").toURI();
-        URI operation3Python = getClass().getResource("/yaml/check_Weahther.sl").toURI();
+        URI operation3Python = getClass().getResource("/yaml/check_weather.sl").toURI();
 
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operationPython), SlangSource.fromFile(operation2Python), SlangSource.fromFile(operation3Python));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);

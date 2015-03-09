@@ -15,12 +15,12 @@ flow:
   inputs:
     - input1: "'value'"
   workflow:
-    - Task0:
+    - task01:
         do:
           ops.get_time_zone:
             - time_zone_as_string:
                 system_property: user.sys.props.port
-    - CheckWeather:
+    - task02:
         do:
           ops.test_op:
   outputs:
