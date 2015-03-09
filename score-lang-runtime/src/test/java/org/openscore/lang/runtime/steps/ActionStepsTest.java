@@ -259,7 +259,8 @@ public class ActionStepsTest {
         //invoke doAction
         actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(), "doJavaNumbersAction", executionRuntimeServicesMock, null, 2L);
         ReturnValues returnValues = runEnv.removeReturnValues();
-        Assert.assertEquals(5, returnValues.getOutputs().get("port"));
+        Assert.assertEquals(5, returnValues.getOutputs()
+                                           .get("port"));
     }
 
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
@@ -442,6 +443,7 @@ public class ActionStepsTest {
                 "another = 'just a string'\n" +
 //                we can also change..
                 "port = 8081\n" +
+                "condition = 1==1\n" +
                 "print url";
 
         //invoke doAction
@@ -454,6 +456,7 @@ public class ActionStepsTest {
         expectedOutputs.put("url", "http://localhost:8080");
         expectedOutputs.put("url2", "http://localhost:8080/oo");
         expectedOutputs.put("another", "just a string");
+        expectedOutputs.put("condition", true);
 
         //extract actual outputs
         ReturnValues actualReturnValues = runEnv.removeReturnValues();
