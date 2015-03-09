@@ -13,11 +13,19 @@ imports:
 flow:
   name: simple_loop
   inputs:
-    - values: [1,2,3]
+    - person_map: >
+        {'john': 1, 'jane': 2, 'peter': 'three'}
   workflow:
     - print_values:
         loop:
-          for: value in values
+          for: k, v in person_map.items()
           do:
             ops.print:
               - text: value
+        navigate:
+          SUCCESS: print_other_values
+
+    - print_other_values:
+        do:
+          ops.print:
+            - text: "'abc'"

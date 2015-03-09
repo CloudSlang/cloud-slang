@@ -56,16 +56,22 @@ public class ScoreServicesImpl implements ScoreServices{
      * @return executionId
      */
     @Override
-	public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties){
+    public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties, boolean isQuiet){
         //add start event
         Set<String> handlerTypes = new HashSet<>();
-        handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
-        handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
-        handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
-        handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
-        handlerTypes.add(EVENT_EXECUTION_FINISHED);
-        handlerTypes.add(EVENT_INPUT_END);
-        handlerTypes.add(EVENT_OUTPUT_END);
+        if(isQuiet){
+            handlerTypes.add(EVENT_EXECUTION_FINISHED);
+            handlerTypes.add(EVENT_OUTPUT_END);
+        }
+        else {
+            handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
+            handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
+            handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
+            handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
+            handlerTypes.add(EVENT_EXECUTION_FINISHED);
+            handlerTypes.add(EVENT_INPUT_END);
+            handlerTypes.add(EVENT_OUTPUT_END);
+        }
         
         SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener();
         slang.subscribeOnEvents(scoreEventListener, handlerTypes);
@@ -87,5 +93,4 @@ public class ScoreServicesImpl implements ScoreServices{
 
         return executionId;
     }
-
 }

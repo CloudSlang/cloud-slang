@@ -136,7 +136,7 @@ public class ScoreServicesImplTest {
         }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
 
         // invoke method
-        long executionID = scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties);
+        long executionID = scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false);
 
         // verify constraints
         ArgumentCaptor<ScoreEventListener> scoreEventListenerArg = ArgumentCaptor.forClass(ScoreEventListener.class);
@@ -189,7 +189,7 @@ public class ScoreServicesImplTest {
         exception.expectMessage("exception message");
 
         // invoke method
-        scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties);
+        scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false);
     }
 
     @Configuration

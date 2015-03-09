@@ -17,19 +17,30 @@ import java.util.Iterator;
 
 public class ForLoopCondition implements LoopCondition {
 
-    private final Iterator<? extends Serializable> iterator;
+    private final Iterable<? extends Serializable> iterable;
+    private int index = 0;
 
-    public ForLoopCondition(Iterator<? extends Serializable> iterator) {
-        this.iterator = iterator;
+    public ForLoopCondition(Iterable<? extends Serializable> iterable) {
+        this.iterable = iterable;
+    }
+
+    private Iterator<? extends Serializable> loopToCurrentObject() {
+        Iterator<? extends Serializable> iterator = iterable.iterator();
+        for (int i = 0; i < index; i++) {
+            iterator.next();
+        }
+        return iterator;
     }
 
     public Serializable next() {
-        return iterator.next();
+        Serializable next = loopToCurrentObject().next();
+        index++;
+        return next;
     }
 
     @Override
     public boolean hasMore() {
-        return iterator.hasNext();
+        return loopToCurrentObject().hasNext();
     }
 
     @Override
@@ -42,14 +53,16 @@ public class ForLoopCondition implements LoopCondition {
         ForLoopCondition that = (ForLoopCondition) o;
 
         return new EqualsBuilder()
-                .append(this.iterator, that.iterator)
+                .append(this.iterable, that.iterable)
+                .append(this.index, that.index)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-                .append(iterator)
+                .append(iterable)
+                .append(index)
                 .toHashCode();
     }
 }

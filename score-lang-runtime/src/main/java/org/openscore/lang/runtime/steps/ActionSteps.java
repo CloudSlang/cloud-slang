@@ -21,6 +21,7 @@ import org.openscore.lang.entities.ActionType;
 import org.openscore.lang.runtime.env.ReturnValues;
 import org.openscore.lang.runtime.env.RunEnvironment;
 import org.openscore.lang.runtime.events.LanguageEventData;
+import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyModule;
 import org.python.core.PyObject;
@@ -261,7 +262,7 @@ public class ActionSteps extends AbstractSteps {
             if ((key.startsWith("__") && key.endsWith("__")) || value instanceof PyModule) {
                 continue;
             }
-            returnValue.put(key, (Serializable) value.__tojava__(Serializable.class));
+            returnValue.put(key, Py.tojava(value, Serializable.class));
         }
         cleanInterpreter(interpreter);
         return returnValue;
