@@ -22,6 +22,7 @@ import org.openscore.lang.runtime.env.ReturnValues;
 import org.openscore.lang.runtime.env.RunEnvironment;
 import org.openscore.lang.runtime.events.LanguageEventData;
 import org.python.core.Py;
+import org.python.core.PyBoolean;
 import org.python.core.PyException;
 import org.python.core.PyModule;
 import org.python.core.PyObject;
@@ -262,10 +263,20 @@ public class ActionSteps extends AbstractSteps {
             if ((key.startsWith("__") && key.endsWith("__")) || value instanceof PyModule) {
                 continue;
             }
-            returnValue.put(key, Py.tojava(value, Serializable.class));
+            Serializable javaValue = resolveJythonObjectToJava(value);
+            returnValue.put(key, javaValue);
         }
         cleanInterpreter(interpreter);
         return returnValue;
+    }
+
+    private Serializable resolveJythonObjectToJava(PyObject value) {
+        if (value instanceof PyBoolean) {
+            PyBoolean pyBoolean = (PyBoolean) value;
+            return pyBoolean.getBooleanValue();
+        } else {
+            return Py.tojava(value, Serializable.class);
+        }
     }
 
     private void executePythonScript(PythonInterpreter interpreter, String script, Map<String, Serializable> userVars) {

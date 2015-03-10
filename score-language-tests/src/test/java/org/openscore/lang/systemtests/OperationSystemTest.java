@@ -103,4 +103,19 @@ public class OperationSystemTest extends SystemsTestsParent {
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, execStepData.getResult());
         Assert.assertEquals(120, execStepData.getOutputs().get("dur"));
     }
+
+    @Test
+    public void testOperationWithPythonWithBooleanOutput() throws Exception {
+        URI resource = getClass().getResource("/yaml/python_op_with_boolean.sl").toURI();
+
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), null);
+
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, null, null);
+        StepData execStepData = stepsData.get(EXEC_START_PATH);
+        Assert.assertEquals(true, execStepData.getOutputs().get("condition_1"));
+        Assert.assertEquals(false, execStepData.getOutputs().get("condition_2"));
+        Assert.assertEquals(false, execStepData.getOutputs().get("condition_3"));
+        Assert.assertEquals(true, execStepData.getOutputs().get("condition_4"));
+        Assert.assertEquals(1, execStepData.getOutputs().get("an_int"));
+    }
 }
