@@ -50,7 +50,6 @@ public class ScoreCompilerImpl implements ScoreCompiler{
 
     @Override
     public CompilationArtifact compile(Executable executable, Set<Executable> path) {
-        Validate.notEmpty(executable.getNamespace(),"Operation/Flow " +executable.getName() +" must have a namespace");
 
         Map<String, Executable> filteredDependencies = new HashMap<>();
         //we handle dependencies only if the file has imports
