@@ -11,6 +11,7 @@ package org.openscore.lang.compiler.scorecompiler;
 
 import org.openscore.lang.compiler.SlangTextualKeys;
 import org.openscore.lang.entities.ForLoopStatement;
+import org.openscore.lang.entities.ListForLoopStatement;
 import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.ScoreLangConstants;
 import org.openscore.lang.entities.bindings.Input;
@@ -51,7 +52,7 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateStartStepPutForUnderTheRightKey() throws Exception {
-        ForLoopStatement statement = new ForLoopStatement("1", "2");
+        ForLoopStatement statement = new ListForLoopStatement("1", "2");
         HashMap<String, Serializable> preTaskData = new HashMap<>();
         preTaskData.put(SlangTextualKeys.FOR_KEY, statement);
         ExecutionStep startStep = factory.createBeginTaskStep(1L, new ArrayList<Input>(), preTaskData, "", "");

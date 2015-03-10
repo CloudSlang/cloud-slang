@@ -9,6 +9,7 @@
 package org.openscore.lang.cli;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.openscore.events.EventConstants;
@@ -27,7 +28,6 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -67,6 +67,7 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath,
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String,? extends Serializable> inputs,
             @CliOption(key = {"if", "input-file"}, mandatory = false, help = "comma separated list of input file locations") final List<String> inputFiles,
+            @CliOption(key = {"", "q", "quiet"}, mandatory = false, help = "quiet", specifiedDefaultValue = "true",unspecifiedDefaultValue = "false") final Boolean quiet,
             @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = "comma separated list of system property file locations") final List<String> systemPropertyFiles) throws IOException {
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
@@ -85,12 +86,12 @@ public class SlangCLI implements CommandMarker {
         if (!triggerAsync) {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            id = scoreServices.triggerSync(compilationArtifact, mergedInputs, systemProperties);
+            id = scoreServices.triggerSync(compilationArtifact, mergedInputs, systemProperties, quiet);
             stopWatch.stop();
-            return triggerSyncMsg(id, stopWatch.toString());
+            return quiet ? StringUtils.EMPTY : triggerSyncMsg(id, stopWatch.toString());
         }
         id = scoreServices.trigger(compilationArtifact, mergedInputs, systemProperties);
-        return triggerAsyncMsg(id, compilationArtifact.getExecutionPlan().getName());
+        return quiet ? StringUtils.EMPTY : triggerAsyncMsg(id, compilationArtifact.getExecutionPlan().getName());
     }
 
     @CliCommand(value = "env", help = "Set environment var relevant to the CLI")

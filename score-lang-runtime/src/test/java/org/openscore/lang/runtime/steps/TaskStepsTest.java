@@ -18,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.openscore.events.ScoreEvent;
 import org.openscore.lang.ExecutionRuntimeServices;
 import org.openscore.lang.entities.ForLoopStatement;
+import org.openscore.lang.entities.ListForLoopStatement;
 import org.openscore.lang.entities.ResultNavigation;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.entities.bindings.Output;
@@ -86,6 +87,10 @@ public class TaskStepsTest {
         RunEnvironment runEnvironment = new RunEnvironment();
         runEnvironment.getStack().pushContext(new Context(new HashMap<String, Serializable>()));
         return runEnvironment;
+    }
+
+    private ForLoopStatement createBasicForStatement(String varName, String collectionExpression) {
+        return new ListForLoopStatement(varName, collectionExpression);
     }
 
     @Before
@@ -259,11 +264,11 @@ public class TaskStepsTest {
     @Test
     public void whenLoopKeyProvidedLoopConditionIsRequested(){
         String collectionExpression = "collection";
-        ForLoopStatement statement = new ForLoopStatement("x", collectionExpression);
+        ForLoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         when(loopsBinding.getOrCreateLoopCondition(statement, context, nodeName))
-                .thenReturn(new ForLoopCondition(Arrays.asList("1", "2").iterator()));
+                .thenReturn(new ForLoopCondition(Arrays.asList("1", "2")));
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.getStack().pushContext(context);
         taskSteps.beginTask(new ArrayList<Input>(), statement, runEnv, createRuntimeServices(), nodeName, 1L, 2L, "2");
@@ -273,7 +278,7 @@ public class TaskStepsTest {
     @Test
     public void whenLoopConditionHasNoMoreNextStepIdSetToEndTask(){
         String collectionExpression = "collection";
-        ForLoopStatement statement = new ForLoopStatement("x", collectionExpression);
+        ForLoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
@@ -293,7 +298,7 @@ public class TaskStepsTest {
     @Test
     public void whenLoopConditionHasMoreNextStepIdSetToEndTask(){
         String collectionExpression = "collection";
-        ForLoopStatement statement = new ForLoopStatement("x", collectionExpression);
+        ForLoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
@@ -315,7 +320,7 @@ public class TaskStepsTest {
     @Test
     public void whenLoopConditionIsOfForTypeStartTaskWillIncrementIt(){
         String collectionExpression = "collection";
-        ForLoopStatement statement = new ForLoopStatement("x", collectionExpression);
+        ForLoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         ForLoopCondition mockLoopCondition = mock(ForLoopCondition.class);
@@ -325,7 +330,7 @@ public class TaskStepsTest {
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.getStack().pushContext(context);
         taskSteps.beginTask(new ArrayList<Input>(), statement, runEnv, createRuntimeServices(), nodeName, 1L, 2L, "2");
-        verify(loopsBinding).incrementForLoop("x", context, mockLoopCondition);
+        verify(loopsBinding).incrementListForLoop("x", context, mockLoopCondition);
     }
 
     @Test
