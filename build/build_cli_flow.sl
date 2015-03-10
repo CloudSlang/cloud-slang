@@ -1,14 +1,77 @@
 namespace: build
 
+imports:
+  sub_flows: build.sub_flows
+  utils: org.openscore.slang.base.utils
+  files: org.openscore.slang.base.files
+
 flow:
+  inputs:
+    - target_dir: "'build/target'"
   name: build_cli_flow
   workflow:
-    - clone_slang_content
-    - run_verifier
-    - copy_slang_cli
+    - create_target_dir:
+        do:
+          files.create_folder:
+            - folder_name: target_dir
+
+    - get_slang_content:
+        do:
+          sub_flows.get_slang_content:
+            - url: "'https://github.com/openscore/slang-content.git'"
+            - target_dir:
+                default:  target_dir + "/slang_content"
+                overridable: false
+
+    - run_verifier:
+        do:
+          utils.run_command:
+            - command: >
+                "java -jar
+                score-lang-content-verifier/target/*-jar-with-dependencies.jar " +
+                target_dir + "/slang_content/content/"
+
+    - copy_slang_cli:
+        do:
+          files.copy:
+            - source: "'score-lang-cli/target/slang/'"
+            - destination: target_dir + '/slang_cli'
+
+    - copy_content_to_slang_cli:
+        do:
+          files.copy:
+            - source: target_dir + '/slang_content/content'
+            - destination: target_dir + '/slang_cli/content'
+
+    - copy_python_lib_to_slang_cli:
+        do:
+          files.copy:
+            - source: target_dir + '/slang_content/python-lib'
+            - destination: target_dir + '/slang_cli/python-lib'
+
 #    - precompile_jython_standalone
-    - pip_install
-    - chmod_slang_exec
+
+    - pip_install:
+        do:
+          utils.run_command:
+            - command: >
+                "pip install -t " + target_dir + "/slang_cli/python-lib " +
+                "-r " + target_dir + "/slang_cli/python-lib/requirements.txt --compile"
+
+    - chmod_slang_exec:
+        do:
+          utils.run_command:
+            - command: >
+                "chmod +x " + target_dir + "/slang_cli/bin/slang"
+
 #    - add_docs
-    - create_zip
-    - create_tar_gz
+
+    - create_zip:
+        do:
+          files.zip_folder:
+            - archive_name: "'slang_cli'"
+            - folder_path: target_dir + "/slang_cli"
+            - output_folder: target_dir
+
+
+#    - create_tar_gz
