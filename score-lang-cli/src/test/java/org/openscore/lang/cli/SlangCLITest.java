@@ -164,25 +164,21 @@ public class SlangCLITest {
         long executionID = 1;
         String inputsString = "--i input1=value1,input2=value2";
 
-        URI inputsFromFile = getClass().getResource(INPUT_FILE_PATH).toURI();
-        List<String> inputFiles = Arrays.asList(inputsFromFile.getPath());
-        String fileInputsString = "--if " + inputFiles.toString();
         Map<String, Serializable> inputsMap = new HashMap<>();
         inputsMap.put("input1", "value1");
         inputsMap.put("input2", "value2");
 
-        Map<String,  Serializable> fileInputsMap = new HashMap<>();
+        Map fileInputsMap = new HashMap<>();
         fileInputsMap.put("host", "localhost");
         fileInputsMap.put("port", "22");
-        Map map =  fileInputsMap;
 
         inputsMap.putAll(fileInputsMap);
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
-        when(compilerHelperMock.loadInputsFromFile(anyList())).thenReturn(map);
+        when(compilerHelperMock.loadInputsFromFile(anyList())).thenReturn(fileInputsMap);
         when(ScoreServicesMock.triggerSync(eq(emptyCompilationArtifact), eq(inputsMap), anyMapOf(String.class, Serializable.class), eq(false))).thenReturn(executionID);
 
-        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " " + inputsString + " " + fileInputsString);
+        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " " + inputsString);
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
         verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), eq(inputsMap), anyMapOf(String.class, Serializable.class), eq(false));
@@ -197,22 +193,18 @@ public class SlangCLITest {
         long executionID = 1;
         String inputsString = "--i input1=value1,input2=value2";
 
-        URI inputsFromFile = getClass().getResource(INPUT_FILE_PATH).toURI();
-        List<String> inputFiles = Arrays.asList(inputsFromFile.getPath());
-        String fileInputsString = "--if " + inputFiles.toString();
         Map<String, Serializable> inputsMap = new HashMap<>();
         inputsMap.put("input1", "value1");
         inputsMap.put("input2", "value2");
 
-        Map<String,  Serializable> fileInputsMap = new HashMap<>();
+        Map fileInputsMap = new HashMap<>();
         fileInputsMap.put("host", "localhost");
         fileInputsMap.put("port", "22");
-        Map map =  fileInputsMap;
 
         inputsMap.putAll(fileInputsMap);
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
-        when(compilerHelperMock.loadInputsFromFile(anyList())).thenReturn(map);
+        when(compilerHelperMock.loadInputsFromFile(anyList())).thenReturn(fileInputsMap);
         when(ScoreServicesMock.trigger(eq(emptyCompilationArtifact), eq(inputsMap), anyMapOf(String.class, Serializable.class))).thenReturn(executionID);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " " + inputsString);
