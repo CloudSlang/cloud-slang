@@ -18,7 +18,7 @@ flow:
   workflow:
     - print_values:
         loop:
-          for: k, v in person_map.items()
+          for: k, v in person_map
           do:
             ops.operation_that_goes_to_custom_when_value_is_2:
               - text: v

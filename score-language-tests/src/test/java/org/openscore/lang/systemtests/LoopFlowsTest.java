@@ -116,12 +116,25 @@ public class LoopFlowsTest extends SystemsTestsParent{
 
         Map<String, Serializable> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null);
-        StepData firstTask = stepsData.get(FIRST_STEP_PATH);
-        StepData secondTask = stepsData.get(SECOND_STEP_KEY);
-        StepData thirdTask = stepsData.get(THIRD_STEP_KEY);
-        Assert.assertTrue(firstTask.getInputs().containsValue(1));
-        Assert.assertTrue(secondTask.getInputs().containsValue(2));
-        Assert.assertTrue(thirdTask.getInputs().containsValue("three"));
+        verifyPersonMap(stepsData);
+    }
+
+    @Test
+    public void testFlowWithHashMap() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/simple_loop_with_hashmap.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/print.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Map<String, Serializable> personMap = new HashMap<>();
+        personMap.put("john", 1);
+        personMap.put("jane", 2);
+        personMap.put("peter", "three");
+        Map<String, Serializable> userInputs = new HashMap<>();
+        userInputs.put("person_map", (Serializable) personMap);
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null);
+        verifyPersonMap(stepsData);
     }
 
     @Test
@@ -185,5 +198,17 @@ public class LoopFlowsTest extends SystemsTestsParent{
 
     private List<String> getTasksOnly(Map<String, StepData> stepsData) {
         return filter(not(endsWith(ExecutionPath.PATH_SEPARATOR + "0")), stepsData.keySet());
+    }
+
+    private void verifyPersonMap(Map<String, StepData> stepsData) {
+        StepData firstTask = stepsData.get(FIRST_STEP_PATH);
+        StepData secondTask = stepsData.get(SECOND_STEP_KEY);
+        StepData thirdTask = stepsData.get(THIRD_STEP_KEY);
+        Assert.assertTrue(firstTask.getInputs().containsValue("john"));
+        Assert.assertTrue(firstTask.getInputs().containsValue(1));
+        Assert.assertTrue(secondTask.getInputs().containsValue("jane"));
+        Assert.assertTrue(secondTask.getInputs().containsValue(2));
+        Assert.assertTrue(thirdTask.getInputs().containsValue("peter"));
+        Assert.assertTrue(thirdTask.getInputs().containsValue("three"));
     }
 }

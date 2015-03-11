@@ -1,5 +1,6 @@
 package org.openscore.lang.runtime.bindings;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,9 +14,6 @@ import org.openscore.lang.entities.ListForLoopStatement;
 import org.openscore.lang.runtime.env.Context;
 import org.openscore.lang.runtime.env.ForLoopCondition;
 import org.openscore.lang.runtime.env.LoopCondition;
-import org.python.core.PyInteger;
-import org.python.core.PyString;
-import org.python.core.PyTuple;
 
 import javax.script.ScriptEngine;
 import java.io.Serializable;
@@ -101,10 +99,9 @@ public class LoopsBindingTest {
 
     @Test
     public void testIncrementMapForLoop() throws Exception {
-        PyTuple tuple = new PyTuple(new PyString("john"), new PyInteger(1));
         Context context = mock(Context.class);
         ForLoopCondition forLoopCondition = mock(ForLoopCondition.class);
-        when(forLoopCondition.next()).thenReturn(tuple);
+        when(forLoopCondition.next()).thenReturn(Pair.of("john", 1));
 
         loopsBinding.incrementMapForLoop("k", "v", context, forLoopCondition);
 
