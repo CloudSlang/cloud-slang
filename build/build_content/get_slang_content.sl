@@ -1,7 +1,7 @@
-namespace: build.sub_flows
+namespace: build.build_content
 
 imports:
-  git: org.openscore.slang.git
+  build_content: build.build_content
 
 flow:
   name: get_slang_content
@@ -11,6 +11,6 @@ flow:
   workflow:
     - clone_slang_content:
         do:
-          git.clone:
+          build_content.clone:
             - url
             - target_location: target_dir

@@ -1,8 +1,8 @@
-namespace: build
+namespace: build.build_content
 
 imports:
-  sub_flows: build.sub_flows
-  utils: org.openscore.slang.base.utils
+  build_content: build.build_content
+  cmd: org.openscore.slang.base.cmd
   files: org.openscore.slang.base.files
 
 flow:
@@ -17,7 +17,7 @@ flow:
 
     - get_slang_content:
         do:
-          sub_flows.get_slang_content:
+          build_content.get_slang_content:
             - url: "'https://github.com/openscore/slang-content.git'"
             - target_dir:
                 default:  target_dir + "/slang_content"
@@ -25,7 +25,7 @@ flow:
 
     - run_verifier:
         do:
-          utils.run_command:
+          cmd.run_command:
             - command: >
                 "java -jar
                 score-lang-content-verifier/target/*-jar-with-dependencies.jar " +
@@ -53,14 +53,14 @@ flow:
 
     - pip_install:
         do:
-          utils.run_command:
+          cmd.run_command:
             - command: >
                 "pip install -t " + target_dir + "/slang_cli/python-lib " +
                 "-r " + target_dir + "/slang_cli/python-lib/requirements.txt --compile"
 
     - chmod_slang_exec:
         do:
-          utils.run_command:
+          cmd.run_command:
             - command: >
                 "chmod +x " + target_dir + "/slang_cli/bin/slang"
 
