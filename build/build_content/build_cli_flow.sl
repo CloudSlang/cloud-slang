@@ -7,7 +7,7 @@ imports:
 
 flow:
   inputs:
-    - target_dir: "'build/target'"
+    - target_dir: "'target'"
   name: build_cli_flow
   workflow:
     - create_target_dir:
@@ -28,13 +28,13 @@ flow:
           cmd.run_command:
             - command: >
                 "java -jar
-                score-lang-content-verifier/target/*-jar-with-dependencies.jar " +
+                ../score-lang-content-verifier/target/*-jar-with-dependencies.jar " +
                 target_dir + "/slang_content/content/"
 
     - copy_slang_cli:
         do:
           files.copy:
-            - source: "'score-lang-cli/target/slang/'"
+            - source: "'../score-lang-cli/target/slang/'"
             - destination: target_dir + '/slang_cli'
 
     - copy_content_to_slang_cli:
