@@ -14,6 +14,7 @@ import com.google.common.collect.Lists;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -63,14 +64,8 @@ public class CompilerHelperImpl implements CompilerHelper{
         Set<SlangSource> depsSources = new HashSet<>();
         File file = new File(filePath);
         Validate.isTrue(file.isFile(), "File: " + file.getName() + " was not found");
-        boolean validFileExtension = false;
 
-        Collection<File> slangFiles = FileUtils.listFiles(new File(file.getParent()), SLANG_FILE_EXTENSIONS, false);
-        for (File slangFile : slangFiles) {
-            if (StringUtils.equals(slangFile.getAbsolutePath(), file.getAbsolutePath())){
-                validFileExtension = true;
-            }
-        }
+        boolean validFileExtension = checkIsFileSupported(file);
         Validate.isTrue(validFileExtension, "File: " + file.getName() + " must have one of the following extensions: sl, sl.yaml, sl.yml");
 
         if (CollectionUtils.isEmpty(dependencies)) {
@@ -128,6 +123,13 @@ public class CompilerHelperImpl implements CompilerHelper{
 			}
 		}
         return result;
+    }
+    private Boolean checkIsFileSupported(File file){
+        String[] suffixes = new String[SLANG_FILE_EXTENSIONS.length];
+        for(int i = 0; i < suffixes.length; ++i){
+            suffixes[i] = "." + SLANG_FILE_EXTENSIONS[i];
+        }
+        return new SuffixFileFilter(suffixes).accept(file);
     }
 
 }
