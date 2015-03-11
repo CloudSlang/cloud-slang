@@ -147,4 +147,12 @@ public class CompileOperationTest {
         exception.expectMessage("workflow");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
+
+    @Test
+    public void testCompileOperationWithMissingNamespace() throws Exception {
+        URL resource = getClass().getResource("/corrupted/op_without_namespace.sl");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("namespace");
+        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+    }
 }
