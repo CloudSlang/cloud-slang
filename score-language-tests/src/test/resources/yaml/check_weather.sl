@@ -8,7 +8,7 @@
 namespace: user.ops
 
 operation:
-  name: check_Weather
+  name: check_weather
   inputs:
     - city
   action:
