@@ -61,7 +61,16 @@ public class CompilerHelperTest {
         Mockito.reset(slang);
     }
 
-	@Test
+    @Test
+    public void testUnsupportedExtension() throws Exception {
+        URI flowFilePath = getClass().getResource("/flow.yaml").toURI();
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("must have one of the following extensions");
+        compilerHelper.compile(flowFilePath.getPath(), null);
+
+    }
+
+    @Test
 	public void testFilePathValid() throws Exception {
 		URI flowFilePath = getClass().getResource("/flow.sl").toURI();
 		URI opFilePath = getClass().getResource("/test_op.sl").toURI();
