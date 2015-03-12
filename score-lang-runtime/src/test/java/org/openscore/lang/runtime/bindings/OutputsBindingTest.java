@@ -64,7 +64,7 @@ public class OutputsBindingTest {
 
         Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
 
-        Map<String, String> expectedOutputs = new HashMap<>();
+        Map<String, Serializable> expectedOutputs = new HashMap<>();
         expectedOutputs.put("host1", "valueHost1");
 
         Assert.assertEquals("Binding results are not as expected", expectedOutputs, result);
@@ -78,18 +78,27 @@ public class OutputsBindingTest {
 
         Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
 
-        Map<String, String> expectedOutputs = new HashMap<>();
+        Map<String, Serializable> expectedOutputs = new HashMap<>();
         expectedOutputs.put("host1", "valueHost1");
         expectedOutputs.put("host2", "valueHost2");
 
         Assert.assertEquals("Binding results are not as expected", expectedOutputs, result);
     }
 
+    @Test
+    public void testOperationOutputsNoExpressionAtAll() throws Exception {
+        Map<String, Serializable> operationContext = prepareOperationContext();
+        Map<String, Serializable> actionReturnValues = new HashMap<>();
+        List<Output> outputs = Arrays.asList(createNoExpressionOutput("actionOutputKey1"));
+
+        outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
+    }
+
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void testOperationOutputsIllegalEvaluatedExpression() throws Exception {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = new HashMap<>();
-        List<Output> outputs = Arrays.asList(createNoExpressionOutput("actionOutputKey1"));
+        List<Output> outputs = Arrays.asList(createExpressionOutput("actionOutputKey1", "None + 'str'"));
 
         outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
     }
@@ -102,7 +111,7 @@ public class OutputsBindingTest {
 
         Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
 
-        Map<String, String> expectedOutputs = new HashMap<>();
+        Map<String, Serializable> expectedOutputs = new HashMap<>();
         expectedOutputs.put("hostFromExpression", "http://hostExpr:9999");
 
         Assert.assertEquals("Binding results are not as expected", expectedOutputs, result);
@@ -135,7 +144,7 @@ public class OutputsBindingTest {
 
         Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
 
-        Map<String, String> expectedOutputs = new HashMap<>();
+        Map<String, Serializable> expectedOutputs = new HashMap<>();
         expectedOutputs.put("hostFromExpression", "http://hostExpr:9999");
         expectedOutputs.put("host1", "valueHost1");
 

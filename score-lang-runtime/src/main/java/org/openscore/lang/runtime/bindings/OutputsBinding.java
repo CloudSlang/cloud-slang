@@ -49,6 +49,8 @@ public class OutputsBinding {
                     Map<String, Serializable> scriptContext = new HashMap<>();
                     //put action outputs
                     scriptContext.putAll(actionReturnValues);
+                    //declare the new output
+                    scriptContext.put(outputKey, actionReturnValues.get(outputKey));
                     //put operation inputs as a map
                     if(MapUtils.isNotEmpty(inputs)) {
                         scriptContext.put(BIND_OUTPUT_FROM_INPUTS_KEY, (Serializable) inputs);
