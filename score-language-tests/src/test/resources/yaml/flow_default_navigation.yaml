@@ -24,9 +24,9 @@ flow:
           ops.produce_default_navigation:
             - navigationType
 
-    - check_Weather: # default navigation: go to this step on success
+    - check_weather: # default navigation: go to this step on success
         do:
-          ops.check_Weather:
+          ops.check_weather:
             - city: "'AwesomeCity'"
         navigate:
           SUCCESS: SUCCESS # end flow with success result

@@ -14,7 +14,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.entities.CompilationArtifact;
-import org.openscore.lang.runtime.env.ExecutionPath;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -184,6 +183,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
     }
 
     private List<String> getTasksOnly(Map<String, StepData> stepsData) {
-        return filter(not(endsWith(ExecutionPath.PATH_SEPARATOR + "0")), stepsData.keySet());
+        return filter(not(endsWith("0")), stepsData.keySet());
     }
+
 }

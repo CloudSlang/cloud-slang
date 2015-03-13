@@ -5,17 +5,15 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: user.ops
-
 operation:
   name: check_Weather
   inputs:
     - city
   action:
-    python_script: |
-      weather = "weather thing"
-      print city
+    python_script: 'print "weather thing"'
   outputs:
-    - weather: weather
+    - weather: '"great!!"'
+    - temperature: '"30"'
   results:
-    - SUCCESS: 'weather == "weather thing"'
+    - SUCCESS: 1 == 1
+

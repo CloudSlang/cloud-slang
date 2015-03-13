@@ -127,6 +127,7 @@ public class TaskSteps extends AbstractSteps {
 
             // set the start step of the given ref as the next step to execute (in the new running execution plan that will be set)
             runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
+			runEnv.getExecutionPath().down();
         } catch(RuntimeException e) {
             logger.error("There was an error running the begin task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
@@ -146,6 +147,7 @@ public class TaskSteps extends AbstractSteps {
                         @Param(NODE_NAME_KEY) String nodeName) {
 
         try {
+			if(runEnv.getExecutionPath().getDepth() > 0) runEnv.getExecutionPath().up();
             Context flowContext = runEnv.getStack().popContext();
             Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
 
