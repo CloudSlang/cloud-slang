@@ -88,17 +88,17 @@ public class SlangContentVerifier {
     }
 
     private int compileAllSlangModels(Map<String, Executable> slangModels)  {
-        Collection<Executable> models = slangModels.values();
         Map<String, CompilationArtifact> compiledArtifacts = new HashMap<>();
-        for(Executable slangModel : models) {
+        for(Map.Entry<String, Executable> slangModelEntry : slangModels.entrySet()) {
+            Executable slangModel = slangModelEntry.getValue();
             try {
                 Set<Executable> dependenciesModels = getModelDependenciesRecursively(slangModels, slangModel);
-                CompilationArtifact compiledSource = compiledArtifacts.get(slangModel.getName());
+                CompilationArtifact compiledSource = compiledArtifacts.get(getUniqueName(slangModel));
                 if (compiledSource == null) {
                     compiledSource = scoreCompiler.compile(slangModel, dependenciesModels);
                     if(compiledSource != null) {
                         log.info("Compiled: \'" + slangModel.getNamespace() + "." + slangModel.getName() + "\' successfully");
-                        compiledArtifacts.put(slangModel.getName(), compiledSource);
+                        compiledArtifacts.put(getUniqueName(slangModel), compiledSource);
                     } else {
                         log.error("Failed to compile source: \'" + slangModel.getNamespace() + "." + slangModel.getName() + "\'");
                     }
