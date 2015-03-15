@@ -37,31 +37,38 @@ flow:
                 default:  target_dir + "/slang_content"
                 overridable: false
 
+    - copy_verifier:
+            do:
+              cmd.run_command:
+                - command: >
+                    "cp ../score-lang-content-verifier/target/*-jar-with-dependencies.jar " +
+                    target_dir + "/slang-content-verifer.jar"
+
     - run_verifier:
         do:
           cmd.run_command:
             - command: >
-                "java -jar
-                ../score-lang-content-verifier/target/*-jar-with-dependencies.jar " +
+                "java -jar " +
+                target_dir + "/slang-content-verifer.jar " +
                 target_dir + "/slang_content/content/"
 
     - copy_slang_cli:
         do:
           files.copy:
             - source: "'../score-lang-cli/target/slang/'"
-            - destination: target_dir + '/slang_cli'
+            - destination: target_dir + '/slang-cli'
 
     - copy_content_to_slang_cli:
         do:
           files.copy:
             - source: target_dir + '/slang_content/content'
-            - destination: target_dir + '/slang_cli/content'
+            - destination: target_dir + '/slang-cli/content'
 
     - copy_python_lib_to_slang_cli:
         do:
           files.copy:
             - source: target_dir + '/slang_content/python-lib'
-            - destination: target_dir + '/slang_cli/python-lib'
+            - destination: target_dir + '/slang-cli/python-lib'
 
 #    - precompile_jython_standalone
 
@@ -69,22 +76,22 @@ flow:
         do:
           cmd.run_command:
             - command: >
-                "pip install -t " + target_dir + "/slang_cli/python-lib " +
-                "-r " + target_dir + "/slang_cli/python-lib/requirements.txt --compile"
+                "pip install -t " + target_dir + "/slang-cli/python-lib " +
+                "-r " + target_dir + "/slang-cli/python-lib/requirements.txt --compile"
 
     - chmod_slang_exec:
         do:
           cmd.run_command:
             - command: >
-                "chmod +x " + target_dir + "/slang_cli/bin/slang"
+                "chmod +x " + target_dir + "/slang-cli/bin/slang"
 
 #    - add_docs
 
     - create_zip:
         do:
           files.zip_folder:
-            - archive_name: "'slang_cli'"
-            - folder_path: target_dir + "/slang_cli"
+            - archive_name: "'slang-cli'"
+            - folder_path: target_dir + "/slang-cli"
             - output_folder: target_dir
 
 
