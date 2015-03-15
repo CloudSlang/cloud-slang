@@ -66,12 +66,10 @@ public class OutputsBinding {
                     }
                     //evaluate expression
 
-                    if (scriptResult != null) {
-                        try {
-                            outputs.put(outputKey, scriptResult);
-                        } catch (ClassCastException ex) {
-                            throw new RuntimeException("The output expression " + outputExpr + " does not return serializable value", ex);
-                        }
+                    try {
+                        outputs.put(outputKey, scriptResult);
+                    } catch (ClassCastException ex) {
+                        throw new RuntimeException("The output expression " + outputExpr + " does not return serializable value", ex);
                     }
                 } else {
                     throw new RuntimeException("Output: " + outputKey + " has no expression");

@@ -45,7 +45,7 @@ public class OutputsBindingTest {
     private OutputsBinding outputsBinding;
 
     @Test(timeout = DEFAULT_TIMEOUT)
-    public void testOperationEmptyOutputs() throws Exception {
+    public void testOperationEmptyOutputs() {
         Map<String, Serializable> operationContext = new HashMap<>();
         Map<String, Serializable> actionReturnValues = new HashMap<>();
         List<Output> outputs = new LinkedList<>();
@@ -57,7 +57,7 @@ public class OutputsBindingTest {
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
-    public void testOperationOutputsNoExpression() throws Exception {
+    public void testOperationOutputsNoExpression() {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(createNoExpressionOutput("host1"));
@@ -71,7 +71,7 @@ public class OutputsBindingTest {
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
-    public void testOperationOutputsNoExpressionMultipleOutputs() throws Exception {
+    public void testOperationOutputsNoExpressionMultipleOutputs() {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(createNoExpressionOutput("host1"), createNoExpressionOutput("host2"));
@@ -86,16 +86,18 @@ public class OutputsBindingTest {
     }
 
     @Test
-    public void testOperationOutputsNoExpressionAtAll() throws Exception {
+    public void testOperationOutputsNoExpressionAtAll() {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = new HashMap<>();
         List<Output> outputs = Arrays.asList(createNoExpressionOutput("actionOutputKey1"));
 
-        outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
+        Map<String, Serializable> boundOutputs = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
+        Assert.assertTrue(boundOutputs.containsKey("actionOutputKey1"));
+        Assert.assertEquals(null, boundOutputs.get("actionOutputKey1"));
     }
 
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
-    public void testOperationOutputsIllegalEvaluatedExpression() throws Exception {
+    public void testOperationOutputsIllegalEvaluatedExpression() {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = new HashMap<>();
         List<Output> outputs = Arrays.asList(createExpressionOutput("actionOutputKey1", "None + 'str'"));
@@ -104,7 +106,7 @@ public class OutputsBindingTest {
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
-    public void testOperationOutputsExpression() throws Exception {
+    public void testOperationOutputsExpression() {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(fromInputs['port'])"));
@@ -118,7 +120,7 @@ public class OutputsBindingTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void testMissingOperationOutputsNoExpression() throws Exception {
+    public void testMissingOperationOutputsNoExpression() {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = new HashMap<>();
         List<Output> outputs = Arrays.asList(new Output("actionOutputKey1", null));
@@ -126,7 +128,7 @@ public class OutputsBindingTest {
         outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
     }
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
-    public void testOperationOutputsInvalidExpression() throws Exception {
+    public void testOperationOutputsInvalidExpression() {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(fromInputs[SHOULD_BE_STRING])"));
@@ -135,7 +137,7 @@ public class OutputsBindingTest {
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
-    public void testOperationOutputsMixed() throws Exception {
+    public void testOperationOutputsMixed() {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(
