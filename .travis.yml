@@ -2,7 +2,7 @@ language: java
 
 before_deploy: >
   sudo apt-get install python-pip &&
-  ant --f build/ant.xml
+  ant -f build/ant.xml
 deploy:
   provider: releases
   api_key:
