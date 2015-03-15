@@ -12,4 +12,4 @@ deploy:
   on:
     repo: openscore/score-language
     tags: true
-    branch: better_packaging_fixes#4
+    all_branches: true
