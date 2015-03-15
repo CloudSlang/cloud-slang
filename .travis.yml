@@ -14,4 +14,4 @@ deploy:
   on:
     repo: openscore/score-language
     tags: true
-    all_branches: true
+    branch: master
