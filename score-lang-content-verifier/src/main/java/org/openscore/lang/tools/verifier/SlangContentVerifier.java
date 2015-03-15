@@ -54,11 +54,16 @@ public class SlangContentVerifier {
      * @return the number of valid Slang files in the given directory
      */
     public int verifyAllSlangFilesInDirAreValid(String directoryPath){
-        Map<String, Executable> slangModels = transformSlangFilesInDirToModels(directoryPath);
-        return compileAllSlangModels(slangModels);
+        Map<String, Executable> slangModels = transformSlangFilesInDirToModelsAndValidate(directoryPath);
+        return compileAllSlangModelsAndValidate(slangModels);
     }
 
-    private Map<String, Executable> transformSlangFilesInDirToModels(String directoryPath) {
+    public void runTests(String testsPath){
+        Map<String, Executable> testFlowModels = transformSlangFilesInDirToModelsAndValidate(testsPath);
+        Map<String, CompilationArtifact> compiledTestFlows = compileSlangModels(testFlowModels);
+    }
+
+    private Map<String, Executable> transformSlangFilesInDirToModelsAndValidate(String directoryPath) {
         Validate.notEmpty(directoryPath, "You must specify a path");
         Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" + directoryPath + "\' does not lead to a directory");
         Map<String, Executable> slangModels = new HashMap<>();
@@ -87,7 +92,18 @@ public class SlangContentVerifier {
         return slangModels;
     }
 
-    private int compileAllSlangModels(Map<String, Executable> slangModels)  {
+    private int compileAllSlangModelsAndValidate(Map<String, Executable> slangModels)  {
+        Map<String, CompilationArtifact> compiledArtifacts = compileSlangModels(slangModels);
+        if(compiledArtifacts.size() != slangModels.size()){
+            throw new RuntimeException("Some Slang files were not compiled.\n" +
+                    "Found: " + slangModels.size() + " slang models, but managed to compile only: " + compiledArtifacts.size());
+        }
+        String successMessage = "Successfully finished Compilation of: " + compiledArtifacts.size() + " Slang files";
+        log.info(successMessage);
+        return compiledArtifacts.size();
+    }
+
+    private Map<String, CompilationArtifact> compileSlangModels(Map<String, Executable> slangModels) {
         Map<String, CompilationArtifact> compiledArtifacts = new HashMap<>();
         for(Map.Entry<String, Executable> slangModelEntry : slangModels.entrySet()) {
             Executable slangModel = slangModelEntry.getValue();
@@ -109,13 +125,7 @@ public class SlangContentVerifier {
                 throw new RuntimeException(errorMessage, e);
             }
         }
-        if(compiledArtifacts.size() != slangModels.size()){
-            throw new RuntimeException("Some Slang files were not compiled.\n" +
-                    "Found: " + slangModels.size() + " slang models, but managed to compile only: " + compiledArtifacts.size());
-        }
-        String successMessage = "Successfully finished Compilation of: " + compiledArtifacts.size() + " Slang files";
-        log.info(successMessage);
-        return compiledArtifacts.size();
+        return compiledArtifacts;
     }
 
     private Set<Executable> getModelDependenciesRecursively(Map<String, Executable> slangModels, Executable slangModel) {

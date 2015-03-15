@@ -23,7 +23,9 @@ import java.io.File;
 public class VerifierMain {
 
     public static void main(String[] args) {
-        String repositoryPath = args[0];
+        String repositoryPath = System.getProperty("path");
+        String testsPath = System.getProperty("testPath");
+        String testSuits = System.getProperty("testSuits");
         Validate.notNull(repositoryPath, "You must pass a path to your repository");
         repositoryPath = FilenameUtils.separatorsToSystem(repositoryPath);
         Validate.isTrue(new File(repositoryPath).isDirectory(),
@@ -34,6 +36,11 @@ public class VerifierMain {
         try {
             int numberOfValidSlangFiles = slangContentVerifier.verifyAllSlangFilesInDirAreValid(repositoryPath);
             System.out.println("SUCCESS: Found " + numberOfValidSlangFiles + " slang files under directory: \"" + repositoryPath + "\" and all are valid.");
+
+            if(testsPath != null) {
+                slangContentVerifier.runTests(testsPath);
+            }
+
             System.exit(0);
         } catch (Exception e) {
             System.out.println(e.getMessage() + "\n\nFAILURE: Validation of slang files under directory: \"" + repositoryPath + "\" failed.");
