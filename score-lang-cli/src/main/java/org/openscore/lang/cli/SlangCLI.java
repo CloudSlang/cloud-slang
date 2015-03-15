@@ -90,7 +90,7 @@ public class SlangCLI implements CommandMarker {
             stopWatch.stop();
             return quiet ? StringUtils.EMPTY : triggerSyncMsg(id, stopWatch.toString());
         }
-        id = scoreServices.trigger(compilationArtifact, inputs, systemProperties);
+        id = scoreServices.trigger(compilationArtifact, mergedInputs, systemProperties);
         return quiet ? StringUtils.EMPTY : triggerAsyncMsg(id, compilationArtifact.getExecutionPlan().getName());
     }
 

@@ -25,6 +25,7 @@ import org.springframework.shell.core.JLineShellComponent;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -48,8 +49,9 @@ public class SlangCLITest {
     private final static String FLOW_PATH_BACKSLASH = "C:\\flow.yaml";
     private final static String DEPENDENCIES_PATH_BACKSLASH = "C:\\\\flowsdir\\\\";
     private static final long DEFAULT_TIMEOUT = 10000;
+    public static final String INPUT_FILE_PATH = "/inputs/inputs.yaml";
 
-	private JLineShellComponent shell;
+    private JLineShellComponent shell;
     private SlangCLI slangCLI;
     private ScoreServices ScoreServicesMock;
     private CompilerHelper compilerHelperMock;
@@ -153,6 +155,64 @@ public class SlangCLITest {
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), anyListOf(String.class));
         verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class), eq(false));
 
+        Assert.assertEquals("method threw exception", null, cr.getException());
+        Assert.assertEquals("success should be true", true, cr.isSuccess());
+    }
+
+    @Test (timeout = DEFAULT_TIMEOUT)
+    public void testRunSyncWithInputsAndFileInputs() throws Exception {
+        long executionID = 1;
+        String inputsString = "--i input1=value1,input2=value2";
+
+        Map<String, Serializable> inputsMap = new HashMap<>();
+        inputsMap.put("input1", "value1");
+        inputsMap.put("input2", "value2");
+
+        Map fileInputsMap = new HashMap<>();
+        fileInputsMap.put("host", "localhost");
+        fileInputsMap.put("port", "22");
+
+        inputsMap.putAll(fileInputsMap);
+
+        when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
+        when(compilerHelperMock.loadInputsFromFile(anyList())).thenReturn(fileInputsMap);
+        when(ScoreServicesMock.triggerSync(eq(emptyCompilationArtifact), eq(inputsMap), anyMapOf(String.class, Serializable.class), eq(false))).thenReturn(executionID);
+
+        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " " + inputsString);
+
+        verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
+        verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), eq(inputsMap), anyMapOf(String.class, Serializable.class), eq(false));
+
+        Assert.assertEquals("method threw exception", null, cr.getException());
+        Assert.assertEquals("success should be true", true, cr.isSuccess());
+    }
+    @Test (timeout = DEFAULT_TIMEOUT)
+    public void testRunAsyncWithInputsAndFileInputs() throws Exception {
+        slangCLI.setEnvVar(true);
+
+        long executionID = 1;
+        String inputsString = "--i input1=value1,input2=value2";
+
+        Map<String, Serializable> inputsMap = new HashMap<>();
+        inputsMap.put("input1", "value1");
+        inputsMap.put("input2", "value2");
+
+        Map fileInputsMap = new HashMap<>();
+        fileInputsMap.put("host", "localhost");
+        fileInputsMap.put("port", "22");
+
+        inputsMap.putAll(fileInputsMap);
+
+        when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
+        when(compilerHelperMock.loadInputsFromFile(anyList())).thenReturn(fileInputsMap);
+        when(ScoreServicesMock.trigger(eq(emptyCompilationArtifact), eq(inputsMap), anyMapOf(String.class, Serializable.class))).thenReturn(executionID);
+
+        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " " + inputsString);
+
+        verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
+        verify(ScoreServicesMock).trigger(eq(emptyCompilationArtifact), eq(inputsMap), anyMapOf(String.class, Serializable.class));
+
+        Assert.assertEquals("method result mismatch", SlangCLI.triggerAsyncMsg(executionID, emptyCompilationArtifact.getExecutionPlan().getName()), cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
