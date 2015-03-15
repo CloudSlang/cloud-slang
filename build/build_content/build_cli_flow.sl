@@ -22,6 +22,9 @@ imports:
 flow:
   inputs:
     - target_dir: "'target'"
+    - target_cli:
+        default: 'target_dir + "/slang-cli/slang"'
+        overridable: false
   name: build_cli_flow
   workflow:
     - create_target_dir:
@@ -56,19 +59,19 @@ flow:
         do:
           files.copy:
             - source: "'../score-lang-cli/target/slang/'"
-            - destination: target_dir + '/slang-cli'
+            - destination: target_cli
 
     - copy_content_to_slang_cli:
         do:
           files.copy:
             - source: target_dir + '/slang_content/content'
-            - destination: target_dir + '/slang-cli/content'
+            - destination: target_cli + '/content'
 
     - copy_python_lib_to_slang_cli:
         do:
           files.copy:
             - source: target_dir + '/slang_content/python-lib'
-            - destination: target_dir + '/slang-cli/python-lib'
+            - destination: target_cli + '/python-lib'
 
 #    - precompile_jython_standalone
 
@@ -76,14 +79,14 @@ flow:
         do:
           cmd.run_command:
             - command: >
-                "pip install -t " + target_dir + "/slang-cli/python-lib " +
-                "-r " + target_dir + "/slang-cli/python-lib/requirements.txt --compile"
+                "pip install -t " + target_cli + "/python-lib " +
+                "-r " + target_cli + "/python-lib/requirements.txt --compile"
 
     - chmod_slang_exec:
         do:
           cmd.run_command:
             - command: >
-                "chmod +x " + target_dir + "/slang-cli/bin/slang"
+                "chmod +x " + target_cli + "/bin/slang"
 
 #    - add_docs
 
@@ -91,7 +94,7 @@ flow:
         do:
           files.zip_folder:
             - archive_name: "'slang-cli'"
-            - folder_path: target_dir + "/slang-cli"
+            - folder_path: 'target_dir + "/slang-cli"'
             - output_folder: target_dir
 
 
