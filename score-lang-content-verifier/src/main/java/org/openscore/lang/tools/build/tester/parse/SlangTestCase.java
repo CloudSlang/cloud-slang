@@ -1,6 +1,10 @@
 package org.openscore.lang.tools.build.tester.parse;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,7 +14,7 @@ public class SlangTestCase {
 
     private final String description;
 
-    private final String testSuits;
+    private final List<String> testSuits;
 
     private final String systemPropertiesFile;
 
@@ -20,12 +24,19 @@ public class SlangTestCase {
 
     private final String result;
 
+    public static final String BASE_TEST_SUITE = "base";
 
-    public SlangTestCase(String description, String testSuits, String systemPropertiesFile,
+
+    public SlangTestCase(String description, List<String> testSuits, String systemPropertiesFile,
                          Map<String, Serializable> inputs, Boolean throwsException, String result){
         this.description = description;
-        this.testSuits = testSuits;
         this.systemPropertiesFile = systemPropertiesFile;
+        if(CollectionUtils.isEmpty(testSuits)){
+            this.testSuits = new ArrayList<>();
+            this.testSuits.add(BASE_TEST_SUITE);
+        } else {
+            this.testSuits = testSuits;
+        }
         this.inputs = inputs;
         this.throwsException = throwsException;
         this.result = result;
@@ -35,7 +46,7 @@ public class SlangTestCase {
         return description;
     }
 
-    public String getTestSuits() {
+    public List<String> getTestSuits() {
         return testSuits;
     }
 
