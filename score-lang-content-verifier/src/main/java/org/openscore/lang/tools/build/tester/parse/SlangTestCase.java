@@ -50,4 +50,8 @@ public class SlangTestCase {
     public Boolean getThrowsException() {
         return throwsException;
     }
+
+    public String getResult() {
+        return result;
+    }
 }
