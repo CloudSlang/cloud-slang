@@ -21,6 +21,8 @@ import java.util.Map;
  **/
 public class SlangTestCase {
 
+    private final String name;
+
     private final String description;
 
     private final List<String> testSuits;
@@ -36,8 +38,9 @@ public class SlangTestCase {
     public static final String BASE_TEST_SUITE = "base";
 
 
-    public SlangTestCase(String description, List<String> testSuits, String systemPropertiesFile,
+    public SlangTestCase(String name, String description, List<String> testSuits, String systemPropertiesFile,
                          Map<String, Serializable> inputs, Boolean throwsException, String result){
+        this.name = name;
         this.description = description;
         this.systemPropertiesFile = systemPropertiesFile;
         if(CollectionUtils.isEmpty(testSuits)){
@@ -49,6 +52,10 @@ public class SlangTestCase {
         this.inputs = inputs;
         this.throwsException = throwsException;
         this.result = result;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getDescription() {
