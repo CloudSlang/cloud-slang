@@ -7,10 +7,11 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-package org.openscore.lang.tools.verifier.configuration;
+package org.openscore.lang.tools.build.configuration;
 
 import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
-import org.openscore.lang.tools.verifier.SlangContentVerifier;
+import org.openscore.lang.tools.build.SlangBuild;
+import org.openscore.lang.tools.build.verifier.SlangContentVerifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -20,9 +21,14 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @Import(SlangCompilerSpringConfig.class)
-public class VerifierSpringConfiguration {
+public class SlangBuildSpringConfiguration {
     @Bean
-    public SlangContentVerifier verifierHelper(){
+    public SlangBuild slangBuild(){
+        return new SlangBuild();
+    }
+
+    @Bean
+    public SlangContentVerifier slangContentVerifier(){
         return new SlangContentVerifier();
     }
 }

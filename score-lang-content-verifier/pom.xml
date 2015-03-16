@@ -17,6 +17,11 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+        </dependency>
+
         <!-- test -->
         <dependency>
             <groupId>org.mockito</groupId>
@@ -43,7 +48,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.openscore.lang.tools.verifier.VerifierMain</mainClass>
+                            <mainClass>org.openscore.lang.tools.build.SlangBuildMain</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

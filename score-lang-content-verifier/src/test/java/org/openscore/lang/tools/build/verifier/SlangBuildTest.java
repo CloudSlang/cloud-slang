@@ -6,7 +6,7 @@
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-package org.openscore.lang.tools.verifier;
+package org.openscore.lang.tools.build.verifier;
 
 import junit.framework.Assert;
 
@@ -24,6 +24,7 @@ import org.openscore.lang.compiler.modeller.model.Flow;
 import org.openscore.lang.compiler.scorecompiler.ScoreCompiler;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.bindings.Input;
+import org.openscore.lang.tools.build.SlangBuild;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,14 +44,14 @@ import static org.mockito.Mockito.mock;
  * Created by stoneo on 2/11/2015.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = SlangContentVerifierTest.Config.class)
-public class SlangContentVerifierTest {
+@ContextConfiguration(classes = SlangBuildTest.Config.class)
+public class SlangBuildTest {
 
 	private static final CompilationArtifact emptyCompilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>(), new ArrayList<Input>());
 	private static final Flow emptyExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, null, new HashSet<String>());
 
     @Autowired
-    private SlangContentVerifier slangContentVerifier;
+    private SlangBuild slangBuild;
 
     @Autowired
     private SlangCompiler slangCompiler;
@@ -71,14 +72,14 @@ public class SlangContentVerifierTest {
     public void testNullDirPath() throws Exception {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("path");
-        slangContentVerifier.verifyAllSlangFilesInDirAreValid(null);
+        slangBuild.buildSlangContent(null, null, null);
     }
 
     @Test
     public void testEmptyDirPath() throws Exception {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("path");
-        slangContentVerifier.verifyAllSlangFilesInDirAreValid("");
+        slangBuild.buildSlangContent("", null, null);
     }
 
     @Test
@@ -86,7 +87,7 @@ public class SlangContentVerifierTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("c/h/j");
         exception.expectMessage("directory");
-        slangContentVerifier.verifyAllSlangFilesInDirAreValid("c/h/j");
+        slangBuild.buildSlangContent("c/h/j", null, null);
     }
 
     @Test
@@ -94,7 +95,7 @@ public class SlangContentVerifierTest {
         URI resource = getClass().getResource("/no_dependencies").toURI();
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenThrow(new RuntimeException());
         exception.expect(RuntimeException.class);
-        slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+        slangBuild.buildSlangContent(resource.getPath(), null, null);
     }
 
     @Test
@@ -105,7 +106,7 @@ public class SlangContentVerifierTest {
         exception.expectMessage("1");
         exception.expectMessage("0");
         exception.expectMessage("compiled");
-        slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+        slangBuild.buildSlangContent(resource.getPath(), null, null);
     }
 
     @Test
@@ -113,7 +114,7 @@ public class SlangContentVerifierTest {
         URI resource = getClass().getResource("/no_dependencies").toURI();
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(emptyExecutable);
         Mockito.when(scoreCompiler.compile(emptyExecutable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
-        int numberOfCompiledSlangFiles = slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+        int numberOfCompiledSlangFiles = slangBuild.buildSlangContent(resource.getPath(), null, null);
         Assert.assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
     }
 
@@ -123,7 +124,7 @@ public class SlangContentVerifierTest {
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(emptyExecutable);
         Mockito.when(scoreCompiler.compile(emptyExecutable, new HashSet<Executable>())).thenThrow(new RuntimeException());
         exception.expect(RuntimeException.class);
-        slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+        slangBuild.buildSlangContent(resource.getPath(), null, null);
     }
 
     @Test
@@ -136,7 +137,7 @@ public class SlangContentVerifierTest {
         exception.expectMessage("0");
         exception.expectMessage("compile");
         exception.expectMessage("models");
-        slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+        slangBuild.buildSlangContent(resource.getPath(), null, null);
     }
 
     @Test
@@ -150,7 +151,7 @@ public class SlangContentVerifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("dependency");
         exception.expectMessage("dep1");
-        slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+        slangBuild.buildSlangContent(resource.getPath(), null, null);
     }
 
     @Test
@@ -166,7 +167,7 @@ public class SlangContentVerifierTest {
         dependencies.add(dependencyExecutable);
         Mockito.when(scoreCompiler.compile(emptyFlowExecutable, dependencies)).thenReturn(emptyCompilationArtifact);
         Mockito.when(scoreCompiler.compile(dependencyExecutable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
-        int numberOfCompiledSlangFiles = slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+        int numberOfCompiledSlangFiles = slangBuild.buildSlangContent(resource.getPath(), null, null);
         Assert.assertEquals("Did not compile all Slang files. Expected to compile: 2, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 2);
     }
 
@@ -178,7 +179,7 @@ public class SlangContentVerifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Namespace");
         exception.expectMessage("wrong.namespace");
-        slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+        slangBuild.buildSlangContent(resource.getPath(), null, null);
     }
 
     @Test
@@ -189,7 +190,7 @@ public class SlangContentVerifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Name");
         exception.expectMessage("wrong_name");
-        slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+        slangBuild.buildSlangContent(resource.getPath(), null, null);
     }
 
     @Test
@@ -197,7 +198,7 @@ public class SlangContentVerifierTest {
         URI resource = getClass().getResource("/no_dependencies").toURI();
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(emptyExecutable);
         Mockito.when(scoreCompiler.compile(emptyExecutable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
-        int numberOfCompiledSlangFiles = slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+        int numberOfCompiledSlangFiles = slangBuild.buildSlangContent(resource.getPath(), null, null);
         Assert.assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
     }
 
@@ -207,7 +208,7 @@ public class SlangContentVerifierTest {
         Flow executable = new Flow(null, null, null, "no_dependencies-0123456789", "empty_flow", null, null, null, new HashSet<String>());
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(executable);
         Mockito.when(scoreCompiler.compile(executable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
-        int numberOfCompiledSlangFiles = slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+        int numberOfCompiledSlangFiles = slangBuild.buildSlangContent(resource.getPath(), null, null);
         Assert.assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
     }
 
@@ -217,7 +218,7 @@ public class SlangContentVerifierTest {
         Flow executable = new Flow(null, null, null, "No_Dependencies", "empty_flow", null, null, null, new HashSet<String>());
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(executable);
         Mockito.when(scoreCompiler.compile(executable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
-        int numberOfCompiledSlangFiles = slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+        int numberOfCompiledSlangFiles = slangBuild.buildSlangContent(resource.getPath(), null, null);
         Assert.assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
     }
 
@@ -229,7 +230,7 @@ public class SlangContentVerifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("invalid-chars$");
         exception.expectMessage("alphanumeric");
-        slangContentVerifier.verifyAllSlangFilesInDirAreValid(resource.getPath());
+        slangBuild.buildSlangContent(resource.getPath(), null, null);
     }
 
     @Configuration
@@ -246,7 +247,11 @@ public class SlangContentVerifierTest {
         }
 
         @Bean
-        public SlangContentVerifier slangContentVerifier() {
+        public SlangBuild slangBuild() {
+            return new SlangBuild();
+        }
+
+        @Bean SlangContentVerifier slangContentVerifier() {
             return new SlangContentVerifier();
         }
 

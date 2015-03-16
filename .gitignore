@@ -1,6 +1,5 @@
 target/
 output/
-build/
 *.class
 *.log
 .idea/
