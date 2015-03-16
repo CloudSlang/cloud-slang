@@ -16,15 +16,17 @@ import org.openscore.lang.entities.MapForLoopStatement;
 import org.openscore.lang.runtime.env.Context;
 import org.openscore.lang.runtime.env.ForLoopCondition;
 import org.openscore.lang.runtime.env.LoopCondition;
-import org.python.core.PyList;
 import org.python.core.PyObject;
-import org.python.core.PyTuple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.List;
+import java.util.Set;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import static org.openscore.lang.runtime.env.LoopCondition.LOOP_CONDITION_KEY;
@@ -66,9 +68,9 @@ public class LoopsBinding {
         Validate.notNull(flowContext, "flow context cannot be null");
         Validate.notNull(forLoopCondition, "for condition cannot be null");
 
-        PyTuple keyValueTuple = (PyTuple) forLoopCondition.next();
-        Serializable keyFromIteration = (Serializable) keyValueTuple.get(0);
-        Serializable valueFromIteration = (Serializable) keyValueTuple.get(1);
+        @SuppressWarnings("unchecked") Map.Entry<Serializable, Serializable> entry = (Map.Entry<Serializable, Serializable>) forLoopCondition.next();
+        Serializable keyFromIteration = entry.getKey();
+        Serializable valueFromIteration = entry.getValue();
 
         flowContext.putVariable(keyName, keyFromIteration);
         flowContext.putVariable(valueName, valueFromIteration);
@@ -86,10 +88,17 @@ public class LoopsBinding {
             throw new RuntimeException("Error evaluating for loop expression in task '" + nodeName + "', error is: \n" + t.getMessage(), t);
         }
 
-        if ((forLoopStatement instanceof MapForLoopStatement) && !(evalResult instanceof PyList)) {
-            throw new RuntimeException(
-                    "Invalid expression for iterating maps: " + collectionExpression
-                    + "\nValid format is: map.items()");
+        if (forLoopStatement instanceof MapForLoopStatement) {
+            if (evalResult instanceof Map) {
+                List<Map.Entry<Serializable, Serializable>> entriesAsSerializable = new ArrayList<>();
+                @SuppressWarnings("unchecked") Set<Map.Entry<Serializable, Serializable>> entrySet = ((Map) evalResult).entrySet();
+                for (Map.Entry<Serializable, Serializable> entry : entrySet) {
+                    entriesAsSerializable.add(Pair.of(entry.getKey(), entry.getValue()));
+                }
+                evalResult = (Serializable) entriesAsSerializable;
+            } else {
+                throw new RuntimeException("Invalid expression for iterating maps: " + collectionExpression);
+            }
         }
 
         ForLoopCondition forLoopCondition = createForLoopCondition(evalResult);

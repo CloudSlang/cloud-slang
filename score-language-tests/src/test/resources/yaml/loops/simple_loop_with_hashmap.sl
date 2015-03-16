@@ -11,29 +11,16 @@ imports:
   ops: loops
 
 flow:
-  name: loop_with_break
+  name: simple_loop_with_map
   inputs:
-    - person_map: >
-        {'john': 1, 'jane': 2, 'peter': 'three'}
+    - person_map
   workflow:
     - print_values:
         loop:
           for: k, v in person_map
           do:
-            ops.operation_that_goes_to_custom_when_value_is_2:
-              - text: v
-          break:
-            - CUSTOM
-        navigate:
-          CUSTOM: print_other_values
-          SUCCESS: SUCCESS
-
-    - task_that_doesnt_run:
-        do:
-          ops.print:
-            - text: "'I don't run'"
-
-    - print_other_values:
-        do:
-          ops.print:
-            - text: "'abc'"
+            ops.print:
+              - text: k
+              - text2: v
+          publish:
+            - new_var: "'a'"
