@@ -25,11 +25,14 @@ import org.openscore.lang.compiler.scorecompiler.ScoreCompiler;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.bindings.Input;
 import org.openscore.lang.tools.build.SlangBuild;
+import org.openscore.lang.tools.build.tester.SlangTestRunner;
+import org.openscore.lang.tools.build.tester.parse.TestCasesYamlParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.yaml.snakeyaml.Yaml;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -251,9 +254,24 @@ public class SlangBuildTest {
             return new SlangBuild();
         }
 
-        @Bean SlangContentVerifier slangContentVerifier() {
+        @Bean
+        public SlangContentVerifier slangContentVerifier() {
             return new SlangContentVerifier();
         }
 
+        @Bean
+        public SlangTestRunner slangTestRunner() {
+            return new SlangTestRunner();
+        }
+
+        @Bean
+        public TestCasesYamlParser testCasesYamlParser(){
+            return mock(TestCasesYamlParser.class);
+        }
+
+        @Bean
+        public Yaml yaml(){
+            return mock(Yaml.class);
+        }
     }
 }

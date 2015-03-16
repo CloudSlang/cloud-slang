@@ -11,6 +11,8 @@ package org.openscore.lang.tools.build.configuration;
 
 import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
 import org.openscore.lang.tools.build.SlangBuild;
+import org.openscore.lang.tools.build.tester.SlangTestRunner;
+import org.openscore.lang.tools.build.tester.parse.TestCasesYamlParser;
 import org.openscore.lang.tools.build.verifier.SlangContentVerifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,5 +32,15 @@ public class SlangBuildSpringConfiguration {
     @Bean
     public SlangContentVerifier slangContentVerifier(){
         return new SlangContentVerifier();
+    }
+
+    @Bean
+    public SlangTestRunner slangTestRunner(){
+        return new SlangTestRunner();
+    }
+
+    @Bean
+    public TestCasesYamlParser parser(){
+        return new TestCasesYamlParser();
     }
 }

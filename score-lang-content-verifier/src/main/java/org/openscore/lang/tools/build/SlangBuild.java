@@ -12,6 +12,8 @@ package org.openscore.lang.tools.build;
 import org.apache.log4j.Logger;
 import org.openscore.lang.compiler.modeller.model.Executable;
 import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.tools.build.tester.SlangTestRunner;
+import org.openscore.lang.tools.build.tester.parse.SlangTestCase;
 import org.openscore.lang.tools.build.verifier.SlangContentVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -29,6 +31,10 @@ public class SlangBuild {
 
     @Autowired
     private SlangContentVerifier slangContentVerifier;
+
+    @Autowired
+    private SlangTestRunner slangTestRunner;
+
 
     Map<String, CompilationArtifact> compiledArtifacts;
 
@@ -64,8 +70,10 @@ public class SlangBuild {
 
     public void runTests(String testsPath, String[] testSuits){
         // Compile all slang test flows under the test directory
-//        Map<String, Executable> testFlowModels = transformSlangFilesInDirToModelsAndValidate(testsPath);
-//        Map<String, CompilationArtifact> compiledTestFlows = compileSlangModels(testFlowModels);
+        Map<String, Executable> testFlowModels = slangContentVerifier.transformSlangFilesInDirToModelsAndValidate(testsPath);
+        Map<String, CompilationArtifact> compiledTestFlows = slangContentVerifier.compileSlangModels(testFlowModels);
+
+        Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath);
     }
 
 
