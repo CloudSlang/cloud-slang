@@ -28,7 +28,7 @@ import java.util.Map;
 @ContextConfiguration(locations = "classpath:/META-INF/spring/systemTestContext.xml")
 public abstract class SystemsTestsParent {
 
-    protected static final String EXEC_START_PATH = "0/0";
+    protected static final String EXEC_START_PATH = "0";
     protected static final String FIRST_STEP_PATH = "0/1";
     protected static final String SECOND_STEP_KEY = "0/2";
     protected static final String THIRD_STEP_KEY = "0/3";

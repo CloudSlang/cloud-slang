@@ -5,23 +5,17 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: user.flows
+namespace: user.ops
 
-imports:
-  ops: user.ops
-
-flow:
-  name: child_flow
+operation:
+  name: check_weather
   inputs:
-    - input1: "'value'"
-  workflow:
-    - task01:
-        do:
-          ops.get_time_zone:
-            - time_zone_as_string:
-                system_property: user.sys.props.port
-    - task02:
-        do:
-          ops.test_op:
+    - city
+  action:
+    python_script: |
+      weather = "weather thing"
+      print city
   outputs:
-    - val_output: fromInputs['input1']
+    - weather: weather
+  results:
+    - SUCCESS: 'weather == "weather thing"'

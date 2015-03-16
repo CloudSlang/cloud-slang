@@ -1,3 +1,11 @@
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package org.openscore.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
@@ -11,7 +19,6 @@ import org.openscore.lang.runtime.bindings.InputsBinding;
 import org.openscore.lang.runtime.bindings.OutputsBinding;
 import org.openscore.lang.runtime.bindings.ResultsBinding;
 import org.openscore.lang.runtime.env.Context;
-import org.openscore.lang.runtime.env.ExecutionPath;
 import org.openscore.lang.runtime.env.ParentFlowData;
 import org.openscore.lang.runtime.env.ReturnValues;
 import org.openscore.lang.runtime.env.RunEnvironment;
@@ -57,8 +64,7 @@ public class ExecutableSteps extends AbstractSteps {
                                 @Param(NODE_NAME_KEY) String nodeName,
                                 @Param(NEXT_STEP_ID_KEY) Long nextStepId) {
         try {
-            runEnv.getExecutionPath()
-                  .down();
+//			runEnv.getExecutionPath().forward(); // Start with 1 for consistency
             Map<String, Serializable> callArguments = runEnv.removeCallArguments();
 
             if (userInputs != null) {
@@ -85,6 +91,7 @@ public class ExecutableSteps extends AbstractSteps {
 
             // put the next step position for the navigation
             runEnv.putNextStepPosition(nextStepId);
+			runEnv.getExecutionPath().down();
         } catch (RuntimeException e){
             logger.error("There was an error running the start executable execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);
@@ -105,9 +112,7 @@ public class ExecutableSteps extends AbstractSteps {
                                  @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                                  @Param(NODE_NAME_KEY) String nodeName) {
 		try {
-            ExecutionPath executionPath = runEnv.getExecutionPath();
-            executionPath.up();
-            if (executionPath.getDepth() < 1) executionPath.down(); // In case we're at top level
+			runEnv.getExecutionPath().up();
             Context operationContext = runEnv.getStack().popContext();
             Map<String, Serializable> operationVariables = operationContext == null ? null : operationContext.getImmutableViewOfVariables();
             ReturnValues actionReturnValues = runEnv.removeReturnValues();
