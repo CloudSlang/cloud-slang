@@ -31,6 +31,10 @@ public class SlangTestRunner {
     @Autowired
     private TestCasesYamlParser parser;
 
+//    @Autowired
+//    private Slang slang;
+
+
     private String[] TEST_CASE_FILE_EXTENSIONS = {"yaml", "yml"};
 
     private final static Logger log = Logger.getLogger(SlangTestRunner.class);
@@ -44,11 +48,14 @@ public class SlangTestRunner {
         log.info(testCasesFiles.size() + " test cases files were found");
         for(File testCaseFile: testCasesFiles){
             Validate.isTrue(testCaseFile.isFile(), "file path \'" + testCaseFile.getAbsolutePath() + "\' must lead to a file");
-            testCases = parser.parse(SlangSource.fromFile(testCaseFile));
+            testCases.putAll(parser.parse(SlangSource.fromFile(testCaseFile)));
         }
         //todo: temp solution, until we have the data from the parse
         testCases = createMockTestCases();
-//        for()
+        for(Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()){
+            log.info("Start running test: " + testCaseEntry.getKey());
+
+        }
 
         return testCases;
     }
@@ -58,13 +65,13 @@ public class SlangTestRunner {
         Map<String, Serializable> inputs1 = new HashMap<>();
         inputs1.put("input1", "value1");
         inputs1.put("input2", "value2");
-        SlangTestCase testCase1 = new SlangTestCase("testCase1", "Test case 1", null, null, inputs1, Boolean.FALSE, "SUCCESS");
+        SlangTestCase testCase1 = new SlangTestCase("testCase1", "testFlow1", "Test case 1", null, null, inputs1, Boolean.FALSE, "SUCCESS");
         testCases.put(testCase1.getName(), testCase1);
 
         Map<String, Serializable> inputs2 = new HashMap<>();
         inputs1.put("input3", "value3");
         inputs1.put("input4", "value4");
-        SlangTestCase testCase2 = new SlangTestCase("testCase2", "Test case 2", null, null, inputs2, Boolean.FALSE, "FAILURE");
+        SlangTestCase testCase2 = new SlangTestCase("testCase2", "testFlow2", "Test case 2", null, null, inputs2, Boolean.FALSE, "FAILURE");
         testCases.put(testCase2.getName(), testCase2);
 
         return testCases;
