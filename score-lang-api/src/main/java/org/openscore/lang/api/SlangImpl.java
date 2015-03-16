@@ -80,7 +80,8 @@ public class SlangImpl implements Slang {
 		Map<String, Serializable> executionContext = new HashMap<>();
 		RunEnvironment runEnv = new RunEnvironment(systemProperties);
 		executionContext.put(ScoreLangConstants.RUN_ENV, runEnv);
-		executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable)runInputs);
+	        Map<String, ? extends Serializable> clonedRunInputs = new HashMap<>(runInputs);
+		executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable) clonedRunInputs);
 		TriggeringProperties triggeringProperties = TriggeringProperties.create(compilationArtifact.getExecutionPlan()).setDependencies(compilationArtifact.getDependencies())
 			.setContext(executionContext);
 		return score.trigger(triggeringProperties);
