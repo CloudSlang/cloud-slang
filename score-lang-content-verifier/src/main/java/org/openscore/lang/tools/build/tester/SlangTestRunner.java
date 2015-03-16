@@ -14,6 +14,7 @@ import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.openscore.lang.api.Slang;
 import org.openscore.lang.compiler.SlangSource;
+import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.tools.build.tester.parse.SlangTestCase;
 import org.openscore.lang.tools.build.tester.parse.TestCasesYamlParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,12 +54,24 @@ public class SlangTestRunner {
         }
         //todo: temp solution, until we have the data from the parse
         testCases = createMockTestCases();
-        for(Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()){
-            log.info("Start running test: " + testCaseEntry.getKey());
-
-        }
 
         return testCases;
+    }
+
+    public void runAllTests(Map<String, SlangTestCase> testCases, Map<String, CompilationArtifact> compiledContent,
+                            Map<String, CompilationArtifact> compiledTestFlows){
+        for(Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()){
+            log.info("Start running test: " + testCaseEntry.getKey());
+            SlangTestCase testCase = testCaseEntry.getValue();
+            String testFlowPath = testCase.getTestFlowPath();
+            String testFlowPathTransformed = testFlowPath.replace(File.separatorChar, '.');
+            CompilationArtifact compiledTestFlow = compiledTestFlows.get(testFlowPathTransformed);
+            Validate.notNull("Test flow: " + testFlowPath + " is missing. Referenced in test case: " + testCase.getName());
+            runTest(testCase, compiledTestFlow, compiledContent);
+        }
+    }
+
+    private void runTest(SlangTestCase testCase, CompilationArtifact compiledTestFlow, Map<String, CompilationArtifact> compiledContent) {
     }
 
     private Map<String, SlangTestCase> createMockTestCases() {

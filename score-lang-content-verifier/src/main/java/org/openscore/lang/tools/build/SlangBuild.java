@@ -36,13 +36,13 @@ public class SlangBuild {
     private SlangTestRunner slangTestRunner;
 
 
-    Map<String, CompilationArtifact> compiledArtifacts;
+    Map<String, CompilationArtifact> compiledSlangFiles;
 
     private final static Logger log = Logger.getLogger(SlangBuild.class);
 
     public int buildSlangContent(String directoryPath, String testsPath, String[] testSuits){
         verifyAllSlangFilesInDirAreValid(directoryPath);
-        int numOfCompiledSlangFiles = compiledArtifacts.size();
+        int numOfCompiledSlangFiles = compiledSlangFiles.size();
 
         if(testsPath != null) {
             verifyAllSlangFilesInDirAreValid(testsPath);
@@ -59,12 +59,12 @@ public class SlangBuild {
      */
     private void verifyAllSlangFilesInDirAreValid(String directoryPath){
         Map<String, Executable> slangModels = slangContentVerifier.transformSlangFilesInDirToModelsAndValidate(directoryPath);
-        compiledArtifacts = slangContentVerifier.compileSlangModels(slangModels);
-        if(compiledArtifacts.size() != slangModels.size()){
+        compiledSlangFiles = slangContentVerifier.compileSlangModels(slangModels);
+        if(compiledSlangFiles.size() != slangModels.size()){
             throw new RuntimeException("Some Slang files were not compiled.\n" +
-                    "Found: " + slangModels.size() + " slang models, but managed to compile only: " + compiledArtifacts.size());
+                    "Found: " + slangModels.size() + " slang models, but managed to compile only: " + compiledSlangFiles.size());
         }
-        String successMessage = "Successfully finished Compilation of: " + compiledArtifacts.size() + " Slang files";
+        String successMessage = "Successfully finished Compilation of: " + compiledSlangFiles.size() + " Slang files";
         log.info(successMessage);
     }
 
@@ -74,6 +74,7 @@ public class SlangBuild {
         Map<String, CompilationArtifact> compiledTestFlows = slangContentVerifier.compileSlangModels(testFlowModels);
 
         Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath);
+        slangTestRunner.runAllTests(testCases, compiledSlangFiles, compiledTestFlows);
     }
 
 
