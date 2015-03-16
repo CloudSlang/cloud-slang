@@ -25,6 +25,9 @@ flow:
     - target_cli:
         default: 'target_dir + "/slang-cli/slang"'
         overridable: false
+    - slang_content_repo:
+        default: "'https://github.com/openscore/slang-content.git'"
+        overridable: false
   name: build_cli_flow
   workflow:
     - create_target_dir:
@@ -35,7 +38,7 @@ flow:
     - get_slang_content:
         do:
           build_content.get_slang_content:
-            - url: "'https://github.com/openscore/slang-content.git'"
+            - url: slang_content_repo
             - target_dir:
                 default:  target_dir + "/slang_content"
                 overridable: false
