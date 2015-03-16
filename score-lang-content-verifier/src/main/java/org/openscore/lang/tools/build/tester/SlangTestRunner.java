@@ -12,6 +12,7 @@ package org.openscore.lang.tools.build.tester;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
+import org.openscore.lang.api.Slang;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.tools.build.tester.parse.SlangTestCase;
 import org.openscore.lang.tools.build.tester.parse.TestCasesYamlParser;
@@ -31,8 +32,8 @@ public class SlangTestRunner {
     @Autowired
     private TestCasesYamlParser parser;
 
-//    @Autowired
-//    private Slang slang;
+    @Autowired
+    private Slang slang;
 
 
     private String[] TEST_CASE_FILE_EXTENSIONS = {"yaml", "yml"};

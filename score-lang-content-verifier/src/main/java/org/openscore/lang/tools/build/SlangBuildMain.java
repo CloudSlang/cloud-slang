@@ -11,9 +11,8 @@ package org.openscore.lang.tools.build;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
-import org.openscore.lang.tools.build.configuration.SlangBuildSpringConfiguration;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
 
@@ -35,7 +34,7 @@ public class SlangBuildMain {
         if(testSuitsArg != null){
             testSuits = testSuitsArg.split(",");
         }
-        ApplicationContext context = new AnnotationConfigApplicationContext(SlangBuildSpringConfiguration.class);
+        ApplicationContext context = new ClassPathXmlApplicationContext("/META-INF/spring/testRunnerContext.xml");
         SlangBuild slangBuild = context.getBean(SlangBuild.class);
         try {
             int numberOfValidSlangFiles = slangBuild.buildSlangContent(repositoryPath, testsPath, testSuits);

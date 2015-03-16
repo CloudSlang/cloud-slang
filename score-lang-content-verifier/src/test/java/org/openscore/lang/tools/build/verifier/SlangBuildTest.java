@@ -17,6 +17,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.openscore.api.ExecutionPlan;
+import org.openscore.lang.api.Slang;
 import org.openscore.lang.compiler.SlangCompiler;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.compiler.modeller.model.Executable;
@@ -272,6 +273,11 @@ public class SlangBuildTest {
         @Bean
         public Yaml yaml(){
             return mock(Yaml.class);
+        }
+
+        @Bean
+        public Slang slang(){
+            return mock(Slang.class);
         }
     }
 }

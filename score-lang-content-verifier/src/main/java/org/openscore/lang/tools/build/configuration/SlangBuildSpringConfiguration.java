@@ -9,7 +9,7 @@
  *******************************************************************************/
 package org.openscore.lang.tools.build.configuration;
 
-import org.openscore.lang.compiler.configuration.SlangCompilerSpringConfig;
+import org.openscore.lang.api.configuration.SlangSpringConfiguration;
 import org.openscore.lang.tools.build.SlangBuild;
 import org.openscore.lang.tools.build.tester.SlangTestRunner;
 import org.openscore.lang.tools.build.tester.parse.TestCasesYamlParser;
@@ -22,8 +22,9 @@ import org.springframework.context.annotation.Import;
  * Created by stoneo on 2/9/2015.
  */
 @Configuration
-@Import(SlangCompilerSpringConfig.class)
+@Import(SlangSpringConfiguration.class)
 public class SlangBuildSpringConfiguration {
+
     @Bean
     public SlangBuild slangBuild(){
         return new SlangBuild();
