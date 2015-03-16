@@ -17,7 +17,6 @@ import org.openscore.lang.runtime.env.Context;
 import org.openscore.lang.runtime.env.ForLoopCondition;
 import org.openscore.lang.runtime.env.LoopCondition;
 import org.python.core.PyObject;
-import org.python.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.apache.commons.lang3.tuple.Pair;
@@ -27,6 +26,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import static org.openscore.lang.runtime.env.LoopCondition.LOOP_CONDITION_KEY;
@@ -90,7 +90,7 @@ public class LoopsBinding {
 
         if (forLoopStatement instanceof MapForLoopStatement) {
             if (evalResult instanceof Map) {
-                List<Map.Entry<Serializable, Serializable>> entriesAsSerializable = Lists.newArrayList();
+                List<Map.Entry<Serializable, Serializable>> entriesAsSerializable = new ArrayList<>();
                 @SuppressWarnings("unchecked") Set<Map.Entry<Serializable, Serializable>> entrySet = ((Map) evalResult).entrySet();
                 for (Map.Entry<Serializable, Serializable> entry : entrySet) {
                     entriesAsSerializable.add(Pair.of(entry.getKey(), entry.getValue()));
