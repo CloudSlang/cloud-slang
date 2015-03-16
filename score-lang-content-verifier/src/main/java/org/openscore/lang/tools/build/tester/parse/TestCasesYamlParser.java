@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Component
@@ -31,7 +32,7 @@ public class TestCasesYamlParser {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    public void parse(SlangSource source) {
+    public Map<String, SlangTestCase> parse(SlangSource source) {
 
         Validate.notEmpty(source.getSource(), "Source " + source.getName() + " cannot be empty");
 
@@ -49,6 +50,7 @@ public class TestCasesYamlParser {
         } catch (Throwable e) {
             throw new RuntimeException("There was a problem parsing the YAML source: " + source.getName() + ".\n" + e.getMessage(), e);
         }
+        return new HashMap<>();
     }
 
     private void createTestCase(Map.Entry<String, Map> testCase) {

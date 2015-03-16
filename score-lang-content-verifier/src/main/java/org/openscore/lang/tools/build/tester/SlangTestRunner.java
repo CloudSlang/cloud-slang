@@ -31,10 +31,11 @@ public class SlangTestRunner {
         Map<String, SlangTestCase> testCases = new HashMap<>();
         Collection<File> testCasesFiles = FileUtils.listFiles(new File(testPath), TEST_CASE_FILE_EXTENSIONS, true);
         log.info("Start parsing all test cases files under: " + testPath);
-        log.info(testCasesFiles.size() + " yaml files were found");
+        log.info(testCasesFiles.size() + " test cases files were found");
         for(File testCaseFile: testCasesFiles){
             Validate.isTrue(testCaseFile.isFile(), "file path \'" + testCaseFile.getAbsolutePath() + "\' must lead to a file");
-            parser.parse(SlangSource.fromFile(testCaseFile));
+
+            testCases = parser.parse(SlangSource.fromFile(testCaseFile));
         }
         return testCases;
     }
