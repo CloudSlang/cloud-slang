@@ -1,4 +1,3 @@
-package org.openscore.lang.tools.build.tester.parse;
 /*******************************************************************************
 * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
 * All rights reserved. This program and the accompanying materials
@@ -9,6 +8,7 @@ package org.openscore.lang.tools.build.tester.parse;
 *
 *******************************************************************************/
 
+package org.openscore.lang.tools.build.tester.parse;
 
 /*
  * Created by orius123 on 05/11/14.

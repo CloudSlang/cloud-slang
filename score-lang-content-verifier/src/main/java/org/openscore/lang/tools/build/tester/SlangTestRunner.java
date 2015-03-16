@@ -1,3 +1,12 @@
+/*
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ */
 package org.openscore.lang.tools.build.tester;
 
 import org.apache.commons.io.FileUtils;
@@ -15,7 +24,7 @@ import java.util.Map;
 
 /**
  * Created by stoneo on 3/15/2015.
- */
+ **/
 public class SlangTestRunner {
 
     @Autowired
@@ -34,9 +43,18 @@ public class SlangTestRunner {
         log.info(testCasesFiles.size() + " test cases files were found");
         for(File testCaseFile: testCasesFiles){
             Validate.isTrue(testCaseFile.isFile(), "file path \'" + testCaseFile.getAbsolutePath() + "\' must lead to a file");
-
             testCases = parser.parse(SlangSource.fromFile(testCaseFile));
         }
+        //todo: temp solution, until we have the data from the parse
+        testCases = createMockTestCases();
+
+        return testCases;
+    }
+
+    private Map<String, SlangTestCase> createMockTestCases() {
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+//        SlangTestCase testCase1 = new SlangTestCase("Test case 1", null, )
+
         return testCases;
     }
 
