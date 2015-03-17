@@ -42,7 +42,7 @@ public class SyncTriggerEventListener implements ScoreEventListener{
     public static final String SLANG_STEP_ERROR_MSG = "Slang Error : ";
     public static final String SCORE_ERROR_EVENT_MSG = "Score Error Event :";
     public static final String FLOW_FINISHED_WITH_FAILURE_MSG = "Flow finished with failure";
-    public static final String EXEC_START_PATH = "0/0";
+    public static final String EXEC_START_PATH = "0";
     public static final int OUTPUT_VALUE_LIMIT = 40;
     private final static String TASK_PATH_PREFIX = "- ";
 
