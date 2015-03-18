@@ -7,7 +7,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  */
-package org.openscore.lang.tools.build.verifier.parser;
+package org.openscore.lang.tools.build.tester.parser;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,7 +34,7 @@ import java.util.Map;
 
 /**
  * Created by stoneo on 3/16/2015.
- */
+ **/
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestCasesYamlParserTest.Config.class)
 public class TestCasesYamlParserTest {

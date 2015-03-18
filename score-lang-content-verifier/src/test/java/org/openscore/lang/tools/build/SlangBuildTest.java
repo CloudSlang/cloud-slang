@@ -6,10 +6,9 @@
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-package org.openscore.lang.tools.build.verifier;
+package org.openscore.lang.tools.build;
 
 import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,9 +24,9 @@ import org.openscore.lang.compiler.modeller.model.Flow;
 import org.openscore.lang.compiler.scorecompiler.ScoreCompiler;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.openscore.lang.entities.bindings.Input;
-import org.openscore.lang.tools.build.SlangBuild;
 import org.openscore.lang.tools.build.tester.SlangTestRunner;
 import org.openscore.lang.tools.build.tester.parse.TestCasesYamlParser;
+import org.openscore.lang.tools.build.verifier.SlangContentVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

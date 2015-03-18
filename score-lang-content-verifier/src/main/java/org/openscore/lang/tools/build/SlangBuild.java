@@ -19,8 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
-import static org.openscore.lang.compiler.SlangSource.fromFile;
-
 /*
  * Created by stoneo on 2/9/2015.
  */
@@ -74,7 +72,7 @@ public class SlangBuild {
         Map<String, CompilationArtifact> compiledTestFlows = slangContentVerifier.compileSlangModels(testFlowModels);
 
         Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath);
-        slangTestRunner.runAllTests(testCases, compiledSlangFiles, compiledTestFlows);
+        slangTestRunner.runAllTests(testCases, compiledTestFlows);
     }
 
 

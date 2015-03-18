@@ -10,6 +10,7 @@
 package org.openscore.lang.tools.build.tester;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.openscore.lang.api.Slang;
@@ -20,9 +21,16 @@ import org.openscore.lang.tools.build.tester.parse.TestCasesYamlParser;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import static org.openscore.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
+import static org.openscore.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
 
 /**
  * Created by stoneo on 3/15/2015.
@@ -53,7 +61,7 @@ public class SlangTestRunner {
         return testCases;
     }
 
-    public void runAllTests(Map<String, SlangTestCase> testCases, Map<String, CompilationArtifact> compiledContent,
+    public void runAllTests(Map<String, SlangTestCase> testCases,
                             Map<String, CompilationArtifact> compiledTestFlows) {
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
             log.info("Start running test: " + testCaseEntry.getKey());
@@ -62,11 +70,52 @@ public class SlangTestRunner {
             String testFlowPathTransformed = testFlowPath.replace(File.separatorChar, '.');
             CompilationArtifact compiledTestFlow = compiledTestFlows.get(testFlowPathTransformed);
             Validate.notNull("Test flow: " + testFlowPath + " is missing. Referenced in test case: " + testCase.getName());
-            runTest(testCase, compiledTestFlow, compiledContent);
+            runTest(testCase, compiledTestFlow);
         }
     }
 
-    private void runTest(SlangTestCase testCase, CompilationArtifact compiledTestFlow,
-                         Map<String, CompilationArtifact> compiledContent) {
+    private void runTest(SlangTestCase testCase, CompilationArtifact compiledTestFlow) {
+
+        List<Map> inputs = testCase.getInputs();
+        Map<String, Serializable> convertedInputs = new HashMap<>();
+        for(Map input : inputs){
+            convertedInputs.put((String)input.keySet().iterator().next(), (Serializable)input.values().iterator().next());
+        }
+        //todo: add support in sys properties
+        trigger(testCase.getName(), compiledTestFlow, convertedInputs, null);
+    }
+
+    /**
+     * This method will trigger the flow in a synchronize matter, meaning only one flow can run at a time.
+     * @param compilationArtifact the artifact to trigger
+     * @param inputs : flow inputs
+     * @return executionId
+     */
+    public Long trigger(String testCaseName, CompilationArtifact compilationArtifact,
+                        Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties){
+        //add start event
+        Set<String> handlerTypes = new HashSet<>();
+        handlerTypes.add(EVENT_EXECUTION_FINISHED);
+        handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
+
+        TriggerTestCaseEventListener testsEventListener = new TriggerTestCaseEventListener(testCaseName);
+        slang.subscribeOnEvents(testsEventListener, handlerTypes);
+
+        Long executionId = slang.run(compilationArtifact, inputs, systemProperties);
+
+        while(!testsEventListener.isFlowFinished()){
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException ignore) {}
+        }
+        slang.unSubscribeOnEvents(testsEventListener);
+
+        String errorMessageFlowExecution = testsEventListener.getErrorMessage();
+        if (StringUtils.isNotEmpty(errorMessageFlowExecution)) {
+            // exception occurred during flow execution
+            throw new RuntimeException(errorMessageFlowExecution);
+        }
+
+        return executionId;
     }
 }
