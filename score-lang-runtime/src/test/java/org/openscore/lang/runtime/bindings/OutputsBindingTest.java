@@ -45,7 +45,7 @@ public class OutputsBindingTest {
     private OutputsBinding outputsBinding;
 
     @Test(timeout = DEFAULT_TIMEOUT)
-    public void testOperationEmptyOutputs() throws Exception {
+    public void testOperationEmptyOutputs() {
         Map<String, Serializable> operationContext = new HashMap<>();
         Map<String, Serializable> actionReturnValues = new HashMap<>();
         List<Output> outputs = new LinkedList<>();
@@ -57,59 +57,70 @@ public class OutputsBindingTest {
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
-    public void testOperationOutputsNoExpression() throws Exception {
+    public void testOperationOutputsNoExpression() {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(createNoExpressionOutput("host1"));
 
         Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
 
-        Map<String, String> expectedOutputs = new HashMap<>();
+        Map<String, Serializable> expectedOutputs = new HashMap<>();
         expectedOutputs.put("host1", "valueHost1");
 
         Assert.assertEquals("Binding results are not as expected", expectedOutputs, result);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
-    public void testOperationOutputsNoExpressionMultipleOutputs() throws Exception {
+    public void testOperationOutputsNoExpressionMultipleOutputs() {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(createNoExpressionOutput("host1"), createNoExpressionOutput("host2"));
 
         Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
 
-        Map<String, String> expectedOutputs = new HashMap<>();
+        Map<String, Serializable> expectedOutputs = new HashMap<>();
         expectedOutputs.put("host1", "valueHost1");
         expectedOutputs.put("host2", "valueHost2");
 
         Assert.assertEquals("Binding results are not as expected", expectedOutputs, result);
     }
 
-    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
-    public void testOperationOutputsIllegalEvaluatedExpression() throws Exception {
+    @Test
+    public void testOperationOutputsNoExpressionAtAll() {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = new HashMap<>();
         List<Output> outputs = Arrays.asList(createNoExpressionOutput("actionOutputKey1"));
+
+        Map<String, Serializable> boundOutputs = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
+        Assert.assertTrue(boundOutputs.containsKey("actionOutputKey1"));
+        Assert.assertEquals(null, boundOutputs.get("actionOutputKey1"));
+    }
+
+    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
+    public void testOperationOutputsIllegalEvaluatedExpression() {
+        Map<String, Serializable> operationContext = prepareOperationContext();
+        Map<String, Serializable> actionReturnValues = new HashMap<>();
+        List<Output> outputs = Arrays.asList(createExpressionOutput("actionOutputKey1", "None + 'str'"));
 
         outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
-    public void testOperationOutputsExpression() throws Exception {
+    public void testOperationOutputsExpression() {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(fromInputs['port'])"));
 
         Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
 
-        Map<String, String> expectedOutputs = new HashMap<>();
+        Map<String, Serializable> expectedOutputs = new HashMap<>();
         expectedOutputs.put("hostFromExpression", "http://hostExpr:9999");
 
         Assert.assertEquals("Binding results are not as expected", expectedOutputs, result);
     }
 
     @Test(expected = RuntimeException.class)
-    public void testMissingOperationOutputsNoExpression() throws Exception {
+    public void testMissingOperationOutputsNoExpression() {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = new HashMap<>();
         List<Output> outputs = Arrays.asList(new Output("actionOutputKey1", null));
@@ -117,7 +128,7 @@ public class OutputsBindingTest {
         outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
     }
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
-    public void testOperationOutputsInvalidExpression() throws Exception {
+    public void testOperationOutputsInvalidExpression() {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(fromInputs[SHOULD_BE_STRING])"));
@@ -126,7 +137,7 @@ public class OutputsBindingTest {
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
-    public void testOperationOutputsMixed() throws Exception {
+    public void testOperationOutputsMixed() {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(
@@ -135,7 +146,7 @@ public class OutputsBindingTest {
 
         Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
 
-        Map<String, String> expectedOutputs = new HashMap<>();
+        Map<String, Serializable> expectedOutputs = new HashMap<>();
         expectedOutputs.put("hostFromExpression", "http://hostExpr:9999");
         expectedOutputs.put("host1", "valueHost1");
 
