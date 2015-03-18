@@ -1,4 +1,4 @@
 testPrintFinishesWithSuccess:
   inputs:
     - text: "text to print"
-  description: "Tests that print_text operation finshes with SUCCESS"
+  description: "Tests that print_text operation finishes with SUCCESS"

@@ -11,7 +11,6 @@ package org.openscore.lang.tools.build.tester.parse;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,27 +20,29 @@ import java.util.Map;
  **/
 public class SlangTestCase {
 
-    private final String name;
+    private String name;
 
-    private final String testFlowPath;
+    private String testFlowPath;
 
-    private final String description;
+    private String description;
 
-    private final List<String> testSuits;
+    private List<String> testSuits;
 
-    private final String systemPropertiesFile;
+    private String systemPropertiesFile;
 
-    private final Map<String, Serializable> inputs;
+    private List<Map> inputs;
 
-    private final Boolean throwsException;
+    private Boolean throwsException;
 
-    private final String result;
+    private String result;
 
     public static final String BASE_TEST_SUITE = "base";
 
+    //for jackson
+    private SlangTestCase() {}
 
     public SlangTestCase(String name, String testFlowPath, String description, List<String> testSuits,
-                         String systemPropertiesFile, Map<String, Serializable> inputs,
+                         String systemPropertiesFile, List<Map> inputs,
                          Boolean throwsException, String result){
         this.name = name;
         this.testFlowPath = testFlowPath;
@@ -78,7 +79,7 @@ public class SlangTestCase {
         return systemPropertiesFile;
     }
 
-    public Map<String, Serializable> getInputs() {
+    public List<Map> getInputs() {
         return inputs;
     }
 

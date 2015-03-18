@@ -20,14 +20,13 @@ import org.openscore.lang.tools.build.tester.parse.TestCasesYamlParser;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by stoneo on 3/15/2015.
- **/
+ */
 public class SlangTestRunner {
 
     @Autowired
@@ -35,7 +34,6 @@ public class SlangTestRunner {
 
     @Autowired
     private Slang slang;
-
 
     private String[] TEST_CASE_FILE_EXTENSIONS = {"yaml", "yml"};
 
@@ -48,19 +46,16 @@ public class SlangTestRunner {
         Collection<File> testCasesFiles = FileUtils.listFiles(new File(testPath), TEST_CASE_FILE_EXTENSIONS, true);
         log.info("Start parsing all test cases files under: " + testPath);
         log.info(testCasesFiles.size() + " test cases files were found");
-        for(File testCaseFile: testCasesFiles){
+        for (File testCaseFile : testCasesFiles) {
             Validate.isTrue(testCaseFile.isFile(), "file path \'" + testCaseFile.getAbsolutePath() + "\' must lead to a file");
             testCases.putAll(parser.parse(SlangSource.fromFile(testCaseFile)));
         }
-        //todo: temp solution, until we have the data from the parse
-        testCases = createMockTestCases();
-
         return testCases;
     }
 
     public void runAllTests(Map<String, SlangTestCase> testCases, Map<String, CompilationArtifact> compiledContent,
-                            Map<String, CompilationArtifact> compiledTestFlows){
-        for(Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()){
+                            Map<String, CompilationArtifact> compiledTestFlows) {
+        for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
             log.info("Start running test: " + testCaseEntry.getKey());
             SlangTestCase testCase = testCaseEntry.getValue();
             String testFlowPath = testCase.getTestFlowPath();
@@ -71,24 +66,7 @@ public class SlangTestRunner {
         }
     }
 
-    private void runTest(SlangTestCase testCase, CompilationArtifact compiledTestFlow, Map<String, CompilationArtifact> compiledContent) {
+    private void runTest(SlangTestCase testCase, CompilationArtifact compiledTestFlow,
+                         Map<String, CompilationArtifact> compiledContent) {
     }
-
-    private Map<String, SlangTestCase> createMockTestCases() {
-        Map<String, SlangTestCase> testCases = new HashMap<>();
-        Map<String, Serializable> inputs1 = new HashMap<>();
-        inputs1.put("input1", "value1");
-        inputs1.put("input2", "value2");
-        SlangTestCase testCase1 = new SlangTestCase("testCase1", "testFlow1", "Test case 1", null, null, inputs1, Boolean.FALSE, "SUCCESS");
-        testCases.put(testCase1.getName(), testCase1);
-
-        Map<String, Serializable> inputs2 = new HashMap<>();
-        inputs1.put("input3", "value3");
-        inputs1.put("input4", "value4");
-        SlangTestCase testCase2 = new SlangTestCase("testCase2", "testFlow2", "Test case 2", null, null, inputs2, Boolean.FALSE, "FAILURE");
-        testCases.put(testCase2.getName(), testCase2);
-
-        return testCases;
-    }
-
 }

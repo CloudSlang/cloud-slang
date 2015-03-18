@@ -9,9 +9,12 @@
  */
 package org.openscore.lang.tools.build.verifier.parser;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.compiler.parser.YamlParser;
+import org.openscore.lang.tools.build.tester.parse.SlangTestCase;
 import org.openscore.lang.tools.build.tester.parse.TestCasesYamlParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -21,10 +24,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import static org.mockito.Mockito.mock;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by stoneo on 3/16/2015.
@@ -37,10 +43,17 @@ public class TestCasesYamlParserTest {
     private TestCasesYamlParser parser;
 
     @Test
-    public void testSimpleTestCasersParsing() throws URISyntaxException {
+    public void testSimpleTestCasesParsing() throws URISyntaxException {
         String filePath = "/test/org/content/test_print_text-SUCCESS.inputs.yaml";
         URI fileUri = getClass().getResource(filePath).toURI();
-//        parser.parse(SlangSource.fromFile(fileUri));
+        Map<String, SlangTestCase> testCases = parser.parse(SlangSource.fromFile(fileUri));
+        SlangTestCase testPrintFinishesWithSuccess = testCases.get("testPrintFinishesWithSuccess");
+        Assert.assertEquals("Tests that print_text operation finishes with SUCCESS", testPrintFinishesWithSuccess.getDescription());
+        List<Map> expectedInputsList = new ArrayList<>();
+        Map<String, Serializable> expectedInputs = new HashMap<>();
+        expectedInputs.put("text", "text to print");
+        expectedInputsList.add(expectedInputs);
+        Assert.assertEquals(expectedInputsList, testPrintFinishesWithSuccess.getInputs());
     }
 
 

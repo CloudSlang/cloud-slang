@@ -14,6 +14,7 @@ package org.openscore.lang.tools.build.tester.parse;
  * Created by orius123 on 05/11/14.
  */
 
+import ch.lambdaj.function.convert.Converter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.Validate;
 import org.openscore.lang.compiler.SlangSource;
@@ -21,8 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.Map;
+
+import static ch.lambdaj.Lambda.convertMap;
 
 @Component
 public class TestCasesYamlParser {
@@ -37,25 +40,24 @@ public class TestCasesYamlParser {
         Validate.notEmpty(source.getSource(), "Source " + source.getName() + " cannot be empty");
 
         try {
-            Map<String, Map> parsedTestCases = yaml.loadAs(source.getSource(), Map.class);
-            for(Map.Entry<String, Map> testCaseEntry : parsedTestCases.entrySet()){
-//                objectMapper.convertValue(testCase.getValue(), ParsedSlangTestCase.class);
-                createTestCase(testCaseEntry);
-            }
-            if(parsedTestCases == null) {
-                throw new RuntimeException("Source " + source.getName() + " does not contain YAML content");
-            }
-//            parsedSlang.setName(source.getName());
-//            return parsedSlang.getTest_cases();
+            @SuppressWarnings("unchecked") Map<String, Map> parsedTestCases = yaml.loadAs(source.getSource(), Map.class);
+            return convertMap(parsedTestCases, new Converter<Map, SlangTestCase>() {
+                @Override
+                public SlangTestCase convert(Map from) {
+                    return parseTestCase(from);
+                }
+            });
         } catch (Throwable e) {
             throw new RuntimeException("There was a problem parsing the YAML source: " + source.getName() + ".\n" + e.getMessage(), e);
         }
-        return new HashMap<>();
     }
 
-    private void createTestCase(Map.Entry<String, Map> testCase) {
-        String testCaseName = testCase.getKey();
-//        Map testCaseValue =
+    private SlangTestCase parseTestCase(Map map) {
+        try {
+            String content = objectMapper.writeValueAsString(map);
+            return objectMapper.readValue(content, SlangTestCase.class);
+        } catch (IOException e) {
+            throw new RuntimeException("Error parsing slang test case", e);
+        }
     }
-
 }
