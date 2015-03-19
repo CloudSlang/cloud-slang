@@ -12,4 +12,6 @@ deploy:
     - build/target/slang-content-verifer.jar
   skip_cleanup: true
   on:
+    repo: openscore/score-language
     tags: true
+    branch: master
