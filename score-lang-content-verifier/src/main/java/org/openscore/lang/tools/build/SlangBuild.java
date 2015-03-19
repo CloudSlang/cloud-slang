@@ -17,6 +17,7 @@ import org.openscore.lang.tools.build.tester.parse.SlangTestCase;
 import org.openscore.lang.tools.build.verifier.SlangContentVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /*
@@ -34,7 +35,9 @@ public class SlangBuild {
     private SlangTestRunner slangTestRunner;
 
 
-    Map<String, CompilationArtifact> compiledSlangFiles;
+    private Map<String, CompilationArtifact> compiledSlangFiles;
+
+    private Map<String, Executable> slangModels;
 
     private final static Logger log = Logger.getLogger(SlangBuild.class);
 
@@ -43,7 +46,6 @@ public class SlangBuild {
         int numOfCompiledSlangFiles = compiledSlangFiles.size();
 
         if(testsPath != null) {
-            verifyAllSlangFilesInDirAreValid(testsPath);
             runTests(testsPath, testSuits);
         }
 
@@ -56,7 +58,7 @@ public class SlangBuild {
      * @return the number of valid Slang files in the given directory
      */
     private void verifyAllSlangFilesInDirAreValid(String directoryPath){
-        Map<String, Executable> slangModels = slangContentVerifier.transformSlangFilesInDirToModelsAndValidate(directoryPath);
+        slangModels = slangContentVerifier.transformSlangFilesInDirToModelsAndValidate(directoryPath);
         compiledSlangFiles = slangContentVerifier.compileSlangModels(slangModels);
         if(compiledSlangFiles.size() != slangModels.size()){
             throw new RuntimeException("Some Slang files were not compiled.\n" +
@@ -68,11 +70,16 @@ public class SlangBuild {
 
     public void runTests(String testsPath, String[] testSuits){
         // Compile all slang test flows under the test directory
+        Map<String, Executable> allFlowsModels = new HashMap<>();
         Map<String, Executable> testFlowModels = slangContentVerifier.transformSlangFilesInDirToModelsAndValidate(testsPath);
-        Map<String, CompilationArtifact> compiledTestFlows = slangContentVerifier.compileSlangModels(testFlowModels);
+        allFlowsModels.putAll(testFlowModels);
+        // Add also all of the slang models for the content, so they could be compiled together
+        allFlowsModels.putAll(slangModels);
+        // Compiling all the Slang content + all the test flows
+        Map<String, CompilationArtifact> compiledFlows = slangContentVerifier.compileSlangModels(allFlowsModels);
 
         Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath);
-        slangTestRunner.runAllTests(testCases, compiledTestFlows);
+        slangTestRunner.runAllTests(testCases, compiledFlows);
     }
 
 
