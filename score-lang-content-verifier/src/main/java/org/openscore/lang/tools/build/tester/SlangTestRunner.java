@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.openscore.lang.api.Slang;
 import org.openscore.lang.compiler.SlangSource;
 import org.openscore.lang.entities.CompilationArtifact;
+import org.openscore.lang.runtime.env.ReturnValues;
 import org.openscore.lang.tools.build.tester.parse.SlangTestCase;
 import org.openscore.lang.tools.build.tester.parse.TestCasesYamlParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.openscore.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
-import static org.openscore.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
+import static org.openscore.lang.entities.ScoreLangConstants.*;
 
 /**
  * Created by stoneo on 3/15/2015.
@@ -82,7 +82,7 @@ public class SlangTestRunner {
             convertedInputs.put((String)input.keySet().iterator().next(), (Serializable)input.values().iterator().next());
         }
         //todo: add support in sys properties
-        trigger(testCase.getName(), compiledTestFlow, convertedInputs, null);
+        trigger(testCase.getName(), compiledTestFlow, convertedInputs, null, testCase.getResult());
     }
 
     /**
@@ -92,11 +92,14 @@ public class SlangTestRunner {
      * @return executionId
      */
     public Long trigger(String testCaseName, CompilationArtifact compilationArtifact,
-                        Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties){
+                        Map<String, ? extends Serializable> inputs,
+                        Map<String, ? extends Serializable> systemProperties,
+                        String result){
         //add start event
         Set<String> handlerTypes = new HashSet<>();
         handlerTypes.add(EVENT_EXECUTION_FINISHED);
         handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
+        handlerTypes.add(EVENT_OUTPUT_END);
 
         TriggerTestCaseEventListener testsEventListener = new TriggerTestCaseEventListener(testCaseName);
         slang.subscribeOnEvents(testsEventListener, handlerTypes);
@@ -110,8 +113,11 @@ public class SlangTestRunner {
         }
         slang.unSubscribeOnEvents(testsEventListener);
 
+        ReturnValues executionReturnValues = testsEventListener.getExecutionReturnValues();
+        String executionResult = executionReturnValues.getResult();
+
         String errorMessageFlowExecution = testsEventListener.getErrorMessage();
-        if (StringUtils.isNotEmpty(errorMessageFlowExecution)) {
+        if (StringUtils.isNotEmpty(errorMessageFlowExecution) || !executionResult.equals(result)) {
             // exception occurred during flow execution
             throw new RuntimeException(errorMessageFlowExecution);
         }

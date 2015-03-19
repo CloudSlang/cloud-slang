@@ -18,14 +18,19 @@ package org.openscore.lang.tools.build.tester;
  * under the License.
 */
 
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.openscore.events.EventConstants;
 import org.openscore.events.ScoreEvent;
 import org.openscore.events.ScoreEventListener;
 import org.openscore.lang.entities.ScoreLangConstants;
+import org.openscore.lang.runtime.env.ReturnValues;
 import org.openscore.lang.runtime.events.LanguageEventData;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -43,12 +48,15 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
 
     public static final String TEST_CASE_PASSED = "Passed test case: ";
     public static final String TEST_CASE_FAILED = "Failed running test case: ";
+    public static final String EXEC_START_PATH = "0";
 
     private final static Logger log = Logger.getLogger(SlangTestRunner.class);
 
     private AtomicBoolean flowFinished = new AtomicBoolean(false);
     private AtomicReference<String> errorMessage = new AtomicReference<>("");
     private String testCaseName;
+    private String result;
+    private Map<String, Serializable> outputs;
 
     public TriggerTestCaseEventListener(String testCaseName) {
         this.testCaseName = testCaseName;
@@ -78,9 +86,46 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
                 break;
             case EVENT_EXECUTION_FINISHED :
                 flowFinished.set(true);
+                result = (String)data.get(RESULT);
                 printFinishEvent(data);
                 break;
+            case ScoreLangConstants.EVENT_OUTPUT_END:
+                Map<String, Serializable> extractOutputs = extractOutputs(data);
+                if(MapUtils.isNotEmpty(extractOutputs)) {
+                    outputs = extractOutputs;
+                }
+                break;
         }
+    }
+
+    public ReturnValues getExecutionReturnValues(){
+        if(StringUtils.isEmpty(result)){
+            throw new RuntimeException("Result of executing the test " + testCaseName + " cannot be empty");
+        }
+        return new ReturnValues(outputs, result);
+    }
+
+    private Map<String, Serializable> extractOutputs(Map<String, Serializable> data) {
+        if(data.containsKey(LanguageEventData.OUTPUTS)
+                && data.containsKey(LanguageEventData.PATH)
+                && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
+
+            @SuppressWarnings("unchecked") Map<String, Serializable> outputs = (Map<String, Serializable>) data.get(LanguageEventData.OUTPUTS);
+            if (MapUtils.isNotEmpty(outputs)) {
+                Iterator<Map.Entry<String,Serializable>> iterator = outputs.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<String,Serializable> output = iterator.next();
+                    if(StringUtils.isEmpty(output.getValue()
+                                                 .toString())){
+                        iterator.remove();
+                    } else {
+                        outputs.put(output.getKey(), output.getValue());
+                    }
+                }
+            }
+            return outputs;
+        }
+        return new HashMap<>();
     }
 
     private void printFinishEvent(Map<String, Serializable> data) {
