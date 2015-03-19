@@ -68,7 +68,7 @@ public class SlangBuild {
         log.info(successMessage);
     }
 
-    public void runTests(String testsPath, String[] testSuits){
+    public void runTests(String testsPath, String[] testSuites){
         // Compile all slang test flows under the test directory
         Map<String, Executable> allFlowsModels = new HashMap<>();
         Map<String, Executable> testFlowModels = slangContentVerifier.transformSlangFilesInDirToModelsAndValidate(testsPath);
