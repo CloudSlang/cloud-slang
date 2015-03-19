@@ -1,0 +1,47 @@
+<project name="score-runner" default="init" basedir=".">
+    <!--
+        (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+        All rights reserved. This program and the accompanying materials
+        are made available under the terms of the Apache License v2.0 which accompany this distribution.
+        The Apache License is available at
+        http://www.apache.org/licenses/LICENSE-2.0
+    -->
+    <description>
+        run score cli
+    </description>
+    <!-- set global properties for this build -->
+    <property name="build" location="cli"/>
+    <!--<property name="proxy.host" value="proxy-host"/>-->
+    <!--<property name="proxy.port" value="8080"/>-->
+    <!--<echo message="proxy host: ${proxy.host}, proxy port: ${proxy.port}"/>-->
+    <target name="init">
+        <!-- Create the time stamp -->
+        <tstamp/>
+        <!-- Create the build directory structure used by compile -->
+        <!--<setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"/>-->
+        <mkdir dir="${build}"/>
+        <get src="https://github.com/openscore/score-language/releases/download/score-language-0.1.18/slang-cli.zip"
+            dest="${build}/slang.zip" usetimestamp="true" verbose="true"/>
+        <!--<gunzip src="${build}/slang.tar.gz"/>-->
+        <!--<untar src="${build}/slang.tar" dest="${build}"/>-->
+        <unzip src="${build}/slang.zip" dest="${build}"/>
+        <exec executable="/bin/bash" osfamily="unix">
+            <arg value="${build}/slang/bin/slang"/>
+            <arg value="run"/>
+            <arg value="--f"/>
+            <arg value="build_content/build_cli_flow.sl"/>
+            <arg value="--cp"/>
+            <arg value="build_content,${build}"/>
+        </exec>
+        <exec executable="cmd" osfamily="windows">
+            <arg value="/c"/>
+            <arg value="${build}/slang/bin/slang"/>
+            <arg value="run"/>
+            <arg value="build_content/build_cli_flow.sl"/>
+        </exec>
+    </target>
+    <target name="clean"
+        description="clean up" >
+        <delete dir="${build}"/>
+    </target>
+</project>

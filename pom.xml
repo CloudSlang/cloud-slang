@@ -10,7 +10,7 @@
     -->
     <groupId>io.openscore.lang</groupId>
     <artifactId>score-language</artifactId>
-    <version>0.1.19-SNAPSHOT</version>
+    <version>0.7.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A DSL for writing flows</description>
