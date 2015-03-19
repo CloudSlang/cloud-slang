@@ -35,7 +35,7 @@ import java.util.Map;
 @ContextConfiguration(classes = SyncTriggerEventListenerTest.Config.class)
 public class SyncTriggerEventListenerTest {
 
-    public static final String EXEC_START_PATH = "0/0";
+    public static final String EXEC_START_PATH = "0";
     public static final String FIRST_STEP_PATH = "0/1";
 
     public static final String RETURN_RESULT = "returnResult";

@@ -112,15 +112,6 @@ public class ForTransformerTest {
     }
 
     @Test
-    public void testValidMapStatementWithExpression() throws Exception {
-        ForLoopStatement statement = transformer.transform("k, v in dictionary.items()");
-        MapForLoopStatement mapForLoopStatement  = validateMapForLoopStatement(statement);
-        Assert.assertEquals("k", mapForLoopStatement.getKeyName());
-        Assert.assertEquals("v", mapForLoopStatement.getValueName());
-        Assert.assertEquals("dictionary.items()", statement.getCollectionExpression());
-    }
-
-    @Test
     public void testValidMapStatementAndTrim() throws Exception {
         ForLoopStatement statement = transformer.transform(" k, v   in  collection  ");
         MapForLoopStatement mapForLoopStatement  = validateMapForLoopStatement(statement);

@@ -49,6 +49,10 @@ public class OutputsBinding {
                     Map<String, Serializable> scriptContext = new HashMap<>();
                     //put action outputs
                     scriptContext.putAll(actionReturnValues);
+                    //declare the new output
+                    if (!actionReturnValues.containsKey(outputKey)) {
+                        scriptContext.put(outputKey, null);
+                    }
                     //put operation inputs as a map
                     if(MapUtils.isNotEmpty(inputs)) {
                         scriptContext.put(BIND_OUTPUT_FROM_INPUTS_KEY, (Serializable) inputs);
@@ -62,12 +66,10 @@ public class OutputsBinding {
                     }
                     //evaluate expression
 
-                    if (scriptResult != null) {
-                        try {
-                            outputs.put(outputKey, scriptResult);
-                        } catch (ClassCastException ex) {
-                            throw new RuntimeException("The output expression " + outputExpr + " does not return serializable value", ex);
-                        }
+                    try {
+                        outputs.put(outputKey, scriptResult);
+                    } catch (ClassCastException ex) {
+                        throw new RuntimeException("The output expression " + outputExpr + " does not return serializable value", ex);
                     }
                 } else {
                     throw new RuntimeException("Output: " + outputKey + " has no expression");
