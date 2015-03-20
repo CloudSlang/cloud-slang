@@ -109,16 +109,12 @@ public class SyncTriggerEventListener implements ScoreEventListener{
                 Iterator<Map.Entry<String,Serializable>> iterator = outputs.entrySet().iterator();
                 while (iterator.hasNext()) {
                     Map.Entry<String,Serializable> output = iterator.next();
-                    if(output.getValue() == null){
+                    if(output.getValue() == null || StringUtils.isEmpty(output.getValue().toString())){
                         iterator.remove();
+                    } else {
+                        outputs.put(output.getKey(), StringUtils.abbreviate(output.getValue().toString(), 0, OUTPUT_VALUE_LIMIT));
                     }
-                    else {
-                        if (StringUtils.isEmpty(output.getValue().toString())) {
-                            iterator.remove();
-                        } else  {
-                            outputs.put(output.getKey(), StringUtils.abbreviate(output.getValue().toString(), 0, OUTPUT_VALUE_LIMIT));
-                        }
-                    }
+
                 }
             }
             return outputs;
