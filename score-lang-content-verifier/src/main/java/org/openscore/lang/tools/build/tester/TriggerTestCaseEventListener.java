@@ -30,7 +30,6 @@ import org.openscore.lang.runtime.events.LanguageEventData;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -105,27 +104,22 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
         return new ReturnValues(outputs, result);
     }
 
-    private Map<String, Serializable> extractOutputs(Map<String, Serializable> data) {
-        if(data.containsKey(LanguageEventData.OUTPUTS)
-                && data.containsKey(LanguageEventData.PATH)
-                && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
+    private static Map<String, Serializable> extractOutputs(Map<String, Serializable> data) {
 
-            @SuppressWarnings("unchecked") Map<String, Serializable> outputs = (Map<String, Serializable>) data.get(LanguageEventData.OUTPUTS);
-            if (MapUtils.isNotEmpty(outputs)) {
-                Iterator<Map.Entry<String,Serializable>> iterator = outputs.entrySet().iterator();
-                while (iterator.hasNext()) {
-                    Map.Entry<String,Serializable> output = iterator.next();
-                    if(StringUtils.isEmpty(output.getValue()
-                                                 .toString())){
-                        iterator.remove();
-                    } else {
-                        outputs.put(output.getKey(), output.getValue());
-                    }
-                }
-            }
-            return outputs;
+        Map<String, Serializable> outputsMap = new HashMap<>();
+
+        boolean thereAreOutputsForRootPath =
+                data.containsKey(LanguageEventData.OUTPUTS)
+                && data.containsKey(LanguageEventData.PATH)
+                && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH);
+
+        if (thereAreOutputsForRootPath) {
+            @SuppressWarnings("unchecked") Map<String, Serializable> outputs =
+                    (Map<String, Serializable>) data.get(LanguageEventData.OUTPUTS);
+            if (MapUtils.isNotEmpty(outputs)) outputsMap.putAll(outputs);
         }
-        return new HashMap<>();
+
+        return outputsMap;
     }
 
     private void printFinishEvent(Map<String, Serializable> data) {
