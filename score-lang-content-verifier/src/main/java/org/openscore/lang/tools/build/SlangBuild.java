@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /*
  * Created by stoneo on 2/9/2015.
@@ -41,7 +42,7 @@ public class SlangBuild {
 
     private final static Logger log = Logger.getLogger(SlangBuild.class);
 
-    public int buildSlangContent(String directoryPath, String testsPath, String[] testSuits){
+    public int buildSlangContent(String directoryPath, String testsPath, Set<String> testSuits){
         verifyAllSlangFilesInDirAreValid(directoryPath);
         int numOfCompiledSlangFiles = compiledSlangFiles.size();
 
@@ -68,7 +69,7 @@ public class SlangBuild {
         log.info(successMessage);
     }
 
-    public void runTests(String testsPath, String[] testSuites){
+    public void runTests(String testsPath, Set<String> testSuites){
         // Compile all slang test flows under the test directory
         Map<String, Executable> allFlowsModels = new HashMap<>();
         Map<String, Executable> testFlowModels = slangContentVerifier.transformSlangFilesInDirToModelsAndValidate(testsPath);
