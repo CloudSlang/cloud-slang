@@ -9,6 +9,7 @@
  */
 package org.openscore.lang.tools.build.tester;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
@@ -30,7 +31,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.openscore.lang.entities.ScoreLangConstants.*;
+import static org.openscore.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
+import static org.openscore.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
+import static org.openscore.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
 
 /**
  * Created by stoneo on 3/15/2015.
@@ -67,24 +70,35 @@ public class SlangTestRunner {
     }
 
     public void runAllTests(Map<String, SlangTestCase> testCases,
-                            Map<String, CompilationArtifact> compiledTestFlows) {
+                            Map<String, CompilationArtifact> compiledFlows
+    ) {
+
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
             log.info("Start running test: " + testCaseEntry.getKey());
             SlangTestCase testCase = testCaseEntry.getValue();
-            String testFlowPath = testCase.getTestFlowPath();
-            String testFlowPathTransformed = testFlowPath.replace(File.separatorChar, '.');
-            CompilationArtifact compiledTestFlow = compiledTestFlows.get(testFlowPathTransformed);
-            Validate.notNull("Test flow: " + testFlowPath + " is missing. Referenced in test case: " + testCase.getName());
+            CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
             runTest(testCase, compiledTestFlow);
         }
+    }
+
+    private static CompilationArtifact getCompiledTestFlow(Map<String, CompilationArtifact> compiledFlows, SlangTestCase testCase) {
+        String testFlowPath = testCase.getTestFlowPath();
+        String testFlowPathTransformed = testFlowPath.replace(File.separatorChar, '.');
+        CompilationArtifact compiledTestFlow = compiledFlows.get(testFlowPathTransformed);
+        Validate.notNull("Test flow: " + testFlowPath + " is missing. Referenced in test case: " + testCase.getName());
+        return compiledTestFlow;
     }
 
     private void runTest(SlangTestCase testCase, CompilationArtifact compiledTestFlow) {
 
         List<Map> inputs = testCase.getInputs();
         Map<String, Serializable> convertedInputs = new HashMap<>();
-        for(Map input : inputs){
-            convertedInputs.put((String)input.keySet().iterator().next(), (Serializable)input.values().iterator().next());
+        if (CollectionUtils.isNotEmpty(inputs)) {
+            for (Map input : inputs) {
+                convertedInputs.put(
+                        (String) input.keySet().iterator().next(),
+                        (Serializable) input.values().iterator().next());
+            }
         }
         //todo: add support in sys properties
         trigger(testCase.getName(), compiledTestFlow, convertedInputs, null, testCase.getResult());
@@ -92,14 +106,15 @@ public class SlangTestRunner {
 
     /**
      * This method will trigger the flow in a synchronize matter, meaning only one flow can run at a time.
+     *
      * @param compilationArtifact the artifact to trigger
-     * @param inputs : flow inputs
+     * @param inputs              : flow inputs
      * @return executionId
      */
     public Long trigger(String testCaseName, CompilationArtifact compilationArtifact,
                         Map<String, ? extends Serializable> inputs,
                         Map<String, ? extends Serializable> systemProperties,
-                        String result){
+                        String result) {
         //add start event
         Set<String> handlerTypes = new HashSet<>();
         handlerTypes.add(EVENT_EXECUTION_FINISHED);
@@ -111,7 +126,7 @@ public class SlangTestRunner {
 
         Long executionId = slang.run(compilationArtifact, inputs, systemProperties);
 
-        while(!testsEventListener.isFlowFinished()){
+        while (!testsEventListener.isFlowFinished()) {
             try {
                 Thread.sleep(200);
             } catch (InterruptedException ignore) {}
