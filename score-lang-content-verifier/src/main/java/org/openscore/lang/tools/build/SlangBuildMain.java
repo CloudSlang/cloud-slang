@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
+import java.util.regex.Pattern;
 
 /*
  * Created by stoneo on 1/11/2015.
@@ -22,22 +23,23 @@ import java.io.File;
 public class SlangBuildMain {
 
     public static void main(String[] args) {
-        String repositoryPath = System.getProperty("path");
-        String testsPath = System.getProperty("testPath");
-        String testSuitsArg = System.getProperty("testSuits");
+        Validate.notEmpty(args, "You must pass a path to your repository");
+        String repositoryPath = args[0];
         Validate.notNull(repositoryPath, "You must pass a path to your repository");
         repositoryPath = FilenameUtils.separatorsToSystem(repositoryPath);
         Validate.isTrue(new File(repositoryPath).isDirectory(),
                 "Directory path argument \'" + repositoryPath + "\' does not lead to a directory");
 
-        String[] testSuits = null;
-        if(testSuitsArg != null){
-            testSuits = testSuitsArg.split(",");
+        String testSuitesArg = System.getProperty("testSuites");
+        String[] testSuites = null;
+        if (testSuitesArg != null) {
+            testSuites = testSuitesArg.split(Pattern.quote(","));
         }
-        ApplicationContext context = new ClassPathXmlApplicationContext("/META-INF/spring/testRunnerContext.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("spring/testRunnerContext.xml");
         SlangBuild slangBuild = context.getBean(SlangBuild.class);
         try {
-            int numberOfValidSlangFiles = slangBuild.buildSlangContent(repositoryPath, testsPath, testSuits);
+            String testsPath = System.getProperty("testPath");
+            int numberOfValidSlangFiles = slangBuild.buildSlangContent(repositoryPath, testsPath, testSuites);
             System.out.println("SUCCESS: Found " + numberOfValidSlangFiles + " slang files under directory: \"" + repositoryPath + "\" and all are valid.");
 
             System.exit(0);
