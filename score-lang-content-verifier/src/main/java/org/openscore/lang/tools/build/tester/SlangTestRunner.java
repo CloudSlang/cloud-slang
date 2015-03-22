@@ -49,13 +49,18 @@ public class SlangTestRunner {
 
     public Map<String, SlangTestCase> createTestCases(String testPath) {
         Validate.notEmpty(testPath, "You must specify a path for tests");
-        Validate.isTrue(new File(testPath).isDirectory(), "Directory path argument \'" + testPath + "\' does not lead to a directory");
-        Map<String, SlangTestCase> testCases = new HashMap<>();
-        Collection<File> testCasesFiles = FileUtils.listFiles(new File(testPath), TEST_CASE_FILE_EXTENSIONS, true);
+        File testPathDir = new File(testPath);
+        Validate.isTrue(testPathDir.isDirectory(),
+                "Directory path argument \'" + testPath + "\' does not lead to a directory");
+        Collection<File> testCasesFiles = FileUtils.listFiles(testPathDir, TEST_CASE_FILE_EXTENSIONS, true);
+
         log.info("Start parsing all test cases files under: " + testPath);
         log.info(testCasesFiles.size() + " test cases files were found");
+
+        Map<String, SlangTestCase> testCases = new HashMap<>();
         for (File testCaseFile : testCasesFiles) {
-            Validate.isTrue(testCaseFile.isFile(), "file path \'" + testCaseFile.getAbsolutePath() + "\' must lead to a file");
+            Validate.isTrue(testCaseFile.isFile(),
+                    "file path \'" + testCaseFile.getAbsolutePath() + "\' must lead to a file");
             testCases.putAll(parser.parse(SlangSource.fromFile(testCaseFile)));
         }
         return testCases;
