@@ -12,6 +12,7 @@ package org.openscore.lang.tools.build.tester.parse;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public class SlangTestCase {
 
     private String description;
 
-    private List<String> testSuits;
+    private List<String> testSuites;
 
     private String systemPropertiesFile;
 
@@ -41,19 +42,14 @@ public class SlangTestCase {
     //for jackson
     private SlangTestCase() {}
 
-    public SlangTestCase(String name, String testFlowPath, String description, List<String> testSuits,
+    public SlangTestCase(String name, String testFlowPath, String description, List<String> testSuites,
                          String systemPropertiesFile, List<Map> inputs,
                          Boolean throwsException, String result){
         this.name = name;
         this.testFlowPath = testFlowPath;
         this.description = description;
         this.systemPropertiesFile = systemPropertiesFile;
-        if(CollectionUtils.isEmpty(testSuits)){
-            this.testSuits = new ArrayList<>();
-            this.testSuits.add(BASE_TEST_SUITE);
-        } else {
-            this.testSuits = testSuits;
-        }
+        this.testSuites = testSuites;
         this.inputs = inputs;
         this.throwsException = throwsException;
         this.result = result;
@@ -71,8 +67,11 @@ public class SlangTestCase {
         return description;
     }
 
-    public List<String> getTestSuits() {
-        return testSuits;
+    public List<String> getTestSuites() {
+        if(CollectionUtils.isEmpty(testSuites)) {
+            this.testSuites = Arrays.asList(BASE_TEST_SUITE);
+        }
+        return testSuites;
     }
 
     public String getSystemPropertiesFile() {
