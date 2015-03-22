@@ -9,6 +9,10 @@
  *******************************************************************************/
 package org.openscore.lang.entities;
 
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.io.Serializable;
 
 /**
@@ -16,21 +20,42 @@ import java.io.Serializable;
  *
  * @author Bonczidai Levente
  */
-public class AsyncLoopStatement implements Serializable {
+public class AsyncLoopStatement extends LoopStatement implements Serializable {
 
     private final String varName;
-    private final String listExpression;
 
-    public AsyncLoopStatement(String varName, String listExpression) {
+    public AsyncLoopStatement(String varName, String expression) {
+        super(expression);
+
+        Validate.notBlank(varName, "async loop var name cannot be empty");
         this.varName = varName;
-        this.listExpression = listExpression;
     }
 
     public String getVarName() {
         return varName;
     }
 
-    public String getListExpression() {
-        return listExpression;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        AsyncLoopStatement that = (AsyncLoopStatement) o;
+
+        return new EqualsBuilder()
+                .append(varName, that.varName)
+                .append(getExpression(), that.getExpression())
+                .isEquals();
     }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(varName)
+                .append(getExpression())
+                .toHashCode();
+    }
+
 }

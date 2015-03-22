@@ -29,14 +29,14 @@ public class AsyncLoopBinding {
     @Autowired
     private ScriptEvaluator scriptEvaluator;
 
-    public List<Serializable> bindAsyncLoopList(AsyncLoopStatement AsyncLoopStatement, Context flowContext, String nodeName) {
-        Validate.notNull(AsyncLoopStatement, "async task statement cannot be null");
+    public List<Serializable> bindAsyncLoopList(AsyncLoopStatement asyncLoopStatement, Context flowContext, String nodeName) {
+        Validate.notNull(asyncLoopStatement, "async task statement cannot be null");
         Validate.notNull(flowContext, "flow context cannot be null");
         Validate.notNull(nodeName, "node name cannot be null");
 
         try {
             @SuppressWarnings("unchecked") List<Serializable> evalResult = (List<Serializable>) scriptEvaluator.evalExpr(
-                    AsyncLoopStatement.getListExpression(),
+                    asyncLoopStatement.getExpression(),
                     flowContext.getImmutableViewOfVariables());
             return evalResult;
         } catch (Throwable t) {
