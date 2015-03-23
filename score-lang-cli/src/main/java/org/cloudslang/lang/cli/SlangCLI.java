@@ -44,7 +44,7 @@ public class SlangCLI implements CommandMarker {
     public static final String TRIGGERED_FLOW_MSG = "Triggered flow : ";
     public static final String WITH_EXECUTION_ID_MSG = "Execution id: ";
     public static final String FLOW_EXECUTION_TIME_TOOK = ", duration: ";
-    private static final String CURRENTLY = "You are CURRENTLY running Slang version: ";
+    private static final String CURRENTLY = "You are CURRENTLY running CloudSlang version: ";
     private final static Logger logger = Logger.getLogger(SlangCLI.class);
 
     @Autowired
@@ -117,7 +117,7 @@ public class SlangCLI implements CommandMarker {
         return inputsResult;
     }
 
-    @CliCommand(value = "slang --version", help = "Prints the slang version used")
+    @CliCommand(value = "cslang --version", help = "Prints the CloudSlang version used")
     public String version() {
         return CURRENTLY + slangVersion;
     }

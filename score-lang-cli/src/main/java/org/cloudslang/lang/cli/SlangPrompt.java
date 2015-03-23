@@ -23,7 +23,7 @@ public class SlangPrompt extends SlangNamedProvider implements PromptProvider {
 
 	@Override
 	public String getPrompt() {
-		return "slang>";
+		return "cslang>";
 	}
 
 }

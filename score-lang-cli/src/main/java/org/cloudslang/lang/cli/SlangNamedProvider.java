@@ -20,7 +20,7 @@ public abstract class SlangNamedProvider implements NamedProvider {
 
 	@Override
 	public String getProviderName() {
-		return "Slang";
+		return "CloudSlang";
 	}
 
 }

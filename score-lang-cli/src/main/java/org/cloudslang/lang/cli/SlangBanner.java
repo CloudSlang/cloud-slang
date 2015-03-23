@@ -28,7 +28,7 @@ import java.io.InputStream;
 public class SlangBanner extends SlangNamedProvider implements BannerProvider {
 
 	private static final String BANNER = "slangBanner.txt";
-	private static final String ASSISTANCE = "Welcome to Slang. For assistance type help.";
+	private static final String ASSISTANCE = "Welcome to CloudSlang. For assistance type help.";
 
     @Value("${slang.version}")
     private String slangVersion;
@@ -39,7 +39,7 @@ public class SlangBanner extends SlangNamedProvider implements BannerProvider {
 		try (InputStream in = ClassLoader.getSystemResourceAsStream(BANNER)) {
 			sb.append(IOUtils.toString(in));
 		} catch(IOException e) {
-			sb.append("Slang");
+			sb.append("CloudSlang");
 		}
 		sb.append(System.lineSeparator());
 		sb.append(getVersion());

@@ -364,7 +364,7 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testGetVersion() throws Exception {
-        CommandResult cr = shell.executeCommand("slang --version");
+        CommandResult cr = shell.executeCommand("cslang --version");
 
         Assert.assertEquals("method result mismatch", slangCLI.version(), cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
