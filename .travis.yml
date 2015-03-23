@@ -12,6 +12,6 @@ deploy:
     - build/target/slang-content-verifer.jar
   skip_cleanup: true
   on:
-    repo: openscore/score-language
+    repo: CloudSlang/cloud-slang
     tags: true
     branch: master
