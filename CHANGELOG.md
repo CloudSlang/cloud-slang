@@ -3,7 +3,7 @@
 ##Version 0.7
 
 + Tools
-	+ Verifier - Verifies SLANG files are syntactically correct.
+	+ Verifier - Verifies CloudSlang files are syntactically correct.
 + DSL additions
 	+ Loops - A task can contain a for loop to iteratively call an operation or subflow
 	+ System Properties - Inputs can declare a `system_property` property to receive values from a system properties file. 
@@ -18,7 +18,7 @@
 	+ Error messages - Error messages are more clear with helpful guidance on how to fix common errors
 	+ Inputs from file - Inputs to CLI can be read from a file instead of, or in addition to, being entered manually.
 + Content additions - Content has been added in the following areas.
-	+ Slang
+	+ CloudSlang
 		+ Base
 		+ Utils
 		+ cAdvisor
@@ -28,7 +28,7 @@
 	+ Java @Actions
 		+ JSON
 + Organization
-	+ Slang content moved to its own repository.
+	+ CloudSlang content moved to its own repository.
 + Documentation
 	+ Restructured and updated DSL Reference.
 	+ Added developer content including API references and architecture explanations.
