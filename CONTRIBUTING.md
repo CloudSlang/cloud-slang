@@ -1,8 +1,8 @@
-# Contribution Guide score
+# CloudSlang Contribution Guide
 
-We welcome and encourage community contributions to score.
+We welcome and encourage community contributions to CloudSlang.
 Please familiarize yourself with the Contribution Guidelines and Project Roadmap before contributing.
-There are many ways to help score:
+There are many ways to help CloudSlang:
 * Report issues
 * Fix issues
 * Improve the documentation
@@ -10,7 +10,7 @@ There are many ways to help score:
 
 ## Contributing Code
 
-The best way to directly collaborate with the project contributors is through GitHub: https://github.com/openscore
+The best way to directly collaborate with the project contributors is through GitHub: https://github.com/CloudSlang
 * If you want to contribute to our code by either fixing a problem or creating a new feature, please open a GitHub pull request.
 * If you want to raise an issue such as a defect, an enhancement request or a general issue, please open a GitHub issue.
 
@@ -87,4 +87,4 @@ We are committed to providing a friendly, safe and welcoming environment for all
 Please avoid using nicknames that might detract from a friendly, safe and welcoming environment for all.
 Be kind and courteous.
 Those who insult, demean or harass anyone will be excluded from interaction. In particular, behavior that excludes people in socially marginalized groups will not be tolerated.
-We welcome discussion about creating a welcoming, safe and productive environment for the community. If you have any questions, feedback or concerns please let us know. (info@openscore.io)
+We welcome discussion about creating a welcoming, safe and productive environment for the community. If you have any questions, feedback or concerns please let us know. (info@cloudslang.io)
