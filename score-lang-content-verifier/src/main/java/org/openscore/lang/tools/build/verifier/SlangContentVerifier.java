@@ -7,7 +7,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  */
-package org.openscore.lang.tools.verifier;
+package org.openscore.lang.tools.build.verifier;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
@@ -17,6 +17,7 @@ import org.openscore.lang.compiler.modeller.model.Executable;
 import org.openscore.lang.compiler.scorecompiler.ScoreCompiler;
 import org.openscore.lang.entities.CompilationArtifact;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.Collection;
@@ -29,13 +30,15 @@ import java.util.regex.Pattern;
 
 import static org.openscore.lang.compiler.SlangSource.fromFile;
 
-/*
- * Created by stoneo on 2/9/2015.
- */
 /**
- * Verifies all files with extensions: .sl, .sl.yaml or .sl.yml in a given directory are valid
- */
+ * Created by stoneo on 3/15/2015.
+ **/
+@Component
 public class SlangContentVerifier {
+
+    private final static Logger log = Logger.getLogger(SlangContentVerifier.class);
+
+    private String[] SLANG_FILE_EXTENSIONS = {"sl", "sl.yaml", "sl.yml"};
 
     @Autowired
     private SlangCompiler slangCompiler;
@@ -43,22 +46,7 @@ public class SlangContentVerifier {
     @Autowired
     private ScoreCompiler scoreCompiler;
 
-    private final static Logger log = Logger.getLogger(VerifierMain.class);
-
-    private String[] SLANG_FILE_EXTENSIONS = {"sl", "sl.yaml", "sl.yml"};
-
-
-    /**
-     * Transform all Slang files in given directory to Slang models, and store them
-     * @param directoryPath given directory containing all Slang files
-     * @return the number of valid Slang files in the given directory
-     */
-    public int verifyAllSlangFilesInDirAreValid(String directoryPath){
-        Map<String, Executable> slangModels = transformSlangFilesInDirToModels(directoryPath);
-        return compileAllSlangModels(slangModels);
-    }
-
-    private Map<String, Executable> transformSlangFilesInDirToModels(String directoryPath) {
+    public Map<String, Executable> createModelsAndValidate(String directoryPath) {
         Validate.notEmpty(directoryPath, "You must specify a path");
         Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" + directoryPath + "\' does not lead to a directory");
         Map<String, Executable> slangModels = new HashMap<>();
@@ -87,7 +75,7 @@ public class SlangContentVerifier {
         return slangModels;
     }
 
-    private int compileAllSlangModels(Map<String, Executable> slangModels)  {
+    public Map<String, CompilationArtifact> compileSlangModels(Map<String, Executable> slangModels) {
         Map<String, CompilationArtifact> compiledArtifacts = new HashMap<>();
         for(Map.Entry<String, Executable> slangModelEntry : slangModels.entrySet()) {
             Executable slangModel = slangModelEntry.getValue();
@@ -109,13 +97,7 @@ public class SlangContentVerifier {
                 throw new RuntimeException(errorMessage, e);
             }
         }
-        if(compiledArtifacts.size() != slangModels.size()){
-            throw new RuntimeException("Some Slang files were not compiled.\n" +
-                    "Found: " + slangModels.size() + " slang models, but managed to compile only: " + compiledArtifacts.size());
-        }
-        String successMessage = "Successfully finished Compilation of: " + compiledArtifacts.size() + " Slang files";
-        log.info(successMessage);
-        return compiledArtifacts.size();
+        return compiledArtifacts;
     }
 
     private Set<Executable> getModelDependenciesRecursively(Map<String, Executable> slangModels, Executable slangModel) {
@@ -136,16 +118,6 @@ public class SlangContentVerifier {
         validateNamespace(slangFile, executable);
 
         validateExecutableName(slangFile, executable);
-    }
-
-    private void validateExecutableName(File slangFile, Executable executable) {
-        // Validate executable name is the same as the file name
-        String[] splitName = slangFile.getName().split("\\Q.");
-        String fileNameNoExtension = splitName[0];
-        String executableNameErrorMessage = "Error validating Slang file: \'" + slangFile.getAbsoluteFile() +
-                "\'. Name of flow or operation: \'" + executable.getName() +
-                "\' is invalid.\nIt should be identical to the file name: \'" + fileNameNoExtension + "\'";
-        Validate.isTrue(fileNameNoExtension.equals(executable.getName()), executableNameErrorMessage);
     }
 
     private void validateNamespace(File slangFile, Executable executable) {
@@ -173,4 +145,13 @@ public class SlangContentVerifier {
         return sourceModel.getNamespace() + "." + sourceModel.getName();
     }
 
+    private void validateExecutableName(File slangFile, Executable executable) {
+        // Validate executable name is the same as the file name
+        String[] splitName = slangFile.getName().split("\\Q.");
+        String fileNameNoExtension = splitName[0];
+        String executableNameErrorMessage = "Error validating Slang file: \'" + slangFile.getAbsoluteFile() +
+                "\'. Name of flow or operation: \'" + executable.getName() +
+                "\' is invalid.\nIt should be identical to the file name: \'" + fileNameNoExtension + "\'";
+        Validate.isTrue(fileNameNoExtension.equals(executable.getName()), executableNameErrorMessage);
+    }
 }
