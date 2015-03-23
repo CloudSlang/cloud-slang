@@ -30,7 +30,7 @@ public class ForTransformerTest {
         ForLoopStatement statement = transformer.transform("x in collection");
         ListForLoopStatement listForLoopStatement  = validateListForLoopStatement(statement);
         Assert.assertEquals("x", listForLoopStatement.getVarName());
-        Assert.assertEquals("collection", listForLoopStatement.getCollectionExpression());
+        Assert.assertEquals("collection", listForLoopStatement.getExpression());
     }
 
     @Test
@@ -38,7 +38,7 @@ public class ForTransformerTest {
         ForLoopStatement statement = transformer.transform("x in range(0, 9)");
         ListForLoopStatement listForLoopStatement  = validateListForLoopStatement(statement);
         Assert.assertEquals("x", listForLoopStatement.getVarName());
-        Assert.assertEquals("range(0, 9)", listForLoopStatement.getCollectionExpression());
+        Assert.assertEquals("range(0, 9)", listForLoopStatement.getExpression());
     }
 
     @Test
@@ -46,7 +46,7 @@ public class ForTransformerTest {
         ForLoopStatement statement = transformer.transform(" min   in  collection  ");
         ListForLoopStatement listForLoopStatement  = validateListForLoopStatement(statement);
         Assert.assertEquals("min", listForLoopStatement.getVarName());
-        Assert.assertEquals("collection", listForLoopStatement.getCollectionExpression());
+        Assert.assertEquals("collection", listForLoopStatement.getExpression());
     }
 
     @Test
@@ -67,7 +67,7 @@ public class ForTransformerTest {
     @Test
     public void testNoCollectionExpression() throws Exception {
         exception.expect(RuntimeException.class);
-        exception.expectMessage("collection expression");
+        exception.expectMessage("expression");
         transformer.transform("x in  ");
     }
 
@@ -75,7 +75,7 @@ public class ForTransformerTest {
     public void testMultipleInsAreTrimmed() throws Exception {
         ForLoopStatement statement = transformer.transform(" in   in in ");
         ListForLoopStatement listForLoopStatement  = validateListForLoopStatement(statement);
-        Assert.assertEquals("in", listForLoopStatement.getCollectionExpression());
+        Assert.assertEquals("in", listForLoopStatement.getExpression());
     }
 
     @Test
@@ -90,7 +90,7 @@ public class ForTransformerTest {
         MapForLoopStatement mapForLoopStatement  = validateMapForLoopStatement(statement);
         Assert.assertEquals("k", mapForLoopStatement.getKeyName());
         Assert.assertEquals("v", mapForLoopStatement.getValueName());
-        Assert.assertEquals("collection", statement.getCollectionExpression());
+        Assert.assertEquals("collection", statement.getExpression());
     }
 
     @Test
@@ -99,7 +99,7 @@ public class ForTransformerTest {
         MapForLoopStatement mapForLoopStatement  = validateMapForLoopStatement(statement);
         Assert.assertEquals("k", mapForLoopStatement.getKeyName());
         Assert.assertEquals("v", mapForLoopStatement.getValueName());
-        Assert.assertEquals("collection", statement.getCollectionExpression());
+        Assert.assertEquals("collection", statement.getExpression());
     }
 
     @Test
@@ -108,7 +108,7 @@ public class ForTransformerTest {
         MapForLoopStatement mapForLoopStatement  = validateMapForLoopStatement(statement);
         Assert.assertEquals("k", mapForLoopStatement.getKeyName());
         Assert.assertEquals("v", mapForLoopStatement.getValueName());
-        Assert.assertEquals("collection", statement.getCollectionExpression());
+        Assert.assertEquals("collection", statement.getExpression());
     }
 
     @Test
@@ -117,7 +117,7 @@ public class ForTransformerTest {
         MapForLoopStatement mapForLoopStatement  = validateMapForLoopStatement(statement);
         Assert.assertEquals("k", mapForLoopStatement.getKeyName());
         Assert.assertEquals("v", mapForLoopStatement.getValueName());
-        Assert.assertEquals("collection", statement.getCollectionExpression());
+        Assert.assertEquals("collection", statement.getExpression());
     }
 
     @Test
@@ -126,7 +126,7 @@ public class ForTransformerTest {
         MapForLoopStatement mapForLoopStatement  = validateMapForLoopStatement(statement);
         Assert.assertEquals("k", mapForLoopStatement.getKeyName());
         Assert.assertEquals("v", mapForLoopStatement.getValueName());
-        Assert.assertEquals("collection", statement.getCollectionExpression());
+        Assert.assertEquals("collection", statement.getExpression());
     }
 
     @Test
@@ -140,7 +140,7 @@ public class ForTransformerTest {
     @Test
     public void testMapNoCollectionExpression() throws Exception {
         exception.expect(RuntimeException.class);
-        exception.expectMessage("collection expression");
+        exception.expectMessage("expression");
         transformer.transform("k, v in  ");
     }
 

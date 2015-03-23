@@ -9,28 +9,34 @@
  *******************************************************************************/
 package org.openscore.lang.compiler.modeller.transformers;
 
-import org.openscore.lang.entities.ForLoopStatement;
+import org.openscore.lang.entities.AsyncLoopStatement;
+import org.openscore.lang.entities.ScoreLangConstants;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Date: 3/17/2015
+ *
+ * @author Bonczidai Levente
+ */
 @Component
-public class ForTransformer extends AbstractForTransformer implements Transformer<String, ForLoopStatement>{
+public class AsyncLoopForTransformer extends AbstractForTransformer implements Transformer<String, AsyncLoopStatement> {
 
     @Override
-    public ForLoopStatement transform(String rawData) {
-        return (ForLoopStatement) transformToLoopStatement(rawData, false);
+    public AsyncLoopStatement transform(String rawData) {
+        return (AsyncLoopStatement) transformToLoopStatement(rawData, true);
     }
 
     @Override
-    public List<Scope> getScopes() {
-        return Arrays.asList(Scope.BEFORE_TASK);
+    public List<Transformer.Scope> getScopes() {
+        return Arrays.asList(Transformer.Scope.BEFORE_TASK);
     }
 
     @Override
     public String keyToTransform() {
-        return null;
+        return ScoreLangConstants.ASYNC_LOOP_KEY;
     }
 
 }

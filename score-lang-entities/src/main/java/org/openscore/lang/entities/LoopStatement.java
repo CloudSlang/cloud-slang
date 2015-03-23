@@ -9,11 +9,25 @@
  *******************************************************************************/
 package org.openscore.lang.entities;
 
+import org.apache.commons.lang3.Validate;
+
 import java.io.Serializable;
 
-public abstract class ForLoopStatement extends LoopStatement implements Serializable{
+/**
+ * Date: 3/22/2015
+ *
+ * @author Bonczidai Levente
+ */
+public abstract class LoopStatement implements Serializable {
+    private final String expression;
 
-    public ForLoopStatement(String expression) {
-        super(expression);
+    public LoopStatement(String expression) {
+        Validate.notBlank(expression, "loop expression cannot be empty");
+
+        this.expression = expression;
+    }
+
+    public String getExpression() {
+        return expression;
     }
 }

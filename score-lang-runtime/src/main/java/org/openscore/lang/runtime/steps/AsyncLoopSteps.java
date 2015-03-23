@@ -7,13 +7,20 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-package org.openscore.lang.entities;
+package org.openscore.lang.runtime.steps;
 
-import java.io.Serializable;
+/**
+ * Date: 3/19/2015
+ *
+ * @author Bonczidai Levente
+ */
+public class AsyncLoopSteps extends AbstractSteps {
 
-public abstract class ForLoopStatement extends LoopStatement implements Serializable{
+    public void addBranches() {
 
-    public ForLoopStatement(String expression) {
-        super(expression);
+    }
+
+    public void joinBranches() {
+
     }
 }

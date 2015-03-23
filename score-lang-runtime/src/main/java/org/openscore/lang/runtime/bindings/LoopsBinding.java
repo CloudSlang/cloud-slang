@@ -81,7 +81,7 @@ public class LoopsBinding {
     private LoopCondition createForLoopCondition(ForLoopStatement forLoopStatement, Context flowContext, String nodeName) {
         Map<String, Serializable> variables = flowContext.getImmutableViewOfVariables();
         Serializable evalResult;
-        String collectionExpression = forLoopStatement.getCollectionExpression();
+        String collectionExpression = forLoopStatement.getExpression();
         try {
             evalResult = scriptEvaluator.evalExpr(collectionExpression, variables);
         } catch (Throwable t) {
