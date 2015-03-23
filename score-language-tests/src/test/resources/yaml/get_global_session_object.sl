@@ -13,7 +13,7 @@ operation:
     - value
   action:
     java_action:
-      className: org.openscore.lang.systemtests.actions.LangTestActions
+      className: org.cloudslang.lang.systemtests.actions.LangTestActions
       methodName: getConnectionFromNonSerializableSession
   outputs:
     - session_object_value: connection

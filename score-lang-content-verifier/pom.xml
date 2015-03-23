@@ -78,7 +78,7 @@
                     <useWildcardClassPath>true</useWildcardClassPath>
                     <programs>
                         <program>
-                            <mainClass>org.openscore.lang.tools.build.SlangBuildMain</mainClass>
+                            <mainClass>org.cloudslang.lang.tools.build.SlangBuildMain</mainClass>
                             <id>diphthong</id>
                         </program>
                     </programs>

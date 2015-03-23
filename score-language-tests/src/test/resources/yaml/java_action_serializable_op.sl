@@ -13,7 +13,7 @@ operation:
     - string
   action:
     java_action:
-      className: org.openscore.lang.systemtests.actions.LangTestActions
+      className: org.cloudslang.lang.systemtests.actions.LangTestActions
       methodName: printAndReturnDur
   outputs:
     - dur
