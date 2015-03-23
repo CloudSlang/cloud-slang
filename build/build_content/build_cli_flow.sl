@@ -16,8 +16,8 @@ namespace: build.build_content
 
 imports:
   build_content: build.build_content
-  cmd: org.openscore.slang.base.cmd
-  files: org.openscore.slang.base.files
+  cmd: io.cloudslang.slang.base.cmd
+  files: io.cloudslang.slang.base.files
 
 flow:
   inputs:
@@ -26,7 +26,7 @@ flow:
         default: 'target_dir + "/slang-cli/slang"'
         overridable: false
     - slang_content_repo:
-        default: "'https://github.com/openscore/slang-content.git'"
+        default: "'https://github.com/CloudSlang/cloud-slang-content.git'"
         overridable: false
   name: build_cli_flow
   workflow:
