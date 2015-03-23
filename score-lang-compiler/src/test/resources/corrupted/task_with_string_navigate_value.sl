@@ -4,10 +4,10 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-namespace: org.openscore
+namespace: org.cloudslang
 
 imports:
-  ops: org.openscore
+  ops: org.cloudslang
 
 flow:
   name: task_with_string_navigate_value

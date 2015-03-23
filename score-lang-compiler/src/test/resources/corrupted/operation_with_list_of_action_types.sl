@@ -4,7 +4,7 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-namespace: org.openscore
+namespace: org.cloudslang
 
 operation:
   name: operation_with_list_of_action_types

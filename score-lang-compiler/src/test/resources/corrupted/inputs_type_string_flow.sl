@@ -4,10 +4,10 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-namespace: org.openscore
+namespace: org.cloudslang
 
 imports:
-  opertions: org.openscore
+  opertions: org.cloudslang
 
 flow:
   name: inputs_type_string_flow

@@ -4,10 +4,10 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-namespace: org.openscore
+namespace: org.cloudslang
 
 imports:
-  flows: org.openscore
+  flows: org.cloudslang
 
 flow:
   name: parent_flow_to_no_task_data_flow
