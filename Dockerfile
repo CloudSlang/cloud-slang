@@ -15,7 +15,7 @@ ADD . /app-src/
 
 WORKDIR /app-src/
 
-RUN git clone http://github.com/openscore/slang-content.git
+RUN git clone https://github.com/CloudSlang/cloud-slang-content.git
 
 RUN mvn package
 
