@@ -9,15 +9,13 @@ CloudSlang is a YAML based language for writing human-readable workflows for the
 
 ###### Pre-Requisite: Java JRE >= 7
 
-1. Download the slang zip from [here](https://github.com/cloudslang/cloud-slang/releases/download/slang-CLI-v0.2.1/score-lang-cli.zip).
+1. Download the CLI zip from [here](https://github.com/CloudSlang/cloud-slang/releases/latest).
 2. Unzip it.
-3. Go to the folder /slang/bin/
+3. Go to the folder /cslang/bin/
 4. Run the executable :
-  - For Windows : slang.bat 
-  - For Linux : bash slang
-5. Run the Docker example flow:  run --f ../content/org/cloudslang/docker/containers/demo_dev_ops.sl  --cp ../content/  --inputs dockerHost=[*dockerHost*],dockerUsername=[*dockerHostUser*],dockerPassword=[*dockerHostPasword*],emailHost=[*emailHost*],emailPort=[*Emailport*],emailSender=[*EmailSender*],emailRecipient=[*EmailRecipient*]
-
-
+  - For Windows : cslang.bat 
+  - For Linux : bash cslang
+5. Run the Docker example flow:  run --f ../content/io/cloudslang/docker/containers/demo_dev_ops.sl  --cp ../content/  --inputs dockerHost=[*dockerHost*],dockerUsername=[*dockerHostUser*],dockerPassword=[*dockerHostPasword*],emailHost=[*emailHost*],emailPort=[*Emailport*],emailSender=[*EmailSender*],emailRecipient=[*EmailRecipient*]
 
 #### Documentation :
 
