@@ -29,7 +29,7 @@ Contact us at [here](mailto:support@cloudslang.io).
 
 ###### Pre-Requisites:
 
-1. maven version >= 3.0.3
+1. Maven version >= 3.0.3
 2. Java JDK version >= 7
 
 ###### Steps:
