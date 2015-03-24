@@ -17,7 +17,7 @@
 namespace: build.build_content
 
 imports:
-  cmd: org.openscore.slang.base.cmd
+  cmd: io.cloudslang.slang.base.cmd
 
 flow:
   name: clone
