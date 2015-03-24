@@ -14,7 +14,7 @@ operation:
     - port
   action:
     java_action:
-      className: org.cloudslang.lang.systemtests.actions.LangTestActions
+      className: io.cloudslang.lang.systemtests.actions.LangTestActions
       methodName: parseUrl
   outputs:
     - url

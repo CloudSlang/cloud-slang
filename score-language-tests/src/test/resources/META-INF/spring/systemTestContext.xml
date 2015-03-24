@@ -15,12 +15,12 @@
                         http://www.openscore.org/schema/score
                         http://www.openscore.org/schema/score.xsd">
 
-    <bean class="org.cloudslang.lang.api.configuration.SlangSpringConfiguration"/>
+    <bean class="io.cloudslang.lang.api.configuration.SlangSpringConfiguration"/>
 
     <score:engine />
 
     <score:worker uuid="-1"/>
 
-    <bean class="org.cloudslang.lang.systemtests.TriggerFlows"/>
+    <bean class="io.cloudslang.lang.systemtests.TriggerFlows"/>
 
 </beans>

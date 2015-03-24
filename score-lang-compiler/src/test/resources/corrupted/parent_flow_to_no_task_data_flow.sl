@@ -4,10 +4,10 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-namespace: org.cloudslang
+namespace: io.cloudslang
 
 imports:
-  flows: org.cloudslang
+  flows: io.cloudslang
 
 flow:
   name: parent_flow_to_no_task_data_flow

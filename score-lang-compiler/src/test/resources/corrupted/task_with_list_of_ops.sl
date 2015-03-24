@@ -4,7 +4,7 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-namespace: org.cloudslang
+namespace: io.cloudslang
 
 flow:
   name: task_with_list_of_ops

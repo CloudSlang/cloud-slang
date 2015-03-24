@@ -4,10 +4,10 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-namespace: org.cloudslang
+namespace: io.cloudslang
 
 imports:
-  opertions: org.cloudslang
+  opertions: io.cloudslang
 
 flow:
   name: inputs_type_string_flow

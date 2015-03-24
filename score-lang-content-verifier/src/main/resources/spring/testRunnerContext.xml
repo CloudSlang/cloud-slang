@@ -15,7 +15,7 @@
                         http://www.openscore.org/schema/score
                         http://www.openscore.org/schema/score.xsd">
 
-    <bean class="org.cloudslang.lang.tools.build.configuration.SlangBuildSpringConfiguration"/>
+    <bean class="io.cloudslang.lang.tools.build.configuration.SlangBuildSpringConfiguration"/>
 
     <score:engine />
 
