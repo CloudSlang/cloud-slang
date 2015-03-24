@@ -9,18 +9,18 @@
     -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>score-lang-cli</artifactId>
+    <artifactId>cloudslang-cli</artifactId>
 
-	<parent>
-		<groupId>io.openscore.lang</groupId>
-		<artifactId>score-language</artifactId>
-		<version>0.7.1-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <artifactId>cloudslang</artifactId>
+        <groupId>io.cloudslang.lang</groupId>
+        <version>0.7.1-SNAPSHOT</version>
+    </parent>
 
 	<dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>score-lang-api</artifactId>
+            <artifactId>cloudslang-all</artifactId>
             <version>${project.version}</version>
         </dependency>
 		<dependency>

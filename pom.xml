@@ -8,24 +8,24 @@
         The Apache License is available at
         http://www.apache.org/licenses/LICENSE-2.0
     -->
-    <groupId>io.openscore.lang</groupId>
-    <artifactId>score-language</artifactId>
+    <groupId>io.cloudslang.lang</groupId>
+    <artifactId>cloudslang</artifactId>
     <version>0.7.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A DSL for writing flows</description>
-    <url>https://github.com/openscore/score-language</url>
+    <url>https://github.com/CloudSlang/cloud-slang</url>
     <licenses>
-      <license>
-        <name>The Apache License, Version 2.0</name>
-        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      </license>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
     </licenses>
 
     <scm>
-        <connection>scm:git:https://github.com/openscore/score-language.git</connection>
-        <developerConnection>scm:git:git@github.com:openscore/score-language.git</developerConnection>
-        <url>https://github.com/openscore/score-language.git</url>
+        <connection>scm:git:https://github.com/CloudSlang/cloud-slang.git</connection>
+        <developerConnection>scm:git:git@github.com:CloudSlang/cloud-slang.git</developerConnection>
+        <url>https://github.com/CloudSlang/cloud-slang.git</url>
         <tag>master</tag>
     </scm>
 
@@ -499,13 +499,13 @@
     </profiles>
 
     <modules>
-        <module>score-lang-runtime</module>
-        <module>score-lang-compiler</module>
-        <module>score-lang-entities</module>
-        <module>score-lang-cli</module>
-        <module>score-language-tests</module>
-        <module>score-lang-api</module>
-        <module>score-lang-content-verifier</module>
+        <module>cloudslang-runtime</module>
+        <module>cloudslang-compiler</module>
+        <module>cloudslang-entities</module>
+        <module>cloudslang-cli</module>
+        <module>cloudslang-tests</module>
+        <module>cloudslang-all</module>
+        <module>cloudslang-content-verifier</module>
     </modules>
 
 </project>

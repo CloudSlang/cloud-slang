@@ -9,25 +9,25 @@ http://www.apache.org/licenses/LICENSE-2.0
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>score-language</artifactId>
-        <groupId>io.openscore.lang</groupId>
+        <artifactId>cloudslang</artifactId>
+        <groupId>io.cloudslang.lang</groupId>
         <version>0.7.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>score-lang-api</artifactId>
+    <artifactId>cloudslang-all</artifactId>
 
     <dependencies>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>score-lang-compiler</artifactId>
+            <artifactId>cloudslang-compiler</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>score-lang-runtime</artifactId>
+            <artifactId>cloudslang-runtime</artifactId>
             <version>${project.version}</version>
         </dependency>
 
