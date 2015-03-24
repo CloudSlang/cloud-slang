@@ -19,10 +19,10 @@ RUN git clone https://github.com/CloudSlang/cloud-slang-content.git
 
 RUN mvn package
 
-RUN mkdir -p score-lang-cli/target/slang/content/
+RUN mkdir -p cloudslang-cli/target/cslang/content/
 
-RUN cp -r slang-content/* score-lang-cli/target/slang/content
+RUN cp -r cloud-slang-content/* cloudslang-cli/target/cslang/content/
 
-WORKDIR score-lang-cli/target/slang/bin/
+WORKDIR cloudslang-cli/target/cslang/bin/
 
 CMD ["sh","slang"]
