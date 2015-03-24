@@ -132,12 +132,12 @@
 				<configuration>
 					<repositoryLayout>flat</repositoryLayout>
 					<repositoryName>lib</repositoryName>
-                    <assembleDirectory>target/slang</assembleDirectory>
+                    <assembleDirectory>target/cslang</assembleDirectory>
 					<useWildcardClassPath>true</useWildcardClassPath>
 					<programs>
 						<program>
 							<mainClass>org.springframework.shell.Bootstrap</mainClass>
-							<id>slang</id>
+							<id>cslang</id>
 						</program>
 					</programs>
                     <extraJvmArguments>-Dpython.path=@BASEDIR@/python-lib</extraJvmArguments>

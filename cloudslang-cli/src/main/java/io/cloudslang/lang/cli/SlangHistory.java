@@ -24,7 +24,7 @@ public class SlangHistory extends SlangNamedProvider implements HistoryFileNameP
 
 	@Override
 	public String getHistoryFileName() {
-		return "slang-cli.history";
+		return "cslang-cli.history";
 	}
 
 }
