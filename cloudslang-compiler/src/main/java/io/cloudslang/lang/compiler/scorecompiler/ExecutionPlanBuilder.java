@@ -17,8 +17,8 @@ import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import org.apache.commons.collections4.CollectionUtils;
-import org.openscore.api.ExecutionPlan;
-import org.openscore.api.ExecutionStep;
+import io.cloudslang.score.api.ExecutionPlan;
+import io.cloudslang.score.api.ExecutionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

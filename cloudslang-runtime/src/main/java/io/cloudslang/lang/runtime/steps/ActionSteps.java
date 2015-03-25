@@ -20,8 +20,8 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-import org.openscore.api.execution.ExecutionParametersConsts;
-import org.openscore.lang.ExecutionRuntimeServices;
+import io.cloudslang.score.api.execution.ExecutionParametersConsts;
+import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import org.python.core.Py;
 import org.python.core.PyBoolean;
 import org.python.core.PyException;
@@ -41,7 +41,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static org.openscore.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
 /**
  * User: stoneo

@@ -24,7 +24,7 @@ import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.runtime.env.ParentFlowData;
 import org.apache.commons.lang3.tuple.Pair;
-import org.openscore.lang.ExecutionRuntimeServices;
+import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.openscore.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
 /**
  * User: stoneo

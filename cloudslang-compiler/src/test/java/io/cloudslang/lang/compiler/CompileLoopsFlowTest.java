@@ -14,7 +14,7 @@ import io.cloudslang.lang.entities.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openscore.api.ExecutionPlan;
+import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Task;

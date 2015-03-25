@@ -16,7 +16,7 @@ import io.cloudslang.lang.runtime.env.ContextStack;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import org.apache.commons.lang3.tuple.Pair;
-import org.openscore.lang.ExecutionRuntimeServices;
+import io.cloudslang.score.lang.ExecutionRuntimeServices;
 
 import java.io.Serializable;
 import java.util.Date;

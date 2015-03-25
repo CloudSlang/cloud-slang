@@ -9,7 +9,7 @@
 package io.cloudslang.lang.api;
 
 import io.cloudslang.lang.compiler.SlangSource;
-import org.openscore.events.ScoreEventListener;
+import io.cloudslang.score.events.ScoreEventListener;
 import io.cloudslang.lang.entities.CompilationArtifact;
 
 import java.io.Serializable;
