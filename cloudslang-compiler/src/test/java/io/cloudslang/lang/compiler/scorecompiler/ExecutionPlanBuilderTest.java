@@ -126,7 +126,7 @@ public class ExecutionPlanBuilderTest {
 
         assertEquals("different number of execution steps than expected", 3, executionPlan.getSteps().size());
         assertEquals("operation name is different than expected", operationName, executionPlan.getName());
-        assertEquals("language name is different than expected", "slang", executionPlan.getLanguage());
+        assertEquals("language name is different than expected", "CloudSlang", executionPlan.getLanguage());
         assertEquals("begin step is different than expected", new Long(1), executionPlan.getBeginStep());
     }
 
@@ -155,7 +155,7 @@ public class ExecutionPlanBuilderTest {
 
         assertEquals("different number of execution steps than expected", 4, executionPlan.getSteps().size());
         assertEquals("flow name is different than expected", flowName, executionPlan.getName());
-        assertEquals("language name is different than expected", "slang", executionPlan.getLanguage());
+        assertEquals("language name is different than expected", "CloudSlang", executionPlan.getLanguage());
         assertEquals("begin step is different than expected", new Long(1), executionPlan.getBeginStep());
     }
 
@@ -195,7 +195,7 @@ public class ExecutionPlanBuilderTest {
 
         assertEquals("different number of execution steps than expected", 6, executionPlan.getSteps().size());
         assertEquals("flow name is different than expected", flowName, executionPlan.getName());
-        assertEquals("language name is different than expected", "slang", executionPlan.getLanguage());
+        assertEquals("language name is different than expected", "CloudSlang", executionPlan.getLanguage());
         assertEquals("begin step is different than expected", new Long(1), executionPlan.getBeginStep());
     }
 
