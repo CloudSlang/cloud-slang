@@ -54,7 +54,7 @@ public class MapForLoopStatement extends ForLoopStatement implements Serializabl
         return new EqualsBuilder()
                 .append(keyName, that.keyName)
                 .append(valueName, that.valueName)
-                .append(getCollectionExpression(), that.getCollectionExpression())
+                .append(getExpression(), that.getExpression())
                 .isEquals();
     }
 
@@ -63,7 +63,7 @@ public class MapForLoopStatement extends ForLoopStatement implements Serializabl
         return new HashCodeBuilder()
                 .append(keyName)
                 .append(valueName)
-                .append(getCollectionExpression())
+                .append(getExpression())
                 .toHashCode();
     }
 

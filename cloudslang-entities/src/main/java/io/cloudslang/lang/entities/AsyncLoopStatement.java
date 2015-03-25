@@ -16,18 +16,18 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.io.Serializable;
 
 /**
- * Date: 2/3/2015
+ * Date: 3/25/2015
  *
  * @author Bonczidai Levente
  */
-public class ListForLoopStatement extends ForLoopStatement implements Serializable {
+public class AsyncLoopStatement extends LoopStatement implements Serializable {
 
     private final String varName;
 
-    public ListForLoopStatement(String varName, String collectionExpression) {
-        super(collectionExpression);
-        Validate.notBlank(varName, "for loop var name cannot be empty");
+    public AsyncLoopStatement(String varName, String expression) {
+        super(expression);
 
+        Validate.notBlank(varName, "async loop var name cannot be empty");
         this.varName = varName;
     }
 
@@ -42,7 +42,7 @@ public class ListForLoopStatement extends ForLoopStatement implements Serializab
         if (o == null || getClass() != o.getClass())
             return false;
 
-        ListForLoopStatement that = (ListForLoopStatement) o;
+        AsyncLoopStatement that = (AsyncLoopStatement) o;
 
         return new EqualsBuilder()
                 .append(varName, that.varName)

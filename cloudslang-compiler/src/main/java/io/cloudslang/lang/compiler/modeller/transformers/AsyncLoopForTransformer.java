@@ -9,28 +9,34 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
-import io.cloudslang.lang.entities.ForLoopStatement;
+import io.cloudslang.lang.entities.AsyncLoopStatement;
+import io.cloudslang.lang.entities.ScoreLangConstants;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Date: 3/25/2015
+ *
+ * @author Bonczidai Levente
+ */
 @Component
-public class ForTransformer extends AbstractForTransformer implements Transformer<String, ForLoopStatement> {
+public class AsyncLoopForTransformer extends AbstractForTransformer implements Transformer<String, AsyncLoopStatement> {
 
     @Override
-    public ForLoopStatement transform(String rawData) {
-        return (ForLoopStatement) transformToLoopStatement(rawData, false);
+    public AsyncLoopStatement transform(String rawData) {
+        return (AsyncLoopStatement) transformToLoopStatement(rawData, true);
     }
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Scope.BEFORE_TASK);
+        return Arrays.asList(Transformer.Scope.BEFORE_TASK);
     }
 
     @Override
     public String keyToTransform() {
-        return null;
+        return ScoreLangConstants.ASYNC_LOOP_KEY;
     }
 
 }
