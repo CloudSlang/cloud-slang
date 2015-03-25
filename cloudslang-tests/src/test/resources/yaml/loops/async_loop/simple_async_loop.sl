@@ -5,15 +5,19 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: loops
+namespace: loops.async_loop
 
-operation:
-  name: print
+imports:
+  ops: loops.async_loop
+
+flow:
+  name: simple_async_loop
   inputs:
-     - text
-     - text2:
-        default: "'default value'"
-  action:
-    python_script: |
-        print text
-        print text2
+    - values: [1,2,3]
+  workflow:
+    - print_values:
+        async_loop:
+          for: value in values
+          do:
+            ops.print:
+              - text: value

@@ -39,6 +39,7 @@ public class ExecutionStepFactory {
     private static final String TASK_STEPS_CLASS = STEPS_PACKAGE + ".TaskSteps";
     private static final String OPERATION_STEPS_CLASS = STEPS_PACKAGE + ".ExecutableSteps";
     private static final String ACTION_STEPS_CLASS = STEPS_PACKAGE + ".ActionSteps";
+    private static final String ASYNC_LOOP_STEPS_CLASS = STEPS_PACKAGE + ".AsyncLoopSteps";
     private static final String NAVIGATION_ACTIONS_CLASS = "io.cloudslang.lang.runtime.navigations.Navigations";
     private static final String SIMPLE_NAVIGATION_METHOD = "navigate";
 
@@ -121,6 +122,20 @@ public class ExecutionStepFactory {
         return createGeneralStep(index, OPERATION_STEPS_CLASS, "finishExecutable", actionData);
     }
 
+    public ExecutionStep createAddBranchesStep(Long index, Map<String, Serializable> preTaskData) {
+        Validate.notNull(preTaskData, "preTaskData is null");
+        Map<String, Serializable> actionData = new HashMap<>();
+        actionData.put(ScoreLangConstants.ASYNC_LOOP_KEY, preTaskData.get(ScoreLangConstants.ASYNC_LOOP_KEY));
+        ExecutionStep executionStep = createGeneralStep(index, ASYNC_LOOP_STEPS_CLASS, "addBranches", actionData);
+        executionStep.setSplitStep(true);
+        return executionStep;
+    }
+
+    public ExecutionStep createJoinBranchesStep(Long index) {
+        Map<String, Serializable> actionData = new HashMap<>();
+        ExecutionStep executionStep = createGeneralStep(index, ASYNC_LOOP_STEPS_CLASS, "joinBranches", actionData);
+        return executionStep;
+    }
 
     private ExecutionStep createGeneralStep(
             Long stepId,

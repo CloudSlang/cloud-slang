@@ -5,15 +5,12 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: loops
+namespace: loops.async_loop
 
 operation:
   name: print
   inputs:
      - text
-     - text2:
-        default: "'default value'"
   action:
     python_script: |
-        print text
-        print text2
+        print 'Hello from branch ' + str(text)
