@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
-public class CompileLoopsFlowTest {
+public class CompileForLoopsFlowTest {
 
     @Autowired
     private SlangCompiler compiler;
