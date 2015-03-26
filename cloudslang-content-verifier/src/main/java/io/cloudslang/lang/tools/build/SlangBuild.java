@@ -52,8 +52,8 @@ public class SlangBuild {
     }
 
     /**
-     * Compiles all Slang models
-     * @return the number of valid Slang files in the given directory
+     * Compiles all CloudSlang models
+     * @return the number of valid CloudSlang files in the given directory
      */
     private Map<String, CompilationArtifact> compileModels(Map<String, Executable> slangModels){
         Map<String, CompilationArtifact> compiledSlangFiles =
