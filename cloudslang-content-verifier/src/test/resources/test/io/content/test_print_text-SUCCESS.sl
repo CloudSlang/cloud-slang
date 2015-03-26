@@ -1,7 +1,7 @@
-namespace: org.content
+namespace: io.content
 
 imports:
-  ops: org.content
+  ops: io.content
 
 flow:
   name: test_print_text-SUCCESS

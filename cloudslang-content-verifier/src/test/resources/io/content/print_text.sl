@@ -14,7 +14,7 @@
 #   - SUCCESS
 ####################################################
 
-namespace: org.content
+namespace: io.content
 
 operation:
   name: print_text
