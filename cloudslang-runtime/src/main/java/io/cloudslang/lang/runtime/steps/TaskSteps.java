@@ -54,6 +54,7 @@ public class TaskSteps extends AbstractSteps {
 
     @Autowired
     private LoopsBinding loopsBinding;
+
     private static final Logger logger = Logger.getLogger(TaskSteps.class);
 
     public void beginTask(@Param(ScoreLangConstants.TASK_INPUTS_KEY) List<Input> taskInputs,
@@ -129,7 +130,8 @@ public class TaskSteps extends AbstractSteps {
                         @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                         @Param(ScoreLangConstants.PREVIOUS_STEP_ID_KEY) Long previousStepId,
                         @Param(ScoreLangConstants.BREAK_LOOP_KEY) List<String> breakOn,
-                        @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName) {
+                        @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
+                        @Param(ScoreLangConstants.ASYNC_LOOP_KEY) boolean async_loop) {
 
         try {
 			if(runEnv.getExecutionPath().getDepth() > 0) runEnv.getExecutionPath().up();
@@ -171,7 +173,12 @@ public class TaskSteps extends AbstractSteps {
 
             Long nextPosition = navigation.getNextStepId();
             String presetResult = navigation.getPresetResult();
-            runEnv.putNextStepPosition(nextPosition);
+
+            if (async_loop) {
+                runEnv.removeNextStepPosition();
+            } else {
+                runEnv.putNextStepPosition(nextPosition);
+            }
 
             HashMap<String, Serializable> outputs = new HashMap<>(flowVariables);
 

@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Input;
 
 /*
@@ -57,6 +58,10 @@ public class Task {
 
     public String getRefId() {
         return refId;
+    }
+
+    public boolean isAsync() {
+        return preTaskActionData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY);
     }
 
 }

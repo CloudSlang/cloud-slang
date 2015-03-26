@@ -67,6 +67,12 @@ public class RunDataAggregatorListener implements ScoreEventListener {
         LanguageEventData inputsEvent = stepEvents.get(ScoreLangConstants.EVENT_INPUT_END);
         LanguageEventData outputsEvent = stepEvents.get(ScoreLangConstants.EVENT_OUTPUT_END);
 
+        if (inputsEvent == null || outputsEvent == null) {
+            // TODO  - async loop - update event capturing
+            Map<String, Serializable> placeHolder = new HashMap<>();
+            return new StepData("TODO", "TODO", placeHolder, placeHolder, "TODO");
+        }
+
         String path = inputsEvent.getPath();
         String stepName = inputsEvent.get(TASK_NAME) != null ? (String) inputsEvent.get(TASK_NAME)
                 : (String) inputsEvent.get(EXECUTABLE_NAME);

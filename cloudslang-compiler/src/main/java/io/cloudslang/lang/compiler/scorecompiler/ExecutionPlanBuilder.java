@@ -22,11 +22,7 @@ import org.openscore.api.ExecutionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
@@ -45,6 +41,9 @@ public class ExecutionPlanBuilder {
     private static final int NUMBER_OF_TASK_EXECUTION_STEPS = 2;
     private static final long FLOW_END_STEP_ID = 0L;
     private static final long FLOW_START_STEP_ID = 1L;
+    private static final long BRANCH_START_STEP_ID = 0L;
+    private static final long BRANCH_END_STEP_ID = 1L;
+    private static final String BRANCH_KEY = "branch";
 
     public ExecutionPlan createOperationExecutionPlan(Operation compiledOp) {
         ExecutionPlan executionPlan = new ExecutionPlan();
@@ -87,24 +86,65 @@ public class ExecutionPlanBuilder {
             throw new RuntimeException("Flow: " + compiledFlow.getName() + " has no tasks");
         }
 
-        List<ExecutionStep> taskExecutionSteps = buildTaskExecutionSteps(tasks.getFirst(), taskReferences, tasks);
+        List<ExecutionStep> taskExecutionSteps = buildTaskExecutionSteps(tasks.getFirst(), taskReferences, tasks, compiledFlow);
         executionPlan.addSteps(taskExecutionSteps);
 
         return executionPlan;
     }
 
+    public Map<String, ExecutionPlan> createBranchExecutionPlans(Flow compiledFlow) {
+        Deque<Task> tasks = compiledFlow.getWorkflow().getTasks();
+
+        if (CollectionUtils.isEmpty(tasks)) {
+            throw new RuntimeException("Flow: " + compiledFlow.getName() + " has no tasks");
+        }
+
+        Map<String, ExecutionPlan> branchExecutionPlans = new HashMap<>();
+        for (Task task : tasks) {
+            if (task.isAsync()) {
+                String refID = generateAsyncTaskRefID(compiledFlow, task);
+
+                ExecutionPlan executionPlan = new ExecutionPlan();
+                executionPlan.setName(BRANCH_KEY + "-" + refID);
+                executionPlan.setLanguage(SLANG_NAME);
+                executionPlan.setFlowUuid(refID);
+
+                executionPlan.setBeginStep(BRANCH_START_STEP_ID);
+                //branch start step
+                executionPlan.addStep(stepFactory.createBeginTaskStep(BRANCH_START_STEP_ID, task.getInputs(), task.getPreTaskActionData(),
+                        task.getRefId(), task.getName()));
+                //branch end step
+                Map<String, ResultNavigation> navigationValues = new HashMap<>();
+                for (Map.Entry<String, String> entry : task.getNavigationStrings().entrySet()) {
+                    navigationValues.put(entry.getKey(), new ResultNavigation(0, entry.getKey()));
+                }
+                executionPlan.addStep(stepFactory.createFinishTaskStep(BRANCH_END_STEP_ID, task.getPostTaskActionData(),
+                        navigationValues, task.getName(), true));
+
+                branchExecutionPlans.put(refID, executionPlan);
+            }
+        }
+
+        return branchExecutionPlans;
+    }
+
     private List<ExecutionStep> buildTaskExecutionSteps(Task task,
-                                                        Map<String, Long> taskReferences, Deque<Task> tasks) {
+                                                        Map<String, Long> taskReferences, Deque<Task> tasks, Flow compiledFlow) {
 
         List<ExecutionStep> taskExecutionSteps = new ArrayList<>();
 
         String taskName = task.getName();
         Long currentId = getCurrentId(taskReferences);
+        boolean isAsync = task.isAsync();
 
         //Begin Task
         taskReferences.put(taskName, currentId);
-        taskExecutionSteps.add(stepFactory.createBeginTaskStep(currentId++, task.getInputs(), task.getPreTaskActionData(),
-                task.getRefId(), taskName));
+        if (isAsync) {
+            taskExecutionSteps.add(stepFactory.createAddBranchesStep(currentId++, task.getPreTaskActionData(), generateAsyncTaskRefID(compiledFlow, task), taskName));
+        } else {
+            taskExecutionSteps.add(stepFactory.createBeginTaskStep(currentId++, task.getInputs(), task.getPreTaskActionData(),
+                    task.getRefId(), taskName));
+        }
 
         //End Task
         Map<String, ResultNavigation> navigationValues = new HashMap<>();
@@ -115,20 +155,28 @@ public class ExecutionPlanBuilder {
                 if(nextTaskToCompile == null){
                     throw new RuntimeException("Failed to compile task: " + taskName + ". The task/result name: " + entry.getValue() + " of navigation: " + entry.getKey() + " -> " + entry.getValue() + " is missing");
                 }
-                taskExecutionSteps.addAll(buildTaskExecutionSteps(nextTaskToCompile, taskReferences, tasks));
+                taskExecutionSteps.addAll(buildTaskExecutionSteps(nextTaskToCompile, taskReferences, tasks, compiledFlow));
             }
 			long nextStepId = taskReferences.get(nextStepName);
 			String presetResult = (FLOW_END_STEP_ID == nextStepId) ? nextStepName : null;
 			navigationValues.put(entry.getKey(), new ResultNavigation(nextStepId, presetResult));
         }
-        taskExecutionSteps.add(stepFactory.createFinishTaskStep(currentId, task.getPostTaskActionData(),
-                navigationValues, taskName));
+        if (isAsync) {
+            taskExecutionSteps.add(stepFactory.createJoinBranchesStep(currentId, task.getPostTaskActionData(), navigationValues, taskName));
+        } else {
+            taskExecutionSteps.add(stepFactory.createFinishTaskStep(currentId, task.getPostTaskActionData(),
+                    navigationValues, taskName, false));
+        }
         return taskExecutionSteps;
     }
 
     private Long getCurrentId(Map<String, Long> taskReferences) {
         Long max = Lambda.max(taskReferences);
         return max + NUMBER_OF_TASK_EXECUTION_STEPS;
+    }
+
+    private String generateAsyncTaskRefID(Flow compiledFlow, Task task) {
+        return compiledFlow.getNamespace() + "." + compiledFlow.getName() + "." + task.getName();
     }
 
 }

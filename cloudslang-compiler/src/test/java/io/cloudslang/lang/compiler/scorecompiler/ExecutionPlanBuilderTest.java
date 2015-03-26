@@ -93,7 +93,7 @@ public class ExecutionPlanBuilderTest {
     private void mockFinishTask(Long stepId, Task task) {
         Map<String, Serializable> postTaskActionData = task.getPostTaskActionData();
         String taskName = task.getName();
-        when(stepFactory.createFinishTaskStep(eq(stepId), same(postTaskActionData), anyMapOf(String.class, ResultNavigation.class), same(taskName))).thenReturn(new ExecutionStep(stepId));
+        when(stepFactory.createFinishTaskStep(eq(stepId), same(postTaskActionData), anyMapOf(String.class, ResultNavigation.class), same(taskName), eq(false))).thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockBeginTask(Long stepId, Task task) {

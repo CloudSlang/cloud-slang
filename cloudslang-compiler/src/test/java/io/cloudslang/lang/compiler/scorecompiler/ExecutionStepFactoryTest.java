@@ -68,7 +68,8 @@ public class ExecutionStepFactoryTest {
                 1L,
                 new HashMap<String, Serializable>(),
                 new HashMap<String, ResultNavigation>(),
-                "taskName");
+                "taskName",
+                false);
         Assert.assertTrue(finishTaskStep.getActionData().containsKey(ScoreLangConstants.PREVIOUS_STEP_ID_KEY));
         Assert.assertTrue(finishTaskStep.getActionData().containsKey(ScoreLangConstants.BREAK_LOOP_KEY));
 
