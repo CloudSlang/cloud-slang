@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.Serializable;
@@ -35,6 +36,7 @@ import java.util.Set;
 /**
  * Created by stoneo on 3/15/2015.
  */
+@Component
 public class SlangTestRunner {
 
     @Autowired

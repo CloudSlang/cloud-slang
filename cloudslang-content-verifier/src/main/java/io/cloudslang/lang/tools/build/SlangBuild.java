@@ -16,6 +16,7 @@ import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +27,7 @@ import java.util.Set;
 /**
  * Verifies all files with extensions: .sl, .sl.yaml or .sl.yml in a given directory are valid
  */
+@Component
 public class SlangBuild {
 
     @Autowired
