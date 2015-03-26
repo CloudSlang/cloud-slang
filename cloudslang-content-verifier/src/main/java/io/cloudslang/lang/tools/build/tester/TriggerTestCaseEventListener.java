@@ -97,6 +97,9 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
         if(StringUtils.isEmpty(result)){
             throw new RuntimeException("Result of executing the test " + testCaseName + " cannot be empty");
         }
+        if (outputs == null){
+            outputs = new HashMap<>();
+        }
         return new ReturnValues(outputs, result);
     }
 
