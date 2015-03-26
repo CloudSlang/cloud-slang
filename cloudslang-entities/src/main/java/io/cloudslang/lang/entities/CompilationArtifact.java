@@ -11,7 +11,7 @@ package io.cloudslang.lang.entities;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import io.cloudslang.lang.entities.bindings.Input;
-import org.openscore.api.ExecutionPlan;
+import io.cloudslang.score.api.ExecutionPlan;
 
 import java.util.Collection;
 import java.util.List;

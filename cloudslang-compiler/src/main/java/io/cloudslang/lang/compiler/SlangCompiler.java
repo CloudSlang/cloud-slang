@@ -16,15 +16,15 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 public interface SlangCompiler {
 
     /**
-     * Compile a Slang source and its path to a {@link io.cloudslang.lang.entities.CompilationArtifact} object
-     * @param source the slang source file
-     * @param path a set of slang sources containing the source dependencies
+     * Compile a CloudSlang source and its path to a {@link io.cloudslang.lang.entities.CompilationArtifact} object
+     * @param source the CloudSlang source file
+     * @param path a set of CloudSlang sources containing the source dependencies
      * @return the compiled {@link io.cloudslang.lang.entities.CompilationArtifact}
      */
     CompilationArtifact compile(SlangSource source, Set<SlangSource> path);
 
     /**
-     * Pre-compile a Slang source into an {@link io.cloudslang.lang.compiler.modeller.model.Executable}
+     * Pre-compile a CloudSlang source into an {@link io.cloudslang.lang.compiler.modeller.model.Executable}
      * @param source the {@link SlangSource}
      * @return an {@link io.cloudslang.lang.compiler.modeller.model.Executable} object, containing either a flow or operation in the file.
      */

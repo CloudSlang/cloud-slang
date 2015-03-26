@@ -15,11 +15,11 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
-import org.openscore.api.Score;
-import org.openscore.api.TriggeringProperties;
-import org.openscore.events.EventBus;
-import org.openscore.events.EventConstants;
-import org.openscore.events.ScoreEventListener;
+import io.cloudslang.score.api.Score;
+import io.cloudslang.score.api.TriggeringProperties;
+import io.cloudslang.score.events.EventBus;
+import io.cloudslang.score.events.EventConstants;
+import io.cloudslang.score.events.ScoreEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;

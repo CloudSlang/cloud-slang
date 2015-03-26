@@ -9,8 +9,8 @@
 package io.cloudslang.lang.cli.services;
 
 import org.apache.commons.lang.StringUtils;
-import org.openscore.events.EventConstants;
-import org.openscore.events.ScoreEventListener;
+import io.cloudslang.score.events.EventConstants;
+import io.cloudslang.score.events.ScoreEventListener;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import org.springframework.beans.factory.annotation.Autowired;

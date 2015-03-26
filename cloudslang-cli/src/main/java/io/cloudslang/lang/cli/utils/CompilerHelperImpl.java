@@ -49,7 +49,7 @@ public class CompilerHelperImpl implements CompilerHelper{
     private static final Logger logger = Logger.getLogger(CompilerHelperImpl.class);
     private String[] SLANG_FILE_EXTENSIONS = {"sl", "sl.yaml", "sl.yml"};
     private static final String[] YAML_FILE_EXTENSIONS = {"yaml", "yml"};
-    private static final String SP_DIR = "properties"; //TODO reconsider it after closing slang file extensions & some real usecases
+    private static final String SP_DIR = "properties"; //TODO reconsider it after closing CloudSlang file extensions & some real usecases
     private static final String INPUT_DIR = "inputs";
 
     @Autowired

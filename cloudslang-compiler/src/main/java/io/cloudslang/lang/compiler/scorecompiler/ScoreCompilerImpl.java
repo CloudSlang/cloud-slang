@@ -19,7 +19,7 @@ import org.apache.commons.lang.Validate;
 import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.bindings.Input;
-import org.openscore.api.ExecutionPlan;
+import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,10 +129,10 @@ public class ScoreCompilerImpl implements ScoreCompiler{
 
     /**
      * Utility method that cast a {@link io.cloudslang.lang.compiler.modeller.model.Executable} to its subtype
-     * and create an {@link org.openscore.api.ExecutionPlan} for it
+     * and create an {@link io.cloudslang.score.api.ExecutionPlan} for it
      *
-     * @param executable the executable to create an {@link org.openscore.api.ExecutionPlan} for
-     * @return {@link org.openscore.api.ExecutionPlan} of the given {@link io.cloudslang.lang.compiler.modeller.model.Executable}
+     * @param executable the executable to create an {@link io.cloudslang.score.api.ExecutionPlan} for
+     * @return {@link io.cloudslang.score.api.ExecutionPlan} of the given {@link io.cloudslang.lang.compiler.modeller.model.Executable}
      */
     private ExecutionPlan compileToExecutionPlan(Executable executable) {
 

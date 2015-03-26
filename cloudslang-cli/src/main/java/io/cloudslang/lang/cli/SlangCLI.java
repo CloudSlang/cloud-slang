@@ -14,9 +14,9 @@ import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import io.cloudslang.lang.cli.services.ScoreServices;
 import io.cloudslang.lang.cli.utils.CompilerHelper;
-import org.openscore.events.EventConstants;
-import org.openscore.events.ScoreEvent;
-import org.openscore.events.ScoreEventListener;
+import io.cloudslang.score.events.EventConstants;
+import io.cloudslang.score.events.ScoreEvent;
+import io.cloudslang.score.events.ScoreEventListener;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Input;
@@ -61,9 +61,9 @@ public class SlangCLI implements CommandMarker {
      */
     private Boolean triggerAsync = false;
 
-    @CliCommand(value = "run", help = "triggers a slang flow")
+    @CliCommand(value = "run", help = "triggers a CloudSlang flow")
     public String run(
-            @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. slang run --f C:\\Slang\\flow.yaml") final File file,
+            @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. cslang run --f C:\\CloudSlang\\flow.yaml") final File file,
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath,
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String,? extends Serializable> inputs,
             @CliOption(key = {"if", "input-file"}, mandatory = false, help = "comma separated list of input file locations") final List<String> inputFiles,
@@ -103,7 +103,7 @@ public class SlangCLI implements CommandMarker {
 
     @CliCommand(value = "inputs", help = "Get flow inputs")
     public List<String> getFlowInputs(
-            @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. slang inputs --f C:\\Slang\\flow.yaml") final File file,
+            @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. cslang inputs --f C:\\CloudSlang\\flow.yaml") final File file,
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath)
             throws IOException {
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);

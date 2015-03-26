@@ -17,9 +17,9 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
-import org.openscore.events.EventConstants;
-import org.openscore.events.ScoreEvent;
-import org.openscore.events.ScoreEventListener;
+import io.cloudslang.score.events.EventConstants;
+import io.cloudslang.score.events.ScoreEvent;
+import io.cloudslang.score.events.ScoreEventListener;
 
 import java.io.Serializable;
 import java.util.HashMap;

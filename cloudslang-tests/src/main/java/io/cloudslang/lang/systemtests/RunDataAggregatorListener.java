@@ -14,8 +14,8 @@ import ch.lambdaj.function.convert.Converter;
 import ch.lambdaj.group.Group;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import org.openscore.events.ScoreEvent;
-import org.openscore.events.ScoreEventListener;
+import io.cloudslang.score.events.ScoreEvent;
+import io.cloudslang.score.events.ScoreEventListener;
 
 import java.io.Serializable;
 import java.util.ArrayList;

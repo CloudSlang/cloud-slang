@@ -18,7 +18,7 @@ import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import junit.framework.Assert;
-import org.openscore.api.ExecutionStep;
+import io.cloudslang.score.api.ExecutionStep;
 import org.junit.Before;
 import org.junit.Test;
 

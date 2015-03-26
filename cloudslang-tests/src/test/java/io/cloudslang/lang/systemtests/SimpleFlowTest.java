@@ -16,7 +16,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.openscore.events.ScoreEvent;
+import io.cloudslang.score.events.ScoreEvent;
 
 import java.io.Serializable;
 import java.net.URI;

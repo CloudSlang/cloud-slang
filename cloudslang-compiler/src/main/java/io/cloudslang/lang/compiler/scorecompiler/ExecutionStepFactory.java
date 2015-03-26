@@ -20,8 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import io.cloudslang.lang.entities.ResultNavigation;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.Validate;
-import org.openscore.api.ControlActionMetadata;
-import org.openscore.api.ExecutionStep;
+import io.cloudslang.score.api.ControlActionMetadata;
+import io.cloudslang.score.api.ExecutionStep;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
