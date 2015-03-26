@@ -134,11 +134,13 @@ public class SlangTestRunner {
         String executionResult = executionReturnValues.getResult();
 
         String errorMessageFlowExecution = testsEventListener.getErrorMessage();
-        if (StringUtils.isNotEmpty(errorMessageFlowExecution) || !executionResult.equals(result)) {
+        if (StringUtils.isNotEmpty(errorMessageFlowExecution)){
             // exception occurred during flow execution
             throw new RuntimeException(errorMessageFlowExecution);
         }
-
+        if (!executionResult.equals(result)){
+            throw new RuntimeException("Flow " + compilationArtifact.getExecutionPlan().getName() +" finished with wrong result.\nActual: " + executionResult + "\nExpected: " + result);
+        }
         return executionId;
     }
 }
