@@ -20,7 +20,7 @@ import java.util.Set;
 /**
  * Score Compiler - compiles Slang {@link io.cloudslang.lang.compiler.modeller.model.Executable} model
  * to a {@link io.cloudslang.lang.entities.CompilationArtifact}
- * {@link io.cloudslang.lang.entities.CompilationArtifact} is an object holding an {@link org.openscore.api.ExecutionPlan}:
+ * {@link io.cloudslang.lang.entities.CompilationArtifact} is an object holding an {@link io.cloudslang.api.ExecutionPlan}:
  * compilation result of a workflow
  * in the score format. This object can be run on score engine.
  */

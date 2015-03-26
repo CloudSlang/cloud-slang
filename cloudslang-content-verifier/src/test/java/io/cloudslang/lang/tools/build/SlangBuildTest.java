@@ -24,7 +24,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.openscore.api.ExecutionPlan;
+import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -14,7 +14,7 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openscore.api.ExecutionPlan;
+import io.cloudslang.score.api.ExecutionPlan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;

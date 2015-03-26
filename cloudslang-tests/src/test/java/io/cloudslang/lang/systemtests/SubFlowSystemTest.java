@@ -15,7 +15,7 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import org.junit.Assert;
 import org.junit.Test;
-import org.openscore.events.ScoreEvent;
+import io.cloudslang.score.events.ScoreEvent;
 
 import java.io.Serializable;
 import java.net.URI;

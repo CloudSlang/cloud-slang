@@ -15,7 +15,7 @@ import io.cloudslang.lang.cli.services.ScoreServices;
 import io.cloudslang.lang.cli.utils.CompilerHelper;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.bindings.Input;
-import org.openscore.api.ExecutionPlan;
+import io.cloudslang.score.api.ExecutionPlan;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
