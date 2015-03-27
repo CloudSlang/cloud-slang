@@ -114,6 +114,11 @@ public class SlangTestRunner {
                         Map<String, ? extends Serializable> inputs,
                         Map<String, ? extends Serializable> systemProperties,
                         String result) {
+
+        if (StringUtils.isBlank(result)) {
+            result = getResultFromFileName(compilationArtifact.getExecutionPlan().getName());
+        }
+
         //add start event
         Set<String> handlerTypes = new HashSet<>();
         handlerTypes.add(ScoreLangConstants.EVENT_EXECUTION_FINISHED);
@@ -144,5 +149,15 @@ public class SlangTestRunner {
             throw new RuntimeException("Flow " + compilationArtifact.getExecutionPlan().getName() +" finished with wrong result.\nActual: " + executionResult + "\nExpected: " + result);
         }
         return executionId;
+    }
+
+    private String getResultFromFileName(String fileName) {
+
+        int dashPosition = fileName.lastIndexOf('-');
+        if (dashPosition > 0 && dashPosition < fileName.length()) {
+            return fileName.substring(dashPosition + 1);
+        } else {
+            return "SUCCESS";
+        }
     }
 }
