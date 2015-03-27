@@ -16,6 +16,7 @@ import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
@@ -100,7 +101,7 @@ public class SlangTestRunner {
             }
         }
         //todo: add support in sys properties
-        trigger(testCase.getName(), compiledTestFlow, convertedInputs, null, testCase.getResult());
+        trigger(testCase, compiledTestFlow, convertedInputs, null);
     }
 
     /**
@@ -110,10 +111,11 @@ public class SlangTestRunner {
      * @param inputs              : flow inputs
      * @return executionId
      */
-    public Long trigger(String testCaseName, CompilationArtifact compilationArtifact,
+    public Long trigger(SlangTestCase testCase, CompilationArtifact compilationArtifact,
                         Map<String, ? extends Serializable> inputs,
-                        Map<String, ? extends Serializable> systemProperties,
-                        String result) {
+                        Map<String, ? extends Serializable> systemProperties) {
+        String testCaseName = testCase.getName();
+        String result = testCase.getResult();
 
         if (StringUtils.isBlank(result)) {
             result = getResultFromFileName(compilationArtifact.getExecutionPlan().getName());
@@ -141,12 +143,19 @@ public class SlangTestRunner {
         String executionResult = executionReturnValues.getResult();
 
         String errorMessageFlowExecution = testsEventListener.getErrorMessage();
-        if (StringUtils.isNotEmpty(errorMessageFlowExecution)){
-            // exception occurred during flow execution
-            throw new RuntimeException(errorMessageFlowExecution);
+
+        if(StringUtils.isBlank(errorMessageFlowExecution) && BooleanUtils.isTrue(testCase.getThrowsException())){
+            throw new RuntimeException("Flow " + compilationArtifact.getExecutionPlan().getName() +" did not throw an exception as expected"
+                    + "\n\nTest description: " + testCase.getDescription());
         }
+        if(StringUtils.isNotBlank(errorMessageFlowExecution) && BooleanUtils.isFalse(testCase.getThrowsException())){
+                // unexpected exception occurred during flow execution
+                throw new RuntimeException(errorMessageFlowExecution);
+        }
+
         if (!executionResult.equals(result)){
-            throw new RuntimeException("Flow " + compilationArtifact.getExecutionPlan().getName() +" finished with wrong result.\nActual: " + executionResult + "\nExpected: " + result);
+            throw new RuntimeException("Flow " + compilationArtifact.getExecutionPlan().getName() +" finished with wrong result.\nActual: " + executionResult + "\nExpected: " + result
+                                        + "\n\nTest description: " + testCase.getDescription());
         }
         return executionId;
     }
