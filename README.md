@@ -41,21 +41,21 @@ Contact us at [here](mailto:support@cloudslang.io).
 3. Run the CLI executable from cloudslang-cli\target\cslang\bin 
 
 ### Another way of getting the score command line interface.
-###### score-cli
+###### cslang-cli
 > The score command line interface.
 
-Install this globally and you'll have access to the `slang` command anywhere on your system.
+Install this globally and you'll have access to the `cslang` command anywhere on your system.
 
 ```shell
-npm install -g score-cli
+npm install -g cslang-cli
 ```
 
-Now you can just use the `slang` command anywhere
+Now you can just use the `cslang` command anywhere
 ```shell
-slang
+cslang
 ```
 
 ###### Pre-Requisites:
 Node.js & Java installed.
 
-score-cli page in the [NPM repository](https://www.npmjs.com/package/score-cli).
+cslang-cli page in the [NPM repository](https://www.npmjs.com/package/cslang-cli).
