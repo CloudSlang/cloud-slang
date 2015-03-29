@@ -47,7 +47,7 @@ public class SlangBuild {
         Map<String, CompilationArtifact> compiledSources = compileModels(slangModels);
 
         if(testsPath != null) {
-            runTests(compiledSources, testsPath, testSuits);
+            runTests(slangModels, testsPath, testSuits);
         }
 
         return compiledSources.size();
@@ -71,14 +71,14 @@ public class SlangBuild {
         return compiledSlangFiles;
     }
 
-    private void runTests(Map<String, CompilationArtifact> compiledSources,
+    private void runTests(Map<String, Executable> contentSlangModels,
                           String testsPath, Set<String> testSuites){
         // Compile all slang test flows under the test directory
         Map<String, Executable> testFlowModels = slangContentVerifier.createModelsAndValidate(testsPath);
+        // Add also all of the slang models of the content in order to allow for compilation of the test flows
+        testFlowModels.putAll(contentSlangModels);
         // Compiling all the test flows
         Map<String, CompilationArtifact> compiledFlows = slangContentVerifier.compileSlangModels(testFlowModels);
-        // Add also all of the compiled sources
-        compiledFlows.putAll(compiledSources);
 
         Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath);
         slangTestRunner.runAllTests(testCases, compiledFlows);
