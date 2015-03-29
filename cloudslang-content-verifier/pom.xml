@@ -74,7 +74,7 @@
                 <configuration>
                     <repositoryLayout>flat</repositoryLayout>
                     <repositoryName>lib</repositoryName>
-                    <assembleDirectory>target/diphthong</assembleDirectory>
+                    <assembleDirectory>target/cslang-builder</assembleDirectory>
                     <useWildcardClassPath>true</useWildcardClassPath>
                     <programs>
                         <program>
