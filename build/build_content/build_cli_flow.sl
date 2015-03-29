@@ -36,17 +36,11 @@ flow:
           files.create_folder:
             - folder_name: target_dir
 
-    - create_target_cli_dir1:
+    - create_target_cli_dir:
         do:
           cmd.run_command:
             - command: >
-                "mkdir target/cloudslang-cli"
-
-    - create_tearget_cli_dir2:
-        do:
-          cmd.run_command:
-            - command: >
-                "mkdir target/cloudslang-cli/cslang"
+                "mkdir target/cloudslang-cli && mkdir target/cloudslang-cli/cslang"
 
 
     - get_cloudslang_content:
