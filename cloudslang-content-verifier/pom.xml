@@ -79,7 +79,7 @@
                     <programs>
                         <program>
                             <mainClass>io.cloudslang.lang.tools.build.SlangBuildMain</mainClass>
-                            <id>diphthong</id>
+                            <id>cslang-builder</id>
                         </program>
                     </programs>
                 </configuration>
