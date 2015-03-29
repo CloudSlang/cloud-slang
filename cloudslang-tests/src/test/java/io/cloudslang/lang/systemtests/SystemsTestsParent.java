@@ -13,7 +13,7 @@ package io.cloudslang.lang.systemtests;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import org.junit.runner.RunWith;
-import org.openscore.events.ScoreEvent;
+import io.cloudslang.score.events.ScoreEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;

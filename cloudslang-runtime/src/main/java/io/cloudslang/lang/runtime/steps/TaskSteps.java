@@ -21,8 +21,8 @@ import io.cloudslang.lang.entities.MapForLoopStatement;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.LoopCondition;
 import io.cloudslang.lang.runtime.env.ParentFlowStack;
-import org.openscore.api.execution.ExecutionParametersConsts;
-import org.openscore.lang.ExecutionRuntimeServices;
+import io.cloudslang.score.api.execution.ExecutionParametersConsts;
+import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.openscore.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
 /**
  * User: stoneo

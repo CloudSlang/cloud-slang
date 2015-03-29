@@ -9,7 +9,7 @@
 package io.cloudslang.lang.api;
 
 import io.cloudslang.lang.compiler.SlangSource;
-import org.openscore.events.ScoreEventListener;
+import io.cloudslang.score.events.ScoreEventListener;
 import io.cloudslang.lang.entities.CompilationArtifact;
 
 import java.io.Serializable;
@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * API for using slang
+ * API for using CloudSlang
  *
  * @author stoneo
  * @since 03/12/2014
@@ -26,15 +26,15 @@ import java.util.Set;
 public interface Slang {
 
     /**
-     * Compile a flow or operation written in slang
-     * @param source the slang source containing the flow
-     * @param dependencies a set of slang sources of of all the flow or operation's dependencies
+     * Compile a flow or operation written in CloudSlang
+     * @param source the CloudSlang source containing the flow
+     * @param dependencies a set of CloudSlang sources of of all the flow or operation's dependencies
      * @return the compiled artifact of the flow
      */
     public CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencies);
 
 	/**
-	 * Run a flow or operation written in slang already compiled to a compilationArtifact
+	 * Run a flow or operation written in CloudSlang already compiled to a compilationArtifact
 	 * @param compilationArtifact the compiled artifact of the flow or operation
 	 * @param runInputs the inputs for the flow or operation run
 	 * @param systemProperties the system properties for the flow or operation run
@@ -43,9 +43,9 @@ public interface Slang {
 	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties);
 
 	/**
-	 * Compile and run a flow or operation written in slang
-	 * @param source the slang source containing the flow or operation
-	 * @param dependencies a set of slang sources of all the flow or operation's dependencies
+	 * Compile and run a flow or operation written in CloudSlang
+	 * @param source the CloudSlang source containing the flow or operation
+	 * @param dependencies a set of CloudSlang sources of all the flow or operation's dependencies
 	 * @param runInputs the inputs for the flow or operation run
 	 * @param systemProperties the system properties for the flow or operation run
 	 * @return the execution ID in score
@@ -53,20 +53,20 @@ public interface Slang {
 	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties);
 
     /**
-     * Subscribe to events of score or slang
+     * Subscribe to events of score or CloudSlang
      * @param eventListener listener for the events
      * @param eventTypes set of types of events to subscribe to
      */
     public void subscribeOnEvents(ScoreEventListener eventListener, Set<String> eventTypes);
 
     /**
-     * Unsubscribe from events of score or slang
+     * Unsubscribe from events of score or CloudSlang
      * @param eventListener listener for the events
      */
     public void unSubscribeOnEvents(ScoreEventListener eventListener);
 
     /**
-     * Subscribe to all of the events of score and slang
+     * Subscribe to all of the events of score and CloudSlang
      * @param eventListener listener for the events
      */
     public void subscribeOnAllEvents(ScoreEventListener eventListener);

@@ -23,9 +23,9 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.openscore.events.EventConstants;
-import org.openscore.events.ScoreEvent;
-import org.openscore.events.ScoreEventListener;
+import io.cloudslang.score.events.EventConstants;
+import io.cloudslang.score.events.ScoreEvent;
+import io.cloudslang.score.events.ScoreEventListener;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 
 import java.io.Serializable;

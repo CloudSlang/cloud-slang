@@ -14,8 +14,8 @@ import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import org.openscore.events.ScoreEvent;
-import org.openscore.events.ScoreEventListener;
+import io.cloudslang.score.events.ScoreEvent;
+import io.cloudslang.score.events.ScoreEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
