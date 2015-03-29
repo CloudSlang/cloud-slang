@@ -21,7 +21,7 @@ Slang is a YAML based language for writing human-readable workflows for score. T
 
 #### Documentation :
 
-All documentation is available on the [openscore website](http://www.openscore.io/#/docs).
+All documentation is available on the [CloudSlang website](http://www.cloudslang.io/#/docs).
 
 #### Get Involved
 
@@ -55,7 +55,7 @@ Now you can just use the `slang` command anywhere
 slang
 ```
 
-Refer to [openscore](http://openscore.io) website for more information.
+Refer to [openscore](http://cloudslang.io/) website for more information.
 
 ###### Pre-Requisites:
 Node.js & Java installed.
