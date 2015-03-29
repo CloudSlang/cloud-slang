@@ -103,7 +103,7 @@ flow:
     - create_cli_zip:
         do:
           files.zip_folder:
-            - archive_name: "'cloudslang-cli'"
+            - archive_name: "'cslang-cli'"
             - folder_path: 'target_dir + "/cloudslang-cli"'
             - output_folder: target_dir
 
@@ -111,7 +111,7 @@ flow:
     - create_builder_zip:
         do:
           files.zip_folder:
-            - archive_name: "'cloudslang-builder'"
+            - archive_name: "'cslang-builder'"
             - folder_path: 'target_dir + "/cslang-builder"'
 
 #    - create_tar_gz
