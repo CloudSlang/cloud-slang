@@ -1,9 +1,9 @@
 score-language (Slang)
 ==============
-
+ 
 Slang is a YAML based language for writing human-readable workflows for score. This project includes the CLI to trigger flows.
 
-[![Build Status](https://travis-ci.org/openscore/score-language.svg)](https://travis-ci.org/openscore/score-language)
+[![Build Status](https://travis-ci.org/CloudSlang/cloud-slang.svg?branch=master)](https://travis-ci.org/CloudSlang/cloud-slang)
 
 #### Getting started:
 
@@ -40,3 +40,24 @@ Contact us at [here](mailto:support@openscore.io).
 2. ```mvn clean install```
 3. Run the CLI executable from score-lang-cli\target\slang\bin 
 
+### Another way of getting the score command line interface.
+###### score-cli
+> The score command line interface.
+
+Install this globally and you'll have access to the `slang` command anywhere on your system.
+
+```shell
+npm install -g score-cli
+```
+
+Now you can just use the `slang` command anywhere
+```shell
+slang
+```
+
+Refer to [openscore](http://openscore.io) website for more information.
+
+###### Pre-Requisites:
+Node.js & Java installed.
+
+score-cli page in the [NPM repository](https://www.npmjs.com/package/score-cli).

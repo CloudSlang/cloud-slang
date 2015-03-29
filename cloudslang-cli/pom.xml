@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+        (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+        All rights reserved. This program and the accompanying materials
+        are made available under the terms of the Apache License v2.0 which accompany this distribution.
+
+        The Apache License is available at
+        http://www.apache.org/licenses/LICENSE-2.0
+    -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+    <artifactId>cloudslang-cli</artifactId>
+
+    <parent>
+        <artifactId>cloudslang</artifactId>
+        <groupId>io.cloudslang.lang</groupId>
+        <version>0.7.3-SNAPSHOT</version>
+    </parent>
+
+	<dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cloudslang-all</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+		<dependency>
+			<groupId>org.springframework.shell</groupId>
+			<artifactId>spring-shell</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>jline</groupId>
+			<artifactId>jline</artifactId>
+			<version>2.12</version>
+			<scope>compile</scope>
+		</dependency>
+
+        <!-- liquibase : this is only for fixing liquibase logging issue  -->
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+        </dependency>
+
+		<!-- runtime -->
+		<dependency>
+			<groupId>${score.group}</groupId>
+			<artifactId>score-all</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.python</groupId>
+			<artifactId>jython-standalone</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+
+        <!-- content dep -->
+        <dependency>
+            <groupId>io.openscore.content</groupId>
+            <artifactId>score-ssh</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.openscore.content</groupId>
+            <artifactId>score-mail</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.openscore.content</groupId>
+            <artifactId>score-http-client</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+		<!-- test -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+		<plugins>
+			<!-- make the jar executable by adding a Main-Class and Class-Path to the manifest -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.1</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>org.springframework.shell.Bootstrap</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>appassembler-maven-plugin</artifactId>
+				<version>1.8.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>assemble</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<repositoryLayout>flat</repositoryLayout>
+					<repositoryName>lib</repositoryName>
+                    <assembleDirectory>target/cslang</assembleDirectory>
+					<useWildcardClassPath>true</useWildcardClassPath>
+					<programs>
+						<program>
+							<mainClass>org.springframework.shell.Bootstrap</mainClass>
+							<id>cslang</id>
+						</program>
+					</programs>
+                    <extraJvmArguments>-Dpython.path=@BASEDIR@/python-lib</extraJvmArguments>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

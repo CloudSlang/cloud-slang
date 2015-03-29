@@ -1,0 +1,42 @@
+#   (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+#   All rights reserved. This program and the accompanying materials
+#   are made available under the terms of the Apache License v2.0 which accompany this distribution.
+#
+#   The Apache License is available at
+#   http://www.apache.org/licenses/LICENSE-2.0
+
+namespace: user.flows
+
+imports:
+  ops: user.ops
+
+flow:
+  name: simple_flow
+  inputs:
+    - input1
+    - time_zone_as_string:
+        required: false
+    - host:
+        system_property: user.sys.props.host
+  workflow:
+    - Task1:
+        do:
+          ops.get_time_zone:
+            - time_zone_as_string: time_zone_as_string if time_zone_as_string is not None else input1
+            - port:
+                system_property: user.sys.props.port
+        publish:
+          - time_zone: time_zone
+        navigate:
+          SUCCESS: Task2
+          NEGATIVE: FAILURE
+
+    - Task2:
+        do:
+          ops.compute_daylight_time_zone:
+            - time_zone_as_string: time_zone
+        publish:
+          - daylight_time_zone: daylight_time_zone
+  results:
+    - SUCCESS
+    - FAILURE

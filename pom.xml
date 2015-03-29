@@ -8,32 +8,32 @@
         The Apache License is available at
         http://www.apache.org/licenses/LICENSE-2.0
     -->
-    <groupId>io.openscore.lang</groupId>
-    <artifactId>score-language</artifactId>
-    <version>0.1.9-SNAPSHOT</version>
+    <groupId>io.cloudslang.lang</groupId>
+    <artifactId>cloudslang</artifactId>
+    <version>0.7.3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A DSL for writing flows</description>
-    <url>https://github.com/openscore/score-language</url>
+    <url>https://github.com/CloudSlang/cloud-slang</url>
     <licenses>
-      <license>
-        <name>The Apache License, Version 2.0</name>
-        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      </license>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
     </licenses>
 
     <scm>
-        <connection>scm:git:https://github.com/openscore/score-language.git</connection>
-        <developerConnection>scm:git:git@github.com:openscore/score-language.git</developerConnection>
-        <url>https://github.com/openscore/score-language.git</url>
+        <connection>scm:git:https://github.com/CloudSlang/cloud-slang.git</connection>
+        <developerConnection>scm:git:git@github.com:CloudSlang/cloud-slang.git</developerConnection>
+        <url>https://github.com/CloudSlang/cloud-slang.git</url>
         <tag>master</tag>
     </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <score.group>io.openscore</score.group>
-        <score.version>0.1.251</score.version>
+        <score.group>io.cloudslang</score.group>
+        <score.version>0.1.271</score.version>
         <spring.version>4.0.8.RELEASE</spring.version>
     </properties>
 
@@ -152,7 +152,7 @@
             <dependency>
                 <groupId>com.hp.score.sdk</groupId>
                 <artifactId>score-content-sdk</artifactId>
-                <version>1.5</version>
+                <version>1.10.6</version>
             </dependency>
             <!--end of score dependencies-->
 
@@ -160,17 +160,17 @@
             <dependency>
                 <groupId>io.openscore.content</groupId>
                 <artifactId>score-ssh</artifactId>
-                <version>0.0.13</version>
+                <version>0.0.22</version>
             </dependency>
             <dependency>
                 <groupId>io.openscore.content</groupId>
                 <artifactId>score-mail</artifactId>
-                <version>0.0.6</version>
+                <version>0.0.10</version>
             </dependency>
             <dependency>
                 <groupId>io.openscore.content</groupId>
                 <artifactId>score-http-client</artifactId>
-                <version>0.1.44</version>
+                <version>0.1.57</version>
             </dependency>
             <!--end of score content dependencies-->
 
@@ -223,11 +223,7 @@
                 <version>2.7-b3</version>
                 <scope>compile</scope>
             </dependency>
-            <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-                <version>2.2.4</version>
-            </dependency>
+
 
             <!-- spring artifacts -->
             <dependency>
@@ -291,6 +287,19 @@
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
                 <version>1.10.17</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.5.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.2.4</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
@@ -490,12 +499,13 @@
     </profiles>
 
     <modules>
-        <module>score-lang-runtime</module>
-        <module>score-lang-compiler</module>
-        <module>score-lang-entities</module>
-        <module>score-lang-cli</module>
-        <module>score-language-tests</module>
-        <module>score-lang-api</module>
+        <module>cloudslang-runtime</module>
+        <module>cloudslang-compiler</module>
+        <module>cloudslang-entities</module>
+        <module>cloudslang-cli</module>
+        <module>cloudslang-tests</module>
+        <module>cloudslang-all</module>
+        <module>cloudslang-content-verifier</module>
     </modules>
 
 </project>

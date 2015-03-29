@@ -1,1 +1,17 @@
 language: java
+
+before_deploy: >
+  sudo apt-get install python-pip &&
+  ant -f build/ant.xml
+deploy:
+  provider: releases
+  api_key:
+    secure: XUEVH4recWuA+xxjmy+AXeUSEZINSSeDe5xOALAr7rH3DvYGMV2tC4vO33zmOfyevnn2FxiDJLQqewlc/x9cComjCsuBXys8eMXaoEaFB6UIayBx0iilNQ56ItYnbAXz580/oDvJEVPAzXyGuOLhkW7qvwbVq0fXNauAMRUKrYY=
+  file:
+    - build/target/cloudslang-cli.zip
+    - build/target/cloudslang-content-verifier.jar
+  skip_cleanup: true
+  on:
+    repo: CloudSlang/cloud-slang
+    tags: true
+    branch: master
