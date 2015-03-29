@@ -1,4 +1,4 @@
-<project name="score-runner" default="init" basedir=".">
+<project name="score-runner" default="init" basedir="../../../../Temp">
     <!--
         (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
         All rights reserved. This program and the accompanying materials

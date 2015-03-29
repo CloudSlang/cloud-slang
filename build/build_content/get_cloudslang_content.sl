@@ -19,7 +19,7 @@ imports:
   build_content: build.build_content
 
 flow:
-  name: get_slang_content
+  name: get_cloudslang_content
   inputs:
     - url
     - target_dir
