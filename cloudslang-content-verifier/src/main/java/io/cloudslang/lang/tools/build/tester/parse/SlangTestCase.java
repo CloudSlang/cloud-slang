@@ -60,6 +60,10 @@ public class SlangTestCase {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getTestFlowPath() {
         return testFlowPath;
     }

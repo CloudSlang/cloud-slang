@@ -14,6 +14,7 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
+import io.cloudslang.score.events.EventConstants;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.BooleanUtils;
@@ -70,12 +71,14 @@ public class SlangTestRunner {
     }
 
     public void runAllTests(Map<String, SlangTestCase> testCases,
-                            Map<String, CompilationArtifact> compiledFlows
-    ) {
+                            Map<String, CompilationArtifact> compiledFlows) {
 
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
-            log.info("Start running test: " + testCaseEntry.getKey());
+            String testCaseName = testCaseEntry.getKey();
+            log.info("Start running test: " + testCaseName);
             SlangTestCase testCase = testCaseEntry.getValue();
+            //todo: temporary solution
+            testCase.setName(testCaseName);
             CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
             runTest(testCase, compiledTestFlow);
         }
@@ -126,6 +129,9 @@ public class SlangTestRunner {
         handlerTypes.add(ScoreLangConstants.EVENT_EXECUTION_FINISHED);
         handlerTypes.add(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION);
         handlerTypes.add(ScoreLangConstants.EVENT_OUTPUT_END);
+        handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
+        handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
+        handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
 
         TriggerTestCaseEventListener testsEventListener = new TriggerTestCaseEventListener(testCaseName);
         slang.subscribeOnEvents(testsEventListener, handlerTypes);
@@ -154,8 +160,7 @@ public class SlangTestRunner {
         }
 
         if (!executionResult.equals(result)){
-            throw new RuntimeException("Flow " + compilationArtifact.getExecutionPlan().getName() +" finished with wrong result.\nActual: " + executionResult + "\nExpected: " + result
-                                        + "\n\nTest description: " + testCase.getDescription());
+            throw new RuntimeException("Failed test: " + testCaseName +" - " + testCase.getDescription() + "\nExpected result: " + executionResult + "\nActual result: " + result);
         }
         return executionId;
     }
