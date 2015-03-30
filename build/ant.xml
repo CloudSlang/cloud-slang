@@ -20,8 +20,8 @@
         <!-- Create the build directory structure used by compile -->
         <!--<setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"/>-->
         <mkdir dir="${build}"/>
-        <get src="https://github.com/openscore/score-language/releases/download/score-language-0.1.18/slang-cli.zip"
-            dest="${build}/slang.zip" usetimestamp="true" verbose="true"/>
+        <get src="https://github.com/CloudSlang/cloud-slang/releases/download/cloudslang-0.7.2/slang.zip"
+             dest="${build}/slang.zip" usetimestamp="true" verbose="true"/>
         <!--<gunzip src="${build}/slang.tar.gz"/>-->
         <!--<untar src="${build}/slang.tar" dest="${build}"/>-->
         <unzip src="${build}/slang.zip" dest="${build}"/>

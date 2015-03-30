@@ -17,7 +17,7 @@
 namespace: build.build_content
 
 imports:
-  cmd: io.cloudslang.slang.base.cmd
+  cmd: io.cloudslang.base.cmd
 
 flow:
   name: clone

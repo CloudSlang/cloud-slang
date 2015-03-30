@@ -37,7 +37,7 @@ public class ExecutionPlanBuilder {
     @Autowired
     private ExecutionStepFactory stepFactory;
 
-    private static final String SLANG_NAME = "slang";
+    private static final String CLOUDSLANG_NAME = "CloudSlang";
     private static final int NUMBER_OF_TASK_EXECUTION_STEPS = 2;
     private static final long FLOW_END_STEP_ID = 0L;
     private static final long FLOW_START_STEP_ID = 1L;
@@ -48,7 +48,7 @@ public class ExecutionPlanBuilder {
     public ExecutionPlan createOperationExecutionPlan(Operation compiledOp) {
         ExecutionPlan executionPlan = new ExecutionPlan();
         executionPlan.setName(compiledOp.getName());
-        executionPlan.setLanguage(SLANG_NAME);
+        executionPlan.setLanguage(CLOUDSLANG_NAME);
         executionPlan.setFlowUuid(compiledOp.getId());
 
         executionPlan.setBeginStep(1L);
@@ -64,7 +64,7 @@ public class ExecutionPlanBuilder {
     public ExecutionPlan createFlowExecutionPlan(Flow compiledFlow) {
         ExecutionPlan executionPlan = new ExecutionPlan();
         executionPlan.setName(compiledFlow.getName());
-        executionPlan.setLanguage(SLANG_NAME);
+        executionPlan.setLanguage(CLOUDSLANG_NAME);
         executionPlan.setFlowUuid(compiledFlow.getId());
 
         executionPlan.setBeginStep(FLOW_START_STEP_ID);
