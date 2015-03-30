@@ -3,7 +3,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.7.3-SNAPSHOT</version>
+        <version>0.7.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -74,12 +74,12 @@
                 <configuration>
                     <repositoryLayout>flat</repositoryLayout>
                     <repositoryName>lib</repositoryName>
-                    <assembleDirectory>target/diphthong</assembleDirectory>
+                    <assembleDirectory>target/cslang-builder</assembleDirectory>
                     <useWildcardClassPath>true</useWildcardClassPath>
                     <programs>
                         <program>
                             <mainClass>io.cloudslang.lang.tools.build.SlangBuildMain</mainClass>
-                            <id>diphthong</id>
+                            <id>cslang-builder</id>
                         </program>
                     </programs>
                 </configuration>
