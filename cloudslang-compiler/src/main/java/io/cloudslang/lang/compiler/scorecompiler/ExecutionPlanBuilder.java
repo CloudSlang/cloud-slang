@@ -106,7 +106,7 @@ public class ExecutionPlanBuilder {
 
                 ExecutionPlan executionPlan = new ExecutionPlan();
                 executionPlan.setName(BRANCH_KEY + "-" + refID);
-                executionPlan.setLanguage(SLANG_NAME);
+                executionPlan.setLanguage(CLOUDSLANG_NAME);
                 executionPlan.setFlowUuid(refID);
 
                 executionPlan.setBeginStep(BRANCH_START_STEP_ID);
