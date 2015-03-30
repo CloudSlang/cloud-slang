@@ -6,12 +6,14 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 #
 ####################################################
+# Gets the cloud-slang-content repository.
 #
-#   this flow gets the slang-content repo
-#
-#    Inputs:
-#      - url - URL to of the content repo
-#      - target_dir - location to puth the content repo in
+# Inputs:
+#   - url - URL of content repository
+#   - target_dir - location to put content repository in
+# Results:
+#   - SUCCESS
+#   - FAILURE
 ####################################################
 namespace: build.build_content
 
