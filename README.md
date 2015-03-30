@@ -15,9 +15,7 @@ CloudSlang is a YAML based language for writing human-readable workflows for the
 4. Run the executable :
   - For Windows : cslang.bat 
   - For Linux : bash cslang
-5. Run the Docker example flow:  run --f ../content/org/openscore/slang/docker/containers/demo_dev_ops.sl  --cp ../content/  --inputs dockerHost=[*dockerHost*],dockerUsername=[*dockerHostUser*],dockerPassword=[*dockerHostPasword*],emailHost=[*emailHost*],emailPort=[*Emailport*],emailSender=[*EmailSender*],emailRecipient=[*EmailRecipient*]
-
-
+5. Run a simple example print text flow:  run --f ../../content/io/cloudslang/base/print/print_text.sl --i text=first_flow
 
 #### Documentation :
 
