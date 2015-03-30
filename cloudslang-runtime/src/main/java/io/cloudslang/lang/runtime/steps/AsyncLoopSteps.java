@@ -19,9 +19,9 @@ import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 import io.cloudslang.lang.runtime.env.*;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.log4j.Logger;
-import org.openscore.api.EndBranchDataContainer;
-import org.openscore.api.execution.ExecutionParametersConsts;
-import org.openscore.lang.ExecutionRuntimeServices;
+import io.cloudslang.score.api.EndBranchDataContainer;
+import io.cloudslang.score.api.execution.ExecutionParametersConsts;
+import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.openscore.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
 /**
  * Date: 3/25/2015
