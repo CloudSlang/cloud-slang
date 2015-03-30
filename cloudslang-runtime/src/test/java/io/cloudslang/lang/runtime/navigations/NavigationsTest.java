@@ -12,9 +12,9 @@ package io.cloudslang.lang.runtime.navigations;
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
-import junit.framework.Assert;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,20 +57,22 @@ public class NavigationsTest {
         runEnv.putNextStepPosition(nextStepId);
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         runtimeServices.setStepErrorKey("Error");
-        Long nextPosition = navigations.navigate(runEnv , runtimeServices);
+        try {
+            Long nextPosition = navigations.navigate(runEnv , runtimeServices);
 
-        Collection<ScoreEvent> events = runtimeServices.getEvents();
+        }catch (RuntimeException e){
+            Collection<ScoreEvent> events = runtimeServices.getEvents();
 
-        Assert.assertNull(nextPosition);
-
-        Assert.assertFalse(events.isEmpty());
-        ScoreEvent stepErrorEvent = null;
-        for(ScoreEvent event:events){
-            if(event.getEventType().equals(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION)){
-                stepErrorEvent = event;
+            Assert.assertFalse(events.isEmpty());
+            ScoreEvent stepErrorEvent = null;
+            for(ScoreEvent event:events){
+                if(event.getEventType().equals(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION)){
+                    stepErrorEvent = event;
+                }
             }
+            Assert.assertNotNull(stepErrorEvent);
         }
-        Assert.assertNotNull(stepErrorEvent);
+
     }
 
     @Configuration
