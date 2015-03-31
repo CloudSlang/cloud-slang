@@ -77,6 +77,7 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
                 errorMessage.set(TEST_CASE_FAILED + testCaseName + ". " + data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " +
                         data.get(EventConstants.SCORE_ERROR_MSG));
                 flowFinished.set(true);
+                result = ScoreLangConstants.FAILURE_RESULT;
                 break;
             case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
                 errorMessage.set(TEST_CASE_FAILED + testCaseName + ". " + data.get(LanguageEventData.EXCEPTION));

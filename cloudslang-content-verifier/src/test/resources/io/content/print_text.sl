@@ -23,4 +23,5 @@ operation:
   action:
     python_script: print text
   results:
-    - SUCCESS
+    - SUCCESS: text != ""
+    - FAILURE
