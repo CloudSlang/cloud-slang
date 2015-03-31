@@ -72,6 +72,9 @@ public class SlangTestRunner {
                 if(StringUtils.isBlank(currentTestCase.getResult())){
                     currentTestCase.setResult(getResultFromFileName(currentTestCase.getTestFlowPath()));
                 }
+                if(currentTestCase.getThrowsException() == null){
+                    currentTestCase.setThrowsException(false);
+                }
             }
             testCases.putAll(testCasesFromCurrentFile);
         }
@@ -158,7 +161,7 @@ public class SlangTestRunner {
             throw new RuntimeException("Flow " + compilationArtifact.getExecutionPlan().getName() +" did not throw an exception as expected"
                     + "\n\nTest description: " + testCase.getDescription());
         }
-        if(StringUtils.isNotBlank(errorMessageFlowExecution) && (testCase.getThrowsException() == null || BooleanUtils.isFalse(testCase.getThrowsException()))){
+        if(StringUtils.isNotBlank(errorMessageFlowExecution) && BooleanUtils.isFalse(testCase.getThrowsException())){
                 // unexpected exception occurred during flow execution
                 throw new RuntimeException(errorMessageFlowExecution);
         }

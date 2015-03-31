@@ -91,6 +91,10 @@ public class SlangTestCase {
         return throwsException;
     }
 
+    public void setThrowsException(boolean throwsException) {
+        this.throwsException = throwsException;
+    }
+
     public String getResult() {
         return result;
     }
@@ -106,4 +110,6 @@ public class SlangTestCase {
     public int hashCode() {
         return HashCodeBuilder.reflectionHashCode(this);
     }
+
+
 }
