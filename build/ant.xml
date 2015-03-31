@@ -37,7 +37,10 @@
             <arg value="/c"/>
             <arg value="${build}/slang/bin/slang"/>
             <arg value="run"/>
+            <arg value="--f"/>
             <arg value="build_content/build_cli_flow.sl"/>
+            <arg value="--cp"/>
+            <arg value="build_content,${build}"/>
         </exec>
     </target>
     <target name="clean"
