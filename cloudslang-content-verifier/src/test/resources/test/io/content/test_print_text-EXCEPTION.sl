@@ -15,7 +15,7 @@ flow:
         # publish:
         # navigate:
   outputs:
-    - output: inexistend_output
+    - output: inexistent_output
   # results:
 
 

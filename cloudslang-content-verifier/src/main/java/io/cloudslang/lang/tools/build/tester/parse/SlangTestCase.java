@@ -95,6 +95,8 @@ public class SlangTestCase {
         return result;
     }
 
+    public void setResult(String result){ this.result = result; }
+
     @Override
     public boolean equals(Object o) {
         return EqualsBuilder.reflectionEquals(this, o);

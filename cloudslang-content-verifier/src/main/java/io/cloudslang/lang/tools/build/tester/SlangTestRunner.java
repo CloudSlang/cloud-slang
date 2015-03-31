@@ -65,7 +65,15 @@ public class SlangTestRunner {
         for (File testCaseFile : testCasesFiles) {
             Validate.isTrue(testCaseFile.isFile(),
                     "file path \'" + testCaseFile.getAbsolutePath() + "\' must lead to a file");
-            testCases.putAll(parser.parse(SlangSource.fromFile(testCaseFile)));
+
+            Map<String, SlangTestCase> testCasesFromCurrentFile = parser.parse(SlangSource.fromFile(testCaseFile));
+            for (String currentTestCaseName : testCasesFromCurrentFile.keySet()) {
+                SlangTestCase currentTestCase = testCasesFromCurrentFile.get(currentTestCaseName);
+                if(StringUtils.isBlank(currentTestCase.getResult())){
+                    currentTestCase.setResult(getResultFromFileName(currentTestCase.getTestFlowPath()));
+                }
+            }
+            testCases.putAll(testCasesFromCurrentFile);
         }
         return testCases;
     }
@@ -120,10 +128,6 @@ public class SlangTestRunner {
         String testCaseName = testCase.getName();
         String result = testCase.getResult();
 
-        if (StringUtils.isBlank(result)) {
-            result = getResultFromFileName(compilationArtifact.getExecutionPlan().getName());
-        }
-
         //add start event
         Set<String> handlerTypes = new HashSet<>();
         handlerTypes.add(ScoreLangConstants.EVENT_EXECUTION_FINISHED);
@@ -160,7 +164,7 @@ public class SlangTestRunner {
         }
 
         if (!executionResult.equals(result)){
-            throw new RuntimeException("Failed test: " + testCaseName +" - " + testCase.getDescription() + "\nExpected result: " + executionResult + "\nActual result: " + result);
+            throw new RuntimeException("Failed test: " + testCaseName +" - " + testCase.getDescription() + "\nExpected result: " + result + "\nActual result: " + executionResult);
         }
         return executionId;
     }

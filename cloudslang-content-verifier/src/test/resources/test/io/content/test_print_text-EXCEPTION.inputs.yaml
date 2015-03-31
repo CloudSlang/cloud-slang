@@ -1,7 +1,7 @@
 testPrintFinishesWithException:
   inputs:
     - text: text to print
-  description: Tests that print_text operation throws exception if inexistent output is binded
+  description: Tests that print_text operation throws exception if inexistent output binding
   testFlowPath: io.content.test_print_text-EXCEPTION
   throwsException: true
   result: FAILURE
