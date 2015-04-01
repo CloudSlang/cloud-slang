@@ -166,7 +166,7 @@ public class SlangTestRunner {
                 throw new RuntimeException(errorMessageFlowExecution);
         }
 
-        if (!executionResult.equals(result)){
+        if (result != null && !executionResult.equals(result)){
             throw new RuntimeException("Failed test: " + testCaseName +" - " + testCase.getDescription() + "\nExpected result: " + result + "\nActual result: " + executionResult);
         }
         return executionId;
