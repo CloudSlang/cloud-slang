@@ -13,4 +13,9 @@ operation:
      - text
   action:
     python_script: |
-        print 'Hello from branch ' + str(text)
+        name = 'branch ' + str(text)
+        name_length = len(name)
+        print 'Hello from ' + name
+  outputs:
+    - name
+    - name_length

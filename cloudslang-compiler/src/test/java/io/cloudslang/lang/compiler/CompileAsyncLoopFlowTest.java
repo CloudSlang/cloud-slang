@@ -24,6 +24,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URI;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -43,24 +44,40 @@ public class CompileAsyncLoopFlowTest {
     private SlangCompiler compiler;
 
     @Test
-    public void testPreCompileLoopFlow() throws Exception {
+    public void testPreCompileAsyncLoopFlow() throws Exception {
         URI flow = getClass().getResource("/loops/async_loop/simple_async_loop.sl").toURI();
         Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
         assertNotNull("executable is null", executable);
+
         Task task = ((Flow) executable).getWorkflow()
                 .getTasks()
                 .getFirst();
+
         assertTrue(task.getPreTaskActionData().containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
         AsyncLoopStatement asyncLoopStatement = (AsyncLoopStatement) task.getPreTaskActionData()
                 .get(ScoreLangConstants.ASYNC_LOOP_KEY);
         assertEquals("values", asyncLoopStatement.getExpression());
         assertEquals("value", asyncLoopStatement.getVarName());
+
+        assertTrue(task.getPostTaskActionData().containsKey(SlangTextualKeys.AGGREGATE_KEY));
+        List<Object> aggregateValues = (List<Object>) task.getPostTaskActionData().get(SlangTextualKeys.AGGREGATE_KEY);
+        assertNotNull("aggregate list is null", aggregateValues);
+        assertEquals("aggregate list is not empty", 0, aggregateValues.size());
     }
 
+    @Test
+    public void testCompileAsyncLoopFlow() throws Exception {
+        URI flow = getClass().getResource("/loops/async_loop/simple_async_loop.sl").toURI();
+        URI operation = getClass().getResource("/loops/async_loop/print.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+        CompilationArtifact artifact = compiler.compile(SlangSource.fromFile(flow), path);
+        assertNotNull("artifact is null", artifact);
+    }
 
     @Test
-    public void testCompileLoopFlow() throws Exception {
-        URI flow = getClass().getResource("/loops/async_loop/simple_async_loop.sl").toURI();
+    public void testCompileAsyncLoopFlowAggregate() throws Exception {
+        URI flow = getClass().getResource("/loops/async_loop/async_loop_aggregate.sl").toURI();
         URI operation = getClass().getResource("/loops/async_loop/print.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));

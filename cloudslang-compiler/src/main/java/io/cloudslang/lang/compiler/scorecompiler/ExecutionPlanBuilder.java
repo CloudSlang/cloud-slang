@@ -114,12 +114,8 @@ public class ExecutionPlanBuilder {
                 executionPlan.addStep(stepFactory.createBeginTaskStep(BRANCH_START_STEP_ID, task.getInputs(), task.getPreTaskActionData(),
                         task.getRefId(), task.getName()));
                 //branch end step
-                Map<String, ResultNavigation> navigationValues = new HashMap<>();
-                for (Map.Entry<String, String> entry : task.getNavigationStrings().entrySet()) {
-                    navigationValues.put(entry.getKey(), new ResultNavigation(0, entry.getKey()));
-                }
                 executionPlan.addStep(stepFactory.createFinishTaskStep(BRANCH_END_STEP_ID, task.getPostTaskActionData(),
-                        navigationValues, task.getName(), true));
+                        new HashMap<String, ResultNavigation>(), task.getName(), true));
 
                 branchExecutionPlans.put(refID, executionPlan);
             }

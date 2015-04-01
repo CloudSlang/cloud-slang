@@ -222,6 +222,13 @@ public class ExecutableBuilder {
                         @SuppressWarnings("unchecked") Map<String, Object> asyncLoopData = (Map<String, Object>) taskRawDataValue.remove(ASYNC_LOOP_KEY);
                         asyncLoopData.put(ASYNC_LOOP_KEY, asyncLoopData.remove(FOR_KEY));
                         taskRawDataValue.putAll(asyncLoopData);
+
+                        if (taskRawDataValue.containsKey(NAVIGATION_KEY)) {
+                            taskRawDataValue.put(NAVIGATION_KEY, taskRawDataValue.remove(NAVIGATION_KEY));
+                        }
+                        if (taskRawDataValue.containsKey(AGGREGATE_KEY)) {
+                            taskRawDataValue.put(AGGREGATE_KEY, taskRawDataValue.remove(AGGREGATE_KEY));
+                        }
                     }
                 }
             } catch (ClassCastException ex){

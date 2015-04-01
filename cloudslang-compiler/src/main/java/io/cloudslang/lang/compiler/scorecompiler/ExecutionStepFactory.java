@@ -138,15 +138,13 @@ public class ExecutionStepFactory {
     public ExecutionStep createJoinBranchesStep(Long index, Map<String, Serializable> postTaskData,
                                                 Map<String, ResultNavigation> navigationValues, String taskName) {
         Validate.notNull(postTaskData, "postTaskData is null");
+        Validate.notNull(navigationValues, "navigationValues is null");
         Map<String, Serializable> actionData = new HashMap<>();
-        // TODO - async task - aggregate -> actionData.put(ScoreLangConstants.TASK_PUBLISH_KEY, postTaskData.get(SlangTextualKeys.PUBLISH_KEY));
-        actionData.put(ScoreLangConstants.PREVIOUS_STEP_ID_KEY, index - 1);
+        actionData.put(ScoreLangConstants.TASK_AGGREGATE_KEY, postTaskData.get(SlangTextualKeys.AGGREGATE_KEY));
         actionData.put(ScoreLangConstants.TASK_NAVIGATION_KEY, new HashMap<>(navigationValues));
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, taskName);
 
-        ExecutionStep executionStep = createGeneralStep(index, ASYNC_LOOP_STEPS_CLASS, "joinBranches", actionData);
-
-        return executionStep;
+        return createGeneralStep(index, ASYNC_LOOP_STEPS_CLASS, "joinBranches", actionData);
     }
 
     private ExecutionStep createGeneralStep(
