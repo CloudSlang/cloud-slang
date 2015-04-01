@@ -86,7 +86,7 @@ public class SlangTestRunner {
 
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
             String testCaseName = testCaseEntry.getKey();
-            log.info("Start running test: " + testCaseName);
+            log.info("Start running test: " + testCaseName + " - " + testCaseEntry.getValue().getDescription());
             SlangTestCase testCase = testCaseEntry.getValue();
             //todo: temporary solution
             testCase.setName(testCaseName);
@@ -140,7 +140,7 @@ public class SlangTestRunner {
         handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
         handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
 
-        TriggerTestCaseEventListener testsEventListener = new TriggerTestCaseEventListener(testCaseName);
+        TriggerTestCaseEventListener testsEventListener = new TriggerTestCaseEventListener(testCaseName, result);
         slang.subscribeOnEvents(testsEventListener, handlerTypes);
 
         Long executionId = slang.run(compilationArtifact, inputs, systemProperties);
@@ -158,15 +158,14 @@ public class SlangTestRunner {
         String errorMessageFlowExecution = testsEventListener.getErrorMessage();
 
         if(StringUtils.isBlank(errorMessageFlowExecution) && BooleanUtils.isTrue(testCase.getThrowsException())){
-            throw new RuntimeException("Flow " + compilationArtifact.getExecutionPlan().getName() +" did not throw an exception as expected"
-                    + "\n\nTest description: " + testCase.getDescription());
+            throw new RuntimeException("Failed test: " + testCaseName + " - " + testCase.getDescription() + "\nFlow " + compilationArtifact.getExecutionPlan().getName() +" did not throw an exception as expected");
         }
         if(StringUtils.isNotBlank(errorMessageFlowExecution) && BooleanUtils.isFalse(testCase.getThrowsException())){
                 // unexpected exception occurred during flow execution
                 throw new RuntimeException(errorMessageFlowExecution);
         }
 
-        if (!executionResult.equals(result)){
+        if (result != null && !executionResult.equals(result)){
             throw new RuntimeException("Failed test: " + testCaseName +" - " + testCase.getDescription() + "\nExpected result: " + result + "\nActual result: " + executionResult);
         }
         return executionId;
