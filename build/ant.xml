@@ -20,13 +20,13 @@
         <!-- Create the build directory structure used by compile -->
         <!--<setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"/>-->
         <mkdir dir="${build}"/>
-        <get src="https://github.com/CloudSlang/cloud-slang/releases/download/cloudslang-0.7.2/slang.zip"
-             dest="${build}/slang.zip" usetimestamp="true" verbose="true"/>
+        <get src="https://github.com/CloudSlang/cloud-slang/releases/download/cloudslang-0.7.5/cslang-cli.zip"
+             dest="${build}/cslang-cli.zip" usetimestamp="true" verbose="true"/>
         <!--<gunzip src="${build}/slang.tar.gz"/>-->
         <!--<untar src="${build}/slang.tar" dest="${build}"/>-->
-        <unzip src="${build}/slang.zip" dest="${build}"/>
+        <unzip src="${build}/cslang-cli.zip" dest="${build}"/>
         <exec executable="/bin/bash" osfamily="unix">
-            <arg value="${build}/slang/bin/slang"/>
+            <arg value="${build}/cslang/cslang/bin/cslang"/>
             <arg value="run"/>
             <arg value="--f"/>
             <arg value="build_content/build_cli_flow.sl"/>
@@ -35,7 +35,7 @@
         </exec>
         <exec executable="cmd" osfamily="windows">
             <arg value="/c"/>
-            <arg value="${build}/slang/bin/slang"/>
+            <arg value="${build}\cslang\cslang\bin\cslang"/>
             <arg value="run"/>
             <arg value="--f"/>
             <arg value="build_content/build_cli_flow.sl"/>
