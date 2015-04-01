@@ -8,14 +8,10 @@
 namespace: loops.async_loop
 
 operation:
-  name: print
+  name: print_list
   inputs:
-     - text
+     - words_list
   action:
     python_script: |
-        name = 'branch ' + str(text)
-        name_length = len(name)
-        print 'Hello from ' + name
-  outputs:
-    - name
-    - name_length
+        print words_list
+

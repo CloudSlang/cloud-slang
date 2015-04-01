@@ -11,9 +11,9 @@ imports:
   ops: loops.async_loop
 
 flow:
-  name: async_loop_aggregate
+  name: async_loop_aggregate_navigate
   inputs:
-    - values: range(1, 4)
+    - values: range(1, 11)
   workflow:
     - print_values:
         async_loop:
@@ -27,3 +27,11 @@ flow:
         aggregate:
             - name_list: map(lambda x:str(x['name']), branches_context)
             - number_from_last_branch: branches_context[-1]['number']
+        navigate:
+            SUCCESS: print_list
+            FAILURE: FAILURE
+
+    - print_list:
+        do:
+            ops.print_list:
+                - words_list: [name_list, number_from_last_branch]
