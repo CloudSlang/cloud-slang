@@ -45,6 +45,14 @@ public class ExecutionPlanBuilder {
     private static final long BRANCH_END_STEP_ID = 1L;
     private static final String BRANCH_KEY = "branch";
 
+    public static String generateAsyncTaskRefID(Flow compiledFlow, Task task) {
+        return compiledFlow.getNamespace() + "." + compiledFlow.getName() + "." + task.getName();
+    }
+
+    public static String generateBranchName(String refID) {
+        return BRANCH_KEY + "-" + refID;
+    }
+
     public ExecutionPlan createOperationExecutionPlan(Operation compiledOp) {
         ExecutionPlan executionPlan = new ExecutionPlan();
         executionPlan.setName(compiledOp.getName());
@@ -105,7 +113,7 @@ public class ExecutionPlanBuilder {
                 String refID = generateAsyncTaskRefID(compiledFlow, task);
 
                 ExecutionPlan executionPlan = new ExecutionPlan();
-                executionPlan.setName(BRANCH_KEY + "-" + refID);
+                executionPlan.setName(generateBranchName(refID));
                 executionPlan.setLanguage(CLOUDSLANG_NAME);
                 executionPlan.setFlowUuid(refID);
 
@@ -169,10 +177,6 @@ public class ExecutionPlanBuilder {
     private Long getCurrentId(Map<String, Long> taskReferences) {
         Long max = Lambda.max(taskReferences);
         return max + NUMBER_OF_TASK_EXECUTION_STEPS;
-    }
-
-    private String generateAsyncTaskRefID(Flow compiledFlow, Task task) {
-        return compiledFlow.getNamespace() + "." + compiledFlow.getName() + "." + task.getName();
     }
 
 }
