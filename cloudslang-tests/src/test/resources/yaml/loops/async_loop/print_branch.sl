@@ -7,17 +7,15 @@
 
 namespace: loops.async_loop
 
-imports:
-  ops: loops.async_loop
-
-flow:
-  name: simple_async_loop
+operation:
+  name: print_branch
   inputs:
-    - values: range(1, 11)
-  workflow:
-    - print_values:
-        async_loop:
-          for: value in values
-          do:
-            ops.print_branch:
-              - ID: value
+     - ID
+  action:
+    python_script: |
+        name = 'branch ' + str(ID)
+        int_output = len(name) + int(ID)
+        print 'Hello from ' + name
+  outputs:
+    - name
+    - int_output

@@ -56,32 +56,25 @@ public class RunDataAggregatorListener implements ScoreEventListener {
     }
 
     private StepData buildStepData(List<LanguageEventData> data) {
-        try {
-            Map<String, LanguageEventData> stepEvents = map(data, new Converter<LanguageEventData, String>() {
-                @Override
-                public String convert(LanguageEventData from) {
-                    return from.getEventType();
-                }
-            });
+        Map<String, LanguageEventData> stepEvents = map(data, new Converter<LanguageEventData, String>() {
+            @Override
+            public String convert(LanguageEventData from) {
+                return from.getEventType();
+            }
+        });
 
-            LanguageEventData inputsEvent = stepEvents.get(ScoreLangConstants.EVENT_INPUT_END);
-            LanguageEventData outputsEvent = stepEvents.get(ScoreLangConstants.EVENT_OUTPUT_END);
+        LanguageEventData inputsEvent = stepEvents.get(ScoreLangConstants.EVENT_INPUT_END);
+        LanguageEventData outputsEvent = stepEvents.get(ScoreLangConstants.EVENT_OUTPUT_END);
 
-            String path = inputsEvent.getPath();
-            String stepName = inputsEvent.get(TASK_NAME) != null ? (String) inputsEvent.get(TASK_NAME)
-                    : (String) inputsEvent.get(EXECUTABLE_NAME);
-            Map<String, Serializable> inputs = inputsEvent.getInputs();
+        String path = inputsEvent.getPath();
+        String stepName = inputsEvent.get(TASK_NAME) != null ? (String) inputsEvent.get(TASK_NAME)
+                : (String) inputsEvent.get(EXECUTABLE_NAME);
+        Map<String, Serializable> inputs = inputsEvent.getInputs();
 
-            Map<String, Serializable> outputs = outputsEvent == null ? null : outputsEvent.getOutputs();
-            String result = outputsEvent == null ? null : (String) outputsEvent.get(LanguageEventData.RESULT);
+        Map<String, Serializable> outputs = outputsEvent == null ? null : outputsEvent.getOutputs();
+        String result = outputsEvent == null ? null : (String) outputsEvent.get(LanguageEventData.RESULT);
 
-            return new StepData(path, stepName, inputs, outputs, result);
-
-        } catch (Exception ex) {
-            // TODO  - async loop - update event capturing
-            Map<String, Serializable> placeHolder = new HashMap<>();
-            return new StepData("TODO", "TODO", placeHolder, placeHolder, "TODO");
-        }
+        return new StepData(path, stepName, inputs, outputs, result);
     }
 
 }
