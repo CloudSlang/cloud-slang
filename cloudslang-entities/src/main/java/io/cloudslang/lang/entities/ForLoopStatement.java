@@ -16,4 +16,9 @@ public abstract class ForLoopStatement extends LoopStatement implements Serializ
     public ForLoopStatement(String expression) {
         super(expression);
     }
+
+    /**
+     * only here to satisfy serialization libraries
+     */
+    protected ForLoopStatement() {}
 }

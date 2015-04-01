@@ -27,6 +27,13 @@ public abstract class LoopStatement implements Serializable {
         this.expression = expression;
     }
 
+    /**
+     * only here to satisfy serialization libraries
+     */
+    protected LoopStatement() {
+        expression = null;
+    }
+
     public String getExpression() {
         return expression;
     }

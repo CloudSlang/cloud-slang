@@ -65,4 +65,22 @@ public class DeserializeTest {
         testToAndFromJson(resultNavigation, ResultNavigation.class);
     }
 
+    @Test
+    public void testDeserializeListForLoopStatement() throws IOException {
+        ForLoopStatement listForLoopStatement = new ListForLoopStatement("varName", "expression");
+        testToAndFromJson(listForLoopStatement, ListForLoopStatement.class);
+    }
+
+    @Test
+    public void testDeserializeMapForLoopStatement() throws IOException {
+        MapForLoopStatement mapForLoopStatement = new MapForLoopStatement("keyName", "valueName", "expression");
+        testToAndFromJson(mapForLoopStatement, MapForLoopStatement.class);
+    }
+
+    @Test
+    public void testDeserializeAsyncLoopStatement() throws IOException {
+        AsyncLoopStatement asyncLoopStatement = new AsyncLoopStatement("varName", "expression");
+        testToAndFromJson(asyncLoopStatement, AsyncLoopStatement.class);
+    }
+
 }

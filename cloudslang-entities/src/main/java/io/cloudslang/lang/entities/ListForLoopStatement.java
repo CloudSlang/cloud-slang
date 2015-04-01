@@ -31,6 +31,14 @@ public class ListForLoopStatement extends ForLoopStatement implements Serializab
         this.varName = varName;
     }
 
+    /**
+     * only here to satisfy serialization libraries
+     */
+    @SuppressWarnings("unused")
+    private ListForLoopStatement() {
+        varName = null;
+    }
+
     public String getVarName() {
         return varName;
     }

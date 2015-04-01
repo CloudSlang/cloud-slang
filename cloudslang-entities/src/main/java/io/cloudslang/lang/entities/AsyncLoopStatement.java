@@ -31,6 +31,14 @@ public class AsyncLoopStatement extends LoopStatement implements Serializable {
         this.varName = varName;
     }
 
+    /**
+     * only here to satisfy serialization libraries
+     */
+    @SuppressWarnings("unused")
+    private AsyncLoopStatement() {
+        varName = null;
+    }
+
     public String getVarName() {
         return varName;
     }

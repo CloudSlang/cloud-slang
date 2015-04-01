@@ -34,6 +34,15 @@ public class MapForLoopStatement extends ForLoopStatement implements Serializabl
         this.valueName = valueName;
     }
 
+    /**
+     * only here to satisfy serialization libraries
+     */
+    @SuppressWarnings("unused")
+    private MapForLoopStatement() {
+        keyName = null;
+        valueName = null;
+    }
+
     public String getKeyName() {
         return keyName;
     }
