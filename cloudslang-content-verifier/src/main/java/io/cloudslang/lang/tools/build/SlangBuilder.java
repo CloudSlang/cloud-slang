@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,7 +29,7 @@ import java.util.Set;
  * Verifies all files with extensions: .sl, .sl.yaml or .sl.yml in a given directory are valid
  */
 @Component
-public class SlangBuild {
+public class SlangBuilder {
 
     @Autowired
     private SlangContentVerifier slangContentVerifier;
@@ -37,20 +38,21 @@ public class SlangBuild {
     private SlangTestRunner slangTestRunner;
 
 
-    private final static Logger log = Logger.getLogger(SlangBuild.class);
+    private final static Logger log = Logger.getLogger(SlangBuilder.class);
 
-    public int buildSlangContent(String directoryPath, String testsPath, Set<String> testSuits){
+    public SlangBuildResults buildSlangContent(String directoryPath, String testsPath, Set<String> testSuits){
 
         Map<String, Executable> slangModels =
                 slangContentVerifier.createModelsAndValidate(directoryPath);
 
         Map<String, CompilationArtifact> compiledSources = compileModels(slangModels);
 
+        Map<SlangTestCase, String> failedTests = new HashMap<>();
         if(testsPath != null) {
-            runTests(slangModels, testsPath, testSuits);
+            failedTests = runTests(slangModels, testsPath, testSuits);
         }
 
-        return compiledSources.size();
+        return new SlangBuildResults(compiledSources.size(), failedTests);
     }
 
     /**
@@ -71,7 +73,7 @@ public class SlangBuild {
         return compiledSlangFiles;
     }
 
-    private void runTests(Map<String, Executable> contentSlangModels,
+    private Map<SlangTestCase, String> runTests(Map<String, Executable> contentSlangModels,
                           String testsPath, Set<String> testSuites){
         // Compile all slang test flows under the test directory
         Map<String, Executable> testFlowModels = slangContentVerifier.createModelsAndValidate(testsPath);
@@ -81,7 +83,7 @@ public class SlangBuild {
         Map<String, CompilationArtifact> compiledFlows = slangContentVerifier.compileSlangModels(testFlowModels);
 
         Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath);
-        slangTestRunner.runAllTests(testCases, compiledFlows);
+        return slangTestRunner.runAllTests(testCases, compiledFlows);
     }
 
 

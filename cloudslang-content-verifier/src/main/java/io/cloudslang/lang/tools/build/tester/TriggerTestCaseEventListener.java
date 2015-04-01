@@ -52,7 +52,7 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
     private String testCaseName;
     private String expectedResult;
     private String result;
-    private Map<String, Serializable> outputs;
+    private Map<String, Serializable> outputs = new HashMap<>();
 
     public TriggerTestCaseEventListener(String testCaseName, String expectedResult) {
         this.testCaseName = testCaseName;
@@ -79,7 +79,7 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
                 errorMessage.set(TEST_CASE_FAILED + testCaseName + ". " + data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " +
                         data.get(EventConstants.SCORE_ERROR_MSG));
                 flowFinished.set(true);
-                result = ScoreLangConstants.FAILURE_RESULT;
+//                result = ScoreLangConstants.FAILURE_RESULT;
                 break;
             case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
                 errorMessage.set(TEST_CASE_FAILED + testCaseName + ". " + data.get(LanguageEventData.EXCEPTION));
@@ -98,12 +98,9 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
     }
 
     public ReturnValues getExecutionReturnValues(){
-        if(StringUtils.isEmpty(result)){
-            throw new RuntimeException("Result of executing the test " + testCaseName + " cannot be empty");
-        }
-        if (outputs == null){
-            outputs = new HashMap<>();
-        }
+//        if(StringUtils.isEmpty(result)){
+//            throw new RuntimeException("Result of executing the test " + testCaseName + " cannot be empty");
+//        }
         return new ReturnValues(outputs, result);
     }
 

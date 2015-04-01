@@ -9,6 +9,8 @@
  *******************************************************************************/
 package io.cloudslang.lang.tools.build;
 
+import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
 import org.springframework.context.ApplicationContext;
@@ -17,6 +19,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -32,13 +35,24 @@ public class SlangBuildMain {
 
         //load application context
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/testRunnerContext.xml");
-        SlangBuild slangBuild = context.getBean(SlangBuild.class);
+        SlangBuilder slangBuilder = context.getBean(SlangBuilder.class);
 
         try {
-            int numberOfValidSlangFiles = slangBuild.buildSlangContent(repositoryPath, testsPath, testSuites);
-            System.out.println("SUCCESS: Found " + numberOfValidSlangFiles
-                    + " slang files under directory: \"" + repositoryPath + "\" and all are valid.");
-            System.exit(0);
+            SlangBuildResults buildResults = slangBuilder.buildSlangContent(repositoryPath, testsPath, testSuites);
+            Map<SlangTestCase, String> failedTests = buildResults.getFailedTests();
+            if(MapUtils.isNotEmpty(failedTests)){
+                System.out.println("FAILURE: CloudSlang build for repository: \"" + repositoryPath + "\" failed due to failed tests.");
+                System.out.println("Following tests failed:");
+                for(Map.Entry<SlangTestCase, String> failedTest : failedTests.entrySet()){
+                    SlangTestCase testCase = failedTest.getKey();
+                    System.out.println("  - Test: " + testCase.getName() + " - " + testCase.getDescription() + ". Error: " + failedTest.getValue());
+                }
+                System.exit(1);
+            } else {
+                System.out.println("SUCCESS: Found " + buildResults.getNumberOfCompiledSources()
+                        + " slang files under directory: \"" + repositoryPath + "\" and all are valid.");
+                System.exit(0);
+            }
         } catch (Throwable e) {
             System.out.println(e.getMessage() + "\n\nFAILURE: Validation of slang files under directory: \""
                     + repositoryPath + "\" failed.");
