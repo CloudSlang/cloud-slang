@@ -11,9 +11,7 @@ package io.cloudslang.lang.runtime.steps;
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Input;
-import io.cloudslang.lang.runtime.env.Context;
-import io.cloudslang.lang.runtime.env.ContextStack;
-import io.cloudslang.lang.runtime.env.RunEnvironment;
+import io.cloudslang.lang.runtime.env.*;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import org.apache.commons.lang3.tuple.Pair;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
@@ -44,13 +42,6 @@ public abstract class AbstractSteps {
                 (Serializable) inputsForEvent), Pair.of(levelName.name(), nodeName));
     }
 
-    protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment, Context currentContext, Map<String, Serializable> callArguments) {
-        ContextStack contextStack = runEnvironment.getStack();
-        contextStack.pushContext(currentContext);
-        //TODO: put a deep clone of the new context
-        runEnvironment.putCallArguments(callArguments);
-    }
-
     @SafeVarargs
     public static void fireEvent(ExecutionRuntimeServices runtimeServices,
                                  RunEnvironment runEnvironment,
@@ -67,6 +58,21 @@ public abstract class AbstractSteps {
             eventData.put(field.getKey(), field.getValue());
         }
         runtimeServices.addEvent(type, eventData);
+    }
+
+    protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment, Context currentContext, Map<String, Serializable> callArguments) {
+        ContextStack contextStack = runEnvironment.getStack();
+        contextStack.pushContext(currentContext);
+        //TODO: put a deep clone of the new context
+        runEnvironment.putCallArguments(callArguments);
+    }
+
+    protected void pushParentFlowDataOnStack(RunEnvironment runEnv, Long RUNNING_EXECUTION_PLAN_ID, Long nextStepId) {
+        // create ParentFlowData object containing the current running execution plan id and
+        // the next step id to navigate to in the current execution plan,
+        // and push it to the ParentFlowStack for future use (once we finish running the ref operation/flow)
+        ParentFlowStack stack = runEnv.getParentFlowStack();
+        stack.pushParentFlowData(new ParentFlowData(RUNNING_EXECUTION_PLAN_ID, nextStepId));
     }
 
 }

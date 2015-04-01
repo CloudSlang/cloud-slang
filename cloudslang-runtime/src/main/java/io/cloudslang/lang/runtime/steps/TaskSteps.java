@@ -1,12 +1,12 @@
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
@@ -20,7 +20,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import io.cloudslang.lang.entities.MapForLoopStatement;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.LoopCondition;
-import io.cloudslang.lang.runtime.env.ParentFlowStack;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.lang.entities.ResultNavigation;
@@ -113,8 +112,8 @@ public class TaskSteps extends AbstractSteps {
 
             // set the start step of the given ref as the next step to execute (in the new running execution plan that will be set)
             runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
-			runEnv.getExecutionPath().down();
-        } catch(RuntimeException e) {
+            runEnv.getExecutionPath().down();
+        } catch (RuntimeException e) {
             logger.error("There was an error running the begin task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
         }
@@ -134,7 +133,7 @@ public class TaskSteps extends AbstractSteps {
                         @Param(ScoreLangConstants.ASYNC_LOOP_KEY) boolean async_loop) {
 
         try {
-			if(runEnv.getExecutionPath().getDepth() > 0) runEnv.getExecutionPath().up();
+            if (runEnv.getExecutionPath().getDepth() > 0) runEnv.getExecutionPath().up();
             Context flowContext = runEnv.getStack().popContext();
             Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
 
@@ -163,26 +162,30 @@ public class TaskSteps extends AbstractSteps {
 
             //todo: hook
 
-            // set the position of the next step - for the use of the navigation
-            // find in the navigation values the correct next step position, according to the operation result, and set it
-            ResultNavigation navigation = taskNavigationValues.get(executableReturnValues.getResult());
-            if (navigation == null) {
-                // should always have the executable response mapped to a navigation by the task, if not, it is an error
-                throw new RuntimeException("Task: " + nodeName + " has no matching navigation for the executable result: " + executableReturnValues.getResult());
+            // if this is an end task method from a branch then next step position should ne null (end the flow)
+            // and result should be the one from the executable (navigation is handled in join branches step)
+            Long nextPosition = null;
+            String executableResult = executableReturnValues.getResult();
+            String presetResult = executableResult;
+
+            if (!async_loop) {
+                // set the position of the next step - for the use of the navigation
+                // find in the navigation values the correct next step position, according to the operation result, and set it
+                ResultNavigation navigation = taskNavigationValues.get(executableResult);
+                if (navigation == null) {
+                    // should always have the executable response mapped to a navigation by the task, if not, it is an error
+                    throw new RuntimeException("Task: " + nodeName + " has no matching navigation for the executable result: " + executableReturnValues.getResult());
+                }
+
+                nextPosition = navigation.getNextStepId();
+                presetResult = navigation.getPresetResult();
             }
 
-            Long nextPosition = navigation.getNextStepId();
-            String presetResult = navigation.getPresetResult();
+            runEnv.putNextStepPosition(nextPosition);
 
-            if (async_loop) {
-                runEnv.removeNextStepPosition();
-            } else {
-                runEnv.putNextStepPosition(nextPosition);
-            }
+            HashMap<String, Serializable> outputs = new HashMap<>(publishValues);
 
-            HashMap<String, Serializable> outputs = new HashMap<>(flowVariables);
-
-            ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : executableReturnValues.getResult());
+            ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : executableResult);
             runEnv.putReturnValues(returnValues);
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
                     Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
@@ -191,7 +194,7 @@ public class TaskSteps extends AbstractSteps {
                     Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName));
 
             runEnv.getStack().pushContext(flowContext);
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             logger.error("There was an error running the end task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);
         }
@@ -206,11 +209,8 @@ public class TaskSteps extends AbstractSteps {
                                                            Long RUNNING_EXECUTION_PLAN_ID,
                                                            String refId,
                                                            Long nextStepId) {
-        // create ParentFlowData object containing the current running execution plan id and
-        // the next step id to navigate to in the current execution plan,
-        // and push it to the ParentFlowStack for future use (once we finish running the ref operation/flow)
-        ParentFlowStack stack = runEnv.getParentFlowStack();
-        stack.pushParentFlowData(new ParentFlowData(RUNNING_EXECUTION_PLAN_ID, nextStepId));
+        pushParentFlowDataOnStack(runEnv, RUNNING_EXECUTION_PLAN_ID, nextStepId);
+
         // request the score engine to switch the execution plan to the one with the given refId once it can
         Long subFlowRunningExecutionPlanId = executionRuntimeServices.getSubFlowRunningExecutionPlan(refId);
         executionRuntimeServices.requestToChangeExecutionPlan(subFlowRunningExecutionPlanId);
