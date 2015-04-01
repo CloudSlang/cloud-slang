@@ -10,11 +10,8 @@
 package io.cloudslang.lang.compiler.scorecompiler;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
-import io.cloudslang.lang.entities.ListForLoopStatement;
-import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.*;
 import io.cloudslang.lang.entities.bindings.Result;
-import io.cloudslang.lang.entities.ForLoopStatement;
-import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import junit.framework.Assert;
@@ -25,6 +22,7 @@ import org.junit.Test;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ExecutionStepFactoryTest {
 
@@ -158,5 +156,48 @@ public class ExecutionStepFactoryTest {
         ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), results,"stepX");
         Assert.assertNotNull("results key is null", endStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
         Assert.assertEquals("stepX", endStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
+    }
+
+    @Test
+    public void testCreateAddBranchesStep() throws Exception {
+        ExecutionStep startStep = factory.createAddBranchesStep(0L, new HashMap<String, Serializable>(), "refID", "evenCoolerStep");
+        Assert.assertNotNull("step should not be null", startStep);
+        Assert.assertEquals("evenCoolerStep",startStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
+    }
+
+    @Test
+    public void testSplitStep() throws Exception {
+        ExecutionStep startStep = factory.createAddBranchesStep(0L, new HashMap<String, Serializable>(), "refID", "evenCoolerStep");
+        Assert.assertNotNull("step should not be null", startStep);
+        Assert.assertEquals("not marked as split step", true, startStep.isSplitStep());
+    }
+
+    @Test
+    public void testCreateAddBranchesStepPutAsyncLoopUnderTheRightKey() throws Exception {
+        AsyncLoopStatement statement = new AsyncLoopStatement("value", "values");
+        HashMap<String, Serializable> preTaskData = new HashMap<>();
+        preTaskData.put(ScoreLangConstants.ASYNC_LOOP_KEY, statement);
+        ExecutionStep startStep =  factory.createAddBranchesStep(0L, preTaskData, "refID", "evenCoolerStep");
+        AsyncLoopStatement actualStatement = (AsyncLoopStatement) startStep.getActionData()
+                .get(ScoreLangConstants.ASYNC_LOOP_KEY);
+        Assert.assertNotNull("async loop statement not found in action data", actualStatement);
+        Assert.assertSame("async loop statement in not correctly set under the key", statement, actualStatement);
+    }
+
+    @Test
+    public void testCreateJoinBranchesStep() throws Exception {
+        Map<String, Serializable> postTaskData = new HashMap<>();
+        postTaskData.put(SlangTextualKeys.AGGREGATE_KEY, new ArrayList<>());
+
+        ExecutionStep executionStep = factory.createJoinBranchesStep(
+                0L,
+                postTaskData,
+                new HashMap<String, ResultNavigation>(),
+                "joinStep");
+
+        @SuppressWarnings("unchecked") Map<String, Serializable> actionData = (Map<String, Serializable>) executionStep.getActionData();
+        Assert.assertTrue(actionData.containsKey(ScoreLangConstants.TASK_AGGREGATE_KEY));
+        Assert.assertTrue(actionData.containsKey(ScoreLangConstants.TASK_NAVIGATION_KEY));
+        Assert.assertTrue(actionData.containsKey(ScoreLangConstants.NODE_NAME_KEY));
     }
 }
