@@ -50,11 +50,13 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
     private AtomicBoolean flowFinished = new AtomicBoolean(false);
     private AtomicReference<String> errorMessage = new AtomicReference<>("");
     private String testCaseName;
+    private String expectedResult;
     private String result;
     private Map<String, Serializable> outputs;
 
-    public TriggerTestCaseEventListener(String testCaseName) {
+    public TriggerTestCaseEventListener(String testCaseName, String expectedResult) {
         this.testCaseName = testCaseName;
+        this.expectedResult = expectedResult;
     }
 
     public boolean isFlowFinished() {
@@ -126,6 +128,10 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
     private void printFinishEvent(Map<String, Serializable> data) {
         String flowResult = (String)data.get(LanguageEventData.RESULT);
         String flowName = (String)data.get(LanguageEventData.levelName.EXECUTABLE_NAME.toString());
-        log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with result: " + flowResult);
+        if(expectedResult == null || expectedResult.equals(flowResult)) {
+            log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with result: " + flowResult);
+        } else {
+            log.info(TEST_CASE_FAILED + testCaseName + ". Finished running: " + flowName + " with result: " + flowResult + " and expected result: " + expectedResult);
+        }
     }
 }

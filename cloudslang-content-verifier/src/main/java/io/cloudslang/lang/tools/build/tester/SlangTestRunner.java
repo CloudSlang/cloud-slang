@@ -140,7 +140,7 @@ public class SlangTestRunner {
         handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
         handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
 
-        TriggerTestCaseEventListener testsEventListener = new TriggerTestCaseEventListener(testCaseName);
+        TriggerTestCaseEventListener testsEventListener = new TriggerTestCaseEventListener(testCaseName, result);
         slang.subscribeOnEvents(testsEventListener, handlerTypes);
 
         Long executionId = slang.run(compilationArtifact, inputs, systemProperties);
