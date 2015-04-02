@@ -7,7 +7,7 @@ testPrintFinishesWithSuccess:
 
 testPrintFinishesWithFailure:
   inputs:
-    - text: ""
+    - text: orit
   description: Tests that print_text operation finishes with FAILURE
   testFlowPath: io.content.test_print_text-SUCCESS
   result: FAILURE

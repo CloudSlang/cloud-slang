@@ -162,15 +162,19 @@ public class SlangTestRunner {
 
         String errorMessageFlowExecution = testsEventListener.getErrorMessage();
 
-        if(StringUtils.isBlank(errorMessageFlowExecution) && BooleanUtils.isTrue(testCase.getThrowsException())){
-            throw new RuntimeException("Failed test: " + testCaseName + " - " + testCase.getDescription() + "\nFlow " + compilationArtifact.getExecutionPlan().getName() +" did not throw an exception as expected");
+        if (BooleanUtils.isTrue(testCase.getThrowsException())) {
+            if(StringUtils.isBlank(errorMessageFlowExecution)) {
+                throw new RuntimeException("Failed test: " + testCaseName + " - " + testCase.getDescription() + "\nFlow " + compilationArtifact.getExecutionPlan().getName() +" did not throw an exception as expected");
+            }
+            return executionId;
         }
-        if(StringUtils.isNotBlank(errorMessageFlowExecution) && BooleanUtils.isFalse(testCase.getThrowsException())){
+
+        if(StringUtils.isNotBlank(errorMessageFlowExecution)){
             // unexpected exception occurred during flow execution
             throw new RuntimeException("Error occured while running test: " + testCaseName + " - " + testCase.getDescription() + "\n" + errorMessageFlowExecution);
         }
 
-        if (result != null && !executionResult.equals(result)){
+        if (result != null && !result.equals(executionResult)){
             throw new RuntimeException("Failed test: " + testCaseName +" - " + testCase.getDescription() + "\nExpected result: " + result + "\nActual result: " + executionResult);
         }
         return executionId;

@@ -5,3 +5,25 @@ testPrintFinishesWithException:
   testFlowPath: io.content.test_print_text-EXCEPTION
   throwsException: true
   result: FAILURE
+
+testPrintFinishesWithException2:
+  inputs:
+    - text: text to print
+  description: Tests that print_text operation throws exception if inexistent output binding
+  testFlowPath: io.content.test_print_text-EXCEPTION
+  throwsException: true
+
+testPrintFinishesWithoutException:
+  inputs:
+    - text: text to print
+  description: Tests that print_text operation throws exception if inexistent output binding
+  testFlowPath: io.content.test_print_text-EXCEPTION
+  result: SUCCESS
+
+testPrintFinishesWithFalseException:
+  inputs:
+    - text: text to print
+  description: Tests that print_text operation throws exception if inexistent output binding
+  testFlowPath: io.content.test_print_text-EXCEPTION
+  throwsException: false
+  result: FAILURE
