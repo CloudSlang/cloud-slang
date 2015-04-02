@@ -83,6 +83,7 @@ public class SlangBuilder {
         Map<String, CompilationArtifact> compiledFlows = slangContentVerifier.compileSlangModels(testFlowModels);
 
         Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath);
+        log.info("Going to run " + testCases.size() + " tests");
         return slangTestRunner.runAllTests(testCases, compiledFlows);
     }
 
