@@ -68,7 +68,6 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
         @SuppressWarnings("unchecked") Map<String,Serializable> data = (Map<String,Serializable>)scoreEvent.getData();
         switch (scoreEvent.getEventType()){
             case EventConstants.SCORE_FINISHED_EVENT :
-                flowFinished.set(true);
                 break;
             case EventConstants.SCORE_ERROR_EVENT :
             case EventConstants.SCORE_FAILURE_EVENT :
@@ -77,9 +76,11 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
                 break;
             case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
                 errorMessage.set((String)data.get(LanguageEventData.EXCEPTION));
+                flowFinished.set(true);
                 break;
             case ScoreLangConstants.EVENT_EXECUTION_FINISHED :
                 result = (String)data.get(LanguageEventData.RESULT);
+                flowFinished.set(true);
                 break;
             case ScoreLangConstants.EVENT_OUTPUT_END:
                 Map<String, Serializable> extractOutputs = extractOutputs(data);
