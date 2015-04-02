@@ -15,12 +15,21 @@ import java.io.Serializable;
 
 public abstract class ForLoopStatement implements Serializable{
 
+    private static final long serialVersionUID = -1467375536631244911L;
+
     private final String collectionExpression;
 
     public ForLoopStatement(String collectionExpression) {
         Validate.notBlank(collectionExpression, "for loop collection expression cannot be empty");
 
         this.collectionExpression = collectionExpression;
+    }
+
+    /**
+     * only here to satisfy serialization libraries
+     */
+    protected ForLoopStatement() {
+        collectionExpression = null;
     }
 
     public String getCollectionExpression() {
