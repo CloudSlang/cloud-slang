@@ -48,6 +48,7 @@ public class SlangBuildMain {
                 }
                 System.exit(1);
             } else {
+                //todo: add printing of how many tests actually ran
                 System.out.println("SUCCESS: Found " + buildResults.getNumberOfCompiledSources()
                         + " slang files under directory: \"" + repositoryPath + "\" and all are valid.");
                 System.exit(0);
