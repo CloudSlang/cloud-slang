@@ -31,7 +31,7 @@ public class SlangBuildMain {
     public static void main(String[] args) {
         String repositoryPath = parseRepositoryPathArg(args);
         Set<String> testSuites = getTestSuitesProperty();
-        String testsPath = System.getProperty("testPath");
+        String testsPath = System.getProperty("testPath", System.getProperty("user.dir") + File.separator + "test");
 
         //load application context
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/testRunnerContext.xml");
@@ -60,10 +60,12 @@ public class SlangBuildMain {
     }
 
     private static String parseRepositoryPathArg(String[] args) {
-        Validate.notEmpty(args, "You must pass a path to your repository");
-        String repositoryPath = args[0];
-        Validate.notNull(repositoryPath, "You must pass a path to your repository");
-        repositoryPath = FilenameUtils.separatorsToSystem(repositoryPath);
+        String repositoryPath;
+        if(args == null || args.length == 0){
+            repositoryPath = System.getProperty("user.dir") + File.separator + "content";
+        } else {
+            repositoryPath = FilenameUtils.separatorsToSystem(args[0]);
+        }
         Validate.isTrue(new File(repositoryPath).isDirectory(),
                 "Directory path argument \'" + repositoryPath + "\' does not lead to a directory");
         return repositoryPath;
