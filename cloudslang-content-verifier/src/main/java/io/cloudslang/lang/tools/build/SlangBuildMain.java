@@ -42,10 +42,9 @@ public class SlangBuildMain {
             Map<SlangTestCase, String> failedTests = buildResults.getFailedTests();
             if(MapUtils.isNotEmpty(failedTests)){
                 System.out.println("FAILURE: CloudSlang build for repository: \"" + repositoryPath + "\" failed due to failed tests.");
-                System.out.println("Following tests failed:");
+                System.out.println("Following " + failedTests.size() + " tests failed:");
                 for(Map.Entry<SlangTestCase, String> failedTest : failedTests.entrySet()){
-                    SlangTestCase testCase = failedTest.getKey();
-                    System.out.println("  - Test: " + testCase.getName() + " - " + testCase.getDescription() + ". Error: " + failedTest.getValue());
+                    System.out.println("  - " + failedTest.getValue());
                 }
                 System.exit(1);
             } else {

@@ -107,7 +107,7 @@ public class ResultsBinding {
             } catch (ClassCastException ex){
                 throw new RuntimeException("Error resolving the result. The expression " + expression + " does not return boolean value", ex);
             } catch (Throwable t) {
-                throw new RuntimeException("Error evaluating result: '" + result.getName()+ "', error is: \n" + t.getMessage(), t);
+                throw new RuntimeException("Error evaluating result: '" + result.getName()+ "',\n\tError is: " + t.getMessage(), t);
             }
         }
         throw new RuntimeException("No possible result was resolved");
