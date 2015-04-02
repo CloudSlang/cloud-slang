@@ -50,7 +50,7 @@ public class InputsBinding {
         try {
             value = resolveValue(input, context, targetContext, systemProperties);
         } catch (Throwable t) {
-            throw new RuntimeException("Error binding input: '" + inputName + "', error is: \n" + t.getMessage(), t);
+            throw new RuntimeException("Error binding input: '" + inputName + "', \n\tError is: " + t.getMessage(), t);
         }
 
 

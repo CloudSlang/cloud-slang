@@ -41,17 +41,15 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class TriggerTestCaseEventListener implements ScoreEventListener {
 
-    public static final String TEST_CASE_PASSED = "Passed test case: ";
     public static final String TEST_CASE_FAILED = "Failed running test case: ";
     public static final String EXEC_START_PATH = "0";
 
-    private final static Logger log = Logger.getLogger(SlangTestRunner.class);
 
     private AtomicBoolean flowFinished = new AtomicBoolean(false);
     private AtomicReference<String> errorMessage = new AtomicReference<>("");
     private String testCaseName;
     private String result;
-    private Map<String, Serializable> outputs;
+    private Map<String, Serializable> outputs = new HashMap<>();
 
     public TriggerTestCaseEventListener(String testCaseName) {
         this.testCaseName = testCaseName;
@@ -73,16 +71,15 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
                 flowFinished.set(true);
                 break;
             case EventConstants.SCORE_ERROR_EVENT :
-                errorMessage.set(TEST_CASE_FAILED + testCaseName + ". " + data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " +
-                        data.get(EventConstants.SCORE_ERROR_MSG));
+            case EventConstants.SCORE_FAILURE_EVENT :
+                errorMessage.set(data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " + data.get(EventConstants.SCORE_ERROR_MSG));
+                flowFinished.set(true);
                 break;
             case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
-                errorMessage.set(TEST_CASE_FAILED + testCaseName + ". " + data.get(LanguageEventData.EXCEPTION));
+                errorMessage.set((String)data.get(LanguageEventData.EXCEPTION));
                 break;
             case ScoreLangConstants.EVENT_EXECUTION_FINISHED :
-                flowFinished.set(true);
                 result = (String)data.get(LanguageEventData.RESULT);
-                printFinishEvent(data);
                 break;
             case ScoreLangConstants.EVENT_OUTPUT_END:
                 Map<String, Serializable> extractOutputs = extractOutputs(data);
@@ -94,9 +91,6 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
     }
 
     public ReturnValues getExecutionReturnValues(){
-        if(StringUtils.isEmpty(result)){
-            throw new RuntimeException("Result of executing the test " + testCaseName + " cannot be empty");
-        }
         return new ReturnValues(outputs, result);
     }
 
@@ -116,11 +110,5 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
         }
 
         return outputsMap;
-    }
-
-    private void printFinishEvent(Map<String, Serializable> data) {
-        String flowResult = (String)data.get(LanguageEventData.RESULT);
-        String flowName = (String)data.get(LanguageEventData.levelName.EXECUTABLE_NAME.toString());
-        log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with result: " + flowResult);
     }
 }

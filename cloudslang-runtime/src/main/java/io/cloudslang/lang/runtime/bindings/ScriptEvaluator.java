@@ -47,7 +47,7 @@ public class ScriptEvaluator {
             ScriptException scriptException =  new ScriptException(e);
             throw new RuntimeException(
                     "Error in running script expression or variable reference, for expression: '"
-                    + expr + "', Script exception is: \n" + scriptException.getMessage(), scriptException);
+                    + expr + "',\n\tScript exception is: " + scriptException.getMessage(), scriptException);
         }
     }
 

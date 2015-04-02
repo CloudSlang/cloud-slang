@@ -1,10 +1,10 @@
-namespace: org.content
+namespace: io.content
 
 imports:
-  ops: org.content
+  ops: io.content
 
 flow:
-  name: test_print_text-SUCCESS
+  name: test_print_text-EXCEPTION
   inputs:
     - text
   workflow:
@@ -14,5 +14,8 @@ flow:
             - text
         # publish:
         # navigate:
-  # outputs:
+  outputs:
+    - output: inexistent_output
   # results:
+
+
