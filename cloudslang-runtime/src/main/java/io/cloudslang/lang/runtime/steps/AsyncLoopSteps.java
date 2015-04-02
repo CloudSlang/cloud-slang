@@ -68,6 +68,14 @@ public class AsyncLoopSteps extends AbstractSteps {
 
             List<Serializable> splitData = asyncLoopBinding.bindAsyncLoopList(async_loop, flowContext, nodeName);
 
+            fireEvent(
+                    executionRuntimeServices,
+                    runEnv,
+                    ScoreLangConstants.EVENT_ASYNC_LOOP_INPUT_END,
+                    "async loop list evaluated",
+                    Pair.of(LanguageEventData.BOUND_ASYNC_LOOP_INPUTS, (Serializable) splitData),
+                    Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName));
+
             Long branchBeginStep = executionRuntimeServices.getSubFlowBeginStep(refId);
             runEnv.putNextStepPosition(nextStepId);
 
@@ -130,7 +138,7 @@ public class AsyncLoopSteps extends AbstractSteps {
 
                 fireEvent(
                         executionRuntimeServices,
-                        branchRuntimeEnvironment,
+                        runEnv,
                         ScoreLangConstants.EVENT_BRANCH_END,
                         "async loop branch ended",
                         Pair.of("branchReturnValues", executableReturnValues),
@@ -141,7 +149,11 @@ public class AsyncLoopSteps extends AbstractSteps {
             Map<String, Serializable> aggregateContext = new HashMap<>();
             aggregateContext.put(ScoreLangConstants.BRANCHES_CONTEXT_KEY, (Serializable) branches_context);
 
-            fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
+            fireEvent(
+                    executionRuntimeServices,
+                    runEnv,
+                    ScoreLangConstants.EVENT_ASYNC_LOOP_OUTPUT_START,
+                    "Async loop output binding started",
                     Pair.of(ScoreLangConstants.TASK_AGGREGATE_KEY, (Serializable) taskAggregateValues),
                     Pair.of(ScoreLangConstants.TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues),
                     Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName));
@@ -172,7 +184,11 @@ public class AsyncLoopSteps extends AbstractSteps {
             HashMap<String, Serializable> outputs = new HashMap<>(publishValues);
             ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : asyncLoopResult);
 
-            fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
+            fireEvent(
+                    executionRuntimeServices,
+                    runEnv,
+                    ScoreLangConstants.EVENT_ASYNC_LOOP_OUTPUT_END,
+                    "Async loop output binding finished",
                     Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
                     Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
                     Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextStepPosition),
