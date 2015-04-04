@@ -1,0 +1,20 @@
+testPrintFinishesWithSuccess:
+  inputs:
+    - text: text to print
+  description: Tests that print_text operation finishes with SUCCESS
+  testFlowPath: io.content.test_print_text-SUCCESS
+  result: SUCCESS
+
+testPrintFinishesWithFailure:
+  inputs:
+    - text: orit
+  description: Tests that print_text operation finishes with FAILURE
+  testFlowPath: io.content.test_print_text-SUCCESS
+  result: FAILURE
+
+
+testPrintFinishesWithSuccess2:
+  inputs:
+    - text: text to print
+  description: Tests that print_text operation finishes with SUCCESS 2
+  testFlowPath: io.content.test_print_text-SUCCESS

@@ -6,11 +6,13 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 #
 ####################################################
+# Builds the cloudslang-cli.
 #
-#   this flow builds the cloudslang-cli
-#
-#    Inputs:
-#      - target_dir - the directory to create the artifacts in
+# Inputs:
+#   - target_dir - directory to create artifacts in - Default: target
+# Results:
+#   - SUCCESS
+#   - FAILURE
 ####################################################
 namespace: build.build_content
 

@@ -22,6 +22,8 @@ import java.io.Serializable;
  */
 public class ListForLoopStatement extends ForLoopStatement implements Serializable {
 
+    private static final long serialVersionUID = -540865117927676643L;
+
     private final String varName;
 
     public ListForLoopStatement(String varName, String collectionExpression) {

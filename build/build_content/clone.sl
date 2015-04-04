@@ -6,12 +6,14 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 #
 ####################################################
+# Clones a remote git repository to a specified location.
 #
-#   this operation clones a remote repository to a specified location
-#
-#    Inputs:
-#      - url - URL to of the remote repository to clone
-#      - target_location - location of the cloned repository
+# Inputs:
+#   - url - URL of the remote repository to clone
+#   - target_location - location of the cloned repository - Default: .
+# Results:
+#   - SUCCESS
+#   - FAILURE
 ####################################################
 
 namespace: build.build_content

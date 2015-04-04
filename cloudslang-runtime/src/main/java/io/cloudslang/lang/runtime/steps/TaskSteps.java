@@ -53,7 +53,7 @@ public class TaskSteps extends AbstractSteps {
 
     @Autowired
     private LoopsBinding loopsBinding;
-
+    
     private static final Logger logger = Logger.getLogger(TaskSteps.class);
 
     public void beginTask(@Param(ScoreLangConstants.TASK_INPUTS_KEY) List<Input> taskInputs,

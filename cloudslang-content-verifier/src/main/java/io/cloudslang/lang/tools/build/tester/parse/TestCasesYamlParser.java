@@ -17,12 +17,16 @@ package io.cloudslang.lang.tools.build.tester.parse;
 import ch.lambdaj.function.convert.Converter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cloudslang.lang.compiler.SlangSource;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import static ch.lambdaj.Lambda.convertMap;
@@ -35,12 +39,22 @@ public class TestCasesYamlParser {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
+    private final static Logger log = Logger.getLogger(TestCasesYamlParser.class);
+
     public Map<String, SlangTestCase> parse(SlangSource source) {
 
+        if(StringUtils.isEmpty(source.getSource())){
+            log.info("No tests cases were found in: " + source.getName());
+            return new HashMap<>();
+        }
         Validate.notEmpty(source.getSource(), "Source " + source.getName() + " cannot be empty");
 
         try {
             @SuppressWarnings("unchecked") Map<String, Map> parsedTestCases = yaml.loadAs(source.getSource(), Map.class);
+            if (MapUtils.isEmpty(parsedTestCases)){
+                log.info("No tests cases were found in: " + source.getName());
+                return new HashMap<>();
+            }
             return convertMap(parsedTestCases, new Converter<Map, SlangTestCase>() {
                 @Override
                 public SlangTestCase convert(Map from) {

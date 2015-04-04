@@ -44,7 +44,7 @@ public class TestCasesYamlParserTest {
 
     @Test
     public void testSimpleTestCasesParsing() throws URISyntaxException {
-        String filePath = "/test/org/content/test_print_text-SUCCESS.inputs.yaml";
+        String filePath = "/test/io/content/test_print_text-SUCCESS.inputs.yaml";
         URI fileUri = getClass().getResource(filePath).toURI();
         Map<String, SlangTestCase> testCases = parser.parse(SlangSource.fromFile(fileUri));
         SlangTestCase testPrintFinishesWithSuccess = testCases.get("testPrintFinishesWithSuccess");

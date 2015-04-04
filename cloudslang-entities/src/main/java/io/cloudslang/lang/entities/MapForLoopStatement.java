@@ -22,6 +22,8 @@ import java.io.Serializable;
  */
 public class MapForLoopStatement extends ForLoopStatement implements Serializable{
 
+    private static final long serialVersionUID = -667210580560286978L;
+
     private final String keyName;
     private final String valueName;
 

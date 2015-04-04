@@ -85,7 +85,7 @@ public class LoopsBinding {
         try {
             evalResult = scriptEvaluator.evalExpr(collectionExpression, variables);
         } catch (Throwable t) {
-            throw new RuntimeException("Error evaluating for loop expression in task '" + nodeName + "', error is: \n" + t.getMessage(), t);
+            throw new RuntimeException("Error evaluating for loop expression in task '" + nodeName + "',\n\tError is: " + t.getMessage(), t);
         }
 
         if (forLoopStatement instanceof MapForLoopStatement) {
