@@ -215,20 +215,14 @@ public class ExecutableBuilder {
                         }
 
                         message = "Task: " + taskName + " syntax is illegal.\nBelow the 'loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
-                        taskRawDataValue.putAll((Map<String, Object>) taskRawDataValue.remove(LOOP_KEY));
+                        @SuppressWarnings("unchecked") Map<String, Object> loopRawData = (Map<String, Object>) taskRawDataValue.remove(LOOP_KEY);
+                        taskRawDataValue.putAll(loopRawData);
                     }
                     if (asyncLoopKeyFound) {
                         message = "Task: " + taskName + " syntax is illegal.\nBelow the 'async_loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
-                        @SuppressWarnings("unchecked") Map<String, Object> asyncLoopData = (Map<String, Object>) taskRawDataValue.remove(ASYNC_LOOP_KEY);
-                        asyncLoopData.put(ASYNC_LOOP_KEY, asyncLoopData.remove(FOR_KEY));
-                        taskRawDataValue.putAll(asyncLoopData);
-
-                        if (taskRawDataValue.containsKey(NAVIGATION_KEY)) {
-                            taskRawDataValue.put(NAVIGATION_KEY, taskRawDataValue.remove(NAVIGATION_KEY));
-                        }
-                        if (taskRawDataValue.containsKey(AGGREGATE_KEY)) {
-                            taskRawDataValue.put(AGGREGATE_KEY, taskRawDataValue.remove(AGGREGATE_KEY));
-                        }
+                        @SuppressWarnings("unchecked") Map<String, Object> asyncLoopRawData = (Map<String, Object>) taskRawDataValue.remove(ASYNC_LOOP_KEY);
+                        asyncLoopRawData.put(ASYNC_LOOP_KEY, asyncLoopRawData.remove(FOR_KEY));
+                        taskRawDataValue.putAll(asyncLoopRawData);
                     }
                 }
             } catch (ClassCastException ex){
