@@ -183,7 +183,7 @@ public class TaskSteps extends AbstractSteps {
 
             runEnv.putNextStepPosition(nextPosition);
 
-            HashMap<String, Serializable> outputs = new HashMap<>(publishValues);
+            HashMap<String, Serializable> outputs = new HashMap<>(flowVariables);
 
             ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : executableResult);
             runEnv.putReturnValues(returnValues);
