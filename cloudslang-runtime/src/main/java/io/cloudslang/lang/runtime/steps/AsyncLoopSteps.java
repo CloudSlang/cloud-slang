@@ -92,8 +92,7 @@ public class AsyncLoopSteps extends AbstractSteps {
                         RUNNING_EXECUTION_PLAN_ID,
                         refId,
                         nextStepId,
-                        branchBeginStep,
-                        branchContext.getImmutableViewOfVariables());
+                        branchBeginStep);
 
                 fireEvent(
                         executionRuntimeServices,
@@ -208,11 +207,10 @@ public class AsyncLoopSteps extends AbstractSteps {
                               Long RUNNING_EXECUTION_PLAN_ID,
                               String refId,
                               Long nextStepId,
-                              Long branchBeginStep,
-                              Map<String, Serializable> context) {
+                              Long branchBeginStep) {
         pushParentFlowDataOnStack(runEnv, RUNNING_EXECUTION_PLAN_ID, nextStepId);
 
-        Map<String, Serializable> branchContext = new HashMap<>(context);
+        Map<String, Serializable> branchContext = new HashMap<>();
         branchContext.put(ScoreLangConstants.RUN_ENV, runEnv);
         executionRuntimeServices.addBranch(branchBeginStep, refId, branchContext);
     }
