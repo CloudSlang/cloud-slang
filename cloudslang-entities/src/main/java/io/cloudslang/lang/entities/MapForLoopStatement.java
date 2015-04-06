@@ -22,6 +22,8 @@ import java.io.Serializable;
  */
 public class MapForLoopStatement extends ForLoopStatement implements Serializable{
 
+    private static final long serialVersionUID = -667210580560286978L;
+
     private final String keyName;
     private final String valueName;
 
@@ -32,6 +34,15 @@ public class MapForLoopStatement extends ForLoopStatement implements Serializabl
 
         this.keyName = keyName;
         this.valueName = valueName;
+    }
+
+    /**
+     * only here to satisfy serialization libraries
+     */
+    @SuppressWarnings("unused")
+    private MapForLoopStatement() {
+        keyName = null;
+        valueName = null;
     }
 
     public String getKeyName() {

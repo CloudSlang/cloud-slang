@@ -81,7 +81,7 @@ public class ActionSteps extends AbstractSteps {
                     break;
             }
         } catch (RuntimeException ex) {
-            fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_ACTION_ERROR, ex.getMessage(), Pair.of(LanguageEventData.EXCEPTION, ex));
+            fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_ACTION_ERROR, ex.getMessage(), Pair.of(LanguageEventData.EXCEPTION, ex.getMessage()));
             logger.error(ex);
             throw(ex);
         }

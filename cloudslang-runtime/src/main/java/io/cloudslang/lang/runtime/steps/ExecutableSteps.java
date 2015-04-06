@@ -90,8 +90,8 @@ public class ExecutableSteps extends AbstractSteps {
             runEnv.putNextStepPosition(nextStepId);
 			runEnv.getExecutionPath().down();
         } catch (RuntimeException e){
-            logger.error("There was an error running the start executable execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
-            throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);
+            logger.error("There was an error running the start executable execution step of: \'" + nodeName + "\'.\n\tError is: " + e.getMessage());
+            throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t " + e.getMessage(), e);
         }
     }
 
@@ -143,8 +143,8 @@ public class ExecutableSteps extends AbstractSteps {
                         Pair.of(LanguageEventData.levelName.EXECUTABLE_NAME.toString(), nodeName));
             }
         } catch (RuntimeException e){
-            logger.error("There was an error running the finish executable execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
-            throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);
+            logger.error("There was an error running the finish executable execution step of: \'" + nodeName + "\'.\n\tError is: " + e.getMessage());
+            throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t" + e.getMessage(), e);
         }
     }
 

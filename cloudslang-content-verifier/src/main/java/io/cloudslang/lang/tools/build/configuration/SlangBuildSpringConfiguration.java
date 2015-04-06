@@ -12,7 +12,7 @@ package io.cloudslang.lang.tools.build.configuration;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
 import io.cloudslang.lang.api.configuration.SlangSpringConfiguration;
-import io.cloudslang.lang.tools.build.SlangBuild;
+import io.cloudslang.lang.tools.build.SlangBuilder;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,8 +26,8 @@ import org.springframework.context.annotation.Import;
 public class SlangBuildSpringConfiguration {
 
     @Bean
-    public SlangBuild slangBuild(){
-        return new SlangBuild();
+    public SlangBuilder slangBuild(){
+        return new SlangBuilder();
     }
 
     @Bean
