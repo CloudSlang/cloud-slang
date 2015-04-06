@@ -48,7 +48,6 @@ And run it using:
 
 ``` docker run -it cloudslang/cloudslang ```
 
-### Another way of getting the score command line interface.
 ### Another way of getting the CSlang command line interface.
 ###### cslang-cli
 > The score command line interface.
