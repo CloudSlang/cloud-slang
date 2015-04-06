@@ -39,6 +39,15 @@ Contact us at [here](mailto:support@cloudslang.io).
 2. ```mvn clean install```
 3. Run the CLI executable from cloudslang-cli\target\cslang\bin 
 
+### CloudSlang Docker Image
+Just use:
+
+``` docker pull cloudslang/cloudslang ```
+
+And run it using:
+
+``` docker run -it cloudslang/cloudslang ```
+
 ### Another way of getting the score command line interface.
 ###### cslang-cli
 > The score command line interface.
