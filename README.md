@@ -39,7 +39,7 @@ Contact us at [here](mailto:support@cloudslang.io).
 2. ```mvn clean install```
 3. Run the CLI executable from cloudslang-cli\target\cslang\bin 
 
-### Another way of getting the score command line interface.
+### Another way of getting the CSlang command line interface.
 ###### cslang-cli
 > The score command line interface.
 
