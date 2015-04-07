@@ -55,7 +55,7 @@ public class AsyncLoopSteps extends AbstractSteps {
 
     private static final Logger logger = Logger.getLogger(AsyncLoopSteps.class);
 
-    public void addBranches(@Param(ScoreLangConstants.ASYNC_LOOP_KEY) AsyncLoopStatement async_loop,
+    public void addBranches(@Param(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY) AsyncLoopStatement asyncLoopStatement,
                             @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                             @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                             @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
@@ -66,7 +66,7 @@ public class AsyncLoopSteps extends AbstractSteps {
         try {
             Context flowContext = runEnv.getStack().popContext();
 
-            List<Serializable> splitData = asyncLoopBinding.bindAsyncLoopList(async_loop, flowContext, nodeName);
+            List<Serializable> splitData = asyncLoopBinding.bindAsyncLoopList(asyncLoopStatement, flowContext, nodeName);
 
             fireEvent(
                     executionRuntimeServices,
@@ -82,7 +82,7 @@ public class AsyncLoopSteps extends AbstractSteps {
             for (Serializable splitItem : splitData) {
                 RunEnvironment branchRuntimeEnvironment = (RunEnvironment) SerializationUtils.clone(runEnv);
                 Context branchContext = (Context) SerializationUtils.clone(flowContext);
-                branchContext.putVariable(async_loop.getVarName(), splitItem);
+                branchContext.putVariable(asyncLoopStatement.getVarName(), splitItem);
 
                 updateCallArgumentsAndPushContextToStack(branchRuntimeEnvironment, branchContext, new HashMap<String, Serializable>());
 

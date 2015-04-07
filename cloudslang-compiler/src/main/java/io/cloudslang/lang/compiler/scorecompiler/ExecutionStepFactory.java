@@ -129,7 +129,7 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, taskName);
         actionData.put(ScoreLangConstants.REF_ID, refId);
         actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
-        actionData.put(ScoreLangConstants.ASYNC_LOOP_KEY, preTaskData.get(ScoreLangConstants.ASYNC_LOOP_KEY));
+        actionData.put(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY, preTaskData.get(ScoreLangConstants.ASYNC_LOOP_KEY));
         ExecutionStep executionStep = createGeneralStep(index, ASYNC_LOOP_STEPS_CLASS, "addBranches", actionData);
         executionStep.setSplitStep(true);
         return executionStep;

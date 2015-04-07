@@ -46,6 +46,7 @@ public interface ScoreLangConstants {
 
     // async loop
     String ASYNC_LOOP_KEY = "async_loop";
+    String ASYNC_LOOP_STATEMENT_KEY = "asyncLoopStatement";
     String TASK_AGGREGATE_KEY = "taskAggregateValues";
     String BRANCHES_CONTEXT_KEY = "branches_context";
     String SPLIT_ITEM_KEY = "splitItem";
