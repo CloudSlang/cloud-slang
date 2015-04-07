@@ -26,7 +26,6 @@ public class Task {
     private final List<Input> inputs;
     private final Map<String, String> navigationStrings;
     private final String refId;
-    private final boolean async;
 
     public Task(String name, Map<String, Serializable> preTaskActionData, Map<String, Serializable> postTaskActionData, List<Input> inputs, Map<String, String> navigationStrings, String refId) {
         this.name = name;
@@ -35,7 +34,6 @@ public class Task {
         this.inputs = inputs;
         this.navigationStrings = navigationStrings;
         this.refId = refId;
-        this.async = preTaskActionData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY);
     }
 
     public String getName() {
@@ -63,7 +61,7 @@ public class Task {
     }
 
     public boolean isAsync() {
-        return async;
+        return preTaskActionData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY);
     }
 
 }
