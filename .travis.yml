@@ -1,12 +1,8 @@
 language: java
 
-addons:
-  apt:
-    packages:
-    - python-pip
-
 before_deploy: >
   ant -f build/ant.xml
+  
 deploy:
   provider: releases
   api_key:
