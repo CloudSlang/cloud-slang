@@ -251,6 +251,35 @@ public class TaskStepsTest {
                 createRuntimeServices(), 1L, new ArrayList<String>(), "Task1", false);
     }
 
+    @Test
+    public void testEndTaskAsyncLoopReturnValues() throws Exception {
+        RunEnvironment runEnv = createRunEnvironment();
+        String result = ScoreLangConstants.SUCCESS_RESULT;
+        Context context = new Context(new HashMap<String, Serializable>());
+        runEnv.getStack().pushContext(context);
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, Serializable>(), result));
+        Long nextStepPosition = 5L;
+
+        HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
+        ResultNavigation successNavigation = new ResultNavigation(nextStepPosition, "CUSTOM1");
+        taskNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
+        ResultNavigation failureNavigation = new ResultNavigation(1, "CUSTOM2");
+        taskNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
+        taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
+                createRuntimeServices(), 1L, new ArrayList<String>(),"task1", true);
+
+        Assert.assertEquals(
+                "next step position should be null for async endTask method",
+                null,
+                runEnv.removeNextStepPosition()
+        );
+        Assert.assertEquals(
+                "executable result should be returned in async endTask method",
+                ScoreLangConstants.SUCCESS_RESULT,
+                runEnv.removeReturnValues().getResult()
+        );
+    }
+
     /////////
     //loops//
     /////////
