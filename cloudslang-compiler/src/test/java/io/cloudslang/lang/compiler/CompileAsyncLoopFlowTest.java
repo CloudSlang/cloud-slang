@@ -298,9 +298,9 @@ public class CompileAsyncLoopFlowTest {
     }
 
     private void verifyAsyncLoopStatement(Map<String, ?> addBranchesActionData) {
-        assertTrue(addBranchesActionData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
+        assertTrue(addBranchesActionData.containsKey(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY));
         AsyncLoopStatement asyncLoopStatement =
-                (AsyncLoopStatement) addBranchesActionData.get(ScoreLangConstants.ASYNC_LOOP_KEY);
+                (AsyncLoopStatement) addBranchesActionData.get(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY);
         assertEquals("async loop statement value not as expected", "value", asyncLoopStatement.getVarName());
         assertEquals("async loop statement expression not as expected", "values", asyncLoopStatement.getExpression());
     }

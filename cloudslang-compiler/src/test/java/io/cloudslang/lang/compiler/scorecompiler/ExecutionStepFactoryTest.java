@@ -179,7 +179,7 @@ public class ExecutionStepFactoryTest {
         preTaskData.put(ScoreLangConstants.ASYNC_LOOP_KEY, statement);
         ExecutionStep startStep =  factory.createAddBranchesStep(0L, preTaskData, "refID", "evenCoolerStep");
         AsyncLoopStatement actualStatement = (AsyncLoopStatement) startStep.getActionData()
-                .get(ScoreLangConstants.ASYNC_LOOP_KEY);
+                .get(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY);
         Assert.assertNotNull("async loop statement not found in action data", actualStatement);
         Assert.assertSame("async loop statement in not correctly set under the key", statement, actualStatement);
     }
