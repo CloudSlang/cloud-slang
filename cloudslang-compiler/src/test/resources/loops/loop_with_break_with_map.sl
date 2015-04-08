@@ -11,7 +11,7 @@ imports:
   ops: loops
 
 flow:
-  name: simple_loop
+  name: loop_with_break_with_map
   inputs:
     - person_map: >
         {'john': 1, 'jane': 2, 'peter': 'three'}
