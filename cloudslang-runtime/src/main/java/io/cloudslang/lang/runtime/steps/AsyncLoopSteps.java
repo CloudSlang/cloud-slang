@@ -106,6 +106,8 @@ public class AsyncLoopSteps extends AbstractSteps {
 
             updateCallArgumentsAndPushContextToStack(runEnv, flowContext, new HashMap<String, Serializable>());
 
+            // forward after the branches are created because begin task method also calls forward
+            runEnv.getExecutionPath().forward();
         } catch (RuntimeException e) {
             logger.error("There was an error running the add branches execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
@@ -140,7 +142,7 @@ public class AsyncLoopSteps extends AbstractSteps {
                         runEnv,
                         ScoreLangConstants.EVENT_BRANCH_END,
                         "async loop branch ended",
-                        Pair.of("branchReturnValues", executableReturnValues),
+                        Pair.of(ScoreLangConstants.BRANCH_RETURN_VALUES_KEY, executableReturnValues),
                         Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName)
                 );
             }

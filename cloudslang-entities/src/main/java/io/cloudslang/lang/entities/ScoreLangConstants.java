@@ -50,6 +50,7 @@ public interface ScoreLangConstants {
     String TASK_AGGREGATE_KEY = "taskAggregateValues";
     String BRANCHES_CONTEXT_KEY = "branches_context";
     String SPLIT_ITEM_KEY = "splitItem";
+    String BRANCH_RETURN_VALUES_KEY = "branchReturnValues";
 
     // Events types
 	String SLANG_EXECUTION_EXCEPTION = "SLANG_EXECUTION_EXCEPTION";
