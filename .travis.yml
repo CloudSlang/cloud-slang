@@ -8,8 +8,8 @@ jdk:
   - openjdk7
 
 before_deploy: >
-  sudo apt-get install python-pip &&
   ant -f build/ant.xml
+  
 deploy:
   provider: releases
   api_key:
@@ -22,3 +22,6 @@ deploy:
     repo: CloudSlang/cloud-slang
     tags: true
     branch: master
+    
+after_success:
+  - mvn clean cobertura:cobertura coveralls:report

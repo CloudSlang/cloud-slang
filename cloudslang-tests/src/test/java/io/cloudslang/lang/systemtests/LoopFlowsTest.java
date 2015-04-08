@@ -146,8 +146,8 @@ public class LoopFlowsTest extends SystemsTestsParent{
 
         Map<String, Serializable> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null);
-        StepData thirdTask = stepsData.get(FOURTH_STEP_KEY);
-        Assert.assertEquals("print_other_values", thirdTask.getName());
+        StepData fourthTask = stepsData.get(FOURTH_STEP_KEY);
+        Assert.assertEquals("print_other_values", fourthTask.getName());
     }
 
     @Test
@@ -161,7 +161,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Map<String, Serializable> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null);
         List<String> actualTasks = getTasksOnly(stepsData);
-        Assert.assertEquals(2, actualTasks.size());
+        Assert.assertEquals(1, actualTasks.size());
     }
 
     @Test
@@ -190,9 +190,9 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Map<String, Serializable> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null);
         List<String> actualTasks = getTasksOnly(stepsData);
-        Assert.assertEquals(3, actualTasks.size());
-        StepData thirdTask = stepsData.get(THIRD_STEP_KEY);
-        Assert.assertEquals("print_other_values", thirdTask.getName());
+        Assert.assertEquals(2, actualTasks.size());
+        StepData secondTask = stepsData.get(SECOND_STEP_KEY);
+        Assert.assertEquals("print_other_values", secondTask.getName());
     }
 
     private List<String> getTasksOnly(Map<String, StepData> stepsData) {
@@ -203,11 +203,30 @@ public class LoopFlowsTest extends SystemsTestsParent{
         StepData firstTask = stepsData.get(FIRST_STEP_PATH);
         StepData secondTask = stepsData.get(SECOND_STEP_KEY);
         StepData thirdTask = stepsData.get(THIRD_STEP_KEY);
-        Assert.assertTrue(firstTask.getInputs().containsValue("john"));
-        Assert.assertTrue(firstTask.getInputs().containsValue(1));
-        Assert.assertTrue(secondTask.getInputs().containsValue("jane"));
-        Assert.assertTrue(secondTask.getInputs().containsValue(2));
-        Assert.assertTrue(thirdTask.getInputs().containsValue("peter"));
-        Assert.assertTrue(thirdTask.getInputs().containsValue("three"));
+        @SuppressWarnings("unchecked")
+        Set<Map<String, Serializable>> actualContextSet = Sets.newHashSet(
+                firstTask.getInputs(),
+                secondTask.getInputs(),
+                thirdTask.getInputs()
+        );
+
+        Map<String, Serializable> context1 = new HashMap<>();
+        context1.put("text", "john");
+        context1.put("text2", 1);
+        Map<String, Serializable> context2 = new HashMap<>();
+        context2.put("text", "jane");
+        context2.put("text2", 2);
+        Map<String, Serializable> context3 = new HashMap<>();
+        context3.put("text", "peter");
+        context3.put("text2", "three");
+        @SuppressWarnings("unchecked")
+        Set<Map<String, Serializable>> expectedContextSet = Sets.newHashSet(
+                context1,
+                context2,
+                context3
+        );
+
+        Assert.assertEquals("loop task inputs not as expected", expectedContextSet, actualContextSet);
     }
+
 }
