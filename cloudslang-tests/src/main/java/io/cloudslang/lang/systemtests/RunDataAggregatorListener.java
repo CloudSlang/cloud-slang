@@ -14,11 +14,8 @@ import ch.lambdaj.function.convert.Converter;
 import ch.lambdaj.group.Group;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import io.cloudslang.score.events.ScoreEvent;
-import io.cloudslang.score.events.ScoreEventListener;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,24 +25,13 @@ import static ch.lambdaj.Lambda.*;
 /*
  * Created by orius123 on 24/12/14.
  */
-public class RunDataAggregatorListener implements ScoreEventListener {
-
-    private static final String TASK_NAME = LanguageEventData.levelName.TASK_NAME.name();
-    private static final String EXECUTABLE_NAME = LanguageEventData.levelName.EXECUTABLE_NAME.name();
-
-    private final List<LanguageEventData> events = new ArrayList<>();
-
-    @Override
-    public void onEvent(ScoreEvent event) throws InterruptedException {
-        LanguageEventData languageEvent = (LanguageEventData) event.getData();
-        events.add(languageEvent);
-    }
+public class RunDataAggregatorListener extends AbstractAggregatorListener {
 
     public Map<String, StepData> aggregate() {
 
         Map<String, StepData> stepsData = new HashMap<>();
 
-        Group<LanguageEventData> groups = group(events, by(on(LanguageEventData.class).getPath()));
+        Group<LanguageEventData> groups = group(getEvents(), by(on(LanguageEventData.class).getPath()));
 
         for (Group<LanguageEventData> subGroup : groups.subgroups()) {
             StepData stepData = buildStepData(subGroup.findAll());
