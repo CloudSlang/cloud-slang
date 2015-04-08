@@ -11,7 +11,7 @@ imports:
   ops: loops
 
 flow:
-  name: simple_loop
+  name: loop_with_break
   inputs:
     - values: [1,2,3]
   workflow:

@@ -11,7 +11,7 @@ imports:
   ops: loops
 
 flow:
-  name: simple_loop_with_map
+  name: simple_loop_with_hashmap
   inputs:
     - person_map
   workflow:
