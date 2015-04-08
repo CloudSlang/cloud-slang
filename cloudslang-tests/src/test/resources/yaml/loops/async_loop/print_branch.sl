@@ -14,7 +14,7 @@ operation:
   action:
     python_script: |
         name = 'branch ' + str(ID)
-        int_output = len(name) + int(ID)
+        int_output = int(ID)
         print 'Hello from ' + name
   outputs:
     - name

@@ -13,7 +13,7 @@ imports:
 flow:
   name: simple_async_loop
   inputs:
-    - values: range(1, 11)
+    - values: range(1, 4)
   workflow:
     - print_values:
         async_loop:

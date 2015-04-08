@@ -33,6 +33,7 @@ public abstract class SystemsTestsParent {
     protected static final String SECOND_STEP_KEY = "0/2";
     protected static final String THIRD_STEP_KEY = "0/3";
     protected static final String FOURTH_STEP_KEY = "0/4";
+    protected static final String FIRST_ASYNC_LOOP_KEY = "0/1";
 
     @Autowired
     protected Slang slang;
@@ -43,7 +44,7 @@ public abstract class SystemsTestsParent {
         return triggerFlows.runSync(compilationArtifact, userInputs, systemProperties);
     }
 
-	public Map<String, StepData> triggerWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> systemProperties) {
+	public RuntimeInformation triggerWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> systemProperties) {
 		return triggerFlows.runWithData(compilationArtifact, userInputs, systemProperties);
 	}
 
