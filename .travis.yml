@@ -22,3 +22,6 @@ deploy:
     repo: CloudSlang/cloud-slang
     tags: true
     branch: master
+
+after_success:
+  - mvn clean cobertura:cobertura coveralls:report
