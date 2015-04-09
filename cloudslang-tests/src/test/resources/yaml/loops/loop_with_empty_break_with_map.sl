@@ -11,10 +11,10 @@ imports:
   ops: loops
 
 flow:
-  name: loop_with_empty_break
+  name: loop_with_empty_break_with_map
   inputs:
-    - person_map: >
-        {'john': 1, 'jane': 2, 'peter': 'three'}
+    - person_map: > # each task will end with FAILURE but the loop will not break on the result
+        {'john': 2, 'jane': 2, 'peter': 2}
   workflow:
     - print_values:
         loop:
