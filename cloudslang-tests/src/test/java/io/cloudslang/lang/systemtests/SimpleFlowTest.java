@@ -20,6 +20,7 @@ import io.cloudslang.score.events.ScoreEvent;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -63,6 +64,26 @@ public class SimpleFlowTest extends SystemsTestsParent {
         exception.expectMessage("input1");
         exception.expectMessage("Required");
         compileAndRunSimpleFlow(new HashMap<String, Serializable>(), null);
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void testSimpleFlowBasicWithEmptyRequiredStringInput() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("input1");
+        exception.expectMessage("Required");
+        Map<String, Serializable> context = new HashMap<>();
+        context.put("input1", "");
+        compileAndRunSimpleFlow(context, null);
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void testSimpleFlowBasicWithEmptyRequiredCollectionInput() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("input1");
+        exception.expectMessage("Required");
+        Map<String, Serializable> context = new HashMap<>();
+        context.put("input1", new ArrayList<>());
+        compileAndRunSimpleFlow(context, null);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
