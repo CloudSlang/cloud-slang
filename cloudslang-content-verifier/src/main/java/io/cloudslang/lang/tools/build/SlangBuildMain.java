@@ -28,10 +28,12 @@ import java.util.regex.Pattern;
  */
 public class SlangBuildMain {
 
+    private static final String CONTENT_DIR = "content";
+
     public static void main(String[] args) {
         String repositoryPath = parseRepositoryPathArg(args);
         Set<String> testSuites = getTestSuitesProperty();
-        String testsPath = System.getProperty("testPath", System.getProperty("user.dir") + File.separator + "test");
+        String testsPath = System.getProperty("testPath", repositoryPath.replaceAll(CONTENT_DIR + "$", "test"));
 
         //load application context
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/testRunnerContext.xml");
@@ -63,7 +65,7 @@ public class SlangBuildMain {
     private static String parseRepositoryPathArg(String[] args) {
         String repositoryPath;
         if(args == null || args.length == 0){
-            repositoryPath = System.getProperty("user.dir") + File.separator + "content";
+            repositoryPath = System.getProperty("user.dir") + File.separator + CONTENT_DIR;
         } else {
             repositoryPath = FilenameUtils.separatorsToSystem(args[0]);
         }

@@ -14,10 +14,12 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -48,7 +50,7 @@ public class SlangBuilder {
         Map<String, CompilationArtifact> compiledSources = compileModels(slangModels);
 
         Map<SlangTestCase, String> failedTests = new HashMap<>();
-        if(testsPath != null) {
+        if (StringUtils.isNotBlank(testsPath) && new File(testsPath).isDirectory()) {
             failedTests = runTests(slangModels, testsPath, testSuits);
         }
 
