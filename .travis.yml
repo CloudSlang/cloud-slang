@@ -19,6 +19,7 @@ deploy:
     repo: CloudSlang/cloud-slang
     tags: true
     branch: master
+    jdk: openjdk7
 
 after_success:
-  - mvn clean cobertura:cobertura coveralls:report
+  - mvn cobertura:cobertura coveralls:report
