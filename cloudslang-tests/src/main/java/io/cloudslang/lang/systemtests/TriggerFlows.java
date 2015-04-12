@@ -66,7 +66,19 @@ public class TriggerFlows {
         RunDataAggregatorListener listener = new RunDataAggregatorListener();
         slang.subscribeOnEvents(listener, STEP_EVENTS);
 
+        try {
+            Thread.sleep(2000L);      /* TODO : remove this! only to test unstable navigation tests*/
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         runSync(compilationArtifact, userInputs, systemProperties);
+
+        try {
+            Thread.sleep(2000L);     /* TODO : remove this! only to test unstable navigation tests*/
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         Map<String, StepData> tasks = listener.aggregate();
 

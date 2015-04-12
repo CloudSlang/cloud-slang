@@ -114,8 +114,8 @@ public class TaskSteps extends AbstractSteps {
             runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
 			runEnv.getExecutionPath().down();
         } catch(RuntimeException e) {
-            logger.error("There was an error running the begin task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
-            throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
+            logger.error("There was an error running the begin task execution step of: \'" + nodeName + "\'.\n\tError is: " + e.getMessage());
+            throw new RuntimeException("Error running: " + nodeName + ".\n\t" + e.getMessage(), e);
         }
     }
 
@@ -185,8 +185,8 @@ public class TaskSteps extends AbstractSteps {
 
             runEnv.getStack().pushContext(flowContext);
         } catch (RuntimeException e){
-            logger.error("There was an error running the end task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
-            throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);
+            logger.error("There was an error running the end task execution step of: \'" + nodeName + "\'.\n\tError is: " + e.getMessage());
+            throw new RuntimeException("Error running: \'" + nodeName + "\'\n\t" + e.getMessage(), e);
         }
     }
 

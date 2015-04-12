@@ -60,6 +60,10 @@ public class SlangTestCase {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getTestFlowPath() {
         return testFlowPath;
     }
@@ -87,9 +91,15 @@ public class SlangTestCase {
         return throwsException;
     }
 
+    public void setThrowsException(boolean throwsException) {
+        this.throwsException = throwsException;
+    }
+
     public String getResult() {
         return result;
     }
+
+    public void setResult(String result){ this.result = result; }
 
     @Override
     public boolean equals(Object o) {
@@ -100,4 +110,6 @@ public class SlangTestCase {
     public int hashCode() {
         return HashCodeBuilder.reflectionHashCode(this);
     }
+
+
 }

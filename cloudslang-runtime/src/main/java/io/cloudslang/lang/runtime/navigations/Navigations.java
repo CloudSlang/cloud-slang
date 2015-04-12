@@ -41,7 +41,7 @@ public class Navigations {
 		if(executionRuntimeServices.hasStepErrorKey()) {
 			AbstractSteps.fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.SLANG_EXECUTION_EXCEPTION, "Error detected during step",
                     Pair.of(LanguageEventData.EXCEPTION, executionRuntimeServices.getStepErrorKey()));
-			return null;
+			throw new RuntimeException(executionRuntimeServices.getStepErrorKey());
 		}
 
         // return the next step position from the run env

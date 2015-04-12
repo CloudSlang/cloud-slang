@@ -22,6 +22,8 @@ import java.io.Serializable;
  */
 public class ListForLoopStatement extends ForLoopStatement implements Serializable{
 
+    private static final long serialVersionUID = -540865117927676643L;
+
     private final String varName;
 
     public ListForLoopStatement(String varName, String collectionExpression) {
@@ -29,6 +31,14 @@ public class ListForLoopStatement extends ForLoopStatement implements Serializab
         Validate.notBlank(varName, "for loop var name cannot be empty");
 
         this.varName = varName;
+    }
+
+    /**
+     * only here to satisfy serialization libraries
+     */
+    @SuppressWarnings("unused")
+    private ListForLoopStatement() {
+        varName = null;
     }
 
     public String getVarName() {

@@ -1,6 +1,0 @@
-testPrintFinishesWithSuccess:
-  inputs:
-    - text: text to print
-  description: Tests that print_text operation finishes with SUCCESS
-  testFlowPath: org.content.test_print_text-SUCCESS
-  result: SUCCESS

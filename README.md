@@ -4,12 +4,13 @@ CloudSlang
 CloudSlang is a YAML based language for writing human-readable workflows for the CloudSlang Orchestration Engine (Score). This project includes the CLI to trigger flows.
 
 [![Build Status](https://travis-ci.org/CloudSlang/cloud-slang.svg?branch=master)](https://travis-ci.org/CloudSlang/cloud-slang)
+[![Coverage Status](https://coveralls.io/repos/CloudSlang/cloud-slang/badge.svg?branch=master)](https://coveralls.io/r/CloudSlang/cloud-slang?branch=master)
 
 #### Getting started:
 
 ###### Pre-Requisite: Java JRE >= 7
 
-1. Download the cslang zip from [here](https://github.com/CloudSlang/cloud-slang/releases/latest).
+1. Download the cslang zip from [here](https://github.com/CloudSlang/cloud-slang/releases/download/cloudslang-0.7.4/cslang-cli.zip). (For the latest snapshot, download from [here](https://github.com/CloudSlang/cloud-slang/releases/latest).)
 2. Unzip it.
 3. Go to the folder /cslang/bin/
 4. Run the executable :
@@ -38,7 +39,16 @@ Contact us at [here](mailto:support@cloudslang.io).
 2. ```mvn clean install```
 3. Run the CLI executable from cloudslang-cli\target\cslang\bin 
 
-### Another way of getting the score command line interface.
+### CloudSlang Docker Image
+Just use:
+
+``` docker pull cloudslang/cloudslang ```
+
+And run it using:
+
+``` docker run -it cloudslang/cloudslang ```
+
+### Another way of getting the CSlang command line interface.
 ###### cslang-cli
 > The score command line interface.
 

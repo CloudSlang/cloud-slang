@@ -14,14 +14,17 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
+import io.cloudslang.score.events.EventConstants;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.Serializable;
@@ -35,6 +38,7 @@ import java.util.Set;
 /**
  * Created by stoneo on 3/15/2015.
  */
+@Component
 public class SlangTestRunner {
 
     @Autowired
@@ -44,6 +48,8 @@ public class SlangTestRunner {
     private Slang slang;
 
     private String[] TEST_CASE_FILE_EXTENSIONS = {"yaml", "yml"};
+    public static final String TEST_CASE_PASSED = "Passed test case: ";
+    public static final String TEST_CASE_FAILED = "Failed running test case: ";
 
     private final static Logger log = Logger.getLogger(SlangTestRunner.class);
 
@@ -61,21 +67,39 @@ public class SlangTestRunner {
         for (File testCaseFile : testCasesFiles) {
             Validate.isTrue(testCaseFile.isFile(),
                     "file path \'" + testCaseFile.getAbsolutePath() + "\' must lead to a file");
-            testCases.putAll(parser.parse(SlangSource.fromFile(testCaseFile)));
+
+            Map<String, SlangTestCase> testCasesFromCurrentFile = parser.parse(SlangSource.fromFile(testCaseFile));
+            for (String currentTestCaseName : testCasesFromCurrentFile.keySet()) {
+                SlangTestCase currentTestCase = testCasesFromCurrentFile.get(currentTestCaseName);
+                //todo: temporary solution
+                currentTestCase.setName(currentTestCaseName);
+                if(StringUtils.isBlank(currentTestCase.getResult())){
+                    currentTestCase.setResult(getResultFromFileName(currentTestCase.getTestFlowPath()));
+                }
+                if(currentTestCase.getThrowsException() == null){
+                    currentTestCase.setThrowsException(false);
+                }
+            }
+            testCases.putAll(testCasesFromCurrentFile);
         }
         return testCases;
     }
 
-    public void runAllTests(Map<String, SlangTestCase> testCases,
-                            Map<String, CompilationArtifact> compiledFlows
-    ) {
+    public Map<SlangTestCase, String> runAllTests(Map<String, SlangTestCase> testCases,
+                            Map<String, CompilationArtifact> compiledFlows) {
 
+        Map<SlangTestCase, String> failedTestCases = new HashMap<>();
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
-            log.info("Start running test: " + testCaseEntry.getKey());
+            log.info("Start running test: " + testCaseEntry.getKey() + " - " + testCaseEntry.getValue().getDescription());
             SlangTestCase testCase = testCaseEntry.getValue();
             CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
-            runTest(testCase, compiledTestFlow);
+            try {
+                runTest(testCase, compiledTestFlow);
+            } catch (RuntimeException e){
+                failedTestCases.put(testCase, e.getMessage());
+            }
         }
+        return failedTestCases;
     }
 
     private static CompilationArtifact getCompiledTestFlow(Map<String, CompilationArtifact> compiledFlows, SlangTestCase testCase) {
@@ -98,7 +122,7 @@ public class SlangTestRunner {
             }
         }
         //todo: add support in sys properties
-        trigger(testCase.getName(), compiledTestFlow, convertedInputs, null, testCase.getResult());
+        trigger(testCase, compiledTestFlow, convertedInputs, null);
     }
 
     /**
@@ -108,15 +132,21 @@ public class SlangTestRunner {
      * @param inputs              : flow inputs
      * @return executionId
      */
-    public Long trigger(String testCaseName, CompilationArtifact compilationArtifact,
+    public Long trigger(SlangTestCase testCase, CompilationArtifact compilationArtifact,
                         Map<String, ? extends Serializable> inputs,
-                        Map<String, ? extends Serializable> systemProperties,
-                        String result) {
+                        Map<String, ? extends Serializable> systemProperties) {
+        String testCaseName = testCase.getName();
+        String result = testCase.getResult();
+        String flowName = testCase.getTestFlowPath();
+
         //add start event
         Set<String> handlerTypes = new HashSet<>();
         handlerTypes.add(ScoreLangConstants.EVENT_EXECUTION_FINISHED);
         handlerTypes.add(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION);
         handlerTypes.add(ScoreLangConstants.EVENT_OUTPUT_END);
+        handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
+        handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
+        handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
 
         TriggerTestCaseEventListener testsEventListener = new TriggerTestCaseEventListener(testCaseName);
         slang.subscribeOnEvents(testsEventListener, handlerTypes);
@@ -134,11 +164,42 @@ public class SlangTestRunner {
         String executionResult = executionReturnValues.getResult();
 
         String errorMessageFlowExecution = testsEventListener.getErrorMessage();
-        if (StringUtils.isNotEmpty(errorMessageFlowExecution) || !executionResult.equals(result)) {
-            // exception occurred during flow execution
-            throw new RuntimeException(errorMessageFlowExecution);
+
+        String message;
+        if (BooleanUtils.isTrue(testCase.getThrowsException())) {
+            if(StringUtils.isBlank(errorMessageFlowExecution)) {
+                message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tFlow " +
+                                compilationArtifact.getExecutionPlan().getName() + " did not throw an exception as expected";
+                log.info(message);
+                throw new RuntimeException(message);
+            }
+            log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with exception as expected" );
+            return executionId;
         }
 
+        if(StringUtils.isNotBlank(errorMessageFlowExecution)){
+            // unexpected exception occurred during flow execution
+            message = "Error occurred while running test: " + testCaseName + " - " + testCase.getDescription() + "\n\t" + errorMessageFlowExecution;
+            log.info(message);
+            throw new RuntimeException(message);
+        }
+
+        if (result != null && !result.equals(executionResult)){
+            message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tExpected result: " + result + "\n\tActual result: " + executionResult;
+            log.info(message);
+            throw new RuntimeException(message);
+        }
+        log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with result: " + executionResult);
         return executionId;
+    }
+
+    private String getResultFromFileName(String fileName) {
+
+        int dashPosition = fileName.lastIndexOf('-');
+        if (dashPosition > 0 && dashPosition < fileName.length()) {
+            return fileName.substring(dashPosition + 1);
+        } else {
+            return null;
+        }
     }
 }

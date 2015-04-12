@@ -61,7 +61,7 @@ public class OutputsBinding {
                     try {
                         scriptResult = scriptEvaluator.evalExpr(outputExpr, scriptContext);
                     } catch (Throwable t) {
-                        throw new RuntimeException("Error binding output: '" + output.getName() + "', error is: \n" + t.getMessage(), t);
+                        throw new RuntimeException("Error binding output: '" + output.getName() + "',\n\tError is: " + t.getMessage(), t);
                     }
                     //evaluate expression
 
