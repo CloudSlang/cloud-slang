@@ -1,7 +1,8 @@
 CloudSlang
 ==============
  
-CloudSlang is a YAML based language for writing human-readable workflows for the CloudSlang Orchestration Engine (Score). This project includes the CLI to trigger flows.
+CloudSlang is a YAML based language for writing human-readable workflows for the CloudSlang Orchestration Engine . 
+This project includes the CLI to trigger flows.
 
 [![Build Status](https://travis-ci.org/CloudSlang/cloud-slang.svg?branch=master)](https://travis-ci.org/CloudSlang/cloud-slang)
 [![Coverage Status](https://coveralls.io/repos/CloudSlang/cloud-slang/badge.svg?branch=master)](https://coveralls.io/r/CloudSlang/cloud-slang?branch=master)
