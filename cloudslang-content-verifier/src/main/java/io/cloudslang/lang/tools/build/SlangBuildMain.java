@@ -33,7 +33,7 @@ public class SlangBuildMain {
     public static void main(String[] args) {
         String repositoryPath = parseRepositoryPathArg(args);
         Set<String> testSuites = getTestSuitesProperty();
-        String testsPath = System.getProperty("testPath", repositoryPath.replaceAll(CONTENT_DIR + "$", "test"));
+        String testsPath = System.getProperty("testPath", repositoryPath.replaceAll(CONTENT_DIR + "(\\\\+|\\/+)?$", "test"));
 
         //load application context
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/testRunnerContext.xml");
@@ -56,7 +56,7 @@ public class SlangBuildMain {
                 System.exit(0);
             }
         } catch (Throwable e) {
-            System.out.println(e.getMessage() + "\n\nFAILURE: Validation of slang files under directory: \""
+            System.out.println("Exception: " + e.getMessage() + "\n\nFAILURE: Validation of slang files under directory: \""
                     + repositoryPath + "\" failed.");
             System.exit(1);
         }
