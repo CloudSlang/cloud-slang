@@ -48,9 +48,9 @@ And run it using:
 
 ``` docker run -it cloudslang/cloudslang ```
 
-### Another way of getting the CSlang command line interface.
+### CloudSlang npm Package
 ###### cslang-cli
-> The score command line interface.
+> The CloudSlang command line interface.
 
 Install this globally and you'll have access to the `cslang` command anywhere on your system.
 
@@ -66,4 +66,4 @@ cslang
 ###### Pre-Requisites:
 Node.js & Java installed.
 
-cslang-cli page in the [NPM repository](https://www.npmjs.com/package/cslang-cli).
+cslang-cli page in the [npm repository](https://www.npmjs.com/package/cslang-cli).
