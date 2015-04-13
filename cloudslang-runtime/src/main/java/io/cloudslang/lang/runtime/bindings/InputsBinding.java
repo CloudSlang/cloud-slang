@@ -82,9 +82,7 @@ public class InputsBinding {
         String inputName = input.getName();
         if (input.isOverridable()) {
             value = context.get(inputName);
-            scriptContext.put(inputName, value);
         }
-
 
         if (value == null) {
             String systemPropertyKey = input.getSystemPropertyName();
@@ -94,6 +92,7 @@ public class InputsBinding {
         }
 
         if (value == null) {
+            scriptContext.put(inputName, null);
             if (StringUtils.isNotEmpty(input.getExpression())) {
                 //so you can resolve previous inputs already bound
                 scriptContext.putAll(targetContext);
