@@ -11,7 +11,9 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.bindings.Input;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -23,11 +25,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = InputsBindingTest.Config.class)
@@ -35,6 +33,9 @@ public class InputsBindingTest {
 
     @Autowired
     private InputsBinding inputsBinding;
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testEmptyBindInputs() throws Exception {
@@ -380,6 +381,44 @@ public class InputsBindingTest {
 		Assert.assertEquals(22, result.get(in));
 	}
 
+    @Test
+    public void testRequiredInputWithNull() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("empty");
+
+        List<Input> inputs = Arrays.asList(
+                new Input("name", "name")
+        );
+        Map<String, Serializable> context = new HashMap<>();
+        bindInputs(inputs, context);
+    }
+
+    @Test
+    public void testRequiredInputWithEmptyString() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("empty");
+
+        List<Input> inputs = Arrays.asList(
+                new Input("name", "name")
+        );
+        Map<String, Serializable> context = new HashMap<>();
+        context.put("name", "");
+        bindInputs(inputs, context);
+    }
+
+    @Test
+    public void testRequiredInputWithEmptyCollection() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("empty");
+
+        List<Input> inputs = Arrays.asList(
+                new Input("name", "name")
+        );
+        Map<String, Serializable> context = new HashMap<>();
+        context.put("name", new ArrayList<>());
+        bindInputs(inputs, context);
+    }
+    
 	private Map<String, Serializable> bindInputs(List<Input> inputs, Map<String, ? extends Serializable> context, Map<String, ? extends Serializable> systemProperties) {
 		return inputsBinding.bindInputs(inputs, context, systemProperties);
 	}
