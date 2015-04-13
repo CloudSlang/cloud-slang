@@ -10,7 +10,7 @@ CloudSlang is a YAML based language for writing human-readable workflows for the
 
 ###### Pre-Requisite: Java JRE >= 7
 
-1. Download the cslang zip from [here](https://github.com/CloudSlang/cloud-slang/releases/download/cloudslang-0.7.4/cslang-cli.zip). (For the latest snapshot, download from [here](https://github.com/CloudSlang/cloud-slang/releases/latest).)
+1. Download the cslang zip from [here](https://github.com/CloudSlang/cloud-slang/releases/download/cloudslang-0.7.14/cslang-cli.zip). (For the latest snapshot, download from [here](https://github.com/CloudSlang/cloud-slang/releases/latest).)
 2. Unzip it.
 3. Go to the folder /cslang/bin/
 4. Run the executable :
@@ -48,9 +48,9 @@ And run it using:
 
 ``` docker run -it cloudslang/cloudslang ```
 
-### Another way of getting the CSlang command line interface.
+### CloudSlang npm Package
 ###### cslang-cli
-> The score command line interface.
+> The CloudSlang command line interface.
 
 Install this globally and you'll have access to the `cslang` command anywhere on your system.
 
@@ -66,4 +66,4 @@ cslang
 ###### Pre-Requisites:
 Node.js & Java installed.
 
-cslang-cli page in the [NPM repository](https://www.npmjs.com/package/cslang-cli).
+cslang-cli page in the [npm repository](https://www.npmjs.com/package/cslang-cli).
