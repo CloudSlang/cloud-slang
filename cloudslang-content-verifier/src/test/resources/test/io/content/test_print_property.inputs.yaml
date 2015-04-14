@@ -1,0 +1,13 @@
+testPrintPropertyWithTextInput:
+  inputs:
+    - text: text to print
+  description: Tests that print_text operation finishes with SUCCESS
+  testFlowPath: io.content.print_property
+  result: SUCCESS
+
+testPrintPropertyWithSysProperty:
+  description: Tests that print_text operation finishes with SUCCESS
+  systemPropertiesFile: C:\dev\score_repos\cloud-slang\cloudslang-content-verifier\src\test\resources\io\content\properties.yaml
+  testFlowPath: io.content.print_property
+  result: SUCCESS
+
