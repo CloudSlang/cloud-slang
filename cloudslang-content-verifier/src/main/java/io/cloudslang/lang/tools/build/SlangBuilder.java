@@ -39,11 +39,17 @@ public class SlangBuilder {
     @Autowired
     private SlangTestRunner slangTestRunner;
 
-
     private final static Logger log = Logger.getLogger(SlangBuilder.class);
 
     public SlangBuildResults buildSlangContent(String directoryPath, String testsPath, Set<String> testSuits){
 
+        log.info("");
+        log.info("------------------------------------------------------------");
+        log.info("Building project: "); //todo add project home here
+        log.info("------------------------------------------------------------");
+
+        log.info("");
+        log.info("--- compiling sources ---");
         Map<String, Executable> slangModels =
                 slangContentVerifier.createModelsAndValidate(directoryPath);
 
@@ -77,6 +83,8 @@ public class SlangBuilder {
 
     private Map<SlangTestCase, String> runTests(Map<String, Executable> contentSlangModels,
                           String testsPath, Set<String> testSuites){
+        log.info("");
+        log.info("--- compiling tests sources ---");
         // Compile all slang test flows under the test directory
         Map<String, Executable> testFlowModels = slangContentVerifier.createModelsAndValidate(testsPath);
         // Add also all of the slang models of the content in order to allow for compilation of the test flows
@@ -85,6 +93,9 @@ public class SlangBuilder {
         Map<String, CompilationArtifact> compiledFlows = slangContentVerifier.compileSlangModels(testFlowModels);
 
         Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath);
+
+        log.info("");
+        log.info("--- running tests ---");
         log.info("Going to run " + testCases.size() + " tests");
         return slangTestRunner.runAllTests(testCases, compiledFlows);
     }
