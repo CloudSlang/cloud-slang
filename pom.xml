@@ -33,7 +33,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <score.group>io.cloudslang</score.group>
-        <score.version>0.1.274</score.version>
+        <score.version>0.1.275</score.version>
         <spring.version>4.1.4.RELEASE</spring.version>
     </properties>
 
@@ -258,6 +258,12 @@
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-core</artifactId>
                 <version>2.0.5</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.mattbertolini</groupId>
+                <artifactId>liquibase-slf4j</artifactId>
+                <version>1.2.1</version>
             </dependency>
 
             <!-- DB drivers -->

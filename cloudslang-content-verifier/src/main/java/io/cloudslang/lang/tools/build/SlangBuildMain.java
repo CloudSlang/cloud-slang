@@ -13,6 +13,7 @@ import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -30,11 +31,14 @@ public class SlangBuildMain {
 
     private static final String CONTENT_DIR = "content";
 
+    private final static Logger log = Logger.getLogger(SlangBuildMain.class);
+
     public static void main(String[] args) {
         String repositoryPath = parseRepositoryPathArg(args);
         Set<String> testSuites = getTestSuitesProperty();
         String testsPath = System.getProperty("testPath", repositoryPath.replaceAll(CONTENT_DIR + "(\\\\+|\\/+)?$", "test"));
 
+        log.info("Loading...");
         //load application context
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/testRunnerContext.xml");
         SlangBuilder slangBuilder = context.getBean(SlangBuilder.class);
@@ -43,21 +47,35 @@ public class SlangBuildMain {
             SlangBuildResults buildResults = slangBuilder.buildSlangContent(repositoryPath, testsPath, testSuites);
             Map<SlangTestCase, String> failedTests = buildResults.getFailedTests();
             if(MapUtils.isNotEmpty(failedTests)){
-                System.out.println("FAILURE: CloudSlang build for repository: \"" + repositoryPath + "\" failed due to failed tests.");
-                System.out.println("Following " + failedTests.size() + " tests failed:");
+                log.error("");
+                log.error("------------------------------------------------------------");
+                log.error("BUILD FAILURE");
+                log.error("------------------------------------------------------------");
+                log.error("CloudSlang build for repository: \"" + repositoryPath + "\" failed due to failed tests.");
+                log.error("Following " + failedTests.size() + " tests failed:");
                 for(Map.Entry<SlangTestCase, String> failedTest : failedTests.entrySet()){
-                    System.out.println("  - " + failedTest.getValue());
+                    log.error("- " + failedTest.getValue().replaceAll("\n", "\n\t"));
                 }
+                log.error("");
                 System.exit(1);
             } else {
                 //todo: add printing of how many tests actually ran
-                System.out.println("SUCCESS: Found " + buildResults.getNumberOfCompiledSources()
+                log.info("");
+                log.info("------------------------------------------------------------");
+                log.info("BUILD SUCCESS");
+                log.info("------------------------------------------------------------");
+                log.info("Found " + buildResults.getNumberOfCompiledSources()
                         + " slang files under directory: \"" + repositoryPath + "\" and all are valid.");
+                log.info("");
                 System.exit(0);
             }
         } catch (Throwable e) {
-            System.out.println("Exception: " + e.getMessage() + "\n\nFAILURE: Validation of slang files under directory: \""
+            log.error("");
+            log.error("------------------------------------------------------------");
+            log.error("Exception: " + e.getMessage() + "\n\nFAILURE: Validation of slang files under directory: \""
                     + repositoryPath + "\" failed.");
+            log.error("------------------------------------------------------------");
+            log.error("");
             System.exit(1);
         }
     }

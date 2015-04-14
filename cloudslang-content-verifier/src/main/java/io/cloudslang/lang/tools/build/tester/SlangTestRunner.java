@@ -48,8 +48,8 @@ public class SlangTestRunner {
     private Slang slang;
 
     private String[] TEST_CASE_FILE_EXTENSIONS = {"yaml", "yml"};
-    public static final String TEST_CASE_PASSED = "Passed test case: ";
-    public static final String TEST_CASE_FAILED = "Failed running test case: ";
+    public static final String TEST_CASE_PASSED = "Test case passed: ";
+    public static final String TEST_CASE_FAILED = "Test case failed: ";
 
     private final static Logger log = Logger.getLogger(SlangTestRunner.class);
 
@@ -60,6 +60,8 @@ public class SlangTestRunner {
                 "Directory path argument \'" + testPath + "\' does not lead to a directory");
         Collection<File> testCasesFiles = FileUtils.listFiles(testPathDir, TEST_CASE_FILE_EXTENSIONS, true);
 
+        log.info("");
+        log.info("--- parsing test cases ---");
         log.info("Start parsing all test cases files under: " + testPath);
         log.info(testCasesFiles.size() + " test cases files were found");
 
@@ -90,7 +92,7 @@ public class SlangTestRunner {
 
         Map<SlangTestCase, String> failedTestCases = new HashMap<>();
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
-            log.info("Start running test: " + testCaseEntry.getKey() + " - " + testCaseEntry.getValue().getDescription());
+            log.info("Running test: " + testCaseEntry.getKey() + " - " + testCaseEntry.getValue().getDescription());
             SlangTestCase testCase = testCaseEntry.getValue();
             CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
             try {
@@ -192,7 +194,7 @@ public class SlangTestRunner {
 
         if (result != null && !result.equals(executionResult)){
             message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tExpected result: " + result + "\n\tActual result: " + executionResult;
-            log.info(message);
+            log.error(message);
             throw new RuntimeException(message);
         }
         log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with result: " + executionResult);
