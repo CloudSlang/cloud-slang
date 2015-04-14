@@ -38,6 +38,7 @@ public class SlangBuildMain {
         Set<String> testSuites = getTestSuitesProperty();
         String testsPath = System.getProperty("testPath", repositoryPath.replaceAll(CONTENT_DIR + "(\\\\+|\\/+)?$", "test"));
 
+        log.info("Loading...");
         //load application context
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/testRunnerContext.xml");
         SlangBuilder slangBuilder = context.getBean(SlangBuilder.class);
