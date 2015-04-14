@@ -88,7 +88,7 @@ public class SlangTestRunner {
     }
 
     public Map<SlangTestCase, String> runAllTests(Map<String, SlangTestCase> testCases,
-                            Map<String, CompilationArtifact> compiledFlows) {
+                            Map<String, CompilationArtifact> compiledFlows, Set<String> testSuites) {
 
         Map<SlangTestCase, String> failedTestCases = new HashMap<>();
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {

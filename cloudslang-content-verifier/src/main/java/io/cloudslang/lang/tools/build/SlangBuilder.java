@@ -97,7 +97,7 @@ public class SlangBuilder {
         log.info("");
         log.info("--- running tests ---");
         log.info("Going to run " + testCases.size() + " tests");
-        return slangTestRunner.runAllTests(testCases, compiledFlows);
+        return slangTestRunner.runAllTests(testCases, compiledFlows, testSuites);
     }
 
 
