@@ -94,8 +94,8 @@ public class SlangTestRunner {
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
             log.info("Running test: " + testCaseEntry.getKey() + " - " + testCaseEntry.getValue().getDescription());
             SlangTestCase testCase = testCaseEntry.getValue();
-            CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
             try {
+                CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
                 runTest(testCase, compiledTestFlow);
             } catch (RuntimeException e){
                 failedTestCases.put(testCase, e.getMessage());
@@ -108,7 +108,10 @@ public class SlangTestRunner {
         String testFlowPath = testCase.getTestFlowPath();
         String testFlowPathTransformed = testFlowPath.replace(File.separatorChar, '.');
         CompilationArtifact compiledTestFlow = compiledFlows.get(testFlowPathTransformed);
-        Validate.notNull("Test flow: " + testFlowPath + " is missing. Referenced in test case: " + testCase.getName());
+        if(compiledTestFlow == null) {
+            String message = "Test flow: " + testFlowPath + " is missing. Referenced in test case: " + testCase.getName();
+            throw new RuntimeException(message);
+        }
         return compiledTestFlow;
     }
 
