@@ -281,7 +281,14 @@ public class ExecutableBuilder {
             navigationStrings.put(ScoreLangConstants.FAILURE_RESULT, defaultFailure);
         }
 
-        return new Task(taskName, preTaskData, postTaskData, inputs, navigationStrings, refId);
+        return new Task(
+                taskName,
+                preTaskData,
+                postTaskData,
+                inputs,
+                navigationStrings,
+                refId,
+                preTaskData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
     }
 
 	private static String resolveRefId(String refIdString, Map<String, String> imports) {

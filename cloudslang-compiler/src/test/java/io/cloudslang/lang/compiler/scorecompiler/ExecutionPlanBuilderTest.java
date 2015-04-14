@@ -86,7 +86,14 @@ public class ExecutionPlanBuilderTest {
 
         Map<String, Serializable> postTaskActionData = new HashMap<>();
         String refId = "refId";
-        return new Task(taskName, preTaskActionData, postTaskActionData, null, navigationStrings, refId);
+        return new Task(
+                taskName,
+                preTaskActionData,
+                postTaskActionData,
+                null,
+                navigationStrings,
+                refId,
+                isAsync);
     }
 
     private List<Result> defaultFlowResults() {
