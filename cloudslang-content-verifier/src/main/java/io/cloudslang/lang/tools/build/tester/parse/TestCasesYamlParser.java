@@ -18,6 +18,7 @@ import ch.lambdaj.function.convert.Converter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cloudslang.lang.compiler.SlangSource;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
@@ -25,7 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +44,7 @@ public class TestCasesYamlParser {
 
     private final static Logger log = Logger.getLogger(TestCasesYamlParser.class);
 
-    public Map<String, SlangTestCase> parse(SlangSource source) {
+    public Map<String, SlangTestCase> parseTestCases(SlangSource source) {
 
         if(StringUtils.isEmpty(source.getSource())){
             log.info("No tests cases were found in: " + source.getName());
@@ -73,5 +76,18 @@ public class TestCasesYamlParser {
         } catch (IOException e) {
             throw new RuntimeException("Error parsing slang test case", e);
         }
+    }
+
+    public Map<String, Serializable> parseProperties(String fileName) {
+        Map<String, Serializable> result = new HashMap<>();
+        if(org.apache.commons.lang.StringUtils.isNotEmpty(fileName)) {
+            try {
+                result.putAll((Map<String, Serializable>) yaml.load(FileUtils.readFileToString(new File(fileName))));
+            } catch (IOException ex) {
+                log.error("Error loading file: " + fileName, ex);
+                throw new RuntimeException(ex);
+            }
+        }
+        return result;
     }
 }

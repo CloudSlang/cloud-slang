@@ -68,7 +68,7 @@ public class SlangTestRunner {
             Validate.isTrue(testCaseFile.isFile(),
                     "file path \'" + testCaseFile.getAbsolutePath() + "\' must lead to a file");
 
-            Map<String, SlangTestCase> testCasesFromCurrentFile = parser.parse(SlangSource.fromFile(testCaseFile));
+            Map<String, SlangTestCase> testCasesFromCurrentFile = parser.parseTestCases(SlangSource.fromFile(testCaseFile));
             for (String currentTestCaseName : testCasesFromCurrentFile.keySet()) {
                 SlangTestCase currentTestCase = testCasesFromCurrentFile.get(currentTestCaseName);
                 //todo: temporary solution
@@ -112,6 +112,13 @@ public class SlangTestRunner {
 
     private void runTest(SlangTestCase testCase, CompilationArtifact compiledTestFlow) {
 
+        Map<String, Serializable> convertedInputs = getTestCaseInputsMap(testCase);
+        Map<String, Serializable> systemProperties = parser.parseProperties(testCase.getSystemPropertiesFile());
+
+        trigger(testCase, compiledTestFlow, convertedInputs, systemProperties);
+    }
+
+    private Map<String, Serializable> getTestCaseInputsMap(SlangTestCase testCase) {
         List<Map> inputs = testCase.getInputs();
         Map<String, Serializable> convertedInputs = new HashMap<>();
         if (CollectionUtils.isNotEmpty(inputs)) {
@@ -121,8 +128,7 @@ public class SlangTestRunner {
                         (Serializable) input.values().iterator().next());
             }
         }
-        //todo: add support in sys properties
-        trigger(testCase, compiledTestFlow, convertedInputs, null);
+        return convertedInputs;
     }
 
     /**
