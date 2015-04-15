@@ -41,6 +41,8 @@ import java.util.Set;
 @Component
 public class SlangTestRunner {
 
+    private final static String PROJECT_PATH_TOKEN = "${project_path}";
+
     @Autowired
     private TestCasesYamlParser parser;
 
@@ -70,7 +72,7 @@ public class SlangTestRunner {
             Validate.isTrue(testCaseFile.isFile(),
                     "file path \'" + testCaseFile.getAbsolutePath() + "\' must lead to a file");
 
-            Map<String, SlangTestCase> testCasesFromCurrentFile = parser.parse(SlangSource.fromFile(testCaseFile));
+            Map<String, SlangTestCase> testCasesFromCurrentFile = parser.parseTestCases(SlangSource.fromFile(testCaseFile));
             for (String currentTestCaseName : testCasesFromCurrentFile.keySet()) {
                 SlangTestCase currentTestCase = testCasesFromCurrentFile.get(currentTestCaseName);
                 //todo: temporary solution
@@ -87,16 +89,16 @@ public class SlangTestRunner {
         return testCases;
     }
 
-    public Map<SlangTestCase, String> runAllTests(Map<String, SlangTestCase> testCases,
-                            Map<String, CompilationArtifact> compiledFlows) {
+    public Map<SlangTestCase, String> runAllTests(String projectPath, Map<String, SlangTestCase> testCases,
+                            Map<String, CompilationArtifact> compiledFlows, Set<String> testSuites) {
 
         Map<SlangTestCase, String> failedTestCases = new HashMap<>();
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
-            log.info("Running test: " + testCaseEntry.getKey() + " - " + testCaseEntry.getValue().getDescription());
             SlangTestCase testCase = testCaseEntry.getValue();
-            CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
+            log.info("Running test: " + testCaseEntry.getKey() + " - " + testCase.getDescription());
             try {
-                runTest(testCase, compiledTestFlow);
+                CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
+                runTest(testCase, compiledTestFlow, projectPath);
             } catch (RuntimeException e){
                 failedTestCases.put(testCase, e.getMessage());
             }
@@ -108,12 +110,32 @@ public class SlangTestRunner {
         String testFlowPath = testCase.getTestFlowPath();
         String testFlowPathTransformed = testFlowPath.replace(File.separatorChar, '.');
         CompilationArtifact compiledTestFlow = compiledFlows.get(testFlowPathTransformed);
-        Validate.notNull("Test flow: " + testFlowPath + " is missing. Referenced in test case: " + testCase.getName());
+        if(compiledTestFlow == null) {
+            String message = "Test flow: " + testFlowPath + " is missing. Referenced in test case: " + testCase.getName();
+            throw new RuntimeException(message);
+        }
         return compiledTestFlow;
     }
 
-    private void runTest(SlangTestCase testCase, CompilationArtifact compiledTestFlow) {
+    private void runTest(SlangTestCase testCase, CompilationArtifact compiledTestFlow, String projectPath) {
 
+        Map<String, Serializable> convertedInputs = getTestCaseInputsMap(testCase);
+        Map<String, Serializable> systemProperties = getTestSystemProperties(testCase, projectPath);
+
+        trigger(testCase, compiledTestFlow, convertedInputs, systemProperties);
+    }
+
+    private Map<String, Serializable> getTestSystemProperties(SlangTestCase testCase, String projectPath) {
+        String systemPropertiesFile = testCase.getSystemPropertiesFile();
+        if(StringUtils.isEmpty(systemPropertiesFile)){
+            return new HashMap<>();
+        }
+        StringUtils.replace(systemPropertiesFile, PROJECT_PATH_TOKEN, projectPath);
+        systemPropertiesFile = StringUtils.replace(systemPropertiesFile, PROJECT_PATH_TOKEN, projectPath);
+        return parser.parseProperties(systemPropertiesFile);
+    }
+
+    private Map<String, Serializable> getTestCaseInputsMap(SlangTestCase testCase) {
         List<Map> inputs = testCase.getInputs();
         Map<String, Serializable> convertedInputs = new HashMap<>();
         if (CollectionUtils.isNotEmpty(inputs)) {
@@ -123,8 +145,7 @@ public class SlangTestRunner {
                         (Serializable) input.values().iterator().next());
             }
         }
-        //todo: add support in sys properties
-        trigger(testCase, compiledTestFlow, convertedInputs, null);
+        return convertedInputs;
     }
 
     /**
