@@ -34,6 +34,8 @@ public class SlangTestCase {
 
     private List<Map> inputs;
 
+    private List<Map> outputs;
+
     private Boolean throwsException;
 
     private String result;
@@ -44,7 +46,7 @@ public class SlangTestCase {
     private SlangTestCase() {}
 
     public SlangTestCase(String name, String testFlowPath, String description, List<String> testSuites,
-                         String systemPropertiesFile, List<Map> inputs,
+                         String systemPropertiesFile, List<Map> inputs, List<Map> outputs,
                          Boolean throwsException, String result){
         this.name = name;
         this.testFlowPath = testFlowPath;
@@ -52,6 +54,7 @@ public class SlangTestCase {
         this.systemPropertiesFile = systemPropertiesFile;
         this.testSuites = testSuites;
         this.inputs = inputs;
+        this.outputs = outputs;
         this.throwsException = throwsException;
         this.result = result;
     }
@@ -85,6 +88,10 @@ public class SlangTestCase {
 
     public List<Map> getInputs() {
         return inputs;
+    }
+
+    public List<Map> getOutputs() {
+        return outputs;
     }
 
     public Boolean getThrowsException() {
