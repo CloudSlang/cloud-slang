@@ -30,13 +30,15 @@ import java.util.regex.Pattern;
 public class SlangBuildMain {
 
     private static final String CONTENT_DIR = "content";
+    private static final String TEST_DIR = "test";
 
     private final static Logger log = Logger.getLogger(SlangBuildMain.class);
 
     public static void main(String[] args) {
-        String repositoryPath = parseRepositoryPathArg(args);
+        String projectPath = parseProjectPathArg(args);
+        String contentPath = System.getProperty("contentPath", projectPath + File.separator + CONTENT_DIR);
+        String testsPath = System.getProperty("testPath", projectPath + File.separator + TEST_DIR);
         Set<String> testSuites = getTestSuitesProperty();
-        String testsPath = System.getProperty("testPath", repositoryPath.replaceAll(CONTENT_DIR + "(\\\\+|\\/+)?$", "test"));
 
         log.info("Loading...");
         //load application context
@@ -44,14 +46,14 @@ public class SlangBuildMain {
         SlangBuilder slangBuilder = context.getBean(SlangBuilder.class);
 
         try {
-            SlangBuildResults buildResults = slangBuilder.buildSlangContent(repositoryPath, testsPath, testSuites);
+            SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites);
             Map<SlangTestCase, String> failedTests = buildResults.getFailedTests();
             if(MapUtils.isNotEmpty(failedTests)){
                 log.error("");
                 log.error("------------------------------------------------------------");
                 log.error("BUILD FAILURE");
                 log.error("------------------------------------------------------------");
-                log.error("CloudSlang build for repository: \"" + repositoryPath + "\" failed due to failed tests.");
+                log.error("CloudSlang build for repository: \"" + projectPath + "\" failed due to failed tests.");
                 log.error("Following " + failedTests.size() + " tests failed:");
                 for(Map.Entry<SlangTestCase, String> failedTest : failedTests.entrySet()){
                     log.error("- " + failedTest.getValue().replaceAll("\n", "\n\t"));
@@ -65,7 +67,7 @@ public class SlangBuildMain {
                 log.info("BUILD SUCCESS");
                 log.info("------------------------------------------------------------");
                 log.info("Found " + buildResults.getNumberOfCompiledSources()
-                        + " slang files under directory: \"" + repositoryPath + "\" and all are valid.");
+                        + " slang files under directory: \"" + projectPath + "\" and all are valid.");
                 log.info("");
                 System.exit(0);
             }
@@ -73,17 +75,17 @@ public class SlangBuildMain {
             log.error("");
             log.error("------------------------------------------------------------");
             log.error("Exception: " + e.getMessage() + "\n\nFAILURE: Validation of slang files under directory: \""
-                    + repositoryPath + "\" failed.");
+                    + projectPath + "\" failed.");
             log.error("------------------------------------------------------------");
             log.error("");
             System.exit(1);
         }
     }
 
-    private static String parseRepositoryPathArg(String[] args) {
+    private static String parseProjectPathArg(String[] args) {
         String repositoryPath;
         if(args == null || args.length == 0){
-            repositoryPath = System.getProperty("user.dir") + File.separator + CONTENT_DIR;
+            repositoryPath = System.getProperty("user.dir");
         } else {
             repositoryPath = FilenameUtils.separatorsToSystem(args[0]);
         }

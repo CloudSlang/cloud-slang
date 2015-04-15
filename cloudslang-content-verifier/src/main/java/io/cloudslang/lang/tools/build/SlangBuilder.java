@@ -14,6 +14,7 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,23 +42,24 @@ public class SlangBuilder {
 
     private final static Logger log = Logger.getLogger(SlangBuilder.class);
 
-    public SlangBuildResults buildSlangContent(String directoryPath, String testsPath, Set<String> testSuits){
+    public SlangBuildResults buildSlangContent(String projectPath, String contentPath, String testsPath, Set<String> testSuits){
 
+        String projectName = FilenameUtils.getName(projectPath);
         log.info("");
         log.info("------------------------------------------------------------");
-        log.info("Building project: "); //todo add project home here
+        log.info("Building project: " + projectName);
         log.info("------------------------------------------------------------");
 
         log.info("");
         log.info("--- compiling sources ---");
         Map<String, Executable> slangModels =
-                slangContentVerifier.createModelsAndValidate(directoryPath);
+                slangContentVerifier.createModelsAndValidate(contentPath);
 
         Map<String, CompilationArtifact> compiledSources = compileModels(slangModels);
 
         Map<SlangTestCase, String> failedTests = new HashMap<>();
         if (StringUtils.isNotBlank(testsPath) && new File(testsPath).isDirectory()) {
-            failedTests = runTests(slangModels, testsPath, testSuits);
+            failedTests = runTests(slangModels, projectPath, testsPath, testSuits);
         }
 
         return new SlangBuildResults(compiledSources.size(), failedTests);
@@ -82,7 +84,7 @@ public class SlangBuilder {
     }
 
     private Map<SlangTestCase, String> runTests(Map<String, Executable> contentSlangModels,
-                          String testsPath, Set<String> testSuites){
+                          String projectPath, String testsPath, Set<String> testSuites){
         log.info("");
         log.info("--- compiling tests sources ---");
         // Compile all slang test flows under the test directory
@@ -97,7 +99,7 @@ public class SlangBuilder {
         log.info("");
         log.info("--- running tests ---");
         log.info("Going to run " + testCases.size() + " tests");
-        return slangTestRunner.runAllTests(testCases, compiledFlows, testSuites);
+        return slangTestRunner.runAllTests(projectPath, testCases, compiledFlows, testSuites);
     }
 
 

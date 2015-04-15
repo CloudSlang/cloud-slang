@@ -41,6 +41,7 @@ import java.util.Set;
 @Component
 public class SlangTestRunner {
 
+    private final String PROJECT_PATH_TOKEN = "${project_path}";
     @Autowired
     private TestCasesYamlParser parser;
 
@@ -87,16 +88,17 @@ public class SlangTestRunner {
         return testCases;
     }
 
-    public Map<SlangTestCase, String> runAllTests(Map<String, SlangTestCase> testCases,
+    public Map<SlangTestCase, String> runAllTests(String projectPath, Map<String, SlangTestCase> testCases,
                             Map<String, CompilationArtifact> compiledFlows, Set<String> testSuites) {
 
         Map<SlangTestCase, String> failedTestCases = new HashMap<>();
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
-            log.info("Running test: " + testCaseEntry.getKey() + " - " + testCaseEntry.getValue().getDescription());
+            log.info("Running test: " + testCaseEntry.getKey() + " - " + testCaseEntry.getValue()
+                                                                                      .getDescription());
             SlangTestCase testCase = testCaseEntry.getValue();
             try {
                 CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
-                runTest(testCase, compiledTestFlow);
+                runTest(testCase, compiledTestFlow, projectPath);
             } catch (RuntimeException e){
                 failedTestCases.put(testCase, e.getMessage());
             }
@@ -115,12 +117,22 @@ public class SlangTestRunner {
         return compiledTestFlow;
     }
 
-    private void runTest(SlangTestCase testCase, CompilationArtifact compiledTestFlow) {
+    private void runTest(SlangTestCase testCase, CompilationArtifact compiledTestFlow, String projectPath) {
 
         Map<String, Serializable> convertedInputs = getTestCaseInputsMap(testCase);
-        Map<String, Serializable> systemProperties = parser.parseProperties(testCase.getSystemPropertiesFile());
+        Map<String, Serializable> systemProperties = getTestSystemProperties(testCase, projectPath);
 
         trigger(testCase, compiledTestFlow, convertedInputs, systemProperties);
+    }
+
+    private Map<String, Serializable> getTestSystemProperties(SlangTestCase testCase, String projectPath) {
+        String systemPropertiesFile = testCase.getSystemPropertiesFile();
+        if(StringUtils.isEmpty(systemPropertiesFile)){
+            return new HashMap<>();
+        }
+        StringUtils.replace(systemPropertiesFile, PROJECT_PATH_TOKEN, projectPath);
+        systemPropertiesFile = StringUtils.replace(systemPropertiesFile, PROJECT_PATH_TOKEN, projectPath);
+        return parser.parseProperties(systemPropertiesFile);
     }
 
     private Map<String, Serializable> getTestCaseInputsMap(SlangTestCase testCase) {
