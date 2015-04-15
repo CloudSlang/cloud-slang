@@ -80,7 +80,7 @@ public class TestCasesYamlParser {
 
     public Map<String, Serializable> parseProperties(String fileName) {
         Map<String, Serializable> result = new HashMap<>();
-        if(org.apache.commons.lang.StringUtils.isNotEmpty(fileName)) {
+        if(StringUtils.isNotEmpty(fileName)) {
             try {
                 result.putAll((Map<String, Serializable>) yaml.load(FileUtils.readFileToString(new File(fileName))));
             } catch (IOException ex) {

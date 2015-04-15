@@ -42,7 +42,8 @@ import java.util.Set;
 @Component
 public class SlangTestRunner {
 
-    private final String PROJECT_PATH_TOKEN = "${project_path}";
+    private final static String PROJECT_PATH_TOKEN = "${project_path}";
+
     @Autowired
     private TestCasesYamlParser parser;
 
@@ -94,9 +95,8 @@ public class SlangTestRunner {
 
         Map<SlangTestCase, String> failedTestCases = new HashMap<>();
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
-            log.info("Running test: " + testCaseEntry.getKey() + " - " + testCaseEntry.getValue()
-                                                                                      .getDescription());
             SlangTestCase testCase = testCaseEntry.getValue();
+            log.info("Running test: " + testCaseEntry.getKey() + " - " + testCase.getDescription());
             try {
                 CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
                 runTest(testCase, compiledTestFlow, projectPath);
