@@ -7,7 +7,7 @@
 #
 ####################################################
 
-namespace: io.content
+namespace: base
 
 operation:
   name: output_op

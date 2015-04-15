@@ -2,20 +2,20 @@ testPrintPropertyWithTextInput:
   inputs:
     - text: text to print
   description: Tests that print_text operation finishes with SUCCESS
-  testFlowPath: io.content.print_property
+  testFlowPath: base.print_property
   result: SUCCESS
 
 testPrintPropertyWithSysProperty:
   description: Tests that print_text operation finishes with SUCCESS
-  systemPropertiesFile: ${project_path}\io\content\properties.yaml
-  testFlowPath: io.content.print_property
+  systemPropertiesFile: ${project_path}\content\base\properties.yaml
+  testFlowPath: base.print_property
   result: SUCCESS
 
 testOutputTextOp:
   inputs:
     - text: text to print
   description: Tests outputs
-  testFlowPath: io.content.output_op
+  testFlowPath: base.output_op
   result: SUCCESS
   outputs:
     - output_text1: text to print
