@@ -83,14 +83,6 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         Collection<Executable> executables = new ArrayList<>(filteredDependencies.values());
         executables.add(executable);
 
-        Map<String, ExecutionPlan> branchExecutionPlans = new HashMap<>();
-        for (Executable compiledExecutable : executables) {
-            Map<String, ExecutionPlan> branches = createBranchExecutionPlans(compiledExecutable);
-            branchExecutionPlans.putAll(branches);
-        }
-
-        dependencies.putAll(branchExecutionPlans);
-
         executionPlan.setSubflowsUUIDs(new HashSet<>(dependencies.keySet()));
         return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemProperties(executables));
     }
@@ -143,17 +135,6 @@ public class ScoreCompilerImpl implements ScoreCompiler{
                 return executionPlanBuilder.createFlowExecutionPlan((Flow) executable);
             default:
                 throw new RuntimeException("Executable: " + executable.getName() + " cannot be compiled to an ExecutionPlan since it is not a flow and not an operation");
-        }
-    }
-
-    private Map<String, ExecutionPlan> createBranchExecutionPlans(Executable executable) {
-        switch (executable.getType()){
-            case SlangTextualKeys.OPERATION_TYPE:
-                return new HashMap<>();
-            case SlangTextualKeys.FLOW_TYPE:
-                return executionPlanBuilder.createBranchExecutionPlans((Flow) executable);
-            default:
-                throw new RuntimeException("Executable: " + executable.getName() + " cannot be compiled since it is not a flow and not an operation");
         }
     }
 

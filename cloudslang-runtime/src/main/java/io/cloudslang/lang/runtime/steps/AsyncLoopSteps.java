@@ -61,6 +61,7 @@ public class AsyncLoopSteps extends AbstractSteps {
                             @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
                             @Param(ExecutionParametersConsts.RUNNING_EXECUTION_PLAN_ID) Long RUNNING_EXECUTION_PLAN_ID,
                             @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
+                            @Param(ScoreLangConstants.BRANCH_BEGIN_STEP_ID_KEY) Long branchBeginStep,
                             @Param(ScoreLangConstants.REF_ID) String refId) {
 
         try {
@@ -76,7 +77,6 @@ public class AsyncLoopSteps extends AbstractSteps {
                     Pair.of(LanguageEventData.BOUND_ASYNC_LOOP_INPUTS, (Serializable) splitData),
                     Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName));
 
-            Long branchBeginStep = executionRuntimeServices.getSubFlowBeginStep(refId);
             runEnv.putNextStepPosition(nextStepId);
 
             for (Serializable splitItem : splitData) {

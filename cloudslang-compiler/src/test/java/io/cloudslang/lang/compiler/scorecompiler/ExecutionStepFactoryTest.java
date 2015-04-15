@@ -160,14 +160,14 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateAddBranchesStep() throws Exception {
-        ExecutionStep startStep = factory.createAddBranchesStep(0L, new HashMap<String, Serializable>(), "refID", "evenCoolerStep");
+        ExecutionStep startStep = factory.createAddBranchesStep(2L, 5L, 3L, new HashMap<String, Serializable>(), "refID", "evenCoolerStep");
         Assert.assertNotNull("step should not be null", startStep);
         Assert.assertEquals("evenCoolerStep",startStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
     }
 
     @Test
     public void testSplitStep() throws Exception {
-        ExecutionStep startStep = factory.createAddBranchesStep(0L, new HashMap<String, Serializable>(), "refID", "evenCoolerStep");
+        ExecutionStep startStep = factory.createAddBranchesStep(2L, 5L, 3L, new HashMap<String, Serializable>(), "refID", "evenCoolerStep");
         Assert.assertNotNull("step should not be null", startStep);
         Assert.assertEquals("not marked as split step", true, startStep.isSplitStep());
     }
@@ -177,7 +177,7 @@ public class ExecutionStepFactoryTest {
         AsyncLoopStatement statement = new AsyncLoopStatement("value", "values");
         HashMap<String, Serializable> preTaskData = new HashMap<>();
         preTaskData.put(ScoreLangConstants.ASYNC_LOOP_KEY, statement);
-        ExecutionStep startStep =  factory.createAddBranchesStep(0L, preTaskData, "refID", "evenCoolerStep");
+        ExecutionStep startStep =  factory.createAddBranchesStep(2L, 5L, 3L, preTaskData, "refID", "evenCoolerStep");
         AsyncLoopStatement actualStatement = (AsyncLoopStatement) startStep.getActionData()
                 .get(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY);
         Assert.assertNotNull("async loop statement not found in action data", actualStatement);

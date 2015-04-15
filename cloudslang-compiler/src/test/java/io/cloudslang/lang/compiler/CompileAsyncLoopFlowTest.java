@@ -151,11 +151,11 @@ public class CompileAsyncLoopFlowTest {
         ExecutionStep addBranchesStep = executionPlan.getStep(2L);
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
-
         verifyAsyncLoopStatement(addBranchesActionData);
 
-        //verify branch execution plan is created as a dependency
-        verifyBranchExecutionPlan(artifact, "loops.async_loop.simple_async_loop.print_values", 2);
+        assertNotNull("branch begin task method not found", executionPlan.getStep(3L));
+        assertNotNull("branch end task method not found", executionPlan.getStep(4L));
+        assertNotNull("join branches method not found", executionPlan.getStep(5L));
     }
 
     @Test
@@ -176,15 +176,16 @@ public class CompileAsyncLoopFlowTest {
 
         verifyAsyncLoopStatement(addBranchesActionData);
 
-        ExecutionStep joinBranchesStep = executionPlan.getStep(3L);
+        ExecutionStep joinBranchesStep = executionPlan.getStep(5L);
         Map<String, ?> joinBranchesActionData = joinBranchesStep.getActionData();
 
         verifyAggregateValues(joinBranchesActionData);
 
-        //verify branch execution plan is created as a dependency
-        Map<Long, ExecutionStep> branchExecutionSteps =
-                verifyBranchExecutionPlan(artifact, "loops.async_loop.async_loop_aggregate.print_values", 2);
-        verifyPublishValues(branchExecutionSteps);
+        assertNotNull("branch begin task method not found", executionPlan.getStep(3L));
+        ExecutionStep branchEndTaskStep = executionPlan.getStep(4L);
+        assertNotNull("branch end task method not found", branchEndTaskStep);
+
+        verifyPublishValues(branchEndTaskStep.getActionData());
     }
 
     @Test
@@ -207,12 +208,13 @@ public class CompileAsyncLoopFlowTest {
 
         verifyAsyncLoopStatement(addBranchesActionData);
 
-        ExecutionStep joinBranchesStep = executionPlan.getStep(3L);
+        ExecutionStep joinBranchesStep = executionPlan.getStep(5L);
         Map<String, ?> joinBranchesActionData = joinBranchesStep.getActionData();
 
         verifyNavigationValues(joinBranchesActionData);
 
-        verifyBranchExecutionPlan(artifact, "loops.async_loop.async_loop_navigate.print_values", 3);
+        assertNotNull("branch begin task method not found", executionPlan.getStep(3L));
+        assertNotNull("branch end task method not found", executionPlan.getStep(4L));
     }
 
     @Test
@@ -235,22 +237,21 @@ public class CompileAsyncLoopFlowTest {
 
         verifyAsyncLoopStatement(addBranchesActionData);
 
-        ExecutionStep joinBranchesStep = executionPlan.getStep(3L);
+        ExecutionStep joinBranchesStep = executionPlan.getStep(5L);
         Map<String, ?> joinBranchesActionData = joinBranchesStep.getActionData();
 
         verifyAggregateValues(joinBranchesActionData);
 
         verifyNavigationValues(joinBranchesActionData);
 
-        //verify branch execution plan is created as a dependency
-        Map<Long, ExecutionStep> branchExecutionSteps =
-                verifyBranchExecutionPlan(artifact, "loops.async_loop.async_loop_aggregate_navigate.print_values", 3);
+        assertNotNull("branch begin task method not found", executionPlan.getStep(3L));
+        ExecutionStep branchEndTaskStep = executionPlan.getStep(4L);
+        assertNotNull("branch end task method not found", branchEndTaskStep);
 
-        verifyPublishValues(branchExecutionSteps);
+        verifyPublishValues(branchEndTaskStep.getActionData());
     }
 
-    private void verifyPublishValues(Map<Long, ExecutionStep> branchExecutionSteps) {
-        Map<String, ?> branchEndTaskActionData = branchExecutionSteps.get(1L).getActionData();
+    private void verifyPublishValues(Map<String, ?> branchEndTaskActionData) {
         @SuppressWarnings("unchecked") List<Output> actualPublishOutputs =
                 (List<Output>) branchEndTaskActionData.get(ScoreLangConstants.TASK_PUBLISH_KEY);
         List<Output> expectedPublishOutputs = new ArrayList<>();
@@ -264,7 +265,7 @@ public class CompileAsyncLoopFlowTest {
         @SuppressWarnings("unchecked") Map<String, ResultNavigation> actualNavigateValues =
                 (Map<String, ResultNavigation>) joinBranchesActionData.get(ScoreLangConstants.TASK_NAVIGATION_KEY);
         Map<String, ResultNavigation> expectedNavigationValues = new HashMap<>();
-        expectedNavigationValues.put("SUCCESS", new ResultNavigation(4L, null));
+        expectedNavigationValues.put("SUCCESS", new ResultNavigation(6L, null));
         expectedNavigationValues.put("FAILURE", new ResultNavigation(0L, "FAILURE"));
         assertEquals("navigation values not as expected", expectedNavigationValues, actualNavigateValues);
     }

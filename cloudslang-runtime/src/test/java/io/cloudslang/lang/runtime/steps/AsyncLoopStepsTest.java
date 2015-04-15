@@ -1,12 +1,12 @@
 /*******************************************************************************
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Apache License v2.0 which accompany this distribution.
- *
- * The Apache License is available at
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- *******************************************************************************/
+* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Apache License v2.0 which accompany this distribution.
+*
+* The Apache License is available at
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+*******************************************************************************/
 package io.cloudslang.lang.runtime.steps;
 
 import io.cloudslang.lang.entities.AsyncLoopStatement;
@@ -44,10 +44,10 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
- * Date: 4/7/2015
- *
- * @author Bonczidai Levente
- */
+* Date: 4/7/2015
+*
+* @author Bonczidai Levente
+*/
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = AsyncLoopStepsTest.Config.class)
 public class AsyncLoopStepsTest {
@@ -73,7 +73,7 @@ public class AsyncLoopStepsTest {
         reset(outputsBinding);
         reset(loopsBinding);
     }
-    
+
     @Test
     public void testBranchesAreCreated() throws Exception {
         // prepare arguments
@@ -91,8 +91,7 @@ public class AsyncLoopStepsTest {
         ExecutionRuntimeServices executionRuntimeServices = mock(ExecutionRuntimeServices.class);
         List<Serializable> expectedSplitData = Lists.newArrayList((Serializable) 1, 2, 3);
         when(asyncLoopBinding.bindAsyncLoopList(eq(asyncLoopStatement), eq(context), eq(nodeName))).thenReturn(expectedSplitData);
-        Long subflowBeginStepID = 0L;
-        when(executionRuntimeServices.getSubFlowBeginStep(eq(refId))).thenReturn(subflowBeginStepID);
+        Long branchBeginStepID = 3L;
 
         // call method
         asyncLoopSteps.addBranches(
@@ -101,13 +100,14 @@ public class AsyncLoopStepsTest {
                 executionRuntimeServices,
                 nodeName,
                 1234L,
-                1L,
+                5L,
+                branchBeginStepID,
                 refId
         );
 
         // verify expected behaviour
         ArgumentCaptor<Map> branchContextArgumentCaptor = ArgumentCaptor.forClass(Map.class);
-        verify(executionRuntimeServices, times(3)).addBranch(eq(subflowBeginStepID), eq(refId), branchContextArgumentCaptor.capture());
+        verify(executionRuntimeServices, times(3)).addBranch(eq(branchBeginStepID), eq(refId), branchContextArgumentCaptor.capture());
 
         List<Map> branchContexts = branchContextArgumentCaptor.getAllValues();
         List<Serializable> actualSplitData = Lists.newArrayList();
@@ -119,7 +119,7 @@ public class AsyncLoopStepsTest {
         }
         Assert.assertEquals(expectedSplitData, actualSplitData);
 
-        Assert.assertEquals(1, (long) runEnvironment.removeNextStepPosition());
+        Assert.assertEquals(5, (long) runEnvironment.removeNextStepPosition());
     }
 
     @Test
@@ -139,8 +139,7 @@ public class AsyncLoopStepsTest {
         ExecutionRuntimeServices executionRuntimeServices = mock(ExecutionRuntimeServices.class);
         List<Serializable> expectedSplitData = Lists.newArrayList((Serializable) 1, 2, 3);
         when(asyncLoopBinding.bindAsyncLoopList(eq(asyncLoopStatement), eq(context), eq(nodeName))).thenReturn(expectedSplitData);
-        Long subflowBeginStepID = 0L;
-        when(executionRuntimeServices.getSubFlowBeginStep(eq(refId))).thenReturn(subflowBeginStepID);
+        Long branchBeginStepID = 0L;
 
         // call method
         asyncLoopSteps.addBranches(
@@ -149,7 +148,8 @@ public class AsyncLoopStepsTest {
                 executionRuntimeServices,
                 nodeName,
                 1234L,
-                1L,
+                5L,
+                branchBeginStepID,
                 refId
         );
 
@@ -166,7 +166,7 @@ public class AsyncLoopStepsTest {
         List<String> actualEventTypesInOrder = eventTypeArgumentCaptor.getAllValues();
         Assert.assertEquals(expectedEventTypesInOrder, actualEventTypesInOrder);
 
-        Assert.assertEquals(1, (long) runEnvironment.removeNextStepPosition());
+        Assert.assertEquals(5, (long) runEnvironment.removeNextStepPosition());
     }
 
     @Test

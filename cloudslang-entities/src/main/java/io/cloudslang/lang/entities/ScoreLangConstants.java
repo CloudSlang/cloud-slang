@@ -51,6 +51,7 @@ public interface ScoreLangConstants {
     String BRANCHES_CONTEXT_KEY = "branches_context";
     String SPLIT_ITEM_KEY = "splitItem";
     String BRANCH_RETURN_VALUES_KEY = "branchReturnValues";
+    String BRANCH_BEGIN_STEP_ID_KEY = "branchBeginStep";
 
     // Events types
 	String SLANG_EXECUTION_EXCEPTION = "SLANG_EXECUTION_EXCEPTION";

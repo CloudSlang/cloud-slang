@@ -39,19 +39,9 @@ public class ExecutionPlanBuilder {
 
     private static final String CLOUDSLANG_NAME = "CloudSlang";
     private static final int NUMBER_OF_TASK_EXECUTION_STEPS = 2;
+    private static final int NUMBER_OF_ASYNC_LOOP_EXECUTION_STEPS = 2;
     private static final long FLOW_END_STEP_ID = 0L;
     private static final long FLOW_START_STEP_ID = 1L;
-    private static final long BRANCH_START_STEP_ID = 0L;
-    private static final long BRANCH_END_STEP_ID = 1L;
-    private static final String BRANCH_KEY = "branch";
-
-    public static String generateAsyncTaskRefID(Flow compiledFlow, Task task) {
-        return compiledFlow.getNamespace() + "." + compiledFlow.getName() + "." + task.getName();
-    }
-
-    public static String generateBranchName(String refID) {
-        return BRANCH_KEY + "-" + refID;
-    }
 
     public ExecutionPlan createOperationExecutionPlan(Operation compiledOp) {
         ExecutionPlan executionPlan = new ExecutionPlan();
@@ -100,54 +90,49 @@ public class ExecutionPlanBuilder {
         return executionPlan;
     }
 
-    public Map<String, ExecutionPlan> createBranchExecutionPlans(Flow compiledFlow) {
-        Deque<Task> tasks = compiledFlow.getWorkflow().getTasks();
-
-        if (CollectionUtils.isEmpty(tasks)) {
-            throw new RuntimeException("Flow: " + compiledFlow.getName() + " has no tasks");
-        }
-
-        Map<String, ExecutionPlan> branchExecutionPlans = new HashMap<>();
-        for (Task task : tasks) {
-            if (task.isAsync()) {
-                String refID = generateAsyncTaskRefID(compiledFlow, task);
-
-                ExecutionPlan executionPlan = new ExecutionPlan();
-                executionPlan.setName(generateBranchName(refID));
-                executionPlan.setLanguage(CLOUDSLANG_NAME);
-                executionPlan.setFlowUuid(refID);
-
-                executionPlan.setBeginStep(BRANCH_START_STEP_ID);
-                //branch start step
-                executionPlan.addStep(stepFactory.createBeginTaskStep(BRANCH_START_STEP_ID, task.getInputs(), task.getPreTaskActionData(),
-                        task.getRefId(), task.getName()));
-                //branch end step
-                executionPlan.addStep(stepFactory.createFinishTaskStep(BRANCH_END_STEP_ID, task.getPostTaskActionData(),
-                        new HashMap<String, ResultNavigation>(), task.getName(), true));
-
-                branchExecutionPlans.put(refID, executionPlan);
-            }
-        }
-
-        return branchExecutionPlans;
-    }
-
-    private List<ExecutionStep> buildTaskExecutionSteps(Task task,
-                                                        Map<String, Long> taskReferences, Deque<Task> tasks, Flow compiledFlow) {
+    private List<ExecutionStep> buildTaskExecutionSteps(
+            Task task,
+            Map<String, Long> taskReferences, Deque<Task> tasks,
+            Flow compiledFlow) {
 
         List<ExecutionStep> taskExecutionSteps = new ArrayList<>();
 
         String taskName = task.getName();
-        Long currentId = getCurrentId(taskReferences);
+        Long currentId = getCurrentId(taskReferences, tasks);
         boolean isAsync = task.isAsync();
 
         //Begin Task
         taskReferences.put(taskName, currentId);
         if (isAsync) {
-            taskExecutionSteps.add(stepFactory.createAddBranchesStep(currentId++, task.getPreTaskActionData(), generateAsyncTaskRefID(compiledFlow, task), taskName));
+            Long joinStepID = currentId + NUMBER_OF_ASYNC_LOOP_EXECUTION_STEPS + 1;
+            taskExecutionSteps.add(
+                    stepFactory.createAddBranchesStep(
+                            currentId++,
+                            joinStepID,
+                            currentId,
+                            task.getPreTaskActionData(),
+                            compiledFlow.getId(),
+                            taskName
+                    )
+            );
+            taskExecutionSteps.add(
+                    stepFactory.createBeginTaskStep(
+                            currentId++,
+                            task.getInputs(),
+                            task.getPreTaskActionData(),
+                            task.getRefId(),
+                            task.getName()
+                    )
+            );
         } else {
-            taskExecutionSteps.add(stepFactory.createBeginTaskStep(currentId++, task.getInputs(), task.getPreTaskActionData(),
-                    task.getRefId(), taskName));
+            taskExecutionSteps.add(
+                    stepFactory.createBeginTaskStep(
+                            currentId++,
+                            task.getInputs(),
+                            task.getPreTaskActionData(),
+                            task.getRefId(),
+                            taskName)
+            );
         }
 
         //End Task
@@ -166,17 +151,57 @@ public class ExecutionPlanBuilder {
 			navigationValues.put(entry.getKey(), new ResultNavigation(nextStepId, presetResult));
         }
         if (isAsync) {
-            taskExecutionSteps.add(stepFactory.createJoinBranchesStep(currentId, task.getPostTaskActionData(), navigationValues, taskName));
+            taskExecutionSteps.add(
+                    stepFactory.createFinishTaskStep(
+                            currentId++,
+                            task.getPostTaskActionData(),
+                            new HashMap<String, ResultNavigation>(),
+                            task.getName(),
+                            true)
+            );
+            taskExecutionSteps.add(
+                    stepFactory.createJoinBranchesStep(
+                            currentId,
+                            task.getPostTaskActionData(),
+                            navigationValues,
+                            taskName)
+            );
         } else {
-            taskExecutionSteps.add(stepFactory.createFinishTaskStep(currentId, task.getPostTaskActionData(),
-                    navigationValues, taskName, false));
+            taskExecutionSteps.add(
+                    stepFactory.createFinishTaskStep(
+                            currentId,
+                            task.getPostTaskActionData(),
+                            navigationValues,
+                            taskName,
+                            false)
+            );
         }
         return taskExecutionSteps;
     }
 
-    private Long getCurrentId(Map<String, Long> taskReferences) {
+    private Long getCurrentId(Map<String, Long> taskReferences, Deque<Task> tasks) {
+        Long currentID;
+
         Long max = Lambda.max(taskReferences);
-        return max + NUMBER_OF_TASK_EXECUTION_STEPS;
+        Map.Entry maxEntry = Lambda.selectFirst(taskReferences.entrySet(), having(on(Map.Entry.class).getValue(), equalTo(max)));
+        String referenceKey = (String) (maxEntry).getKey();
+        Task task = null;
+        for (Task taskItem : tasks) {
+            if (taskItem.getName().equals(referenceKey)) {
+                task = taskItem;
+                break;
+            }
+        }
+
+        if (task == null || !task.isAsync()) {
+            // the reference is not a task or is not an async task
+            currentID = max + NUMBER_OF_TASK_EXECUTION_STEPS;
+        } else {
+            //async task
+            currentID = max + NUMBER_OF_TASK_EXECUTION_STEPS + NUMBER_OF_ASYNC_LOOP_EXECUTION_STEPS;
+        }
+
+        return currentID;
     }
 
 }

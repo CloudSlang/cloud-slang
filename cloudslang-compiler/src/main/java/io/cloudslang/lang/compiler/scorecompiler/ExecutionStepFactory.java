@@ -123,14 +123,15 @@ public class ExecutionStepFactory {
         return createGeneralStep(index, OPERATION_STEPS_CLASS, "finishExecutable", actionData);
     }
 
-    public ExecutionStep createAddBranchesStep(Long index, Map<String, Serializable> preTaskData, String refId, String taskName) {
+    public ExecutionStep createAddBranchesStep(Long currentStepID, Long nextStepID, Long branchBeginStepID, Map<String, Serializable> preTaskData, String refId, String taskName) {
         Validate.notNull(preTaskData, "preTaskData is null");
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, taskName);
         actionData.put(ScoreLangConstants.REF_ID, refId);
-        actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
+        actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, nextStepID);
+        actionData.put(ScoreLangConstants.BRANCH_BEGIN_STEP_ID_KEY, branchBeginStepID);
         actionData.put(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY, preTaskData.get(ScoreLangConstants.ASYNC_LOOP_KEY));
-        ExecutionStep executionStep = createGeneralStep(index, ASYNC_LOOP_STEPS_CLASS, "addBranches", actionData);
+        ExecutionStep executionStep = createGeneralStep(currentStepID, ASYNC_LOOP_STEPS_CLASS, "addBranches", actionData);
         executionStep.setSplitStep(true);
         return executionStep;
     }
