@@ -16,6 +16,7 @@ import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.score.events.EventConstants;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -138,6 +139,10 @@ public class SlangTestRunner {
     private Map<String, Serializable> getTestCaseInputsMap(SlangTestCase testCase) {
         List<Map> inputs = testCase.getInputs();
         Map<String, Serializable> convertedInputs = new HashMap<>();
+        return convertMapParams(inputs, convertedInputs);
+    }
+
+    private Map<String, Serializable> convertMapParams(List<Map> inputs, Map<String, Serializable> convertedInputs) {
         if (CollectionUtils.isNotEmpty(inputs)) {
             for (Map input : inputs) {
                 convertedInputs.put(
@@ -146,6 +151,12 @@ public class SlangTestRunner {
             }
         }
         return convertedInputs;
+    }
+
+    private Map<String, Serializable> getTestCaseOutputsMap(SlangTestCase testCase) {
+        List<Map> outputs = testCase.getOutputs();
+        Map<String, Serializable> convertedOutputs = new HashMap<>();
+        return convertMapParams(outputs, convertedOutputs);
     }
 
     /**
@@ -158,21 +169,14 @@ public class SlangTestRunner {
     public Long trigger(SlangTestCase testCase, CompilationArtifact compilationArtifact,
                         Map<String, ? extends Serializable> inputs,
                         Map<String, ? extends Serializable> systemProperties) {
+
         String testCaseName = testCase.getName();
         String result = testCase.getResult();
+        Map<String, Serializable> outputs = getTestCaseOutputsMap(testCase);
         String flowName = testCase.getTestFlowPath();
 
-        //add start event
-        Set<String> handlerTypes = new HashSet<>();
-        handlerTypes.add(ScoreLangConstants.EVENT_EXECUTION_FINISHED);
-        handlerTypes.add(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION);
-        handlerTypes.add(ScoreLangConstants.EVENT_OUTPUT_END);
-        handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
-        handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
-        handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
-
         TriggerTestCaseEventListener testsEventListener = new TriggerTestCaseEventListener(testCaseName);
-        slang.subscribeOnEvents(testsEventListener, handlerTypes);
+        slang.subscribeOnEvents(testsEventListener, createListenerEventTypesSet());
 
         Long executionId = slang.run(compilationArtifact, inputs, systemProperties);
 
@@ -184,7 +188,6 @@ public class SlangTestRunner {
         slang.unSubscribeOnEvents(testsEventListener);
 
         ReturnValues executionReturnValues = testsEventListener.getExecutionReturnValues();
-        String executionResult = executionReturnValues.getResult();
 
         String errorMessageFlowExecution = testsEventListener.getErrorMessage();
 
@@ -200,20 +203,47 @@ public class SlangTestRunner {
             return executionId;
         }
 
-        if(StringUtils.isNotBlank(errorMessageFlowExecution)){
+        if (StringUtils.isNotBlank(errorMessageFlowExecution)){
             // unexpected exception occurred during flow execution
             message = "Error occurred while running test: " + testCaseName + " - " + testCase.getDescription() + "\n\t" + errorMessageFlowExecution;
             log.info(message);
             throw new RuntimeException(message);
         }
 
+        String executionResult = executionReturnValues.getResult();
         if (result != null && !result.equals(executionResult)){
             message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tExpected result: " + result + "\n\tActual result: " + executionResult;
             log.error(message);
             throw new RuntimeException(message);
         }
+
+        Map<String, Serializable> executionOutputs = executionReturnValues.getOutputs();
+        if (MapUtils.isNotEmpty(outputs)){
+            for(Map.Entry<String, Serializable> output: outputs.entrySet()) {
+                String outputName = output.getKey();
+                Serializable outputValue = output.getValue();
+                Serializable executionOutputValue = executionOutputs.get(outputName);
+                if(!StringUtils.equals((String)executionOutputValue, (String)outputValue)){
+                    message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tFor output: " + outputName+ "\n\tExpected value: " + executionOutputValue + "\n\tActual value: " + outputValue;
+                    log.error(message);
+                    throw new RuntimeException(message);
+                }
+            }
+        }
+
         log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with result: " + executionResult);
         return executionId;
+    }
+
+    private Set<String> createListenerEventTypesSet() {
+        Set<String> handlerTypes = new HashSet<>();
+        handlerTypes.add(ScoreLangConstants.EVENT_EXECUTION_FINISHED);
+        handlerTypes.add(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION);
+        handlerTypes.add(ScoreLangConstants.EVENT_OUTPUT_END);
+        handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
+        handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
+        handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
+        return handlerTypes;
     }
 
     private String getResultFromFileName(String fileName) {
