@@ -13,6 +13,7 @@ import io.cloudslang.lang.entities.AsyncLoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.lang.runtime.bindings.*;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ReturnValues;
@@ -218,10 +219,10 @@ public class AsyncLoopStepsTest {
         List<Map<String, Serializable>> expectedBranchContexts = Lists.newArrayList(runtimeContext1, runtimeContext2, runtimeContext3);
         @SuppressWarnings("unchecked")
         Map<String, Serializable> aggregateContext = aggregateContextArgumentCaptor.getValue();
-        Assert.assertTrue(aggregateContext.containsKey(ScoreLangConstants.BRANCHES_CONTEXT_KEY));
+        Assert.assertTrue(aggregateContext.containsKey(RuntimeConstants.BRANCHES_CONTEXT_KEY));
         @SuppressWarnings("unchecked")
         List<Map<String, Serializable>> actualBranchesContexts =
-                (List<Map<String, Serializable>>) aggregateContext.get(ScoreLangConstants.BRANCHES_CONTEXT_KEY);
+                (List<Map<String, Serializable>>) aggregateContext.get(RuntimeConstants.BRANCHES_CONTEXT_KEY);
         Assert.assertEquals(expectedBranchContexts, actualBranchesContexts);
     }
 

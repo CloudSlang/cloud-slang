@@ -14,6 +14,7 @@ import io.cloudslang.lang.entities.AsyncLoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.lang.runtime.bindings.AsyncLoopBinding;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
@@ -100,7 +101,7 @@ public class AsyncLoopSteps extends AbstractSteps {
                         ScoreLangConstants.EVENT_BRANCH_START,
                         "async loop branch created",
                         Pair.of(ScoreLangConstants.REF_ID, refId),
-                        Pair.of(ScoreLangConstants.SPLIT_ITEM_KEY, splitItem),
+                        Pair.of(RuntimeConstants.SPLIT_ITEM_KEY, splitItem),
                         Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName));
             }
 
@@ -142,13 +143,13 @@ public class AsyncLoopSteps extends AbstractSteps {
                         runEnv,
                         ScoreLangConstants.EVENT_BRANCH_END,
                         "async loop branch ended",
-                        Pair.of(ScoreLangConstants.BRANCH_RETURN_VALUES_KEY, executableReturnValues),
+                        Pair.of(RuntimeConstants.BRANCH_RETURN_VALUES_KEY, executableReturnValues),
                         Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName)
                 );
             }
 
             Map<String, Serializable> aggregateContext = new HashMap<>();
-            aggregateContext.put(ScoreLangConstants.BRANCHES_CONTEXT_KEY, (Serializable) branches_context);
+            aggregateContext.put(RuntimeConstants.BRANCHES_CONTEXT_KEY, (Serializable) branches_context);
 
             fireEvent(
                     executionRuntimeServices,
