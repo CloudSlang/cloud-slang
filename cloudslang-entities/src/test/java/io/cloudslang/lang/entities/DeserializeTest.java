@@ -67,7 +67,7 @@ public class DeserializeTest {
 
     @Test
     public void testDeserializeListForLoopStatement() throws IOException {
-        ForLoopStatement listForLoopStatement = new ListForLoopStatement("varName", "expression");
+        LoopStatement listForLoopStatement = new ListForLoopStatement("varName", "expression");
         testToAndFromJson(listForLoopStatement, ListForLoopStatement.class);
     }
 

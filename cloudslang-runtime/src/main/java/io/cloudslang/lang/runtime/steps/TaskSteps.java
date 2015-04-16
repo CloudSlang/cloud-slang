@@ -57,7 +57,7 @@ public class TaskSteps extends AbstractSteps {
     private static final Logger logger = Logger.getLogger(TaskSteps.class);
 
     public void beginTask(@Param(ScoreLangConstants.TASK_INPUTS_KEY) List<Input> taskInputs,
-                          @Param(ScoreLangConstants.LOOP_KEY) ForLoopStatement loop,
+                          @Param(ScoreLangConstants.LOOP_KEY) LoopStatement loop,
                           @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                           @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
@@ -119,7 +119,7 @@ public class TaskSteps extends AbstractSteps {
         }
     }
 
-    private boolean loopStatementExist(ForLoopStatement forLoopStatement) {
+    private boolean loopStatementExist(LoopStatement forLoopStatement) {
         return forLoopStatement != null;
     }
 

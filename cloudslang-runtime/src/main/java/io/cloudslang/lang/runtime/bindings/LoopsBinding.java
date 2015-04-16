@@ -13,7 +13,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
 import io.cloudslang.lang.entities.MapForLoopStatement;
 import io.cloudslang.lang.runtime.env.LoopCondition;
-import io.cloudslang.lang.entities.ForLoopStatement;
+import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ForLoopCondition;
 import org.python.core.PyObject;
@@ -39,7 +39,7 @@ public class LoopsBinding {
     @Autowired
     private ScriptEvaluator scriptEvaluator;
 
-    public LoopCondition getOrCreateLoopCondition(ForLoopStatement forLoopStatement, Context flowContext, String nodeName) {
+    public LoopCondition getOrCreateLoopCondition(LoopStatement forLoopStatement, Context flowContext, String nodeName) {
         Validate.notNull(forLoopStatement, "loop statement cannot be null");
         Validate.notNull(flowContext, "flow context cannot be null");
         Validate.notNull(nodeName, "node name cannot be null");
@@ -78,7 +78,7 @@ public class LoopsBinding {
         logger.debug("value name: " + keyName + ", value: " + valueFromIteration);
     }
 
-    private LoopCondition createForLoopCondition(ForLoopStatement forLoopStatement, Context flowContext, String nodeName) {
+    private LoopCondition createForLoopCondition(LoopStatement forLoopStatement, Context flowContext, String nodeName) {
         Map<String, Serializable> variables = flowContext.getImmutableViewOfVariables();
         Serializable evalResult;
         String collectionExpression = forLoopStatement.getExpression();

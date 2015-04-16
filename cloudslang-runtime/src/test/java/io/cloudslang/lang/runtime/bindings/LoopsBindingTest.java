@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import io.cloudslang.lang.entities.ForLoopStatement;
+import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ForLoopCondition;
 
@@ -41,7 +41,7 @@ public class LoopsBindingTest {
     @Mock
     private ScriptEngine scriptEngine;
 
-    private ForLoopStatement createBasicForStatement() {
+    private LoopStatement createBasicForStatement() {
         return new ListForLoopStatement("x", "[1]");
     }
 

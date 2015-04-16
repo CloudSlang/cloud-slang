@@ -20,7 +20,7 @@ import java.io.Serializable;
  *
  * @author Bonczidai Levente
  */
-public class MapForLoopStatement extends ForLoopStatement implements Serializable{
+public class MapForLoopStatement extends LoopStatement implements Serializable{
 
     private static final long serialVersionUID = -667210580560286978L;
 

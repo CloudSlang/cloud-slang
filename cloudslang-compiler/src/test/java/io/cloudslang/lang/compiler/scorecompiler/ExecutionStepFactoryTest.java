@@ -50,11 +50,11 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateStartStepPutForUnderTheRightKey() throws Exception {
-        ForLoopStatement statement = new ListForLoopStatement("1", "2");
+        LoopStatement statement = new ListForLoopStatement("1", "2");
         HashMap<String, Serializable> preTaskData = new HashMap<>();
         preTaskData.put(SlangTextualKeys.FOR_KEY, statement);
         ExecutionStep startStep = factory.createBeginTaskStep(1L, new ArrayList<Input>(), preTaskData, "", "");
-        ForLoopStatement actualStatement = (ForLoopStatement) startStep.getActionData()
+        LoopStatement actualStatement = (LoopStatement) startStep.getActionData()
                                  .get(ScoreLangConstants.LOOP_KEY);
         Assert.assertNotNull("for key is null", actualStatement);
         Assert.assertSame("inputs are not set under their key", statement, actualStatement);

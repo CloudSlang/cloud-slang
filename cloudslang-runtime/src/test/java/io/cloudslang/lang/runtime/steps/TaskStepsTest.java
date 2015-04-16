@@ -24,7 +24,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
-import io.cloudslang.lang.entities.ForLoopStatement;
+import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
@@ -83,7 +83,7 @@ public class TaskStepsTest {
         return runEnvironment;
     }
 
-    private ForLoopStatement createBasicForStatement(String varName, String collectionExpression) {
+    private LoopStatement createBasicForStatement(String varName, String collectionExpression) {
         return new ListForLoopStatement(varName, collectionExpression);
     }
 
@@ -287,7 +287,7 @@ public class TaskStepsTest {
     @Test
     public void whenLoopKeyProvidedLoopConditionIsRequested(){
         String collectionExpression = "collection";
-        ForLoopStatement statement = createBasicForStatement("x", collectionExpression);
+        LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         when(loopsBinding.getOrCreateLoopCondition(statement, context, nodeName))
@@ -301,7 +301,7 @@ public class TaskStepsTest {
     @Test
     public void whenLoopConditionHasNoMoreNextStepIdSetToEndTask(){
         String collectionExpression = "collection";
-        ForLoopStatement statement = createBasicForStatement("x", collectionExpression);
+        LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
@@ -321,7 +321,7 @@ public class TaskStepsTest {
     @Test
     public void whenLoopConditionHasMoreNextStepIdSetToEndTask(){
         String collectionExpression = "collection";
-        ForLoopStatement statement = createBasicForStatement("x", collectionExpression);
+        LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
@@ -343,7 +343,7 @@ public class TaskStepsTest {
     @Test
     public void whenLoopConditionIsOfForTypeStartTaskWillIncrementIt(){
         String collectionExpression = "collection";
-        ForLoopStatement statement = createBasicForStatement("x", collectionExpression);
+        LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         ForLoopCondition mockLoopCondition = mock(ForLoopCondition.class);

@@ -9,18 +9,18 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
-import io.cloudslang.lang.entities.ForLoopStatement;
+import io.cloudslang.lang.entities.LoopStatement;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Component
-public class ForTransformer extends AbstractForTransformer implements Transformer<String, ForLoopStatement> {
+public class ForTransformer extends AbstractForTransformer implements Transformer<String, LoopStatement> {
 
     @Override
-    public ForLoopStatement transform(String rawData) {
-        return (ForLoopStatement) transformToLoopStatement(rawData, false);
+    public LoopStatement transform(String rawData) {
+        return transformToLoopStatement(rawData, false);
     }
 
     @Override
