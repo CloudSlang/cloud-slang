@@ -115,25 +115,15 @@ public class ExecutionPlanBuilder {
                             taskName
                     )
             );
-            taskExecutionSteps.add(
-                    stepFactory.createBeginTaskStep(
-                            currentId++,
-                            task.getInputs(),
-                            task.getPreTaskActionData(),
-                            task.getRefId(),
-                            task.getName()
-                    )
-            );
-        } else {
-            taskExecutionSteps.add(
-                    stepFactory.createBeginTaskStep(
-                            currentId++,
-                            task.getInputs(),
-                            task.getPreTaskActionData(),
-                            task.getRefId(),
-                            taskName)
-            );
         }
+        taskExecutionSteps.add(
+                stepFactory.createBeginTaskStep(
+                        currentId++,
+                        task.getInputs(),
+                        task.getPreTaskActionData(),
+                        task.getRefId(),
+                        taskName)
+        );
 
         //End Task
         Map<String, ResultNavigation> navigationValues = new HashMap<>();
@@ -156,7 +146,7 @@ public class ExecutionPlanBuilder {
                             currentId++,
                             task.getPostTaskActionData(),
                             new HashMap<String, ResultNavigation>(),
-                            task.getName(),
+                            taskName,
                             true)
             );
             taskExecutionSteps.add(
