@@ -14,10 +14,13 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -37,19 +40,26 @@ public class SlangBuilder {
     @Autowired
     private SlangTestRunner slangTestRunner;
 
-
     private final static Logger log = Logger.getLogger(SlangBuilder.class);
 
-    public SlangBuildResults buildSlangContent(String directoryPath, String testsPath, Set<String> testSuits){
+    public SlangBuildResults buildSlangContent(String projectPath, String contentPath, String testsPath, Set<String> testSuits){
 
+        String projectName = FilenameUtils.getName(projectPath);
+        log.info("");
+        log.info("------------------------------------------------------------");
+        log.info("Building project: " + projectName);
+        log.info("------------------------------------------------------------");
+
+        log.info("");
+        log.info("--- compiling sources ---");
         Map<String, Executable> slangModels =
-                slangContentVerifier.createModelsAndValidate(directoryPath);
+                slangContentVerifier.createModelsAndValidate(contentPath);
 
         Map<String, CompilationArtifact> compiledSources = compileModels(slangModels);
 
         Map<SlangTestCase, String> failedTests = new HashMap<>();
-        if(testsPath != null) {
-            failedTests = runTests(slangModels, testsPath, testSuits);
+        if (StringUtils.isNotBlank(testsPath) && new File(testsPath).isDirectory()) {
+            failedTests = runTests(slangModels, projectPath, testsPath, testSuits);
         }
 
         return new SlangBuildResults(compiledSources.size(), failedTests);
@@ -74,7 +84,9 @@ public class SlangBuilder {
     }
 
     private Map<SlangTestCase, String> runTests(Map<String, Executable> contentSlangModels,
-                          String testsPath, Set<String> testSuites){
+                          String projectPath, String testsPath, Set<String> testSuites){
+        log.info("");
+        log.info("--- compiling tests sources ---");
         // Compile all slang test flows under the test directory
         Map<String, Executable> testFlowModels = slangContentVerifier.createModelsAndValidate(testsPath);
         // Add also all of the slang models of the content in order to allow for compilation of the test flows
@@ -83,8 +95,11 @@ public class SlangBuilder {
         Map<String, CompilationArtifact> compiledFlows = slangContentVerifier.compileSlangModels(testFlowModels);
 
         Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath);
+
+        log.info("");
+        log.info("--- running tests ---");
         log.info("Going to run " + testCases.size() + " tests");
-        return slangTestRunner.runAllTests(testCases, compiledFlows);
+        return slangTestRunner.runAllTests(projectPath, testCases, compiledFlows, testSuites);
     }
 
 

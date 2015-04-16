@@ -1,16 +1,17 @@
 CloudSlang
 ==============
  
-CloudSlang is a YAML based language for writing human-readable workflows for the CloudSlang Orchestration Engine (Score). This project includes the CLI to trigger flows.
+CloudSlang is a YAML based language for writing human-readable workflows for the CloudSlang Orchestration Engine . 
+This project includes the CLI to trigger flows.
 
 [![Build Status](https://travis-ci.org/CloudSlang/cloud-slang.svg?branch=master)](https://travis-ci.org/CloudSlang/cloud-slang)
-[![Coverage Status](https://coveralls.io/repos/CloudSlang/cloud-slang/badge.svg?branch=coveralls)](https://coveralls.io/r/CloudSlang/cloud-slang?branch=coveralls)
+[![Coverage Status](https://coveralls.io/repos/CloudSlang/cloud-slang/badge.svg?branch=master)](https://coveralls.io/r/CloudSlang/cloud-slang?branch=master)
 
 #### Getting started:
 
 ###### Pre-Requisite: Java JRE >= 7
 
-1. Download the cslang zip from [here](https://github.com/CloudSlang/cloud-slang/releases/download/cloudslang-0.7.4/cslang-cli.zip). (For the latest snapshot, download from [here](https://github.com/CloudSlang/cloud-slang/releases/latest).)
+1. Download the cslang zip from [here](https://github.com/CloudSlang/cloud-slang/releases/download/cloudslang-0.7.14/cslang-cli.zip). (For the latest snapshot, download from [here](https://github.com/CloudSlang/cloud-slang/releases/latest).)
 2. Unzip it.
 3. Go to the folder /cslang/bin/
 4. Run the executable :
@@ -48,9 +49,9 @@ And run it using:
 
 ``` docker run -it cloudslang/cloudslang ```
 
-### Another way of getting the CSlang command line interface.
+### CloudSlang npm Package
 ###### cslang-cli
-> The score command line interface.
+> The CloudSlang command line interface.
 
 Install this globally and you'll have access to the `cslang` command anywhere on your system.
 
@@ -66,4 +67,4 @@ cslang
 ###### Pre-Requisites:
 Node.js & Java installed.
 
-cslang-cli page in the [NPM repository](https://www.npmjs.com/package/cslang-cli).
+cslang-cli page in the [npm repository](https://www.npmjs.com/package/cslang-cli).

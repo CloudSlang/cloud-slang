@@ -6,7 +6,7 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 #
 ####################################################
-# Prints text to the screen.
+# Prints sys property to the screen.
 #
 # Inputs:
 #   - text - text to print
@@ -14,14 +14,14 @@
 #   - SUCCESS
 ####################################################
 
-namespace: io.content
+namespace: base
 
 operation:
-  name: print_text
+  name: print_property
   inputs:
-    - text
+    - text:
+        system_property: base.prop1
   action:
     python_script: print text
   results:
     - SUCCESS: text != ""
-    - FAILURE

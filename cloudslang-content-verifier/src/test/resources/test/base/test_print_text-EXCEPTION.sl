@@ -1,7 +1,7 @@
-namespace: io.content
+namespace: base
 
 imports:
-  ops: io.content
+  ops: base
 
 flow:
   name: test_print_text-EXCEPTION
