@@ -14,13 +14,13 @@
 #   - SUCCESS
 ####################################################
 
-namespace: io.content
+namespace: base
 
 operation:
   name: print_property
   inputs:
     - text:
-        system_property: io.content.prop1
+        system_property: base.prop1
   action:
     python_script: print text
   results:
