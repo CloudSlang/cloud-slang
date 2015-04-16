@@ -1,6 +1,7 @@
 package io.cloudslang.lang.tools.build.tester;
 
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import junit.framework.Assert;
@@ -18,9 +19,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by stoneo on 4/15/2015.
@@ -50,21 +53,21 @@ public class SlangTestRunnerTest {
     }
 
     @Test
-    public void testNullTestPath() throws Exception {
+    public void testNullTestPath() {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("path");
         slangTestRunner.createTestCases(null);
     }
 
     @Test
-    public void testEmptyTestPath() throws Exception {
+    public void testEmptyTestPath(){
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("path");
         slangTestRunner.createTestCases("");
     }
 
     @Test
-    public void testInvalidTestPath() throws Exception {
+    public void testInvalidTestPath() {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("directory");
         slangTestRunner.createTestCases("aaa");
@@ -75,6 +78,16 @@ public class SlangTestRunnerTest {
         URI resource = getClass().getResource("/dependencies").toURI();
         Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(resource.getPath());
         Assert.assertEquals(0, testCases.size());
+    }
+
+    @Test
+    public void testPathWithValidTests() throws Exception {
+        URI resource = getClass().getResource("/test/valid").toURI();
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        testCases.put("Test1", new SlangTestCase("Test1", "path", "desc", null, null, null, null, null, null));
+        when(parser.parseTestCases(Mockito.any(SlangSource.class))).thenReturn(testCases);
+        Map<String, SlangTestCase> foundTestCases = slangTestRunner.createTestCases(resource.getPath());
+        Assert.assertEquals(1, foundTestCases.size());
     }
 
 
