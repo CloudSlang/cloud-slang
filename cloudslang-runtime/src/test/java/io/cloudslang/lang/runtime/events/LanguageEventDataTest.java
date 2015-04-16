@@ -15,10 +15,12 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.python.google.common.collect.Lists;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -146,5 +148,16 @@ public class LanguageEventDataTest {
 		assertEquals(outputs, eventData.getOutputs());
 		assertEquals(outputs, eventData.get(LanguageEventData.OUTPUTS));
 	}
+
+    /**
+     * Test method for {@link LanguageEventData#getAsyncLoopInputs()}.
+     */
+    @Test
+    public void testAsyncLoopInputs() {
+        List<Serializable> asyncLoopInputs = Lists.newArrayList((Serializable) "a", "b", "c");
+        eventData.setAsyncLoopInputs(asyncLoopInputs);
+        assertEquals(asyncLoopInputs, eventData.getAsyncLoopInputs());
+        assertEquals(asyncLoopInputs, eventData.get(LanguageEventData.BOUND_ASYNC_LOOP_INPUTS));
+    }
 
 }

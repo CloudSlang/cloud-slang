@@ -12,6 +12,7 @@ package io.cloudslang.lang.runtime.events;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -105,5 +106,13 @@ public class LanguageEventData extends HashMap<String, Serializable> {
 	public void setOutputs(Map<String, Serializable> outputs) {
 		put(OUTPUTS, (Serializable)outputs);
 	}
+
+    public List<Serializable> getAsyncLoopInputs() {
+        return (List<Serializable>) get(BOUND_ASYNC_LOOP_INPUTS);
+    }
+
+    public void setAsyncLoopInputs(List<Serializable> asyncLoopInputs) {
+        put(BOUND_ASYNC_LOOP_INPUTS, (Serializable) asyncLoopInputs);
+    }
 
 }
