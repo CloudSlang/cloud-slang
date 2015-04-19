@@ -224,7 +224,7 @@ public class SlangTestRunner {
                 Serializable outputValue = output.getValue();
                 Serializable executionOutputValue = executionOutputs.get(outputName);
                 if(!StringUtils.equals((String)executionOutputValue, (String)outputValue)){
-                    message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tFor output: " + outputName+ "\n\tExpected value: " + executionOutputValue + "\n\tActual value: " + outputValue;
+                    message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tFor output: " + outputName+ "\n\tExpected value: " + outputValue + "\n\tActual value: " + executionOutputValue;
                     log.error(message);
                     throw new RuntimeException(message);
                 }
