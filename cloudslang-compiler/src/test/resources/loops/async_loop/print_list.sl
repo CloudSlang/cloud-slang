@@ -13,6 +13,6 @@ operation:
      - words_list
   action:
     python_script: |
-        if len(words_list) > 0:
+        if words_list != None and len(words_list) > 0:
             print words_list
 
