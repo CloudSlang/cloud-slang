@@ -123,20 +123,20 @@ public class AsyncLoopSteps extends AbstractSteps {
                              @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName) {
         try {
             List<EndBranchDataContainer> branches = executionRuntimeServices.getFinishedChildBranchesData();
-            List<Map<String, Serializable>> branches_context = Lists.newArrayList();
+            List<Map<String, Serializable>> branchesContext = Lists.newArrayList();
             Context flowContext = runEnv.getStack().popContext();
             Map<String, Serializable> contextBeforeSplit = flowContext.getImmutableViewOfVariables();
-            List<String> branchResults = Lists.newArrayList();
+            List<String> branchesResult = Lists.newArrayList();
 
             for (EndBranchDataContainer branch : branches) {
                 Map<String, Serializable> branchContext = branch.getContexts();
 
                 RunEnvironment branchRuntimeEnvironment = (RunEnvironment) branchContext.get(ScoreLangConstants.RUN_ENV);
 
-                branches_context.add(branchRuntimeEnvironment.getStack().popContext().getImmutableViewOfVariables());
+                branchesContext.add(branchRuntimeEnvironment.getStack().popContext().getImmutableViewOfVariables());
 
                 ReturnValues executableReturnValues = branchRuntimeEnvironment.removeReturnValues();
-                branchResults.add(executableReturnValues.getResult());
+                branchesResult.add(executableReturnValues.getResult());
 
                 fireEvent(
                         executionRuntimeServices,
@@ -149,7 +149,7 @@ public class AsyncLoopSteps extends AbstractSteps {
             }
 
             Map<String, Serializable> aggregateContext = new HashMap<>();
-            aggregateContext.put(RuntimeConstants.BRANCHES_CONTEXT_KEY, (Serializable) branches_context);
+            aggregateContext.put(RuntimeConstants.BRANCHES_CONTEXT_KEY, (Serializable) branchesContext);
 
             fireEvent(
                     executionRuntimeServices,
@@ -166,7 +166,7 @@ public class AsyncLoopSteps extends AbstractSteps {
 
             // if one of the branches failed then return with FAILURE, otherwise return with SUCCESS
             String asyncLoopResult = ScoreLangConstants.SUCCESS_RESULT;
-            for (String branchResult : branchResults) {
+            for (String branchResult : branchesResult) {
                 if (branchResult.equals(ScoreLangConstants.FAILURE_RESULT)) {
                     asyncLoopResult = ScoreLangConstants.FAILURE_RESULT;
                     break;
