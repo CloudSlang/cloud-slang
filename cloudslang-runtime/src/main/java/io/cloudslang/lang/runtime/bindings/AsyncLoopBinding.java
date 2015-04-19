@@ -11,6 +11,7 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.AsyncLoopStatement;
 import io.cloudslang.lang.runtime.env.Context;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,9 +39,12 @@ public class AsyncLoopBinding {
             @SuppressWarnings("unchecked") List<Serializable> evalResult = (List<Serializable>) scriptEvaluator.evalExpr(
                     asyncLoopStatement.getExpression(),
                     flowContext.getImmutableViewOfVariables());
+            if (CollectionUtils.isEmpty(evalResult)) {
+                throw new RuntimeException("Expression cannot be empty");
+            }
             return evalResult;
         } catch (Throwable t) {
-            throw new RuntimeException("Error evaluating async task expression in task '" + nodeName + "', error is: \n" + t.getMessage(), t);
+            throw new RuntimeException("Error evaluating async loop expression in task '" + nodeName + "', error is: \n" + t.getMessage(), t);
         }
     }
 }
