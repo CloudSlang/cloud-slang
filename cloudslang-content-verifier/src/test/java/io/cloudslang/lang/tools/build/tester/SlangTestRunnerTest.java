@@ -2,6 +2,7 @@ package io.cloudslang.lang.tools.build.tester;
 
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import junit.framework.Assert;
@@ -53,41 +54,88 @@ public class SlangTestRunnerTest {
     }
 
     @Test
-    public void testNullTestPath() {
+    public void createTestCaseWithNullTestPath() {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("path");
         slangTestRunner.createTestCases(null);
     }
 
     @Test
-    public void testEmptyTestPath(){
+    public void createTestCaseWithEmptyTestPath(){
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("path");
         slangTestRunner.createTestCases("");
     }
 
     @Test
-    public void testInvalidTestPath() {
+    public void createTestCaseWithInvalidTestPath() {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("directory");
         slangTestRunner.createTestCases("aaa");
     }
 
     @Test
-    public void testPathWithNoTests() throws Exception {
+    public void createTestCaseWithPathWithNoTests() throws Exception {
         URI resource = getClass().getResource("/dependencies").toURI();
         Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(resource.getPath());
-        Assert.assertEquals(0, testCases.size());
+        Assert.assertEquals("No test cases were supposed to be created", 0, testCases.size());
     }
 
     @Test
-    public void testPathWithValidTests() throws Exception {
+    public void createTestCaseWithPathWithValidTests() throws Exception {
         URI resource = getClass().getResource("/test/valid").toURI();
         Map<String, SlangTestCase> testCases = new HashMap<>();
         testCases.put("Test1", new SlangTestCase("Test1", "path", "desc", null, null, null, null, null, null));
         when(parser.parseTestCases(Mockito.any(SlangSource.class))).thenReturn(testCases);
         Map<String, SlangTestCase> foundTestCases = slangTestRunner.createTestCases(resource.getPath());
-        Assert.assertEquals(1, foundTestCases.size());
+        Assert.assertEquals("1 test case was supposed to be created", 1, foundTestCases.size());
+    }
+
+    @Test
+    public void runTestCasesFromEmptyMap(){
+        Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", new HashMap<String, SlangTestCase>(), new HashMap<String, CompilationArtifact>(), null);
+        Assert.assertEquals("No test cases should fail", 0, failedTests.size());
+    }
+
+    @Test
+    public void runTestCasesFromNullMap(){
+        Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", null, new HashMap<String, CompilationArtifact>(), null);
+        Assert.assertEquals("No test cases should fail", 0, failedTests.size());
+    }
+
+    @Test
+    public void runNullTestCase(){
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        testCases.put("test1", null);
+        Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", testCases, new HashMap<String, CompilationArtifact>(), null);
+        Assert.assertEquals("1 test case should fail", 1, failedTests.size());
+        String errorMessage = failedTests.values().iterator().next();
+        Assert.assertTrue(errorMessage.contains("Test case"));
+        Assert.assertTrue(errorMessage.contains("null"));
+    }
+
+    @Test
+    public void runTestCaseWithNoTestFlowPathProperty(){
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        SlangTestCase testCase = new SlangTestCase("test1", null, null, null, null, null, null, null, null);
+        testCases.put("test1", testCase);
+        Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", testCases, new HashMap<String, CompilationArtifact>(), null);
+        Assert.assertEquals("1 test case should fail", 1, failedTests.size());
+        String errorMessage = failedTests.values().iterator().next();
+        Assert.assertTrue(errorMessage.contains("testFlowPath"));
+        Assert.assertTrue(errorMessage.contains("mandatory"));
+    }
+
+    @Test
+    public void runTestCaseWithNoCompiledFlow(){
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", null, null, null, null, null, null, null);
+        testCases.put("test1", testCase);
+        Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", testCases, new HashMap<String, CompilationArtifact>(), null);
+        Assert.assertEquals("1 test case should fail", 1, failedTests.size());
+        String errorMessage = failedTests.values().iterator().next();
+        Assert.assertTrue(errorMessage.contains("testFlowPath"));
+        Assert.assertTrue(errorMessage.contains("missing"));
     }
 
 

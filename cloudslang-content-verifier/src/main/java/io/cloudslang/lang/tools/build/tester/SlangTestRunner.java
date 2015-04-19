@@ -94,8 +94,15 @@ public class SlangTestRunner {
                             Map<String, CompilationArtifact> compiledFlows, Set<String> testSuites) {
 
         Map<SlangTestCase, String> failedTestCases = new HashMap<>();
+        if(MapUtils.isEmpty(testCases)){
+            return failedTestCases;
+        }
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
             SlangTestCase testCase = testCaseEntry.getValue();
+            if(testCase == null){
+                failedTestCases.put(testCase, "Test case cannot be null");
+                continue;
+            }
             log.info("Running test: " + testCaseEntry.getKey() + " - " + testCase.getDescription());
             try {
                 CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
@@ -109,11 +116,13 @@ public class SlangTestRunner {
 
     private static CompilationArtifact getCompiledTestFlow(Map<String, CompilationArtifact> compiledFlows, SlangTestCase testCase) {
         String testFlowPath = testCase.getTestFlowPath();
+        if(StringUtils.isEmpty(testFlowPath)){
+            throw new RuntimeException("For test case: " + testCase.getName() + " testFlowPath property is mandatory");
+        }
         String testFlowPathTransformed = testFlowPath.replace(File.separatorChar, '.');
         CompilationArtifact compiledTestFlow = compiledFlows.get(testFlowPathTransformed);
         if(compiledTestFlow == null) {
-            String message = "Test flow: " + testFlowPath + " is missing. Referenced in test case: " + testCase.getName();
-            throw new RuntimeException(message);
+            throw new RuntimeException("Test flow: " + testFlowPath + " is missing. Referenced in test case: " + testCase.getName());
         }
         return compiledTestFlow;
     }
