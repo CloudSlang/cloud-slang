@@ -48,12 +48,27 @@ public abstract class AbstractSteps {
                                  String type,
                                  String description,
                                  Map.Entry<String, ? extends Serializable>... fields) {
+        fireEvent(
+                runtimeServices,
+                type,
+                description,
+                runEnvironment.getExecutionPath().getCurrentPath(),
+                fields
+        );
+    }
+
+    @SafeVarargs
+    public static void fireEvent(ExecutionRuntimeServices runtimeServices,
+                                 String type,
+                                 String description,
+                                 String path,
+                                 Map.Entry<String, ? extends Serializable>... fields) {
         LanguageEventData eventData = new LanguageEventData();
         eventData.setEventType(type);
         eventData.setDescription(description);
         eventData.setTimeStamp(new Date());
         eventData.setExecutionId(runtimeServices.getExecutionId());
-        eventData.setPath(runEnvironment.getExecutionPath().getCurrentPath());
+        eventData.setPath(path);
         for (Entry<String, ? extends Serializable> field : fields) {
             eventData.put(field.getKey(), field.getValue());
         }
