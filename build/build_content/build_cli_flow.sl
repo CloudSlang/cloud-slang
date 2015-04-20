@@ -67,7 +67,7 @@ flow:
             - command: >
                 "bash " +
                 target_dir + "/cslang-builder/bin/cslang-builder " +
-                target_dir + "/cloudslang_content/content/"
+                target_dir + "/cloudslang_content"
         navigate:
           SUCCESS: copy_cloudslang_cli
           FAILURE: FAILURE
@@ -77,7 +77,7 @@ flow:
           cmd.run_command:
             - command: >
                 target_dir + "\\cslang-builder\\bin\\cslang-builder.bat " +
-                target_dir + "/cloudslang_content/content/"
+                target_dir + "/cloudslang_content"
 
 
     - copy_cloudslang_cli:
