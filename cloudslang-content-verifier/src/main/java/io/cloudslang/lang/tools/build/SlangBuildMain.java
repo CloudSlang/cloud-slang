@@ -95,12 +95,16 @@ public class SlangBuildMain {
     }
 
     private static Set<String> getTestSuitesProperty() {
+        Set<String> testSuites = new HashSet<>();
+        testSuites.add(SlangTestCase.BASE_TEST_SUITE);
+
+        //if specified override
         String testSuitesArg = System.getProperty("testSuites");
-        Set<String> testSuites = null;
         if (testSuitesArg != null) {
             String[] testSuitesArray = testSuitesArg.split(Pattern.quote(","));
             testSuites = new HashSet<>(Arrays.asList(testSuitesArray));
         }
+
         return testSuites;
     }
 
