@@ -15,4 +15,3 @@ operation:
     python_script: |
         if words_list != None and len(words_list) > 0:
             print words_list
-
