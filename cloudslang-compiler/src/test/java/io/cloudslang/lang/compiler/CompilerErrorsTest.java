@@ -308,6 +308,28 @@ public class CompilerErrorsTest {
     }
 
     @Test
+    public void testInputNotOverridableAndNoDefault() throws Exception {
+        URI resource = getClass().getResource("/non_overridable_input_without_default.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("overridable");
+        exception.expectMessage("default");
+        exception.expectMessage("input_without_default");
+        compiler.compile(SlangSource.fromFile(resource), path);
+    }
+
+    @Test
+    public void testInputWithInvalidKey() throws Exception {
+        URI resource = getClass().getResource("/illegal_key_in_input.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("known property");
+        exception.expectMessage("input_with_illegal_key");
+        exception.expectMessage("karambula");
+        compiler.compile(SlangSource.fromFile(resource), path);
+    }
+
+    @Test
     public void testOperationWithNoActionData() throws Exception {
         URI resource = getClass().getResource("/corrupted/operation_with_no_action_data.sl").toURI();
 
