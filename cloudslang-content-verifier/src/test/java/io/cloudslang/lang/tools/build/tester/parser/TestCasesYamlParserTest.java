@@ -91,12 +91,12 @@ public class TestCasesYamlParserTest {
         parser.parseTestCases(SlangSource.fromFile(fileUri));
     }
 
-    @Test
-    public void parseSystemPropertiesFile() throws Exception{
-        String filePath = System.getProperty("user.dir") + "/cloudslang-content-verifier/src/test/resources/content/base/properties.yaml";
-        Map<String, Serializable> sysProperties = parser.parseProperties(filePath);
-        Assert.assertEquals("One system property should be parsed", 1, sysProperties.size());
-    }
+//    @Test
+//    public void parseSystemPropertiesFile() throws Exception{
+//        String filePath = System.getProperty("user.dir") + "/cloudslang-content-verifier/src/test/resources/content/base/properties.yaml";
+//        Map<String, Serializable> sysProperties = parser.parseProperties(filePath);
+//        Assert.assertEquals("One system property should be parsed", 1, sysProperties.size());
+//    }
 
     @Test
     public void parseNotFoundSystemPropertiesFile(){
