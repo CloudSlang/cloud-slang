@@ -150,12 +150,12 @@ public class SlangTestRunner {
         return convertMapParams(inputs, convertedInputs);
     }
 
-    private Map<String, Serializable> convertMapParams(List<Map> inputs, Map<String, Serializable> convertedInputs) {
-        if (CollectionUtils.isNotEmpty(inputs)) {
-            for (Map input : inputs) {
+    private Map<String, Serializable> convertMapParams(List<Map> params, Map<String, Serializable> convertedInputs) {
+        if (CollectionUtils.isNotEmpty(params)) {
+            for (Map param : params) {
                 convertedInputs.put(
-                        (String) input.keySet().iterator().next(),
-                        (Serializable) input.values().iterator().next());
+                        (String) param.keySet().iterator().next(),
+                        (Serializable) param.values().iterator().next());
             }
         }
         return convertedInputs;
