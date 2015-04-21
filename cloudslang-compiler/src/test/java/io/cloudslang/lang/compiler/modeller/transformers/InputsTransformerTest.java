@@ -15,7 +15,9 @@ import junit.framework.Assert;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.entities.bindings.Input;
@@ -45,12 +47,19 @@ public class InputsTransformerTest {
 
     private List inputsMap;
 
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     @Before
     public void init() throws URISyntaxException {
-        URL resource = getClass().getResource("/operation_with_data.sl");
+        inputsMap = getInputsFormSl("/operation_with_data.sl");
+    }
+
+    private List getInputsFormSl(String filePath) throws URISyntaxException {
+        URL resource = getClass().getResource(filePath);
         ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
         Map op = file.getOperation();
-        inputsMap = (List) op.get("inputs");
+        return (List) op.get("inputs");
     }
 
     @Test
@@ -140,6 +149,26 @@ public class InputsTransformerTest {
         Assert.assertFalse(input.isOverridable());
         Assert.assertFalse(input.isEncrypted());
         Assert.assertTrue(input.isRequired());
+    }
+
+    @Test
+    public void testOverridableInputWithoutDefault() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("overridable");
+        exception.expectMessage("default");
+        exception.expectMessage("input_without_default");
+        List inputs = getInputsFormSl("/non_overridable_input_without_default.sl");
+        inputTransformer.transform(inputs);
+    }
+
+    @Test
+    public void testIllegalKeyInInput() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("known property");
+        exception.expectMessage("input_with_illegal_key");
+        exception.expectMessage("karambula");
+        List inputs = getInputsFormSl("/illegal_key_in_input.sl");
+        inputTransformer.transform(inputs);
     }
 
     @Test

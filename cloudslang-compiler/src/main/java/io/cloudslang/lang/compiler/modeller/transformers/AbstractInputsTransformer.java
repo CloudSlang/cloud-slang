@@ -8,8 +8,6 @@
  */
 package io.cloudslang.lang.compiler.modeller.transformers;
 
-import io.cloudslang.lang.compiler.SlangTextualKeys;
-import org.apache.log4j.Logger;
 import io.cloudslang.lang.entities.bindings.Input;
 
 import java.io.Serializable;
@@ -17,47 +15,67 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static io.cloudslang.lang.compiler.SlangTextualKeys.DEFAULT_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.ENCRYPTED_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.OVERRIDABLE_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.REQUIRED_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SYSTEM_PROPERTY_KEY;
+
 public abstract class AbstractInputsTransformer {
 
-	private static final Logger logger = Logger.getLogger(AbstractInputsTransformer.class);
+    protected Input transformSingleInput(Object rawInput) {
+        // - some_input
+        // this is our default behaviour that if the user specifies only a key, the key is also the ref we look for
+        if (rawInput instanceof String) {
+            String inputName = (String) rawInput;
+            return new Input(inputName, inputName);
+        } else if (rawInput instanceof Map) {
+            Map.Entry<String, ?> entry = ((Map<String, ?>) rawInput).entrySet().iterator().next();
+            if (entry.getValue() instanceof Map) {
+                // - some_inputs:
+                // property1: value1
+                // property2: value2
+                // this is the verbose way of defining inputs with all of the properties available
+                return createPropInput((Map.Entry<String, Map<String, Serializable>>) entry);
+            }
+            // - some_input: some_expression
+            // the value of the input is an expression we need to evaluate at runtime
+            return new Input(entry.getKey(), entry.getValue()
+                                                  .toString());
+        }
+        throw new RuntimeException("Could not transform Input : " + rawInput);
+    }
 
-	protected Input transformSingleInput(Object rawInput) {
-		// - some_input
-		// this is our default behaviour that if the user specifies only a key, the key is also the ref we look for
-		if(rawInput instanceof String) {
-			String inputName = (String)rawInput;
-			return new Input(inputName, inputName);
-		} else if(rawInput instanceof Map) {
-			Map.Entry<String, ?> entry = ((Map<String, ?>)rawInput).entrySet().iterator().next();
-			if(entry.getValue() instanceof Map) {
-				// - some_inputs:
-				// property1: value1
-				// property2: value2
-				// this is the verbose way of defining inputs with all of the properties available
-				return createPropInput((Map.Entry<String, Map<String, Serializable>>)entry);
-			}
-			// - some_input: some_expression
-			// the value of the input is an expression we need to evaluate at runtime
-			return new Input(entry.getKey(), entry.getValue().toString());
-		}
-		throw new RuntimeException("Could not transform Input : " + rawInput);
-	}
+    private static Input createPropInput(Map.Entry<String, Map<String, Serializable>> entry) {
+        Map<String, Serializable> props = entry.getValue();
+        List<String> knownKeys = Arrays.asList(REQUIRED_KEY, ENCRYPTED_KEY,
+                OVERRIDABLE_KEY, DEFAULT_KEY, SYSTEM_PROPERTY_KEY);
 
-	private static Input createPropInput(Map.Entry<String, Map<String, Serializable>> entry) {
-		Map<String, Serializable> props = entry.getValue();
-		List<String> knownKeys = Arrays.asList(SlangTextualKeys.REQUIRED_KEY, SlangTextualKeys.ENCRYPTED_KEY, SlangTextualKeys.OVERRIDABLE_KEY, SlangTextualKeys.DEFAULT_KEY, SlangTextualKeys.SYSTEM_PROPERTY_KEY);
-		for(String key : props.keySet()) {
-			if(!knownKeys.contains(key)) {
-				logger.warn("key: " + key + " in input: " + entry.getKey() + " is not a known property");
-			}
-		}
-		boolean required = !props.containsKey(SlangTextualKeys.REQUIRED_KEY) || (boolean)props.get(SlangTextualKeys.REQUIRED_KEY);// default is required=true
-		boolean encrypted = props.containsKey(SlangTextualKeys.ENCRYPTED_KEY) && (boolean)props.get(SlangTextualKeys.ENCRYPTED_KEY);
-		boolean overridable = !props.containsKey(SlangTextualKeys.OVERRIDABLE_KEY) || (boolean)props.get(SlangTextualKeys.OVERRIDABLE_KEY);
-		String inputName = entry.getKey();
-		String expression = props.containsKey(SlangTextualKeys.DEFAULT_KEY) ? props.get(SlangTextualKeys.DEFAULT_KEY).toString() : inputName;
-		String systemPropertyName = (String)props.get(SlangTextualKeys.SYSTEM_PROPERTY_KEY);
-		return new Input(inputName, expression, encrypted, required, overridable, systemPropertyName);
-	}
+        for (String key : props.keySet()) {
+            if (!knownKeys.contains(key)) {
+                throw new RuntimeException("key: " + key + " in input: " + entry.getKey() + " is not a known property");
+            }
+        }
 
+        // default is required=true
+        boolean required = !props.containsKey(REQUIRED_KEY) ||
+                (boolean) props.get(REQUIRED_KEY);
+        // default is encrypted=false
+        boolean encrypted = props.containsKey(ENCRYPTED_KEY) &&
+                (boolean) props.get(ENCRYPTED_KEY);
+        // default is overridable=true
+        boolean overridable = !props.containsKey(OVERRIDABLE_KEY) ||
+                (boolean) props.get(OVERRIDABLE_KEY);
+        boolean defaultSpecified = props.containsKey(DEFAULT_KEY);
+        String inputName = entry.getKey();
+        String expression = defaultSpecified ? props.get(DEFAULT_KEY)
+                                                    .toString() : inputName;
+        String systemPropertyName = (String) props.get(SYSTEM_PROPERTY_KEY);
+
+        if (!overridable && !defaultSpecified) {
+            throw new RuntimeException("input: " + inputName + " is not overridable but no default value was specified");
+        }
+
+        return new Input(inputName, expression, encrypted, required, overridable, systemPropertyName);
+    }
 }
