@@ -1,10 +1,16 @@
 package io.cloudslang.lang.tools.build.tester;
 
+import com.google.common.collect.ImmutableMap;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
+import io.cloudslang.score.api.ExecutionPlan;
+import io.cloudslang.score.events.ScoreEvent;
+import io.cloudslang.score.events.ScoreEventListener;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -12,6 +18,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +31,8 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -136,6 +146,26 @@ public class SlangTestRunnerTest {
         String errorMessage = failedTests.values().iterator().next();
         Assert.assertTrue(errorMessage.contains("testFlowPath"));
         Assert.assertTrue(errorMessage.contains("missing"));
+    }
+
+    @Test
+    public void runTestCaseWithCompiledFlow(){
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", null, null, null, null, null, null, null);
+        testCases.put("test1", testCase);
+        HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
+
+        Mockito.doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                ScoreEventListener listener = (ScoreEventListener) invocationOnMock.getArguments()[0];
+                listener.onEvent(new ScoreEvent(ScoreLangConstants.EVENT_EXECUTION_FINISHED, ImmutableMap.of(LanguageEventData.RESULT, "SUCCESS")));
+                return listener;
+            }
+        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
+        Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", testCases, compiledFlows, null);
+        Assert.assertEquals("No test cases should fail", 0, failedTests.size());
     }
 
 
