@@ -102,8 +102,8 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
 
     private List<StepData> extractAsyncLoopData(RuntimeInformation runtimeInformation) {
         Map<String, List<StepData>> branchesByPath = runtimeInformation.getBranchesByPath();
-        Assert.assertTrue("async loop data not found", branchesByPath.containsKey(FIRST_ASYNC_LOOP_KEY));
-        return branchesByPath.get(FIRST_ASYNC_LOOP_KEY);
+        Assert.assertTrue("async loop data not found", branchesByPath.containsKey(FIRST_STEP_PATH));
+        return branchesByPath.get(FIRST_STEP_PATH);
     }
 
     private <T> boolean containsSameElementsWithoutOrdering(List<T> firstList, List<T> secondList) {
@@ -143,7 +143,7 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
     private void verifyAggregateValues(RuntimeInformation runtimeInformation, List<String> expectedNameOutputs) {
         // aggregate
         Map<String, StepData> asyncTasks = runtimeInformation.getAsyncTasks();
-        StepData asyncTask = asyncTasks.get(FIRST_ASYNC_LOOP_KEY);
+        StepData asyncTask = asyncTasks.get(FIRST_STEP_PATH);
 
         Map<String, Serializable> aggregateValues = asyncTask.getOutputs();
         Assert.assertTrue("aggregate name not found in async loop outputs", aggregateValues.containsKey("name_list"));
