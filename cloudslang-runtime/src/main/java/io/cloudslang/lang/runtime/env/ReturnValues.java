@@ -32,4 +32,13 @@ public class ReturnValues implements Serializable{
     public String getResult() {
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "ReturnValues{" +
+                "result='" + result + "', " +
+                "outputs=" + outputs +
+                '}';
+    }
+
 }

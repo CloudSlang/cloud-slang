@@ -39,6 +39,9 @@ import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
 
+import static io.cloudslang.lang.compiler.SlangTextualKeys.*;
+import static io.cloudslang.lang.entities.ScoreLangConstants.*;
+
 /*
  * Created by orius123 on 09/11/14.
  */
@@ -203,9 +206,24 @@ public class ExecutableBuilder {
             String message = "Task: " + taskName + " syntax is illegal.\nBelow task name, there should be a map of values in the format:\ndo:\n\top_name:";
             try {
                 taskRawDataValue = taskRawData.values().iterator().next();
-                if (MapUtils.isNotEmpty(taskRawDataValue) && taskRawDataValue.containsKey(ScoreLangConstants.LOOP_KEY)) {
-                    message = "Task: " + taskName + " syntax is illegal.\nBelow the 'loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
-                    taskRawDataValue.putAll((Map<String, Object>) taskRawDataValue.remove(ScoreLangConstants.LOOP_KEY));
+                if (MapUtils.isNotEmpty(taskRawDataValue)) {
+                    boolean loopKeyFound = taskRawDataValue.containsKey(LOOP_KEY);
+                    boolean asyncLoopKeyFound = taskRawDataValue.containsKey(ASYNC_LOOP_KEY);
+                    if (loopKeyFound) {
+                        if (asyncLoopKeyFound) {
+                            throw new RuntimeException("Task: " + taskName + " syntax is illegal.\nBelow task name, there can be either \'loop\' or \'aync_loop\' key.");
+                        }
+
+                        message = "Task: " + taskName + " syntax is illegal.\nBelow the 'loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
+                        @SuppressWarnings("unchecked") Map<String, Object> loopRawData = (Map<String, Object>) taskRawDataValue.remove(LOOP_KEY);
+                        taskRawDataValue.putAll(loopRawData);
+                    }
+                    if (asyncLoopKeyFound) {
+                        message = "Task: " + taskName + " syntax is illegal.\nBelow the 'async_loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
+                        @SuppressWarnings("unchecked") Map<String, Object> asyncLoopRawData = (Map<String, Object>) taskRawDataValue.remove(ASYNC_LOOP_KEY);
+                        asyncLoopRawData.put(ASYNC_LOOP_KEY, asyncLoopRawData.remove(FOR_KEY));
+                        taskRawDataValue.putAll(asyncLoopRawData);
+                    }
                 }
             } catch (ClassCastException ex){
                 throw new RuntimeException(message);
@@ -263,7 +281,14 @@ public class ExecutableBuilder {
             navigationStrings.put(ScoreLangConstants.FAILURE_RESULT, defaultFailure);
         }
 
-        return new Task(taskName, preTaskData, postTaskData, inputs, navigationStrings, refId);
+        return new Task(
+                taskName,
+                preTaskData,
+                postTaskData,
+                inputs,
+                navigationStrings,
+                refId,
+                preTaskData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
     }
 
 	private static String resolveRefId(String refIdString, Map<String, String> imports) {

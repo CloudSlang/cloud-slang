@@ -12,6 +12,7 @@ package io.cloudslang.lang.runtime.events;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,6 +32,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     public static final String RESULT = "RESULT";
 	public static final String CALL_ARGUMENTS = "CALL_ARGUMENTS";
 	public static final String BOUND_INPUTS = "BOUND_INPUTS";
+    public static final String BOUND_ASYNC_LOOP_EXPRESSION = "BOUND_ASYNC_LOOP_EXPRESSION";
 	public static final String RETURN_VALUES = "RETURN_VALUES";
     public static final String NEXT_STEP_POSITION = "nextPosition";
 	public static final String ENCRYPTED_VALUE = "*****";
@@ -104,5 +106,13 @@ public class LanguageEventData extends HashMap<String, Serializable> {
 	public void setOutputs(Map<String, Serializable> outputs) {
 		put(OUTPUTS, (Serializable)outputs);
 	}
+
+    public List<Serializable> getAsyncLoopBoundExpression() {
+        return (List<Serializable>) get(BOUND_ASYNC_LOOP_EXPRESSION);
+    }
+
+    public void setAsyncLoopBoundExpression(List<Serializable> asyncLoopBoundExpression) {
+        put(BOUND_ASYNC_LOOP_EXPRESSION, (Serializable) asyncLoopBoundExpression);
+    }
 
 }

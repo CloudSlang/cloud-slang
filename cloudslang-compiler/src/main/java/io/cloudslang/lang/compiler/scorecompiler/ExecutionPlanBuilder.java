@@ -22,11 +22,7 @@ import io.cloudslang.score.api.ExecutionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
@@ -43,6 +39,7 @@ public class ExecutionPlanBuilder {
 
     private static final String CLOUDSLANG_NAME = "CloudSlang";
     private static final int NUMBER_OF_TASK_EXECUTION_STEPS = 2;
+    private static final int NUMBER_OF_ASYNC_LOOP_EXECUTION_STEPS = 2;
     private static final long FLOW_END_STEP_ID = 0L;
     private static final long FLOW_START_STEP_ID = 1L;
 
@@ -87,24 +84,46 @@ public class ExecutionPlanBuilder {
             throw new RuntimeException("Flow: " + compiledFlow.getName() + " has no tasks");
         }
 
-        List<ExecutionStep> taskExecutionSteps = buildTaskExecutionSteps(tasks.getFirst(), taskReferences, tasks);
+        List<ExecutionStep> taskExecutionSteps = buildTaskExecutionSteps(tasks.getFirst(), taskReferences, tasks, compiledFlow);
         executionPlan.addSteps(taskExecutionSteps);
 
         return executionPlan;
     }
 
-    private List<ExecutionStep> buildTaskExecutionSteps(Task task,
-                                                        Map<String, Long> taskReferences, Deque<Task> tasks) {
+    private List<ExecutionStep> buildTaskExecutionSteps(
+            Task task,
+            Map<String, Long> taskReferences, Deque<Task> tasks,
+            Flow compiledFlow) {
 
         List<ExecutionStep> taskExecutionSteps = new ArrayList<>();
 
         String taskName = task.getName();
-        Long currentId = getCurrentId(taskReferences);
+        Long currentId = getCurrentId(taskReferences, tasks);
+        boolean isAsync = task.isAsync();
 
         //Begin Task
         taskReferences.put(taskName, currentId);
-        taskExecutionSteps.add(stepFactory.createBeginTaskStep(currentId++, task.getInputs(), task.getPreTaskActionData(),
-                task.getRefId(), taskName));
+        if (isAsync) {
+            Long joinStepID = currentId + NUMBER_OF_ASYNC_LOOP_EXECUTION_STEPS + 1;
+            taskExecutionSteps.add(
+                    stepFactory.createAddBranchesStep(
+                            currentId++,
+                            joinStepID,
+                            currentId,
+                            task.getPreTaskActionData(),
+                            compiledFlow.getId(),
+                            taskName
+                    )
+            );
+        }
+        taskExecutionSteps.add(
+                stepFactory.createBeginTaskStep(
+                        currentId++,
+                        task.getInputs(),
+                        task.getPreTaskActionData(),
+                        task.getRefId(),
+                        taskName)
+        );
 
         //End Task
         Map<String, ResultNavigation> navigationValues = new HashMap<>();
@@ -115,20 +134,64 @@ public class ExecutionPlanBuilder {
                 if(nextTaskToCompile == null){
                     throw new RuntimeException("Failed to compile task: " + taskName + ". The task/result name: " + entry.getValue() + " of navigation: " + entry.getKey() + " -> " + entry.getValue() + " is missing");
                 }
-                taskExecutionSteps.addAll(buildTaskExecutionSteps(nextTaskToCompile, taskReferences, tasks));
+                taskExecutionSteps.addAll(buildTaskExecutionSteps(nextTaskToCompile, taskReferences, tasks, compiledFlow));
             }
 			long nextStepId = taskReferences.get(nextStepName);
 			String presetResult = (FLOW_END_STEP_ID == nextStepId) ? nextStepName : null;
 			navigationValues.put(entry.getKey(), new ResultNavigation(nextStepId, presetResult));
         }
-        taskExecutionSteps.add(stepFactory.createFinishTaskStep(currentId, task.getPostTaskActionData(),
-                navigationValues, taskName));
+        if (isAsync) {
+            taskExecutionSteps.add(
+                    stepFactory.createFinishTaskStep(
+                            currentId++,
+                            task.getPostTaskActionData(),
+                            new HashMap<String, ResultNavigation>(),
+                            taskName,
+                            true)
+            );
+            taskExecutionSteps.add(
+                    stepFactory.createJoinBranchesStep(
+                            currentId,
+                            task.getPostTaskActionData(),
+                            navigationValues,
+                            taskName)
+            );
+        } else {
+            taskExecutionSteps.add(
+                    stepFactory.createFinishTaskStep(
+                            currentId,
+                            task.getPostTaskActionData(),
+                            navigationValues,
+                            taskName,
+                            false)
+            );
+        }
         return taskExecutionSteps;
     }
 
-    private Long getCurrentId(Map<String, Long> taskReferences) {
+    private Long getCurrentId(Map<String, Long> taskReferences, Deque<Task> tasks) {
+        Long currentID;
+
         Long max = Lambda.max(taskReferences);
-        return max + NUMBER_OF_TASK_EXECUTION_STEPS;
+        Map.Entry maxEntry = Lambda.selectFirst(taskReferences.entrySet(), having(on(Map.Entry.class).getValue(), equalTo(max)));
+        String referenceKey = (String) (maxEntry).getKey();
+        Task task = null;
+        for (Task taskItem : tasks) {
+            if (taskItem.getName().equals(referenceKey)) {
+                task = taskItem;
+                break;
+            }
+        }
+
+        if (task == null || !task.isAsync()) {
+            // the reference is not a task or is not an async task
+            currentID = max + NUMBER_OF_TASK_EXECUTION_STEPS;
+        } else {
+            //async task
+            currentID = max + NUMBER_OF_TASK_EXECUTION_STEPS + NUMBER_OF_ASYNC_LOOP_EXECUTION_STEPS;
+        }
+
+        return currentID;
     }
 
 }

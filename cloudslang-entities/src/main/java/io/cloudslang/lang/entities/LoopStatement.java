@@ -13,27 +13,28 @@ import org.apache.commons.lang3.Validate;
 
 import java.io.Serializable;
 
-public abstract class ForLoopStatement implements Serializable{
+/**
+ * Date: 3/25/2015
+ *
+ * @author Bonczidai Levente
+ */
+public abstract class LoopStatement implements Serializable {
+    private final String expression;
 
-    private static final long serialVersionUID = -1467375536631244911L;
+    public LoopStatement(String expression) {
+        Validate.notBlank(expression, "loop expression cannot be empty");
 
-    private final String collectionExpression;
-
-    public ForLoopStatement(String collectionExpression) {
-        Validate.notBlank(collectionExpression, "for loop collection expression cannot be empty");
-
-        this.collectionExpression = collectionExpression;
+        this.expression = expression;
     }
 
     /**
      * only here to satisfy serialization libraries
      */
-    protected ForLoopStatement() {
-        collectionExpression = null;
+    protected LoopStatement() {
+        expression = null;
     }
 
-    public String getCollectionExpression() {
-        return collectionExpression;
+    public String getExpression() {
+        return expression;
     }
-
 }

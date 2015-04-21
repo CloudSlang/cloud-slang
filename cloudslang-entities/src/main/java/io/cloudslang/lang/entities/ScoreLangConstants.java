@@ -44,6 +44,12 @@ public interface ScoreLangConstants {
     String LOOP_KEY = "loop";
     String BREAK_LOOP_KEY = "breakOn";
 
+    // async loop
+    String ASYNC_LOOP_KEY = "async_loop";
+    String ASYNC_LOOP_STATEMENT_KEY = "asyncLoopStatement";
+    String TASK_AGGREGATE_KEY = "taskAggregateValues";
+    String BRANCH_BEGIN_STEP_ID_KEY = "branchBeginStep";
+
     // Events types
 	String SLANG_EXECUTION_EXCEPTION = "SLANG_EXECUTION_EXCEPTION";
 	String EVENT_ACTION_START = "EVENT_ACTION_START";
@@ -54,6 +60,12 @@ public interface ScoreLangConstants {
 	String EVENT_OUTPUT_START = "EVENT_OUTPUT_START";
 	String EVENT_OUTPUT_END = "EVENT_OUTPUT_END";
     String EVENT_EXECUTION_FINISHED = "EVENT_EXECUTION_FINISHED";
+    String EVENT_BRANCH_START = "EVENT_BRANCH_START";
+    String EVENT_BRANCH_END = "EVENT_BRANCH_END";
+    String EVENT_ASYNC_LOOP_EXPRESSION_START = "EVENT_ASYNC_LOOP_EXPRESSION_START";
+    String EVENT_ASYNC_LOOP_EXPRESSION_END = "EVENT_ASYNC_LOOP_EXPRESSION_END";
+    String EVENT_ASYNC_LOOP_OUTPUT_START = "EVENT_ASYNC_LOOP_OUTPUT_START";
+    String EVENT_ASYNC_LOOP_OUTPUT_END = "EVENT_ASYNC_LOOP_OUTPUT_END";
 
     // results
     String SUCCESS_RESULT = "SUCCESS";
