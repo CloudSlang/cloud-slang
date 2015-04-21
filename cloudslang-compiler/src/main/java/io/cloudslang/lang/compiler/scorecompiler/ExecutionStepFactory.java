@@ -39,6 +39,7 @@ public class ExecutionStepFactory {
     private static final String TASK_STEPS_CLASS = STEPS_PACKAGE + ".TaskSteps";
     private static final String OPERATION_STEPS_CLASS = STEPS_PACKAGE + ".ExecutableSteps";
     private static final String ACTION_STEPS_CLASS = STEPS_PACKAGE + ".ActionSteps";
+    private static final String ASYNC_LOOP_STEPS_CLASS = STEPS_PACKAGE + ".AsyncLoopSteps";
     private static final String NAVIGATION_ACTIONS_CLASS = "io.cloudslang.lang.runtime.navigations.Navigations";
     private static final String SIMPLE_NAVIGATION_METHOD = "navigate";
 
@@ -56,7 +57,7 @@ public class ExecutionStepFactory {
     }
 
     public ExecutionStep createFinishTaskStep(Long index, Map<String, Serializable> postTaskData,
-                                              Map<String, ResultNavigation> navigationValues, String taskName) {
+                                              Map<String, ResultNavigation> navigationValues, String taskName, boolean isAsync) {
         Validate.notNull(postTaskData, "postTaskData is null");
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.TASK_PUBLISH_KEY, postTaskData.get(SlangTextualKeys.PUBLISH_KEY));
@@ -65,6 +66,7 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.TASK_NAVIGATION_KEY, new HashMap<>(navigationValues));
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, taskName);
+        actionData.put(ScoreLangConstants.ASYNC_LOOP_KEY, isAsync);
         ExecutionStep finishTask = createGeneralStep(index, TASK_STEPS_CLASS, "endTask", actionData);
         finishTask.setNavigationData(null);
         return finishTask;
@@ -121,6 +123,30 @@ public class ExecutionStepFactory {
         return createGeneralStep(index, OPERATION_STEPS_CLASS, "finishExecutable", actionData);
     }
 
+    public ExecutionStep createAddBranchesStep(Long currentStepID, Long nextStepID, Long branchBeginStepID, Map<String, Serializable> preTaskData, String refId, String taskName) {
+        Validate.notNull(preTaskData, "preTaskData is null");
+        Map<String, Serializable> actionData = new HashMap<>();
+        actionData.put(ScoreLangConstants.NODE_NAME_KEY, taskName);
+        actionData.put(ScoreLangConstants.REF_ID, refId);
+        actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, nextStepID);
+        actionData.put(ScoreLangConstants.BRANCH_BEGIN_STEP_ID_KEY, branchBeginStepID);
+        actionData.put(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY, preTaskData.get(ScoreLangConstants.ASYNC_LOOP_KEY));
+        ExecutionStep executionStep = createGeneralStep(currentStepID, ASYNC_LOOP_STEPS_CLASS, "addBranches", actionData);
+        executionStep.setSplitStep(true);
+        return executionStep;
+    }
+
+    public ExecutionStep createJoinBranchesStep(Long index, Map<String, Serializable> postTaskData,
+                                                Map<String, ResultNavigation> navigationValues, String taskName) {
+        Validate.notNull(postTaskData, "postTaskData is null");
+        Validate.notNull(navigationValues, "navigationValues is null");
+        Map<String, Serializable> actionData = new HashMap<>();
+        actionData.put(ScoreLangConstants.TASK_AGGREGATE_KEY, postTaskData.get(SlangTextualKeys.AGGREGATE_KEY));
+        actionData.put(ScoreLangConstants.TASK_NAVIGATION_KEY, new HashMap<>(navigationValues));
+        actionData.put(ScoreLangConstants.NODE_NAME_KEY, taskName);
+
+        return createGeneralStep(index, ASYNC_LOOP_STEPS_CLASS, "joinBranches", actionData);
+    }
 
     private ExecutionStep createGeneralStep(
             Long stepId,

@@ -36,17 +36,17 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
-public class CompileLoopsFlowTest {
+public class CompileForLoopsFlowTest {
 
     @Autowired
     private SlangCompiler compiler;
 
-    public static ListForLoopStatement validateListForLoopStatement(ForLoopStatement statement) {
+    public static ListForLoopStatement validateListForLoopStatement(LoopStatement statement) {
         Assert.assertEquals(true, statement instanceof ListForLoopStatement);
         return (ListForLoopStatement) statement;
     }
 
-    public static MapForLoopStatement validateMapForLoopStatement(ForLoopStatement statement) {
+    public static MapForLoopStatement validateMapForLoopStatement(LoopStatement statement) {
         Assert.assertEquals(true, statement instanceof MapForLoopStatement);
         return (MapForLoopStatement) statement;
     }
@@ -60,10 +60,10 @@ public class CompileLoopsFlowTest {
                                         .getTasks()
                                         .getFirst();
         assertTrue(task.getPreTaskActionData().containsKey(SlangTextualKeys.FOR_KEY));
-        ForLoopStatement forStatement = (ForLoopStatement) task.getPreTaskActionData()
+        LoopStatement forStatement = (LoopStatement) task.getPreTaskActionData()
                                 .get(SlangTextualKeys.FOR_KEY);
         ListForLoopStatement listForLoopStatement  = validateListForLoopStatement(forStatement);
-        assertEquals("values", listForLoopStatement.getCollectionExpression());
+        assertEquals("values", listForLoopStatement.getExpression());
         assertEquals("value", listForLoopStatement.getVarName());
         @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) task.getPostTaskActionData()
                                   .get(SlangTextualKeys.PUBLISH_KEY);
@@ -95,10 +95,10 @@ public class CompileLoopsFlowTest {
                                        .getTasks()
                                        .getFirst();
         assertTrue(task.getPreTaskActionData().containsKey(SlangTextualKeys.FOR_KEY));
-        ForLoopStatement forStatement = (ForLoopStatement) task.getPreTaskActionData()
+        LoopStatement forStatement = (LoopStatement) task.getPreTaskActionData()
                                                          .get(SlangTextualKeys.FOR_KEY);
         ListForLoopStatement listForLoopStatement  = validateListForLoopStatement(forStatement);
-        assertEquals("values", listForLoopStatement.getCollectionExpression());
+        assertEquals("values", listForLoopStatement.getExpression());
         assertEquals("value", listForLoopStatement.getVarName());
         @SuppressWarnings("unchecked") Map<String, String> actual = (Map<String, String>) task.getPostTaskActionData()
                                                                                 .get(SlangTextualKeys.NAVIGATION_KEY);
@@ -118,9 +118,9 @@ public class CompileLoopsFlowTest {
         Map<String, ?> startTaskActionData = executionPlan.getStep(2L)
                                                  .getActionData();
         assertTrue(startTaskActionData.containsKey(ScoreLangConstants.LOOP_KEY));
-        ForLoopStatement forStatement = (ForLoopStatement) startTaskActionData.get(ScoreLangConstants.LOOP_KEY);
+        LoopStatement forStatement = (LoopStatement) startTaskActionData.get(ScoreLangConstants.LOOP_KEY);
         ListForLoopStatement listForLoopStatement  = validateListForLoopStatement(forStatement);
-        assertEquals("values", listForLoopStatement.getCollectionExpression());
+        assertEquals("values", listForLoopStatement.getExpression());
         assertEquals("value", listForLoopStatement.getVarName());
 
         Map<String, ?> endTaskActionData = executionPlan.getStep(3L)
@@ -154,10 +154,10 @@ public class CompileLoopsFlowTest {
                 .getTasks()
                 .getFirst();
         assertTrue(task.getPreTaskActionData().containsKey(SlangTextualKeys.FOR_KEY));
-        ForLoopStatement forStatement = (ForLoopStatement) task.getPreTaskActionData()
+        LoopStatement forStatement = (LoopStatement) task.getPreTaskActionData()
                 .get(SlangTextualKeys.FOR_KEY);
         MapForLoopStatement mapForLoopStatement  = validateMapForLoopStatement(forStatement);
-        assertEquals("person_map", mapForLoopStatement.getCollectionExpression());
+        assertEquals("person_map", mapForLoopStatement.getExpression());
         assertEquals("k", mapForLoopStatement.getKeyName());
         assertEquals("v", mapForLoopStatement.getValueName());
         @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) task.getPostTaskActionData()
@@ -189,10 +189,10 @@ public class CompileLoopsFlowTest {
                 .getTasks()
                 .getFirst();
         assertTrue(task.getPreTaskActionData().containsKey(SlangTextualKeys.FOR_KEY));
-        ForLoopStatement forStatement = (ForLoopStatement) task.getPreTaskActionData()
+        LoopStatement forStatement = (LoopStatement) task.getPreTaskActionData()
                 .get(SlangTextualKeys.FOR_KEY);
         MapForLoopStatement mapForLoopStatement  = validateMapForLoopStatement(forStatement);
-        assertEquals("person_map", mapForLoopStatement.getCollectionExpression());
+        assertEquals("person_map", mapForLoopStatement.getExpression());
         assertEquals("k", mapForLoopStatement.getKeyName());
         assertEquals("v", mapForLoopStatement.getValueName());
         @SuppressWarnings("unchecked") Map<String, String> actual = (Map<String, String>) task.getPostTaskActionData()
@@ -213,9 +213,9 @@ public class CompileLoopsFlowTest {
         Map<String, ?> startTaskActionData = executionPlan.getStep(2L)
                 .getActionData();
         assertTrue(startTaskActionData.containsKey(ScoreLangConstants.LOOP_KEY));
-        ForLoopStatement forStatement = (ForLoopStatement) startTaskActionData.get(ScoreLangConstants.LOOP_KEY);
+        LoopStatement forStatement = (LoopStatement) startTaskActionData.get(ScoreLangConstants.LOOP_KEY);
         MapForLoopStatement mapForLoopStatement  = validateMapForLoopStatement(forStatement);
-        assertEquals("person_map", mapForLoopStatement.getCollectionExpression());
+        assertEquals("person_map", mapForLoopStatement.getExpression());
         assertEquals("k", mapForLoopStatement.getKeyName());
         assertEquals("v", mapForLoopStatement.getValueName());
 

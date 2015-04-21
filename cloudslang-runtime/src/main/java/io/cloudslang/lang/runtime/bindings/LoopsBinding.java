@@ -13,7 +13,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
 import io.cloudslang.lang.entities.MapForLoopStatement;
 import io.cloudslang.lang.runtime.env.LoopCondition;
-import io.cloudslang.lang.entities.ForLoopStatement;
+import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ForLoopCondition;
 import org.python.core.PyObject;
@@ -29,6 +29,8 @@ import java.util.Set;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import static io.cloudslang.lang.runtime.env.LoopCondition.LOOP_CONDITION_KEY;
+
 @Component
 public class LoopsBinding {
 
@@ -37,17 +39,17 @@ public class LoopsBinding {
     @Autowired
     private ScriptEvaluator scriptEvaluator;
 
-    public LoopCondition getOrCreateLoopCondition(ForLoopStatement forLoopStatement, Context flowContext, String nodeName) {
+    public LoopCondition getOrCreateLoopCondition(LoopStatement forLoopStatement, Context flowContext, String nodeName) {
         Validate.notNull(forLoopStatement, "loop statement cannot be null");
         Validate.notNull(flowContext, "flow context cannot be null");
         Validate.notNull(nodeName, "node name cannot be null");
 
         Map<String, Serializable> langVariables = flowContext.getLangVariables();
-        if (!langVariables.containsKey(LoopCondition.LOOP_CONDITION_KEY)) {
+        if (!langVariables.containsKey(LOOP_CONDITION_KEY)) {
             LoopCondition loopCondition = createForLoopCondition(forLoopStatement, flowContext, nodeName);
-            langVariables.put(LoopCondition.LOOP_CONDITION_KEY, loopCondition);
+            langVariables.put(LOOP_CONDITION_KEY, loopCondition);
         }
-        return (LoopCondition) langVariables.get(LoopCondition.LOOP_CONDITION_KEY);
+        return (LoopCondition) langVariables.get(LOOP_CONDITION_KEY);
     }
 
     public void incrementListForLoop(String varName, Context flowContext, ForLoopCondition forLoopCondition) {
@@ -76,10 +78,10 @@ public class LoopsBinding {
         logger.debug("value name: " + keyName + ", value: " + valueFromIteration);
     }
 
-    private LoopCondition createForLoopCondition(ForLoopStatement forLoopStatement, Context flowContext, String nodeName) {
+    private LoopCondition createForLoopCondition(LoopStatement forLoopStatement, Context flowContext, String nodeName) {
         Map<String, Serializable> variables = flowContext.getImmutableViewOfVariables();
         Serializable evalResult;
-        String collectionExpression = forLoopStatement.getCollectionExpression();
+        String collectionExpression = forLoopStatement.getExpression();
         try {
             evalResult = scriptEvaluator.evalExpr(collectionExpression, variables);
         } catch (Throwable t) {

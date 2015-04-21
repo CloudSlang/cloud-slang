@@ -20,7 +20,7 @@ import java.io.Serializable;
  *
  * @author Bonczidai Levente
  */
-public class MapForLoopStatement extends ForLoopStatement implements Serializable{
+public class MapForLoopStatement extends LoopStatement implements Serializable{
 
     private static final long serialVersionUID = -667210580560286978L;
 
@@ -65,7 +65,7 @@ public class MapForLoopStatement extends ForLoopStatement implements Serializabl
         return new EqualsBuilder()
                 .append(keyName, that.keyName)
                 .append(valueName, that.valueName)
-                .append(getCollectionExpression(), that.getCollectionExpression())
+                .append(getExpression(), that.getExpression())
                 .isEquals();
     }
 
@@ -74,7 +74,7 @@ public class MapForLoopStatement extends ForLoopStatement implements Serializabl
         return new HashCodeBuilder()
                 .append(keyName)
                 .append(valueName)
-                .append(getCollectionExpression())
+                .append(getExpression())
                 .toHashCode();
     }
 

@@ -20,24 +20,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static com.google.common.collect.Sets.newHashSet;
-
 public class TriggerFlows {
 
-    private final static HashSet<String> FINISHED_EVENT =
+    private final static HashSet<String> FINISHED_EVENTS =
             Sets.newHashSet(ScoreLangConstants.EVENT_EXECUTION_FINISHED, ScoreLangConstants.SLANG_EXECUTION_EXCEPTION);
 
     private final static HashSet<String> STEP_EVENTS =
             Sets.newHashSet(ScoreLangConstants.EVENT_INPUT_END, ScoreLangConstants.EVENT_OUTPUT_END);
 
+    private final static HashSet<String> BRANCH_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_BRANCH_END);
+
+    private final static HashSet<String> ASYNC_LOOP_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_ASYNC_LOOP_OUTPUT_END);
+
     @Autowired
     private Slang slang;
 
-    public ScoreEvent runSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> systemProperties) {
+    public ScoreEvent runSync(
+            CompilationArtifact compilationArtifact,
+            Map<String, ? extends Serializable> userInputs,
+            Map<String, ? extends Serializable> systemProperties) {
         final BlockingQueue<ScoreEvent> finishEvent = new LinkedBlockingQueue<>();
         ScoreEventListener finishListener = new ScoreEventListener() {
             @Override
@@ -45,7 +51,7 @@ public class TriggerFlows {
                 finishEvent.add(event);
             }
         };
-        slang.subscribeOnEvents(finishListener, FINISHED_EVENT);
+        slang.subscribeOnEvents(finishListener, FINISHED_EVENTS);
 
         slang.run(compilationArtifact, userInputs, systemProperties);
 
@@ -62,9 +68,15 @@ public class TriggerFlows {
         }
     }
 
-    public Map<String, StepData> runWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> systemProperties) {
-        RunDataAggregatorListener listener = new RunDataAggregatorListener();
-        slang.subscribeOnEvents(listener, STEP_EVENTS);
+    public RuntimeInformation runWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> systemProperties) {
+        RunDataAggregatorListener runDataAggregatorListener = new RunDataAggregatorListener();
+        slang.subscribeOnEvents(runDataAggregatorListener, STEP_EVENTS);
+
+        BranchAggregatorListener branchAggregatorListener = new BranchAggregatorListener();
+        slang.subscribeOnEvents(branchAggregatorListener, BRANCH_EVENTS);
+
+        JoinAggregatorListener joinAggregatorListener = new JoinAggregatorListener();
+        slang.subscribeOnEvents(joinAggregatorListener, ASYNC_LOOP_EVENTS);
 
         try {
             Thread.sleep(2000L);      /* TODO : remove this! only to test unstable navigation tests*/
@@ -80,11 +92,17 @@ public class TriggerFlows {
             e.printStackTrace();
         }
 
-        Map<String, StepData> tasks = listener.aggregate();
+        Map<String, StepData> tasks = runDataAggregatorListener.aggregate();
+        Map<String, List<StepData>> branchesByPath = branchAggregatorListener.aggregate();
+        Map<String, StepData> asyncTasks = joinAggregatorListener.aggregate();
 
-        slang.unSubscribeOnEvents(listener);
+        RuntimeInformation runtimeInformation = new RuntimeInformation(tasks, branchesByPath, asyncTasks);
 
-        return tasks;
+        slang.unSubscribeOnEvents(joinAggregatorListener);
+        slang.unSubscribeOnEvents(branchAggregatorListener);
+        slang.unSubscribeOnEvents(runDataAggregatorListener);
+
+        return runtimeInformation;
     }
 
 }

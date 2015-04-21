@@ -51,12 +51,20 @@ public class ExecutionPath implements Serializable {
 	}
 
 	public String getCurrentPath() {
-		StringBuilder result = new StringBuilder();
-		for(Iterator<Integer> iterator = parentPositions.descendingIterator(); iterator.hasNext();) {
-			result.append(iterator.next()).append(PATH_SEPARATOR);
-		}
-		result.append(position);
-		return result.toString();
+        return getCurrentPath(position);
 	}
+
+    public String getCurrentPathPeekForward() {
+        return getCurrentPath(position + 1);
+    }
+
+    private String getCurrentPath(int position) {
+        StringBuilder result = new StringBuilder();
+        for(Iterator<Integer> iterator = parentPositions.descendingIterator(); iterator.hasNext();) {
+            result.append(iterator.next()).append(PATH_SEPARATOR);
+        }
+        result.append(position);
+        return result.toString();
+    }
 
 }

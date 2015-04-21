@@ -20,7 +20,7 @@ import java.io.Serializable;
  *
  * @author Bonczidai Levente
  */
-public class ListForLoopStatement extends ForLoopStatement implements Serializable{
+public class ListForLoopStatement extends LoopStatement implements Serializable {
 
     private static final long serialVersionUID = -540865117927676643L;
 
@@ -56,7 +56,7 @@ public class ListForLoopStatement extends ForLoopStatement implements Serializab
 
         return new EqualsBuilder()
                 .append(varName, that.varName)
-                .append(getCollectionExpression(), that.getCollectionExpression())
+                .append(getExpression(), that.getExpression())
                 .isEquals();
     }
 
@@ -64,7 +64,7 @@ public class ListForLoopStatement extends ForLoopStatement implements Serializab
     public int hashCode() {
         return new HashCodeBuilder()
                 .append(varName)
-                .append(getCollectionExpression())
+                .append(getExpression())
                 .toHashCode();
     }
 

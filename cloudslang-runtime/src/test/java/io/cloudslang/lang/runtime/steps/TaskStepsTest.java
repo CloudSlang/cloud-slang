@@ -24,7 +24,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
-import io.cloudslang.lang.entities.ForLoopStatement;
+import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
@@ -83,7 +83,7 @@ public class TaskStepsTest {
         return runEnvironment;
     }
 
-    private ForLoopStatement createBasicForStatement(String varName, String collectionExpression) {
+    private LoopStatement createBasicForStatement(String varName, String collectionExpression) {
         return new ListForLoopStatement(varName, collectionExpression);
     }
 
@@ -164,7 +164,7 @@ public class TaskStepsTest {
         HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
         taskNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, new ResultNavigation(0, ScoreLangConstants.SUCCESS_RESULT));
         taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
-                runtimeServices, 1L, new ArrayList<String>(), "task1");
+                runtimeServices, 1L, new ArrayList<String>(), "task1", false);
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
         Assert.assertEquals(2,events.size());
@@ -200,7 +200,7 @@ public class TaskStepsTest {
         HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
         taskNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, new ResultNavigation(0, ScoreLangConstants.SUCCESS_RESULT));
         taskSteps.endTask(runEnv, possiblePublishValues, taskNavigationValues,
-                createRuntimeServices(), 1L, new ArrayList<String>(), "task1");
+                createRuntimeServices(), 1L, new ArrayList<String>(), "task1", false);
 
         Map<String,Serializable> flowVars = runEnv.getStack().popContext().getImmutableViewOfVariables();
         Assert.assertTrue(flowVars.containsKey("name"));
@@ -223,7 +223,7 @@ public class TaskStepsTest {
         ResultNavigation failureNavigation = new ResultNavigation(1, null);
         taskNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
         taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
-                createRuntimeServices(), 1L, new ArrayList<String>(),"task1");
+                createRuntimeServices(), 1L, new ArrayList<String>(),"task1", false);
 
         Assert.assertEquals(runEnv.removeNextStepPosition(), nextStepPosition);
     }
@@ -248,7 +248,36 @@ public class TaskStepsTest {
         exception.expectMessage("CUSTOM");
         exception.expectMessage("navigation");
         taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
-                createRuntimeServices(), 1L, new ArrayList<String>(), "Task1");
+                createRuntimeServices(), 1L, new ArrayList<String>(), "Task1", false);
+    }
+
+    @Test
+    public void testEndTaskAsyncLoopReturnValues() throws Exception {
+        RunEnvironment runEnv = createRunEnvironment();
+        String result = ScoreLangConstants.SUCCESS_RESULT;
+        Context context = new Context(new HashMap<String, Serializable>());
+        runEnv.getStack().pushContext(context);
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, Serializable>(), result));
+        Long nextStepPosition = 5L;
+
+        HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
+        ResultNavigation successNavigation = new ResultNavigation(nextStepPosition, "CUSTOM1");
+        taskNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
+        ResultNavigation failureNavigation = new ResultNavigation(1, "CUSTOM2");
+        taskNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
+        taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
+                createRuntimeServices(), 1L, new ArrayList<String>(),"task1", true);
+
+        Assert.assertEquals(
+                "next step position should be null for async endTask method",
+                null,
+                runEnv.removeNextStepPosition()
+        );
+        Assert.assertEquals(
+                "executable result should be returned in async endTask method",
+                ScoreLangConstants.SUCCESS_RESULT,
+                runEnv.removeReturnValues().getResult()
+        );
     }
 
     /////////
@@ -258,7 +287,7 @@ public class TaskStepsTest {
     @Test
     public void whenLoopKeyProvidedLoopConditionIsRequested(){
         String collectionExpression = "collection";
-        ForLoopStatement statement = createBasicForStatement("x", collectionExpression);
+        LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         when(loopsBinding.getOrCreateLoopCondition(statement, context, nodeName))
@@ -272,7 +301,7 @@ public class TaskStepsTest {
     @Test
     public void whenLoopConditionHasNoMoreNextStepIdSetToEndTask(){
         String collectionExpression = "collection";
-        ForLoopStatement statement = createBasicForStatement("x", collectionExpression);
+        LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
@@ -292,7 +321,7 @@ public class TaskStepsTest {
     @Test
     public void whenLoopConditionHasMoreNextStepIdSetToEndTask(){
         String collectionExpression = "collection";
-        ForLoopStatement statement = createBasicForStatement("x", collectionExpression);
+        LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
@@ -314,7 +343,7 @@ public class TaskStepsTest {
     @Test
     public void whenLoopConditionIsOfForTypeStartTaskWillIncrementIt(){
         String collectionExpression = "collection";
-        ForLoopStatement statement = createBasicForStatement("x", collectionExpression);
+        LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         ForLoopCondition mockLoopCondition = mock(ForLoopCondition.class);
@@ -341,7 +370,7 @@ public class TaskStepsTest {
 
         Long previousStepId = 1L;
         taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
-                createRuntimeServices(), previousStepId, new ArrayList<String>(),"taskName");
+                createRuntimeServices(), previousStepId, new ArrayList<String>(),"taskName", false);
 
         Assert.assertEquals(previousStepId, runEnv.removeNextStepPosition());
         Assert.assertEquals(context, runEnv.getStack().popContext());
@@ -362,7 +391,7 @@ public class TaskStepsTest {
 
         Long previousStepId = 1L;
         taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
-                createRuntimeServices(), previousStepId, Arrays.asList(ScoreLangConstants.SUCCESS_RESULT),"taskName");
+                createRuntimeServices(), previousStepId, Arrays.asList(ScoreLangConstants.SUCCESS_RESULT),"taskName", false);
 
         Assert.assertEquals(nextStepId, runEnv.removeNextStepPosition());
         Assert.assertFalse(context.getLangVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
@@ -381,7 +410,7 @@ public class TaskStepsTest {
         when(mockLoopCondition.hasMore()).thenReturn(false);
 
         taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
-                createRuntimeServices(), 1L,  new ArrayList<String>(), "taskName");
+                createRuntimeServices(), 1L,  new ArrayList<String>(), "taskName", false);
 
         Assert.assertFalse(context.getLangVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
     }

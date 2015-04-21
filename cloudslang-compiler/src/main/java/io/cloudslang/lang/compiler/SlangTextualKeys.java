@@ -39,6 +39,7 @@ public interface SlangTextualKeys {
     String BREAK_KEY = "break";
     String PUBLISH_KEY = "publish";
     String NAVIGATION_KEY = "navigate";
+    String AGGREGATE_KEY = "aggregate";
 
     //inputs
     String DEFAULT_KEY = "default";

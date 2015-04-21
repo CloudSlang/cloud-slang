@@ -82,6 +82,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         });
         Collection<Executable> executables = new ArrayList<>(filteredDependencies.values());
         executables.add(executable);
+
         executionPlan.setSubflowsUUIDs(new HashSet<>(dependencies.keySet()));
         return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemProperties(executables));
     }

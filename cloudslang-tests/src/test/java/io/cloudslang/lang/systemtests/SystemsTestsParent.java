@@ -43,7 +43,7 @@ public abstract class SystemsTestsParent {
         return triggerFlows.runSync(compilationArtifact, userInputs, systemProperties);
     }
 
-	public Map<String, StepData> triggerWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> systemProperties) {
+	public RuntimeInformation triggerWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> systemProperties) {
 		return triggerFlows.runWithData(compilationArtifact, userInputs, systemProperties);
 	}
 
