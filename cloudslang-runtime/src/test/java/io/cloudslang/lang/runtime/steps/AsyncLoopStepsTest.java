@@ -159,7 +159,7 @@ public class AsyncLoopStepsTest {
         verify(executionRuntimeServices, times(4)).addEvent(eventTypeArgumentCaptor.capture(), any(LanguageEventData.class));
 
         List<String> expectedEventTypesInOrder = Lists.newArrayList(
-                ScoreLangConstants.EVENT_ASYNC_LOOP_INPUT_END,
+                ScoreLangConstants.EVENT_ASYNC_LOOP_EXPRESSION_END,
                 ScoreLangConstants.EVENT_BRANCH_START,
                 ScoreLangConstants.EVENT_BRANCH_START,
                 ScoreLangConstants.EVENT_BRANCH_START

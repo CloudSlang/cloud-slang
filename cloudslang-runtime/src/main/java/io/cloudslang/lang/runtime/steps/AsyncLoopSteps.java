@@ -72,10 +72,10 @@ public class AsyncLoopSteps extends AbstractSteps {
 
             fireEvent(
                     executionRuntimeServices,
-                    ScoreLangConstants.EVENT_ASYNC_LOOP_INPUT_END,
-                    "async loop list evaluated",
+                    ScoreLangConstants.EVENT_ASYNC_LOOP_EXPRESSION_END,
+                    "async loop expression bound",
                     runEnv.getExecutionPath().getCurrentPathPeekForward(),
-                    Pair.of(LanguageEventData.BOUND_ASYNC_LOOP_INPUTS, (Serializable) splitData),
+                    Pair.of(LanguageEventData.BOUND_ASYNC_LOOP_EXPRESSION, (Serializable) splitData),
                     Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName));
 
             runEnv.putNextStepPosition(nextStepId);
