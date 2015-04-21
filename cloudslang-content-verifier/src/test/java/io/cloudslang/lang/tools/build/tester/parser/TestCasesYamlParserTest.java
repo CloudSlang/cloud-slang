@@ -14,7 +14,9 @@ import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -42,6 +44,17 @@ public class TestCasesYamlParserTest {
     @Autowired
     private TestCasesYamlParser parser;
 
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
+    @Test
+    public void emptyTestCaseFileParsing() throws Exception{
+        String filePath = "/test/invalid/empty_file.inputs.yaml";
+        URI fileUri = getClass().getResource(filePath).toURI();
+        Map<String, SlangTestCase> testCases = parser.parseTestCases(SlangSource.fromFile(fileUri));
+        Assert.assertEquals("There should have been no test cases in the file", 0 ,testCases.size());
+    }
+
     @Test
     public void testSimpleTestCasesParsing() throws URISyntaxException {
         String filePath = "/test/base/test_print_text-SUCCESS.inputs.yaml";
@@ -56,6 +69,44 @@ public class TestCasesYamlParserTest {
         Assert.assertEquals(expectedInputsList, testPrintFinishesWithSuccess.getInputs());
     }
 
+    @Test
+    public void testCaseFileParsingForNonTestCasesFile() throws Exception{
+        String filePath = "/content/base/properties.yaml";
+        URI fileUri = getClass().getResource(filePath).toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("problem");
+        exception.expectMessage("parsing");
+        exception.expectMessage("properties.yaml");
+        parser.parseTestCases(SlangSource.fromFile(fileUri));
+    }
+
+    @Test
+    public void illegalTestCaseFileParsing() throws Exception{
+        String filePath = "/test/invalid/invalid_test_case.yaml";
+        URI fileUri = getClass().getResource(filePath).toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("slang");
+        exception.expectMessage("parsing");
+        exception.expectMessage("invalid_test_case.yaml");
+        parser.parseTestCases(SlangSource.fromFile(fileUri));
+    }
+
+    @Test
+    public void parseSystemPropertiesFile() throws Exception{
+        String filePath = System.getProperty("user.dir") + "/cloudslang-content-verifier/src/test/resources/content/base/properties.yaml";
+        Map<String, Serializable> sysProperties = parser.parseProperties(filePath);
+        Assert.assertEquals("One system property should be parsed", 1, sysProperties.size());
+    }
+
+    @Test
+    public void parseNotFoundSystemPropertiesFile(){
+        String filePath = "wrongPath";
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Error");
+        exception.expectMessage("loading");
+        exception.expectMessage("wrongPath");
+        parser.parseProperties(filePath);
+    }
 
     @Configuration
     static class Config {

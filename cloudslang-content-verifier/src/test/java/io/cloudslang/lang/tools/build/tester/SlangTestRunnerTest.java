@@ -28,6 +28,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -149,13 +150,90 @@ public class SlangTestRunnerTest {
     }
 
     @Test
-    public void runTestCaseWithCompiledFlow(){
+    public void runTestCase(){
         Map<String, SlangTestCase> testCases = new HashMap<>();
         SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", null, null, null, null, null, null, null);
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
+        prepareMockForEventListenerWithSuccessResult();
+        Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", testCases, compiledFlows, null);
+        Assert.assertEquals("No test cases should fail", 0, failedTests.size());
+    }
 
+    @Test
+    public void runTestCaseWithEmptyOutputs(){
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, new ArrayList<Map>(), false, null);
+        testCases.put("test1", testCase);
+        HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
+        prepareMockForEventListenerWithSuccessResult();
+        Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", testCases, compiledFlows, null);
+        Assert.assertEquals("No test cases should fail", 0, failedTests.size());
+    }
+
+    @Test
+    public void runTestCaseThatExpectsException(){
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, null, true, null);
+        testCases.put("test1", testCase);
+        HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
+        prepareMockForEventListenerWithSlangExceptionEvent();
+        Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", testCases, compiledFlows, null);
+        Assert.assertEquals("No test case should fail", 0, failedTests.size());
+    }
+
+    @Test
+    public void runFailTestCaseThatExpectsException(){
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, null, true, null);
+        testCases.put("test1", testCase);
+        HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
+        prepareMockForEventListenerWithSuccessResult();
+        Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", testCases, compiledFlows, null);
+        Assert.assertEquals("1 test case should fail", 1, failedTests.size());
+    }
+
+    @Test
+    public void runTestCaseWithUnexpectedException(){
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, null, false, null);
+        testCases.put("test1", testCase);
+        HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
+        prepareMockForEventListenerWithSlangExceptionEvent();
+        Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", testCases, compiledFlows, null);
+        Assert.assertEquals("1 test case should fail", 1, failedTests.size());
+    }
+
+    @Test
+    public void runFailTestCaseWithWrongResult(){
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, null, false, "FAILURE");
+        testCases.put("test1", testCase);
+        HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
+        prepareMockForEventListenerWithSuccessResult();
+        Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", testCases, compiledFlows, null);
+        Assert.assertEquals("1 test case should fail", 1, failedTests.size());
+    }
+
+    @Test
+    public void runTestCaseWithSystemProperties(){
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", null, null, "mock", null, null, null, null);
+        testCases.put("test1", testCase);
+        HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
+        prepareMockForEventListenerWithSuccessResult();
+        Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", testCases, compiledFlows, null);
+        Assert.assertEquals("No test cases should fail", 0, failedTests.size());
+    }
+
+    private void prepareMockForEventListenerWithSuccessResult() {
         Mockito.doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
@@ -164,8 +242,17 @@ public class SlangTestRunnerTest {
                 return listener;
             }
         }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
-        Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", testCases, compiledFlows, null);
-        Assert.assertEquals("No test cases should fail", 0, failedTests.size());
+    }
+
+    private void prepareMockForEventListenerWithSlangExceptionEvent() {
+        Mockito.doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                ScoreEventListener listener = (ScoreEventListener) invocationOnMock.getArguments()[0];
+                listener.onEvent(new ScoreEvent(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION, ImmutableMap.of(LanguageEventData.EXCEPTION, "Error")));
+                return listener;
+            }
+        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
     }
 
 

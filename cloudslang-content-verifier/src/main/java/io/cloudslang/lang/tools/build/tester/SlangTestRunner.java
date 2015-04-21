@@ -140,7 +140,6 @@ public class SlangTestRunner {
         if(StringUtils.isEmpty(systemPropertiesFile)){
             return new HashMap<>();
         }
-        StringUtils.replace(systemPropertiesFile, PROJECT_PATH_TOKEN, projectPath);
         systemPropertiesFile = StringUtils.replace(systemPropertiesFile, PROJECT_PATH_TOKEN, projectPath);
         return parser.parseProperties(systemPropertiesFile);
     }
