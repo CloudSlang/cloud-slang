@@ -122,86 +122,131 @@ public class AsyncLoopSteps extends AbstractSteps {
                              @Param(ScoreLangConstants.TASK_NAVIGATION_KEY) Map<String, ResultNavigation> taskNavigationValues,
                              @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName) {
         try {
-            List<EndBranchDataContainer> branches = executionRuntimeServices.getFinishedChildBranchesData();
             List<Map<String, Serializable>> branchesContext = Lists.newArrayList();
             Context flowContext = runEnv.getStack().popContext();
             Map<String, Serializable> contextBeforeSplit = flowContext.getImmutableViewOfVariables();
             List<String> branchesResult = Lists.newArrayList();
 
-            for (EndBranchDataContainer branch : branches) {
-                Map<String, Serializable> branchContext = branch.getContexts();
+            collectBranchesData(runEnv, executionRuntimeServices, nodeName, branchesContext, branchesResult);
 
-                RunEnvironment branchRuntimeEnvironment = (RunEnvironment) branchContext.get(ScoreLangConstants.RUN_ENV);
-
-                branchesContext.add(branchRuntimeEnvironment.getStack().popContext().getImmutableViewOfVariables());
-
-                ReturnValues executableReturnValues = branchRuntimeEnvironment.removeReturnValues();
-                branchesResult.add(executableReturnValues.getResult());
-
-                fireEvent(
-                        executionRuntimeServices,
-                        runEnv,
-                        ScoreLangConstants.EVENT_BRANCH_END,
-                        "async loop branch ended",
-                        Pair.of(RuntimeConstants.BRANCH_RETURN_VALUES_KEY, executableReturnValues),
-                        Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName)
-                );
-            }
-
-            Map<String, Serializable> aggregateContext = new HashMap<>();
-            aggregateContext.put(RuntimeConstants.BRANCHES_CONTEXT_KEY, (Serializable) branchesContext);
-
-            fireEvent(
-                    executionRuntimeServices,
-                    runEnv,
-                    ScoreLangConstants.EVENT_ASYNC_LOOP_OUTPUT_START,
-                    "Async loop output binding started",
-                    Pair.of(ScoreLangConstants.TASK_AGGREGATE_KEY, (Serializable) taskAggregateValues),
-                    Pair.of(ScoreLangConstants.TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues),
-                    Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName));
-
-            Map<String, Serializable> publishValues = outputsBinding.bindOutputs(contextBeforeSplit, aggregateContext, taskAggregateValues);
+            Map<String, Serializable> publishValues =
+                    bindAggregateOutputs(
+                            runEnv,
+                            executionRuntimeServices,
+                            taskAggregateValues,
+                            (Serializable) taskNavigationValues,
+                            nodeName, (Serializable) branchesContext,
+                            contextBeforeSplit
+                    );
 
             flowContext.putVariables(publishValues);
 
-            // if one of the branches failed then return with FAILURE, otherwise return with SUCCESS
-            String asyncLoopResult = ScoreLangConstants.SUCCESS_RESULT;
-            for (String branchResult : branchesResult) {
-                if (branchResult.equals(ScoreLangConstants.FAILURE_RESULT)) {
-                    asyncLoopResult = ScoreLangConstants.FAILURE_RESULT;
-                    break;
-                }
-            }
+            String asyncLoopResult = getAsyncLoopResult(branchesResult);
 
-            // set the position of the next step - for the use of the navigation
-            // find in the navigation values the correct next step position, according to the async loop result, and set it
-            ResultNavigation navigation = taskNavigationValues.get(asyncLoopResult);
-            if (navigation == null) {
-                // should always have the executable response mapped to a navigation by the task, if not, it is an error
-                throw new RuntimeException("Task: " + nodeName + " has no matching navigation for the async loop result: " + asyncLoopResult);
-            }
-            Long nextStepPosition = navigation.getNextStepId();
-            String presetResult = navigation.getPresetResult();
+            handleNavigationAndReturnValues(runEnv, executionRuntimeServices, taskNavigationValues, nodeName, publishValues, asyncLoopResult);
 
-            HashMap<String, Serializable> outputs = new HashMap<>(publishValues);
-            ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : asyncLoopResult);
+            runEnv.getStack().pushContext(flowContext);
+        } catch (RuntimeException e) {
+            logger.error("There was an error running the end task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
+            throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);
+        }
+    }
+
+    private void handleNavigationAndReturnValues(
+            RunEnvironment runEnv,
+            ExecutionRuntimeServices executionRuntimeServices,
+            Map<String, ResultNavigation> taskNavigationValues,
+            String nodeName,
+            Map<String, Serializable> publishValues,
+            String asyncLoopResult) {
+        // set the position of the next step - for the use of the navigation
+        // find in the navigation values the correct next step position, according to the async loop result, and set it
+        ResultNavigation navigation = taskNavigationValues.get(asyncLoopResult);
+        if (navigation == null) {
+            // should always have the executable response mapped to a navigation by the task, if not, it is an error
+            throw new RuntimeException("Task: " + nodeName + " has no matching navigation for the async loop result: " + asyncLoopResult);
+        }
+        Long nextStepPosition = navigation.getNextStepId();
+        String presetResult = navigation.getPresetResult();
+
+        HashMap<String, Serializable> outputs = new HashMap<>(publishValues);
+        ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : asyncLoopResult);
+
+        fireEvent(
+                executionRuntimeServices,
+                runEnv,
+                ScoreLangConstants.EVENT_ASYNC_LOOP_OUTPUT_END,
+                "Async loop output binding finished",
+                Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
+                Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
+                Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextStepPosition),
+                Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName));
+
+        runEnv.putReturnValues(returnValues);
+        runEnv.putNextStepPosition(nextStepPosition);
+    }
+
+    private String getAsyncLoopResult(List<String> branchesResult) {
+        // if one of the branches failed then return with FAILURE, otherwise return with SUCCESS
+        String asyncLoopResult = ScoreLangConstants.SUCCESS_RESULT;
+        for (String branchResult : branchesResult) {
+            if (branchResult.equals(ScoreLangConstants.FAILURE_RESULT)) {
+                asyncLoopResult = ScoreLangConstants.FAILURE_RESULT;
+                break;
+            }
+        }
+        return asyncLoopResult;
+    }
+
+    private Map<String, Serializable> bindAggregateOutputs(
+            RunEnvironment runEnv,
+            ExecutionRuntimeServices executionRuntimeServices,
+            List<Output> taskAggregateValues,
+            Serializable taskNavigationValues,
+            String nodeName, Serializable branchesContext,
+            Map<String, Serializable> contextBeforeSplit) {
+
+        Map<String, Serializable> aggregateContext = new HashMap<>();
+        aggregateContext.put(RuntimeConstants.BRANCHES_CONTEXT_KEY, branchesContext);
+
+        fireEvent(
+                executionRuntimeServices,
+                runEnv,
+                ScoreLangConstants.EVENT_ASYNC_LOOP_OUTPUT_START,
+                "Async loop output binding started",
+                Pair.of(ScoreLangConstants.TASK_AGGREGATE_KEY, (Serializable) taskAggregateValues),
+                Pair.of(ScoreLangConstants.TASK_NAVIGATION_KEY, taskNavigationValues),
+                Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName));
+
+        return outputsBinding.bindOutputs(contextBeforeSplit, aggregateContext, taskAggregateValues);
+    }
+
+    private void collectBranchesData(
+            RunEnvironment runEnv,
+            ExecutionRuntimeServices executionRuntimeServices,
+            String nodeName,
+            List<Map<String, Serializable>> branchesContext,
+            List<String> branchesResult) {
+
+        List<EndBranchDataContainer> branches = executionRuntimeServices.getFinishedChildBranchesData();
+        for (EndBranchDataContainer branch : branches) {
+            Map<String, Serializable> branchContext = branch.getContexts();
+
+            RunEnvironment branchRuntimeEnvironment = (RunEnvironment) branchContext.get(ScoreLangConstants.RUN_ENV);
+
+            branchesContext.add(branchRuntimeEnvironment.getStack().popContext().getImmutableViewOfVariables());
+
+            ReturnValues executableReturnValues = branchRuntimeEnvironment.removeReturnValues();
+            branchesResult.add(executableReturnValues.getResult());
 
             fireEvent(
                     executionRuntimeServices,
                     runEnv,
-                    ScoreLangConstants.EVENT_ASYNC_LOOP_OUTPUT_END,
-                    "Async loop output binding finished",
-                    Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
-                    Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
-                    Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextStepPosition),
-                    Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName));
-
-            runEnv.getStack().pushContext(flowContext);
-            runEnv.putReturnValues(returnValues);
-            runEnv.putNextStepPosition(nextStepPosition);
-        } catch (RuntimeException e) {
-            logger.error("There was an error running the end task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
-            throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);
+                    ScoreLangConstants.EVENT_BRANCH_END,
+                    "async loop branch ended",
+                    Pair.of(RuntimeConstants.BRANCH_RETURN_VALUES_KEY, executableReturnValues),
+                    Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName)
+            );
         }
     }
 
