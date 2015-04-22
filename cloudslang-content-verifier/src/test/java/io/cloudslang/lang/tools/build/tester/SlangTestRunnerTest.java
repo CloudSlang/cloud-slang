@@ -67,7 +67,7 @@ public class SlangTestRunnerTest {
 
     @Test
     public void createTestCaseWithNullTestPath() {
-        exception.expect(IllegalArgumentException.class);
+        exception.expect(NullPointerException.class);
         exception.expectMessage("path");
         slangTestRunner.createTestCases(null);
     }

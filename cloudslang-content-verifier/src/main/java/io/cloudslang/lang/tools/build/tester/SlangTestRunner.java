@@ -18,9 +18,9 @@ import io.cloudslang.score.events.EventConstants;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
@@ -231,7 +231,8 @@ public class SlangTestRunner {
                 String outputName = output.getKey();
                 Serializable outputValue = output.getValue();
                 Serializable executionOutputValue = executionOutputs.get(outputName);
-                if(!executionOutputValue.equals(outputValue.toString())){
+                if(!executionOutputs.containsKey(outputName) ||
+                        !outputsAreEqual(outputValue, executionOutputValue)){
                     message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tFor output: " + outputName+ "\n\tExpected value: " + outputValue + "\n\tActual value: " + executionOutputValue;
                     log.error(message);
                     throw new RuntimeException(message);
@@ -241,6 +242,11 @@ public class SlangTestRunner {
 
         log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with result: " + executionResult);
         return executionId;
+    }
+
+    private boolean outputsAreEqual(Serializable outputValue, Serializable executionOutputValue) {
+        return executionOutputValue == outputValue ||
+                    StringUtils.equals(executionOutputValue.toString(), outputValue.toString());
     }
 
     private Set<String> createListenerEventTypesSet() {
