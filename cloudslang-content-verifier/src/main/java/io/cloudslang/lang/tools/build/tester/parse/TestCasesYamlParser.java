@@ -85,7 +85,7 @@ public class TestCasesYamlParser {
                 result.putAll((Map<String, Serializable>) yaml.load(FileUtils.readFileToString(new File(fileName))));
             } catch (IOException ex) {
                 log.error("Error loading file: " + fileName, ex);
-                throw new RuntimeException(ex);
+                throw new RuntimeException("Error loading file: " + fileName, ex);
             }
         }
         return result;
