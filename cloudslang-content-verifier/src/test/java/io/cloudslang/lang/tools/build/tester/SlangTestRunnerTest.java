@@ -210,6 +210,26 @@ public class SlangTestRunnerTest {
     }
 
     @Test
+    public void runTestCaseWithNullValueOutput(){
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        ArrayList<Map> outputs = new ArrayList<>();
+        Map output1 = new HashMap();
+        output1.put("output1", null);
+        outputs.add(output1);
+
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, outputs, null, null);
+        testCases.put("test1", testCase);
+        HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
+        Map<String, Serializable> convertedOutputs = new HashMap<>();
+        convertedOutputs.put("output1", null);
+        prepareMockForEventListenerWithSuccessResultAndOutputs(convertedOutputs);
+        Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", testCases, compiledFlows, null);
+        //TODO: add assert after Eliya's change
+//        Assert.assertEquals("No test cases should fail", 0, failedTests.size());
+    }
+
+    @Test
     public void runTestCaseThatExpectsException(){
         Map<String, SlangTestCase> testCases = new HashMap<>();
         SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, null, true, null);
