@@ -13,6 +13,7 @@ import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
+import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
 import junit.framework.Assert;
@@ -38,9 +39,12 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anySet;
 import static org.mockito.Mockito.mock;
 
 /*
@@ -62,6 +66,9 @@ public class SlangBuildTest {
     @Autowired
     private ScoreCompiler scoreCompiler;
 
+    @Autowired
+    private SlangTestRunner slangTestRunner;
+
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
@@ -69,6 +76,7 @@ public class SlangBuildTest {
     public void resetMocks() {
         Mockito.reset(slangCompiler);
         Mockito.reset(scoreCompiler);
+        Mockito.reset(slangTestRunner);
     }
 
     @Test
@@ -128,7 +136,7 @@ public class SlangBuildTest {
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(emptyExecutable);
         Mockito.when(scoreCompiler.compile(emptyExecutable, new HashSet<Executable>())).thenThrow(new RuntimeException());
         exception.expect(RuntimeException.class);
-        slangBuilder.buildSlangContent(resource.getPath(),resource.getPath(), null, null);
+        slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null);
     }
 
     @Test
@@ -241,6 +249,22 @@ public class SlangBuildTest {
         slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null);
     }
 
+    @Test
+    public void testCompileSlangFileAndRunTests() throws Exception {
+        URI contentResource = getClass().getResource("/no_dependencies").toURI();
+        URI testResource = getClass().getResource("/test/valid").toURI();
+        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(emptyExecutable);
+        Mockito.when(scoreCompiler.compile(emptyExecutable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
+        Map<SlangTestCase, String> failedTestsMap = new HashMap<>();
+        failedTestsMap.put(new SlangTestCase("test1", "", null, null, null, null, null, null, null), "message");
+        Mockito.when(slangTestRunner.runAllTests(any(String.class), anyMap(), anyMap(), anySet())).thenReturn(failedTestsMap);
+        SlangBuildResults buildResults = slangBuilder.buildSlangContent(contentResource.getPath(), contentResource.getPath(), testResource.getPath(), null);
+        int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
+        Map<SlangTestCase, String> failedTests = buildResults.getFailedTests();
+        Assert.assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
+        Assert.assertEquals("1 test case should fail", 1, failedTests.size());
+    }
+
     @Configuration
     static class Config {
 
@@ -266,7 +290,7 @@ public class SlangBuildTest {
 
         @Bean
         public SlangTestRunner slangTestRunner() {
-            return new SlangTestRunner();
+            return mock(SlangTestRunner.class);
         }
 
         @Bean

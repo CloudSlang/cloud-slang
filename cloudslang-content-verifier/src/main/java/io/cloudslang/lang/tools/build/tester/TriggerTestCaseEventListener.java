@@ -41,19 +41,14 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class TriggerTestCaseEventListener implements ScoreEventListener {
 
-    public static final String TEST_CASE_FAILED = "Failed running test case: ";
     public static final String EXEC_START_PATH = "0";
 
 
     private AtomicBoolean flowFinished = new AtomicBoolean(false);
     private AtomicReference<String> errorMessage = new AtomicReference<>("");
-    private String testCaseName;
     private String result;
     private Map<String, Serializable> outputs = new HashMap<>();
 
-    public TriggerTestCaseEventListener(String testCaseName) {
-        this.testCaseName = testCaseName;
-    }
 
     public boolean isFlowFinished() {
         return flowFinished.get();
