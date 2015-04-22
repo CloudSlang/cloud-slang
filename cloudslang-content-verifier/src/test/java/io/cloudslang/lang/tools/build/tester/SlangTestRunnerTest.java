@@ -216,7 +216,6 @@ public class SlangTestRunnerTest {
         Map output1 = new HashMap();
         output1.put("output1", null);
         outputs.add(output1);
-
         SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, outputs, null, null);
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
@@ -225,8 +224,61 @@ public class SlangTestRunnerTest {
         convertedOutputs.put("output1", null);
         prepareMockForEventListenerWithSuccessResultAndOutputs(convertedOutputs);
         Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", testCases, compiledFlows, null);
-        //TODO: add assert after Eliya's change
-//        Assert.assertEquals("No test cases should fail", 0, failedTests.size());
+        Assert.assertEquals("No test cases should fail", 0, failedTests.size());
+    }
+
+    @Test
+    public void runTestCaseWithIntOutput(){
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        ArrayList<Map> outputs = new ArrayList<>();
+        Map output1 = new HashMap();
+        output1.put("output1", 1);
+        outputs.add(output1);
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, outputs, null, null);
+        testCases.put("test1", testCase);
+        HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
+        Map<String, Serializable> convertedOutputs = new HashMap<>();
+        convertedOutputs.put("output1", 1);
+        prepareMockForEventListenerWithSuccessResultAndOutputs(convertedOutputs);
+        Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", testCases, compiledFlows, null);
+        Assert.assertEquals("No test cases should fail", 0, failedTests.size());
+    }
+
+    @Test
+    public void runTestCaseWithWrongIntOutput(){
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        ArrayList<Map> outputs = new ArrayList<>();
+        Map output1 = new HashMap();
+        output1.put("output1", 1);
+        outputs.add(output1);
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, outputs, null, null);
+        testCases.put("test1", testCase);
+        HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
+        Map<String, Serializable> convertedOutputs = new HashMap<>();
+        convertedOutputs.put("output1", 2);
+        prepareMockForEventListenerWithSuccessResultAndOutputs(convertedOutputs);
+        Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", testCases, compiledFlows, null);
+        Assert.assertEquals("1 test cases should fail", 1, failedTests.size());
+    }
+
+    @Test
+    public void runTestCaseWithBooleanOutput(){
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        ArrayList<Map> outputs = new ArrayList<>();
+        Map output1 = new HashMap();
+        output1.put("output1", Boolean.TRUE);
+        outputs.add(output1);
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, outputs, null, null);
+        testCases.put("test1", testCase);
+        HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
+        Map<String, Serializable> convertedOutputs = new HashMap<>();
+        convertedOutputs.put("output1", Boolean.TRUE);
+        prepareMockForEventListenerWithSuccessResultAndOutputs(convertedOutputs);
+        Map<SlangTestCase, String> failedTests = slangTestRunner.runAllTests("path", testCases, compiledFlows, null);
+        Assert.assertEquals("No test cases should fail", 0, failedTests.size());
     }
 
     @Test
