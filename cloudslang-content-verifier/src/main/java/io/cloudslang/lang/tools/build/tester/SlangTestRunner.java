@@ -90,6 +90,14 @@ public class SlangTestRunner {
         return testCases;
     }
 
+    /**
+     *
+     * @param projectPath
+     * @param testCases
+     * @param compiledFlows
+     * @param testSuites
+     * @return map of failed test cases to the error message
+     */
     public Map<SlangTestCase, String> runAllTests(String projectPath, Map<String, SlangTestCase> testCases,
                             Map<String, CompilationArtifact> compiledFlows, Set<String> testSuites) {
 
@@ -183,7 +191,7 @@ public class SlangTestRunner {
         Map<String, Serializable> outputs = getTestCaseOutputsMap(testCase);
         String flowName = testCase.getTestFlowPath();
 
-        TriggerTestCaseEventListener testsEventListener = new TriggerTestCaseEventListener(testCaseName);
+        TriggerTestCaseEventListener testsEventListener = new TriggerTestCaseEventListener();
         slang.subscribeOnEvents(testsEventListener, createListenerEventTypesSet());
 
         Long executionId = slang.run(compilationArtifact, inputs, systemProperties);
