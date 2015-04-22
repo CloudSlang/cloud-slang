@@ -1,0 +1,7 @@
+testPrintPropertyWithTextInput:
+  inputs3:
+    - text: text to print
+  description: Tests that print_text operation finishes with SUCCESS
+  testFlowPath: base.print_property
+  result: SUCCESS
+
