@@ -107,16 +107,20 @@ public class SlangTestRunner {
         }
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
             SlangTestCase testCase = testCaseEntry.getValue();
-            if(testCase == null){
+            if (testCase == null) {
                 failedTestCases.put(testCase, "Test case cannot be null");
                 continue;
             }
-            log.info("Running test: " + testCaseEntry.getKey() + " - " + testCase.getDescription());
-            try {
-                CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
-                runTest(testCase, compiledTestFlow, projectPath);
-            } catch (RuntimeException e){
-                failedTestCases.put(testCase, e.getMessage());
+            if (CollectionUtils.containsAny(testSuites, testCase.getTestSuites())) {
+                log.info("Running test: " + testCaseEntry.getKey() + " - " + testCase.getDescription());
+                try {
+                    CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
+                    runTest(testCase, compiledTestFlow, projectPath);
+                } catch (RuntimeException e) {
+                    failedTestCases.put(testCase, e.getMessage());
+                }
+            } else {
+                log.info("Skipping test: " + testCaseEntry.getKey() + " because it is not in active test suites");
             }
         }
         return failedTestCases;
