@@ -3,7 +3,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.7.21-SNAPSHOT</version>
+        <version>0.7.23-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -42,6 +42,23 @@
         <dependency>
             <groupId>com.mattbertolini</groupId>
             <artifactId>liquibase-slf4j</artifactId>
+        </dependency>
+
+        <!-- content dep -->
+        <dependency>
+            <groupId>io.openscore.content</groupId>
+            <artifactId>score-ssh</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.openscore.content</groupId>
+            <artifactId>score-mail</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.openscore.content</groupId>
+            <artifactId>score-http-client</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- test -->
