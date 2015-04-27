@@ -49,6 +49,16 @@ public class SlangBuildMain {
         try {
             SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites);
             RunTestsResults runTestsResults = buildResults.getRunTestsResults();
+            Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
+            if(MapUtils.isNotEmpty(skippedTests)){
+                log.info("");
+                log.info("------------------------------------------------------------");
+                log.info("Following " + skippedTests.size() + " tests were skipped:");
+                for(Map.Entry<String, TestRun> skippedTest : skippedTests.entrySet()){
+                    String message = skippedTest.getValue().getMessage();
+                    log.info("- " + message.replaceAll("\n", "\n\t"));
+                }
+            }
             Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
             if(MapUtils.isNotEmpty(failedTests)){
                 log.error("");
@@ -64,13 +74,13 @@ public class SlangBuildMain {
                 log.error("");
                 System.exit(1);
             } else {
-                //todo: add printing of how many tests actually ran
                 log.info("");
                 log.info("------------------------------------------------------------");
                 log.info("BUILD SUCCESS");
                 log.info("------------------------------------------------------------");
                 log.info("Found " + buildResults.getNumberOfCompiledSources()
                         + " slang files under directory: \"" + projectPath + "\" and all are valid.");
+                log.info(runTestsResults.getPassedTests().size() + " test cases passed");
                 log.info("");
                 System.exit(0);
             }

@@ -100,6 +100,16 @@ public class SlangTestRunnerTest {
     }
 
     @Test
+    public void createTestCaseWithEmptyName() throws Exception {
+        URI resource = getClass().getResource("/test/valid").toURI();
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        testCases.put("", new SlangTestCase("", "path", "desc", null, null, null, null, null, null));
+        when(parser.parseTestCases(Mockito.any(SlangSource.class))).thenReturn(testCases);
+        Map<String, SlangTestCase> foundTestCases = slangTestRunner.createTestCases(resource.getPath());
+        Assert.assertEquals("1 test case was supposed to be created", 1, foundTestCases.size());
+    }
+
+    @Test
     public void createTestCaseWithPathWithValidTests() throws Exception {
         URI resource = getClass().getResource("/test/valid").toURI();
         Map<String, SlangTestCase> testCases = new HashMap<>();
