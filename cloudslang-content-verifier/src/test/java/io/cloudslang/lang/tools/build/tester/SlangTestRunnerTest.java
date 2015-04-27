@@ -390,6 +390,48 @@ public class SlangTestRunnerTest {
     }
 
     @Test
+    public void runTestCaseWithSpecialTestSuiteWhenSeveralTestCasesAreGiven(){
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", Arrays.asList("special"), "mock", null, null, false, "SUCCESS");
+        testCases.put("test1", testCase);
+        HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
+        prepareMockForEventListenerWithSuccessResult();
+        Set<String> runtimeTestSuites = new HashSet<>(specialTestSuite);
+        runtimeTestSuites.add("anotherTestSuite");
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, runtimeTestSuites);
+        Assert.assertEquals("No test cases should be skipped", 0, runTestsResults.getSkippedTests().size());
+    }
+
+    @Test
+    public void runTestCaseWithSeveralTestSuitesWithIntersection(){
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", Arrays.asList("special", "new"), "mock", null, null, false, "SUCCESS");
+        testCases.put("test1", testCase);
+        HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
+        prepareMockForEventListenerWithSuccessResult();
+        Set<String> runtimeTestSuites = new HashSet<>(specialTestSuite);
+        runtimeTestSuites.add("anotherTestSuite");
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, runtimeTestSuites);
+        Assert.assertEquals("No test cases should be skipped", 0, runTestsResults.getSkippedTests().size());
+    }
+
+    @Test
+    public void runTestCaseWithSeveralTestSuitesWithNoIntersection(){
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", Arrays.asList("new", "newer"), "mock", null, null, false, "SUCCESS");
+        testCases.put("test1", testCase);
+        HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
+        prepareMockForEventListenerWithSuccessResult();
+        Set<String> runtimeTestSuites = new HashSet<>(specialTestSuite);
+        runtimeTestSuites.add("anotherTestSuite");
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, runtimeTestSuites);
+        Assert.assertEquals("1 test case should be skipped", 1, runTestsResults.getSkippedTests().size());
+    }
+
+    @Test
     public void runTestCaseWithUnsupportedSpecialTestSuite(){
         Map<String, SlangTestCase> testCases = new HashMap<>();
         SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", Arrays.asList("special"), "mock", null, null, false, "SUCCESS");
