@@ -111,7 +111,7 @@ public class SlangTestRunner {
                 failedTestCases.put(testCase, "Test case cannot be null");
                 continue;
             }
-            if (CollectionUtils.containsAny(testSuites, testCase.getTestSuites())) {
+            if (CollectionUtils.isEmpty(testCase.getTestSuites()) || CollectionUtils.containsAny(testSuites, testCase.getTestSuites())) {
                 log.info("Running test: " + testCaseEntry.getKey() + " - " + testCase.getDescription());
                 try {
                     CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);

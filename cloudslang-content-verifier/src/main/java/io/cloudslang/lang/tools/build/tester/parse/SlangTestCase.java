@@ -13,7 +13,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +40,6 @@ public class SlangTestCase {
 
     private String result;
 
-    public static final String BASE_TEST_SUITE = "base";
 
     //for jackson
     private SlangTestCase() {}
@@ -77,7 +76,7 @@ public class SlangTestCase {
 
     public List<String> getTestSuites() {
         if(CollectionUtils.isEmpty(testSuites)) {
-            this.testSuites = Arrays.asList(BASE_TEST_SUITE);
+            this.testSuites = new ArrayList<>();
         }
         return testSuites;
     }
