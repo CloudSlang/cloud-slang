@@ -51,37 +51,14 @@ public class SlangBuildMain {
             RunTestsResults runTestsResults = buildResults.getRunTestsResults();
             Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
             if(MapUtils.isNotEmpty(skippedTests)){
-                log.info("");
-                log.info("------------------------------------------------------------");
-                log.info("Following " + skippedTests.size() + " tests were skipped:");
-                for(Map.Entry<String, TestRun> skippedTest : skippedTests.entrySet()){
-                    String message = skippedTest.getValue().getMessage();
-                    log.info("- " + message.replaceAll("\n", "\n\t"));
-                }
+                printSkippedTestsSummary(skippedTests);
             }
             Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
             if(MapUtils.isNotEmpty(failedTests)){
-                log.error("");
-                log.error("------------------------------------------------------------");
-                log.error("BUILD FAILURE");
-                log.error("------------------------------------------------------------");
-                log.error("CloudSlang build for repository: \"" + projectPath + "\" failed due to failed tests.");
-                log.error("Following " + failedTests.size() + " tests failed:");
-                for(Map.Entry<String, TestRun> failedTest : failedTests.entrySet()){
-                    String failureMessage = failedTest.getValue().getMessage();
-                    log.error("- " + failureMessage.replaceAll("\n", "\n\t"));
-                }
-                log.error("");
+                printBuildFailureSummary(projectPath, failedTests);
                 System.exit(1);
             } else {
-                log.info("");
-                log.info("------------------------------------------------------------");
-                log.info("BUILD SUCCESS");
-                log.info("------------------------------------------------------------");
-                log.info("Found " + buildResults.getNumberOfCompiledSources()
-                        + " slang files under directory: \"" + projectPath + "\" and all are valid.");
-                log.info(runTestsResults.getPassedTests().size() + " test cases passed");
-                log.info("");
+                printBuildSuccessSummary(projectPath, buildResults, runTestsResults, skippedTests);
                 System.exit(0);
             }
         } catch (Throwable e) {
@@ -92,6 +69,44 @@ public class SlangBuildMain {
             log.error("------------------------------------------------------------");
             log.error("");
             System.exit(1);
+        }
+    }
+
+    private static void printBuildSuccessSummary(String projectPath, SlangBuildResults buildResults, RunTestsResults runTestsResults, Map<String, TestRun> skippedTests) {
+        log.info("");
+        log.info("------------------------------------------------------------");
+        log.info("BUILD SUCCESS");
+        log.info("------------------------------------------------------------");
+        log.info("Found " + buildResults.getNumberOfCompiledSources()
+                + " slang files under directory: \"" + projectPath + "\" and all are valid.");
+        log.info(runTestsResults.getPassedTests().size() + " test cases passed");
+        if(skippedTests.size() > 0){
+            log.info(skippedTests.size() + " test cases skipped");
+        }
+        log.info("");
+    }
+
+    private static void printBuildFailureSummary(String projectPath, Map<String, TestRun> failedTests) {
+        log.error("");
+        log.error("------------------------------------------------------------");
+        log.error("BUILD FAILURE");
+        log.error("------------------------------------------------------------");
+        log.error("CloudSlang build for repository: \"" + projectPath + "\" failed due to failed tests.");
+        log.error("Following " + failedTests.size() + " tests failed:");
+        for(Map.Entry<String, TestRun> failedTest : failedTests.entrySet()){
+            String failureMessage = failedTest.getValue().getMessage();
+            log.error("- " + failureMessage.replaceAll("\n", "\n\t"));
+        }
+        log.error("");
+    }
+
+    private static void printSkippedTestsSummary(Map<String, TestRun> skippedTests) {
+        log.info("");
+        log.info("------------------------------------------------------------");
+        log.info("Following " + skippedTests.size() + " tests were skipped:");
+        for(Map.Entry<String, TestRun> skippedTest : skippedTests.entrySet()){
+            String message = skippedTest.getValue().getMessage();
+            log.info("- " + message.replaceAll("\n", "\n\t"));
         }
     }
 
