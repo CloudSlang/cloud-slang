@@ -33,13 +33,6 @@ public class RunTestsResults {
         this.skippedTests = new HashMap<>();
     }
 
-    public RunTestsResults(Map<String, TestRun> passedTests, Map<String, TestRun> failedTests, Map<String, TestRun> skippedTests) {
-        this.passedTests = passedTests;
-        this.failedTests = failedTests;
-        this.skippedTests = skippedTests;
-    }
-
-
     public Map<String, TestRun> getPassedTests() {
         return passedTests;
     }
