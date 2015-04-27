@@ -11,6 +11,7 @@ package io.cloudslang.lang.tools.build;
 
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
@@ -57,12 +58,12 @@ public class SlangBuilder {
 
         Map<String, CompilationArtifact> compiledSources = compileModels(slangModels);
 
-        Map<SlangTestCase, String> failedTests = new HashMap<>();
+        RunTestsResults runTestsResults = new RunTestsResults();
         if (StringUtils.isNotBlank(testsPath) && new File(testsPath).isDirectory()) {
-            failedTests = runTests(slangModels, projectPath, testsPath, testSuits);
+            runTestsResults = runTests(slangModels, projectPath, testsPath, testSuits);
         }
 
-        return new SlangBuildResults(compiledSources.size(), failedTests);
+        return new SlangBuildResults(compiledSources.size(), runTestsResults);
     }
 
     /**
@@ -83,7 +84,7 @@ public class SlangBuilder {
         return compiledSlangFiles;
     }
 
-    private Map<SlangTestCase, String> runTests(Map<String, Executable> contentSlangModels,
+    private RunTestsResults runTests(Map<String, Executable> contentSlangModels,
                           String projectPath, String testsPath, Set<String> testSuites){
         log.info("");
         log.info("--- compiling tests sources ---");

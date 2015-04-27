@@ -9,7 +9,7 @@
  */
 package io.cloudslang.lang.tools.build;
 
-import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
+import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 
 import java.util.Map;
 
@@ -19,18 +19,18 @@ import java.util.Map;
 public class SlangBuildResults {
 
     private int numberOfCompiledSources;
-    private Map<SlangTestCase, String> failedTests;
+    private RunTestsResults runTestsResults;
 
-    public SlangBuildResults(int numberOfCompiledSources, Map<SlangTestCase, String> failedTests) {
+    public SlangBuildResults(int numberOfCompiledSources, RunTestsResults runTestsResults) {
         this.numberOfCompiledSources = numberOfCompiledSources;
-        this.failedTests = failedTests;
+        this.runTestsResults = runTestsResults;
     }
 
     public int getNumberOfCompiledSources() {
         return numberOfCompiledSources;
     }
 
-    public Map<SlangTestCase, String> getFailedTests() {
-        return failedTests;
+    public RunTestsResults getRunTestsResults() {
+        return runTestsResults;
     }
 }

@@ -9,7 +9,8 @@
  *******************************************************************************/
 package io.cloudslang.lang.tools.build;
 
-import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
+import io.cloudslang.lang.tools.build.tester.RunTestsResults;
+import io.cloudslang.lang.tools.build.tester.TestRun;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
@@ -47,7 +48,8 @@ public class SlangBuildMain {
 
         try {
             SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites);
-            Map<SlangTestCase, String> failedTests = buildResults.getFailedTests();
+            RunTestsResults runTestsResults = buildResults.getRunTestsResults();
+            Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
             if(MapUtils.isNotEmpty(failedTests)){
                 log.error("");
                 log.error("------------------------------------------------------------");
@@ -55,8 +57,9 @@ public class SlangBuildMain {
                 log.error("------------------------------------------------------------");
                 log.error("CloudSlang build for repository: \"" + projectPath + "\" failed due to failed tests.");
                 log.error("Following " + failedTests.size() + " tests failed:");
-                for(Map.Entry<SlangTestCase, String> failedTest : failedTests.entrySet()){
-                    log.error("- " + failedTest.getValue().replaceAll("\n", "\n\t"));
+                for(Map.Entry<String, TestRun> failedTest : failedTests.entrySet()){
+                    String failureMessage = failedTest.getValue().getMessage();
+                    log.error("- " + failureMessage.replaceAll("\n", "\n\t"));
                 }
                 log.error("");
                 System.exit(1);

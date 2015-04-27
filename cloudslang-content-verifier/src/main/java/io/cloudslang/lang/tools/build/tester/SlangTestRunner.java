@@ -98,17 +98,17 @@ public class SlangTestRunner {
      * @param testSuites
      * @return map of failed test cases to the error message
      */
-    public Map<SlangTestCase, String> runAllTests(String projectPath, Map<String, SlangTestCase> testCases,
+    public RunTestsResults runAllTests(String projectPath, Map<String, SlangTestCase> testCases,
                             Map<String, CompilationArtifact> compiledFlows, Set<String> testSuites) {
 
-        Map<SlangTestCase, String> failedTestCases = new HashMap<>();
+        RunTestsResults runTestsResults = new RunTestsResults();
         if(MapUtils.isEmpty(testCases)){
-            return failedTestCases;
+            return runTestsResults;
         }
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
             SlangTestCase testCase = testCaseEntry.getValue();
             if (testCase == null) {
-                failedTestCases.put(testCase, "Test case cannot be null");
+                runTestsResults.addFailedTest("", new TestRun(testCase, "Test case cannot be null"));
                 continue;
             }
             if (CollectionUtils.isEmpty(testCase.getTestSuites()) || CollectionUtils.containsAny(testSuites, testCase.getTestSuites())) {
@@ -116,14 +116,17 @@ public class SlangTestRunner {
                 try {
                     CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
                     runTest(testCase, compiledTestFlow, projectPath);
+                    runTestsResults.addPassedTest(testCase.getName(), new TestRun(testCase, null));
                 } catch (RuntimeException e) {
-                    failedTestCases.put(testCase, e.getMessage());
+                    runTestsResults.addFailedTest(testCase.getName(), new TestRun(testCase, e.getMessage()));
                 }
             } else {
-                log.info("Skipping test: " + testCaseEntry.getKey() + " because it is not in active test suites");
+                String message = "Skipping test: " + testCaseEntry.getKey() + " because it is not in active test suites";
+                log.info(message);
+                runTestsResults.addSkippedTest(testCase.getName(), new TestRun(testCase, message));
             }
         }
-        return failedTestCases;
+        return runTestsResults;
     }
 
     private static CompilationArtifact getCompiledTestFlow(Map<String, CompilationArtifact> compiledFlows, SlangTestCase testCase) {

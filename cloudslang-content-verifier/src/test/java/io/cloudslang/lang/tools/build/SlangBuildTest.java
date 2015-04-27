@@ -12,7 +12,9 @@ import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
+import io.cloudslang.lang.tools.build.tester.TestRun;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
@@ -255,14 +257,14 @@ public class SlangBuildTest {
         URI testResource = getClass().getResource("/test/valid").toURI();
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(emptyExecutable);
         Mockito.when(scoreCompiler.compile(emptyExecutable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
-        Map<SlangTestCase, String> failedTestsMap = new HashMap<>();
-        failedTestsMap.put(new SlangTestCase("test1", "", null, null, null, null, null, null, null), "message");
-        Mockito.when(slangTestRunner.runAllTests(any(String.class), anyMap(), anyMap(), anySet())).thenReturn(failedTestsMap);
+        RunTestsResults runTestsResults = new RunTestsResults();
+        runTestsResults.addFailedTest("test1", new TestRun(new SlangTestCase("test1", "", null, null, null, null, null, null, null), "message"));
+        Mockito.when(slangTestRunner.runAllTests(any(String.class), anyMap(), anyMap(), anySet())).thenReturn(runTestsResults);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(contentResource.getPath(), contentResource.getPath(), testResource.getPath(), null);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
-        Map<SlangTestCase, String> failedTests = buildResults.getFailedTests();
+        RunTestsResults actualRunTestsResults = buildResults.getRunTestsResults();
         Assert.assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
-        Assert.assertEquals("1 test case should fail", 1, failedTests.size());
+        Assert.assertEquals("1 test case should fail", 1, actualRunTestsResults.getFailedTests().size());
     }
 
     @Configuration
