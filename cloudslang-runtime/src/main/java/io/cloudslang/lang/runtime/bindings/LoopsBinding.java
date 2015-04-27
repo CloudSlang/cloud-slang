@@ -107,6 +107,9 @@ public class LoopsBinding {
                     "in task: '" + nodeName + "' " +
                     "doesn't return an iterable, other types are not supported");
         }
+        if (!forLoopCondition.hasMore()) {
+            throw new RuntimeException("Error evaluating for loop expression in task '" + nodeName + "',\n\tError is: expression is empty");
+        }
         return forLoopCondition;
     }
 
