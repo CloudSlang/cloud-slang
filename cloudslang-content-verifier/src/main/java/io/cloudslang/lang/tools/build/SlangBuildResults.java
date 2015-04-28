@@ -9,28 +9,54 @@
  */
 package io.cloudslang.lang.tools.build;
 
-import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
+import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 
 import java.util.Map;
 
 /**
  * Created by stoneo on 4/1/2015.
  **/
+
+/**
+ * Holds the results of the CloudSlang build including the number of CloudSlang sources that were compiled, and the tests results
+ */
 public class SlangBuildResults {
 
-    private int numberOfCompiledSources;
-    private Map<SlangTestCase, String> failedTests;
+    private final int numberOfCompiledSources;
+    private final RunTestsResults runTestsResults;
 
-    public SlangBuildResults(int numberOfCompiledSources, Map<SlangTestCase, String> failedTests) {
+    public SlangBuildResults(int numberOfCompiledSources, RunTestsResults runTestsResults) {
         this.numberOfCompiledSources = numberOfCompiledSources;
-        this.failedTests = failedTests;
+        this.runTestsResults = runTestsResults;
     }
 
     public int getNumberOfCompiledSources() {
         return numberOfCompiledSources;
     }
 
-    public Map<SlangTestCase, String> getFailedTests() {
-        return failedTests;
+    public RunTestsResults getRunTestsResults() {
+        return runTestsResults;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        SlangBuildResults that = (SlangBuildResults) o;
+
+        if (numberOfCompiledSources != that.numberOfCompiledSources)
+            return false;
+        return !(runTestsResults != null ? !runTestsResults.equals(that.runTestsResults) : that.runTestsResults != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = numberOfCompiledSources;
+        result = 31 * result + (runTestsResults != null ? runTestsResults.hashCode() : 0);
+        return result;
     }
 }
