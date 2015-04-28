@@ -19,10 +19,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 /*
@@ -39,7 +39,7 @@ public class SlangBuildMain {
         String projectPath = parseProjectPathArg(args);
         String contentPath = System.getProperty("contentPath", projectPath + File.separator + CONTENT_DIR);
         String testsPath = System.getProperty("testPath", projectPath + File.separator + TEST_DIR);
-        Set<String> testSuites = getTestSuitesProperty();
+        List<String> testSuites = getTestSuitesProperty();
 
         log.info("Loading...");
         //load application context
@@ -121,12 +121,12 @@ public class SlangBuildMain {
         return repositoryPath;
     }
 
-    private static Set<String> getTestSuitesProperty() {
-        Set<String> testSuites = new HashSet<>();
+    private static List<String> getTestSuitesProperty() {
+        List<String> testSuites = new ArrayList<>();
         String testSuitesArg = System.getProperty("testSuites");
         if (testSuitesArg != null) {
             String[] testSuitesArray = testSuitesArg.split(Pattern.quote(","));
-            testSuites = new HashSet<>(Arrays.asList(testSuitesArray));
+            testSuites = Arrays.asList(testSuitesArray);
         }
         return testSuites;
     }

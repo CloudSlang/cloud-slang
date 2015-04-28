@@ -22,9 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /*
  * Created by stoneo on 2/9/2015.
@@ -43,7 +42,7 @@ public class SlangBuilder {
 
     private final static Logger log = Logger.getLogger(SlangBuilder.class);
 
-    public SlangBuildResults buildSlangContent(String projectPath, String contentPath, String testsPath, Set<String> testSuits){
+    public SlangBuildResults buildSlangContent(String projectPath, String contentPath, String testsPath, List<String> testSuits){
 
         String projectName = FilenameUtils.getName(projectPath);
         log.info("");
@@ -85,7 +84,7 @@ public class SlangBuilder {
     }
 
     private RunTestsResults runTests(Map<String, Executable> contentSlangModels,
-                          String projectPath, String testsPath, Set<String> testSuites){
+                          String projectPath, String testsPath, List<String> testSuites){
         log.info("");
         log.info("--- compiling tests sources ---");
         // Compile all slang test flows under the test directory

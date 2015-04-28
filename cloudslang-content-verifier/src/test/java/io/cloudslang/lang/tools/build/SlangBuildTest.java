@@ -41,12 +41,11 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anySet;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.mock;
 
 /*
@@ -259,7 +258,7 @@ public class SlangBuildTest {
         Mockito.when(scoreCompiler.compile(emptyExecutable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
         RunTestsResults runTestsResults = new RunTestsResults();
         runTestsResults.addFailedTest("test1", new TestRun(new SlangTestCase("test1", "", null, null, null, null, null, null, null), "message"));
-        Mockito.when(slangTestRunner.runAllTests(any(String.class), anyMap(), anyMap(), anySet())).thenReturn(runTestsResults);
+        Mockito.when(slangTestRunner.runAllTests(any(String.class), anyMap(), anyMap(), anyList())).thenReturn(runTestsResults);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(contentResource.getPath(), contentResource.getPath(), testResource.getPath(), null);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
         RunTestsResults actualRunTestsResults = buildResults.getRunTestsResults();

@@ -10,10 +10,12 @@
 package io.cloudslang.lang.tools.build.tester;
 
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
+import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import io.cloudslang.score.events.EventConstants;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -22,8 +24,6 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
-import io.cloudslang.lang.compiler.SlangSource;
-import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -100,7 +100,7 @@ public class SlangTestRunner {
      * @return RunTestsResults containing maps of passed, failed & skipped tests
      */
     public RunTestsResults runAllTests(String projectPath, Map<String, SlangTestCase> testCases,
-                            Map<String, CompilationArtifact> compiledFlows, Set<String> testSuites) {
+                            Map<String, CompilationArtifact> compiledFlows, List<String> testSuites) {
 
         RunTestsResults runTestsResults = new RunTestsResults();
         if(MapUtils.isEmpty(testCases)){
