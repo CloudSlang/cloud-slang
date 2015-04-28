@@ -59,7 +59,7 @@ public class SlangBuildMain {
                     log.error("- " + failedTest.getValue().replaceAll("\n", "\n\t"));
                 }
                 log.error("");
-                System.exit(1);
+                throw new RuntimeException("BUILD FAILURE");
             } else {
                 //todo: add printing of how many tests actually ran
                 log.info("");
@@ -69,7 +69,6 @@ public class SlangBuildMain {
                 log.info("Found " + buildResults.getNumberOfCompiledSources()
                         + " slang files under directory: \"" + projectPath + "\" and all are valid.");
                 log.info("");
-                System.exit(0);
             }
         } catch (Throwable e) {
             log.error("");
@@ -78,7 +77,7 @@ public class SlangBuildMain {
                     + projectPath + "\" failed.");
             log.error("------------------------------------------------------------");
             log.error("");
-            System.exit(1);
+            throw new RuntimeException("BUILD FAILURE");
         }
     }
 
