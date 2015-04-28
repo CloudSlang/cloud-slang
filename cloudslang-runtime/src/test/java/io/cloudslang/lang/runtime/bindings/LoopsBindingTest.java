@@ -57,6 +57,20 @@ public class LoopsBindingTest {
         Assert.assertEquals(true, context.getLangVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
     }
 
+    @Test
+    public void whenExpressionIsEmptyThrowException() throws Exception {
+        Context context = mock(Context.class);
+        when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Serializable.class)))
+                .thenReturn(Lists.newArrayList());
+        HashMap<String, Serializable> langVars = new HashMap<>();
+        when(context.getLangVariables()).thenReturn(langVars);
+
+        exception.expectMessage("expression is empty");
+        exception.expect(RuntimeException.class);
+
+        loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, "node");
+    }
+
     @Test(expected = RuntimeException.class)
     public void passingNullLoopStatementThrowsException() throws Exception {
         loopsBinding.getOrCreateLoopCondition(null, mock(Context.class), "aa");

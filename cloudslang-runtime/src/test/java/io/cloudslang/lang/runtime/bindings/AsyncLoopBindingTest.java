@@ -68,6 +68,21 @@ public class AsyncLoopBindingTest {
     }
 
     @Test
+    public void testEmptyExpressionThrowsException() throws Exception {
+        Map<String, Serializable> variables = new HashMap<>();
+        variables.put("key1", "value1");
+        variables.put("key2", "value2");
+        Context context = new Context(variables);
+
+        when(scriptEvaluator.evalExpr(eq("expression"), eq(variables))).thenReturn(Lists.newArrayList());
+
+        exception.expectMessage("expression is empty");
+        exception.expect(RuntimeException.class);
+
+        asyncLoopBinding.bindAsyncLoopList(createBasicSyncLoopStatement(), context, "nodeName");
+    }
+
+    @Test
     public void testExceptionIsPropagated() throws Exception {
         Map<String, Serializable> variables = new HashMap<>();
 
