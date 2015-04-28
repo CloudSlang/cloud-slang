@@ -58,7 +58,7 @@ public class LoopsBindingTest {
     }
 
     @Test
-    public void whenExpressionIsEmptyThrowException() throws Exception {
+    public void whenExpressionIsEmptyThrowsException() throws Exception {
         Context context = mock(Context.class);
         when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Serializable.class)))
                 .thenReturn(Lists.newArrayList());
