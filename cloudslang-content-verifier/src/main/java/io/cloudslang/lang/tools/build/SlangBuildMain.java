@@ -9,7 +9,8 @@
  *******************************************************************************/
 package io.cloudslang.lang.tools.build;
 
-import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
+import io.cloudslang.lang.tools.build.tester.RunTestsResults;
+import io.cloudslang.lang.tools.build.tester.TestRun;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
@@ -18,10 +19,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 /*
@@ -38,7 +39,7 @@ public class SlangBuildMain {
         String projectPath = parseProjectPathArg(args);
         String contentPath = System.getProperty("contentPath", projectPath + File.separator + CONTENT_DIR);
         String testsPath = System.getProperty("testPath", projectPath + File.separator + TEST_DIR);
-        Set<String> testSuites = getTestSuitesProperty();
+        List<String> testSuites = getTestSuitesProperty();
 
         log.info("Loading...");
         //load application context
@@ -47,29 +48,17 @@ public class SlangBuildMain {
 
         try {
             SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites);
-            Map<SlangTestCase, String> failedTests = buildResults.getFailedTests();
+            RunTestsResults runTestsResults = buildResults.getRunTestsResults();
+            Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
+            if(MapUtils.isNotEmpty(skippedTests)){
+                printSkippedTestsSummary(skippedTests);
+            }
+            Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
             if(MapUtils.isNotEmpty(failedTests)){
-                log.error("");
-                log.error("------------------------------------------------------------");
-                log.error("BUILD FAILURE");
-                log.error("------------------------------------------------------------");
-                log.error("CloudSlang build for repository: \"" + projectPath + "\" failed due to failed tests.");
-                log.error("Following " + failedTests.size() + " tests failed:");
-                for(Map.Entry<SlangTestCase, String> failedTest : failedTests.entrySet()){
-                    log.error("- " + failedTest.getValue().replaceAll("\n", "\n\t"));
-                }
-                log.error("");
+                printBuildFailureSummary(projectPath, failedTests);
                 System.exit(1);
             } else {
-                //todo: add printing of how many tests actually ran
-                log.info("");
-                log.info("------------------------------------------------------------");
-                log.info("BUILD SUCCESS");
-                log.info("------------------------------------------------------------");
-                log.info("Found " + buildResults.getNumberOfCompiledSources()
-                        + " slang files under directory: \"" + projectPath + "\" and all are valid.");
-                log.info("");
-                System.exit(0);
+                printBuildSuccessSummary(projectPath, buildResults, runTestsResults, skippedTests);
             }
         } catch (Throwable e) {
             log.error("");
@@ -79,6 +68,44 @@ public class SlangBuildMain {
             log.error("------------------------------------------------------------");
             log.error("");
             System.exit(1);
+        }
+    }
+
+    private static void printBuildSuccessSummary(String projectPath, SlangBuildResults buildResults, RunTestsResults runTestsResults, Map<String, TestRun> skippedTests) {
+        log.info("");
+        log.info("------------------------------------------------------------");
+        log.info("BUILD SUCCESS");
+        log.info("------------------------------------------------------------");
+        log.info("Found " + buildResults.getNumberOfCompiledSources()
+                + " slang files under directory: \"" + projectPath + "\" and all are valid.");
+        log.info(runTestsResults.getPassedTests().size() + " test cases passed");
+        if(skippedTests.size() > 0){
+            log.info(skippedTests.size() + " test cases skipped");
+        }
+        log.info("");
+    }
+
+    private static void printBuildFailureSummary(String projectPath, Map<String, TestRun> failedTests) {
+        log.error("");
+        log.error("------------------------------------------------------------");
+        log.error("BUILD FAILURE");
+        log.error("------------------------------------------------------------");
+        log.error("CloudSlang build for repository: \"" + projectPath + "\" failed due to failed tests.");
+        log.error("Following " + failedTests.size() + " tests failed:");
+        for(Map.Entry<String, TestRun> failedTest : failedTests.entrySet()){
+            String failureMessage = failedTest.getValue().getMessage();
+            log.error("- " + failureMessage.replaceAll("\n", "\n\t"));
+        }
+        log.error("");
+    }
+
+    private static void printSkippedTestsSummary(Map<String, TestRun> skippedTests) {
+        log.info("");
+        log.info("------------------------------------------------------------");
+        log.info("Following " + skippedTests.size() + " tests were skipped:");
+        for(Map.Entry<String, TestRun> skippedTest : skippedTests.entrySet()){
+            String message = skippedTest.getValue().getMessage();
+            log.info("- " + message.replaceAll("\n", "\n\t"));
         }
     }
 
@@ -94,12 +121,12 @@ public class SlangBuildMain {
         return repositoryPath;
     }
 
-    private static Set<String> getTestSuitesProperty() {
+    private static List<String> getTestSuitesProperty() {
+        List<String> testSuites = new ArrayList<>();
         String testSuitesArg = System.getProperty("testSuites");
-        Set<String> testSuites = null;
         if (testSuitesArg != null) {
             String[] testSuitesArray = testSuitesArg.split(Pattern.quote(","));
-            testSuites = new HashSet<>(Arrays.asList(testSuitesArray));
+            testSuites = Arrays.asList(testSuitesArray);
         }
         return testSuites;
     }
