@@ -59,7 +59,6 @@ public class SlangBuildMain {
                 System.exit(1);
             } else {
                 printBuildSuccessSummary(projectPath, buildResults, runTestsResults, skippedTests);
-                System.exit(0);
             }
         } catch (Throwable e) {
             log.error("");

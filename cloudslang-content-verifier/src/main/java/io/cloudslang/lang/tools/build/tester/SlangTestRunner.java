@@ -55,6 +55,7 @@ public class SlangTestRunner {
     public static final String TEST_CASE_FAILED = "Test case failed: ";
 
     private final static Logger log = Logger.getLogger(SlangTestRunner.class);
+    private final String UNAVAILABLE_NAME = "N/A";
 
     public Map<String, SlangTestCase> createTestCases(String testPath) {
         Validate.notEmpty(testPath, "You must specify a path for tests");
@@ -96,7 +97,7 @@ public class SlangTestRunner {
      * @param testCases
      * @param compiledFlows
      * @param testSuites
-     * @return map of failed test cases to the error message
+     * @return RunTestsResults containing maps of passed, failed & skipped tests
      */
     public RunTestsResults runAllTests(String projectPath, Map<String, SlangTestCase> testCases,
                             Map<String, CompilationArtifact> compiledFlows, Set<String> testSuites) {
@@ -108,7 +109,7 @@ public class SlangTestRunner {
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
             SlangTestCase testCase = testCaseEntry.getValue();
             if (testCase == null) {
-                runTestsResults.addFailedTest("", new TestRun(testCase, "Test case cannot be null"));
+                runTestsResults.addFailedTest(UNAVAILABLE_NAME, new TestRun(testCase, "Test case cannot be null"));
                 continue;
             }
             if (CollectionUtils.isEmpty(testCase.getTestSuites()) || CollectionUtils.containsAny(testSuites, testCase.getTestSuites())) {

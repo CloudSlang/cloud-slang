@@ -16,10 +16,14 @@ import java.util.Map;
 /**
  * Created by stoneo on 4/1/2015.
  **/
+
+/**
+ * Holds the results of the CloudSlang build including the number of CloudSlang sources that were compiled, and the tests results
+ */
 public class SlangBuildResults {
 
-    private int numberOfCompiledSources;
-    private RunTestsResults runTestsResults;
+    private final int numberOfCompiledSources;
+    private final RunTestsResults runTestsResults;
 
     public SlangBuildResults(int numberOfCompiledSources, RunTestsResults runTestsResults) {
         this.numberOfCompiledSources = numberOfCompiledSources;
@@ -32,5 +36,27 @@ public class SlangBuildResults {
 
     public RunTestsResults getRunTestsResults() {
         return runTestsResults;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        SlangBuildResults that = (SlangBuildResults) o;
+
+        if (numberOfCompiledSources != that.numberOfCompiledSources)
+            return false;
+        return !(runTestsResults != null ? !runTestsResults.equals(that.runTestsResults) : that.runTestsResults != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = numberOfCompiledSources;
+        result = 31 * result + (runTestsResults != null ? runTestsResults.hashCode() : 0);
+        return result;
     }
 }

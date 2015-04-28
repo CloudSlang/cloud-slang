@@ -20,9 +20,9 @@ import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
  */
 public class TestRun {
 
-    private SlangTestCase testCase;
+    private final SlangTestCase testCase;
 
-    private String message;
+    private final String message;
 
     public TestRun(SlangTestCase testCase, String message) {
         this.testCase = testCase;
@@ -35,5 +35,27 @@ public class TestRun {
 
     public String getMessage() {
         return message;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        TestRun testRun = (TestRun) o;
+
+        if (testCase != null ? !testCase.equals(testRun.testCase) : testRun.testCase != null)
+            return false;
+        return !(message != null ? !message.equals(testRun.message) : testRun.message != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = testCase != null ? testCase.hashCode() : 0;
+        result = 31 * result + (message != null ? message.hashCode() : 0);
+        return result;
     }
 }
