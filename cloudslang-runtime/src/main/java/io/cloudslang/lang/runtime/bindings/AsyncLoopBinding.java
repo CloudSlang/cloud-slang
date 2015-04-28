@@ -27,15 +27,17 @@ import java.util.List;
 @Component
 public class AsyncLoopBinding {
 
+    public static final String ASYNC_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating async loop expression in task";
+
     @Autowired
     private ScriptEvaluator scriptEvaluator;
 
     public static String generateAsyncLoopExpressionMessage(String nodeName, String message) {
-        return "Error evaluating async loop expression in task '" + nodeName + "', error is: \n" + message;
+        return ASYNC_LOOP_EXPRESSION_ERROR_MESSAGE + " '" + nodeName + "', error is: \n" + message;
     }
 
     public List<Serializable> bindAsyncLoopList(AsyncLoopStatement asyncLoopStatement, Context flowContext, String nodeName) {
-        Validate.notNull(asyncLoopStatement, "async task statement cannot be null");
+        Validate.notNull(asyncLoopStatement, "async loop statement cannot be null");
         Validate.notNull(flowContext, "flow context cannot be null");
         Validate.notNull(nodeName, "node name cannot be null");
 
