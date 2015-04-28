@@ -56,4 +56,29 @@ public class RunTestsResults {
     public void addSkippedTest(String testCaseName, TestRun testRun){
         skippedTests.put(testCaseName, testRun);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        RunTestsResults that = (RunTestsResults) o;
+
+        if (passedTests != null ? !passedTests.equals(that.passedTests) : that.passedTests != null)
+            return false;
+        if (failedTests != null ? !failedTests.equals(that.failedTests) : that.failedTests != null)
+            return false;
+        return !(skippedTests != null ? !skippedTests.equals(that.skippedTests) : that.skippedTests != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = passedTests != null ? passedTests.hashCode() : 0;
+        result = 31 * result + (failedTests != null ? failedTests.hashCode() : 0);
+        result = 31 * result + (skippedTests != null ? skippedTests.hashCode() : 0);
+        return result;
+    }
 }
