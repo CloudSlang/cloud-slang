@@ -14,6 +14,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ForLoopCondition;
+import org.python.google.common.collect.Lists;
 
 import javax.script.ScriptEngine;
 import java.io.Serializable;
@@ -49,11 +50,25 @@ public class LoopsBindingTest {
     public void whenValueIsNotThereItWillBeCreated() throws Exception {
         Context context = mock(Context.class);
         when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Serializable.class)))
-                .thenReturn(new ArrayList<>());
+                .thenReturn(Lists.newArrayList(1));
         HashMap<String, Serializable> langVars = new HashMap<>();
         when(context.getLangVariables()).thenReturn(langVars);
         loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, "node");
         Assert.assertEquals(true, context.getLangVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
+    }
+
+    @Test
+    public void whenExpressionIsEmptyThrowsException() throws Exception {
+        Context context = mock(Context.class);
+        when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Serializable.class)))
+                .thenReturn(Lists.newArrayList());
+        HashMap<String, Serializable> langVars = new HashMap<>();
+        when(context.getLangVariables()).thenReturn(langVars);
+
+        exception.expectMessage("expression is empty");
+        exception.expect(RuntimeException.class);
+
+        loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, "node");
     }
 
     @Test(expected = RuntimeException.class)
@@ -109,4 +124,5 @@ public class LoopsBindingTest {
         verify(context).putVariable("k", "john");
         verify(context).putVariable("v", 1);
     }
+
 }

@@ -34,6 +34,9 @@ import static io.cloudslang.lang.runtime.env.LoopCondition.LOOP_CONDITION_KEY;
 @Component
 public class LoopsBinding {
 
+    public static final String FOR_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating for loop expression in task";
+    public static final String INVALID_MAP_EXPRESSION_MESSAGE = "Invalid expression for iterating maps";
+
     private final Logger logger = Logger.getLogger(getClass());
 
     @Autowired
@@ -85,7 +88,7 @@ public class LoopsBinding {
         try {
             evalResult = scriptEvaluator.evalExpr(collectionExpression, variables);
         } catch (Throwable t) {
-            throw new RuntimeException("Error evaluating for loop expression in task '" + nodeName + "',\n\tError is: " + t.getMessage(), t);
+            throw new RuntimeException(FOR_LOOP_EXPRESSION_ERROR_MESSAGE + " '" + nodeName + "',\n\tError is: " + t.getMessage(), t);
         }
 
         if (forLoopStatement instanceof MapForLoopStatement) {
@@ -97,7 +100,7 @@ public class LoopsBinding {
                 }
                 evalResult = (Serializable) entriesAsSerializable;
             } else {
-                throw new RuntimeException("Invalid expression for iterating maps: " + collectionExpression);
+                throw new RuntimeException(INVALID_MAP_EXPRESSION_MESSAGE + ": " + collectionExpression);
             }
         }
 
@@ -106,6 +109,9 @@ public class LoopsBinding {
             throw new RuntimeException("collection expression: '" + collectionExpression + "' in the 'for' loop " +
                     "in task: '" + nodeName + "' " +
                     "doesn't return an iterable, other types are not supported");
+        }
+        if (!forLoopCondition.hasMore()) {
+            throw new RuntimeException(FOR_LOOP_EXPRESSION_ERROR_MESSAGE + " '" + nodeName + "',\n\tError is: expression is empty");
         }
         return forLoopCondition;
     }
