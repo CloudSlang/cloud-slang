@@ -124,4 +124,5 @@ public class LoopsBindingTest {
         verify(context).putVariable("k", "john");
         verify(context).putVariable("v", 1);
     }
+
 }
