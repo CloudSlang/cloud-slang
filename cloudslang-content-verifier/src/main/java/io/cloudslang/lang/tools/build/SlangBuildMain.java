@@ -9,11 +9,16 @@
  *******************************************************************************/
 package io.cloudslang.lang.tools.build;
 
+import com.beust.jcommander.JCommander;
+import io.cloudslang.lang.tools.build.commands.ApplicationArgs;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.TestRun;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -30,17 +35,27 @@ import java.util.regex.Pattern;
  */
 public class SlangBuildMain {
 
-    private static final String CONTENT_DIR = "content";
-    private static final String TEST_DIR = "test";
+    private static final String CONTENT_DIR =  File.separator + "content";
+    private static final String TEST_DIR = File.separator + "test";
 
     private final static Logger log = Logger.getLogger(SlangBuildMain.class);
 
     public static void main(String[] args) {
-        String projectPath = parseProjectPathArg(args);
-        String contentPath = System.getProperty("contentPath", projectPath + File.separator + CONTENT_DIR);
-        String testsPath = System.getProperty("testPath", projectPath + File.separator + TEST_DIR);
-        List<String> testSuites = getTestSuitesProperty();
+        ApplicationArgs appArgs = new ApplicationArgs();
+        new JCommander(appArgs, args);
+        String projectPath = parseProjectPathArg(appArgs);
+        String contentPath = StringUtils.defaultIfEmpty(appArgs.getContentRoot(), projectPath + CONTENT_DIR);
+        String testsPath = StringUtils.defaultIfEmpty(appArgs.getTestRoot(), projectPath + TEST_DIR);
+        List<String> testSuites = ListUtils.defaultIfNull(appArgs.getTestSuites(), new ArrayList<String>());
 
+        log.info("");
+        log.info("------------------------------------------------------------");
+        log.info("Building project: " + projectPath);
+        log.info("Content root is at: " + contentPath);
+        log.info("Test root is at: " + testsPath);
+        log.info("Active test suites are: " + Arrays.toString(testSuites.toArray()));
+
+        log.info("");
         log.info("Loading...");
         //load application context
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/testRunnerContext.xml");
@@ -110,26 +125,22 @@ public class SlangBuildMain {
         }
     }
 
-    private static String parseProjectPathArg(String[] args) {
+    private static String parseProjectPathArg(ApplicationArgs args) {
         String repositoryPath;
-        if(args == null || args.length == 0){
-            repositoryPath = System.getProperty("user.dir");
+
+        if (args.getProjectRoot() != null) {
+            repositoryPath = args.getProjectRoot();
+        } else if (args.getParameters().size() == 1) {
+            repositoryPath = args.getParameters().get(0);
         } else {
-            repositoryPath = FilenameUtils.separatorsToSystem(args[0]);
+            repositoryPath = System.getProperty("user.dir");
         }
+
+        repositoryPath = FilenameUtils.separatorsToSystem(repositoryPath);
+
         Validate.isTrue(new File(repositoryPath).isDirectory(),
                 "Directory path argument \'" + repositoryPath + "\' does not lead to a directory");
+
         return repositoryPath;
     }
-
-    private static List<String> getTestSuitesProperty() {
-        List<String> testSuites = new ArrayList<>();
-        String testSuitesArg = System.getProperty("testSuites");
-        if (testSuitesArg != null) {
-            String[] testSuitesArray = testSuitesArg.split(Pattern.quote(","));
-            testSuites = Arrays.asList(testSuitesArray);
-        }
-        return testSuites;
-    }
-
 }
