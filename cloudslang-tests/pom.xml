@@ -48,17 +48,17 @@
         </dependency>
 
         <dependency>
-            <groupId>io.openscore.content</groupId>
+            <groupId>io.cloudslang.content</groupId>
             <artifactId>score-ssh</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>io.openscore.content</groupId>
+            <groupId>io.cloudslang.content</groupId>
             <artifactId>score-mail</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>io.openscore.content</groupId>
+            <groupId>io.cloudslang.content</groupId>
             <artifactId>score-http-client</artifactId>
         </dependency>
         <dependency>

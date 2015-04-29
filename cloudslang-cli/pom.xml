@@ -61,17 +61,17 @@
 
         <!-- content dep -->
         <dependency>
-            <groupId>io.openscore.content</groupId>
+            <groupId>io.cloudslang.content</groupId>
             <artifactId>score-ssh</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>io.openscore.content</groupId>
+            <groupId>io.cloudslang.content</groupId>
             <artifactId>score-mail</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>io.openscore.content</groupId>
+            <groupId>io.cloudslang.content</groupId>
             <artifactId>score-http-client</artifactId>
             <scope>runtime</scope>
         </dependency>

@@ -158,19 +158,19 @@
 
             <!--score content dependencies-->
             <dependency>
-                <groupId>io.openscore.content</groupId>
+                <groupId>io.cloudslang.content</groupId>
                 <artifactId>score-ssh</artifactId>
-                <version>0.0.22</version>
+                <version>0.0.23</version>
             </dependency>
             <dependency>
-                <groupId>io.openscore.content</groupId>
+                <groupId>io.cloudslang.content</groupId>
                 <artifactId>score-mail</artifactId>
-                <version>0.0.10</version>
+                <version>0.0.13</version>
             </dependency>
             <dependency>
-                <groupId>io.openscore.content</groupId>
+                <groupId>io.cloudslang.content</groupId>
                 <artifactId>score-http-client</artifactId>
-                <version>0.1.57</version>
+                <version>0.1.59</version>
             </dependency>
             <!--end of score content dependencies-->
 
