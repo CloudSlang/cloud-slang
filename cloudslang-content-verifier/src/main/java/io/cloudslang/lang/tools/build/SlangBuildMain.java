@@ -130,6 +130,8 @@ public class SlangBuildMain {
 
         if (args.getProjectRoot() != null) {
             repositoryPath = args.getProjectRoot();
+        // if only one parameter was passed, we treat it as the project root
+        // i.e. './cslang-builder some/path/to/project'
         } else if (args.getParameters().size() == 1) {
             repositoryPath = args.getParameters().get(0);
         } else {
