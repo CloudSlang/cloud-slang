@@ -13,12 +13,14 @@ import ch.lambdaj.function.convert.Converter;
 import com.google.common.collect.Lists;
 
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.cli.SlangCLI;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -68,7 +70,14 @@ public class CompilerHelperImpl implements CompilerHelper{
         Validate.isTrue(validFileExtension, "File: " + file.getName() + " must have one of the following extensions: sl, sl.yaml, sl.yml");
 
         if (CollectionUtils.isEmpty(dependencies)) {
-            dependencies = Lists.newArrayList(file.getParent()); //default behavior is taking the parent dir
+            //app.home is the basedir property we set in executable
+            String appHome = System.getProperty("app.home");
+            if (StringUtils.isNotEmpty(appHome)) {
+                dependencies.add(appHome + File.separator + "/content");
+            } else {
+                //default behavior is taking the parent dir if not running from executable
+                dependencies = Lists.newArrayList(file.getParent());
+            }
         }
         for (String dependency:dependencies) {
             Collection<File> dependenciesFiles = FileUtils.listFiles(new File(dependency), SLANG_FILE_EXTENSIONS, true);
