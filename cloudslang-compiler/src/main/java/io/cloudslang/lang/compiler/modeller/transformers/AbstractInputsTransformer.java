@@ -28,7 +28,7 @@ public abstract class AbstractInputsTransformer {
         // this is our default behaviour that if the user specifies only a key, the key is also the ref we look for
         if (rawInput instanceof String) {
             String inputName = (String) rawInput;
-            return new Input(inputName, inputName);
+            return new Input(inputName, null);
         } else if (rawInput instanceof Map) {
             Map.Entry<String, ?> entry = ((Map<String, ?>) rawInput).entrySet().iterator().next();
             if (entry.getValue() instanceof Map) {
@@ -40,8 +40,7 @@ public abstract class AbstractInputsTransformer {
             }
             // - some_input: some_expression
             // the value of the input is an expression we need to evaluate at runtime
-            return new Input(entry.getKey(), entry.getValue()
-                                                  .toString());
+            return new Input(entry.getKey(), entry.getValue().toString());
         }
         throw new RuntimeException("Could not transform Input : " + rawInput);
     }
