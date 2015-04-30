@@ -73,7 +73,7 @@ public class InputsTransformerTest {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(0);
         Assert.assertEquals("input1", input.getName());
-        Assert.assertEquals("input1", input.getExpression());
+        Assert.assertNull(null, input.getExpression());
     }
 
     @Test
