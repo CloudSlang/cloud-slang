@@ -11,6 +11,7 @@
     </description>
     <!-- set global properties for this build -->
     <property name="build" location="cli"/>
+    <property name="include_content" value="false"/>
     <!--<property name="proxy.host" value="proxy-host"/>-->
     <!--<property name="proxy.port" value="8080"/>-->
     <!--<echo message="proxy host: ${proxy.host}, proxy port: ${proxy.port}"/>-->
@@ -21,7 +22,7 @@
         <!--<setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"/>-->
         <mkdir dir="${build}"/>
         <get src="https://github.com/CloudSlang/cloud-slang/releases/download/cloudslang-0.7.5/cslang-cli.zip"
-             dest="${build}/cslang-cli.zip" usetimestamp="true" verbose="true"/>
+            dest="${build}/cslang-cli.zip" usetimestamp="true" verbose="true"/>
         <!--<gunzip src="${build}/slang.tar.gz"/>-->
         <!--<untar src="${build}/slang.tar" dest="${build}"/>-->
         <unzip src="${build}/cslang-cli.zip" dest="${build}"/>
@@ -32,6 +33,8 @@
             <arg value="build_content/build_cli_flow.sl"/>
             <arg value="--cp"/>
             <arg value="build_content,${build}"/>
+            <arg value="--i"/>
+            <arg value="include_content=${include_content}"/>
         </exec>
         <exec executable="cmd" osfamily="windows">
             <arg value="/c"/>
@@ -41,6 +44,8 @@
             <arg value="build_content/build_cli_flow.sl"/>
             <arg value="--cp"/>
             <arg value="build_content,${build}"/>
+            <arg value="--i"/>
+            <arg value="include_content=${include_content}"/>
         </exec>
     </target>
     <target name="clean"
