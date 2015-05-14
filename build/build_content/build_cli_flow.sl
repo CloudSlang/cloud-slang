@@ -36,11 +36,6 @@ flow:
   name: build_cli_flow
 
   workflow:
-    - create_target_dir:
-        do:
-          files.create_folder:
-            - folder_name: target_dir
-
     - copy_cloudslang_cli:
         do:
           files.copy:
