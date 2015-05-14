@@ -31,7 +31,7 @@ flow:
         default: 'target_dir + "/cloudslang-cli/cslang"'
         overridable: false
     - cloudslang_content_repo:
-        default: "'https://github.com/CloudSlang/cloud-slang-content.git'"
+        default: "'git@github.com:CloudSlang/cloud-slang.git'"
         overridable: false
   name: build_cli_flow
 
