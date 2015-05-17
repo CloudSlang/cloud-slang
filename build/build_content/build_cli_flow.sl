@@ -141,7 +141,7 @@ flow:
         do:
           files.zip_folder:
             - archive_name: "'cslang-cli'"
-            - folder_path: target_cli
+            - folder_path: target_dir + "/cloudslang-cli"
             - output_folder: target_dir
 
 
