@@ -14,6 +14,8 @@ curl https://api.github.com/repos/${myrepo}/releases/tags/${branch} >> res.json
 
 assets_url='grep -e assets_url res.json | awk \'{print $2}\' | grep -oe "[^\"].*[^\,\"]"'
 
+echo ${assets_url}
+
 echo -e "\n\nCreating release from tag branch\n=================================================================================\n"
 
 ##################################################################################################################################################
@@ -28,8 +30,8 @@ auth_header="Authorization:token $ghusertoken"
 
 echo -e "\n\n$cli_location\n"
 
-curl  --insecure -XPOST -H ${auth_header} -H "Content-Type:application/zip" --data-binary @${cli_location} ${assets_url}?name=cslang-cli-with-content.zip
+#curl  --insecure -XPOST -H ${auth_header} -H "Content-Type:application/zip" --data-binary @${cli_location} ${assets_url}?name=cslang-cli-with-content.zip
 
 echo -e "\n\n$builder_location\n"
 
-curl  --insecure -XPOST -H ${auth_header} -H "Content-Type:application/zip" --data-binary @${builder_location} ${assets_url}?name=cslang-builder.zip
+#curl  --insecure -XPOST -H ${auth_header} -H "Content-Type:application/zip" --data-binary @${builder_location} ${assets_url}?name=cslang-builder.zip
