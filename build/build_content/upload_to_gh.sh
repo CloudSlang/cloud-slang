@@ -3,21 +3,21 @@
 myrepo=cloudslang/cloud-slang
 ghusertoken=$GH_TOKEN
 branch=$GIT_BRANCH
+build_dir=$WORKSPACE
 
 cli_location=build/target/cloudslang-cli/cslang-cli.zip
 builder_location=build/target/cslang-builder/cslang-builder.zip
 
-cd $WORKSPACE
+cd ${build_dir}
 
 echo -e "fetching https://api.github.com/repos/${myrepo}/releases/tags/${branch}\n"
 
-curl https://api.github.com/repos/${myrepo}/releases/tags/${branch} >> res.json
+curl https://api.github.com/repos/${myrepo}/releases/tags/${branch} > ${build_dir}/res.json
 
-assets_url='grep -e assets_url res.json | awk \'{print $2}\' | grep -oe "[^\"].*[^\,\"]"'
+assets_url=$(grep -e assets_url ${build_dir}/res.json | awk '{print $2}' | grep -oe '[^\"].*[^\,\"]')
 
 echo ${assets_url}
 
-echo -e "\n\nCreating release from tag branch\n=================================================================================\n"
 
 ##################################################################################################################################################
 
