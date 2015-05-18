@@ -5,7 +5,8 @@ GHUSERTOKEN=$GH_TOKEN
 BRANCH=$GIT_BRANCH
 BUILD_DIR=$WORKSPACE
 
-CLI_PATH=build/target/cloudslang-cli/cslang-cli.zip
+CLI_DIR=build/target/cloudslang-cli
+CLI_PATH=${CLI_DIR}/cslang-cli.zip
 BUILDER_PATH=build/target/cslang-builder/cslang-builder.zip
 
 cd ${BUILD_DIR}
@@ -30,6 +31,8 @@ echo -e "\n\nUpoloading artifacts using curl\n==================================
 #curl  --insecure -XPOST -H "Authorization:token $GHUSERTOKEN" -H "Content-Type:application/gzip" --data-binary @slang-cli.tar.gz https://uploads.github.com/repos/$REPO/releases/$uniquereleaseid/assets?name=slang-cli.tar.gz
 
 echo -e "\n\n$CLI_PATH\n"
+
+bash $CLI_DIR/cslang/bin/cslang run --f $CLI_DIR/cslang/content/io/cloudslang/base/print/print_text.sl --i text=hi
 
 FILESIZE=`stat -c '%s' "$CLI_PATH"`
 curl -s -H "Authorization:token ${GHUSERTOKEN}" -H "Content-Type:application/zip" --data-binary "@${CLI_PATH}" "${UPLOAD_URL}?name=cslang-cli-with-content.zip&size=$FILESIZE"

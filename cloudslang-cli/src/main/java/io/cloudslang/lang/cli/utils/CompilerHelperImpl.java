@@ -101,7 +101,7 @@ public class CompilerHelperImpl implements CompilerHelper{
 
     private Map<String, ? extends Serializable> loadFiles(List<String> files, String[] extensions, String directory) {
         if(CollectionUtils.isEmpty(files)) {
-            Collection<File> implicitFiles = FileUtils.listFiles(new File("."), extensions, true);
+            Collection<File> implicitFiles = FileUtils.listFiles(new File("."), extensions, false);
             implicitFiles = select(implicitFiles, having(on(File.class).getPath(), containsString(directory)));
             files = convert(implicitFiles, new Converter<File, String>() {
                 @Override
