@@ -15,6 +15,7 @@ import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -117,6 +118,7 @@ public class CompilerHelperTest {
 		Assert.assertEquals(expected, result);
 	}
 
+    @Ignore("Awaiting CloudSlang/cloud-slang#302 decision")
 	@Test
 	public void testLoadSystemPropertiesImplicit() throws Exception {
 		Map<String, ? extends Serializable> result = compilerHelper.loadSystemProperties(null);
@@ -142,6 +144,7 @@ public class CompilerHelperTest {
         Assert.assertEquals(expected, result);
     }
 
+    @Ignore("Awaiting CloudSlang/cloud-slang#302 decision")
     @Test
     public void testLoadInputsFromFileImplicit() throws Exception {
         Map<String, ? extends Serializable> result = compilerHelper.loadInputsFromFile(null);
