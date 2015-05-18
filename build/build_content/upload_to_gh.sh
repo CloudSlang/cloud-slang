@@ -1,22 +1,24 @@
 #!/bin/bash
 
-myrepo=cloudslang/cloud-slang
-ghusertoken=$GH_TOKEN
-branch=$GIT_BRANCH
-build_dir=$WORKSPACE
+REPO=cloudslang/cloud-slang
+GHUSERTOKEN=$GH_TOKEN
+BRANCH=$GIT_BRANCH
+BUILD_DIR=$WORKSPACE
 
-cli_location=build/target/cloudslang-cli/cslang-cli.zip
-builder_location=build/target/cslang-builder/cslang-builder.zip
+CLI_PATH=build/target/cloudslang-cli/cslang-cli.zip
+BUILDER_PATH=build/target/cslang-builder/cslang-builder.zip
 
-cd ${build_dir}
+cd ${BUILD_DIR}
 
-echo -e "fetching https://api.github.com/repos/${myrepo}/releases/tags/${branch}\n"
+echo -e "fetching https://api.github.com/repos/${REPO}/releases/tags/${BRANCH}\n"
 
-curl https://api.github.com/repos/${myrepo}/releases/tags/${branch} > ${build_dir}/res.json
+curl https://api.github.com/repos/${REPO}/releases/tags/${BRANCH} > ${BUILD_DIR}/res.json
 
-assets_url=$(grep -e assets_url ${build_dir}/res.json | awk '{print $2}' | grep -oe '[^\"].*[^\,\"]')
 
-echo ${assets_url}
+RELEASEID=$(grep -e id ${BUILD_DIR}/res.json | head -n 1 | awk '{print $2}' | grep -oe '[0-9]*')
+UPLOAD_URL="https://uploads.github.com/repos/$REPO/releases/$RELEASEID/assets"
+
+echo ${UPLOAD_URL}
 
 
 ##################################################################################################################################################
@@ -25,13 +27,13 @@ echo -e "\n\nUpoloading artifacts using curl\n==================================
 
 #echo -e "\n\nUpoloading slang-cli.tar.gz\n"
 #
-#curl  --insecure -XPOST -H "Authorization:token $ghusertoken" -H "Content-Type:application/gzip" --data-binary @slang-cli.tar.gz https://uploads.github.com/repos/$myrepo/releases/$uniquereleaseid/assets?name=slang-cli.tar.gz
+#curl  --insecure -XPOST -H "Authorization:token $GHUSERTOKEN" -H "Content-Type:application/gzip" --data-binary @slang-cli.tar.gz https://uploads.github.com/repos/$REPO/releases/$uniquereleaseid/assets?name=slang-cli.tar.gz
 
-echo -e "\n\n$cli_location\n"
+echo -e "\n\n$CLI_PATH\n"
 
-curl  --insecure -XPOST -H "Authorization:token ${ghusertoken}" -H "Content-Type:application/zip" --data-binary @${cli_location} ${assets_url}?name=cslang-cli-with-content.zip
+FILESIZE=`stat -c '%s' "$CLI_PATH"`
+curl -s -H "Authorization:token ${GHUSERTOKEN}" -H "Content-Type:application/zip" --data-binary "@${CLI_PATH}" "${UPLOAD_URL}?name=cslang-cli-with-content.zip&size=$FILESIZE"
 
-#echo -e "\n\n$builder_location\n"
+#echo -e "\n\n$BUILDER_PATH\n"
 
-#curl  --insecure -XPOST -H "Authorization:token $ghusertoken" -H "Content-Type:application/zip" --data-binary @${builder_location} ${assets_url}?name=cslang-builder.zip
-
+#curl  --insecure -XPOST -H "Authorization:token $GHUSERTOKEN" -H "Content-Type:application/zip" --data-binary @${BUILDER_PATH} ${UPLOAD_URL}?name=cslang-builder.zip
