@@ -9,6 +9,7 @@ builder_location=build/target/cslang-builder/cslang-builder.zip
 
 cd $WORKSPACE
 
+echo -e "fetching https://api.github.com/repos/${myrepo}/releases/tags/${branch}\n"
 
 curl https://api.github.com/repos/${myrepo}/releases/tags/${branch} >> res.json
 
@@ -32,7 +33,7 @@ echo -e "\n\n$cli_location\n"
 
 curl  --insecure -XPOST -H ${auth_header} -H "Content-Type:application/zip" --data-binary @${cli_location} ${assets_url}?name=cslang-cli-with-content.zip
 
-echo -e "\n\n$builder_location\n"
+#echo -e "\n\n$builder_location\n"
 
-curl  --insecure -XPOST -H ${auth_header} -H "Content-Type:application/zip" --data-binary @${builder_location} ${assets_url}?name=cslang-builder.zip
+#curl  --insecure -XPOST -H ${auth_header} -H "Content-Type:application/zip" --data-binary @${builder_location} ${assets_url}?name=cslang-builder.zip
 
