@@ -1,5 +1,6 @@
 target/
 output/
+build/cli/
 *.class
 *.log
 .idea/
