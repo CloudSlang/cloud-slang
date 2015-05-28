@@ -36,16 +36,11 @@ flow:
   name: build_cli_flow
 
   workflow:
-    - create_target_dir:
-        do:
-          files.create_folder:
-            - folder_name: target_dir
-
     - copy_cloudslang_cli:
         do:
           files.copy:
             - source: "'../cloudslang-cli/target/cslang'"
-            - destination: target_cli + "/cslang"
+            - destination: target_cli
 
     - copy_verifier:
         do:
@@ -127,7 +122,7 @@ flow:
         do:
           cmd.run_command:
             - command: >
-                "chmod +x " + target_cli + "/cslang/bin/cslang"
+                "chmod +x " + target_cli + "/bin/cslang"
         navigate:
           SUCCESS: create_cli_zip
           FAILURE: FAILURE
@@ -146,7 +141,7 @@ flow:
         do:
           files.zip_folder:
             - archive_name: "'cslang-cli'"
-            - folder_path: 'target_dir + "/cloudslang-cli"'
+            - folder_path: target_dir + "/cloudslang-cli"
             - output_folder: target_dir
 
 

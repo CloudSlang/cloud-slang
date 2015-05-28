@@ -10,37 +10,44 @@
         run score cli
     </description>
     <!-- set global properties for this build -->
-    <property name="build" location="cli"/>
-    <!--<property name="proxy.host" value="proxy-host"/>-->
-    <!--<property name="proxy.port" value="8080"/>-->
+    <property name="stable-cli" location="cli"/>
+    <property name="build" location="target"/>
+    <property name="include_content" value="false"/>
+    <property name="proxy.host" value="proxy-host"/>
+    <property name="proxy.port" value="8080"/>
     <!--<echo message="proxy host: ${proxy.host}, proxy port: ${proxy.port}"/>-->
     <target name="init">
         <!-- Create the time stamp -->
         <tstamp/>
         <!-- Create the build directory structure used by compile -->
-        <!--<setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"/>-->
+        <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"/>
+        <mkdir dir="${stable-cli}"/>
         <mkdir dir="${build}"/>
         <get src="https://github.com/CloudSlang/cloud-slang/releases/download/cloudslang-0.7.5/cslang-cli.zip"
-             dest="${build}/cslang-cli.zip" usetimestamp="true" verbose="true"/>
-        <!--<gunzip src="${build}/slang.tar.gz"/>-->
-        <!--<untar src="${build}/slang.tar" dest="${build}"/>-->
-        <unzip src="${build}/cslang-cli.zip" dest="${build}"/>
+            dest="${stable-cli}/cslang-cli.zip" usetimestamp="true" verbose="true"/>
+        <!--<gunzip src="${stable-cli}/slang.tar.gz"/>-->
+        <!--<untar src="${stable-cli}/slang.tar" dest="${stable-cli}"/>-->
+        <unzip src="${stable-cli}/cslang-cli.zip" dest="${stable-cli}"/>
         <exec executable="/bin/bash" osfamily="unix">
-            <arg value="${build}/cslang/cslang/bin/cslang"/>
+            <arg value="${stable-cli}/cslang/cslang/bin/cslang"/>
             <arg value="run"/>
             <arg value="--f"/>
             <arg value="build_content/build_cli_flow.sl"/>
             <arg value="--cp"/>
-            <arg value="build_content,${build}"/>
+            <arg value="build_content,${stable-cli}"/>
+            <arg value="--i"/>
+            <arg value="include_content=${include_content}"/>
         </exec>
         <exec executable="cmd" osfamily="windows">
             <arg value="/c"/>
-            <arg value="${build}\cslang\cslang\bin\cslang"/>
+            <arg value="${stable-cli}\cslang\cslang\bin\cslang"/>
             <arg value="run"/>
             <arg value="--f"/>
             <arg value="build_content/build_cli_flow.sl"/>
             <arg value="--cp"/>
-            <arg value="build_content,${build}"/>
+            <arg value="build_content,${stable-cli}"/>
+            <arg value="--i"/>
+            <arg value="include_content=${include_content}"/>
         </exec>
     </target>
     <target name="clean"
