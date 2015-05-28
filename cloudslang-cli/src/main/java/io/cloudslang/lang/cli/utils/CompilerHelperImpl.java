@@ -19,6 +19,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -115,7 +116,12 @@ public class CompilerHelperImpl implements CompilerHelper{
 		for(String inputFile : files) {
 			logger.info("Loading file: " + inputFile);
 			try {
-				result.putAll((Map<String, ? extends Serializable>)yaml.load(FileUtils.readFileToString(new File(inputFile))));
+                String inputsFileContent = FileUtils.readFileToString(new File(inputFile));
+                if (StringUtils.isNotEmpty(inputsFileContent)) {
+                    @SuppressWarnings("unchecked") Map<String, ? extends Serializable> inputFileYamlContent =
+                            (Map<String, ? extends Serializable>) yaml.load(inputsFileContent);
+                    result.putAll(inputFileYamlContent);
+                }
 			} catch(IOException ex) {
 				logger.error("Error loading file: " + inputFile, ex);
 				throw new RuntimeException(ex);
