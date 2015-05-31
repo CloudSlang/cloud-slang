@@ -72,7 +72,7 @@ public class CompilerHelperImpl implements CompilerHelper{
 
         if (CollectionUtils.isEmpty(dependencies)) {
             dependencies = new ArrayList<>();
-            //app.home is the basedir property we set in executable
+            //app.home is the basedir property we set in our executables
             String appHome = System.getProperty("app.home", "");
             String contentRoot = appHome + File.separator + "content";
             File contentRootDir = new File(contentRoot);
@@ -80,7 +80,7 @@ public class CompilerHelperImpl implements CompilerHelper{
                     contentRootDir.exists() && contentRootDir.isDirectory()) {
                 dependencies.add(contentRoot);
             } else {
-                //default behavior is taking the parent dir if not running from executable
+                //default behavior is taking the parent dir if not running from our executables
                 dependencies.add(file.getParent());
             }
         }
