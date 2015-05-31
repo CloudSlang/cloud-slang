@@ -1,16 +1,16 @@
-# Contribution Guide score
+# CloudSlang Contribution Guide
 
-We welcome and encourage community contributions to score.
-Please familiarize yourself with the Contribution Guidelines and Project Roadmap before contributing.
-There are many ways to help score:
+We welcome and encourage community contributions to CloudSlang.
+Please familiarize yourself with the Contribution Guidelines and [Project Roadmap](https://github.com/CloudSlang/cloud-slang/wiki/Project-Roadmap) before contributing.
+
+There are many ways to help CloudSlang:
 * Report issues
 * Fix issues
 * Improve the documentation
 
-
 ## Contributing Code
 
-The best way to directly collaborate with the project contributors is through GitHub: https://github.com/CloudSlang
+The best way to directly collaborate with the project contributors is through GitHub: https://github.com/CloudSlang.
 * If you want to contribute to our code by either fixing a problem or creating a new feature, please open a GitHub pull request.
 * If you want to raise an issue such as a defect, an enhancement request or a general issue, please open a GitHub issue.
 
@@ -21,6 +21,33 @@ When a pull request fails testing, the author is expected to update the pull req
 
 At least one review from a maintainer is required for all patches (even patches from maintainers).
 
+## Pull Requests
+We encourage and support contributions from the community. No fix is too small. We strive to process all pull requests as soon as possible and with constructive feedback. If your pull request is not accepted at first, please try again after addressing the feedback you received.
+
+To make a pull request you will need a GitHub account. For help, see GitHub's documentation on forking and pull requests https://help.github.com/articles/using-pull-requests/.
+
+Pull requests that fix bugs or introduce new features must include tests that test your change in addition to passing all current tests. Please do not submit pull requests if tests fail. See existing tests for examples of how to properly compose your own tests. 
+
+Occasionally, a change will be very difficult to test. In those cases, please include a detailed note in your commit message explaining why tests are not included.
+
+Test coverage statistics are calculated using [Coveralls](coveralls.io). If test coverage falls below 80% or by more than 5% for a given pull request, the build will fail. 
+
+##Conduct
+
+Whether you are a regular contributor or a newcomer, we care about making this community a safe place for you.
+
+We are committed to providing a friendly, safe and welcoming environment for all regardless of their background and the extent of their contributions.
+Please avoid using nicknames that might detract from a friendly, safe and welcoming environment for all.
+Be kind and courteous.
+Those who insult, demean or harass anyone will be excluded from interaction. In particular, behavior that excludes people in socially marginalized groups will not be tolerated.
+We welcome discussion about creating a welcoming, safe and productive environment for the community. If you have any questions, feedback or concerns please let us know. (support@cloudslang.io)
+
+## Sign your work
+
+To accept the DCO, simply add this line to each commit message with your name and email address (git commit -s will do this for you):
+
+Signed-off-by: Jane Example <jane@example.com>
+For legal reasons, no anonymous or pseudonymous contributions are accepted.
 
 ## Developer's Certificate of Origin
 
@@ -62,29 +89,3 @@ By making a contribution to this project, I certify that:
     personal information I submit with it, including my sign-off) is
     maintained indefinitely and may be redistributed consistent with
     this project or the open source license(s) involved.
-
-### Sign your work
-
-To accept the DCO, simply add this line to each commit message with your name and email address (git commit -s will do this for you):
-
-Signed-off-by: Jane Example <jane@example.com>
-For legal reasons, no anonymous or pseudonymous contributions are accepted.
-
-## Pull Requests
-We encourage and support contributions from the community. No fix is too small. We strive to process all pull requests as soon as possible and with constructive feedback. If your pull request is not accepted at first, please try again after addressing the feedback you received.
-To make a pull request you will need a GitHub account. For help, see GitHub's documentation on forking and pull requests. (https://help.github.com/articles/using-pull-requests/ )
-
-Pull requests that fix bugs or introduce new features must include tests that test your change in addition to passing all current tests. Please do not submit pull requests if tests fail. See existing tests for examples of how to properly compose your own tests. 
-
-Occasionally, a change will be very difficult to test. In those cases, please include a detailed note in your commit message explaining why tests are not included.
-
-
-##Conduct
-
-Whether you are a regular contributor or a newcomer, we care about making this community a safe place for you.
-
-We are committed to providing a friendly, safe and welcoming environment for all regardless of their background and the extent of their contributions.
-Please avoid using nicknames that might detract from a friendly, safe and welcoming environment for all.
-Be kind and courteous.
-Those who insult, demean or harass anyone will be excluded from interaction. In particular, behavior that excludes people in socially marginalized groups will not be tolerated.
-We welcome discussion about creating a welcoming, safe and productive environment for the community. If you have any questions, feedback or concerns please let us know. (info@openscore.io)
