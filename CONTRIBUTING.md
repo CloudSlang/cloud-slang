@@ -40,7 +40,7 @@ We are committed to providing a friendly, safe and welcoming environment for all
 Please avoid using nicknames that might detract from a friendly, safe and welcoming environment for all.
 Be kind and courteous.
 Those who insult, demean or harass anyone will be excluded from interaction. In particular, behavior that excludes people in socially marginalized groups will not be tolerated.
-We welcome discussion about creating a welcoming, safe and productive environment for the community. If you have any questions, feedback or concerns please let us know. (info@openscore.io)
+We welcome discussion about creating a welcoming, safe and productive environment for the community. If you have any questions, feedback or concerns please let us know. (support@cloudslang.io)
 
 ## Sign your work
 
