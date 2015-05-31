@@ -13,6 +13,7 @@ import ch.lambdaj.function.convert.Converter;
 import com.google.common.collect.Lists;
 
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.cli.SlangCLI;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import org.apache.commons.collections4.CollectionUtils;
@@ -28,6 +29,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,7 +71,18 @@ public class CompilerHelperImpl implements CompilerHelper{
         Validate.isTrue(validFileExtension, "File: " + file.getName() + " must have one of the following extensions: sl, sl.yaml, sl.yml");
 
         if (CollectionUtils.isEmpty(dependencies)) {
-            dependencies = Lists.newArrayList(file.getParent()); //default behavior is taking the parent dir
+            dependencies = new ArrayList<>();
+            //app.home is the basedir property we set in our executables
+            String appHome = System.getProperty("app.home", "");
+            String contentRoot = appHome + File.separator + "content";
+            File contentRootDir = new File(contentRoot);
+            if (StringUtils.isNotEmpty(appHome) &&
+                    contentRootDir.exists() && contentRootDir.isDirectory()) {
+                dependencies.add(contentRoot);
+            } else {
+                //default behavior is taking the parent dir if not running from our executables
+                dependencies.add(file.getParent());
+            }
         }
         for (String dependency:dependencies) {
             Collection<File> dependenciesFiles = FileUtils.listFiles(new File(dependency), SLANG_FILE_EXTENSIONS, true);
