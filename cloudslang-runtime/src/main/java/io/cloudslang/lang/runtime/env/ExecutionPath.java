@@ -15,6 +15,8 @@ import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import static org.apache.commons.lang3.StringUtils.join;
+
 /**
  * @author moradi
  * @since 06/11/2014
@@ -30,19 +32,17 @@ public class ExecutionPath implements Serializable {
         parentPositions = new ArrayDeque<>();
     }
 
-    public int forward() {
-        return position++;
+    public void forward() {
+        position++;
     }
 
-    public int down() {
+    public void down() {
         parentPositions.push(position);
         position = 0;
-        return position;
     }
 
-    public int up() {
+    public void up() {
         position = parentPositions.pop();
-        return position;
     }
 
     public int getDepth() {
@@ -58,7 +58,7 @@ public class ExecutionPath implements Serializable {
     }
 
     private String getCurrentPath(int position) {
-        String parents = StringUtils.join(parentPositions.descendingIterator(), PATH_SEPARATOR);
+        String parents = join(parentPositions.descendingIterator(), PATH_SEPARATOR);
         return StringUtils.isEmpty(parents) ? position + "" : parents + PATH_SEPARATOR + position;
     }
 
