@@ -65,7 +65,6 @@ public class TaskSteps extends AbstractSteps {
                           @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
                           @Param(ScoreLangConstants.REF_ID) String refId) {
         try {
-            runEnv.getExecutionPath().forward();
             runEnv.removeCallArguments();
             runEnv.removeReturnValues();
 
@@ -112,7 +111,6 @@ public class TaskSteps extends AbstractSteps {
 
             // set the start step of the given ref as the next step to execute (in the new running execution plan that will be set)
             runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
-            runEnv.getExecutionPath().down();
         } catch (RuntimeException e) {
             logger.error("There was an error running the begin task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
@@ -133,7 +131,6 @@ public class TaskSteps extends AbstractSteps {
                         @Param(ScoreLangConstants.ASYNC_LOOP_KEY) boolean async_loop) {
 
         try {
-            if (runEnv.getExecutionPath().getDepth() > 0) runEnv.getExecutionPath().up();
             Context flowContext = runEnv.getStack().popContext();
             Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
 
@@ -154,6 +151,7 @@ public class TaskSteps extends AbstractSteps {
                 if (!shouldBreakLoop(breakOn, executableReturnValues) && loopCondition.hasMore()) {
                     runEnv.putNextStepPosition(previousStepId);
                     runEnv.getStack().pushContext(flowContext);
+                    runEnv.getExecutionPath().forward();
                     return;
                 } else {
                     flowContext.getLangVariables().remove(LoopCondition.LOOP_CONDITION_KEY);
@@ -194,6 +192,7 @@ public class TaskSteps extends AbstractSteps {
                     Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName));
 
             runEnv.getStack().pushContext(flowContext);
+            runEnv.getExecutionPath().forward();
         } catch (RuntimeException e) {
             logger.error("There was an error running the end task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);

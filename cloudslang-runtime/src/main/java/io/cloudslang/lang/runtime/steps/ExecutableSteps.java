@@ -61,7 +61,6 @@ public class ExecutableSteps extends AbstractSteps {
                                 @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
                                 @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId) {
         try {
-//			runEnv.getExecutionPath().forward(); // Start with 1 for consistency
             Map<String, Serializable> callArguments = runEnv.removeCallArguments();
 
             if (userInputs != null) {
@@ -88,7 +87,7 @@ public class ExecutableSteps extends AbstractSteps {
 
             // put the next step position for the navigation
             runEnv.putNextStepPosition(nextStepId);
-			runEnv.getExecutionPath().down();
+            runEnv.getExecutionPath().down();
         } catch (RuntimeException e){
             logger.error("There was an error running the start executable execution step of: \'" + nodeName + "\'.\n\tError is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t " + e.getMessage(), e);
@@ -109,7 +108,7 @@ public class ExecutableSteps extends AbstractSteps {
                                  @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                                  @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName) {
 		try {
-			runEnv.getExecutionPath().up();
+            runEnv.getExecutionPath().up();
             Context operationContext = runEnv.getStack().popContext();
             Map<String, Serializable> operationVariables = operationContext == null ? null : operationContext.getImmutableViewOfVariables();
             ReturnValues actionReturnValues = runEnv.removeReturnValues();

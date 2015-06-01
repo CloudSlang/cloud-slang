@@ -23,7 +23,7 @@ import static org.apache.commons.lang3.StringUtils.join;
  */
 public class ExecutionPath implements Serializable {
 
-    public static final String PATH_SEPARATOR = "/";
+    public static final String PATH_SEPARATOR = ".";
 
     private Deque<Integer> parentPositions;
     private int position;
@@ -45,20 +45,16 @@ public class ExecutionPath implements Serializable {
         position = parentPositions.pop();
     }
 
-    public int getDepth() {
-        return parentPositions.size();
-    }
-
     public String getCurrentPath() {
         return getCurrentPath(position);
     }
 
-    public String getCurrentPathPeekForward() {
-        return getCurrentPath(position + 1);
+    public String getParentPath() {
+        return join(parentPositions.descendingIterator(), PATH_SEPARATOR);
     }
 
     private String getCurrentPath(int position) {
-        String parents = join(parentPositions.descendingIterator(), PATH_SEPARATOR);
+        String parents = getParentPath();
         return StringUtils.isEmpty(parents) ? position + "" : parents + PATH_SEPARATOR + position;
     }
 

@@ -68,7 +68,8 @@ public class ActionSteps extends AbstractSteps {
         Map<String, Serializable> returnValue = new HashMap<>();
         Map<String, Serializable> callArguments = runEnv.removeCallArguments();
         Map<String, SerializableSessionObject> serializableSessionData = runEnv.getSerializableDataMap();
-        fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_ACTION_START, "Preparing to run action " + actionType, Pair.of(LanguageEventData.CALL_ARGUMENTS, (Serializable) callArguments));
+        fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_ACTION_START, "Preparing to run action " + actionType,
+                runEnv.getExecutionPath().getParentPath(), Pair.of(LanguageEventData.CALL_ARGUMENTS, (Serializable) callArguments));
         try {
             switch (actionType) {
                 case JAVA:
@@ -81,7 +82,8 @@ public class ActionSteps extends AbstractSteps {
                     break;
             }
         } catch (RuntimeException ex) {
-            fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_ACTION_ERROR, ex.getMessage(), Pair.of(LanguageEventData.EXCEPTION, ex.getMessage()));
+            fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_ACTION_ERROR, ex.getMessage(),
+                    runEnv.getExecutionPath().getParentPath(), Pair.of(LanguageEventData.EXCEPTION, ex.getMessage()));
             logger.error(ex);
             throw(ex);
         }
@@ -90,7 +92,8 @@ public class ActionSteps extends AbstractSteps {
 
         ReturnValues returnValues = new ReturnValues(returnValue, null);
         runEnv.putReturnValues(returnValues);
-        fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_ACTION_END, "Action performed", Pair.of(LanguageEventData.RETURN_VALUES, (Serializable)returnValue));
+        fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_ACTION_END, "Action performed",
+                runEnv.getExecutionPath().getParentPath(), Pair.of(LanguageEventData.RETURN_VALUES, (Serializable)returnValue));
 
         runEnv.putNextStepPosition(nextStepId);
     }
