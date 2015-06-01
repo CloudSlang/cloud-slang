@@ -72,7 +72,13 @@ public abstract class AbstractSteps {
         for (Entry<String, ? extends Serializable> field : fields) {
             eventData.put(field.getKey(), field.getValue());
         }
+
+        eventData.put(LanguageEventData.EFFECTIVE_RUNNING_USER, getEffectiveRunningUser(runtimeServices));
         runtimeServices.addEvent(type, eventData);
+    }
+
+    private static Serializable getEffectiveRunningUser(Serializable runtimeServices) {
+        return ((Map<String, Serializable>) runtimeServices).get(LanguageEventData.EFFECTIVE_RUNNING_USER);
     }
 
     protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment, Context currentContext, Map<String, Serializable> callArguments) {

@@ -88,7 +88,7 @@ public class ExecutableSteps extends AbstractSteps {
 
             // put the next step position for the navigation
             runEnv.putNextStepPosition(nextStepId);
-			runEnv.getExecutionPath().down();
+//			runEnv.getExecutionPath().down();
         } catch (RuntimeException e){
             logger.error("There was an error running the start executable execution step of: \'" + nodeName + "\'.\n\tError is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t " + e.getMessage(), e);
@@ -109,7 +109,7 @@ public class ExecutableSteps extends AbstractSteps {
                                  @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                                  @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName) {
 		try {
-			runEnv.getExecutionPath().up();
+//            if (runEnv.getExecutionPath().getDepth() > 0) runEnv.getExecutionPath().up();
             Context operationContext = runEnv.getStack().popContext();
             Map<String, Serializable> operationVariables = operationContext == null ? null : operationContext.getImmutableViewOfVariables();
             ReturnValues actionReturnValues = runEnv.removeReturnValues();

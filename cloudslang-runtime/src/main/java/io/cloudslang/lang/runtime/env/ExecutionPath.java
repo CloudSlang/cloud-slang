@@ -21,11 +21,27 @@ import java.util.Iterator;
  */
 public class ExecutionPath implements Serializable {
 
-	public static final String PATH_SEPARATOR = "/";
+	public static final String PATH_SEPARATOR = ".";
 	private static final long serialVersionUID = 5536588094244112461L;
 
 	private Deque<Integer> parentPositions;
 	private int position;
+
+    public String getNextAction() {
+        return nextAction;
+    }
+
+    public void setNextAction(String nextAction) {
+        this.nextAction = nextAction;
+    }
+
+    private String nextAction;
+
+    public enum  Action {
+        FORWARD,
+        UP,
+        DOWN
+    }
 
 	public ExecutionPath() {
 		parentPositions = new ArrayDeque<>();
