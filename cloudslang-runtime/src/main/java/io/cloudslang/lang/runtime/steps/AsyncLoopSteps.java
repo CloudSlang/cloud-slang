@@ -137,6 +137,7 @@ public class AsyncLoopSteps extends AbstractSteps {
             handleNavigationAndReturnValues(runEnv, executionRuntimeServices, taskNavigationValues, nodeName, publishValues, asyncLoopResult);
 
             runEnv.getStack().pushContext(flowContext);
+            runEnv.getExecutionPath().forward();
         } catch (RuntimeException e) {
             logger.error("There was an error running the end task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);
