@@ -23,8 +23,10 @@ import java.util.Map;
 import java.util.Set;
 
 import static ch.lambdaj.Lambda.filter;
+import static ch.lambdaj.Lambda.select;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
 
 public class LoopFlowsTest extends SystemsTestsParent{
 
@@ -196,7 +198,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
     }
 
     private List<String> getTasksOnly(Map<String, StepData> stepsData) {
-        return filter(not(endsWith("0")), stepsData.keySet());
+        return select(stepsData.keySet(), startsWith("0."));
     }
 
     private void verifyPersonMap(Map<String, StepData> stepsData) {

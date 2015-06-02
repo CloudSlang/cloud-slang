@@ -10,10 +10,13 @@
 
 package io.cloudslang.lang.systemtests;
 
+import ch.lambdaj.Lambda;
 import ch.lambdaj.function.convert.Converter;
 import ch.lambdaj.group.Group;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
+import org.apache.commons.collections4.CollectionUtils;
+import org.hamcrest.Matchers;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -21,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import static ch.lambdaj.Lambda.*;
+import static org.hamcrest.Matchers.equalTo;
 
 /*
  * Created by orius123 on 24/12/14.
@@ -42,24 +46,37 @@ public class RunDataAggregatorListener extends AbstractAggregatorListener {
     }
 
     private StepData buildStepData(List<LanguageEventData> data) {
-        Map<String, LanguageEventData> stepEvents = map(data, new Converter<LanguageEventData, String>() {
-            @Override
-            public String convert(LanguageEventData from) {
-                return from.getEventType();
-            }
-        });
+        List<LanguageEventData> taskEvents = selectByStepType(data, LanguageEventData.StepType.TASK);
+        List<LanguageEventData> executableEvents = selectByStepType(data, LanguageEventData.StepType.EXECUTABLE);
 
-        LanguageEventData inputsEvent = stepEvents.get(ScoreLangConstants.EVENT_INPUT_END);
-        LanguageEventData outputsEvent = stepEvents.get(ScoreLangConstants.EVENT_OUTPUT_END);
+        LanguageEventData inputsEvent;
+        LanguageEventData outputsEvent;
 
-        String path = inputsEvent.getPath();
-        String stepName = inputsEvent.getStepName();
-        Map<String, Serializable> inputs = inputsEvent.getInputs();
+        if (CollectionUtils.isNotEmpty(taskEvents)) {
+            inputsEvent = selectByEventType(taskEvents, ScoreLangConstants.EVENT_INPUT_END);
+            outputsEvent = selectByEventType(taskEvents, ScoreLangConstants.EVENT_OUTPUT_END);
+        } else {
+            inputsEvent = selectByEventType(executableEvents, ScoreLangConstants.EVENT_INPUT_END);
+            outputsEvent = selectByEventType(executableEvents, ScoreLangConstants.EVENT_OUTPUT_END);
+        }
+            String path = inputsEvent.getPath();
+            String stepName = inputsEvent.getStepName();
+            Map<String, Serializable> inputs = inputsEvent.getInputs();
 
-        Map<String, Serializable> outputs = outputsEvent == null ? null : outputsEvent.getOutputs();
-        String result = outputsEvent == null ? null : (String) outputsEvent.get(LanguageEventData.RESULT);
+            Map<String, Serializable> outputs = outputsEvent == null ? null : outputsEvent.getOutputs();
+            String result = outputsEvent == null ? null : (String) outputsEvent.get(LanguageEventData.RESULT);
 
-        return new StepData(path, stepName, inputs, outputs, result);
+            String executableName = executableEvents.get(0).getStepName();
+
+        return new StepData(path, stepName, inputs, outputs, executableName, result);
+    }
+
+    private List<LanguageEventData> selectByStepType(List<LanguageEventData> data, LanguageEventData.StepType stepType) {
+        return select(data, having(on(LanguageEventData.class).getStepType(), equalTo(stepType)));
+    }
+
+    private LanguageEventData selectByEventType(List<LanguageEventData> data, String eventType) {
+        return selectFirst(data, having(on(LanguageEventData.class).getEventType(), equalTo(eventType)));
     }
 
 }

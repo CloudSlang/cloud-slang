@@ -49,7 +49,7 @@ public class JoinAggregatorListener extends AbstractAggregatorListener {
                 stepName,
                 new HashMap<String, Serializable>(),
                 outputs,
-                result
+                null, result
         );
     }
 
