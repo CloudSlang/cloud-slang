@@ -174,6 +174,7 @@ public class AsyncLoopStepsTest {
     public void testJoinBranchesAggregateContexts() throws Exception {
         // prepare arguments
         RunEnvironment runEnvironment = new RunEnvironment();
+        runEnvironment.getExecutionPath().down();
         Map<String, Serializable> variables = new HashMap<>();
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
@@ -230,6 +231,7 @@ public class AsyncLoopStepsTest {
     public void testJoinBranchesNavigationAllBranchesSucced() throws Exception {
         // prepare arguments
         RunEnvironment runEnvironment = new RunEnvironment();
+        runEnvironment.getExecutionPath().down();
         Map<String, Serializable> variables = new HashMap<>();
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
@@ -279,6 +281,7 @@ public class AsyncLoopStepsTest {
     public void testJoinBranchesNavigationOneBranchFails() throws Exception {
         // prepare arguments
         RunEnvironment runEnvironment = new RunEnvironment();
+        runEnvironment.getExecutionPath().down();
         Map<String, Serializable> variables = new HashMap<>();
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
@@ -334,6 +337,7 @@ public class AsyncLoopStepsTest {
     public void testJoinBranchesEventsAreFired() throws Exception {
         // prepare arguments
         RunEnvironment runEnvironment = new RunEnvironment();
+        runEnvironment.getExecutionPath().down();
         Map<String, Serializable> variables = new HashMap<>();
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
