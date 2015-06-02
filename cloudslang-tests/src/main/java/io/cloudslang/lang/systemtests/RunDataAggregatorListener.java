@@ -53,8 +53,7 @@ public class RunDataAggregatorListener extends AbstractAggregatorListener {
         LanguageEventData outputsEvent = stepEvents.get(ScoreLangConstants.EVENT_OUTPUT_END);
 
         String path = inputsEvent.getPath();
-        String stepName = inputsEvent.get(TASK_NAME) != null ? (String) inputsEvent.get(TASK_NAME)
-                : (String) inputsEvent.get(EXECUTABLE_NAME);
+        String stepName = inputsEvent.getStepName();
         Map<String, Serializable> inputs = inputsEvent.getInputs();
 
         Map<String, Serializable> outputs = outputsEvent == null ? null : outputsEvent.getOutputs();

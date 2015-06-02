@@ -73,7 +73,7 @@ public class SyncTriggerEventListener implements ScoreEventListener{
                 errorMessage.set(SLANG_STEP_ERROR_MSG + data.get(LanguageEventData.EXCEPTION));
                 break;
             case ScoreLangConstants.EVENT_INPUT_END:
-                String taskName = (String)data.get(LanguageEventData.levelName.TASK_NAME.name());
+                String taskName = (String)data.get(LanguageEventData.STEP_NAME);
                 if(StringUtils.isNotEmpty(taskName)){
                     String path = (String) data.get(LanguageEventData.PATH);
                     int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
@@ -121,7 +121,7 @@ public class SyncTriggerEventListener implements ScoreEventListener{
 
     private void printFinishEvent(Map<String, Serializable> data) {
         String flowResult = (String)data.get(LanguageEventData.RESULT);
-        String flowName = (String)data.get(LanguageEventData.levelName.EXECUTABLE_NAME.toString());
+        String flowName = (String)data.get(LanguageEventData.STEP_NAME);
         printWithColor(Ansi.Color.CYAN,"Flow : " + flowName + " finished with result : " + flowResult);
     }
 

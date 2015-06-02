@@ -112,14 +112,15 @@ public class ExecutableStepsTest {
             }
         }
         Assert.assertNotNull(boundInputEvent);
-        Map<String,Serializable> eventData = (Map<String,Serializable>)boundInputEvent.getData();
+        LanguageEventData eventData = (LanguageEventData)boundInputEvent.getData();
         Assert.assertTrue(eventData.containsKey(LanguageEventData.BOUND_INPUTS));
         Map<String,Serializable> inputsBounded = (Map<String,Serializable>)eventData.get(LanguageEventData.BOUND_INPUTS);
         Assert.assertEquals(5, inputsBounded.get("input1"));
         Assert.assertEquals(LanguageEventData.ENCRYPTED_VALUE,inputsBounded.get("input2"));
 
-        Assert.assertTrue(eventData.containsKey(LanguageEventData.levelName.EXECUTABLE_NAME.name()));
-        Assert.assertEquals("dockerizeStep",eventData.get(LanguageEventData.levelName.EXECUTABLE_NAME.name()));
+        Assert.assertNotNull(eventData.getStepName());
+        Assert.assertEquals(LanguageEventData.StepType.EXECUTABLE, eventData.getStepType());
+        Assert.assertEquals("dockerizeStep", eventData.getStepName());
     }
 
     @Test
@@ -225,7 +226,7 @@ public class ExecutableStepsTest {
             }
         }
         Assert.assertNotNull(startOutputEvent);
-        Map<String,Serializable> eventData = (Map<String,Serializable>)startOutputEvent.getData();
+        LanguageEventData eventData = (LanguageEventData)startOutputEvent.getData();
         Assert.assertTrue(eventData.containsKey(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY));
         Assert.assertTrue(eventData.containsKey(ScoreLangConstants.EXECUTABLE_RESULTS_KEY));
         List<Output> outputs= (List<Output>)eventData.get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY);
@@ -234,17 +235,18 @@ public class ExecutableStepsTest {
         Assert.assertEquals(possibleResults, results);
 
         Assert.assertNotNull(boundOutputEvent);
-        eventData = (Map<String,Serializable>)boundOutputEvent.getData();
+        eventData = (LanguageEventData)boundOutputEvent.getData();
         Assert.assertTrue(eventData.containsKey(LanguageEventData.OUTPUTS));
-        Map<String, String> returnOutputs= (Map<String, String>)eventData.get(LanguageEventData.OUTPUTS);
+        Map<String, Serializable> returnOutputs= eventData.getOutputs();
         String returnResult= (String)eventData.get(LanguageEventData.RESULT);
-        Assert.assertEquals("task1",eventData.get(LanguageEventData.levelName.EXECUTABLE_NAME.name()));
+        Assert.assertEquals("task1",eventData.getStepName());
+        Assert.assertEquals(LanguageEventData.StepType.EXECUTABLE, eventData.getStepType());
         Assert.assertEquals(1, returnOutputs.size());
         Assert.assertEquals("John", returnOutputs.get("name"));
         Assert.assertTrue(returnResult.equals(ScoreLangConstants.SUCCESS_RESULT));
 
         Assert.assertNotNull(executableFinishedEvent);
-        eventData = (Map<String,Serializable>)executableFinishedEvent.getData();
+        eventData = (LanguageEventData)executableFinishedEvent.getData();
         String result = (String)eventData.get(LanguageEventData.RESULT);
         Map<String, String> eventOutputs = (Map<String, String>)eventData.get(LanguageEventData.OUTPUTS);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result);

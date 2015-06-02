@@ -41,8 +41,7 @@ public class JoinAggregatorListener extends AbstractAggregatorListener {
 
     private StepData buildPublishAggregateData(LanguageEventData data) {
         String path = data.getPath();
-        String stepName = data.get(TASK_NAME) != null ? (String) data.get(TASK_NAME)
-                : (String) data.get(EXECUTABLE_NAME);
+        String stepName = data.getStepName();
         Map<String, Serializable> outputs = data.getOutputs();
         String result = (String) data.get(LanguageEventData.RESULT);
         return new StepData(

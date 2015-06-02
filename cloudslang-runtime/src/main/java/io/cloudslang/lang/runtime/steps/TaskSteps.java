@@ -102,7 +102,7 @@ public class TaskSteps extends AbstractSteps {
             //todo: hook
 
             sendBindingInputsEvent(taskInputs, operationArguments, runEnv, executionRuntimeServices, "Task inputs resolved",
-                    nodeName, LanguageEventData.levelName.TASK_NAME);
+                    LanguageEventData.StepType.TASK, nodeName);
 
             updateCallArgumentsAndPushContextToStack(runEnv, flowContext, operationArguments);
 
@@ -136,9 +136,10 @@ public class TaskSteps extends AbstractSteps {
 
             ReturnValues executableReturnValues = runEnv.removeReturnValues();
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
+                    LanguageEventData.StepType.TASK, nodeName,
                     Pair.of(ScoreLangConstants.TASK_PUBLISH_KEY, (Serializable) taskPublishValues),
                     Pair.of(ScoreLangConstants.TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues),
-                    Pair.of("operationReturnValues", executableReturnValues), Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName));
+                    Pair.of("operationReturnValues", executableReturnValues));
 
             Map<String, Serializable> publishValues = outputsBinding.bindOutputs(flowVariables, executableReturnValues.getOutputs(), taskPublishValues);
 
@@ -186,10 +187,10 @@ public class TaskSteps extends AbstractSteps {
             ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : executableResult);
             runEnv.putReturnValues(returnValues);
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
+                    LanguageEventData.StepType.TASK, nodeName,
                     Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
                     Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
-                    Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition),
-                    Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName));
+                    Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition));
 
             runEnv.getStack().pushContext(flowContext);
             runEnv.getExecutionPath().forward();

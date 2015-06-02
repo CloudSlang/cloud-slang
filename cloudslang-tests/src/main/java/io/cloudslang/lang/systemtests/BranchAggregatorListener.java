@@ -49,8 +49,7 @@ public class BranchAggregatorListener extends AbstractAggregatorListener {
 
         for (LanguageEventData branchData : data) {
             String path = branchData.getPath();
-            String stepName = branchData.get(TASK_NAME) != null ? (String) branchData.get(TASK_NAME)
-                : (String) branchData.get(EXECUTABLE_NAME);
+            String stepName = branchData.getStepName();
             ReturnValues returnValues = (ReturnValues) branchData.get(RuntimeConstants.BRANCH_RETURN_VALUES_KEY);
             branches.add(
                     new StepData(

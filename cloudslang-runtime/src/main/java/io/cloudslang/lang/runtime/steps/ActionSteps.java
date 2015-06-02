@@ -69,7 +69,8 @@ public class ActionSteps extends AbstractSteps {
         Map<String, Serializable> callArguments = runEnv.removeCallArguments();
         Map<String, SerializableSessionObject> serializableSessionData = runEnv.getSerializableDataMap();
         fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_ACTION_START, "Preparing to run action " + actionType,
-                runEnv.getExecutionPath().getParentPath(), Pair.of(LanguageEventData.CALL_ARGUMENTS, (Serializable) callArguments));
+                runEnv.getExecutionPath().getParentPath(), LanguageEventData.StepType.ACTION, null,
+                Pair.of(LanguageEventData.CALL_ARGUMENTS, (Serializable) callArguments));
         try {
             switch (actionType) {
                 case JAVA:
@@ -83,7 +84,8 @@ public class ActionSteps extends AbstractSteps {
             }
         } catch (RuntimeException ex) {
             fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_ACTION_ERROR, ex.getMessage(),
-                    runEnv.getExecutionPath().getParentPath(), Pair.of(LanguageEventData.EXCEPTION, ex.getMessage()));
+                    runEnv.getExecutionPath().getParentPath(), LanguageEventData.StepType.ACTION, null,
+                    Pair.of(LanguageEventData.EXCEPTION, ex.getMessage()));
             logger.error(ex);
             throw(ex);
         }
@@ -93,7 +95,8 @@ public class ActionSteps extends AbstractSteps {
         ReturnValues returnValues = new ReturnValues(returnValue, null);
         runEnv.putReturnValues(returnValues);
         fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_ACTION_END, "Action performed",
-                runEnv.getExecutionPath().getParentPath(), Pair.of(LanguageEventData.RETURN_VALUES, (Serializable)returnValue));
+                runEnv.getExecutionPath().getParentPath(), LanguageEventData.StepType.ACTION, null,
+                Pair.of(LanguageEventData.RETURN_VALUES, (Serializable)returnValue));
 
         runEnv.putNextStepPosition(nextStepId);
     }

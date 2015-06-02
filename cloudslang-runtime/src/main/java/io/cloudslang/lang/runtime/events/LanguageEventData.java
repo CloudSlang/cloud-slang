@@ -38,15 +38,11 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     public static final String STEP_TYPE = "STEP_TYPE";
     public static final String STEP_NAME = "STEP_NAME";
 
-    public enum levelName {
-        TASK_NAME,
-        EXECUTABLE_NAME
-    }
-
     public enum StepType {
         TASK,
         EXECUTABLE,
-        ACTION
+        ACTION,
+        NAVIGATION
     }
 
     public String getStepName() {
