@@ -65,7 +65,6 @@ public class TaskSteps extends AbstractSteps {
                           @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
                           @Param(ScoreLangConstants.REF_ID) String refId) {
         try {
-            runEnv.getExecutionPath().forward();
             runEnv.removeCallArguments();
             runEnv.removeReturnValues();
 
@@ -103,7 +102,7 @@ public class TaskSteps extends AbstractSteps {
             //todo: hook
 
             sendBindingInputsEvent(taskInputs, operationArguments, runEnv, executionRuntimeServices, "Task inputs resolved",
-                    nodeName, LanguageEventData.levelName.TASK_NAME);
+                    LanguageEventData.StepType.TASK, nodeName);
 
             updateCallArgumentsAndPushContextToStack(runEnv, flowContext, operationArguments);
 
@@ -112,7 +111,6 @@ public class TaskSteps extends AbstractSteps {
 
             // set the start step of the given ref as the next step to execute (in the new running execution plan that will be set)
             runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
-            runEnv.getExecutionPath().down();
         } catch (RuntimeException e) {
             logger.error("There was an error running the begin task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
@@ -133,15 +131,15 @@ public class TaskSteps extends AbstractSteps {
                         @Param(ScoreLangConstants.ASYNC_LOOP_KEY) boolean async_loop) {
 
         try {
-            if (runEnv.getExecutionPath().getDepth() > 0) runEnv.getExecutionPath().up();
             Context flowContext = runEnv.getStack().popContext();
             Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
 
             ReturnValues executableReturnValues = runEnv.removeReturnValues();
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
+                    LanguageEventData.StepType.TASK, nodeName,
                     Pair.of(ScoreLangConstants.TASK_PUBLISH_KEY, (Serializable) taskPublishValues),
                     Pair.of(ScoreLangConstants.TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues),
-                    Pair.of("operationReturnValues", executableReturnValues), Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName));
+                    Pair.of("operationReturnValues", executableReturnValues));
 
             Map<String, Serializable> publishValues = outputsBinding.bindOutputs(flowVariables, executableReturnValues.getOutputs(), taskPublishValues);
 
@@ -154,6 +152,7 @@ public class TaskSteps extends AbstractSteps {
                 if (!shouldBreakLoop(breakOn, executableReturnValues) && loopCondition.hasMore()) {
                     runEnv.putNextStepPosition(previousStepId);
                     runEnv.getStack().pushContext(flowContext);
+                    runEnv.getExecutionPath().forward();
                     return;
                 } else {
                     flowContext.getLangVariables().remove(LoopCondition.LOOP_CONDITION_KEY);
@@ -188,12 +187,13 @@ public class TaskSteps extends AbstractSteps {
             ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : executableResult);
             runEnv.putReturnValues(returnValues);
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
+                    LanguageEventData.StepType.TASK, nodeName,
                     Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
                     Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
-                    Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition),
-                    Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName));
+                    Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition));
 
             runEnv.getStack().pushContext(flowContext);
+            runEnv.getExecutionPath().forward();
         } catch (RuntimeException e) {
             logger.error("There was an error running the end task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);

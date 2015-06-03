@@ -1,28 +1,32 @@
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 package io.cloudslang.lang.compiler.scorecompiler;
 
 import ch.lambdaj.Lambda;
+import io.cloudslang.lang.compiler.modeller.model.Flow;
+import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Task;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.bindings.Result;
-import io.cloudslang.lang.compiler.modeller.model.Flow;
-import io.cloudslang.lang.compiler.modeller.model.Operation;
-import org.apache.commons.collections4.CollectionUtils;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
@@ -106,23 +110,14 @@ public class ExecutionPlanBuilder {
         if (isAsync) {
             Long joinStepID = currentId + NUMBER_OF_ASYNC_LOOP_EXECUTION_STEPS + 1;
             taskExecutionSteps.add(
-                    stepFactory.createAddBranchesStep(
-                            currentId++,
-                            joinStepID,
-                            currentId,
-                            task.getPreTaskActionData(),
-                            compiledFlow.getId(),
-                            taskName
+                    stepFactory.createAddBranchesStep(currentId++, joinStepID, currentId,
+                            task.getPreTaskActionData(), compiledFlow.getId(), taskName
                     )
             );
         }
         taskExecutionSteps.add(
-                stepFactory.createBeginTaskStep(
-                        currentId++,
-                        task.getInputs(),
-                        task.getPreTaskActionData(),
-                        task.getRefId(),
-                        taskName)
+                stepFactory.createBeginTaskStep(currentId++, task.getInputs(),
+                        task.getPreTaskActionData(), task.getRefId(), taskName)
         );
 
         //End Task
@@ -131,39 +126,28 @@ public class ExecutionPlanBuilder {
             String nextStepName = entry.getValue();
             if (taskReferences.get(nextStepName) == null) {
                 Task nextTaskToCompile = Lambda.selectFirst(tasks, having(on(Task.class).getName(), equalTo(nextStepName)));
-                if(nextTaskToCompile == null){
+                if (nextTaskToCompile == null) {
                     throw new RuntimeException("Failed to compile task: " + taskName + ". The task/result name: " + entry.getValue() + " of navigation: " + entry.getKey() + " -> " + entry.getValue() + " is missing");
                 }
                 taskExecutionSteps.addAll(buildTaskExecutionSteps(nextTaskToCompile, taskReferences, tasks, compiledFlow));
             }
-			long nextStepId = taskReferences.get(nextStepName);
-			String presetResult = (FLOW_END_STEP_ID == nextStepId) ? nextStepName : null;
-			navigationValues.put(entry.getKey(), new ResultNavigation(nextStepId, presetResult));
+            long nextStepId = taskReferences.get(nextStepName);
+            String presetResult = (FLOW_END_STEP_ID == nextStepId) ? nextStepName : null;
+            navigationValues.put(entry.getKey(), new ResultNavigation(nextStepId, presetResult));
         }
         if (isAsync) {
             taskExecutionSteps.add(
-                    stepFactory.createFinishTaskStep(
-                            currentId++,
-                            task.getPostTaskActionData(),
-                            new HashMap<String, ResultNavigation>(),
-                            taskName,
-                            true)
+                    stepFactory.createFinishTaskStep(currentId++, task.getPostTaskActionData(),
+                            new HashMap<String, ResultNavigation>(), taskName, true)
             );
             taskExecutionSteps.add(
-                    stepFactory.createJoinBranchesStep(
-                            currentId,
-                            task.getPostTaskActionData(),
-                            navigationValues,
-                            taskName)
+                    stepFactory.createJoinBranchesStep(currentId, task.getPostTaskActionData(),
+                            navigationValues, taskName)
             );
         } else {
             taskExecutionSteps.add(
-                    stepFactory.createFinishTaskStep(
-                            currentId,
-                            task.getPostTaskActionData(),
-                            navigationValues,
-                            taskName,
-                            false)
+                    stepFactory.createFinishTaskStep(currentId, task.getPostTaskActionData(),
+                            navigationValues, taskName, false)
             );
         }
         return taskExecutionSteps;

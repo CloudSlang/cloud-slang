@@ -53,7 +53,6 @@ public class NavigationTest extends SystemsTestsParent {
 
         Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs, null).getTasks();
 
-        Assert.assertEquals(5, tasks.size());
         Assert.assertEquals("check_number", tasks.get(FIRST_STEP_PATH).getName());
         Assert.assertEquals("process_even_number", tasks.get(SECOND_STEP_KEY).getName());
     }

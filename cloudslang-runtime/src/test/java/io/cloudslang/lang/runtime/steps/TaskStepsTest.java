@@ -143,8 +143,9 @@ public class TaskStepsTest {
         ScoreEvent inputEvent = events.iterator().next();
         Assert.assertEquals(ScoreLangConstants.EVENT_INPUT_END,inputEvent.getEventType());
 
-        Map<String,Serializable> eventData = (Map<String,Serializable>)inputEvent.getData();
-        Assert.assertEquals("task1",eventData.get(LanguageEventData.levelName.TASK_NAME.name()));
+        LanguageEventData eventData = (LanguageEventData)inputEvent.getData();
+        Assert.assertEquals("task1",eventData.getStepName());
+        Assert.assertEquals(LanguageEventData.StepType.TASK,eventData.getStepType());
 
         Map<String,Serializable> boundInputs = (Map<String,Serializable>)eventData.get(LanguageEventData.BOUND_INPUTS);
         Assert.assertEquals(5,boundInputs.get("input1"));
@@ -172,14 +173,16 @@ public class TaskStepsTest {
         ScoreEvent outputStart = eventsIter.next();
         Assert.assertEquals(ScoreLangConstants.EVENT_OUTPUT_START,outputStart.getEventType());
 
-        Map<String,Serializable> eventData = (Map<String,Serializable>)outputStart.getData();
-        Assert.assertEquals("task1",eventData.get(LanguageEventData.levelName.TASK_NAME.name()));
+        LanguageEventData eventData = (LanguageEventData)outputStart.getData();
+        Assert.assertEquals("task1",eventData.getStepName());
+        Assert.assertEquals(LanguageEventData.StepType.TASK,eventData.getStepType());
 
         ScoreEvent outputEnd = eventsIter.next();
         Assert.assertEquals(ScoreLangConstants.EVENT_OUTPUT_END,outputEnd.getEventType());
 
-        eventData = (Map<String,Serializable>)outputEnd.getData();
-        Assert.assertEquals("task1",eventData.get(LanguageEventData.levelName.TASK_NAME.name()));
+        eventData = (LanguageEventData)outputEnd.getData();
+        Assert.assertEquals("task1",eventData.getStepName());
+        Assert.assertEquals(LanguageEventData.StepType.TASK,eventData.getStepType());
 
     }
 

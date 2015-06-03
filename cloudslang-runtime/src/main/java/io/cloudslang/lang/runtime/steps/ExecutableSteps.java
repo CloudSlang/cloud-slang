@@ -43,6 +43,8 @@ import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUT
 @Component
 public class ExecutableSteps extends AbstractSteps {
 
+    public static final String ACTION_RETURN_VALUES_KEY = "actionReturnValues";
+
     @Autowired
     private ResultsBinding resultsBinding;
 
@@ -61,7 +63,6 @@ public class ExecutableSteps extends AbstractSteps {
                                 @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
                                 @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId) {
         try {
-//			runEnv.getExecutionPath().forward(); // Start with 1 for consistency
             Map<String, Serializable> callArguments = runEnv.removeCallArguments();
 
             if (userInputs != null) {
@@ -84,11 +85,11 @@ public class ExecutableSteps extends AbstractSteps {
             updateCallArgumentsAndPushContextToStack(runEnv, new Context(executableContext), actionArguments);
 
             sendBindingInputsEvent(executableInputs, executableContext, runEnv, executionRuntimeServices,
-                    "Post Input binding for operation/flow", nodeName, LanguageEventData.levelName.EXECUTABLE_NAME);
+                    "Post Input binding for operation/flow", LanguageEventData.StepType.EXECUTABLE, nodeName);
 
             // put the next step position for the navigation
             runEnv.putNextStepPosition(nextStepId);
-			runEnv.getExecutionPath().down();
+            runEnv.getExecutionPath().down();
         } catch (RuntimeException e){
             logger.error("There was an error running the start executable execution step of: \'" + nodeName + "\'.\n\tError is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t " + e.getMessage(), e);
@@ -109,14 +110,15 @@ public class ExecutableSteps extends AbstractSteps {
                                  @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                                  @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName) {
 		try {
-			runEnv.getExecutionPath().up();
+            runEnv.getExecutionPath().up();
             Context operationContext = runEnv.getStack().popContext();
             Map<String, Serializable> operationVariables = operationContext == null ? null : operationContext.getImmutableViewOfVariables();
             ReturnValues actionReturnValues = runEnv.removeReturnValues();
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
+                    LanguageEventData.StepType.EXECUTABLE, nodeName,
                     Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable) executableOutputs),
                     Pair.of(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable) executableResults),
-                    Pair.of("actionReturnValues", actionReturnValues), Pair.of(LanguageEventData.levelName.EXECUTABLE_NAME.toString(), nodeName));
+                    Pair.of(ACTION_RETURN_VALUES_KEY, actionReturnValues));
 
             // Resolving the result of the operation/flow
             String result = resultsBinding.resolveResult(operationVariables, actionReturnValues.getOutputs(), executableResults, actionReturnValues.getResult());
@@ -128,19 +130,19 @@ public class ExecutableSteps extends AbstractSteps {
             ReturnValues returnValues = new ReturnValues(operationReturnOutputs, result);
             runEnv.putReturnValues(returnValues);
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
+                    LanguageEventData.StepType.EXECUTABLE, nodeName,
                     Pair.of(LanguageEventData.OUTPUTS, (Serializable) operationReturnOutputs),
-                    Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
-                    Pair.of(LanguageEventData.levelName.EXECUTABLE_NAME.toString(), nodeName));
+                    Pair.of(LanguageEventData.RESULT, returnValues.getResult()));
 
             // If we have parent flow data on the stack, we pop it and request the score engine to switch to the parent
             // execution plan id once it can, and we set the next position that was stored there for the use of the navigation
             if (!runEnv.getParentFlowStack().isEmpty()) {
                 handleNavigationToParent(runEnv, executionRuntimeServices);
             } else {
-                fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_EXECUTION_FINISHED, "Execution finished running",
+                fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_EXECUTION_FINISHED,
+                        "Execution finished running", LanguageEventData.StepType.EXECUTABLE, nodeName,
                         Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
-                        Pair.of(LanguageEventData.OUTPUTS, (Serializable) operationReturnOutputs),
-                        Pair.of(LanguageEventData.levelName.EXECUTABLE_NAME.toString(), nodeName));
+                        Pair.of(LanguageEventData.OUTPUTS, (Serializable) operationReturnOutputs));
             }
         } catch (RuntimeException e){
             logger.error("There was an error running the finish executable execution step of: \'" + nodeName + "\'.\n\tError is: " + e.getMessage());
