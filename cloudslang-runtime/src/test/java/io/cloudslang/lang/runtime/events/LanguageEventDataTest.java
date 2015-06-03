@@ -9,7 +9,6 @@
 *******************************************************************************/
 package io.cloudslang.lang.runtime.events;
 
-import com.google.common.collect.Lists;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -18,6 +17,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -155,7 +156,7 @@ public class LanguageEventDataTest {
      */
     @Test
     public void testAsyncLoopBoundExpression() {
-        List<Serializable> asyncLoopBoundExpression = Lists.newArrayList((Serializable) "a", "b", "c");
+        List<Serializable> asyncLoopBoundExpression = new ArrayList<Serializable>(Arrays.asList("a", "b", "c"));
         eventData.setAsyncLoopBoundExpression(asyncLoopBoundExpression);
         assertEquals(asyncLoopBoundExpression, eventData.getAsyncLoopBoundExpression());
         assertEquals(asyncLoopBoundExpression, eventData.get(LanguageEventData.BOUND_ASYNC_LOOP_EXPRESSION));
