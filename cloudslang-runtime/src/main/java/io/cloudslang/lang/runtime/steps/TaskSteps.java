@@ -153,6 +153,8 @@ public class TaskSteps extends AbstractSteps {
                     runEnv.putNextStepPosition(previousStepId);
                     runEnv.getStack().pushContext(flowContext);
                     runEnv.getExecutionPath().forward();
+                    throwEventOutputEnd(runEnv, executionRuntimeServices, nodeName,
+                            (Serializable) publishValues, previousStepId, new ReturnValues(publishValues, null));
                     return;
                 } else {
                     flowContext.getLangVariables().remove(LoopCondition.LOOP_CONDITION_KEY);
@@ -186,11 +188,8 @@ public class TaskSteps extends AbstractSteps {
 
             ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : executableResult);
             runEnv.putReturnValues(returnValues);
-            fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
-                    LanguageEventData.StepType.TASK, nodeName,
-                    Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
-                    Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
-                    Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition));
+            throwEventOutputEnd(runEnv, executionRuntimeServices, nodeName,
+                    (Serializable) publishValues, nextPosition, returnValues);
 
             runEnv.getStack().pushContext(flowContext);
             runEnv.getExecutionPath().forward();
@@ -198,6 +197,19 @@ public class TaskSteps extends AbstractSteps {
             logger.error("There was an error running the end task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);
         }
+    }
+
+    private void throwEventOutputEnd(RunEnvironment runEnv,
+                                     ExecutionRuntimeServices executionRuntimeServices,
+                                     String nodeName,
+                                     Serializable publishValues,
+                                     Long nextPosition,
+                                     ReturnValues returnValues) {
+        fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
+                LanguageEventData.StepType.TASK, nodeName,
+                Pair.of(LanguageEventData.OUTPUTS, publishValues),
+                Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
+                Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition));
     }
 
     private boolean shouldBreakLoop(List<String> breakOn, ReturnValues executableReturnValues) {

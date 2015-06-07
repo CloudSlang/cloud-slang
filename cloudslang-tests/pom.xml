@@ -30,6 +30,7 @@
         <dependency>
             <groupId>${score.group}</groupId>
             <artifactId>score-all</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -50,6 +51,11 @@
         <dependency>
             <groupId>io.cloudslang.content</groupId>
             <artifactId>score-ssh</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
 
         <dependency>
