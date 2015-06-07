@@ -10,9 +10,12 @@
 package io.cloudslang.lang.tools.build;
 
 import com.beust.jcommander.JCommander;
+import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.tools.build.commands.ApplicationArgs;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.TestRun;
+import io.cloudslang.score.events.ScoreEvent;
+import io.cloudslang.score.events.ScoreEventListener;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -55,9 +58,12 @@ public class SlangBuildMain {
 
         log.info("");
         log.info("Loading...");
+
         //load application context
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/testRunnerContext.xml");
         SlangBuilder slangBuilder = context.getBean(SlangBuilder.class);
+        Slang slang = context.getBean(Slang.class);
+        registerEventHandlers(slang);
 
         try {
             SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites);
@@ -143,4 +149,18 @@ public class SlangBuildMain {
 
         return repositoryPath;
     }
+
+    private static void registerEventHandlers(Slang slang) {
+        slang.subscribeOnAllEvents(new ScoreEventListener() {
+            @Override
+            public void onEvent(ScoreEvent event) {
+                logEvent(event);
+            }
+        });
+    }
+
+    private static void logEvent(ScoreEvent event) {
+        log.debug(("Event received: " + event.getEventType() + " Data is: " + event.getData()));
+    }
+
 }
