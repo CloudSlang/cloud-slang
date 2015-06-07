@@ -62,6 +62,8 @@ public class SlangTestRunnerTest {
     public ExpectedException exception = ExpectedException.none();
 
     private List<String> specialTestSuite = Arrays.asList("special");
+    private List<String> specialRuntimeTestSuite = Arrays.asList("special","default");
+    private List<String> defaultTestSuite = Arrays.asList("default");
 
 
     @Before
@@ -161,7 +163,7 @@ public class SlangTestRunnerTest {
         Map<String, SlangTestCase> testCases = new HashMap<>();
         SlangTestCase testCase = new SlangTestCase("test1", null, null, null, null, null, null, null, null);
         testCases.put("test1", testCase);
-        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, new HashMap<String, CompilationArtifact>(), new ArrayList<String>());
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, new HashMap<String, CompilationArtifact>(), defaultTestSuite);
         Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
         Assert.assertEquals("1 test case should fail", 1, failedTests.size());
         TestRun failedTest = failedTests.values().iterator().next();
@@ -175,7 +177,7 @@ public class SlangTestRunnerTest {
         Map<String, SlangTestCase> testCases = new HashMap<>();
         SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", null, null, null, null, null, null, null);
         testCases.put("test1", testCase);
-        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, new HashMap<String, CompilationArtifact>(), new ArrayList<String>());
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, new HashMap<String, CompilationArtifact>(), defaultTestSuite);
         Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
         Assert.assertEquals("1 test case should fail", 1, failedTests.size());
         TestRun failedTest = failedTests.values().iterator().next();
@@ -192,7 +194,7 @@ public class SlangTestRunnerTest {
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
         prepareMockForEventListenerWithSuccessResult();
-        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, new ArrayList<String>());
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, defaultTestSuite);
         Assert.assertEquals("No test cases should fail", 0, runTestsResults.getFailedTests().size());
     }
 
@@ -204,7 +206,7 @@ public class SlangTestRunnerTest {
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
         prepareMockForEventListenerWithSuccessResult();
-        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, new ArrayList<String>());
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows,defaultTestSuite);
         Assert.assertEquals("No test cases should fail", 0, runTestsResults.getFailedTests()
                                                                            .size());
     }
@@ -228,7 +230,7 @@ public class SlangTestRunnerTest {
         convertedOutputs.put("output1", "value1");
         convertedOutputs.put("output2", "value2");
         prepareMockForEventListenerWithSuccessResultAndOutputs(convertedOutputs);
-        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, new ArrayList<String>());
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, defaultTestSuite);
         Assert.assertEquals("No test cases should fail", 0, runTestsResults.getFailedTests().size());
     }
 
@@ -246,7 +248,7 @@ public class SlangTestRunnerTest {
         Map<String, Serializable> convertedOutputs = new HashMap<>();
         convertedOutputs.put("output1", null);
         prepareMockForEventListenerWithSuccessResultAndOutputs(convertedOutputs);
-        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, new ArrayList<String>());
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, defaultTestSuite);
         Assert.assertEquals("No test cases should fail", 0, runTestsResults.getFailedTests().size());
     }
 
@@ -264,7 +266,7 @@ public class SlangTestRunnerTest {
         Map<String, Serializable> convertedOutputs = new HashMap<>();
         convertedOutputs.put("output1", 1);
         prepareMockForEventListenerWithSuccessResultAndOutputs(convertedOutputs);
-        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, new ArrayList<String>());
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, defaultTestSuite);
         Assert.assertEquals("No test cases should fail", 0, runTestsResults.getFailedTests().size());
     }
 
@@ -282,7 +284,7 @@ public class SlangTestRunnerTest {
         Map<String, Serializable> convertedOutputs = new HashMap<>();
         convertedOutputs.put("output1", 2);
         prepareMockForEventListenerWithSuccessResultAndOutputs(convertedOutputs);
-        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, new ArrayList<String>());
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, defaultTestSuite);
         Assert.assertEquals("1 test cases should fail", 1, runTestsResults.getFailedTests().size());
     }
 
@@ -300,7 +302,7 @@ public class SlangTestRunnerTest {
         Map<String, Serializable> convertedOutputs = new HashMap<>();
         convertedOutputs.put("output1", Boolean.TRUE);
         prepareMockForEventListenerWithSuccessResultAndOutputs(convertedOutputs);
-        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, new ArrayList<String>());
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, defaultTestSuite);
         Assert.assertEquals("No test cases should fail", 0, runTestsResults.getFailedTests().size());
     }
 
@@ -312,7 +314,7 @@ public class SlangTestRunnerTest {
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
         prepareMockForEventListenerWithSlangExceptionEvent();
-        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, new ArrayList<String>());
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, defaultTestSuite);
         Assert.assertEquals("No test case should fail", 0, runTestsResults.getFailedTests().size());
     }
 
@@ -324,7 +326,7 @@ public class SlangTestRunnerTest {
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
         prepareMockForEventListenerWithSuccessResult();
-        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, new ArrayList<String>());
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, defaultTestSuite);
         Assert.assertEquals("1 test case should fail", 1, runTestsResults.getFailedTests().size());
     }
 
@@ -336,7 +338,7 @@ public class SlangTestRunnerTest {
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
         prepareMockForEventListenerWithSlangExceptionEvent();
-        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, new ArrayList<String>());
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, defaultTestSuite);
         Assert.assertEquals("1 test case should fail", 1, runTestsResults.getFailedTests().size());
     }
 
@@ -348,7 +350,7 @@ public class SlangTestRunnerTest {
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
         prepareMockForEventListenerWithSuccessResult();
-        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, new ArrayList<String>());
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, defaultTestSuite);
         Assert.assertEquals("No test case should fail", 0, runTestsResults.getFailedTests().size());
     }
 
@@ -360,7 +362,7 @@ public class SlangTestRunnerTest {
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
         prepareMockForEventListenerWithSuccessResult();
-        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, new ArrayList<String>());
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, defaultTestSuite);
         Assert.assertEquals("1 test case should fail", 1, runTestsResults.getFailedTests().size());
     }
 
@@ -372,7 +374,7 @@ public class SlangTestRunnerTest {
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
         prepareMockForEventListenerWithSuccessResult();
-        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, new ArrayList<String>());
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, defaultTestSuite);
         Assert.assertEquals("No test cases should fail", 0, runTestsResults.getFailedTests().size());
     }
 
@@ -384,7 +386,7 @@ public class SlangTestRunnerTest {
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
         prepareMockForEventListenerWithSuccessResult();
-        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, specialTestSuite);
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, specialRuntimeTestSuite);
         Assert.assertEquals("No test cases should be skipped", 0, runTestsResults.getSkippedTests().size());
     }
 
@@ -396,7 +398,7 @@ public class SlangTestRunnerTest {
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
         prepareMockForEventListenerWithSuccessResult();
-        List<String> runtimeTestSuites = new ArrayList<>(specialTestSuite);
+        List<String> runtimeTestSuites = new ArrayList<>(specialRuntimeTestSuite);
         runtimeTestSuites.add("anotherTestSuite");
         RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, runtimeTestSuites);
         Assert.assertEquals("No test cases should be skipped", 0, runTestsResults.getSkippedTests().size());
@@ -410,7 +412,7 @@ public class SlangTestRunnerTest {
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
         prepareMockForEventListenerWithSuccessResult();
-        List<String> runtimeTestSuites = new ArrayList<>(specialTestSuite);
+        List<String> runtimeTestSuites = new ArrayList<>(specialRuntimeTestSuite);
         runtimeTestSuites.add("anotherTestSuite");
         RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, runtimeTestSuites);
         Assert.assertEquals("No test cases should be skipped", 0, runTestsResults.getSkippedTests().size());
@@ -424,7 +426,7 @@ public class SlangTestRunnerTest {
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
         prepareMockForEventListenerWithSuccessResult();
-        List<String> runtimeTestSuites = new ArrayList<>(specialTestSuite);
+        List<String> runtimeTestSuites = new ArrayList<>(specialRuntimeTestSuite);
         runtimeTestSuites.add("anotherTestSuite");
         RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, runtimeTestSuites);
         Assert.assertEquals("1 test case should be skipped", 1, runTestsResults.getSkippedTests().size());
@@ -438,7 +440,7 @@ public class SlangTestRunnerTest {
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
         prepareMockForEventListenerWithSuccessResult();
-        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, new ArrayList<String>());
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, defaultTestSuite);
         Assert.assertEquals("1 test case should be skipped", 1, runTestsResults.getSkippedTests().size());
     }
 

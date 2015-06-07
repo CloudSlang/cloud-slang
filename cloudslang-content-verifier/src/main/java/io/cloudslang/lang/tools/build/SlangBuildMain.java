@@ -38,8 +38,10 @@ public class SlangBuildMain {
 
     private static final String CONTENT_DIR =  File.separator + "content";
     private static final String TEST_DIR = File.separator + "test";
+    public static final String DEFAULT_TESTS = "default";
 
     private final static Logger log = Logger.getLogger(SlangBuildMain.class);
+    private static String NOT_TS = "!";
 
     public static void main(String[] args) {
         ApplicationArgs appArgs = new ApplicationArgs();
@@ -47,7 +49,7 @@ public class SlangBuildMain {
         String projectPath = parseProjectPathArg(appArgs);
         String contentPath = StringUtils.defaultIfEmpty(appArgs.getContentRoot(), projectPath + CONTENT_DIR);
         String testsPath = StringUtils.defaultIfEmpty(appArgs.getTestRoot(), projectPath + TEST_DIR);
-        List<String> testSuites = ListUtils.defaultIfNull(appArgs.getTestSuites(), new ArrayList<String>());
+        List<String> testSuites = parseTestSuites(appArgs);
 
         log.info("");
         log.info("------------------------------------------------------------");
@@ -89,6 +91,20 @@ public class SlangBuildMain {
             log.error("");
             System.exit(1);
         }
+    }
+
+    private static List<String> parseTestSuites(ApplicationArgs appArgs) {
+        boolean runDefaultTests = true;
+        List<String> testSuites = ListUtils.defaultIfNull(appArgs.getTestSuites(), new ArrayList<String>());
+        for(String testSuite : testSuites){
+            if(testSuite.equalsIgnoreCase(NOT_TS + DEFAULT_TESTS)){
+                runDefaultTests = false;
+            }
+        }
+        if(runDefaultTests && !testSuites.contains(DEFAULT_TESTS)){
+            testSuites.add(DEFAULT_TESTS);
+        }
+        return testSuites;
     }
 
     private static void printBuildSuccessSummary(String projectPath, SlangBuildResults buildResults, RunTestsResults runTestsResults, Map<String, TestRun> skippedTests) {
