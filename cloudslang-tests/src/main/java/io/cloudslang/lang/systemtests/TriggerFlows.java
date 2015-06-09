@@ -79,18 +79,12 @@ public class TriggerFlows {
         slang.subscribeOnEvents(joinAggregatorListener, ASYNC_LOOP_EVENTS);
 
         try {
-            Thread.sleep(2000L);      /* TODO : remove this! only to test unstable navigation tests*/
+            Thread.sleep(0);      // TODO : remove this! when it is not here tests fail for some reason
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
         runSync(compilationArtifact, userInputs, systemProperties);
-
-        try {
-            Thread.sleep(2000L);     /* TODO : remove this! only to test unstable navigation tests*/
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         Map<String, StepData> tasks = runDataAggregatorListener.aggregate();
         Map<String, List<StepData>> branchesByPath = branchAggregatorListener.aggregate();
