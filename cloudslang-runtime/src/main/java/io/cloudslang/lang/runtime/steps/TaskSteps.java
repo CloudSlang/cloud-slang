@@ -152,9 +152,10 @@ public class TaskSteps extends AbstractSteps {
                 if (!shouldBreakLoop(breakOn, executableReturnValues) && loopCondition.hasMore()) {
                     runEnv.putNextStepPosition(previousStepId);
                     runEnv.getStack().pushContext(flowContext);
-                    runEnv.getExecutionPath().forward();
                     throwEventOutputEnd(runEnv, executionRuntimeServices, nodeName,
-                            (Serializable) publishValues, previousStepId, new ReturnValues(publishValues, null));
+                            (Serializable) publishValues, previousStepId,
+                            new ReturnValues(publishValues, executableReturnValues.getResult()));
+                    runEnv.getExecutionPath().forward();
                     return;
                 } else {
                     flowContext.getLangVariables().remove(LoopCondition.LOOP_CONDITION_KEY);
