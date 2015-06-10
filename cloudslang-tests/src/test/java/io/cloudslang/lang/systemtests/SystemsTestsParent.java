@@ -36,6 +36,7 @@ public abstract class SystemsTestsParent {
 
     @Autowired
     protected Slang slang;
+
     @Autowired
     protected TriggerFlows triggerFlows;
 

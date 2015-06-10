@@ -45,7 +45,6 @@
 		<dependency>
 			<groupId>${score.group}</groupId>
 			<artifactId>score-all</artifactId>
-			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
