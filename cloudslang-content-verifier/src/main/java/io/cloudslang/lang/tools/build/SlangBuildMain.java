@@ -94,14 +94,17 @@ public class SlangBuildMain {
     }
 
     private static List<String> parseTestSuites(ApplicationArgs appArgs) {
+        List<String> testSuites = new ArrayList<>();
         boolean runDefaultTests = true;
-        List<String> testSuites = ListUtils.defaultIfNull(appArgs.getTestSuites(), new ArrayList<String>());
-        for(String testSuite : testSuites){
-            if(testSuite.equalsIgnoreCase(NOT_TS + DEFAULT_TESTS)){
+        List<String> testSuitesArg = ListUtils.defaultIfNull(appArgs.getTestSuites(), new ArrayList<String>());
+        for(String testSuite : testSuitesArg){
+            if(!testSuite.startsWith(NOT_TS)){
+                testSuites.add(testSuite);
+            } else if(testSuite.equalsIgnoreCase(NOT_TS + DEFAULT_TESTS)){
                 runDefaultTests = false;
             }
         }
-        if(runDefaultTests && !testSuites.contains(DEFAULT_TESTS)){
+        if(runDefaultTests && !testSuitesArg.contains(DEFAULT_TESTS)){
             testSuites.add(DEFAULT_TESTS);
         }
         return testSuites;
