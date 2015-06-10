@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /*
  * Created by stoneo on 1/11/2015.
@@ -71,6 +72,8 @@ public class SlangBuildMain {
             SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites);
             RunTestsResults runTestsResults = buildResults.getRunTestsResults();
             Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
+            printCoveredExecutables(runTestsResults.getCoveredExecutables());
+            printUncoveredExecutables(runTestsResults.getUncoveredExecutables());
             if(MapUtils.isNotEmpty(skippedTests)){
                 printSkippedTestsSummary(skippedTests);
             }
@@ -145,6 +148,24 @@ public class SlangBuildMain {
         for(Map.Entry<String, TestRun> skippedTest : skippedTests.entrySet()){
             String message = skippedTest.getValue().getMessage();
             log.info("- " + message.replaceAll("\n", "\n\t"));
+        }
+    }
+
+    private static void printCoveredExecutables(Set<String> coveredExecutables) {
+        log.info("");
+        log.info("------------------------------------------------------------");
+        log.info("Following " + coveredExecutables.size() + " executables were tested:");
+        for(String executable : coveredExecutables){
+            log.info("- " + executable);
+        }
+    }
+
+    private static void printUncoveredExecutables(Set<String> uncoveredExecutables) {
+        log.info("");
+        log.info("------------------------------------------------------------");
+        log.info("Following " + uncoveredExecutables.size() + " executables were NOT tested:");
+        for(String executable : uncoveredExecutables){
+            log.info("- " + executable);
         }
     }
 

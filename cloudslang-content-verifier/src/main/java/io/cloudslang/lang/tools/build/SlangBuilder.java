@@ -22,8 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /*
  * Created by stoneo on 2/9/2015.
@@ -95,11 +97,29 @@ public class SlangBuilder {
         Map<String, CompilationArtifact> compiledFlows = slangContentVerifier.compileSlangModels(testFlowModels);
 
         Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath);
+        Set<String> coveredContent = new HashSet<>();
+        Set<String> uncoveredContent = new HashSet<>();
+        for(Executable testFlowModel : testFlowModels.values()){
+            coveredContent.addAll(testFlowModel.getDependencies());
+        }
+        for(SlangTestCase testCase : testCases.values()){
+            coveredContent.add(testCase.getTestFlowPath());
+        }
+        for(Executable contentModel : contentSlangModels.values()){
+            String contentModelName = contentModel.getNamespace() + "." + contentModel.getName();
+            if(!coveredContent.contains(contentModelName)){
+                uncoveredContent.add(contentModelName);
+            }
+        }
+
 
         log.info("");
         log.info("--- running tests ---");
         log.info("Found " + testCases.size() + " tests");
-        return slangTestRunner.runAllTests(projectPath, testCases, compiledFlows, testSuites);
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests(projectPath, testCases, compiledFlows, testSuites);
+        runTestsResults.addCoveredExecutables(coveredContent);
+        runTestsResults.addUncoveredExecutables(uncoveredContent);
+        return runTestsResults;
     }
 
 
