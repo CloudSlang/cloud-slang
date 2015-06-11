@@ -51,6 +51,7 @@ public class SlangBuildMain {
         String contentPath = StringUtils.defaultIfEmpty(appArgs.getContentRoot(), projectPath + CONTENT_DIR);
         String testsPath = StringUtils.defaultIfEmpty(appArgs.getTestRoot(), projectPath + TEST_DIR);
         List<String> testSuites = parseTestSuites(appArgs);
+        Boolean shouldPrintCoverageData = parseCoverageArg(appArgs);
 
         log.info("");
         log.info("------------------------------------------------------------");
@@ -76,7 +77,9 @@ public class SlangBuildMain {
             if(MapUtils.isNotEmpty(skippedTests)){
                 printSkippedTestsSummary(skippedTests);
             }
-            printTestCoverageData(runTestsResults);
+            if(shouldPrintCoverageData) {
+                printTestCoverageData(runTestsResults);
+            }
             Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
             if(MapUtils.isNotEmpty(failedTests)){
                 printBuildFailureSummary(projectPath, failedTests);
@@ -111,6 +114,15 @@ public class SlangBuildMain {
             testSuites.add(DEFAULT_TESTS);
         }
         return testSuites;
+    }
+
+    private static Boolean parseCoverageArg(ApplicationArgs appArgs){
+        Boolean shouldOutputCoverageData = false;
+
+        if (appArgs.shouldOutputCoverage() != null) {
+            shouldOutputCoverageData = appArgs.shouldOutputCoverage();
+        }
+        return shouldOutputCoverageData;
     }
 
     private static void printBuildSuccessSummary(String projectPath, SlangBuildResults buildResults, RunTestsResults runTestsResults, Map<String, TestRun> skippedTests) {
@@ -157,10 +169,10 @@ public class SlangBuildMain {
         int coveredExecutablesSize = runTestsResults.getCoveredExecutables().size();
         int uncoveredExecutablesSize = runTestsResults.getUncoveredExecutables().size();
         int totalNumberOfExecutables = coveredExecutablesSize + uncoveredExecutablesSize;
-        double coveragePercentage = new Double(coveredExecutablesSize)/new Double(uncoveredExecutablesSize)*100;
+        Double coveragePercentage = new Double(coveredExecutablesSize)/new Double(uncoveredExecutablesSize)*100;
         log.info("");
         log.info("------------------------------------------------------------");
-        log.info("Percentage of covered content: " + coveragePercentage + "%");
+        log.info(coveragePercentage.intValue() + "% of the content has tests");
         log.info("Out of " + totalNumberOfExecutables + " executables, " + coveredExecutablesSize + " executables have tests");
     }
 
