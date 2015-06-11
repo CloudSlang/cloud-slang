@@ -22,8 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /*
  * Created by stoneo on 2/9/2015.
@@ -90,17 +93,47 @@ public class SlangBuilder {
         // Compile all slang test flows under the test directory
         Map<String, Executable> testFlowModels = slangContentVerifier.createModelsAndValidate(testsPath);
         // Add also all of the slang models of the content in order to allow for compilation of the test flows
-        testFlowModels.putAll(contentSlangModels);
+        Map<String, Executable> allTestedFlowModels = new HashMap<>(testFlowModels);
+        allTestedFlowModels.putAll(contentSlangModels);
+
         // Compiling all the test flows
-        Map<String, CompilationArtifact> compiledFlows = slangContentVerifier.compileSlangModels(testFlowModels);
+        Map<String, CompilationArtifact> compiledFlows = slangContentVerifier.compileSlangModels(allTestedFlowModels);
 
         Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath);
-
         log.info("");
         log.info("--- running tests ---");
         log.info("Found " + testCases.size() + " tests");
-        return slangTestRunner.runAllTests(projectPath, testCases, compiledFlows, testSuites);
+        RunTestsResults runTestsResults = slangTestRunner.runAllTests(projectPath, testCases, compiledFlows, testSuites);
+        addCoverageDataToRunTestsResults(contentSlangModels, testFlowModels, testCases, runTestsResults);
+        return runTestsResults;
     }
 
+    private void addCoverageDataToRunTestsResults(Map<String, Executable> contentSlangModels, Map<String, Executable> testFlowModels,
+                                                  Map<String, SlangTestCase> testCases, RunTestsResults runTestsResults) {
+        Set<String> coveredContent = new HashSet<>();
+        Set<String> uncoveredContent = new HashSet<>();
+        // Add to the covered content set all the dependencies of the test flows
+        for(Executable testFlowModel : testFlowModels.values()){
+            coveredContent.addAll(testFlowModel.getDependencies());
+        }
+        Set<String> contentExecutablesNames = contentSlangModels.keySet();
+        // Add to the covered content set also all the direct test case's test flows, which are part of the tested content
+        for(SlangTestCase testCase : testCases.values()){
+            String testFlowPath = testCase.getTestFlowPath();
+            // Add the test flow only if it part of the content, and not of the test flows
+            if(contentExecutablesNames.contains(testFlowPath)) {
+                coveredContent.add(testFlowPath);
+            }
+        }
+        // Create the uncovered content set from the content which does not appear in the covered set
+        for(String contentModelName : contentExecutablesNames){
+            if(!coveredContent.contains(contentModelName)){
+                uncoveredContent.add(contentModelName);
+            }
+        }
+
+        runTestsResults.addCoveredExecutables(coveredContent);
+        runTestsResults.addUncoveredExecutables(uncoveredContent);
+    }
 
 }

@@ -10,7 +10,9 @@
 package io.cloudslang.lang.tools.build.tester;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by stoneo on 4/27/2015.
@@ -27,10 +29,16 @@ public class RunTestsResults {
 
     private Map<String, TestRun> skippedTests;
 
+    private Set<String> coveredExecutables;
+
+    private Set<String> uncoveredExecutables;
+
     public RunTestsResults(){
         this.passedTests = new HashMap<>();
         this.failedTests = new HashMap<>();
         this.skippedTests = new HashMap<>();
+        coveredExecutables = new HashSet<>();
+        uncoveredExecutables = new HashSet<>();
     }
 
     public Map<String, TestRun> getPassedTests() {
@@ -45,6 +53,14 @@ public class RunTestsResults {
         return skippedTests;
     }
 
+    public Set<String> getCoveredExecutables() {
+        return coveredExecutables;
+    }
+
+    public Set<String> getUncoveredExecutables() {
+        return uncoveredExecutables;
+    }
+
     public void addPassedTest(String testCaseName, TestRun testRun){
         passedTests.put(testCaseName, testRun);
     }
@@ -55,6 +71,14 @@ public class RunTestsResults {
 
     public void addSkippedTest(String testCaseName, TestRun testRun){
         skippedTests.put(testCaseName, testRun);
+    }
+
+    public void addCoveredExecutables(Set<String> coveredExecutables){
+        this.coveredExecutables.addAll(coveredExecutables);
+    }
+
+    public void addUncoveredExecutables(Set<String> uncoveredExecutables){
+        this.uncoveredExecutables.addAll(uncoveredExecutables);
     }
 
     @Override

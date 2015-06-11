@@ -41,6 +41,10 @@ public class ApplicationArgs {
             splitter = CommaParameterSplitter.class)
     public List<String> testSuites;
 
+    @Parameter(names = {"--coverage", "-co"},
+            description = "Whether or not test coverage data should be outputted")
+    public boolean coverage = false;
+
     @DynamicParameter(names = "-D", description = "Dynamic parameters go here")
     public Map<String, String> dynamicParams = new HashMap<>();
 
@@ -62,6 +66,10 @@ public class ApplicationArgs {
 
     public List<String> getTestSuites() {
         return testSuites;
+    }
+
+    public Boolean shouldOutputCoverage() {
+        return coverage;
     }
 
     public Map<String, String> getDynamicParams() {

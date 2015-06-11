@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /*
  * Created by stoneo on 1/11/2015.
@@ -50,6 +51,7 @@ public class SlangBuildMain {
         String contentPath = StringUtils.defaultIfEmpty(appArgs.getContentRoot(), projectPath + CONTENT_DIR);
         String testsPath = StringUtils.defaultIfEmpty(appArgs.getTestRoot(), projectPath + TEST_DIR);
         List<String> testSuites = parseTestSuites(appArgs);
+        Boolean shouldPrintCoverageData = parseCoverageArg(appArgs);
 
         log.info("");
         log.info("------------------------------------------------------------");
@@ -71,8 +73,12 @@ public class SlangBuildMain {
             SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites);
             RunTestsResults runTestsResults = buildResults.getRunTestsResults();
             Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
+
             if(MapUtils.isNotEmpty(skippedTests)){
                 printSkippedTestsSummary(skippedTests);
+            }
+            if(shouldPrintCoverageData) {
+                printTestCoverageData(runTestsResults);
             }
             Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
             if(MapUtils.isNotEmpty(failedTests)){
@@ -110,6 +116,15 @@ public class SlangBuildMain {
         return testSuites;
     }
 
+    private static Boolean parseCoverageArg(ApplicationArgs appArgs){
+        Boolean shouldOutputCoverageData = false;
+
+        if (appArgs.shouldOutputCoverage() != null) {
+            shouldOutputCoverageData = appArgs.shouldOutputCoverage();
+        }
+        return shouldOutputCoverageData;
+    }
+
     private static void printBuildSuccessSummary(String projectPath, SlangBuildResults buildResults, RunTestsResults runTestsResults, Map<String, TestRun> skippedTests) {
         log.info("");
         log.info("------------------------------------------------------------");
@@ -145,6 +160,37 @@ public class SlangBuildMain {
         for(Map.Entry<String, TestRun> skippedTest : skippedTests.entrySet()){
             String message = skippedTest.getValue().getMessage();
             log.info("- " + message.replaceAll("\n", "\n\t"));
+        }
+    }
+
+    private static void printTestCoverageData(RunTestsResults runTestsResults){
+        printCoveredExecutables(runTestsResults.getCoveredExecutables());
+        printUncoveredExecutables(runTestsResults.getUncoveredExecutables());
+        int coveredExecutablesSize = runTestsResults.getCoveredExecutables().size();
+        int uncoveredExecutablesSize = runTestsResults.getUncoveredExecutables().size();
+        int totalNumberOfExecutables = coveredExecutablesSize + uncoveredExecutablesSize;
+        Double coveragePercentage = new Double(coveredExecutablesSize)/new Double(uncoveredExecutablesSize)*100;
+        log.info("");
+        log.info("------------------------------------------------------------");
+        log.info(coveragePercentage.intValue() + "% of the content has tests");
+        log.info("Out of " + totalNumberOfExecutables + " executables, " + coveredExecutablesSize + " executables have tests");
+    }
+
+    private static void printCoveredExecutables(Set<String> coveredExecutables) {
+        log.info("");
+        log.info("------------------------------------------------------------");
+        log.info("Following " + coveredExecutables.size() + " executables have tests:");
+        for(String executable : coveredExecutables){
+            log.info("- " + executable);
+        }
+    }
+
+    private static void printUncoveredExecutables(Set<String> uncoveredExecutables) {
+        log.info("");
+        log.info("------------------------------------------------------------");
+        log.info("Following " + uncoveredExecutables.size() + " executables do not have tests:");
+        for(String executable : uncoveredExecutables){
+            log.info("- " + executable);
         }
     }
 
