@@ -72,11 +72,11 @@ public class SlangBuildMain {
             SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites);
             RunTestsResults runTestsResults = buildResults.getRunTestsResults();
             Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
-            printCoveredExecutables(runTestsResults.getCoveredExecutables());
-            printUncoveredExecutables(runTestsResults.getUncoveredExecutables());
+
             if(MapUtils.isNotEmpty(skippedTests)){
                 printSkippedTestsSummary(skippedTests);
             }
+            printTestCoverageData(runTestsResults);
             Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
             if(MapUtils.isNotEmpty(failedTests)){
                 printBuildFailureSummary(projectPath, failedTests);
@@ -151,10 +151,23 @@ public class SlangBuildMain {
         }
     }
 
+    private static void printTestCoverageData(RunTestsResults runTestsResults){
+        printCoveredExecutables(runTestsResults.getCoveredExecutables());
+        printUncoveredExecutables(runTestsResults.getUncoveredExecutables());
+        int coveredExecutablesSize = runTestsResults.getCoveredExecutables().size();
+        int uncoveredExecutablesSize = runTestsResults.getUncoveredExecutables().size();
+        int totalNumberOfExecutables = coveredExecutablesSize + uncoveredExecutablesSize;
+        double coveragePercentage = new Double(coveredExecutablesSize)/new Double(uncoveredExecutablesSize)*100;
+        log.info("");
+        log.info("------------------------------------------------------------");
+        log.info("Percentage of covered content: " + coveragePercentage + "%");
+        log.info("Out of " + totalNumberOfExecutables + " executables, " + coveredExecutablesSize + " executables have tests");
+    }
+
     private static void printCoveredExecutables(Set<String> coveredExecutables) {
         log.info("");
         log.info("------------------------------------------------------------");
-        log.info("Following " + coveredExecutables.size() + " executables were tested:");
+        log.info("Following " + coveredExecutables.size() + " executables have tests:");
         for(String executable : coveredExecutables){
             log.info("- " + executable);
         }
@@ -163,7 +176,7 @@ public class SlangBuildMain {
     private static void printUncoveredExecutables(Set<String> uncoveredExecutables) {
         log.info("");
         log.info("------------------------------------------------------------");
-        log.info("Following " + uncoveredExecutables.size() + " executables were NOT tested:");
+        log.info("Following " + uncoveredExecutables.size() + " executables do not have tests:");
         for(String executable : uncoveredExecutables){
             log.info("- " + executable);
         }
