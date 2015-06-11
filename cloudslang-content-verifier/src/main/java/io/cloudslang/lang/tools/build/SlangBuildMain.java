@@ -169,7 +169,7 @@ public class SlangBuildMain {
         int coveredExecutablesSize = runTestsResults.getCoveredExecutables().size();
         int uncoveredExecutablesSize = runTestsResults.getUncoveredExecutables().size();
         int totalNumberOfExecutables = coveredExecutablesSize + uncoveredExecutablesSize;
-        Double coveragePercentage = new Double(coveredExecutablesSize)/new Double(uncoveredExecutablesSize)*100;
+        Double coveragePercentage = new Double(coveredExecutablesSize)/new Double(totalNumberOfExecutables)*100;
         log.info("");
         log.info("------------------------------------------------------------");
         log.info(coveragePercentage.intValue() + "% of the content has tests");
