@@ -10,6 +10,7 @@
 package io.cloudslang.lang.tools.build;
 
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.tools.build.commands.ApplicationArgs;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
@@ -42,11 +43,11 @@ public class SlangBuildMain {
     public static final String DEFAULT_TESTS = "default";
 
     private final static Logger log = Logger.getLogger(SlangBuildMain.class);
-    private static String NOT_TS = "!";
+    private final static String NOT_TS = "!";
 
     public static void main(String[] args) {
         ApplicationArgs appArgs = new ApplicationArgs();
-        new JCommander(appArgs, args);
+        parseArgs(args, appArgs);
         String projectPath = parseProjectPathArg(appArgs);
         String contentPath = StringUtils.defaultIfEmpty(appArgs.getContentRoot(), projectPath + CONTENT_DIR);
         String testsPath = StringUtils.defaultIfEmpty(appArgs.getTestRoot(), projectPath + TEST_DIR);
@@ -95,6 +96,20 @@ public class SlangBuildMain {
                     + projectPath + "\" failed.");
             log.error("------------------------------------------------------------");
             log.error("");
+            System.exit(1);
+        }
+    }
+
+    private static void parseArgs(String[] args, ApplicationArgs appArgs) {
+        try {
+            JCommander jCommander = new JCommander(appArgs, args);
+            if (appArgs.isHelp()) {
+                jCommander.usage();
+                System.exit(0);
+            }
+        } catch (ParameterException e) {
+            System.out.println(e.getMessage());
+            System.out.println("You can use '--help' for usage");
             System.exit(1);
         }
     }
