@@ -9,6 +9,7 @@
 package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.entities.bindings.Input;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -71,8 +72,9 @@ public abstract class AbstractInputsTransformer {
                                                     .toString() : inputName;
         String systemPropertyName = (String) props.get(SYSTEM_PROPERTY_KEY);
 
-        if (!overridable && !defaultSpecified) {
-            throw new RuntimeException("input: " + inputName + " is not overridable but no default value was specified");
+        if (!overridable && !defaultSpecified && StringUtils.isEmpty(systemPropertyName)) {
+            throw new RuntimeException(
+                    "input: " + inputName + " is not overridable but no default value or system property was specified");
         }
 
         return new Input(inputName, expression, encrypted, required, overridable, systemPropertyName);
