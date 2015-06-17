@@ -10,9 +10,9 @@
 package io.cloudslang.lang.tools.build.tester;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by stoneo on 4/27/2015.
@@ -29,16 +29,16 @@ public class RunTestsResults {
 
     private Map<String, TestRun> skippedTests;
 
-    private Set<String> coveredExecutables;
+    private TreeSet<String> coveredExecutables;
 
-    private Set<String> uncoveredExecutables;
+    private TreeSet<String> uncoveredExecutables;
 
     public RunTestsResults(){
         this.passedTests = new HashMap<>();
         this.failedTests = new HashMap<>();
         this.skippedTests = new HashMap<>();
-        coveredExecutables = new HashSet<>();
-        uncoveredExecutables = new HashSet<>();
+        coveredExecutables = new TreeSet<>();
+        uncoveredExecutables = new TreeSet<>();
     }
 
     public Map<String, TestRun> getPassedTests() {
