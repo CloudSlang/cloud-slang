@@ -114,7 +114,7 @@ public class SlangBuilder {
         Set<String> uncoveredContent = new HashSet<>();
         // Add to the covered content set all the dependencies of the test flows
         for(Executable testFlowModel : testFlowModels.values()){
-            coveredContent.addAll(testFlowModel.getDependencies());
+            collectAllDependencies(coveredContent, testFlowModel.getDependencies(), contentSlangModels);
         }
         Set<String> contentExecutablesNames = contentSlangModels.keySet();
         // Add to the covered content set also all the direct test case's test flows, which are part of the tested content
@@ -134,6 +134,26 @@ public class SlangBuilder {
 
         runTestsResults.addCoveredExecutables(coveredContent);
         runTestsResults.addUncoveredExecutables(uncoveredContent);
+    }
+
+    /**
+     * Collect recursively all the dependencies of an executable
+     * @param allDependencies
+     * @param directDependencies
+     * @param contentSlangModels
+     */
+    private void collectAllDependencies(Set<String> allDependencies, Set<String> directDependencies, Map<String, Executable> contentSlangModels) {
+        for (String dependency : directDependencies) {
+            if (allDependencies.contains(dependency)) {
+                continue;
+            }
+            allDependencies.add(dependency);
+            Executable executable = contentSlangModels.get(dependency);
+            // Executable will be null in case of a dependecy which is a test flow (and not patr of the content)
+            if(executable != null) {
+                collectAllDependencies(allDependencies, executable.getDependencies(), contentSlangModels);
+            }
+        }
     }
 
 }
