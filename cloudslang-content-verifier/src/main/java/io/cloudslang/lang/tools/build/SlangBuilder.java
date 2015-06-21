@@ -113,8 +113,18 @@ public class SlangBuilder {
         Set<String> coveredContent = new HashSet<>();
         Set<String> uncoveredContent = new HashSet<>();
         // Add to the covered content set all the dependencies of the test flows
-        for(Executable testFlowModel : testFlowModels.values()){
-            collectAllDependencies(coveredContent, testFlowModel.getDependencies(), contentSlangModels);
+        for (SlangTestCase testCase : testCases.values()){
+            String testFlowPath = testCase.getTestFlowPath();
+            Executable testFlowModel;
+            if(testFlowModels.containsKey(testFlowPath)) {
+                testFlowModel = testFlowModels.get(testFlowPath);
+            } else {
+                testFlowModel = contentSlangModels.get(testFlowPath);
+            }
+            if(testFlowModel == null){
+                return;
+            }
+            addAllDependenciesToCoveredContent(coveredContent, testFlowModel.getDependencies(), contentSlangModels);
         }
         Set<String> contentExecutablesNames = contentSlangModels.keySet();
         // Add to the covered content set also all the direct test case's test flows, which are part of the tested content
@@ -142,7 +152,7 @@ public class SlangBuilder {
      * @param directDependencies
      * @param contentSlangModels
      */
-    private void collectAllDependencies(Set<String> allDependencies, Set<String> directDependencies, Map<String, Executable> contentSlangModels) {
+    private void addAllDependenciesToCoveredContent(Set<String> allDependencies, Set<String> directDependencies, Map<String, Executable> contentSlangModels) {
         for (String dependency : directDependencies) {
             if (allDependencies.contains(dependency)) {
                 continue;
@@ -151,7 +161,7 @@ public class SlangBuilder {
             Executable executable = contentSlangModels.get(dependency);
             // Executable will be null in case of a dependecy which is a test flow (and not patr of the content)
             if(executable != null) {
-                collectAllDependencies(allDependencies, executable.getDependencies(), contentSlangModels);
+                addAllDependenciesToCoveredContent(allDependencies, executable.getDependencies(), contentSlangModels);
             }
         }
     }
