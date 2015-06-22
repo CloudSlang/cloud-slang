@@ -17,7 +17,7 @@ This project includes the CLI to trigger flows.
 4. Run the executable :
   - For Windows : cslang.bat 
   - For Linux : bash cslang
-5. Run a simple example print text flow:  run --f ../../content/io/cloudslang/base/print/print_text.sl --i text=first_flow
+5. Run a simple example print text flow:  run --f ../content/io/cloudslang/base/print/print_text.sl --i text=first_flow
 
 #### Documentation :
 
