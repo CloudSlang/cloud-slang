@@ -19,13 +19,16 @@ public class StepData {
     private final String name;
     private final Map<String, Serializable> inputs;
     private final Map<String, Serializable> outputs;
+    private final String executableName;
     private final String result;
 
-    public StepData(String path, String name, Map<String, Serializable> inputs, Map<String, Serializable> outputs, String result) {
+    public StepData(String path, String name, Map<String, Serializable> inputs,
+                    Map<String, Serializable> outputs, String executableName, String result) {
         this.path = path;
         this.name = name;
         this.inputs = inputs;
         this.outputs = outputs;
+        this.executableName = executableName;
         this.result = result;
     }
 
@@ -43,6 +46,10 @@ public class StepData {
 
     public Map<String, Serializable> getOutputs() {
         return outputs;
+    }
+
+    public String getExecutableName() {
+        return executableName;
     }
 
     public String getResult() {

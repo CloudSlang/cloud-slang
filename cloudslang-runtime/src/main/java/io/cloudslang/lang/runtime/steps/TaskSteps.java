@@ -10,32 +10,27 @@
 package io.cloudslang.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
-import io.cloudslang.lang.entities.ListForLoopStatement;
-import io.cloudslang.lang.entities.LoopStatement;
+import io.cloudslang.lang.entities.*;
+import io.cloudslang.lang.runtime.bindings.LoopsBinding;
+import io.cloudslang.lang.runtime.bindings.OutputsBinding;
+import io.cloudslang.lang.runtime.env.*;
+import io.cloudslang.lang.runtime.events.LanguageEventData;
+import org.apache.log4j.Logger;
+import org.apache.commons.lang3.tuple.Pair;
 import io.cloudslang.lang.entities.MapForLoopStatement;
-import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.runtime.env.LoopCondition;
+import io.cloudslang.score.api.execution.ExecutionParametersConsts;
+import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
-import io.cloudslang.lang.runtime.bindings.LoopsBinding;
-import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.env.Context;
-import io.cloudslang.lang.runtime.env.ExecutionPath;
-import io.cloudslang.lang.runtime.env.ForLoopCondition;
-import io.cloudslang.lang.runtime.env.LoopCondition;
-import io.cloudslang.lang.runtime.env.ReturnValues;
-import io.cloudslang.lang.runtime.env.RunEnvironment;
-import io.cloudslang.lang.runtime.events.LanguageEventData;
-import io.cloudslang.score.api.execution.ExecutionParametersConsts;
-import io.cloudslang.score.lang.ExecutionRuntimeServices;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,17 +65,10 @@ public class TaskSteps extends AbstractSteps {
                           @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
                           @Param(ScoreLangConstants.REF_ID) String refId) {
         try {
-            startStepExecutionPathCalc(runEnv);
             runEnv.removeCallArguments();
             runEnv.removeReturnValues();
 
             Context flowContext = runEnv.getStack().popContext();
-
-            Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
-
-            fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_INPUT_START, "Task inputs start Binding",
-                    Pair.of(LanguageEventData.BOUND_INPUTS,(Serializable)retrieveInputs(taskInputs)),
-                    Pair.of( LanguageEventData.levelName.TASK_NAME.name(), nodeName));
 
             //loops
             if (loopStatementExist(loop)) {
@@ -108,13 +96,13 @@ public class TaskSteps extends AbstractSteps {
                 }
             }
 
-//            Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
+            Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
             Map<String, Serializable> operationArguments = inputsBinding.bindInputs(taskInputs, flowVariables, runEnv.getSystemProperties());
 
             //todo: hook
 
             sendBindingInputsEvent(taskInputs, operationArguments, runEnv, executionRuntimeServices, "Task inputs resolved",
-                    nodeName, LanguageEventData.levelName.TASK_NAME);
+                    LanguageEventData.StepType.TASK, nodeName);
 
             updateCallArgumentsAndPushContextToStack(runEnv, flowContext, operationArguments);
 
@@ -123,26 +111,9 @@ public class TaskSteps extends AbstractSteps {
 
             // set the start step of the given ref as the next step to execute (in the new running execution plan that will be set)
             runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
-//            runEnv.getExecutionPath().down();
         } catch (RuntimeException e) {
             logger.error("There was an error running the begin task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
-        }
-    }
-
-    private List<String> retrieveInputs(List<Input> taskInputs) {
-        List<String> inputs = new ArrayList<>(taskInputs.size());
-        for (Input input : taskInputs){
-            inputs.add(input.getName());
-        }
-        return inputs;
-    }
-
-    private void startStepExecutionPathCalc(RunEnvironment runEnv) {
-        if(runEnv.getExecutionPath().getNextAction() != null && runEnv.getExecutionPath().getNextAction().equals(ExecutionPath.Action.FORWARD.name())){
-            runEnv.getExecutionPath().forward();
-        }else{
-            runEnv.getExecutionPath().down();
         }
     }
 
@@ -160,15 +131,15 @@ public class TaskSteps extends AbstractSteps {
                         @Param(ScoreLangConstants.ASYNC_LOOP_KEY) boolean async_loop) {
 
         try {
-//            if (runEnv.getExecutionPath().getDepth() > 0) runEnv.getExecutionPath().up();
             Context flowContext = runEnv.getStack().popContext();
             Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
 
             ReturnValues executableReturnValues = runEnv.removeReturnValues();
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
+                    LanguageEventData.StepType.TASK, nodeName,
                     Pair.of(ScoreLangConstants.TASK_PUBLISH_KEY, (Serializable) taskPublishValues),
                     Pair.of(ScoreLangConstants.TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues),
-                    Pair.of("operationReturnValues", executableReturnValues), Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName));
+                    Pair.of("operationReturnValues", executableReturnValues));
 
             Map<String, Serializable> publishValues = outputsBinding.bindOutputs(flowVariables, executableReturnValues.getOutputs(), taskPublishValues);
 
@@ -181,7 +152,10 @@ public class TaskSteps extends AbstractSteps {
                 if (!shouldBreakLoop(breakOn, executableReturnValues) && loopCondition.hasMore()) {
                     runEnv.putNextStepPosition(previousStepId);
                     runEnv.getStack().pushContext(flowContext);
-                    endStepExecutionPathCalc(runEnv, previousStepId);
+                    throwEventOutputEnd(runEnv, executionRuntimeServices, nodeName,
+                            (Serializable) publishValues, previousStepId,
+                            new ReturnValues(publishValues, executableReturnValues.getResult()));
+                    runEnv.getExecutionPath().forward();
                     return;
                 } else {
                     flowContext.getLangVariables().remove(LoopCondition.LOOP_CONDITION_KEY);
@@ -215,29 +189,28 @@ public class TaskSteps extends AbstractSteps {
 
             ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : executableResult);
             runEnv.putReturnValues(returnValues);
-            fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
-                    Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
-                    Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
-                    Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition),
-                    Pair.of(LanguageEventData.levelName.TASK_NAME.name(), nodeName));
+            throwEventOutputEnd(runEnv, executionRuntimeServices, nodeName,
+                    (Serializable) publishValues, nextPosition, returnValues);
 
             runEnv.getStack().pushContext(flowContext);
-
-            endStepExecutionPathCalc(runEnv, nextPosition);
-
+            runEnv.getExecutionPath().forward();
         } catch (RuntimeException e) {
             logger.error("There was an error running the end task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);
         }
     }
 
-    private void endStepExecutionPathCalc(RunEnvironment runEnv, Long nextPosition) {
-        if(nextPosition != 0L){
-            runEnv.getExecutionPath().setNextAction(ExecutionPath.Action.FORWARD.name());
-        }
-        else {
-            runEnv.getExecutionPath().up();
-        }
+    private void throwEventOutputEnd(RunEnvironment runEnv,
+                                     ExecutionRuntimeServices executionRuntimeServices,
+                                     String nodeName,
+                                     Serializable publishValues,
+                                     Long nextPosition,
+                                     ReturnValues returnValues) {
+        fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
+                LanguageEventData.StepType.TASK, nodeName,
+                Pair.of(LanguageEventData.OUTPUTS, publishValues),
+                Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
+                Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition));
     }
 
     private boolean shouldBreakLoop(List<String> breakOn, ReturnValues executableReturnValues) {

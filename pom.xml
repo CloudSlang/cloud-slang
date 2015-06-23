@@ -10,7 +10,7 @@
     -->
     <groupId>io.cloudslang.lang</groupId>
     <artifactId>cloudslang</artifactId>
-    <version>0.7.34-SNAPSHOT</version>
+    <version>0.7.40-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A DSL for writing flows</description>
@@ -33,7 +33,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <score.group>io.cloudslang</score.group>
-        <score.version>0.1.275</score.version>
+        <score.version>0.1.280</score.version>
         <spring.version>4.1.4.RELEASE</spring.version>
     </properties>
 
@@ -148,6 +148,7 @@
                 <groupId>${score.group}</groupId>
                 <artifactId>score-all</artifactId>
                 <version>${score.version}</version>
+                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>com.hp.score.sdk</groupId>
@@ -209,6 +210,12 @@
                 <groupId>com.googlecode.lambdaj</groupId>
                 <artifactId>lambdaj</artifactId>
                 <version>2.3.3</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>15.0</version>
             </dependency>
 
             <dependency>

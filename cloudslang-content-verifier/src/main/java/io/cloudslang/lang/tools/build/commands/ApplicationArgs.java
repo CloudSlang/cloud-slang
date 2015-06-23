@@ -24,25 +24,31 @@ public class ApplicationArgs {
     @Parameter
     public List<String> parameters = new ArrayList<>();
 
-    @Parameter(names = { "-project_root", "-pr"},
+    @Parameter(names = { "--project-root", "-pr"},
             description = "Project root directory")
     public String projectRoot;
 
-    @Parameter(names = { "-content_root", "-cr"},
+    @Parameter(names = { "--content-root", "-cr"},
             description = "Content root directory")
     public String contentRoot;
 
-    @Parameter(names = { "-test_root", "-tr"},
+    @Parameter(names = { "--test-root", "-tr"},
             description = "Test root directory")
     public String testRoot;
 
-    @Parameter(names = {"-test_suites", "-ts"},
+    @Parameter(names = {"--test-suites", "-ts"},
             description = "Comma-separated list of group names to be run",
             splitter = CommaParameterSplitter.class)
     public List<String> testSuites;
 
-    @Parameter(names = "-debug", description = "Debug mode")
-    public boolean debug = false;
+    @Parameter(names = {"--coverage", "-cov"},
+            description = "Whether or not test coverage data should be outputted")
+    public boolean coverage = false;
+
+
+    @Parameter(names = {"--help", "-h"}, help = true,
+            description = "Print this message")
+    private boolean help;
 
     @DynamicParameter(names = "-D", description = "Dynamic parameters go here")
     public Map<String, String> dynamicParams = new HashMap<>();
@@ -67,8 +73,12 @@ public class ApplicationArgs {
         return testSuites;
     }
 
-    public boolean isDebug() {
-        return debug;
+    public Boolean shouldOutputCoverage() {
+        return coverage;
+    }
+
+    public boolean isHelp() {
+        return help;
     }
 
     public Map<String, String> getDynamicParams() {

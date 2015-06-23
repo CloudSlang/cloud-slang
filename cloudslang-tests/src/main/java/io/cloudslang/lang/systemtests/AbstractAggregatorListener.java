@@ -23,9 +23,6 @@ import java.util.List;
  */
 public abstract class AbstractAggregatorListener implements ScoreEventListener {
 
-    public static final String TASK_NAME = LanguageEventData.levelName.TASK_NAME.name();
-    public static final String EXECUTABLE_NAME = LanguageEventData.levelName.EXECUTABLE_NAME.name();
-
     private final List<LanguageEventData> events = new ArrayList<>();
 
     public List<LanguageEventData> getEvents() {

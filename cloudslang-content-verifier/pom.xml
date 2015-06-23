@@ -3,7 +3,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.7.34-SNAPSHOT</version>
+        <version>0.7.40-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -25,7 +25,6 @@
         <dependency>
             <groupId>${score.group}</groupId>
             <artifactId>score-all</artifactId>
-            <scope>runtime</scope>
         </dependency>
 
         <dependency>
@@ -110,6 +109,7 @@
                             <id>cslang-builder</id>
                         </program>
                     </programs>
+                    <extraJvmArguments>-Dpython.path=@BASEDIR@/python-lib</extraJvmArguments>
                 </configuration>
             </plugin>
         </plugins>

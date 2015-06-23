@@ -11,7 +11,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 *******************************************************************************/
 
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import org.junit.Before;
@@ -159,6 +159,13 @@ public class InputsTransformerTest {
         exception.expectMessage("input_without_default");
         List inputs = getInputsFormSl("/non_overridable_input_without_default.sl");
         inputTransformer.transform(inputs);
+    }
+
+    @Test
+    public void testOverridableInputWithoutDefaultButWithSysProp() throws Exception {
+        List inputs = getInputsFormSl("/non_overridable_input_with_sys_prop.sl");
+        List<Input> transformed_inputs = inputTransformer.transform(inputs);
+        Assert.assertEquals("booya", transformed_inputs.get(0).getSystemPropertyName());
     }
 
     @Test

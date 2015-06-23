@@ -10,9 +10,13 @@
 package io.cloudslang.lang.tools.build;
 
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
+import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.tools.build.commands.ApplicationArgs;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.TestRun;
+import io.cloudslang.score.events.ScoreEvent;
+import io.cloudslang.score.events.ScoreEventListener;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -27,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /*
  * Created by stoneo on 1/11/2015.
@@ -35,16 +40,19 @@ public class SlangBuildMain {
 
     private static final String CONTENT_DIR =  File.separator + "content";
     private static final String TEST_DIR = File.separator + "test";
+    public static final String DEFAULT_TESTS = "default";
 
     private final static Logger log = Logger.getLogger(SlangBuildMain.class);
+    private final static String NOT_TS = "!";
 
     public static void main(String[] args) {
         ApplicationArgs appArgs = new ApplicationArgs();
-        new JCommander(appArgs, args);
+        parseArgs(args, appArgs);
         String projectPath = parseProjectPathArg(appArgs);
         String contentPath = StringUtils.defaultIfEmpty(appArgs.getContentRoot(), projectPath + CONTENT_DIR);
         String testsPath = StringUtils.defaultIfEmpty(appArgs.getTestRoot(), projectPath + TEST_DIR);
-        List<String> testSuites = ListUtils.defaultIfNull(appArgs.getTestSuites(), new ArrayList<String>());
+        List<String> testSuites = parseTestSuites(appArgs);
+        Boolean shouldPrintCoverageData = parseCoverageArg(appArgs);
 
         log.info("");
         log.info("------------------------------------------------------------");
@@ -55,16 +63,23 @@ public class SlangBuildMain {
 
         log.info("");
         log.info("Loading...");
+
         //load application context
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/testRunnerContext.xml");
         SlangBuilder slangBuilder = context.getBean(SlangBuilder.class);
+        Slang slang = context.getBean(Slang.class);
+        registerEventHandlers(slang);
 
         try {
             SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites);
             RunTestsResults runTestsResults = buildResults.getRunTestsResults();
             Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
+
             if(MapUtils.isNotEmpty(skippedTests)){
                 printSkippedTestsSummary(skippedTests);
+            }
+            if(shouldPrintCoverageData) {
+                printTestCoverageData(runTestsResults);
             }
             Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
             if(MapUtils.isNotEmpty(failedTests)){
@@ -83,6 +98,46 @@ public class SlangBuildMain {
             log.error("");
             System.exit(1);
         }
+    }
+
+    private static void parseArgs(String[] args, ApplicationArgs appArgs) {
+        try {
+            JCommander jCommander = new JCommander(appArgs, args);
+            if (appArgs.isHelp()) {
+                jCommander.usage();
+                System.exit(0);
+            }
+        } catch (ParameterException e) {
+            System.out.println(e.getMessage());
+            System.out.println("You can use '--help' for usage");
+            System.exit(1);
+        }
+    }
+
+    private static List<String> parseTestSuites(ApplicationArgs appArgs) {
+        List<String> testSuites = new ArrayList<>();
+        boolean runDefaultTests = true;
+        List<String> testSuitesArg = ListUtils.defaultIfNull(appArgs.getTestSuites(), new ArrayList<String>());
+        for(String testSuite : testSuitesArg){
+            if(!testSuite.startsWith(NOT_TS)){
+                testSuites.add(testSuite);
+            } else if(testSuite.equalsIgnoreCase(NOT_TS + DEFAULT_TESTS)){
+                runDefaultTests = false;
+            }
+        }
+        if(runDefaultTests && !testSuitesArg.contains(DEFAULT_TESTS)){
+            testSuites.add(DEFAULT_TESTS);
+        }
+        return testSuites;
+    }
+
+    private static Boolean parseCoverageArg(ApplicationArgs appArgs){
+        Boolean shouldOutputCoverageData = false;
+
+        if (appArgs.shouldOutputCoverage() != null) {
+            shouldOutputCoverageData = appArgs.shouldOutputCoverage();
+        }
+        return shouldOutputCoverageData;
     }
 
     private static void printBuildSuccessSummary(String projectPath, SlangBuildResults buildResults, RunTestsResults runTestsResults, Map<String, TestRun> skippedTests) {
@@ -123,6 +178,37 @@ public class SlangBuildMain {
         }
     }
 
+    private static void printTestCoverageData(RunTestsResults runTestsResults){
+        printCoveredExecutables(runTestsResults.getCoveredExecutables());
+        printUncoveredExecutables(runTestsResults.getUncoveredExecutables());
+        int coveredExecutablesSize = runTestsResults.getCoveredExecutables().size();
+        int uncoveredExecutablesSize = runTestsResults.getUncoveredExecutables().size();
+        int totalNumberOfExecutables = coveredExecutablesSize + uncoveredExecutablesSize;
+        Double coveragePercentage = new Double(coveredExecutablesSize)/new Double(totalNumberOfExecutables)*100;
+        log.info("");
+        log.info("------------------------------------------------------------");
+        log.info(coveragePercentage.intValue() + "% of the content has tests");
+        log.info("Out of " + totalNumberOfExecutables + " executables, " + coveredExecutablesSize + " executables have tests");
+    }
+
+    private static void printCoveredExecutables(Set<String> coveredExecutables) {
+        log.info("");
+        log.info("------------------------------------------------------------");
+        log.info("Following " + coveredExecutables.size() + " executables have tests:");
+        for(String executable : coveredExecutables){
+            log.info("- " + executable);
+        }
+    }
+
+    private static void printUncoveredExecutables(Set<String> uncoveredExecutables) {
+        log.info("");
+        log.info("------------------------------------------------------------");
+        log.info("Following " + uncoveredExecutables.size() + " executables do not have tests:");
+        for(String executable : uncoveredExecutables){
+            log.info("- " + executable);
+        }
+    }
+
     private static String parseProjectPathArg(ApplicationArgs args) {
         String repositoryPath;
 
@@ -143,4 +229,18 @@ public class SlangBuildMain {
 
         return repositoryPath;
     }
+
+    private static void registerEventHandlers(Slang slang) {
+        slang.subscribeOnAllEvents(new ScoreEventListener() {
+            @Override
+            public void onEvent(ScoreEvent event) {
+                logEvent(event);
+            }
+        });
+    }
+
+    private static void logEvent(ScoreEvent event) {
+        log.debug(("Event received: " + event.getEventType() + " Data is: " + event.getData()));
+    }
+
 }

@@ -14,6 +14,7 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.ReturnValues;
+import io.cloudslang.lang.tools.build.SlangBuildMain;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import io.cloudslang.score.events.EventConstants;
@@ -112,7 +113,8 @@ public class SlangTestRunner {
                 runTestsResults.addFailedTest(UNAVAILABLE_NAME, new TestRun(testCase, "Test case cannot be null"));
                 continue;
             }
-            if (CollectionUtils.isEmpty(testCase.getTestSuites()) || CollectionUtils.containsAny(testSuites, testCase.getTestSuites())) {
+            if ((CollectionUtils.isEmpty(testCase.getTestSuites()) && testSuites.contains(SlangBuildMain.DEFAULT_TESTS)) ||
+                    CollectionUtils.containsAny(testSuites, testCase.getTestSuites())) {
                 log.info("Running test: " + testCaseEntry.getKey() + " - " + testCase.getDescription());
                 try {
                     CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);

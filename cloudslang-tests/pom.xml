@@ -13,7 +13,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.7.34-SNAPSHOT</version>
+        <version>0.7.40-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -30,6 +30,7 @@
         <dependency>
             <groupId>${score.group}</groupId>
             <artifactId>score-all</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -50,6 +51,11 @@
         <dependency>
             <groupId>io.cloudslang.content</groupId>
             <artifactId>score-ssh</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
 
         <dependency>
