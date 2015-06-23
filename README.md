@@ -11,7 +11,9 @@ This project includes the CLI to trigger flows.
 
 ###### Pre-Requisite: Java JRE >= 7
 
-1. Download the latest snapshot of cslang-cli-with-content.zip from [here](https://github.com/CloudSlang/cloud-slang/releases/latest).
+1. Download the CloudSlang CLI file named cslang-cli-with-content.zip:
+    + [Stable release](http://www.cloudslang.io/download)
+    + [Latest snapshot](https://github.com/CloudSlang/cloud-slang/releases/latest)
 2. Unzip it.
 3. Go to the folder /cslang/bin/
 4. Run the executable :
@@ -23,9 +25,15 @@ This project includes the CLI to trigger flows.
 
 All documentation is available on the [CloudSlang website](http://www.cloudslang.io/#/docs).
 
+#### What's New
+
+See what's new [here](CHANGELOG.md).
+
 #### Get Involved
 
-Contact us at [here](mailto:support@cloudslang.io).
+Read our contributing guide [here](CONTRIBUTING.md).
+
+Contact us at support@cloudslang.io.
 
 #### Building and Testing from Source
 
