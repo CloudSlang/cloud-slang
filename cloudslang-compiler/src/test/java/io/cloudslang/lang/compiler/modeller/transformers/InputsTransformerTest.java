@@ -105,7 +105,7 @@ public class InputsTransformerTest {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(4);
         Assert.assertEquals("input5", input.getName());
-        Assert.assertEquals("input5", input.getExpression());
+        Assert.assertEquals(null, input.getExpression());
         Assert.assertEquals(true, input.isEncrypted());
         Assert.assertEquals(true, input.isRequired());
     }
