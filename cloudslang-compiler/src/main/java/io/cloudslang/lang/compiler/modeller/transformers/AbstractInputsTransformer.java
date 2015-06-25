@@ -68,7 +68,7 @@ public abstract class AbstractInputsTransformer {
                 (boolean) props.get(OVERRIDABLE_KEY);
         boolean defaultSpecified = props.containsKey(DEFAULT_KEY);
         String inputName = entry.getKey();
-        String expression = props.containsKey(DEFAULT_KEY) ? (String)props.get(DEFAULT_KEY).toString() : null;
+        String expression = defaultSpecified ? props.get(DEFAULT_KEY).toString() : null;
         String systemPropertyName = (String) props.get(SYSTEM_PROPERTY_KEY);
 
         if (!overridable && !defaultSpecified && StringUtils.isEmpty(systemPropertyName)) {
