@@ -59,7 +59,7 @@ public class TriggerFlows {
             ScoreEvent event = finishEvent.take();
             if (event.getEventType().equals(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION)){
                 LanguageEventData languageEvent = (LanguageEventData) event.getData();
-                throw new RuntimeException((String) languageEvent.get(LanguageEventData.EXCEPTION));
+                throw new RuntimeException(languageEvent.getException());
             }
             slang.unSubscribeOnEvents(finishListener);
             return event;
