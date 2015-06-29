@@ -20,6 +20,7 @@ import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.env.*;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import io.cloudslang.score.api.EndBranchDataContainer;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
@@ -140,7 +141,7 @@ public class AsyncLoopSteps extends AbstractSteps {
             runEnv.getExecutionPath().forward();
         } catch (RuntimeException e) {
             logger.error("There was an error running the end task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
-            throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);
+            throw new RuntimeException("Error running: \'" + nodeName + "\': \n" + e.getMessage(), e);
         }
     }
 
@@ -217,6 +218,14 @@ public class AsyncLoopSteps extends AbstractSteps {
 
         List<EndBranchDataContainer> branches = executionRuntimeServices.getFinishedChildBranchesData();
         for (EndBranchDataContainer branch : branches) {
+
+            //first we check that no exception was thrown during the execution of the branch
+            if (StringUtils.isNotEmpty(branch.getException())) {
+                logger.error("There was an error running branch: " +
+                        executionRuntimeServices.getBranchId() + " Error is: " + branch.getException());
+                throw new RuntimeException("Error running branch: \n" + branch.getException());
+            }
+
             Map<String, Serializable> branchContext = branch.getContexts();
 
             RunEnvironment branchRuntimeEnvironment = (RunEnvironment) branchContext.get(ScoreLangConstants.RUN_ENV);
