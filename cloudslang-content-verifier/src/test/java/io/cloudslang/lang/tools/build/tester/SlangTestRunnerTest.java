@@ -1,7 +1,5 @@
 package io.cloudslang.lang.tools.build.tester;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
@@ -449,7 +447,9 @@ public class SlangTestRunnerTest {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
                 ScoreEventListener listener = (ScoreEventListener) invocationOnMock.getArguments()[0];
-                listener.onEvent(new ScoreEvent(ScoreLangConstants.EVENT_EXECUTION_FINISHED, ImmutableMap.of(LanguageEventData.RESULT, "SUCCESS")));
+                LanguageEventData data = new LanguageEventData();
+                data.setResult("SUCCESS");
+                listener.onEvent(new ScoreEvent(ScoreLangConstants.EVENT_EXECUTION_FINISHED, data));
                 return listener;
             }
         }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
@@ -460,9 +460,13 @@ public class SlangTestRunnerTest {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
                 ScoreEventListener listener = (ScoreEventListener) invocationOnMock.getArguments()[0];
-                ImmutableMap data = ImmutableMap.of(LanguageEventData.OUTPUTS, outputs, LanguageEventData.PATH, "0");
+                LanguageEventData data = new LanguageEventData();
+                data.setOutputs(outputs);
+                data.setPath("0");
                 listener.onEvent(new ScoreEvent(ScoreLangConstants.EVENT_OUTPUT_END, data));
-                listener.onEvent(new ScoreEvent(ScoreLangConstants.EVENT_EXECUTION_FINISHED, ImmutableMap.of(LanguageEventData.RESULT, "SUCCESS")));
+                data = new LanguageEventData();
+                data.setResult("SUCCESS");
+                listener.onEvent(new ScoreEvent(ScoreLangConstants.EVENT_EXECUTION_FINISHED, data));
                 return listener;
             }
         }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
@@ -473,7 +477,9 @@ public class SlangTestRunnerTest {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
                 ScoreEventListener listener = (ScoreEventListener) invocationOnMock.getArguments()[0];
-                listener.onEvent(new ScoreEvent(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION, ImmutableMap.of(LanguageEventData.EXCEPTION, "Error")));
+                LanguageEventData data = new LanguageEventData();
+                data.setException("Error");
+                listener.onEvent(new ScoreEvent(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION, data));
                 return listener;
             }
         }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
