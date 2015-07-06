@@ -15,13 +15,13 @@ import org.yaml.snakeyaml.parser.Parser;
 import org.yaml.snakeyaml.parser.ParserImpl;
 import org.yaml.snakeyaml.reader.StreamReader;
 
-public class ParserWithDoubleQuotesImpl implements Parser {
+public class ParserWithQuotesImpl implements Parser {
 
     public static final char DOUBLE_QUOTES = '"';
     public static final char SINGLE_QUOTE = '\'';
     private Parser parser;
 
-    public ParserWithDoubleQuotesImpl(StreamReader reader) {
+    public ParserWithQuotesImpl(StreamReader reader) {
         this.parser =  new ParserImpl(reader);
 
     }
@@ -62,14 +62,14 @@ public class ParserWithDoubleQuotesImpl implements Parser {
         return event;
     }
 
-    private ScalarEvent wrapEventValue(ScalarEvent scalarEvent, char wrapChar) {
+    private ScalarEvent wrapEventValue(ScalarEvent event, char wrapChar) {
         return new ScalarEvent(
-                scalarEvent.getAnchor(),
-                scalarEvent.getTag(),
-                scalarEvent.getImplicit(),
-                wrapChar + scalarEvent.getValue() + wrapChar,
-                scalarEvent.getStartMark(),
-                scalarEvent.getEndMark(),
-                scalarEvent.getStyle());
+                event.getAnchor(),
+                event.getTag(),
+                event.getImplicit(),
+                wrapChar + event.getValue() + wrapChar,
+                event.getStartMark(),
+                event.getEndMark(),
+                event.getStyle());
     }
 }

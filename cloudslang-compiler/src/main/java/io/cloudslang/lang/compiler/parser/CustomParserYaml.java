@@ -21,7 +21,7 @@ public class CustomParserYaml extends Yaml {
     }
 
     private Object loadFromReader(StreamReader sreader, Class<?> type) {
-        Composer composer = new Composer(new ParserWithDoubleQuotesImpl(sreader), resolver);
+        Composer composer = new Composer(new ParserWithQuotesImpl(sreader), resolver);
         constructor.setComposer(composer);
         return constructor.getSingleData(type);
     }
