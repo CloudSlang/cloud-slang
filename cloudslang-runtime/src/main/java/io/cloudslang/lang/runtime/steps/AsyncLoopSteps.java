@@ -220,10 +220,11 @@ public class AsyncLoopSteps extends AbstractSteps {
         for (EndBranchDataContainer branch : branches) {
 
             //first we check that no exception was thrown during the execution of the branch
-            if (StringUtils.isNotEmpty(branch.getException())) {
+            String branchException = branch.getException();
+            if (StringUtils.isNotEmpty(branchException)) {
                 logger.error("There was an error running branch: " +
-                        executionRuntimeServices.getBranchId() + " Error is: " + branch.getException());
-                throw new RuntimeException("Error running branch: \n" + branch.getException());
+                        executionRuntimeServices.getBranchId() + " Error is: " + branchException);
+                throw new RuntimeException("Error running branch: \n" + branchException);
             }
 
             Map<String, Serializable> branchContext = branch.getContexts();
