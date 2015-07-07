@@ -46,7 +46,7 @@ public class YamlParser {
                 errorMessage += "Probably did not provide (key: value) pair or missing space after colon(:)";
             }
             if (e instanceof ConstructorException && errorMessage.startsWith("Cannot create property")){
-                errorMessage += "Are you sure you are not missing a space after colon(:) for one of the imports?";
+                errorMessage += "Are you sure you are not missing a space after colon(:) for one of the imports and that all imports have an alias?";
             }
 
             throw new RuntimeException("There was a problem parsing the YAML source: " + source.getName() + ".\n" + errorMessage, e);
