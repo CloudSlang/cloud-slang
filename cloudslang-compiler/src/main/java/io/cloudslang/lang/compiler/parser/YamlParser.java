@@ -45,7 +45,7 @@ public class YamlParser {
             if (e instanceof ScannerException && errorMessage.startsWith("mapping values")){
                 errorMessage += "Probably did not provide (key: value) pair or missing space after colon(:)";
             }
-            if (e instanceof ConstructorException && errorMessage.startsWith("Cannot create property")){
+            else if (e instanceof ConstructorException && errorMessage.startsWith("Cannot create property")){
                 errorMessage += "Are you sure you are not missing a space after colon(:) for one of the imports and that all imports have an alias?";
             }
 
