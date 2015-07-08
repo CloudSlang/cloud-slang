@@ -20,6 +20,8 @@ import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.ConstructorException;
+import org.yaml.snakeyaml.scanner.ScannerException;
 
 @Component
 public class YamlParser {
@@ -39,7 +41,15 @@ public class YamlParser {
             parsedSlang.setName(source.getName());
             return parsedSlang;
         } catch (Throwable e) {
-            throw new RuntimeException("There was a problem parsing the YAML source: " + source.getName() + ".\n" + e.getMessage(), e);
+            String errorMessage = e.getMessage();
+            if (e instanceof ScannerException && (errorMessage.startsWith("mapping values") || errorMessage.startsWith("while scanning a simple key"))){
+                errorMessage += "Probably did not provide (key: value) pair or missing space after colon(:)";
+            }
+            else if (e instanceof ConstructorException && errorMessage.startsWith("Cannot create property")){
+                errorMessage += "Are you sure you are not missing a space after colon(:) for one of the imports and that all imports have an alias?";
+            }
+
+            throw new RuntimeException("There was a problem parsing the YAML source: " + source.getName() + ".\n" + errorMessage, e);
         }
     }
 

@@ -86,8 +86,6 @@ public class CompilerHelperImpl implements CompilerHelper{
         }
         for (String dependency:dependencies) {
             Collection<File> dependenciesFiles = FileUtils.listFiles(new File(dependency), SLANG_FILE_EXTENSIONS, true);
-            dependenciesFiles = select(dependenciesFiles, having(on(File.class).getPath(), not(containsString(SP_DIR))));
-            dependenciesFiles = select(dependenciesFiles, having(on(File.class).getPath(), not(containsString(INPUT_DIR))));
             depsSources.addAll(convert(dependenciesFiles, new Converter<File, SlangSource>() {
                 @Override
                 public SlangSource convert(File from) {

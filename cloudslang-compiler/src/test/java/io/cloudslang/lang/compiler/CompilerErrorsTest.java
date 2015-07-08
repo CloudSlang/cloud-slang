@@ -102,6 +102,50 @@ public class CompilerErrorsTest {
         exception.expectMessage("navigation");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
+    @Test
+    public void testFlowWithMissingSpace1() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_with_missing_space_1.sl").toURI();
+        URI operations = getClass().getResource("/java_op.sl").toURI();
+        URI flows = getClass().getResource("/flow_with_data.yaml").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operations));
+        path.add(SlangSource.fromFile(flows));
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Probably did not provide (key: value) pair");
+        exception.expectMessage("mapping values are not allowed here");
+        compiler.compile(SlangSource.fromFile(resource), path);
+    }
+
+    @Test
+    public void testFlowWithMissingSpace2() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_with_missing_space_2.sl").toURI();
+        URI operations = getClass().getResource("/java_op.sl").toURI();
+        URI flows = getClass().getResource("/flow_with_data.yaml").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operations));
+        path.add(SlangSource.fromFile(flows));
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Cannot create property");
+        exception.expectMessage("missing a space after colon");
+        compiler.compile(SlangSource.fromFile(resource), path);
+    }
+
+    @Test
+    public void testFlowWithMissingSpace3() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_with_missing_space_3.sl").toURI();
+        URI operations = getClass().getResource("/java_op.sl").toURI();
+        URI flows = getClass().getResource("/flow_with_data.yaml").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operations));
+        path.add(SlangSource.fromFile(flows));
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Probably did not provide (key: value) pair");
+        exception.expectMessage("while scanning a simple key");
+        compiler.compile(SlangSource.fromFile(resource), path);
+    }
 
     @Test
     public void testFlowWithNavigationToMissingDefaultResults() throws Exception {
