@@ -87,6 +87,9 @@ public class ScoreServicesImpl implements ScoreServices{
 
         String errorMessageFlowExecution = scoreEventListener.getErrorMessage();
         if (StringUtils.isNotEmpty(errorMessageFlowExecution)) {
+            if (compilationArtifact.getSystemProperties().size() != 0 && errorMessageFlowExecution.contains("is Required, but value is empty")){
+                errorMessageFlowExecution += "\n\nBe sure to include a valid system property file using --spf <path_to_file>";
+            }
             // exception occurred during flow execution
             throw new RuntimeException(errorMessageFlowExecution);
         }
