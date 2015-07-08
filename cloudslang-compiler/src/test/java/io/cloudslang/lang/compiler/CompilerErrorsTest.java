@@ -411,4 +411,16 @@ public class CompilerErrorsTest {
         exception.expectMessage("unique");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
+
+    @Test
+    public void testNullValueInputFlow() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_with_null_value_input.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Input");
+        exception.expectMessage("input1");
+        exception.expectMessage("null");
+        compiler.compile(SlangSource.fromFile(resource), path);
+    }
 }
