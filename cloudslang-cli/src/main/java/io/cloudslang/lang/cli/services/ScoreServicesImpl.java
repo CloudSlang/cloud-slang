@@ -8,6 +8,8 @@
  */
 package io.cloudslang.lang.cli.services;
 
+import io.cloudslang.lang.entities.bindings.Input;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEventListener;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -87,8 +90,25 @@ public class ScoreServicesImpl implements ScoreServices{
 
         String errorMessageFlowExecution = scoreEventListener.getErrorMessage();
         if (StringUtils.isNotEmpty(errorMessageFlowExecution)) {
-            if (compilationArtifact.getSystemProperties().size() != 0 && errorMessageFlowExecution.contains("is Required, but value is empty")){
-                errorMessageFlowExecution += "\n\nBe sure to include a valid system property file using --spf <path_to_file>";
+            Collection<Input> sps = compilationArtifact.getSystemProperties();
+
+            if (sps.size() != 0 && errorMessageFlowExecution.contains("is Required, but value is empty")){
+                Boolean spMissing = false;
+                if (systemProperties == null){
+                    spMissing = true;
+                }
+
+                else {
+                    for (Input sp : sps) {
+                        if (systemProperties.get(sp.getSystemPropertyName()) == null){
+                            spMissing = true;
+                            break;
+                        }
+                    }
+                }
+                if(spMissing) {
+                    errorMessageFlowExecution += "\n\nA system property is missing. Be sure to include a valid system property file using --spf <path_to_file>";
+                }
             }
             // exception occurred during flow execution
             throw new RuntimeException(errorMessageFlowExecution);
