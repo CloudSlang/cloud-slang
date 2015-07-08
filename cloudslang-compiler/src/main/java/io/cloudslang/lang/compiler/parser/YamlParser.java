@@ -42,7 +42,7 @@ public class YamlParser {
             return parsedSlang;
         } catch (Throwable e) {
             String errorMessage = e.getMessage();
-            if (e instanceof ScannerException && errorMessage.startsWith("mapping values")){
+            if (e instanceof ScannerException && (errorMessage.startsWith("mapping values") || errorMessage.startsWith("while scanning a simple key"))){
                 errorMessage += "Probably did not provide (key: value) pair or missing space after colon(:)";
             }
             else if (e instanceof ConstructorException && errorMessage.startsWith("Cannot create property")){
