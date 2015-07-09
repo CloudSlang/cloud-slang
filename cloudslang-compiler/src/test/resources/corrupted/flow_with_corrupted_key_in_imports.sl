@@ -9,9 +9,9 @@ namespace: io.cloudslang
 
 imports:
  ops: user.ops
-flows: slang.sample.flows
+ flows:slang.sample.flows
 flow:
- name: flow_with_missing_spaces_2
+ name: flow_with_corrupted_key_in_imports
 
  workflow:
    - Task1:

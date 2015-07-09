@@ -46,9 +46,16 @@ public class YamlParser {
                 errorMessage += "Probably did not provide (key: value) pair or missing space after colon(:)";
             }
             else if (e instanceof ConstructorException && errorMessage.startsWith("Cannot create property")){
-                errorMessage += "Are you sure you are not missing a space after colon(:) for one of the imports and that all imports have an alias?";
+                if (errorMessage.contains("Unable to find property")){
+                    String truncatedErrorMessage = errorMessage.substring(errorMessage.indexOf("Unable"), errorMessage.indexOf("on class"));
+                    String undefinedProperty = truncatedErrorMessage.substring(truncatedErrorMessage.indexOf("\'")+1, truncatedErrorMessage.lastIndexOf("\'"));
+                    errorMessage += "Property \'" + undefinedProperty + "\' is not supported by CloudSlang. Check that \'" + undefinedProperty + "\' is indented properly.";
+                }
+                else if (errorMessage.contains("No single argument constructor found for interface java.util.Map")){
+                    errorMessage += "Probably did not provide (key: value) pair or missing space after colon(:)";
+                }
+                //errorMessage += "Are you sure you are not missing a space after colon(:) for one of the imports and that all imports have an alias?";
             }
-
             throw new RuntimeException("There was a problem parsing the YAML source: " + source.getName() + ".\n" + errorMessage, e);
         }
     }

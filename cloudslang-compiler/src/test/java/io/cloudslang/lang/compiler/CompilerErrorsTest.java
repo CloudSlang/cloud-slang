@@ -103,14 +103,16 @@ public class CompilerErrorsTest {
         compiler.compile(SlangSource.fromFile(resource), path);
     }
     @Test
-    public void testFlowWithMissingSpace1() throws Exception {
-        URI resource = getClass().getResource("/corrupted/flow_with_missing_space_1.sl").toURI();
+    public void testFlowWithMissingSpaceBeforeFirstImport() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_with_missing_space_before_first_import.sl").toURI();
         URI operations = getClass().getResource("/java_op.sl").toURI();
+        URI checkWeather = getClass().getResource("/check_Weather.sl").toURI();
         URI flows = getClass().getResource("/flow_with_data.yaml").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
         path.add(SlangSource.fromFile(flows));
+        path.add(SlangSource.fromFile(checkWeather));
         exception.expect(RuntimeException.class);
         exception.expectMessage("Probably did not provide (key: value) pair");
         exception.expectMessage("mapping values are not allowed here");
@@ -118,23 +120,42 @@ public class CompilerErrorsTest {
     }
 
     @Test
-    public void testFlowWithMissingSpace2() throws Exception {
-        URI resource = getClass().getResource("/corrupted/flow_with_missing_space_2.sl").toURI();
+    public void testFlowWithWrongIndentation() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_with_wrong_indentation.sl").toURI();
         URI operations = getClass().getResource("/java_op.sl").toURI();
         URI flows = getClass().getResource("/flow_with_data.yaml").toURI();
+        URI checkWeather = getClass().getResource("/check_Weather.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
         path.add(SlangSource.fromFile(flows));
+        path.add(SlangSource.fromFile(checkWeather));
         exception.expect(RuntimeException.class);
         exception.expectMessage("Cannot create property");
-        exception.expectMessage("missing a space after colon");
+        exception.expectMessage("not supported by CloudSlang");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
-    public void testFlowWithMissingSpace3() throws Exception {
-        URI resource = getClass().getResource("/corrupted/flow_with_missing_space_3.sl").toURI();
+    public void testFlowWhereMapCannotBeCreated() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_where_map_cannot_be_created.sl").toURI();
+        URI operations = getClass().getResource("/java_op.sl").toURI();
+        URI flows = getClass().getResource("/flow_with_data.yaml").toURI();
+        URI checkWeather = getClass().getResource("/check_Weather.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operations));
+        path.add(SlangSource.fromFile(flows));
+        path.add(SlangSource.fromFile(checkWeather));
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Cannot create property");
+        exception.expectMessage("missing a spface after colon");
+        compiler.compile(SlangSource.fromFile(resource), path);
+    }
+
+    @Test
+    public void testFlowWithCorruptedKeyInImports() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_with_corrupted_key_in_imports.sl").toURI();
         URI operations = getClass().getResource("/java_op.sl").toURI();
         URI flows = getClass().getResource("/flow_with_data.yaml").toURI();
 
@@ -143,7 +164,7 @@ public class CompilerErrorsTest {
         path.add(SlangSource.fromFile(flows));
         exception.expect(RuntimeException.class);
         exception.expectMessage("Probably did not provide (key: value) pair");
-        exception.expectMessage("while scanning a simple key");
+        exception.expectMessage("while scanning a sdimple key");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 

@@ -8,10 +8,10 @@
 namespace: io.cloudslang
 
 imports:
- ops: user.ops
- flows:slang.sample.flows
+ops: user.ops
+ flows: slang.sample.flows
 flow:
- name: flow_with_missing_spaces_3
+ name: flow_with_missing_space_before_first_import
 
  workflow:
    - Task1:
