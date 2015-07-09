@@ -11,7 +11,7 @@ imports:
  ops: user.ops
 flows: slang.sample.flows
 flow:
- name: flow_with_missing_spaces_1
+ name: flow_with_missing_spaces_2
 
  workflow:
    - Task1:
