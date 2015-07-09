@@ -54,7 +54,6 @@ public class YamlParser {
                 else if (errorMessage.contains("No single argument constructor found for interface java.util.Map")){
                     errorMessage += "Probably did not provide (key: value) pair or missing space after colon(:)";
                 }
-                //errorMessage += "Are you sure you are not missing a space after colon(:) for one of the imports and that all imports have an alias?";
             }
             throw new RuntimeException("There was a problem parsing the YAML source: " + source.getName() + ".\n" + errorMessage, e);
         }
