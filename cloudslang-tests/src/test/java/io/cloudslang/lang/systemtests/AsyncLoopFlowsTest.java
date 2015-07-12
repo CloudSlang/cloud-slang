@@ -102,8 +102,13 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
 
     private List<StepData> extractAsyncLoopData(RuntimeInformation runtimeInformation) {
         Map<String, List<StepData>> branchesByPath = runtimeInformation.getBranchesByPath();
-        Assert.assertTrue("async loop data not found", branchesByPath.containsKey(FIRST_STEP_PATH));
-        return branchesByPath.get(FIRST_STEP_PATH);
+        Assert.assertTrue("async loop data not found", branchesByPath.containsKey(BRANCH_FIRST_STEP_PATH));
+        List<StepData> stepDataList = new ArrayList<>();
+        for (List<StepData> list : branchesByPath.values()){
+            stepDataList.add(list.get(0));
+        }
+
+        return stepDataList;
     }
 
     private <T> boolean containsSameElementsWithoutOrdering(List<T> firstList, List<T> secondList) {

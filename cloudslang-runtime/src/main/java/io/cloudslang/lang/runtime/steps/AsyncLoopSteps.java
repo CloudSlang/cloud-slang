@@ -17,17 +17,19 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.lang.runtime.bindings.AsyncLoopBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
-import io.cloudslang.lang.runtime.env.*;
+import io.cloudslang.lang.runtime.env.Context;
+import io.cloudslang.lang.runtime.env.ReturnValues;
+import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import org.apache.commons.lang.SerializationUtils;
-import org.apache.log4j.Logger;
 import io.cloudslang.score.api.EndBranchDataContainer;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
 import org.python.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -75,6 +77,15 @@ public class AsyncLoopSteps extends AbstractSteps {
             runEnv.getExecutionPath().down();
 
             for (Serializable splitItem : splitData) {
+
+                // first fire event
+                fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_BRANCH_START,
+                        "async loop branch created", runEnv.getExecutionPath().getCurrentPath(),
+                        LanguageEventData.StepType.TASK, nodeName, Pair.of(ScoreLangConstants.REF_ID, refId),
+                        Pair.of(RuntimeConstants.SPLIT_ITEM_KEY, splitItem));
+                // take path down one level
+                runEnv.getExecutionPath().down();
+
                 RunEnvironment branchRuntimeEnvironment = (RunEnvironment) SerializationUtils.clone(runEnv);
                 Context branchContext = (Context) SerializationUtils.clone(flowContext);
                 branchContext.putVariable(asyncLoopStatement.getVarName(), splitItem);
@@ -90,11 +101,10 @@ public class AsyncLoopSteps extends AbstractSteps {
                         nextStepId,
                         branchBeginStep);
 
-                fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_BRANCH_START,
-                        "async loop branch created", runEnv.getExecutionPath().getCurrentPath(),
-                        LanguageEventData.StepType.TASK, nodeName, Pair.of(ScoreLangConstants.REF_ID, refId),
-                        Pair.of(RuntimeConstants.SPLIT_ITEM_KEY, splitItem));
+                // take path down up level
+                runEnv.getExecutionPath().up();
 
+                // forward for next branch
                 runEnv.getExecutionPath().forward();
             }
 
@@ -226,7 +236,10 @@ public class AsyncLoopSteps extends AbstractSteps {
             ReturnValues executableReturnValues = branchRuntimeEnvironment.removeReturnValues();
             branchesResult.add(executableReturnValues.getResult());
 
-            fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_BRANCH_END,
+            // down branch path
+            branchRuntimeEnvironment.getExecutionPath().up();
+
+            fireEvent(executionRuntimeServices, branchRuntimeEnvironment, ScoreLangConstants.EVENT_BRANCH_END,
                     "async loop branch ended", LanguageEventData.StepType.TASK, nodeName,
                     Pair.of(RuntimeConstants.BRANCH_RETURN_VALUES_KEY, executableReturnValues)
             );
