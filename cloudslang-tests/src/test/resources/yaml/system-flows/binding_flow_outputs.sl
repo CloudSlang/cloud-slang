@@ -24,6 +24,6 @@ flow:
         publish:
           - weather
   outputs:
-    - weather
-    - weather2: weather
-    - weather3: weather + " day"
+    - weather1: fromInputs['city_name']
+    - weather2: weather1
+    - weather3: weather1 + " day"

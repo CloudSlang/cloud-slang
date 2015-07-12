@@ -115,12 +115,12 @@ public class DataFlowTest extends SystemsTestsParent {
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, null).getTasks();
 
         Map<String, Serializable> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
-        String weatherOutput = (String) flowOutputs.get("weather");
+        String weatherOutput = (String) flowOutputs.get("weather1");
         String weather2Output = (String) flowOutputs.get("weather2");
         String weather3Output = (String) flowOutputs.get("weather3");
 
-        Assert.assertEquals("some of the inputs or outputs were not bound correctly", "great!!", weatherOutput);
-        Assert.assertEquals("some of the inputs or outputs were not bound correctly", "great!!", weather2Output);
-        Assert.assertEquals("some of the inputs or outputs were not bound correctly", "great!! day", weather3Output);
+        Assert.assertEquals("weather1 not bound correctly", "New York", weatherOutput);
+        Assert.assertEquals("weather2 not bound correctly", "New York", weather2Output);
+        Assert.assertEquals("weather3 not bound correctly", "New York day", weather3Output);
     }
 }
