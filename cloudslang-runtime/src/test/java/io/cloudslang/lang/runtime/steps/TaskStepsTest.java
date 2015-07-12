@@ -126,24 +126,35 @@ public class TaskStepsTest {
         RunEnvironment runEnv = createRunEnvironment();
         List<Input> inputs = Arrays.asList(new Input("input1", "input1"), new Input("input2", "input2"));
         Map<String,Serializable> resultMap = new HashMap<>();
-        resultMap.put("input1",5);
-        resultMap.put("input2",3);
+        resultMap.put("input1", 5);
+        resultMap.put("input2", 3);
 
         when(inputsBinding.bindInputs(eq(inputs), anyMap(), anyMap())).thenReturn(resultMap);
 
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
-        taskSteps.beginTask(inputs,null,runEnv,runtimeServices,"task1", 1L, 2L, "2");
+        taskSteps.beginTask(inputs, null, runEnv, runtimeServices, "task1", 1L, 2L, "2");
         Map<String,Serializable> callArgs = runEnv.removeCallArguments();
         Assert.assertFalse(callArgs.isEmpty());
         Assert.assertEquals(5, callArgs.get("input1"));
-        Assert.assertEquals(3,callArgs.get("input2"));
+        Assert.assertEquals(3, callArgs.get("input2"));
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
-        Assert.assertEquals(1,events.size());
-        ScoreEvent inputEvent = events.iterator().next();
-        Assert.assertEquals(ScoreLangConstants.EVENT_INPUT_END,inputEvent.getEventType());
+        Assert.assertEquals(2,events.size());
+        Iterator<ScoreEvent> eventsIterator = events.iterator();
+        ScoreEvent inputStartEvent = eventsIterator.next();
+        Assert.assertEquals(ScoreLangConstants.EVENT_INPUT_START, inputStartEvent.getEventType());
+        ScoreEvent inputEndEvent = eventsIterator.next();
+        Assert.assertEquals(ScoreLangConstants.EVENT_INPUT_END, inputEndEvent.getEventType());
 
-        LanguageEventData eventData = (LanguageEventData)inputEvent.getData();
+        LanguageEventData startBindingEventData = (LanguageEventData)inputStartEvent.getData();
+        Assert.assertEquals("task1",startBindingEventData.getStepName());
+        Assert.assertEquals(LanguageEventData.StepType.TASK,startBindingEventData.getStepType());
+
+        List<String> inputsToBind = (List<String>)startBindingEventData.get(LanguageEventData.INPUTS);
+        Assert.assertTrue(inputsToBind.contains("input1"));
+        Assert.assertTrue(inputsToBind.contains("input2"));
+
+        LanguageEventData eventData = (LanguageEventData)inputEndEvent.getData();
         Assert.assertEquals("task1",eventData.getStepName());
         Assert.assertEquals(LanguageEventData.StepType.TASK,eventData.getStepType());
 
