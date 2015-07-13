@@ -98,4 +98,29 @@ public class DataFlowTest extends SystemsTestsParent {
         Assert.assertEquals("some of the inputs or outputs were not bound correctly",
                 13, final_output);
     }
+
+
+    @Test
+    public void testCompileFlowWithOutputBinding() throws Exception {
+        URI flow = getClass().getResource("/yaml/system-flows/binding_flow_outputs.sl").toURI();
+        URI operation = getClass().getResource("/yaml/system-flows/check_Weather.sl").toURI();
+
+        SlangSource dep = SlangSource.fromFile(operation);
+        Set<SlangSource> path = Sets.newHashSet(dep);
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
+
+        Map<String, Serializable> userInputs = new HashMap<>();
+        userInputs.put("city_name", "New York");
+
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+
+        Map<String, Serializable> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
+        String weatherOutput = (String) flowOutputs.get("weather1");
+        String weather2Output = (String) flowOutputs.get("weather2");
+        String weather3Output = (String) flowOutputs.get("weather3");
+
+        Assert.assertEquals("weather1 not bound correctly", "New York", weatherOutput);
+        Assert.assertEquals("weather2 not bound correctly", "New York", weather2Output);
+        Assert.assertEquals("weather3 not bound correctly", "New York day", weather3Output);
+    }
 }
