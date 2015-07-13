@@ -449,6 +449,9 @@ public class AsyncLoopStepsTest {
         RunEnvironment branchRuntimeEnvironment1 = new RunEnvironment();
         RunEnvironment branchRuntimeEnvironment2 = new RunEnvironment();
         RunEnvironment branchRuntimeEnvironment3 = new RunEnvironment();
+        branchRuntimeEnvironment1.getExecutionPath().down();
+        branchRuntimeEnvironment2.getExecutionPath().down();
+        branchRuntimeEnvironment3.getExecutionPath().down();
         branchRuntimeEnvironment1.getStack().pushContext(new Context(runtimeContext1));
         branchRuntimeEnvironment2.getStack().pushContext(new Context(runtimeContext2));
         branchRuntimeEnvironment3.getStack().pushContext(new Context(runtimeContext3));
