@@ -97,11 +97,15 @@ public class TaskSteps extends AbstractSteps {
             }
 
             Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
+
+            sendStartBindingInputsEvent(taskInputs, runEnv, executionRuntimeServices,
+                    "Pre Input binding for task", LanguageEventData.StepType.TASK, nodeName);
+
             Map<String, Serializable> operationArguments = inputsBinding.bindInputs(taskInputs, flowVariables, runEnv.getSystemProperties());
 
             //todo: hook
 
-            sendBindingInputsEvent(taskInputs, operationArguments, runEnv, executionRuntimeServices, "Task inputs resolved",
+            sendEndBindingInputsEvent(taskInputs, operationArguments, runEnv, executionRuntimeServices, "Task inputs resolved",
                     LanguageEventData.StepType.TASK, nodeName);
 
             updateCallArgumentsAndPushContextToStack(runEnv, flowContext, operationArguments);

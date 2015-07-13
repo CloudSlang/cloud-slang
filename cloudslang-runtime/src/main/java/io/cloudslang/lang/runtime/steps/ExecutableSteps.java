@@ -68,6 +68,9 @@ public class ExecutableSteps extends AbstractSteps {
             if (userInputs != null) {
                 callArguments.putAll(userInputs);
             }
+            sendStartBindingInputsEvent(executableInputs, runEnv, executionRuntimeServices,
+                    "Pre Input binding for operation/flow", LanguageEventData.StepType.EXECUTABLE, nodeName);
+
             Map<String, Serializable> executableContext = inputsBinding.bindInputs(executableInputs, callArguments, runEnv.getSystemProperties());
 
             Map<String, Serializable> actionArguments = new HashMap<>();
@@ -84,7 +87,7 @@ public class ExecutableSteps extends AbstractSteps {
 
             updateCallArgumentsAndPushContextToStack(runEnv, new Context(executableContext), actionArguments);
 
-            sendBindingInputsEvent(executableInputs, executableContext, runEnv, executionRuntimeServices,
+            sendEndBindingInputsEvent(executableInputs, executableContext, runEnv, executionRuntimeServices,
                     "Post Input binding for operation/flow", LanguageEventData.StepType.EXECUTABLE, nodeName);
 
             // put the next step position for the navigation
