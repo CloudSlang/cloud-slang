@@ -101,7 +101,7 @@ public class AsyncLoopSteps extends AbstractSteps {
                         nextStepId,
                         branchBeginStep);
 
-                // take path down up level
+                // take path up level
                 runEnv.getExecutionPath().up();
 
                 // forward for next branch
@@ -236,7 +236,7 @@ public class AsyncLoopSteps extends AbstractSteps {
             ReturnValues executableReturnValues = branchRuntimeEnvironment.removeReturnValues();
             branchesResult.add(executableReturnValues.getResult());
 
-            // down branch path
+            // up branch path
             branchRuntimeEnvironment.getExecutionPath().up();
 
             fireEvent(executionRuntimeServices, branchRuntimeEnvironment, ScoreLangConstants.EVENT_BRANCH_END,
