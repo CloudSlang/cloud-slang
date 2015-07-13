@@ -17,6 +17,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -25,13 +26,27 @@ import java.util.Map.Entry;
 
 public abstract class AbstractSteps {
 
-    public void sendBindingInputsEvent(List<Input> inputs,
-                                       final Map<String, Serializable> context,
-                                       RunEnvironment runEnv,
-                                       ExecutionRuntimeServices executionRuntimeServices,
-                                       String desc,
-                                       LanguageEventData.StepType stepType,
-                                       String stepName) {
+    public void sendStartBindingInputsEvent(List<Input> inputs,
+                                          RunEnvironment runEnv,
+                                          ExecutionRuntimeServices executionRuntimeServices,
+                                          String desc,
+                                          LanguageEventData.StepType stepType,
+                                          String stepName) {
+        ArrayList<String> inputNames = new ArrayList<>();
+        for (Input input : inputs) {
+            inputNames.add(input.getName());
+        }
+        fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_INPUT_START, desc, stepType, stepName,
+                Pair.of(LanguageEventData.INPUTS, inputNames));
+    }
+
+    public void sendEndBindingInputsEvent(List<Input> inputs,
+                                          final Map<String, Serializable> context,
+                                          RunEnvironment runEnv,
+                                          ExecutionRuntimeServices executionRuntimeServices,
+                                          String desc,
+                                          LanguageEventData.StepType stepType,
+                                          String stepName) {
         Map<String, Serializable> inputsForEvent = new HashMap<>();
         for (Input input : inputs) {
             String inputName = input.getName();
