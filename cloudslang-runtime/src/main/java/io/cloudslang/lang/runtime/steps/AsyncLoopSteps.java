@@ -132,7 +132,7 @@ public class AsyncLoopSteps extends AbstractSteps {
             Map<String, Serializable> contextBeforeSplit = flowContext.getImmutableViewOfVariables();
             List<String> branchesResult = Lists.newArrayList();
 
-            collectBranchesData(runEnv, executionRuntimeServices, nodeName, branchesContext, branchesResult);
+            collectBranchesData(executionRuntimeServices, nodeName, branchesContext, branchesResult);
 
             Map<String, Serializable> publishValues =
                     bindAggregateOutputs(
@@ -223,7 +223,6 @@ public class AsyncLoopSteps extends AbstractSteps {
     }
 
     private void collectBranchesData(
-            RunEnvironment runEnv,
             ExecutionRuntimeServices executionRuntimeServices,
             String nodeName,
             List<Map<String, Serializable>> branchesContext,
