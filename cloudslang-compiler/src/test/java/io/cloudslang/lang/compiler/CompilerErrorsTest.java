@@ -149,7 +149,7 @@ public class CompilerErrorsTest {
         path.add(SlangSource.fromFile(checkWeather));
         exception.expect(RuntimeException.class);
         exception.expectMessage("Cannot create property");
-        exception.expectMessage("missing a spface after colon");
+        exception.expectMessage("missing space after colon(:)");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -164,7 +164,7 @@ public class CompilerErrorsTest {
         path.add(SlangSource.fromFile(flows));
         exception.expect(RuntimeException.class);
         exception.expectMessage("Probably did not provide (key: value) pair");
-        exception.expectMessage("while scanning a sdimple key");
+        exception.expectMessage("while scanning a simple key");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
