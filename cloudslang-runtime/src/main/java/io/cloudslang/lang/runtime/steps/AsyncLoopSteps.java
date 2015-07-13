@@ -46,6 +46,7 @@ import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUT
 public class AsyncLoopSteps extends AbstractSteps {
 
     public static final String BRANCH_EXCEPTION_PREFIX = "Error running branch";
+    private static final String BRANCH_ID = "BRANCH_ID";
 
     @Autowired
     private AsyncLoopBinding asyncLoopBinding;
@@ -224,8 +225,8 @@ public class AsyncLoopSteps extends AbstractSteps {
             //first we check that no exception was thrown during the execution of the branch
             String branchException = branch.getException();
             if (StringUtils.isNotEmpty(branchException)) {
-                logger.error("There was an error running branch: " +
-                        executionRuntimeServices.getBranchId() + " Error is: " + branchException);
+                String branchID = (String) branch.getSystemContext().get(BRANCH_ID);
+                logger.error("There was an error running branch: " + branchID + " Error is: " + branchException);
                 throw new RuntimeException(BRANCH_EXCEPTION_PREFIX + ": \n" + branchException);
             }
 
