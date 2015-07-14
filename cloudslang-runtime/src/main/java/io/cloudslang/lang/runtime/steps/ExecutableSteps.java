@@ -69,7 +69,7 @@ public class ExecutableSteps extends AbstractSteps {
                 callArguments.putAll(userInputs);
             }
             sendStartBindingInputsEvent(executableInputs, runEnv, executionRuntimeServices,
-                    "Pre Input binding for operation/flow", LanguageEventData.StepType.EXECUTABLE, nodeName);
+                    "Pre Input binding for operation/flow", LanguageEventData.StepType.EXECUTABLE, nodeName, null);
 
             Map<String, Serializable> executableContext = inputsBinding.bindInputs(executableInputs, callArguments, runEnv.getSystemProperties());
 

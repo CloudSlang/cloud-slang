@@ -135,7 +135,8 @@ public class ExecutionPlanBuilderTest {
         Map<String, Serializable> preTaskActionData = task.getPreTaskActionData();
         String refId = task.getRefId();
         String name = task.getName();
-        when(stepFactory.createBeginTaskStep(eq(stepId), anyListOf(Input.class), eq(preTaskActionData), eq(refId), eq(name))).thenReturn(new ExecutionStep(stepId));
+        String taskType = task.getType().name();
+        when(stepFactory.createBeginTaskStep(eq(stepId), anyListOf(Input.class), eq(preTaskActionData), eq(refId), eq(name), eq(taskType))).thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockAddBranchesStep(Long stepId, Long nextStepID, Long branchBeginStepID, Task task, Flow flow) {
@@ -239,7 +240,7 @@ public class ExecutionPlanBuilderTest {
                 eq(task.getPreTaskActionData()),
                 eq(compiledFlow.getId()),
                 eq(task.getName()));
-        verify(stepFactory).createBeginTaskStep(eq(3L), anyListOf(Input.class), eq(task.getPreTaskActionData()), eq(task.getRefId()), eq(task.getName()));
+        verify(stepFactory).createBeginTaskStep(eq(3L), anyListOf(Input.class), eq(task.getPreTaskActionData()), eq(task.getRefId()), eq(task.getName()), eq(TaskType.OTHER.name()));
         verify(stepFactory).createFinishTaskStep(eq(4L), eq(task.getPostTaskActionData()), anyMapOf(String.class, ResultNavigation.class), eq(task.getName()), eq(task.isAsync()));
         verify(stepFactory).createJoinBranchesStep(eq(5L), eq(task.getPostTaskActionData()), anyMapOf(String.class, ResultNavigation.class), eq(task.getName()));
 

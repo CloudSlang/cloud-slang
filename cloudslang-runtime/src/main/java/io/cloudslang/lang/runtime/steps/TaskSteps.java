@@ -63,7 +63,8 @@ public class TaskSteps extends AbstractSteps {
                           @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
                           @Param(ExecutionParametersConsts.RUNNING_EXECUTION_PLAN_ID) Long RUNNING_EXECUTION_PLAN_ID,
                           @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
-                          @Param(ScoreLangConstants.REF_ID) String refId) {
+                          @Param(ScoreLangConstants.REF_ID) String refId,
+                          @Param(ScoreLangConstants.TASK_TYPE) String taskType) {
         try {
             runEnv.removeCallArguments();
             runEnv.removeReturnValues();
@@ -99,7 +100,7 @@ public class TaskSteps extends AbstractSteps {
             Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
 
             sendStartBindingInputsEvent(taskInputs, runEnv, executionRuntimeServices,
-                    "Pre Input binding for task", LanguageEventData.StepType.TASK, nodeName);
+                    "Pre Input binding for task", LanguageEventData.StepType.TASK, nodeName, taskType);
 
             Map<String, Serializable> operationArguments = inputsBinding.bindInputs(taskInputs, flowVariables, runEnv.getSystemProperties());
 

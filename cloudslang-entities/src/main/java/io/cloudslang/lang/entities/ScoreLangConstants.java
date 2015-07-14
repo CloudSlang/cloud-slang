@@ -43,7 +43,7 @@ public interface ScoreLangConstants {
     String REF_ID = "refId";
     String LOOP_KEY = "loop";
     String BREAK_LOOP_KEY = "breakOn";
-
+    String TASK_TYPE = "taskType";
     // async loop
     String ASYNC_LOOP_KEY = "async_loop";
     String ASYNC_LOOP_STATEMENT_KEY = "asyncLoopStatement";
