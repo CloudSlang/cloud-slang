@@ -26,6 +26,7 @@ import org.yaml.snakeyaml.scanner.ScannerException;
 @Component
 public class YamlParser {
 
+    public static final String KEY_VALUE_PAIR_MISSING_MSG = "Probably did not provide (key: value) pair or missing space after colon(:). Also check that everything is indented properly";
     @Autowired
     private Yaml yaml;
 
@@ -43,7 +44,7 @@ public class YamlParser {
         } catch (Throwable e) {
             String errorMessage = e.getMessage();
             if (e instanceof ScannerException && (errorMessage.startsWith("mapping values") || errorMessage.startsWith("while scanning a simple key"))){
-                errorMessage += "Probably did not provide (key: value) pair or missing space after colon(:)";
+                errorMessage += KEY_VALUE_PAIR_MISSING_MSG;
             }
             else if (e instanceof ConstructorException && errorMessage.startsWith("Cannot create property")){
                 if (errorMessage.contains("Unable to find property")){
@@ -52,7 +53,7 @@ public class YamlParser {
                     errorMessage += "Property \'" + undefinedProperty + "\' is not supported by CloudSlang. Check that \'" + undefinedProperty + "\' is indented properly.";
                 }
                 else if (errorMessage.contains("No single argument constructor found for interface java.util.Map")){
-                    errorMessage += "Probably did not provide (key: value) pair or missing space after colon(:)";
+                    errorMessage += KEY_VALUE_PAIR_MISSING_MSG;
                 }
             }
             throw new RuntimeException("There was a problem parsing the YAML source: " + source.getName() + ".\n" + errorMessage, e);
