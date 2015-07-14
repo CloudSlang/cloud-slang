@@ -8,24 +8,24 @@
 namespace: io.cloudslang
 
 imports:
-  cloudslang: io.cloudslang
+  ops: user.ops
 
 flow:
   name: multiple_on_failure
   workflow:
     - print_message:
         do:
-          cloudslang.print:
-            - text: "'hello'"
+          ops.test_op:
+            - alla: "'hello'"
 
     - on_failure:
         - print_on_failure_1:
             do:
-              cloudslang.print:
-                - text: "'on_failure 1'"
+              ops.test_op:
+                - alla: "'on_failure 1'"
 
     - on_failure:
         - print_on_failure_2:
             do:
-              cloudslang.print:
-                - text: "'on_failure 2'"
+              ops.test_op:
+                - alla: "'on_failure 2'"
