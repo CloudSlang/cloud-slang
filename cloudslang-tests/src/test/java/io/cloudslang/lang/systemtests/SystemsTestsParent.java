@@ -34,6 +34,11 @@ public abstract class SystemsTestsParent {
     protected static final String THIRD_STEP_KEY = "0.2";
     protected static final String FOURTH_STEP_KEY = "0.3";
 
+    protected static final String BRANCH_FIRST_STEP_PATH = "0.0.0";
+    protected static final String BRANCH_SECOND_STEP_KEY = "0.0.1";
+    protected static final String BRANCH_THIRD_STEP_KEY = "0.0.2";
+    protected static final String BRANCH_FOURTH_STEP_KEY = "0.0.3";
+
     @Autowired
     protected Slang slang;
 
