@@ -192,6 +192,49 @@ public class ScoreServicesImplTest {
         scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false);
     }
 
+    @Test (timeout = DEFAULT_TIMEOUT)
+    public void testTriggerSyncSpException() throws Exception {
+        //prepare method args
+        CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
+        Map<String, Serializable > inputs = new HashMap<>();
+        inputs.put("a", 1);
+        Map<String, Serializable> systemProperties  = new HashMap<>();
+        systemProperties.put("b", "c");
+
+        doAnswer(new Answer<Object>() {
+            public Object answer(InvocationOnMock invocation) {
+                final ScoreEventListener scoreEventListener = (ScoreEventListener) invocation.getArguments()[0];
+                Thread eventDispatcherThread = new Thread() {
+                    public void run(){
+                        try {
+                            Thread.sleep(DEFAULT_THREAD_SLEEP_TIME);
+
+                            Map<String, Serializable> slangExecutionExceptionEventData = new HashMap<>();
+                            slangExecutionExceptionEventData.put(LanguageEventData.EXCEPTION, "This value can also be supplied using a system property");
+                            ScoreEvent slangExecutionExceptionEvent = new ScoreEvent(
+                                    ScoreLangConstants.SLANG_EXECUTION_EXCEPTION,
+                                    (Serializable) slangExecutionExceptionEventData);
+                            ScoreEvent scoreFinishedEvent = new ScoreEvent(EventConstants.SCORE_FINISHED_EVENT, new HashMap<>());
+
+                            scoreEventListener.onEvent(slangExecutionExceptionEvent);
+                            scoreEventListener.onEvent(scoreFinishedEvent);
+                        } catch (InterruptedException ignore) {}
+                    }
+                };
+                eventDispatcherThread.start();
+                return null;
+            }
+        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("This value can also be supplied using a system property");
+        exception.expectMessage("A system property file can be included using --spf <path_to_file>");
+
+
+        // invoke method
+        scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false);
+    }
+
     @Configuration
     static class Config {
 
