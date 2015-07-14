@@ -11,7 +11,9 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.bindings.Input;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -29,12 +31,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = InputsBindingTest.Config.class)
 public class InputsBindingTest {
 
     @Autowired
     private InputsBinding inputsBinding;
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testEmptyBindInputs() throws Exception {
@@ -355,6 +361,19 @@ public class InputsBindingTest {
 		Assert.assertTrue(result.containsKey(in));
 		Assert.assertEquals(null, result.get(in));
 	}
+
+    @Test
+    public void testRequiredSystemPropertyMissing() throws Exception{
+        String in = "input1";
+        String fqspn = "docker.sys.props.port";
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Input with name:");
+        exception.expectMessage("This value can also be supplied using a system property");
+
+        List<Input> inputs = Arrays.asList(new Input(in, null, false, true, true, fqspn));
+        Map<String, Serializable> result = bindInputs(inputs, new HashMap<String, Serializable>());
+    }
 
 	@Test
 	public void testSystemPropertyContext() {
