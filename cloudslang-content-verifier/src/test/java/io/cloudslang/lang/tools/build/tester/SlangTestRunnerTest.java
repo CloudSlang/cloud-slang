@@ -119,6 +119,20 @@ public class SlangTestRunnerTest {
     }
 
     @Test
+    public void createTestCaseWithDuplicateName() throws Exception {
+        URI resource = getClass().getResource("/test/valid").toURI();
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        testCases.put("Test1", new SlangTestCase("Test1", "path", "desc", null, null, null, null, null, null));
+        testCases.put("Test2", new SlangTestCase("Test1", "path2", "desc2", null, null, null, null, null, null));
+        when(parser.parseTestCases(Mockito.any(SlangSource.class))).thenReturn(testCases);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("name");
+        exception.expectMessage("Test1");
+        exception.expectMessage("exists");
+        slangTestRunner.createTestCases(resource.getPath());
+    }
+
+    @Test
     public void createTestCaseWithResultFromFileName() throws Exception {
         URI resource = getClass().getResource("/test/valid").toURI();
         Map<String, SlangTestCase> testCases = new HashMap<>();
