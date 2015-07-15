@@ -37,6 +37,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.script.ScriptEngine;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,8 @@ import static org.mockito.Mockito.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = AsyncLoopStepsTest.Config.class)
 public class AsyncLoopStepsTest {
+
+    public static final String BRANCH_EXCEPTION_MESSAGE = "Exception details placeholder";
 
     @Autowired
     private AsyncLoopSteps asyncLoopSteps;
@@ -390,6 +393,29 @@ public class AsyncLoopStepsTest {
         Assert.assertEquals(expectedEventTypesInOrder, actualEventTypesInOrder);
     }
 
+    @Test
+    public void testExceptionIsCapturedFromBranches() throws Exception {
+        // prepare arguments
+        RunEnvironment runEnvironment = new RunEnvironment();
+        runEnvironment.getExecutionPath().down();
+        Map<String, Serializable> variables = new HashMap<>();
+        Context context = new Context(variables);
+        runEnvironment.getStack().pushContext(context);
+
+        ExecutionRuntimeServices executionRuntimeServices = createExecutionRuntimeServicesMockWithBranchException();
+
+        exception.expectMessage(BRANCH_EXCEPTION_MESSAGE);
+        exception.expect(RuntimeException.class);
+
+        asyncLoopSteps.joinBranches(
+                runEnvironment,
+                executionRuntimeServices,
+                new ArrayList<Output>(0),
+                new HashMap<String, ResultNavigation>(),
+                "nodeName"
+        );
+    }
+
     private ExecutionRuntimeServices createAndConfigureExecutionRuntimeServicesMock(
             Map<String, Serializable> runtimeContext1,
             Map<String, Serializable> runtimeContext2,
@@ -440,6 +466,18 @@ public class AsyncLoopStepsTest {
                 new EndBranchDataContainer(branchContext1, new HashMap<String, Serializable>(), null),
                 new EndBranchDataContainer(branchContext2, new HashMap<String, Serializable>(), null),
                 new EndBranchDataContainer(branchContext3, new HashMap<String, Serializable>(), null)
+        );
+        when(executionRuntimeServices.getFinishedChildBranchesData()).thenReturn(branchesContainers);
+        return executionRuntimeServices;
+    }
+
+    private ExecutionRuntimeServices createExecutionRuntimeServicesMockWithBranchException() {
+        ExecutionRuntimeServices executionRuntimeServices = mock(ExecutionRuntimeServices.class);
+        List<EndBranchDataContainer> branchesContainers = Lists.newArrayList(
+                new EndBranchDataContainer(
+                        new HashMap<String, Serializable>(),
+                        new HashMap<String, Serializable>(),
+                        BRANCH_EXCEPTION_MESSAGE)
         );
         when(executionRuntimeServices.getFinishedChildBranchesData()).thenReturn(branchesContainers);
         return executionRuntimeServices;
