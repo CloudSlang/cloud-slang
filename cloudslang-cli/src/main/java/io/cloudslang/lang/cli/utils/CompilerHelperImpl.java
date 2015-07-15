@@ -17,6 +17,7 @@ import io.cloudslang.lang.cli.SlangCLI;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang.Validate;
@@ -131,12 +132,10 @@ public class CompilerHelperImpl implements CompilerHelper{
                 if (StringUtils.isNotEmpty(inputsFileContent)) {
                     @SuppressWarnings("unchecked") Map<String, ? extends Serializable> inputFileYamlContent =
                             (Map<String, ? extends Serializable>) yaml.load(inputsFileContent);
-                    if (inputFileYamlContent != null) {
-                        result.putAll(inputFileYamlContent);
+                    if (MapUtils.isEmpty(inputFileYamlContent)) {
+                        throw new RuntimeException("Inputs / System properties file: " + inputFile + " is empty or does not contain valid YAML content.");
                     }
-                    else{
-                        throw new RuntimeException("Specified inputs file or system property file is empty or does not contain valid YAML content.");
-                    }
+                    result.putAll(inputFileYamlContent);
                 }
 			} catch(IOException ex) {
 				logger.error("Error loading file: " + inputFile, ex);
