@@ -24,6 +24,8 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.EndBranchDataContainer;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import io.cloudslang.score.lang.SystemContext;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -48,7 +50,6 @@ import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUT
 public class AsyncLoopSteps extends AbstractSteps {
 
     public static final String BRANCH_EXCEPTION_PREFIX = "Error running branch";
-    private static final String BRANCH_ID = "BRANCH_ID";
 
     @Autowired
     private AsyncLoopBinding asyncLoopBinding;
@@ -234,7 +235,12 @@ public class AsyncLoopSteps extends AbstractSteps {
             //first we check that no exception was thrown during the execution of the branch
             String branchException = branch.getException();
             if (StringUtils.isNotEmpty(branchException)) {
-                String branchID = (String) branch.getSystemContext().get(BRANCH_ID);
+                Map<String, Serializable> systemContextMap = branch.getSystemContext();
+                String branchID = null;
+                if (MapUtils.isNotEmpty(systemContextMap)) {
+                    ExecutionRuntimeServices branchExecutionRuntimeServices = new SystemContext(systemContextMap);
+                    branchID = branchExecutionRuntimeServices.getBranchId();
+                }
                 logger.error("There was an error running branch: " + branchID + " Error is: " + branchException);
                 throw new RuntimeException(BRANCH_EXCEPTION_PREFIX + ": \n" + branchException);
             }
