@@ -131,7 +131,12 @@ public class CompilerHelperImpl implements CompilerHelper{
                 if (StringUtils.isNotEmpty(inputsFileContent)) {
                     @SuppressWarnings("unchecked") Map<String, ? extends Serializable> inputFileYamlContent =
                             (Map<String, ? extends Serializable>) yaml.load(inputsFileContent);
-                    result.putAll(inputFileYamlContent);
+                    if (inputFileYamlContent != null) {
+                        result.putAll(inputFileYamlContent);
+                    }
+                    else{
+                        throw new RuntimeException("Specified inputs file or system property file is empty or does not contain valid YAML content.");
+                    }
                 }
 			} catch(IOException ex) {
 				logger.error("Error loading file: " + inputFile, ex);
