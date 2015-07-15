@@ -48,6 +48,8 @@ import static io.cloudslang.lang.entities.ScoreLangConstants.*;
 @Component
 public class ExecutableBuilder {
 
+    public static final String MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX = "Multiple 'on_failure' properties found";
+
     @Autowired
     private List<Transformer> transformers;
 
@@ -125,10 +127,16 @@ public class ExecutableBuilder {
                 Workflow onFailureWorkFlow = null;
                 List<Map<String, Map<String, Object>>> onFailureData;
                 Iterator<Map<String, Map<String, Object>>> tasksIterator = workFlowRawData.iterator();
+                boolean onFailureFound = false;
                 while(tasksIterator.hasNext()){
                     Map<String, Map<String, Object>> taskData = tasksIterator.next();
                     String taskName = taskData.keySet().iterator().next();
                     if(taskName.equals(SlangTextualKeys.ON_FAILURE_KEY)){
+                        if (onFailureFound) {
+                            throw new RuntimeException("Flow: '" + execName + "' syntax is illegal.\n" + MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX);
+                        } else {
+                            onFailureFound = true;
+                        }
                         try{
                             onFailureData = (List<Map<String, Map<String, Object>>>)taskData.values().iterator().next();
                         } catch (ClassCastException ex){
@@ -138,7 +146,6 @@ public class ExecutableBuilder {
                             onFailureWorkFlow = compileWorkFlow(onFailureData, imports, null, true);
                         }
                         tasksIterator.remove();
-                        break;
                     }
                 }
 

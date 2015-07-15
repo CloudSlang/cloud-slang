@@ -65,7 +65,11 @@ public class InputsBinding {
         }
 
         if (input.isRequired() && value == null) {
-            throw new RuntimeException("Input with name: \'" + inputName + "\' is Required, but value is empty");
+            String errorMessage = "Input with name: \'" + inputName + "\' is Required, but value is empty";
+            if (input.getSystemPropertyName() != null){
+                errorMessage += "\nThis value can also be supplied using a system property";
+            }
+            throw new RuntimeException(errorMessage);
         }
 
         targetContext.put(inputName, value);

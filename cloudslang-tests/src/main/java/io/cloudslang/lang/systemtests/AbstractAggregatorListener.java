@@ -30,7 +30,7 @@ public abstract class AbstractAggregatorListener implements ScoreEventListener {
     }
 
     @Override
-    public void onEvent(ScoreEvent event) throws InterruptedException {
+    public synchronized void onEvent(ScoreEvent event) throws InterruptedException {
         LanguageEventData languageEvent = (LanguageEventData) event.getData();
         events.add(languageEvent);
     }

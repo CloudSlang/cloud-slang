@@ -11,11 +11,14 @@
 package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
+import io.cloudslang.lang.compiler.modeller.ExecutableBuilder;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
@@ -37,6 +40,9 @@ public class CompileFlowWithOnFailureTest {
 
     @Autowired
     private SlangCompiler compiler;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void testCompileOnFailureBasic() throws Exception {
@@ -70,6 +76,20 @@ public class CompileFlowWithOnFailureTest {
                 secondOnFailStepNavigationMap.get(ScoreLangConstants.SUCCESS_RESULT);
         Assert.assertEquals("on failure success should navigate to failure",
                 ScoreLangConstants.FAILURE_RESULT, secondOnFailStepResultSuccessNavigation.getPresetResult());
+    }
+
+    @Test
+    public void testCompileMultipleOnFailure() throws Exception {
+        URI flow = getClass().getResource("/corrupted/multiple_on_failure.sl").toURI();
+        URI operation = getClass().getResource("/test_op.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+
+        expectedException.expectMessage(ExecutableBuilder.MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX);
+        expectedException.expect(RuntimeException.class);
+
+        compiler.compile(SlangSource.fromFile(flow), path);
     }
 
 	private long getFailureNavigationStepId(ExecutionStep firstStep) {
