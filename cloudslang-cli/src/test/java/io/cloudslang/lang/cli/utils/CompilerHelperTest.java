@@ -151,6 +151,14 @@ public class CompilerHelperTest {
 
         URI inputsFromFile = getClass().getResource("/inputs/commented_inputs.yaml").toURI();
         compilerHelper.loadInputsFromFile(Arrays.asList(inputsFromFile.getPath()));
+    }
+    @Test
+    public void testLoadInputsFromEmptyFile() throws Exception {
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("Inputs / System properties file");
+
+        URI inputsFromFile = getClass().getResource("/inputs/empty_inputs.yaml").toURI();
+        compilerHelper.loadInputsFromFile(Arrays.asList(inputsFromFile.getPath()));
 
     }
 
