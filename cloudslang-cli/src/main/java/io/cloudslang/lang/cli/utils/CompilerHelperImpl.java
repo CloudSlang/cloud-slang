@@ -10,10 +10,8 @@ package io.cloudslang.lang.cli.utils;
 
 import ch.lambdaj.function.convert.Converter;
 
-import com.google.common.collect.Lists;
 
 import io.cloudslang.lang.api.Slang;
-import io.cloudslang.lang.cli.SlangCLI;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import org.apache.commons.collections4.CollectionUtils;
