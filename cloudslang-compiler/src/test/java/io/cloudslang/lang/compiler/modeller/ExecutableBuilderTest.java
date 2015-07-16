@@ -33,6 +33,7 @@ public class ExecutableBuilderTest {
     @Autowired
     private Transformer transformer;
     private static final String FILE_NAME = "filename";
+    private static final String NAMESPACE = "io.cloudslang";
 
     @Before
     public void resetMocks() {
@@ -46,6 +47,7 @@ public class ExecutableBuilderTest {
         Map<String, String> imports = new HashMap<>();
         imports.put("ops", "ops");
         Mockito.when(parsedSlang.getImports()).thenReturn(imports);
+        Mockito.when(parsedSlang.getNamespace()).thenReturn(NAMESPACE);
         return parsedSlang;
     }
 
@@ -226,6 +228,35 @@ public class ExecutableBuilderTest {
         Assert.assertEquals(taskName, tasks.getFirst().getName());
         Assert.assertEquals(refId, tasks.getFirst().getRefId());
 
+    }
+
+    @Test
+    public void taskWithImplicitAlias() throws Exception {
+        ParsedSlang mockParsedSlang = mockFlowSlangFile();
+
+        Map<String, Object> executableRawData = new HashMap<>();
+        List<Map<String, Object>> workFlowData = new ArrayList<>();
+        Map<String, Object> taskRawData = new HashMap<>();
+        Map<String, Object> doRawData = new HashMap<>();
+
+        String refString = "print";
+        doRawData.put(refString, new HashMap<>());
+        taskRawData.put(SlangTextualKeys.DO_KEY, doRawData);
+        String taskName = "task1";
+        Map<String, Object> task = new HashMap<>();
+        task.put(taskName, taskRawData);
+        workFlowData.add(task);
+        executableRawData.put(SlangTextualKeys.WORKFLOW_KEY, workFlowData);
+
+        String flowName = "flow1";
+        Flow flow = (Flow) executableBuilder.transformToExecutable(mockParsedSlang, flowName, executableRawData);
+
+        Assert.assertEquals(SlangTextualKeys.FLOW_TYPE, flow.getType());
+        Assert.assertEquals(flowName, flow.getName());
+        Deque<Task> tasks = flow.getWorkflow().getTasks();
+        Assert.assertEquals(1, tasks.size());
+        Assert.assertEquals(taskName, tasks.getFirst().getName());
+        Assert.assertEquals(NAMESPACE + "." + refString, tasks.getFirst().getRefId());
     }
 
     @Test
