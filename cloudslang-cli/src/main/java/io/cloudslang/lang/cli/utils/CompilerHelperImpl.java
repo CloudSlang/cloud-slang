@@ -129,12 +129,10 @@ public class CompilerHelperImpl implements CompilerHelper{
                 String inputsFileContent = FileUtils.readFileToString(new File(inputFile));
                 Boolean emptyContent = true;
                 if (StringUtils.isNotEmpty(inputsFileContent)) {
-                    emptyContent = false;
                     @SuppressWarnings("unchecked") Map<String, ? extends Serializable> inputFileYamlContent =
                             (Map<String, ? extends Serializable>) yaml.load(inputsFileContent);
-                    if (MapUtils.isEmpty(inputFileYamlContent)) {
-                        emptyContent = true;
-                    } else {
+                    if (MapUtils.isNotEmpty(inputFileYamlContent)) {
+                        emptyContent = false;
                         result.putAll(inputFileYamlContent);
                     }
                 }
