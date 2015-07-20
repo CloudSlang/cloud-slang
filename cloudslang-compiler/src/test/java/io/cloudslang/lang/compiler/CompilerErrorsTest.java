@@ -104,6 +104,8 @@ public class CompilerErrorsTest {
     }
     @Test
     public void testFlowWithMissingSpaceBeforeFirstImport() throws Exception {
+        //covers "mapping values are not allowed here" error
+
         URI resource = getClass().getResource("/corrupted/flow_with_missing_space_before_first_import.sl").toURI();
         URI operations = getClass().getResource("/java_op.sl").toURI();
         URI checkWeather = getClass().getResource("/check_Weather.sl").toURI();
@@ -121,6 +123,8 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithWrongIndentation() throws Exception {
+        //covers "Unable to find property 'X' on class: io.cloudslang.lang.compiler.parser.model.ParsedSlang"
+
         URI resource = getClass().getResource("/corrupted/flow_with_wrong_indentation.sl").toURI();
         URI operations = getClass().getResource("/java_op.sl").toURI();
         URI flows = getClass().getResource("/flow_with_data.yaml").toURI();
@@ -138,6 +142,8 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWhereMapCannotBeCreated() throws Exception {
+        //covers "No single argument constructor found for interface java.util.Map"
+
         URI resource = getClass().getResource("/corrupted/flow_where_map_cannot_be_created.sl").toURI();
         URI operations = getClass().getResource("/java_op.sl").toURI();
         URI flows = getClass().getResource("/flow_with_data.yaml").toURI();
@@ -155,6 +161,8 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithCorruptedKeyInImports() throws Exception {
+        //covers problem parsing YAML source "while scanning a simple key"
+
         URI resource = getClass().getResource("/corrupted/flow_with_corrupted_key_in_imports.sl").toURI();
         URI operations = getClass().getResource("/java_op.sl").toURI();
         URI flows = getClass().getResource("/flow_with_data.yaml").toURI();

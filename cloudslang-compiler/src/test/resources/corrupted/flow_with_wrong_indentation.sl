@@ -7,6 +7,7 @@
 
 namespace: io.cloudslang
 
+#because of indentation, 'flows' is considered as an undefined property
 imports:
  ops: user.ops
 flows: slang.sample.flows

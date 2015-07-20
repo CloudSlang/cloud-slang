@@ -7,6 +7,7 @@
 
 namespace: io.cloudslang
 
+#imports map cannot be created since key-value pairs are not provided(there is no " " after ":")
 imports:
  user:value
  slang:value

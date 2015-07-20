@@ -7,6 +7,7 @@
 
 namespace: io.cloudslang
 
+#cannot map values here because of the indentation of the first key from imports map
 imports:
 ops: user.ops
  flows: slang.sample.flows

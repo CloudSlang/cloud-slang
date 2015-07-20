@@ -7,6 +7,7 @@
 
 namespace: io.cloudslang
 
+#second key from imports map does not contain value (there is no " " after ":")
 imports:
  ops: user.ops
  flows:slang.sample.flows
