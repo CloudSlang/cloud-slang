@@ -34,7 +34,7 @@ public abstract class AbstractInputsTransformer {
             Map.Entry<String, ?> entry = ((Map<String, ?>) rawInput).entrySet().iterator().next();
             Object entryValue = entry.getValue();
             if(entryValue == null){
-                throw new RuntimeException("Could not transform Input : " + rawInput + " Since it has a null value");
+                throw new RuntimeException("Could not transform Input : " + rawInput + " Since it has a null value.\n\nMake sure a value is specified or that indentation is properly done.");
             }
             if (entryValue instanceof Map) {
                 // - some_inputs:

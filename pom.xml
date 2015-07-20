@@ -10,7 +10,7 @@
     -->
     <groupId>io.cloudslang.lang</groupId>
     <artifactId>cloudslang</artifactId>
-    <version>0.7.44-SNAPSHOT</version>
+    <version>0.7.45-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A DSL for writing flows</description>
@@ -33,7 +33,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <score.group>io.cloudslang</score.group>
-        <score.version>0.1.280</score.version>
+        <score.version>0.1.286</score.version>
         <spring.version>4.1.4.RELEASE</spring.version>
     </properties>
 

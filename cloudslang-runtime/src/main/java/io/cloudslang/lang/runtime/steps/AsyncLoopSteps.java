@@ -24,7 +24,10 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.EndBranchDataContainer;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import io.cloudslang.score.lang.SystemContext;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.python.google.common.collect.Lists;
@@ -45,6 +48,8 @@ import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUT
  */
 @Component
 public class AsyncLoopSteps extends AbstractSteps {
+
+    public static final String BRANCH_EXCEPTION_PREFIX = "Error running branch";
 
     @Autowired
     private AsyncLoopBinding asyncLoopBinding;
@@ -128,7 +133,7 @@ public class AsyncLoopSteps extends AbstractSteps {
             Map<String, Serializable> contextBeforeSplit = flowContext.getImmutableViewOfVariables();
             List<String> branchesResult = Lists.newArrayList();
 
-            collectBranchesData(runEnv, executionRuntimeServices, nodeName, branchesContext, branchesResult);
+            collectBranchesData(executionRuntimeServices, nodeName, branchesContext, branchesResult);
 
             Map<String, Serializable> publishValues =
                     bindAggregateOutputs(
@@ -150,7 +155,7 @@ public class AsyncLoopSteps extends AbstractSteps {
             runEnv.getExecutionPath().forward();
         } catch (RuntimeException e) {
             logger.error("There was an error running the end task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
-            throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);
+            throw new RuntimeException("Error running: \'" + nodeName + "\': \n" + e.getMessage(), e);
         }
     }
 
@@ -219,7 +224,6 @@ public class AsyncLoopSteps extends AbstractSteps {
     }
 
     private void collectBranchesData(
-            RunEnvironment runEnv,
             ExecutionRuntimeServices executionRuntimeServices,
             String nodeName,
             List<Map<String, Serializable>> branchesContext,
@@ -227,6 +231,20 @@ public class AsyncLoopSteps extends AbstractSteps {
 
         List<EndBranchDataContainer> branches = executionRuntimeServices.getFinishedChildBranchesData();
         for (EndBranchDataContainer branch : branches) {
+
+            //first we check that no exception was thrown during the execution of the branch
+            String branchException = branch.getException();
+            if (StringUtils.isNotEmpty(branchException)) {
+                Map<String, Serializable> systemContextMap = branch.getSystemContext();
+                String branchID = null;
+                if (MapUtils.isNotEmpty(systemContextMap)) {
+                    ExecutionRuntimeServices branchExecutionRuntimeServices = new SystemContext(systemContextMap);
+                    branchID = branchExecutionRuntimeServices.getBranchId();
+                }
+                logger.error("There was an error running branch: " + branchID + " Error is: " + branchException);
+                throw new RuntimeException(BRANCH_EXCEPTION_PREFIX + ": \n" + branchException);
+            }
+
             Map<String, Serializable> branchContext = branch.getContexts();
 
             RunEnvironment branchRuntimeEnvironment = (RunEnvironment) branchContext.get(ScoreLangConstants.RUN_ENV);
