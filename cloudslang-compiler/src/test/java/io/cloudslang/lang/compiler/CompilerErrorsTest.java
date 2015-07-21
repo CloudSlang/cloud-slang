@@ -10,6 +10,7 @@
 
 package io.cloudslang.lang.compiler;
 
+import io.cloudslang.lang.compiler.parser.YamlParser;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -116,8 +117,8 @@ public class CompilerErrorsTest {
         path.add(SlangSource.fromFile(flows));
         path.add(SlangSource.fromFile(checkWeather));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Probably did not provide (key: value) pair");
-        exception.expectMessage("mapping values are not allowed here");
+        exception.expectMessage(YamlParser.MAPPING_VALUES_NOT_ALLOWED_HERE_ERROR);
+        exception.expectMessage(YamlParser.KEY_VALUE_PAIR_MISSING_OR_INDENTATION_PROBLEM_MSG);
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -135,7 +136,7 @@ public class CompilerErrorsTest {
         path.add(SlangSource.fromFile(flows));
         path.add(SlangSource.fromFile(checkWeather));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Cannot create property");
+        exception.expectMessage(YamlParser.CANNOT_CREATE_PROPERTY_ERROR);
         exception.expectMessage("not supported by CloudSlang");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
@@ -154,8 +155,8 @@ public class CompilerErrorsTest {
         path.add(SlangSource.fromFile(flows));
         path.add(SlangSource.fromFile(checkWeather));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Cannot create property");
-        exception.expectMessage("missing space after colon(:)");
+        exception.expectMessage(YamlParser.CANNOT_CREATE_PROPERTY_ERROR);
+        exception.expectMessage(YamlParser.KEY_VALUE_PAIR_MISSING_OR_INDENTATION_PROBLEM_MSG);
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -171,8 +172,8 @@ public class CompilerErrorsTest {
         path.add(SlangSource.fromFile(operations));
         path.add(SlangSource.fromFile(flows));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Probably did not provide (key: value) pair");
-        exception.expectMessage("while scanning a simple key");
+        exception.expectMessage(YamlParser.SCANNING_A_SIMPLE_KEY_ERROR);
+        exception.expectMessage(YamlParser.KEY_VALUE_PAIR_MISSING_OR_INDENTATION_PROBLEM_MSG);
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
