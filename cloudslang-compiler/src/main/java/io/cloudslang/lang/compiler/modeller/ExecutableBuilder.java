@@ -143,13 +143,13 @@ public class ExecutableBuilder {
                             throw new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a list of tasks and not a map");
                         }
                         if (CollectionUtils.isNotEmpty(onFailureData)) {
-                            onFailureWorkFlow = compileWorkFlow(onFailureData, imports, null, true);
+                            onFailureWorkFlow = compileWorkFlow(onFailureData, imports, null, true, namespace);
                         }
                         tasksIterator.remove();
                     }
                 }
 
-                Workflow workflow = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false);
+                Workflow workflow = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false, namespace);
                 dependencies = fetchDirectTasksDependencies(workflow);
                 return new Flow(preExecutableActionData, postExecutableActionData, workflow, namespace, execName, inputs, outputs, results, dependencies);
 
@@ -185,7 +185,8 @@ public class ExecutableBuilder {
     private Workflow compileWorkFlow(List<Map<String, Map<String, Object>>> workFlowRawData,
                                              Map<String, String> imports,
                                              Workflow onFailureWorkFlow,
-                                             boolean onFailureSection) {
+                                             boolean onFailureSection,
+                                             String namespace) {
 
         Deque<Task> tasks = new LinkedList<>();
 
@@ -242,7 +243,7 @@ public class ExecutableBuilder {
             } else {
                 defaultSuccess = onFailureSection ? ScoreLangConstants.FAILURE_RESULT : ScoreLangConstants.SUCCESS_RESULT;
             }
-            Task task = compileTask(taskName, taskRawDataValue, defaultSuccess, imports, defaultFailure);
+            Task task = compileTask(taskName, taskRawDataValue, defaultSuccess, imports, defaultFailure, namespace);
             tasks.add(task);
         }
 
@@ -254,7 +255,7 @@ public class ExecutableBuilder {
     }
 
     private Task compileTask(String taskName, Map<String, Object> taskRawData, String defaultSuccess,
-                                     Map<String, String> imports, String defaultFailure) {
+                                     Map<String, String> imports, String defaultFailure, String namespace) {
 
         if (MapUtils.isEmpty(taskRawData)) {
             throw new RuntimeException("Task: " + taskName + " has no data");
@@ -277,7 +278,7 @@ public class ExecutableBuilder {
             throw new RuntimeException("Task: \'" + taskName + "\' has no reference information");
         }
         String refString = doRawData.keySet().iterator().next();
-        String refId = resolveRefId(refString, imports);
+        String refId = resolveRefId(refString, imports, namespace);
 
         @SuppressWarnings("unchecked") Map<String, String> navigationStrings = (Map<String, String>) postTaskData.get(SlangTextualKeys.NAVIGATION_KEY);
 
@@ -298,12 +299,16 @@ public class ExecutableBuilder {
                 preTaskData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
     }
 
-	private static String resolveRefId(String refIdString, Map<String, String> imports) {
-		String alias = StringUtils.substringBefore(refIdString, ".");
-		Validate.notNull(imports, "No imports specified for source: " + refIdString);
-		if(!imports.containsKey(alias)) throw new RuntimeException("Unresolved alias: " + alias);
-		String refName = StringUtils.substringAfter(refIdString, ".");
-		return imports.get(alias) + "." + refName;
+	private static String resolveRefId(String refIdString, Map<String, String> imports, String namespace) {
+        if (refIdString.contains(".")) {
+            Validate.notNull(imports, "No imports specified for source: " + refIdString);
+            String alias = StringUtils.substringBefore(refIdString, ".");
+            if (! imports.containsKey(alias)) throw new RuntimeException("Unresolved alias: " + alias);
+            String refName = StringUtils.substringAfter(refIdString, ".");
+            return imports.get(alias) + "." + refName;
+        } else {
+            return namespace + "." + refIdString;
+        }
 	}
 
     /**
