@@ -1,0 +1,13 @@
+testPrintPropertyWithTextInput:
+  inputs:
+    - text: text to print
+  description: Tests that print_text operation finishes with SUCCESS
+  testFlowPath: base.print_property
+  result: SUCCESS
+
+testPrintPropertyWithSysProperty:
+  description: Tests that print_text operation finishes with SUCCESS
+  systemPropertiesFile: ${project_path}\content\base\properties.yaml
+  testFlowPath: base.print_property
+  throwsException: false
+

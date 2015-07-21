@@ -120,7 +120,7 @@ public class SlangTestRunnerTest {
 
     @Test
     public void createTestCaseWithDuplicateName() throws Exception {
-        URI resource = getClass().getResource("/test/valid").toURI();
+        URI resource = getClass().getResource("/test/duplicate").toURI();
         Map<String, SlangTestCase> testCases = new HashMap<>();
         testCases.put("Test1", new SlangTestCase("Test1", "path", "desc", null, null, null, null, null, null));
         testCases.put("Test2", new SlangTestCase("Test1", "path2", "desc2", null, null, null, null, null, null));

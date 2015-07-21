@@ -76,8 +76,9 @@ public class SlangTestRunner {
                     "file path \'" + testCaseFile.getAbsolutePath() + "\' must lead to a file");
 
             Map<String, SlangTestCase> testCasesFromCurrentFile = parser.parseTestCases(SlangSource.fromFile(testCaseFile));
-            for (SlangTestCase currentTestCase : testCasesFromCurrentFile.values()) {
-                String currentTestCaseName = currentTestCase.getName();
+            for (Map.Entry<String, SlangTestCase> currentTestCaseEntry : testCasesFromCurrentFile.entrySet()) {
+                SlangTestCase currentTestCase = currentTestCaseEntry.getValue();
+                String currentTestCaseName = currentTestCaseEntry.getKey();
                 //todo: temporary solution
                 currentTestCase.setName(currentTestCaseName);
                 if(StringUtils.isBlank(currentTestCase.getResult())){
