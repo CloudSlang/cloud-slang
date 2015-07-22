@@ -161,17 +161,17 @@
             <dependency>
                 <groupId>io.cloudslang.content</groupId>
                 <artifactId>score-ssh</artifactId>
-                <version>0.0.23</version>
+                <version>0.0.25</version>
             </dependency>
             <dependency>
                 <groupId>io.cloudslang.content</groupId>
                 <artifactId>score-mail</artifactId>
-                <version>0.0.13</version>
+                <version>0.0.25</version>
             </dependency>
             <dependency>
                 <groupId>io.cloudslang.content</groupId>
                 <artifactId>score-http-client</artifactId>
-                <version>0.1.59</version>
+                <version>0.1.63</version>
             </dependency>
             <!--end of score content dependencies-->
 
