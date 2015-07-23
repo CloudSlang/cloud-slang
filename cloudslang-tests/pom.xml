@@ -13,7 +13,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.7.48-SNAPSHOT</version>
+        <version>0.7.48</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
