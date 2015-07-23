@@ -68,11 +68,6 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
                 errorMessage.set(data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " + data.get(EventConstants.SCORE_ERROR_MSG));
                 flowFinished.set(true);
                 break;
-            case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
-                eventData = (LanguageEventData) data;
-                errorMessage.set(eventData.getException());
-                flowFinished.set(true);
-                break;
             case ScoreLangConstants.EVENT_EXECUTION_FINISHED :
                 eventData = (LanguageEventData) data;
                 result = eventData.getResult();
