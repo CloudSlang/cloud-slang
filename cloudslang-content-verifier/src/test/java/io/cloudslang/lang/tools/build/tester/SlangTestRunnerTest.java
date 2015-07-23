@@ -8,6 +8,7 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import io.cloudslang.score.api.ExecutionPlan;
+import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
 import junit.framework.Assert;
@@ -494,6 +495,7 @@ public class SlangTestRunnerTest {
                 LanguageEventData data = new LanguageEventData();
                 data.setException("Error");
                 listener.onEvent(new ScoreEvent(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION, data));
+                listener.onEvent(new ScoreEvent(EventConstants.SCORE_ERROR_EVENT, data));
                 return listener;
             }
         }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
