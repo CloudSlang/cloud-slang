@@ -494,7 +494,6 @@ public class SlangTestRunnerTest {
                 ScoreEventListener listener = (ScoreEventListener) invocationOnMock.getArguments()[0];
                 LanguageEventData data = new LanguageEventData();
                 data.setException("Error");
-                listener.onEvent(new ScoreEvent(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION, data));
                 listener.onEvent(new ScoreEvent(EventConstants.SCORE_ERROR_EVENT, data));
                 return listener;
             }
