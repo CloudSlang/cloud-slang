@@ -33,6 +33,9 @@ flow:
     - cloudslang_content_repo:
         default: "'https://github.com/CloudSlang/cloud-slang-content.git'"
         overridable: false
+    - content_branch:
+        required: false
+        
   name: build_cli_flow
 
   workflow:
@@ -67,6 +70,7 @@ flow:
             - content_dir: target_dir + "/cloudslang_content"
             - target_dir
             - target_cli
+            - content_branch
 
 
     #    end adding content

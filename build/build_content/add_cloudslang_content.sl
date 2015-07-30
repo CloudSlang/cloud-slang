@@ -31,13 +31,15 @@ flow:
     - content_dir
     - target_dir
     - target_cli
+    - content_branch:
+        required: false
   workflow:
     - clone_slang_content:
         do:
           build_content.clone:
             - url
             - target_location: content_dir
-
+            - branch: content_branch
 
     - get_os_to_verify:
         do:
