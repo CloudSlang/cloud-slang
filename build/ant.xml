@@ -13,6 +13,7 @@
     <property name="stable-cli" location="cli"/>
     <property name="build" location="target"/>
     <property name="include_content" value="false"/>
+    <property name="content_branch" value="master"/>
     <property name="proxy.host" value="proxy-host"/>
     <property name="proxy.port" value="8080"/>
     <!--<echo message="proxy host: ${proxy.host}, proxy port: ${proxy.port}"/>-->
@@ -36,7 +37,7 @@
             <arg value="--cp"/>
             <arg value="build_content,${stable-cli}"/>
             <arg value="--i"/>
-            <arg value="include_content=${include_content}"/>
+            <arg value="include_content=${include_content},content_branch=${content_branch}"/>
         </exec>
         <exec executable="cmd" osfamily="windows">
             <arg value="/c"/>
@@ -47,7 +48,7 @@
             <arg value="--cp"/>
             <arg value="build_content,${stable-cli}"/>
             <arg value="--i"/>
-            <arg value="include_content=${include_content}"/>
+            <arg value="include_content=${include_content},content_branch=${content_branch}"/>
         </exec>
     </target>
     <target name="clean"
