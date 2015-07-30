@@ -5,9 +5,9 @@
 + General - project renamed to CloudSlang
 + Tools
 	+ Build Tool - The verifier has been replaced by the build tool, which in addition to checking syntactic validity of a project's files runs the projects associated tests.
+		+ Tests - Syntax for writing content tests. 
 + DSL Additions
 	+ Async Loops - A task can contain a loop which performs an operation for each value in a list in parallel. 
-	+ Tests - Syntax for writing content tests.
 + DSL Improvements
 	+ Imports - Flows no longer need to explicitly import files in the same namespace.
 + CLI Enhancements
