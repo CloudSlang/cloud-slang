@@ -105,6 +105,12 @@ flow:
             - source: target_dir + '/cloudslang_content/python-lib'
             - destination: target_cli + '/python-lib'
 
+    - copy_content_docs_to_cloudslang_cli:
+        do:
+          files.copy:
+            - source: target_dir + '/cloudslang_content/DOCS.md'
+            - destination: target_cli + '/DOCS.md'
+
     - pip_install:
         do:
           cmd.run_command:
