@@ -62,64 +62,14 @@ flow:
 
     - get_cloudslang_content:
         do:
-          build_content.get_cloudslang_content:
+          build_content.add_cloudslang_content:
             - url: cloudslang_content_repo
-            - target_dir:
-                default:  target_dir + "/cloudslang_content"
-                overridable: false
-
-    - get_os_to_verify:
-        do:
-          os.get_os:
-        navigate:
-          LINUX: run_verifier_linux
-          WINDOWS: run_verifier_windows
-
-    - run_verifier_linux:
-        do:
-          cmd.run_command:
-            - command: >
-                "bash " +
-                target_dir + "/cslang-builder/bin/cslang-builder " +
-                target_dir + "/cloudslang_content"
-        navigate:
-          SUCCESS: copy_content_to_cloudslang_cli
-          FAILURE: FAILURE
-
-    - run_verifier_windows:
-        do:
-          cmd.run_command:
-            - command: >
-                target_dir + "\\cslang-builder\\bin\\cslang-builder.bat " +
-                target_dir + "/cloudslang_content"
-
-    - copy_content_to_cloudslang_cli:
-        do:
-          files.copy:
-            - source: target_dir + '/cloudslang_content/content'
-            - destination: target_cli + "/content"
-
-    - copy_python_lib_to_cloudslang_cli:
-        do:
-          files.copy:
-            - source: target_dir + '/cloudslang_content/python-lib'
-            - destination: target_cli + '/python-lib'
-
-    - copy_content_docs_to_cloudslang_cli:
-        do:
-          files.copy:
-            - source: target_dir + '/cloudslang_content/DOCS.md'
-            - destination: target_cli + '/DOCS.md'
-
-    - pip_install:
-        do:
-          cmd.run_command:
-            - command: >
-                "pip install -t " + target_cli + "/python-lib " +
-                "-r " + target_cli + "/python-lib/requirements.txt --compile"
+            - content_dir: target_dir + "/cloudslang_content"
+            - target_dir
+            - target_cli
 
 
-#    end adding content
+    #    end adding content
 
 
     - copy_changelog_to_cloudslang_cli:
