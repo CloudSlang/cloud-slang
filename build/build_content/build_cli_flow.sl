@@ -54,7 +54,11 @@ flow:
             - expression: include_content
         navigate:
           IS: get_cloudslang_content
-          IS_NOT: get_os_to_chmod
+          IS_NOT: copy_changelog_to_cloudslang_cli
+
+
+    # adding content
+
 
     - get_cloudslang_content:
         do:
@@ -101,8 +105,11 @@ flow:
             - source: target_dir + '/cloudslang_content/python-lib'
             - destination: target_cli + '/python-lib'
 
-
-#    - precompile_jython_standalone
+    - copy_content_docs_to_cloudslang_cli:
+        do:
+          files.copy:
+            - source: target_dir + '/cloudslang_content/DOCS.md'
+            - destination: target_cli + '/DOCS.md'
 
     - pip_install:
         do:
@@ -110,6 +117,16 @@ flow:
             - command: >
                 "pip install -t " + target_cli + "/python-lib " +
                 "-r " + target_cli + "/python-lib/requirements.txt --compile"
+
+
+#    end adding content
+
+
+    - copy_changelog_to_cloudslang_cli:
+        do:
+          files.copy:
+            - source: "'../CHANGELOG.md'"
+            - destination: target_cli + '/CHANGELOG.md'
 
     - get_os_to_chmod:
         do:
@@ -144,11 +161,14 @@ flow:
             - folder_path: target_dir + "/cloudslang-cli"
             - output_folder: target_dir
 
+    - create_cli_tar_gz:
+            do:
+              cmd.run_command:
+                - command: >
+                    "tar -cvzf " + target_dir + "/cslang-cli.tar.gz " + target_dir + "/cloudslang-cli"
 
     - create_builder_zip:
         do:
           files.zip_folder:
             - archive_name: "'cslang-builder'"
             - folder_path: 'target_dir + "/cslang-builder"'
-
-#    - create_tar_gz
