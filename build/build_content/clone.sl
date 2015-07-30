@@ -26,9 +26,10 @@ flow:
   inputs:
     - url
     - target_location: "'.'"
+    - branch: "'master'"
   workflow:
     - clone:
         do:
           cmd.run_command:
             - command: >
-                'git clone ' + url + ' ' + target_location
+                'git clone -b ' + branch + ' ' + url + ' ' + target_location
