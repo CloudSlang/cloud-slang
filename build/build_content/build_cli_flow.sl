@@ -9,7 +9,11 @@
 # Builds the cloudslang-cli.
 #
 # Inputs:
+#   - include_content - shoud include the content or not - Default: false
 #   - target_dir - directory to create artifacts in - Default: target
+#   - target_cli - where to put the CLI - Default: target_dir + "/cloudslang-cli/cslang"
+#   - cloudslang_content_repo - content repo to include = Default: https://github.com/CloudSlang/cloud-slang-content.git
+#   - content_branch - content branch to clone
 # Results:
 #   - SUCCESS
 #   - FAILURE
