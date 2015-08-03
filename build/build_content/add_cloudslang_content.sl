@@ -42,7 +42,9 @@ flow:
           build_content.clone:
             - url
             - target_location: content_dir
-            - branch: content_branch
+            - branch:
+                default: content_branch
+                required: false
 
     - get_os_to_verify:
         do:
