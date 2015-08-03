@@ -10,7 +10,10 @@
 #
 # Inputs:
 #   - url - URL of content repository
-#   - target_dir - location to put content repository in
+#   - content_dir - location to put content repository in
+#   - target_dir - location of the target/build dir
+#   - content_branch - Optional - content branch to checkout
+#   - target_cli - location of the CLI we're building
 # Results:
 #   - SUCCESS
 #   - FAILURE
