@@ -17,7 +17,7 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 
 public interface CompilerHelper {
 
-	public CompilationArtifact compile(String filePath, List<String> dependencies) throws IOException;
+	public CompilationArtifact compile(String filePath, List<String> dependencies, List<String> additionalDependencies) throws IOException;
 
 	/**
 	 * Load system property sources written in yaml and map them to fully qualified names

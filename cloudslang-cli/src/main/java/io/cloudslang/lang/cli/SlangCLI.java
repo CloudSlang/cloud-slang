@@ -63,14 +63,15 @@ public class SlangCLI implements CommandMarker {
 
     @CliCommand(value = "run", help = "triggers a CloudSlang flow")
     public String run(
-            @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. cslang run --f C:\\CloudSlang\\flow.yaml") final File file,
-            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath,
+            @CliOption(key = {"", "f", "file"}, mandatory = true, help = "path to filename. e.g. cslang run --f C:\\CloudSlang\\flow.yaml") final File file,
+            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath,
+            @CliOption(key = {"addcp", "additional-classpaths"}, mandatory = false, help = "comma separated list of directories that will be added to the default classpath location") final List<String> additionalClassPaths,
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String,? extends Serializable> inputs,
             @CliOption(key = {"if", "input-file"}, mandatory = false, help = "comma separated list of input file locations") final List<String> inputFiles,
             @CliOption(key = {"", "q", "quiet"}, mandatory = false, help = "quiet", specifiedDefaultValue = "true",unspecifiedDefaultValue = "false") final Boolean quiet,
             @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = "comma separated list of system property file locations") final List<String> systemPropertyFiles) throws IOException {
 
-        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
+        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath, additionalClassPaths);
         Map<String, ? extends Serializable> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
         Map<String, ? extends Serializable> inputsFromFile = compilerHelper.loadInputsFromFile(inputFiles);
         Map<String, Serializable> mergedInputs = new HashMap<>();
@@ -103,10 +104,11 @@ public class SlangCLI implements CommandMarker {
 
     @CliCommand(value = "inputs", help = "Get flow inputs")
     public List<String> getFlowInputs(
-            @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. cslang inputs --f C:\\CloudSlang\\flow.yaml") final File file,
-            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath)
+            @CliOption(key = {"", "f", "file"}, mandatory = true, help = "path to filename. e.g. cslang inputs --f C:\\CloudSlang\\flow.yaml") final File file,
+            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath,
+            @CliOption(key = {"addcp", "additional-classpaths"}, mandatory = false, help = "comma separated list of directories that will be added to the default classpath location") final List<String> additionalClassPaths)
             throws IOException {
-        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
+        CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath, additionalClassPaths);
         List<Input> inputs = compilationArtifact.getInputs();
         List<String> inputsResult = new ArrayList<>();
         for (Input input : inputs) {

@@ -49,12 +49,12 @@ public class CompilerHelperTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testFilePathWrong() throws Exception {
-        compilerHelper.compile(null, null);
+        compilerHelper.compile(null, null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFilePathNotFile() throws Exception {
-        compilerHelper.compile("xxx", null);
+        compilerHelper.compile("xxx", null, null);
     }
 
     @Before
@@ -67,7 +67,7 @@ public class CompilerHelperTest {
         URI flowFilePath = getClass().getResource("/flow.yaml").toURI();
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("must have one of the following extensions");
-        compilerHelper.compile(flowFilePath.getPath(), null);
+        compilerHelper.compile(flowFilePath.getPath(), null, null);
 
     }
 
@@ -78,17 +78,29 @@ public class CompilerHelperTest {
 		URI flow2FilePath = getClass().getResource("/flowsdir/flow2.sl").toURI();
 		URI spFlow = getClass().getResource("/sp/flow.sl").toURI();
 		URI spOp = getClass().getResource("/sp/operation.sl").toURI();
-		compilerHelper.compile(flowFilePath.getPath(), null);
+		compilerHelper.compile(flowFilePath.getPath(), null, null);
 		Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath), Sets.newHashSet(SlangSource.fromFile(flowFilePath), SlangSource.fromFile(flow2FilePath),
 			SlangSource.fromFile(opFilePath), SlangSource.fromFile(spFlow), SlangSource.fromFile(spOp)));
 	}
+
+    @Test
+    public void testFilePathValidWithAdditionalDependencies() throws Exception{
+        URI dependency = getClass().getResource("/flowsdir/flow2.sl").toURI();
+        URI classPath = getClass().getResource("/flowsdir/").toURI();
+        URI additionalDependency = getClass().getResource("/additionalflowsdir/").toURI();
+        URI additionalClassPath = getClass().getResource("/additionalflowsdir/flow3.sl").toURI();
+
+        compilerHelper.compile(dependency.getPath(), Lists.newArrayList(classPath.getPath()), Lists.newArrayList(additionalDependency.getPath()));
+        Mockito.verify(slang).compile(SlangSource.fromFile(dependency),
+                Sets.newHashSet(SlangSource.fromFile(additionalClassPath), SlangSource.fromFile(dependency)));
+    }
 
     @Test
     public void testFilePathValidWithOtherPathForDependencies() throws Exception {
         URI flowFilePath = getClass().getResource("/flow.sl").toURI();
         URI folderPath = getClass().getResource("/flowsdir/").toURI();
         URI flow2FilePath = getClass().getResource("/flowsdir/flow2.sl").toURI();
-        compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(folderPath.getPath()));
+        compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(folderPath.getPath()), null);
         Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath),
                 Sets.newHashSet(SlangSource.fromFile(flow2FilePath)));
     }
@@ -97,13 +109,13 @@ public class CompilerHelperTest {
     public void testInvalidDirPathForDependencies() throws Exception {
         String flowFilePath = getClass().getResource("/flow.sl").getPath();
         String invalidDirPath = getClass().getResource("").getPath().concat("xxx");
-        compilerHelper.compile(flowFilePath, Lists.newArrayList(invalidDirPath));
+        compilerHelper.compile(flowFilePath, Lists.newArrayList(invalidDirPath), null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidDirPathForDependencies2() throws Exception {
         String flowFilePath = getClass().getResource("/flow.sl").getPath();
-        compilerHelper.compile(flowFilePath, Lists.newArrayList(flowFilePath));
+        compilerHelper.compile(flowFilePath, Lists.newArrayList(flowFilePath), null);
     }
 
 	@Test
