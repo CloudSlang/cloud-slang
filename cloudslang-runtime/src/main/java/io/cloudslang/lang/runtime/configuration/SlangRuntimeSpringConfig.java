@@ -11,6 +11,7 @@ package io.cloudslang.lang.runtime.configuration;
 *******************************************************************************/
 
 
+import org.python.core.Options;
 import org.python.util.PythonInterpreter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -22,6 +23,10 @@ import javax.script.ScriptEngineManager;
 @Configuration
 @ComponentScan("io.cloudslang.lang.runtime")
 public class SlangRuntimeSpringConfig {
+
+    static {
+        Options.importSite = false;
+    }
 
     @Bean
     public PythonInterpreter interpreter(){
