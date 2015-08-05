@@ -47,7 +47,7 @@ public class SlangCLITest {
     private final static String FLOW_PATH_BACKSLASH_INPUT = "C:\\\\flow.yaml";
     private final static String FLOW_PATH_BACKSLASH = "C:\\flow.yaml";
     private final static String DEPENDENCIES_PATH_BACKSLASH = "C:\\\\flowsdir\\\\";
-    private final static String ADDITIONAL_DEPENDENCIES_PATH_BACKSLASH = "C:\\\\flowsdir\\\\";
+    private final static String ADDITIONAL_DEPENDENCIES_PATH_BACKSLASH = "C:\\\\additionalflowsdir\\\\";
     private static final long DEFAULT_TIMEOUT = 10000;
     public static final String INPUT_FILE_PATH = "/inputs/inputs.yaml";
 
@@ -167,6 +167,22 @@ public class SlangCLITest {
         when(ScoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class), eq(false))).thenReturn(executionID);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --cp " + DEPENDENCIES_PATH_BACKSLASH + " --addcp " + ADDITIONAL_DEPENDENCIES_PATH_BACKSLASH);
+
+        verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), anyListOf(String.class), anyListOf(String.class));
+        verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class), eq(false));
+
+        Assert.assertEquals("method threw exception", null, cr.getException());
+        Assert.assertEquals("success should be true", true, cr.isSuccess());
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void testRunValidWithDefaultPathForDependenciesAndAdditionalDependencies() throws Exception {
+        long executionID = 1;
+
+        when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), anyListOf(String.class), anyListOf(String.class))).thenReturn(emptyCompilationArtifact);
+        when(ScoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class), eq(false))).thenReturn(executionID);
+
+        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --addcp " + ADDITIONAL_DEPENDENCIES_PATH_BACKSLASH);
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), anyListOf(String.class), anyListOf(String.class));
         verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class), eq(false));
