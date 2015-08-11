@@ -19,7 +19,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
+
+import static ch.lambdaj.Lambda.select;
+import static org.hamcrest.Matchers.startsWith;
 
 /*
  * Created by orius123 on 12/11/14.
@@ -52,5 +56,9 @@ public abstract class SystemsTestsParent {
 	public RuntimeInformation triggerWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> systemProperties) {
 		return triggerFlows.runWithData(compilationArtifact, userInputs, systemProperties);
 	}
+
+    protected List<String> getTasksOnly(Map<String, StepData> stepsData) {
+        return select(stepsData.keySet(), startsWith("0."));
+    }
 
 }
