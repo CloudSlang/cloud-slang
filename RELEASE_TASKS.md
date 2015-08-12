@@ -1,6 +1,6 @@
 ##What##
 When we want to release a new version that:
-  - Will be markes as release in Github
+  - Will be marked as release in Github
   - Will have artifacts that include the content (i.e. cslang-wih-content.zip)
   - Will test the content matches the language version (only default content test suite)
   - will run the CLI with a simple flow (sanity check)
