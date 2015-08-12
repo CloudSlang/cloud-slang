@@ -30,7 +30,10 @@ public class SlangRuntimeSpringConfig {
 
     @Bean
     public PythonInterpreter interpreter(){
-        return new PythonInterpreter();
+        PythonInterpreter interpreter = new PythonInterpreter();
+//        here to avoid jython preferring io.cloudslang package over python io package
+        interpreter.exec("import io");
+        return interpreter;
     }
 
     @Bean
