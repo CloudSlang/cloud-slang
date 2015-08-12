@@ -92,18 +92,17 @@ public class AsyncLoopSteps extends AbstractSteps {
                 runEnv.getExecutionPath().down();
 
                 RunEnvironment branchRuntimeEnvironment = (RunEnvironment) SerializationUtils.clone(runEnv);
+                branchRuntimeEnvironment.resetStacks();
+
                 Context branchContext = (Context) SerializationUtils.clone(flowContext);
                 branchContext.putVariable(asyncLoopStatement.getVarName(), splitItem);
-
                 updateCallArgumentsAndPushContextToStack(branchRuntimeEnvironment,
                         branchContext, new HashMap<String, Serializable>());
 
                 createBranch(
                         branchRuntimeEnvironment,
                         executionRuntimeServices,
-                        RUNNING_EXECUTION_PLAN_ID,
                         refId,
-                        nextStepId,
                         branchBeginStep);
 
                 // take path up level
@@ -266,12 +265,8 @@ public class AsyncLoopSteps extends AbstractSteps {
 
     private void createBranch(RunEnvironment runEnv,
                               ExecutionRuntimeServices executionRuntimeServices,
-                              Long RUNNING_EXECUTION_PLAN_ID,
                               String refId,
-                              Long nextStepId,
                               Long branchBeginStep) {
-        pushParentFlowDataOnStack(runEnv, RUNNING_EXECUTION_PLAN_ID, nextStepId);
-
         Map<String, Serializable> branchContext = new HashMap<>();
         branchContext.put(ScoreLangConstants.RUN_ENV, runEnv);
         executionRuntimeServices.addBranch(branchBeginStep, refId, branchContext);
