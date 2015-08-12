@@ -109,35 +109,9 @@ public class RunEnvironment implements Serializable{
         return serializableDataMap;
     }
 
-    public RunEnvironment cloneWithoutStacks() {
-        @SuppressWarnings("unchecked")
-        Map<String, ? extends Serializable> systemPropertiesCopy =
-                (Map<String, ? extends Serializable>) SerializationUtils.clone((Serializable) systemProperties);
-
-        RunEnvironment runEnvironmentWithoutStacks = new RunEnvironment(systemPropertiesCopy);
-
-        runEnvironmentWithoutStacks.contextStack = new ContextStack();
-        runEnvironmentWithoutStacks.parentFlowStack = new ParentFlowStack();
-
-        @SuppressWarnings("unchecked")
-        Map<String, Serializable> callArgumentsCopy =
-                (Map<String, Serializable>) SerializationUtils.clone((Serializable) callArguments);
-        runEnvironmentWithoutStacks.callArguments = callArgumentsCopy;
-
-        runEnvironmentWithoutStacks.executionPath =
-                (ExecutionPath) SerializationUtils.clone(executionPath);
-
-        @SuppressWarnings("unchecked")
-        Map<String, SerializableSessionObject> serializableDataMapCopy =
-                (Map<String, SerializableSessionObject>) SerializationUtils.clone((Serializable) serializableDataMap);
-        runEnvironmentWithoutStacks.serializableDataMap = serializableDataMapCopy;
-
-        runEnvironmentWithoutStacks.returnValues =
-                (ReturnValues) SerializationUtils.clone(returnValues);
-
-        runEnvironmentWithoutStacks.nextStepPosition = nextStepPosition;
-
-        return runEnvironmentWithoutStacks;
+    public void resetStacks() {
+        contextStack = new ContextStack();
+        parentFlowStack = new ParentFlowStack();
     }
 
 }

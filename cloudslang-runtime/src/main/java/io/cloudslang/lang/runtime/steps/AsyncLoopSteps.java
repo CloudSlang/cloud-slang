@@ -91,7 +91,8 @@ public class AsyncLoopSteps extends AbstractSteps {
                 // take path down one level
                 runEnv.getExecutionPath().down();
 
-                RunEnvironment branchRuntimeEnvironment = runEnv.cloneWithoutStacks();
+                RunEnvironment branchRuntimeEnvironment = (RunEnvironment) SerializationUtils.clone(runEnv);
+                branchRuntimeEnvironment.resetStacks();
 
                 Context branchContext = (Context) SerializationUtils.clone(flowContext);
                 branchContext.putVariable(asyncLoopStatement.getVarName(), splitItem);
