@@ -1,0 +1,55 @@
+What is drone.io used for?
+                I use it to build a CLI that tests and packs the latest content into it.
+                In addition I also test here that the CLI is actually working (just a sanity check)
+
+Where can I find the script you are using?
+                The script can be found in the cloud-slang repo under `build` directory
+                We have there
+1.	An ant flow that runs a slang flow that builds and tests the CLI. (we use it also in travis, but without adding and testing the content)
+2.	A shell script that upload the artifacts to GH.
+Why using another CI SaaS tool?
+                Because I didn’t find a proper way to trigger manual build with travis and circle-ci
+
+
+Ok, how do we do it?
+
+In Github:
+                Choose a release tag you want to build. (every release of Jenkins creates a tag)
+ 
+
+Than copy the tag name:
+ 
+                
+                
+Drone.io:
+First if you want to do the following steps you need to create a user in drone.io and send me its name (you can use your github account).
+
+After you created a user and I added you to the project..
+
+1.	Enter the project             
+ 
+2.	Go to setting tab
+ 
+
+3.	Press the little arrow next to build now
+ 
+4.	Press “Choose custom branch”
+ 
+
+5.	Fill in the tag you want to create a release  for (you copies it from Github hopefully) in the branch name and press “build now”
+ 
+
+6.	Wait for it…..
+7.	Look at the log (if you wish) or do something useful to the world!
+
+![4](https://cloud.githubusercontent.com/assets/4418018/9223230/ee308c0e-4100-11e5-9e1e-131c9a037dd7.png)
+![5](https://cloud.githubusercontent.com/assets/4418018/9223229/ee2fbc70-4100-11e5-9554-b525db0fbc13.png)
+![6](https://cloud.githubusercontent.com/assets/4418018/9223231/ee33c23e-4100-11e5-8d9d-80c6ee92b6fa.png)
+![7](https://cloud.githubusercontent.com/assets/4418018/9223233/ee3d179e-4100-11e5-9f44-81df41b7bb00.png)
+![1](https://cloud.githubusercontent.com/assets/4418018/9223232/ee3cc384-4100-11e5-9cb0-84612ebc8d70.png)
+![2](https://cloud.githubusercontent.com/assets/4418018/9223234/ee405062-4100-11e5-92b6-1006057fbf41.png)
+![3](https://cloud.githubusercontent.com/assets/4418018/9223235/ee4d7198-4100-11e5-8e28-ff73c8c8d5b3.png)
+
+Thx
+
+Eliya
