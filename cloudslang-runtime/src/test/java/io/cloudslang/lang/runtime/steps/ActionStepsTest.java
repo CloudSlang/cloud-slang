@@ -489,6 +489,23 @@ public class ActionStepsTest {
         actionSteps.doAction(runEnv, nonSerializableExecutionData, PYTHON, "", "", executionRuntimeServicesMock, userPythonScript, 2L);
     }
 
+
+    @Test
+    public void doActionPythonImportRightIOPackage() {
+        //prepare doAction arguments
+        RunEnvironment runEnv = new RunEnvironment();
+
+        String userPythonScript =
+                "import io\n" +
+                "if 'StringIO' not in dir(io):\n" +
+                "  raise Exception('cant find StringIO')";
+
+        //invoke doAction
+        actionSteps.doAction(
+                runEnv, new HashMap<String, Object>(), PYTHON, "", "",
+                executionRuntimeServicesMock, userPythonScript, 2L);
+    }
+
     @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void doActionPythonInputTypeMismatchTest() {
         //prepare doAction arguments
