@@ -113,6 +113,7 @@ public class SlangImpl implements Slang {
         eventTypes.add(ScoreLangConstants.EVENT_ACTION_START);
         eventTypes.add(ScoreLangConstants.EVENT_ACTION_END);
         eventTypes.add(ScoreLangConstants.EVENT_ACTION_ERROR);
+        eventTypes.add(ScoreLangConstants.EVENT_TASK_START);
         eventTypes.add(ScoreLangConstants.EVENT_INPUT_START);
         eventTypes.add(ScoreLangConstants.EVENT_INPUT_END);
         eventTypes.add(ScoreLangConstants.EVENT_OUTPUT_START);
