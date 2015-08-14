@@ -157,7 +157,7 @@ public class SlangCLI implements CommandMarker {
         handlerTypes.add(ScoreLangConstants.EVENT_EXECUTION_FINISHED);
         scoreServices.subscribe(new ScoreEventListener() {
             @Override
-            public void onEvent(ScoreEvent event) {
+            public synchronized void onEvent(ScoreEvent event) {
                 logEvent(event);
             }
         }, handlerTypes);

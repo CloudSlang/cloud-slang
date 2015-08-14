@@ -47,7 +47,7 @@ public class TriggerFlows {
         final BlockingQueue<ScoreEvent> finishEvent = new LinkedBlockingQueue<>();
         ScoreEventListener finishListener = new ScoreEventListener() {
             @Override
-            public void onEvent(ScoreEvent event) throws InterruptedException {
+            public synchronized void onEvent(ScoreEvent event) throws InterruptedException {
                 finishEvent.add(event);
             }
         };
