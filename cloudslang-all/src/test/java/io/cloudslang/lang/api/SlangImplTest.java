@@ -56,7 +56,7 @@ import static org.mockito.Matchers.*;
 public class SlangImplTest {
 
     static final CompilationArtifact emptyCompilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>(), new ArrayList<Input>());
-    private static final int ALL_EVENTS_SIZE = 23;
+    private static final int ALL_EVENTS_SIZE = 22;
 
     @Autowired
     private Slang slang;
