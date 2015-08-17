@@ -20,11 +20,11 @@ In the build folder we have:
 ###In GitHub:
 
 - Choose a release tag you want to build. (Every release of Jenkins creates a tag.)
-- 
+ 
   ![1](https://cloud.githubusercontent.com/assets/4418018/9223232/ee3cc384-4100-11e5-9cb0-84612ebc8d70.png)
  
 - Copy the tag name.
-- 
+ 
   ![2](https://cloud.githubusercontent.com/assets/4418018/9223234/ee405062-4100-11e5-92b6-1006057fbf41.png)
 
 ###In drone.io:
