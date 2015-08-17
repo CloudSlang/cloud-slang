@@ -308,6 +308,17 @@ public class CompilerErrorsTest {
     }
 
     @Test
+    public void testFlowTaskWithTwoKeysUnderDo() throws Exception {
+        URI resource = getClass().getResource("/corrupted/multiple_keys_under_do.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("task1");
+        exception.expectMessage("to many keys");
+        compiler.compile(SlangSource.fromFile(resource), path);
+    }
+
+    @Test
     public void testFlowWithTasksAsList() throws Exception {
         URI resource = getClass().getResource("/corrupted/workflow_with_task_map.sl").toURI();
 

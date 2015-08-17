@@ -35,7 +35,7 @@ public class TriggerFlows {
 
     private final static HashSet<String> BRANCH_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_BRANCH_END);
 
-    private final static HashSet<String> ASYNC_LOOP_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_ASYNC_LOOP_OUTPUT_END);
+    private final static HashSet<String> ASYNC_LOOP_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_JOIN_BRANCHES_END);
 
     @Autowired
     private Slang slang;

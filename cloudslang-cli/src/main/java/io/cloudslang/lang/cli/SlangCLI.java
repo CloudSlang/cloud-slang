@@ -149,10 +149,9 @@ public class SlangCLI implements CommandMarker {
         handlerTypes.add(ScoreLangConstants.EVENT_OUTPUT_END);
         handlerTypes.add(ScoreLangConstants.EVENT_BRANCH_START);
         handlerTypes.add(ScoreLangConstants.EVENT_BRANCH_END);
-        handlerTypes.add(ScoreLangConstants.EVENT_ASYNC_LOOP_EXPRESSION_START);
-        handlerTypes.add(ScoreLangConstants.EVENT_ASYNC_LOOP_EXPRESSION_END);
-        handlerTypes.add(ScoreLangConstants.EVENT_ASYNC_LOOP_OUTPUT_START);
-        handlerTypes.add(ScoreLangConstants.EVENT_ASYNC_LOOP_OUTPUT_END);
+        handlerTypes.add(ScoreLangConstants.EVENT_SPLIT_BRANCHES);
+        handlerTypes.add(ScoreLangConstants.EVENT_JOIN_BRANCHES_START);
+        handlerTypes.add(ScoreLangConstants.EVENT_JOIN_BRANCHES_END);
         handlerTypes.add(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION);
         handlerTypes.add(ScoreLangConstants.EVENT_EXECUTION_FINISHED);
         scoreServices.subscribe(new ScoreEventListener() {
