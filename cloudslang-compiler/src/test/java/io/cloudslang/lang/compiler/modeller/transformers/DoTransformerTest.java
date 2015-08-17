@@ -51,7 +51,7 @@ public class DoTransformerTest {
 
     @Test
     public void testTransformExpression() throws Exception {
-        LinkedHashMap doArgumentsMap = loadFirstTaskFromFile("/flow_with_data.yaml");
+        Map doArgumentsMap = loadFirstTaskFromFile("/flow_with_data.yaml");
         @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap);
         Assert.assertFalse(arguments.isEmpty());
         Assert.assertEquals(2, arguments.size());
@@ -62,7 +62,7 @@ public class DoTransformerTest {
 
     @Test
     public void testTransformConst() throws Exception {
-        LinkedHashMap doArgumentsMap = loadFirstTaskFromFile("/flow_with_data.yaml");
+        Map doArgumentsMap = loadFirstTaskFromFile("/flow_with_data.yaml");
         @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap);
         Assert.assertFalse(arguments.isEmpty());
         Assert.assertEquals(2, arguments.size());
@@ -76,7 +76,10 @@ public class DoTransformerTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("country");
         exception.expectMessage("null");
-        LinkedHashMap doArgumentsMap = loadFirstTaskFromFile("/corrupted/flow_with_empty_argument_expression.yaml");
+
+        @SuppressWarnings("unchecked")
+        Map<String, List> doArgumentsMap = loadFirstTaskFromFile("/corrupted/flow_with_empty_argument_expression.yaml");
+
         doTransformer.transform(doArgumentsMap);
     }
 
@@ -85,7 +88,10 @@ public class DoTransformerTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("country");
         exception.expectMessage("modifier");
-        LinkedHashMap doArgumentsMap = loadFirstTaskFromFile("/corrupted/flow_with_argument_modifiers.yaml");
+
+        @SuppressWarnings("unchecked")
+        Map<String, List> doArgumentsMap = loadFirstTaskFromFile("/corrupted/flow_with_argument_modifiers.yaml");
+
         doTransformer.transform(doArgumentsMap);
     }
 
@@ -94,12 +100,15 @@ public class DoTransformerTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("argument");
         exception.expectMessage("22");
-        LinkedHashMap doArgumentsMap = loadFirstTaskFromFile("/corrupted/flow_with_invalid_argument.yaml");
+
+        @SuppressWarnings("unchecked")
+        Map<String, List> doArgumentsMap = loadFirstTaskFromFile("/corrupted/flow_with_invalid_argument.yaml");
+
         doTransformer.transform(doArgumentsMap);
     }
 
-    private LinkedHashMap loadFirstTaskFromFile(String path) throws URISyntaxException {
-        LinkedHashMap doArgumentsMap = new LinkedHashMap();
+    private Map loadFirstTaskFromFile(String path) throws URISyntaxException {
+        Map doArgumentsMap = new LinkedHashMap();
         URL resource = getClass().getResource(path);
         File file = new File(resource.toURI());
         ParsedSlang parsedSlang = yamlParser.parse(SlangSource.fromFile(file));
@@ -107,7 +116,7 @@ public class DoTransformerTest {
         List<Map<String, Map>> flow = (List<Map<String, Map>>) parsedSlang.getFlow().get(SlangTextualKeys.WORKFLOW_KEY);
         for(Map<String, Map> task : flow){
             if(task.keySet().iterator().next().equals("CheckWeather")){
-                doArgumentsMap = (LinkedHashMap) task.values().iterator().next().get(SlangTextualKeys.DO_KEY);
+                doArgumentsMap = (Map) task.values().iterator().next().get(SlangTextualKeys.DO_KEY);
                 return doArgumentsMap;
             }
         }
