@@ -70,15 +70,8 @@ public class DoTransformer implements Transformer<Map<String, List>, List<Argume
                         "Make sure a value is specified or that indentation is properly done."
                 );
             }
-            if (entryValue instanceof String) {
-                // - some_input: some_expression
-                return new Argument(entry.getKey(), entryValue.toString());
-            } else {
-                throw new RuntimeException("Could not transform task argument : " +
-                        rawArgument + ". Since task arguments do not support input specific modifiers.\n" +
-                        "Correct syntax is: '- argument' or '- argument: expression'."
-                );
-            }
+            // - some_input: some_expression
+            return new Argument(entry.getKey(), entryValue.toString());
         }
         throw new RuntimeException("Could not transform task argument : " + rawArgument);
     }
