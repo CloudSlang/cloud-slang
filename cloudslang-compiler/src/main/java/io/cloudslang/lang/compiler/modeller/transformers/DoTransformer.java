@@ -33,6 +33,9 @@ public class DoTransformer extends AbstractInputsTransformer implements Transfor
         List<Input> result = new ArrayList<>();
         if (MapUtils.isEmpty(rawData)) {
             return result;
+        } else if (rawData.size() > 1) {
+            throw new RuntimeException("Task has to many keys under the 'do' keyword,\n" +
+                    "May happen due to wrong indentation");
         }
         Map.Entry<String, List> inputsEntry = rawData.entrySet().iterator().next();
         if (inputsEntry.getValue() == null) {

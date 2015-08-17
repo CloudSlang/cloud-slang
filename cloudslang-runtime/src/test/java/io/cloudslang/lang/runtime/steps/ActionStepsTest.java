@@ -477,9 +477,12 @@ public class ActionStepsTest {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
         File file = folder.newFile();
+
+        String fileAbsolutePathEscaped = file.getAbsolutePath().replace("\\", "\\\\");
+
         String userPythonScript =
                 "valid = 1\n" +
-                "with open('" + file.getAbsolutePath() + "', 'r') as f:\n" +
+                "with open('" + fileAbsolutePathEscaped + "', 'r') as f:\n" +
                 "  f.close()\n\n" +
                 "import sys\n" +
                 "import io\n" +

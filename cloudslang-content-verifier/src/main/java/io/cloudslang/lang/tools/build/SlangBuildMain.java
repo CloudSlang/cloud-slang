@@ -233,7 +233,7 @@ public class SlangBuildMain {
     private static void registerEventHandlers(Slang slang) {
         slang.subscribeOnAllEvents(new ScoreEventListener() {
             @Override
-            public void onEvent(ScoreEvent event) {
+            public synchronized void onEvent(ScoreEvent event) {
                 logEvent(event);
             }
         });
