@@ -11,7 +11,7 @@ imports:
   ops: user.ops
 
 flow:
-  name: flow_with_data
+  name: flow_with_invalid_argument
   inputs:
   - city_name
 
@@ -20,7 +20,7 @@ flow:
         do:
           ops.check_Weather:
             - city: city_name
-            - country: str('Israel')
+            - 22
         publish:
           - weather
   outputs:
