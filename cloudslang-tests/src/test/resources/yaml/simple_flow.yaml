@@ -18,13 +18,13 @@ flow:
         required: false
     - host:
         system_property: user.sys.props.host
+    - port: 22
   workflow:
     - Task1:
         do:
           ops.get_time_zone:
             - time_zone_as_string: time_zone_as_string if time_zone_as_string is not None else input1
-            - port:
-                system_property: user.sys.props.port
+            - port
         publish:
           - time_zone: time_zone
         navigate:

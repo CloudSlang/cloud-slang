@@ -142,11 +142,12 @@ public class ScoreCompilerImpl implements ScoreCompiler{
 		Collection<Input> result = new ArrayList<>();
 		for(Executable executable : executables) {
 			result.addAll(getSystemProperties(executable.getInputs()));
-			if(executable instanceof Flow) {
-				for(Task task : ((Flow)executable).getWorkflow().getTasks()) {
-					result.addAll(getSystemProperties(task.getInputs()));
-				}
-			}
+            // TODO - task args - don't support sys prop for task args
+//			if(executable instanceof Flow) {
+//				for(Task task : ((Flow)executable).getWorkflow().getTasks()) {
+//					//result.addAll(getSystemProperties(task.getArguments()));
+//				}
+//			}
 		}
 		return result;
 	}

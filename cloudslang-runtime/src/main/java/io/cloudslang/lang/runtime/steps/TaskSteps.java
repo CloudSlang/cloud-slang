@@ -11,6 +11,8 @@ package io.cloudslang.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
 import io.cloudslang.lang.entities.*;
+import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.runtime.bindings.ArgumentsBinding;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.env.*;
@@ -23,9 +25,7 @@ import io.cloudslang.lang.runtime.env.LoopCondition;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.lang.entities.ResultNavigation;
-import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
-import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.env.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -46,7 +46,7 @@ import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUT
 public class TaskSteps extends AbstractSteps {
 
     @Autowired
-    private InputsBinding inputsBinding;
+    private ArgumentsBinding argumentsBinding;
 
     @Autowired
     private OutputsBinding outputsBinding;
@@ -56,7 +56,7 @@ public class TaskSteps extends AbstractSteps {
     
     private static final Logger logger = Logger.getLogger(TaskSteps.class);
 
-    public void beginTask(@Param(ScoreLangConstants.TASK_INPUTS_KEY) List<Input> taskInputs,
+    public void beginTask(@Param(ScoreLangConstants.TASK_ARGUMENTS_KEY) List<Argument> taskArguments,
                           @Param(ScoreLangConstants.LOOP_KEY) LoopStatement loop,
                           @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
@@ -98,15 +98,15 @@ public class TaskSteps extends AbstractSteps {
 
             Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
 
-            sendStartBindingInputsEvent(taskInputs, runEnv, executionRuntimeServices,
-                    "Pre Input binding for task", LanguageEventData.StepType.TASK, nodeName);
+            // TODO - task args - fire event
+//            sendStartBindingInputsEvent(taskInputs, runEnv, executionRuntimeServices,
+//                    "Pre Input binding for task", LanguageEventData.StepType.TASK, nodeName);
 
-            Map<String, Serializable> operationArguments = inputsBinding.bindInputs(taskInputs, flowVariables, runEnv.getSystemProperties());
+            Map<String, Serializable> operationArguments = argumentsBinding.bindArguments(taskArguments, flowVariables);
 
-            //todo: hook
-
-            sendEndBindingInputsEvent(taskInputs, operationArguments, runEnv, executionRuntimeServices, "Task inputs resolved",
-                    LanguageEventData.StepType.TASK, nodeName);
+            // TODO - task args - fire event
+//            sendEndBindingInputsEvent(taskInputs, operationArguments, runEnv, executionRuntimeServices, "Task inputs resolved",
+//                    LanguageEventData.StepType.TASK, nodeName);
 
             updateCallArgumentsAndPushContextToStack(runEnv, flowContext, operationArguments);
 

@@ -37,7 +37,7 @@ public interface ScoreLangConstants {
     String EXECUTABLE_RESULTS_KEY = "executableResults";
 
     //task scope
-    String TASK_INPUTS_KEY = "taskInputs";
+    String TASK_ARGUMENTS_KEY = "taskArguments";
     String TASK_PUBLISH_KEY = "taskPublishValues";
     String TASK_NAVIGATION_KEY = "taskNavigationValues";
     String REF_ID = "refId";
