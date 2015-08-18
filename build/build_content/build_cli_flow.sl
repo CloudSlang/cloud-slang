@@ -123,7 +123,7 @@ flow:
             do:
               cmd.run_command:
                 - command: >
-                    "tar -cvzf " + target_dir + "/cslang-cli.tar.gz " + target_dir + "/cloudslang-cli"
+                    "tar --exclude='cslang-cli.zip' -cvzf " + target_dir + "/cloudslang-cli/cslang-cli.tar.gz " + target_dir + "/cloudslang-cli"
 
     - create_builder_zip:
         do:
