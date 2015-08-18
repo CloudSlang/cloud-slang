@@ -18,6 +18,7 @@ import io.cloudslang.lang.entities.bindings.Argument;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.*;
 
 @Component
@@ -62,8 +63,8 @@ public class DoTransformer implements Transformer<Map<String, List>, List<Argume
             return new Argument(argumentName, null);
         } else if (rawArgument instanceof Map) {
             @SuppressWarnings("unchecked")
-            Map.Entry<String, ?> entry = ((Map<String, ?>) rawArgument).entrySet().iterator().next();
-            Object entryValue = entry.getValue();
+            Map.Entry<String, Serializable> entry = ((Map<String, Serializable>) rawArgument).entrySet().iterator().next();
+            Serializable entryValue = entry.getValue();
             if(entryValue == null){
                 throw new RuntimeException("Could not transform task argument : " +
                         rawArgument + ". Since it has a null value.\n" +
