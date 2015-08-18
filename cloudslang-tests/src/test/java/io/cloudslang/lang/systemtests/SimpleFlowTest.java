@@ -12,12 +12,11 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import io.cloudslang.score.events.ScoreEvent;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -30,7 +29,6 @@ import java.util.Set;
  * Date: 11/14/2014
  * @author Bonczidai Levente
  */
-@Ignore // TODO - task args - update tests
 public class SimpleFlowTest extends SystemsTestsParent {
 
 	private static final Map<String, Serializable> SYS_PROPS = new HashMap<>();
@@ -79,27 +77,6 @@ public class SimpleFlowTest extends SystemsTestsParent {
         compileAndRunSimpleFlow(inputs, null);
     }
 
-    @Test(timeout = DEFAULT_TIMEOUT)
-    public void testSimpleFlowBasicMissingTaskInput() throws Exception {
-        URI flow = getClass().getResource("/yaml/simple_flow.yaml").toURI();
-        URI operations1 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
-        URI operations2 = getClass().getResource("/yaml/comopute_daylight_time_zone.sl").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("input1", "-2");
-        userInputs.put("time_zone_as_string", "+2");
-        userInputs.put("host", "hostName");
-        for (Map.Entry<String, ? extends Serializable> input : new HashMap<String, Serializable>().entrySet()) {
-            userInputs.put(input.getKey(), input.getValue());
-        }
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("port");
-        exception.expectMessage("Required");
-        ScoreEvent event = trigger(compilationArtifact, userInputs, new HashMap<String, Serializable>());
-        Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
-    }
-
     @Test
     public void testFlowWithGlobalSession() throws Exception {
         URI resource = getClass().getResource("/yaml/flow_using_global_session.yaml").toURI();
@@ -121,7 +98,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
 		URI operations2 = getClass().getResource("/yaml/comopute_daylight_time_zone.sl").toURI();
 		Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
 		CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
-        Assert.assertEquals("the system properties size is not as expected", 3, compilationArtifact.getSystemProperties().size());
+        Assert.assertEquals("the system properties size is not as expected", 2, compilationArtifact.getSystemProperties().size());
 		ScoreEvent event = trigger(compilationArtifact, inputs, systemProperties);
 		Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
 	}

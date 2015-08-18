@@ -9,14 +9,12 @@
 package io.cloudslang.lang.systemtests;
 
 import com.google.common.collect.Sets;
-
-import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.score.events.ScoreEvent;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -27,7 +25,6 @@ import java.util.Set;
 /*
  * Created by orius123 on 12/11/14.
  */
-@Ignore // TODO - task args - update tests.
 public class SubFlowSystemTest extends SystemsTestsParent {
 
     @Test
@@ -46,7 +43,6 @@ public class SubFlowSystemTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
         Assert.assertEquals("the system properties size is not as expected", 2, compilationArtifact.getSystemProperties().size());
 		Map<String, Serializable> systemProperties = new HashMap<>();
-		systemProperties.put("user.sys.props.host", "localhost");
 		systemProperties.put("user.sys.props.port", 22);
 		systemProperties.put("user.sys.props.alla", "balla");
         Map<String, Serializable> userInputs = new HashMap<>();

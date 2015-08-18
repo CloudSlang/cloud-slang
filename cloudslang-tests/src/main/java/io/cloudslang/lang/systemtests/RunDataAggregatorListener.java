@@ -1,22 +1,21 @@
-/*******************************************************************************
+/**
+ * ****************************************************************************
  * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
- *
+ * <p/>
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
- *
- *******************************************************************************/
+ * <p/>
+ * *****************************************************************************
+ */
 
 package io.cloudslang.lang.systemtests;
 
-import ch.lambdaj.Lambda;
-import ch.lambdaj.function.convert.Converter;
 import ch.lambdaj.group.Group;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import org.apache.commons.collections4.CollectionUtils;
-import org.hamcrest.Matchers;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -52,21 +51,27 @@ public class RunDataAggregatorListener extends AbstractAggregatorListener {
         LanguageEventData inputsEvent;
         LanguageEventData outputsEvent;
 
-        if (CollectionUtils.isNotEmpty(taskEvents)) {
-            inputsEvent = selectByEventType(taskEvents, ScoreLangConstants.EVENT_INPUT_END);
+        boolean taskStep = CollectionUtils.isNotEmpty(taskEvents);
+        if (taskStep) {
+            inputsEvent = selectByEventType(taskEvents, ScoreLangConstants.EVENT_ARGUMENT_END);
             outputsEvent = selectByEventType(taskEvents, ScoreLangConstants.EVENT_OUTPUT_END);
         } else {
             inputsEvent = selectByEventType(executableEvents, ScoreLangConstants.EVENT_INPUT_END);
             outputsEvent = selectByEventType(executableEvents, ScoreLangConstants.EVENT_OUTPUT_END);
         }
-            String path = inputsEvent.getPath();
-            String stepName = inputsEvent.getStepName();
-            Map<String, Serializable> inputs = inputsEvent.getInputs();
+        String path = inputsEvent.getPath();
+        String stepName = inputsEvent.getStepName();
+        Map<String, Serializable> inputs;
+        if (taskStep) {
+            inputs = inputsEvent.getArguments();
+        } else {
+            inputs = inputsEvent.getInputs();
+        }
 
-            Map<String, Serializable> outputs = outputsEvent == null ? null : outputsEvent.getOutputs();
-            String result = outputsEvent == null ? null : (String) outputsEvent.get(LanguageEventData.RESULT);
+        Map<String, Serializable> outputs = outputsEvent == null ? null : outputsEvent.getOutputs();
+        String result = outputsEvent == null ? null : (String) outputsEvent.get(LanguageEventData.RESULT);
 
-            String executableName = executableEvents.get(0).getStepName();
+        String executableName = executableEvents.get(0).getStepName();
 
         return new StepData(path, stepName, inputs, outputs, executableName, result);
     }

@@ -31,7 +31,12 @@ public class TriggerFlows {
             Sets.newHashSet(ScoreLangConstants.EVENT_EXECUTION_FINISHED, ScoreLangConstants.SLANG_EXECUTION_EXCEPTION);
 
     private final static HashSet<String> STEP_EVENTS =
-            Sets.newHashSet(ScoreLangConstants.EVENT_INPUT_END, ScoreLangConstants.EVENT_OUTPUT_END);
+            Sets.newHashSet(
+                    ScoreLangConstants.EVENT_INPUT_END,
+                    ScoreLangConstants.EVENT_OUTPUT_END,
+                    ScoreLangConstants.EVENT_ARGUMENT_START,
+                    ScoreLangConstants.EVENT_ARGUMENT_END
+            );
 
     private final static HashSet<String> BRANCH_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_BRANCH_END);
 

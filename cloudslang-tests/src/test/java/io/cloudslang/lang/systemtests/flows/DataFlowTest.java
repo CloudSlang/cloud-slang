@@ -8,31 +8,29 @@
 *
 *******************************************************************************/
 
-
 package io.cloudslang.lang.systemtests.flows;
 
 import com.google.common.collect.Sets;
-import org.apache.commons.lang3.StringUtils;
-import io.cloudslang.lang.entities.ScoreLangConstants;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.SystemsTestsParent;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.*;
-
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Date: 12/11/2014
  *
  * @author lesant
  */
-@Ignore // TODO - task args - update tests
 public class DataFlowTest extends SystemsTestsParent {
 
     @Test
@@ -101,7 +99,6 @@ public class DataFlowTest extends SystemsTestsParent {
                 13, final_output);
     }
 
-
     @Test
     public void testCompileFlowWithOutputBinding() throws Exception {
         URI flow = getClass().getResource("/yaml/system-flows/binding_flow_outputs.sl").toURI();
@@ -125,4 +122,5 @@ public class DataFlowTest extends SystemsTestsParent {
         Assert.assertEquals("weather2 not bound correctly", "New York", weather2Output);
         Assert.assertEquals("weather3 not bound correctly", "New York day", weather3Output);
     }
+
 }

@@ -13,22 +13,22 @@ package io.cloudslang.lang.systemtests.flows;
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.SystemsTestsParent;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Date: 12/4/2014
  *
  * @author Bonczidai Levente
  */
-@Ignore // TODO - task args - update tests
 public class NavigationTest extends SystemsTestsParent {
 
     @Test
