@@ -31,8 +31,7 @@ public class ArgumentsBinding {
 
     public Map<String, Serializable> bindArguments(
             List<Argument> arguments,
-            Map<String, ? extends Serializable> context
-    ) {
+            Map<String, ? extends Serializable> context) {
         Map<String, Serializable> resultContext = new HashMap<>();
 
         //we do not want to change original context map
@@ -48,8 +47,7 @@ public class ArgumentsBinding {
     private void bindArgument(
             Argument argument,
             Map<String, ? extends Serializable> srcContext,
-            Map<String, Serializable> targetContext
-    ) {
+            Map<String, Serializable> targetContext) {
         Serializable argumentValue;
         String argumentName = argument.getName();
 
@@ -58,7 +56,6 @@ public class ArgumentsBinding {
             Map<String, Serializable> scriptContext = new HashMap<>(srcContext);
 
             argumentValue = srcContext.get(argumentName);
-
             scriptContext.put(argumentName, argumentValue);
 
             if (StringUtils.isNotEmpty(argument.getExpression())) {

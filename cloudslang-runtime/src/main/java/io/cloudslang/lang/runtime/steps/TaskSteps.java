@@ -56,6 +56,7 @@ public class TaskSteps extends AbstractSteps {
     
     private static final Logger logger = Logger.getLogger(TaskSteps.class);
 
+    @SuppressWarnings("unused")
     public void beginTask(@Param(ScoreLangConstants.TASK_ARGUMENTS_KEY) List<Argument> taskArguments,
                           @Param(ScoreLangConstants.LOOP_KEY) LoopStatement loop,
                           @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
@@ -98,17 +99,26 @@ public class TaskSteps extends AbstractSteps {
 
             Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
 
-            // TODO - task args - fire event
-//            sendStartBindingInputsEvent(taskInputs, runEnv, executionRuntimeServices,
-//                    "Pre Input binding for task", LanguageEventData.StepType.TASK, nodeName);
+            sendStartBindingArgumentsEvent(
+                    taskArguments,
+                    runEnv,
+                    executionRuntimeServices,
+                    "Pre Input binding for task",
+                    nodeName
+            );
 
-            Map<String, Serializable> operationArguments = argumentsBinding.bindArguments(taskArguments, flowVariables);
+            Map<String, Serializable> boundArguments = argumentsBinding.bindArguments(taskArguments, flowVariables);
 
-            // TODO - task args - fire event
-//            sendEndBindingInputsEvent(taskInputs, operationArguments, runEnv, executionRuntimeServices, "Task inputs resolved",
-//                    LanguageEventData.StepType.TASK, nodeName);
+            sendEndBindingArgumentsEvent(
+                    taskArguments,
+                    boundArguments,
+                    runEnv,
+                    executionRuntimeServices,
+                    "Task arguments resolved",
+                    nodeName
+            );
 
-            updateCallArgumentsAndPushContextToStack(runEnv, flowContext, operationArguments);
+            updateCallArgumentsAndPushContextToStack(runEnv, flowContext, boundArguments);
 
             // request the score engine to switch to the execution plan of the given ref
             requestSwitchToRefExecutableExecutionPlan(runEnv, executionRuntimeServices, RUNNING_EXECUTION_PLAN_ID, refId, nextStepId);
@@ -125,6 +135,7 @@ public class TaskSteps extends AbstractSteps {
         return forLoopStatement != null;
     }
 
+    @SuppressWarnings("unused")
     public void endTask(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                         @Param(ScoreLangConstants.TASK_PUBLISH_KEY) List<Output> taskPublishValues,
                         @Param(ScoreLangConstants.TASK_NAVIGATION_KEY) Map<String, ResultNavigation> taskNavigationValues,
