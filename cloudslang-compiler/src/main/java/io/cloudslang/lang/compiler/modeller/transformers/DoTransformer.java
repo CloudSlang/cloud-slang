@@ -25,6 +25,9 @@ import java.util.*;
 @Component
 public class DoTransformer implements Transformer<Map<String, Object>, List<Argument>> {
 
+    // every comma that is not preceded by '\' (escaped)
+    private static final String REGEX_COMMA_NOT_ESCAPED = "(?<!\\\\)(,)";
+
     @Override
     public List<Argument> transform(Map<String, Object> rawData) {
         List<Argument> result = new ArrayList<>();
@@ -86,10 +89,7 @@ public class DoTransformer implements Transformer<Map<String, Object>, List<Argu
     private List<Argument> transformOneLinerArguments(String line) {
         List<Argument> arguments = new ArrayList<>();
 
-        List<String> rawArguments = Arrays.asList(
-                // every comma that is not preceded by '\' (escaped)
-                line.split("(?<!\\\\)(,)")
-        );
+        List<String> rawArguments = Arrays.asList(line.split(REGEX_COMMA_NOT_ESCAPED));
 
         for (String rawArgument : rawArguments) {
             // handle escaped comma characters
