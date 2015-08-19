@@ -56,7 +56,7 @@ import static org.mockito.Matchers.*;
 public class SlangImplTest {
 
     static final CompilationArtifact emptyCompilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>(), new ArrayList<Input>());
-    private static final int ALL_EVENTS_SIZE = 22;
+    private static final int ALL_EVENTS_SIZE = 21;
 
     @Autowired
     private Slang slang;
@@ -214,7 +214,7 @@ public class SlangImplTest {
     private class EventListener implements ScoreEventListener{
 
         @Override
-        public void onEvent(ScoreEvent event) throws InterruptedException {
+        public synchronized void onEvent(ScoreEvent event) throws InterruptedException {
 
         }
     }
