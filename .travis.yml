@@ -14,7 +14,7 @@ deploy:
     secure: XUEVH4recWuA+xxjmy+AXeUSEZINSSeDe5xOALAr7rH3DvYGMV2tC4vO33zmOfyevnn2FxiDJLQqewlc/x9cComjCsuBXys8eMXaoEaFB6UIayBx0iilNQ56ItYnbAXz580/oDvJEVPAzXyGuOLhkW7qvwbVq0fXNauAMRUKrYY=
   file:
     - build/target/cloudslang-cli/cslang-cli.zip
-    - build/target/cslang-cli.tar.gz
+    - build/target/cloudslang-cli/cslang-cli.tar.gz
     - build/target/cslang-builder/cslang-builder.zip
   skip_cleanup: true
   on:
