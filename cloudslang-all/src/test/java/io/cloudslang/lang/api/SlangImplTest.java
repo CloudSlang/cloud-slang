@@ -214,7 +214,7 @@ public class SlangImplTest {
     private class EventListener implements ScoreEventListener{
 
         @Override
-        public void onEvent(ScoreEvent event) throws InterruptedException {
+        public synchronized void onEvent(ScoreEvent event) throws InterruptedException {
 
         }
     }
