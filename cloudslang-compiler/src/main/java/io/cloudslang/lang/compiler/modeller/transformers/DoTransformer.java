@@ -16,16 +16,17 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.entities.bindings.Argument;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.*;
 
 @Component
-public class DoTransformer implements Transformer<Map<String, List>, List<Argument>> {
+public class DoTransformer implements Transformer<Map<String, Object>, List<Argument>> {
 
     @Override
-    public List<Argument> transform(Map<String, List> rawData) {
+    public List<Argument> transform(Map<String, Object> rawData) {
         List<Argument> result = new ArrayList<>();
         if (MapUtils.isEmpty(rawData)) {
             return result;
@@ -33,15 +34,20 @@ public class DoTransformer implements Transformer<Map<String, List>, List<Argume
             throw new RuntimeException("Task has to many keys under the 'do' keyword,\n" +
                     "May happen due to wrong indentation");
         }
-        // TODO - task args - support one liner syntax
-        Map.Entry<String, List> argumentsEntry = rawData.entrySet().iterator().next();
-        if (argumentsEntry.getValue() == null) {
-            return result;
+        Map.Entry<String, Object> argumentsEntry = rawData.entrySet().iterator().next();
+        Object rawArguments = argumentsEntry.getValue();
+        if (rawArguments instanceof List) {
+            // list syntax
+            List rawArgumentsList = (List) rawArguments;
+            for (Object rawArgument : rawArgumentsList) {
+                Argument argument = transformListArgument(rawArgument);
+                result.add(argument);
+            }
+        } else if (rawArguments instanceof String) {
+            // one liner syntax
+            result = transformOneLinerArguments((String) rawArguments);
         }
-        for (Object rawArgument : argumentsEntry.getValue()) {
-            Argument argument = transformArgument(rawArgument);
-            result.add(argument);
-        }
+
         return result;
     }
 
@@ -55,7 +61,7 @@ public class DoTransformer implements Transformer<Map<String, List>, List<Argume
         return null;
     }
 
-    private Argument transformArgument(Object rawArgument) {
+    private Argument transformListArgument(Object rawArgument) {
         // - some_arg
         // this is our default behaviour that if the user specifies only a key, the key is also the ref we look for
         if (rawArgument instanceof String) {
@@ -66,7 +72,7 @@ public class DoTransformer implements Transformer<Map<String, List>, List<Argume
             Map.Entry<String, Serializable> entry = ((Map<String, Serializable>) rawArgument).entrySet().iterator().next();
             Serializable entryValue = entry.getValue();
             if(entryValue == null){
-                throw new RuntimeException("Could not transform task argument : " +
+                throw new RuntimeException("Could not transform task argument: " +
                         rawArgument + ". Since it has a null value.\n" +
                         "Make sure a value is specified or that indentation is properly done."
                 );
@@ -74,7 +80,45 @@ public class DoTransformer implements Transformer<Map<String, List>, List<Argume
             // - some_input: some_expression
             return new Argument(entry.getKey(), entryValue.toString());
         }
-        throw new RuntimeException("Could not transform task argument : " + rawArgument);
+        throw new RuntimeException("Could not transform task argument: " + rawArgument);
+    }
+
+    private List<Argument> transformOneLinerArguments(String line) {
+        List<Argument> arguments = new ArrayList<>();
+
+        List<String> rawArguments = Arrays.asList(
+                // every comma that is not preceded by '\' (escaped)
+                line.split("(?<!\\\\)(,)")
+        );
+
+        for (String rawArgument : rawArguments) {
+            // handle escaped comma characters
+            rawArgument = rawArgument.replaceAll("\\\\,", ",");
+            arguments.add(transformOneLinerArgument(rawArgument));
+        }
+
+        return  arguments;
+    }
+
+    private Argument transformOneLinerArgument(String rawArgument) {
+        Argument argument;
+        if (rawArgument.contains("=")) {
+            // case: argument_name = expression
+            String argumentName = StringUtils.trim(rawArgument.substring(0, rawArgument.indexOf("=")));
+            if (StringUtils.isEmpty(argumentName)) {
+                throw new RuntimeException("Could not transform task argument: " +
+                        rawArgument + ". Since it has no argument name.\n" +
+                        "Correct formats are:\n\targument_name\n\targument_name = expression"
+                );
+            }
+
+            String argumentExpression = StringUtils.trim(rawArgument.substring(rawArgument.indexOf("=") + 1));
+            argument = new Argument(argumentName, argumentExpression);
+        } else {
+            // case: argument_name
+            argument = new Argument(StringUtils.trim(rawArgument), null);
+        }
+        return argument;
     }
 
 }

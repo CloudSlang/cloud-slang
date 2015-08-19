@@ -21,6 +21,7 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +90,7 @@ public class DoTransformerTest {
         exception.expectMessage("null");
 
         @SuppressWarnings("unchecked")
-        Map<String, List> doArgumentsMap = loadFirstTaskFromFile("/corrupted/flow_with_empty_argument_expression.yaml");
+        Map<String, Object> doArgumentsMap = loadFirstTaskFromFile("/corrupted/flow_with_empty_argument_expression.yaml");
 
         doTransformer.transform(doArgumentsMap);
     }
@@ -101,8 +102,109 @@ public class DoTransformerTest {
         exception.expectMessage("22");
 
         @SuppressWarnings("unchecked")
-        Map<String, List> doArgumentsMap = loadFirstTaskFromFile("/corrupted/flow_with_invalid_argument.yaml");
+        Map<String, Object> doArgumentsMap = loadFirstTaskFromFile("/corrupted/flow_with_invalid_argument.yaml");
 
+        doTransformer.transform(doArgumentsMap);
+    }
+
+    @Test
+    public void testOneLinerValid1() throws Exception {
+        Map doArgumentsMap = loadFirstTaskFromFile("/task-args-one-liner/flow_1.yaml");
+        @SuppressWarnings("unchecked") List<Argument> actualArguments = doTransformer.transform(doArgumentsMap);
+
+        Assert.assertFalse(actualArguments.isEmpty());
+        Assert.assertEquals(2, actualArguments.size());
+
+        List<Argument> expectedArguments = Arrays.asList(
+                new Argument("city", "city_name"),
+                new Argument("country", "str('Wonderland')")
+        );
+        Assert.assertEquals(expectedArguments, actualArguments);
+    }
+
+    @Test
+    public void testOneLinerValid2() throws Exception {
+        Map doArgumentsMap = loadFirstTaskFromFile("/task-args-one-liner/flow_2.yaml");
+        @SuppressWarnings("unchecked") List<Argument> actualArguments = doTransformer.transform(doArgumentsMap);
+
+        Assert.assertFalse(actualArguments.isEmpty());
+        Assert.assertEquals(2, actualArguments.size());
+
+        List<Argument> expectedArguments = Arrays.asList(
+                new Argument("city", "city_name"),
+                new Argument("country", "str('Wonderland')")
+        );
+        Assert.assertEquals(expectedArguments, actualArguments);
+    }
+
+    @Test
+    public void testOneLinerValid3() throws Exception {
+        Map doArgumentsMap = loadFirstTaskFromFile("/task-args-one-liner/flow_3.yaml");
+        @SuppressWarnings("unchecked") List<Argument> actualArguments = doTransformer.transform(doArgumentsMap);
+
+        Assert.assertFalse(actualArguments.isEmpty());
+        Assert.assertEquals(2, actualArguments.size());
+
+        List<Argument> expectedArguments = Arrays.asList(
+                new Argument("city", "city_name"),
+                new Argument("country", "str('Wonderland')")
+        );
+        Assert.assertEquals(expectedArguments, actualArguments);
+    }
+
+    @Test
+    public void testFlowExpressionContainsReservedCharacters() throws Exception {
+        Map doArgumentsMap = loadFirstTaskFromFile("/task-args-one-liner/flow_expression_contains_reserved_characters.yaml");
+        @SuppressWarnings("unchecked") List<Argument> actualArguments = doTransformer.transform(doArgumentsMap);
+
+        Assert.assertFalse(actualArguments.isEmpty());
+        Assert.assertEquals(2, actualArguments.size());
+
+        List<Argument> expectedArguments = Arrays.asList(
+                new Argument("city", "city_name if city_name != 'abc' else 'efg'"),
+                new Argument("country", "str('Wonderland')")
+        );
+        Assert.assertEquals(expectedArguments, actualArguments);
+    }
+
+    @Test
+    public void testFlowExpressionContainsComma() throws Exception {
+        Map doArgumentsMap = loadFirstTaskFromFile("/task-args-one-liner/flow_expression_contains_comma.yaml");
+        @SuppressWarnings("unchecked") List<Argument> actualArguments = doTransformer.transform(doArgumentsMap);
+
+        Assert.assertFalse(actualArguments.isEmpty());
+        Assert.assertEquals(2, actualArguments.size());
+
+        List<Argument> expectedArguments = Arrays.asList(
+                new Argument("city", "city_name"),
+                new Argument("country", "str('Wonderland,Land')")
+        );
+        Assert.assertEquals(expectedArguments, actualArguments);
+    }
+
+    @Test
+    public void testFlowNoExpression() throws Exception {
+        Map doArgumentsMap = loadFirstTaskFromFile("/task-args-one-liner/flow_no_expression.yaml");
+        @SuppressWarnings("unchecked") List<Argument> actualArguments = doTransformer.transform(doArgumentsMap);
+
+        Assert.assertFalse(actualArguments.isEmpty());
+        Assert.assertEquals(2, actualArguments.size());
+
+        List<Argument> expectedArguments = Arrays.asList(
+                new Argument("city", ""),
+                new Argument("country", "str('Wonderland')")
+        );
+        Assert.assertEquals(expectedArguments, actualArguments);
+    }
+
+    @Test
+    public void testFlowMissingArgumentName() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("= city_name");
+        exception.expectMessage("argument name");
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> doArgumentsMap = loadFirstTaskFromFile("/corrupted/task-args-one-liner/flow_missing_argument_name.yaml");
         doTransformer.transform(doArgumentsMap);
     }
 

@@ -51,6 +51,14 @@ public class SimpleFlowTest extends SystemsTestsParent {
 		compileAndRunSimpleFlow(inputs, SYS_PROPS);
     }
 
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void testSimpleFlowBasicOneLinerSyntax() throws Exception {
+        Map<String, Serializable> inputs = new HashMap<>();
+        inputs.put("input1", "-2");
+        inputs.put("time_zone_as_string", "+2");
+        compileAndRunSimpleFlowOneLinerSyntax(inputs, SYS_PROPS);
+    }
+
 	@Test(timeout = DEFAULT_TIMEOUT)
 	public void testSimpleFlowNavigation() throws Exception {
         Map<String, Serializable> inputs = new HashMap<>();
@@ -102,6 +110,17 @@ public class SimpleFlowTest extends SystemsTestsParent {
 		ScoreEvent event = trigger(compilationArtifact, inputs, systemProperties);
 		Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
 	}
+
+    private void compileAndRunSimpleFlowOneLinerSyntax(Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties) throws Exception {
+        URI flow = getClass().getResource("/yaml/simple_flow_one_liner.yaml").toURI();
+        URI operations1 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
+        URI operations2 = getClass().getResource("/yaml/comopute_daylight_time_zone.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
+        Assert.assertEquals("the system properties size is not as expected", 2, compilationArtifact.getSystemProperties().size());
+        ScoreEvent event = trigger(compilationArtifact, inputs, systemProperties);
+        Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
+    }
 
     @Test
     public void testFlowWithMissingNavigationFromOperationResult() throws Exception {
