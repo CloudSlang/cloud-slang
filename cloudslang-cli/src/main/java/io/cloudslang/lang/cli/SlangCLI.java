@@ -141,7 +141,7 @@ public class SlangCLI implements CommandMarker {
         slangHandlerTypes.add(ScoreLangConstants.EVENT_ACTION_START);
         slangHandlerTypes.add(ScoreLangConstants.EVENT_ACTION_END);
         slangHandlerTypes.add(ScoreLangConstants.EVENT_ACTION_ERROR);
-        handlerTypes.add(ScoreLangConstants.EVENT_TASK_START);
+        slangHandlerTypes.add(ScoreLangConstants.EVENT_TASK_START);
         slangHandlerTypes.add(ScoreLangConstants.EVENT_INPUT_START);
         slangHandlerTypes.add(ScoreLangConstants.EVENT_INPUT_END);
         slangHandlerTypes.add(ScoreLangConstants.EVENT_OUTPUT_START);
