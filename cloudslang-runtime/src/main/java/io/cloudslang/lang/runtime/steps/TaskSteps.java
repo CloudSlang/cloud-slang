@@ -66,8 +66,9 @@ public class TaskSteps extends AbstractSteps {
                           @Param(ScoreLangConstants.REF_ID) String refId) {
         try {
 
-            fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_TASK_START, "something",
-                    LanguageEventData.StepType.TASK, nodeName);
+            fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_TASK_START,
+                    "Task step started", LanguageEventData.StepType.TASK, nodeName);
+
             runEnv.removeCallArguments();
             runEnv.removeReturnValues();
 
