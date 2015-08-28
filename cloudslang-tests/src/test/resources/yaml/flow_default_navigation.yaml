@@ -27,7 +27,7 @@ flow:
     - check_weather: # default navigation: go to this step on success
         do:
           ops.check_weather:
-            - city: "'AwesomeCity'"
+            - city: 'AwesomeCity'
         navigate:
           SUCCESS: SUCCESS # end flow with success result
 
@@ -39,8 +39,8 @@ flow:
                 - port: emailPort
                 - sender: emailSender
                 - recipient: emailRecipient
-                - subject: "'Flow failure'"
-                - body: "'Default failure navigation here'"
+                - subject: 'Flow failure'
+                - body: 'Default failure navigation here'
             navigate:
               SUCCESS: FAILURE # end flow with failure result
               FAILURE: FAILURE

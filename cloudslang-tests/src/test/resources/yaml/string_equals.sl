@@ -24,6 +24,8 @@ operation:
     - second_string
   action:
     python_script: |
+      print '*' + first_string + '*'
+      print '*' + second_string + '*'
       res = False
       if first_string == second_string:
         res = True
