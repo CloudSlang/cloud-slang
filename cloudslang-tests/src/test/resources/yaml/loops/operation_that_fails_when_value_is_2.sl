@@ -9,7 +9,7 @@ namespace: loops
 
 operation:
   name: operation_that_fails_when_value_is_2
-  inputs: ['text']
+  inputs: [text]
   action:
     python_script: print text
   results:
