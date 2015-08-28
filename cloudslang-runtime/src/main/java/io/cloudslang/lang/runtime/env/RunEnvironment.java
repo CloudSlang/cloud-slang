@@ -11,6 +11,7 @@
 package io.cloudslang.lang.runtime.env;
 
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
+import org.apache.commons.lang.SerializationUtils;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -107,4 +108,10 @@ public class RunEnvironment implements Serializable{
     public Map<String, SerializableSessionObject> getSerializableDataMap() {
         return serializableDataMap;
     }
+
+    public void resetStacks() {
+        contextStack = new ContextStack();
+        parentFlowStack = new ParentFlowStack();
+    }
+
 }

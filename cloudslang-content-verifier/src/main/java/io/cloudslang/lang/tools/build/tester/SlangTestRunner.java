@@ -76,8 +76,9 @@ public class SlangTestRunner {
                     "file path \'" + testCaseFile.getAbsolutePath() + "\' must lead to a file");
 
             Map<String, SlangTestCase> testCasesFromCurrentFile = parser.parseTestCases(SlangSource.fromFile(testCaseFile));
-            for (String currentTestCaseName : testCasesFromCurrentFile.keySet()) {
-                SlangTestCase currentTestCase = testCasesFromCurrentFile.get(currentTestCaseName);
+            for (Map.Entry<String, SlangTestCase> currentTestCaseEntry : testCasesFromCurrentFile.entrySet()) {
+                SlangTestCase currentTestCase = currentTestCaseEntry.getValue();
+                String currentTestCaseName = currentTestCaseEntry.getKey();
                 //todo: temporary solution
                 currentTestCase.setName(currentTestCaseName);
                 if(StringUtils.isBlank(currentTestCase.getResult())){
@@ -86,8 +87,13 @@ public class SlangTestRunner {
                 if(currentTestCase.getThrowsException() == null){
                     currentTestCase.setThrowsException(false);
                 }
+                // Make sure the new test cases names are unique
+                if (testCases.containsKey(currentTestCaseName)){
+                    throw new RuntimeException("Test case with the name: " + currentTestCaseName + " already exists. Test case name should be unique across the project"
+                    );
+                }
+                testCases.put(currentTestCaseName, currentTestCase);
             }
-            testCases.putAll(testCasesFromCurrentFile);
         }
         return testCases;
     }

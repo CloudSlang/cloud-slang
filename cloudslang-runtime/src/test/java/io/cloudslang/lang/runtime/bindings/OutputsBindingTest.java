@@ -14,6 +14,7 @@ import io.cloudslang.lang.entities.bindings.Output;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.python.google.common.collect.Lists;
 import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -24,11 +25,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Date: 11/7/2014
@@ -117,6 +114,24 @@ public class OutputsBindingTest {
         expectedOutputs.put("hostFromExpression", "http://hostExpr:9999");
 
         Assert.assertEquals("Binding results are not as expected", expectedOutputs, result);
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void testOutputsRetainOrder() {
+        Map<String, Serializable> operationContext = prepareOperationContext();
+        Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
+        List<Output> outputs = Lists.newArrayList(
+                createExpressionOutput("output1", "1"),
+                createExpressionOutput("output2", "2"),
+                createExpressionOutput("output3", "3")
+        );
+
+        Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
+
+        List<String> actualInputNames = Lists.newArrayList(result.keySet());
+        List<String> expectedInputNames = Lists.newArrayList("output1", "output2", "output3");
+
+        Assert.assertEquals("Binding results are not as expected", expectedInputNames, actualInputNames);
     }
 
     @Test(expected = RuntimeException.class)

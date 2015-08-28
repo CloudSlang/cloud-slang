@@ -25,9 +25,13 @@ import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import org.python.core.Py;
 import org.python.core.PyBoolean;
 import org.python.core.PyException;
+import org.python.core.PyFile;
+import org.python.core.PyFunction;
 import org.python.core.PyModule;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
+import org.python.core.PySystemState;
+import org.python.core.PyType;
 import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,6 +40,7 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -258,7 +263,7 @@ public class ActionSteps extends AbstractSteps {
         while (localsIterator.hasNext()) {
             String key = localsIterator.next().asString();
             PyObject value = interpreter.get(key);
-            if ((key.startsWith("__") && key.endsWith("__")) || value instanceof PyModule) {
+            if (keyIsExcluded(key, value)) {
                 continue;
             }
             Serializable javaValue = resolveJythonObjectToJava(value);
@@ -266,6 +271,14 @@ public class ActionSteps extends AbstractSteps {
         }
         cleanInterpreter(interpreter);
         return returnValue;
+    }
+
+    private boolean keyIsExcluded(String key, PyObject value) {
+        return (key.startsWith("__") && key.endsWith("__")) ||
+                value instanceof PyFile ||
+                value instanceof PyModule ||
+                value instanceof PyFunction ||
+                value instanceof PySystemState;
     }
 
     private Serializable resolveJythonObjectToJava(PyObject value) {

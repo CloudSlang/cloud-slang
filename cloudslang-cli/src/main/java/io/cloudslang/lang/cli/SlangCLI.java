@@ -8,6 +8,7 @@
  */
 package io.cloudslang.lang.cli;
 
+import io.cloudslang.lang.runtime.events.LanguageEventData;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
@@ -136,35 +137,54 @@ public class SlangCLI implements CommandMarker {
 
     @PostConstruct
     private void registerEventHandlers() {
-        Set<String> handlerTypes = new HashSet<>();
-        handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
-        handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
-        handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
-        handlerTypes.add(ScoreLangConstants.EVENT_ACTION_START);
-        handlerTypes.add(ScoreLangConstants.EVENT_ACTION_END);
-        handlerTypes.add(ScoreLangConstants.EVENT_ACTION_ERROR);
-        handlerTypes.add(ScoreLangConstants.EVENT_INPUT_START);
-        handlerTypes.add(ScoreLangConstants.EVENT_INPUT_END);
-        handlerTypes.add(ScoreLangConstants.EVENT_OUTPUT_START);
-        handlerTypes.add(ScoreLangConstants.EVENT_OUTPUT_END);
-        handlerTypes.add(ScoreLangConstants.EVENT_BRANCH_START);
-        handlerTypes.add(ScoreLangConstants.EVENT_BRANCH_END);
-        handlerTypes.add(ScoreLangConstants.EVENT_ASYNC_LOOP_EXPRESSION_START);
-        handlerTypes.add(ScoreLangConstants.EVENT_ASYNC_LOOP_EXPRESSION_END);
-        handlerTypes.add(ScoreLangConstants.EVENT_ASYNC_LOOP_OUTPUT_START);
-        handlerTypes.add(ScoreLangConstants.EVENT_ASYNC_LOOP_OUTPUT_END);
-        handlerTypes.add(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION);
-        handlerTypes.add(ScoreLangConstants.EVENT_EXECUTION_FINISHED);
+        Set<String> slangHandlerTypes = new HashSet<>();
+        slangHandlerTypes.add(ScoreLangConstants.EVENT_ACTION_START);
+        slangHandlerTypes.add(ScoreLangConstants.EVENT_ACTION_END);
+        slangHandlerTypes.add(ScoreLangConstants.EVENT_ACTION_ERROR);
+        slangHandlerTypes.add(ScoreLangConstants.EVENT_TASK_START);
+        slangHandlerTypes.add(ScoreLangConstants.EVENT_INPUT_START);
+        slangHandlerTypes.add(ScoreLangConstants.EVENT_INPUT_END);
+        slangHandlerTypes.add(ScoreLangConstants.EVENT_OUTPUT_START);
+        slangHandlerTypes.add(ScoreLangConstants.EVENT_OUTPUT_END);
+        slangHandlerTypes.add(ScoreLangConstants.EVENT_BRANCH_START);
+        slangHandlerTypes.add(ScoreLangConstants.EVENT_BRANCH_END);
+        slangHandlerTypes.add(ScoreLangConstants.EVENT_SPLIT_BRANCHES);
+        slangHandlerTypes.add(ScoreLangConstants.EVENT_JOIN_BRANCHES_START);
+        slangHandlerTypes.add(ScoreLangConstants.EVENT_JOIN_BRANCHES_END);
+        slangHandlerTypes.add(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION);
+        slangHandlerTypes.add(ScoreLangConstants.EVENT_EXECUTION_FINISHED);
+
+        Set<String> scoreHandlerTypes = new HashSet<>();
+        scoreHandlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
+        scoreHandlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
+        scoreHandlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
+
         scoreServices.subscribe(new ScoreEventListener() {
             @Override
             public void onEvent(ScoreEvent event) {
-                logEvent(event);
+                logSlangEvent(event);
             }
-        }, handlerTypes);
+        }, slangHandlerTypes);
+        scoreServices.subscribe(new ScoreEventListener() {
+            @Override
+            public void onEvent(ScoreEvent event) {
+                logScoreEvent(event);
+            }
+        }, scoreHandlerTypes);
     }
 
-    private void logEvent(ScoreEvent event) {
-        logger.info(("Event received: " + event.getEventType() + " Data is: " + event.getData()));
+    private void logSlangEvent(ScoreEvent event) {
+        LanguageEventData eventData = (LanguageEventData) event.getData();
+        logger.info(("[ " + eventData.getPath() + " - " + eventData.getStepName() +  " ] "
+                + event.getEventType() + " - Inputs: " + eventData.getInputs()
+                + ", Outputs: " + eventData.getOutputs()
+                + ", Result: " + eventData.getResult()
+                + ", Raw Data: " + event.getData()
+         ));
+    }
+
+    private void logScoreEvent(ScoreEvent event) {
+        logger.info((event.getEventType() + " - " + event.getData()));
     }
 
 }

@@ -32,7 +32,11 @@ public abstract class AbstractInputsTransformer {
             return new Input(inputName, null);
         } else if (rawInput instanceof Map) {
             Map.Entry<String, ?> entry = ((Map<String, ?>) rawInput).entrySet().iterator().next();
-            if (entry.getValue() instanceof Map) {
+            Object entryValue = entry.getValue();
+            if(entryValue == null){
+                throw new RuntimeException("Could not transform Input : " + rawInput + " Since it has a null value.\n\nMake sure a value is specified or that indentation is properly done.");
+            }
+            if (entryValue instanceof Map) {
                 // - some_inputs:
                 // property1: value1
                 // property2: value2
@@ -41,7 +45,8 @@ public abstract class AbstractInputsTransformer {
             }
             // - some_input: some_expression
             // the value of the input is an expression we need to evaluate at runtime
-            return new Input(entry.getKey(), entry.getValue().toString());
+            return new Input(entry.getKey(), entryValue
+                                                  .toString());
         }
         throw new RuntimeException("Could not transform Input : " + rawInput);
     }

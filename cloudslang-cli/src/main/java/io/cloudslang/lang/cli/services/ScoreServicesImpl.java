@@ -69,10 +69,10 @@ public class ScoreServicesImpl implements ScoreServices{
             handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
             handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
             handlerTypes.add(EVENT_EXECUTION_FINISHED);
-            handlerTypes.add(EVENT_INPUT_END);
+            handlerTypes.add(EVENT_TASK_START);
             handlerTypes.add(EVENT_OUTPUT_END);
         }
-        
+
         SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener();
         slang.subscribeOnEvents(scoreEventListener, handlerTypes);
 
@@ -87,6 +87,10 @@ public class ScoreServicesImpl implements ScoreServices{
 
         String errorMessageFlowExecution = scoreEventListener.getErrorMessage();
         if (StringUtils.isNotEmpty(errorMessageFlowExecution)) {
+
+            if (errorMessageFlowExecution.contains("supplied using a system property")) {
+                errorMessageFlowExecution += "\n\nA system property file can be included using --spf <path_to_file>";
+            }
             // exception occurred during flow execution
             throw new RuntimeException(errorMessageFlowExecution);
         }

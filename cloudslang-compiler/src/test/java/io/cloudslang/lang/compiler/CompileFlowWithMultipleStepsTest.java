@@ -15,12 +15,14 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import io.cloudslang.score.api.ExecutionPlan;
+import org.mockito.internal.util.collections.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URI;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /*
@@ -51,6 +53,25 @@ public class CompileFlowWithMultipleStepsTest {
         Assert.assertEquals("there is a different number of steps than expected", 10, executionPlan.getSteps().size());
         Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());
         Assert.assertEquals("the dependencies size is not as expected", 3, compilationArtifact.getDependencies().size());
+    }
+
+    @Test
+    public void testImplicitAliasForCurrentNamespace() throws Exception {
+        URI flow = getClass().getResource("/flow_implicit_alias_for_current_namespace.sl").toURI();
+        URI operation1 = getClass().getResource("/test_op.sl").toURI();
+        URI operation2 = getClass().getResource("/check_op.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation1));
+        path.add(SlangSource.fromFile(operation2));
+
+        CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
+
+        Map<String, ExecutionPlan> dependencies= compilationArtifact.getDependencies();
+        Assert.assertNotNull("dependencies reference is null", dependencies);
+        Set<String> actualDependencies = dependencies.keySet();
+        Set<String> expectedDependencies = Sets.newSet("user.ops.test_op", "io.cloudslang.check_op");
+        junit.framework.Assert.assertEquals("dependencies are not resolved as expected", expectedDependencies, actualDependencies);
     }
 
     @Test

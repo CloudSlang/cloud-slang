@@ -1,7 +1,5 @@
 package io.cloudslang.lang.tools.build.tester;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
@@ -10,6 +8,7 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import io.cloudslang.score.api.ExecutionPlan;
+import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
 import junit.framework.Assert;
@@ -118,6 +117,20 @@ public class SlangTestRunnerTest {
         when(parser.parseTestCases(Mockito.any(SlangSource.class))).thenReturn(testCases);
         Map<String, SlangTestCase> foundTestCases = slangTestRunner.createTestCases(resource.getPath());
         Assert.assertEquals("1 test case was supposed to be created", 1, foundTestCases.size());
+    }
+
+    @Test
+    public void createTestCaseWithDuplicateName() throws Exception {
+        URI resource = getClass().getResource("/test/duplicate").toURI();
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        testCases.put("Test1", new SlangTestCase("Test1", "path", "desc", null, null, null, null, null, null));
+        testCases.put("Test2", new SlangTestCase("Test1", "path2", "desc2", null, null, null, null, null, null));
+        when(parser.parseTestCases(Mockito.any(SlangSource.class))).thenReturn(testCases);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("name");
+        exception.expectMessage("Test1");
+        exception.expectMessage("exists");
+        slangTestRunner.createTestCases(resource.getPath());
     }
 
     @Test
@@ -449,7 +462,9 @@ public class SlangTestRunnerTest {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
                 ScoreEventListener listener = (ScoreEventListener) invocationOnMock.getArguments()[0];
-                listener.onEvent(new ScoreEvent(ScoreLangConstants.EVENT_EXECUTION_FINISHED, ImmutableMap.of(LanguageEventData.RESULT, "SUCCESS")));
+                LanguageEventData data = new LanguageEventData();
+                data.setResult("SUCCESS");
+                listener.onEvent(new ScoreEvent(ScoreLangConstants.EVENT_EXECUTION_FINISHED, data));
                 return listener;
             }
         }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
@@ -460,9 +475,13 @@ public class SlangTestRunnerTest {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
                 ScoreEventListener listener = (ScoreEventListener) invocationOnMock.getArguments()[0];
-                ImmutableMap data = ImmutableMap.of(LanguageEventData.OUTPUTS, outputs, LanguageEventData.PATH, "0");
+                LanguageEventData data = new LanguageEventData();
+                data.setOutputs(outputs);
+                data.setPath("0");
                 listener.onEvent(new ScoreEvent(ScoreLangConstants.EVENT_OUTPUT_END, data));
-                listener.onEvent(new ScoreEvent(ScoreLangConstants.EVENT_EXECUTION_FINISHED, ImmutableMap.of(LanguageEventData.RESULT, "SUCCESS")));
+                data = new LanguageEventData();
+                data.setResult("SUCCESS");
+                listener.onEvent(new ScoreEvent(ScoreLangConstants.EVENT_EXECUTION_FINISHED, data));
                 return listener;
             }
         }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
@@ -473,7 +492,9 @@ public class SlangTestRunnerTest {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
                 ScoreEventListener listener = (ScoreEventListener) invocationOnMock.getArguments()[0];
-                listener.onEvent(new ScoreEvent(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION, ImmutableMap.of(LanguageEventData.EXCEPTION, "Error")));
+                LanguageEventData data = new LanguageEventData();
+                data.setException("Error");
+                listener.onEvent(new ScoreEvent(EventConstants.SCORE_ERROR_EVENT, data));
                 return listener;
             }
         }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));

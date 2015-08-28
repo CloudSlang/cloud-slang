@@ -21,6 +21,7 @@ import io.cloudslang.score.events.ScoreEvent;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -136,5 +137,28 @@ public class SimpleFlowTest extends SystemsTestsParent {
         exception.expectMessage("navigation");
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
         trigger(compilationArtifact, new HashMap<String, Serializable>(), null);
+    }
+
+    @Test
+    public void testFlowWithSameInputNameAsTask() throws Exception {
+        URI resource = getClass().getResource("/yaml/flow_with_same_input_name_as_task.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/string_equals.sl").toURI();
+        URI operation2 = getClass().getResource("/yaml/test_op.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Map<String, Serializable> userInputs = new HashMap<>();
+        userInputs.put("first", "value");
+        userInputs.put("second_string", "value");
+
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+
+        List<String> actualTasks = getTasksOnly(stepsData);
+        Assert.assertEquals(2, actualTasks.size());
+        StepData firstTask = stepsData.get(FIRST_STEP_PATH);
+        StepData secondTask = stepsData.get(SECOND_STEP_KEY);
+        Assert.assertEquals("CheckBinding", firstTask.getName());
+        Assert.assertEquals("TaskOnSuccess", secondTask.getName());
     }
 }

@@ -144,6 +144,24 @@ public class CompilerHelperTest {
         Assert.assertEquals(expected, result);
     }
 
+    @Test
+    public void testLoadInputsFromCommentedFile() throws Exception {
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("Inputs / System properties file");
+
+        URI inputsFromFile = getClass().getResource("/inputs/commented_inputs.yaml").toURI();
+        compilerHelper.loadInputsFromFile(Arrays.asList(inputsFromFile.getPath()));
+    }
+    @Test
+    public void testLoadInputsFromEmptyFile() throws Exception {
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("Inputs / System properties file");
+
+        URI inputsFromFile = getClass().getResource("/inputs/empty_inputs.yaml").toURI();
+        compilerHelper.loadInputsFromFile(Arrays.asList(inputsFromFile.getPath()));
+
+    }
+
     @Ignore("Awaiting CloudSlang/cloud-slang#302 decision")
     @Test
     public void testLoadInputsFromFileImplicit() throws Exception {

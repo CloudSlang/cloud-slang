@@ -39,15 +39,15 @@ public class OutputsBinding {
                                            List<Output> possibleOutputs) {
 
         Map<String, Serializable> outputs = new LinkedHashMap<>();
+        //construct script context
+        Map<String, Serializable> scriptContext = new HashMap<>();
+        //put action outputs
+        scriptContext.putAll(actionReturnValues);
         if (possibleOutputs != null) {
             for (Output output : possibleOutputs) {
                 String outputKey = output.getName();
                 String outputExpr = output.getExpression();
                 if (outputExpr != null) {
-                    //construct script context
-                    Map<String, Serializable> scriptContext = new HashMap<>();
-                    //put action outputs
-                    scriptContext.putAll(actionReturnValues);
                     //declare the new output
                     if (!actionReturnValues.containsKey(outputKey)) {
                         scriptContext.put(outputKey, null);
@@ -59,14 +59,15 @@ public class OutputsBinding {
 
                     Serializable scriptResult;
                     try {
+                        //evaluate expression
                         scriptResult = scriptEvaluator.evalExpr(outputExpr, scriptContext);
                     } catch (Throwable t) {
                         throw new RuntimeException("Error binding output: '" + output.getName() + "',\n\tError is: " + t.getMessage(), t);
                     }
-                    //evaluate expression
 
                     try {
                         outputs.put(outputKey, scriptResult);
+                        scriptContext.put(outputKey, scriptResult);
                     } catch (ClassCastException ex) {
                         throw new RuntimeException("The output expression " + outputExpr + " does not return serializable value", ex);
                     }

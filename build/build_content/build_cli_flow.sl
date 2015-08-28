@@ -9,7 +9,11 @@
 # Builds the cloudslang-cli.
 #
 # Inputs:
+#   - include_content - shoud include the content or not - Default: false
 #   - target_dir - directory to create artifacts in - Default: target
+#   - target_cli - where to put the CLI - Default: target_dir + "/cloudslang-cli/cslang"
+#   - cloudslang_content_repo - content repo to include = Default: https://github.com/CloudSlang/cloud-slang-content.git
+#   - content_branch - content branch to clone
 # Results:
 #   - SUCCESS
 #   - FAILURE
@@ -33,6 +37,9 @@ flow:
     - cloudslang_content_repo:
         default: "'https://github.com/CloudSlang/cloud-slang-content.git'"
         overridable: false
+    - content_branch:
+        required: false
+        
   name: build_cli_flow
 
   workflow:
@@ -54,62 +61,30 @@ flow:
             - expression: include_content
         navigate:
           IS: get_cloudslang_content
-          IS_NOT: get_os_to_chmod
+          IS_NOT: copy_changelog_to_cloudslang_cli
+
+
+    # adding content
+
 
     - get_cloudslang_content:
         do:
-          build_content.get_cloudslang_content:
+          build_content.add_cloudslang_content:
             - url: cloudslang_content_repo
-            - target_dir:
-                default:  target_dir + "/cloudslang_content"
-                overridable: false
+            - content_dir: target_dir + "/cloudslang_content"
+            - target_dir
+            - target_cli
+            - content_branch
 
-    - get_os_to_verify:
-        do:
-          os.get_os:
-        navigate:
-          LINUX: run_verifier_linux
-          WINDOWS: run_verifier_windows
 
-    - run_verifier_linux:
-        do:
-          cmd.run_command:
-            - command: >
-                "bash " +
-                target_dir + "/cslang-builder/bin/cslang-builder " +
-                target_dir + "/cloudslang_content"
-        navigate:
-          SUCCESS: copy_content_to_cloudslang_cli
-          FAILURE: FAILURE
+    #    end adding content
 
-    - run_verifier_windows:
-        do:
-          cmd.run_command:
-            - command: >
-                target_dir + "\\cslang-builder\\bin\\cslang-builder.bat " +
-                target_dir + "/cloudslang_content"
 
-    - copy_content_to_cloudslang_cli:
+    - copy_changelog_to_cloudslang_cli:
         do:
           files.copy:
-            - source: target_dir + '/cloudslang_content/content'
-            - destination: target_cli + "/content"
-
-    - copy_python_lib_to_cloudslang_cli:
-        do:
-          files.copy:
-            - source: target_dir + '/cloudslang_content/python-lib'
-            - destination: target_cli + '/python-lib'
-
-
-#    - precompile_jython_standalone
-
-    - pip_install:
-        do:
-          cmd.run_command:
-            - command: >
-                "pip install -t " + target_cli + "/python-lib " +
-                "-r " + target_cli + "/python-lib/requirements.txt --compile"
+            - source: "'../CHANGELOG.md'"
+            - destination: target_cli + '/CHANGELOG.md'
 
     - get_os_to_chmod:
         do:
@@ -144,11 +119,16 @@ flow:
             - folder_path: target_dir + "/cloudslang-cli"
             - output_folder: target_dir
 
+    - create_cli_tar_gz:
+            do:
+              cmd.run_command:
+                - command: >
+                    "(cd " + target_dir + "/cloudslang-cli && tar -cvzf cslang-cli.tar.gz cslang)"
 
     - create_builder_zip:
         do:
           files.zip_folder:
             - archive_name: "'cslang-builder'"
             - folder_path: 'target_dir + "/cslang-builder"'
+            - output_folder: target_dir
 
-#    - create_tar_gz

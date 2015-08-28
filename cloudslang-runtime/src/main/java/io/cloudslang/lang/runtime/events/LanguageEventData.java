@@ -31,6 +31,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     public static final String OUTPUTS = "OUTPUTS";
     public static final String RESULT = "RESULT";
     public static final String CALL_ARGUMENTS = "CALL_ARGUMENTS";
+    public static final String INPUTS = "INPUTS";
     public static final String BOUND_INPUTS = "BOUND_INPUTS";
     public static final String BOUND_ASYNC_LOOP_EXPRESSION = "BOUND_ASYNC_LOOP_EXPRESSION";
     public static final String RETURN_VALUES = "RETURN_VALUES";
@@ -102,12 +103,20 @@ public class LanguageEventData extends HashMap<String, Serializable> {
         put(PATH, path);
     }
 
-    public Exception getException() {
-        return (Exception) get(EXCEPTION);
+    public String getResult() {
+        return (String) get(RESULT);
     }
 
-    public void setException(Exception ex) {
-        put(EXCEPTION, ex);
+    public void setResult(String result) {
+        put(RESULT, result);
+    }
+
+    public String getException() {
+        return (String) get(EXCEPTION);
+    }
+
+    public void setException(String exceptionMessage) {
+        put(EXCEPTION, exceptionMessage);
     }
 
     public Map<String, Serializable> getInputs() {

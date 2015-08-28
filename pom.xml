@@ -10,7 +10,7 @@
     -->
     <groupId>io.cloudslang.lang</groupId>
     <artifactId>cloudslang</artifactId>
-    <version>0.7.42-SNAPSHOT</version>
+    <version>0.8.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A DSL for writing flows</description>
@@ -33,7 +33,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <score.group>io.cloudslang</score.group>
-        <score.version>0.1.280</score.version>
+        <score.version>0.1.286</score.version>
         <spring.version>4.1.4.RELEASE</spring.version>
     </properties>
 
@@ -161,17 +161,17 @@
             <dependency>
                 <groupId>io.cloudslang.content</groupId>
                 <artifactId>score-ssh</artifactId>
-                <version>0.0.23</version>
+                <version>0.0.25</version>
             </dependency>
             <dependency>
                 <groupId>io.cloudslang.content</groupId>
                 <artifactId>score-mail</artifactId>
-                <version>0.0.13</version>
+                <version>0.0.25</version>
             </dependency>
             <dependency>
                 <groupId>io.cloudslang.content</groupId>
                 <artifactId>score-http-client</artifactId>
-                <version>0.1.59</version>
+                <version>0.1.63</version>
             </dependency>
             <!--end of score content dependencies-->
 
@@ -227,7 +227,7 @@
             <dependency>
                 <groupId>org.python</groupId>
                 <artifactId>jython-standalone</artifactId>
-                <version>2.7-rc3</version>
+                <version>2.7.0</version>
                 <scope>compile</scope>
             </dependency>
 

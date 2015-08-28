@@ -102,14 +102,26 @@ public class LanguageEventDataTest {
 	}
 
 	/**
+	 * Test method for {@link LanguageEventData#getResult()}.
+	 */
+	@Test
+	public void testResult() {
+        String message = "Good";
+		eventData.setResult(message);
+		assertEquals(message, eventData.getResult());
+		assertEquals(message, eventData.get(LanguageEventData.RESULT));
+	}
+
+	/**
 	 * Test method for {@link LanguageEventData#getException()}.
 	 */
 	@Test
 	public void testException() {
-		Exception ex = new Exception("My exception");
-		eventData.setException(ex);
-		assertEquals(ex, eventData.getException());
-		assertEquals(ex, eventData.get(LanguageEventData.EXCEPTION));
+        String message = "My exception";
+        Exception ex = new Exception(message);
+		eventData.setException(ex.getMessage());
+		assertEquals(message, eventData.getException());
+		assertEquals(message, eventData.get(LanguageEventData.EXCEPTION));
 	}
 
 	/**

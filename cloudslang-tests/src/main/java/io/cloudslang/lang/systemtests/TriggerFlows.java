@@ -35,7 +35,7 @@ public class TriggerFlows {
 
     private final static HashSet<String> BRANCH_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_BRANCH_END);
 
-    private final static HashSet<String> ASYNC_LOOP_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_ASYNC_LOOP_OUTPUT_END);
+    private final static HashSet<String> ASYNC_LOOP_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_JOIN_BRANCHES_END);
 
     @Autowired
     private Slang slang;
@@ -47,7 +47,7 @@ public class TriggerFlows {
         final BlockingQueue<ScoreEvent> finishEvent = new LinkedBlockingQueue<>();
         ScoreEventListener finishListener = new ScoreEventListener() {
             @Override
-            public void onEvent(ScoreEvent event) throws InterruptedException {
+            public synchronized void onEvent(ScoreEvent event) throws InterruptedException {
                 finishEvent.add(event);
             }
         };
@@ -59,7 +59,7 @@ public class TriggerFlows {
             ScoreEvent event = finishEvent.take();
             if (event.getEventType().equals(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION)){
                 LanguageEventData languageEvent = (LanguageEventData) event.getData();
-                throw new RuntimeException((String) languageEvent.get(LanguageEventData.EXCEPTION));
+                throw new RuntimeException(languageEvent.getException());
             }
             slang.unSubscribeOnEvents(finishListener);
             return event;

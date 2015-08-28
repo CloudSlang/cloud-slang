@@ -65,23 +65,30 @@ public class InputsBinding {
         }
 
         if (input.isRequired() && value == null) {
-            throw new RuntimeException("Input with name: \'" + inputName + "\' is Required, but value is empty");
+            String errorMessage = "Input with name: \'" + inputName + "\' is Required, but value is empty";
+            if (input.getSystemPropertyName() != null){
+                errorMessage += "\nThis value can also be supplied using a system property";
+            }
+            throw new RuntimeException(errorMessage);
         }
 
         targetContext.put(inputName, value);
     }
 
-    private Serializable resolveValue(Input input, Map<String, ? extends Serializable> context,
-                                      Map<String, ? extends Serializable> targetContext,
-                                      Map<String, ? extends Serializable> systemProperties) {
+    private Serializable resolveValue(
+            Input input,
+            Map<String, ? extends Serializable> context,
+            Map<String, ? extends Serializable> targetContext,
+            Map<String, ? extends Serializable> systemProperties) {
         Serializable value = null;
 
         //we do not want to change original context map
         Map<String, Serializable> scriptContext = new HashMap<>(context);
 
         String inputName = input.getName();
+        Serializable valueFromContext = context.get(inputName);
         if (input.isOverridable()) {
-            value = context.get(inputName);
+            value = valueFromContext;
         }
 
         if (value == null) {
@@ -92,7 +99,7 @@ public class InputsBinding {
         }
 
         if (value == null) {
-            scriptContext.put(inputName, null);
+            scriptContext.put(inputName, valueFromContext);
             if (StringUtils.isNotEmpty(input.getExpression())) {
                 //so you can resolve previous inputs already bound
                 scriptContext.putAll(targetContext);

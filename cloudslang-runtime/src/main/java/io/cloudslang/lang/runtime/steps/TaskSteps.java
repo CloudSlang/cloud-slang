@@ -65,6 +65,10 @@ public class TaskSteps extends AbstractSteps {
                           @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
                           @Param(ScoreLangConstants.REF_ID) String refId) {
         try {
+
+            fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_TASK_START,
+                    "Task step started", LanguageEventData.StepType.TASK, nodeName);
+
             runEnv.removeCallArguments();
             runEnv.removeReturnValues();
 
@@ -97,11 +101,15 @@ public class TaskSteps extends AbstractSteps {
             }
 
             Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
+
+            sendStartBindingInputsEvent(taskInputs, runEnv, executionRuntimeServices,
+                    "Pre Input binding for task", LanguageEventData.StepType.TASK, nodeName);
+
             Map<String, Serializable> operationArguments = inputsBinding.bindInputs(taskInputs, flowVariables, runEnv.getSystemProperties());
 
             //todo: hook
 
-            sendBindingInputsEvent(taskInputs, operationArguments, runEnv, executionRuntimeServices, "Task inputs resolved",
+            sendEndBindingInputsEvent(taskInputs, operationArguments, runEnv, executionRuntimeServices, "Task inputs resolved",
                     LanguageEventData.StepType.TASK, nodeName);
 
             updateCallArgumentsAndPushContextToStack(runEnv, flowContext, operationArguments);

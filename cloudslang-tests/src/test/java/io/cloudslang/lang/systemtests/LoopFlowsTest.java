@@ -197,10 +197,6 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Assert.assertEquals("print_other_values", secondTask.getName());
     }
 
-    private List<String> getTasksOnly(Map<String, StepData> stepsData) {
-        return select(stepsData.keySet(), startsWith("0."));
-    }
-
     private void verifyPersonMap(Map<String, StepData> stepsData) {
         StepData firstTask = stepsData.get(FIRST_STEP_PATH);
         StepData secondTask = stepsData.get(SECOND_STEP_KEY);

@@ -14,7 +14,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.7.42-SNAPSHOT</version>
+        <version>0.8.1-SNAPSHOT</version>
     </parent>
 
 	<dependencies>
@@ -39,6 +39,11 @@
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mattbertolini</groupId>
+            <artifactId>liquibase-slf4j</artifactId>
         </dependency>
 
 		<!-- runtime -->

@@ -32,6 +32,7 @@ import io.cloudslang.lang.runtime.bindings.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ParentFlowData;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
+import org.python.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,13 +41,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.script.ScriptEngine;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyMap;
@@ -126,36 +121,65 @@ public class TaskStepsTest {
         RunEnvironment runEnv = createRunEnvironment();
         List<Input> inputs = Arrays.asList(new Input("input1", "input1"), new Input("input2", "input2"));
         Map<String,Serializable> resultMap = new HashMap<>();
-        resultMap.put("input1",5);
-        resultMap.put("input2",3);
+        resultMap.put("input1", 5);
+        resultMap.put("input2", 3);
 
         when(inputsBinding.bindInputs(eq(inputs), anyMap(), anyMap())).thenReturn(resultMap);
 
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
-        taskSteps.beginTask(inputs,null,runEnv,runtimeServices,"task1", 1L, 2L, "2");
+        taskSteps.beginTask(inputs, null, runEnv, runtimeServices, "task1", 1L, 2L, "2");
         Map<String,Serializable> callArgs = runEnv.removeCallArguments();
         Assert.assertFalse(callArgs.isEmpty());
         Assert.assertEquals(5, callArgs.get("input1"));
-        Assert.assertEquals(3,callArgs.get("input2"));
+        Assert.assertEquals(3, callArgs.get("input2"));
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
-        Assert.assertEquals(1,events.size());
-        ScoreEvent inputEvent = events.iterator().next();
-        Assert.assertEquals(ScoreLangConstants.EVENT_INPUT_END,inputEvent.getEventType());
+        Assert.assertEquals(3,events.size());
+        Iterator<ScoreEvent> eventsIterator = events.iterator();
+        ScoreEvent taskStartEvent = eventsIterator.next();
+        Assert.assertEquals(ScoreLangConstants.EVENT_TASK_START, taskStartEvent.getEventType());
+        ScoreEvent inputStartEvent = eventsIterator.next();
+        Assert.assertEquals(ScoreLangConstants.EVENT_INPUT_START, inputStartEvent.getEventType());
+        ScoreEvent inputEndEvent = eventsIterator.next();
+        Assert.assertEquals(ScoreLangConstants.EVENT_INPUT_END, inputEndEvent.getEventType());
 
-        LanguageEventData eventData = (LanguageEventData)inputEvent.getData();
+        LanguageEventData startBindingEventData = (LanguageEventData)inputStartEvent.getData();
+        Assert.assertEquals("task1",startBindingEventData.getStepName());
+        Assert.assertEquals(LanguageEventData.StepType.TASK, startBindingEventData.getStepType());
+
+        @SuppressWarnings("unchecked")
+        List<String> inputsToBind = (List<String>)startBindingEventData.get(LanguageEventData.INPUTS);
+        Assert.assertEquals(
+                "Inputs are not in defined order in start binding event",
+                Lists.newArrayList("input1", "input2"),
+                inputsToBind
+        );
+
+        LanguageEventData eventData = (LanguageEventData)inputEndEvent.getData();
         Assert.assertEquals("task1",eventData.getStepName());
         Assert.assertEquals(LanguageEventData.StepType.TASK,eventData.getStepType());
 
-        Map<String,Serializable> boundInputs = (Map<String,Serializable>)eventData.get(LanguageEventData.BOUND_INPUTS);
-        Assert.assertEquals(5,boundInputs.get("input1"));
-        Assert.assertEquals(3,boundInputs.get("input2"));
+        @SuppressWarnings("unchecked")
+        Map<String, Serializable> boundInputs = (Map<String,Serializable>)eventData.get(LanguageEventData.BOUND_INPUTS);
+        Assert.assertEquals(2, boundInputs.size());
+
+        // verify input names are in defined order and have the expected value
+        Set<Map.Entry<String, Serializable>> inputEntries = boundInputs.entrySet();
+        Iterator<Map.Entry<String, Serializable>> inputNamesIterator = inputEntries.iterator();
+
+        Map.Entry<String, Serializable> firstInput =  inputNamesIterator.next();
+        Assert.assertEquals("Inputs are not in defined order in end inputs binding event", "input1", firstInput.getKey());
+        Assert.assertEquals(5,firstInput.getValue());
+
+        Map.Entry<String, Serializable> secondInput =  inputNamesIterator.next();
+        Assert.assertEquals("Inputs are not in defined order in end inputs binding event", "input2", secondInput.getKey());
+        Assert.assertEquals(3,secondInput.getValue());
     }
 
     @Test
     public void testEndTaskEvents() throws Exception {
         RunEnvironment runEnv = createRunEnvironment();
-        runEnv.putReturnValues(new ReturnValues(new HashMap<String,Serializable>(), ScoreLangConstants.SUCCESS_RESULT));
+        runEnv.putReturnValues(new ReturnValues(new HashMap<String, Serializable>(), ScoreLangConstants.SUCCESS_RESULT));
         Context context = new Context(new HashMap<String, Serializable>());
         runEnv.getStack().pushContext(context);
 

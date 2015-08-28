@@ -21,8 +21,6 @@ package io.cloudslang.lang.tools.build.tester;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
@@ -60,7 +58,8 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
 
     @Override
     public synchronized void onEvent(ScoreEvent scoreEvent) throws InterruptedException {
-        @SuppressWarnings("unchecked") Map<String,Serializable> data = (Map<String,Serializable>)scoreEvent.getData();
+        @SuppressWarnings("unchecked") Map<String,Serializable> data = (Map<String,Serializable>) scoreEvent.getData();
+        LanguageEventData eventData;
         switch (scoreEvent.getEventType()){
             case EventConstants.SCORE_FINISHED_EVENT :
                 break;
@@ -69,16 +68,14 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
                 errorMessage.set(data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " + data.get(EventConstants.SCORE_ERROR_MSG));
                 flowFinished.set(true);
                 break;
-            case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
-                errorMessage.set((String)data.get(LanguageEventData.EXCEPTION));
-                flowFinished.set(true);
-                break;
             case ScoreLangConstants.EVENT_EXECUTION_FINISHED :
-                result = (String)data.get(LanguageEventData.RESULT);
+                eventData = (LanguageEventData) data;
+                result = eventData.getResult();
                 flowFinished.set(true);
                 break;
             case ScoreLangConstants.EVENT_OUTPUT_END:
-                Map<String, Serializable> extractOutputs = extractOutputs(data);
+                eventData = (LanguageEventData) data;
+                Map<String, Serializable> extractOutputs = extractOutputs(eventData);
                 if(MapUtils.isNotEmpty(extractOutputs)) {
                     outputs = extractOutputs;
                 }
@@ -90,18 +87,17 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
         return new ReturnValues(outputs, result);
     }
 
-    private static Map<String, Serializable> extractOutputs(Map<String, Serializable> data) {
+    private static Map<String, Serializable> extractOutputs(LanguageEventData data) {
 
         Map<String, Serializable> outputsMap = new HashMap<>();
 
         boolean thereAreOutputsForRootPath =
                 data.containsKey(LanguageEventData.OUTPUTS)
                 && data.containsKey(LanguageEventData.PATH)
-                && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH);
+                && data.getPath().equals(EXEC_START_PATH);
 
         if (thereAreOutputsForRootPath) {
-            @SuppressWarnings("unchecked") Map<String, Serializable> outputs =
-                    (Map<String, Serializable>) data.get(LanguageEventData.OUTPUTS);
+            Map<String, Serializable> outputs = data.getOutputs();
             if (MapUtils.isNotEmpty(outputs)) outputsMap.putAll(outputs);
         }
 
