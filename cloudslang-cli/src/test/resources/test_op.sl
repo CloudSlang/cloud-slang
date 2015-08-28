@@ -5,4 +5,4 @@ operation:
   action:
     python_script: 'print "hello world"'
   outputs:
-    - weather: "'stam'"
+    - weather: 'stam'

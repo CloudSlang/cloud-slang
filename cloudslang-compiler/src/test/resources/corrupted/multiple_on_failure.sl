@@ -16,16 +16,16 @@ flow:
     - print_message:
         do:
           ops.test_op:
-            - alla: "'hello'"
+            - alla: 'hello'
 
     - on_failure:
         - print_on_failure_1:
             do:
               ops.test_op:
-                - alla: "'on_failure 1'"
+                - alla: 'on_failure 1'
 
     - on_failure:
         - print_on_failure_2:
             do:
               ops.test_op:
-                - alla: "'on_failure 2'"
+                - alla: 'on_failure 2'

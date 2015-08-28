@@ -12,7 +12,7 @@ operation:
   inputs:
      - text
      - text2:
-        default: "'default value'"
+        default: 'default value'
   action:
     python_script: |
         print text

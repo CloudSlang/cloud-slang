@@ -22,4 +22,4 @@ flow:
             ops.print:
               - text: value
           publish:
-            - new_var: "'a'"
+            - new_var: 'a'
