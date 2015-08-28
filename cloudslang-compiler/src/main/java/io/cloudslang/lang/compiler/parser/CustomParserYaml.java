@@ -15,6 +15,7 @@ import org.yaml.snakeyaml.reader.StreamReader;
 
 public class CustomParserYaml extends Yaml {
 
+    @Override
     public <T> T loadAs(String yaml, Class<T> type) {
         @SuppressWarnings("unchecked") T object = (T) loadFromReader(new StreamReader(yaml), type);
         return object;
