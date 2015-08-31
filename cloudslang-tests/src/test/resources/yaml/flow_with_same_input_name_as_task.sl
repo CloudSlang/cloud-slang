@@ -19,7 +19,8 @@ flow:
     - CheckBinding:
         do:
           ops.string_equals:
-            - first_string: "'prefix_' + first"
+            - first_string: >
+                'prefix_' + first
             - second_string:
                 default: >
                   'prefix_' + second_string
