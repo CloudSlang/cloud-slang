@@ -173,6 +173,11 @@
                 <artifactId>score-http-client</artifactId>
                 <version>0.1.63</version>
             </dependency>
+            <dependency>
+                <groupId>io.cloudslang.content</groupId>
+                <artifactId>score-rft</artifactId>
+                <version>0.0.2</version>
+            </dependency>
             <!--end of score content dependencies-->
 
             <dependency>
