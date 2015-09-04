@@ -20,7 +20,7 @@ import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -48,7 +48,7 @@ public abstract class AbstractSteps {
                                           String desc,
                                           LanguageEventData.StepType stepType,
                                           String stepName) {
-        Map<String, Serializable> inputsForEvent = new HashMap<>();
+        Map<String, Serializable> inputsForEvent = new LinkedHashMap<>();
         for (Input input : inputs) {
             String inputName = input.getName();
             Serializable inputValue = context.get(inputName);
