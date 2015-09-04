@@ -90,7 +90,7 @@ public abstract class AbstractSteps {
             ExecutionRuntimeServices executionRuntimeServices,
             String description,
             String stepName) {
-        Map<String, Serializable> argumentsForEvent = new HashMap<>();
+        Map<String, Serializable> argumentsForEvent = new LinkedHashMap<>();
         for (Argument argument : arguments) {
             String argumentName = argument.getName();
             Serializable argumentValue = context.get(argumentName);
