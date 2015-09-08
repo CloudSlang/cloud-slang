@@ -19,7 +19,9 @@ import org.junit.Assert;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,6 +51,9 @@ import static org.mockito.Mockito.mock;
 public class ActionStepsTest {
 
     private static final long DEFAULT_TIMEOUT = 10000;
+
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
 
     @Autowired
     private ActionSteps actionSteps;
@@ -465,6 +472,35 @@ public class ActionStepsTest {
         Assert.assertEquals("Python action outputs are not as expected", expectedOutputs, actualOutputs);
     }
 
+    @Test
+    public void doActionInvalidReturnTypes() throws IOException {
+        //prepare doAction arguments
+        RunEnvironment runEnv = new RunEnvironment();
+        File file = folder.newFile();
+
+        String fileAbsolutePathEscaped = file.getAbsolutePath().replace("\\", "\\\\");
+
+        String userPythonScript =
+                "valid = 1\n" +
+                "with open('" + fileAbsolutePathEscaped + "', 'r') as f:\n" +
+                "  f.close()\n\n" +
+                "import sys\n" +
+                "import io\n" +
+                "def a():\n" +
+                "  print 'a'\n\n";
+
+        //invoke doAction
+        actionSteps.doAction(runEnv, new HashMap<String, Object>(), PYTHON, "", "", executionRuntimeServicesMock, userPythonScript, 2L);
+
+        //extract actual outputs
+        ReturnValues actualReturnValues = runEnv.removeReturnValues();
+        Map<String, Serializable> actualOutputs = actualReturnValues.getOutputs();
+
+        //verify matching
+        Assert.assertEquals("Invalid types passed exclusion",
+                1, actualOutputs.size());
+    }
+
     @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void doActionPythonMissingInputsTest() {
         //prepare doAction arguments
@@ -487,6 +523,23 @@ public class ActionStepsTest {
 
         //invoke doAction
         actionSteps.doAction(runEnv, nonSerializableExecutionData, PYTHON, "", "", executionRuntimeServicesMock, userPythonScript, 2L);
+    }
+
+
+    @Test
+    public void doActionPythonImportRightIOPackage() {
+        //prepare doAction arguments
+        RunEnvironment runEnv = new RunEnvironment();
+
+        String userPythonScript =
+                "import io\n" +
+                "if 'StringIO' not in dir(io):\n" +
+                "  raise Exception('cant find StringIO')";
+
+        //invoke doAction
+        actionSteps.doAction(
+                runEnv, new HashMap<String, Object>(), PYTHON, "", "",
+                executionRuntimeServicesMock, userPythonScript, 2L);
     }
 
     @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)

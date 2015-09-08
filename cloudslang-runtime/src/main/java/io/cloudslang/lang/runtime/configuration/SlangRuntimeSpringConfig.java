@@ -11,6 +11,7 @@ package io.cloudslang.lang.runtime.configuration;
 *******************************************************************************/
 
 
+import org.python.core.Options;
 import org.python.util.PythonInterpreter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -23,9 +24,16 @@ import javax.script.ScriptEngineManager;
 @ComponentScan("io.cloudslang.lang.runtime")
 public class SlangRuntimeSpringConfig {
 
+    static {
+        Options.importSite = false;
+    }
+
     @Bean
     public PythonInterpreter interpreter(){
-        return new PythonInterpreter();
+        PythonInterpreter interpreter = new PythonInterpreter();
+//        here to avoid jython preferring io.cloudslang package over python io package
+        interpreter.exec("import io");
+        return interpreter;
     }
 
     @Bean

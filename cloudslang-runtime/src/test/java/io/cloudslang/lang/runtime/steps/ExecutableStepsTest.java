@@ -35,12 +35,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.script.ScriptEngine;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;
@@ -115,12 +110,22 @@ public class ExecutableStepsTest {
         LanguageEventData eventData = (LanguageEventData)boundInputEvent.getData();
         Assert.assertTrue(eventData.containsKey(LanguageEventData.BOUND_INPUTS));
         Map<String,Serializable> inputsBounded = (Map<String,Serializable>)eventData.get(LanguageEventData.BOUND_INPUTS);
-        Assert.assertEquals(5, inputsBounded.get("input1"));
-        Assert.assertEquals(LanguageEventData.ENCRYPTED_VALUE,inputsBounded.get("input2"));
 
         Assert.assertNotNull(eventData.getStepName());
         Assert.assertEquals(LanguageEventData.StepType.EXECUTABLE, eventData.getStepType());
         Assert.assertEquals("dockerizeStep", eventData.getStepName());
+
+        // verify input names are in defined order and have the expected value
+        Set<Map.Entry<String, Serializable>> inputEntries = inputsBounded.entrySet();
+        Iterator<Map.Entry<String, Serializable>> inputNamesIterator = inputEntries.iterator();
+
+        Map.Entry<String, Serializable> firstInput =  inputNamesIterator.next();
+        org.junit.Assert.assertEquals("Inputs are not in defined order in end inputs binding event", "input1", firstInput.getKey());
+        org.junit.Assert.assertEquals(5, firstInput.getValue());
+
+        Map.Entry<String, Serializable> secondInput =  inputNamesIterator.next();
+        org.junit.Assert.assertEquals("Inputs are not in defined order in end inputs binding event", "input2", secondInput.getKey());
+        org.junit.Assert.assertEquals(LanguageEventData.ENCRYPTED_VALUE, secondInput.getValue());
     }
 
     @Test

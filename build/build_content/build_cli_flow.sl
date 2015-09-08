@@ -123,10 +123,12 @@ flow:
             do:
               cmd.run_command:
                 - command: >
-                    "tar -cvzf " + target_dir + "/cslang-cli.tar.gz " + target_dir + "/cloudslang-cli"
+                    "(cd " + target_dir + "/cloudslang-cli && tar -cvzf cslang-cli.tar.gz cslang)"
 
     - create_builder_zip:
         do:
           files.zip_folder:
             - archive_name: "'cslang-builder'"
             - folder_path: 'target_dir + "/cslang-builder"'
+            - output_folder: target_dir
+
