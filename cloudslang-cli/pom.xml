@@ -149,7 +149,7 @@
 							<id>cslang</id>
 						</program>
 					</programs>
-                    <extraJvmArguments>-XX:PermSize=128m -XX:MaxPermSize=256m -Dpython.path=@BASEDIR@/python-lib</extraJvmArguments>
+                    <extraJvmArguments>-Dpython.path=@BASEDIR@/python-lib</extraJvmArguments>
 				</configuration>
 			</plugin>
 		</plugins>
