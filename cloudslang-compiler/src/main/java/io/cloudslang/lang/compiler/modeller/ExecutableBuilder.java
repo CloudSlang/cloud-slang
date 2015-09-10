@@ -49,7 +49,7 @@ import static io.cloudslang.lang.entities.ScoreLangConstants.*;
 public class ExecutableBuilder {
 
     public static final String MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX = "Multiple 'on_failure' properties found";
-    public static final String NAMESPACE_SEPARATOR = ".";
+    public static final String NAMESPACE_DELIMITER = ".";
 
     @Autowired
     private List<Transformer> transformers;
@@ -301,22 +301,22 @@ public class ExecutableBuilder {
     }
 
 	private static String resolveRefId(String refIdString, Map<String, String> imports, String namespace) {
-        int numberOfSeparators = StringUtils.countMatches(refIdString, NAMESPACE_SEPARATOR);
+        int numberOfDelimiters = StringUtils.countMatches(refIdString, NAMESPACE_DELIMITER);
         String referenceID;
-        switch(numberOfSeparators) {
+        switch(numberOfDelimiters) {
             case 0:
                 // implicit namespace
-                referenceID = namespace + NAMESPACE_SEPARATOR + refIdString;
+                referenceID = namespace + NAMESPACE_DELIMITER + refIdString;
                 break;
             case 1:
-                String prefix = StringUtils.substringBefore(refIdString, NAMESPACE_SEPARATOR);
-                String refName = StringUtils.substringAfter(refIdString, NAMESPACE_SEPARATOR);
+                String prefix = StringUtils.substringBefore(refIdString, NAMESPACE_DELIMITER);
+                String refName = StringUtils.substringAfter(refIdString, NAMESPACE_DELIMITER);
                 if (MapUtils.isNotEmpty(imports) && imports.containsKey(prefix)) {
                     // resolve alias
-                    referenceID = imports.get(prefix) + NAMESPACE_SEPARATOR + refName;
+                    referenceID = imports.get(prefix) + NAMESPACE_DELIMITER + refName;
                 } else {
                     // full path
-                    referenceID = prefix + NAMESPACE_SEPARATOR + refName;
+                    referenceID = prefix + NAMESPACE_DELIMITER + refName;
                 }
                 break;
             default:
