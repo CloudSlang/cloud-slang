@@ -303,23 +303,22 @@ public class ExecutableBuilder {
     private static String resolveReferenceID(String rawReferenceID, Map<String, String> imports, String namespace) {
         int numberOfDelimiters = StringUtils.countMatches(rawReferenceID, NAMESPACE_DELIMITER);
         String resolvedReferenceID;
-        switch(numberOfDelimiters) {
-            case 0:
-                // implicit namespace
-                resolvedReferenceID = namespace + NAMESPACE_DELIMITER + rawReferenceID;
-                break;
-            default:
-                String prefix = StringUtils.substringBefore(rawReferenceID, NAMESPACE_DELIMITER);
-                String suffix = StringUtils.substringAfter(rawReferenceID, NAMESPACE_DELIMITER);
-                if (MapUtils.isNotEmpty(imports) && imports.containsKey(prefix)) {
-                    // expand alias
-                    resolvedReferenceID = imports.get(prefix) + NAMESPACE_DELIMITER + suffix;
-                } else {
-                    // full path without alias expanding
-                    resolvedReferenceID = rawReferenceID;
-                }
-                break;
+
+        if (numberOfDelimiters == 0) {
+            // implicit namespace
+            resolvedReferenceID = namespace + NAMESPACE_DELIMITER + rawReferenceID;
+        } else {
+            String prefix = StringUtils.substringBefore(rawReferenceID, NAMESPACE_DELIMITER);
+            String suffix = StringUtils.substringAfter(rawReferenceID, NAMESPACE_DELIMITER);
+            if (MapUtils.isNotEmpty(imports) && imports.containsKey(prefix)) {
+                // expand alias
+                resolvedReferenceID = imports.get(prefix) + NAMESPACE_DELIMITER + suffix;
+            } else {
+                // full path without alias expanding
+                resolvedReferenceID = rawReferenceID;
+            }
         }
+
         return resolvedReferenceID;
     }
 
