@@ -279,7 +279,7 @@ public class ExecutableBuilder {
             throw new RuntimeException("Task: \'" + taskName + "\' has no reference information");
         }
         String refString = doRawData.keySet().iterator().next();
-        String refId = resolveRefId(refString, imports, namespace);
+        String refId = resolveReferenceID(refString, imports, namespace);
 
         @SuppressWarnings("unchecked") Map<String, String> navigationStrings = (Map<String, String>) postTaskData.get(SlangTextualKeys.NAVIGATION_KEY);
 
@@ -300,32 +300,28 @@ public class ExecutableBuilder {
                 preTaskData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
     }
 
-	private static String resolveRefId(String refIdString, Map<String, String> imports, String namespace) {
-        int numberOfDelimiters = StringUtils.countMatches(refIdString, NAMESPACE_DELIMITER);
-        String referenceID;
+    private static String resolveReferenceID(String rawReferenceID, Map<String, String> imports, String namespace) {
+        int numberOfDelimiters = StringUtils.countMatches(rawReferenceID, NAMESPACE_DELIMITER);
+        String resolvedReferenceID;
         switch(numberOfDelimiters) {
             case 0:
                 // implicit namespace
-                referenceID = namespace + NAMESPACE_DELIMITER + refIdString;
-                break;
-            case 1:
-                String prefix = StringUtils.substringBefore(refIdString, NAMESPACE_DELIMITER);
-                String refName = StringUtils.substringAfter(refIdString, NAMESPACE_DELIMITER);
-                if (MapUtils.isNotEmpty(imports) && imports.containsKey(prefix)) {
-                    // resolve alias
-                    referenceID = imports.get(prefix) + NAMESPACE_DELIMITER + refName;
-                } else {
-                    // full path
-                    referenceID = prefix + NAMESPACE_DELIMITER + refName;
-                }
+                resolvedReferenceID = namespace + NAMESPACE_DELIMITER + rawReferenceID;
                 break;
             default:
-                // full path
-                referenceID = refIdString;
+                String prefix = StringUtils.substringBefore(rawReferenceID, NAMESPACE_DELIMITER);
+                String suffix = StringUtils.substringAfter(rawReferenceID, NAMESPACE_DELIMITER);
+                if (MapUtils.isNotEmpty(imports) && imports.containsKey(prefix)) {
+                    // expand alias
+                    resolvedReferenceID = imports.get(prefix) + NAMESPACE_DELIMITER + suffix;
+                } else {
+                    // full path without alias expanding
+                    resolvedReferenceID = rawReferenceID;
+                }
                 break;
         }
-        return referenceID;
-	}
+        return resolvedReferenceID;
+    }
 
     /**
      * Fetch the first level of the dependencies of the executable (non recursively)
