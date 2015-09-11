@@ -7,9 +7,10 @@
 
 namespace: cloudslang.sample
 
-operation:
-  name: simple_op
-  inputs:
-    - cool_input: 1992
-  action:
-    python_script: 'print "hello world"'
+flow:
+  name: default_namespace
+  workflow:
+    - task1:
+        do:
+          simple_op:
+            - cool_input: 25

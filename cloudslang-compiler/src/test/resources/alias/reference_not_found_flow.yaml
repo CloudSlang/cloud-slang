@@ -5,11 +5,15 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: cloudslang.sample
+namespace: cloudslang.integrations
 
-operation:
-  name: simple_op
-  inputs:
-    - cool_input: 1992
-  action:
-    python_script: 'print "hello world"'
+imports:
+  sample: cloudslang.sample
+
+flow:
+  name: reference_not_found_flow
+  workflow:
+    - task1:
+        do:
+          sample_typo.simple_op:
+            - cool_input: 25

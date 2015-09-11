@@ -5,15 +5,15 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: slang.sample.flows
+namespace: cloudslang.integrations
 
 imports:
-  ops: slang.sample.operations
+  sample: cloudslang.sample
 
 flow:
   name: basic_alias
   workflow:
     - task1:
         do:
-          ops.simple_op:
+          sample.simple_op:
             - cool_input: 25

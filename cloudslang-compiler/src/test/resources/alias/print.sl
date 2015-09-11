@@ -5,10 +5,10 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: cloudslang.sample
+namespace: a.b.c.d
 
 operation:
-  name: simple_op
+  name: print
   inputs:
     - cool_input: 1992
   action:
