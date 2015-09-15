@@ -12,11 +12,11 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import io.cloudslang.score.events.ScoreEvent;
 
 import java.io.Serializable;
 import java.net.URI;

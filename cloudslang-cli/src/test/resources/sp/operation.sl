@@ -12,10 +12,10 @@ operation:
   inputs:
     - city:
         system_property: user.sys.props.city
-        default: "'Bangkok'"
+        default: 'Bangkok'
         overridable: false
     - weather:
         system_property: user.sys.props.weather
-        default: "'hot'"
+        default: 'hot'
   action:
     python_script: 'print "The weather is " + weather + " in " + city'

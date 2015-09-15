@@ -16,7 +16,7 @@ flow:
     - CheckWeather:
         do:
           ops.test_op:
-            - city: "'input_1'"
+            - city: 'input_1'
         publish:
           - weather
         navigate:

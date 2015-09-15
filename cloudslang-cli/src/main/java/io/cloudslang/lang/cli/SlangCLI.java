@@ -161,13 +161,13 @@ public class SlangCLI implements CommandMarker {
 
         scoreServices.subscribe(new ScoreEventListener() {
             @Override
-            public void onEvent(ScoreEvent event) {
+            public synchronized void onEvent(ScoreEvent event) {
                 logSlangEvent(event);
             }
         }, slangHandlerTypes);
         scoreServices.subscribe(new ScoreEventListener() {
             @Override
-            public void onEvent(ScoreEvent event) {
+            public synchronized void onEvent(ScoreEvent event) {
                 logScoreEvent(event);
             }
         }, scoreHandlerTypes);

@@ -24,4 +24,4 @@ flow:
               - text: k
               - text2: v
           publish:
-            - new_var: "'a'"
+            - new_var: 'a'

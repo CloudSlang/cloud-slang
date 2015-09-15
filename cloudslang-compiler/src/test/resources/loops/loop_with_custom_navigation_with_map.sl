@@ -28,4 +28,4 @@ flow:
     - print_other_values:
         do:
           ops.print:
-            - text: "'abc'"
+            - text: 'abc'

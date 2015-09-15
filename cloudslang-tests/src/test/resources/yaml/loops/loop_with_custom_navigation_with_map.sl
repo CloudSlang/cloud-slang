@@ -30,9 +30,9 @@ flow:
     - task_that_doesnt_run:
         do:
           ops.print:
-            - text: "'I don't run'"
+            - text: "I don't run"
 
     - print_other_values:
         do:
           ops.print:
-            - text: "'abc'"
+            - text: 'abc'
