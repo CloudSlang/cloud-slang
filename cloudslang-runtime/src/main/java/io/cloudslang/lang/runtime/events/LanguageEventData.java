@@ -38,6 +38,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     public static final String NEXT_STEP_POSITION = "nextPosition";
     public static final String ENCRYPTED_VALUE = "*****";
     public static final String STEP_TYPE = "STEP_TYPE";
+    public static final String TASK_TYPE = "TASK_TYPE";
     public static final String STEP_NAME = "STEP_NAME";
 
     public enum StepType {
@@ -61,6 +62,14 @@ public class LanguageEventData extends HashMap<String, Serializable> {
 
     public void setStepType(StepType stepType){
         put(STEP_TYPE, stepType);
+    }
+
+   public String getTaskType() {
+        return (String) get(TASK_TYPE);
+    }
+
+    public void setTaskType(String taskTYpe){
+        put(TASK_TYPE, taskTYpe);
     }
 
     public String getEventType() {

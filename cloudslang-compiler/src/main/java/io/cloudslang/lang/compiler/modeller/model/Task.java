@@ -8,12 +8,11 @@
  */
 package io.cloudslang.lang.compiler.modeller.model;
 
+import io.cloudslang.lang.entities.bindings.Input;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-
-import io.cloudslang.lang.entities.ScoreLangConstants;
-import io.cloudslang.lang.entities.bindings.Input;
 
 /*
  * Created by orius123 on 06/11/14.
@@ -27,6 +26,7 @@ public class Task {
     private final Map<String, String> navigationStrings;
     private final String refId;
     private final boolean async;
+    private TaskType type = TaskType.OTHER;
 
     public Task(
             String name,
@@ -71,6 +71,14 @@ public class Task {
 
     public boolean isAsync() {
         return async;
+    }
+
+    public TaskType getType() {
+        return type;
+    }
+
+    public void setType(TaskType type) {
+        this.type = type;
     }
 
 }

@@ -66,6 +66,8 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             //than we match the references to the actual dependencies
             filteredDependencies = dependenciesHelper.matchReferences(executable, availableExecutables);
 
+            dependenciesHelper.resolveTasksType(executable, availableExecutables);
+
             // Validate that all the tasks of a flow have navigations for all the reference's results
             validateAllDependenciesResultsHaveMatchingNavigations(executable, filteredDependencies);
         }

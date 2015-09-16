@@ -31,12 +31,13 @@ public abstract class AbstractSteps {
                                           ExecutionRuntimeServices executionRuntimeServices,
                                           String desc,
                                           LanguageEventData.StepType stepType,
-                                          String stepName) {
+                                          String stepName,
+                                          String taskType) {
         ArrayList<String> inputNames = new ArrayList<>();
         for (Input input : inputs) {
             inputNames.add(input.getName());
         }
-        fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_INPUT_START, desc, stepType, stepName,
+        fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_INPUT_START, desc, stepType, stepName, taskType,
                 Pair.of(LanguageEventData.INPUTS, inputNames));
     }
 
@@ -68,9 +69,22 @@ public abstract class AbstractSteps {
                                  String description,
                                  LanguageEventData.StepType stepType,
                                  String stepName,
+                                 String taskType,
                                  Map.Entry<String, ? extends Serializable>... fields) {
         fireEvent(runtimeServices, type, description,
-                runEnvironment.getExecutionPath().getCurrentPath(), stepType, stepName, fields);
+                runEnvironment.getExecutionPath().getCurrentPath(), stepType, stepName, taskType, fields);
+    }
+
+    @SafeVarargs
+    public static void fireEvent(ExecutionRuntimeServices runtimeServices,
+                                 RunEnvironment runEnvironment,
+                                 String type,
+                                 String description,
+                                 LanguageEventData.StepType stepType,
+                                 String stepName,
+                                 Map.Entry<String, ? extends Serializable>... fields) {
+        fireEvent(runtimeServices, type, description,
+                runEnvironment.getExecutionPath().getCurrentPath(), stepType, stepName, null, fields);
     }
 
     @SafeVarargs
@@ -80,7 +94,19 @@ public abstract class AbstractSteps {
                                  String path,
                                  LanguageEventData.StepType stepType,
                                  String stepName,
-                                 Map.Entry<String, ? extends Serializable>... fields) {
+                                 Entry<String, ? extends Serializable>... fields) {
+        fireEvent(runtimeServices, type, description,path, stepType, stepName, null, fields);
+    }
+
+    @SafeVarargs
+    public static void fireEvent(ExecutionRuntimeServices runtimeServices,
+                                 String type,
+                                 String description,
+                                 String path,
+                                 LanguageEventData.StepType stepType,
+                                 String stepName,
+                                 String taskType,
+                                 Entry<String, ? extends Serializable>... fields) {
         LanguageEventData eventData = new LanguageEventData();
         eventData.setStepType(stepType);
         eventData.setStepName(stepName);
@@ -91,6 +117,10 @@ public abstract class AbstractSteps {
         eventData.setPath(path);
         for (Entry<String, ? extends Serializable> field : fields) {
             eventData.put(field.getKey(), field.getValue());
+        }
+
+        if(taskType!=null){
+            eventData.setTaskType(taskType);
         }
         runtimeServices.addEvent(type, eventData);
     }

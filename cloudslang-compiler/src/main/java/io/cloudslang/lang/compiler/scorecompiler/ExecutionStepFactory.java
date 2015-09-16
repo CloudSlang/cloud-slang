@@ -44,7 +44,7 @@ public class ExecutionStepFactory {
     private static final String SIMPLE_NAVIGATION_METHOD = "navigate";
 
 
-    public ExecutionStep createBeginTaskStep(Long index, List<Input> inputs, Map<String, Serializable> preTaskData, String refId, String taskName) {
+    public ExecutionStep createBeginTaskStep(Long index, List<Input> inputs, Map<String, Serializable> preTaskData, String refId, String taskName, String taskType) {
         Validate.notNull(preTaskData, "preTaskData is null");
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.TASK_INPUTS_KEY, (Serializable)inputs);
@@ -53,6 +53,7 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, taskName);
         actionData.put(ScoreLangConstants.REF_ID, refId);
         actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
+        actionData.put(ScoreLangConstants.TASK_TYPE, taskType);
         return createGeneralStep(index, TASK_STEPS_CLASS, "beginTask", actionData);
     }
 
