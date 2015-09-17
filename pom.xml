@@ -161,7 +161,7 @@
             <dependency>
                 <groupId>io.cloudslang.content</groupId>
                 <artifactId>score-ssh</artifactId>
-                <version>0.0.25</version>
+                <version>0.0.30</version>
             </dependency>
             <dependency>
                 <groupId>io.cloudslang.content</groupId>
