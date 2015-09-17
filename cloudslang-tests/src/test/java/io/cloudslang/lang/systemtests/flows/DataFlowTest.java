@@ -8,23 +8,24 @@
 *
 *******************************************************************************/
 
-
 package io.cloudslang.lang.systemtests.flows;
 
 import com.google.common.collect.Sets;
-import org.apache.commons.lang3.StringUtils;
-import io.cloudslang.lang.entities.ScoreLangConstants;
-import org.junit.Assert;
-import org.junit.Test;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.SystemsTestsParent;
+import io.cloudslang.score.events.ScoreEvent;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.*;
-
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Date: 12/11/2014
@@ -99,7 +100,6 @@ public class DataFlowTest extends SystemsTestsParent {
                 13, final_output);
     }
 
-
     @Test
     public void testCompileFlowWithOutputBinding() throws Exception {
         URI flow = getClass().getResource("/yaml/system-flows/binding_flow_outputs.sl").toURI();
@@ -123,4 +123,27 @@ public class DataFlowTest extends SystemsTestsParent {
         Assert.assertEquals("weather2 not bound correctly", "New York", weather2Output);
         Assert.assertEquals("weather3 not bound correctly", "New York day", weather3Output);
     }
+
+    @Test
+    public void testBindingsOneLiner() throws Exception {
+        URI resource = getClass().getResource("/yaml/simple_flow_one_liner_binding_check.yaml").toURI();
+        URI operations = getClass().getResource("/yaml/compare_values.sl").toURI();
+
+        SlangSource dep = SlangSource.fromFile(operations);
+        Set<SlangSource> path = Sets.newHashSet(dep);
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Map<String, Serializable> userInputs = new HashMap<>();
+        ScoreEvent event = trigger(compilationArtifact, userInputs, null);
+
+        Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
+        Serializable eventRawData = event.getData();
+        Assert.assertTrue(eventRawData instanceof Map);
+        Map eventDataMap = (Map) eventRawData;
+        Assert.assertTrue(eventDataMap.containsKey("RESULT"));
+        String result = (String) eventDataMap.get("RESULT");
+
+        Assert.assertEquals("Result not as expected - task arguments binding may be corrupted", "SUCCESS", result);
+    }
+
 }

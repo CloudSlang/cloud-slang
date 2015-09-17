@@ -13,6 +13,7 @@ import io.cloudslang.lang.compiler.modeller.model.*;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Workflow;
+import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
@@ -135,7 +136,7 @@ public class ExecutionPlanBuilderTest {
         Map<String, Serializable> preTaskActionData = task.getPreTaskActionData();
         String refId = task.getRefId();
         String name = task.getName();
-        when(stepFactory.createBeginTaskStep(eq(stepId), anyListOf(Input.class), eq(preTaskActionData), eq(refId), eq(name))).thenReturn(new ExecutionStep(stepId));
+        when(stepFactory.createBeginTaskStep(eq(stepId), anyListOf(Argument.class), eq(preTaskActionData), eq(refId), eq(name))).thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockAddBranchesStep(Long stepId, Long nextStepID, Long branchBeginStepID, Task task, Flow flow) {
@@ -239,7 +240,7 @@ public class ExecutionPlanBuilderTest {
                 eq(task.getPreTaskActionData()),
                 eq(compiledFlow.getId()),
                 eq(task.getName()));
-        verify(stepFactory).createBeginTaskStep(eq(3L), anyListOf(Input.class), eq(task.getPreTaskActionData()), eq(task.getRefId()), eq(task.getName()));
+        verify(stepFactory).createBeginTaskStep(eq(3L), anyListOf(Argument.class), eq(task.getPreTaskActionData()), eq(task.getRefId()), eq(task.getName()));
         verify(stepFactory).createFinishTaskStep(eq(4L), eq(task.getPostTaskActionData()), anyMapOf(String.class, ResultNavigation.class), eq(task.getName()), eq(task.isAsync()));
         verify(stepFactory).createJoinBranchesStep(eq(5L), eq(task.getPostTaskActionData()), anyMapOf(String.class, ResultNavigation.class), eq(task.getName()));
 

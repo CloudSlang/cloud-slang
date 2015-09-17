@@ -116,7 +116,7 @@ public class ExecutionPlanBuilder {
             );
         }
         taskExecutionSteps.add(
-                stepFactory.createBeginTaskStep(currentId++, task.getInputs(),
+                stepFactory.createBeginTaskStep(currentId++, task.getArguments(),
                         task.getPreTaskActionData(), task.getRefId(), taskName)
         );
 

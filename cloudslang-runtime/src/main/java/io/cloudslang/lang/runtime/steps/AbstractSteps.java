@@ -10,6 +10,7 @@
 package io.cloudslang.lang.runtime.steps;
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.runtime.env.*;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
@@ -59,6 +60,50 @@ public abstract class AbstractSteps {
         }
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_INPUT_END, desc, stepType, stepName,
                 Pair.of(LanguageEventData.BOUND_INPUTS, (Serializable) inputsForEvent));
+    }
+
+    public void sendStartBindingArgumentsEvent(
+            List<Argument> arguments,
+            RunEnvironment runEnv,
+            ExecutionRuntimeServices executionRuntimeServices,
+            String description,
+            String stepName) {
+        ArrayList<String> argumentNames = new ArrayList<>();
+        for (Argument argument : arguments) {
+            argumentNames.add(argument.getName());
+        }
+        fireEvent(
+                executionRuntimeServices,
+                runEnv,
+                ScoreLangConstants.EVENT_ARGUMENT_START,
+                description,
+                LanguageEventData.StepType.TASK,
+                stepName,
+                Pair.of(LanguageEventData.ARGUMENTS, argumentNames)
+        );
+    }
+
+    public void sendEndBindingArgumentsEvent(
+            List<Argument> arguments,
+            final Map<String, Serializable> context,
+            RunEnvironment runEnv,
+            ExecutionRuntimeServices executionRuntimeServices,
+            String description,
+            String stepName) {
+        Map<String, Serializable> argumentsForEvent = new LinkedHashMap<>();
+        for (Argument argument : arguments) {
+            String argumentName = argument.getName();
+            Serializable argumentValue = context.get(argumentName);
+            argumentsForEvent.put(argumentName, argumentValue);
+        }
+        fireEvent(
+                executionRuntimeServices,
+                runEnv, ScoreLangConstants.EVENT_ARGUMENT_END,
+                description,
+                LanguageEventData.StepType.TASK,
+                stepName,
+                Pair.of(LanguageEventData.BOUND_ARGUMENTS, (Serializable) argumentsForEvent)
+        );
     }
 
     @SafeVarargs

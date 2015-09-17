@@ -8,12 +8,11 @@
  */
 package io.cloudslang.lang.compiler.modeller.model;
 
+import io.cloudslang.lang.entities.bindings.Argument;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-
-import io.cloudslang.lang.entities.ScoreLangConstants;
-import io.cloudslang.lang.entities.bindings.Input;
 
 /*
  * Created by orius123 on 06/11/14.
@@ -23,7 +22,7 @@ public class Task {
     private final String name;
     private final Map<String, Serializable> preTaskActionData;
     private final Map<String, Serializable> postTaskActionData;
-    private final List<Input> inputs;
+    private final List<Argument> arguments;
     private final Map<String, String> navigationStrings;
     private final String refId;
     private final boolean async;
@@ -32,14 +31,14 @@ public class Task {
             String name,
             Map<String, Serializable> preTaskActionData,
             Map<String, Serializable> postTaskActionData,
-            List<Input> inputs,
+            List<Argument> arguments,
             Map<String, String> navigationStrings,
             String refId,
             boolean async) {
         this.name = name;
         this.preTaskActionData = preTaskActionData;
         this.postTaskActionData = postTaskActionData;
-        this.inputs = inputs;
+        this.arguments = arguments;
         this.navigationStrings = navigationStrings;
         this.refId = refId;
         this.async = async;
@@ -57,8 +56,8 @@ public class Task {
         return postTaskActionData;
     }
 
-    public List<Input> getInputs() {
-        return inputs;
+    public List<Argument> getArguments() {
+        return arguments;
     }
 
     public Map<String, String> getNavigationStrings() {

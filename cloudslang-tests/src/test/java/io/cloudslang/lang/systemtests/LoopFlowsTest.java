@@ -22,12 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static ch.lambdaj.Lambda.filter;
-import static ch.lambdaj.Lambda.select;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.startsWith;
-
 public class LoopFlowsTest extends SystemsTestsParent{
 
     @Test

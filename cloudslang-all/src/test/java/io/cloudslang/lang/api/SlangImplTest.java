@@ -8,8 +8,6 @@
  */
 package io.cloudslang.lang.api;
 
-import ch.lambdaj.function.matcher.Predicate;
-
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.ScoreLangConstants;
@@ -56,7 +54,7 @@ import static org.mockito.Matchers.*;
 public class SlangImplTest {
 
     static final CompilationArtifact emptyCompilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>(), new ArrayList<Input>());
-    private static final int ALL_EVENTS_SIZE = 22;
+    private static final int ALL_EVENTS_SIZE = 24;
 
     @Autowired
     private Slang slang;
@@ -197,18 +195,21 @@ public class SlangImplTest {
         Mockito.verify(eventBus).unsubscribe(eventListener);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testSubscribeOnAllEventsWithListener(){
         Slang mockSlang = Mockito.mock(SlangImpl.class);
         ScoreEventListener eventListener = new EventListener();
         Mockito.doCallRealMethod().when(mockSlang).subscribeOnAllEvents(any(ScoreEventListener.class));
+        ArgumentCaptor<Set> eventsCaptor = ArgumentCaptor.forClass(Set.class);
+
         mockSlang.subscribeOnAllEvents(eventListener);
-        Mockito.verify(mockSlang).subscribeOnEvents(eq(eventListener), argThat(new Predicate<Set<String>>() {
-            @Override
-            public boolean apply(Set<String> item) {
-                return item.size() == ALL_EVENTS_SIZE;
-            }
-        }));
+
+        Mockito.verify(mockSlang).subscribeOnEvents(eq(eventListener), eventsCaptor.capture());
+        Set allEvents = eventsCaptor.getValue();
+
+        Assert.assertNotNull(allEvents);
+        Assert.assertEquals("Events size not as expected", ALL_EVENTS_SIZE, allEvents.size());
     }
 
     private class EventListener implements ScoreEventListener{

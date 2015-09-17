@@ -69,11 +69,11 @@ public class InputsBindingTest {
 
 	@Test
 	public void testDefaultValueBoolean() {
-		List<Input> inputs = Arrays.asList(new Input("input1", "true"), new Input("input2", "false"), new Input("input3", "str('phrase cantaining true and false')"));
+		List<Input> inputs = Arrays.asList(new Input("input1", "true"), new Input("input2", "false"), new Input("input3", "str('phrase containing true and false')"));
 		Map<String, Serializable> result = bindInputs(inputs);
 		Assert.assertTrue((boolean)result.get("input1"));
 		Assert.assertFalse((boolean)result.get("input2"));
-		Assert.assertEquals("phrase cantaining true and false", result.get("input3"));
+		Assert.assertEquals("phrase containing true and false", result.get("input3"));
 	}
 
     @Test

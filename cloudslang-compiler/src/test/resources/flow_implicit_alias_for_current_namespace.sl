@@ -17,12 +17,10 @@ flow:
         do:
           ops.test_op:
             - city: str('input_1')
-            - port:
-                system_property: user.sys.props.port
+            - port: "'22'"
 
     - implicit_alias:
         do:
           check_op:
             - city: str('input_1')
-            - port:
-                system_property: user.sys.props.port
+            - port: "'22'"

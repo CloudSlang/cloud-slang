@@ -144,6 +144,25 @@ public class LanguageEventDataTest {
 	}
 
 	/**
+	 * Test method for {@link LanguageEventData#getArguments()}.
+	 */
+	@Test
+	public void testArguments() {
+		HashMap<String, Serializable> arguments = new HashMap<String, Serializable>() {
+
+			private static final long serialVersionUID = 161841000262993977L;
+			{
+				put("argument1", "str1");
+				put("argument2", 123L);
+				put("argument3", true);
+			}
+		};
+		eventData.setArguments(arguments);
+		assertEquals(arguments, eventData.getArguments());
+		assertEquals(arguments, eventData.get(LanguageEventData.BOUND_ARGUMENTS));
+	}
+
+	/**
 	 * Test method for {@link LanguageEventData#getOutputs()}.
 	 */
 	@Test
