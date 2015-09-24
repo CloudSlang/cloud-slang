@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
@@ -53,8 +54,8 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
         Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());
         Assert.assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
-        Assert.assertEquals("the inputs size is not as expected", 2, compilationArtifact.getInputs().size());
-        Assert.assertEquals("the system properties size is not as expected", 3, compilationArtifact.getSystemProperties().size());
+        Assert.assertEquals("the inputs size is not as expected", 3, compilationArtifact.getInputs().size());
+        Assert.assertEquals("the system properties size is not as expected", 2, compilationArtifact.getSystemProperties().size());
     }
 
     @Test
@@ -69,7 +70,7 @@ public class CompileBasicFlowTest {
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
-        Assert.assertEquals("execution plan name is different than expected", "SimpleFlow", executionPlan.getName());
+        Assert.assertEquals("execution plan name is different than expected", "flow_with_data", executionPlan.getName());
         Assert.assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
 
         ExecutionStep startStep = executionPlan.getStep(1L);
@@ -78,7 +79,7 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("there is a different number of inputs than expected", 1, inputs.size());
 
         ExecutionStep beginTaskStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") List<Input> taskArguments = (List<Input>) beginTaskStep.getActionData().get(ScoreLangConstants.TASK_INPUTS_KEY);
+        @SuppressWarnings("unchecked") List<Argument> taskArguments = (List<Argument>) beginTaskStep.getActionData().get(ScoreLangConstants.TASK_ARGUMENTS_KEY);
         Assert.assertNotNull("arguments doesn't exist", taskArguments);
         Assert.assertEquals("there is a different number of arguments than expected", 2, taskArguments.size());
         Assert.assertEquals("city", taskArguments.get(0).getName());
@@ -119,7 +120,7 @@ public class CompileBasicFlowTest {
         Assert.assertNotNull("Pre-Compiled meta-data is null", flow);
         Assert.assertEquals("Flow name is wrong", "basic_flow", flow.getName());
         Assert.assertEquals("Flow namespace is wrong", "user.ops", flow.getNamespace());
-        Assert.assertEquals("There is a different number of flow inputs than expected", 2, flow.getInputs().size());
+        Assert.assertEquals("There is a different number of flow inputs than expected", 3, flow.getInputs().size());
         Assert.assertEquals("There is a different number of flow outputs than expected", 0, flow.getOutputs().size());
         Assert.assertEquals("There is a different number of flow results than expected", 2, flow.getResults().size());
         Set<String> dependencies = flow.getDependencies();

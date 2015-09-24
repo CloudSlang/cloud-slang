@@ -5,24 +5,22 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: user.flows
+namespace: io.cloudslang
 
 imports:
   ops: user.ops
 
 flow:
-  name: child_flow
-  inputs:
-    - input1: "'value'"
-    - time_zone_as_string:
-        system_property: user.sys.props.port
+  name: flow_implicit_alias_for_current_namespace
   workflow:
-    - task01:
-        do:
-          ops.get_time_zone:
-            - time_zone_as_string
-    - task02:
+    - explicit_alias:
         do:
           ops.test_op:
-  outputs:
-    - val_output: fromInputs['input1']
+            - city: str('input_1')
+            - port: "'22'"
+
+    - implicit_alias:
+        do:
+          check_op:
+            - city: str('input_1')
+            - port: "'22'"

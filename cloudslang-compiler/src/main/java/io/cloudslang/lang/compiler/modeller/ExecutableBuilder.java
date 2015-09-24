@@ -12,6 +12,7 @@ import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import org.apache.commons.collections4.CollectionUtils;
@@ -273,7 +274,10 @@ public class ExecutableBuilder {
         } catch (Exception ex){
             throw new RuntimeException("For task: " + taskName + " syntax is illegal.\n" + ex.getMessage(), ex);
         }
-        List<Input> inputs = (List<Input>)preTaskData.get(SlangTextualKeys.DO_KEY);
+
+        @SuppressWarnings("unchecked")
+        List<Argument> arguments = (List<Argument>)preTaskData.get(SlangTextualKeys.DO_KEY);
+
         @SuppressWarnings("unchecked") Map<String, Object> doRawData = (Map<String, Object>) taskRawData.get(SlangTextualKeys.DO_KEY);
         if (MapUtils.isEmpty(doRawData)) {
             throw new RuntimeException("Task: \'" + taskName + "\' has no reference information");
@@ -294,7 +298,7 @@ public class ExecutableBuilder {
                 taskName,
                 preTaskData,
                 postTaskData,
-                inputs,
+                arguments,
                 navigationStrings,
                 refId,
                 preTaskData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));

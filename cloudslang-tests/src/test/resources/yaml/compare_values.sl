@@ -5,23 +5,17 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: slang.sample.flows
+namespace: user.ops
 
-imports:
-  ops: user.ops
-
-flow:
-  name: flow_with_data
+operation:
+  name: compare_values
   inputs:
-  - city_name
-
-  workflow:
-    - CheckWeather:
-        do:
-          ops.check_Weather:
-            - city: city_name
-            - country: str('Israel')
-        publish:
-          - weather
-  outputs:
-    - weather
+    - eq_str_bla
+    - eq_int_22
+    - eq_bool_true
+  action:
+    python_script: |
+      result = (eq_str_bla == 'bla') and (eq_int_22 == 22) and (eq_bool_true)
+  results:
+    - SUCCESS: result
+    - FAILURE

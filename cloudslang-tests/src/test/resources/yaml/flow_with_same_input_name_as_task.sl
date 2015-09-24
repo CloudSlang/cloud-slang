@@ -20,10 +20,7 @@ flow:
         do:
           ops.string_equals:
             - first_string: "'prefix_' + first"
-            - second_string:
-                default: >
-                  'prefix_' + second_string
-                overridable: false
+            - second_string: "'prefix_' + second_string"
         navigate:
           SUCCESS: TaskOnSuccess
           FAILURE: TaskOnFailure

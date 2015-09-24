@@ -2,6 +2,7 @@ package io.cloudslang.lang.entities;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Result;
 import org.junit.Test;
 import io.cloudslang.lang.entities.bindings.Input;
@@ -39,6 +40,15 @@ public class DeserializeTest {
                 true,
                 "system_property_ok_a_kind");
         testToAndFromJson(input, Input.class);
+    }
+
+    @Test
+    public void testDeserializeArgument() throws IOException {
+        Argument argument = new Argument(
+                "new_argument",
+                "some_expression"
+        );
+        testToAndFromJson(argument, Argument.class);
     }
 
     @Test

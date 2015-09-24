@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler.scorecompiler;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.*;
+import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
@@ -53,7 +54,7 @@ public class ExecutionStepFactoryTest {
         LoopStatement statement = new ListForLoopStatement("1", "2");
         HashMap<String, Serializable> preTaskData = new HashMap<>();
         preTaskData.put(SlangTextualKeys.FOR_KEY, statement);
-        ExecutionStep startStep = factory.createBeginTaskStep(1L, new ArrayList<Input>(), preTaskData, "", "");
+        ExecutionStep startStep = factory.createBeginTaskStep(1L, new ArrayList<Argument>(), preTaskData, "", "");
         LoopStatement actualStatement = (LoopStatement) startStep.getActionData()
                                  .get(ScoreLangConstants.LOOP_KEY);
         Assert.assertNotNull("for key is null", actualStatement);

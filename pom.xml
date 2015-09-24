@@ -10,7 +10,7 @@
     -->
     <groupId>io.cloudslang.lang</groupId>
     <artifactId>cloudslang</artifactId>
-    <version>0.8.2-SNAPSHOT</version>
+    <version>0.8.3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A DSL for writing flows</description>
@@ -161,7 +161,7 @@
             <dependency>
                 <groupId>io.cloudslang.content</groupId>
                 <artifactId>score-ssh</artifactId>
-                <version>0.0.25</version>
+                <version>0.0.30</version>
             </dependency>
             <dependency>
                 <groupId>io.cloudslang.content</groupId>
