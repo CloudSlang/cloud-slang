@@ -60,7 +60,7 @@ public class CompilerHelperImpl implements CompilerHelper{
     private Yaml yaml;
 
     @Override
-	public CompilationArtifact compile(String filePath, List<String> dependencies) throws IOException {
+	public CompilationArtifact compile(String filePath, List<String> dependencies, List<String> additionalDependencies) throws IOException {
         Validate.notNull(filePath, "File path can not be null");
         Set<SlangSource> depsSources = new HashSet<>();
         File file = new File(filePath);
@@ -82,6 +82,9 @@ public class CompilerHelperImpl implements CompilerHelper{
                 //default behavior is taking the parent dir if not running from our executables
                 dependencies.add(file.getParent());
             }
+        }
+        if (CollectionUtils.isNotEmpty(additionalDependencies)){
+            dependencies.addAll(additionalDependencies);
         }
         for (String dependency:dependencies) {
             Collection<File> dependenciesFiles = FileUtils.listFiles(new File(dependency), SLANG_FILE_EXTENSIONS, true);

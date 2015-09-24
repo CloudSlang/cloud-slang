@@ -30,10 +30,9 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -49,12 +48,12 @@ public class CompilerHelperTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testFilePathWrong() throws Exception {
-        compilerHelper.compile(null, null);
+        compilerHelper.compile(null, null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFilePathNotFile() throws Exception {
-        compilerHelper.compile("xxx", null);
+        compilerHelper.compile("xxx", null, null);
     }
 
     @Before
@@ -67,7 +66,7 @@ public class CompilerHelperTest {
         URI flowFilePath = getClass().getResource("/flow.yaml").toURI();
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("must have one of the following extensions");
-        compilerHelper.compile(flowFilePath.getPath(), null);
+        compilerHelper.compile(flowFilePath.getPath(), null, null);
 
     }
 
@@ -76,19 +75,82 @@ public class CompilerHelperTest {
 		URI flowFilePath = getClass().getResource("/flow.sl").toURI();
 		URI opFilePath = getClass().getResource("/test_op.sl").toURI();
 		URI flow2FilePath = getClass().getResource("/flowsdir/flow2.sl").toURI();
+        URI flow3FilePath = getClass().getResource("/additionalflowsdir/flow3.sl").toURI();
 		URI spFlow = getClass().getResource("/sp/flow.sl").toURI();
 		URI spOp = getClass().getResource("/sp/operation.sl").toURI();
-		compilerHelper.compile(flowFilePath.getPath(), null);
+		compilerHelper.compile(flowFilePath.getPath(), null, null);
 		Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath), Sets.newHashSet(SlangSource.fromFile(flowFilePath), SlangSource.fromFile(flow2FilePath),
-			SlangSource.fromFile(opFilePath), SlangSource.fromFile(spFlow), SlangSource.fromFile(spOp)));
+                SlangSource.fromFile(opFilePath), SlangSource.fromFile(spFlow), SlangSource.fromFile(spOp), SlangSource.fromFile(flow3FilePath)));
 	}
+
+    @Test
+    public void testFilePathValidWithSpecifiedCpAndAddCp() throws Exception{
+        URI flowFilePath = getClass().getResource("/flowsdir/flow2.sl").toURI();
+        URI classPath = getClass().getResource("/flowsdir/").toURI();
+        URI additionalDependency = getClass().getResource("/additionalflowsdir/flow3.sl").toURI();
+        URI additionalClassPath = getClass().getResource("/additionalflowsdir/").toURI();
+
+        compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(classPath.getPath()), Lists.newArrayList(additionalClassPath.getPath()));
+        Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath),
+                Sets.newHashSet(SlangSource.fromFile(additionalDependency), SlangSource.fromFile(flowFilePath)));
+    }
+
+    @Test
+    public void testFilePathValidWithDefaultCpAndAddCp() throws Exception{
+        Set<SlangSource> sources = Sets.newHashSet();
+        sources.add(SlangSource.fromFile(getClass().getResource("/flowsdir/flow2.sl").toURI()));
+        sources.add(SlangSource.fromFile(getClass().getResource("/sp/flow.sl").toURI()));
+        sources.add(SlangSource.fromFile(getClass().getResource("/sp/operation.sl").toURI()));
+        sources.add(SlangSource.fromFile(getClass().getResource("/test_op.sl").toURI()));
+        sources.add(SlangSource.fromFile(getClass().getResource("/additionalflowsdir/flow3.sl").toURI()));
+        sources.add(SlangSource.fromFile(getClass().getResource("/flow.sl").toURI()));
+
+        URI flowFilePath = getClass().getResource("/flow.sl").toURI();
+
+        URI additionalClassPath = getClass().getResource("/additionalflowsdir/").toURI();
+
+        compilerHelper.compile(flowFilePath.getPath(), null, Lists.newArrayList(additionalClassPath.getPath()));
+
+
+        Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath), sources);
+    }
+
+    @Test
+         public void testFilePathValidWithSameFolderForCpAndAddCp() throws Exception{
+        URI flowFilePath = getClass().getResource("/flowsdir/flow2.sl").toURI();
+        URI classPath = getClass().getResource("/flowsdir/").toURI();
+
+        URI additionalClassPath = getClass().getResource("/flowsdir/").toURI();
+
+        compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(classPath.getPath()), Lists.newArrayList(additionalClassPath.getPath()));
+        Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath),
+                Sets.newHashSet(SlangSource.fromFile(flowFilePath)));
+    }
+
+    @Test
+    public void testFilePathValidWithDefaultCpFolderForAddCp() throws Exception{
+        Set<SlangSource> sources = Sets.newHashSet();
+        sources.add(SlangSource.fromFile(getClass().getResource("/flowsdir/flow2.sl").toURI()));
+        sources.add(SlangSource.fromFile(getClass().getResource("/sp/flow.sl").toURI()));
+        sources.add(SlangSource.fromFile(getClass().getResource("/sp/operation.sl").toURI()));
+        sources.add(SlangSource.fromFile(getClass().getResource("/test_op.sl").toURI()));
+        sources.add(SlangSource.fromFile(getClass().getResource("/additionalflowsdir/flow3.sl").toURI()));
+        sources.add(SlangSource.fromFile(getClass().getResource("/flow.sl").toURI()));
+
+        URI additionalClassPath = getClass().getResource("/").toURI();
+
+        URI flowFilePath = getClass().getResource("/flow.sl").toURI();
+
+        compilerHelper.compile(flowFilePath.getPath(), null, Lists.newArrayList(additionalClassPath.getPath()));
+        Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath), sources);
+    }
 
     @Test
     public void testFilePathValidWithOtherPathForDependencies() throws Exception {
         URI flowFilePath = getClass().getResource("/flow.sl").toURI();
         URI folderPath = getClass().getResource("/flowsdir/").toURI();
         URI flow2FilePath = getClass().getResource("/flowsdir/flow2.sl").toURI();
-        compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(folderPath.getPath()));
+        compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(folderPath.getPath()), null);
         Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath),
                 Sets.newHashSet(SlangSource.fromFile(flow2FilePath)));
     }
@@ -97,13 +159,13 @@ public class CompilerHelperTest {
     public void testInvalidDirPathForDependencies() throws Exception {
         String flowFilePath = getClass().getResource("/flow.sl").getPath();
         String invalidDirPath = getClass().getResource("").getPath().concat("xxx");
-        compilerHelper.compile(flowFilePath, Lists.newArrayList(invalidDirPath));
+        compilerHelper.compile(flowFilePath, Lists.newArrayList(invalidDirPath), null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidDirPathForDependencies2() throws Exception {
         String flowFilePath = getClass().getResource("/flow.sl").getPath();
-        compilerHelper.compile(flowFilePath, Lists.newArrayList(flowFilePath));
+        compilerHelper.compile(flowFilePath, Lists.newArrayList(flowFilePath), null);
     }
 
 	@Test
