@@ -217,17 +217,6 @@ public class CompilerErrorsTest {
     }
 
     @Test
-    public void testFlowWithMissingAlias() throws Exception {
-        URI resource = getClass().getResource("/corrupted/missing_dependency_alias_in_imports_flow.sl").toURI();
-
-        Set<SlangSource> path = new HashSet<>();
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("alias");
-        exception.expectMessage("ops");
-        compiler.compile(SlangSource.fromFile(resource), path);
-    }
-
-    @Test
     public void testFlowWithMissingName() throws Exception {
         URI resource = getClass().getResource("/corrupted/missing_name_flow.sl").toURI();
 

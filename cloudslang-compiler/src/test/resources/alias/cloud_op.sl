@@ -4,16 +4,12 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-namespace: io.cloudslang
 
-imports:
-  opertions: io.cloudslang
+namespace: cloud
 
-flow:
-  name: missing_dependency_alias_in_imports_flow
+operation:
+  name: cloud_op
   inputs:
-    - input1
-  workflow:
-    - task1:
-        do:
-          ops.op1:
+    - cool_input: 1992
+  action:
+    python_script: 'print "hello world"'

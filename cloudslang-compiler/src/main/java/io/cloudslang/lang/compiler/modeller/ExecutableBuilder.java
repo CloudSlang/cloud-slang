@@ -50,6 +50,7 @@ import static io.cloudslang.lang.entities.ScoreLangConstants.*;
 public class ExecutableBuilder {
 
     public static final String MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX = "Multiple 'on_failure' properties found";
+    public static final String NAMESPACE_DELIMITER = ".";
 
     @Autowired
     private List<Transformer> transformers;
@@ -282,7 +283,7 @@ public class ExecutableBuilder {
             throw new RuntimeException("Task: \'" + taskName + "\' has no reference information");
         }
         String refString = doRawData.keySet().iterator().next();
-        String refId = resolveRefId(refString, imports, namespace);
+        String refId = resolveReferenceID(refString, imports, namespace);
 
         @SuppressWarnings("unchecked") Map<String, String> navigationStrings = (Map<String, String>) postTaskData.get(SlangTextualKeys.NAVIGATION_KEY);
 
@@ -303,17 +304,27 @@ public class ExecutableBuilder {
                 preTaskData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
     }
 
-	private static String resolveRefId(String refIdString, Map<String, String> imports, String namespace) {
-        if (refIdString.contains(".")) {
-            Validate.notNull(imports, "No imports specified for source: " + refIdString);
-            String alias = StringUtils.substringBefore(refIdString, ".");
-            if (! imports.containsKey(alias)) throw new RuntimeException("Unresolved alias: " + alias);
-            String refName = StringUtils.substringAfter(refIdString, ".");
-            return imports.get(alias) + "." + refName;
+    private static String resolveReferenceID(String rawReferenceID, Map<String, String> imports, String namespace) {
+        int numberOfDelimiters = StringUtils.countMatches(rawReferenceID, NAMESPACE_DELIMITER);
+        String resolvedReferenceID;
+
+        if (numberOfDelimiters == 0) {
+            // implicit namespace
+            resolvedReferenceID = namespace + NAMESPACE_DELIMITER + rawReferenceID;
         } else {
-            return namespace + "." + refIdString;
+            String prefix = StringUtils.substringBefore(rawReferenceID, NAMESPACE_DELIMITER);
+            String suffix = StringUtils.substringAfter(rawReferenceID, NAMESPACE_DELIMITER);
+            if (MapUtils.isNotEmpty(imports) && imports.containsKey(prefix)) {
+                // expand alias
+                resolvedReferenceID = imports.get(prefix) + NAMESPACE_DELIMITER + suffix;
+            } else {
+                // full path without alias expanding
+                resolvedReferenceID = rawReferenceID;
+            }
         }
-	}
+
+        return resolvedReferenceID;
+    }
 
     /**
      * Fetch the first level of the dependencies of the executable (non recursively)

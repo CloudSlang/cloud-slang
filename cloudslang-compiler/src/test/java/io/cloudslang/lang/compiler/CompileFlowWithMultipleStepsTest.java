@@ -11,18 +11,16 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.score.api.ExecutionPlan;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import io.cloudslang.score.api.ExecutionPlan;
-import org.mockito.internal.util.collections.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URI;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /*
@@ -56,25 +54,6 @@ public class CompileFlowWithMultipleStepsTest {
     }
 
     @Test
-    public void testImplicitAliasForCurrentNamespace() throws Exception {
-        URI flow = getClass().getResource("/flow_implicit_alias_for_current_namespace.sl").toURI();
-        URI operation1 = getClass().getResource("/test_op.sl").toURI();
-        URI operation2 = getClass().getResource("/check_op.sl").toURI();
-
-        Set<SlangSource> path = new HashSet<>();
-        path.add(SlangSource.fromFile(operation1));
-        path.add(SlangSource.fromFile(operation2));
-
-        CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
-
-        Map<String, ExecutionPlan> dependencies= compilationArtifact.getDependencies();
-        Assert.assertNotNull("dependencies reference is null", dependencies);
-        Set<String> actualDependencies = dependencies.keySet();
-        Set<String> expectedDependencies = Sets.newSet("user.ops.test_op", "io.cloudslang.check_op");
-        junit.framework.Assert.assertEquals("dependencies are not resolved as expected", expectedDependencies, actualDependencies);
-    }
-
-    @Test
     public void testPreCompileFlowBasic() throws Exception {
         URI flowUri = getClass().getResource("/flow_with_multiple_steps.yaml").toURI();
         Executable flow = compiler.preCompile(SlangSource.fromFile(flowUri));
@@ -87,6 +66,5 @@ public class CompileFlowWithMultipleStepsTest {
         Assert.assertEquals("There is a different number of flow results than expected", 2, flow.getResults().size());
         Assert.assertEquals("There is a different number of flow dependencies than expected", 3, flow.getDependencies().size());
     }
-
 
 }
