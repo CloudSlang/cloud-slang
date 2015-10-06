@@ -86,7 +86,7 @@ public class ExecutionStepFactoryTest {
 
     @Test (expected = RuntimeException.class)
     public void testCreateActionStepWithEmptyData() throws Exception {
-        factory.createActionStep(1L, new HashMap<String, Serializable>());
+        factory.createActionStep(1L, new HashMap<String, Serializable>(), "operationName");
     }
 
     @Test
@@ -95,7 +95,7 @@ public class ExecutionStepFactoryTest {
         HashMap<String, String> javaActionData = new HashMap<>();
         javaActionData.put("key", "value");
         actionRawData.put(SlangTextualKeys.JAVA_ACTION, javaActionData);
-        ExecutionStep actionStep = factory.createActionStep(1L, actionRawData);
+        ExecutionStep actionStep = factory.createActionStep(1L, actionRawData, "operationName");
         Assert.assertNotNull("step should not be null", actionStep);
         Assert.assertEquals(actionStep.getActionData().get("key"), "value");
     }
@@ -104,14 +104,14 @@ public class ExecutionStepFactoryTest {
     public void testCreatePythonActionStep() throws Exception {
         HashMap<String, Serializable> actionRawData = new HashMap<>();
         actionRawData.put(ScoreLangConstants.PYTHON_SCRIPT_KEY, "print 'Hi there'");
-        ExecutionStep actionStep = factory.createActionStep(1L, actionRawData);
+        ExecutionStep actionStep = factory.createActionStep(1L, actionRawData, "operationName");
         Assert.assertNotNull("step should not be null", actionStep);
         Assert.assertEquals(actionStep.getActionData().get(ScoreLangConstants.PYTHON_SCRIPT_KEY), "print 'Hi there'");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateActionStepWithNullData() throws Exception {
-        factory.createActionStep(1L, null);
+        factory.createActionStep(1L, null, "operationName");
     }
 
     @Test
