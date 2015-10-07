@@ -291,7 +291,7 @@ public class ActionSteps extends AbstractSteps {
                         throw new RuntimeException("Problem occurred in operation: '" + operationName + "':\n" +
                                 "Non-serializable values are not allowed in the output context of a Python script:\n" +
                                 "\tConversion failed for '" + key + "' (" + String.valueOf(value) + "),\n" +
-                                "\tThe error can be solved by removing the variable from the context in the script: e.g. 'del " + key + "'.", e);
+                                "\tThe error can be solved by removing the variable from the context in the script: e.g. 'del " + key + "'.\n", e);
                     }
                 }
                 throw e;
