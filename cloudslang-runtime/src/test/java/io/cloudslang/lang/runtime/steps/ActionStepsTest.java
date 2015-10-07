@@ -52,6 +52,7 @@ import static org.mockito.Mockito.mock;
 public class ActionStepsTest {
 
     private static final long DEFAULT_TIMEOUT = 10000;
+    private static final String NON_SERIALIZABLE_VARIABLE_NAME = "current_time";
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -602,11 +603,11 @@ public class ActionStepsTest {
         Map<String, Object> nonSerializableExecutionData = new HashMap<>();
         String userPythonScript =
                 "from datetime import datetime\n" +
-                "current_time = datetime.utcnow()";
+                NON_SERIALIZABLE_VARIABLE_NAME + " = datetime.utcnow()";
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("nonSerializableOutputOperation");
-        exception.expectMessage("current_time");
+        exception.expectMessage(NON_SERIALIZABLE_VARIABLE_NAME);
         exception.expectMessage("serializable");
 
         actionSteps.doAction(runEnv, nonSerializableExecutionData, PYTHON, "", "", executionRuntimeServicesMock, userPythonScript, 2L, "nonSerializableOutputOperation");

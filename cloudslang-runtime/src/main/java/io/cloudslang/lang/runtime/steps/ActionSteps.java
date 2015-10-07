@@ -247,6 +247,7 @@ public class ActionSteps extends AbstractSteps {
             String script,
             String operationName) {
 
+        cleanInterpreter(interpreter);
         try {
             executePythonScript(interpreter, script, callArguments);
         } catch (PyException e) {
@@ -263,7 +264,6 @@ public class ActionSteps extends AbstractSteps {
             Serializable javaValue = resolveJythonObjectToJava(key, value, operationName);
             returnValue.put(key, javaValue);
         }
-        cleanInterpreter(interpreter);
         return returnValue;
     }
 
