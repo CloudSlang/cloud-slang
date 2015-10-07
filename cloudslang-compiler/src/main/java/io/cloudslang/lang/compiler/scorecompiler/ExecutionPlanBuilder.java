@@ -57,7 +57,7 @@ public class ExecutionPlanBuilder {
 
         executionPlan.addStep(stepFactory.createStartStep(1L, compiledOp.getPreExecActionData(), compiledOp.getInputs(),
                 compiledOp.getName()));
-        executionPlan.addStep(stepFactory.createActionStep(2L, compiledOp.getAction().getActionData()));
+        executionPlan.addStep(stepFactory.createActionStep(2L, compiledOp.getAction().getActionData(), compiledOp.getName()));
         executionPlan.addStep(stepFactory.createEndStep(3L, compiledOp.getPostExecActionData(), compiledOp.getOutputs(),
                 compiledOp.getResults(), compiledOp.getName()));
         return executionPlan;

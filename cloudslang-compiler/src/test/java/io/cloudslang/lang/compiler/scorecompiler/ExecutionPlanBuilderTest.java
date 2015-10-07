@@ -158,7 +158,7 @@ public class ExecutionPlanBuilderTest {
         Map<String, Serializable> postOpActionData = new HashMap<>();
         Map<String, Serializable> actionData = new HashMap<>();
         Action action = new Action(actionData);
-        String operationName = "opName";
+        String operationName = "operationName";
         String opNamespace = "user.flows";
         List<Input> inputs = new ArrayList<>();
         List<Output> outputs = new ArrayList<>();
@@ -168,7 +168,7 @@ public class ExecutionPlanBuilderTest {
                 new Operation(preOpActionData, postOpActionData, action, opNamespace, operationName, inputs, outputs, results, null);
 
         mockStartStep(compiledOperation);
-        when(stepFactory.createActionStep(eq(2L), same(actionData))).thenReturn(new ExecutionStep(2L));
+        when(stepFactory.createActionStep(eq(2L), same(actionData), eq("operationName"))).thenReturn(new ExecutionStep(2L));
         mockEndStep(3L, compiledOperation);
 
         ExecutionPlan executionPlan = executionPlanBuilder.createOperationExecutionPlan(compiledOperation);
