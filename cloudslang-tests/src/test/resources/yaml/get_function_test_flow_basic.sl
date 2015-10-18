@@ -11,7 +11,7 @@ imports:
   ops: user.ops
 
 flow:
-  name: get_function_test_flow
+  name: get_function_test_flow_basic
   inputs:
     - input1:
         default: None
@@ -28,11 +28,25 @@ flow:
         default: get('input2', 'input2_default')
         overridable: false
         required: false
+    - input_locals_found:
+        default: locals().get('input2', 'input_locals_found_default')
+        overridable: false
+        required: false
+    - input_locals_not_found:
+        default: locals().get('input2_i_dont_exist', 'input_locals_not_found_default')
+        overridable: false
+        required: false
   workflow:
     - Task1:
         do:
-          ops.get_function_test: []
+          ops.get_function_test_basic: []
         publish:
           - output1_safe
           - output2_safe
           - output_same_name
+        navigate:
+          GET_FUNCTION_KEY_EXISTS: GET_FUNCTION_KEY_EXISTS
+          GET_FUNCTION_PROBLEM: GET_FUNCTION_PROBLEM
+  results:
+    - GET_FUNCTION_KEY_EXISTS
+    - GET_FUNCTION_PROBLEM

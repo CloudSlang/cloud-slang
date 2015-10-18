@@ -20,10 +20,8 @@ import org.junit.rules.ExpectedException;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.net.URL;
+import java.util.*;
 
 /**
  * Date: 11/14/2014
@@ -159,4 +157,63 @@ public class SimpleFlowTest extends SystemsTestsParent {
         Assert.assertEquals("CheckBinding", firstTask.getName());
         Assert.assertEquals("TaskOnSuccess", secondTask.getName());
     }
+
+    @Test
+    public void testGetFunctionBasic() throws Exception {
+        URL resource = getClass().getResource("/yaml/get_function_test_flow_basic.sl");
+        URI operation = getClass().getResource("/yaml/get_function_test_basic.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
+
+        // trigger ExecutionPlan
+        Map<String, Serializable> userInputs = new HashMap<>();
+        RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, null);
+        Map<String, StepData> executionData = runtimeInformation.getTasks();
+
+        StepData flowData = executionData.get(EXEC_START_PATH);
+        StepData taskData = executionData.get(FIRST_STEP_PATH);
+        Assert.assertNotNull("flow data is null", flowData);
+        Assert.assertNotNull("task data is null", taskData);
+
+        // verify 'get' function worked in input binding and locals().get() works
+        Map<String, Serializable> expectedFlowInputs = new LinkedHashMap<>();
+        expectedFlowInputs.put("input1", null);
+        expectedFlowInputs.put("input1_safe", "input1_default");
+        expectedFlowInputs.put("input2", 22);
+        expectedFlowInputs.put("input2_safe", 22);
+        expectedFlowInputs.put("input_locals_found", 22);
+        expectedFlowInputs.put("input_locals_not_found", "input_locals_not_found_default");
+        Map<String, Serializable> actualFlowInputs = flowData.getInputs();
+        Assert.assertEquals("flow input values not as expected", expectedFlowInputs, actualFlowInputs);
+
+        // verify 'get' function worked in output binding
+        Map<String, Serializable> expectedOperationPublishValues = new LinkedHashMap<>();
+        expectedOperationPublishValues.put("output1_safe", "CloudSlang");
+        expectedOperationPublishValues.put("output2_safe", "output2_default");
+        expectedOperationPublishValues.put("output_same_name", "output_same_name_default");
+        Map<String, Serializable> actualOperationPublishValues = taskData.getOutputs();
+        Assert.assertEquals("operation publish values not as expected", expectedOperationPublishValues, actualOperationPublishValues);
+
+        // verify 'get' function worked in result expressions
+        Assert.assertEquals("Get function problem in result expression", "GET_FUNCTION_KEY_EXISTS", flowData.getResult());
+    }
+
+    @Test
+    public void testGetFunctionDefaultResult() throws Exception {
+        URL resource = getClass().getResource("/yaml/get_function_test_flow_default_result.sl");
+        URI operation = getClass().getResource("/yaml/get_function_test_default_result.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
+
+        // trigger ExecutionPlan
+        Map<String, Serializable> userInputs = new HashMap<>();
+        RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, null);
+        Map<String, StepData> executionData = runtimeInformation.getTasks();
+
+        StepData flowData = executionData.get(EXEC_START_PATH);
+
+        // verify 'get' function worked in result expressions
+        Assert.assertEquals("Get function problem in result expression", "GET_FUNCTION_DEFAULT_VALUE", flowData.getResult());
+    }
+
 }

@@ -10,7 +10,6 @@
 
 package io.cloudslang.lang.systemtests;
 
-import com.google.common.collect.Sets;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
@@ -24,9 +23,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * User: stoneo
@@ -120,41 +117,6 @@ public class OperationSystemTest extends SystemsTestsParent {
         Assert.assertEquals(false, execStepData.getOutputs().get("condition_3"));
         Assert.assertEquals(true, execStepData.getOutputs().get("condition_4"));
         Assert.assertEquals(1, execStepData.getOutputs().get("an_int"));
-    }
-
-    @Test
-    public void testGetFunction() throws Exception {
-        URL resource = getClass().getResource("/yaml/get_function_test_flow.sl");
-        URI operation = getClass().getResource("/yaml/get_function_test.sl").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
-
-        //Trigger ExecutionPlan
-        Map<String, Serializable> userInputs = new HashMap<>();
-        RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, null);
-        Map<String, StepData> executionData = runtimeInformation.getTasks();
-
-        StepData flowData = executionData.get(EXEC_START_PATH);
-        StepData taskData = executionData.get(FIRST_STEP_PATH);
-        Assert.assertNotNull("flow data is null", flowData);
-        Assert.assertNotNull("task data is null", taskData);
-
-        // verify 'get' function worked in input binding
-        Map<String, Serializable> expectedFlowInputs = new LinkedHashMap<>();
-        expectedFlowInputs.put("input1", null);
-        expectedFlowInputs.put("input1_safe", "input1_default");
-        expectedFlowInputs.put("input2", 22);
-        expectedFlowInputs.put("input2_safe", 22);
-        Map<String, Serializable> actualFlowInputs = flowData.getInputs();
-        Assert.assertEquals("flow input values not as expected", expectedFlowInputs, actualFlowInputs);
-
-        // verify 'get' function worked in output binding
-        Map<String, Serializable> expectedOperationPublishValues = new LinkedHashMap<>();
-        expectedOperationPublishValues.put("output1_safe", "CloudSlang");
-        expectedOperationPublishValues.put("output2_safe", "output2_default");
-        expectedOperationPublishValues.put("output_same_name", "output_same_name_default");
-        Map<String, Serializable> actualOperationPublishValues = taskData.getOutputs();
-        Assert.assertEquals("operation publish values not as expected", expectedOperationPublishValues, actualOperationPublishValues);
     }
 
 }
