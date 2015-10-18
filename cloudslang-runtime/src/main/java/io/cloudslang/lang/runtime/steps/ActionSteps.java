@@ -22,16 +22,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
-import org.python.core.Py;
-import org.python.core.PyBoolean;
-import org.python.core.PyException;
-import org.python.core.PyFile;
-import org.python.core.PyFunction;
-import org.python.core.PyModule;
-import org.python.core.PyObject;
-import org.python.core.PyStringMap;
-import org.python.core.PySystemState;
-import org.python.core.PyType;
+import org.python.core.*;
 import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -40,7 +31,6 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -68,7 +58,8 @@ public class ActionSteps extends AbstractSteps {
                          @Param(ScoreLangConstants.ACTION_METHOD_KEY) String methodName,
                          @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                          @Param(ScoreLangConstants.PYTHON_SCRIPT_KEY) String python_script,
-                         @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId) {
+                         @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
+                         @Param(ScoreLangConstants.OPERATION_NAME_KEY) String operationName) {
 
         Map<String, Serializable> returnValue = new HashMap<>();
         Map<String, Serializable> callArguments = runEnv.removeCallArguments();
@@ -82,7 +73,7 @@ public class ActionSteps extends AbstractSteps {
                     returnValue = runJavaAction(serializableSessionData, callArguments, nonSerializableExecutionData, className, methodName);
                     break;
                 case PYTHON:
-                    returnValue = prepareAndRunPythonAction(callArguments, python_script);
+                    returnValue = prepareAndRunPythonAction(callArguments, python_script, operationName);
                     break;
                 default:
                     break;
@@ -240,19 +231,23 @@ public class ActionSteps extends AbstractSteps {
     @SuppressWarnings("unchecked")
     private Map<String, Serializable> prepareAndRunPythonAction(
             Map<String, Serializable> callArguments,
-            String pythonScript) {
+            String pythonScript,
+            String operationName) {
 
         if (StringUtils.isNotBlank(pythonScript)) {
-            return runPythonAction(callArguments, pythonScript);
+            return runPythonAction(callArguments, pythonScript, operationName);
         }
 
         throw new RuntimeException("Python script not found in action data");
     }
 
     //we need this method to be synchronized so we will not have multiple scripts run in parallel on the same context
-    private synchronized Map<String, Serializable> runPythonAction(Map<String, Serializable> callArguments,
-                                                             String script) {
+    private synchronized Map<String, Serializable> runPythonAction(
+            Map<String, Serializable> callArguments,
+            String script,
+            String operationName) {
 
+        cleanInterpreter(interpreter);
         try {
             executePythonScript(interpreter, script, callArguments);
         } catch (PyException e) {
@@ -266,10 +261,9 @@ public class ActionSteps extends AbstractSteps {
             if (keyIsExcluded(key, value)) {
                 continue;
             }
-            Serializable javaValue = resolveJythonObjectToJava(value);
+            Serializable javaValue = resolveJythonObjectToJava(key, value, operationName);
             returnValue.put(key, javaValue);
         }
-        cleanInterpreter(interpreter);
         return returnValue;
     }
 
@@ -281,12 +275,27 @@ public class ActionSteps extends AbstractSteps {
                 value instanceof PySystemState;
     }
 
-    private Serializable resolveJythonObjectToJava(PyObject value) {
+    private Serializable resolveJythonObjectToJava(String key, PyObject value, String operationName) {
         if (value instanceof PyBoolean) {
             PyBoolean pyBoolean = (PyBoolean) value;
             return pyBoolean.getBooleanValue();
         } else {
-            return Py.tojava(value, Serializable.class);
+            try {
+                return Py.tojava(value, Serializable.class);
+            } catch (PyException e) {
+                PyObject typeObject = e.type;
+                if (typeObject instanceof PyType) {
+                    PyType type = (PyType) typeObject;
+                    String typeName = type.getName();
+                    if ("TypeError".equals(typeName)) {
+                        throw new RuntimeException("Problem occurred in operation: '" + operationName + "':\n" +
+                                "Non-serializable values are not allowed in the output context of a Python script:\n" +
+                                "\tConversion failed for '" + key + "' (" + String.valueOf(value) + "),\n" +
+                                "\tThe error can be solved by removing the variable from the context in the script: e.g. 'del " + key + "'.\n", e);
+                    }
+                }
+                throw e;
+            }
         }
     }
 
