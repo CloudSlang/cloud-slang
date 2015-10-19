@@ -118,4 +118,5 @@ public class OperationSystemTest extends SystemsTestsParent {
         Assert.assertEquals(true, execStepData.getOutputs().get("condition_4"));
         Assert.assertEquals(1, execStepData.getOutputs().get("an_int"));
     }
+
 }
