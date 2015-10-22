@@ -106,7 +106,7 @@ public class OutputsBindingTest {
     public void testOperationOutputsExpression() {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
-        List<Output> outputs = Arrays.asList(createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(fromInputs['port'])"));
+        List<Output> outputs = Arrays.asList(createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(self['port'])"));
 
         Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
 
@@ -146,7 +146,7 @@ public class OutputsBindingTest {
     public void testOperationOutputsInvalidExpression() {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
-        List<Output> outputs = Arrays.asList(createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(fromInputs[SHOULD_BE_STRING])"));
+        List<Output> outputs = Arrays.asList(createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(self[SHOULD_BE_STRING])"));
 
         outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
     }
@@ -157,7 +157,7 @@ public class OutputsBindingTest {
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(
                 createNoExpressionOutput("host1"),
-                createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(fromInputs['port'])"));
+                createExpressionOutput("hostFromExpression", "'http://' + hostExpr + ':' + str(self['port'])"));
 
         Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
 
