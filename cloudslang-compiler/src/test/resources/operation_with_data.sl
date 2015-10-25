@@ -48,7 +48,7 @@ operation:
   outputs:
     - output1: input1
     - output2: processId
-    - output3: fromInputs['input1']
+    - output3: self['input1']
     - output4
   results:
     - SUCCESS: 1 != 123456

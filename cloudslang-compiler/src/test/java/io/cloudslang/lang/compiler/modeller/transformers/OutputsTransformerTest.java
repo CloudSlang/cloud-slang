@@ -92,7 +92,7 @@ public class OutputsTransformerTest {
         @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
         Output output = outputs.get(2);
         Assert.assertEquals("output3", output.getName());
-        Assert.assertEquals("fromInputs['input1']", output.getExpression());
+        Assert.assertEquals("self['input1']", output.getExpression());
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
