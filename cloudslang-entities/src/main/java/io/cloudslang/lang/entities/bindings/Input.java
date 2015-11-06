@@ -8,6 +8,8 @@
  */
 package io.cloudslang.lang.entities.bindings;
 
+import java.io.Serializable;
+
 /**
  * @author orius123
  * @since 05/11/14.
@@ -22,7 +24,7 @@ public class Input extends InOutParam {
 	private boolean overridable;
 	private String systemPropertyName;
 
-	public Input(String name, String expression, boolean encrypted, boolean required, boolean overridable, String systemPropertyName) {
+	public Input(String name, Serializable expression, boolean encrypted, boolean required, boolean overridable, String systemPropertyName) {
 		super(name, expression);
 		this.encrypted = encrypted;
 		this.required = required;
@@ -30,7 +32,7 @@ public class Input extends InOutParam {
 		this.systemPropertyName = systemPropertyName;
 	}
 
-	public Input(String name, String expression) {
+	public Input(String name, Serializable expression) {
 		this(name, expression, false, true, true, null);
 	}
 

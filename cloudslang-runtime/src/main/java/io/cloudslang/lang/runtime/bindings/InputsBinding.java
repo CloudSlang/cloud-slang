@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class InputsBinding {
+public class InputsBinding extends Binding {
 
     @Autowired
     private ScriptEvaluator scriptEvaluator;
@@ -99,12 +99,15 @@ public class InputsBinding {
         }
 
         if (value == null) {
-            scriptContext.put(inputName, valueFromContext);
-            if (StringUtils.isNotEmpty(input.getExpression())) {
+            Serializable rawExpression = input.getExpression();
+            String expressionToEvaluate = extractExpression(rawExpression);
+            if (expressionToEvaluate != null) {
+                scriptContext.put(inputName, valueFromContext);
                 //so you can resolve previous inputs already bound
                 scriptContext.putAll(targetContext);
-                String expr = input.getExpression();
-                value = scriptEvaluator.evalExpr(expr, scriptContext);
+                value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext);
+            } else {
+                value = rawExpression;
             }
         }
 
