@@ -29,9 +29,7 @@ public abstract class Binding {
         String expression = null;
         if (value instanceof String) {
             String valueAsString = ((String) value);
-
             Matcher expressionMatcher = EXPRESSION_PATTERN.matcher(valueAsString);
-
             if (expressionMatcher.find()) {
                 expression = expressionMatcher.group(1);
             }
