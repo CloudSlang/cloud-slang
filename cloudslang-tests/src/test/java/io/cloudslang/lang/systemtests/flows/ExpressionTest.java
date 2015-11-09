@@ -57,6 +57,7 @@ public class ExpressionTest extends SystemsTestsParent {
         StepData taskData = steps.get(FIRST_STEP_PATH);
 
         verifyFlowInputs(flowData);
+        verifyFlowOutputs(flowData);
         verifyTaskInputs(taskData);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, flowData.getResult());
     }
@@ -94,7 +95,18 @@ public class ExpressionTest extends SystemsTestsParent {
         expectedInputs.put("input_concat_2_one_liner", "prefix_ab_suffix");
         expectedInputs.put("input_concat_2_folded", "prefix_ab_suffix");
 
-        Assert.assertEquals("Flow inputs not bound correctly", expectedInputs, flowData.getInputs());
+        Assert.assertTrue("Flow inputs not bound correctly", includeAllPairs(flowData.getInputs(), expectedInputs));
+    }
+
+    private void verifyFlowOutputs(StepData flowData) {
+        Map<String, Serializable> expectedOutputs = new HashMap<>();
+
+        expectedOutputs.put("output_no_expression", "output_no_expression_value");
+        expectedOutputs.put("output_int", 22);
+        expectedOutputs.put("output_str", "output_str_value");
+        expectedOutputs.put("output_expression", "output_str_value_suffix");
+
+        Assert.assertEquals("Flow outputs not bound correctly", expectedOutputs, flowData.getOutputs());
     }
 
     private void verifyTaskInputs(StepData taskData) {
@@ -127,7 +139,13 @@ public class ExpressionTest extends SystemsTestsParent {
         expectedTaskArguments.put("input_concat_2_one_liner", "prefix_ab_suffix");
         expectedTaskArguments.put("input_concat_2_folded", "prefix_ab_suffix");
 
-        Assert.assertEquals("Task arguments not bound correctly", expectedTaskArguments, taskData.getInputs());
+        Assert.assertTrue("Task arguments not bound correctly", includeAllPairs(taskData.getInputs(), expectedTaskArguments));
+    }
+
+    private boolean includeAllPairs(Map<String, Serializable> map1, Map<String, Serializable> map2) {
+        Map<String, Serializable> accumulator = new HashMap<>(map1);
+        accumulator.putAll(map2);
+        return accumulator.equals(map1);
     }
 
 }

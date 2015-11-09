@@ -52,6 +52,9 @@ flow:
         input_concat_1 +
         '_suffix'
         }
+
+    # used in output binding
+    - output_no_expression: output_no_expression_value
   workflow:
     - Task1:
         do:
@@ -83,6 +86,11 @@ flow:
                 input_concat_1 +
                 '_suffix'
                 }
+  outputs:
+    - output_no_expression
+    - output_int: 22
+    - output_str: output_str_value
+    - output_expression: ${ output_str + '_suffix' }
   results:
     - SUCCESS
     - FAILURE
