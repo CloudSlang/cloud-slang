@@ -38,5 +38,4 @@ public class PublishTransformer extends AbstractOutputsTransformer implements Tr
         return null;
     }
 
-
 }

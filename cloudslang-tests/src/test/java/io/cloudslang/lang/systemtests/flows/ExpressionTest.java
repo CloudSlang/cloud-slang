@@ -37,7 +37,7 @@ public class ExpressionTest extends SystemsTestsParent {
     public void testValuesInFlow() throws Exception {
         // compile
         URI resource = getClass().getResource("/yaml/formats/values_flow.sl").toURI();
-        URI operation = getClass().getResource("/yaml/noop.sl").toURI();
+        URI operation = getClass().getResource("/yaml/formats/values_op.sl").toURI();
 
         SlangSource dep = SlangSource.fromFile(operation);
         Set<SlangSource> path = Sets.newHashSet(dep);
@@ -59,6 +59,7 @@ public class ExpressionTest extends SystemsTestsParent {
         verifyFlowInputs(flowData);
         verifyFlowOutputs(flowData);
         verifyTaskInputs(taskData);
+        verifyTaskPublishValues(taskData);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, flowData.getResult());
     }
 
@@ -91,6 +92,7 @@ public class ExpressionTest extends SystemsTestsParent {
         expectedInputPythonMapQuotes.put("value", 2);
         expectedInputs.put("input_python_map_quotes", expectedInputPythonMapQuotes);
         expectedInputs.put("b", "b");
+        expectedInputs.put("b_copy", "b");
         expectedInputs.put("input_concat_1", "ab");
         expectedInputs.put("input_concat_2_one_liner", "prefix_ab_suffix");
         expectedInputs.put("input_concat_2_folded", "prefix_ab_suffix");
@@ -135,11 +137,23 @@ public class ExpressionTest extends SystemsTestsParent {
         expectedInputPythonMapQuotes.put("value", 2);
         expectedTaskArguments.put("input_python_map_quotes", expectedInputPythonMapQuotes);
         expectedTaskArguments.put("b", "b");
+        expectedTaskArguments.put("b_copy", "b");
         expectedTaskArguments.put("input_concat_1", "ab");
         expectedTaskArguments.put("input_concat_2_one_liner", "prefix_ab_suffix");
         expectedTaskArguments.put("input_concat_2_folded", "prefix_ab_suffix");
 
         Assert.assertTrue("Task arguments not bound correctly", includeAllPairs(taskData.getInputs(), expectedTaskArguments));
+    }
+
+    private void verifyTaskPublishValues(StepData taskData) {
+        Map<String, Serializable> expectedTaskPublishValues = new HashMap<>();
+
+        expectedTaskPublishValues.put("output_no_expression", "output_no_expression_value");
+        expectedTaskPublishValues.put("publish_int", 22);
+        expectedTaskPublishValues.put("publish_str", "publish_str_value");
+        expectedTaskPublishValues.put("publish_expression", "publish_str_value_suffix");
+
+        Assert.assertEquals("Task publish values not bound correctly", expectedTaskPublishValues, taskData.getOutputs());
     }
 
     private boolean includeAllPairs(Map<String, Serializable> map1, Map<String, Serializable> map2) {

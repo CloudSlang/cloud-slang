@@ -44,6 +44,7 @@ flow:
         }}
     - input_python_map_quotes: "${{'value': 2}}"
     - b: b
+    - b_copy: ${ b }
     - input_concat_1: ${'a' + b}
     - input_concat_2_one_liner: ${'prefix_' + input_concat_1 + '_suffix'}
     - input_concat_2_folded: >
@@ -58,7 +59,7 @@ flow:
   workflow:
     - Task1:
         do:
-          ops.noop:
+          ops.values_op:
             # loaded by Yaml
             - input_int: 22
             - input_str_no_quotes: Hi
@@ -78,6 +79,7 @@ flow:
                 }}
             - input_python_map_quotes: "${{'value': 2}}"
             - b: b
+            - b_copy: ${ b }
             - input_concat_1: ${'a' + b}
             - input_concat_2_one_liner: ${'prefix_' + input_concat_1 + '_suffix'}
             - input_concat_2_folded: >
@@ -86,6 +88,11 @@ flow:
                 input_concat_1 +
                 '_suffix'
                 }
+        publish:
+          - output_no_expression
+          - publish_int: 22
+          - publish_str: publish_str_value
+          - publish_expression: ${ publish_str + '_suffix' }
   outputs:
     - output_no_expression
     - output_int: 22
