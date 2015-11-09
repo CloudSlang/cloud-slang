@@ -54,14 +54,17 @@ public class ExpressionTest extends SystemsTestsParent {
 
         // verify
         StepData flowData = steps.get(EXEC_START_PATH);
+        StepData taskData = steps.get(FIRST_STEP_PATH);
 
         verifyFlowInputs(flowData);
+        verifyTaskInputs(taskData);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, flowData.getResult());
     }
 
     private void verifyFlowInputs(StepData flowData) {
-        // properties
         Map<String, Serializable> expectedInputs = new HashMap<>();
+
+        // properties
         expectedInputs.put("input_no_expression", "hello world");
         expectedInputs.put("input_no_expression_not_required", null);
         expectedInputs.put("input_system_property", "localhost");
@@ -92,6 +95,39 @@ public class ExpressionTest extends SystemsTestsParent {
         expectedInputs.put("input_concat_2_folded", "prefix_ab_suffix");
 
         Assert.assertEquals("Flow inputs not bound correctly", expectedInputs, flowData.getInputs());
+    }
+
+    private void verifyTaskInputs(StepData taskData) {
+        Map<String, Serializable> expectedInputs = new HashMap<>();
+
+        // loaded by Yaml
+        expectedInputs.put("input_int", 22);
+        expectedInputs.put("input_str_no_quotes", "Hi");
+        expectedInputs.put("input_str_single", "Hi");
+        expectedInputs.put("input_str_double", "Hi");
+        expectedInputs.put("input_yaml_list", Lists.newArrayList(1, 2, 3));
+        HashMap<String, Serializable> expectedYamlMapFolded = new HashMap<>();
+        expectedYamlMapFolded.put("key1", "medium");
+        expectedYamlMapFolded.put("key2", false);
+        expectedInputs.put("input_yaml_map_folded", expectedYamlMapFolded);
+
+        // evaluated via Python
+        expectedInputs.put("input_python_null", null);
+        expectedInputs.put("input_python_list",  Lists.newArrayList(1, 2, 3));
+        HashMap<String, Serializable> expectedInputPythonMap = new HashMap<>();
+        expectedInputPythonMap.put("key1", "value1");
+        expectedInputPythonMap.put("key2", "value2");
+        expectedInputPythonMap.put("key3", "value3");
+        expectedInputs.put("input_python_map", expectedInputPythonMap);
+        HashMap<String, Serializable> expectedInputPythonMapQuotes = new HashMap<>();
+        expectedInputPythonMapQuotes.put("value", 2);
+        expectedInputs.put("input_python_map_quotes", expectedInputPythonMapQuotes);
+        expectedInputs.put("b", "b");
+        expectedInputs.put("input_concat_1", "ab");
+        expectedInputs.put("input_concat_2_one_liner", "prefix_ab_suffix");
+        expectedInputs.put("input_concat_2_folded", "prefix_ab_suffix");
+
+        Assert.assertEquals("Flow inputs not bound correctly", expectedInputs, taskData.getInputs());
     }
 
 }

@@ -1,16 +1,17 @@
-/*******************************************************************************
+/**
+ * ****************************************************************************
  * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
- *
+ * <p/>
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
- *
- *******************************************************************************/
+ * <p/>
+ * *****************************************************************************
+ */
 package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.bindings.Argument;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +25,7 @@ import java.util.Map;
  * @since 8/17/2015
  */
 @Component
-public class ArgumentsBinding {
+public class ArgumentsBinding extends Binding {
 
     @Autowired
     private ScriptEvaluator scriptEvaluator;
@@ -52,17 +53,20 @@ public class ArgumentsBinding {
         String argumentName = argument.getName();
 
         try {
-            //we do not want to change original context map
-            Map<String, Serializable> scriptContext = new HashMap<>(srcContext);
+            Serializable rawExpression = argument.getExpression();
+            String expressionToEvaluate = extractExpression(rawExpression);
+            if (expressionToEvaluate != null) {
+                //we do not want to change original context map
+                Map<String, Serializable> scriptContext = new HashMap<>(srcContext);
 
-            argumentValue = srcContext.get(argumentName);
-            scriptContext.put(argumentName, argumentValue);
+                argumentValue = srcContext.get(argumentName);
+                scriptContext.put(argumentName, argumentValue);
 
-            if (StringUtils.isNotEmpty(argument.getExpression())) {
                 //so you can resolve previous arguments already bound
                 scriptContext.putAll(targetContext);
-                String expr = argument.getExpression();
-                argumentValue = scriptEvaluator.evalExpr(expr, scriptContext);
+                argumentValue = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext);
+            } else {
+                argumentValue = rawExpression;
             }
         } catch (Throwable t) {
             throw new RuntimeException("Error binding task argument: '" + argumentName + "', \n\tError is: " + t.getMessage(), t);

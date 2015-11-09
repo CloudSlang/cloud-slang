@@ -81,7 +81,7 @@ public class DoTransformer implements Transformer<Map<String, Object>, List<Argu
                 );
             }
             // - some_input: some_expression
-            return new Argument(entry.getKey(), entryValue.toString());
+            return new Argument(entry.getKey(), entryValue);
         }
         throw new RuntimeException("Could not transform task argument: " + rawArgument);
     }

@@ -9,13 +9,15 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities.bindings;
 
+import java.io.Serializable;
+
 /**
  * @author Bonczidai Levente
  * @since 8/14/2015
  */
 public class Argument extends InOutParam {
 
-    public Argument(String name, String expression) {
+    public Argument(String name, Serializable expression) {
         super(name, expression);
     }
 

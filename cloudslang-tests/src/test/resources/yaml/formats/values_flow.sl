@@ -55,7 +55,34 @@ flow:
   workflow:
     - Task1:
         do:
-          ops.noop: []
+          ops.noop:
+            # loaded by Yaml
+            - input_int: 22
+            - input_str_no_quotes: Hi
+            - input_str_single: 'Hi'
+            - input_str_double: "Hi"
+            - input_yaml_list: [1, 2, 3]
+            - input_yaml_map_folded: {key1: medium, key2: false}
+
+            # evalauted via Python
+            - input_python_null: ${ None }
+            - input_python_list: ${[1, 2, 3]}
+            - input_python_map: >
+                ${{
+                'key1': 'value1',
+                'key2': 'value2',
+                'key3': 'value3'
+                }}
+            - input_python_map_quotes: "${{'value': 2}}"
+            - b: b
+            - input_concat_1: ${'a' + b}
+            - input_concat_2_one_liner: ${'prefix_' + input_concat_1 + '_suffix'}
+            - input_concat_2_folded: >
+                ${
+                'prefix_' +
+                input_concat_1 +
+                '_suffix'
+                }
   results:
     - SUCCESS
     - FAILURE
