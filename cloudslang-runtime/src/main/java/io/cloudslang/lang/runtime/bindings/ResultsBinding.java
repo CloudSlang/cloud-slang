@@ -29,7 +29,7 @@ import java.util.Map;
  * Time: 09:32
  */
 @Component
-public class ResultsBinding {
+public class ResultsBinding extends Binding {
 
     @Autowired
     public ScriptEvaluator scriptEvaluator;
@@ -76,7 +76,12 @@ public class ResultsBinding {
         // In the case of operation, we resolve the result by searching for the first result with a true expression
         // An empty expression passes as true
         for(Result result : possibleResults){
-            String expression = result.getExpression();
+            Serializable rawExpression = result.getExpression();
+            String expression = extractExpression(rawExpression);
+            if (expression == null) {
+                throw new RuntimeException("Expression: '" + rawExpression + "' is not valid. Accepted format is: ${ expression }");
+            }
+
             // If the answer has no expression, we treat it as a true expression, and choose it
             if(StringUtils.isEmpty(expression)) {
                 return result.getName();

@@ -24,6 +24,7 @@ import org.junit.Test;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -60,7 +61,26 @@ public class ExpressionTest extends SystemsTestsParent {
         verifyFlowOutputs(flowData);
         verifyTaskInputs(taskData);
         verifyTaskPublishValues(taskData);
-        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, flowData.getResult());
+        verifyExecutableResult(flowData);
+    }
+
+    @Test
+    public void testValuesInOperation() throws Exception {
+        // compile
+        URI resource = getClass().getResource("/yaml/formats/values_op.sl").toURI();
+
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), new HashSet<SlangSource>());
+
+        // trigger
+        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Serializable> systemProperties = new HashMap<>();
+
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, systemProperties).getTasks();
+
+        // verify
+        StepData operationData = steps.get(EXEC_START_PATH);
+
+        verifyExecutableResult(operationData);
     }
 
     private void verifyFlowInputs(StepData flowData) {
@@ -154,6 +174,10 @@ public class ExpressionTest extends SystemsTestsParent {
         expectedTaskPublishValues.put("publish_expression", "publish_str_value_suffix");
 
         Assert.assertEquals("Task publish values not bound correctly", expectedTaskPublishValues, taskData.getOutputs());
+    }
+
+    private void verifyExecutableResult(StepData stepData) {
+        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, stepData.getResult());
     }
 
     private boolean includeAllPairs(Map<String, Serializable> map1, Map<String, Serializable> map2) {

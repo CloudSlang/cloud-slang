@@ -13,9 +13,12 @@ operation:
     # used in output binding
     - output_no_expression: output_no_expression_value
   action:
-    python_script: 'pass'
+    python_script: result = 'success'
   outputs:
     - output_no_expression
     - output_int: 22
     - output_str: output_str_value
     - output_expression: ${ output_str + '_suffix' }
+  results:
+    - SUCCESS: ${ result == 'success' }
+    - FAILURE
