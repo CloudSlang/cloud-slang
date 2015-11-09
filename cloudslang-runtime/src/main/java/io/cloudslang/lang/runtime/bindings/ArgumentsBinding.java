@@ -53,19 +53,19 @@ public class ArgumentsBinding extends Binding {
         String argumentName = argument.getName();
 
         try {
+            //we do not want to change original context map
+            Map<String, Serializable> scriptContext = new HashMap<>(srcContext);
+
+            argumentValue = srcContext.get(argumentName);
+            scriptContext.put(argumentName, argumentValue);
+
             Serializable rawExpression = argument.getExpression();
             String expressionToEvaluate = extractExpression(rawExpression);
             if (expressionToEvaluate != null) {
-                //we do not want to change original context map
-                Map<String, Serializable> scriptContext = new HashMap<>(srcContext);
-
-                argumentValue = srcContext.get(argumentName);
-                scriptContext.put(argumentName, argumentValue);
-
                 //so you can resolve previous arguments already bound
                 scriptContext.putAll(targetContext);
                 argumentValue = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext);
-            } else {
+            } else if (rawExpression != null) {
                 argumentValue = rawExpression;
             }
         } catch (Throwable t) {

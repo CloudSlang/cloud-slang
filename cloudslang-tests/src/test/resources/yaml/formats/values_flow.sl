@@ -60,6 +60,9 @@ flow:
     - Task1:
         do:
           ops.values_op:
+            # properties
+            - input_no_expression
+
             # loaded by Yaml
             - input_int: 22
             - input_str_no_quotes: Hi

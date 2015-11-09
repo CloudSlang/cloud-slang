@@ -46,7 +46,7 @@ public class ExpressionTest extends SystemsTestsParent {
 
         // trigger
         Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("input_no_expression", "hello world");
+        userInputs.put("input_no_expression", "input_no_expression_value");
         userInputs.put("input_overridable", "i_should_not_be_assigned");
         Map<String, Serializable> systemProperties = new HashMap<>();
         systemProperties.put("user.sys.props.host", "localhost");
@@ -87,7 +87,7 @@ public class ExpressionTest extends SystemsTestsParent {
         Map<String, Serializable> expectedInputs = new HashMap<>();
 
         // properties
-        expectedInputs.put("input_no_expression", "hello world");
+        expectedInputs.put("input_no_expression", "input_no_expression_value");
         expectedInputs.put("input_no_expression_not_required", null);
         expectedInputs.put("input_system_property", "localhost");
         expectedInputs.put("input_not_overridable", 25);
@@ -133,6 +133,9 @@ public class ExpressionTest extends SystemsTestsParent {
 
     private void verifyTaskInputs(StepData taskData) {
         Map<String, Serializable> expectedTaskArguments = new HashMap<>();
+
+        // properties
+        expectedTaskArguments.put("input_no_expression", "input_no_expression_value");
 
         // loaded by Yaml
         expectedTaskArguments.put("input_int", 22);
