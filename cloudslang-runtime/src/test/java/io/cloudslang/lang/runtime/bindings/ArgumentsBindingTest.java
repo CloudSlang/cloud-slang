@@ -44,8 +44,8 @@ public class ArgumentsBindingTest {
     }
 
     @Test
-    public void testDefaultValue() {
-		List<Argument> arguments = Collections.singletonList(new Argument("argument1", "str('value')"));
+    public void testDefaultValueNoExpression() {
+		List<Argument> arguments = Collections.singletonList(new Argument("argument1", "value"));
         Map<String,Serializable> result = bindArguments(arguments);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
@@ -53,8 +53,17 @@ public class ArgumentsBindingTest {
     }
 
     @Test
-    public void testDefaultValueInt(){
-        List<Argument> arguments = Collections.singletonList(new Argument("argument1", "2"));
+    public void testDefaultValueExpression() {
+        List<Argument> arguments = Collections.singletonList(new Argument("argument1", "${ 'value' }"));
+        Map<String,Serializable> result = bindArguments(arguments);
+        Assert.assertFalse(result.isEmpty());
+        Assert.assertTrue(result.containsKey("argument1"));
+        Assert.assertEquals("value", result.get("argument1"));
+    }
+
+    @Test
+    public void testDefaultValueInt() {
+        List<Argument> arguments = Collections.singletonList(new Argument("argument1", 2));
         Map<String,Serializable> result = bindArguments(arguments);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
@@ -64,9 +73,9 @@ public class ArgumentsBindingTest {
 	@Test
 	public void testDefaultValueBoolean() {
 		List<Argument> arguments = Arrays.asList(
-                new Argument("argument1", "true"),
-                new Argument("argument2", "false"),
-                new Argument("argument3", "str('phrase containing true and false')")
+                new Argument("argument1", true),
+                new Argument("argument2", false),
+                new Argument("argument3", "phrase containing true and false")
         );
 		Map<String, Serializable> result = bindArguments(arguments);
 		Assert.assertTrue((boolean) result.get("argument1"));
@@ -76,7 +85,7 @@ public class ArgumentsBindingTest {
 
     @Test
     public void testTwoArguments() {
-		List<Argument> arguments = Arrays.asList(new Argument("argument2", "'yyy'"), new Argument("argument1", "'zzz'"));
+		List<Argument> arguments = Arrays.asList(new Argument("argument2", "yyy"), new Argument("argument1", "zzz"));
         Map<String,Serializable> result = bindArguments(arguments);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
@@ -87,8 +96,8 @@ public class ArgumentsBindingTest {
 
     @Test
     public void testAssignNoExpression() {
-        Argument argument1 = new Argument("argument1", "argument1");
-        Argument argument2 = new Argument("argument2", "argument1");
+        Argument argument1 = new Argument("argument1", "${ argument1 }");
+        Argument argument2 = new Argument("argument2", "${ argument1 }");
         List<Argument> arguments = Arrays.asList(argument1, argument2);
         Map<String,Serializable> result = bindArguments(arguments);
         Assert.assertFalse(result.isEmpty());
@@ -102,7 +111,7 @@ public class ArgumentsBindingTest {
     public void testArgumentRef() {
         Map<String,Serializable> context = new HashMap<>();
         context.put("argumentX","xxx");
-        List<Argument> arguments = Collections.singletonList(new Argument("argument1", "str(argumentX)"));
+        List<Argument> arguments = Collections.singletonList(new Argument("argument1", "${ str(argumentX) }"));
         Map<String,Serializable> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
@@ -115,7 +124,7 @@ public class ArgumentsBindingTest {
     public void testArgumentScriptEval() {
         Map<String,Serializable> context = new HashMap<>();
         context.put("valX",5);
-        Argument scriptArgument = new Argument("argument1","3 + valX");
+        Argument scriptArgument = new Argument("argument1","${ 3 + valX }");
         List<Argument> arguments = Collections.singletonList(scriptArgument);
         Map<String,Serializable> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
@@ -130,7 +139,7 @@ public class ArgumentsBindingTest {
         Map<String,Serializable> context = new HashMap<>();
         context.put("valB","b");
         context.put("valC","c");
-        Argument scriptArgument = new Argument("argument1"," 'a' + valB + valC");
+        Argument scriptArgument = new Argument("argument1","${ 'a' + valB + valC }");
         List<Argument> arguments = Collections.singletonList(scriptArgument);
         Map<String,Serializable> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
@@ -142,7 +151,7 @@ public class ArgumentsBindingTest {
     public void testDefaultValueVsEmptyRef() {
         Map<String,Serializable> context = new HashMap<>();
 
-		Argument refArgument = new Argument("argument1", "str('val')");
+		Argument refArgument = new Argument("argument1", "${ str('val') }");
         List<Argument> arguments = Collections.singletonList(refArgument);
 
         Map<String,Serializable> result = bindArguments(arguments, context);
@@ -157,7 +166,7 @@ public class ArgumentsBindingTest {
     public void testOverridableFalseBehaviour() {
         Map<String,Serializable> context = new HashMap<>();
         context.put("argument1",3);
-		Argument argument = new Argument("argument1", "5+7");
+		Argument argument = new Argument("argument1", "${ 5+7 }");
         List<Argument> arguments = Collections.singletonList(argument);
 
         Map<String,Serializable> result = bindArguments(arguments, context);
@@ -173,7 +182,7 @@ public class ArgumentsBindingTest {
     public void testComplexExpr(){
         Map<String,Serializable> context = new HashMap<>();
         context.put("argument1", 3);
-		Argument argument = new Argument("argument2", " argument1 + 3 * 2 ");
+		Argument argument = new Argument("argument2", "${ argument1 + 3 * 2 }");
         List<Argument> arguments = Collections.singletonList(argument);
 
         Map<String,Serializable> result = bindArguments(arguments, context);
@@ -188,7 +197,7 @@ public class ArgumentsBindingTest {
         Map<String, Serializable> context = new HashMap<>();
         context.put("argument2", 3);
         context.put("argument1", 5);
-        Argument argument = new Argument("argument1", "argument2");
+        Argument argument = new Argument("argument1", "${ argument2 }");
         List<Argument> arguments = Collections.singletonList(argument);
 
         Map<String, Serializable> result = bindArguments(arguments, context);
@@ -202,7 +211,7 @@ public class ArgumentsBindingTest {
     public void testExpressionWithWrongRef() {
         Map<String,Serializable> context = new HashMap<>();
 
-		Argument argument = new Argument("argument1", "argument2");
+		Argument argument = new Argument("argument1", "${ argument2 }");
         List<Argument> arguments = Arrays.asList(argument);
 
         bindArguments(arguments, context);
@@ -212,19 +221,19 @@ public class ArgumentsBindingTest {
     public void testArgumentAssignFromAnotherArgument() {
         Map<String,Serializable> context = new HashMap<>();
 
-		Argument argument1 = new Argument("argument1", "5");
-        Argument argument2 = new Argument("argument2","argument1");
+		Argument argument1 = new Argument("argument1","5");
+        Argument argument2 = new Argument("argument2","${ argument1 }");
         List<Argument> arguments = Arrays.asList(argument1,argument2);
 
         Map<String,Serializable> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
-        Assert.assertEquals(5, result.get("argument1"));
+        Assert.assertEquals("5", result.get("argument1"));
         Assert.assertTrue(result.containsKey("argument2"));
-        Assert.assertEquals(5, result.get("argument2"));
+        Assert.assertEquals("5", result.get("argument2"));
         Assert.assertEquals(2, result.size());
 
-        Assert.assertTrue("orig context should not change",context.isEmpty());
+        Assert.assertTrue("orig context should not change", context.isEmpty());
     }
 
     @Test
@@ -232,8 +241,8 @@ public class ArgumentsBindingTest {
         Map<String,Serializable> context = new HashMap<>();
         context.put("varX",5);
 
-		Argument argument1 = new Argument("argument1", "5");
-        Argument argument2 = new Argument("argument2","argument1 + 5 + varX");
+		Argument argument1 = new Argument("argument1", 5);
+        Argument argument2 = new Argument("argument2","${ argument1 + 5 + varX }");
         List<Argument> arguments = Arrays.asList(argument1,argument2);
 
         Map<String,Serializable> result = bindArguments(arguments, context);
@@ -252,7 +261,7 @@ public class ArgumentsBindingTest {
         Map<String,Serializable> context = new HashMap<>();
         context.put("varX","roles");
 
-		Argument argument1 = new Argument("argument1", "\"mighty\" + ' max '   + varX");
+		Argument argument1 = new Argument("argument1", "${ 'mighty' + ' max '   + varX }");
         List<Argument> arguments = Collections.singletonList(argument1);
 
         Map<String,Serializable> result = bindArguments(arguments, context);
