@@ -38,10 +38,12 @@ public class ExpressionTest extends SystemsTestsParent {
     public void testValuesInFlow() throws Exception {
         // compile
         URI resource = getClass().getResource("/yaml/formats/values_flow.sl").toURI();
-        URI operation = getClass().getResource("/yaml/formats/values_op.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/formats/values_op.sl").toURI();
+        URI operation2 = getClass().getResource("/yaml/noop.sl").toURI();
 
-        SlangSource dep = SlangSource.fromFile(operation);
-        Set<SlangSource> path = Sets.newHashSet(dep);
+        SlangSource dep1 = SlangSource.fromFile(operation1);
+        SlangSource dep2 = SlangSource.fromFile(operation2);
+        Set<SlangSource> path = Sets.newHashSet(dep1, dep2);
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         // trigger
@@ -56,11 +58,13 @@ public class ExpressionTest extends SystemsTestsParent {
         // verify
         StepData flowData = steps.get(EXEC_START_PATH);
         StepData taskData = steps.get(FIRST_STEP_PATH);
+        StepData oneLinerTaskData = steps.get(SECOND_STEP_KEY);
 
         verifyFlowInputs(flowData);
         verifyFlowOutputs(flowData);
         verifyTaskInputs(taskData);
         verifyTaskPublishValues(taskData);
+        verifyOneLinerInputs(oneLinerTaskData);
         verifyExecutableResult(flowData);
     }
 
@@ -177,6 +181,16 @@ public class ExpressionTest extends SystemsTestsParent {
         expectedTaskPublishValues.put("publish_expression", "publish_str_value_suffix");
 
         Assert.assertEquals("Task publish values not bound correctly", expectedTaskPublishValues, taskData.getOutputs());
+    }
+
+    private void verifyOneLinerInputs(StepData taskData) {
+        Map<String, Serializable> expectedTaskArguments = new HashMap<>();
+
+        expectedTaskArguments.put("input_no_expression", "input_no_expression_value");
+        expectedTaskArguments.put("input_int", 22);
+        expectedTaskArguments.put("input_expression", "input_no_expression_value_suffix");
+
+        Assert.assertTrue("One liner task arguments not bound correctly", includeAllPairs(taskData.getInputs(), expectedTaskArguments));
     }
 
     private void verifyExecutableResult(StepData stepData) {

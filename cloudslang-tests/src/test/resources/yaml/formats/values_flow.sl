@@ -54,10 +54,10 @@ flow:
         '_suffix'
         }
 
-    # used in output binding
+    # helpers
     - output_no_expression: output_no_expression_value
   workflow:
-    - Task1:
+    - task_standard:
         do:
           ops.values_op:
             # properties
@@ -96,6 +96,10 @@ flow:
           - publish_int: 22
           - publish_str: publish_str_value
           - publish_expression: ${ publish_str + '_suffix' }
+
+    - task_one_liner:
+        do:
+          ops.noop: input_no_expression, input_int = ${ 22 }, input_expression = ${ input_no_expression + '_suffix' }
   outputs:
     - output_no_expression
     - output_int: 22
