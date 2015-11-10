@@ -16,11 +16,11 @@ flow:
     - explicit_alias:
         do:
           ops.test_op:
-            - city: str('input_1')
-            - port: "'22'"
+            - city: 'input_1'
+            - port: '22'
 
     - implicit_alias:
         do:
           check_op:
-            - city: str('input_1')
-            - port: "'22'"
+            - city: 'input_1'
+            - port: '22'

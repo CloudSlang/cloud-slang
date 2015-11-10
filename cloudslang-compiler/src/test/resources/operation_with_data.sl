@@ -11,26 +11,26 @@ operation:
   name: operation_with_data
   inputs:
     - input1
-    - input2: input2
+    - input2: ${ input2 }
     - input3:
-        default: str('value3')
-    - input4: "'value4' if input3 == value3 else None"
+        default: 'value3'
+    - input4: ${ 'value4' if input3 == value3 else None }
     - input5:
         required: yes
         encrypted: true
     - input6:
-        default: 1 + 5
+        default: ${ 1 + 5 }
         required: False
     - input7: 77
     - input8:
-        default: input6
+        default: ${ input6 }
     - input9:
-        default: input6
+        default: ${ input6 }
         overridable: false
     - input10:
-        default: input5
-    - input11: 5 + 6
-    - input12: '"mighty" + " max"   + varX'
+        default: ${ input5 }
+    - input11: ${ 5 + 6 }
+    - input12: ${ "mighty" + " max"   + varX }
     - input13: true
 
   action:
@@ -46,12 +46,11 @@ operation:
             print input5
             print input6
   outputs:
-    - output1: input1
-    - output2: processId
-    - output3: self['input1']
+    - output1: ${ input1 }
+    - output2: ${ processId }
+    - output3: ${ self['input1'] }
     - output4
   results:
-    - SUCCESS: 1 != 123456
-    - NO_ACTION: true
+    - SUCCESS: ${ 1 != 123456 }
+    - NO_ACTION: ${ true }
     - FAILURE
-

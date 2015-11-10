@@ -69,7 +69,7 @@ public class DoTransformerTest {
         Assert.assertEquals(2, arguments.size());
         Argument argument = arguments.get(1);
         Assert.assertEquals("country", argument.getName());
-        Assert.assertEquals("str('Israel')", argument.getExpression());
+        Assert.assertEquals("Israel", argument.getExpression());
     }
 
     @Test
@@ -80,7 +80,7 @@ public class DoTransformerTest {
         Assert.assertEquals(2, arguments.size());
         Argument argument = arguments.get(1);
         Assert.assertEquals("country", argument.getName());
-        Assert.assertEquals("{default='Neverland', overridable=false}", argument.getExpression());
+        Assert.assertEquals("Neverland", argument.getExpression());
     }
 
     @Test
@@ -116,8 +116,8 @@ public class DoTransformerTest {
         Assert.assertEquals(2, actualArguments.size());
 
         List<Argument> expectedArguments = Arrays.asList(
-                new Argument("city", "city_name"),
-                new Argument("country", "str('Wonderland')")
+                new Argument("city", "${ city_name }"),
+                new Argument("country", "${ 'Wonderland' }")
         );
         Assert.assertEquals(expectedArguments, actualArguments);
     }
@@ -131,8 +131,8 @@ public class DoTransformerTest {
         Assert.assertEquals(2, actualArguments.size());
 
         List<Argument> expectedArguments = Arrays.asList(
-                new Argument("city", "city_name"),
-                new Argument("country", "str('Wonderland')")
+                new Argument("city", "${ city_name }"),
+                new Argument("country", "${ 'Wonderland' }")
         );
         Assert.assertEquals(expectedArguments, actualArguments);
     }
@@ -146,8 +146,8 @@ public class DoTransformerTest {
         Assert.assertEquals(2, actualArguments.size());
 
         List<Argument> expectedArguments = Arrays.asList(
-                new Argument("city", "city_name"),
-                new Argument("country", "str('Wonderland')")
+                new Argument("city", "${ city_name }"),
+                new Argument("country", "${ 'Wonderland' }")
         );
         Assert.assertEquals(expectedArguments, actualArguments);
     }
@@ -161,8 +161,8 @@ public class DoTransformerTest {
         Assert.assertEquals(2, actualArguments.size());
 
         List<Argument> expectedArguments = Arrays.asList(
-                new Argument("city", "city_name if city_name != 'abc' else 'efg'"),
-                new Argument("country", "str('Wonderland')")
+                new Argument("city", "${ city_name if city_name != 'abc' else 'efg' }"),
+                new Argument("country", "${ 'Wonderland' }")
         );
         Assert.assertEquals(expectedArguments, actualArguments);
     }
@@ -176,8 +176,8 @@ public class DoTransformerTest {
         Assert.assertEquals(2, actualArguments.size());
 
         List<Argument> expectedArguments = Arrays.asList(
-                new Argument("city", "city_name"),
-                new Argument("country", "str('Wonderland,Land')")
+                new Argument("city", "${ city_name }"),
+                new Argument("country", "${ 'Wonderland,Land' }")
         );
         Assert.assertEquals(expectedArguments, actualArguments);
     }
@@ -192,7 +192,7 @@ public class DoTransformerTest {
 
         List<Argument> expectedArguments = Arrays.asList(
                 new Argument("city", ""),
-                new Argument("country", "str('Wonderland')")
+                new Argument("country", "${ 'Wonderland' }")
         );
         Assert.assertEquals(expectedArguments, actualArguments);
     }

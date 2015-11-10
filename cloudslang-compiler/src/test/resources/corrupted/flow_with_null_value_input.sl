@@ -18,8 +18,8 @@ flow:
     - CheckWeather:
         do:
           ops.check_Weather:
-            - city: city_name
-            - country: str('Israel')
+            - city: $ { city_name }
+            - country: 'Israel'
         publish:
           - weather
   outputs:

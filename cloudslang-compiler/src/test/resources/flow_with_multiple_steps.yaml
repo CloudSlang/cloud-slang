@@ -16,14 +16,14 @@ flow:
     - CheckWeather:
         do:
           ops.test_op:
-            - city: str('input_1')
+            - city: 'input_1'
         publish:
           - weather
 
     - RealCheckWeather:
         do:
           ops.java_op:
-            - city: str('input_1')
+            - city: 'input_1'
         publish:
           - weather
         navigate:
@@ -33,7 +33,7 @@ flow:
     - RealRealCheckWeather:
         do:
           ops.check_Weather:
-            - city: str('input_1')
+            - city: 'input_1'
         publish:
           - weather
           - temp: temperature
@@ -44,7 +44,7 @@ flow:
     - NotRealCheckWeather:
         do:
           ops.check_Weather:
-            - city: str('input_1')
+            - city: 'input_1'
         publish:
           - weather
 

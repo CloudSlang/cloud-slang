@@ -15,6 +15,6 @@ flow:
     - task1:
         do:
           ops.test_op:
-            - alla: "'hello'"
+            - alla: 'hello'
           publish:
             this: is the wrong place

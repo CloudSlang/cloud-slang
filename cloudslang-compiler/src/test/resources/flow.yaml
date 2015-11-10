@@ -16,12 +16,12 @@ flow:
     - input1
     - host:
         system_property: user.sys.props.host
-    - port: "'22'"
+    - port: '22'
   workflow:
     - CheckWeather:
         do:
           ops.test_op:
-            - city: str('input_1')
+            - city: 'input_1'
             - port
         publish:
           - weather

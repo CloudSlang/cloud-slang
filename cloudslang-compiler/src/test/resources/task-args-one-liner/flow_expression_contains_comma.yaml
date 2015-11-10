@@ -18,7 +18,7 @@ flow:
   workflow:
     - CheckWeather:
         do:
-          ops.check_Weather: city = city_name, country = str('Wonderland\,Land')
+          ops.check_Weather: city = ${ city_name }, country = ${ 'Wonderland\,Land' }
         publish:
           - weather
   outputs:

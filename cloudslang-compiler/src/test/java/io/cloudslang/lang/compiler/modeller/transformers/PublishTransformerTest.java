@@ -81,7 +81,7 @@ public class PublishTransformerTest {
         @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap);
         Output publish = publishValues.get(0);
         Assert.assertEquals("weather", publish.getName());
-        Assert.assertEquals("weather", publish.getExpression());
+        Assert.assertEquals("${ weather }", publish.getExpression());
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
@@ -92,24 +92,6 @@ public class PublishTransformerTest {
         Assert.assertEquals("temperature", publish.getExpression());
     }
 
-
-    @Test (timeout = DEFAULT_TIMEOUT)
-    public void testInvalidOutputType() throws Exception{
-        URL resource = getClass().getResource("/flow_with_invalid_publish_from_task.yaml");
-        ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
-        List<Map<String, Map>> flow = (List<Map<String, Map>>) file.getFlow().get(SlangTextualKeys.WORKFLOW_KEY);
-        List<Object> publishMap = new ArrayList<>();
-        for(Map<String, Map> task : flow){
-            if(task.keySet().iterator().next().equals("CheckWeather")){
-                publishMap = (List) task.values().iterator().next().get(SlangTextualKeys.PUBLISH_KEY);
-                break;
-            }
-        }
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("weather");
-        exception.expectMessage("3");
-        publishTransformer.transform(publishMap);
-    }
     @Configuration
     public static class Config {
 

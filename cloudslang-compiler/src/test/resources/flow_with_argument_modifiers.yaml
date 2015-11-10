@@ -20,9 +20,7 @@ flow:
         do:
           ops.check_Weather:
             - city: city_name
-            - country:
-                default: "'Neverland'"
-                overridable: false
+            - country: 'Neverland'
         publish:
           - weather
   outputs:
