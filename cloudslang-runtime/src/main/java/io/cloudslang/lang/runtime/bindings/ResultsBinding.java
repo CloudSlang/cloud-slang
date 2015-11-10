@@ -77,15 +77,17 @@ public class ResultsBinding extends Binding {
         // An empty expression passes as true
         for(Result result : possibleResults){
             Serializable rawExpression = result.getExpression();
+
+            // If the answer has no expression, we treat it as a true expression, and choose it
+            if(StringUtils.isEmpty(rawExpression)) {
+                return result.getName();
+            }
+
             String expression = extractExpression(rawExpression);
             if (expression == null) {
                 throw new RuntimeException("Expression: '" + rawExpression + "' is not valid. Accepted format is: ${ expression }");
             }
 
-            // If the answer has no expression, we treat it as a true expression, and choose it
-            if(StringUtils.isEmpty(expression)) {
-                return result.getName();
-            }
             //construct script context
             Map<String, Serializable> scriptContext = new HashMap<>();
             //put action outputs
