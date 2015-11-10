@@ -12,13 +12,13 @@ operation:
   inputs:
     - base_input
     - bound_input:
-        default: base_input + 1
+        default: ${ base_input + 1 }
 
   action:
     python_script: |
       bound_result = bound_input + 1
   outputs:
-    - bound_output: bound_result + 1
+    - bound_output: ${ bound_result + 1 }
   results:
     - SUCCESS
 

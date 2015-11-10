@@ -20,4 +20,4 @@ flow:
           for: value in values
           do:
             ops.print:
-              - text: value
+              - text: ${ value }

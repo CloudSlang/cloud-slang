@@ -17,5 +17,5 @@ operation:
     python_script: |
       result = (eq_str_bla == 'bla') and (eq_int_22 == 22) and (eq_bool_true)
   results:
-    - SUCCESS: result
+    - SUCCESS: ${ result }
     - FAILURE

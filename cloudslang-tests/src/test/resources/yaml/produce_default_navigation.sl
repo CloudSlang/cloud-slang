@@ -15,5 +15,5 @@ operation:
     python_script:
       print 'Producing default navigation based on input'
   results:
-    - SUCCESS: navigationType == 'success'
-    - FAILURE: 1 == 1
+    - SUCCESS: ${ navigationType == 'success' }
+    - FAILURE: ${ 1 == 1 }

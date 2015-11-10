@@ -19,11 +19,11 @@ flow:
     - CheckWeather:
         do:
           ops.check_Weather:
-            - city: city_name
-            - country: str('Israel')
+            - city: ${ city_name }
+            - country: 'Israel'
         publish:
           - weather
   outputs:
-    - weather1: self['city_name']
-    - weather2: weather1
-    - weather3: weather1 + " day"
+    - weather1: ${ self['city_name'] }
+    - weather2: ${ weather1 }
+    - weather3: ${ weather1 + " day" }

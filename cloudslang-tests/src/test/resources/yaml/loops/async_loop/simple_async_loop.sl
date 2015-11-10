@@ -13,11 +13,11 @@ imports:
 flow:
   name: simple_async_loop
   inputs:
-    - values: range(1, 4)
+    - values: ${ range(1, 4) }
   workflow:
     - print_values:
         async_loop:
           for: value in values
           do:
             ops.print_branch:
-              - ID: value
+              - ID: ${ value }

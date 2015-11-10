@@ -13,7 +13,7 @@ imports:
 flow:
   name: child_flow
   inputs:
-    - input1: "'value'"
+    - input1: 'value'
     - time_zone_as_string:
         system_property: user.sys.props.port
   workflow:
@@ -25,4 +25,4 @@ flow:
         do:
           ops.test_op:
   outputs:
-    - val_output: self['input1']
+    - val_output: ${ self['input1'] }

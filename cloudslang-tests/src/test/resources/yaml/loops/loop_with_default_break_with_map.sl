@@ -14,11 +14,11 @@ flow:
   name: loop_with_default_break_with_map
   inputs:
     - person_map: > # make all the values 2 to be sure that after the first key-value pair the loop will break
-        {'john': 2, 'jane': 2, 'peter': 2}
+        ${{'john': 2, 'jane': 2, 'peter': 2}}
   workflow:
     - print_values:
         loop:
           for: k, v in person_map
           do:
             ops.operation_that_fails_when_value_is_2:
-              - text: v
+              - text: ${ v }

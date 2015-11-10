@@ -18,14 +18,14 @@ flow:
     - set_session_object:
         do:
           ops.set_global_session_object:
-            - value: object_value
+            - value: ${ object_value }
 
     - get_session_object:
         do:
           ops.get_global_session_object:
-            - value: object_value
+            - value: ${ object_value }
         publish:
-          - object_value: session_object_value
+          - object_value: ${ session_object_value }
 
   results:
     - SUCCESS

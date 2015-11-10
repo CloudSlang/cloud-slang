@@ -21,13 +21,13 @@ flow:
     - task1:
         do:
           ops.check_weather:
-            - city: city if city is not None else input1
+            - city: ${ city if city is not None else input1 }
         publish:
-          - kuku: weather
+          - kuku: ${ weather }
     - task2:
         do:
           flows.child_flow:
-            - input1: kuku
+            - input1: ${ kuku }
         publish:
           - val_output
     - task3:

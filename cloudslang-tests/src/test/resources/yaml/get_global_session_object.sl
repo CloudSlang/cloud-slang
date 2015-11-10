@@ -16,7 +16,7 @@ operation:
       className: io.cloudslang.lang.systemtests.actions.LangTestActions
       methodName: getConnectionFromNonSerializableSession
   outputs:
-    - session_object_value: connection
+    - session_object_value: ${ connection }
   results:
-    - SUCCESS: connection == self['value']
+    - SUCCESS: ${ connection == self['value'] }
     - FAILURE

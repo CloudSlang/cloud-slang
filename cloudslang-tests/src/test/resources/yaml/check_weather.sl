@@ -16,6 +16,6 @@ operation:
       weather = "weather thing"
       print city
   outputs:
-    - weather: weather
+    - weather: ${ weather }
   results:
-    - SUCCESS: 'weather == "weather thing"'
+    - SUCCESS: ${ weather == "weather thing" }

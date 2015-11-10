@@ -20,7 +20,7 @@ flow:
           for: value in values
           do:
             ops.operation_that_goes_to_custom_when_value_is_2:
-              - text: value
+              - text: ${ value }
           break:
             - CUSTOM
         navigate:
@@ -30,9 +30,9 @@ flow:
     - task_that_doesnt_run:
         do:
           ops.print:
-            - text: "'I don't run'"
+            - text: "I don't run"
 
     - print_other_values:
         do:
           ops.print:
-            - text: "'abc'"
+            - text: 'abc'

@@ -18,5 +18,5 @@ operation:
   outputs:
     - dur
   results:
-    - SUCCESS: dur == 120
+    - SUCCESS: ${ dur == 120 }
     - FAILURE

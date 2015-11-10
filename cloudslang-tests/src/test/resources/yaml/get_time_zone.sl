@@ -18,7 +18,7 @@ operation:
         time_zone_as_int = int(time_zone_as_string)
         print 'time zone is: ' + str(time_zone_as_int)
   outputs:
-    - time_zone: time_zone_as_int
+    - time_zone: ${ time_zone_as_int }
   results:
-    - NEGATIVE: int(time_zone_as_int) < 0
+    - NEGATIVE: ${ int(time_zone_as_int) < 0 }
     - SUCCESS
