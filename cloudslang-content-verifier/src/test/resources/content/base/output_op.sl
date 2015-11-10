@@ -18,7 +18,7 @@ operation:
       output_text1=text
   outputs:
     - output_text1
-    - output_text2: "'second output'"
+    - output_text2: 'second output'
   results:
-    - SUCCESS: text != ""
+    - SUCCESS: ${ text != "" }
     - FAILURE
