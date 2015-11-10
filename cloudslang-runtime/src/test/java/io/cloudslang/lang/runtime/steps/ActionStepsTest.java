@@ -15,6 +15,7 @@ import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.env.ReturnValues;
+import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Assert;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.events.ScoreEvent;
@@ -133,6 +134,75 @@ public class ActionStepsTest {
         }
         Assert.assertNotNull(actionErrorEvent);
         Assert.assertNotNull(actionEndEvent);
+    }
+
+    @Test
+    public void doActionPythonActionCheckCallArgumentsOnEvent() {
+        //prepare doAction arguments
+        RunEnvironment runEnv = new RunEnvironment();
+        ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
+
+        Map<String, Serializable> callArguments = new HashMap<>();
+        callArguments.put("index", 1);
+        runEnv.putCallArguments(callArguments);
+
+        String userPythonScript = "print \"hello\"";
+
+        //invoke doAction
+        actionSteps.doAction(runEnv,new HashMap<String, Object>(), PYTHON, "", "", runtimeServices, userPythonScript, 2L, "operationName");
+
+        Collection<ScoreEvent> events = runtimeServices.getEvents();
+
+        Assert.assertFalse(events.isEmpty());
+        ScoreEvent eventActionStart = null;
+        for(ScoreEvent event:events){
+            if(event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_START)){
+                eventActionStart = event;
+            }
+        }
+        assert eventActionStart != null;
+        Map<String, Serializable> data = (HashMap)eventActionStart.getData();
+        for (Map.Entry<String, Serializable> entry : data.entrySet()) {
+            if (entry.getKey().equals("CALL_ARGUMENTS")){
+                Assert.assertNotNull(entry.getValue());
+                return;
+            }
+        }
+        Assert.fail();
+    }
+
+    @Test
+    public void doActionJavaActionCheckCallArgumentsOnEvent() {
+        //prepare doAction arguments
+        RunEnvironment runEnv = new RunEnvironment();
+        ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
+
+        Map<String, Serializable> callArguments = new HashMap<>();
+        callArguments.put("index", 1);
+        runEnv.putCallArguments(callArguments);
+
+        //invoke doAction
+        actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, ContentTestActions.class.getName(), "doJavaSampleAction", runtimeServices, null, 2L, "operationName");
+
+        Collection<ScoreEvent> events = runtimeServices.getEvents();
+
+        Assert.assertFalse(events.isEmpty());
+        ScoreEvent eventActionStart = null;
+        for(ScoreEvent event:events){
+            if(event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_START)){
+                eventActionStart = event;
+            }
+        }
+        assert eventActionStart != null;
+        Map<String, Serializable> data = (HashMap)eventActionStart.getData();
+        for (Map.Entry<String, Serializable> entry : data.entrySet()) {
+            if (entry.getKey().equals("CALL_ARGUMENTS")){
+                Assert.assertNotNull(entry.getValue());
+                return;
+            }
+        }
+        Assert.fail();
+
     }
 
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
