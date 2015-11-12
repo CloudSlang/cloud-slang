@@ -49,7 +49,7 @@ public class CompileFlowWithMultipleStepsTest {
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 10, executionPlan.getSteps().size());
-        Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());
+        Assert.assertEquals("execution plan name is different than expected", "flow_with_multiple_steps", executionPlan.getName());
         Assert.assertEquals("the dependencies size is not as expected", 3, compilationArtifact.getDependencies().size());
     }
 
@@ -59,7 +59,7 @@ public class CompileFlowWithMultipleStepsTest {
         Executable flow = compiler.preCompile(SlangSource.fromFile(flowUri));
 
         Assert.assertNotNull("Pre-Compiled meta-data is null", flow);
-        Assert.assertEquals("Flow name is wrong", "basic_flow", flow.getName());
+        Assert.assertEquals("Flow name is wrong", "flow_with_multiple_steps", flow.getName());
         Assert.assertEquals("Flow namespace is wrong", "user.ops", flow.getNamespace());
         Assert.assertEquals("There is a different number of flow inputs than expected", 0, flow.getInputs().size());
         Assert.assertEquals("There is a different number of flow outputs than expected", 0, flow.getOutputs().size());

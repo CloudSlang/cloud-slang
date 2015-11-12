@@ -76,7 +76,7 @@ public class PublishTransformerTest {
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
-    public void testNoExpression() throws Exception {
+    public void testNoValue() throws Exception {
         @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap);
         Output publish = publishValues.get(0);
         Assert.assertEquals("weather", publish.getName());
@@ -84,11 +84,19 @@ public class PublishTransformerTest {
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
-    public void testExpressionKey() throws Exception {
+    public void testExpressionValue() throws Exception {
         @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap);
         Output publish = publishValues.get(1);
         Assert.assertEquals("temp", publish.getName());
-        Assert.assertEquals("temperature", publish.getValue());
+        Assert.assertEquals("${temperature}", publish.getValue());
+    }
+
+    @Test (timeout = DEFAULT_TIMEOUT)
+    public void testStringValue() throws Exception {
+        @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap);
+        Output publish = publishValues.get(2);
+        Assert.assertEquals("publish_str", publish.getName());
+        Assert.assertEquals("publish_str_value", publish.getValue());
     }
 
     @Configuration

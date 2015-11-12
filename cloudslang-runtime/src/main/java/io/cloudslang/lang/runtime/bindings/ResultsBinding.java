@@ -76,16 +76,16 @@ public class ResultsBinding extends Binding {
         // In the case of operation, we resolve the result by searching for the first result with a true expression
         // An empty expression passes as true
         for(Result result : possibleResults){
-            Serializable rawExpression = result.getValue();
+            Serializable value = result.getValue();
 
             // If the answer has no expression, we treat it as a true expression, and choose it
-            if(StringUtils.isEmpty(rawExpression)) {
+            if(StringUtils.isEmpty(value)) {
                 return result.getName();
             }
 
-            String expression = extractExpression(rawExpression);
+            String expression = extractExpression(value);
             if (expression == null) {
-                throw new RuntimeException("Expression: '" + rawExpression + "' is not valid. Accepted format is: ${ expression }");
+                throw new RuntimeException("Expression: '" + value + "' is not valid. Accepted format is: ${ expression }");
             }
 
             //construct script context

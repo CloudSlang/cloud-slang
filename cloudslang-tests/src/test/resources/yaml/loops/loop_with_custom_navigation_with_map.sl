@@ -13,8 +13,8 @@ imports:
 flow:
   name: loop_with_custom_navigation_with_map
   inputs:
-    - person_map: >
-        ${{'john': 1, 'jane': 2, 'peter': 'three'}}
+    - person_map:
+        default: {'john': 1, 'jane': 2, 'peter': 'three'}
   workflow:
     - print_values:
         loop:

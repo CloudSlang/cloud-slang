@@ -11,7 +11,7 @@ imports:
   ops: user.ops
 
 flow:
-  name: basic_flow
+  name: flow_with_multiple_steps
   workflow:
     - CheckWeather:
         do:
@@ -36,7 +36,8 @@ flow:
             - city: 'input_1'
         publish:
           - weather
-          - temp: temperature
+          - temp: ${temperature}
+          - publish_str: 'publish_str_value'
         navigate:
           SUCCESS: SUCCESS
           FAILURE: NotRealCheckWeather

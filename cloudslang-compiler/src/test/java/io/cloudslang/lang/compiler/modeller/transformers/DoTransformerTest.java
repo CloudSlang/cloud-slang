@@ -73,17 +73,6 @@ public class DoTransformerTest {
     }
 
     @Test
-    public void testTransformArgumentWithModifiers() throws Exception {
-        Map doArgumentsMap = loadFirstTaskFromFile("/flow_with_argument_modifiers.yaml");
-        @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap);
-        Assert.assertFalse(arguments.isEmpty());
-        Assert.assertEquals(2, arguments.size());
-        Argument argument = arguments.get(1);
-        Assert.assertEquals("country", argument.getName());
-        Assert.assertEquals("Neverland", argument.getValue());
-    }
-
-    @Test
     public void testTransformEmptyArgumentExpression() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage("country");
