@@ -221,16 +221,16 @@ public class ArgumentsBindingTest {
     public void testArgumentAssignFromAnotherArgument() {
         Map<String,Serializable> context = new HashMap<>();
 
-		Argument argument1 = new Argument("argument1","5");
+		Argument argument1 = new Argument("argument1",5);
         Argument argument2 = new Argument("argument2","${ argument1 }");
         List<Argument> arguments = Arrays.asList(argument1,argument2);
 
         Map<String,Serializable> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
-        Assert.assertEquals("5", result.get("argument1"));
+        Assert.assertEquals(5, result.get("argument1"));
         Assert.assertTrue(result.containsKey("argument2"));
-        Assert.assertEquals("5", result.get("argument2"));
+        Assert.assertEquals(5, result.get("argument2"));
         Assert.assertEquals(2, result.size());
 
         Assert.assertTrue("orig context should not change", context.isEmpty());

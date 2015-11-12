@@ -49,7 +49,7 @@ public class ExpressionTest extends SystemsTestsParent {
         // trigger
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("input_no_expression", "input_no_expression_value");
-        userInputs.put("input_overridable", "i_should_not_be_assigned");
+        userInputs.put("input_not_overridable", "i_should_not_be_assigned");
         Map<String, Serializable> systemProperties = new HashMap<>();
         systemProperties.put("user.sys.props.host", "localhost");
 

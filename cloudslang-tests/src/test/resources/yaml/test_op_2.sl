@@ -11,7 +11,7 @@ operation:
   name: test_op_2
   inputs:
     - input1
-    - input2: $[ input2 ]
+    - input2: ${ input2 }
     - input3:
         default: 'value3'
     - input4: ${ 'value4' if input3 == value3 else None }
