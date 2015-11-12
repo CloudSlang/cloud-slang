@@ -59,7 +59,7 @@ public class ArgumentsBinding extends Binding {
             argumentValue = srcContext.get(argumentName);
             scriptContext.put(argumentName, argumentValue);
 
-            Serializable rawExpression = argument.getExpression();
+            Serializable rawExpression = argument.getValue();
             String expressionToEvaluate = extractExpression(rawExpression);
             if (expressionToEvaluate != null) {
                 //so you can resolve previous arguments already bound

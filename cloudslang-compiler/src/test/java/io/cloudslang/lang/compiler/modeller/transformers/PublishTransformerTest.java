@@ -31,7 +31,6 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -81,7 +80,7 @@ public class PublishTransformerTest {
         @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap);
         Output publish = publishValues.get(0);
         Assert.assertEquals("weather", publish.getName());
-        Assert.assertEquals("${ weather }", publish.getExpression());
+        Assert.assertEquals("${ weather }", publish.getValue());
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
@@ -89,7 +88,7 @@ public class PublishTransformerTest {
         @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap);
         Output publish = publishValues.get(1);
         Assert.assertEquals("temp", publish.getName());
-        Assert.assertEquals("temperature", publish.getExpression());
+        Assert.assertEquals("temperature", publish.getValue());
     }
 
     @Configuration

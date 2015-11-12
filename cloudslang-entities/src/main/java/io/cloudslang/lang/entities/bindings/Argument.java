@@ -17,8 +17,8 @@ import java.io.Serializable;
  */
 public class Argument extends InOutParam {
 
-    public Argument(String name, Serializable expression) {
-        super(name, expression);
+    public Argument(String name, Serializable value) {
+        super(name, value);
     }
 
     /**

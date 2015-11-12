@@ -24,8 +24,8 @@ public class Input extends InOutParam {
 	private boolean overridable;
 	private String systemPropertyName;
 
-	public Input(String name, Serializable expression, boolean encrypted, boolean required, boolean overridable, String systemPropertyName) {
-		super(name, expression);
+	public Input(String name, Serializable value, boolean encrypted, boolean required, boolean overridable, String systemPropertyName) {
+		super(name, value);
 		this.encrypted = encrypted;
 		this.required = required;
 		this.overridable = overridable;

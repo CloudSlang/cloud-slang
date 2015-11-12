@@ -76,7 +76,7 @@ public class OutputsTransformerTest {
         @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
         Output output = outputs.get(3);
         Assert.assertEquals("output4", output.getName());
-        Assert.assertEquals("${ output4 }", output.getExpression());
+        Assert.assertEquals("${ output4 }", output.getValue());
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
@@ -84,7 +84,7 @@ public class OutputsTransformerTest {
         @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
         Output output = outputs.get(0);
         Assert.assertEquals("output1", output.getName());
-        Assert.assertEquals("${ input1 }", output.getExpression());
+        Assert.assertEquals("${ input1 }", output.getValue());
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
@@ -92,7 +92,7 @@ public class OutputsTransformerTest {
         @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
         Output output = outputs.get(2);
         Assert.assertEquals("output3", output.getName());
-        Assert.assertEquals("${ self['input1'] }", output.getExpression());
+        Assert.assertEquals("${ self['input1'] }", output.getValue());
     }
 
     @Configuration

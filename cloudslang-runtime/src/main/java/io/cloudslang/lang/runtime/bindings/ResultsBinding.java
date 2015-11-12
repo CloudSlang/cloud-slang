@@ -76,7 +76,7 @@ public class ResultsBinding extends Binding {
         // In the case of operation, we resolve the result by searching for the first result with a true expression
         // An empty expression passes as true
         for(Result result : possibleResults){
-            Serializable rawExpression = result.getExpression();
+            Serializable rawExpression = result.getValue();
 
             // If the answer has no expression, we treat it as a true expression, and choose it
             if(StringUtils.isEmpty(rawExpression)) {

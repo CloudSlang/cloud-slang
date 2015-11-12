@@ -18,8 +18,8 @@ public class Result extends InOutParam {
 
 	private static final long serialVersionUID = -809266116566407854L;
 
-	public Result(String name, String expression) {
-		super(name, expression);
+	public Result(String name, String value) {
+		super(name, value);
 	}
 
     /**

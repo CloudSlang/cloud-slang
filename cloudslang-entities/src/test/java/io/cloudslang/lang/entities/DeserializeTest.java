@@ -113,7 +113,7 @@ public class DeserializeTest {
         public void write(JsonWriter out, Input input) throws IOException {
             out.beginObject();
             out.name("name").value(input.getName());
-            out.name("expression").value(String.valueOf(input.getExpression()));
+            out.name("expression").value(String.valueOf(input.getValue()));
             out.name("encrypted").value(input.isEncrypted());
             out.name("required").value(input.isRequired());
             out.name("overridable").value(input.isOverridable());

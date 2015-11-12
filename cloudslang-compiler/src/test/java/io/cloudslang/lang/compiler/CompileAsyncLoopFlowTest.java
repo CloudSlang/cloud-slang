@@ -74,11 +74,11 @@ public class CompileAsyncLoopFlowTest {
 
         List<Output> aggregateValues = getAggregateOutputs(task);
         assertEquals(2, aggregateValues.size());
-        assertEquals("${ map(lambda x:str(x['name']), branches_context) }", aggregateValues.get(0).getExpression());
+        assertEquals("${ map(lambda x:str(x['name']), branches_context) }", aggregateValues.get(0).getValue());
 
         List<Output> publishValues = getPublishOutputs(task);
         assertEquals("aggregate list is not empty", 2, publishValues.size());
-        assertEquals("${ name }", publishValues.get(0).getExpression());
+        assertEquals("${ name }", publishValues.get(0).getValue());
 
         Map<String, String> expectedNavigationStrings = new HashMap<>();
         expectedNavigationStrings.put("SUCCESS", "SUCCESS");
@@ -122,11 +122,11 @@ public class CompileAsyncLoopFlowTest {
 
         List<Output> aggregateValues = getAggregateOutputs(asyncTask);
         assertEquals(2, aggregateValues.size());
-        assertEquals("${ map(lambda x:str(x['name']), branches_context) }", aggregateValues.get(0).getExpression());
+        assertEquals("${ map(lambda x:str(x['name']), branches_context) }", aggregateValues.get(0).getValue());
 
         List<Output> publishValues = getPublishOutputs(asyncTask);
         assertEquals("aggregate list is not empty", 2, publishValues.size());
-        assertEquals("${ name }", publishValues.get(0).getExpression());
+        assertEquals("${ name }", publishValues.get(0).getValue());
 
         Map<String, String> expectedNavigationStrings = new HashMap<>();
         expectedNavigationStrings.put("SUCCESS", "print_list");

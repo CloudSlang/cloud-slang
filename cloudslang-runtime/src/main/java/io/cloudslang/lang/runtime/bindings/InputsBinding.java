@@ -99,7 +99,7 @@ public class InputsBinding extends Binding {
         }
 
         if (value == null) {
-            Serializable rawExpression = input.getExpression();
+            Serializable rawExpression = input.getValue();
             String expressionToEvaluate = extractExpression(rawExpression);
             if (expressionToEvaluate != null) {
                 scriptContext.put(inputName, valueFromContext);

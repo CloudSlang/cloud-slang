@@ -20,8 +20,8 @@ public class Output extends InOutParam {
 
 	private static final long serialVersionUID = -5390581034091916685L;
 
-	public Output(String name, Serializable expression) {
-		super(name, expression);
+	public Output(String name, Serializable value) {
+		super(name, value);
 	}
 
     /**

@@ -46,7 +46,7 @@ public class OutputsBinding extends Binding {
         if (possibleOutputs != null) {
             for (Output output : possibleOutputs) {
                 String outputKey = output.getName();
-                Serializable rawExpression = output.getExpression();
+                Serializable rawExpression = output.getValue();
                 Serializable valueToAssign = rawExpression;
                 String expressionToEvaluate = extractExpression(rawExpression);
                 if (expressionToEvaluate != null) {
