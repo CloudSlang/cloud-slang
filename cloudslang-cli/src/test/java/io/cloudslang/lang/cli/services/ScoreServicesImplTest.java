@@ -136,7 +136,7 @@ public class ScoreServicesImplTest {
         }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
 
         // invoke method
-        long executionID = scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false);
+        long executionID = scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false, false);
 
         // verify constraints
         ArgumentCaptor<ScoreEventListener> scoreEventListenerArg = ArgumentCaptor.forClass(ScoreEventListener.class);
@@ -189,7 +189,7 @@ public class ScoreServicesImplTest {
         exception.expectMessage("exception message");
 
         // invoke method
-        scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false);
+        scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false, false);
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
@@ -232,7 +232,7 @@ public class ScoreServicesImplTest {
 
 
         // invoke method
-        scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false);
+        scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false, false);
     }
 
     @Configuration
