@@ -7,6 +7,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import io.cloudslang.lang.entities.bindings.*;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -17,9 +18,10 @@ import static org.junit.Assert.*;
 public class DeserializeTest {
 
     private ObjectMapper mapper;
-    Gson gson = new Gson();
+    private Gson gson;
 
-    public DeserializeTest() {
+    @Before
+    public void setUp() throws Exception {
         mapper = new ObjectMapper().enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
 
         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -35,7 +37,6 @@ public class DeserializeTest {
 
         //gson
         String json = gson.toJson(objToTest);
-        System.out.println(json);
         T fromJson = gson.fromJson(json, type);
         assertEquals(objToTest, fromJson);
     }
