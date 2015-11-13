@@ -67,10 +67,6 @@
             <groupId>io.cloudslang.content</groupId>
             <artifactId>score-http-client</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-        </dependency>
 
     </dependencies>
 
