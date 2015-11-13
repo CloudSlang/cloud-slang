@@ -76,26 +76,26 @@ public class ResultsBinding extends Binding {
         // In the case of operation, we resolve the result by searching for the first result with a true expression
         // An empty expression passes as true
         for(Result result : possibleResults){
-            Serializable resultValue = result.getValue();
+            Serializable rawValue = result.getValue();
             String resultName = result.getName();
 
             // If the answer has no expression, we treat it as a true expression, and choose it
-            if(resultValue == null) {
+            if(rawValue == null) {
                 return resultName;
             }
 
-            if(resultValue == Boolean.TRUE) {
+            if(rawValue == Boolean.TRUE) {
                 return resultName;
             }
-            if (resultValue == Boolean.FALSE) {
+            if (rawValue == Boolean.FALSE) {
                 continue;
             }
 
-            if (resultValue instanceof String) {
-                String expression = extractExpression(resultValue);
+            if (rawValue instanceof String) {
+                String expression = extractExpression(rawValue);
                 if (expression == null) {
                     throw new RuntimeException(
-                            "Error resolving the result. The expression: '" + resultValue + "' is not valid." +
+                            "Error resolving the result. The expression: '" + rawValue + "' is not valid." +
                                     " Accepted format is: " + ScoreLangConstants.EXPRESSION_START_DELIMITER +
                                     " expression " + ScoreLangConstants.EXPRESSION_END_DELIMITER);
                 }
@@ -129,7 +129,7 @@ public class ResultsBinding extends Binding {
                     throw new RuntimeException("Error evaluating result: '" + resultName + "',\n\tError is: " + t.getMessage(), t);
                 }
             } else {
-                throw new RuntimeException("Error resolving the result. Value: '" + resultValue + "' is not valid.");
+                throw new RuntimeException("Error resolving the result. Value: '" + rawValue + "' is not valid.");
             }
         }
         throw new RuntimeException("No possible result was resolved");

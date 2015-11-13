@@ -99,15 +99,15 @@ public class InputsBinding extends Binding {
         }
 
         if (value == null) {
-            Serializable rawExpression = input.getValue();
-            String expressionToEvaluate = extractExpression(rawExpression);
+            Serializable rawValue = input.getValue();
+            String expressionToEvaluate = extractExpression(rawValue);
             if (expressionToEvaluate != null) {
                 scriptContext.put(inputName, valueFromContext);
                 //so you can resolve previous inputs already bound
                 scriptContext.putAll(targetContext);
                 value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext);
             } else {
-                value = rawExpression;
+                value = rawValue;
             }
         }
 

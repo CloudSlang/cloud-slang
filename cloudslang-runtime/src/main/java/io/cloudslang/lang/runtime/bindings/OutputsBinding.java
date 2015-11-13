@@ -46,9 +46,9 @@ public class OutputsBinding extends Binding {
         if (possibleOutputs != null) {
             for (Output output : possibleOutputs) {
                 String outputKey = output.getName();
-                Serializable rawExpression = output.getValue();
-                Serializable valueToAssign = rawExpression;
-                String expressionToEvaluate = extractExpression(rawExpression);
+                Serializable rawValue = output.getValue();
+                Serializable valueToAssign = rawValue;
+                String expressionToEvaluate = extractExpression(rawValue);
                 if (expressionToEvaluate != null) {
                     //declare the new output
                     if (!actionReturnValues.containsKey(outputKey)) {
@@ -70,7 +70,7 @@ public class OutputsBinding extends Binding {
                     outputs.put(outputKey, valueToAssign);
                     scriptContext.put(outputKey, valueToAssign);
                 } catch (ClassCastException ex) {
-                    throw new RuntimeException("The output value: " + rawExpression + " is not serializable", ex);
+                    throw new RuntimeException("The output value: " + rawValue + " is not serializable", ex);
                 }
             }
         }

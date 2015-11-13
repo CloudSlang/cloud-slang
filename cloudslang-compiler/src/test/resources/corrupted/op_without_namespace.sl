@@ -15,5 +15,4 @@ operation:
     - weather: "great!!"
     - temperature: "30"
   results:
-    - SUCCESS: $ { 1 == 1 }
-
+    - SUCCESS: ${ 1 == 1 }

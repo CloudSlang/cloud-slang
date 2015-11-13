@@ -59,14 +59,14 @@ public class ArgumentsBinding extends Binding {
             argumentValue = srcContext.get(argumentName);
             scriptContext.put(argumentName, argumentValue);
 
-            Serializable rawExpression = argument.getValue();
-            String expressionToEvaluate = extractExpression(rawExpression);
+            Serializable rawValue = argument.getValue();
+            String expressionToEvaluate = extractExpression(rawValue);
             if (expressionToEvaluate != null) {
                 //so you can resolve previous arguments already bound
                 scriptContext.putAll(targetContext);
                 argumentValue = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext);
-            } else if (rawExpression != null) {
-                argumentValue = rawExpression;
+            } else if (rawValue != null) {
+                argumentValue = rawValue;
             }
         } catch (Throwable t) {
             throw new RuntimeException("Error binding task argument: '" + argumentName + "', \n\tError is: " + t.getMessage(), t);
