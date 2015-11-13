@@ -78,7 +78,7 @@ public class CompileAsyncLoopFlowTest {
 
         List<Output> publishValues = getPublishOutputs(task);
         assertEquals("aggregate list is not empty", 2, publishValues.size());
-        assertEquals("${ name }", publishValues.get(0).getValue());
+        assertEquals("${name}", publishValues.get(0).getValue());
 
         Map<String, String> expectedNavigationStrings = new HashMap<>();
         expectedNavigationStrings.put("SUCCESS", "SUCCESS");
@@ -126,7 +126,7 @@ public class CompileAsyncLoopFlowTest {
 
         List<Output> publishValues = getPublishOutputs(asyncTask);
         assertEquals("aggregate list is not empty", 2, publishValues.size());
-        assertEquals("${ name }", publishValues.get(0).getValue());
+        assertEquals("${name}", publishValues.get(0).getValue());
 
         Map<String, String> expectedNavigationStrings = new HashMap<>();
         expectedNavigationStrings.put("SUCCESS", "print_list");
@@ -255,7 +255,7 @@ public class CompileAsyncLoopFlowTest {
         @SuppressWarnings("unchecked") List<Output> actualPublishOutputs =
                 (List<Output>) branchEndTaskActionData.get(ScoreLangConstants.TASK_PUBLISH_KEY);
         List<Output> expectedPublishOutputs = new ArrayList<>();
-        expectedPublishOutputs.add(new Output("name", "${ name }"));
+        expectedPublishOutputs.add(new Output("name", "${name}"));
         expectedPublishOutputs.add(new Output("number", "${ int_output }"));
         assertEquals("publish outputs not as expected", expectedPublishOutputs, actualPublishOutputs);
     }

@@ -76,7 +76,7 @@ public class OutputsTransformerTest {
         @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
         Output output = outputs.get(3);
         Assert.assertEquals("output4", output.getName());
-        Assert.assertEquals("${ output4 }", output.getValue());
+        Assert.assertEquals("${output4}", output.getValue());
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)

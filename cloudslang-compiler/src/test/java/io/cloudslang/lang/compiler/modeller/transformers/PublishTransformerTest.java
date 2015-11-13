@@ -80,7 +80,7 @@ public class PublishTransformerTest {
         @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap);
         Output publish = publishValues.get(0);
         Assert.assertEquals("weather", publish.getName());
-        Assert.assertEquals("${ weather }", publish.getValue());
+        Assert.assertEquals("${weather}", publish.getValue());
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
