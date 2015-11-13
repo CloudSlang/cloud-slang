@@ -35,6 +35,8 @@ flow:
     - input_str_double: "Hi"
     - input_yaml_list: [1, 2, 3]
     - input_properties_yaml_map_folded: {default: medium, required: false}
+    - input_yaml_map:
+        default: {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
 
     # evalauted via Python
     - input_python_null:
@@ -47,7 +49,6 @@ flow:
         'key2': 'value2',
         'key3': 'value3'
         }}
-    - input_python_map_quotes: "${{'value': 2}}"
     - b: b
     - b_copy: ${ b }
     - input_concat_1: ${'a' + b}
@@ -85,7 +86,6 @@ flow:
                 'key2': 'value2',
                 'key3': 'value3'
                 }}
-            - input_python_map_quotes: "${{'value': 2}}"
             - b: b
             - b_copy: ${ b }
             - input_concat_1: ${'a' + b}

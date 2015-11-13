@@ -15,16 +15,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
-import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.systemtests.StepData;
-import io.cloudslang.lang.systemtests.SystemsTestsParent;
+import io.cloudslang.lang.systemtests.ValueSyntaxParent;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,10 +30,10 @@ import java.util.Set;
  * @author Bonczidai Levente
  * @since 11/6/2015
  */
-public class ExpressionTest extends SystemsTestsParent {
+public class ValueSyntaxInFlowTest extends ValueSyntaxParent {
 
     @Test
-    public void testValuesInFlow() throws Exception {
+    public void testValues() throws Exception {
         // compile
         URI resource = getClass().getResource("/yaml/formats/values_flow.sl").toURI();
         URI operation1 = getClass().getResource("/yaml/formats/values_op.sl").toURI();
@@ -47,96 +45,19 @@ public class ExpressionTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         // trigger
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("input_no_expression", "input_no_expression_value");
-        userInputs.put("input_not_overridable", "i_should_not_be_assigned");
-        Map<String, Serializable> systemProperties = new HashMap<>();
-        systemProperties.put("user.sys.props.host", "localhost");
-
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, systemProperties).getTasks();
+        Map<String, StepData> steps = prepareAndRun(compilationArtifact);
 
         // verify
         StepData flowData = steps.get(EXEC_START_PATH);
         StepData taskData = steps.get(FIRST_STEP_PATH);
         StepData oneLinerTaskData = steps.get(SECOND_STEP_KEY);
 
-        verifyFlowInputs(flowData);
-        verifyFlowOutputs(flowData);
+        verifyExecutableInputs(flowData);
+        verifyExecutableOutputs(flowData);
         verifyTaskInputs(taskData);
         verifyTaskPublishValues(taskData);
         verifyOneLinerInputs(oneLinerTaskData);
-        verifyExecutableResult(flowData);
-    }
-
-    @Test
-    public void testValuesInOperation() throws Exception {
-        // compile
-        URI resource = getClass().getResource("/yaml/formats/values_op.sl").toURI();
-
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), new HashSet<SlangSource>());
-
-        // trigger
-        Map<String, Serializable> userInputs = new HashMap<>();
-        Map<String, Serializable> systemProperties = new HashMap<>();
-
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, systemProperties).getTasks();
-
-        // verify
-        StepData operationData = steps.get(EXEC_START_PATH);
-
-        verifyExecutableResult(operationData);
-    }
-
-    private void verifyFlowInputs(StepData flowData) {
-        Map<String, Serializable> expectedInputs = new HashMap<>();
-
-        // properties
-        expectedInputs.put("input_no_expression", "input_no_expression_value");
-        expectedInputs.put("input_no_expression_not_required", null);
-        expectedInputs.put("input_system_property", "localhost");
-        expectedInputs.put("input_not_overridable", 25);
-
-        // loaded by Yaml
-        expectedInputs.put("input_int", 22);
-        expectedInputs.put("input_str_no_quotes", "Hi");
-        expectedInputs.put("input_str_single", "Hi");
-        expectedInputs.put("input_str_double", "Hi");
-        expectedInputs.put("input_yaml_list", Lists.newArrayList(1, 2, 3));
-        expectedInputs.put("input_properties_yaml_map_folded", "medium");
-
-        // evaluated via Python
-        expectedInputs.put("input_python_null", null);
-        expectedInputs.put("input_python_list",  Lists.newArrayList(1, 2, 3));
-        HashMap<String, Serializable> expectedInputPythonMap = new HashMap<>();
-        expectedInputPythonMap.put("key1", "value1");
-        expectedInputPythonMap.put("key2", "value2");
-        expectedInputPythonMap.put("key3", "value3");
-        expectedInputs.put("input_python_map", expectedInputPythonMap);
-        HashMap<String, Serializable> expectedInputPythonMapQuotes = new HashMap<>();
-        expectedInputPythonMapQuotes.put("value", 2);
-        expectedInputs.put("input_python_map_quotes", expectedInputPythonMapQuotes);
-        expectedInputs.put("b", "b");
-        expectedInputs.put("b_copy", "b");
-        expectedInputs.put("input_concat_1", "ab");
-        expectedInputs.put("input_concat_2_one_liner", "prefix_ab_suffix");
-        expectedInputs.put("input_concat_2_folded", "prefix_ab_suffix");
-        expectedInputs.put(
-                "input_expression_characters",
-                "docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ./auth} -p 8888:22 --name test1 -v /data:"
-        );
-
-        Assert.assertTrue("Flow inputs not bound correctly", includeAllPairs(flowData.getInputs(), expectedInputs));
-    }
-
-    private void verifyFlowOutputs(StepData flowData) {
-        Map<String, Serializable> expectedOutputs = new HashMap<>();
-
-        expectedOutputs.put("output_no_expression", "output_no_expression_value");
-        expectedOutputs.put("output_int", 22);
-        expectedOutputs.put("output_str", "output_str_value");
-        expectedOutputs.put("output_expression", "output_str_value_suffix");
-
-        Assert.assertEquals("Flow outputs not bound correctly", expectedOutputs, flowData.getOutputs());
+        verifySuccessResult(flowData);
     }
 
     private void verifyTaskInputs(StepData taskData) {
@@ -164,9 +85,6 @@ public class ExpressionTest extends SystemsTestsParent {
         expectedInputPythonMap.put("key2", "value2");
         expectedInputPythonMap.put("key3", "value3");
         expectedTaskArguments.put("input_python_map", expectedInputPythonMap);
-        HashMap<String, Serializable> expectedInputPythonMapQuotes = new HashMap<>();
-        expectedInputPythonMapQuotes.put("value", 2);
-        expectedTaskArguments.put("input_python_map_quotes", expectedInputPythonMapQuotes);
         expectedTaskArguments.put("b", "b");
         expectedTaskArguments.put("b_copy", "b");
         expectedTaskArguments.put("input_concat_1", "ab");
@@ -195,16 +113,6 @@ public class ExpressionTest extends SystemsTestsParent {
         expectedTaskArguments.put("input_expression", "input_no_expression_value_suffix");
 
         Assert.assertTrue("One liner task arguments not bound correctly", includeAllPairs(taskData.getInputs(), expectedTaskArguments));
-    }
-
-    private void verifyExecutableResult(StepData stepData) {
-        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, stepData.getResult());
-    }
-
-    private boolean includeAllPairs(Map<String, Serializable> map1, Map<String, Serializable> map2) {
-        Map<String, Serializable> accumulator = new HashMap<>(map1);
-        accumulator.putAll(map2);
-        return accumulator.equals(map1);
     }
 
 }
