@@ -120,6 +120,10 @@ public class ExpressionTest extends SystemsTestsParent {
         expectedInputs.put("input_concat_1", "ab");
         expectedInputs.put("input_concat_2_one_liner", "prefix_ab_suffix");
         expectedInputs.put("input_concat_2_folded", "prefix_ab_suffix");
+        expectedInputs.put(
+                "input_expression_characters",
+                "docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ./auth} -p 8888:22 --name test1 -v /data:"
+        );
 
         Assert.assertTrue("Flow inputs not bound correctly", includeAllPairs(flowData.getInputs(), expectedInputs));
     }

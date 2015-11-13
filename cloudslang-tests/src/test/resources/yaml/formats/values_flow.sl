@@ -13,6 +13,11 @@ imports:
 flow:
   name: values_flow
   inputs:
+    # helpers
+    - output_no_expression: output_no_expression_value
+    - authorized_keys_path: './auth'
+    - scp_host_port: '8888'
+
     # properties
     - input_no_expression
     - input_no_expression_not_required:
@@ -53,9 +58,9 @@ flow:
         input_concat_1 +
         '_suffix'
         }
-
-    # helpers
-    - output_no_expression: output_no_expression_value
+    - input_expression_characters: >
+        ${ 'docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ' + authorized_keys_path + '} -p ' +
+        scp_host_port + ':22 --name test1 -v /data:'}
   workflow:
     - task_standard:
         do:
