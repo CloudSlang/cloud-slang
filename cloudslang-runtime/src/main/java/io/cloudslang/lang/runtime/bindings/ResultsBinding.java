@@ -94,7 +94,10 @@ public class ResultsBinding extends Binding {
             if (resultValue instanceof String) {
                 String expression = extractExpression(resultValue);
                 if (expression == null) {
-                    throw new RuntimeException("Error resolving the result. The expression: '" + resultValue + "' is not valid. Accepted format is: ${ expression }");
+                    throw new RuntimeException(
+                            "Error resolving the result. The expression: '" + resultValue + "' is not valid." +
+                                    " Accepted format is: " + ScoreLangConstants.EXPRESSION_START_DELIMITER +
+                                    " expression " + ScoreLangConstants.EXPRESSION_END_DELIMITER);
                 }
 
                 //construct script context

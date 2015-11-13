@@ -10,6 +10,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 *******************************************************************************/
 
 
+import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -55,7 +56,7 @@ public class AbstractOutputsTransformer {
     }
 
     private String transformNameToExpression(String name) {
-        return "${ " + name + " }";
+        return ScoreLangConstants.EXPRESSION_START_DELIMITER + name + ScoreLangConstants.EXPRESSION_END_DELIMITER;
     }
 
 }
