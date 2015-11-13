@@ -41,6 +41,22 @@ public class ResultBindingTest {
     private ResultsBinding resultsBinding;
 
     @Test
+    public void testPrimitiveBooleanResult() throws Exception {
+        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, true),
+                createResult(ScoreLangConstants.FAILURE_RESULT, "${ True and (not False) }"));
+        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), results, null);
+        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result);
+    }
+
+    @Test
+    public void testObjectBooleanResult() throws Exception {
+        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, Boolean.TRUE),
+                createResult(ScoreLangConstants.FAILURE_RESULT, "${ True and (not False) }"));
+        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), results, null);
+        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result);
+    }
+
+    @Test
     public void testConstExprChooseFirstResult() throws Exception {
         List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, "${ 1==1 }"),
                 createResult(ScoreLangConstants.FAILURE_RESULT, "${ True and (not False) }"));
@@ -95,16 +111,6 @@ public class ResultBindingTest {
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
-    @Test
-    public void testBindInputEmptyResult() throws Exception {
-        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, "${ int(status) == 1 }"),
-                                            createResult(ScoreLangConstants.FAILURE_RESULT, ""));
-        HashMap<String, Serializable> context = new HashMap<>();
-        context.put("status", "-1");
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, results, null);
-        Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
-    }
-
     @Test(expected = RuntimeException.class)
     public void testNoResults() throws Exception {
         List<Result> results = Arrays.asList();
@@ -147,7 +153,8 @@ public class ResultBindingTest {
         context.put("status", "-1");
         resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, results, null);
     }
-    private Result createResult(String name, String expression){
+
+    private Result createResult(String name, Serializable expression){
         return new Result(name, expression);
     }
 
