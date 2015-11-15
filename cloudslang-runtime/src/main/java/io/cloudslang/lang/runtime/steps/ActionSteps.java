@@ -63,7 +63,7 @@ public class ActionSteps extends AbstractSteps {
         Map<String, Serializable> callArgumentsDeepCopy = new HashMap<>();
 
         for (Map.Entry<String, Serializable> entry : callArguments.entrySet()) {
-            callArgumentsDeepCopy.put(new String(entry.getKey().toString()),  SerializationUtils.clone(entry.getValue()));
+            callArgumentsDeepCopy.put(entry.getKey(),  SerializationUtils.clone(entry.getValue()));
         }
 
         Map<String, SerializableSessionObject> serializableSessionData = runEnv.getSerializableDataMap();
@@ -316,6 +316,4 @@ public class ActionSteps extends AbstractSteps {
     private void cleanInterpreter(PythonInterpreter interpreter) {
         interpreter.setLocals(new PyStringMap());
     }
-
-
 }

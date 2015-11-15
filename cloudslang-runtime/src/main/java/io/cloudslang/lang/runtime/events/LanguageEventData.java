@@ -152,4 +152,10 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     public void setAsyncLoopBoundExpression(List<Serializable> asyncLoopBoundExpression) {
         put(BOUND_ASYNC_LOOP_EXPRESSION, (Serializable) asyncLoopBoundExpression);
     }
+
+    public Map<String, Serializable> getCallArguments() {return (Map<String, Serializable>) get(CALL_ARGUMENTS);}
+
+    public void setCallArguments(String callArguments) {
+        put(CALL_ARGUMENTS, callArguments);
+    }
 }

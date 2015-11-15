@@ -15,7 +15,7 @@ import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.env.ReturnValues;
-import org.apache.commons.lang3.SerializationUtils;
+import io.cloudslang.lang.runtime.events.LanguageEventData;
 import org.junit.Assert;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.events.ScoreEvent;
@@ -146,7 +146,7 @@ public class ActionStepsTest {
         callArguments.put("index", 1);
         runEnv.putCallArguments(callArguments);
 
-        String userPythonScript = "print \"hello\"";
+        String userPythonScript = "var= \"hello\"";
 
         //invoke doAction
         actionSteps.doAction(runEnv,new HashMap<String, Object>(), PYTHON, "", "", runtimeServices, userPythonScript, 2L, "operationName");
@@ -160,15 +160,11 @@ public class ActionStepsTest {
                 eventActionStart = event;
             }
         }
-        assert eventActionStart != null;
-        Map<String, Serializable> data = (HashMap)eventActionStart.getData();
-        for (Map.Entry<String, Serializable> entry : data.entrySet()) {
-            if (entry.getKey().equals("CALL_ARGUMENTS")){
-                Assert.assertNotNull(entry.getValue());
-                return;
-            }
-        }
-        Assert.fail();
+
+        Assert.assertNotNull(eventActionStart);
+        LanguageEventData data = (LanguageEventData)eventActionStart.getData();
+        Map<String, Serializable> actualCallArguments = data.getCallArguments();
+        Assert.assertEquals("Python action call arguments are not as expected", callArguments, actualCallArguments);
     }
 
     @Test
@@ -193,16 +189,11 @@ public class ActionStepsTest {
                 eventActionStart = event;
             }
         }
-        assert eventActionStart != null;
-        Map<String, Serializable> data = (HashMap)eventActionStart.getData();
-        for (Map.Entry<String, Serializable> entry : data.entrySet()) {
-            if (entry.getKey().equals("CALL_ARGUMENTS")){
-                Assert.assertNotNull(entry.getValue());
-                return;
-            }
-        }
-        Assert.fail();
 
+        Assert.assertNotNull(eventActionStart);
+        LanguageEventData data = (LanguageEventData)eventActionStart.getData();
+        Map<String, Serializable> actualCallArguments = data.getCallArguments();
+        Assert.assertEquals("Java action call arguments are not as expected", callArguments, actualCallArguments);
     }
 
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
