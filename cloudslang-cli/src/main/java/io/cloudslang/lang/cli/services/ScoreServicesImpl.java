@@ -56,7 +56,7 @@ public class ScoreServicesImpl implements ScoreServices{
      * @return executionId
      */
     @Override
-    public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties, boolean isQuiet){
+    public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties, boolean isQuiet, boolean debug){
         //add start event
         Set<String> handlerTypes = new HashSet<>();
         if(isQuiet){
@@ -74,6 +74,7 @@ public class ScoreServicesImpl implements ScoreServices{
         }
 
         SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener();
+        scoreEventListener.setIsDebugMode(debug);
         slang.subscribeOnEvents(scoreEventListener, handlerTypes);
 
         Long executionId = trigger(compilationArtifact, inputs, systemProperties);

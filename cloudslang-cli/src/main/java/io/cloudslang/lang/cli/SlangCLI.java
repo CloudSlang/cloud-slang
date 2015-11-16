@@ -69,6 +69,7 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String,? extends Serializable> inputs,
             @CliOption(key = {"if", "input-file"}, mandatory = false, help = "comma separated list of input file locations") final List<String> inputFiles,
             @CliOption(key = {"", "q", "quiet"}, mandatory = false, help = "quiet", specifiedDefaultValue = "true",unspecifiedDefaultValue = "false") final Boolean quiet,
+            @CliOption(key = {"", "d", "debug"}, mandatory = false, help = "print each task outputs", specifiedDefaultValue = "true",unspecifiedDefaultValue = "false") final Boolean debug,
             @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = "comma separated list of system property file locations") final List<String> systemPropertyFiles) throws IOException {
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
@@ -87,7 +88,7 @@ public class SlangCLI implements CommandMarker {
         if (!triggerAsync) {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            id = scoreServices.triggerSync(compilationArtifact, mergedInputs, systemProperties, quiet);
+            id = scoreServices.triggerSync(compilationArtifact, mergedInputs, systemProperties, quiet, debug);
             stopWatch.stop();
             return quiet ? StringUtils.EMPTY : triggerSyncMsg(id, stopWatch.toString());
         }
