@@ -41,19 +41,43 @@ public class ResultBindingTest {
     private ResultsBinding resultsBinding;
 
     @Test
-    public void testPrimitiveBooleanResult() throws Exception {
-        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, true),
-                createResult(ScoreLangConstants.FAILURE_RESULT, "${ True and (not False) }"));
+    public void testPrimitiveBooleanFirstResult() throws Exception {
+        List<Result> results = Arrays.asList(
+                createResult(ScoreLangConstants.SUCCESS_RESULT, true),
+                createResult(ScoreLangConstants.FAILURE_RESULT, "${ True and (not False) }")
+        );
         String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), results, null);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result);
     }
 
     @Test
-    public void testObjectBooleanResult() throws Exception {
-        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, Boolean.TRUE),
-                createResult(ScoreLangConstants.FAILURE_RESULT, "${ True and (not False) }"));
+    public void testPrimitiveBooleanSecondResult() throws Exception {
+        List<Result> results = Arrays.asList(
+                createResult(ScoreLangConstants.SUCCESS_RESULT, false),
+                createResult(ScoreLangConstants.FAILURE_RESULT, true)
+        );
+        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), results, null);
+        Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
+    }
+
+    @Test
+    public void testObjectBooleanFirstResult() throws Exception {
+        List<Result> results = Arrays.asList(
+                createResult(ScoreLangConstants.SUCCESS_RESULT, Boolean.TRUE),
+                createResult(ScoreLangConstants.FAILURE_RESULT, "${ True and (not False) }")
+        );
         String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), results, null);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result);
+    }
+
+    @Test
+    public void testObjectBooleanSecondResult() throws Exception {
+        List<Result> results = Arrays.asList(
+                createResult(ScoreLangConstants.SUCCESS_RESULT, Boolean.FALSE),
+                createResult(ScoreLangConstants.FAILURE_RESULT, Boolean.TRUE)
+        );
+        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), results, null);
+        Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
     @Test
