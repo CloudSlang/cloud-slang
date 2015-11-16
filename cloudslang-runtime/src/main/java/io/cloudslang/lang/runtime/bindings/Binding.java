@@ -11,6 +11,8 @@
  */
 package io.cloudslang.lang.runtime.bindings;
 
+import io.cloudslang.lang.entities.ScoreLangConstants;
+
 import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,7 +24,11 @@ import java.util.regex.Pattern;
 public abstract class Binding {
 
     // match ${ expression } pattern
-    private final static String EXPRESSION_REGEX = "^\\s*\\$\\{(.+)\\}\\s*$";
+    private final static String EXPRESSION_REGEX =
+            "^\\s*" + ScoreLangConstants.EXPRESSION_START_DELIMITER_ESCAPED +
+                    "(.+)" +
+                    ScoreLangConstants.EXPRESSION_END_DELIMITER_ESCAPED +
+                    "\\s*$";
     private final static Pattern EXPRESSION_PATTERN = Pattern.compile(EXPRESSION_REGEX, Pattern.DOTALL);
 
     protected String extractExpression(Serializable value) {
