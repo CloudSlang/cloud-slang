@@ -158,6 +158,7 @@ public class ActionStepsTest {
         for(ScoreEvent event:events){
             if(event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_START)){
                 eventActionStart = event;
+                break;
             }
         }
 
@@ -187,6 +188,7 @@ public class ActionStepsTest {
         for(ScoreEvent event:events){
             if(event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_START)){
                 eventActionStart = event;
+                break;
             }
         }
 

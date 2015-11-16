@@ -155,7 +155,6 @@ public class LanguageEventData extends HashMap<String, Serializable> {
 
     public Map<String, Serializable> getCallArguments() {return (Map<String, Serializable>) get(CALL_ARGUMENTS);}
 
-    public void setCallArguments(String callArguments) {
-        put(CALL_ARGUMENTS, callArguments);
+    public void setCallArguments(Map<String, Serializable> callArguments) {put(CALL_ARGUMENTS, (Serializable) callArguments);
     }
 }
