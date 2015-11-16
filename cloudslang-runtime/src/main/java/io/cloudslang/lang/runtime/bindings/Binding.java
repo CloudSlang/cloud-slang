@@ -25,7 +25,8 @@ public abstract class Binding {
 
     // match ${ expression } pattern
     private final static String EXPRESSION_REGEX =
-            "^\\s*" + ScoreLangConstants.EXPRESSION_START_DELIMITER_ESCAPED +
+            "^\\s*" +
+                    ScoreLangConstants.EXPRESSION_START_DELIMITER_ESCAPED +
                     "(.+)" +
                     ScoreLangConstants.EXPRESSION_END_DELIMITER_ESCAPED +
                     "\\s*$";
