@@ -54,6 +54,11 @@
         </dependency>
 
         <dependency>
+            <groupId>io.cloudslang.content</groupId>
+            <artifactId>score-powershell</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
