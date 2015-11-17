@@ -17,11 +17,12 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
 import org.python.core.*;
 import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +31,7 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
@@ -63,10 +60,16 @@ public class ActionSteps extends AbstractSteps {
 
         Map<String, Serializable> returnValue = new HashMap<>();
         Map<String, Serializable> callArguments = runEnv.removeCallArguments();
+        Map<String, Serializable> callArgumentsDeepCopy = new HashMap<>();
+
+        for (Map.Entry<String, Serializable> entry : callArguments.entrySet()) {
+            callArgumentsDeepCopy.put(entry.getKey(),  SerializationUtils.clone(entry.getValue()));
+        }
+
         Map<String, SerializableSessionObject> serializableSessionData = runEnv.getSerializableDataMap();
         fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_ACTION_START, "Preparing to run action " + actionType,
                 runEnv.getExecutionPath().getParentPath(), LanguageEventData.StepType.ACTION, null,
-                Pair.of(LanguageEventData.CALL_ARGUMENTS, (Serializable) callArguments));
+                Pair.of(LanguageEventData.CALL_ARGUMENTS, (Serializable) callArgumentsDeepCopy));
         try {
             switch (actionType) {
                 case JAVA:
