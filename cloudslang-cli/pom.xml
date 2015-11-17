@@ -69,11 +69,11 @@
             <artifactId>score-ssh</artifactId>
             <scope>runtime</scope>
         </dependency>
-		<dependency>
-			<groupId>io.cloudslang.content</groupId>
-			<artifactId>score-powershell</artifactId>
+        <dependency>
+	    <groupId>io.cloudslang.content</groupId>
+	    <artifactId>score-powershell</artifactId>
             <scope>runtime</scope>
-		</dependency>
+	</dependency>
         <dependency>
             <groupId>io.cloudslang.content</groupId>
             <artifactId>score-mail</artifactId>
