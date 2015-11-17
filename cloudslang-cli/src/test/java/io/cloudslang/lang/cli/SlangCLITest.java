@@ -105,24 +105,6 @@ public class SlangCLITest {
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
-    public void testRunDebugValidFilePathAsync() throws Exception {
-        slangCLI.setEnvVar(true);
-
-        long executionID = 1;
-
-        when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
-        when(ScoreServicesMock.trigger(eq(emptyCompilationArtifact), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class))).thenReturn(executionID);
-
-        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --d");
-
-        verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
-        verify(ScoreServicesMock).trigger(eq(emptyCompilationArtifact), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class));
-
-        Assert.assertEquals("method threw exception", null, cr.getException());
-        Assert.assertEquals("success should be true", true, cr.isSuccess());
-    }
-
-    @Test (timeout = DEFAULT_TIMEOUT)
     public void testRunDebugValidFilePathSync() throws Exception {
         long executionID = 1;
 

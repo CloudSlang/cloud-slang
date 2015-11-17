@@ -15,6 +15,7 @@ import io.cloudslang.lang.runtime.env.ExecutionPath;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.SerializationUtils;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 import io.cloudslang.score.events.EventConstants;
@@ -87,26 +88,31 @@ public class SyncTriggerEventListener implements ScoreEventListener{
                 }
                 break;
             case ScoreLangConstants.EVENT_OUTPUT_END:
-                Map<String, Serializable> outputs = extractOutputs(data);
+                // Task end case
+                if((data.get(LanguageEventData.STEP_TYPE)).equals((LanguageEventData.StepType.TASK))) {
+                    if (this.isDebugMode) {
+                        Map<String, Serializable> taskOutputs = extractNotEmptyOutputs(data);
+                        String path = ((LanguageEventData) data).getPath();
+                        int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
+                        String prefix = StringUtils.repeat(TASK_PATH_PREFIX, matches);
 
-                if (this.isDebugMode){
-                    Map<String, Serializable> taskOutputs = extractTaskOutputs(data);
-                    String path = ((LanguageEventData) data).getPath();
-                    int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
-                    String prefix = StringUtils.repeat(TASK_PATH_PREFIX, matches);
-
-                    for (String key : taskOutputs.keySet()) {
-                        printWithColor(Ansi.Color.WHITE, prefix + key + " = " + taskOutputs.get(key));
+                        for (String key : taskOutputs.keySet()) {
+                            printWithColor(Ansi.Color.WHITE, prefix + key + " = " + taskOutputs.get(key));
+                        }
                     }
                 }
 
-
-                for (String key : outputs.keySet()) {
-                    printWithColor(Ansi.Color.WHITE, "\nFlow outputs:");
-                    printWithColor(Ansi.Color.WHITE, "- " + key + " = " + outputs.get(key));
+                // Flow end case
+                else if(data.containsKey(LanguageEventData.OUTPUTS)
+                        && data.containsKey(LanguageEventData.PATH)
+                        && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
+                    Map<String, Serializable> outputs = extractNotEmptyOutputs(data);
+                    for (String key : outputs.keySet()) {
+                        printWithColor(Ansi.Color.WHITE, "\nFlow outputs:");
+                        printWithColor(Ansi.Color.WHITE, "- " + key + " = " + outputs.get(key));
+                    }
                 }
                 break;
-
             case ScoreLangConstants.EVENT_EXECUTION_FINISHED :
                 flowFinished.set(true);
                 printFinishEvent(data);
@@ -114,34 +120,24 @@ public class SyncTriggerEventListener implements ScoreEventListener{
         }
     }
 
-    public static Map<String, Serializable> extractTaskOutputs(Map<String, Serializable> data) {
-        if((data.get(LanguageEventData.STEP_TYPE)).equals((LanguageEventData.StepType.TASK))) {
-            return extractNotEmptyOutputs(data);
-        }
-        return new HashMap<>();
-    }
-
-    public static Map<String, Serializable> extractOutputs(Map<String, Serializable> data) {
-        if(data.containsKey(LanguageEventData.OUTPUTS)
-                && data.containsKey(LanguageEventData.PATH)
-                && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)){
-            return extractNotEmptyOutputs(data);
-        }
-        return new HashMap<>();
-    }
-
     public static Map<String, Serializable> extractNotEmptyOutputs(Map<String, Serializable> data) {
-        @SuppressWarnings("unchecked") Map<String, Serializable> outputs = (Map<String, Serializable>) data.get(LanguageEventData.OUTPUTS);
+
+        Map<String, Serializable> originalOutputs = (Map<String, Serializable>) data.get(LanguageEventData.OUTPUTS);
+        Map<String, Serializable> outputs = new HashMap<>();
+        for (Map.Entry<String, Serializable> entry : originalOutputs.entrySet()) {
+            outputs.put(entry.getKey(),  SerializationUtils.clone(entry.getValue()));
+        }
+
         if (MapUtils.isNotEmpty(outputs)) {
             Iterator<Map.Entry<String, Serializable>> iterator = outputs.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<String, Serializable> output = iterator.next();
+
                 if (output.getValue() == null || StringUtils.isEmpty(output.getValue().toString())) {
                     iterator.remove();
                 } else {
                     outputs.put(output.getKey(), StringUtils.abbreviate(output.getValue().toString(), 0, OUTPUT_VALUE_LIMIT));
                 }
-
             }
             return outputs;
         }

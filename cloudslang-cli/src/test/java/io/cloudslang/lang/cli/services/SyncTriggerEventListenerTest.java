@@ -64,7 +64,7 @@ public class SyncTriggerEventListenerTest {
         expectedFilteredOutputs = new HashMap<>();
         expectedFilteredOutputs.put(RETURN_RESULT, RESULT);
 
-        actualFilteredOutputs = SyncTriggerEventListener.extractOutputs(data);
+        actualFilteredOutputs = SyncTriggerEventListener.extractNotEmptyOutputs(data);
 
         Assert.assertEquals("outputs different than expected", expectedFilteredOutputs, actualFilteredOutputs);
     }
@@ -79,7 +79,7 @@ public class SyncTriggerEventListenerTest {
         expectedFilteredOutputs = new HashMap<>();
         expectedFilteredOutputs.put(RETURN_RESULT, RESULT);
 
-        actualFilteredOutputs = SyncTriggerEventListener.extractTaskOutputs(data);
+        actualFilteredOutputs = SyncTriggerEventListener.extractNotEmptyOutputs(data);
 
         Assert.assertEquals("outputs different than expected", expectedFilteredOutputs, actualFilteredOutputs);
     }
@@ -90,7 +90,7 @@ public class SyncTriggerEventListenerTest {
         data.put(LanguageEventData.OUTPUTS, (Serializable)outputs);
         data.put(LanguageEventData.STEP_TYPE, LanguageEventData.StepType.TASK);
 
-        actualFilteredOutputs = SyncTriggerEventListener.extractTaskOutputs(data);
+        actualFilteredOutputs = SyncTriggerEventListener.extractNotEmptyOutputs(data);
 
         Assert.assertTrue("outputs different than expected", MapUtils.isEmpty(actualFilteredOutputs));
     }
@@ -104,7 +104,7 @@ public class SyncTriggerEventListenerTest {
         expectedFilteredOutputs = new HashMap<>();
         expectedFilteredOutputs.put(RETURN_RESULT, ABBREVIATED_RESULT);
 
-        actualFilteredOutputs = SyncTriggerEventListener.extractOutputs(data);
+        actualFilteredOutputs = SyncTriggerEventListener.extractNotEmptyOutputs(data);
 
         Assert.assertEquals("outputs different than expected", expectedFilteredOutputs, actualFilteredOutputs);
     }
@@ -115,7 +115,7 @@ public class SyncTriggerEventListenerTest {
         data.put(LanguageEventData.OUTPUTS, (Serializable)outputs);
         data.put(LanguageEventData.PATH, EXEC_START_PATH);
 
-        actualFilteredOutputs = SyncTriggerEventListener.extractOutputs(data);
+        actualFilteredOutputs = SyncTriggerEventListener.extractNotEmptyOutputs(data);
 
         Assert.assertTrue("outputs different than expected", MapUtils.isEmpty(actualFilteredOutputs));
     }
@@ -127,17 +127,6 @@ public class SyncTriggerEventListenerTest {
         data.put(LanguageEventData.PATH, EXEC_START_PATH);
 
         actualFilteredOutputs = SyncTriggerEventListener.extractNotEmptyOutputs(data);
-
-        Assert.assertTrue("outputs different than expected", MapUtils.isEmpty(actualFilteredOutputs));
-    }
-
-    @Test
-    public void testExtractOutputsNotFlowLevel() throws InterruptedException {
-        outputs.put(RETURN_RESULT, RESULT);
-        data.put(LanguageEventData.OUTPUTS, (Serializable)outputs);
-        data.put(LanguageEventData.PATH, FIRST_STEP_PATH);
-
-        actualFilteredOutputs = SyncTriggerEventListener.extractOutputs(data);
 
         Assert.assertTrue("outputs different than expected", MapUtils.isEmpty(actualFilteredOutputs));
     }
