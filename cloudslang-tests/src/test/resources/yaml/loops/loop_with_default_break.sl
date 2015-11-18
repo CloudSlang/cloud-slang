@@ -20,4 +20,4 @@ flow:
           for: value in values
           do:
             ops.operation_that_fails_when_value_is_2:
-              - text: value
+              - text: ${ value }

@@ -78,7 +78,7 @@ public class ResultsTransformerTest {
         List<Result> results = resultsTransformer.transform(resultsMapOpWithData);
         Result result = results.get(0);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result.getName());
-        Assert.assertEquals("1 != 123456", result.getExpression());
+        Assert.assertEquals("${ 1 != 123456 }", result.getValue());
     }
 
     @Test
@@ -86,7 +86,7 @@ public class ResultsTransformerTest {
         List<Result> results = resultsTransformer.transform(resultsMapOpWithData);
         Result result = results.get(1);
         Assert.assertEquals("NO_ACTION", result.getName());
-        Assert.assertEquals("true", result.getExpression());
+        Assert.assertEquals("${ true }", result.getValue());
     }
 
     @Test
@@ -94,7 +94,7 @@ public class ResultsTransformerTest {
         List<Result> results = resultsTransformer.transform(resultsMapOpWithData);
         Result result = results.get(2);
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result.getName());
-        Assert.assertNull(result.getExpression());
+        Assert.assertNull(result.getValue());
     }
 
     @Test

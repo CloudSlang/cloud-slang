@@ -76,7 +76,7 @@ public class OutputsTransformerTest {
         @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
         Output output = outputs.get(3);
         Assert.assertEquals("output4", output.getName());
-        Assert.assertEquals("output4", output.getExpression());
+        Assert.assertEquals("${output4}", output.getValue());
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
@@ -84,7 +84,7 @@ public class OutputsTransformerTest {
         @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
         Output output = outputs.get(0);
         Assert.assertEquals("output1", output.getName());
-        Assert.assertEquals("input1", output.getExpression());
+        Assert.assertEquals("${ input1 }", output.getValue());
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
@@ -92,19 +92,7 @@ public class OutputsTransformerTest {
         @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
         Output output = outputs.get(2);
         Assert.assertEquals("output3", output.getName());
-        Assert.assertEquals("self['input1']", output.getExpression());
-    }
-
-    @Test (timeout = DEFAULT_TIMEOUT)
-    public void testInvalidOutputType() throws Exception{
-        URL resource = getClass().getResource("/operation_with_invalid_outputs.sl");
-        ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
-        Map op = file.getOperation();
-        List<Object> outputsMap = (List<Object>) op.get(SlangTextualKeys.OUTPUTS_KEY);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("output1");
-        exception.expectMessage("3");
-        outputTransformer.transform(outputsMap);
+        Assert.assertEquals("${ self['input1'] }", output.getValue());
     }
 
     @Configuration

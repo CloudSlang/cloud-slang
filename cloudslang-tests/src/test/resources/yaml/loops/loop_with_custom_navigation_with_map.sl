@@ -13,16 +13,16 @@ imports:
 flow:
   name: loop_with_custom_navigation_with_map
   inputs:
-    - person_map: >
-        {'john': 1, 'jane': 2, 'peter': 'three'}
+    - person_map:
+        default: {'john': 1, 'jane': 2, 'peter': 'three'}
   workflow:
     - print_values:
         loop:
           for: k, v in person_map
           do:
               ops.print:
-                - text: k
-                - text2: v
+                - text: ${ k }
+                - text2: ${ v }
         navigate:
           SUCCESS: print_other_values
           FAILURE: FAILURE
@@ -30,9 +30,9 @@ flow:
     - task_that_doesnt_run:
         do:
           ops.print:
-            - text: "'I don't run'"
+            - text: "I don't run"
 
     - print_other_values:
         do:
           ops.print:
-            - text: "'abc'"
+            - text: 'abc'

@@ -13,5 +13,5 @@ operation:
     python_script: |
         language = 'CloudSlang'
   results:
-    - GET_FUNCTION_DEFAULT_VALUE: get('key_not_found', 'key_not_found_default') == 'key_not_found_default'
+    - GET_FUNCTION_DEFAULT_VALUE: ${ get('key_not_found', 'key_not_found_default') == 'key_not_found_default' }
     - GET_FUNCTION_PROBLEM

@@ -32,7 +32,7 @@ public abstract class AbstractInputsTransformer {
             return new Input(inputName, null);
         } else if (rawInput instanceof Map) {
             Map.Entry<String, ?> entry = ((Map<String, ?>) rawInput).entrySet().iterator().next();
-            Object entryValue = entry.getValue();
+            Serializable entryValue = (Serializable) entry.getValue();
             if(entryValue == null){
                 throw new RuntimeException("Could not transform Input : " + rawInput + " Since it has a null value.\n\nMake sure a value is specified or that indentation is properly done.");
             }
@@ -45,8 +45,7 @@ public abstract class AbstractInputsTransformer {
             }
             // - some_input: some_expression
             // the value of the input is an expression we need to evaluate at runtime
-            return new Input(entry.getKey(), entryValue
-                                                  .toString());
+            return new Input(entry.getKey(), entryValue);
         }
         throw new RuntimeException("Could not transform Input : " + rawInput);
     }
@@ -73,7 +72,7 @@ public abstract class AbstractInputsTransformer {
                 (boolean) props.get(OVERRIDABLE_KEY);
         boolean defaultSpecified = props.containsKey(DEFAULT_KEY);
         String inputName = entry.getKey();
-        String expression = defaultSpecified ? props.get(DEFAULT_KEY).toString() : null;
+        Serializable expression = defaultSpecified ? props.get(DEFAULT_KEY) : null;
         String systemPropertyName = (String) props.get(SYSTEM_PROPERTY_KEY);
 
         if (!overridable && !defaultSpecified && StringUtils.isEmpty(systemPropertyName)) {

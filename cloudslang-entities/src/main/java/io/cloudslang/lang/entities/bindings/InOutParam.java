@@ -24,11 +24,11 @@ public abstract class InOutParam implements Serializable {
 	private static final long serialVersionUID = -7712676295781864973L;
 
 	private String name;
-	private String expression;
+	private Serializable value;
 
-	public InOutParam(String name, String expression) {
+	public InOutParam(String name, Serializable value) {
 		this.name = name;
-		this.expression = expression;
+		this.value = value;
 	}
 
 	/**
@@ -40,8 +40,8 @@ public abstract class InOutParam implements Serializable {
 		return name;
 	}
 
-	public String getExpression() {
-		return expression;
+	public Serializable getValue() {
+		return value;
 	}
 
 	@Override

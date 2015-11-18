@@ -5,23 +5,9 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: slang.sample.flows
+namespace: user.ops
 
-imports:
-  ops: user.ops
-
-flow:
-  name: flow_with_invalid_argument
-  inputs:
-  - city_name
-
-  workflow:
-    - CheckWeather:
-        do:
-          ops.check_Weather:
-            - city: ${ city_name }
-            - 22
-        publish:
-          - weather
-  outputs:
-    - weather
+operation:
+  name: noop
+  action:
+    python_script: 'pass'

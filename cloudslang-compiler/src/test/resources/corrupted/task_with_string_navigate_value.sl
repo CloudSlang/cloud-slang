@@ -15,4 +15,4 @@ flow:
     - task1:
         do:
           ops.op1:
-        navigate: "'hi'"
+        navigate: 'hi'

@@ -14,26 +14,26 @@ flow:
   name: get_function_test_flow_basic
   inputs:
     - input1:
-        default: None
+        default: null
         overridable: false
         required: false
     - input1_safe:
-        default: get('input1', 'input1_default')
+        default: ${ get('input1', 'input1_default') }
         overridable: false
         required: false
     - input2:
         default: 22
         overridable: false
     - input2_safe:
-        default: get('input2', 'input2_default')
+        default: ${ get('input2', 'input2_default') }
         overridable: false
         required: false
     - input_locals_found:
-        default: locals().get('input2', 'input_locals_found_default')
+        default: ${ locals().get('input2', 'input_locals_found_default') }
         overridable: false
         required: false
     - input_locals_not_found:
-        default: locals().get('input2_i_dont_exist', 'input_locals_not_found_default')
+        default: ${ locals().get('input2_i_dont_exist', 'input_locals_not_found_default') }
         overridable: false
         required: false
   workflow:

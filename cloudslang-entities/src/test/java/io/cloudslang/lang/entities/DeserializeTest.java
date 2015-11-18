@@ -1,33 +1,31 @@
 package io.cloudslang.lang.entities;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import io.cloudslang.lang.entities.bindings.Argument;
-import io.cloudslang.lang.entities.bindings.Result;
-import org.junit.Test;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.Result;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class DeserializeTest {
 
-    private ObjectMapper mapper = new ObjectMapper();
-    Gson gson = new Gson();
+    private ObjectMapper mapper;
 
+    @Before
+    public void setUp() throws Exception {
+        mapper = new ObjectMapper().enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+    }
 
     private <T> void testToAndFromJson(Object objToTest, Class<T> type) throws IOException {
         //jackson
         String objAsString = mapper.writeValueAsString(objToTest);
         T objAfterDeserialize = mapper.readValue(objAsString, type);
         assertEquals(objToTest, objAfterDeserialize);
-
-        //gson
-        String json = gson.toJson(objToTest);
-        T fromJson = gson.fromJson(json, type);
-        assertEquals(objToTest, fromJson);
     }
 
     @Test

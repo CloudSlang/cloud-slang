@@ -11,19 +11,19 @@ imports:
   ops: user.ops
 
 flow:
-  name: basic_flow
+  name: flow_with_multiple_steps
   workflow:
     - CheckWeather:
         do:
           ops.test_op:
-            - city: str('input_1')
+            - city: 'input_1'
         publish:
           - weather
 
     - RealCheckWeather:
         do:
           ops.java_op:
-            - city: str('input_1')
+            - city: 'input_1'
         publish:
           - weather
         navigate:
@@ -33,10 +33,11 @@ flow:
     - RealRealCheckWeather:
         do:
           ops.check_Weather:
-            - city: str('input_1')
+            - city: 'input_1'
         publish:
           - weather
-          - temp: temperature
+          - temp: ${temperature}
+          - publish_str: 'publish_str_value'
         navigate:
           SUCCESS: SUCCESS
           FAILURE: NotRealCheckWeather
@@ -44,7 +45,7 @@ flow:
     - NotRealCheckWeather:
         do:
           ops.check_Weather:
-            - city: str('input_1')
+            - city: 'input_1'
         publish:
           - weather
 

@@ -11,21 +11,21 @@ operation:
   name: test_op_2
   inputs:
     - input1
-    - input2: input2
+    - input2: ${ input2 }
     - input3:
-        default: str('value3')
-    - input4: "'value4' if input3 == value3 else None"
+        default: 'value3'
+    - input4: ${ 'value4' if input3 == value3 else None }
     - input5:
         required: yes
         encrypted: true
     - input6:
-        default: 1 + 5
+        default: ${ 1 + 5 }
         required: False
     - input7: 77
     - input8:
-        default: input6
+        default: ${ input6 }
     - input9:
-        default: input6
+        default: ${ input6 }
         overridable: false
     - input10:
         default: true
@@ -47,12 +47,11 @@ operation:
             print input5
             print input6
   outputs:
-    - output1: input1
-    - output2: processId
-    - output3: self['input1']
+    - output1: ${ input1 }
+    - output2: ${ processId }
+    - output3: ${ self['input1'] }
     - output4
   results:
-    - SUCCESS: 1 != 123456
+    - SUCCESS: ${ 1 != 123456 }
     - NO_ACTION: true
     - FAILURE
-

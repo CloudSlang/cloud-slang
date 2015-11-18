@@ -29,7 +29,7 @@ import java.util.Map;
  * @author Bonczidai Levente
  */
 @Component
-public class OutputsBinding {
+public class OutputsBinding extends Binding {
 
     @Autowired
     ScriptEvaluator scriptEvaluator;
@@ -46,8 +46,10 @@ public class OutputsBinding {
         if (possibleOutputs != null) {
             for (Output output : possibleOutputs) {
                 String outputKey = output.getName();
-                String outputExpr = output.getExpression();
-                if (outputExpr != null) {
+                Serializable rawValue = output.getValue();
+                Serializable valueToAssign = rawValue;
+                String expressionToEvaluate = extractExpression(rawValue);
+                if (expressionToEvaluate != null) {
                     //declare the new output
                     if (!actionReturnValues.containsKey(outputKey)) {
                         scriptContext.put(outputKey, null);
@@ -57,22 +59,18 @@ public class OutputsBinding {
                         scriptContext.put(ScoreLangConstants.BIND_OUTPUT_FROM_INPUTS_KEY, (Serializable) inputs);
                     }
 
-                    Serializable scriptResult;
                     try {
                         //evaluate expression
-                        scriptResult = scriptEvaluator.evalExpr(outputExpr, scriptContext);
+                        valueToAssign = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext);
                     } catch (Throwable t) {
                         throw new RuntimeException("Error binding output: '" + output.getName() + "',\n\tError is: " + t.getMessage(), t);
                     }
-
-                    try {
-                        outputs.put(outputKey, scriptResult);
-                        scriptContext.put(outputKey, scriptResult);
-                    } catch (ClassCastException ex) {
-                        throw new RuntimeException("The output expression " + outputExpr + " does not return serializable value", ex);
-                    }
-                } else {
-                    throw new RuntimeException("Output: " + outputKey + " has no expression");
+                }
+                try {
+                    outputs.put(outputKey, valueToAssign);
+                    scriptContext.put(outputKey, valueToAssign);
+                } catch (ClassCastException ex) {
+                    throw new RuntimeException("The output value: " + rawValue + " is not serializable", ex);
                 }
             }
         }

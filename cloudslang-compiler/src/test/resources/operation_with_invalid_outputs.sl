@@ -16,4 +16,3 @@ operation:
             print input1
   outputs:
     - output1: 3
-

@@ -22,9 +22,9 @@ flow:
     - check_number:
         do:
           ops.check_number:
-            - number: userNumber
+            - number: ${ userNumber }
         publish:
-          - new_number: preprocessed_number # publish the output in the flow level so it will be visible for other steps
+          - new_number: ${ preprocessed_number } # publish the output in the flow level so it will be visible for other steps
         navigate:
           EVEN: process_even_number
           ODD: process_odd_number
@@ -33,7 +33,7 @@ flow:
     - process_even_number:
         do:
           ops.process_even_number:
-            - even_number: new_number
+            - even_number: ${ new_number }
         navigate:
           SUCCESS: SUCCESS # end flow with success result
           FAILURE: send_error_mail
@@ -41,7 +41,7 @@ flow:
     - process_odd_number:
         do:
           ops.process_odd_number:
-            - odd_number: new_number
+            - odd_number: ${ new_number }
         navigate:
           SUCCESS: SUCCESS # end flow with success result
           FAILURE: send_error_mail
@@ -50,12 +50,13 @@ flow:
         - send_error_mail: # or refer it by the task name
             do:
               ops.send_email_mock:
-                - hostname: emailHost
-                - port: emailPort
-                - sender: emailSender
-                - recipient: emailRecipient
-                - subject: "'Flow failure'"
-                - body: "'Wrong number: ' + str(userNumber)"
+                - hostname: ${ emailHost }
+                - port: ${ emailPort }
+                - sender: ${ emailSender }
+                - recipient: ${ emailRecipient }
+                - subject: 'Flow failure'
+                - body: >
+                    ${ 'Wrong number: ' + str(userNumber) }
             navigate:
               SUCCESS: FAILURE # end flow with failure result
               FAILURE: FAILURE

@@ -29,7 +29,7 @@ import java.util.Map;
  * Time: 09:32
  */
 @Component
-public class ResultsBinding {
+public class ResultsBinding extends Binding {
 
     @Autowired
     public ScriptEvaluator scriptEvaluator;
@@ -76,38 +76,60 @@ public class ResultsBinding {
         // In the case of operation, we resolve the result by searching for the first result with a true expression
         // An empty expression passes as true
         for(Result result : possibleResults){
-            String expression = result.getExpression();
+            Serializable rawValue = result.getValue();
+            String resultName = result.getName();
+
             // If the answer has no expression, we treat it as a true expression, and choose it
-            if(StringUtils.isEmpty(expression)) {
-                return result.getName();
-            }
-            //construct script context
-            Map<String, Serializable> scriptContext = new HashMap<>();
-            //put action outputs
-            scriptContext.putAll(context);
-            //put executable inputs as a map
-            if(MapUtils.isNotEmpty(inputs)) {
-                scriptContext.put(ScoreLangConstants.BIND_OUTPUT_FROM_INPUTS_KEY, (Serializable) inputs);
+            if(rawValue == null) {
+                return resultName;
             }
 
-            try {
-                Serializable expressionResult = scriptEvaluator.evalExpr(expression, scriptContext);
-                Boolean evaluatedResult;
-                if (expressionResult instanceof Integer) {
-                    evaluatedResult = (Integer) expressionResult != 0;
-                } else {
-                    evaluatedResult = (Boolean) expressionResult;
+            if(rawValue == Boolean.TRUE) {
+                return resultName;
+            }
+            if (rawValue == Boolean.FALSE) {
+                continue;
+            }
+
+            if (rawValue instanceof String) {
+                String expression = extractExpression(rawValue);
+                if (expression == null) {
+                    throw new RuntimeException(
+                            "Error resolving the result. The expression: '" + rawValue + "' is not valid." +
+                                    " Accepted format is: " + ScoreLangConstants.EXPRESSION_START_DELIMITER +
+                                    " expression " + ScoreLangConstants.EXPRESSION_END_DELIMITER);
                 }
-                if(evaluatedResult == null){
-                    throw new RuntimeException("Expression of the operation result: " + expression + " cannot be evaluated correctly to true or false value");
+
+                //construct script context
+                Map<String, Serializable> scriptContext = new HashMap<>();
+                //put action outputs
+                scriptContext.putAll(context);
+                //put executable inputs as a map
+                if (MapUtils.isNotEmpty(inputs)) {
+                    scriptContext.put(ScoreLangConstants.BIND_OUTPUT_FROM_INPUTS_KEY, (Serializable) inputs);
                 }
-                if(evaluatedResult) {
-                    return result.getName();
+
+                try {
+                    Serializable expressionResult = scriptEvaluator.evalExpr(expression, scriptContext);
+                    Boolean evaluatedResult;
+                    if (expressionResult instanceof Integer) {
+                        evaluatedResult = (Integer) expressionResult != 0;
+                    } else {
+                        evaluatedResult = (Boolean) expressionResult;
+                    }
+                    if (evaluatedResult == null) {
+                        throw new RuntimeException("Expression of the operation result: " + expression + " cannot be evaluated correctly to true or false value");
+                    }
+                    if (evaluatedResult) {
+                        return resultName;
+                    }
+                } catch (ClassCastException ex) {
+                    throw new RuntimeException("Error resolving the result. The expression " + expression + " does not return boolean value", ex);
+                } catch (Throwable t) {
+                    throw new RuntimeException("Error evaluating result: '" + resultName + "',\n\tError is: " + t.getMessage(), t);
                 }
-            } catch (ClassCastException ex){
-                throw new RuntimeException("Error resolving the result. The expression " + expression + " does not return boolean value", ex);
-            } catch (Throwable t) {
-                throw new RuntimeException("Error evaluating result: '" + result.getName()+ "',\n\tError is: " + t.getMessage(), t);
+            } else {
+                throw new RuntimeException("Error resolving the result. Value: '" + rawValue + "' is not valid.");
             }
         }
         throw new RuntimeException("No possible result was resolved");

@@ -13,5 +13,5 @@ operation:
   action:
     python_script: print text
   results:
-    - CUSTOM: self['text'] == 2
+    - CUSTOM: ${ self['text'] == 2 }
     - SUCCESS

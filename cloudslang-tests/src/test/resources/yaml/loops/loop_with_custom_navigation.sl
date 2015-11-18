@@ -20,7 +20,7 @@ flow:
           for: value in values
           do:
             ops.print:
-              - text: value
+              - text: ${ value }
         navigate:
           SUCCESS: print_other_values
           FAILURE: FAILURE
@@ -28,9 +28,9 @@ flow:
     - task_that_doesnt_run:
         do:
           ops.print:
-            - text: "'I don't run'"
+            - text: "I don't run"
 
     - print_other_values:
         do:
           ops.print:
-            - text: "'abc'"
+            - text: 'abc'

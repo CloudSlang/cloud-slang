@@ -19,8 +19,8 @@ flow:
     - CheckBinding:
         do:
           ops.string_equals:
-            - first_string: "'prefix_' + first"
-            - second_string: "'prefix_' + second_string"
+            - first_string: ${ 'prefix_' + first }
+            - second_string: ${ 'prefix_' + second_string }
         navigate:
           SUCCESS: TaskOnSuccess
           FAILURE: TaskOnFailure

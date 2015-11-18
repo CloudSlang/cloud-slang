@@ -31,7 +31,6 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -77,39 +76,29 @@ public class PublishTransformerTest {
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
-    public void testNoExpression() throws Exception {
+    public void testNoValue() throws Exception {
         @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap);
         Output publish = publishValues.get(0);
         Assert.assertEquals("weather", publish.getName());
-        Assert.assertEquals("weather", publish.getExpression());
+        Assert.assertEquals("${weather}", publish.getValue());
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
-    public void testExpressionKey() throws Exception {
+    public void testExpressionValue() throws Exception {
         @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap);
         Output publish = publishValues.get(1);
         Assert.assertEquals("temp", publish.getName());
-        Assert.assertEquals("temperature", publish.getExpression());
+        Assert.assertEquals("${temperature}", publish.getValue());
     }
-
 
     @Test (timeout = DEFAULT_TIMEOUT)
-    public void testInvalidOutputType() throws Exception{
-        URL resource = getClass().getResource("/flow_with_invalid_publish_from_task.yaml");
-        ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
-        List<Map<String, Map>> flow = (List<Map<String, Map>>) file.getFlow().get(SlangTextualKeys.WORKFLOW_KEY);
-        List<Object> publishMap = new ArrayList<>();
-        for(Map<String, Map> task : flow){
-            if(task.keySet().iterator().next().equals("CheckWeather")){
-                publishMap = (List) task.values().iterator().next().get(SlangTextualKeys.PUBLISH_KEY);
-                break;
-            }
-        }
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("weather");
-        exception.expectMessage("3");
-        publishTransformer.transform(publishMap);
+    public void testStringValue() throws Exception {
+        @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap);
+        Output publish = publishValues.get(2);
+        Assert.assertEquals("publish_str", publish.getName());
+        Assert.assertEquals("publish_str_value", publish.getValue());
     }
+
     @Configuration
     public static class Config {
 

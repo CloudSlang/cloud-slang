@@ -16,6 +16,6 @@ operation:
         daylight_time_zone = int(time_zone_as_string) + 1
         print 'daylight time zone is: ' + str(daylight_time_zone)
   outputs:
-    - daylight_time_zone: daylight_time_zone
+    - daylight_time_zone: ${ daylight_time_zone }
   results:
-    - SUCCESS: 1 == 1
+    - SUCCESS: ${ 1 == 1 }

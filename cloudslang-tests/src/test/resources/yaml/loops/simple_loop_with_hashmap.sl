@@ -20,7 +20,7 @@ flow:
           for: k, v in person_map
           do:
             ops.print:
-              - text: k
-              - text2: v
+              - text: ${ k }
+              - text2: ${ v }
           publish:
-            - new_var: "'a'"
+            - new_var: 'a'

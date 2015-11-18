@@ -19,4 +19,4 @@ flow:
   workflow:
     - validate_binding:
         do:
-          ops.compare_values: eq_str_bla = 'bla', eq_int_22 = int_value, eq_bool_true = true
+          ops.compare_values: eq_str_bla = ${ 'bla' }, eq_int_22 = ${ int_value }, eq_bool_true = ${ true }

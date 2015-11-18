@@ -20,7 +20,7 @@ flow:
         do:
           ops.check_Weather:
             - city: city_name
-            - country: str('Israel')
+            - country: 'Israel'
         publish:
           - weather : 3
   outputs:

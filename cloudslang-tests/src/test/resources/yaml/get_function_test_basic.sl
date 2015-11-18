@@ -13,9 +13,9 @@ operation:
     python_script: |
         language = 'CloudSlang'
   outputs:
-    - output1_safe: get('language', 'output1_default')
-    - output2_safe: get('not_defined_key', 'output2_default')
-    - output_same_name: get('output_same_name', 'output_same_name_default')
+    - output1_safe: ${ get('language', 'output1_default') }
+    - output2_safe: ${ get('not_defined_key', 'output2_default') }
+    - output_same_name: ${ get('output_same_name', 'output_same_name_default') }
   results:
-    - GET_FUNCTION_KEY_EXISTS: get('language', 'output1_default') == 'CloudSlang'
+    - GET_FUNCTION_KEY_EXISTS: ${ get('language', 'output1_default') == 'CloudSlang' }
     - GET_FUNCTION_PROBLEM

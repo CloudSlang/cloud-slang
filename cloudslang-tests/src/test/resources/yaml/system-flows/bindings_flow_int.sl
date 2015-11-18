@@ -15,22 +15,22 @@ flow:
   inputs:
     - base_input
     - bound_input:
-        default: base_input + 1
+        default: ${ base_input + 1 }
 
   workflow:
     - Task_1:
         do:
           ops.binding_flow_op:
-            - base_input: bound_input + 1
+            - base_input: ${ bound_input + 1 }
         publish:
-          - bound_input: bound_output + 1
+          - bound_input: ${ bound_output + 1 }
 
     - Task_2:
         do:
           ops.binding_flow_op:
-            - base_input: bound_input + 1
+            - base_input: ${ bound_input + 1 }
         publish:
-          - bound_input: bound_output + 1
+          - bound_input: ${ bound_output + 1 }
 
   outputs:
-    - final_output: bound_input + 1
+    - final_output: ${ bound_input + 1 }

@@ -24,4 +24,4 @@ operation:
   action:
     python_script: print text
   results:
-    - SUCCESS: text != ""
+    - SUCCESS: ${ text != "" }

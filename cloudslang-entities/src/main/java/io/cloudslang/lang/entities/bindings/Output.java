@@ -9,6 +9,8 @@
 *******************************************************************************/
 package io.cloudslang.lang.entities.bindings;
 
+import java.io.Serializable;
+
 /**
  * @author Bonczidai Levente
  * @since 11/7/2014
@@ -18,8 +20,8 @@ public class Output extends InOutParam {
 
 	private static final long serialVersionUID = -5390581034091916685L;
 
-	public Output(String name, String expression) {
-		super(name, expression);
+	public Output(String name, Serializable value) {
+		super(name, value);
 	}
 
     /**

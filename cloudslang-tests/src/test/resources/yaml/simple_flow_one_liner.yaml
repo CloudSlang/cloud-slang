@@ -23,19 +23,19 @@ flow:
     - Task1:
         do:
           ops.get_time_zone: >
-            time_zone_as_string = time_zone_as_string if time_zone_as_string is not None else input1,
+            time_zone_as_string = ${ time_zone_as_string if time_zone_as_string is not None else input1 },
             port
         publish:
-          - time_zone: time_zone
+          - time_zone: ${ time_zone }
         navigate:
           SUCCESS: Task2
           NEGATIVE: FAILURE
 
     - Task2:
         do:
-          ops.compute_daylight_time_zone: time_zone_as_string = time_zone, not_used = "'I am not used'"
+          ops.compute_daylight_time_zone: time_zone_as_string = ${ time_zone }, not_used = 'I am not used'
         publish:
-          - daylight_time_zone: daylight_time_zone
+          - daylight_time_zone: ${ daylight_time_zone }
   results:
     - SUCCESS
     - FAILURE

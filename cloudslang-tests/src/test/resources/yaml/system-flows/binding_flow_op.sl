@@ -12,14 +12,12 @@ operation:
   inputs:
     - base_input
     - bound_input:
-        default: base_input + ">"
+        default: ${ base_input + ">" }
 
   action:
     python_script: |
       bound_result = bound_input + "|"
   outputs:
-    - bound_output: bound_result + "<"
+    - bound_output: ${ bound_result + "<" }
   results:
     - SUCCESS
-
-

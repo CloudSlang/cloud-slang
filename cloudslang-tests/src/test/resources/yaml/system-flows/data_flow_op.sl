@@ -12,9 +12,9 @@ operation:
   inputs:
     - opMessage
     - unchangableMessage:
-        default:  str('defaultString')
+        default:  'defaultString'
         overridable: false
-    - message: opMessage
+    - message: ${ opMessage }
 
   action:
     python_script: |
@@ -27,7 +27,7 @@ operation:
   outputs:
     - returnCode
   results:
-    - SUCCESS: returnCode == '0'
+    - SUCCESS: ${ returnCode == '0' }
     - FAILURE
 
 

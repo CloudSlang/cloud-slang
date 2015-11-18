@@ -19,5 +19,5 @@ operation:
   outputs:
     - url
   results:
-    - SUCCESS: url is not None
+    - SUCCESS: ${ url is not None }
     - FAILURE

@@ -67,8 +67,7 @@ public class CompileForLoopsFlowTest {
         assertEquals("value", listForLoopStatement.getVarName());
         @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) task.getPostTaskActionData()
                                   .get(SlangTextualKeys.PUBLISH_KEY);
-        assertEquals("\'a\'", outputs.get(0)
-                                    .getExpression());
+        assertEquals("a", outputs.get(0).getValue());
         assertEquals(Arrays.asList(ScoreLangConstants.FAILURE_RESULT),
                 task.getPostTaskActionData().get(SlangTextualKeys.BREAK_KEY));
     }
@@ -162,8 +161,7 @@ public class CompileForLoopsFlowTest {
         assertEquals("v", mapForLoopStatement.getValueName());
         @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) task.getPostTaskActionData()
                 .get(SlangTextualKeys.PUBLISH_KEY);
-        assertEquals("\'a\'", outputs.get(0)
-                .getExpression());
+        assertEquals("a", outputs.get(0).getValue());
         assertEquals(Arrays.asList(ScoreLangConstants.FAILURE_RESULT),
                 task.getPostTaskActionData().get(SlangTextualKeys.BREAK_KEY));
     }

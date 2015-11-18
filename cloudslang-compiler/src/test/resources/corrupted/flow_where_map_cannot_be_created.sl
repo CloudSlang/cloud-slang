@@ -24,7 +24,7 @@ flow:
    - Task2:
        do:
          flows.SimpleFlow:
-           - city_name: "'New York'"
+           - city_name: 'New York'
        navigate:
          SUCCESS: SUCCESS
          FAILURE: FAILURE

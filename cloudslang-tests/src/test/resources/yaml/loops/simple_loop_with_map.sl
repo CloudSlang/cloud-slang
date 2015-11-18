@@ -14,14 +14,14 @@ flow:
   name: simple_loop_with_map
   inputs:
     - person_map: >
-        {'john': 1, 'jane': 2, 'peter': 'three'}
+        ${{'john': 1, 'jane': 2, 'peter': 'three'}}
   workflow:
     - print_values:
         loop:
           for: k, v in person_map
           do:
             ops.print:
-              - text: k
-              - text2: v
+              - text: ${ k }
+              - text2: ${ v }
           publish:
-            - new_var: "'a'"
+            - new_var: 'a'

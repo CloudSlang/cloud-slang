@@ -12,4 +12,4 @@ operation:
   action:
     python_script: 'print "hello world"'
   results:
-    - CUSTOM: 1==1
+    - CUSTOM: ${ 1==1 }

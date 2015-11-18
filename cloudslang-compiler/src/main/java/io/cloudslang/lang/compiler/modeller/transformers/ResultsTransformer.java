@@ -19,6 +19,7 @@ import io.cloudslang.lang.entities.bindings.Result;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,12 +44,8 @@ public class ResultsTransformer implements Transformer<List, List<Result>> {
             } else if (rawResult instanceof Map) {
                 // - some_result: some_expression
                 // the value of the result is an expression we need to evaluate at runtime
-                @SuppressWarnings("unchecked") Map.Entry<String, ?> entry = (Map.Entry<String, ?>) (((Map) rawResult).entrySet()).iterator().next();
-                if(entry.getValue() instanceof Boolean) {
-                    results.add(createExpressionResult(entry.getKey(), String.valueOf(entry.getValue())));
-                } else {
-                    results.add(createExpressionResult(entry.getKey(), (String)entry.getValue()));
-                }
+                @SuppressWarnings("unchecked") Map.Entry<String, Serializable> entry = (Map.Entry<String, Serializable>) (((Map) rawResult).entrySet()).iterator().next();
+                results.add(createExpressionResult(entry.getKey(), entry.getValue()));
             }
         }
         return results;
@@ -68,7 +65,7 @@ public class ResultsTransformer implements Transformer<List, List<Result>> {
         return new Result(rawResult, null);
     }
 
-    private Result createExpressionResult(String resultName, String resultExpression) {
+    private Result createExpressionResult(String resultName, Serializable resultExpression) {
         return new Result(resultName, resultExpression);
     }
 }
