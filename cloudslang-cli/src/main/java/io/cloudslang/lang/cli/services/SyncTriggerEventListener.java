@@ -123,23 +123,18 @@ public class SyncTriggerEventListener implements ScoreEventListener{
     public static Map<String, Serializable> extractNotEmptyOutputs(Map<String, Serializable> data) {
 
         Map<String, Serializable> originalOutputs = (Map<String, Serializable>) data.get(LanguageEventData.OUTPUTS);
-        Map<String, Serializable> outputs = new HashMap<>();
-        for (Map.Entry<String, Serializable> entry : originalOutputs.entrySet()) {
-            outputs.put(entry.getKey(),  SerializationUtils.clone(entry.getValue()));
-        }
+        Map<String, Serializable> extractedOutputs = new HashMap<>();
 
-        if (MapUtils.isNotEmpty(outputs)) {
-            Iterator<Map.Entry<String, Serializable>> iterator = outputs.entrySet().iterator();
+        if (MapUtils.isNotEmpty(originalOutputs)) {
+            Iterator<Map.Entry<String, Serializable>> iterator = originalOutputs.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<String, Serializable> output = iterator.next();
 
-                if (output.getValue() == null || StringUtils.isEmpty(output.getValue().toString())) {
-                    iterator.remove();
-                } else {
-                    outputs.put(output.getKey(), StringUtils.abbreviate(output.getValue().toString(), 0, OUTPUT_VALUE_LIMIT));
+                if (output.getValue() != null && !(StringUtils.isEmpty(output.getValue().toString()))){
+                    extractedOutputs.put(output.getKey(), StringUtils.abbreviate(output.getValue().toString(), 0, OUTPUT_VALUE_LIMIT));
                 }
             }
-            return outputs;
+            return extractedOutputs;
         }
         return new HashMap<>();
     }
