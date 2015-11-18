@@ -41,8 +41,8 @@ public class SyncTriggerEventListenerTest {
     public static final String RETURN_RESULT = "returnResult";
     public static final String ERROR_MESSAGE = "errorMessage";
     public static final String RESULT = "result";
-    public static final String LONG_RESULT = "result that is too long will be abbreviated so that it does not affect CLI readability";
-    public static final String ABBREVIATED_RESULT = "result that is too long will be abbre...";
+    public static final String LONG_RESULT = "result that is too long will be abbreviated so that it does not affect CLI readability result that is too long will be abbreviated so that it does not affect CLI readability";
+    public static final String ABBREVIATED_RESULT = "result that is too long will be abbreviated so that it does not affect CLI readability result tha...";
 
     Map<String, Serializable> data;
     Map<String, Serializable> outputs, expectedFilteredOutputs, actualFilteredOutputs;
@@ -52,6 +52,7 @@ public class SyncTriggerEventListenerTest {
         data = new HashMap<>();
         outputs = new HashMap<>();
     }
+
 
     @Test
     public void testExtractOutputs() throws InterruptedException {
@@ -63,9 +64,35 @@ public class SyncTriggerEventListenerTest {
         expectedFilteredOutputs = new HashMap<>();
         expectedFilteredOutputs.put(RETURN_RESULT, RESULT);
 
-        actualFilteredOutputs = SyncTriggerEventListener.extractOutputs(data);
+        actualFilteredOutputs = SyncTriggerEventListener.extractNotEmptyOutputs(data);
 
         Assert.assertEquals("outputs different than expected", expectedFilteredOutputs, actualFilteredOutputs);
+    }
+
+    @Test
+    public void testExtractTaskOutputs() throws InterruptedException {
+        outputs.put(RETURN_RESULT, RESULT);
+        outputs.put(ERROR_MESSAGE, StringUtils.EMPTY);
+        data.put(LanguageEventData.OUTPUTS, (Serializable)outputs);
+        data.put(LanguageEventData.STEP_TYPE, LanguageEventData.StepType.TASK);
+
+        expectedFilteredOutputs = new HashMap<>();
+        expectedFilteredOutputs.put(RETURN_RESULT, RESULT);
+
+        actualFilteredOutputs = SyncTriggerEventListener.extractNotEmptyOutputs(data);
+
+        Assert.assertEquals("outputs different than expected", expectedFilteredOutputs, actualFilteredOutputs);
+    }
+
+    @Test
+    public void testExtractTaskOutputsEmpty() throws InterruptedException {
+        outputs.put(ERROR_MESSAGE, StringUtils.EMPTY);
+        data.put(LanguageEventData.OUTPUTS, (Serializable)outputs);
+        data.put(LanguageEventData.STEP_TYPE, LanguageEventData.StepType.TASK);
+
+        actualFilteredOutputs = SyncTriggerEventListener.extractNotEmptyOutputs(data);
+
+        Assert.assertTrue("outputs different than expected", MapUtils.isEmpty(actualFilteredOutputs));
     }
 
     @Test
@@ -77,7 +104,7 @@ public class SyncTriggerEventListenerTest {
         expectedFilteredOutputs = new HashMap<>();
         expectedFilteredOutputs.put(RETURN_RESULT, ABBREVIATED_RESULT);
 
-        actualFilteredOutputs = SyncTriggerEventListener.extractOutputs(data);
+        actualFilteredOutputs = SyncTriggerEventListener.extractNotEmptyOutputs(data);
 
         Assert.assertEquals("outputs different than expected", expectedFilteredOutputs, actualFilteredOutputs);
     }
@@ -88,18 +115,18 @@ public class SyncTriggerEventListenerTest {
         data.put(LanguageEventData.OUTPUTS, (Serializable)outputs);
         data.put(LanguageEventData.PATH, EXEC_START_PATH);
 
-        actualFilteredOutputs = SyncTriggerEventListener.extractOutputs(data);
+        actualFilteredOutputs = SyncTriggerEventListener.extractNotEmptyOutputs(data);
 
         Assert.assertTrue("outputs different than expected", MapUtils.isEmpty(actualFilteredOutputs));
     }
 
     @Test
-    public void testExtractOutputsNotFlowLevel() throws InterruptedException {
-        outputs.put(RETURN_RESULT, RESULT);
+    public void testExtractNotEmptyOutputs() throws InterruptedException {
+        outputs.put(ERROR_MESSAGE, StringUtils.EMPTY);
         data.put(LanguageEventData.OUTPUTS, (Serializable)outputs);
-        data.put(LanguageEventData.PATH, FIRST_STEP_PATH);
+        data.put(LanguageEventData.PATH, EXEC_START_PATH);
 
-        actualFilteredOutputs = SyncTriggerEventListener.extractOutputs(data);
+        actualFilteredOutputs = SyncTriggerEventListener.extractNotEmptyOutputs(data);
 
         Assert.assertTrue("outputs different than expected", MapUtils.isEmpty(actualFilteredOutputs));
     }
