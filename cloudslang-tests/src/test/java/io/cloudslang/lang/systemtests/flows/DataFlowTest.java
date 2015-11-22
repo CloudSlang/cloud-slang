@@ -123,27 +123,4 @@ public class DataFlowTest extends SystemsTestsParent {
         Assert.assertEquals("weather2 not bound correctly", "New York", weather2Output);
         Assert.assertEquals("weather3 not bound correctly", "New York day", weather3Output);
     }
-
-    @Test
-    public void testBindingsOneLiner() throws Exception {
-        URI resource = getClass().getResource("/yaml/simple_flow_one_liner_binding_check.yaml").toURI();
-        URI operations = getClass().getResource("/yaml/compare_values.sl").toURI();
-
-        SlangSource dep = SlangSource.fromFile(operations);
-        Set<SlangSource> path = Sets.newHashSet(dep);
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
-
-        Map<String, Serializable> userInputs = new HashMap<>();
-        ScoreEvent event = trigger(compilationArtifact, userInputs, null);
-
-        Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
-        Serializable eventRawData = event.getData();
-        Assert.assertTrue(eventRawData instanceof Map);
-        Map eventDataMap = (Map) eventRawData;
-        Assert.assertTrue(eventDataMap.containsKey("RESULT"));
-        String result = (String) eventDataMap.get("RESULT");
-
-        Assert.assertEquals("Result not as expected - task arguments binding may be corrupted", "SUCCESS", result);
-    }
-
 }

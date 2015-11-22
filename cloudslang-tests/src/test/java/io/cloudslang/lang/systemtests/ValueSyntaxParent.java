@@ -66,7 +66,6 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         expectedInputs.put("b", "b");
         expectedInputs.put("b_copy", "b");
         expectedInputs.put("input_concat_1", "ab");
-        expectedInputs.put("input_concat_2_one_liner", "prefix_ab_suffix");
         expectedInputs.put("input_concat_2_folded", "prefix_ab_suffix");
         expectedInputs.put(
                 "input_expression_characters",

@@ -52,7 +52,6 @@ flow:
     - b: b
     - b_copy: ${ b }
     - input_concat_1: ${'a' + b}
-    - input_concat_2_one_liner: ${'prefix_' + input_concat_1 + '_suffix'}
     - input_concat_2_folded: >
         ${
         'prefix_' +
@@ -89,7 +88,6 @@ flow:
             - b: b
             - b_copy: ${ b }
             - input_concat_1: ${'a' + b}
-            - input_concat_2_one_liner: ${'prefix_' + input_concat_1 + '_suffix'}
             - input_concat_2_folded: >
                 ${
                 'prefix_' +
@@ -102,9 +100,6 @@ flow:
           - publish_str: publish_str_value
           - publish_expression: ${ publish_str + '_suffix' }
 
-    - task_one_liner:
-        do:
-          ops.noop: input_no_expression, input_int = ${ 22 }, input_expression = ${ input_no_expression + '_suffix' }
   outputs:
     - output_no_expression
     - output_int: 22
