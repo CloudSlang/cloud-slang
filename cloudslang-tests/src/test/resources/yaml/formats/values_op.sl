@@ -49,7 +49,6 @@ operation:
     - b: b
     - b_copy: ${ b }
     - input_concat_1: ${'a' + b}
-    - input_concat_2_one_liner: ${'prefix_' + input_concat_1 + '_suffix'}
     - input_concat_2_folded: >
         ${
         'prefix_' +

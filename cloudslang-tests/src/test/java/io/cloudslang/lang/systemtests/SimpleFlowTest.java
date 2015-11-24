@@ -50,7 +50,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
-    public void testSimpleFlowBasicOneLinerSyntax() throws Exception {
+    public void testOneLinerIsInvalid() throws Exception {
         Map<String, Serializable> inputs = new HashMap<>();
         inputs.put("input1", "-2");
         inputs.put("time_zone_as_string", "+2");
@@ -101,7 +101,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
 	private void compileAndRunSimpleFlow(Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties) throws Exception {
 		URI flow = getClass().getResource("/yaml/simple_flow.yaml").toURI();
 		URI operations1 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
-		URI operations2 = getClass().getResource("/yaml/comopute_daylight_time_zone.sl").toURI();
+		URI operations2 = getClass().getResource("/yaml/compute_daylight_time_zone.sl").toURI();
 		Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
 		CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
         Assert.assertEquals("the system properties size is not as expected", 2, compilationArtifact.getSystemProperties().size());
@@ -112,12 +112,12 @@ public class SimpleFlowTest extends SystemsTestsParent {
     private void compileAndRunSimpleFlowOneLinerSyntax(Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties) throws Exception {
         URI flow = getClass().getResource("/yaml/simple_flow_one_liner.yaml").toURI();
         URI operations1 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
-        URI operations2 = getClass().getResource("/yaml/comopute_daylight_time_zone.sl").toURI();
+        URI operations2 = getClass().getResource("/yaml/compute_daylight_time_zone.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Task arguments");
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
-        Assert.assertEquals("the system properties size is not as expected", 2, compilationArtifact.getSystemProperties().size());
         ScoreEvent event = trigger(compilationArtifact, inputs, systemProperties);
-        Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 
     @Test

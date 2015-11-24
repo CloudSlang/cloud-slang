@@ -50,13 +50,11 @@ public class ValueSyntaxInFlowTest extends ValueSyntaxParent {
         // verify
         StepData flowData = steps.get(EXEC_START_PATH);
         StepData taskData = steps.get(FIRST_STEP_PATH);
-        StepData oneLinerTaskData = steps.get(SECOND_STEP_KEY);
 
         verifyExecutableInputs(flowData);
         verifyExecutableOutputs(flowData);
         verifyTaskInputs(taskData);
         verifyTaskPublishValues(taskData);
-        verifyOneLinerInputs(oneLinerTaskData);
         verifySuccessResult(flowData);
     }
 
@@ -88,7 +86,6 @@ public class ValueSyntaxInFlowTest extends ValueSyntaxParent {
         expectedTaskArguments.put("b", "b");
         expectedTaskArguments.put("b_copy", "b");
         expectedTaskArguments.put("input_concat_1", "ab");
-        expectedTaskArguments.put("input_concat_2_one_liner", "prefix_ab_suffix");
         expectedTaskArguments.put("input_concat_2_folded", "prefix_ab_suffix");
 
         Assert.assertTrue("Task arguments not bound correctly", includeAllPairs(taskData.getInputs(), expectedTaskArguments));
@@ -104,15 +101,4 @@ public class ValueSyntaxInFlowTest extends ValueSyntaxParent {
 
         Assert.assertEquals("Task publish values not bound correctly", expectedTaskPublishValues, taskData.getOutputs());
     }
-
-    private void verifyOneLinerInputs(StepData taskData) {
-        Map<String, Serializable> expectedTaskArguments = new HashMap<>();
-
-        expectedTaskArguments.put("input_no_expression", "input_no_expression_value");
-        expectedTaskArguments.put("input_int", 22);
-        expectedTaskArguments.put("input_expression", "input_no_expression_value_suffix");
-
-        Assert.assertTrue("One liner task arguments not bound correctly", includeAllPairs(taskData.getInputs(), expectedTaskArguments));
-    }
-
 }
