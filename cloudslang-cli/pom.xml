@@ -89,6 +89,11 @@
             <artifactId>score-rft</artifactId>
             <scope>runtime</scope>
         </dependency>
+		<dependency>
+			<groupId>io.cloudslang.content</groupId>
+			<artifactId>score-jClouds</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 
 		<!-- test -->
 		<dependency>
