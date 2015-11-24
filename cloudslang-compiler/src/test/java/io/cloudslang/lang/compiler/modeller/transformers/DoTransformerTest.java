@@ -97,30 +97,15 @@ public class DoTransformerTest {
     }
 
     @Test
-    public void testTransformArgumentsNotInList() throws Exception {
+    public void testOneLinerTransformIsInvalid() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Task arguments should be defined using a standard YAML list.");
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> doArgumentsMap = loadFirstTaskFromFile("/task-args-in-list/flow_arguments_not_in_list.yaml");
+        Map<String, Object> doArgumentsMap = loadFirstTaskFromFile("/task-args-in-list/flow_arguments_one_liner.yaml");
 
         doTransformer.transform(doArgumentsMap);
 
-    }
-
-    @Test
-    public void testFlowArgumentsContainsReservedCharacters() throws Exception {
-        Map doArgumentsMap = loadFirstTaskFromFile("/task-args-in-list/flow_arguments_contains_reserved_characters.yaml");
-        @SuppressWarnings("unchecked") List<Argument> actualArguments = doTransformer.transform(doArgumentsMap);
-
-        Assert.assertFalse(actualArguments.isEmpty());
-        Assert.assertEquals(2, actualArguments.size());
-
-        List<Argument> expectedArguments = Arrays.asList(
-                new Argument("city", "${ city_name if city_name != 'abc' else 'efg' }"),
-                new Argument("country", "${ 'Wonderland' }")
-        );
-        Assert.assertEquals(expectedArguments, actualArguments);
     }
 
     private Map loadFirstTaskFromFile(String path) throws URISyntaxException {

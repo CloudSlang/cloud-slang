@@ -11,7 +11,7 @@ imports:
   ops: user.ops
 
 flow:
-  name: flow_arguments_not_in_list
+  name: flow_arguments_one_liner
   inputs:
   - city_name
 

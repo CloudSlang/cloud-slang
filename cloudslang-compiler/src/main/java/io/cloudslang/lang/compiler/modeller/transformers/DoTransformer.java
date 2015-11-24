@@ -24,9 +24,6 @@ import java.util.*;
 @Component
 public class DoTransformer implements Transformer<Map<String, Object>, List<Argument>> {
 
-    // every comma that is not preceded by '\' (escaped)
-    private static final String REGEX_COMMA_NOT_ESCAPED = "(?<!\\\\)(,)";
-
     @Override
     public List<Argument> transform(Map<String, Object> rawData) {
         List<Argument> result = new ArrayList<>();
@@ -45,7 +42,7 @@ public class DoTransformer implements Transformer<Map<String, Object>, List<Argu
                 Argument argument = transformListArgument(rawArgument);
                 result.add(argument);
             }
-        } else if (rawArguments instanceof String) {
+        } else if (rawArguments != null) {
             throw new RuntimeException("Task arguments should be defined using a standard YAML list.");
         }
 
