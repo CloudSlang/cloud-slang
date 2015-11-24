@@ -1,5 +1,31 @@
 #CHANGE LOG
 
+##Version 0.9
+
++ DSL Improvements
+	+ Simplified Value Syntax - The syntax of inputs & tasks arguments default values and of outputs or results values has changed. We now distinguish between specifying literal values and expressions.
+	    + Literal Values - Literals are denoted now as they are in standard YAML. For example, numbers are interpreted as numerical values and strings may be written unquoted, single quoted or double quoted
+	    + Expressions - Expressions are preceded by a dollar sign and enclosed in curly brackets (e.g. `expression_1: ${4 + 7}`, `expression_2: ${some_input}`, `expression_3: ${get('input1', 'default_input')}`)
+	+ Task Arguments - Task arguments no longer support properties except for an optional default value
+	+ Simplified Expressions - We have a new function for simplifying the python expressions (`get("key", "default_value")`)
+	+ Use Fully Qualified Name - We now support also referencing an operation or flow by using the fully qualified name (e.g. `do: path.to.operation.op_name`)
+	+ New Keyword For Accessing Inputs - `self` replaced the former `fromInputs` keyword for referring to an input parameter as opposed to another variable with the same name in a narrower scope. Can be used in the value of an output, publish or result expression
++ CLI Enhancements
+	+  Events Logging - Events logging is now more comprehensive
+	+  Log file - The execution log file is now saved under `cslang/logs/execution.log`
+	+  Debug Mode - To print each task’s published variables to the screen, use the --d flag
++ Content Additions - Content has been added in the following areas.
+	+ OpenShift
+    + Git
+    + OpenStack
+    + Stackato
+    + HP Cloud
+    + Chef
+    + Google Container Engine (added in beta mode)
+	+ Amazon AWS
+	+ PowerShell
+	+ Base - Math, JSON, Remote file transfer
+
 ##Version 0.8
 
 + General - project renamed to CloudSlang
