@@ -183,6 +183,11 @@
                 <artifactId>score-rft</artifactId>
                 <version>0.0.2</version>
             </dependency>
+            <dependency>
+                <groupId>io.cloudslang.content</groupId>
+                <artifactId>score-jClouds</artifactId>
+                <version>0.0.2</version>
+            </dependency>
             <!--end of score content dependencies-->
 
             <dependency>

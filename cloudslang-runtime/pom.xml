@@ -60,6 +60,11 @@
             <artifactId>log4j</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>io.cloudslang.content</groupId>
+            <artifactId>score-jClouds</artifactId>
+        </dependency>
+
         <!-- For tests -->
 
         <dependency>

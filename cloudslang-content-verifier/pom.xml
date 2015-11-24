@@ -93,6 +93,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>io.cloudslang.content</groupId>
+            <artifactId>score-jClouds</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
