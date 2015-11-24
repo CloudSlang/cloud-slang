@@ -3,10 +3,10 @@
 ##Version 0.9
 
 + DSL Improvements
-	+ Simplified Value Syntax - The syntax of input and task argument default values, output values and results value has changed. We now distinguish between specifying literal values and expressions. This change alleviates the need for two sets of quotes surrounding literal strings.
-	    + Literal Values - Literals are denoted now as they are in standard YAML. For example, numbers are interpreted as numerical values and strings may be written unquoted, single quoted or double quoted
-	    + Expressions - Expressions are preceded by a dollar sign and enclosed in curly brackets (e.g. `expression_1: ${4 + 7}`, `expression_2: ${some_input}`, `expression_3: ${get('input1', 'default_input')}`)
-	+ Task Arguments - Task arguments no longer support properties, except for an optional default value.
+	+ Simplified Value Syntax - The syntax of input and task argument default values, output values and result values has changed. We now distinguish between specifying literal values and expressions. This change alleviates the need for two sets of quotes surrounding literal strings.
+	    + Literal Values - Literals are denoted now as they are in standard YAML. For example, numbers are interpreted as numerical values and strings may be written unquoted, single quoted or double quoted.
+	    + Expressions - Expressions are preceded by a dollar sign and enclosed in curly brackets (e.g. `expression_1: ${4 + 7}`, `expression_2: ${some_input}`, `expression_3: ${get('input1', 'default_input')}`).
+	+ Task Arguments - Task arguments no longer support properties, except for an optional `default` value.
 	+ Get Function - The new get function (`get("key", "default_value")`) returns the value associated with `key` if the key is defined and its value is not `None`. If the key is undefined or its value is `None` the function returns the `default_value`. This function allows for simplifying some complex Python expressions.
 	+ Qualified Names - An operation or flow may now be referenced from a task by using the fully qualified name (e.g. `do: path.to.operation.op_name`) or a continuation of the path after an alias (e.g. `do: alias.cont.path.flow_name`).
 	+ Keyword Change - `self` replaced the former `fromInputs` keyword for referring to an input parameter as opposed to another variable with the same name in a narrower scope. Can be used in the value of an output, publish or result expression.
