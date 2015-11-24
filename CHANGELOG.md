@@ -11,9 +11,9 @@
 	+ Use Fully Qualified Name - We now support also referencing an operation or flow by using the fully qualified name (e.g. `do: path.to.operation.op_name`)
 	+ New Keyword For Accessing Inputs - `self` replaced the former `fromInputs` keyword for referring to an input parameter as opposed to another variable with the same name in a narrower scope. Can be used in the value of an output, publish or result expression
 + CLI Enhancements
-	+  Events Logging - Events logging is now more comprehensive
-	+  Log file - The execution log file is now saved under `cslang/logs/execution.log`
 	+  Debug Mode - To print each task’s published variables to the screen, use the --d flag
+	+  Log file - The execution log file is now saved under `cslang/logs/execution.log`
+	+  Events Logging - Events logging is now more comprehensive
 + Content Additions - Content has been added in the following areas.
 	+ OpenShift
     + Git
