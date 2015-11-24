@@ -107,8 +107,8 @@ public class SyncTriggerEventListener implements ScoreEventListener{
                         && data.containsKey(LanguageEventData.PATH)
                         && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
                     Map<String, Serializable> outputs = extractNotEmptyOutputs(data);
+                    printWithColor(Ansi.Color.WHITE, "\nFlow outputs:");
                     for (String key : outputs.keySet()) {
-                        printWithColor(Ansi.Color.WHITE, "\nFlow outputs:");
                         printWithColor(Ansi.Color.WHITE, "- " + key + " = " + outputs.get(key));
                     }
                 }
