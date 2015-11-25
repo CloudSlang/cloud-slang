@@ -35,7 +35,7 @@ flow:
   inputs:
     - language_codebase
     - include_content: false
-    - target_dir: ${language_codebase + '/target'}
+    - target_dir: ${language_codebase + '/build/target'}
     - target_cli:
         default: ${target_dir + "/cloudslang-cli/cslang"}
         overridable: false
