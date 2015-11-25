@@ -11,9 +11,7 @@
 # Inputs:
 #   - url - URL of the remote repository to clone
 #   - target_location - location of the cloned repository - Default: .
-# Results:
-#   - SUCCESS
-#   - FAILURE
+#   - branch - branch to checkout - Default: master
 ####################################################
 
 namespace: build.build_content
@@ -25,11 +23,11 @@ flow:
   name: clone
   inputs:
     - url
-    - target_location: "'.'"
-    - branch: "'master'"
+    - target_location: '.'
+    - branch: 'master'
   workflow:
     - clone:
         do:
           cmd.run_command:
             - command: >
-                'git clone -b ' + branch + ' ' + url + ' ' + target_location
+                ${'git clone -b ' + branch + ' ' + url + ' ' + target_location}
