@@ -111,7 +111,7 @@ flow:
     - chmod_cloudslang_exec:
         do:
           cmd.run_command:
-            - command: ${chmod +x " + target_cli + "/bin/cslang}
+            - command: ${"chmod +x " + target_cli + "/bin/cslang"}
         navigate:
           SUCCESS: create_cli_zip
           FAILURE: CHMOD_CLOUDSLANG_EXEC_FAILURE
