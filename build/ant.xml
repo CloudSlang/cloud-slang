@@ -34,7 +34,7 @@
         <mkdir dir="${stable-cli_forward_slash}"/>
         <mkdir dir="${build}"/>
         <!--TODO: replace "-beta"-->
-        <get src="https://github.com/CloudSlang/cloud-slang/releases/download/cloudslang-0.8.6/cslang-cli-with-content-beta.zip"
+        <get src="https://github.com/CloudSlang/cloud-slang/releases/download/cloudslang-0.8.6/cslang-cli-with-content.zip"
             dest="${stable-cli_forward_slash}/cslang-cli-with-content.zip" usetimestamp="true" verbose="true"/>
         <unzip src="${stable-cli_forward_slash}/cslang-cli-with-content.zip" dest="${stable-cli_forward_slash}"/>
         <exec executable="/bin/bash" osfamily="unix">
