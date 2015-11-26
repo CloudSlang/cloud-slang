@@ -132,24 +132,21 @@ public class SlangTestRunner {
         return runTestsResults;
     }
 
-    boolean containsAny(Collection<?> coll1, Collection<?> coll2) {
-        Iterator i$;
-        Object aColl2;
+    boolean containsAny(Collection coll1, Collection coll2) {
+        Iterator it;
         if(coll1.size() < coll2.size()) {
-            i$ = coll1.iterator();
+            it = coll1.iterator();
 
-            while(i$.hasNext()) {
-                aColl2 = i$.next();
-                if(coll2.contains(aColl2)) {
+            while(it.hasNext()) {
+                if(coll2.contains(it.next())) {
                     return true;
                 }
             }
         } else {
-            i$ = coll2.iterator();
+            it = coll2.iterator();
 
-            while(i$.hasNext()) {
-                aColl2 = i$.next();
-                if(coll1.contains(aColl2)) {
+            while(it.hasNext()) {
+                if(coll1.contains(it.next())) {
                     return true;
                 }
             }
