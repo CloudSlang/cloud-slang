@@ -17,8 +17,6 @@ import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.TestRun;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
@@ -75,14 +73,14 @@ public class SlangBuildMain {
             RunTestsResults runTestsResults = buildResults.getRunTestsResults();
             Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
 
-            if(MapUtils.isNotEmpty(skippedTests)){
+            if(!((skippedTests == null) || skippedTests.isEmpty())){
                 printSkippedTestsSummary(skippedTests);
             }
             if(shouldPrintCoverageData) {
                 printTestCoverageData(runTestsResults);
             }
             Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
-            if(MapUtils.isNotEmpty(failedTests)){
+            if(!((failedTests == null) || failedTests.isEmpty())){
                 printBuildFailureSummary(projectPath, failedTests);
                 System.exit(1);
             } else {
@@ -117,7 +115,7 @@ public class SlangBuildMain {
     private static List<String> parseTestSuites(ApplicationArgs appArgs) {
         List<String> testSuites = new ArrayList<>();
         boolean runDefaultTests = true;
-        List<String> testSuitesArg = ListUtils.defaultIfNull(appArgs.getTestSuites(), new ArrayList<String>());
+        List<String> testSuitesArg = appArgs.getTestSuites() == null ? new ArrayList<String>() : appArgs.getTestSuites();
         for(String testSuite : testSuitesArg){
             if(!testSuite.startsWith(NOT_TS)){
                 testSuites.add(testSuite);

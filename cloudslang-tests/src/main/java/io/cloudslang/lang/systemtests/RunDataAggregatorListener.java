@@ -10,13 +10,10 @@
 
 package io.cloudslang.lang.systemtests;
 
-import ch.lambdaj.Lambda;
-import ch.lambdaj.function.convert.Converter;
 import ch.lambdaj.group.Group;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import org.apache.commons.collections4.CollectionUtils;
-import org.hamcrest.Matchers;
+
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -52,7 +49,7 @@ public class RunDataAggregatorListener extends AbstractAggregatorListener {
         LanguageEventData inputsEvent;
         LanguageEventData outputsEvent;
 
-        if (CollectionUtils.isNotEmpty(taskEvents)) {
+        if (!((taskEvents == null) || taskEvents.isEmpty())) {
             inputsEvent = selectByEventType(taskEvents, ScoreLangConstants.EVENT_INPUT_END);
             outputsEvent = selectByEventType(taskEvents, ScoreLangConstants.EVENT_OUTPUT_END);
         } else {

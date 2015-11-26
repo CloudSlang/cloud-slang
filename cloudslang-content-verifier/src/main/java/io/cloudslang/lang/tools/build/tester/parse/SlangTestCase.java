@@ -9,7 +9,6 @@
  */
 package io.cloudslang.lang.tools.build.tester.parse;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -75,7 +74,7 @@ public class SlangTestCase {
     }
 
     public List<String> getTestSuites() {
-        if(CollectionUtils.isEmpty(testSuites)) {
+        if((testSuites == null) || testSuites.isEmpty()) {
             this.testSuites = new ArrayList<>();
         }
         return testSuites;

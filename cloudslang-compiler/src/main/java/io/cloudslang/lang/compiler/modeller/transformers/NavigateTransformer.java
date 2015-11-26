@@ -14,7 +14,6 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
-import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -28,7 +27,7 @@ public class NavigateTransformer implements Transformer<Map<String, Object>, Map
 
     @Override
     public Map<String, String> transform(Map<String, Object> rawData) {
-        if (MapUtils.isEmpty(rawData)){
+        if ((rawData == null) || rawData.isEmpty()){
             return new LinkedHashMap<>();
         }
         Map<String, String> navigationData = new HashMap<>();

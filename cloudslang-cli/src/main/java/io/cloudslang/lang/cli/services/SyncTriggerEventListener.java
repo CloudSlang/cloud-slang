@@ -13,7 +13,6 @@ package io.cloudslang.lang.cli.services;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.ExecutionPath;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
@@ -103,7 +102,7 @@ public class SyncTriggerEventListener implements ScoreEventListener{
                 && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
 
             @SuppressWarnings("unchecked") Map<String, Serializable> outputs = (Map<String, Serializable>) data.get(LanguageEventData.OUTPUTS);
-            if (MapUtils.isNotEmpty(outputs)) {
+            if (!((outputs == null) || outputs.isEmpty())) {
                 Iterator<Map.Entry<String,Serializable>> iterator = outputs.entrySet().iterator();
                 while (iterator.hasNext()) {
                     Map.Entry<String,Serializable> output = iterator.next();

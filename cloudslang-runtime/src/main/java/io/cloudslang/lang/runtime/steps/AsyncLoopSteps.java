@@ -25,7 +25,6 @@ import io.cloudslang.score.api.EndBranchDataContainer;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -237,7 +236,7 @@ public class AsyncLoopSteps extends AbstractSteps {
             if (StringUtils.isNotEmpty(branchException)) {
                 Map<String, Serializable> systemContextMap = branch.getSystemContext();
                 String branchID = null;
-                if (MapUtils.isNotEmpty(systemContextMap)) {
+                if (!((systemContextMap == null) || systemContextMap.isEmpty())) {
                     ExecutionRuntimeServices branchExecutionRuntimeServices = new SystemContext(systemContextMap);
                     branchID = branchExecutionRuntimeServices.getBranchId();
                 }

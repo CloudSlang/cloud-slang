@@ -20,7 +20,6 @@ package io.cloudslang.lang.tools.build.tester;
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import org.apache.commons.collections4.MapUtils;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
@@ -76,7 +75,7 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
             case ScoreLangConstants.EVENT_OUTPUT_END:
                 eventData = (LanguageEventData) data;
                 Map<String, Serializable> extractOutputs = extractOutputs(eventData);
-                if(MapUtils.isNotEmpty(extractOutputs)) {
+                if(!((extractOutputs == null) || extractOutputs.isEmpty())) {
                     outputs = extractOutputs;
                 }
                 break;
@@ -98,7 +97,9 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
 
         if (thereAreOutputsForRootPath) {
             Map<String, Serializable> outputs = data.getOutputs();
-            if (MapUtils.isNotEmpty(outputs)) outputsMap.putAll(outputs);
+            if (!((outputs == null) || outputs.isEmpty())) {
+                outputsMap.putAll(outputs);
+            }
         }
 
         return outputsMap;

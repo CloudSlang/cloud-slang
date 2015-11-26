@@ -18,8 +18,6 @@ import io.cloudslang.lang.tools.build.SlangBuildMain;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import io.cloudslang.score.events.EventConstants;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,12 +28,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by stoneo on 3/15/2015.
@@ -110,7 +103,7 @@ public class SlangTestRunner {
                             Map<String, CompilationArtifact> compiledFlows, List<String> testSuites) {
 
         RunTestsResults runTestsResults = new RunTestsResults();
-        if(MapUtils.isEmpty(testCases)){
+        if((testCases == null) || testCases.isEmpty()){
             return runTestsResults;
         }
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
@@ -119,8 +112,9 @@ public class SlangTestRunner {
                 runTestsResults.addFailedTest(UNAVAILABLE_NAME, new TestRun(testCase, "Test case cannot be null"));
                 continue;
             }
-            if ((CollectionUtils.isEmpty(testCase.getTestSuites()) && testSuites.contains(SlangBuildMain.DEFAULT_TESTS)) ||
-                    CollectionUtils.containsAny(testSuites, testCase.getTestSuites())) {
+            if ((((testCase.getTestSuites() == null) || testCase.getTestSuites().isEmpty()) && testSuites.contains(SlangBuildMain.DEFAULT_TESTS))
+                    || containsAny(testSuites, testCase.getTestSuites())
+                    ) {
                 log.info("Running test: " + testCaseEntry.getKey() + " - " + testCase.getDescription());
                 try {
                     CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
@@ -136,6 +130,29 @@ public class SlangTestRunner {
             }
         }
         return runTestsResults;
+    }
+
+    boolean containsAny(Collection coll1, Collection coll2) {
+        Iterator it;
+        if(coll1.size() < coll2.size()) {
+            it = coll1.iterator();
+
+            while(it.hasNext()) {
+                if(coll2.contains(it.next())) {
+                    return true;
+                }
+            }
+        } else {
+            it = coll2.iterator();
+
+            while(it.hasNext()) {
+                if(coll1.contains(it.next())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private static CompilationArtifact getCompiledTestFlow(Map<String, CompilationArtifact> compiledFlows, SlangTestCase testCase) {
@@ -175,7 +192,7 @@ public class SlangTestRunner {
     }
 
     private Map<String, Serializable> convertMapParams(List<Map> params, Map<String, Serializable> convertedInputs) {
-        if (CollectionUtils.isNotEmpty(params)) {
+        if (!((params == null) || params.isEmpty())) {
             for (Map param : params) {
                 convertedInputs.put(
                         (String) param.keySet().iterator().next(),
@@ -250,7 +267,7 @@ public class SlangTestRunner {
         }
 
         Map<String, Serializable> executionOutputs = executionReturnValues.getOutputs();
-        if (MapUtils.isNotEmpty(outputs)){
+        if (!((outputs == null) || outputs.isEmpty())){
             for(Map.Entry<String, Serializable> output: outputs.entrySet()) {
                 String outputName = output.getKey();
                 Serializable outputValue = output.getValue();
