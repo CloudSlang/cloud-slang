@@ -11,7 +11,6 @@ package io.cloudslang.lang.runtime.bindings;
  *******************************************************************************/
 
 import io.cloudslang.lang.entities.bindings.Input;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,7 +92,8 @@ public class InputsBinding extends Binding {
 
         if (value == null) {
             String systemPropertyKey = input.getSystemPropertyName();
-            if (StringUtils.isNotEmpty(systemPropertyKey) && MapUtils.isNotEmpty(systemProperties)) {
+            if (!((systemPropertyKey == null) || systemPropertyKey.isEmpty())
+                    && !((systemProperties == null) || systemProperties.isEmpty())) {
                 value = systemProperties.get(systemPropertyKey);
             }
         }

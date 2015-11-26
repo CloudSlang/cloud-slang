@@ -18,7 +18,6 @@ import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -84,7 +83,7 @@ public class ExecutionPlanBuilder {
 
         Deque<Task> tasks = compiledFlow.getWorkflow().getTasks();
 
-        if (CollectionUtils.isEmpty(tasks)) {
+        if ((tasks == null) || tasks.isEmpty()) {
             throw new RuntimeException("Flow: " + compiledFlow.getName() + " has no tasks");
         }
 

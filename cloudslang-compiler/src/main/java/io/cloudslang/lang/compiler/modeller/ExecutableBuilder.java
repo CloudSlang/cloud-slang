@@ -15,10 +15,6 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.collections4.iterators.PeekingIterator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
@@ -97,8 +93,9 @@ public class ExecutableBuilder {
         Map<String, Serializable> preExecutableActionData = new HashMap<>();
         Map<String, Serializable> postExecutableActionData = new HashMap<>();
 
-        transformersHandler.validateKeyWords(execName, executableRawData,
-                ListUtils.union(preExecTransformers, postExecTransformers), execAdditionalKeywords, null);
+        List<Transformer> allTransformers = new ArrayList<>(preExecTransformers);
+        allTransformers.addAll(postExecTransformers);
+        transformersHandler.validateKeyWords(execName, executableRawData, allTransformers, execAdditionalKeywords, null);
 
         preExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, preExecTransformers));
         postExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, postExecTransformers));
@@ -122,7 +119,7 @@ public class ExecutableBuilder {
                 } catch (ClassCastException ex){
                     throw new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'workflow' property there should be a list of tasks and not a map");
                 }
-                if (CollectionUtils.isEmpty(workFlowRawData)) {
+                if ((workFlowRawData == null) || workFlowRawData.isEmpty()) {
                     throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + execName + " has no workflow data");
                 }
 
@@ -144,7 +141,7 @@ public class ExecutableBuilder {
                         } catch (ClassCastException ex){
                             throw new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a list of tasks and not a map");
                         }
-                        if (CollectionUtils.isNotEmpty(onFailureData)) {
+                        if (!((onFailureData == null) || onFailureData.isEmpty())) {
                             onFailureWorkFlow = compileWorkFlow(onFailureData, imports, null, true, namespace);
                         }
                         tasksIterator.remove();
@@ -163,7 +160,7 @@ public class ExecutableBuilder {
                     throw new RuntimeException("Operation: '" + execName + "' syntax is illegal.\nBelow 'action' property there should be a map of values such as: 'python_script:' or 'java_action:'");
                 }
 
-                if (MapUtils.isEmpty(actionRawData)) {
+                if ((actionRawData == null) || actionRawData.isEmpty()) {
                     throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Operation: " + execName + " has no action data");
                 }
                 Action action = compileAction(actionRawData);
@@ -194,9 +191,6 @@ public class ExecutableBuilder {
 
         Validate.notEmpty(workFlowRawData, "Flow must have tasks in its workflow");
 
-        PeekingIterator<Map<String, Map<String, Object>>> iterator =
-                new PeekingIterator<>(workFlowRawData.iterator());
-
         boolean isOnFailureDefined = onFailureWorkFlow != null;
 
         String defaultFailure = isOnFailureDefined ?
@@ -204,9 +198,11 @@ public class ExecutableBuilder {
 
         Set<String> taskNames = new HashSet<>();
 
-        while (iterator.hasNext()) {
-            Map<String, Map<String, Object>> taskRawData = iterator.next();
-            Map<String, Map<String, Object>> nextTaskData = iterator.peek();
+        int workFlowRawDataSize = workFlowRawData.size();
+        for(int i = 0; i < workFlowRawDataSize; i++) {
+            Map<String, Map<String, Object>> taskRawData = workFlowRawData.get(i);
+            Map<String, Map<String, Object>> nextTaskData = (i == (workFlowRawDataSize - 1)) ?  null : workFlowRawData.get(i + 1);
+
             String taskName = taskRawData.keySet().iterator().next();
             if(taskNames.contains(taskName)){
                 throw new RuntimeException("Task name: \'" + taskName + "\' appears more than once in the workflow. Each task name in the workflow must be unique");
@@ -216,7 +212,7 @@ public class ExecutableBuilder {
             String message = "Task: " + taskName + " syntax is illegal.\nBelow task name, there should be a map of values in the format:\ndo:\n\top_name:";
             try {
                 taskRawDataValue = taskRawData.values().iterator().next();
-                if (MapUtils.isNotEmpty(taskRawDataValue)) {
+                if (!(taskRawDataValue == null || taskRawDataValue.isEmpty())) {
                     boolean loopKeyFound = taskRawDataValue.containsKey(LOOP_KEY);
                     boolean asyncLoopKeyFound = taskRawDataValue.containsKey(ASYNC_LOOP_KEY);
                     if (loopKeyFound) {
@@ -257,16 +253,18 @@ public class ExecutableBuilder {
     }
 
     private Task compileTask(String taskName, Map<String, Object> taskRawData, String defaultSuccess,
-                                     Map<String, String> imports, String defaultFailure, String namespace) {
+                             Map<String, String> imports, String defaultFailure, String namespace) {
 
-        if (MapUtils.isEmpty(taskRawData)) {
+        if ((taskRawData == null) || taskRawData.isEmpty()) {
             throw new RuntimeException("Task: " + taskName + " has no data");
         }
 
         Map<String, Serializable> preTaskData = new HashMap<>();
         Map<String, Serializable> postTaskData = new HashMap<>();
 
-        transformersHandler.validateKeyWords(taskName, taskRawData, ListUtils.union(preTaskTransformers, postTaskTransformers), TaskAdditionalKeyWords, null);
+        List<Transformer> allTransformes = new ArrayList<>(preTaskTransformers);
+        allTransformes.addAll(postTaskTransformers);
+        transformersHandler.validateKeyWords(taskName, taskRawData, allTransformes, TaskAdditionalKeyWords, null);
 
         try {
             preTaskData.putAll(transformersHandler.runTransformers(taskRawData, preTaskTransformers));
@@ -279,7 +277,7 @@ public class ExecutableBuilder {
         List<Argument> arguments = (List<Argument>)preTaskData.get(SlangTextualKeys.DO_KEY);
 
         @SuppressWarnings("unchecked") Map<String, Object> doRawData = (Map<String, Object>) taskRawData.get(SlangTextualKeys.DO_KEY);
-        if (MapUtils.isEmpty(doRawData)) {
+        if ((doRawData == null) || doRawData.isEmpty()) {
             throw new RuntimeException("Task: \'" + taskName + "\' has no reference information");
         }
         String refString = doRawData.keySet().iterator().next();
@@ -288,7 +286,7 @@ public class ExecutableBuilder {
         @SuppressWarnings("unchecked") Map<String, String> navigationStrings = (Map<String, String>) postTaskData.get(SlangTextualKeys.NAVIGATION_KEY);
 
         //default navigation
-        if (MapUtils.isEmpty(navigationStrings)) {
+        if ((navigationStrings == null) || navigationStrings.isEmpty()) {
             navigationStrings = new HashMap<>();
             navigationStrings.put(ScoreLangConstants.SUCCESS_RESULT, defaultSuccess);
             navigationStrings.put(ScoreLangConstants.FAILURE_RESULT, defaultFailure);
@@ -314,7 +312,7 @@ public class ExecutableBuilder {
         } else {
             String prefix = StringUtils.substringBefore(rawReferenceID, NAMESPACE_DELIMITER);
             String suffix = StringUtils.substringAfter(rawReferenceID, NAMESPACE_DELIMITER);
-            if (MapUtils.isNotEmpty(imports) && imports.containsKey(prefix)) {
+            if ((!((imports == null) || imports.isEmpty())) && imports.containsKey(prefix)) {
                 // expand alias
                 resolvedReferenceID = imports.get(prefix) + NAMESPACE_DELIMITER + suffix;
             } else {
