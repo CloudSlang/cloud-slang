@@ -8,7 +8,6 @@
  */
 package io.cloudslang.lang.cli;
 
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
@@ -75,10 +74,10 @@ public class SlangCLI implements CommandMarker {
         Map<String, ? extends Serializable> inputsFromFile = compilerHelper.loadInputsFromFile(inputFiles);
         Map<String, Serializable> mergedInputs = new HashMap<>();
 
-        if(MapUtils.isNotEmpty(inputsFromFile)){
+        if(!((inputsFromFile == null) || inputsFromFile.isEmpty())){
             mergedInputs.putAll(inputsFromFile);
         }
-        if(MapUtils.isNotEmpty(inputs)) {
+        if(!((inputs == null) || inputs.isEmpty())) {
             mergedInputs.putAll(inputs);
         }
 

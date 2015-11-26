@@ -14,7 +14,6 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
-import org.apache.commons.collections4.MapUtils;
 import io.cloudslang.lang.entities.bindings.Input;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +30,7 @@ public class DoTransformer extends AbstractInputsTransformer implements Transfor
     public List<Input> transform(Map<String, List> rawData) {
         //todo handle also String type
         List<Input> result = new ArrayList<>();
-        if (MapUtils.isEmpty(rawData)) {
+        if ((rawData == null) || rawData.isEmpty()) {
             return result;
         }
         Map.Entry<String, List> inputsEntry = rawData.entrySet().iterator().next();

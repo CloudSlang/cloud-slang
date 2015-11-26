@@ -13,7 +13,6 @@ package io.cloudslang.lang.runtime.bindings;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
 
-import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -53,7 +52,7 @@ public class OutputsBinding {
                         scriptContext.put(outputKey, null);
                     }
                     //put operation inputs as a map
-                    if(MapUtils.isNotEmpty(inputs)) {
+                    if(!((inputs == null) || inputs.isEmpty())) {
                         scriptContext.put(ScoreLangConstants.BIND_OUTPUT_FROM_INPUTS_KEY, (Serializable) inputs);
                     }
 

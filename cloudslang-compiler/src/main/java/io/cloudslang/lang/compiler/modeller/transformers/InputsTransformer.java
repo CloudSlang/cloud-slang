@@ -15,7 +15,6 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  */
 
 import io.cloudslang.lang.entities.bindings.Input;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ public class InputsTransformer extends AbstractInputsTransformer implements Tran
     @Override
     public List<Input> transform(List<Object> rawData) {
         List<Input> result = new ArrayList<>();
-        if (CollectionUtils.isEmpty(rawData)){
+        if ((rawData == null) || rawData.isEmpty()){
             return result;
         }
         for (Object rawInput : rawData) {

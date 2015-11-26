@@ -16,7 +16,6 @@ import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Result;
 import junit.framework.Assert;
-import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,7 +68,7 @@ public class ResultsTransformerTest {
     @Test
     public void testTransform() throws Exception {
         List<Result> results = resultsTransformer.transform(resultsMapOpWithData);
-        Assert.assertTrue(CollectionUtils.isNotEmpty(results));
+        Assert.assertFalse((results == null) || results.isEmpty());
         Assert.assertEquals(3, results.size());
     }
 
@@ -100,7 +99,7 @@ public class ResultsTransformerTest {
     @Test
     public void testFillDefaultResultsWhenNoResultsGiven() throws Exception {
         List<Result> results = resultsTransformer.transform(resultsMapOpNoData);
-        Assert.assertTrue(CollectionUtils.isNotEmpty(results));
+        Assert.assertFalse((results == null) || results.isEmpty());
         Assert.assertEquals(2, results.size());
     }
 

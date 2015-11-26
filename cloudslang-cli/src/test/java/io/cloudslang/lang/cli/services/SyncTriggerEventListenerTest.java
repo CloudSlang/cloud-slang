@@ -11,7 +11,6 @@
 package io.cloudslang.lang.cli.services;
 
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -90,7 +89,7 @@ public class SyncTriggerEventListenerTest {
 
         actualFilteredOutputs = SyncTriggerEventListener.extractOutputs(data);
 
-        Assert.assertTrue("outputs different than expected", MapUtils.isEmpty(actualFilteredOutputs));
+        Assert.assertTrue("outputs different than expected", ((actualFilteredOutputs == null) || actualFilteredOutputs.isEmpty()));
     }
 
     @Test
@@ -101,7 +100,7 @@ public class SyncTriggerEventListenerTest {
 
         actualFilteredOutputs = SyncTriggerEventListener.extractOutputs(data);
 
-        Assert.assertTrue("outputs different than expected", MapUtils.isEmpty(actualFilteredOutputs));
+        Assert.assertTrue("outputs different than expected", ((actualFilteredOutputs == null) || actualFilteredOutputs.isEmpty()));
     }
 
     @Configuration

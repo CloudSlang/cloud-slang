@@ -11,7 +11,6 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 
 import io.cloudslang.lang.entities.bindings.Output;
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +26,7 @@ public class AbstractOutputsTransformer {
     public List<Output> transform(List<Object> rawData) {
 
         List<Output> outputs = new ArrayList<>();
-        if (CollectionUtils.isEmpty(rawData)){
+        if ((rawData == null) || rawData.isEmpty()){
             return outputs;
         }
         for (Object rawOutput : rawData) {

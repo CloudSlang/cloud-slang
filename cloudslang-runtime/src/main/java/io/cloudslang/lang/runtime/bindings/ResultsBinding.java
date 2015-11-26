@@ -12,8 +12,6 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Result;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -56,7 +54,7 @@ public class ResultsBinding {
                                 String presetResult) {
 
         // We must have possible results
-        if (CollectionUtils.isEmpty(possibleResults)) {
+        if ((possibleResults == null) || possibleResults.isEmpty()) {
             throw new RuntimeException("No results were found");
         }
 
@@ -86,7 +84,7 @@ public class ResultsBinding {
             //put action outputs
             scriptContext.putAll(context);
             //put executable inputs as a map
-            if(MapUtils.isNotEmpty(inputs)) {
+            if (!((inputs == null) || inputs.isEmpty())) {
                 scriptContext.put(ScoreLangConstants.BIND_OUTPUT_FROM_INPUTS_KEY, (Serializable) inputs);
             }
 
