@@ -6,7 +6,7 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 #
 ####################################################
-# Clones a remote git repository to a specified location.
+# IF: utility operation
 #
 # Inputs:
 #   - expression - expression to test
@@ -25,5 +25,6 @@ operation:
     python_script: expression
   results:
     - IS: >
-        expression in [True, 'True', 'true', 1, '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh', 'tots', 'positive']
+        ${expression in [True, 'True', 'true', 1, '1', 't', 'y', 'yes',
+        'yeah', 'yup', 'certainly', 'uh-huh', 'tots', 'positive']}
     - IS_NOT
