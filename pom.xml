@@ -187,6 +187,12 @@
                 <groupId>io.cloudslang.content</groupId>
                 <artifactId>score-jClouds</artifactId>
                 <version>0.0.2</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>ch.qos.logback</groupId>
+                        <artifactId>logback-classic</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!--end of score content dependencies-->
 
