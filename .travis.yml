@@ -20,7 +20,6 @@ deploy:
   on:
     repo: CloudSlang/cloud-slang
     tags: true
-    branch: master
     jdk: openjdk7
 
 after_success:
