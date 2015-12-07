@@ -60,7 +60,13 @@ public class ExecutableBuilder {
 
     private List<Transformer> preExecTransformers;
     private List<Transformer> postExecTransformers;
-    private List<String> execAdditionalKeywords = Arrays.asList(SlangTextualKeys.ACTION_KEY, SlangTextualKeys.WORKFLOW_KEY, SlangTextualKeys.EXECUTABLE_NAME_KEY);
+    private List<String> execAdditionalKeywords =
+            Arrays.asList(
+                    SlangTextualKeys.ACTION_KEY,
+                    SlangTextualKeys.WORKFLOW_KEY,
+                    SlangTextualKeys.EXECUTABLE_NAME_KEY,
+                    SlangTextualKeys.EXECUTABLE_DESCRIPTION_KEY
+            );
 
     private List<Transformer> actionTransformers;
     private List<List<String>> actionTransformerConstraintGroups;
@@ -110,6 +116,8 @@ public class ExecutableBuilder {
         String namespace = parsedSlang.getNamespace();
         Map<String, String> imports = parsedSlang.getImports();
         Set<String> dependencies;
+        String description = extractExecutableDescription(executableRawData);
+
         switch (parsedSlang.getType()) {
             case FLOW:
 
@@ -153,7 +161,19 @@ public class ExecutableBuilder {
 
                 Workflow workflow = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false, namespace);
                 dependencies = fetchDirectTasksDependencies(workflow);
-                return new Flow(preExecutableActionData, postExecutableActionData, workflow, namespace, execName, inputs, outputs, results, dependencies);
+
+                return new Flow(
+                        preExecutableActionData,
+                        postExecutableActionData,
+                        workflow,
+                        namespace,
+                        execName,
+                        inputs,
+                        outputs,
+                        results,
+                        dependencies,
+                        description
+                );
 
             case OPERATION:
                 Map<String, Object> actionRawData;
@@ -172,6 +192,21 @@ public class ExecutableBuilder {
             default:
                 throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". It is not of flow or operations type");
         }
+    }
+
+    private String extractExecutableDescription(Map<String, Object> executableRawData) {
+        Object descriptionAsObject = executableRawData.get(SlangTextualKeys.EXECUTABLE_DESCRIPTION_KEY);
+        String description;
+        if (descriptionAsObject == null) {
+            description = "";
+        } else {
+            if (descriptionAsObject instanceof String) {
+                description = (String) descriptionAsObject;
+            } else {
+                throw new RuntimeException("TODO: add message");
+            }
+        }
+        return description;
     }
 
     private Action compileAction(Map<String, Object> actionRawData) {

@@ -38,6 +38,20 @@ public class Flow extends Executable {
         this.workflow = workflow;
     }
 
+    public Flow(Map<String, Serializable> preOpActionData,
+                Map<String, Serializable> postOpActionData,
+                Workflow workflow,
+                String namespace,
+                String name,
+                List<Input> inputs,
+                List<Output> outputs,
+                List<Result> results,
+                Set<String> dependencies,
+                String description) {
+        super(preOpActionData, postOpActionData, namespace, name, inputs, outputs, results, dependencies, description);
+        this.workflow = workflow;
+    }
+
     public Workflow getWorkflow() {
         return workflow;
     }
