@@ -9,6 +9,7 @@
 package io.cloudslang.lang.api;
 
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.score.events.ScoreEventListener;
 import io.cloudslang.lang.entities.CompilationArtifact;
 
@@ -24,6 +25,13 @@ import java.util.Set;
  * @version $Id$
  */
 public interface Slang {
+
+    /**
+     * Precompile a flow or operation written in CloudSlang
+     * @param source the CloudSlang source containing the flow
+     * @return {@link io.cloudslang.lang.compiler.modeller.model.Executable} created for source
+     */
+    public Executable preCompile(SlangSource source);
 
     /**
      * Compile a flow or operation written in CloudSlang
