@@ -188,7 +188,17 @@ public class ExecutableBuilder {
                 }
                 Action action = compileAction(actionRawData);
                 dependencies = new HashSet<>();
-                return new Operation(preExecutableActionData, postExecutableActionData, action, namespace, execName, inputs, outputs, results, dependencies);
+                return new Operation(
+                        preExecutableActionData,
+                        postExecutableActionData,
+                        action,
+                        namespace,
+                        execName,
+                        inputs,
+                        outputs,
+                        results,
+                        dependencies,
+                        description);
             default:
                 throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". It is not of flow or operations type");
         }
