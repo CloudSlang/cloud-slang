@@ -42,4 +42,13 @@ public class CompileDescriptionTest {
         Assert.assertEquals("Flow description not as expected", "sample flow description", flowDescription);
     }
 
+    @Test
+    public void testOperationDescription() throws Exception {
+        URI operationURI = getClass().getResource("/description/operation_description.sl").toURI();
+        Executable operation = compiler.preCompile(SlangSource.fromFile(operationURI));
+
+        String operationDescription = operation.getDescription();
+        Assert.assertEquals("Operation description not as expected", "sample operation description", operationDescription);
+    }
+
 }
