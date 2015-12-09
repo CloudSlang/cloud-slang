@@ -176,7 +176,7 @@
             <dependency>
                 <groupId>io.cloudslang.content</groupId>
                 <artifactId>score-http-client</artifactId>
-                <version>0.1.63</version>
+                <version>0.1.65</version>
             </dependency>
             <dependency>
                 <groupId>io.cloudslang.content</groupId>
