@@ -198,7 +198,7 @@ public class ExecutableBuilder {
         Object descriptionAsObject = executableRawData.get(SlangTextualKeys.EXECUTABLE_DESCRIPTION_KEY);
         String description;
         if (descriptionAsObject == null) {
-            description = "";
+            description = ScoreLangConstants.DEFAULT_DESCRIPTION;
         } else {
             if (descriptionAsObject instanceof String) {
                 description = (String) descriptionAsObject;

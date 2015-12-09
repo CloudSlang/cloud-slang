@@ -8,6 +8,7 @@
  */
 package io.cloudslang.lang.compiler.modeller.model;
 
+import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
@@ -49,7 +50,7 @@ public abstract class Executable {
                 outputs,
                 results,
                 dependencies,
-                ""
+                ScoreLangConstants.DEFAULT_DESCRIPTION
         );
     }
 
