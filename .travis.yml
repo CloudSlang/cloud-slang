@@ -11,7 +11,7 @@ deploy:
   provider: releases
   prerelease: true
   api_key:
-    secure: XUEVH4recWuA+xxjmy+AXeUSEZINSSeDe5xOALAr7rH3DvYGMV2tC4vO33zmOfyevnn2FxiDJLQqewlc/x9cComjCsuBXys8eMXaoEaFB6UIayBx0iilNQ56ItYnbAXz580/oDvJEVPAzXyGuOLhkW7qvwbVq0fXNauAMRUKrYY=
+    secure: "KXrrd1OE/MTeBdc/wdlB2Ln4dNHWxUEBWQFSYt8jpKcvdp6voUlWj5B3TLGQRx6VWczc4dPIMohXV+WzozNN+WgdCeBbdZmZ2ak/03hwYKdgnUrgrDrMc3l3YUoENFOAtq8lEMR8SlDyVFKo05713qcL/LosBxFISirJ366TGS74TALNHk1dRclOZZzF87xeb8RWfBb0JkvaMgR4fa/svhaU3hVkkJS2IMbykP0HehO3n5FN/z8nneMc0TkDd+dqqGEn1uprNO8Vwe3xuiJ5XPTgeoGa0/vL/iTlYP7M+kgsEhQBnHO5aNsYtJzRIfnMdH4XjlhOZTOjrWs5kmM4CMbLTHnMNGs9asFSAazu6zgPKkbE30FpkLZkkqn0y4j9vKD+8l8OLCcxT3pVoteLiXPJjlnFr4QWqzNn7YO169EJFIrJ3n+3+ji0gvK+orVyDSQzVCE8duliw6hcdtHF9TLOeuYwxqo39Csp1dhWOVWvMkn/zycuVeKJWGYtKzAJVSTrvBX+gXzl+2BN2O9HrjiejFdqpYTtkps27zKTypOptiniwNpxvCiCYeCXBGvFfQs3TE9Y5Bh3IiSBkZHNLpQfuq+9fQ5iFwUInvG7Zv5TDcCQkVKiLVmcEWU+EeLERLM2w87YzEe+/sM8NdVm6NWT62AFjrJU88VPtCdq3WU="
   file:
     - build/target/cloudslang-cli/cslang-cli.zip
     - build/target/cloudslang-cli/cslang-cli.tar.gz
