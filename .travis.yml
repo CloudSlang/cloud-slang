@@ -18,7 +18,7 @@ deploy:
     - build/target/cslang-builder/cslang-builder.zip
   skip_cleanup: true
   on:
-    repo: CloudSlang/cloud-slang
+    repo: Bonczidai/cloud-slang
     tags: true
     branch: master
     jdk: openjdk7
