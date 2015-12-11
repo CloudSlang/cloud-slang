@@ -35,20 +35,17 @@ FILESIZE=`stat -c '%s' "$CLI_GZIP_PATH"`
 curl -X POST -s -H "Authorization:token ${GHUSERTOKEN}" -H "Content-Type:application/gzip" --data-binary "@${CLI_GZIP_PATH}" "${UPLOAD_URL}?name=cslang-cli-with-content.tar.gzip&size=$FILESIZE"
 
 # Processing pre-release
+PRE_RELEASE_VALUE='false'
+PRE_RELEASE_MESSAGE="\n\nMarking as release"
 for VALUE in 'true' 'True' 'TRUE' 'yes'
 do
   if [ "${PRE_RELEASE}" = "${VALUE}" ]
   then
-    PRE_RELEASE='true'
+    PRE_RELEASE_VALUE='true'
+    PRE_RELEASE_MESSAGE="\n\nMarking as pre-release"
     continue
   fi
 done
-if [ "${PRE_RELEASE}" = "true" ]
-then
-  echo -e "\n\nMarking as pre-release"
-else
-  PRE_RELEASE='false'
-  echo -e "\n\nMarking as release"
-fi
-REQUEST_BODY='{"prerelease": '${PRE_RELEASE}'}'
+echo -e ${PRE_RELEASE_MESSAGE}
+REQUEST_BODY='{"prerelease": '${PRE_RELEASE_VALUE}'}'
 curl -XPATCH -H "Authorization:token ${GHUSERTOKEN}" -d "${REQUEST_BODY}" "${RELEASES_URL}/${RELEASEID}"
