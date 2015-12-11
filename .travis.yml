@@ -11,7 +11,7 @@ deploy:
   provider: releases
   prerelease: true
   api_key:
-    secure: XUEVH4recWuA+xxjmy+AXeUSEZINSSeDe5xOALAr7rH3DvYGMV2tC4vO33zmOfyevnn2FxiDJLQqewlc/x9cComjCsuBXys8eMXaoEaFB6UIayBx0iilNQ56ItYnbAXz580/oDvJEVPAzXyGuOLhkW7qvwbVq0fXNauAMRUKrYY=
+    secure: "yJHXG2Cn0v4mofCEF58eAnmOM3CzewEa42YPormioOYq0iQHNoF7NdNN7xpItIVoxmp383WsYGDeYeCzFhd4K+4xVQt1n3/jG1E3AJbSGJ7IEWUygUNec7HWS+q+yR911rMIPo8MiIZMjZFxCd4f8zaTqO0WQUui1v+QWHF9rAo="
   file:
     - build/target/cloudslang-cli/cslang-cli.zip
     - build/target/cloudslang-cli/cslang-cli.tar.gz
@@ -20,7 +20,6 @@ deploy:
   on:
     repo: CloudSlang/cloud-slang
     tags: true
-    branch: master
     jdk: openjdk7
 
 after_success:
