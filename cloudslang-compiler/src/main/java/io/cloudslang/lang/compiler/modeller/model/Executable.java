@@ -8,6 +8,7 @@
  */
 package io.cloudslang.lang.compiler.modeller.model;
 
+import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
@@ -30,6 +31,7 @@ public abstract class Executable {
     protected final List<Output> outputs;
     protected final List<Result> results;
     protected final Set<String> dependencies;
+    protected final String description;
 
     protected Executable(Map<String, Serializable> preExecActionData,
                          Map<String, Serializable> postExecActionData,
@@ -39,6 +41,28 @@ public abstract class Executable {
                          List<Output> outputs,
                          List<Result> results,
                          Set<String> dependencies) {
+        this(
+                preExecActionData,
+                postExecActionData,
+                namespace,
+                name,
+                inputs,
+                outputs,
+                results,
+                dependencies,
+                ScoreLangConstants.DEFAULT_DESCRIPTION
+        );
+    }
+
+    protected Executable(Map<String, Serializable> preExecActionData,
+                         Map<String, Serializable> postExecActionData,
+                         String namespace,
+                         String name,
+                         List<Input> inputs,
+                         List<Output> outputs,
+                         List<Result> results,
+                         Set<String> dependencies,
+                         String description) {
         this.preExecActionData = preExecActionData;
         this.postExecActionData = postExecActionData;
         this.namespace = namespace;
@@ -47,6 +71,7 @@ public abstract class Executable {
         this.outputs = outputs;
         this.results = results;
         this.dependencies = dependencies;
+        this.description = description;
     }
 
     public Map<String, Serializable> getPreExecActionData() {
@@ -86,5 +111,9 @@ public abstract class Executable {
     }
 
     public abstract String getType();
+
+    public String getDescription() {
+        return description;
+    }
 
 }

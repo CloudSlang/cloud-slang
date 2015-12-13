@@ -8,6 +8,7 @@
  */
 package io.cloudslang.lang.cli;
 
+import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
@@ -117,6 +118,18 @@ public class SlangCLI implements CommandMarker {
             }
         }
         return inputsResult;
+    }
+
+    @CliCommand(value = "inspect", help = "Display metadata about an executable")
+    public String inspectExecutable(
+            @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. /path/to/file.sl") final File executableFile
+    ) throws IOException {
+        Executable executable = compilerHelper.preCompile(executableFile.getAbsolutePath());
+        String result = "Inspection for: " + executableFile.getAbsolutePath();
+        result += "\n\tNameSpace: " + executable.getNamespace();
+        result +="\n\tName: " + executable.getName();
+        result += "\n\tDescription: " + executable.getDescription();
+        return result;
     }
 
     @CliCommand(value = "cslang --version", help = "Prints the CloudSlang version used")

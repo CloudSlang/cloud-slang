@@ -13,6 +13,7 @@ import ch.lambdaj.function.convert.Converter;
 
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -60,15 +61,16 @@ public class CompilerHelperImpl implements CompilerHelper{
     private Yaml yaml;
 
     @Override
+    public Executable preCompile(String filePath) throws IOException {
+        File file = getFileFromPath(filePath);
+        return slang.preCompile(SlangSource.fromFile(file));
+    }
+
+    @Override
 	public CompilationArtifact compile(String filePath, List<String> dependencies) throws IOException {
-        Validate.notNull(filePath, "File path can not be null");
+        File file = getFileFromPath(filePath);
+
         Set<SlangSource> depsSources = new HashSet<>();
-        File file = new File(filePath);
-        Validate.isTrue(file.isFile(), "File: " + file.getName() + " was not found");
-
-        boolean validFileExtension = checkIsFileSupported(file);
-        Validate.isTrue(validFileExtension, "File: " + file.getName() + " must have one of the following extensions: sl, sl.yaml, sl.yml");
-
         if (CollectionUtils.isEmpty(dependencies)) {
             dependencies = new ArrayList<>();
             //app.home is the basedir property we set in our executables
@@ -100,7 +102,7 @@ public class CompilerHelperImpl implements CompilerHelper{
         }
     }
 
-	@Override
+    @Override
 	public Map<String, ? extends Serializable> loadSystemProperties(List<String> systemPropertyFiles) {
 		return loadFiles(systemPropertyFiles, YAML_FILE_EXTENSIONS, SP_DIR);
 	}
@@ -146,12 +148,22 @@ public class CompilerHelperImpl implements CompilerHelper{
 		}
         return result;
     }
+
     private Boolean checkIsFileSupported(File file){
         String[] suffixes = new String[SLANG_FILE_EXTENSIONS.length];
         for(int i = 0; i < suffixes.length; ++i){
             suffixes[i] = "." + SLANG_FILE_EXTENSIONS[i];
         }
         return new SuffixFileFilter(suffixes).accept(file);
+    }
+
+    private File getFileFromPath(String filePath) {
+        Validate.notNull(filePath, "File path can not be null");
+        File file = new File(filePath);
+        Validate.isTrue(file.isFile(), "File: " + file.getName() + " was not found");
+        boolean validFileExtension = checkIsFileSupported(file);
+        Validate.isTrue(validFileExtension, "File: " + file.getName() + " must have one of the following extensions: sl, sl.yaml, sl.yml");
+        return file;
     }
 
 }

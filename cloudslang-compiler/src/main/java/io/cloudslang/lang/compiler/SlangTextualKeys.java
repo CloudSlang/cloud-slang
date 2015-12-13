@@ -24,6 +24,7 @@ public interface SlangTextualKeys {
 
     //flow
     String EXECUTABLE_NAME_KEY = "name";
+    String EXECUTABLE_DESCRIPTION_KEY = "description";
     String WORKFLOW_KEY = "workflow";
     String ON_FAILURE_KEY = "on_failure";
 

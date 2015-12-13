@@ -38,6 +38,20 @@ public class Operation extends Executable {
         this.action = action;
     }
 
+    public Operation(Map<String, Serializable> preOpActionData,
+                     Map<String, Serializable> postOpActionData,
+                     Action action,
+                     String namespace,
+                     String name,
+                     List<Input> inputs,
+                     List<Output> outputs,
+                     List<Result> results,
+                     Set<String> dependencies,
+                     String description) {
+        super(preOpActionData, postOpActionData, namespace, name, inputs, outputs, results, dependencies, description);
+        this.action = action;
+    }
+
     public Action getAction() {
         return action;
     }

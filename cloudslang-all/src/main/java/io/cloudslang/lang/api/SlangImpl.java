@@ -8,6 +8,7 @@
  */
 package io.cloudslang.lang.api;
 
+import io.cloudslang.lang.compiler.modeller.model.Executable;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import io.cloudslang.lang.compiler.SlangCompiler;
@@ -47,6 +48,17 @@ public class SlangImpl implements Slang {
     private Score score;
     @Autowired
     private EventBus eventBus;
+
+    @Override
+    public Executable preCompile(SlangSource source) {
+        Validate.notNull(source, "Source can not be null");
+        try {
+            return compiler.preCompile(source);
+        } catch (Exception e) {
+            logger.error("Precompile phase failed for source : " + source.getName() + " ,Exception is : " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencies) {
