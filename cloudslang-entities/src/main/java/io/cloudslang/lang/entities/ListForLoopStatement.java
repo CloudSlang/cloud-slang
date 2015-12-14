@@ -10,8 +10,6 @@
 package io.cloudslang.lang.entities;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
 
@@ -43,29 +41,6 @@ public class ListForLoopStatement extends LoopStatement implements Serializable 
 
     public String getVarName() {
         return varName;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-
-        ListForLoopStatement that = (ListForLoopStatement) o;
-
-        return new EqualsBuilder()
-                .append(varName, that.varName)
-                .append(getExpression(), that.getExpression())
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(varName)
-                .append(getExpression())
-                .toHashCode();
     }
 
 }

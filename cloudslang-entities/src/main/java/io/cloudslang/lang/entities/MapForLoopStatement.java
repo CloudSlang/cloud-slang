@@ -10,8 +10,6 @@
 package io.cloudslang.lang.entities;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
 
@@ -51,31 +49,6 @@ public class MapForLoopStatement extends LoopStatement implements Serializable{
 
     public String getValueName() {
         return valueName;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-
-        MapForLoopStatement that = (MapForLoopStatement) o;
-
-        return new EqualsBuilder()
-                .append(keyName, that.keyName)
-                .append(valueName, that.valueName)
-                .append(getExpression(), that.getExpression())
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(keyName)
-                .append(valueName)
-                .append(getExpression())
-                .toHashCode();
     }
 
 }
