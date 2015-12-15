@@ -31,6 +31,7 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("input_no_expression", "input_no_expression_value");
         userInputs.put("input_not_overridable", "i_should_not_be_assigned");
+        userInputs.put("enable_option_for_action", "enable_option_for_action_value");
         Map<String, Serializable> systemProperties = new HashMap<>();
         systemProperties.put("user.sys.props.host", "localhost");
 
@@ -39,6 +40,10 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
 
     protected void verifyExecutableInputs(StepData flowData) {
         Map<String, Serializable> expectedInputs = new HashMap<>();
+
+        // snake-case to camel-case
+        expectedInputs.put("enable_option_for_action", "enable_option_for_action_value");
+        expectedInputs.put("enableOptionForAction", "enable_option_for_action_value");
 
         // properties
         expectedInputs.put("input_no_expression", "input_no_expression_value");
