@@ -15,7 +15,6 @@ package io.cloudslang.lang.systemtests;
 import ch.lambdaj.group.Group;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -51,7 +50,7 @@ public class RunDataAggregatorListener extends AbstractAggregatorListener {
         LanguageEventData inputsEvent;
         LanguageEventData outputsEvent;
 
-        boolean taskStep = CollectionUtils.isNotEmpty(taskEvents);
+        boolean taskStep = !((taskEvents == null) || taskEvents.isEmpty());
         if (taskStep) {
             inputsEvent = selectByEventType(taskEvents, ScoreLangConstants.EVENT_ARGUMENT_END);
             outputsEvent = selectByEventType(taskEvents, ScoreLangConstants.EVENT_OUTPUT_END);

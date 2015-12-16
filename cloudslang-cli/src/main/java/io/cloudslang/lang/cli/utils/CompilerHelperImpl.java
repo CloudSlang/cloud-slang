@@ -14,8 +14,6 @@ import ch.lambdaj.function.convert.Converter;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang.Validate;
@@ -69,7 +67,7 @@ public class CompilerHelperImpl implements CompilerHelper{
         boolean validFileExtension = checkIsFileSupported(file);
         Validate.isTrue(validFileExtension, "File: " + file.getName() + " must have one of the following extensions: sl, sl.yaml, sl.yml");
 
-        if (CollectionUtils.isEmpty(dependencies)) {
+        if ((dependencies == null) || dependencies.isEmpty()) {
             dependencies = new ArrayList<>();
             //app.home is the basedir property we set in our executables
             String appHome = System.getProperty("app.home", "");
@@ -111,7 +109,7 @@ public class CompilerHelperImpl implements CompilerHelper{
     }
 
     private Map<String, ? extends Serializable> loadFiles(List<String> files, String[] extensions, String directory) {
-        if(CollectionUtils.isEmpty(files)) {
+        if((files == null) || files.isEmpty()) {
             Collection<File> implicitFiles = FileUtils.listFiles(new File("."), extensions, false);
             implicitFiles = select(implicitFiles, having(on(File.class).getPath(), containsString(directory)));
             files = convert(implicitFiles, new Converter<File, String>() {
@@ -121,7 +119,7 @@ public class CompilerHelperImpl implements CompilerHelper{
                 }
             });
         }
-        if(CollectionUtils.isEmpty(files)) return null;
+        if((files == null) || files.isEmpty()) return null;
         Map<String, Serializable> result = new HashMap<>();
 		for(String inputFile : files) {
 			logger.info("Loading file: " + inputFile);
@@ -131,7 +129,7 @@ public class CompilerHelperImpl implements CompilerHelper{
                 if (StringUtils.isNotEmpty(inputsFileContent)) {
                     @SuppressWarnings("unchecked") Map<String, ? extends Serializable> inputFileYamlContent =
                             (Map<String, ? extends Serializable>) yaml.load(inputsFileContent);
-                    if (MapUtils.isNotEmpty(inputFileYamlContent)) {
+                    if (!((inputFileYamlContent == null) || inputFileYamlContent.isEmpty())) {
                         emptyContent = false;
                         result.putAll(inputFileYamlContent);
                     }

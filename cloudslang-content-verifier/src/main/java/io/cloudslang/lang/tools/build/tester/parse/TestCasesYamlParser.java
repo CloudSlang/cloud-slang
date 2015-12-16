@@ -17,7 +17,6 @@ package io.cloudslang.lang.tools.build.tester.parse;
 import ch.lambdaj.function.convert.Converter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cloudslang.lang.compiler.SlangSource;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -54,7 +53,7 @@ public class TestCasesYamlParser {
 
         try {
             @SuppressWarnings("unchecked") Map<String, Map> parsedTestCases = yaml.loadAs(source.getSource(), Map.class);
-            if (MapUtils.isEmpty(parsedTestCases)){
+            if ((parsedTestCases == null) || parsedTestCases.isEmpty()){
                 log.info("No tests cases were found in: " + source.getName());
                 return new HashMap<>();
             }

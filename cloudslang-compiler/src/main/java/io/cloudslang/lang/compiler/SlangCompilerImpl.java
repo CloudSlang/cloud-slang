@@ -11,7 +11,6 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.modeller.SlangModeller;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.parser.YamlParser;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
@@ -44,7 +43,7 @@ public class SlangCompilerImpl implements SlangCompiler {
 
         //we transform also all of the files in the given path to model objects
         Set<Executable> pathExecutables = new HashSet<>();
-        if(CollectionUtils.isNotEmpty(path)) {
+        if(!((path == null) || path.isEmpty())) {
             for (SlangSource pathSource : path) {
                 pathExecutables.add(preCompile(pathSource));
             }

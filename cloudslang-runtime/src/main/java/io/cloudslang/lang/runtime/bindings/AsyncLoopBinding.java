@@ -11,7 +11,6 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.AsyncLoopStatement;
 import io.cloudslang.lang.runtime.env.Context;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -49,7 +48,7 @@ public class AsyncLoopBinding {
         } catch (Throwable t) {
             throw new RuntimeException(generateAsyncLoopExpressionMessage(nodeName, t.getMessage()), t);
         }
-        if (CollectionUtils.isEmpty(evalResult)) {
+        if ((evalResult == null) || evalResult.isEmpty()) {
             throw new RuntimeException(generateAsyncLoopExpressionMessage(nodeName, "expression is empty"));
         }
         return evalResult;

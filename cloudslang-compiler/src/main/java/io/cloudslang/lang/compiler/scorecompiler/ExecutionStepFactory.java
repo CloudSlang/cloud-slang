@@ -19,7 +19,6 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import org.apache.commons.lang3.StringUtils;
 import io.cloudslang.lang.entities.ResultNavigation;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.Validate;
 import io.cloudslang.score.api.ControlActionMetadata;
 import io.cloudslang.score.api.ExecutionStep;
@@ -92,7 +91,7 @@ public class ExecutionStepFactory {
 
         @SuppressWarnings("unchecked") Map<String, String> javaActionData = (Map<String, String>) actionRawData.get(SlangTextualKeys.JAVA_ACTION);
         @SuppressWarnings("unchecked") String pythonScript = (String) actionRawData.get(ScoreLangConstants.PYTHON_SCRIPT_KEY);
-        boolean javaActionFound = MapUtils.isNotEmpty(javaActionData);
+        boolean javaActionFound = !(javaActionData == null || javaActionData.isEmpty());
         boolean pythonScriptFound = StringUtils.isNotEmpty(pythonScript);
 
         if (javaActionFound) {

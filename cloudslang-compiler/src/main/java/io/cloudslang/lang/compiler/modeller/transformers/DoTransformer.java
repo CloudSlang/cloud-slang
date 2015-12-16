@@ -15,7 +15,6 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  */
 
 import io.cloudslang.lang.entities.bindings.Argument;
-import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -27,7 +26,7 @@ public class DoTransformer implements Transformer<Map<String, Object>, List<Argu
     @Override
     public List<Argument> transform(Map<String, Object> rawData) {
         List<Argument> result = new ArrayList<>();
-        if (MapUtils.isEmpty(rawData)) {
+        if ((rawData == null) || rawData.isEmpty()) {
             return result;
         } else if (rawData.size() > 1) {
             throw new RuntimeException("Task has to many keys under the 'do' keyword,\n" +

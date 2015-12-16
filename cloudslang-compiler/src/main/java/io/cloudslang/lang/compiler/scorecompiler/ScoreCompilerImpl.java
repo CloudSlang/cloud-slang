@@ -14,7 +14,6 @@ import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Task;
 import io.cloudslang.lang.entities.bindings.Result;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
 import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
 import io.cloudslang.lang.entities.CompilationArtifact;
@@ -53,7 +52,8 @@ public class ScoreCompilerImpl implements ScoreCompiler{
 
         Map<String, Executable> filteredDependencies = new HashMap<>();
         //we handle dependencies only if the file has imports
-        boolean hasDependencies = CollectionUtils.isNotEmpty(executable.getDependencies())
+        Set<String> executableDependencies = executable.getDependencies();
+        boolean hasDependencies = !((executableDependencies == null) || executableDependencies.isEmpty())
                 && executable.getType().equals(SlangTextualKeys.FLOW_TYPE);
         if (hasDependencies) {
             Validate.notEmpty(path, "Source " + executable.getName() + " has dependencies but no path was given to the compiler");
