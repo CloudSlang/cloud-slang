@@ -64,7 +64,7 @@ public class SlangCLI implements CommandMarker {
 
     @CliCommand(value = "run", help = "triggers a CloudSlang flow")
     public String run(
-            @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. cslang run --f C:\\CloudSlang\\flow.yaml") final File file,
+            @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. cslang>run --f c:/.../your_flow.sl") final File file,
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath, a directory comma separated list to flow dependencies, by default it will take flow file dir. " +
                     "e.g. cslang>run --f c:/.../your_flow.sl --i input1=root,input2=25 --cp c:/.../yaml") final List<String> classPath,
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list. " +
