@@ -20,6 +20,7 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
        xmlns:score="http://www.cloudslang.io/schema/score"
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
@@ -30,6 +31,17 @@
                         http://www.springframework.org/schema/context/spring-context.xsd">
 
     <bean class="io.cloudslang.lang.api.configuration.SlangSpringConfiguration"/>
+
+    <!--<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">-->
+        <!--<property name="url" value="jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1;MVCC=TRUE;LOCK_TIMEOUT=5000"/>-->
+        <!--<property name="driverClassName" value="org.h2.Driver"/>-->
+        <!--<property name="username" value="sa"/>-->
+        <!--<property name="password" value="sa"/>-->
+    <!--</bean>-->
+
+    <!--<bean id="liquibase" class="io.cloudslang.lang.cli.configuration.liquibase.AsyncSpringLiquibase"-->
+          <!--p:dataSource-ref="dataSource"-->
+          <!--p:changeLog="classpath:changelog/cli.score.changes.xml"/>-->
 
     <context:property-placeholder location="application.properties"/>
 
