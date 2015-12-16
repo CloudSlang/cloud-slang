@@ -8,10 +8,10 @@
  */
 package io.cloudslang.lang.entities;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.score.api.ExecutionPlan;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Collection;
@@ -53,17 +53,37 @@ public class CompilationArtifact {
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        return new ToStringBuilder(this)
+                .append("executionPlan", executionPlan)
+                .append("dependencies", dependencies)
+                .append("inputs", inputs)
+                .append("systemProperties", systemProperties)
+                .toString();
     }
 
     @Override
     public boolean equals(Object o) {
-        return EqualsBuilder.reflectionEquals(this, o);
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CompilationArtifact that = (CompilationArtifact) o;
+
+        return new EqualsBuilder()
+                .append(executionPlan, that.executionPlan)
+                .append(dependencies, that.dependencies)
+                .append(inputs, that.inputs)
+                .append(systemProperties, that.systemProperties)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this);
+        return new HashCodeBuilder(17, 37)
+                .append(executionPlan)
+                .append(dependencies)
+                .append(inputs)
+                .append(systemProperties)
+                .toHashCode();
     }
-
 }

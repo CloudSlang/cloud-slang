@@ -8,6 +8,10 @@
  */
 package io.cloudslang.lang.entities.bindings;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import java.io.Serializable;
 
 /**
@@ -56,6 +60,45 @@ public class Input extends InOutParam {
 
 	public String getSystemPropertyName() {
 		return this.systemPropertyName;
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this)
+				.appendSuper(super.toString())
+				.append("encrypted", encrypted)
+				.append("required", required)
+				.append("overridable", overridable)
+				.append("systemPropertyName", systemPropertyName)
+				.toString();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Input input = (Input) o;
+
+		return new EqualsBuilder()
+				.appendSuper(super.equals(o))
+				.append(encrypted, input.encrypted)
+				.append(required, input.required)
+				.append(overridable, input.overridable)
+				.append(systemPropertyName, input.systemPropertyName)
+				.isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(17, 37)
+				.appendSuper(super.hashCode())
+				.append(encrypted)
+				.append(required)
+				.append(overridable)
+				.append(systemPropertyName)
+				.toHashCode();
 	}
 
 }

@@ -45,17 +45,32 @@ public class ResultNavigation implements Serializable {
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        return new ToStringBuilder(this)
+                .append("nextStepId", nextStepId)
+                .append("presetResult", presetResult)
+                .toString();
     }
 
     @Override
     public boolean equals(Object o) {
-        return EqualsBuilder.reflectionEquals(this, o);
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ResultNavigation that = (ResultNavigation) o;
+
+        return new EqualsBuilder()
+                .append(nextStepId, that.nextStepId)
+                .append(presetResult, that.presetResult)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this);
+        return new HashCodeBuilder(17, 37)
+                .append(nextStepId)
+                .append(presetResult)
+                .toHashCode();
     }
 
 }
