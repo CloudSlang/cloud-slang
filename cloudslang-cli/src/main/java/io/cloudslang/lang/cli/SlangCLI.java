@@ -51,15 +51,15 @@ public class SlangCLI implements CommandMarker {
     public static final String RUN_HELP = "triggers a CloudSlang flow";
     public static final String FILE_HELP = "Path to filename. e.g. cslang>run --f c:/.../your_flow.sl";
     public static final String CLASSPATH_HELP = "Classpath, a directory comma separated list to flow dependencies, by default it will take flow file dir. " +
-            "e.g. cslang>run --f c:/.../your_flow.sl --i input1=root,input2=25 --cp c:/.../yaml";
+                                                "e.g. cslang>run --f c:/.../your_flow.sl --i input1=root,input2=25 --cp c:/.../yaml";
     public static final String INPUTS_HELP = "inputs in a key=value comma separated list. " +
-            "e.g. cslang>run --f c:/.../your_flow.sl --i input1=root,input2=25";
+                                             "e.g. cslang>run --f c:/.../your_flow.sl --i input1=root,input2=25";
     public static final String INPUT_FILE_HELP = "comma separated list of input file locations. " +
-            "e.g. cslang>run --f C:/.../your_flow.sl --if C:/.../inputs.yaml";
+                                                 "e.g. cslang>run --f C:/.../your_flow.sl --if C:/.../inputs.yaml";
     public static final String QUIET_HELP = "quiet. e.g. cslang>run --f c:/.../your_flow.sl --q";
     public static final String DEBUG_HELP = "print each task outputs. e.g. cslang>run --f c:/.../your_flow.sl --d";
     public static final String SYSTEM_PROPERTY_FILE_HELP = "comma separated list of system property file locations. " +
-            "e.g. cslang>run --f c:/.../your_flow.sl --spf c:/.../yaml";
+                                                           "e.g. cslang>run --f c:/.../your_flow.sl --spf c:/.../yaml";
     public static final String ENV_HELP = "Set environment var relevant to the CLI";
     public static final String SET_ASYNC_HELP = "set the async. e.g. cslang> env --setAsync true";
     public static final String CSLANG_VERSION_HELP = "Prints the CloudSlang version used";
