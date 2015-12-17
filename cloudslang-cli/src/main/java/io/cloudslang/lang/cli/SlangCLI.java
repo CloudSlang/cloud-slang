@@ -68,7 +68,7 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath,
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String,? extends Serializable> inputs,
             @CliOption(key = {"if", "input-file"}, mandatory = false, help = "comma separated list of input file locations") final List<String> inputFiles,
-            @CliOption(key = {"v", "verbose"}, mandatory = false, help = "0 - default, 1 - quiet, 2 - debug(print each task outputs). e.g. cslang>run --f c:/.../your_flow.sl --v 2", specifiedDefaultValue = "0", unspecifiedDefaultValue = "0") final int verbose,
+            @CliOption(key = {"v", "verbose"}, mandatory = false, help = "default, quiet, debug(print each task outputs). e.g. cslang>run --f c:/.../your_flow.sl --v quiet", specifiedDefaultValue = "debug", unspecifiedDefaultValue = "default") final String verbose,
             @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = "comma separated list of system property file locations") final List<String> systemPropertyFiles) throws IOException {
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
@@ -82,8 +82,8 @@ public class SlangCLI implements CommandMarker {
         if(MapUtils.isNotEmpty(inputs)) {
             mergedInputs.putAll(inputs);
         }
-        boolean quiet = (verbose == 1);
-        boolean debug = (verbose == 2);
+        boolean quiet = "quiet".equalsIgnoreCase(verbose);
+        boolean debug = "debug".equalsIgnoreCase(verbose);
 
         Long id;
         if (!triggerAsync) {
