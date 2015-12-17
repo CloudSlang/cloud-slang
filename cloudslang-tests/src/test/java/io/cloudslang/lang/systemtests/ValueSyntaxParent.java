@@ -28,17 +28,46 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
 
     protected Map<String, StepData> prepareAndRun(CompilationArtifact compilationArtifact) {
         // trigger
+        return triggerWithData(compilationArtifact, getUserInputs(), getSystemProperties()).getTasks();
+    }
+
+    protected Map<String, StepData> prepareAndRunDefault(CompilationArtifact compilationArtifact) {
+        Map<String, Serializable> userInputs = getUserInputs();
+        userInputs.put("enable_option_for_action", null);
+
+        return triggerWithData(compilationArtifact, userInputs, getSystemProperties()).getTasks();
+    }
+
+    private Map<String, Serializable> getSystemProperties() {
+        Map<String, Serializable> systemProperties = new HashMap<>();
+        systemProperties.put("user.sys.props.host", "localhost");
+        return systemProperties;
+    }
+
+    private Map<String, Serializable> getUserInputs() {
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("input_no_expression", "input_no_expression_value");
         userInputs.put("input_not_overridable", "i_should_not_be_assigned");
-        Map<String, Serializable> systemProperties = new HashMap<>();
-        systemProperties.put("user.sys.props.host", "localhost");
+        userInputs.put("enable_option_for_action", "enable_option_for_action_value");
+        return userInputs;
+    }
 
-        return triggerWithData(compilationArtifact, userInputs, systemProperties).getTasks();
+    protected void verifyExecutableInputsDefault(StepData flowData) {
+        Map<String, Serializable> expectedInputs = new HashMap<>();
+
+        // snake-case to camel-case
+        expectedInputs.put("enable_option_for_action", null);
+        expectedInputs.put("enableOptionForAction", "default_value");
+
+        Assert.assertTrue("Executable inputs not bound correctly", includeAllPairs(flowData.getInputs(), expectedInputs));
     }
 
     protected void verifyExecutableInputs(StepData flowData) {
         Map<String, Serializable> expectedInputs = new HashMap<>();
+
+        // snake-case to camel-case
+        expectedInputs.put("enable_option_for_action", "enable_option_for_action_value");
+        expectedInputs.put("enableOptionForAction", "enable_option_for_action_value");
 
         // properties
         expectedInputs.put("input_no_expression", "input_no_expression_value");

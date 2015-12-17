@@ -10,6 +10,13 @@ namespace: user.ops
 operation:
   name: values_op
   inputs:
+    # snake-case to camel-case
+    - enable_option_for_action:
+         required: false
+    - enableOptionForAction:
+        default: ${get("enable_option_for_action", "default_value")}
+        overridable: false
+
     # helpers
     - output_no_expression: output_no_expression_value
     - authorized_keys_path: './auth'
