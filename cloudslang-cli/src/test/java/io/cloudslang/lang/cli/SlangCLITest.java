@@ -120,6 +120,14 @@ public class SlangCLITest {
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
 
+    @Test (timeout = DEFAULT_TIMEOUT)
+    public void testRunInvalidVerboseArgumentValidFilePathSync() throws Exception {
+        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --v invalidArgument");
+
+        Assert.assertEquals("method threw exception", "Verbose argument is invalid.", cr.getException().getMessage());
+        Assert.assertEquals("success should be true", false, cr.isSuccess());
+    }
+
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunValidFilePathSync() throws Exception {
         long executionID = 1;
