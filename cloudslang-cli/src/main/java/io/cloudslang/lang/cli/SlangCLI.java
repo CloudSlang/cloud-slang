@@ -42,11 +42,14 @@ import java.util.*;
 @Component
 public class SlangCLI implements CommandMarker {
 
+    private final static Logger logger = Logger.getLogger(SlangCLI.class);
     public static final String TRIGGERED_FLOW_MSG = "Triggered flow : ";
     public static final String WITH_EXECUTION_ID_MSG = "Execution id: ";
     public static final String FLOW_EXECUTION_TIME_TOOK = ", duration: ";
     private static final String CURRENTLY = "You are CURRENTLY running CloudSlang version: ";
-    private final static Logger logger = Logger.getLogger(SlangCLI.class);
+    public static final String QUIET = "quiet";
+    public static final String DEBUG = "debug";
+    public static final String DEFAULT = "default";
 
     @Autowired
     private ScoreServices scoreServices;
@@ -68,9 +71,10 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath,
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String,? extends Serializable> inputs,
             @CliOption(key = {"if", "input-file"}, mandatory = false, help = "comma separated list of input file locations") final List<String> inputFiles,
-            @CliOption(key = {"q", "quiet"}, mandatory = false, help = "quiet", specifiedDefaultValue = "true",unspecifiedDefaultValue = "false") final Boolean quiet,
-            @CliOption(key = {"d", "debug"}, mandatory = false, help = "print each task outputs", specifiedDefaultValue = "true",unspecifiedDefaultValue = "false") final Boolean debug,
+            @CliOption(key = {"v", "verbose"}, mandatory = false, help = "default, quiet, debug(print each task outputs). e.g. cslang>run --f c:/.../your_flow.sl --v quiet", specifiedDefaultValue = "debug", unspecifiedDefaultValue = "default") final String verbose,
             @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = "comma separated list of system property file locations") final List<String> systemPropertyFiles) throws IOException {
+
+        if (invalidVerboseInput(verbose)) throw new IllegalArgumentException("Verbose argument is invalid.");
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
         Map<String, ? extends Serializable> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
@@ -83,6 +87,8 @@ public class SlangCLI implements CommandMarker {
         if(MapUtils.isNotEmpty(inputs)) {
             mergedInputs.putAll(inputs);
         }
+        boolean quiet = QUIET.equalsIgnoreCase(verbose);
+        boolean debug = DEBUG.equalsIgnoreCase(verbose);
 
         Long id;
         if (!triggerAsync) {
@@ -94,6 +100,11 @@ public class SlangCLI implements CommandMarker {
         }
         id = scoreServices.trigger(compilationArtifact, mergedInputs, systemProperties);
         return quiet ? StringUtils.EMPTY : triggerAsyncMsg(id, compilationArtifact.getExecutionPlan().getName());
+    }
+
+    private boolean invalidVerboseInput(String verbose) {
+        String[] validArguments = {DEFAULT, QUIET, DEBUG};
+        return !Arrays.asList(validArguments).contains(verbose.toLowerCase());
     }
 
     @CliCommand(value = "env", help = "Set environment var relevant to the CLI")
