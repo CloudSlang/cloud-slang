@@ -64,6 +64,9 @@ public class SlangCLI implements CommandMarker {
     public static final String SET_ASYNC_HELP = "set the async. e.g. cslang> env --setAsync true";
     public static final String CSLANG_VERSION_HELP = "Prints the CloudSlang version used";
     public static final String INPUTS_COMMAND_HELP = "Get flow inputs";
+    public static final String QUIET = "quiet";
+    public static final String DEBUG = "debug";
+    public static final String DEFAULT = "default";
 
     @Autowired
     private ScoreServices scoreServices;
@@ -85,9 +88,10 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP) final List<String> classPath,
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = INPUTS_HELP) final Map<String,? extends Serializable> inputs,
             @CliOption(key = {"if", "input-file"}, mandatory = false, help = INPUT_FILE_HELP) final List<String> inputFiles,
-            @CliOption(key = {"", "q", "quiet"}, mandatory = false, help = QUIET_HELP, specifiedDefaultValue = "true",unspecifiedDefaultValue = "false") final Boolean quiet,
-            @CliOption(key = {"", "d", "debug"}, mandatory = false, help = DEBUG_HELP, specifiedDefaultValue = "true",unspecifiedDefaultValue = "false") final Boolean debug,
+            @CliOption(key = {"v", "verbose"}, mandatory = false, help = "default, quiet, debug(print each task outputs). e.g. cslang>run --f c:/.../your_flow.sl --v quiet", specifiedDefaultValue = "debug", unspecifiedDefaultValue = "default") final String verbose,
             @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = SYSTEM_PROPERTY_FILE_HELP) final List<String> systemPropertyFiles) throws IOException {
+
+        if (invalidVerboseInput(verbose)) throw new IllegalArgumentException("Verbose argument is invalid.");
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
         Map<String, ? extends Serializable> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
@@ -100,6 +104,8 @@ public class SlangCLI implements CommandMarker {
         if(MapUtils.isNotEmpty(inputs)) {
             mergedInputs.putAll(inputs);
         }
+        boolean quiet = QUIET.equalsIgnoreCase(verbose);
+        boolean debug = DEBUG.equalsIgnoreCase(verbose);
 
         Long id;
         if (!triggerAsync) {
@@ -111,6 +117,11 @@ public class SlangCLI implements CommandMarker {
         }
         id = scoreServices.trigger(compilationArtifact, mergedInputs, systemProperties);
         return quiet ? StringUtils.EMPTY : triggerAsyncMsg(id, compilationArtifact.getExecutionPlan().getName());
+    }
+
+    private boolean invalidVerboseInput(String verbose) {
+        String[] validArguments = {DEFAULT, QUIET, DEBUG};
+        return !Arrays.asList(validArguments).contains(verbose.toLowerCase());
     }
 
     @CliCommand(value = "env", help = ENV_HELP)
