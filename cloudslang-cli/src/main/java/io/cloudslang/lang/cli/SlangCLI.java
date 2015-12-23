@@ -49,19 +49,17 @@ public class SlangCLI implements CommandMarker {
     public static final String FLOW_EXECUTION_TIME_TOOK = ", duration: ";
     private static final String CURRENTLY = "You are CURRENTLY running CloudSlang version: ";
     public static final String RUN_HELP = "triggers a CloudSlang flow";
-    public static final String FILE_HELP = "Path to filename. e.g. cslang>run --f c:/.../your_flow.sl";
+    public static final String FILE_HELP = "Path to filename. e.g. run --f c:/.../your_flow.sl";
     public static final String CLASSPATH_HELP = "Classpath, a directory comma separated list to flow dependencies, by default it will take flow file dir. " +
-                                                "e.g. cslang>run --f c:/.../your_flow.sl --i input1=root,input2=25 --cp c:/.../yaml";
+                                                "e.g. run --f c:/.../your_flow.sl --i input1=root,input2=25 --cp c:/.../yaml";
     public static final String INPUTS_HELP = "inputs in a key=value comma separated list. " +
-                                             "e.g. cslang>run --f c:/.../your_flow.sl --i input1=root,input2=25";
+                                             "e.g. run --f c:/.../your_flow.sl --i input1=root,input2=25";
     public static final String INPUT_FILE_HELP = "comma separated list of input file locations. " +
-                                                 "e.g. cslang>run --f C:/.../your_flow.sl --if C:/.../inputs.yaml";
-    public static final String QUIET_HELP = "quiet. e.g. cslang>run --f c:/.../your_flow.sl --q";
-    public static final String DEBUG_HELP = "print each task outputs. e.g. cslang>run --f c:/.../your_flow.sl --d";
+                                                 "e.g. run --f C:/.../your_flow.sl --if C:/.../inputs.yaml";
     public static final String SYSTEM_PROPERTY_FILE_HELP = "comma separated list of system property file locations. " +
-                                                           "e.g. cslang>run --f c:/.../your_flow.sl --spf c:/.../yaml";
+                                                           "e.g. run --f c:/.../your_flow.sl --spf c:/.../yaml";
     public static final String ENV_HELP = "Set environment var relevant to the CLI";
-    public static final String SET_ASYNC_HELP = "set the async. e.g. cslang> env --setAsync true";
+    public static final String SET_ASYNC_HELP = "set the async. e.g. env --setAsync true";
     public static final String CSLANG_VERSION_HELP = "Prints the CloudSlang version used";
     public static final String INPUTS_COMMAND_HELP = "Get flow inputs";
     public static final String QUIET = "quiet";
@@ -88,7 +86,7 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP) final List<String> classPath,
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = INPUTS_HELP) final Map<String,? extends Serializable> inputs,
             @CliOption(key = {"if", "input-file"}, mandatory = false, help = INPUT_FILE_HELP) final List<String> inputFiles,
-            @CliOption(key = {"v", "verbose"}, mandatory = false, help = "default, quiet, debug(print each task outputs). e.g. cslang>run --f c:/.../your_flow.sl --v quiet", specifiedDefaultValue = "debug", unspecifiedDefaultValue = "default") final String verbose,
+            @CliOption(key = {"v", "verbose"}, mandatory = false, help = "default, quiet, debug(print each task outputs). e.g. run --f c:/.../your_flow.sl --v quiet", specifiedDefaultValue = "debug", unspecifiedDefaultValue = "default") final String verbose,
             @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = SYSTEM_PROPERTY_FILE_HELP) final List<String> systemPropertyFiles) throws IOException {
 
         if (invalidVerboseInput(verbose)) throw new IllegalArgumentException("Verbose argument is invalid.");
