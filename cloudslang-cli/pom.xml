@@ -131,7 +131,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>org.springframework.shell.Bootstrap</mainClass>
+							<mainClass>io.cloudslang.lang.cli.SlangBootstrap</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -155,7 +155,7 @@
 					<useWildcardClassPath>true</useWildcardClassPath>
 					<programs>
 						<program>
-							<mainClass>org.springframework.shell.Bootstrap</mainClass>
+							<mainClass>io.cloudslang.lang.cli.SlangBootstrap</mainClass>
 							<id>cslang</id>
 						</program>
 					</programs>
