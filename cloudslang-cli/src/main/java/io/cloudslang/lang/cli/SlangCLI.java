@@ -43,10 +43,25 @@ import java.util.*;
 public class SlangCLI implements CommandMarker {
 
     private final static Logger logger = Logger.getLogger(SlangCLI.class);
+
     public static final String TRIGGERED_FLOW_MSG = "Triggered flow : ";
     public static final String WITH_EXECUTION_ID_MSG = "Execution id: ";
     public static final String FLOW_EXECUTION_TIME_TOOK = ", duration: ";
     private static final String CURRENTLY = "You are CURRENTLY running CloudSlang version: ";
+    public static final String RUN_HELP = "triggers a CloudSlang flow";
+    public static final String FILE_HELP = "Path to filename. e.g. run --f c:/.../your_flow.sl";
+    public static final String CLASSPATH_HELP = "Classpath, a directory comma separated list to flow dependencies, by default it will take flow file dir. " +
+                                                "e.g. run --f c:/.../your_flow.sl --i input1=root,input2=25 --cp c:/.../yaml";
+    public static final String INPUTS_HELP = "inputs in a key=value comma separated list. " +
+                                             "e.g. run --f c:/.../your_flow.sl --i input1=root,input2=25";
+    public static final String INPUT_FILE_HELP = "comma separated list of input file locations. " +
+                                                 "e.g. run --f C:/.../your_flow.sl --if C:/.../inputs.yaml";
+    public static final String SYSTEM_PROPERTY_FILE_HELP = "comma separated list of system property file locations. " +
+                                                           "e.g. run --f c:/.../your_flow.sl --spf c:/.../yaml";
+    public static final String ENV_HELP = "Set environment var relevant to the CLI";
+    public static final String SET_ASYNC_HELP = "set the async. e.g. env --setAsync true";
+    public static final String CSLANG_VERSION_HELP = "Prints the CloudSlang version used";
+    public static final String INPUTS_COMMAND_HELP = "Get flow inputs";
     public static final String QUIET = "quiet";
     public static final String DEBUG = "debug";
     public static final String DEFAULT = "default";
@@ -65,14 +80,14 @@ public class SlangCLI implements CommandMarker {
      */
     private Boolean triggerAsync = false;
 
-    @CliCommand(value = "run", help = "triggers a CloudSlang flow")
+    @CliCommand(value = "run", help = RUN_HELP)
     public String run(
-            @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. cslang run --f C:\\CloudSlang\\flow.yaml") final File file,
-            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath,
-            @CliOption(key = {"i", "inputs"}, mandatory = false, help = "inputs in a key=value comma separated list") final Map<String,? extends Serializable> inputs,
-            @CliOption(key = {"if", "input-file"}, mandatory = false, help = "comma separated list of input file locations") final List<String> inputFiles,
-            @CliOption(key = {"v", "verbose"}, mandatory = false, help = "default, quiet, debug(print each task outputs). e.g. cslang>run --f c:/.../your_flow.sl --v quiet", specifiedDefaultValue = "debug", unspecifiedDefaultValue = "default") final String verbose,
-            @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = "comma separated list of system property file locations") final List<String> systemPropertyFiles) throws IOException {
+            @CliOption(key = {"", "f", "file"}, mandatory = true, help = FILE_HELP) final File file,
+            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP) final List<String> classPath,
+            @CliOption(key = {"i", "inputs"}, mandatory = false, help = INPUTS_HELP) final Map<String,? extends Serializable> inputs,
+            @CliOption(key = {"if", "input-file"}, mandatory = false, help = INPUT_FILE_HELP) final List<String> inputFiles,
+            @CliOption(key = {"v", "verbose"}, mandatory = false, help = "default, quiet, debug(print each task outputs). e.g. run --f c:/.../your_flow.sl --v quiet", specifiedDefaultValue = "debug", unspecifiedDefaultValue = "default") final String verbose,
+            @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = SYSTEM_PROPERTY_FILE_HELP) final List<String> systemPropertyFiles) throws IOException {
 
         if (invalidVerboseInput(verbose)) throw new IllegalArgumentException("Verbose argument is invalid.");
 
@@ -107,17 +122,17 @@ public class SlangCLI implements CommandMarker {
         return !Arrays.asList(validArguments).contains(verbose.toLowerCase());
     }
 
-    @CliCommand(value = "env", help = "Set environment var relevant to the CLI")
+    @CliCommand(value = "env", help = ENV_HELP)
     public String setEnvVar(
-            @CliOption(key = "setAsync", mandatory = true, help = "set the async") final boolean switchAsync) throws IOException {
+            @CliOption(key = "setAsync", mandatory = true, help = SET_ASYNC_HELP) final boolean switchAsync) throws IOException {
         triggerAsync = switchAsync;
         return setEnvMessage(triggerAsync);
     }
 
-    @CliCommand(value = "inputs", help = "Get flow inputs")
+    @CliCommand(value = "inputs", help = INPUTS_COMMAND_HELP)
     public List<String> getFlowInputs(
-            @CliOption(key = {"", "f", "file"}, mandatory = true, help = "Path to filename. e.g. cslang inputs --f C:\\CloudSlang\\flow.yaml") final File file,
-            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = "Classpath , a directory comma separated list to flow dependencies, by default it will take flow file dir") final List<String> classPath)
+            @CliOption(key = {"", "f", "file"}, mandatory = true, help = FILE_HELP) final File file,
+            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP) final List<String> classPath)
             throws IOException {
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
         List<Input> inputs = compilationArtifact.getInputs();
@@ -130,7 +145,7 @@ public class SlangCLI implements CommandMarker {
         return inputsResult;
     }
 
-    @CliCommand(value = "cslang --version", help = "Prints the CloudSlang version used")
+    @CliCommand(value = "cslang --version", help = CSLANG_VERSION_HELP)
     public String version() {
         return CURRENTLY + slangVersion;
     }
