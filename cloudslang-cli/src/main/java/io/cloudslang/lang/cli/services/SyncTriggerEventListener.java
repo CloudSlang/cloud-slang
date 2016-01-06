@@ -10,6 +10,7 @@
 
 package io.cloudslang.lang.cli.services;
 
+import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.ExecutionPath;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
@@ -43,6 +44,8 @@ public class SyncTriggerEventListener implements ScoreEventListener{
     public static final String EXEC_START_PATH = "0";
     public static final int OUTPUT_VALUE_LIMIT = 100;
     private final static String TASK_PATH_PREFIX = "- ";
+    public static final String FLOW_OUTPUTS = "Flow outputs:";
+    public static final String OPERATION_OUTPUTS = "Run outputs:";
 
     private AtomicBoolean flowFinished = new AtomicBoolean(false);
     private AtomicReference<String> errorMessage = new AtomicReference<>("");
@@ -107,7 +110,12 @@ public class SyncTriggerEventListener implements ScoreEventListener{
                         && data.containsKey(LanguageEventData.PATH)
                         && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
                     Map<String, Serializable> outputs = extractNotEmptyOutputs(data);
-                    printWithColor(Ansi.Color.WHITE, "\nFlow outputs:");
+                    if (data.containsKey(ScoreLangConstants.EXECUTABLE_TYPE) &&
+                            ExecutableType.OPERATION.equals(data.get(ScoreLangConstants.EXECUTABLE_TYPE))) {
+                        printWithColor(Ansi.Color.WHITE, "\n" + OPERATION_OUTPUTS);
+                    } else {
+                        printWithColor(Ansi.Color.WHITE, "\n" + FLOW_OUTPUTS);
+                    }
                     for (String key : outputs.keySet()) {
                         printWithColor(Ansi.Color.WHITE, "- " + key + " = " + outputs.get(key));
                     }

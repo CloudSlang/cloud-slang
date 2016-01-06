@@ -76,7 +76,7 @@ public class ExecutionStepFactoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateStartStepWithNullData() throws Exception {
-        factory.createStartStep(1L, null, new ArrayList<Input>(),"");
+        factory.createStartStep(1L, null, new ArrayList<Input>(), "");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -116,14 +116,14 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateEndStep() throws Exception {
-        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), new ArrayList<Result>(),"");
+        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), new ArrayList<Result>(),"", ExecutableType.FLOW);
         Assert.assertNotNull("step should not be null", endStep);
     }
 
     @Test
     public void testCreateEndStepPutOutputsUnderTheRightKey() throws Exception {
         ArrayList<Output> outputs = new ArrayList<>();
-        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), outputs, new ArrayList<Result>(),"");
+        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), outputs, new ArrayList<Result>(),"", ExecutableType.FLOW);
         Assert.assertNotNull("outputs key is null", endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY));
         Assert.assertSame("outputs are not set under their key", outputs, endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY));
     }
@@ -131,32 +131,40 @@ public class ExecutionStepFactoryTest {
     @Test
     public void testCreateEndStepPutResultsUnderTheRightKey() throws Exception {
         ArrayList<Result> results = new ArrayList<>();
-        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), results,"");
+        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), results,"", ExecutableType.FLOW);
         Assert.assertNotNull("results key is null", endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_RESULTS_KEY));
         Assert.assertSame("results are not set under their key", results, endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_RESULTS_KEY));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateEndStepWithNullData() throws Exception {
-        factory.createEndStep(1L, null, new ArrayList<Output>(), new ArrayList<Result>(),"");
+        factory.createEndStep(1L, null, new ArrayList<Output>(), new ArrayList<Result>(), "", ExecutableType.FLOW);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateEndStepWithNullOutputs() throws Exception {
-        factory.createEndStep(1L, new HashMap<String, Serializable>(), null, new ArrayList<Result>(),"");
+        factory.createEndStep(1L, new HashMap<String, Serializable>(), null, new ArrayList<Result>(),"", ExecutableType.FLOW);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateEndStepWithNullResults() throws Exception {
-        factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), null,"");
+        factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), null,"", ExecutableType.FLOW);
     }
 
     @Test
     public void testStepName() throws Exception {
         ArrayList<Result> results = new ArrayList<>();
-        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), results,"stepX");
+        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), results,"stepX", ExecutableType.FLOW);
         Assert.assertNotNull("results key is null", endStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
         Assert.assertEquals("stepX", endStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
+    }
+
+    @Test
+    public void testExecutableType() throws Exception {
+        ArrayList<Result> results = new ArrayList<>();
+        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), results,"stepX", ExecutableType.FLOW);
+        Assert.assertNotNull("key is null", endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_TYPE));
+        Assert.assertEquals(ExecutableType.FLOW, endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_TYPE));
     }
 
     @Test

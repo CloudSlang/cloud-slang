@@ -12,6 +12,7 @@ package io.cloudslang.lang.compiler.scorecompiler;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.ActionType;
+import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
@@ -113,7 +114,7 @@ public class ExecutionStepFactory {
     }
 
     public ExecutionStep createEndStep(Long index, Map<String, Serializable> postExecutableData,
-                                       List<Output> outputs, List<Result> results, String executableName) {
+                                       List<Output> outputs, List<Result> results, String executableName, ExecutableType executableType) {
         Validate.notNull(postExecutableData, "postExecutableData is null");
         Validate.notNull(outputs, "Executable outputs are null");
         Validate.notNull(results, "Executable results are null");
@@ -122,6 +123,7 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable) results);
         actionData.put(ScoreLangConstants.HOOKS, (Serializable) postExecutableData);
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, executableName);
+        actionData.put(ScoreLangConstants.EXECUTABLE_TYPE, executableType);
         return createGeneralStep(index, OPERATION_STEPS_CLASS, "finishExecutable", actionData);
     }
 
