@@ -112,14 +112,16 @@ public class CompilerHelperImpl implements CompilerHelper{
 
     private Map<String, ? extends Serializable> loadFiles(List<String> files, String[] extensions, String directory) {
         if(CollectionUtils.isEmpty(files)) {
-            Collection<File> implicitFiles = FileUtils.listFiles(new File("."), extensions, false);
-            implicitFiles = select(implicitFiles, having(on(File.class).getPath(), containsString(directory)));
-            files = convert(implicitFiles, new Converter<File, String>() {
-                @Override
-                public String convert(File from) {
-                    return from.getPath();
-                }
-            });
+            File defaultDirectory = new File(directory);
+            if (defaultDirectory.isDirectory()) {
+                Collection<File> implicitFiles = FileUtils.listFiles(defaultDirectory, extensions, false);
+                files = convert(implicitFiles, new Converter<File, String>() {
+                    @Override
+                    public String convert(File from) {
+                        return from.getPath();
+                    }
+                });
+            }
         }
         if(CollectionUtils.isEmpty(files)) return null;
         Map<String, Serializable> result = new HashMap<>();
@@ -146,6 +148,7 @@ public class CompilerHelperImpl implements CompilerHelper{
 		}
         return result;
     }
+
     private Boolean checkIsFileSupported(File file){
         String[] suffixes = new String[SLANG_FILE_EXTENSIONS.length];
         for(int i = 0; i < suffixes.length; ++i){
