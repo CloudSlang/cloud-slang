@@ -112,7 +112,9 @@ public class CompilerHelperImpl implements CompilerHelper{
 
     private Map<String, ? extends Serializable> loadFiles(List<String> files, String[] extensions, String directory) {
         if(CollectionUtils.isEmpty(files)) {
-            File defaultDirectory = new File(directory);
+            String appHome = System.getProperty("app.home", "");
+            String defaultDirectoryPath = appHome + File.separator + "bin" + File.separator + directory;
+            File defaultDirectory = new File(defaultDirectoryPath);
             if (defaultDirectory.isDirectory()) {
                 Collection<File> implicitFiles = FileUtils.listFiles(defaultDirectory, extensions, false);
                 files = convert(implicitFiles, new Converter<File, String>() {
