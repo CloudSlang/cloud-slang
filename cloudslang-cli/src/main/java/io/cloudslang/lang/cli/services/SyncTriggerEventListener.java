@@ -14,14 +14,13 @@ import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.ExecutionPath;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.SerializationUtils;
-import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.AnsiConsole;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.StringUtils;
+import org.fusesource.jansi.Ansi;
+import org.fusesource.jansi.AnsiConsole;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -45,7 +44,7 @@ public class SyncTriggerEventListener implements ScoreEventListener{
     public static final int OUTPUT_VALUE_LIMIT = 100;
     private final static String TASK_PATH_PREFIX = "- ";
     public static final String FLOW_OUTPUTS = "Flow outputs:";
-    public static final String OPERATION_OUTPUTS = "Run outputs:";
+    public static final String OPERATION_OUTPUTS = "Operation outputs:";
 
     private AtomicBoolean flowFinished = new AtomicBoolean(false);
     private AtomicReference<String> errorMessage = new AtomicReference<>("");
@@ -110,8 +109,7 @@ public class SyncTriggerEventListener implements ScoreEventListener{
                         && data.containsKey(LanguageEventData.PATH)
                         && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
                     Map<String, Serializable> outputs = extractNotEmptyOutputs(data);
-                    if (data.containsKey(ScoreLangConstants.EXECUTABLE_TYPE) &&
-                            ExecutableType.OPERATION.equals(data.get(ScoreLangConstants.EXECUTABLE_TYPE))) {
+                    if (ExecutableType.OPERATION.equals(data.get(ScoreLangConstants.EXECUTABLE_TYPE))) {
                         printWithColor(Ansi.Color.WHITE, "\n" + OPERATION_OUTPUTS);
                     } else {
                         printWithColor(Ansi.Color.WHITE, "\n" + FLOW_OUTPUTS);
