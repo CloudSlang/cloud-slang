@@ -148,7 +148,8 @@ public class ExecutableSteps extends AbstractSteps {
                 fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_EXECUTION_FINISHED,
                         "Execution finished running", LanguageEventData.StepType.EXECUTABLE, nodeName,
                         Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
-                        Pair.of(LanguageEventData.OUTPUTS, (Serializable) operationReturnOutputs));
+                        Pair.of(LanguageEventData.OUTPUTS, (Serializable) operationReturnOutputs),
+                        Pair.of(ScoreLangConstants.EXECUTABLE_TYPE, (Serializable) executableType));
             }
         } catch (RuntimeException e){
             logger.error("There was an error running the finish executable execution step of: \'" + nodeName + "\'.\n\tError is: " + e.getMessage());
