@@ -37,15 +37,15 @@ import static org.fusesource.jansi.Ansi.ansi;
  * @author lesant
  */
 public class SyncTriggerEventListener implements ScoreEventListener{
-    public static final String SLANG_STEP_ERROR_MSG = "Slang Error : ";
-    public static final String SCORE_ERROR_EVENT_MSG = "Score Error Event :";
+    public static final String SLANG_STEP_ERROR_MSG = "Slang Error: ";
+    public static final String SCORE_ERROR_EVENT_MSG = "Score Error Event:";
     public static final String FLOW_FINISHED_WITH_FAILURE_MSG = "Flow finished with failure";
     public static final String EXEC_START_PATH = "0";
     public static final int OUTPUT_VALUE_LIMIT = 100;
     private final static String TASK_PATH_PREFIX = "- ";
     public static final String FLOW_OUTPUTS = "Flow outputs:";
     public static final String OPERATION_OUTPUTS = "Operation outputs:";
-    public static final String FINISHED_WITH_RESULT = " finished with result : ";
+    public static final String FINISHED_WITH_RESULT = " finished with result: ";
 
     private AtomicBoolean flowFinished = new AtomicBoolean(false);
     private AtomicReference<String> errorMessage = new AtomicReference<>("");
@@ -148,8 +148,8 @@ public class SyncTriggerEventListener implements ScoreEventListener{
     private void printFinishEvent(Map<String, Serializable> data) {
         String flowResult = (String)data.get(LanguageEventData.RESULT);
         String flowName = (String)data.get(LanguageEventData.STEP_NAME);
-        printForOperationOrFlow(data, Ansi.Color.CYAN, "Operation : " + flowName + FINISHED_WITH_RESULT + flowResult,
-                "Flow : " + flowName + FINISHED_WITH_RESULT + flowResult);
+        printForOperationOrFlow(data, Ansi.Color.CYAN, "Operation: " + flowName + FINISHED_WITH_RESULT + flowResult,
+                "Flow: " + flowName + FINISHED_WITH_RESULT + flowResult);
     }
 
     private void printForOperationOrFlow(Map<String, Serializable> data, Ansi.Color color, String operationMessage, String flowMessage) {
