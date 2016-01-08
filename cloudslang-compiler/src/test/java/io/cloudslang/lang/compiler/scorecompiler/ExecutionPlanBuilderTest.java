@@ -10,6 +10,7 @@
 package io.cloudslang.lang.compiler.scorecompiler;
 
 import io.cloudslang.lang.compiler.modeller.model.*;
+import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Workflow;
@@ -110,12 +111,12 @@ public class ExecutionPlanBuilderTest {
         when(stepFactory.createStartStep(eq(1L), same(preExecActionData), same(inputs), same(execName))).thenReturn(new ExecutionStep(1L));
     }
 
-    private void mockEndStep(Long stepId, Executable executable) {
+    private void mockEndStep(Long stepId, Executable executable, ExecutableType executableType) {
         Map<String, Serializable> postExecActionData = executable.getPostExecActionData();
         List<Output> outputs = executable.getOutputs();
         List<Result> results = executable.getResults();
         String execName = executable.getName();
-        when(stepFactory.createEndStep(eq(stepId), same(postExecActionData), same(outputs), same(results), same(execName))).thenReturn(new ExecutionStep(stepId));
+        when(stepFactory.createEndStep(eq(stepId), same(postExecActionData), same(outputs), same(results), same(execName), same(executableType))).thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockFinishTask(Long stepId, Task task) {
@@ -169,7 +170,7 @@ public class ExecutionPlanBuilderTest {
 
         mockStartStep(compiledOperation);
         when(stepFactory.createActionStep(eq(2L), same(actionData), eq("operationName"))).thenReturn(new ExecutionStep(2L));
-        mockEndStep(3L, compiledOperation);
+        mockEndStep(3L, compiledOperation, ExecutableType.OPERATION);
 
         ExecutionPlan executionPlan = executionPlanBuilder.createOperationExecutionPlan(compiledOperation);
 
@@ -197,7 +198,7 @@ public class ExecutionPlanBuilderTest {
                 new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null);
 
         mockStartStep(compiledFlow);
-        mockEndStep(0L, compiledFlow);
+        mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
         mockBeginTask(2L, task);
         mockFinishTask(3L, task);
         ExecutionPlan executionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFlow);
@@ -226,7 +227,7 @@ public class ExecutionPlanBuilderTest {
                 new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null);
 
         mockStartStep(compiledFlow);
-        mockEndStep(0L, compiledFlow);
+        mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
         mockAddBranchesStep(2L, 5L, 3L, task, compiledFlow);
         mockBeginTask(3L, task);
         mockFinishAsyncTask(4L, task);
@@ -276,7 +277,7 @@ public class ExecutionPlanBuilderTest {
                 new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null);
 
         mockStartStep(compiledFlow);
-        mockEndStep(0L, compiledFlow);
+        mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
 
         mockBeginTask(2L, firstTask);
         mockFinishTask(3L, firstTask);
@@ -306,7 +307,7 @@ public class ExecutionPlanBuilderTest {
                 new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null);
 
         mockStartStep(compiledFlow);
-        mockEndStep(0L, compiledFlow);
+        mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
 
         exception.expect(RuntimeException.class);
         exception.expectMessage(flowName);

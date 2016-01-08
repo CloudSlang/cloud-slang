@@ -14,6 +14,7 @@ import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Task;
+import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ExecutionPlan;
@@ -59,7 +60,7 @@ public class ExecutionPlanBuilder {
                 compiledOp.getName()));
         executionPlan.addStep(stepFactory.createActionStep(2L, compiledOp.getAction().getActionData(), compiledOp.getName()));
         executionPlan.addStep(stepFactory.createEndStep(3L, compiledOp.getPostExecActionData(), compiledOp.getOutputs(),
-                compiledOp.getResults(), compiledOp.getName()));
+                compiledOp.getResults(), compiledOp.getName(), ExecutableType.OPERATION));
         return executionPlan;
     }
 
@@ -75,7 +76,7 @@ public class ExecutionPlanBuilder {
                 compiledFlow.getInputs(), compiledFlow.getName()));
         //flow end step
         executionPlan.addStep(stepFactory.createEndStep(FLOW_END_STEP_ID, compiledFlow.getPostExecActionData(),
-                compiledFlow.getOutputs(), compiledFlow.getResults(), compiledFlow.getName()));
+                compiledFlow.getOutputs(), compiledFlow.getResults(), compiledFlow.getName(), ExecutableType.FLOW));
 
         Map<String, Long> taskReferences = new HashMap<>();
         for (Result result : compiledFlow.getResults()) {

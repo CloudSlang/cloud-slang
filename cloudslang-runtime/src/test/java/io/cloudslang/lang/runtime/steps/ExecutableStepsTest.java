@@ -10,6 +10,7 @@
 
 package io.cloudslang.lang.runtime.steps;
 
+import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Result;
@@ -147,7 +148,7 @@ public class ExecutableStepsTest {
         runEnv.getExecutionPath().down();
 
         when(resultsBinding.resolveResult(isNull(Map.class), anyMapOf(String.class, Serializable.class), eq(results), isNull(String.class))).thenReturn(ScoreLangConstants.SUCCESS_RESULT);
-        executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), results, new ExecutionRuntimeServices(),"");
+        executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), results, new ExecutionRuntimeServices(),"", ExecutableType.FLOW);
 
         ReturnValues returnValues= runEnv.removeReturnValues();
         Assert.assertTrue(returnValues.getResult().equals(ScoreLangConstants.SUCCESS_RESULT));
@@ -164,7 +165,7 @@ public class ExecutableStepsTest {
         boundOutputs.put("name", "John");
 
         when(outputsBinding.bindOutputs(isNull(Map.class), anyMapOf(String.class, Serializable.class), eq(possibleOutputs))).thenReturn(boundOutputs);
-        executableSteps.finishExecutable(runEnv, possibleOutputs, new ArrayList<Result>(), new ExecutionRuntimeServices(),"");
+        executableSteps.finishExecutable(runEnv, possibleOutputs, new ArrayList<Result>(), new ExecutionRuntimeServices(),"", ExecutableType.FLOW);
 
         ReturnValues returnValues= runEnv.removeReturnValues();
         Map<String, Serializable> outputs = returnValues.getOutputs();
@@ -180,7 +181,7 @@ public class ExecutableStepsTest {
         Long parentFirstStepPosition = 2L;
         runEnv.getParentFlowStack().pushParentFlowData(new ParentFlowData(111L, parentFirstStepPosition));
 
-        executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), new ArrayList<Result>(), new ExecutionRuntimeServices(), "");
+        executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), new ArrayList<Result>(), new ExecutionRuntimeServices(), "", ExecutableType.FLOW);
 
         Assert.assertEquals(parentFirstStepPosition, runEnv.removeNextStepPosition());
     }
@@ -191,7 +192,7 @@ public class ExecutableStepsTest {
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Serializable>(), null));
         runEnv.getExecutionPath().down();
 
-        executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), new ArrayList<Result>(), new ExecutionRuntimeServices(), "");
+        executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), new ArrayList<Result>(), new ExecutionRuntimeServices(), "", ExecutableType.FLOW);
 
         Assert.assertEquals(null, runEnv.removeNextStepPosition());
     }
@@ -213,7 +214,7 @@ public class ExecutableStepsTest {
         when(resultsBinding.resolveResult(isNull(Map.class), anyMapOf(String.class, Serializable.class), eq(possibleResults), isNull(String.class))).thenReturn(boundResult);
 
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
-        executableSteps.finishExecutable(runEnv, possibleOutputs, possibleResults, runtimeServices,"task1");
+        executableSteps.finishExecutable(runEnv, possibleOutputs, possibleResults, runtimeServices,"task1", ExecutableType.FLOW);
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 

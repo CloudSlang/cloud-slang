@@ -10,6 +10,7 @@ package io.cloudslang.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
 
+import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
@@ -111,7 +112,8 @@ public class ExecutableSteps extends AbstractSteps {
                                  @Param(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY) List<Output> executableOutputs,
                                  @Param(ScoreLangConstants.EXECUTABLE_RESULTS_KEY) List<Result> executableResults,
                                  @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
-                                 @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName) {
+                                 @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
+                                 @Param(ScoreLangConstants.EXECUTABLE_TYPE) ExecutableType executableType) {
 		try {
             runEnv.getExecutionPath().up();
             Context operationContext = runEnv.getStack().popContext();
@@ -135,7 +137,8 @@ public class ExecutableSteps extends AbstractSteps {
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
                     LanguageEventData.StepType.EXECUTABLE, nodeName,
                     Pair.of(LanguageEventData.OUTPUTS, (Serializable) operationReturnOutputs),
-                    Pair.of(LanguageEventData.RESULT, returnValues.getResult()));
+                    Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
+                    Pair.of(ScoreLangConstants.EXECUTABLE_TYPE, (Serializable) executableType));
 
             // If we have parent flow data on the stack, we pop it and request the score engine to switch to the parent
             // execution plan id once it can, and we set the next position that was stored there for the use of the navigation
@@ -145,7 +148,8 @@ public class ExecutableSteps extends AbstractSteps {
                 fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_EXECUTION_FINISHED,
                         "Execution finished running", LanguageEventData.StepType.EXECUTABLE, nodeName,
                         Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
-                        Pair.of(LanguageEventData.OUTPUTS, (Serializable) operationReturnOutputs));
+                        Pair.of(LanguageEventData.OUTPUTS, (Serializable) operationReturnOutputs),
+                        Pair.of(ScoreLangConstants.EXECUTABLE_TYPE, (Serializable) executableType));
             }
         } catch (RuntimeException e){
             logger.error("There was an error running the finish executable execution step of: \'" + nodeName + "\'.\n\tError is: " + e.getMessage());
