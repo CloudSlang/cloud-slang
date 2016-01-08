@@ -11,6 +11,7 @@ package io.cloudslang.lang.entities;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
 
@@ -43,25 +44,33 @@ public class ResultNavigation implements Serializable {
 	}
 
     @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("nextStepId", nextStepId)
+                .append("presetResult", presetResult)
+                .toString();
+    }
+
+    @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
 
         ResultNavigation that = (ResultNavigation) o;
 
         return new EqualsBuilder()
-                .append(this.nextStepId, that.nextStepId)
-                .append(this.presetResult, that.presetResult)
+                .append(nextStepId, that.nextStepId)
+                .append(presetResult, that.presetResult)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
+        return new HashCodeBuilder(17, 37)
                 .append(nextStepId)
                 .append(presetResult)
                 .toHashCode();
     }
+
 }
