@@ -26,18 +26,16 @@ public class Input extends InOutParam {
 	private boolean encrypted;
 	private boolean required;
 	private boolean overridable;
-	private String systemPropertyName;
 
-	public Input(String name, Serializable value, boolean encrypted, boolean required, boolean overridable, String systemPropertyName) {
+	public Input(String name, Serializable value, boolean encrypted, boolean required, boolean overridable) {
 		super(name, value);
 		this.encrypted = encrypted;
 		this.required = required;
 		this.overridable = overridable;
-		this.systemPropertyName = systemPropertyName;
 	}
 
 	public Input(String name, Serializable expression) {
-		this(name, expression, false, true, true, null);
+		this(name, expression, false, true, true);
 	}
 
 	/**
@@ -58,10 +56,6 @@ public class Input extends InOutParam {
 		return overridable;
 	}
 
-	public String getSystemPropertyName() {
-		return this.systemPropertyName;
-	}
-
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this)
@@ -69,7 +63,6 @@ public class Input extends InOutParam {
 				.append("encrypted", encrypted)
 				.append("required", required)
 				.append("overridable", overridable)
-				.append("systemPropertyName", systemPropertyName)
 				.toString();
 	}
 
@@ -86,7 +79,6 @@ public class Input extends InOutParam {
 				.append(encrypted, input.encrypted)
 				.append(required, input.required)
 				.append(overridable, input.overridable)
-				.append(systemPropertyName, input.systemPropertyName)
 				.isEquals();
 	}
 
@@ -97,7 +89,6 @@ public class Input extends InOutParam {
 				.append(encrypted)
 				.append(required)
 				.append(overridable)
-				.append(systemPropertyName)
 				.toHashCode();
 	}
 

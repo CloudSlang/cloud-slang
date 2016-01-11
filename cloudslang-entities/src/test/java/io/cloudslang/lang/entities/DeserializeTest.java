@@ -35,8 +35,7 @@ public class DeserializeTest {
                 "some_expression",
                 true,
                 true,
-                true,
-                "system_property_ok_a_kind");
+                true);
         testToAndFromJson(input, Input.class);
     }
 
