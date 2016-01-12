@@ -8,6 +8,7 @@
  */
 package io.cloudslang.lang.api;
 
+import io.cloudslang.lang.compiler.MetadataExtractor;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.ScoreLangConstants;
@@ -61,6 +62,9 @@ public class SlangImplTest {
 
     @Autowired
     private SlangCompiler compiler;
+
+    @Autowired
+    private MetadataExtractor metadataExtractor;
 
     @Autowired
     private Score score;
@@ -232,6 +236,11 @@ public class SlangImplTest {
         @Bean
         public SlangImpl slang(){
             return new SlangImpl();
+        }
+
+        @Bean
+        public MetadataExtractor metadataExtractor() {
+            return Mockito.mock(MetadataExtractor.class);
         }
 
         @Bean
