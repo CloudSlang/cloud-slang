@@ -162,13 +162,6 @@ public class InputsTransformerTest {
     }
 
     @Test
-    public void testOverridableInputWithoutDefaultButWithSysProp() throws Exception {
-        List inputs = getInputsFormSl("/non_overridable_input_with_sys_prop.sl");
-        List<Input> transformed_inputs = inputTransformer.transform(inputs);
-        Assert.assertEquals("booya", transformed_inputs.get(0).getSystemPropertyName());
-    }
-
-    @Test
     public void testIllegalKeyInInput() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage("known property");

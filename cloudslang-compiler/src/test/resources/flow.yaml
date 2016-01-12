@@ -14,8 +14,7 @@ flow:
   name: basic_flow
   inputs:
     - input1
-    - host:
-        system_property: user.sys.props.host
+    - host
     - port: '22'
   workflow:
     - CheckWeather:

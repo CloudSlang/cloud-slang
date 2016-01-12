@@ -84,7 +84,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         executables.add(executable);
 
         executionPlan.setSubflowsUUIDs(new HashSet<>(dependencies.keySet()));
-        return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemProperties(executables));
+        return new CompilationArtifact(executionPlan, dependencies, executable.getInputs());
     }
 
     /**
@@ -137,21 +137,5 @@ public class ScoreCompilerImpl implements ScoreCompiler{
                 throw new RuntimeException("Executable: " + executable.getName() + " cannot be compiled to an ExecutionPlan since it is not a flow and not an operation");
         }
     }
-
-	private static Collection<Input> getSystemProperties(Collection<Executable> executables) {
-		Collection<Input> result = new ArrayList<>();
-		for(Executable executable : executables) {
-			result.addAll(getSystemProperties(executable.getInputs()));
-		}
-		return result;
-	}
-
-	private static Collection<Input> getSystemProperties(List<Input> inputs) {
-		Collection<Input> result = new ArrayList<>();
-		for(Input input : inputs) {
-			if(input.getSystemPropertyName() != null) result.add(input);
-		}
-		return result;
-	}
 
 }

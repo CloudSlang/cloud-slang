@@ -9,7 +9,6 @@
 package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.entities.bindings.Input;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -20,7 +19,6 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.DEFAULT_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ENCRYPTED_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.OVERRIDABLE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.REQUIRED_KEY;
-import static io.cloudslang.lang.compiler.SlangTextualKeys.SYSTEM_PROPERTY_KEY;
 
 public abstract class AbstractInputsTransformer {
 
@@ -52,8 +50,7 @@ public abstract class AbstractInputsTransformer {
 
     private static Input createPropInput(Map.Entry<String, Map<String, Serializable>> entry) {
         Map<String, Serializable> props = entry.getValue();
-        List<String> knownKeys = Arrays.asList(REQUIRED_KEY, ENCRYPTED_KEY,
-                OVERRIDABLE_KEY, DEFAULT_KEY, SYSTEM_PROPERTY_KEY);
+        List<String> knownKeys = Arrays.asList(REQUIRED_KEY, ENCRYPTED_KEY, OVERRIDABLE_KEY, DEFAULT_KEY);
 
         for (String key : props.keySet()) {
             if (!knownKeys.contains(key)) {
@@ -73,13 +70,12 @@ public abstract class AbstractInputsTransformer {
         boolean defaultSpecified = props.containsKey(DEFAULT_KEY);
         String inputName = entry.getKey();
         Serializable expression = defaultSpecified ? props.get(DEFAULT_KEY) : null;
-        String systemPropertyName = (String) props.get(SYSTEM_PROPERTY_KEY);
 
-        if (!overridable && !defaultSpecified && StringUtils.isEmpty(systemPropertyName)) {
+        if (!overridable && !defaultSpecified) {
             throw new RuntimeException(
-                    "input: " + inputName + " is not overridable but no default value or system property was specified");
+                    "input: " + inputName + " is not overridable but no default value was specified");
         }
 
-        return new Input(inputName, expression, encrypted, required, overridable, systemPropertyName);
+        return new Input(inputName, expression, encrypted, required, overridable);
     }
 }
