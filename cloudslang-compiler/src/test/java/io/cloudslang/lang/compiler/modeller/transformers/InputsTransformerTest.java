@@ -11,16 +11,17 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 *******************************************************************************/
 
 
-import org.junit.Assert;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+import io.cloudslang.lang.entities.bindings.Input;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import io.cloudslang.lang.compiler.parser.YamlParser;
-import io.cloudslang.lang.entities.bindings.Input;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -215,6 +216,11 @@ public class InputsTransformerTest {
         @Bean
         public YamlParser yamlParser() {
             return new YamlParser();
+        }
+
+        @Bean
+        public ParserExceptionHandler parserExceptionHandler() {
+            return new ParserExceptionHandler();
         }
 
         @Bean

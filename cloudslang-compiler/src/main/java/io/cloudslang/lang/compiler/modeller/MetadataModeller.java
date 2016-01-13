@@ -5,17 +5,16 @@
  *
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
- *
  */
-package io.cloudslang.lang.compiler;
+package io.cloudslang.lang.compiler.modeller;
 
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
+import io.cloudslang.lang.compiler.parser.model.ParsedMetadata;
 
 /**
  * User: bancl
- * Date: 1/11/2016
+ * Date: 1/12/2016
  */
-public interface MetadataExtractor {
-
-    Metadata extractMetadata(SlangSource source);
+public interface MetadataModeller {
+    Metadata createModel(ParsedMetadata parsedMetadata);
 }

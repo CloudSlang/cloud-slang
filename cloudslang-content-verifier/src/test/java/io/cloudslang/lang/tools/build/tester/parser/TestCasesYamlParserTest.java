@@ -11,6 +11,7 @@ package io.cloudslang.lang.tools.build.tester.parser;
 
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.YamlParser;
+import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import org.junit.Assert;
@@ -119,6 +120,11 @@ public class TestCasesYamlParserTest {
         @Bean
         public YamlParser yamlParser(){
             return new YamlParser();
+        }
+
+        @Bean
+        public ParserExceptionHandler parserExceptionHandler() {
+            return new ParserExceptionHandler();
         }
 
         @Bean

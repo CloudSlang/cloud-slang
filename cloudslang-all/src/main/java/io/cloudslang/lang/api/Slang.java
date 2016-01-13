@@ -10,8 +10,8 @@ package io.cloudslang.lang.api;
 
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
-import io.cloudslang.score.events.ScoreEventListener;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.score.events.ScoreEventListener;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -27,19 +27,19 @@ import java.util.Set;
 public interface Slang {
 
     /**
+     * Extract the metadata of a flow or operation written in CloudSlang
+     * @param source the CloudSlang source containing the flow
+     * @return the metadata of the flow
+     */
+    Metadata extractMetadata(SlangSource source);
+
+    /**
      * Compile a flow or operation written in CloudSlang
      * @param source the CloudSlang source containing the flow
      * @param dependencies a set of CloudSlang sources of of all the flow or operation's dependencies
      * @return the compiled artifact of the flow
      */
     CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencies);
-
-    /**
-     * Extract the metadata of a flow or operation written in CloudSlang
-     * @param source the CloudSlang source containing the flow
-     * @return the metadata of the flow
-     */
-    Metadata extractMetadata(SlangSource source);
 
 	/**
 	 * Run a flow or operation written in CloudSlang already compiled to a compilationArtifact
