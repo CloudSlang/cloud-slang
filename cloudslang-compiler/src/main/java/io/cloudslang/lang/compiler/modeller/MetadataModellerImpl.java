@@ -40,8 +40,8 @@ public class MetadataModellerImpl implements MetadataModeller {
     private Map<String, String> convertMapListToMap(List<Map<String, String>> mapList) {
         Map<String, String> inputs = new LinkedHashMap<>();
         for (Map<String,String> inputMap : mapList) {
-            String key = inputMap.keySet().iterator().next();
-            inputs.put(key, inputMap.get(key));
+            Map.Entry<String, String> entry = inputMap.entrySet().iterator().next();
+            inputs.put(entry.getKey(), entry.getValue());
         }
         return inputs;
     }
