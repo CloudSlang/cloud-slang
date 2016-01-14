@@ -8,10 +8,10 @@ import java.util.Map;
  */
 public class Metadata {
 
+    private String description;
     private Map<String, String> inputs;
     private Map<String, String> outputs;
     private Map<String, String> results;
-    private String description;
 
     public Map<String, String> getInputs() {
         return inputs;

@@ -18,6 +18,6 @@ import java.io.File;
  */
 public interface MetadataHelper {
 
-    Metadata extractMetadata(File file);
+    String extractMetadata(File file);
 
 }

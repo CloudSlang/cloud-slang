@@ -6,7 +6,9 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 #
 ####################################################
-## description: Parses the given JSON input to retrieve the corresponding value addressed by the json_path input.
+## description: Parses the given JSON input to retrieve the corresponding value
+## addressed by the json_path input.
+##
 ## inputs:
 ##   - json_input: |
 ##      JSON data input

@@ -132,13 +132,7 @@ public class SlangCLI implements CommandMarker {
     public String inspectExecutable(
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = PATH_TO_FILENAME_HELP) final File executableFile
     ) throws IOException {
-        Metadata metadata = metadataHelper.extractMetadata(executableFile);
-        String result = "Inspection for: " + executableFile.getAbsolutePath();
-        result += "\n\tDescription: " + metadata.getDescription();
-        result +="\n\tInputs: " + metadata.getInputs();
-        result +="\n\tOutputs: " + metadata.getOutputs();
-        result +="\n\tResults: " + metadata.getResults();
-        return result;
+        return metadataHelper.extractMetadata(executableFile);
     }
 
     @CliCommand(value = "env", help = ENV_HELP)

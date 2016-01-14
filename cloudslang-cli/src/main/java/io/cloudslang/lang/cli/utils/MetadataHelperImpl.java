@@ -8,6 +8,8 @@
  */
 package io.cloudslang.lang.cli.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
@@ -28,10 +30,17 @@ public class MetadataHelperImpl implements MetadataHelper {
     private Slang slang;
 
     @Override
-    public Metadata extractMetadata(File file) {
+    public String extractMetadata(File file) {
         Validate.notNull(file.getAbsolutePath(), "File path can not be null");
         Validate.isTrue(file.isFile(), "File: " + file.getName() + " was not found");
 
-        return slang.extractMetadata(SlangSource.fromFile(file));
+        Metadata metadata = slang.extractMetadata(SlangSource.fromFile(file));
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(metadata);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("There was a problem printing the description in JSON format ", e);
+        }
     }
 }

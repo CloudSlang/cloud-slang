@@ -32,7 +32,7 @@ public class MetadataParser {
     public static final int BEGIN_INDEX = 3;
 
     @Autowired
-    private Yaml yaml = new Yaml();
+    private Yaml yaml;
     @Autowired
     private ParserExceptionHandler parserExceptionHandler;
 
