@@ -92,7 +92,7 @@ public class SlangCLI implements CommandMarker {
         if (invalidVerboseInput(verbose)) throw new IllegalArgumentException("Verbose argument is invalid.");
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
-        Map<String, ? extends Serializable> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
+        Map<String, String> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
         Map<String, ? extends Serializable> inputsFromFile = compilerHelper.loadInputsFromFile(inputFiles);
         Map<String, Serializable> mergedInputs = new HashMap<>();
 

@@ -52,6 +52,7 @@ public class ResultsBinding extends Binding {
      */
     public String resolveResult(Map<String, Serializable> inputs,
                                 Map<String, Serializable> context,
+                                Map<String, String> systemProperties,
                                 List<Result> possibleResults,
                                 String presetResult) {
 
@@ -110,7 +111,7 @@ public class ResultsBinding extends Binding {
                 }
 
                 try {
-                    Serializable expressionResult = scriptEvaluator.evalExpr(expression, scriptContext);
+                    Serializable expressionResult = scriptEvaluator.evalExpr(expression, scriptContext, systemProperties);
                     Boolean evaluatedResult;
                     if (expressionResult instanceof Integer) {
                         evaluatedResult = (Integer) expressionResult != 0;

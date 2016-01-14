@@ -38,8 +38,8 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         return triggerWithData(compilationArtifact, userInputs, getSystemProperties()).getTasks();
     }
 
-    private Map<String, Serializable> getSystemProperties() {
-        Map<String, Serializable> systemProperties = new HashMap<>();
+    private Map<String, String> getSystemProperties() {
+        Map<String, String> systemProperties = new HashMap<>();
         systemProperties.put("user.sys.props.host", "localhost");
         return systemProperties;
     }

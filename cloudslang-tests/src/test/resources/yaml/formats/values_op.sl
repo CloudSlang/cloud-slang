@@ -26,8 +26,7 @@ operation:
     - input_no_expression
     - input_no_expression_not_required:
         required: false
-    - input_system_property:
-        system_property: user.sys.props.host
+    - input_system_property: ${get_system_property('user.sys.props.host')}
     - input_not_overridable:
         default: 25
         overridable: false

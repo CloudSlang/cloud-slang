@@ -11,8 +11,6 @@ package io.cloudslang.lang.runtime.bindings;
  *******************************************************************************/
 
 import io.cloudslang.lang.entities.bindings.Input;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,7 +34,7 @@ public class InputsBinding extends Binding {
      * @return : a new map with all inputs resolved (does not include initial context)
      */
     public Map<String, Serializable> bindInputs(List<Input> inputs, Map<String, ? extends Serializable> context,
-                                                Map<String, ? extends Serializable> systemProperties) {
+                                                Map<String, String> systemProperties) {
         Map<String, Serializable> resultContext = new HashMap<>();
 
         //we do not want to change original context map
@@ -51,7 +49,7 @@ public class InputsBinding extends Binding {
 
     private void bindInput(Input input, Map<String, ? extends Serializable> context,
                            Map<String, Serializable> targetContext,
-                           Map<String, ? extends Serializable> systemProperties) {
+                           Map<String, String> systemProperties) {
 
         Serializable value;
 
@@ -66,9 +64,6 @@ public class InputsBinding extends Binding {
 
         if (input.isRequired() && value == null) {
             String errorMessage = "Input with name: \'" + inputName + "\' is Required, but value is empty";
-            if (input.getSystemPropertyName() != null){
-                errorMessage += "\nThis value can also be supplied using a system property";
-            }
             throw new RuntimeException(errorMessage);
         }
 
@@ -79,7 +74,7 @@ public class InputsBinding extends Binding {
             Input input,
             Map<String, ? extends Serializable> context,
             Map<String, ? extends Serializable> targetContext,
-            Map<String, ? extends Serializable> systemProperties) {
+            Map<String, String> systemProperties) {
         Serializable value = null;
 
         //we do not want to change original context map
@@ -92,20 +87,13 @@ public class InputsBinding extends Binding {
         }
 
         if (value == null) {
-            String systemPropertyKey = input.getSystemPropertyName();
-            if (StringUtils.isNotEmpty(systemPropertyKey) && MapUtils.isNotEmpty(systemProperties)) {
-                value = systemProperties.get(systemPropertyKey);
-            }
-        }
-
-        if (value == null) {
             Serializable rawValue = input.getValue();
             String expressionToEvaluate = extractExpression(rawValue);
             if (expressionToEvaluate != null) {
                 scriptContext.put(inputName, valueFromContext);
                 //so you can resolve previous inputs already bound
                 scriptContext.putAll(targetContext);
-                value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext);
+                value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties);
             } else {
                 value = rawValue;
             }

@@ -42,14 +42,19 @@ public class LoopsBinding {
     @Autowired
     private ScriptEvaluator scriptEvaluator;
 
-    public LoopCondition getOrCreateLoopCondition(LoopStatement forLoopStatement, Context flowContext, String nodeName) {
+    public LoopCondition getOrCreateLoopCondition(
+            LoopStatement forLoopStatement,
+            Context flowContext,
+            Map<String, String> systemProperties,
+            String nodeName) {
         Validate.notNull(forLoopStatement, "loop statement cannot be null");
         Validate.notNull(flowContext, "flow context cannot be null");
+        Validate.notNull(systemProperties, "system properties cannot be null");
         Validate.notNull(nodeName, "node name cannot be null");
 
         Map<String, Serializable> langVariables = flowContext.getLangVariables();
         if (!langVariables.containsKey(LOOP_CONDITION_KEY)) {
-            LoopCondition loopCondition = createForLoopCondition(forLoopStatement, flowContext, nodeName);
+            LoopCondition loopCondition = createForLoopCondition(forLoopStatement, flowContext, systemProperties, nodeName);
             langVariables.put(LOOP_CONDITION_KEY, loopCondition);
         }
         return (LoopCondition) langVariables.get(LOOP_CONDITION_KEY);
@@ -81,12 +86,16 @@ public class LoopsBinding {
         logger.debug("value name: " + keyName + ", value: " + valueFromIteration);
     }
 
-    private LoopCondition createForLoopCondition(LoopStatement forLoopStatement, Context flowContext, String nodeName) {
+    private LoopCondition createForLoopCondition(
+            LoopStatement forLoopStatement,
+            Context flowContext,
+            Map<String, String> systemProperties,
+            String nodeName) {
         Map<String, Serializable> variables = flowContext.getImmutableViewOfVariables();
         Serializable evalResult;
         String collectionExpression = forLoopStatement.getExpression();
         try {
-            evalResult = scriptEvaluator.evalExpr(collectionExpression, variables);
+            evalResult = scriptEvaluator.evalExpr(collectionExpression, variables, systemProperties);
         } catch (Throwable t) {
             throw new RuntimeException(FOR_LOOP_EXPRESSION_ERROR_MESSAGE + " '" + nodeName + "',\n\tError is: " + t.getMessage(), t);
         }

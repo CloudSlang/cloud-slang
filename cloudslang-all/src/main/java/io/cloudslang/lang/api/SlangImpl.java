@@ -63,7 +63,7 @@ public class SlangImpl implements Slang {
     }
 
 	@Override
-	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties) {
+	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, String> systemProperties) {
 		Validate.notNull(compilationArtifact, "Compilation artifact can not be null");
 		if(runInputs == null) {
 			runInputs = new HashMap<>();
@@ -80,7 +80,7 @@ public class SlangImpl implements Slang {
 
 	@Override
 	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs,
-		Map<String, ? extends Serializable> systemProperties) {
+		Map<String, String> systemProperties) {
 		CompilationArtifact compilationArtifact = compile(source, dependencies);
 		return run(compilationArtifact, runInputs, systemProperties);
 	}

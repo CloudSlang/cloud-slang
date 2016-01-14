@@ -94,7 +94,7 @@ public class TestCasesYamlParserTest {
     @Test
     public void parseSystemPropertiesFile() throws Exception{
         String filePath = getClass().getResource("/content/base/properties.yaml").toURI().getPath();
-        Map<String, Serializable> sysProperties = parser.parseProperties(filePath);
+        Map<String, String> sysProperties = parser.parseProperties(filePath);
         Assert.assertEquals("One system property should be parsed", 1, sysProperties.size());
     }
 

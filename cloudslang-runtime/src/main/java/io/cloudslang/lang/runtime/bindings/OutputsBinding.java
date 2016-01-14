@@ -34,9 +34,11 @@ public class OutputsBinding extends Binding {
     @Autowired
     ScriptEvaluator scriptEvaluator;
 
-    public Map<String, Serializable> bindOutputs(Map<String, Serializable> inputs,
-                                           Map<String, Serializable> actionReturnValues,
-                                           List<Output> possibleOutputs) {
+    public Map<String, Serializable> bindOutputs(
+            Map<String, Serializable> inputs,
+            Map<String, Serializable> actionReturnValues,
+            Map<String, String> systemProperties,
+            List<Output> possibleOutputs) {
 
         Map<String, Serializable> outputs = new LinkedHashMap<>();
         //construct script context
@@ -61,7 +63,7 @@ public class OutputsBinding extends Binding {
 
                     try {
                         //evaluate expression
-                        valueToAssign = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext);
+                        valueToAssign = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties);
                     } catch (Throwable t) {
                         throw new RuntimeException("Error binding output: '" + output.getName() + "',\n\tError is: " + t.getMessage(), t);
                     }

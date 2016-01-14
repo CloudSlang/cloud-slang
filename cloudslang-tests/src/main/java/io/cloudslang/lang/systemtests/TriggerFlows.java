@@ -48,7 +48,7 @@ public class TriggerFlows {
     public ScoreEvent runSync(
             CompilationArtifact compilationArtifact,
             Map<String, ? extends Serializable> userInputs,
-            Map<String, ? extends Serializable> systemProperties) {
+            Map<String, String> systemProperties) {
         final BlockingQueue<ScoreEvent> finishEvent = new LinkedBlockingQueue<>();
         ScoreEventListener finishListener = new ScoreEventListener() {
             @Override
@@ -73,7 +73,7 @@ public class TriggerFlows {
         }
     }
 
-    public RuntimeInformation runWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> systemProperties) {
+    public RuntimeInformation runWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, String> systemProperties) {
         RunDataAggregatorListener runDataAggregatorListener = new RunDataAggregatorListener();
         slang.subscribeOnEvents(runDataAggregatorListener, STEP_EVENTS);
 

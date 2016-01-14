@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Date: 3/25/2015
@@ -36,16 +37,22 @@ public class AsyncLoopBinding {
         return ASYNC_LOOP_EXPRESSION_ERROR_MESSAGE + " '" + nodeName + "', error is: \n" + message;
     }
 
-    public List<Serializable> bindAsyncLoopList(AsyncLoopStatement asyncLoopStatement, Context flowContext, String nodeName) {
+    public List<Serializable> bindAsyncLoopList(
+            AsyncLoopStatement asyncLoopStatement,
+            Context flowContext,
+            Map<String, String> systemProperties,
+            String nodeName) {
         Validate.notNull(asyncLoopStatement, "async loop statement cannot be null");
         Validate.notNull(flowContext, "flow context cannot be null");
+        Validate.notNull(systemProperties, "system properties cannot be null");
         Validate.notNull(nodeName, "node name cannot be null");
 
         List<Serializable> evalResult;
         try {
             evalResult = (List<Serializable>) scriptEvaluator.evalExpr(
                     asyncLoopStatement.getExpression(),
-                    flowContext.getImmutableViewOfVariables());
+                    flowContext.getImmutableViewOfVariables(),
+                    systemProperties);
         } catch (Throwable t) {
             throw new RuntimeException(generateAsyncLoopExpressionMessage(nodeName, t.getMessage()), t);
         }

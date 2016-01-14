@@ -154,12 +154,12 @@ public class SlangTestRunner {
     private void runTest(SlangTestCase testCase, CompilationArtifact compiledTestFlow, String projectPath) {
 
         Map<String, Serializable> convertedInputs = getTestCaseInputsMap(testCase);
-        Map<String, Serializable> systemProperties = getTestSystemProperties(testCase, projectPath);
+        Map<String, String> systemProperties = getTestSystemProperties(testCase, projectPath);
 
         trigger(testCase, compiledTestFlow, convertedInputs, systemProperties);
     }
 
-    private Map<String, Serializable> getTestSystemProperties(SlangTestCase testCase, String projectPath) {
+    private Map<String, String> getTestSystemProperties(SlangTestCase testCase, String projectPath) {
         String systemPropertiesFile = testCase.getSystemPropertiesFile();
         if(StringUtils.isEmpty(systemPropertiesFile)){
             return new HashMap<>();
@@ -200,7 +200,7 @@ public class SlangTestRunner {
      */
     public Long trigger(SlangTestCase testCase, CompilationArtifact compilationArtifact,
                         Map<String, ? extends Serializable> inputs,
-                        Map<String, ? extends Serializable> systemProperties) {
+                        Map<String, String> systemProperties) {
 
         String testCaseName = testCase.getName();
         String result = testCase.getResult();

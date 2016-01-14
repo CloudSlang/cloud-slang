@@ -38,8 +38,6 @@ import java.util.Set;
 
 import static ch.lambdaj.Lambda.*;
 
-import static org.hamcrest.Matchers.*;
-
 /**
  * @author lesant
  * @since 11/13/2014
@@ -100,17 +98,30 @@ public class CompilerHelperImpl implements CompilerHelper{
         }
     }
 
-	@Override
-	public Map<String, ? extends Serializable> loadSystemProperties(List<String> systemPropertyFiles) {
-		return loadFiles(systemPropertyFiles, YAML_FILE_EXTENSIONS, SP_DIR);
-	}
+    @Override
+    public Map<String, String> loadSystemProperties(List<String> systemPropertyFiles) {
+        Map<String, Serializable> rawSystemProperties = loadFiles(systemPropertyFiles, YAML_FILE_EXTENSIONS, SP_DIR);
+        Map<String, String> systemProperties;
+        systemProperties =
+                convertMap(rawSystemProperties, new Converter<Serializable, String>() {
+                    @Override
+                    public String convert(Serializable rawValue) {
+                        String returnValue = null;
+                        if (rawValue != null) {
+                            returnValue = rawValue.toString();
+                        }
+                        return returnValue;
+                    }
+                });
+        return systemProperties;
+    }
 
     @Override
-    public Map<String, ? extends Serializable> loadInputsFromFile(List<String> inputFiles) {
+    public Map<String, Serializable> loadInputsFromFile(List<String> inputFiles) {
         return loadFiles(inputFiles, YAML_FILE_EXTENSIONS, INPUT_DIR);
     }
 
-    private Map<String, ? extends Serializable> loadFiles(List<String> files, String[] extensions, String directory) {
+    private Map<String, Serializable> loadFiles(List<String> files, String[] extensions, String directory) {
         if(CollectionUtils.isEmpty(files)) {
             String appHome = System.getProperty("app.home", "");
             String defaultDirectoryPath = appHome + File.separator + "bin" + File.separator + directory;

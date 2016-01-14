@@ -40,7 +40,7 @@ public interface Slang {
 	 * @param systemProperties the system properties for the flow or operation run
 	 * @return the execution ID in score
 	 */
-	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties);
+	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, String> systemProperties);
 
 	/**
 	 * Compile and run a flow or operation written in CloudSlang
@@ -50,7 +50,7 @@ public interface Slang {
 	 * @param systemProperties the system properties for the flow or operation run
 	 * @return the execution ID in score
 	 */
-	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties);
+	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs, Map<String, String> systemProperties);
 
     /**
      * Subscribe to events of score or CloudSlang

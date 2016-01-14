@@ -78,11 +78,11 @@ public class TestCasesYamlParser {
         }
     }
 
-    public Map<String, Serializable> parseProperties(String fileName) {
-        Map<String, Serializable> result = new HashMap<>();
+    public Map<String, String> parseProperties(String fileName) {
+        Map<String, String> result = new HashMap<>();
         if(StringUtils.isNotEmpty(fileName)) {
             try {
-                result.putAll((Map<String, Serializable>) yaml.load(FileUtils.readFileToString(new File(fileName))));
+                result.putAll((Map<String, String>) yaml.load(FileUtils.readFileToString(new File(fileName))));
             } catch (IOException ex) {
                 log.error("Error loading file: " + fileName, ex);
                 throw new RuntimeException("Error loading file: " + fileName, ex);

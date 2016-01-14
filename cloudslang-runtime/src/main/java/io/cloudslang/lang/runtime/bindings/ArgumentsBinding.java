@@ -32,14 +32,15 @@ public class ArgumentsBinding extends Binding {
 
     public Map<String, Serializable> bindArguments(
             List<Argument> arguments,
-            Map<String, ? extends Serializable> context) {
+            Map<String, ? extends Serializable> context,
+            Map<String, String> systemProperties) {
         Map<String, Serializable> resultContext = new HashMap<>();
 
         //we do not want to change original context map
         Map<String, Serializable> srcContext = new HashMap<>(context);
 
         for (Argument argument : arguments) {
-            bindArgument(argument, srcContext, resultContext);
+            bindArgument(argument, srcContext, systemProperties, resultContext);
         }
 
         return resultContext;
@@ -48,6 +49,7 @@ public class ArgumentsBinding extends Binding {
     private void bindArgument(
             Argument argument,
             Map<String, ? extends Serializable> srcContext,
+            Map<String, String> systemProperties,
             Map<String, Serializable> targetContext) {
         Serializable argumentValue;
         String argumentName = argument.getName();
@@ -64,7 +66,7 @@ public class ArgumentsBinding extends Binding {
             if (expressionToEvaluate != null) {
                 //so you can resolve previous arguments already bound
                 scriptContext.putAll(targetContext);
-                argumentValue = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext);
+                argumentValue = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties);
             } else if (rawValue != null) {
                 argumentValue = rawValue;
             }
