@@ -78,9 +78,10 @@ public class CompilerHelperTest {
 		URI flow2FilePath = getClass().getResource("/flowsdir/flow2.sl").toURI();
 		URI spFlow = getClass().getResource("/sp/flow.sl").toURI();
 		URI spOp = getClass().getResource("/sp/operation.sl").toURI();
+        URI get_value = getClass().getResource("/get_value.metadata.sl").toURI();
 		compilerHelper.compile(flowFilePath.getPath(), null);
 		Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath), Sets.newHashSet(SlangSource.fromFile(flowFilePath), SlangSource.fromFile(flow2FilePath),
-			SlangSource.fromFile(opFilePath), SlangSource.fromFile(spFlow), SlangSource.fromFile(spOp)));
+			SlangSource.fromFile(opFilePath), SlangSource.fromFile(spFlow), SlangSource.fromFile(spOp), SlangSource.fromFile(get_value)));
 	}
 
     @Test

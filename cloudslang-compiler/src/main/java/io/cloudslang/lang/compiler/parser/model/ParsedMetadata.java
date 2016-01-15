@@ -17,10 +17,10 @@ import java.util.Map;
  */
 public class ParsedMetadata {
 
+    private String description;
     private List<Map<String, String>> inputs;
     private List<Map<String, String>> outputs;
     private List<Map<String, String>> results;
-    private String description;
 
     public List<Map<String, String>> getInputs() {
         return inputs;

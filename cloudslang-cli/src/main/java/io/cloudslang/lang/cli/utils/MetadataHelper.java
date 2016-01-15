@@ -8,8 +8,6 @@
  */
 package io.cloudslang.lang.cli.utils;
 
-import io.cloudslang.lang.compiler.modeller.model.Metadata;
-
 import java.io.File;
 
 /**

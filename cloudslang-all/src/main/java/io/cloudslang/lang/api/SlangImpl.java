@@ -67,6 +67,7 @@ public class SlangImpl implements Slang {
 
     @Override
     public Metadata extractMetadata(SlangSource source) {
+        Validate.notNull(source, "Source can not be null");
         try {
             return metadataExtractor.extractMetadata(source);
         } catch (Exception e) {

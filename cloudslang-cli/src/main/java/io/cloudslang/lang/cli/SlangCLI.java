@@ -8,21 +8,20 @@
  */
 package io.cloudslang.lang.cli;
 
+import io.cloudslang.lang.cli.services.ScoreServices;
+import io.cloudslang.lang.cli.utils.CompilerHelper;
 import io.cloudslang.lang.cli.utils.MetadataHelper;
-import io.cloudslang.lang.compiler.modeller.model.Metadata;
+import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
+import io.cloudslang.score.events.EventConstants;
+import io.cloudslang.score.events.ScoreEvent;
+import io.cloudslang.score.events.ScoreEventListener;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
-import io.cloudslang.lang.cli.services.ScoreServices;
-import io.cloudslang.lang.cli.utils.CompilerHelper;
-import io.cloudslang.score.events.EventConstants;
-import io.cloudslang.score.events.ScoreEvent;
-import io.cloudslang.score.events.ScoreEventListener;
-import io.cloudslang.lang.entities.CompilationArtifact;
-import io.cloudslang.lang.entities.ScoreLangConstants;
-import io.cloudslang.lang.entities.bindings.Input;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.shell.core.CommandMarker;

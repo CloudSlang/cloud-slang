@@ -8,16 +8,17 @@
  */
 package io.cloudslang.lang.cli.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
+import java.util.Map;
 
 /**
  * User: bancl
@@ -31,16 +32,39 @@ public class MetadataHelperImpl implements MetadataHelper {
 
     @Override
     public String extractMetadata(File file) {
+        Validate.notNull(file, "File can not be null");
         Validate.notNull(file.getAbsolutePath(), "File path can not be null");
         Validate.isTrue(file.isFile(), "File: " + file.getName() + " was not found");
 
         Metadata metadata = slang.extractMetadata(SlangSource.fromFile(file));
 
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(metadata);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("There was a problem printing the description in JSON format ", e);
+        return prettyPrint(metadata);
+    }
+
+    private String prettyPrint(Metadata metadata) {
+        DumperOptions dumperOptions = new DumperOptions();
+        dumperOptions.setAllowReadOnlyProperties(true);
+        dumperOptions.setPrettyFlow(true);
+        dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+
+        Yaml yaml = new Yaml(dumperOptions);
+        String lineBreak = dumperOptions.getLineBreak().getString();
+        String result = yaml.dump(cleanWhiteSpaces(metadata, lineBreak));
+        result = result.substring(result.indexOf(lineBreak) + 1);
+        return result;
+    }
+
+    private Metadata cleanWhiteSpaces(Metadata metadata, String lineBreak) {
+        metadata.setDescription(metadata.getDescription().trim().replaceAll("[\\s]+" + lineBreak, lineBreak));
+        cleanMapWhiteSpaces(metadata.getInputs(), lineBreak);
+        cleanMapWhiteSpaces(metadata.getOutputs(), lineBreak);
+        cleanMapWhiteSpaces(metadata.getResults(), lineBreak);
+        return metadata;
+    }
+
+    private void cleanMapWhiteSpaces(Map<String, String> map, String lineBreak) {
+        for (String key : map.keySet()) {
+            map.put(key, map.get(key).trim().replaceAll("[\\s]+" + lineBreak, lineBreak));
         }
     }
 }

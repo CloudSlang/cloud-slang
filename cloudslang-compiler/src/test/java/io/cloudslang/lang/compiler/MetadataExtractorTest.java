@@ -21,8 +21,9 @@ import java.net.URI;
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
 public class MetadataExtractorTest {
 
-    public static final String OPERATION_DESCRIPTION = "Parses the given JSON input to retrieve the corresponding value addressed by the json_path input.";
-    public static final String FIRST_INPUT_VALUE = "JSON data input\n" +
+    public static final String OPERATION_DESCRIPTION = "Parses the given JSON input to retrieve the\t \n" +
+                                                       "corresponding value addressed by the json_path input.\n";
+    public static final String FIRST_INPUT_VALUE = "JSON data input \n" +
                                                    "- Example: '{\"k1\": {\"k2\": [\"v1\", \"v2\"]}}'\n";
     @Rule
     public ExpectedException exception = ExpectedException.none();
