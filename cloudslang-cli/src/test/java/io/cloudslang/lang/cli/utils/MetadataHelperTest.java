@@ -57,7 +57,7 @@ public class MetadataHelperTest {
 
     @Test
     public void testPrettyPrint() throws Exception {
-        URI flowFilePath = getClass().getResource("/get_value.metadata.sl").toURI();
+        URI flowFilePath = getClass().getResource("/metadata.sl").toURI();
         String metadataToPrint = metadataHelper.extractMetadata(new File(flowFilePath));
         Assert.assertNotNull(metadataToPrint);
         Assert.assertFalse(metadataToPrint.contains("io.cloudslang.lang.compiler.modeller.model.Metadata"));

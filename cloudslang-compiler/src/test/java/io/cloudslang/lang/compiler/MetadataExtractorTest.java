@@ -33,7 +33,7 @@ public class MetadataExtractorTest {
 
     @Test
     public void testExtractMetadata() throws Exception {
-        URI operation = getClass().getResource("/get_value.metadata.sl").toURI();
+        URI operation = getClass().getResource("/metadata.sl").toURI();
         Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
         Assert.assertNotNull("metadata is null", metadata);
         Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
@@ -47,7 +47,7 @@ public class MetadataExtractorTest {
 
     @Test
     public void testExtractMetadataWrongDescriptionFormat() throws Exception {
-        URI operation = getClass().getResource("/get_value.metadata.wrong.desc.sl").toURI();
+        URI operation = getClass().getResource("/metadata_wrong_desc.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage("could not found expected ':'");
         metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
@@ -55,7 +55,7 @@ public class MetadataExtractorTest {
 
     @Test
     public void testExtractMetadataWrongDescriptionIndentation() throws Exception {
-        URI operation = getClass().getResource("/get_value.metadata.wrong.indentation.sl").toURI();
+        URI operation = getClass().getResource("/metadata_wrong_indentation.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage("expected <block end>, but found BlockSequenceStart");
         metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
@@ -63,7 +63,7 @@ public class MetadataExtractorTest {
 
     @Test
     public void testExtractMetadataInvalidOutputValue() throws Exception {
-        URI operation = getClass().getResource("/get_value.metadata.invalid.output.value.sl").toURI();
+        URI operation = getClass().getResource("/metadata_invalid_output_value.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage("expected <block end>, but found Scalar");
         metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
