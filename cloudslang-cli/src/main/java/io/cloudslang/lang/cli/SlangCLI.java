@@ -8,19 +8,20 @@
  */
 package io.cloudslang.lang.cli;
 
+import io.cloudslang.lang.cli.services.ScoreServices;
+import io.cloudslang.lang.cli.utils.CompilerHelper;
+import io.cloudslang.lang.cli.utils.MetadataHelper;
+import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
+import io.cloudslang.score.events.EventConstants;
+import io.cloudslang.score.events.ScoreEvent;
+import io.cloudslang.score.events.ScoreEventListener;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
-import io.cloudslang.lang.cli.services.ScoreServices;
-import io.cloudslang.lang.cli.utils.CompilerHelper;
-import io.cloudslang.score.events.EventConstants;
-import io.cloudslang.score.events.ScoreEvent;
-import io.cloudslang.score.events.ScoreEventListener;
-import io.cloudslang.lang.entities.CompilationArtifact;
-import io.cloudslang.lang.entities.ScoreLangConstants;
-import io.cloudslang.lang.entities.bindings.Input;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.shell.core.CommandMarker;
@@ -62,6 +63,7 @@ public class SlangCLI implements CommandMarker {
     public static final String SET_ASYNC_HELP = "set the async. e.g. env --setAsync true";
     public static final String CSLANG_VERSION_HELP = "Prints the CloudSlang version used";
     public static final String INPUTS_COMMAND_HELP = "Get flow inputs";
+    public static final String PATH_TO_FILENAME_HELP = "Path to filename. e.g. /path/to/file.sl";
     public static final String QUIET = "quiet";
     public static final String DEBUG = "debug";
     public static final String DEFAULT = "default";
@@ -71,6 +73,9 @@ public class SlangCLI implements CommandMarker {
 
     @Autowired
     private CompilerHelper compilerHelper;
+
+    @Autowired
+    private MetadataHelper metadataHelper;
 
     @Value("${slang.version}")
     private String slangVersion;
@@ -120,6 +125,13 @@ public class SlangCLI implements CommandMarker {
     private boolean invalidVerboseInput(String verbose) {
         String[] validArguments = {DEFAULT, QUIET, DEBUG};
         return !Arrays.asList(validArguments).contains(verbose.toLowerCase());
+    }
+
+    @CliCommand(value = "inspect", help = "Display metadata about an executable")
+    public String inspectExecutable(
+            @CliOption(key = {"", "f", "file"}, mandatory = true, help = PATH_TO_FILENAME_HELP) final File executableFile
+    ) throws IOException {
+        return metadataHelper.extractMetadata(executableFile);
     }
 
     @CliCommand(value = "env", help = ENV_HELP)

@@ -10,12 +10,13 @@
 
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.parser.YamlParser;
+import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.entities.bindings.Output;
 import junit.framework.Assert;
-import io.cloudslang.lang.compiler.SlangSource;
-import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -108,6 +109,11 @@ public class OutputsTransformerTest {
         @Bean
         public YamlParser yamlParser() {
             return new YamlParser();
+        }
+
+        @Bean
+        public ParserExceptionHandler parserExceptionHandler() {
+            return new ParserExceptionHandler();
         }
 
         @Bean

@@ -8,8 +8,10 @@
  */
 package io.cloudslang.lang.api;
 
+import io.cloudslang.lang.compiler.MetadataExtractor;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.entities.CompilationArtifact;
@@ -63,6 +65,9 @@ public class SlangImplTest {
     private SlangCompiler compiler;
 
     @Autowired
+    private MetadataExtractor metadataExtractor;
+
+    @Autowired
     private Score score;
 
     @Autowired
@@ -73,6 +78,19 @@ public class SlangImplTest {
         Mockito.reset(score, compiler);
     }
 
+    @Test
+    public void testExtractMetadata() throws IOException {
+        SlangSource tempFile = createTempFile();
+        Mockito.when(metadataExtractor.extractMetadata(any(SlangSource.class))).thenReturn(new Metadata());
+        Metadata metadata = slang.extractMetadata(tempFile);
+        Assert.assertNotNull(metadata);
+        Mockito.verify(metadataExtractor).extractMetadata(tempFile);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testExtractMetadataNoFilePath(){
+        slang.extractMetadata(null);
+    }
 
     @Test
     public void testCompile() throws IOException {
@@ -232,6 +250,11 @@ public class SlangImplTest {
         @Bean
         public SlangImpl slang(){
             return new SlangImpl();
+        }
+
+        @Bean
+        public MetadataExtractor metadataExtractor() {
+            return Mockito.mock(MetadataExtractor.class);
         }
 
         @Bean

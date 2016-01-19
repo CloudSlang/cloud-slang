@@ -1,7 +1,7 @@
 package io.cloudslang.lang.compiler.parser;
 
 import io.cloudslang.lang.compiler.SlangSource;
-import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+import io.cloudslang.lang.compiler.parser.model.ParsedMetadata;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,19 +14,21 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 
+/**
+ * User: bancl
+ * Date: 1/12/2016
+ */
 @RunWith(MockitoJUnitRunner.class)
-public class YamlParserTest {
-
+public class MetadataParserTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
     @InjectMocks
-    private YamlParser yamlParser = new YamlParser();
+    private MetadataParser metadataParser = new MetadataParser();
 
     @Mock
     private Yaml yaml;
@@ -36,16 +38,16 @@ public class YamlParserTest {
 
     @Test
     public void throwExceptionWhenFileIsNotValid() throws Exception {
-        Mockito.when(yaml.loadAs(any(InputStream.class), eq(ParsedSlang.class))).thenThrow(IOException.class);
+        Mockito.when(yaml.loadAs(any(String.class), eq(ParsedMetadata.class))).thenThrow(IOException.class);
         exception.expect(RuntimeException.class);
         exception.expectMessage("parsing");
-        yamlParser.parse(new SlangSource("a", "b"));
+        metadataParser.parse(new SlangSource("a", "b"));
     }
 
     @Test
     public void throwExceptionWhenSourceIsEmpty() throws Exception {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("empty");
-        yamlParser.parse(new SlangSource("", null));
+        metadataParser.parse(new SlangSource("", null));
     }
 }
