@@ -18,7 +18,7 @@
 //import io.cloudslang.lang.runtime.bindings.ArgumentsBinding;
 //import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 //import io.cloudslang.lang.runtime.bindings.OutputsBinding;
-//import io.cloudslang.lang.runtime.bindings.ScriptEvaluator;
+//import io.cloudslang.lang.runtime.bindings.scripts.AbstractScriptEvaluator;
 //import io.cloudslang.lang.runtime.env.*;
 //import io.cloudslang.lang.runtime.events.LanguageEventData;
 //import io.cloudslang.score.events.ScoreEvent;
@@ -470,8 +470,8 @@
 //        }
 //
 //        @Bean
-//        public ScriptEvaluator scriptEvaluator(){
-//            return mock(ScriptEvaluator.class);
+//        public AbstractScriptEvaluator scriptEvaluator(){
+//            return mock(AbstractScriptEvaluator.class);
 //        }
 //
 //        @Bean

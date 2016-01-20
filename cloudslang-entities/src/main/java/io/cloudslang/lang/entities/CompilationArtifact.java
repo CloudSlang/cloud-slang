@@ -14,6 +14,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -25,11 +26,13 @@ public class CompilationArtifact {
     private final ExecutionPlan executionPlan;
     private final Map<String, ExecutionPlan> dependencies;
     private final List<Input> inputs;
+    private final List<String> systemProperties;
 
-    public CompilationArtifact(ExecutionPlan executionPlan, Map<String, ExecutionPlan> dependencies, List<Input> inputs) {
+    public CompilationArtifact(ExecutionPlan executionPlan, Map<String, ExecutionPlan> dependencies, List<Input> inputs, List<String> systemProperties) {
         this.executionPlan = executionPlan;
         this.dependencies = dependencies;
         this.inputs = inputs;
+        this.systemProperties = systemProperties;
     }
 
     public ExecutionPlan getExecutionPlan() {
@@ -44,12 +47,17 @@ public class CompilationArtifact {
         return inputs;
     }
 
+    public List<String> getSystemProperties() {
+        return systemProperties;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .append("executionPlan", executionPlan)
                 .append("dependencies", dependencies)
                 .append("inputs", inputs)
+                .append("systemProperties", systemProperties)
                 .toString();
     }
 
@@ -65,6 +73,7 @@ public class CompilationArtifact {
                 .append(executionPlan, that.executionPlan)
                 .append(dependencies, that.dependencies)
                 .append(inputs, that.inputs)
+                .append(systemProperties, that.systemProperties)
                 .isEquals();
     }
 
@@ -74,6 +83,8 @@ public class CompilationArtifact {
                 .append(executionPlan)
                 .append(dependencies)
                 .append(inputs)
+                .append(systemProperties)
                 .toHashCode();
     }
+
 }

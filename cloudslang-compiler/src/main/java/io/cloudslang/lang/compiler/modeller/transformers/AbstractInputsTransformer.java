@@ -8,9 +8,13 @@
  */
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -43,12 +47,12 @@ public abstract class AbstractInputsTransformer {
             }
             // - some_input: some_expression
             // the value of the input is an expression we need to evaluate at runtime
-            return new Input(entry.getKey(), entryValue);
+            return createInput(entry.getKey(), entryValue);
         }
         throw new RuntimeException("Could not transform Input : " + rawInput);
     }
 
-    private static Input createPropInput(Map.Entry<String, Map<String, Serializable>> entry) {
+    private Input createPropInput(Map.Entry<String, Map<String, Serializable>> entry) {
         Map<String, Serializable> props = entry.getValue();
         List<String> knownKeys = Arrays.asList(REQUIRED_KEY, ENCRYPTED_KEY, OVERRIDABLE_KEY, DEFAULT_KEY);
 
@@ -69,13 +73,42 @@ public abstract class AbstractInputsTransformer {
                 (boolean) props.get(OVERRIDABLE_KEY);
         boolean defaultSpecified = props.containsKey(DEFAULT_KEY);
         String inputName = entry.getKey();
-        Serializable expression = defaultSpecified ? props.get(DEFAULT_KEY) : null;
+        Serializable value = defaultSpecified ? props.get(DEFAULT_KEY) : null;
 
         if (!overridable && !defaultSpecified) {
             throw new RuntimeException(
                     "input: " + inputName + " is not overridable but no default value was specified");
         }
 
-        return new Input(inputName, expression, encrypted, required, overridable);
+        return createInput(inputName, value, encrypted, required, overridable);
     }
+
+    private Input createInput(
+            String name,
+            Serializable value) {
+        return createInput(name, value, false, true, true);
+    }
+
+    private Input createInput(
+            String name,
+            Serializable value,
+            boolean encrypted,
+            boolean required,
+            boolean overridable) {
+        String expression = ExpressionUtils.extractExpression(value);
+        List<String> systemPropertyDependencies = new ArrayList<>();
+        List<ScriptFunction> functionDependencies = new ArrayList<>();
+        if (expression != null) {
+            systemPropertyDependencies = ExpressionUtils.extractSystemProperties(expression);
+            if (CollectionUtils.isNotEmpty(systemPropertyDependencies)) {
+                functionDependencies.add(ScriptFunction.GET_SYSTEM_PROPERTY);
+            }
+            boolean getFunctionFound = ExpressionUtils.matchGetFunction(expression);
+            if (getFunctionFound) {
+                functionDependencies.add(ScriptFunction.GET);
+            }
+        }
+        return new Input(name, value, encrypted, required, overridable, functionDependencies, systemPropertyDependencies);
+    }
+
 }

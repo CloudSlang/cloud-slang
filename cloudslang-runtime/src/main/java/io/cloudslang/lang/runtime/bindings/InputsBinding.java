@@ -11,6 +11,8 @@ package io.cloudslang.lang.runtime.bindings;
  *******************************************************************************/
 
 import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.utils.ExpressionUtils;
+import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class InputsBinding extends Binding {
+public class InputsBinding {
 
     @Autowired
     private ScriptEvaluator scriptEvaluator;
@@ -88,12 +90,12 @@ public class InputsBinding extends Binding {
 
         if (value == null) {
             Serializable rawValue = input.getValue();
-            String expressionToEvaluate = extractExpression(rawValue);
+            String expressionToEvaluate = ExpressionUtils.extractExpression(rawValue);
             if (expressionToEvaluate != null) {
                 scriptContext.put(inputName, valueFromContext);
                 //so you can resolve previous inputs already bound
                 scriptContext.putAll(targetContext);
-                value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties);
+                value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, input.getFunctionDependencies());
             } else {
                 value = rawValue;
             }

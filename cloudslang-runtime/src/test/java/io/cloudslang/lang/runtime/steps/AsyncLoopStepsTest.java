@@ -507,8 +507,8 @@
 //        }
 //
 //        @Bean
-//        public ScriptEvaluator scriptEvaluator(){
-//            return mock(ScriptEvaluator.class);
+//        public AbstractScriptEvaluator scriptEvaluator(){
+//            return mock(AbstractScriptEvaluator.class);
 //        }
 //
 //        @Bean

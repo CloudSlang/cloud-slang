@@ -10,6 +10,7 @@
 package io.cloudslang.lang.entities.bindings;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author Bonczidai Levente
@@ -19,6 +20,14 @@ public class Argument extends InOutParam {
 
     public Argument(String name, Serializable value) {
         super(name, value);
+    }
+
+    public Argument(
+            String name,
+            Serializable value,
+            List<ScriptFunction> scriptFunctions,
+            List<String> systemPropertyDependencies) {
+        super(name, value, scriptFunctions, systemPropertyDependencies);
     }
 
     /**

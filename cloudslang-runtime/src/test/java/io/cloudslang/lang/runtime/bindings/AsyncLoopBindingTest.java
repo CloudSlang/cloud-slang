@@ -31,7 +31,7 @@
 //    private AsyncLoopBinding asyncLoopBinding = new AsyncLoopBinding();
 //
 //    @Mock
-//    private ScriptEvaluator scriptEvaluator;
+//    private AbstractScriptEvaluator scriptEvaluator;
 //
 //    @Test
 //    public void passingNullAsyncLoopStatementThrowsException() throws Exception {

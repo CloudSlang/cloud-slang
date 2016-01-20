@@ -12,11 +12,12 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.utils.ExpressionUtils;
+import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -29,7 +30,7 @@ import java.util.Map;
  * Time: 09:32
  */
 @Component
-public class ResultsBinding extends Binding {
+public class ResultsBinding {
 
     @Autowired
     public ScriptEvaluator scriptEvaluator;
@@ -93,7 +94,7 @@ public class ResultsBinding extends Binding {
             }
 
             if (rawValue instanceof String) {
-                String expression = extractExpression(rawValue);
+                String expression = ExpressionUtils.extractExpression(rawValue);
                 if (expression == null) {
                     throw new RuntimeException(
                             "Error resolving the result. The expression: '" + rawValue + "' is not valid." +
@@ -111,7 +112,7 @@ public class ResultsBinding extends Binding {
                 }
 
                 try {
-                    Serializable expressionResult = scriptEvaluator.evalExpr(expression, scriptContext, systemProperties);
+                    Serializable expressionResult = scriptEvaluator.evalExpr(expression, scriptContext, systemProperties, result.getFunctionDependencies());
                     Boolean evaluatedResult;
                     if (expressionResult instanceof Integer) {
                         evaluatedResult = (Integer) expressionResult != 0;

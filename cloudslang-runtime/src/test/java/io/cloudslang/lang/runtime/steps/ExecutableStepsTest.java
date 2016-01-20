@@ -21,7 +21,7 @@
 //import io.cloudslang.lang.runtime.bindings.InputsBinding;
 //import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 //import io.cloudslang.lang.runtime.bindings.ResultsBinding;
-//import io.cloudslang.lang.runtime.bindings.ScriptEvaluator;
+//import io.cloudslang.lang.runtime.bindings.scripts.AbstractScriptEvaluator;
 //import io.cloudslang.lang.runtime.env.ParentFlowData;
 //import junit.framework.Assert;
 //import io.cloudslang.score.events.ScoreEvent;
@@ -279,8 +279,8 @@
 //        }
 //
 //        @Bean
-//        public ScriptEvaluator scriptEvaluator(){
-//            return mock(ScriptEvaluator.class);
+//        public AbstractScriptEvaluator scriptEvaluator(){
+//            return mock(AbstractScriptEvaluator.class);
 //        }
 //
 //        @Bean

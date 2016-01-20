@@ -84,7 +84,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         executables.add(executable);
 
         executionPlan.setSubflowsUUIDs(new HashSet<>(dependencies.keySet()));
-        return new CompilationArtifact(executionPlan, dependencies, executable.getInputs());
+        return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemProperties(executables));
     }
 
     /**
@@ -108,13 +108,13 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             String refId = task.getRefId();
             Executable reference = filteredDependencies.get(refId);
             Validate.notNull(reference, "Cannot compile flow: \'" + executable.getName() + "\' since for task: \'" + task.getName()
-                                        + "\', the dependency: \'" + refId + "\' is missing.");
+                    + "\', the dependency: \'" + refId + "\' is missing.");
             List<Result> refResults = reference.getResults();
             for(Result result : refResults){
                 String resultName = result.getName();
                 Validate.isTrue(taskNavigations.containsKey(resultName), "Cannot compile flow: \'" + executable.getName() +
-                                                "\' since for task: '" + task.getName() + "\', the result \'" + resultName+
-                                                "\' of its dependency: \'"+ refId + "\' has no matching navigation");
+                        "\' since for task: '" + task.getName() + "\', the result \'" + resultName+
+                        "\' of its dependency: \'"+ refId + "\' has no matching navigation");
             }
         }
     }
@@ -136,6 +136,25 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             default:
                 throw new RuntimeException("Executable: " + executable.getName() + " cannot be compiled to an ExecutionPlan since it is not a flow and not an operation");
         }
+    }
+
+    private static List<String> getSystemProperties(Collection<Executable> executables) {
+        List<String> result = new ArrayList<>();
+        for(Executable executable : executables) {
+            result.addAll(getSystemProperties(executable.getInputs()));
+        }
+        return result;
+    }
+
+    private static List<String> getSystemProperties(List<Input> inputs) {
+        List<String> result = new ArrayList<>();
+        for(Input input : inputs) {
+            List<String> systemPropertyDependencies = input.getSystemPropertyDependencies();
+            if(CollectionUtils.isNotEmpty(systemPropertyDependencies)) {
+                result.addAll(systemPropertyDependencies);
+            }
+        }
+        return result;
     }
 
 }

@@ -17,7 +17,7 @@ flow:
     - enable_option_for_action:
          required: false
     - enableOptionForAction:
-        default: ${'test'}
+        default: ${get("enable_option_for_action", "default_value")}
         overridable: false
 
     # helpers
@@ -29,7 +29,7 @@ flow:
     - input_no_expression
     - input_no_expression_not_required:
         required: false
-    - input_system_property: ${get_system_property('user.sys.props.host')}
+    - input_system_property: ${get_sp('user.sys.props.host')}
     - input_not_overridable:
         default: 25
         overridable: false

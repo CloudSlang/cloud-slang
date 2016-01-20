@@ -420,8 +420,8 @@
 //        }
 //
 //        @Bean
-//        public ScriptEvaluator scriptEvaluator(){
-//            return new ScriptEvaluator();
+//        public AbstractScriptEvaluator scriptEvaluator(){
+//            return new AbstractScriptEvaluator();
 //        }
 //
 //

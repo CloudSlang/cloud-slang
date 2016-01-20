@@ -37,7 +37,7 @@
 //    private LoopsBinding loopsBinding = new LoopsBinding();
 //
 //    @Mock
-//    private ScriptEvaluator scriptEvaluator;
+//    private AbstractScriptEvaluator scriptEvaluator;
 //
 //    @Mock
 //    private ScriptEngine scriptEngine;

@@ -28,7 +28,7 @@
 //    public ExpectedException exception = ExpectedException.none();
 //
 //    @InjectMocks
-//    private ScriptEvaluator scriptEvaluator = new ScriptEvaluator();
+//    private AbstractScriptEvaluator scriptEvaluator = new AbstractScriptEvaluator();
 //
 //    @Mock
 //    private ScriptEngine scriptEngine;

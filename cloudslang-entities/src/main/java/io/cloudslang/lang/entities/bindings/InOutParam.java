@@ -13,6 +13,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author moradi
@@ -25,10 +27,22 @@ public abstract class InOutParam implements Serializable {
 
 	private String name;
 	private Serializable value;
+	private List<ScriptFunction> functionDependencies;
+	private List<String> systemPropertyDependencies;
 
-	public InOutParam(String name, Serializable value) {
+	public InOutParam(
+			String name,
+			Serializable value,
+			List<ScriptFunction> functionDependencies,
+			List<String> systemPropertyDependencies) {
 		this.name = name;
 		this.value = value;
+		this.functionDependencies = functionDependencies;
+		this.systemPropertyDependencies = systemPropertyDependencies;
+	}
+
+	public InOutParam(String name, Serializable value) {
+		this(name, value, new ArrayList<ScriptFunction>(), new ArrayList<String>());
 	}
 
 	/**
@@ -44,11 +58,21 @@ public abstract class InOutParam implements Serializable {
 		return value;
 	}
 
+	public List<ScriptFunction> getFunctionDependencies() {
+		return functionDependencies;
+	}
+
+	public List<String> getSystemPropertyDependencies() {
+		return systemPropertyDependencies;
+	}
+
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this)
 				.append("name", name)
 				.append("value", value)
+				.append("functionDependencies", functionDependencies)
+				.append("systemPropertyDependencies", systemPropertyDependencies)
 				.toString();
 	}
 
@@ -63,6 +87,8 @@ public abstract class InOutParam implements Serializable {
 		return new EqualsBuilder()
 				.append(name, that.name)
 				.append(value, that.value)
+				.append("functionDependencies", functionDependencies)
+				.append("systemPropertyDependencies", systemPropertyDependencies)
 				.isEquals();
 	}
 
@@ -71,6 +97,8 @@ public abstract class InOutParam implements Serializable {
 		return new HashCodeBuilder(17, 37)
 				.append(name)
 				.append(value)
+				.append(functionDependencies)
+				.append(systemPropertyDependencies)
 				.toHashCode();
 	}
 

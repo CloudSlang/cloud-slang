@@ -12,6 +12,8 @@
 package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.utils.ExpressionUtils;
+import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +27,7 @@ import java.util.Map;
  * @since 8/17/2015
  */
 @Component
-public class ArgumentsBinding extends Binding {
+public class ArgumentsBinding {
 
     @Autowired
     private ScriptEvaluator scriptEvaluator;
@@ -62,11 +64,11 @@ public class ArgumentsBinding extends Binding {
             scriptContext.put(argumentName, argumentValue);
 
             Serializable rawValue = argument.getValue();
-            String expressionToEvaluate = extractExpression(rawValue);
+            String expressionToEvaluate = ExpressionUtils.extractExpression(rawValue);
             if (expressionToEvaluate != null) {
                 //so you can resolve previous arguments already bound
                 scriptContext.putAll(targetContext);
-                argumentValue = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties);
+                argumentValue = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, argument.getFunctionDependencies());
             } else if (rawValue != null) {
                 argumentValue = rawValue;
             }

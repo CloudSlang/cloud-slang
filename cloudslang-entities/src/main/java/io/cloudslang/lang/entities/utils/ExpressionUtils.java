@@ -9,19 +9,24 @@
  * <p/>
  * *****************************************************************************
  */
-package io.cloudslang.lang.runtime.bindings;
+package io.cloudslang.lang.entities.utils;
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * @author Bonczidai Levente
- * @since 11/6/2015
+ * @since 1/18/2016
  */
-public abstract class Binding {
+public final class ExpressionUtils {
+
+    private ExpressionUtils() {
+    }
 
     // match ${ expression } pattern
     private final static String EXPRESSION_REGEX =
@@ -30,9 +35,16 @@ public abstract class Binding {
                     "(.+)" +
                     ScoreLangConstants.EXPRESSION_END_DELIMITER_ESCAPED +
                     "\\s*$";
-    private final static Pattern EXPRESSION_PATTERN = Pattern.compile(EXPRESSION_REGEX, Pattern.DOTALL);
+    // match get_sp() function
+    private final static String SYSTEM_PROPERTY_REGEX = "get_sp\\('([\\w.]+)'\\)";
+    // match get() function
+    private final static String GET_REGEX = "get\\((.+?),(.+?)\\)";
 
-    protected String extractExpression(Serializable value) {
+    private final static Pattern EXPRESSION_PATTERN = Pattern.compile(EXPRESSION_REGEX, Pattern.DOTALL);
+    private final static Pattern SYSTEM_PROPERTY_PATTERN = Pattern.compile(SYSTEM_PROPERTY_REGEX);
+    private final static Pattern GET_PATTERN = Pattern.compile(GET_REGEX);
+
+    public static String extractExpression(Serializable value) {
         String expression = null;
         if (value instanceof String) {
             String valueAsString = ((String) value);
@@ -42,6 +54,24 @@ public abstract class Binding {
             }
         }
         return expression;
+    }
+
+    public static List<String> extractSystemProperties(String expression) {
+        return matchFunctionSingleParameter(SYSTEM_PROPERTY_PATTERN, expression, 1);
+    }
+
+    public static boolean matchGetFunction(String text) {
+        Matcher matcher = GET_PATTERN.matcher(text);
+        return matcher.find();
+    }
+
+    private static List<String> matchFunctionSingleParameter(Pattern functionPattern, String text, int parameterGroup) {
+        Matcher matcher = functionPattern.matcher(text);
+        List<String> parameters = new ArrayList<>();
+        while(matcher.find()) {
+            parameters.add(matcher.group(parameterGroup));
+        }
+        return parameters;
     }
 
 }

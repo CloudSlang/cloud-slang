@@ -10,6 +10,7 @@
 package io.cloudslang.lang.entities.bindings;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author stoneo
@@ -24,9 +25,18 @@ public class Result extends InOutParam {
 		super(name, value);
 	}
 
+	public Result(
+			String name,
+			Serializable value,
+			List<ScriptFunction> scriptFunctions,
+			List<String> systemPropertyDependencies) {
+		super(name, value, scriptFunctions, systemPropertyDependencies);
+	}
+
     /**
      * only here to satisfy serialization libraries
      */
+	@SuppressWarnings("unused")
     private Result(){}
 
 }

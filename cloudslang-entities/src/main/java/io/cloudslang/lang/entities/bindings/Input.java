@@ -13,6 +13,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author orius123
@@ -27,15 +29,22 @@ public class Input extends InOutParam {
 	private boolean required;
 	private boolean overridable;
 
-	public Input(String name, Serializable value, boolean encrypted, boolean required, boolean overridable) {
-		super(name, value);
+	public Input(
+			String name,
+			Serializable value,
+			boolean encrypted,
+			boolean required,
+			boolean overridable,
+			List<ScriptFunction> scriptFunctions,
+			List<String> systemPropertyDependencies) {
+		super(name, value, scriptFunctions, systemPropertyDependencies);
 		this.encrypted = encrypted;
 		this.required = required;
 		this.overridable = overridable;
 	}
 
 	public Input(String name, Serializable expression) {
-		this(name, expression, false, true, true);
+		this(name, expression, false, true, true, new ArrayList<ScriptFunction>(), new ArrayList<String>());
 	}
 
 	/**
