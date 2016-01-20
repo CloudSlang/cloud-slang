@@ -46,6 +46,20 @@ public class MetadataExtractorTest {
     }
 
     @Test
+    public void testExtractMetadataNoResults() throws Exception {
+        URI operation = getClass().getResource("/metadata_no_results.sl").toURI();
+        Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+        Assert.assertNotNull("metadata is null", metadata);
+        Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
+        Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
+        Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
+        Assert.assertEquals("different number of results", 0, metadata.getResults().size());
+        String key = metadata.getInputs().keySet().iterator().next();
+        Assert.assertEquals("different input name", "json_input", key);
+        Assert.assertEquals("different input value", FIRST_INPUT_VALUE, metadata.getInputs().get(key));
+    }
+
+    @Test
     public void testExtractMetadataWrongDescriptionFormat() throws Exception {
         URI operation = getClass().getResource("/metadata_wrong_desc.sl").toURI();
         exception.expect(RuntimeException.class);

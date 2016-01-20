@@ -12,6 +12,7 @@ import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.compiler.parser.model.ParsedMetadata;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class MetadataModellerImpl implements MetadataModeller {
 
     private Metadata transformToMetadata(ParsedMetadata parsedMetadata) {
         Metadata metadata = new Metadata();
-        metadata.setDescription(parsedMetadata.getDescription());
+        metadata.setDescription(emptyStringIfNull(parsedMetadata.getDescription()));
         metadata.setInputs(convertMapListToMap(parsedMetadata.getInputs()));
         metadata.setOutputs(convertMapListToMap(parsedMetadata.getOutputs()));
         metadata.setResults(convertMapListToMap(parsedMetadata.getResults()));
@@ -39,10 +40,18 @@ public class MetadataModellerImpl implements MetadataModeller {
 
     private Map<String, String> convertMapListToMap(List<Map<String, String>> mapList) {
         Map<String, String> linkedHashMap = new LinkedHashMap<>();
-        for (Map<String,String> inputMap : mapList) {
+        for (Map<String,String> inputMap : emptyListIfNull(mapList) ) {
             Map.Entry<String, String> entry = inputMap.entrySet().iterator().next();
             linkedHashMap.put(entry.getKey(), entry.getValue());
         }
         return linkedHashMap;
+    }
+
+    private List<Map<String, String>> emptyListIfNull(List<Map<String, String>> mapList) {
+        return mapList == null ? Collections.EMPTY_LIST : mapList;
+    }
+
+    private String emptyStringIfNull(String string) {
+        return string == null ? "" : string;
     }
 }
