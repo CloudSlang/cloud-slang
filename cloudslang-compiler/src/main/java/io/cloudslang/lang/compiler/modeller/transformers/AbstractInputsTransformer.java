@@ -31,7 +31,7 @@ public abstract class AbstractInputsTransformer {
         // this is our default behaviour that if the user specifies only a key, the key is also the ref we look for
         if (rawInput instanceof String) {
             String inputName = (String) rawInput;
-            return new Input(inputName, null);
+            return new Input.InputBuilder(inputName, null).build();
         } else if (rawInput instanceof Map) {
             Map.Entry<String, ?> entry = ((Map<String, ?>) rawInput).entrySet().iterator().next();
             Serializable entryValue = (Serializable) entry.getValue();
@@ -108,7 +108,13 @@ public abstract class AbstractInputsTransformer {
                 functionDependencies.add(ScriptFunction.GET);
             }
         }
-        return new Input(name, value, encrypted, required, overridable, functionDependencies, systemPropertyDependencies);
+        return new Input.InputBuilder(name, value)
+                .withEncrypted(encrypted)
+                .withRequired(required)
+                .withOverridable(overridable)
+                .withFunctionDependencies(functionDependencies)
+                .withSystemPropertyDependencies(systemPropertyDependencies)
+                .build();
     }
 
 }

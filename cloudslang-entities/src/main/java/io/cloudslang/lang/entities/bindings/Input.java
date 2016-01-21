@@ -29,22 +29,16 @@ public class Input extends InOutParam {
 	private boolean required;
 	private boolean overridable;
 
-	public Input(
-			String name,
-			Serializable value,
-			boolean encrypted,
-			boolean required,
-			boolean overridable,
-			List<ScriptFunction> scriptFunctions,
-			List<String> systemPropertyDependencies) {
-		super(name, value, scriptFunctions, systemPropertyDependencies);
-		this.encrypted = encrypted;
-		this.required = required;
-		this.overridable = overridable;
-	}
-
-	public Input(String name, Serializable expression) {
-		this(name, expression, false, true, true, new ArrayList<ScriptFunction>(), new ArrayList<String>());
+	private Input(InputBuilder inputBuilder) {
+		super(
+				inputBuilder.name,
+				inputBuilder.value,
+				inputBuilder.functionDependencies,
+				inputBuilder.systemPropertyDependencies
+		);
+		this.encrypted = inputBuilder.encrypted;
+		this.required = inputBuilder.required;
+		this.overridable = inputBuilder.overridable;
 	}
 
 	/**
@@ -99,6 +93,56 @@ public class Input extends InOutParam {
 				.append(required)
 				.append(overridable)
 				.toHashCode();
+	}
+
+	public static class InputBuilder {
+		private String name;
+		private Serializable value;
+		private boolean encrypted;
+		private boolean required;
+		private boolean overridable;
+		private List<ScriptFunction> functionDependencies;
+		private List<String> systemPropertyDependencies;
+
+		public InputBuilder(String name, Serializable value) {
+			this.name = name;
+			this.value = value;
+			encrypted = false;
+			required = true;
+			overridable = true;
+			functionDependencies = new ArrayList<>();
+			systemPropertyDependencies = new ArrayList<>();
+		}
+
+		public InputBuilder withEncrypted(boolean encrypted) {
+			this.encrypted = encrypted;
+			return this;
+		}
+
+		public InputBuilder withRequired(boolean required) {
+			this.required = required;
+			return this;
+		}
+
+		public InputBuilder withOverridable(boolean overridable) {
+			this.overridable = overridable;
+			return this;
+		}
+
+		public InputBuilder withFunctionDependencies(List<ScriptFunction> functionDependencies) {
+			this.functionDependencies = functionDependencies;
+			return this;
+		}
+
+		public InputBuilder withSystemPropertyDependencies(List<String> systemPropertyDependencies) {
+			this.systemPropertyDependencies = systemPropertyDependencies;
+			return this;
+		}
+
+		public Input build() {
+			return new Input(this);
+		}
+
 	}
 
 }
