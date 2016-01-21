@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class PropertiesFile {
 
-    public final static String PROPERTIES_KEY = "properties";
+    public static final String PROPERTIES_KEY = "properties";
 
     private String namespace;
     private Map<String, String> properties;
