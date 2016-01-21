@@ -84,12 +84,13 @@ public class CompilerHelperImpl implements CompilerHelper{
         }
         for (String dependency:dependencies) {
             Collection<File> dependenciesFiles = FileUtils.listFiles(new File(dependency), SLANG_FILE_EXTENSIONS, true);
-            depsSources.addAll(convert(dependenciesFiles, new Converter<File, SlangSource>() {
-                @Override
-                public SlangSource convert(File from) {
-                    return SlangSource.fromFile(from);
+            for (File dependencyCandidate : dependenciesFiles) {
+                SlangSource source = SlangSource.fromFile(dependencyCandidate);
+                // exclude properties files
+                if (!isPropertiesFile(source)) {
+                    depsSources.add(source);
                 }
-            }));
+            }
         }
         try {
             return slang.compile(SlangSource.fromFile(file), depsSources);
@@ -199,6 +200,11 @@ public class CompilerHelperImpl implements CompilerHelper{
             suffixes[i] = "." + SLANG_FILE_EXTENSIONS[i];
         }
         return new SuffixFileFilter(suffixes).accept(file);
+    }
+
+    private boolean isPropertiesFile(SlangSource source) {
+        Object yamlObject = yaml.load(source.getSource());
+        return yamlObject instanceof Map && ((Map) yamlObject).containsKey(PropertiesFile.PROPERTIES_KEY);
     }
 
 }
