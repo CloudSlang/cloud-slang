@@ -32,7 +32,6 @@ public class DeserializeTest {
                 .withEncrypted(true)
                 .withRequired(true)
                 .withOverridable(true)
-                .withOverridable(true)
                 .withFunctionDependencies(Lists.newArrayList(ScriptFunction.GET))
                 .withSystemPropertyDependencies(Lists.newArrayList("a.b.c.prop1", "a.b.c.prop2"))
                 .build();
