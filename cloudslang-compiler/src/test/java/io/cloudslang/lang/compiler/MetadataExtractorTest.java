@@ -89,6 +89,34 @@ public class MetadataExtractorTest {
     }
 
     @Test
+    public void testExtractMetadataSingleHashForResults() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_single_hash_for_results.sl").toURI();
+        Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+        Assert.assertNotNull("metadata is null", metadata);
+        Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
+        Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
+        Assert.assertEquals("different number of outputs", 6, metadata.getOutputs().size());
+        Assert.assertEquals("different number of results", 0, metadata.getResults().size());
+        String key = metadata.getOutputs().keySet().iterator().next();
+        Assert.assertEquals("different input name", "value", key);
+        Assert.assertEquals("different input value", FIRST_OUTPUT_VALUE, metadata.getOutputs().get(key));
+    }
+
+    @Test
+    public void testExtractMetadataSingleHashForAResult() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_single_hash_for_a_result.sl").toURI();
+        Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+        Assert.assertNotNull("metadata is null", metadata);
+        Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
+        Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
+        Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
+        Assert.assertEquals("different number of results", 1, metadata.getResults().size());
+        String key = metadata.getOutputs().keySet().iterator().next();
+        Assert.assertEquals("different input name", "value", key);
+        Assert.assertEquals("different input value", FIRST_OUTPUT_VALUE, metadata.getOutputs().get(key));
+    }
+
+    @Test
     public void testExtractMetadataWrongDescriptionFormat() throws Exception {
         URI operation = getClass().getResource("/metadata/metadata_wrong_desc.sl").toURI();
         exception.expect(RuntimeException.class);
