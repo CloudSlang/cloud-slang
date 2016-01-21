@@ -87,8 +87,8 @@ public abstract class InOutParam implements Serializable {
 		return new EqualsBuilder()
 				.append(name, that.name)
 				.append(value, that.value)
-				.append("functionDependencies", functionDependencies)
-				.append("systemPropertyDependencies", systemPropertyDependencies)
+				.append(functionDependencies, that.functionDependencies)
+				.append(systemPropertyDependencies, that.systemPropertyDependencies)
 				.isEquals();
 	}
 
