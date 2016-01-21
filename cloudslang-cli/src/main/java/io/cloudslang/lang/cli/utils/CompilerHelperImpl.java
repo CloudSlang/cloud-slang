@@ -12,6 +12,7 @@ import ch.lambdaj.function.convert.Converter;
 
 
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.cli.model.PropertiesFile;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import org.apache.commons.collections4.CollectionUtils;
@@ -100,41 +101,17 @@ public class CompilerHelperImpl implements CompilerHelper{
 
     @Override
     public Map<String, String> loadSystemProperties(List<String> systemPropertyFiles) {
-        Map<String, Serializable> rawSystemProperties = loadFiles(systemPropertyFiles, YAML_FILE_EXTENSIONS, SP_DIR);
-        Map<String, String> systemProperties;
-        systemProperties =
-                convertMap(rawSystemProperties, new Converter<Serializable, String>() {
-                    @Override
-                    public String convert(Serializable rawValue) {
-                        String returnValue = null;
-                        if (rawValue != null) {
-                            returnValue = rawValue.toString();
-                        }
-                        return returnValue;
-                    }
-                });
-        return systemProperties;
+        return loadPropertiesFromFiles(systemPropertyFiles, YAML_FILE_EXTENSIONS, SP_DIR);
     }
 
     @Override
     public Map<String, Serializable> loadInputsFromFile(List<String> inputFiles) {
-        return loadFiles(inputFiles, YAML_FILE_EXTENSIONS, INPUT_DIR);
+        return loadMapsFromFiles(inputFiles, YAML_FILE_EXTENSIONS, INPUT_DIR);
     }
 
-    private Map<String, Serializable> loadFiles(List<String> files, String[] extensions, String directory) {
+    private Map<String, Serializable> loadMapsFromFiles(List<String> files, String[] extensions, String directory) {
         if(CollectionUtils.isEmpty(files)) {
-            String appHome = System.getProperty("app.home", "");
-            String defaultDirectoryPath = appHome + File.separator + "bin" + File.separator + directory;
-            File defaultDirectory = new File(defaultDirectoryPath);
-            if (defaultDirectory.isDirectory()) {
-                Collection<File> implicitFiles = FileUtils.listFiles(defaultDirectory, extensions, false);
-                files = convert(implicitFiles, new Converter<File, String>() {
-                    @Override
-                    public String convert(File from) {
-                        return from.getPath();
-                    }
-                });
-            }
+            files = loadDefaultFiles(files, extensions, directory, false);
         }
         if(CollectionUtils.isEmpty(files)) return null;
         Map<String, Serializable> result = new HashMap<>();
@@ -152,7 +129,7 @@ public class CompilerHelperImpl implements CompilerHelper{
                     }
                 }
                 if (emptyContent){
-                    throw new RuntimeException("Inputs / System properties file: " + inputFile + " is empty or does not contain valid YAML content.");
+                    throw new RuntimeException("Inputs file: " + inputFile + " is empty or does not contain valid YAML content.");
                 }
 			} catch(IOException ex) {
 				logger.error("Error loading file: " + inputFile, ex);
@@ -160,6 +137,60 @@ public class CompilerHelperImpl implements CompilerHelper{
 			}
 		}
         return result;
+    }
+
+    private Map<String, String> loadPropertiesFromFiles(List<String> files, String[] extensions, String directory) {
+        if(CollectionUtils.isEmpty(files)) {
+            files = loadDefaultFiles(files, extensions, directory, true);
+        }
+        if(CollectionUtils.isEmpty(files)) return null;
+        Map<String, String> result = new HashMap<>();
+        for(String propFile : files) {
+            logger.info("Loading file: " + propFile);
+            try {
+                String propFileContent = FileUtils.readFileToString(new File(propFile));
+                if (StringUtils.isNotEmpty(propFileContent)) {
+                    PropertiesFile propertiesFile = yaml.loadAs(propFileContent, PropertiesFile.class);
+                    result.putAll(convertPropertiesFileToMap(propertiesFile));
+                } else {
+                    throw new RuntimeException("System properties file: " + propFile + " is empty.");
+                }
+            } catch(IOException ex) {
+                logger.error("Error loading file: " + propFile, ex);
+                throw new RuntimeException(ex);
+            }
+        }
+        return result;
+    }
+
+    private List<String> loadDefaultFiles(List<String> files, String[] extensions, String directory, boolean recursive) {
+        String appHome = System.getProperty("app.home", "");
+        String defaultDirectoryPath = appHome + File.separator + "bin" + File.separator + directory;
+        File defaultDirectory = new File(defaultDirectoryPath);
+        if (defaultDirectory.isDirectory()) {
+            Collection<File> implicitFiles = FileUtils.listFiles(defaultDirectory, extensions, recursive);
+            files = convert(implicitFiles, new Converter<File, String>() {
+                @Override
+                public String convert(File from) {
+                    return from.getPath();
+                }
+            });
+        }
+        return files;
+    }
+
+    private Map<String, String> convertPropertiesFileToMap(PropertiesFile propertiesFile) {
+        Map<String, String> rawProperties = propertiesFile.getProperties();
+        String namespace = propertiesFile.getNamespace();
+        Map<String, String> properties = new HashMap<>(rawProperties.size());
+        for (Map.Entry<String, String> rawProperty : rawProperties.entrySet()) {
+            String key = rawProperty.getKey();
+            if (StringUtils.isNotEmpty(namespace)) {
+                key = namespace + "." + key;
+            }
+            properties.put(key, rawProperty.getValue());
+        }
+        return properties;
     }
 
     private Boolean checkIsFileSupported(File file){
