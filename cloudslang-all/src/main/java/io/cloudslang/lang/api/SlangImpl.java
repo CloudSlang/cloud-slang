@@ -76,8 +76,6 @@ public class SlangImpl implements Slang {
         }
     }
 
-    @Override
-	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties) {
 	@Override
 	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, String> systemProperties) {
 		Validate.notNull(compilationArtifact, "Compilation artifact can not be null");
