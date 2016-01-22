@@ -1,7 +1,7 @@
 package io.cloudslang.lang.entities;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import io.cloudslang.lang.entities.bindings.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,8 +32,8 @@ public class DeserializeTest {
                 .withEncrypted(true)
                 .withRequired(true)
                 .withOverridable(true)
-                .withFunctionDependencies(Lists.newArrayList(ScriptFunction.GET))
-                .withSystemPropertyDependencies(Lists.newArrayList("a.b.c.prop1", "a.b.c.prop2"))
+                .withFunctionDependencies(Sets.newHashSet(ScriptFunction.GET))
+                .withSystemPropertyDependencies(Sets.newHashSet("a.b.c.prop1", "a.b.c.prop2"))
                 .build();
         testToAndFromJson(input, Input.class);
     }

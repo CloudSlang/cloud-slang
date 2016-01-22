@@ -14,7 +14,9 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author moradi
@@ -27,14 +29,14 @@ public abstract class InOutParam implements Serializable {
 
 	private String name;
 	private Serializable value;
-	private List<ScriptFunction> functionDependencies;
-	private List<String> systemPropertyDependencies;
+	private Set<ScriptFunction> functionDependencies;
+	private Set<String> systemPropertyDependencies;
 
 	public InOutParam(
 			String name,
 			Serializable value,
-			List<ScriptFunction> functionDependencies,
-			List<String> systemPropertyDependencies) {
+			Set<ScriptFunction> functionDependencies,
+			Set<String> systemPropertyDependencies) {
 		this.name = name;
 		this.value = value;
 		this.functionDependencies = functionDependencies;
@@ -42,7 +44,7 @@ public abstract class InOutParam implements Serializable {
 	}
 
 	public InOutParam(String name, Serializable value) {
-		this(name, value, new ArrayList<ScriptFunction>(), new ArrayList<String>());
+		this(name, value, new HashSet<ScriptFunction>(), new HashSet<String>());
 	}
 
 	/**
@@ -58,11 +60,11 @@ public abstract class InOutParam implements Serializable {
 		return value;
 	}
 
-	public List<ScriptFunction> getFunctionDependencies() {
+	public Set<ScriptFunction> getFunctionDependencies() {
 		return functionDependencies;
 	}
 
-	public List<String> getSystemPropertyDependencies() {
+	public Set<String> getSystemPropertyDependencies() {
 		return systemPropertyDependencies;
 	}
 

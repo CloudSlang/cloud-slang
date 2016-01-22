@@ -138,18 +138,18 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         }
     }
 
-    private static List<String> getSystemProperties(Collection<Executable> executables) {
-        List<String> result = new ArrayList<>();
+    private static Set<String> getSystemProperties(Collection<Executable> executables) {
+        Set<String> result = new HashSet<>();
         for(Executable executable : executables) {
             result.addAll(getSystemProperties(executable.getInputs()));
         }
         return result;
     }
 
-    private static List<String> getSystemProperties(List<Input> inputs) {
-        List<String> result = new ArrayList<>();
+    private static Set<String> getSystemProperties(List<Input> inputs) {
+        Set<String> result = new HashSet<>();
         for(Input input : inputs) {
-            List<String> systemPropertyDependencies = input.getSystemPropertyDependencies();
+            Set<String> systemPropertyDependencies = input.getSystemPropertyDependencies();
             if(CollectionUtils.isNotEmpty(systemPropertyDependencies)) {
                 result.addAll(systemPropertyDependencies);
             }

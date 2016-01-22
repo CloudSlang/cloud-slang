@@ -14,10 +14,7 @@ import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.DEFAULT_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ENCRYPTED_KEY;
@@ -96,8 +93,8 @@ public abstract class AbstractInputsTransformer {
             boolean required,
             boolean overridable) {
         String expression = ExpressionUtils.extractExpression(value);
-        List<String> systemPropertyDependencies = new ArrayList<>();
-        List<ScriptFunction> functionDependencies = new ArrayList<>();
+        Set<String> systemPropertyDependencies = new HashSet<>();
+        Set<ScriptFunction> functionDependencies = new HashSet<>();
         if (expression != null) {
             systemPropertyDependencies = ExpressionUtils.extractSystemProperties(expression);
             if (CollectionUtils.isNotEmpty(systemPropertyDependencies)) {

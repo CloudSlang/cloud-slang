@@ -13,8 +13,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author orius123
@@ -101,8 +101,8 @@ public class Input extends InOutParam {
 		private boolean encrypted;
 		private boolean required;
 		private boolean overridable;
-		private List<ScriptFunction> functionDependencies;
-		private List<String> systemPropertyDependencies;
+		private Set<ScriptFunction> functionDependencies;
+		private Set<String> systemPropertyDependencies;
 
 		public InputBuilder(String name, Serializable value) {
 			this.name = name;
@@ -110,8 +110,8 @@ public class Input extends InOutParam {
 			encrypted = false;
 			required = true;
 			overridable = true;
-			functionDependencies = new ArrayList<>();
-			systemPropertyDependencies = new ArrayList<>();
+			functionDependencies = new HashSet<>();
+			systemPropertyDependencies = new HashSet<>();
 		}
 
 		public InputBuilder withEncrypted(boolean encrypted) {
@@ -129,12 +129,12 @@ public class Input extends InOutParam {
 			return this;
 		}
 
-		public InputBuilder withFunctionDependencies(List<ScriptFunction> functionDependencies) {
+		public InputBuilder withFunctionDependencies(Set<ScriptFunction> functionDependencies) {
 			this.functionDependencies = functionDependencies;
 			return this;
 		}
 
-		public InputBuilder withSystemPropertyDependencies(List<String> systemPropertyDependencies) {
+		public InputBuilder withSystemPropertyDependencies(Set<String> systemPropertyDependencies) {
 			this.systemPropertyDependencies = systemPropertyDependencies;
 			return this;
 		}

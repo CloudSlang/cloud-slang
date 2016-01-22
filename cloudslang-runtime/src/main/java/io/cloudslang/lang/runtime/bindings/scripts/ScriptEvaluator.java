@@ -15,9 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author stoneo
@@ -35,14 +33,14 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
             String expr,
             Map<String, ? extends Serializable> context,
             Map<String, String> systemProperties){
-        return evalExpr(expr, context, systemProperties, new ArrayList<ScriptFunction>());
+        return evalExpr(expr, context, systemProperties, new HashSet<ScriptFunction>());
     }
 
     public Serializable evalExpr(
             String expr,
             Map<String, ? extends Serializable> context,
             Map<String, String> systemProperties,
-            List<ScriptFunction> functionDependencies) {
+            Set<ScriptFunction> functionDependencies) {
         try {
             cleanInterpreter();
             prepareInterpreterContext(context);
@@ -55,7 +53,7 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
         }
     }
 
-    private void addFunctionsToContext(Map<String, String> systemProperties, List<ScriptFunction> functionDependencies) {
+    private void addFunctionsToContext(Map<String, String> systemProperties, Set<ScriptFunction> functionDependencies) {
         String functions = "";
         for (ScriptFunction function : functionDependencies) {
             switch (function) {

@@ -14,8 +14,8 @@ package io.cloudslang.lang.entities.utils;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,13 +35,16 @@ public final class ExpressionUtils {
                     "(.+)" +
                     ScoreLangConstants.EXPRESSION_END_DELIMITER_ESCAPED +
                     "\\s*$";
-    // match get_sp() function
+    // match get_sp(key) function
     private final static String SYSTEM_PROPERTY_REGEX = "get_sp\\('([\\w.]+)'\\)";
+    // match get_sp(key, default) function
+    private final static String SYSTEM_PROPERTY_REGEX_WITH_DEFAULT = "get_sp\\('([\\w.]+)', (.+?)\\)";
     // match get() function
     private final static String GET_REGEX = "get\\((.+?),(.+?)\\)";
 
     private final static Pattern EXPRESSION_PATTERN = Pattern.compile(EXPRESSION_REGEX, Pattern.DOTALL);
     private final static Pattern SYSTEM_PROPERTY_PATTERN = Pattern.compile(SYSTEM_PROPERTY_REGEX);
+    private final static Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT = Pattern.compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT);
     private final static Pattern GET_PATTERN = Pattern.compile(GET_REGEX);
 
     public static String extractExpression(Serializable value) {
@@ -56,8 +59,11 @@ public final class ExpressionUtils {
         return expression;
     }
 
-    public static List<String> extractSystemProperties(String expression) {
-        return matchFunctionSingleParameter(SYSTEM_PROPERTY_PATTERN, expression, 1);
+    public static Set<String> extractSystemProperties(String expression) {
+        Set<String> properties = matchFunction(SYSTEM_PROPERTY_PATTERN, expression, 1);
+        Set<String> propertiesWithDefault = matchFunction(SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT, expression, 1);
+        properties.addAll(propertiesWithDefault);
+        return properties;
     }
 
     public static boolean matchGetFunction(String text) {
@@ -65,9 +71,9 @@ public final class ExpressionUtils {
         return matcher.find();
     }
 
-    private static List<String> matchFunctionSingleParameter(Pattern functionPattern, String text, int parameterGroup) {
+    private static Set<String> matchFunction(Pattern functionPattern, String text, int parameterGroup) {
         Matcher matcher = functionPattern.matcher(text);
-        List<String> parameters = new ArrayList<>();
+        Set<String> parameters = new HashSet<>();
         while(matcher.find()) {
             parameters.add(matcher.group(parameterGroup));
         }
