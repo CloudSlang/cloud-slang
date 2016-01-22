@@ -26,17 +26,17 @@ public class ScriptExecutor extends AbstractScriptInterpreter {
 
     //we need this method to be synchronized so we will not have multiple scripts run in parallel on the same context
     public synchronized Map<String, Serializable> executeScript(
-            Map<String, Serializable> callArguments,
-            String script) {
+            String script,
+            Map<String, Serializable> callArguments) {
         cleanInterpreter();
         try {
-            return executeScript(script, callArguments);
+            return execute(script, callArguments);
         } catch (Exception e) {
             throw new RuntimeException("Error executing python script: " + e, e);
         }
     }
 
-    private Map<String, Serializable> executeScript(String script, Map<String, Serializable> userVars) {
+    private Map<String, Serializable> execute(String script, Map<String, Serializable> userVars) {
         Iterator<Map.Entry<String, Serializable>> iterator = userVars.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, Serializable> entry = iterator.next();

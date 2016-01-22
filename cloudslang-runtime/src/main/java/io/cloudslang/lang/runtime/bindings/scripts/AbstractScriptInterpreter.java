@@ -29,7 +29,6 @@ public abstract class AbstractScriptInterpreter {
     @Autowired
     private PythonInterpreter interpreter;
 
-
     protected void cleanInterpreter() {
         interpreter.setLocals(new PyStringMap());
     }
@@ -52,8 +51,8 @@ public abstract class AbstractScriptInterpreter {
             if (keyIsExcluded(key, value)) {
                 continue;
             }
-                Serializable javaValue = resolveJythonObjectToJavaExec(value, key);
-                returnValue.put(key, javaValue);
+            Serializable javaValue = resolveJythonObjectToJavaExec(value, key);
+            returnValue.put(key, javaValue);
         }
         return returnValue;
     }
@@ -85,23 +84,25 @@ public abstract class AbstractScriptInterpreter {
     }
 
     private Serializable resolveJythonObjectToJava(PyObject value, String errorMessage) {
+        if (value == null) {
+            return null;
+        }
         if (value instanceof PyBoolean) {
             PyBoolean pyBoolean = (PyBoolean) value;
             return pyBoolean.getBooleanValue();
-        } else {
-            try {
-                return Py.tojava(value, Serializable.class);
-            } catch (PyException e) {
-                PyObject typeObject = e.type;
-                if (typeObject instanceof PyType) {
-                    PyType type = (PyType) typeObject;
-                    String typeName = type.getName();
-                    if ("TypeError".equals(typeName)) {
-                        throw new RuntimeException(errorMessage, e);
-                    }
+        }
+        try {
+            return Py.tojava(value, Serializable.class);
+        } catch (PyException e) {
+            PyObject typeObject = e.type;
+            if (typeObject instanceof PyType) {
+                PyType type = (PyType) typeObject;
+                String typeName = type.getName();
+                if ("TypeError".equals(typeName)) {
+                    throw new RuntimeException(errorMessage, e);
                 }
-                throw e;
             }
+            throw e;
         }
     }
 

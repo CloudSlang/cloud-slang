@@ -237,7 +237,7 @@ public class ActionSteps extends AbstractSteps {
             String pythonScript) {
 
         if (StringUtils.isNotBlank(pythonScript)) {
-            return scriptExecutor.executeScript(callArguments, pythonScript);
+            return scriptExecutor.executeScript(pythonScript, callArguments);
         }
 
         throw new RuntimeException("Python script not found in action data");

@@ -28,6 +28,15 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
     private static final String TRUE = "true";
     private static final String FALSE = "false";
     private static String LINE_SEPARATOR = System.lineSeparator();
+    private static final String SYSTEM_PROPERTIES_MAP = "__sys_prop__";
+    private static final String GET_FUNCTION_DEFINITION =
+            "def get(key, default_value):" + LINE_SEPARATOR +
+                    "  value = globals().get(key)" + LINE_SEPARATOR +
+                    "  return default_value if value is None else value";
+    private static final String GET_SP_FUNCTION_DEFINITION =
+            "def get_sp(key, default_value=None):" + LINE_SEPARATOR +
+                    "  property_value = __sys_prop__.get(key)" + LINE_SEPARATOR +
+                    "  return default_value if property_value is None else property_value";
 
     public Serializable evalExpr(
             String expr,
@@ -58,22 +67,19 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
         for (ScriptFunction function : functionDependencies) {
             switch (function) {
                 case GET:
-                    functions +=
-                            "def get(key, default_value):" + LINE_SEPARATOR +
-                                    "  value = globals().get(key)" + LINE_SEPARATOR +
-                                    "  return default_value if value is None else value";
+                    functions += GET_FUNCTION_DEFINITION;
+                    functions = appendDelimiterBetweenFunctions(functions);
                     break;
                 case GET_SYSTEM_PROPERTY:
-                    setValueInContext("__sys_prop__", systemProperties);
-                    functions +=
-                            "def get_sp(key, default_value=None):" + LINE_SEPARATOR +
-                                    "  property_value = __sys_prop__.get(key)" + LINE_SEPARATOR +
-                                    "  return default_value if property_value is None else property_value";
+                    setValueInContext(SYSTEM_PROPERTIES_MAP, systemProperties);
+                    functions += GET_SP_FUNCTION_DEFINITION;
+                    functions = appendDelimiterBetweenFunctions(functions);
                     break;
             }
         }
 
         if (StringUtils.isNotEmpty(functions)) {
+            functions = trimScript(functions);
             exec(functions);
         }
     }
@@ -86,6 +92,14 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
             setValueInContext(TRUE, Boolean.TRUE);
         if (getValueFromContext(FALSE) == null)
             setValueInContext(FALSE, Boolean.FALSE);
+    }
+
+    private String appendDelimiterBetweenFunctions(String text) {
+        return text + LINE_SEPARATOR + LINE_SEPARATOR;
+    }
+
+    private String trimScript(String text) {
+        return text.trim();
     }
 
 }
