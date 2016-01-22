@@ -22,5 +22,9 @@ operation:
         default: ${get('key', get_sp('a.b.c.key')) + get_sp('d.e.f.key')}
     - input9:
         default: ${get('key', get_sp('a.b.c.key')) + get_sp('a.b.c.key')}
+    - input10:
+        default: ${get_sp(expression)}
+    - input11:
+        default: ${get_sp( 'a.b.c.key'     )}
   action:
     python_script: pass

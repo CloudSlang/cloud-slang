@@ -48,6 +48,11 @@ public class ExpressionUtilsTest {
     }
 
     @Test
+    public void testExtractExpressionWhitespacesAreKept() throws Exception {
+        Assert.assertEquals("   var + 'abc'      ", extractExpression("${   var + 'abc'      }"));
+    }
+
+    @Test
     public void testExtractSystemPropertiesNoMatch() throws Exception {
         Assert.assertEquals(EMPTY_SET, extractSystemProperties("get_sys('a.b.c.key')"));
     }
@@ -55,6 +60,11 @@ public class ExpressionUtilsTest {
     @Test
     public void testExtractSystemPropertiesSingleMatch() throws Exception {
         Assert.assertEquals(props1, extractSystemProperties("get_sp('a.b.c.key')"));
+    }
+
+    @Test
+    public void testExtractSystemPropertiesWhitespaces() throws Exception {
+        Assert.assertEquals(props1, extractSystemProperties("get_sp( 'a.b.c.key'              )"));
     }
 
     @Test
@@ -75,6 +85,11 @@ public class ExpressionUtilsTest {
     @Test
     public void testExtractSystemPropertiesDefault() throws Exception {
         Assert.assertEquals(props1, extractSystemProperties("get_sp('a.b.c.key', default_expression)"));
+    }
+
+    @Test
+    public void testExtractSystemPropertiesDefaultWhitespaces() throws Exception {
+        Assert.assertEquals(props1, extractSystemProperties("get_sp( 'a.b.c.key' ,       default_expression)"));
     }
 
     @Test
@@ -100,6 +115,11 @@ public class ExpressionUtilsTest {
     @Test
     public void testMatchGetFunctionMatch() throws Exception {
         Assert.assertTrue(matchGetFunction("get('a', var)"));
+    }
+
+    @Test
+    public void testMatchGetFunctionWhitespaces() throws Exception {
+        Assert.assertTrue(matchGetFunction("get( 'a'        ,  var)"));
     }
 
     @Test

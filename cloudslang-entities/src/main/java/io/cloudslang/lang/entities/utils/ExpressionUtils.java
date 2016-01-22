@@ -36,9 +36,9 @@ public final class ExpressionUtils {
                     ScoreLangConstants.EXPRESSION_END_DELIMITER_ESCAPED +
                     "\\s*$";
     // match get_sp(key) function
-    private final static String SYSTEM_PROPERTY_REGEX = "get_sp\\('([\\w.]+)'\\)";
+    private final static String SYSTEM_PROPERTY_REGEX = "get_sp\\(\\s*'([\\w.]+)'\\s*\\)";
     // match get_sp(key, default) function
-    private final static String SYSTEM_PROPERTY_REGEX_WITH_DEFAULT = "get_sp\\('([\\w.]+)', (.+?)\\)";
+    private final static String SYSTEM_PROPERTY_REGEX_WITH_DEFAULT = "get_sp\\(\\s*'([\\w.]+)'\\s*,\\s*(.+?)\\)";
     // match get() function
     private final static String GET_REGEX = "get\\((.+?),(.+?)\\)";
 

@@ -213,7 +213,7 @@ public class InputsTransformerTest {
         Set<ScriptFunction> emptySetScriptFunction = new HashSet<>();
         Set<String> emptySetString = new HashSet<>();
 
-        Assert.assertEquals("inputs size not as expected", 9, inputs.size());
+        Assert.assertEquals("inputs size not as expected", 11, inputs.size());
 
         verifyFunctionsAndSPDependencies(inputs, 0, emptySetScriptFunction, emptySetString);
         verifyFunctionsAndSPDependencies(inputs, 1, emptySetScriptFunction, emptySetString);
@@ -224,6 +224,8 @@ public class InputsTransformerTest {
         verifyFunctionsAndSPDependencies(inputs, 6, setGetAndSP, props1);
         verifyFunctionsAndSPDependencies(inputs, 7, setGetAndSP, props2);
         verifyFunctionsAndSPDependencies(inputs, 8, setGetAndSP, props1);
+        verifyFunctionsAndSPDependencies(inputs, 9, emptySetScriptFunction, emptySetString);
+        verifyFunctionsAndSPDependencies(inputs, 10, setSP, props1);
     }
 
     private void verifyFunctionsAndSPDependencies(
