@@ -1,7 +1,6 @@
-package io.cloudslang.lang.runtime.bindings;
+package io.cloudslang.lang.runtime.bindings.scripts;
 
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
-import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -13,10 +12,9 @@ import org.python.core.PyStringMap;
 import org.python.google.common.collect.Sets;
 import org.python.util.PythonInterpreter;
 
-import java.util.Map;
-
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import static org.mockito.Mockito.*;

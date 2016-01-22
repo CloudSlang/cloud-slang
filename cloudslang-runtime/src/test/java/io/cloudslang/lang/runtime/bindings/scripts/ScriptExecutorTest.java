@@ -1,6 +1,5 @@
-package io.cloudslang.lang.runtime.bindings;
+package io.cloudslang.lang.runtime.bindings.scripts;
 
-import io.cloudslang.lang.runtime.bindings.scripts.ScriptExecutor;
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
