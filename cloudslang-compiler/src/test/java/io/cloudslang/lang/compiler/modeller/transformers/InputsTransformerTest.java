@@ -16,12 +16,14 @@ import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,8 +35,7 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = InputsTransformerTest.Config.class)
@@ -47,6 +48,7 @@ public class InputsTransformerTest {
     private YamlParser yamlParser;
 
     private List inputsMap;
+    private List inputsMapWithFunctions;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -54,6 +56,7 @@ public class InputsTransformerTest {
     @Before
     public void init() throws URISyntaxException {
         inputsMap = getInputsFormSl("/operation_with_data.sl");
+        inputsMapWithFunctions = getInputsFormSl("/inputs_with_functions.sl");
     }
 
     private List getInputsFormSl(String filePath) throws URISyntaxException {
@@ -194,6 +197,43 @@ public class InputsTransformerTest {
         Input input = inputs.get(11);
         Assert.assertEquals("input12", input.getName());
         Assert.assertEquals("${ \"mighty\" + \" max\"   + varX }", input.getValue());
+    }
+
+    @Test
+    public void testFunctionsAndSPDependencies() throws Exception {
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMapWithFunctions);
+
+        // prepare parameters
+        Set<ScriptFunction> setGet = Sets.newHashSet(ScriptFunction.GET);
+        Set<ScriptFunction> setSP = Sets.newHashSet(ScriptFunction.GET_SYSTEM_PROPERTY);
+        Set<ScriptFunction> setGetAndSP = new HashSet<>(setGet);
+        setGetAndSP.addAll(setSP);
+        Set<String> props1 = Sets.newHashSet("a.b.c.key");
+        Set<String> props2 = Sets.newHashSet("a.b.c.key", "d.e.f.key");
+        Set<ScriptFunction> emptySetScriptFunction = new HashSet<>();
+        Set<String> emptySetString = new HashSet<>();
+
+        Assert.assertEquals("inputs size not as expected", 9, inputs.size());
+
+        verifyFunctionsAndSPDependencies(inputs, 0, emptySetScriptFunction, emptySetString);
+        verifyFunctionsAndSPDependencies(inputs, 1, emptySetScriptFunction, emptySetString);
+        verifyFunctionsAndSPDependencies(inputs, 2, setGet, emptySetString);
+        verifyFunctionsAndSPDependencies(inputs, 3, setSP, props1);
+        verifyFunctionsAndSPDependencies(inputs, 4, setSP, props1);
+        verifyFunctionsAndSPDependencies(inputs, 5, setGetAndSP, props1);
+        verifyFunctionsAndSPDependencies(inputs, 6, setGetAndSP, props1);
+        verifyFunctionsAndSPDependencies(inputs, 7, setGetAndSP, props2);
+        verifyFunctionsAndSPDependencies(inputs, 8, setGetAndSP, props1);
+    }
+
+    private void verifyFunctionsAndSPDependencies(
+            List<Input> inputs,
+            int inputIndex,
+            Set<ScriptFunction> expectedFunctions,
+            Set<String> expectedSystemProperties) {
+        Input input = inputs.get(inputIndex);
+        Assert.assertEquals(expectedFunctions, input.getFunctionDependencies());
+        Assert.assertEquals(expectedSystemProperties, input.getSystemPropertyDependencies());
     }
 
     @Configuration
