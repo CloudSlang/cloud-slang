@@ -68,7 +68,7 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
                 case GET_SYSTEM_PROPERTY:
                     setValueInContext("__sys_prop__", systemProperties);
                     functions +=
-                            "def get_sp(key):" + LINE_SEPARATOR +
+                            "def get_sp(key, default_value=None):" + LINE_SEPARATOR +
                                     "  property_value = __sys_prop__.get(key)" + LINE_SEPARATOR +
                                     "  return default_value if property_value is None else property_value";
                     break;
