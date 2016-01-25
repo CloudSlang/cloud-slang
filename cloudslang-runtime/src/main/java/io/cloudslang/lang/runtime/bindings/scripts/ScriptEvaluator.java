@@ -45,7 +45,8 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
         return evalExpr(expr, context, systemProperties, new HashSet<ScriptFunction>());
     }
 
-    public Serializable evalExpr(
+    //we need this method to be synchronized so we will not have multiple scripts run in parallel on the same context
+    public synchronized Serializable evalExpr(
             String expr,
             Map<String, ? extends Serializable> context,
             Map<String, String> systemProperties,
