@@ -21,7 +21,7 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.ENCRYPTED_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.OVERRIDABLE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.REQUIRED_KEY;
 
-public abstract class AbstractInputsTransformer {
+public abstract class AbstractInputsTransformer extends InOutTransformer {
 
     protected Input transformSingleInput(Object rawInput) {
         // - some_input
@@ -92,25 +92,13 @@ public abstract class AbstractInputsTransformer {
             boolean encrypted,
             boolean required,
             boolean overridable) {
-        String expression = ExpressionUtils.extractExpression(value);
-        Set<String> systemPropertyDependencies = new HashSet<>();
-        Set<ScriptFunction> functionDependencies = new HashSet<>();
-        if (expression != null) {
-            systemPropertyDependencies = ExpressionUtils.extractSystemProperties(expression);
-            if (CollectionUtils.isNotEmpty(systemPropertyDependencies)) {
-                functionDependencies.add(ScriptFunction.GET_SYSTEM_PROPERTY);
-            }
-            boolean getFunctionFound = ExpressionUtils.matchGetFunction(expression);
-            if (getFunctionFound) {
-                functionDependencies.add(ScriptFunction.GET);
-            }
-        }
+        Accumulator dependencyAccumulator = extractFunctionData(value);
         return new Input.InputBuilder(name, value)
                 .withEncrypted(encrypted)
                 .withRequired(required)
                 .withOverridable(overridable)
-                .withFunctionDependencies(functionDependencies)
-                .withSystemPropertyDependencies(systemPropertyDependencies)
+                .withFunctionDependencies(dependencyAccumulator.getFunctionDependencies())
+                .withSystemPropertyDependencies(dependencyAccumulator.getSystemPropertyDependencies())
                 .build();
     }
 
