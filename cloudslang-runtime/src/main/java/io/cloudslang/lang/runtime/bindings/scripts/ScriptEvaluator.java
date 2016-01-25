@@ -12,6 +12,9 @@ package io.cloudslang.lang.runtime.bindings.scripts;
 
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import org.apache.commons.lang3.StringUtils;
+import org.python.util.PythonInterpreter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -38,8 +41,11 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
                     "  property_value = __sys_prop__.get(key)" + LINE_SEPARATOR +
                     "  return default_value if property_value is None else property_value";
 
-    //we need this method to be synchronized so we will not have multiple scripts run in parallel on the same context
-    public synchronized Serializable evalExpr(
+    @Autowired
+    @Qualifier("evalInterpreter")
+    private PythonInterpreter interpreter;
+
+    public Serializable evalExpr(
             String expr,
             Map<String, ? extends Serializable> context,
             Map<String, String> systemProperties){
@@ -53,10 +59,10 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
             Map<String, String> systemProperties,
             Set<ScriptFunction> functionDependencies) {
         try {
-            cleanInterpreter();
+            cleanInterpreter(interpreter);
             prepareInterpreterContext(context);
             addFunctionsToContext(systemProperties, functionDependencies);
-            return eval(expr);
+            return eval(interpreter, expr);
         } catch (Exception exception) {
             throw new RuntimeException(
                     "Error in running script expression: '"
@@ -73,7 +79,7 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
                     functions = appendDelimiterBetweenFunctions(functions);
                     break;
                 case GET_SYSTEM_PROPERTY:
-                    setValueInContext(SYSTEM_PROPERTIES_MAP, systemProperties);
+                    interpreter.set(SYSTEM_PROPERTIES_MAP, systemProperties);
                     functions += GET_SP_FUNCTION_DEFINITION;
                     functions = appendDelimiterBetweenFunctions(functions);
                     break;
@@ -82,18 +88,18 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
 
         if (StringUtils.isNotEmpty(functions)) {
             functions = trimScript(functions);
-            exec(functions);
+            exec(interpreter, functions);
         }
     }
 
     private void prepareInterpreterContext(Map<String, ? extends Serializable> context) {
         for (Map.Entry<String, ? extends Serializable> entry : context.entrySet()) {
-            setValueInContext(entry.getKey(), entry.getValue());
+            interpreter.set(entry.getKey(), entry.getValue());
         }
-        if (getValueFromContext(TRUE) == null)
-            setValueInContext(TRUE, Boolean.TRUE);
-        if (getValueFromContext(FALSE) == null)
-            setValueInContext(FALSE, Boolean.FALSE);
+        if (interpreter.get(TRUE) == null)
+            interpreter.set(TRUE, Boolean.TRUE);
+        if (interpreter.get(FALSE) == null)
+            interpreter.set(FALSE, Boolean.FALSE);
     }
 
     private String appendDelimiterBetweenFunctions(String text) {

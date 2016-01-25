@@ -26,7 +26,12 @@ public class SlangRuntimeSpringConfig {
     }
 
     @Bean
-    public PythonInterpreter interpreter(){
+    public PythonInterpreter evalInterpreter(){
+        return new PythonInterpreter();
+    }
+
+    @Bean
+    public PythonInterpreter execInterpreter(){
         PythonInterpreter interpreter = new PythonInterpreter();
         //here to avoid jython preferring io.cloudslang package over python io package
         interpreter.exec("import io");

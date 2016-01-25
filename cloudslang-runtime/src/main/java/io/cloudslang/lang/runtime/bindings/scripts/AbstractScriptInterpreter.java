@@ -13,7 +13,6 @@ package io.cloudslang.lang.runtime.bindings.scripts;
 
 import org.python.core.*;
 import org.python.util.PythonInterpreter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -26,28 +25,17 @@ import java.util.Map;
  */
 public abstract class AbstractScriptInterpreter {
 
-    @Autowired
-    private PythonInterpreter interpreter;
-
-    protected void cleanInterpreter() {
+    protected void cleanInterpreter(PythonInterpreter interpreter) {
         interpreter.setLocals(new PyStringMap());
     }
 
-    protected PyObject getValueFromContext(String name) {
-        return interpreter.get(name);
-    }
-
-    protected void setValueInContext(String name, Object value) {
-        interpreter.set(name, value);
-    }
-
-    protected Map<String, Serializable> exec(String script) {
+    protected Map<String, Serializable> exec(PythonInterpreter interpreter, String script) {
         interpreter.exec(script);
-        Iterator<PyObject> localsIterator = getLocals().asIterable().iterator();
+        Iterator<PyObject> localsIterator = interpreter.getLocals().asIterable().iterator();
         Map<String, Serializable> returnValue = new HashMap<>();
         while (localsIterator.hasNext()) {
             String key = localsIterator.next().asString();
-            PyObject value = getValueFromContext(key);
+            PyObject value = interpreter.get(key);
             if (keyIsExcluded(key, value)) {
                 continue;
             }
@@ -57,15 +45,11 @@ public abstract class AbstractScriptInterpreter {
         return returnValue;
     }
 
-    protected Serializable eval(String script) {
+    protected Serializable eval(PythonInterpreter interpreter, String script) {
         PyObject evalResultAsPyObject = interpreter.eval(script);
         Serializable evalResult;
         evalResult = resolveJythonObjectToJavaEval(evalResultAsPyObject, script);
         return evalResult;
-    }
-
-    protected PyObject getLocals() {
-        return interpreter.getLocals();
     }
 
     private Serializable resolveJythonObjectToJavaExec(PyObject value, String key) {
