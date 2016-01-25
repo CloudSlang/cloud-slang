@@ -38,7 +38,8 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
                     "  property_value = __sys_prop__.get(key)" + LINE_SEPARATOR +
                     "  return default_value if property_value is None else property_value";
 
-    public Serializable evalExpr(
+    //we need this method to be synchronized so we will not have multiple scripts run in parallel on the same context
+    public synchronized Serializable evalExpr(
             String expr,
             Map<String, ? extends Serializable> context,
             Map<String, String> systemProperties){
