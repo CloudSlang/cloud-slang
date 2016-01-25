@@ -97,7 +97,7 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(resource, path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        return triggerWithData(compilationArtifact, userInputs, null);
+        return triggerWithData(compilationArtifact, userInputs, new HashMap<String, String>());
     }
 
     private List<StepData> extractAsyncLoopData(RuntimeInformation runtimeInformation) {
