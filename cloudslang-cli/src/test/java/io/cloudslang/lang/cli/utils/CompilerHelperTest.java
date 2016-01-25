@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.introspector.BeanAccess;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -109,12 +110,12 @@ public class CompilerHelperTest {
 
 	@Test
 	public void testLoadSystemProperties() throws Exception {
-		Map<String, Serializable> expected = new HashMap<>();
+		Map<String, String> expected = new HashMap<>();
 		expected.put("user.sys.props.host", "localhost");
-		expected.put("user.sys.props.port", 22);
+		expected.put("user.sys.props.port", "22");
 		expected.put("user.sys.props.alla", "balla");
-		URI systemProperties = getClass().getResource("/properties/system_properties.yaml").toURI();
-		Map<String, ? extends Serializable> result = compilerHelper.loadSystemProperties(Arrays.asList(systemProperties.getPath()));
+		URI systemProperties = getClass().getResource("/properties/system_properties.sl").toURI();
+		Map<String, String> result = compilerHelper.loadSystemProperties(Arrays.asList(systemProperties.getPath()));
 		Assert.assertNotNull(result);
 		Assert.assertEquals(expected, result);
 	}
@@ -148,15 +149,16 @@ public class CompilerHelperTest {
     @Test
     public void testLoadInputsFromCommentedFile() throws Exception {
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("Inputs / System properties file");
+        expectedException.expectMessage("Inputs file");
 
         URI inputsFromFile = getClass().getResource("/inputs/commented_inputs.yaml").toURI();
         compilerHelper.loadInputsFromFile(Arrays.asList(inputsFromFile.getPath()));
     }
+
     @Test
     public void testLoadInputsFromEmptyFile() throws Exception {
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("Inputs / System properties file");
+        expectedException.expectMessage("Inputs file");
 
         URI inputsFromFile = getClass().getResource("/inputs/empty_inputs.yaml").toURI();
         compilerHelper.loadInputsFromFile(Arrays.asList(inputsFromFile.getPath()));
@@ -184,10 +186,12 @@ public class CompilerHelperTest {
             return new CompilerHelperImpl();
         }
 
-		@Bean
-		public Yaml yaml() {
-			return new Yaml();
-		}
+        @Bean
+        public Yaml yaml() {
+            Yaml yaml = new Yaml();
+            yaml.setBeanAccess(BeanAccess.FIELD);
+            return yaml;
+        }
 
     }
 

@@ -5,6 +5,9 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-user.sys.props.host: localhost
-user.sys.props.port: 22
-user.sys.props.alla: balla
+namespace: user.sys
+
+properties:
+  props.host: localhost
+  props.port: 22
+  props.alla: balla
