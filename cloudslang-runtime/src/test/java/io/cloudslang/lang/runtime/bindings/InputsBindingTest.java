@@ -390,8 +390,9 @@ public class InputsBindingTest {
         }
 
         @Bean
-        public PythonInterpreter scriptEngine(){
+        public PythonInterpreter evalInterpreter(){
             return new PythonInterpreter();
         }
+
     }
 }

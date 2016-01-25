@@ -483,7 +483,7 @@ public class TaskStepsTest {
         }
 
         @Bean
-        public PythonInterpreter pythonInterpreter(){
+        public PythonInterpreter evalInterpreter(){
             return mock(PythonInterpreter.class);
         }
 

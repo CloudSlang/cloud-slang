@@ -310,7 +310,7 @@ public class ExecutableStepsTest {
         }
 
         @Bean
-        public PythonInterpreter pythonInterpreter(){
+        public PythonInterpreter evalInterpreter(){
             return mock(PythonInterpreter.class);
         }
 

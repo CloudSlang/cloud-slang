@@ -201,7 +201,7 @@ public class ResultBindingTest {
         }
 
         @Bean
-        public PythonInterpreter pythonInterpreter(){
+        public PythonInterpreter evalInterpreter(){
             return new PythonInterpreter();
         }
 

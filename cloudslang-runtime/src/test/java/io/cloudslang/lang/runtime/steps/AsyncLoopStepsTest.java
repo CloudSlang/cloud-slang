@@ -520,7 +520,7 @@ public class AsyncLoopStepsTest {
         }
 
         @Bean
-        public PythonInterpreter pythonInterpreter(){
+        public PythonInterpreter evalInterpreter(){
             return mock(PythonInterpreter.class);
         }
 

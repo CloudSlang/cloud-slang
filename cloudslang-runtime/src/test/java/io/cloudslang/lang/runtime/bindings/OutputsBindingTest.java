@@ -196,7 +196,7 @@ public class OutputsBindingTest {
         }
 
         @Bean
-        public PythonInterpreter interpreter() {
+        public PythonInterpreter evalInterpreter() {
             return new PythonInterpreter();
         }
 

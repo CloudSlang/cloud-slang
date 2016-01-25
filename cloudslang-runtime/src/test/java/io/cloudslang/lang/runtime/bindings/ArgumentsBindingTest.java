@@ -300,8 +300,9 @@ public class ArgumentsBindingTest {
         }
 
         @Bean
-        public PythonInterpreter scriptEngine(){
+        public PythonInterpreter evalInterpreter(){
             return new PythonInterpreter();
         }
+
     }
 }

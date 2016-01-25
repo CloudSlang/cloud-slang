@@ -690,7 +690,7 @@ public class ActionStepsTest {
         }
 
         @Bean
-        public PythonInterpreter pythonInterpreter() {
+        public PythonInterpreter execInterpreter() {
             return new PythonInterpreter();
         }
 
