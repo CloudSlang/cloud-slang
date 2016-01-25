@@ -162,7 +162,7 @@ public class SlangImplTest {
 
     @Test
     public void testRunWithNullInputs(){
-        Long executionId = slang.run(emptyCompilationArtifact, null, null);
+        Long executionId = slang.run(emptyCompilationArtifact, null, new HashMap<String, String>());
         Assert.assertNotNull(executionId);
     }
 
