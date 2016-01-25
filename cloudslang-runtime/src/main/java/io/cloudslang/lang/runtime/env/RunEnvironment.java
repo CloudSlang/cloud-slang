@@ -11,6 +11,7 @@
 package io.cloudslang.lang.runtime.env;
 
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
+import org.apache.commons.lang3.Validate;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -48,6 +49,7 @@ public class RunEnvironment implements Serializable{
 
 
     public RunEnvironment(Map<String, String> systemProperties) {
+        Validate.notNull(systemProperties, "system properties cannot be null");
         contextStack = new ContextStack();
         parentFlowStack = new ParentFlowStack();
         callArguments = new HashMap<>();
@@ -57,7 +59,7 @@ public class RunEnvironment implements Serializable{
     }
 
     public RunEnvironment() {
-        this(null);
+        this(new HashMap<String, String>());
     }
 
     public ContextStack getStack(){
