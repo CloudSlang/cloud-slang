@@ -1,10 +1,12 @@
 package io.cloudslang.lang.runtime.bindings.scripts;
 
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -14,6 +16,7 @@ import org.python.util.PythonInterpreter;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -63,18 +66,27 @@ public class ScriptEvaluatorTest {
         Map<String, String> props = new HashMap<>();
         props.put("a.b.c.key", "value");
         Set<ScriptFunction> functionDependencies = Sets.newHashSet(ScriptFunction.GET, ScriptFunction.GET_SYSTEM_PROPERTY);
+        ArgumentCaptor<String> scriptCaptor = ArgumentCaptor.forClass(String.class);
+
         when(pythonInterpreter.getLocals()).thenReturn(new PyStringMap());
 
         scriptEvaluator.evalExpr("", new HashMap<String, Serializable>(), props, functionDependencies);
 
         verify(pythonInterpreter).eval(eq(""));
         verify(pythonInterpreter, atLeastOnce()).set("__sys_prop__", props);
-        verify(pythonInterpreter).exec(
-                GET_FUNCTION_DEFINITION +
-                        LINE_SEPARATOR +
-                        LINE_SEPARATOR +
-                        GET_SP_FUNCTION_DEFINITION
+
+        verify(pythonInterpreter).exec(scriptCaptor.capture());
+        String actualScript = scriptCaptor.getValue();
+        String[] actualFunctionsArray = actualScript.split(LINE_SEPARATOR + LINE_SEPARATOR);
+        Set<String> actualFunctions = new HashSet<>();
+        for (int i = 0; i < actualFunctionsArray.length; i++) {
+            actualFunctions.add(actualFunctionsArray[i]);
+        }
+        Set<String> expectedFunctions = Sets.newHashSet(
+                GET_FUNCTION_DEFINITION,
+                GET_SP_FUNCTION_DEFINITION
         );
+        Assert.assertEquals(expectedFunctions, actualFunctions);
     }
 
 }
