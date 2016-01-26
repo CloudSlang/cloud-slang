@@ -32,14 +32,8 @@ import java.util.*;
  */
 public class FunctionDependenciesTest extends ValueSyntaxParent {
 
-    private static final Set<SystemProperty> SYS_PROPS = new HashSet<>();
     @SuppressWarnings("unchecked")
     private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
-    static {
-        SYS_PROPS.add(SystemProperty.createSystemProperty("user.sys", "props.host", "localhost"));
-        SYS_PROPS.add(SystemProperty.createSystemProperty("user.sys", "props.port", "22"));
-        SYS_PROPS.add(SystemProperty.createSystemProperty("user.sys", "props.alla", "balla"));
-    }
 
     @Test
     public void testFunctionsBasic() throws Exception {
