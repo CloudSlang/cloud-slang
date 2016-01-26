@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.bindings;
 
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
@@ -46,7 +47,7 @@ public class LoopsBinding {
     public LoopCondition getOrCreateLoopCondition(
             LoopStatement forLoopStatement,
             Context flowContext,
-            Map<String, String> systemProperties,
+            Set<SystemProperty> systemProperties,
             String nodeName) {
         Validate.notNull(forLoopStatement, "loop statement cannot be null");
         Validate.notNull(flowContext, "flow context cannot be null");
@@ -90,7 +91,7 @@ public class LoopsBinding {
     private LoopCondition createForLoopCondition(
             LoopStatement forLoopStatement,
             Context flowContext,
-            Map<String, String> systemProperties,
+            Set<SystemProperty> systemProperties,
             String nodeName) {
         Map<String, Serializable> variables = flowContext.getImmutableViewOfVariables();
         Serializable evalResult;

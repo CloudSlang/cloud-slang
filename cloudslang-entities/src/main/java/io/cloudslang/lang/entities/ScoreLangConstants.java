@@ -25,6 +25,8 @@ public interface ScoreLangConstants {
     String EXPRESSION_END_DELIMITER = "}";
     String EXPRESSION_END_DELIMITER_ESCAPED = "\\}";
 
+    String NAMESPACE_DELIMITER = ".";
+
     //action scope
     String ACTION_CLASS_KEY = "className";
     String ACTION_TYPE = "actionType";

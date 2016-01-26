@@ -1,5 +1,6 @@
 package io.cloudslang.lang.runtime.bindings.scripts;
 
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import junit.framework.Assert;
 import org.junit.Rule;
@@ -15,10 +16,7 @@ import org.python.google.common.collect.Sets;
 import org.python.util.PythonInterpreter;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 
@@ -46,7 +44,7 @@ public class ScriptEvaluatorTest {
 
     @Test
     public void testEvalExpr() throws Exception {
-        scriptEvaluator.evalExpr("", new HashMap<String, Serializable>(), new HashMap<String, String>());
+        scriptEvaluator.evalExpr("", new HashMap<String, Serializable>(), new HashSet<SystemProperty>());
         verify(pythonInterpreter).eval(eq(""));
         verify(pythonInterpreter).set("true", Boolean.TRUE);
         verify(pythonInterpreter).set("false", Boolean.FALSE);
@@ -58,13 +56,16 @@ public class ScriptEvaluatorTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("input_expression");
         exception.expectMessage("error from interpreter");
-        scriptEvaluator.evalExpr("input_expression", new HashMap<String, Serializable>(), new HashMap<String, String>());
+        scriptEvaluator.evalExpr("input_expression", new HashMap<String, Serializable>(), new HashSet<SystemProperty>());
     }
 
     @Test
     public void testEvalFunctions() throws Exception {
-        Map<String, String> props = new HashMap<>();
-        props.put("a.b.c.key", "value");
+        Set<SystemProperty> props = new HashSet<>();
+        SystemProperty systemProperty = SystemProperty.createSystemProperty("a.b", "c.key", "value");
+        props.add(systemProperty);
+        Map<String, String> propsAsMap = new HashMap<>();
+        propsAsMap.put(systemProperty.getFullyQualifiedName(), systemProperty.getValue());
         Set<ScriptFunction> functionDependencies = Sets.newHashSet(ScriptFunction.GET, ScriptFunction.GET_SYSTEM_PROPERTY);
         ArgumentCaptor<String> scriptCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -73,15 +74,13 @@ public class ScriptEvaluatorTest {
         scriptEvaluator.evalExpr("", new HashMap<String, Serializable>(), props, functionDependencies);
 
         verify(pythonInterpreter).eval(eq(""));
-        verify(pythonInterpreter, atLeastOnce()).set("__sys_prop__", props);
+        verify(pythonInterpreter, atLeastOnce()).set("__sys_prop__", propsAsMap);
 
         verify(pythonInterpreter).exec(scriptCaptor.capture());
         String actualScript = scriptCaptor.getValue();
         String[] actualFunctionsArray = actualScript.split(LINE_SEPARATOR + LINE_SEPARATOR);
         Set<String> actualFunctions = new HashSet<>();
-        for (int i = 0; i < actualFunctionsArray.length; i++) {
-            actualFunctions.add(actualFunctionsArray[i]);
-        }
+        Collections.addAll(actualFunctions, actualFunctionsArray);
         Set<String> expectedFunctions = Sets.newHashSet(
                 GET_FUNCTION_DEFINITION,
                 GET_SP_FUNCTION_DEFINITION

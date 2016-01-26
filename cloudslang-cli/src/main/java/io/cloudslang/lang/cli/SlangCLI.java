@@ -13,6 +13,7 @@ import io.cloudslang.lang.cli.utils.CompilerHelper;
 import io.cloudslang.lang.cli.utils.MetadataHelper;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.EventConstants;
@@ -97,7 +98,7 @@ public class SlangCLI implements CommandMarker {
         if (invalidVerboseInput(verbose)) throw new IllegalArgumentException("Verbose argument is invalid.");
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
-        Map<String, String> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
+        Set<SystemProperty> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
         Map<String, ? extends Serializable> inputsFromFile = compilerHelper.loadInputsFromFile(inputFiles);
         Map<String, Serializable> mergedInputs = new HashMap<>();
 

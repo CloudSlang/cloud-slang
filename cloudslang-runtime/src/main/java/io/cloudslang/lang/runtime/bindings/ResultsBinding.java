@@ -11,6 +11,7 @@ package io.cloudslang.lang.runtime.bindings;
 
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
@@ -23,6 +24,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * User: stoneo
@@ -53,7 +55,7 @@ public class ResultsBinding {
      */
     public String resolveResult(Map<String, Serializable> inputs,
                                 Map<String, Serializable> context,
-                                Map<String, String> systemProperties,
+                                Set<SystemProperty> systemProperties,
                                 List<Result> possibleResults,
                                 String presetResult) {
 

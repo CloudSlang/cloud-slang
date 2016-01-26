@@ -13,6 +13,7 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
@@ -22,6 +23,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -48,7 +50,7 @@ public class TriggerFlows {
     public ScoreEvent runSync(
             CompilationArtifact compilationArtifact,
             Map<String, ? extends Serializable> userInputs,
-            Map<String, String> systemProperties) {
+            Set<SystemProperty> systemProperties) {
         final BlockingQueue<ScoreEvent> finishEvent = new LinkedBlockingQueue<>();
         ScoreEventListener finishListener = new ScoreEventListener() {
             @Override
@@ -73,7 +75,7 @@ public class TriggerFlows {
         }
     }
 
-    public RuntimeInformation runWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, String> systemProperties) {
+    public RuntimeInformation runWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Set<SystemProperty> systemProperties) {
         RunDataAggregatorListener runDataAggregatorListener = new RunDataAggregatorListener();
         slang.subscribeOnEvents(runDataAggregatorListener, STEP_EVENTS);
 

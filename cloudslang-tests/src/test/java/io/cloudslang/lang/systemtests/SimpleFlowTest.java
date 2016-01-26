@@ -12,6 +12,7 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -29,13 +30,13 @@ import java.util.*;
  */
 public class SimpleFlowTest extends SystemsTestsParent {
 
-	private static final Map<String, String> SYS_PROPS = new HashMap<>();
+	private static final Set<SystemProperty> SYS_PROPS = new HashSet<>();
     @SuppressWarnings("unchecked")
-    private static final Map<String, String> EMPTY_MAP = Collections.EMPTY_MAP;
+    private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
 	static {
-		SYS_PROPS.put("user.sys.props.host", "localhost");
-		SYS_PROPS.put("user.sys.props.port", "22");
-		SYS_PROPS.put("user.sys.props.alla", "balla");
+		SYS_PROPS.add(SystemProperty.createSystemProperty("user.sys", "props.host", "localhost"));
+        SYS_PROPS.add(SystemProperty.createSystemProperty("user.sys", "props.port", "22"));
+        SYS_PROPS.add(SystemProperty.createSystemProperty("user.sys", "props.alla", "balla"));
 	}
 
     @Rule
@@ -71,7 +72,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         exception.expect(RuntimeException.class);
         exception.expectMessage("input1");
         exception.expectMessage("Required");
-        compileAndRunSimpleFlow(new HashMap<String, Serializable>(), EMPTY_MAP);
+        compileAndRunSimpleFlow(new HashMap<String, Serializable>(), EMPTY_SET);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -82,7 +83,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         exception.expect(RuntimeException.class);
         exception.expectMessage("host");
         exception.expectMessage("Required");
-        compileAndRunSimpleFlow(inputs, EMPTY_MAP);
+        compileAndRunSimpleFlow(inputs, EMPTY_SET);
     }
 
     @Test
@@ -96,11 +97,11 @@ public class SimpleFlowTest extends SystemsTestsParent {
 
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("object_value", "SessionValue");
-        ScoreEvent event = trigger(compilationArtifact, userInputs, EMPTY_MAP);
+        ScoreEvent event = trigger(compilationArtifact, userInputs, EMPTY_SET);
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 
-	private void compileAndRunSimpleFlow(Map<String, ? extends Serializable> inputs, Map<String, String> systemProperties) throws Exception {
+	private void compileAndRunSimpleFlow(Map<String, ? extends Serializable> inputs, Set<SystemProperty> systemProperties) throws Exception {
 		URI flow = getClass().getResource("/yaml/simple_flow.yaml").toURI();
 		URI operations1 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
 		URI operations2 = getClass().getResource("/yaml/compute_daylight_time_zone.sl").toURI();
@@ -111,7 +112,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
 		Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
 	}
 
-    private void compileAndRunSimpleFlowOneLinerSyntax(Map<String, ? extends Serializable> inputs, Map<String, String> systemProperties) throws Exception {
+    private void compileAndRunSimpleFlowOneLinerSyntax(Map<String, ? extends Serializable> inputs, Set<SystemProperty> systemProperties) throws Exception {
         URI flow = getClass().getResource("/yaml/simple_flow_one_liner.yaml").toURI();
         URI operations1 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
         URI operations2 = getClass().getResource("/yaml/compute_daylight_time_zone.sl").toURI();
@@ -150,7 +151,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         userInputs.put("first", "value");
         userInputs.put("second_string", "value");
 
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_MAP).getTasks();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getTasks();
 
         List<String> actualTasks = getTasksOnly(stepsData);
         Assert.assertEquals(2, actualTasks.size());
@@ -169,7 +170,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
 
         // trigger ExecutionPlan
         Map<String, Serializable> userInputs = new HashMap<>();
-        RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, EMPTY_MAP);
+        RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, EMPTY_SET);
         Map<String, StepData> executionData = runtimeInformation.getTasks();
 
         StepData flowData = executionData.get(EXEC_START_PATH);
@@ -209,7 +210,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
 
         // trigger ExecutionPlan
         Map<String, Serializable> userInputs = new HashMap<>();
-        RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, EMPTY_MAP);
+        RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, EMPTY_SET);
         Map<String, StepData> executionData = runtimeInformation.getTasks();
 
         StepData flowData = executionData.get(EXEC_START_PATH);

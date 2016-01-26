@@ -14,6 +14,7 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.score.api.Score;
 import io.cloudslang.score.api.TriggeringProperties;
@@ -77,7 +78,7 @@ public class SlangImpl implements Slang {
     }
 
 	@Override
-	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, String> systemProperties) {
+	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Set<SystemProperty> systemProperties) {
 		Validate.notNull(compilationArtifact, "Compilation artifact can not be null");
 		if(runInputs == null) {
 			runInputs = new HashMap<>();
@@ -93,8 +94,11 @@ public class SlangImpl implements Slang {
 	}
 
 	@Override
-	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs,
-		Map<String, String> systemProperties) {
+	public Long compileAndRun(
+            SlangSource source,
+            Set<SlangSource> dependencies,
+            Map<String, ? extends Serializable> runInputs,
+            Set<SystemProperty> systemProperties) {
 		CompilationArtifact compilationArtifact = compile(source, dependencies);
 		return run(compilationArtifact, runInputs, systemProperties);
 	}
@@ -112,6 +116,12 @@ public class SlangImpl implements Slang {
     @Override
     public void subscribeOnAllEvents(ScoreEventListener eventListener) {
         subscribeOnEvents(eventListener, getAllEventTypes());
+    }
+
+    @Override
+    public Set<SystemProperty> loadSystemProperties(SlangSource source) {
+        Validate.notNull(source, "Source can not be null");
+        return compiler.loadSystemProperties(source);
     }
 
     private Set<String> getAllEventTypes() {

@@ -9,6 +9,7 @@
  */
 package io.cloudslang.lang.runtime.bindings;
 
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import org.junit.Assert;
@@ -364,7 +365,7 @@ public class InputsBindingTest {
         Assert.assertEquals("orig context should not change",1,context.size());
     }
 
-	private Map<String, Serializable> bindInputs(List<Input> inputs, Map<String, ? extends Serializable> context, Map<String, String> systemProperties) {
+	private Map<String, Serializable> bindInputs(List<Input> inputs, Map<String, ? extends Serializable> context, Set<SystemProperty> systemProperties) {
 		return inputsBinding.bindInputs(inputs, context, systemProperties);
 	}
 

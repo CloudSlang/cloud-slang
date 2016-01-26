@@ -10,6 +10,7 @@
 package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.AsyncLoopStatement;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
 import org.apache.commons.collections4.CollectionUtils;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Date: 3/25/2015
@@ -41,7 +43,7 @@ public class AsyncLoopBinding {
     public List<Serializable> bindAsyncLoopList(
             AsyncLoopStatement asyncLoopStatement,
             Context flowContext,
-            Map<String, String> systemProperties,
+            Set<SystemProperty> systemProperties,
             String nodeName) {
         Validate.notNull(asyncLoopStatement, "async loop statement cannot be null");
         Validate.notNull(flowContext, "flow context cannot be null");

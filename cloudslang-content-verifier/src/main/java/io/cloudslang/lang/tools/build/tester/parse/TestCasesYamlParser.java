@@ -16,9 +16,10 @@ package io.cloudslang.lang.tools.build.tester.parse;
 
 import ch.lambdaj.function.convert.Converter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.entities.SystemProperty;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
@@ -28,9 +29,10 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static ch.lambdaj.Lambda.convertMap;
 
@@ -39,6 +41,9 @@ public class TestCasesYamlParser {
 
     @Autowired
     private Yaml yaml;
+
+    @Autowired
+    Slang slang;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -78,15 +83,11 @@ public class TestCasesYamlParser {
         }
     }
 
-    public Map<String, String> parseProperties(String fileName) {
-        Map<String, String> result = new HashMap<>();
+    public Set<SystemProperty> parseProperties(String fileName) {
+        Set<SystemProperty> result = new HashSet<>();
         if(StringUtils.isNotEmpty(fileName)) {
-            try {
-                result.putAll((Map<String, String>) yaml.load(FileUtils.readFileToString(new File(fileName))));
-            } catch (IOException ex) {
-                log.error("Error loading file: " + fileName, ex);
-                throw new RuntimeException("Error loading file: " + fileName, ex);
-            }
+                SlangSource source = SlangSource.fromFile(new File(fileName));
+                result.addAll(slang.loadSystemProperties(source));
         }
         return result;
     }

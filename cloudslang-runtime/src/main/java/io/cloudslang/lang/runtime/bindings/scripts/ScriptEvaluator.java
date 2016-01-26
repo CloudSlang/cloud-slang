@@ -10,6 +10,7 @@
 
 package io.cloudslang.lang.runtime.bindings.scripts;
 
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import org.apache.commons.lang3.StringUtils;
 import org.python.util.PythonInterpreter;
@@ -48,7 +49,7 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
     public Serializable evalExpr(
             String expr,
             Map<String, ? extends Serializable> context,
-            Map<String, String> systemProperties){
+            Set<SystemProperty> systemProperties){
         return evalExpr(expr, context, systemProperties, new HashSet<ScriptFunction>());
     }
 
@@ -56,7 +57,7 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
     public synchronized Serializable evalExpr(
             String expr,
             Map<String, ? extends Serializable> context,
-            Map<String, String> systemProperties,
+            Set<SystemProperty> systemProperties,
             Set<ScriptFunction> functionDependencies) {
         try {
             cleanInterpreter(interpreter);
@@ -70,7 +71,7 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
         }
     }
 
-    private void addFunctionsToContext(Map<String, String> systemProperties, Set<ScriptFunction> functionDependencies) {
+    private void addFunctionsToContext(Set<SystemProperty> systemProperties, Set<ScriptFunction> functionDependencies) {
         String functions = "";
         for (ScriptFunction function : functionDependencies) {
             switch (function) {
@@ -79,7 +80,7 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
                     functions = appendDelimiterBetweenFunctions(functions);
                     break;
                 case GET_SYSTEM_PROPERTY:
-                    interpreter.set(SYSTEM_PROPERTIES_MAP, systemProperties);
+                    interpreter.set(SYSTEM_PROPERTIES_MAP, prepareSystemProperties(systemProperties));
                     functions += GET_SP_FUNCTION_DEFINITION;
                     functions = appendDelimiterBetweenFunctions(functions);
                     break;
@@ -108,6 +109,14 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
 
     private String trimScript(String text) {
         return text.trim();
+    }
+
+    private Map<String, String> prepareSystemProperties(Set<SystemProperty> properties) {
+        Map<String, String> processedSystemProperties = new HashMap<>();
+        for (SystemProperty property : properties) {
+            processedSystemProperties.put(property.getFullyQualifiedName(), property.getValue());
+        }
+        return processedSystemProperties;
     }
 
 }

@@ -9,12 +9,11 @@
 package io.cloudslang.lang.cli.utils;
 
 import ch.lambdaj.function.convert.Converter;
-
-
 import io.cloudslang.lang.api.Slang;
-import io.cloudslang.lang.cli.model.PropertiesFile;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.SystemProperty;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
@@ -29,15 +28,9 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import static ch.lambdaj.Lambda.*;
+import static ch.lambdaj.Lambda.convert;
 
 /**
  * @author lesant
@@ -87,8 +80,11 @@ public class CompilerHelperImpl implements CompilerHelper{
             for (File dependencyCandidate : dependenciesFiles) {
                 SlangSource source = SlangSource.fromFile(dependencyCandidate);
                 // exclude properties files
-                if (!isPropertiesFile(source)) {
+                if (isExecutable(source)) {
                     depsSources.add(source);
+                } else {
+                    logger.info("Ignoring dependency: " + source.getName() + " (not a valid executable)." +
+                            "\n\tTop level keys(" + SlangTextualKeys.FLOW_TYPE + ", " + SlangTextualKeys.OPERATION_TYPE + ") not found.");
                 }
             }
         }
@@ -101,8 +97,8 @@ public class CompilerHelperImpl implements CompilerHelper{
     }
 
     @Override
-    public Map<String, String> loadSystemProperties(List<String> systemPropertyFiles) {
-        return loadPropertiesFromFiles(systemPropertyFiles, YAML_FILE_EXTENSIONS, SP_DIR);
+    public Set<SystemProperty> loadSystemProperties(List<String> systemPropertyFiles) {
+        return loadPropertiesFromFiles(systemPropertyFiles, SLANG_FILE_EXTENSIONS, SP_DIR);
     }
 
     @Override
@@ -140,25 +136,26 @@ public class CompilerHelperImpl implements CompilerHelper{
         return result;
     }
 
-    private Map<String, String> loadPropertiesFromFiles(List<String> files, String[] extensions, String directory) {
+    private Set<SystemProperty> loadPropertiesFromFiles(List<String> files, String[] extensions, String directory) {
         if(CollectionUtils.isEmpty(files)) {
             files = loadDefaultFiles(files, extensions, directory, true);
         }
         if(CollectionUtils.isEmpty(files)) return null;
-        Map<String, String> result = new HashMap<>();
+        Set<SystemProperty> result = new HashSet<>();
         for(String propFile : files) {
-            logger.info("Loading file: " + propFile);
             try {
-                String propFileContent = FileUtils.readFileToString(new File(propFile));
-                if (StringUtils.isNotEmpty(propFileContent)) {
-                    PropertiesFile propertiesFile = yaml.loadAs(propFileContent, PropertiesFile.class);
-                    result.putAll(convertPropertiesFileToMap(propertiesFile));
+                SlangSource source = SlangSource.fromFile(new File(propFile));
+                if (!isExecutable(source)) {
+                    logger.info("Loading file: " + propFile);
+                    Set<SystemProperty> propsFromFile = slang.loadSystemProperties(source);
+                    result.addAll(propsFromFile);
                 } else {
-                    throw new RuntimeException("System properties file: " + propFile + " is empty.");
+                    logger.info("Ignoring file: " + source.getName() + " (not a valid properties file)." +
+                            "\n\tTop level keys(" + SlangTextualKeys.FLOW_TYPE + ", " + SlangTextualKeys.OPERATION_TYPE + ") are found.");
                 }
-            } catch(IOException ex) {
+            } catch(Throwable ex) {
                 logger.error("Error loading file: " + propFile, ex);
-                throw new RuntimeException(ex);
+                throw new RuntimeException("Error loading file: " + propFile, ex);
             }
         }
         return result;
@@ -180,20 +177,6 @@ public class CompilerHelperImpl implements CompilerHelper{
         return files;
     }
 
-    private Map<String, String> convertPropertiesFileToMap(PropertiesFile propertiesFile) {
-        Map<String, String> rawProperties = propertiesFile.getProperties();
-        String namespace = propertiesFile.getNamespace();
-        Map<String, String> properties = new HashMap<>(rawProperties.size());
-        for (Map.Entry<String, String> rawProperty : rawProperties.entrySet()) {
-            String key = rawProperty.getKey();
-            if (StringUtils.isNotEmpty(namespace)) {
-                key = namespace + "." + key;
-            }
-            properties.put(key, rawProperty.getValue());
-        }
-        return properties;
-    }
-
     private Boolean checkIsFileSupported(File file){
         String[] suffixes = new String[SLANG_FILE_EXTENSIONS.length];
         for(int i = 0; i < suffixes.length; ++i){
@@ -202,9 +185,16 @@ public class CompilerHelperImpl implements CompilerHelper{
         return new SuffixFileFilter(suffixes).accept(file);
     }
 
-    private boolean isPropertiesFile(SlangSource source) {
+    private boolean isExecutable(SlangSource source) {
         Object yamlObject = yaml.load(source.getSource());
-        return yamlObject instanceof Map && ((Map) yamlObject).containsKey(PropertiesFile.PROPERTIES_KEY);
+        if (yamlObject instanceof Map) {
+            Map yamlObjectAsMap = (Map) yamlObject;
+            return
+                    yamlObjectAsMap.containsKey(SlangTextualKeys.FLOW_TYPE) ||
+                            yamlObjectAsMap.containsKey(SlangTextualKeys.OPERATION_TYPE);
+        } else {
+            return false;
+        }
     }
 
 }

@@ -8,6 +8,7 @@
  */
 package io.cloudslang.lang.cli.services;
 
+import io.cloudslang.lang.entities.SystemProperty;
 import org.apache.commons.lang.StringUtils;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEventListener;
@@ -45,7 +46,7 @@ public class ScoreServicesImpl implements ScoreServices{
      * @return executionId
      */
     @Override
-	public Long trigger(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Map<String, String> systemProperties) {
+	public Long trigger(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Set<SystemProperty> systemProperties) {
         return slang.run(compilationArtifact, inputs, systemProperties);
     }
 
@@ -56,7 +57,7 @@ public class ScoreServicesImpl implements ScoreServices{
      * @return executionId
      */
     @Override
-    public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Map<String, String> systemProperties, boolean isQuiet, boolean debug){
+    public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Set<SystemProperty> systemProperties, boolean isQuiet, boolean debug){
         //add start event
         Set<String> handlerTypes = new HashSet<>();
         if(isQuiet){

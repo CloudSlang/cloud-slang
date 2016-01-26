@@ -9,6 +9,7 @@
  */
 package io.cloudslang.lang.runtime.bindings;
 
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import org.junit.Assert;
@@ -31,7 +32,7 @@ import java.util.*;
 public class ArgumentsBindingTest {
 
     @SuppressWarnings("unchecked")
-    private static final Map<String, String> EMPTY_MAP = Collections.EMPTY_MAP;
+    private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
 
     @Autowired
     private ArgumentsBinding argumentsBinding;
@@ -279,7 +280,7 @@ public class ArgumentsBindingTest {
 	private Map<String, Serializable> bindArguments(
             List<Argument> arguments,
             Map<String, ? extends Serializable> context) {
-		return argumentsBinding.bindArguments(arguments, context, EMPTY_MAP);
+		return argumentsBinding.bindArguments(arguments, context, EMPTY_SET);
 	}
 
 	private Map<String, Serializable> bindArguments(List<Argument> arguments) {

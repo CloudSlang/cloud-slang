@@ -71,7 +71,7 @@ public class ExecutableStepsTest {
         Map<String,Serializable> resultMap = new HashMap<>();
         resultMap.put("input1",5);
 
-        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anyMap())).thenReturn(resultMap);
+        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anySet())).thenReturn(resultMap);
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Serializable>(), new ExecutionRuntimeServices(),"", 2L);
 
         Map<String,Serializable> opVars = runEnv.getStack().popContext().getImmutableViewOfVariables();
@@ -100,7 +100,7 @@ public class ExecutableStepsTest {
         resultMap.put("input1", 5);
         resultMap.put("input2", 3);
 
-        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anyMap())).thenReturn(resultMap);
+        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anySet())).thenReturn(resultMap);
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Serializable>(), runtimeServices, "dockerizeStep", 2L);
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 

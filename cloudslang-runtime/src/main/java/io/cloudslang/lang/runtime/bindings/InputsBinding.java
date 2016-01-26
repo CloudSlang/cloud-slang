@@ -10,6 +10,7 @@ package io.cloudslang.lang.runtime.bindings;
  *
  *******************************************************************************/
 
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
@@ -21,6 +22,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Component
 public class InputsBinding {
@@ -36,7 +38,7 @@ public class InputsBinding {
      * @return : a new map with all inputs resolved (does not include initial context)
      */
     public Map<String, Serializable> bindInputs(List<Input> inputs, Map<String, ? extends Serializable> context,
-                                                Map<String, String> systemProperties) {
+                                                Set<SystemProperty> systemProperties) {
         Map<String, Serializable> resultContext = new HashMap<>();
 
         //we do not want to change original context map
@@ -51,7 +53,7 @@ public class InputsBinding {
 
     private void bindInput(Input input, Map<String, ? extends Serializable> context,
                            Map<String, Serializable> targetContext,
-                           Map<String, String> systemProperties) {
+                           Set<SystemProperty> systemProperties) {
 
         Serializable value;
 
@@ -76,7 +78,7 @@ public class InputsBinding {
             Input input,
             Map<String, ? extends Serializable> context,
             Map<String, ? extends Serializable> targetContext,
-            Map<String, String> systemProperties) {
+            Set<SystemProperty> systemProperties) {
         Serializable value = null;
 
         //we do not want to change original context map

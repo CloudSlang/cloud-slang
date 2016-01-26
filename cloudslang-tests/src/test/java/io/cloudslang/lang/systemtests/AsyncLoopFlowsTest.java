@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.SystemProperty;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -97,7 +98,7 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(resource, path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        return triggerWithData(compilationArtifact, userInputs, new HashMap<String, String>());
+        return triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>());
     }
 
     private List<StepData> extractAsyncLoopData(RuntimeInformation runtimeInformation) {

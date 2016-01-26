@@ -11,6 +11,7 @@
  */
 package io.cloudslang.lang.runtime.bindings;
 
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
@@ -21,6 +22,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Bonczidai Levente
@@ -35,7 +37,7 @@ public class ArgumentsBinding {
     public Map<String, Serializable> bindArguments(
             List<Argument> arguments,
             Map<String, ? extends Serializable> context,
-            Map<String, String> systemProperties) {
+            Set<SystemProperty> systemProperties) {
         Map<String, Serializable> resultContext = new HashMap<>();
 
         //we do not want to change original context map
@@ -51,7 +53,7 @@ public class ArgumentsBinding {
     private void bindArgument(
             Argument argument,
             Map<String, ? extends Serializable> srcContext,
-            Map<String, String> systemProperties,
+            Set<SystemProperty> systemProperties,
             Map<String, Serializable> targetContext) {
         Serializable argumentValue;
         String argumentName = argument.getName();

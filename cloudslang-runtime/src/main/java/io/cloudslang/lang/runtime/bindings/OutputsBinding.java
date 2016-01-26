@@ -11,6 +11,7 @@
 package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Output;
 
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
@@ -20,10 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Date: 11/7/2014
@@ -39,7 +37,7 @@ public class OutputsBinding {
     public Map<String, Serializable> bindOutputs(
             Map<String, Serializable> inputs,
             Map<String, Serializable> actionReturnValues,
-            Map<String, String> systemProperties,
+            Set<SystemProperty> systemProperties,
             List<Output> possibleOutputs) {
 
         Map<String, Serializable> outputs = new LinkedHashMap<>();

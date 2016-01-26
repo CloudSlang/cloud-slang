@@ -2,6 +2,7 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.ListForLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ForLoopCondition;
@@ -18,10 +19,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.python.google.common.collect.Lists;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
@@ -31,7 +29,7 @@ import static org.mockito.Mockito.*;
 public class LoopsBindingTest {
 
     @SuppressWarnings("unchecked")
-    private static final Map<String, String> EMPTY_MAP = Collections.EMPTY_MAP;
+    private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -52,18 +50,18 @@ public class LoopsBindingTest {
         when(scriptEvaluator.evalExpr(
                 anyString(),
                 anyMapOf(String.class, Serializable.class),
-                anyMapOf(String.class, String.class))
+                anySetOf(SystemProperty.class))
         ).thenReturn(Lists.newArrayList(1));
         HashMap<String, Serializable> langVars = new HashMap<>();
         when(context.getLangVariables()).thenReturn(langVars);
-        loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, EMPTY_MAP, "node");
+        loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, EMPTY_SET, "node");
         Assert.assertEquals(true, context.getLangVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
     }
 
     @Test
     public void whenExpressionIsEmptyThrowsException() throws Exception {
         Context context = mock(Context.class);
-        when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Serializable.class), eq(EMPTY_MAP)))
+        when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Serializable.class), eq(EMPTY_SET)))
                 .thenReturn(Lists.newArrayList());
         HashMap<String, Serializable> langVars = new HashMap<>();
         when(context.getLangVariables()).thenReturn(langVars);
@@ -71,33 +69,33 @@ public class LoopsBindingTest {
         exception.expectMessage("expression is empty");
         exception.expect(RuntimeException.class);
 
-        loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, EMPTY_MAP, "node");
+        loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, EMPTY_SET, "node");
     }
 
     @Test(expected = RuntimeException.class)
     public void passingNullLoopStatementThrowsException() throws Exception {
-        loopsBinding.getOrCreateLoopCondition(null, mock(Context.class), EMPTY_MAP, "aa");
+        loopsBinding.getOrCreateLoopCondition(null, mock(Context.class), EMPTY_SET, "aa");
     }
 
     @Test(expected = RuntimeException.class)
     public void passingNullContextThrowsException() throws Exception {
-        loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), null, EMPTY_MAP, "aa");
+        loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), null, EMPTY_SET, "aa");
     }
 
     @Test(expected = RuntimeException.class)
     public void passingNullNodeNameThrowsException() throws Exception {
-        loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), mock(Context.class), EMPTY_MAP, null);    }
+        loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), mock(Context.class), EMPTY_SET, null);    }
 
     @Test
     public void whenValueIsThereItWillBeReturned() throws Exception {
         Context context = mock(Context.class);
-        when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Serializable.class), eq(EMPTY_MAP)))
+        when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Serializable.class), eq(EMPTY_SET)))
                 .thenReturn(new ArrayList<>());
         HashMap<String, Serializable> langVars = new HashMap<>();
         ForLoopCondition forLoopCondition = mock(ForLoopCondition.class);
         langVars.put(LoopCondition.LOOP_CONDITION_KEY, forLoopCondition);
         when(context.getLangVariables()).thenReturn(langVars);
-        loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, EMPTY_MAP, "node");
+        loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, EMPTY_SET, "node");
         Assert.assertEquals(true, context.getLangVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
         Assert.assertEquals(forLoopCondition, context.getLangVariables().get(LoopCondition.LOOP_CONDITION_KEY));
     }

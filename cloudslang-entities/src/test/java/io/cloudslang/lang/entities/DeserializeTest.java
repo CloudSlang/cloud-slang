@@ -89,4 +89,10 @@ public class DeserializeTest {
         testToAndFromJson(asyncLoopStatement, AsyncLoopStatement.class);
     }
 
+    @Test
+    public void testDeserializeSystemProperty() throws IOException {
+        SystemProperty systemProperty = SystemProperty.createSystemProperty("a.b", "c.host", "localhost");
+        testToAndFromJson(systemProperty, SystemProperty.class);
+    }
+
 }

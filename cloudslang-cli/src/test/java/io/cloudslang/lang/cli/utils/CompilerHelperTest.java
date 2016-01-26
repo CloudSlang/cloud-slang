@@ -13,6 +13,7 @@ import com.google.common.collect.Sets;
 
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.entities.SystemProperty;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -29,13 +30,18 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
+import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = CompilerHelperTest.Config.class)
@@ -82,7 +88,7 @@ public class CompilerHelperTest {
         URI get_value = getClass().getResource("/metadata.sl").toURI();
 		compilerHelper.compile(flowFilePath.getPath(), null);
 		Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath), Sets.newHashSet(SlangSource.fromFile(flowFilePath), SlangSource.fromFile(flow2FilePath),
-			SlangSource.fromFile(opFilePath), SlangSource.fromFile(spFlow), SlangSource.fromFile(spOp), SlangSource.fromFile(get_value)));
+                SlangSource.fromFile(opFilePath), SlangSource.fromFile(spFlow), SlangSource.fromFile(spOp), SlangSource.fromFile(get_value)));
 	}
 
     @Test
@@ -110,29 +116,18 @@ public class CompilerHelperTest {
 
 	@Test
 	public void testLoadSystemProperties() throws Exception {
-		Map<String, String> expected = new HashMap<>();
-		expected.put("user.sys.props.host", "localhost");
-		expected.put("user.sys.props.port", "22");
-		expected.put("user.sys.props.alla", "balla");
-		URI systemProperties = getClass().getResource("/properties/system_properties.sl").toURI();
-		Map<String, String> result = compilerHelper.loadSystemProperties(Arrays.asList(systemProperties.getPath()));
-		Assert.assertNotNull(result);
-		Assert.assertEquals(expected, result);
-	}
+		Set<SystemProperty> systemProperties = Sets.newHashSet(
+                SystemProperty.createSystemProperty("user.sys", "props.host", "localhost"),
+                SystemProperty.createSystemProperty("user.sys", "props.port", "22"),
+                SystemProperty.createSystemProperty("user.sys", "props.alla", "balla")
+        );
+		URI systemPropertyURI = getClass().getResource("/properties/system_properties.sl").toURI();
+        SlangSource source = SlangSource.fromFile(systemPropertyURI);
+        when(slang.loadSystemProperties(eq(source))).thenReturn(systemProperties);
 
-    @Ignore("Awaiting CloudSlang/cloud-slang#302 decision")
-	@Test
-	public void testLoadSystemPropertiesImplicit() throws Exception {
-		Map<String, ? extends Serializable> result = compilerHelper.loadSystemProperties(null);
-		Assert.assertNotNull(result);
-		Assert.assertEquals(5, result.size());
-	}
+		Set<SystemProperty> result = compilerHelper.loadSystemProperties(Arrays.asList(systemPropertyURI.getPath()));
 
-	@Test
-	public void testLoadSystemPropertiesWrongPath() throws Exception {
-		expectedException.expect(RuntimeException.class);
-		expectedException.expectMessage("does not exist");
-		compilerHelper.loadSystemProperties(Arrays.asList("abc", "def"));
+        verify(slang).loadSystemProperties(eq(source));
 	}
 
     @Test
