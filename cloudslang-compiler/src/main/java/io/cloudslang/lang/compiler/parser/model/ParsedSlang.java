@@ -49,10 +49,10 @@ public class ParsedSlang {
         if(operation != null) return Type.OPERATION;
         if(properties != null) return Type.SYSTEM_PROPERTY_FILE;
         throw new RuntimeException(
-                "Source " + name + " has no " +
+                "Source " + name + " has no content associated with " +
                         Type.FLOW.key() + "/" +
                         Type.OPERATION.key() + "/" +
-                        Type.SYSTEM_PROPERTY_FILE + " property"
+                        Type.SYSTEM_PROPERTY_FILE.key() + " property."
         );
     }
 
@@ -67,7 +67,7 @@ public class ParsedSlang {
     public static enum Type {
         FLOW("flow"),
         OPERATION("operation"),
-        SYSTEM_PROPERTY_FILE("system_property_file");
+        SYSTEM_PROPERTY_FILE("properties");
 
         private String key;
 

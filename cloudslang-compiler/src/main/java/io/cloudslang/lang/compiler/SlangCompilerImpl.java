@@ -75,7 +75,10 @@ public class SlangCompilerImpl implements SlangCompiler {
             ParsedSlang parsedSlang = parseSource(source);
             return extractProperties(parsedSlang);
         } catch (Throwable ex) {
-            throw new RuntimeException("Error loading properties file: " + source.getName(), ex);
+            throw new RuntimeException(
+                    "Error loading properties file: " + source.getName() + " nested exception is: " + ex.getMessage(),
+                    ex
+            );
         }
     }
 
@@ -95,7 +98,7 @@ public class SlangCompilerImpl implements SlangCompiler {
         for (Map.Entry<String, Object> entry : entrySet) {
             Object value = entry.getValue();
             SystemProperty property = SystemProperty.createSystemProperty(
-                    namespace,
+                    namespace == null ? "" : namespace,
                     entry.getKey(),
                     value == null ? null : value.toString()
             );

@@ -34,7 +34,7 @@ public class SystemProperty implements Serializable {
             String key,
             String value) {
         Validate.notNull(namespace, "System property namespace cannot be null");
-        Validate.notEmpty(key, "System property key cannot be emtpy");
+        Validate.notEmpty(key, "System property key cannot be empty");
 
         String fullyQualifiedName;
         if (StringUtils.isNotEmpty(namespace)) {
