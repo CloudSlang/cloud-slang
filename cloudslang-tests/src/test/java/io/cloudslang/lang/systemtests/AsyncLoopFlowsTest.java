@@ -47,14 +47,11 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
         URI resource = getClass().getResource("/yaml/loops/async_loop/async_loop_aggregate.sl").toURI();
         URI operation1 = getClass().getResource("/yaml/loops/async_loop/print_branch.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
-        Set<SystemProperty> systemProperties = Sets.newHashSet(
-                SystemProperty.createSystemProperty("loop", "async.prop1", "aggregate_value")
-        );
 
         RuntimeInformation runtimeInformation = triggerWithData(
                 SlangSource.fromFile(resource),
                 path,
-                systemProperties
+                getSystemProperties()
         );
 
         List<StepData> branchesData = extractAsyncLoopData(runtimeInformation);
@@ -89,7 +86,11 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
 
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
 
-        RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path);
+        RuntimeInformation runtimeInformation = triggerWithData(
+                SlangSource.fromFile(resource),
+                path,
+                getSystemProperties()
+        );
 
         List<StepData> branchesData = extractAsyncLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
@@ -99,6 +100,12 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
         verifyAggregateValues(runtimeInformation, expectedNameOutputs);
 
         verifyNavigation(runtimeInformation);
+    }
+
+    private Set<SystemProperty> getSystemProperties() {
+        return Sets.newHashSet(
+                SystemProperty.createSystemProperty("loop", "async.prop1", "aggregate_value")
+        );
     }
 
     private RuntimeInformation triggerWithData(
