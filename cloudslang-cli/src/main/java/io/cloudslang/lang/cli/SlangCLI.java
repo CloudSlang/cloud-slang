@@ -8,6 +8,7 @@
  */
 package io.cloudslang.lang.cli;
 
+import com.google.common.collect.Lists;
 import io.cloudslang.lang.cli.services.ScoreServices;
 import io.cloudslang.lang.cli.utils.CompilerHelper;
 import io.cloudslang.lang.cli.utils.MetadataHelper;
@@ -19,6 +20,7 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
@@ -128,11 +130,32 @@ public class SlangCLI implements CommandMarker {
         return !Arrays.asList(validArguments).contains(verbose.toLowerCase());
     }
 
-    @CliCommand(value = "inspect", help = "Display metadata about an executable")
+    @CliCommand(
+            value = "inspect",
+            help = "Display metadata about an executable / Load system properties from a properties file"
+    )
     public String inspectExecutable(
-            @CliOption(key = {"", "f", "file"}, mandatory = true, help = PATH_TO_FILENAME_HELP) final File executableFile
+            @CliOption(key = {"", "f", "file"}, mandatory = true, help = PATH_TO_FILENAME_HELP) final String slangFile
     ) throws IOException {
-        return metadataHelper.extractMetadata(executableFile);
+        if (compilerHelper.isExecutable(slangFile)) {
+            return metadataHelper.extractMetadata(new File(slangFile));
+        } else {
+            Set<SystemProperty> systemProperties = compilerHelper.loadSystemProperties(Lists.newArrayList(slangFile));
+            return prittyPrintSystemProperties(systemProperties);
+        }
+    }
+
+    private String prittyPrintSystemProperties(Set<SystemProperty> systemProperties) {
+        String result;
+        if (CollectionUtils.isEmpty(systemProperties)) {
+            result = "No system properties found.";
+        } else {
+            result = "Following system properties were loaded:\n";
+            for (SystemProperty systemProperty : systemProperties) {
+                result += "\t" + systemProperty.getFullyQualifiedName() + ": " + systemProperty.getValue() + "\n";
+            }
+        }
+        return result.trim();
     }
 
     @CliCommand(value = "env", help = ENV_HELP)

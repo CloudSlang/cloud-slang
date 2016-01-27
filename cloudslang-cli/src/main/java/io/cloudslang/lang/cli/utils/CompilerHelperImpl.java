@@ -106,6 +106,11 @@ public class CompilerHelperImpl implements CompilerHelper{
         return loadMapsFromFiles(inputFiles, YAML_FILE_EXTENSIONS, INPUT_DIR);
     }
 
+    @Override
+    public boolean isExecutable(String filePath) {
+        return isExecutable(SlangSource.fromFile(new File(filePath)));
+    }
+
     private Map<String, Serializable> loadMapsFromFiles(List<String> files, String[] extensions, String directory) {
         if(CollectionUtils.isEmpty(files)) {
             files = loadDefaultFiles(files, extensions, directory, false);
@@ -129,7 +134,7 @@ public class CompilerHelperImpl implements CompilerHelper{
                     throw new RuntimeException("Inputs file: " + inputFile + " is empty or does not contain valid YAML content.");
                 }
 			} catch(IOException ex) {
-				logger.error("Error loading file: " + inputFile, ex);
+				logger.error("Error loading file: " + inputFile + ". Nested exception is: " + ex.getMessage(), ex);
 				throw new RuntimeException(ex);
 			}
 		}
