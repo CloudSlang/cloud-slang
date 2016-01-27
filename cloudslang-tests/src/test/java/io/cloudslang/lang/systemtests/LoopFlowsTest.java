@@ -34,13 +34,25 @@ public class LoopFlowsTest extends SystemsTestsParent{
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getTasks();
+        Set<SystemProperty> systemProperties = new HashSet<>();
+        systemProperties.add(
+                SystemProperty.createSystemProperty("loop", "for.prop1", "for_value")
+        );
+
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, systemProperties).getTasks();
+
         StepData firstTask = stepsData.get(FIRST_STEP_PATH);
         StepData secondTask = stepsData.get(SECOND_STEP_KEY);
         StepData thirdTask = stepsData.get(THIRD_STEP_KEY);
-        Assert.assertTrue(firstTask.getInputs().containsValue(1));
-        Assert.assertTrue(secondTask.getInputs().containsValue(2));
-        Assert.assertTrue(thirdTask.getInputs().containsValue(3));
+
+        Map<String, Serializable> expectedInputs = new HashMap<>();
+        expectedInputs.put("text", 1);
+        expectedInputs.put("sp_arg", "for_value");
+        Assert.assertEquals(expectedInputs, firstTask.getInputs());
+        expectedInputs.put("text", 2);
+        Assert.assertEquals(expectedInputs, secondTask.getInputs());
+        expectedInputs.put("text", 3);
+        Assert.assertEquals(expectedInputs, thirdTask.getInputs());
     }
 
     @Test
