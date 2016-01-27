@@ -11,6 +11,9 @@ operation:
   name: functions_test_op
   inputs:
     - exist
+    - value_propagate:
+        default: ${ value_propagate + get_sp('propagate.op.input') }
+        overridable: false
   action:
     python_script: |
         language = 'CloudSlang'
@@ -27,6 +30,7 @@ operation:
     - output_7: ${get(    'i_don_exist',        get_sp('a.b.c.host')       )}
     - output_8: ${get_sp('a.b.c.i_don_exist', get_sp('a.b.c.host'))}
     - output_9: ${get_sp('a.b.c.null_value', 'default_str')}
+    - value_propagate: ${ self['value_propagate'] + get_sp('propagate.op.output') }
   results:
     - FUNCTIONS_KEY_EXISTS: ${ get(get_sp('cloudslang.lang.key'), 'output1_default') == 'CloudSlang' }
     - FUNCTIONS_KEY_EXISTS_PROBLEM

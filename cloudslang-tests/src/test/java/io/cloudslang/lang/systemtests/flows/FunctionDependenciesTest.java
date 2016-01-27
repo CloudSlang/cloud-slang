@@ -72,6 +72,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         verifyFlowInputs(flowData);
         verifyTaskArguments(taskData);
         verifyTaskPublishValues(taskData);
+        verifyFlowOutputs(flowData);
 
         // verify 'get' function worked in result expressions
         Assert.assertEquals("Function evaluation problem in result expression", "FUNCTIONS_KEY_EXISTS", flowData.getResult());
@@ -108,6 +109,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedArguments.put("input_9", "localhost");
         expectedArguments.put("input_10", "localhost");
         expectedArguments.put("input_11", "default_str");
+        expectedArguments.put("value_propagate", "flowInput_taskArg_");
         Map<String, Serializable> actualArguments = taskData.getInputs();
         Assert.assertEquals("task arguments not as expected", expectedArguments, actualArguments);
     }
@@ -131,34 +133,49 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedFlowInputs.put("input_9", "localhost");
         expectedFlowInputs.put("input_10", "localhost");
         expectedFlowInputs.put("input_11", "default_str");
+        expectedFlowInputs.put("value_propagate", "flowInput_");
         Map<String, Serializable> actualFlowInputs = flowData.getInputs();
         Assert.assertEquals("flow input values not as expected", expectedFlowInputs, actualFlowInputs);
     }
 
+    private void verifyFlowOutputs(StepData flowData) {
+        Map<String, Serializable> expectedFlowOutputs = new LinkedHashMap<>();
+        expectedFlowOutputs.put("value_propagate", "flowInput_taskArg_opInput_opOutput_taskPublish_flowOutput_");
+        Map<String, Serializable> actualFlowOutputs = flowData.getOutputs();
+        Assert.assertEquals("flow output values not as expected", expectedFlowOutputs, actualFlowOutputs);
+    }
+
     private void verifyTaskPublishValues(StepData taskData) {
         // verify `get`, `get_sp()` and mixed mode works
-        Map<String, Serializable> expectedOperationPublishValues = new LinkedHashMap<>();
-        expectedOperationPublishValues.put("output1_safe", "CloudSlang");
-        expectedOperationPublishValues.put("output2_safe", "output2_default");
-        expectedOperationPublishValues.put("output_same_name", "output_same_name_default");
-        expectedOperationPublishValues.put("output_1", null);
-        expectedOperationPublishValues.put("output_2", "default_str");
-        expectedOperationPublishValues.put("output_3", "localhost");
-        expectedOperationPublishValues.put("output_4", "localhost");
-        expectedOperationPublishValues.put("output_5", "localhost");
-        expectedOperationPublishValues.put("output_6", "exist_value");
-        expectedOperationPublishValues.put("output_7", "localhost");
-        expectedOperationPublishValues.put("output_8", "localhost");
-        expectedOperationPublishValues.put("output_9", "default_str");
-        Map<String, Serializable> actualOperationPublishValues = taskData.getOutputs();
-        Assert.assertEquals("operation publish values not as expected", expectedOperationPublishValues, actualOperationPublishValues);
+        Map<String, Serializable> expectedPublishValues = new LinkedHashMap<>();
+        expectedPublishValues.put("output1_safe", "CloudSlang");
+        expectedPublishValues.put("output2_safe", "output2_default");
+        expectedPublishValues.put("output_same_name", "output_same_name_default");
+        expectedPublishValues.put("output_1", null);
+        expectedPublishValues.put("output_2", "default_str");
+        expectedPublishValues.put("output_3", "localhost");
+        expectedPublishValues.put("output_4", "localhost");
+        expectedPublishValues.put("output_5", "localhost");
+        expectedPublishValues.put("output_6", "exist_value");
+        expectedPublishValues.put("output_7", "localhost");
+        expectedPublishValues.put("output_8", "localhost");
+        expectedPublishValues.put("output_9", "default_str");
+        expectedPublishValues.put("value_propagate", "flowInput_taskArg_opInput_opOutput_taskPublish_");
+        Map<String, Serializable> actualPublishValues = taskData.getOutputs();
+        Assert.assertEquals("operation publish values not as expected", expectedPublishValues, actualPublishValues);
     }
 
     private Set<SystemProperty> prepareSystemProperties() {
         return Sets.newHashSet(
                 SystemProperty.createSystemProperty("a.b", "c.host", "localhost"),
                 SystemProperty.createSystemProperty("cloudslang", "lang.key", "language"),
-                SystemProperty.createSystemProperty("", "a.b.c.null_value", null)
+                SystemProperty.createSystemProperty("", "a.b.c.null_value", null),
+                SystemProperty.createSystemProperty("propagate", "flow.input", "flowInput_"),
+                SystemProperty.createSystemProperty("propagate", "task.argument", "taskArg_"),
+                SystemProperty.createSystemProperty("propagate", "op.input", "opInput_"),
+                SystemProperty.createSystemProperty("propagate", "op.output", "opOutput_"),
+                SystemProperty.createSystemProperty("propagate", "task.publish", "taskPublish_"),
+                SystemProperty.createSystemProperty("propagate", "flow.output", "flowOutput_")
         );
     }
 

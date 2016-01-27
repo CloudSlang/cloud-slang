@@ -48,6 +48,7 @@ flow:
     - input_9: ${get(    'i_don_exist',        get_sp('a.b.c.host')       )}
     - input_10: ${get_sp('a.b.c.i_don_exist', get_sp('a.b.c.host'))}
     - input_11: ${get_sp('a.b.c.null_value', 'default_str')}
+    - value_propagate: ${ get_sp('propagate.flow.input') }
   workflow:
     - Task1:
         do:
@@ -62,6 +63,7 @@ flow:
             - input_9: ${get(    'i_don_exist',        get_sp('a.b.c.host')       )}
             - input_10: ${get_sp('a.b.c.i_don_exist', get_sp('a.b.c.host'))}
             - input_11: ${get_sp('a.b.c.null_value', 'default_str')}
+            - value_propagate: ${ value_propagate + get_sp('propagate.task.argument') }
         publish:
           - output1_safe
           - output2_safe
@@ -75,9 +77,12 @@ flow:
           - output_7
           - output_8
           - output_9
+          - value_propagate: ${ value_propagate + get_sp('propagate.task.publish') }
         navigate:
           FUNCTIONS_KEY_EXISTS: FUNCTIONS_KEY_EXISTS
           FUNCTIONS_KEY_EXISTS_PROBLEM: FUNCTIONS_KEY_EXISTS_PROBLEM
+  outputs:
+    - value_propagate: ${ value_propagate + get_sp('propagate.flow.output') }
   results:
     - FUNCTIONS_KEY_EXISTS
     - FUNCTIONS_KEY_EXISTS_PROBLEM
