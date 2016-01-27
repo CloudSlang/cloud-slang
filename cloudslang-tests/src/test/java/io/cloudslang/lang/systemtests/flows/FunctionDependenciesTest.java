@@ -36,6 +36,20 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
     private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
 
     @Test
+    public void testSystemPropertyDependencies() throws Exception {
+        URL resource = getClass().getResource("/yaml/functions/system_property_dependencies_flow.sl");
+        URI operation = getClass().getResource("/yaml/functions/system_property_dependencies_op.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
+
+        Assert.assertEquals(
+                "system property dependencies not as expected",
+                prepareSystemPropertiesForDependencyTest(),
+                compilationArtifact.getSystemProperties()
+        );
+    }
+
+    @Test
     public void testFunctionsBasic() throws Exception {
         URL resource = getClass().getResource("/yaml/functions/functions_test_flow.sl");
         URI operation = getClass().getResource("/yaml/functions/functions_test_op.sl").toURI();
@@ -154,4 +168,28 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         return userInputs;
     }
 
+    private Set<String> prepareSystemPropertiesForDependencyTest() {
+        return Sets.newHashSet(
+                "flow.input.prop1",
+                "flow.input.prop2",
+                "flow.input.prop3",
+                "flow.output.prop1",
+                "task.input.prop1",
+                "task.input.prop2",
+                "task.publish.prop1",
+                "task.publish.prop2",
+                "op.input.prop1",
+                "op.input.prop2",
+                "op.input.prop3",
+                "op.output.prop1",
+                "op.result.prop1",
+                "async.aggregate.prop1",
+                "async.aggregate.prop2",
+                "for.input.prop1",
+                "for.input.prop2",
+                "for.publish.prop1",
+                "for.publish.prop2"
+                );
+    }
+    
 }
