@@ -140,7 +140,7 @@ public class CompilerHelperImpl implements CompilerHelper{
         if(CollectionUtils.isEmpty(files)) {
             files = loadDefaultFiles(files, extensions, directory, true);
         }
-        if(CollectionUtils.isEmpty(files)) return null;
+        if(CollectionUtils.isEmpty(files)) return new HashSet<>();
         Set<SystemProperty> result = new HashSet<>();
         for(String propFile : files) {
             try {
