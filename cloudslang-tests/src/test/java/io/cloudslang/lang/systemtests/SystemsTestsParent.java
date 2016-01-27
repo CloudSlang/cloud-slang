@@ -11,8 +11,11 @@
 package io.cloudslang.lang.systemtests;
 
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import io.cloudslang.score.events.ScoreEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +54,9 @@ public abstract class SystemsTestsParent {
     @Autowired
     protected TriggerFlows triggerFlows;
 
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     protected ScoreEvent trigger(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Set<SystemProperty> systemProperties) {
         return triggerFlows.runSync(compilationArtifact, userInputs, systemProperties);
     }
@@ -61,6 +67,10 @@ public abstract class SystemsTestsParent {
 
     protected List<String> getTasksOnly(Map<String, StepData> stepsData) {
         return select(stepsData.keySet(), startsWith("0."));
+    }
+
+    protected Set<SystemProperty> loadSystemProperties(SlangSource source) {
+        return slang.loadSystemProperties(source);
     }
 
 }

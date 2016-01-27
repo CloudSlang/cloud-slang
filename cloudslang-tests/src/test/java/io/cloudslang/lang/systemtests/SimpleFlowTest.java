@@ -15,9 +15,7 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -37,9 +35,6 @@ public class SimpleFlowTest extends SystemsTestsParent {
         SYS_PROPS.add(SystemProperty.createSystemProperty("user.sys", "props.port", "22"));
         SYS_PROPS.add(SystemProperty.createSystemProperty("user.sys", "props.alla", "balla"));
 	}
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     private static final long DEFAULT_TIMEOUT = 20000;
 
