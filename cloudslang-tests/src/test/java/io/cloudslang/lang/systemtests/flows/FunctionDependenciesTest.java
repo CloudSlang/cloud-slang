@@ -93,6 +93,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedArguments.put("input_8", "exist_value");
         expectedArguments.put("input_9", "localhost");
         expectedArguments.put("input_10", "localhost");
+        expectedArguments.put("input_11", "default_str");
         Map<String, Serializable> actualArguments = taskData.getInputs();
         Assert.assertEquals("task arguments not as expected", expectedArguments, actualArguments);
     }
@@ -115,6 +116,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedFlowInputs.put("input_8", "exist_value");
         expectedFlowInputs.put("input_9", "localhost");
         expectedFlowInputs.put("input_10", "localhost");
+        expectedFlowInputs.put("input_11", "default_str");
         Map<String, Serializable> actualFlowInputs = flowData.getInputs();
         Assert.assertEquals("flow input values not as expected", expectedFlowInputs, actualFlowInputs);
     }
@@ -133,6 +135,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedOperationPublishValues.put("output_6", "exist_value");
         expectedOperationPublishValues.put("output_7", "localhost");
         expectedOperationPublishValues.put("output_8", "localhost");
+        expectedOperationPublishValues.put("output_9", "default_str");
         Map<String, Serializable> actualOperationPublishValues = taskData.getOutputs();
         Assert.assertEquals("operation publish values not as expected", expectedOperationPublishValues, actualOperationPublishValues);
     }
@@ -140,7 +143,8 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
     private Set<SystemProperty> prepareSystemProperties() {
         return Sets.newHashSet(
                 SystemProperty.createSystemProperty("a.b", "c.host", "localhost"),
-                SystemProperty.createSystemProperty("cloudslang", "lang.key", "language")
+                SystemProperty.createSystemProperty("cloudslang", "lang.key", "language"),
+                SystemProperty.createSystemProperty("", "a.b.c.null_value", null)
         );
     }
 
