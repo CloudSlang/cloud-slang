@@ -34,9 +34,9 @@ public class ScriptExecutor extends AbstractScriptInterpreter {
     public synchronized Map<String, Serializable> executeScript(
             String script,
             Map<String, Serializable> callArguments) {
-        cleanInterpreter(interpreter);
-        prepareInterpreterContext(callArguments);
         try {
+            cleanInterpreter(interpreter);
+            prepareInterpreterContext(callArguments);
             return exec(interpreter, script);
         } catch (Exception e) {
             throw new RuntimeException("Error executing python script: " + e, e);
