@@ -159,8 +159,9 @@ public class CompilerHelperImpl implements CompilerHelper{
                             "\n\tTop level keys(" + SlangTextualKeys.FLOW_TYPE + ", " + SlangTextualKeys.OPERATION_TYPE + ") are found.");
                 }
             } catch(Throwable ex) {
-                logger.error("Error loading file: " + propFile, ex);
-                throw new RuntimeException("Error loading file: " + propFile, ex);
+                String errorMessage = "Error loading file: " + propFile + " nested exception is " + ex.getMessage();
+                logger.error(errorMessage, ex);
+                throw new RuntimeException(errorMessage, ex);
             }
         }
         return result;
