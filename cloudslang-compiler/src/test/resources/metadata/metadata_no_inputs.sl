@@ -6,23 +6,22 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 #
 #####################################################
-## description: |
-##   Parses the given JSON input to retrieve the	 
-##   corresponding value addressed by the json_path input.
+#!!
+#! @description: Parses the given JSON input to retrieve the
+#!               corresponding value addressed by the json_path input.
+#! @prerequisites: jenkinsapi Python module
 
-## outputs:
-##   - value: the corresponding value of the key referred to by json_path
-##   - return_result: parsing was successful or not
-##   - return_code: will be '0' if parsing was successful, '-1' otherwise
-##   - error_message: |
-##      error message if there was an error when executing,
-##      empty otherwise
-## results:
-##   - SUCCESS: parsing was successful (return_code == '0')
-##   - FAILURE: otherwise
+#! @output value: the corresponding value of the key referred to by json_path
+#! @output return_result: parsing was successful or not
+#! @output return_code: will be '0' if parsing was successful, '-1' otherwise
+#! @output error_message: error message if there was an error when executing,
+#!                        empty otherwise
+#! @result SUCCESS: parsing was successful (return_code == '0')
+#! @result FAILURE: otherwise
+#!!#
 #####################################################sdfdf
-#### comment
-##
+#!#! comment
+#!
 
 namespace: io.cloudslang.base.json
 

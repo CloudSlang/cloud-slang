@@ -9,12 +9,13 @@
 package io.cloudslang.lang.compiler.modeller;
 
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
-import io.cloudslang.lang.compiler.parser.model.ParsedMetadata;
+
+import java.util.Map;
 
 /**
  * User: bancl
  * Date: 1/12/2016
  */
 public interface MetadataModeller {
-    Metadata createModel(ParsedMetadata parsedMetadata);
+    Metadata createModel(Map<String, String> metadataMap);
 }

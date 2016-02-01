@@ -12,6 +12,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URI;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * User: bancl
@@ -21,11 +23,18 @@ import java.net.URI;
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
 public class MetadataExtractorTest {
 
-    public static final String OPERATION_DESCRIPTION = "Parses the given JSON input to retrieve the\t \n" +
-                                                       "corresponding value addressed by the json_path input.\n";
-    public static final String FIRST_INPUT_VALUE = "JSON data input \n" +
-                                                   "- Example: '{\"k1\": {\"k2\": [\"v1\", \"v2\"]}}'\n";
-    public static final String FIRST_OUTPUT_VALUE = "the corresponding value of the key referred to by json_path";
+    public static final String NEWLINE = System.lineSeparator();
+
+    public static final String OPERATION_DESCRIPTION = "Parses the given JSON input to retrieve the" + NEWLINE +
+                                                       "corresponding value addressed by the json_path input." + NEWLINE;
+    public static final String FIRST_INPUT_VALUE = "JSON data input" + NEWLINE +
+                                                   "Example: '{\"k1\": {\"k2\": [\"v1\", \"v2\"]}}'" + NEWLINE;
+    public static final String FIRST_OUTPUT_VALUE = "the corresponding value of the key referred to by json_path" + NEWLINE;
+    public static final String SECOND_OUTPUT_VALUE = "path from which to retrieve value represented as a list of keys and/or indices." + NEWLINE +
+            "Passing an empty list ([]) will retrieve the entire json_input. - Example: [\"k1\", \"k2\", 1]" + NEWLINE +
+            "More information after newline" + NEWLINE;
+    public static final String PREREQUISITES = "jenkinsapi Python module" + NEWLINE;
+
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
@@ -38,12 +47,45 @@ public class MetadataExtractorTest {
         Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
         Assert.assertNotNull("metadata is null", metadata);
         Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
+        Assert.assertEquals("different prerequisites", PREREQUISITES, metadata.getPrerequisites());
         Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
         Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
         Assert.assertEquals("different number of results", 2, metadata.getResults().size());
-        String key = metadata.getInputs().keySet().iterator().next();
-        Assert.assertEquals("different input name", "json_input", key);
-        Assert.assertEquals("different input value", FIRST_INPUT_VALUE, metadata.getInputs().get(key));
+        Iterator<Map.Entry<String, String>> it = metadata.getInputs().entrySet().iterator();
+        Map.Entry<String, String> entry = it.next();
+        Assert.assertEquals("different input name", "json_input", entry.getKey());
+        Assert.assertEquals("different input value", FIRST_INPUT_VALUE, entry.getValue());
+        Map.Entry<String, String> entry2 = it.next();
+        Assert.assertEquals("different input name", "json_path", entry2.getKey());
+        Assert.assertEquals("different input value", SECOND_OUTPUT_VALUE, entry2.getValue());
+    }
+
+    @Test
+    public void testExtractMetadataNoPrerequisites() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_no_prerequisites.sl").toURI();
+        Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+        Assert.assertNotNull("metadata is null", metadata);
+        Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
+        Assert.assertEquals("different prerequisites", "", metadata.getPrerequisites());
+        Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
+        Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
+        Assert.assertEquals("different number of results", 2, metadata.getResults().size());
+        Iterator<Map.Entry<String, String>> it = metadata.getInputs().entrySet().iterator();
+        Map.Entry<String, String> entry = it.next();
+        Assert.assertEquals("different input name", "json_input", entry.getKey());
+        Assert.assertEquals("different input value", FIRST_INPUT_VALUE, entry.getValue());
+        Map.Entry<String, String> entry2 = it.next();
+        Assert.assertEquals("different input name", "json_path", entry2.getKey());
+        Assert.assertEquals("different input value", SECOND_OUTPUT_VALUE, entry2.getValue());
+    }
+
+    @Test
+    public void testExtractMetadataWrongOrder() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_wrong_order.sl").toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("There was a problem parsing the description: metadata_wrong_order.sl.\n" +
+                "Order is not preserved.");
+        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
     }
 
     @Test
@@ -52,12 +94,13 @@ public class MetadataExtractorTest {
         Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
         Assert.assertNotNull("metadata is null", metadata);
         Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
+        Assert.assertEquals("different prerequisites", PREREQUISITES, metadata.getPrerequisites());
         Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
         Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
         Assert.assertEquals("different number of results", 0, metadata.getResults().size());
-        String key = metadata.getInputs().keySet().iterator().next();
-        Assert.assertEquals("different input name", "json_input", key);
-        Assert.assertEquals("different input value", FIRST_INPUT_VALUE, metadata.getInputs().get(key));
+        Map.Entry<String, String> entry = metadata.getInputs().entrySet().iterator().next();
+        Assert.assertEquals("different input name", "json_input", entry.getKey());
+        Assert.assertEquals("different input value", FIRST_INPUT_VALUE, entry.getValue());
     }
 
     @Test
@@ -66,12 +109,13 @@ public class MetadataExtractorTest {
         Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
         Assert.assertNotNull("metadata is null", metadata);
         Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
+        Assert.assertEquals("different prerequisites", PREREQUISITES, metadata.getPrerequisites());
         Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
         Assert.assertEquals("different number of outputs", 0, metadata.getOutputs().size());
         Assert.assertEquals("different number of results", 2, metadata.getResults().size());
-        String key = metadata.getInputs().keySet().iterator().next();
-        Assert.assertEquals("different input name", "json_input", key);
-        Assert.assertEquals("different input value", FIRST_INPUT_VALUE, metadata.getInputs().get(key));
+        Map.Entry<String, String> entry = metadata.getInputs().entrySet().iterator().next();
+        Assert.assertEquals("different input name", "json_input", entry.getKey());
+        Assert.assertEquals("different input value", FIRST_INPUT_VALUE, entry.getValue());
     }
 
     @Test
@@ -83,9 +127,9 @@ public class MetadataExtractorTest {
         Assert.assertEquals("different number of inputs", 0, metadata.getInputs().size());
         Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
         Assert.assertEquals("different number of results", 2, metadata.getResults().size());
-        String key = metadata.getOutputs().keySet().iterator().next();
-        Assert.assertEquals("different input name", "value", key);
-        Assert.assertEquals("different input value", FIRST_OUTPUT_VALUE, metadata.getOutputs().get(key));
+        Map.Entry<String, String> entry = metadata.getOutputs().entrySet().iterator().next();
+        Assert.assertEquals("different input name", "value", entry.getKey());
+        Assert.assertEquals("different input value", FIRST_OUTPUT_VALUE, entry.getValue());
     }
 
     @Test
@@ -95,11 +139,11 @@ public class MetadataExtractorTest {
         Assert.assertNotNull("metadata is null", metadata);
         Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
         Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
-        Assert.assertEquals("different number of outputs", 6, metadata.getOutputs().size());
+        Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
         Assert.assertEquals("different number of results", 0, metadata.getResults().size());
-        String key = metadata.getOutputs().keySet().iterator().next();
-        Assert.assertEquals("different input name", "value", key);
-        Assert.assertEquals("different input value", FIRST_OUTPUT_VALUE, metadata.getOutputs().get(key));
+        Map.Entry<String, String> entry = metadata.getInputs().entrySet().iterator().next();
+        Assert.assertEquals("different input name", "json_input", entry.getKey());
+        Assert.assertEquals("different input value", FIRST_INPUT_VALUE, entry.getValue());
     }
 
     @Test
@@ -111,32 +155,8 @@ public class MetadataExtractorTest {
         Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
         Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
         Assert.assertEquals("different number of results", 1, metadata.getResults().size());
-        String key = metadata.getOutputs().keySet().iterator().next();
-        Assert.assertEquals("different input name", "value", key);
-        Assert.assertEquals("different input value", FIRST_OUTPUT_VALUE, metadata.getOutputs().get(key));
-    }
-
-    @Test
-    public void testExtractMetadataWrongDescriptionFormat() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_wrong_desc.sl").toURI();
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("could not found expected ':'");
-        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
-    }
-
-    @Test
-    public void testExtractMetadataWrongDescriptionIndentation() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_wrong_indentation.sl").toURI();
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("expected <block end>, but found BlockSequenceStart");
-        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
-    }
-
-    @Test
-    public void testExtractMetadataInvalidOutputValue() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_invalid_output_value.sl").toURI();
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("expected <block end>, but found Scalar");
-        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+        Map.Entry<String, String> entry = metadata.getInputs().entrySet().iterator().next();
+        Assert.assertEquals("different input name", "json_input", entry.getKey());
+        Assert.assertEquals("different input value", FIRST_INPUT_VALUE, entry.getValue());
     }
 }

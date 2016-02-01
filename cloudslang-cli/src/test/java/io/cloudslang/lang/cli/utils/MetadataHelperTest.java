@@ -34,13 +34,10 @@ import static org.mockito.Mockito.mock;
 @ContextConfiguration(classes = MetadataHelperTest.Config.class)
 public class MetadataHelperTest {
 
-    private static String outputs = "outputs:\n" +
-            "  value: the corresponding value of the key referred to by json_path\n" +
-            "  return_result: parsing was successful or not\n" +
-            "  return_code: will be '0' if parsing was successful, '-1' otherwise\n" +
-            "  error_message: |-\n" +
-            "    error message if there was an error when executing,\n" +
-            "    empty otherwise";
+    public static final String DESCRIPTION_AND_PREREQUISITES = "description: |-\n" +
+            "  Parses the given JSON input to retrieve the\n" +
+            "  corresponding value addressed by the json_path input.\n" +
+            "prerequisites: jenkinsapi Python module";
 
     @Autowired
     private MetadataHelper metadataHelper;
@@ -61,7 +58,7 @@ public class MetadataHelperTest {
         String metadataToPrint = metadataHelper.extractMetadata(new File(flowFilePath));
         Assert.assertNotNull(metadataToPrint);
         Assert.assertFalse(metadataToPrint.contains("io.cloudslang.lang.compiler.modeller.model.Metadata"));
-        Assert.assertTrue(metadataToPrint.contains(outputs));
+        Assert.assertTrue(metadataToPrint.contains(DESCRIPTION_AND_PREREQUISITES));
     }
 
     @Configuration

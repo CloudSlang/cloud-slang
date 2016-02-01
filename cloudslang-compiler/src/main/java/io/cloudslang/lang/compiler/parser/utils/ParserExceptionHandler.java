@@ -20,14 +20,14 @@ import org.yaml.snakeyaml.scanner.ScannerException;
 @Component
 public class ParserExceptionHandler {
 
-    public static String CANNOT_CREATE_PROPERTY_ERROR = "Cannot create property";
-    public static String KEY_VALUE_PAIR_MISSING_OR_INDENTATION_PROBLEM_MSG = "Probably did not provide (key: value) pair or missing space after colon(:). Also check that everything is indented properly";
-    public static String MAPPING_VALUES_NOT_ALLOWED_HERE_ERROR = "mapping values are not allowed here";
-    public static String SCANNING_A_SIMPLE_KEY_ERROR = "while scanning a simple key";
-    public static String UNABLE_TO_FIND_PROPERTY_ERROR = "Unable to find property";
-    public static String MAP_CONSTRUCTOR_NOT_FOUND_ERROR = "No single argument constructor found for interface java.util.Map";
-    public static String TRUNCATION_BEGINNING = "Unable";
-    public static String TRUNCATION_END = "on class";
+    public static final String CANNOT_CREATE_PROPERTY_ERROR = "Cannot create property";
+    public static final String KEY_VALUE_PAIR_MISSING_OR_INDENTATION_PROBLEM_MSG = "Probably did not provide (key: value) pair or missing space after colon(:). Also check that everything is indented properly";
+    public static final String MAPPING_VALUES_NOT_ALLOWED_HERE_ERROR = "mapping values are not allowed here";
+    public static final String SCANNING_A_SIMPLE_KEY_ERROR = "while scanning a simple key";
+    public static final String UNABLE_TO_FIND_PROPERTY_ERROR = "Unable to find property";
+    public static final String MAP_CONSTRUCTOR_NOT_FOUND_ERROR = "No single argument constructor found for interface java.util.Map";
+    public static final String TRUNCATION_BEGINNING = "Unable";
+    public static final String TRUNCATION_END = "on class";
 
     public String getErrorMessage(Throwable e) {
         String errorMessage = e.getMessage();

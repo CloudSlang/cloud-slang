@@ -16,9 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.introspector.Property;
+import org.yaml.snakeyaml.representer.Representer;
 
+import java.beans.IntrospectionException;
 import java.io.File;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * User: bancl
@@ -47,7 +52,7 @@ public class MetadataHelperImpl implements MetadataHelper {
         dumperOptions.setPrettyFlow(true);
         dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 
-        Yaml yaml = new Yaml(dumperOptions);
+        Yaml yaml = new Yaml(new CustomOrderMetadataRepresenter(), dumperOptions);
         String lineBreak = dumperOptions.getLineBreak().getString();
         String result = yaml.dump(cleanWhiteSpaces(metadata, lineBreak));
         result = result.substring(result.indexOf(lineBreak) + 1);
@@ -56,6 +61,7 @@ public class MetadataHelperImpl implements MetadataHelper {
 
     private Metadata cleanWhiteSpaces(Metadata metadata, String lineBreak) {
         metadata.setDescription(metadata.getDescription().trim().replaceAll("[\\s]+" + lineBreak, lineBreak));
+        metadata.setPrerequisites(metadata.getPrerequisites().trim().replaceAll("[\\s]+" + lineBreak, lineBreak));
         cleanMapWhiteSpaces(metadata.getInputs(), lineBreak);
         cleanMapWhiteSpaces(metadata.getOutputs(), lineBreak);
         cleanMapWhiteSpaces(metadata.getResults(), lineBreak);
@@ -63,8 +69,28 @@ public class MetadataHelperImpl implements MetadataHelper {
     }
 
     private void cleanMapWhiteSpaces(Map<String, String> map, String lineBreak) {
-        for (String key : map.keySet()) {
-            map.put(key, map.get(key).trim().replaceAll("[\\s]+" + lineBreak, lineBreak));
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            map.put(entry.getKey(), entry.getValue().trim().replaceAll("[\\s]+" + lineBreak, lineBreak));
+        }
+    }
+
+    private static class CustomOrderMetadataRepresenter extends Representer {
+        @Override
+        protected Set<Property> getProperties(Class<? extends Object> type)
+                throws IntrospectionException {
+            Set<Property> result = new LinkedHashSet<>();
+            Set<Property> set = super.getProperties(type);
+            for (Property property : set) {
+                if (property.getType().equals(String.class)) {
+                    result.add(property);
+                }
+            }
+            for (Property property : set) {
+                if (property.getType().equals(Map.class)) {
+                    result.add(property);
+                }
+            }
+            return result;
         }
     }
 }

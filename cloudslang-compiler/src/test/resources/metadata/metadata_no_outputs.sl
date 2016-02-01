@@ -6,23 +6,21 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 #
 #####################################################
-## description: |
-##   Parses the given JSON input to retrieve the	 
-##   corresponding value addressed by the json_path input.
-## inputs:
-##   - json_input: |
-##      JSON data input 
-##      - Example: '{"k1": {"k2": ["v1", "v2"]}}'
-##   - json_path: |
-##      path from which to retrieve value represented as a list of keys and/or indices.
-##      Passing an empty list ([]) will retrieve the entire json_input. - Example: ["k1", "k2", 1]
+#!!
+#! @description: Parses the given JSON input to retrieve the
+#!               corresponding value addressed by the json_path input.
+#! @prerequisites: jenkinsapi Python module
+#! @input json_input: JSON data input
+#!                    Example: '{"k1": {"k2": ["v1", "v2"]}}'
+#! @input json_path: path from which to retrieve value represented as a list of keys and/or indices.
+#!                   Passing an empty list ([]) will retrieve the entire json_input. - Example: ["k1", "k2", 1]
 
-## results:
-##   - SUCCESS: parsing was successful (return_code == '0')
-##   - FAILURE: otherwise
+#! @result SUCCESS: parsing was successful (return_code == '0')
+#! @result FAILURE: otherwise
+#!!#
 #####################################################sdfdf
-#### comment
-##
+#!#! comment
+#!
 
 namespace: io.cloudslang.base.json
 
