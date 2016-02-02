@@ -141,11 +141,11 @@ public class SlangCLI implements CommandMarker {
             return metadataHelper.extractMetadata(new File(slangFile));
         } else {
             Set<SystemProperty> systemProperties = compilerHelper.loadSystemProperties(Lists.newArrayList(slangFile));
-            return prittyPrintSystemProperties(systemProperties);
+            return prettyPrintSystemProperties(systemProperties);
         }
     }
 
-    private String prittyPrintSystemProperties(Set<SystemProperty> systemProperties) {
+    private String prettyPrintSystemProperties(Set<SystemProperty> systemProperties) {
         String result;
         if (CollectionUtils.isEmpty(systemProperties)) {
             result = "No system properties found.";
