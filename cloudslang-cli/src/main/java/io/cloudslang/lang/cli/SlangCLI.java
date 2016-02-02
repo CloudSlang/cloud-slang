@@ -22,7 +22,7 @@ import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,32 +130,35 @@ public class SlangCLI implements CommandMarker {
         return !Arrays.asList(validArguments).contains(verbose.toLowerCase());
     }
 
-    @CliCommand(
-            value = "inspect",
-            help = "Display metadata about an executable / Load system properties from a properties file"
-    )
+    @CliCommand(value = "inspect", help = "Display metadata about an executable")
     public String inspectExecutable(
-            @CliOption(key = {"", "f", "file"}, mandatory = true, help = PATH_TO_FILENAME_HELP) final String slangFile
+            @CliOption(key = {"", "f", "file"}, mandatory = true, help = PATH_TO_FILENAME_HELP) final File executableFile
     ) throws IOException {
-        if (compilerHelper.isExecutable(slangFile)) {
-            return metadataHelper.extractMetadata(new File(slangFile));
-        } else {
-            Set<SystemProperty> systemProperties = compilerHelper.loadSystemProperties(Lists.newArrayList(slangFile));
-            return prettyPrintSystemProperties(systemProperties);
-        }
+        return metadataHelper.extractMetadata(executableFile);
+    }
+
+    @CliCommand(value = "list", help = "List system properties from a properties file")
+    public String listSystemProperties(
+            @CliOption(key = {"", "f", "file"}, mandatory = true, help = PATH_TO_FILENAME_HELP) final String propertiesFile) {
+        Set<SystemProperty> systemProperties = compilerHelper.loadSystemProperties(Lists.newArrayList(propertiesFile));
+        return prettyPrintSystemProperties(systemProperties);
     }
 
     private String prettyPrintSystemProperties(Set<SystemProperty> systemProperties) {
-        String result;
+        StringBuilder stringBuilder = new StringBuilder();
         if (CollectionUtils.isEmpty(systemProperties)) {
-            result = "No system properties found.";
+            stringBuilder.append("No system properties found.");
         } else {
-            result = "Following system properties were loaded:\n";
+            stringBuilder.append("Following system properties were loaded:\n");
             for (SystemProperty systemProperty : systemProperties) {
-                result += "\t" + systemProperty.getFullyQualifiedName() + ": " + systemProperty.getValue() + "\n";
+                stringBuilder.append("\t");
+                stringBuilder.append(systemProperty.getFullyQualifiedName());
+                stringBuilder.append(": ");
+                stringBuilder.append(systemProperty.getValue());
+                stringBuilder.append("\n");
             }
         }
-        return result.trim();
+        return StringUtils.trim(stringBuilder.toString());
     }
 
     @CliCommand(value = "env", help = ENV_HELP)

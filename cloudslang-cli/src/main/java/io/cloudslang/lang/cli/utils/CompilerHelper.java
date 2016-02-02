@@ -26,7 +26,7 @@ public interface CompilerHelper {
 	 * @param systemPropertyFiles paths to the files containing the system properties
 	 * @return map containing all of the system properties with fully qualified keys
 	 */
-	Set<SystemProperty> loadSystemProperties(List<String> systemPropertyFiles) throws IOException;
+	Set<SystemProperty> loadSystemProperties(List<String> systemPropertyFiles);
 
     /**
      * Load input sources written in yaml and map them to fully qualified names
