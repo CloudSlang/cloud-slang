@@ -44,10 +44,14 @@ public class MetadataModellerImpl implements MetadataModeller {
         Map<String, String> map = new LinkedHashMap<>();
         for (Map.Entry<String, String> entry : fullMap.entrySet()) {
             if (entry.getKey().contains(tag.getValue())) {
-                map.put(entry.getKey().substring(tag.getValue().length()).trim(), entry.getValue());
+                map.put(getName(entry, tag), entry.getValue());
             }
         }
         return map;
+    }
+
+    private String getName(Map.Entry<String, String> entry, DescriptionTag tag) {
+        return entry.getKey().substring(tag.getValue().length()).trim();
     }
 
 }

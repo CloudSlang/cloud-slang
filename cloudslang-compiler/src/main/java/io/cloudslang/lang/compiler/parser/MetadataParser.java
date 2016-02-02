@@ -70,7 +70,7 @@ public class MetadataParser {
             String line = reader.readLine();
             String key = "";
             while (line != null) {
-                if (lineContainsSomeTag(line)) {
+                if (lineContainsATag(line)) {
                     tag = getContainedTag(line);
                     if (isSingleTagType(tag)) {
                         line = line.substring(line.indexOf(COLON) + 1);
@@ -82,7 +82,7 @@ public class MetadataParser {
                 }
                 valueStringBuilder.append(line.trim()).append(System.lineSeparator());
                 line = reader.readLine();
-                if (line == null || lineContainsSomeTag(line)) {
+                if (line == null || lineContainsATag(line)) {
                     map.put(key, valueStringBuilder.toString());
                     valueStringBuilder.setLength(0);
                 }
@@ -104,7 +104,7 @@ public class MetadataParser {
         return null;
     }
 
-    private boolean lineContainsSomeTag(String line) {
+    private boolean lineContainsATag(String line) {
         for (DescriptionTag descriptionTag : DESCRIPTION_TAGS_LIST) {
             if (line.contains(descriptionTag.getValue())) return true;
         }

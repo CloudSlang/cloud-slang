@@ -76,21 +76,21 @@ public class MetadataHelperImpl implements MetadataHelper {
 
     private static class CustomOrderMetadataRepresenter extends Representer {
         @Override
-        protected Set<Property> getProperties(Class<? extends Object> type)
+        protected Set<Property> getProperties(Class<?> type)
                 throws IntrospectionException {
             Set<Property> result = new LinkedHashSet<>();
             Set<Property> set = super.getProperties(type);
-            for (Property property : set) {
-                if (property.getType().equals(String.class)) {
-                    result.add(property);
-                }
-            }
-            for (Property property : set) {
-                if (property.getType().equals(Map.class)) {
-                    result.add(property);
-                }
-            }
+            addTypeProperties(result, set, String.class);
+            addTypeProperties(result, set, Map.class);
             return result;
+        }
+
+        private void addTypeProperties(Set<Property> result, Set<Property> set, Class type) {
+            for (Property property : set) {
+                if (property.getType().equals(type)) {
+                    result.add(property);
+                }
+            }
         }
     }
 }
