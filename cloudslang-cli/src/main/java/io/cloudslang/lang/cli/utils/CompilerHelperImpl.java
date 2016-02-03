@@ -98,12 +98,12 @@ public class CompilerHelperImpl implements CompilerHelper{
 
     @Override
     public Set<SystemProperty> loadSystemProperties(List<String> systemPropertyFiles) {
-        return loadPropertiesFromFiles(systemPropertyFiles, SLANG_FILE_EXTENSIONS, SP_DIR);
+        return loadPropertiesFromFiles(convertToFiles(systemPropertyFiles), SLANG_FILE_EXTENSIONS, SP_DIR);
     }
 
     @Override
     public Map<String, Serializable> loadInputsFromFile(List<String> inputFiles) {
-        return loadMapsFromFiles(inputFiles, YAML_FILE_EXTENSIONS, INPUT_DIR);
+        return loadMapsFromFiles(convertToFiles(inputFiles), YAML_FILE_EXTENSIONS, INPUT_DIR);
     }
 
     @Override
@@ -111,16 +111,19 @@ public class CompilerHelperImpl implements CompilerHelper{
         return isExecutable(SlangSource.fromFile(new File(filePath)));
     }
 
-    private Map<String, Serializable> loadMapsFromFiles(List<String> files, String[] extensions, String directory) {
+    private Map<String, Serializable> loadMapsFromFiles(List<File> files, String[] extensions, String directory) {
+        Collection<File> fileCollection;
         if(CollectionUtils.isEmpty(files)) {
-            files = loadDefaultFiles(files, extensions, directory, false);
+            fileCollection = loadDefaultFiles(extensions, directory, false);
+            if(CollectionUtils.isEmpty(fileCollection)) return null;
+        } else {
+            fileCollection = files;
         }
-        if(CollectionUtils.isEmpty(files)) return null;
         Map<String, Serializable> result = new HashMap<>();
-		for(String inputFile : files) {
+		for(File inputFile : fileCollection) {
 			logger.info("Loading file: " + inputFile);
 			try {
-                String inputsFileContent = FileUtils.readFileToString(new File(inputFile));
+                String inputsFileContent = FileUtils.readFileToString(inputFile);
                 Boolean emptyContent = true;
                 if (StringUtils.isNotEmpty(inputsFileContent)) {
                     @SuppressWarnings("unchecked") Map<String, ? extends Serializable> inputFileYamlContent =
@@ -141,15 +144,18 @@ public class CompilerHelperImpl implements CompilerHelper{
         return result;
     }
 
-    private Set<SystemProperty> loadPropertiesFromFiles(List<String> files, String[] extensions, String directory) {
+    private Set<SystemProperty> loadPropertiesFromFiles(List<File> files, String[] extensions, String directory) {
+        Collection<File> fileCollection;
         if(CollectionUtils.isEmpty(files)) {
-            files = loadDefaultFiles(files, extensions, directory, true);
+            fileCollection = loadDefaultFiles(extensions, directory, true);
+            if(CollectionUtils.isEmpty(fileCollection)) return new HashSet<>();
+        } else {
+            fileCollection = files;
         }
-        if(CollectionUtils.isEmpty(files)) return new HashSet<>();
         Set<SystemProperty> result = new HashSet<>();
-        for(String propFile : files) {
+        for(File propFile : fileCollection) {
             try {
-                SlangSource source = SlangSource.fromFile(new File(propFile));
+                SlangSource source = SlangSource.fromFile(propFile);
                 if (!isExecutable(source)) {
                     logger.info("Loading file: " + propFile);
                     Set<SystemProperty> propsFromFile = slang.loadSystemProperties(source);
@@ -167,18 +173,15 @@ public class CompilerHelperImpl implements CompilerHelper{
         return result;
     }
 
-    private List<String> loadDefaultFiles(List<String> files, String[] extensions, String directory, boolean recursive) {
+    private Collection<File> loadDefaultFiles(String[] extensions, String directory, boolean recursive) {
+        Collection<File> files;
         String appHome = System.getProperty("app.home", "");
         String defaultDirectoryPath = appHome + File.separator + "bin" + File.separator + directory;
         File defaultDirectory = new File(defaultDirectoryPath);
         if (defaultDirectory.isDirectory()) {
-            Collection<File> implicitFiles = FileUtils.listFiles(defaultDirectory, extensions, recursive);
-            files = convert(implicitFiles, new Converter<File, String>() {
-                @Override
-                public String convert(File from) {
-                    return from.getPath();
-                }
-            });
+            files = FileUtils.listFiles(defaultDirectory, extensions, recursive);
+        } else {
+            files = Collections.emptyList();
         }
         return files;
     }
@@ -201,6 +204,15 @@ public class CompilerHelperImpl implements CompilerHelper{
         } else {
             return false;
         }
+    }
+
+    private List<File> convertToFiles(List<String> fileList) {
+        return convert(fileList, new Converter<String, File>() {
+            @Override
+            public File convert(String from) {
+                return new File(from);
+            }
+        });
     }
 
 }
