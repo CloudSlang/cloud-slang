@@ -12,6 +12,7 @@ import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.DumperOptions;
@@ -32,6 +33,8 @@ import java.util.Set;
 @Component
 public class MetadataHelperImpl implements MetadataHelper {
 
+    public static final String NO_METADATA_TO_DISPLAY = "No metadata to display.";
+
     @Autowired
     private Slang slang;
 
@@ -47,16 +50,30 @@ public class MetadataHelperImpl implements MetadataHelper {
     }
 
     private String prettyPrint(Metadata metadata) {
-        DumperOptions dumperOptions = new DumperOptions();
-        dumperOptions.setAllowReadOnlyProperties(true);
-        dumperOptions.setPrettyFlow(true);
-        dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        if (emptyMetadata(metadata)) {
+            return NO_METADATA_TO_DISPLAY;
+        } else {
+            DumperOptions dumperOptions = new DumperOptions();
+            dumperOptions.setAllowReadOnlyProperties(true);
+            dumperOptions.setPrettyFlow(true);
+            dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 
-        Yaml yaml = new Yaml(new CustomOrderMetadataRepresenter(), dumperOptions);
-        String lineBreak = dumperOptions.getLineBreak().getString();
-        String result = yaml.dump(cleanWhiteSpaces(metadata, lineBreak));
-        result = result.substring(result.indexOf(lineBreak) + 1);
-        return result;
+            Yaml yaml = new Yaml(new CustomOrderMetadataRepresenter(), dumperOptions);
+            String lineBreak = dumperOptions.getLineBreak().getString();
+            String result = yaml.dump(cleanWhiteSpaces(metadata, lineBreak));
+            result = result.substring(result.indexOf(lineBreak) + 1);
+            return result;
+        }
+    }
+
+    private boolean emptyMetadata(Metadata metadata) {
+        boolean isEmpty = false;
+        if ("".equals(metadata.getDescription()) && "".equals(metadata.getPrerequisites()) &&
+                (metadata.getInputs().size() == 0) && (metadata.getOutputs().size() == 0) &&
+                (metadata.getResults().size() == 0)) {
+            isEmpty = true;
+        }
+        return isEmpty;
     }
 
     private Metadata cleanWhiteSpaces(Metadata metadata, String lineBreak) {

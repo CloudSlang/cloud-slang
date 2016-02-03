@@ -46,4 +46,11 @@ public class MetadataParserTest {
         }
         Assert.assertFalse("metadata map contains nulls", containsNulls);
     }
+
+    @Test
+    public void fullDescriptionMissing() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_full_description_missing.sl").toURI();
+        Map<String, String> metadataMap = metadataParser.parse(SlangSource.fromFile(operation));
+        Assert.assertTrue("metadata map should have size 0", metadataMap.size() == 0);
+    }
 }

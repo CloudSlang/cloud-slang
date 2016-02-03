@@ -31,6 +31,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,10 +79,11 @@ public class CompilerHelperTest {
 		URI flow2FilePath = getClass().getResource("/flowsdir/flow2.sl").toURI();
 		URI spFlow = getClass().getResource("/sp/flow.sl").toURI();
 		URI spOp = getClass().getResource("/sp/operation.sl").toURI();
-        URI get_value = getClass().getResource("/metadata.sl").toURI();
+        URI metadata = getClass().getResource("/metadata/metadata.sl").toURI();
+        URI descriptionMissingMetadata = getClass().getResource("/metadata/metadata_full_description_missing.sl").toURI();
 		compilerHelper.compile(flowFilePath.getPath(), null);
 		Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath), Sets.newHashSet(SlangSource.fromFile(flowFilePath), SlangSource.fromFile(flow2FilePath),
-			SlangSource.fromFile(opFilePath), SlangSource.fromFile(spFlow), SlangSource.fromFile(spOp), SlangSource.fromFile(get_value)));
+			SlangSource.fromFile(opFilePath), SlangSource.fromFile(spFlow), SlangSource.fromFile(spOp), SlangSource.fromFile(metadata), SlangSource.fromFile(descriptionMissingMetadata)));
 	}
 
     @Test
@@ -114,7 +116,7 @@ public class CompilerHelperTest {
 		expected.put("user.sys.props.port", 22);
 		expected.put("user.sys.props.alla", "balla");
 		URI systemProperties = getClass().getResource("/properties/system_properties.yaml").toURI();
-		Map<String, ? extends Serializable> result = compilerHelper.loadSystemProperties(Arrays.asList(systemProperties.getPath()));
+		Map<String, ? extends Serializable> result = compilerHelper.loadSystemProperties(Collections.singletonList(systemProperties.getPath()));
 		Assert.assertNotNull(result);
 		Assert.assertEquals(expected, result);
 	}
@@ -140,7 +142,7 @@ public class CompilerHelperTest {
         expected.put("host", "localhost");
         expected.put("port", "22");
         URI inputsFromFile = getClass().getResource("/inputs/inputs.yaml").toURI();
-        Map<String, ? extends Serializable> result = compilerHelper.loadInputsFromFile(Arrays.asList(inputsFromFile.getPath()));
+        Map<String, ? extends Serializable> result = compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath()));
         Assert.assertNotNull(result);
         Assert.assertEquals(expected, result);
     }
@@ -151,7 +153,7 @@ public class CompilerHelperTest {
         expectedException.expectMessage("Inputs / System properties file");
 
         URI inputsFromFile = getClass().getResource("/inputs/commented_inputs.yaml").toURI();
-        compilerHelper.loadInputsFromFile(Arrays.asList(inputsFromFile.getPath()));
+        compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath()));
     }
     @Test
     public void testLoadInputsFromEmptyFile() throws Exception {
@@ -159,7 +161,7 @@ public class CompilerHelperTest {
         expectedException.expectMessage("Inputs / System properties file");
 
         URI inputsFromFile = getClass().getResource("/inputs/empty_inputs.yaml").toURI();
-        compilerHelper.loadInputsFromFile(Arrays.asList(inputsFromFile.getPath()));
+        compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath()));
 
     }
 

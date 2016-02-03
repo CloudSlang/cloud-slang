@@ -53,12 +53,14 @@ public class MetadataParser {
     }
 
     private void checkMapOrder(Map<String, String> fullMap) {
-        Iterator<String> it = fullMap.keySet().iterator();
-        int previousTagPosition = DESCRIPTION_TAGS_LIST.indexOf(getContainedTag(it.next()));
-        while (it.hasNext()) {
-            int keyTagPosition = DESCRIPTION_TAGS_LIST.indexOf(getContainedTag(it.next()));
-            if (previousTagPosition > keyTagPosition) throw new RuntimeException("Order is not preserved.");
-            previousTagPosition = keyTagPosition;
+        if (fullMap.size() > 0) {
+            Iterator<String> it = fullMap.keySet().iterator();
+            int previousTagPosition = DESCRIPTION_TAGS_LIST.indexOf(getContainedTag(it.next()));
+            while (it.hasNext()) {
+                int keyTagPosition = DESCRIPTION_TAGS_LIST.indexOf(getContainedTag(it.next()));
+                if (previousTagPosition > keyTagPosition) throw new RuntimeException("Order is not preserved.");
+                previousTagPosition = keyTagPosition;
+            }
         }
     }
 
@@ -113,25 +115,38 @@ public class MetadataParser {
 
     private String extractFullDescriptionString(SlangSource source) {
         StringBuilder sb = new StringBuilder();
-        int flag = 0;
+        boolean blockEndFound = false, blockStartFound = false;
         try (BufferedReader reader = new BufferedReader(new StringReader(source.getSource()))) {
             String line = reader.readLine();
             while (line != null) {
-                if (line.startsWith(BLOCK_END)) break;
+                if (line.startsWith(BLOCK_END)) {
+                    blockEndFound = true;
+                    break;
+                }
                 else if (line.startsWith(BLOCK_START)) {
-                    flag = 1;
+                    blockStartFound = true;
                     line = reader.readLine();
                 }
 
-                if ((flag == 1) && line.startsWith(PREFIX) && (line.length() > 2)) {
+                if (blockStartFound && line.startsWith(PREFIX) && (line.length() > 2)) {
                     sb.append(line.substring(BEGIN_INDEX)).append(System.lineSeparator());
                 }
                 line = reader.readLine();
             }
+            checkStartingAndClosingTagsMissing(sb, blockEndFound, blockStartFound);
         } catch (IOException e) {
             throw new RuntimeException("Error processing metadata, error extracting metadata from " +
                     source.getName(), e);
         }
         return sb.toString();
+    }
+
+    private void checkStartingAndClosingTagsMissing(StringBuilder sb, boolean blockEndFound, boolean blockStartFound) {
+        if (blockEndFound && !blockStartFound) {
+            throw new RuntimeException("Starting tag missing in the description.");
+        }
+        if (!blockEndFound && sb.length() > 0) {
+            throw new RuntimeException("Closing tag missing in the description.");
+        }
     }
 }

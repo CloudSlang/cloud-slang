@@ -53,12 +53,20 @@ public class MetadataHelperTest {
     }
 
     @Test
-    public void testPrettyPrint() throws Exception {
-        URI flowFilePath = getClass().getResource("/metadata.sl").toURI();
+     public void testPrettyPrint() throws Exception {
+        URI flowFilePath = getClass().getResource("/metadata/metadata.sl").toURI();
         String metadataToPrint = metadataHelper.extractMetadata(new File(flowFilePath));
         Assert.assertNotNull(metadataToPrint);
         Assert.assertFalse(metadataToPrint.contains("io.cloudslang.lang.compiler.modeller.model.Metadata"));
         Assert.assertTrue(metadataToPrint.contains(DESCRIPTION_AND_PREREQUISITES));
+    }
+
+    @Test
+    public void testPrettyPrintForEmptyDescription() throws Exception {
+        URI flowFilePath = getClass().getResource("/metadata/metadata_full_description_missing.sl").toURI();
+        String metadataToPrint = metadataHelper.extractMetadata(new File(flowFilePath));
+        Assert.assertNotNull(metadataToPrint);
+        Assert.assertTrue(metadataToPrint.contains("No metadata"));
     }
 
     @Configuration

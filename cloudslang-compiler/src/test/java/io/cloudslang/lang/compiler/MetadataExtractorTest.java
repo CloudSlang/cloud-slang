@@ -83,8 +83,15 @@ public class MetadataExtractorTest {
     public void testExtractMetadataWrongOrder() throws Exception {
         URI operation = getClass().getResource("/metadata/metadata_wrong_order.sl").toURI();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("There was a problem parsing the description: metadata_wrong_order.sl.\n" +
-                "Order is not preserved.");
+        exception.expectMessage("Order is not preserved.");
+        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+    }
+
+    @Test
+    public void startingTagMissing() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_starting_tag_missing.sl").toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Starting tag missing");
         metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
     }
 
