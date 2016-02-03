@@ -116,24 +116,25 @@ public class MetadataParser {
     private String extractFullDescriptionString(SlangSource source) {
         StringBuilder sb = new StringBuilder();
         boolean blockEndFound = false, blockStartFound = false;
+        String firstLine = "";
         try (BufferedReader reader = new BufferedReader(new StringReader(source.getSource()))) {
-            String line = reader.readLine();
+            String line = getTrimmedLine(reader);
             while (line != null) {
                 if (line.startsWith(BLOCK_END)) {
                     blockEndFound = true;
                     break;
-                }
-                else if (line.startsWith(BLOCK_START)) {
+                } else if (line.startsWith(BLOCK_START)) {
                     blockStartFound = true;
-                    line = reader.readLine();
+                    firstLine = line;
+                    line = getTrimmedLine(reader);
                 }
 
                 if (blockStartFound && line.startsWith(PREFIX) && (line.length() > 2)) {
                     sb.append(line.substring(BEGIN_INDEX)).append(System.lineSeparator());
                 }
-                line = reader.readLine();
+                line = getTrimmedLine(reader);
             }
-            checkStartingAndClosingTagsMissing(sb, blockEndFound, blockStartFound);
+            checkStartingAndClosingTags(sb, firstLine, blockEndFound, blockStartFound);
         } catch (IOException e) {
             throw new RuntimeException("Error processing metadata, error extracting metadata from " +
                     source.getName(), e);
@@ -141,7 +142,15 @@ public class MetadataParser {
         return sb.toString();
     }
 
-    private void checkStartingAndClosingTagsMissing(StringBuilder sb, boolean blockEndFound, boolean blockStartFound) {
+    private String getTrimmedLine(BufferedReader reader) throws IOException {
+        String line = reader.readLine();
+        return line != null ? line.trim() : null;
+    }
+
+    private void checkStartingAndClosingTags(StringBuilder sb, String firstLine, boolean blockEndFound, boolean blockStartFound) {
+        if (firstLine.length() > BLOCK_START.length()) {
+            throw new RuntimeException("Description is not accepted on the same line as the starting tag.");
+        }
         if (blockEndFound && !blockStartFound) {
             throw new RuntimeException("Starting tag missing in the description.");
         }

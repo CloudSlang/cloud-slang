@@ -96,6 +96,14 @@ public class MetadataExtractorTest {
     }
 
     @Test
+    public void descriptionAfterStartingTag() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_description_after_starting_tag.sl").toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Description is not accepted on the same line as the starting tag.");
+        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+    }
+
+    @Test
     public void testExtractMetadataNoResults() throws Exception {
         URI operation = getClass().getResource("/metadata/metadata_no_results.sl").toURI();
         Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
