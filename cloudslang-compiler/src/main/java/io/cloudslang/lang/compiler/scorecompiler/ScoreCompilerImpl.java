@@ -94,7 +94,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         executables.add(executable);
 
         executionPlan.setSubflowsUUIDs(new HashSet<>(dependencies.keySet()));
-        return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemPropertiesFromExecutable(executables));
+        return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemPropertiesFromExecutables(executables));
     }
 
     /**
@@ -148,7 +148,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         }
     }
 
-    private Set<String> getSystemPropertiesFromExecutable(Collection<Executable> executables) {
+    private Set<String> getSystemPropertiesFromExecutables(Collection<Executable> executables) {
         Set<String> result = new HashSet<>();
         for(Executable executable : executables) {
             result.addAll(getSystemPropertiesFromExecutable(executable));
