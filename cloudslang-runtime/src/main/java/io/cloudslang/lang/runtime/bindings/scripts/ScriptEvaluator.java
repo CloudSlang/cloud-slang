@@ -13,6 +13,7 @@ package io.cloudslang.lang.runtime.bindings.scripts;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import org.apache.commons.lang3.StringUtils;
+import org.python.core.PyException;
 import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -65,9 +66,16 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
             addFunctionsToContext(systemProperties, functionDependencies);
             return eval(interpreter, expr);
         } catch (Exception exception) {
+            String message;
+            if (exception instanceof PyException) {
+                PyException pyException = (PyException) exception;
+                message = pyException.value.toString();
+            } else {
+                message = exception.getMessage();
+            }
             throw new RuntimeException(
                     "Error in running script expression: '"
-                            + expr + "',\n\tException is: " + exception.getMessage(), exception);
+                            + expr + "',\n\tException is: " + handleExceptionSpecialCases(message), exception);
         }
     }
 
@@ -117,6 +125,14 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
             processedSystemProperties.put(property.getFullyQualifiedName(), property.getValue());
         }
         return processedSystemProperties;
+    }
+
+    private String handleExceptionSpecialCases(String message) {
+        String processedMessage = message;
+        if (StringUtils.isNotEmpty(message) && message.contains("get_sp") && message.contains("not defined")) {
+            processedMessage =  message + ". Make sure to use correct syntax for the function: get_sp('fully.qualified.name', optional_default_value).";
+        }
+        return processedMessage;
     }
 
 }
