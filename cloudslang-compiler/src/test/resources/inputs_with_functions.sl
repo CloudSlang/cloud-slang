@@ -26,5 +26,7 @@ operation:
         default: ${get_sp(expression)}
     - input11:
         default: ${get_sp( 'a.b.c.key'     )}
+    - input12: ${get('key1', 'value1') + get('key2', 'value2')}
+    - input13: ${get_sp('a.b.c.key', 'value1') + get_sp('d.e.f.key', 'value2')}
   action:
     python_script: pass
