@@ -72,7 +72,7 @@ public class SlangCompilerImpl implements SlangCompiler {
     @Override
     public Set<SystemProperty> loadSystemProperties(SlangSource source) {
         try {
-            ParsedSlang parsedSlang = parseSource(source);
+            ParsedSlang parsedSlang = parseSystemPropertiesFile(source);
             return extractProperties(parsedSlang);
         } catch (Throwable ex) {
             throw new RuntimeException(
@@ -82,7 +82,7 @@ public class SlangCompilerImpl implements SlangCompiler {
         }
     }
 
-    private ParsedSlang parseSource(SlangSource source) {
+    private ParsedSlang parseSystemPropertiesFile(SlangSource source) {
         ParsedSlang parsedSlang = yamlParser.parse(source);
         if (!ParsedSlang.Type.SYSTEM_PROPERTY_FILE.equals(parsedSlang.getType())) {
             throw new RuntimeException("Source: " + parsedSlang.getName() + " is not a valid system property file.");
@@ -94,15 +94,17 @@ public class SlangCompilerImpl implements SlangCompiler {
         String namespace = parsedSlang.getNamespace();
         Map<String, Object> rawSystemProperties = parsedSlang.getProperties();
         Set<SystemProperty> properties = new HashSet<>();
-        Set<Map.Entry<String, Object>> entrySet = rawSystemProperties.entrySet();
-        for (Map.Entry<String, Object> entry : entrySet) {
-            Object value = entry.getValue();
-            SystemProperty property = SystemProperty.createSystemProperty(
-                    namespace == null ? "" : namespace,
-                    entry.getKey(),
-                    value == null ? null : value.toString()
-            );
-            properties.add(property);
+        if (rawSystemProperties != null) {
+            Set<Map.Entry<String, Object>> entrySet = rawSystemProperties.entrySet();
+            for (Map.Entry<String, Object> entry : entrySet) {
+                Object value = entry.getValue();
+                SystemProperty property = SystemProperty.createSystemProperty(
+                        namespace == null ? "" : namespace,
+                        entry.getKey(),
+                        value == null ? null : value.toString()
+                );
+                properties.add(property);
+            }
         }
         return properties;
     }
