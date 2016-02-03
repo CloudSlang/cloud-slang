@@ -12,13 +12,16 @@
 package io.cloudslang.lang.systemtests;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import org.junit.Assert;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Bonczidai Levente
@@ -38,10 +41,10 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         return triggerWithData(compilationArtifact, userInputs, getSystemProperties()).getTasks();
     }
 
-    private Map<String, Serializable> getSystemProperties() {
-        Map<String, Serializable> systemProperties = new HashMap<>();
-        systemProperties.put("user.sys.props.host", "localhost");
-        return systemProperties;
+    private Set<SystemProperty> getSystemProperties() {
+        return Sets.newHashSet(
+                SystemProperty.createSystemProperty("user.sys", "props.host", "localhost")
+        );
     }
 
     private Map<String, Serializable> getUserInputs() {

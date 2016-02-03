@@ -169,7 +169,7 @@ public class ExecutionPlanBuilderTest {
                 new Operation(preOpActionData, postOpActionData, action, opNamespace, operationName, inputs, outputs, results, null);
 
         mockStartStep(compiledOperation);
-        when(stepFactory.createActionStep(eq(2L), same(actionData), eq("operationName"))).thenReturn(new ExecutionStep(2L));
+        when(stepFactory.createActionStep(eq(2L), same(actionData))).thenReturn(new ExecutionStep(2L));
         mockEndStep(3L, compiledOperation, ExecutableType.OPERATION);
 
         ExecutionPlan executionPlan = executionPlanBuilder.createOperationExecutionPlan(compiledOperation);

@@ -1,12 +1,14 @@
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+/**
+ * ****************************************************************************
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ * <p/>
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * *****************************************************************************
+ */
 package io.cloudslang.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
@@ -14,6 +16,7 @@ import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import io.cloudslang.lang.entities.ActionType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.runtime.bindings.scripts.ScriptExecutor;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
@@ -23,15 +26,16 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-import org.python.core.*;
-import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
@@ -46,7 +50,7 @@ public class ActionSteps extends AbstractSteps {
     private static final Logger logger = Logger.getLogger(ActionSteps.class);
 
     @Autowired
-    private PythonInterpreter interpreter;
+    private ScriptExecutor scriptExecutor;
 
     public void doAction(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                          @Param(ExecutionParametersConsts.NON_SERIALIZABLE_EXECUTION_DATA) Map<String, Object> nonSerializableExecutionData,
@@ -55,15 +59,14 @@ public class ActionSteps extends AbstractSteps {
                          @Param(ScoreLangConstants.ACTION_METHOD_KEY) String methodName,
                          @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                          @Param(ScoreLangConstants.PYTHON_SCRIPT_KEY) String python_script,
-                         @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
-                         @Param(ScoreLangConstants.OPERATION_NAME_KEY) String operationName) {
+                         @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId) {
 
         Map<String, Serializable> returnValue = new HashMap<>();
         Map<String, Serializable> callArguments = runEnv.removeCallArguments();
         Map<String, Serializable> callArgumentsDeepCopy = new HashMap<>();
 
         for (Map.Entry<String, Serializable> entry : callArguments.entrySet()) {
-            callArgumentsDeepCopy.put(entry.getKey(),  SerializationUtils.clone(entry.getValue()));
+            callArgumentsDeepCopy.put(entry.getKey(), SerializationUtils.clone(entry.getValue()));
         }
 
         Map<String, SerializableSessionObject> serializableSessionData = runEnv.getSerializableDataMap();
@@ -76,7 +79,7 @@ public class ActionSteps extends AbstractSteps {
                     returnValue = runJavaAction(serializableSessionData, callArguments, nonSerializableExecutionData, className, methodName);
                     break;
                 case PYTHON:
-                    returnValue = prepareAndRunPythonAction(callArguments, python_script, operationName);
+                    returnValue = prepareAndRunPythonAction(callArguments, python_script);
                     break;
                 default:
                     break;
@@ -86,7 +89,7 @@ public class ActionSteps extends AbstractSteps {
                     runEnv.getExecutionPath().getParentPath(), LanguageEventData.StepType.ACTION, null,
                     Pair.of(LanguageEventData.EXCEPTION, ex.getMessage()));
             logger.error(ex);
-            throw(ex);
+            throw (ex);
         }
 
         //todo: hook
@@ -95,16 +98,16 @@ public class ActionSteps extends AbstractSteps {
         runEnv.putReturnValues(returnValues);
         fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_ACTION_END, "Action performed",
                 runEnv.getExecutionPath().getParentPath(), LanguageEventData.StepType.ACTION, null,
-                Pair.of(LanguageEventData.RETURN_VALUES, (Serializable)returnValue));
+                Pair.of(LanguageEventData.RETURN_VALUES, (Serializable) returnValue));
 
         runEnv.putNextStepPosition(nextStepId);
     }
 
     private Map<String, Serializable> runJavaAction(Map<String, SerializableSessionObject> serializableSessionData,
-                                              Map<String, Serializable> currentContext,
-                                              Map<String, Object> nonSerializableExecutionData,
-                                              String className,
-                                              String methodName) {
+                                                    Map<String, Serializable> currentContext,
+                                                    Map<String, Object> nonSerializableExecutionData,
+                                                    String className,
+                                                    String methodName) {
 
         Object[] actualParameters = extractMethodData(serializableSessionData, currentContext, nonSerializableExecutionData, className, methodName);
 
@@ -119,7 +122,7 @@ public class ActionSteps extends AbstractSteps {
 
         //get the Method object
         Method actionMethod = getMethodByName(className, methodName);
-        if(actionMethod == null) {
+        if (actionMethod == null) {
             throw new RuntimeException("Method " + methodName + " is not part of class " + className);
         }
 
@@ -154,7 +157,7 @@ public class ActionSteps extends AbstractSteps {
         return actionClass;
     }
 
-    private Method getMethodByName(String className, String methodName)  {
+    private Method getMethodByName(String className, String methodName) {
         Class actionClass = getActionClass(className);
         Method[] methods = actionClass.getDeclaredMethods();
         Method actionMethod = null;
@@ -185,7 +188,7 @@ public class ActionSteps extends AbstractSteps {
                     } else {
                         String parameterName = ((Param) annotation).value();
                         Serializable value = currentContext.get(parameterName);
-                        Class parameterClass =  parameterTypes[index - 1];
+                        Class parameterClass = parameterTypes[index - 1];
                         if (parameterClass.isInstance(value) || value == null) {
                             args.add(value);
                         } else {
@@ -231,89 +234,15 @@ public class ActionSteps extends AbstractSteps {
         args.add(serializableSessionContextObject);
     }
 
-    @SuppressWarnings("unchecked")
     private Map<String, Serializable> prepareAndRunPythonAction(
             Map<String, Serializable> callArguments,
-            String pythonScript,
-            String operationName) {
+            String pythonScript) {
 
         if (StringUtils.isNotBlank(pythonScript)) {
-            return runPythonAction(callArguments, pythonScript, operationName);
+            return scriptExecutor.executeScript(pythonScript, callArguments);
         }
 
         throw new RuntimeException("Python script not found in action data");
     }
 
-    //we need this method to be synchronized so we will not have multiple scripts run in parallel on the same context
-    private synchronized Map<String, Serializable> runPythonAction(
-            Map<String, Serializable> callArguments,
-            String script,
-            String operationName) {
-
-        cleanInterpreter(interpreter);
-        try {
-            executePythonScript(interpreter, script, callArguments);
-        } catch (PyException e) {
-            throw new RuntimeException("Error executing python script: " + e, e);
-        }
-        Iterator<PyObject> localsIterator = interpreter.getLocals().asIterable().iterator();
-        Map<String, Serializable> returnValue = new HashMap<>();
-        while (localsIterator.hasNext()) {
-            String key = localsIterator.next().asString();
-            PyObject value = interpreter.get(key);
-            if (keyIsExcluded(key, value)) {
-                continue;
-            }
-            Serializable javaValue = resolveJythonObjectToJava(key, value, operationName);
-            returnValue.put(key, javaValue);
-        }
-        return returnValue;
-    }
-
-    private boolean keyIsExcluded(String key, PyObject value) {
-        return (key.startsWith("__") && key.endsWith("__")) ||
-                value instanceof PyFile ||
-                value instanceof PyModule ||
-                value instanceof PyFunction ||
-                value instanceof PySystemState;
-    }
-
-    private Serializable resolveJythonObjectToJava(String key, PyObject value, String operationName) {
-        if (value instanceof PyBoolean) {
-            PyBoolean pyBoolean = (PyBoolean) value;
-            return pyBoolean.getBooleanValue();
-        } else {
-            try {
-                return Py.tojava(value, Serializable.class);
-            } catch (PyException e) {
-                PyObject typeObject = e.type;
-                if (typeObject instanceof PyType) {
-                    PyType type = (PyType) typeObject;
-                    String typeName = type.getName();
-                    if ("TypeError".equals(typeName)) {
-                        throw new RuntimeException("Problem occurred in operation: '" + operationName + "':\n" +
-                                "Non-serializable values are not allowed in the output context of a Python script:\n" +
-                                "\tConversion failed for '" + key + "' (" + String.valueOf(value) + "),\n" +
-                                "\tThe error can be solved by removing the variable from the context in the script: e.g. 'del " + key + "'.\n", e);
-                    }
-                }
-                throw e;
-            }
-        }
-    }
-
-    private void executePythonScript(PythonInterpreter interpreter, String script, Map<String, Serializable> userVars) {
-        Iterator<Map.Entry<String, Serializable>> iterator = userVars.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String, Serializable> entry = iterator.next();
-            interpreter.set(entry.getKey(), entry.getValue());
-            iterator.remove();
-        }
-
-        interpreter.exec(script);
-    }
-
-    private void cleanInterpreter(PythonInterpreter interpreter) {
-        interpreter.setLocals(new PyStringMap());
-    }
 }

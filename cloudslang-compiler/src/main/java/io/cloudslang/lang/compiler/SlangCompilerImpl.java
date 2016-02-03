@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.modeller.SlangModeller;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.parser.YamlParser;
+import io.cloudslang.lang.entities.SystemProperty;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Map;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -66,4 +68,45 @@ public class SlangCompilerImpl implements SlangCompiler {
 
         return executable;
     }
+
+    @Override
+    public Set<SystemProperty> loadSystemProperties(SlangSource source) {
+        try {
+            ParsedSlang parsedSlang = parseSystemPropertiesFile(source);
+            return extractProperties(parsedSlang);
+        } catch (Throwable ex) {
+            throw new RuntimeException(
+                    "Error loading properties file: " + source.getName() + " nested exception is " + ex.getMessage(),
+                    ex
+            );
+        }
+    }
+
+    private ParsedSlang parseSystemPropertiesFile(SlangSource source) {
+        ParsedSlang parsedSlang = yamlParser.parse(source);
+        if (!ParsedSlang.Type.SYSTEM_PROPERTY_FILE.equals(parsedSlang.getType())) {
+            throw new RuntimeException("Source: " + parsedSlang.getName() + " is not a valid system property file.");
+        }
+        return parsedSlang;
+    }
+
+    private Set<SystemProperty> extractProperties(ParsedSlang parsedSlang) {
+        String namespace = parsedSlang.getNamespace();
+        Map<String, Object> rawSystemProperties = parsedSlang.getProperties();
+        Set<SystemProperty> properties = new HashSet<>();
+        if (rawSystemProperties != null) {
+            Set<Map.Entry<String, Object>> entrySet = rawSystemProperties.entrySet();
+            for (Map.Entry<String, Object> entry : entrySet) {
+                Object value = entry.getValue();
+                SystemProperty property = SystemProperty.createSystemProperty(
+                        namespace == null ? "" : namespace,
+                        entry.getKey(),
+                        value == null ? null : value.toString()
+                );
+                properties.add(property);
+            }
+        }
+        return properties;
+    }
+
 }

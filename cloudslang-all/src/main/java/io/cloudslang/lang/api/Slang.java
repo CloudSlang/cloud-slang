@@ -11,6 +11,7 @@ package io.cloudslang.lang.api;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.score.events.ScoreEventListener;
 
 import java.io.Serializable;
@@ -48,7 +49,7 @@ public interface Slang {
 	 * @param systemProperties the system properties for the flow or operation run
 	 * @return the execution ID in score
 	 */
-	Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties);
+	Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Set<SystemProperty> systemProperties);
 
 	/**
 	 * Compile and run a flow or operation written in CloudSlang
@@ -58,7 +59,7 @@ public interface Slang {
 	 * @param systemProperties the system properties for the flow or operation run
 	 * @return the execution ID in score
 	 */
-	Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties);
+	Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs, Set<SystemProperty> systemProperties);
 
     /**
      * Subscribe to events of score or CloudSlang
@@ -78,5 +79,7 @@ public interface Slang {
      * @param eventListener listener for the events
      */
     void subscribeOnAllEvents(ScoreEventListener eventListener);
+
+    Set<SystemProperty> loadSystemProperties(SlangSource source);
 
 }

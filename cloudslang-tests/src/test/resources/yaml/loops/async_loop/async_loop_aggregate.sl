@@ -27,3 +27,4 @@ flow:
         aggregate:
             - name_list: ${ map(lambda x:str(x['name']), branches_context) }
             - number_from_last_branch: ${ branches_context[-1]['number'] }
+            - from_sp: ${get_sp('loop.async.prop1')}

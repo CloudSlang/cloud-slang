@@ -50,7 +50,6 @@ import static io.cloudslang.lang.entities.ScoreLangConstants.*;
 public class ExecutableBuilder {
 
     public static final String MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX = "Multiple 'on_failure' properties found";
-    public static final String NAMESPACE_DELIMITER = ".";
 
     @Autowired
     private List<Transformer> transformers;

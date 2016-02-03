@@ -5,12 +5,9 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: user.ops
+namespace: user.sys
 
-operation:
-  name: operation_with_missing_sys_props_imports
-  inputs:
-    - alla:
-        system_property: user.sys.props.alla
-  action:
-    python_script: 'print "hello world"'
+properties:
+  props.host: localhost
+  props.port: 22
+  props.alla: balla

@@ -8,28 +8,27 @@
  */
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.entities.bindings.Input;
-import org.apache.commons.lang3.StringUtils;
+import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.DEFAULT_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ENCRYPTED_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.OVERRIDABLE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.REQUIRED_KEY;
-import static io.cloudslang.lang.compiler.SlangTextualKeys.SYSTEM_PROPERTY_KEY;
 
-public abstract class AbstractInputsTransformer {
+public abstract class AbstractInputsTransformer extends InOutTransformer {
 
     protected Input transformSingleInput(Object rawInput) {
         // - some_input
         // this is our default behaviour that if the user specifies only a key, the key is also the ref we look for
         if (rawInput instanceof String) {
             String inputName = (String) rawInput;
-            return new Input(inputName, null);
+            return new Input.InputBuilder(inputName, null).build();
         } else if (rawInput instanceof Map) {
             Map.Entry<String, ?> entry = ((Map<String, ?>) rawInput).entrySet().iterator().next();
             Serializable entryValue = (Serializable) entry.getValue();
@@ -45,15 +44,14 @@ public abstract class AbstractInputsTransformer {
             }
             // - some_input: some_expression
             // the value of the input is an expression we need to evaluate at runtime
-            return new Input(entry.getKey(), entryValue);
+            return createInput(entry.getKey(), entryValue);
         }
         throw new RuntimeException("Could not transform Input : " + rawInput);
     }
 
-    private static Input createPropInput(Map.Entry<String, Map<String, Serializable>> entry) {
+    private Input createPropInput(Map.Entry<String, Map<String, Serializable>> entry) {
         Map<String, Serializable> props = entry.getValue();
-        List<String> knownKeys = Arrays.asList(REQUIRED_KEY, ENCRYPTED_KEY,
-                OVERRIDABLE_KEY, DEFAULT_KEY, SYSTEM_PROPERTY_KEY);
+        List<String> knownKeys = Arrays.asList(REQUIRED_KEY, ENCRYPTED_KEY, OVERRIDABLE_KEY, DEFAULT_KEY);
 
         for (String key : props.keySet()) {
             if (!knownKeys.contains(key)) {
@@ -72,14 +70,36 @@ public abstract class AbstractInputsTransformer {
                 (boolean) props.get(OVERRIDABLE_KEY);
         boolean defaultSpecified = props.containsKey(DEFAULT_KEY);
         String inputName = entry.getKey();
-        Serializable expression = defaultSpecified ? props.get(DEFAULT_KEY) : null;
-        String systemPropertyName = (String) props.get(SYSTEM_PROPERTY_KEY);
+        Serializable value = defaultSpecified ? props.get(DEFAULT_KEY) : null;
 
-        if (!overridable && !defaultSpecified && StringUtils.isEmpty(systemPropertyName)) {
+        if (!overridable && !defaultSpecified) {
             throw new RuntimeException(
-                    "input: " + inputName + " is not overridable but no default value or system property was specified");
+                    "input: " + inputName + " is not overridable but no default value was specified");
         }
 
-        return new Input(inputName, expression, encrypted, required, overridable, systemPropertyName);
+        return createInput(inputName, value, encrypted, required, overridable);
     }
+
+    private Input createInput(
+            String name,
+            Serializable value) {
+        return createInput(name, value, false, true, true);
+    }
+
+    private Input createInput(
+            String name,
+            Serializable value,
+            boolean encrypted,
+            boolean required,
+            boolean overridable) {
+        Accumulator dependencyAccumulator = extractFunctionData(value);
+        return new Input.InputBuilder(name, value)
+                .withEncrypted(encrypted)
+                .withRequired(required)
+                .withOverridable(overridable)
+                .withFunctionDependencies(dependencyAccumulator.getFunctionDependencies())
+                .withSystemPropertyDependencies(dependencyAccumulator.getSystemPropertyDependencies())
+                .build();
+    }
+
 }

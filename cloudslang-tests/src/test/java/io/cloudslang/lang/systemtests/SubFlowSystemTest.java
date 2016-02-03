@@ -12,6 +12,7 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,6 +20,7 @@ import org.junit.Test;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,15 +38,15 @@ public class SubFlowSystemTest extends SystemsTestsParent {
         URI operation3 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
         URI operation4 = getClass().getResource("/yaml/check_number.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(subFlow),
-                                                SlangSource.fromFile(operation1),
-                                                SlangSource.fromFile(operation2),
-                                                SlangSource.fromFile(operation3),
-                                                SlangSource.fromFile(operation4));
+                SlangSource.fromFile(operation1),
+                SlangSource.fromFile(operation2),
+                SlangSource.fromFile(operation3),
+                SlangSource.fromFile(operation4));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
         Assert.assertEquals("the system properties size is not as expected", 2, compilationArtifact.getSystemProperties().size());
-		Map<String, Serializable> systemProperties = new HashMap<>();
-		systemProperties.put("user.sys.props.port", 22);
-		systemProperties.put("user.sys.props.alla", "balla");
+		Set<SystemProperty> systemProperties = new HashSet<>();
+        systemProperties.add(SystemProperty.createSystemProperty("user.sys", "props.port", "22"));
+        systemProperties.add(SystemProperty.createSystemProperty("user.sys", "props.alla", "balla"));
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("input1", "value1");
         ScoreEvent event = trigger(compilationArtifact, userInputs, systemProperties);

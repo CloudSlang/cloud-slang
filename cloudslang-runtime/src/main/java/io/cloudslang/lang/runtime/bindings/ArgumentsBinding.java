@@ -11,7 +11,10 @@
  */
 package io.cloudslang.lang.runtime.bindings;
 
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.utils.ExpressionUtils;
+import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,27 +22,29 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Bonczidai Levente
  * @since 8/17/2015
  */
 @Component
-public class ArgumentsBinding extends Binding {
+public class ArgumentsBinding {
 
     @Autowired
     private ScriptEvaluator scriptEvaluator;
 
     public Map<String, Serializable> bindArguments(
             List<Argument> arguments,
-            Map<String, ? extends Serializable> context) {
+            Map<String, ? extends Serializable> context,
+            Set<SystemProperty> systemProperties) {
         Map<String, Serializable> resultContext = new HashMap<>();
 
         //we do not want to change original context map
         Map<String, Serializable> srcContext = new HashMap<>(context);
 
         for (Argument argument : arguments) {
-            bindArgument(argument, srcContext, resultContext);
+            bindArgument(argument, srcContext, systemProperties, resultContext);
         }
 
         return resultContext;
@@ -48,6 +53,7 @@ public class ArgumentsBinding extends Binding {
     private void bindArgument(
             Argument argument,
             Map<String, ? extends Serializable> srcContext,
+            Set<SystemProperty> systemProperties,
             Map<String, Serializable> targetContext) {
         Serializable argumentValue;
         String argumentName = argument.getName();
@@ -60,11 +66,11 @@ public class ArgumentsBinding extends Binding {
             scriptContext.put(argumentName, argumentValue);
 
             Serializable rawValue = argument.getValue();
-            String expressionToEvaluate = extractExpression(rawValue);
+            String expressionToEvaluate = ExpressionUtils.extractExpression(rawValue);
             if (expressionToEvaluate != null) {
                 //so you can resolve previous arguments already bound
                 scriptContext.putAll(targetContext);
-                argumentValue = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext);
+                argumentValue = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, argument.getFunctionDependencies());
             } else if (rawValue != null) {
                 argumentValue = rawValue;
             }

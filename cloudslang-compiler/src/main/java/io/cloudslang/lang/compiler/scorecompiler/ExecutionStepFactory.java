@@ -86,7 +86,7 @@ public class ExecutionStepFactory {
         return createGeneralStep(index, OPERATION_STEPS_CLASS, "startExecutable", actionData);
     }
 
-    public ExecutionStep createActionStep(Long index, Map<String, Serializable> actionRawData, String operationName) {
+    public ExecutionStep createActionStep(Long index, Map<String, Serializable> actionRawData) {
         Validate.notNull(actionRawData, "actionData is null");
         Map<String, Serializable> actionData = new HashMap<>();
         ActionType actionType;
@@ -109,7 +109,6 @@ public class ExecutionStepFactory {
 
         actionData.put(ScoreLangConstants.ACTION_TYPE, actionType);
         actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
-        actionData.put(ScoreLangConstants.OPERATION_NAME_KEY, operationName);
         return createGeneralStep(index, ACTION_STEPS_CLASS, "doAction", actionData);
     }
 

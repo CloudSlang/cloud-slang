@@ -22,7 +22,7 @@ import java.io.Serializable;
 import java.util.*;
 
 @Component
-public class DoTransformer implements Transformer<Map<String, Object>, List<Argument>> {
+public class DoTransformer extends InOutTransformer implements Transformer<Map<String, Object>, List<Argument>> {
 
     @Override
     public List<Argument> transform(Map<String, Object> rawData) {
@@ -76,7 +76,13 @@ public class DoTransformer implements Transformer<Map<String, Object>, List<Argu
                 );
             }
             // - some_input: some_expression
-            return new Argument(entry.getKey(), entryValue);
+            Accumulator accumulator = extractFunctionData(entryValue);
+            return new Argument(
+                    entry.getKey(),
+                    entryValue,
+                    accumulator.getFunctionDependencies(),
+                    accumulator.getSystemPropertyDependencies()
+            );
         }
         throw new RuntimeException("Could not transform task argument: " + rawArgument);
     }

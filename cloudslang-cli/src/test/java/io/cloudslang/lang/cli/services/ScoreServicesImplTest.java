@@ -14,7 +14,11 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
+import io.cloudslang.score.events.EventConstants;
+import io.cloudslang.score.events.ScoreEvent;
+import io.cloudslang.score.events.ScoreEventListener;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,9 +27,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import io.cloudslang.score.events.EventConstants;
-import io.cloudslang.score.events.ScoreEvent;
-import io.cloudslang.score.events.ScoreEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,15 +38,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.mockito.Matchers.anySetOf;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyMapOf;
-import static org.mockito.Mockito.doAnswer;
 import static junit.framework.Assert.assertEquals;
+import static org.mockito.Matchers.anySetOf;
+import static org.mockito.Mockito.*;
 
 /**
  * Date: 24/2/2015
@@ -76,7 +71,7 @@ public class ScoreServicesImplTest {
                 slang.run(
                         any(CompilationArtifact.class),
                         anyMapOf(String.class, Serializable.class),
-                        anyMapOf(String.class, Serializable.class)))
+                        anySetOf(SystemProperty.class)))
                 .thenReturn(DEFAULT_EXECUTION_ID);
     }
 
@@ -95,8 +90,9 @@ public class ScoreServicesImplTest {
         CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
         Map<String, Serializable > inputs = new HashMap<>();
         inputs.put("a", 1);
-        Map<String, Serializable> systemProperties  = new HashMap<>();
-        systemProperties.put("b", "c");
+        Set<SystemProperty> systemProperties  = Sets.newHashSet(
+            SystemProperty.createSystemProperty("ns", "b", "c")
+        );
 
         long executionID = scoreServicesImpl.trigger(compilationArtifact, inputs, systemProperties);
 
@@ -110,8 +106,9 @@ public class ScoreServicesImplTest {
         CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
         Map<String, Serializable > inputs = new HashMap<>();
         inputs.put("a", 1);
-        Map<String, Serializable> systemProperties  = new HashMap<>();
-        systemProperties.put("b", "c");
+        Set<SystemProperty> systemProperties  = Sets.newHashSet(
+                SystemProperty.createSystemProperty("ns", "b", "c")
+        );
 
         /* stubbing subscribeEvents method - mocking the behaviour of the EventBus
          * After a specific amount of time a finish event needs to be sent
@@ -152,8 +149,9 @@ public class ScoreServicesImplTest {
         CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
         Map<String, Serializable > inputs = new HashMap<>();
         inputs.put("a", 1);
-        Map<String, Serializable> systemProperties  = new HashMap<>();
-        systemProperties.put("b", "c");
+        Set<SystemProperty> systemProperties  = Sets.newHashSet(
+                SystemProperty.createSystemProperty("ns", "b", "c")
+        );
 
         /* stubbing subscribeEvents method - mocking the behaviour of the EventBus
          * After a specific amount of time a erroneous event followed by a finish event
@@ -198,8 +196,9 @@ public class ScoreServicesImplTest {
         CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
         Map<String, Serializable > inputs = new HashMap<>();
         inputs.put("a", 1);
-        Map<String, Serializable> systemProperties  = new HashMap<>();
-        systemProperties.put("b", "c");
+        Set<SystemProperty> systemProperties  = Sets.newHashSet(
+                SystemProperty.createSystemProperty("ns", "b", "c")
+        );
 
         doAnswer(new Answer<Object>() {
             public Object answer(InvocationOnMock invocation) {

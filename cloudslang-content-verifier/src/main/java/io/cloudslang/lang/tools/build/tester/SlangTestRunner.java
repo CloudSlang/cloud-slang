@@ -13,6 +13,7 @@ import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.tools.build.SlangBuildMain;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
@@ -154,15 +155,15 @@ public class SlangTestRunner {
     private void runTest(SlangTestCase testCase, CompilationArtifact compiledTestFlow, String projectPath) {
 
         Map<String, Serializable> convertedInputs = getTestCaseInputsMap(testCase);
-        Map<String, Serializable> systemProperties = getTestSystemProperties(testCase, projectPath);
+        Set<SystemProperty> systemProperties = getTestSystemProperties(testCase, projectPath);
 
         trigger(testCase, compiledTestFlow, convertedInputs, systemProperties);
     }
 
-    private Map<String, Serializable> getTestSystemProperties(SlangTestCase testCase, String projectPath) {
+    private Set<SystemProperty> getTestSystemProperties(SlangTestCase testCase, String projectPath) {
         String systemPropertiesFile = testCase.getSystemPropertiesFile();
         if(StringUtils.isEmpty(systemPropertiesFile)){
-            return new HashMap<>();
+            return new HashSet<>();
         }
         systemPropertiesFile = StringUtils.replace(systemPropertiesFile, PROJECT_PATH_TOKEN, projectPath);
         return parser.parseProperties(systemPropertiesFile);
@@ -200,7 +201,7 @@ public class SlangTestRunner {
      */
     public Long trigger(SlangTestCase testCase, CompilationArtifact compilationArtifact,
                         Map<String, ? extends Serializable> inputs,
-                        Map<String, ? extends Serializable> systemProperties) {
+                        Set<SystemProperty> systemProperties) {
 
         String testCaseName = testCase.getName();
         String result = testCase.getResult();

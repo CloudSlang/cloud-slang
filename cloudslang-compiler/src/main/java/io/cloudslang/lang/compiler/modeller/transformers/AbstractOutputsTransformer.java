@@ -24,7 +24,7 @@ import java.util.Map;
  * Date: 12/11/2014
  * Time: 11:33
  */
-public class AbstractOutputsTransformer {
+public class AbstractOutputsTransformer  extends InOutTransformer {
 
     public List<Output> transform(List<Object> rawData) {
 
@@ -52,7 +52,13 @@ public class AbstractOutputsTransformer {
     }
 
     private Output createExpressionOutput(String outputName, Serializable outputExpression){
-        return new Output(outputName, outputExpression);
+        Accumulator accumulator = extractFunctionData(outputExpression);
+        return new Output(
+                outputName,
+                outputExpression,
+                accumulator.getFunctionDependencies(),
+                accumulator.getSystemPropertyDependencies()
+        );
     }
 
     private String transformNameToExpression(String name) {

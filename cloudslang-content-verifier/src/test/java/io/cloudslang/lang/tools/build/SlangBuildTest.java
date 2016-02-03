@@ -55,7 +55,13 @@ import static org.mockito.Mockito.mock;
 @ContextConfiguration(classes = SlangBuildTest.Config.class)
 public class SlangBuildTest {
 
-	private static final CompilationArtifact emptyCompilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>(), new ArrayList<Input>());
+	private static final CompilationArtifact emptyCompilationArtifact =
+            new CompilationArtifact(
+                    new ExecutionPlan(),
+                    new HashMap<String, ExecutionPlan>(),
+                    new ArrayList<Input>(),
+                    new HashSet<String>()
+            );
 	private static final Flow emptyExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, null, new HashSet<String>());
 
     @Autowired
