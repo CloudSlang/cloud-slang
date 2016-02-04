@@ -84,7 +84,7 @@ public class CompilerHelperImpl implements CompilerHelper{
                     depsSources.add(source);
                 } else {
                     logger.info("Ignoring dependency: " + source.getName() + " (not a valid executable)." +
-                            "\n\tTop level keys(" + SlangTextualKeys.FLOW_TYPE + ", " + SlangTextualKeys.OPERATION_TYPE + ") not found.");
+                            " Top level keys(" + SlangTextualKeys.FLOW_TYPE + ", " + SlangTextualKeys.OPERATION_TYPE + ") not found.");
                 }
             }
         }
@@ -162,7 +162,7 @@ public class CompilerHelperImpl implements CompilerHelper{
                     result.addAll(propsFromFile);
                 } else {
                     logger.info("Ignoring file: " + source.getName() + " (not a valid properties file)." +
-                            "\n\tTop level keys(" + SlangTextualKeys.FLOW_TYPE + ", " + SlangTextualKeys.OPERATION_TYPE + ") are found.");
+                            " Top level keys(" + SlangTextualKeys.FLOW_TYPE + ", " + SlangTextualKeys.OPERATION_TYPE + ") found.");
                 }
             } catch(Throwable ex) {
                 String errorMessage = "Error loading file: " + propFile + " nested exception is " + ex.getMessage();

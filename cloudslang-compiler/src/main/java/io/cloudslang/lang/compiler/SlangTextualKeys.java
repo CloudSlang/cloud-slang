@@ -47,4 +47,7 @@ public interface SlangTextualKeys {
     String ENCRYPTED_KEY = "encrypted";
     String OVERRIDABLE_KEY = "overridable";
 
+    // system properties
+    String SYSTEM_PROPERTY_KEY = "properties";
+
 }
