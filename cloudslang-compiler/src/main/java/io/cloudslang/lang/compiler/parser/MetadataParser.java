@@ -73,6 +73,7 @@ public class MetadataParser {
             String key = "";
             while (line != null) {
                 if (lineContainsATag(line)) {
+                    if (!line.contains(COLON)) throw new RuntimeException("Line \"" + line + "\" does not contain colon after name.");
                     tag = getContainedTag(line);
                     if (isSingleTagType(tag)) {
                         line = line.substring(line.indexOf(COLON) + 1);

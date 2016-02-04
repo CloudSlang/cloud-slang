@@ -96,6 +96,14 @@ public class MetadataExtractorTest {
     }
 
     @Test
+    public void colonMissing() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_colon_missing_after_name.sl").toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("does not contain colon after name.");
+        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+    }
+
+    @Test
     public void descriptionAfterStartingTag() throws Exception {
         URI operation = getClass().getResource("/metadata/metadata_description_after_starting_tag.sl").toURI();
         exception.expect(RuntimeException.class);
