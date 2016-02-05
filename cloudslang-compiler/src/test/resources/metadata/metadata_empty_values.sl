@@ -5,27 +5,26 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 #
-####################################################
-## description: Parses the given JSON input to retrieve the corresponding value addressed by the json_path input.
-##
-## inputs:
-##   - json_input: |
-##          JSON data input
-##      - Example: '{"k1": {"k2": ["v1", "v2"]}}'
-##   - json_path: |
-##      path from which to retrieve value represented as a list of keys and/or indices.
-##      Passing an empty list ([]) will retrieve the entire json_input. - Example: ["k1", "k2", 1]
-## outputs:
-##   - value: the corresponding value of the key referred to by json_path
-##   - return_result: parsing was successful or not
-##   - return_code: will be '0' if parsing was successful, '-1' otherwise
-##   - error_message: error message if there was an error when executing, empty otherwise
-## results:
-##   - SUCCESS: parsing was successful (return_code == '0')
-##   - FAILURE: otherwise
-####################################################sdfdf
-#### comment
-##
+#####################################################
+#!!
+#! @description:
+#! @prerequisites:
+#! @input json_input:
+#! @input json_path:
+#!
+#!
+# whatever description that will be ignored
+
+#! @output value:
+#! @output return_result:
+#! @output return_code:
+#! @output error_message:
+#! @result SUCCESS:
+#! @result FAILURE:
+#!!#
+#####################################################sdfdf
+#!#! comment
+#!
 
 namespace: io.cloudslang.base.json
 

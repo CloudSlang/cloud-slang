@@ -11,10 +11,11 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.modeller.MetadataModeller;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.compiler.parser.MetadataParser;
-import io.cloudslang.lang.compiler.parser.model.ParsedMetadata;
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 /**
  * User: bancl
@@ -32,8 +33,11 @@ public class MetadataExtractorImpl implements MetadataExtractor {
     @Override
     public Metadata extractMetadata(SlangSource source) {
         Validate.notNull(source, "You must supply a source to extract the metadata from");
-        ParsedMetadata parsedMetadata = metadataParser.parse(source);
-        Validate.notEmpty(parsedMetadata.getDescription(),"Operation/Flow must have a description");
-        return metadataModeller.createModel(parsedMetadata);
+        Map<String, String> metadataMap = metadataParser.parse(source);
+        Metadata metadata = metadataModeller.createModel(metadataMap);
+        if (metadataMap.size() > 0) {
+            Validate.notEmpty(metadata.getDescription(),"Operation/Flow must have a description");
+        }
+        return metadata;
     }
 }

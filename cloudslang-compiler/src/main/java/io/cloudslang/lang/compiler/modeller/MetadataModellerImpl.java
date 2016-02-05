@@ -9,12 +9,10 @@
 package io.cloudslang.lang.compiler.modeller;
 
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
-import io.cloudslang.lang.compiler.parser.model.ParsedMetadata;
+import io.cloudslang.lang.compiler.parser.utils.DescriptionTag;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,33 +23,35 @@ import java.util.Map;
 public class MetadataModellerImpl implements MetadataModeller {
 
     @Override
-    public Metadata createModel(ParsedMetadata parsedMetadata) {
-        return transformToMetadata(parsedMetadata);
+    public Metadata createModel(Map<String, String> metadataMap) {
+        return transformToMetadata(metadataMap);
     }
 
-    private Metadata transformToMetadata(ParsedMetadata parsedMetadata) {
+    private Metadata transformToMetadata(Map<String, String> fullMap) {
         Metadata metadata = new Metadata();
-        metadata.setDescription(emptyStringIfNull(parsedMetadata.getDescription()));
-        metadata.setInputs(convertMapListToMap(parsedMetadata.getInputs()));
-        metadata.setOutputs(convertMapListToMap(parsedMetadata.getOutputs()));
-        metadata.setResults(convertMapListToMap(parsedMetadata.getResults()));
+        String description = fullMap.get(DescriptionTag.DESCRIPTION.getValue());
+        metadata.setDescription(description != null ? description : "");
+        String prerequisites = fullMap.get(DescriptionTag.PREREQUISITES.getValue());
+        metadata.setPrerequisites(prerequisites != null ? prerequisites : "");
+        metadata.setInputs(getTagMap(fullMap, DescriptionTag.INPUT));
+        metadata.setOutputs(getTagMap(fullMap, DescriptionTag.OUTPUT));
+        metadata.setResults(getTagMap(fullMap, DescriptionTag.RESULT));
+
         return metadata;
     }
 
-    private Map<String, String> convertMapListToMap(List<Map<String, String>> mapList) {
-        Map<String, String> linkedHashMap = new LinkedHashMap<>();
-        for (Map<String,String> inputMap : emptyListIfNull(mapList) ) {
-            Map.Entry<String, String> entry = inputMap.entrySet().iterator().next();
-            linkedHashMap.put(entry.getKey(), entry.getValue());
+    private Map<String, String> getTagMap(Map<String, String> fullMap, DescriptionTag tag) {
+        Map<String, String> map = new LinkedHashMap<>();
+        for (Map.Entry<String, String> entry : fullMap.entrySet()) {
+            if (entry.getKey().contains(tag.getValue())) {
+                map.put(getName(entry, tag), entry.getValue());
+            }
         }
-        return linkedHashMap;
+        return map;
     }
 
-    private List<Map<String, String>> emptyListIfNull(List<Map<String, String>> mapList) {
-        return mapList == null ? Collections.EMPTY_LIST : mapList;
+    private String getName(Map.Entry<String, String> entry, DescriptionTag tag) {
+        return entry.getKey().substring(tag.getValue().length()).trim();
     }
 
-    private String emptyStringIfNull(String string) {
-        return string == null ? "" : string;
-    }
 }

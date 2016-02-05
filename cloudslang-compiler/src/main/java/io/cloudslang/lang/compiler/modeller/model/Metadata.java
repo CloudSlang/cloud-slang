@@ -9,6 +9,7 @@ import java.util.Map;
 public class Metadata {
 
     private String description;
+    private String prerequisites;
     private Map<String, String> inputs;
     private Map<String, String> outputs;
     private Map<String, String> results;
@@ -43,5 +44,13 @@ public class Metadata {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getPrerequisites() {
+        return prerequisites;
+    }
+
+    public void setPrerequisites(String prerequisites) {
+        this.prerequisites = prerequisites;
     }
 }
