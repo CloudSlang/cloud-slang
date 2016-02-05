@@ -13,6 +13,7 @@ import com.google.common.collect.Sets;
 
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.entities.SystemProperty;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -27,15 +28,21 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.introspector.BeanAccess;
 
+import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = CompilerHelperTest.Config.class)
@@ -111,29 +118,18 @@ public class CompilerHelperTest {
 
 	@Test
 	public void testLoadSystemProperties() throws Exception {
-		Map<String, Serializable> expected = new HashMap<>();
-		expected.put("user.sys.props.host", "localhost");
-		expected.put("user.sys.props.port", 22);
-		expected.put("user.sys.props.alla", "balla");
-		URI systemProperties = getClass().getResource("/properties/system_properties.yaml").toURI();
-		Map<String, ? extends Serializable> result = compilerHelper.loadSystemProperties(Collections.singletonList(systemProperties.getPath()));
-		Assert.assertNotNull(result);
-		Assert.assertEquals(expected, result);
-	}
+		Set<SystemProperty> systemProperties = Sets.newHashSet(
+                SystemProperty.createSystemProperty("user.sys", "props.host", "localhost"),
+                SystemProperty.createSystemProperty("user.sys", "props.port", "22"),
+                SystemProperty.createSystemProperty("user.sys", "props.alla", "balla")
+        );
+		URI systemPropertyURI = getClass().getResource("/properties/system_properties.sl").toURI();
+        SlangSource source = SlangSource.fromFile(systemPropertyURI);
+        when(slang.loadSystemProperties(eq(source))).thenReturn(systemProperties);
 
-    @Ignore("Awaiting CloudSlang/cloud-slang#302 decision")
-	@Test
-	public void testLoadSystemPropertiesImplicit() throws Exception {
-		Map<String, ? extends Serializable> result = compilerHelper.loadSystemProperties(null);
-		Assert.assertNotNull(result);
-		Assert.assertEquals(5, result.size());
-	}
+		Set<SystemProperty> result = compilerHelper.loadSystemProperties(Arrays.asList(systemPropertyURI.getPath()));
 
-	@Test
-	public void testLoadSystemPropertiesWrongPath() throws Exception {
-		expectedException.expect(RuntimeException.class);
-		expectedException.expectMessage("does not exist");
-		compilerHelper.loadSystemProperties(Arrays.asList("abc", "def"));
+        verify(slang).loadSystemProperties(eq(source));
 	}
 
     @Test
@@ -150,15 +146,16 @@ public class CompilerHelperTest {
     @Test
     public void testLoadInputsFromCommentedFile() throws Exception {
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("Inputs / System properties file");
+        expectedException.expectMessage("Inputs file");
 
         URI inputsFromFile = getClass().getResource("/inputs/commented_inputs.yaml").toURI();
         compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath()));
     }
+
     @Test
     public void testLoadInputsFromEmptyFile() throws Exception {
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("Inputs / System properties file");
+        expectedException.expectMessage("Inputs file");
 
         URI inputsFromFile = getClass().getResource("/inputs/empty_inputs.yaml").toURI();
         compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath()));
@@ -186,10 +183,12 @@ public class CompilerHelperTest {
             return new CompilerHelperImpl();
         }
 
-		@Bean
-		public Yaml yaml() {
-			return new Yaml();
-		}
+        @Bean
+        public Yaml yaml() {
+            Yaml yaml = new Yaml();
+            yaml.setBeanAccess(BeanAccess.FIELD);
+            return yaml;
+        }
 
     }
 

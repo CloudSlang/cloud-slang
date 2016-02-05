@@ -1,0 +1,88 @@
+#   (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+#   All rights reserved. This program and the accompanying materials
+#   are made available under the terms of the Apache License v2.0 which accompany this distribution.
+#
+#   The Apache License is available at
+#   http://www.apache.org/licenses/LICENSE-2.0
+
+namespace: user.flows
+
+imports:
+  ops: user.ops
+
+flow:
+  name: functions_test_flow
+  inputs:
+    - input1:
+        default: null
+        overridable: false
+        required: false
+    - input1_safe:
+        default: ${ get('input1', 'input1_default') }
+        overridable: false
+        required: false
+    - input2:
+        default: 22
+        overridable: false
+    - input2_safe:
+        default: ${ get('input2', 'input2_default') }
+        overridable: false
+        required: false
+    - input_locals_found:
+        default: ${ locals().get('input2', 'input_locals_found_default') }
+        overridable: false
+        required: false
+    - input_locals_not_found:
+        default: ${ locals().get('input2_i_dont_exist', 'input_locals_not_found_default') }
+        overridable: false
+        required: false
+    - exist
+    - input_3:
+        default: ${get_sp('a.b.c.i_don_t_exist')}
+        required: false
+    - input_4: ${get_sp('a.b.c.i_don_t_exist', 'default_str')}
+    - input_5: ${get_sp('a.b.c.host')}
+    - input_6: ${get_sp('a.b.c.host', 'default_str')}
+    - input_7: ${get('i_don_exist', get_sp('a.b.c.host'))}
+    - input_8: ${get('exist', get_sp('a.b.c.host'))}
+    - input_9: ${get(    'i_don_exist',        get_sp('a.b.c.host')       )}
+    - input_10: ${get_sp('a.b.c.i_don_exist', get_sp('a.b.c.host'))}
+    - input_11: ${get_sp('a.b.c.null_value', 'default_str')}
+    - value_propagate: ${ get_sp('propagate.flow.input') }
+  workflow:
+    - Task1:
+        do:
+          ops.functions_test_op:
+            - exist
+            - input_3: ${get_sp('a.b.c.i_don_t_exist')}
+            - input_4: ${get_sp('a.b.c.i_don_t_exist', 'default_str')}
+            - input_5: ${get_sp('a.b.c.host')}
+            - input_6: ${get_sp('a.b.c.host', 'default_str')}
+            - input_7: ${get('i_don_exist', get_sp('a.b.c.host'))}
+            - input_8: ${get('exist', get_sp('a.b.c.host'))}
+            - input_9: ${get(    'i_don_exist',        get_sp('a.b.c.host')       )}
+            - input_10: ${get_sp('a.b.c.i_don_exist', get_sp('a.b.c.host'))}
+            - input_11: ${get_sp('a.b.c.null_value', 'default_str')}
+            - value_propagate: ${ value_propagate + get_sp('propagate.task.argument') }
+        publish:
+          - output1_safe
+          - output2_safe
+          - output_same_name
+          - output_1
+          - output_2
+          - output_3
+          - output_4
+          - output_5
+          - output_6
+          - output_7
+          - output_8
+          - output_9
+          - value_propagate: ${ value_propagate + get_sp('propagate.task.publish') }
+        navigate:
+          FUNCTIONS_KEY_EXISTS: FUNCTIONS_KEY_EXISTS
+          FUNCTIONS_KEY_EXISTS_PROBLEM: FUNCTIONS_KEY_EXISTS_PROBLEM
+  outputs:
+    - value_propagate: ${ value_propagate + get_sp('propagate.flow.output') }
+  results:
+    - FUNCTIONS_KEY_EXISTS
+    - FUNCTIONS_KEY_EXISTS_PROBLEM

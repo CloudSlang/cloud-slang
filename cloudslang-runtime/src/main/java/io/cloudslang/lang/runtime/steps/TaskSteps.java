@@ -77,7 +77,7 @@ public class TaskSteps extends AbstractSteps {
 
             //loops
             if (loopStatementExist(loop)) {
-                LoopCondition loopCondition = loopsBinding.getOrCreateLoopCondition(loop, flowContext, nodeName);
+                LoopCondition loopCondition = loopsBinding.getOrCreateLoopCondition(loop, flowContext, runEnv.getSystemProperties(), nodeName);
                 if (!loopCondition.hasMore()) {
                     runEnv.putNextStepPosition(nextStepId);
                     runEnv.getStack().pushContext(flowContext);
@@ -111,7 +111,7 @@ public class TaskSteps extends AbstractSteps {
                     nodeName
             );
 
-            Map<String, Serializable> boundArguments = argumentsBinding.bindArguments(taskArguments, flowVariables);
+            Map<String, Serializable> boundArguments = argumentsBinding.bindArguments(taskArguments, flowVariables, runEnv.getSystemProperties());
 
             sendEndBindingArgumentsEvent(
                     taskArguments,
@@ -160,7 +160,13 @@ public class TaskSteps extends AbstractSteps {
                     Pair.of(ScoreLangConstants.TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues),
                     Pair.of("operationReturnValues", executableReturnValues));
 
-            Map<String, Serializable> publishValues = outputsBinding.bindOutputs(flowVariables, executableReturnValues.getOutputs(), taskPublishValues);
+            Map<String, Serializable> publishValues =
+                    outputsBinding.bindOutputs(
+                            flowVariables,
+                            executableReturnValues.getOutputs(),
+                            runEnv.getSystemProperties(),
+                            taskPublishValues
+                    );
 
             flowContext.putVariables(publishValues);
 

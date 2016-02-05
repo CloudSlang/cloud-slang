@@ -126,9 +126,21 @@ public class ExecutableSteps extends AbstractSteps {
                     Pair.of(ACTION_RETURN_VALUES_KEY, actionReturnValues));
 
             // Resolving the result of the operation/flow
-            String result = resultsBinding.resolveResult(operationVariables, actionReturnValues.getOutputs(), executableResults, actionReturnValues.getResult());
+            String result = resultsBinding.resolveResult(
+                    operationVariables,
+                    actionReturnValues.getOutputs(),
+                    runEnv.getSystemProperties(),
+                    executableResults,
+                    actionReturnValues.getResult()
+            );
 
-            Map<String, Serializable> operationReturnOutputs = outputsBinding.bindOutputs(operationVariables, actionReturnValues.getOutputs(), executableOutputs);
+            Map<String, Serializable> operationReturnOutputs =
+                    outputsBinding.bindOutputs(
+                            operationVariables,
+                            actionReturnValues.getOutputs(),
+                            runEnv.getSystemProperties(),
+                            executableOutputs
+                    );
 
             //todo: hook
 

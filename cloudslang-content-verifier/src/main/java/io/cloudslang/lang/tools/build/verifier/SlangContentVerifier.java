@@ -9,6 +9,7 @@
  */
 package io.cloudslang.lang.tools.build.verifier;
 
+import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
@@ -19,6 +20,7 @@ import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.util.Collection;
@@ -28,8 +30,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static io.cloudslang.lang.compiler.SlangSource.fromFile;
 
 /**
  * Created by stoneo on 3/15/2015.
@@ -47,6 +47,9 @@ public class SlangContentVerifier {
     @Autowired
     private ScoreCompiler scoreCompiler;
 
+    @Autowired
+    private Yaml yaml;
+
     public Map<String, Executable> createModelsAndValidate(String directoryPath) {
         Validate.notEmpty(directoryPath, "You must specify a path");
         Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" + directoryPath + "\' does not lead to a directory");
@@ -55,24 +58,32 @@ public class SlangContentVerifier {
         log.info("Start compiling all slang files under: " + directoryPath);
         log.info(slangFiles.size() + " .sl files were found");
         log.info("");
+        int ignoredExecutables = 0;
         for(File slangFile: slangFiles){
             Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() + "\' must lead to a file");
-            Executable sourceModel;
-            try {
-                sourceModel = slangCompiler.preCompile(SlangSource.fromFile(slangFile));
-            } catch (Exception e) {
-                String errorMessage = "Failed creating Slang models for file: \'" + slangFile.getAbsoluteFile() + "\'.\n" + e.getMessage();
-                log.error(errorMessage);
-                throw new RuntimeException(errorMessage, e);
-            }
-            if(sourceModel != null) {
-                staticSlangFileValidation(slangFile, sourceModel);
-                slangModels.put(getUniqueName(sourceModel), sourceModel);
+            if (isSystemPropertyFile(SlangSource.fromFile(slangFile))) {
+                ++ignoredExecutables;
+                log.info("Ignoring file: " + slangFile.getName() + " (not a valid executable)." +
+                        " Top level key '" + SlangTextualKeys.SYSTEM_PROPERTY_KEY + "' found instead of '" + SlangTextualKeys.FLOW_TYPE + "'/'" + SlangTextualKeys.OPERATION_TYPE + "'.");
+            } else {
+                Executable sourceModel;
+                try {
+                    sourceModel = slangCompiler.preCompile(SlangSource.fromFile(slangFile));
+                } catch (Exception e) {
+                    String errorMessage = "Failed creating Slang models for file: \'" + slangFile.getAbsoluteFile() + "\'.\n" + e.getMessage();
+                    log.error(errorMessage);
+                    throw new RuntimeException(errorMessage, e);
+                }
+                if (sourceModel != null) {
+                    staticSlangFileValidation(slangFile, sourceModel);
+                    slangModels.put(getUniqueName(sourceModel), sourceModel);
+                }
             }
         }
-        if(slangFiles.size() != slangModels.size()){
-            throw new RuntimeException("Some Slang files were not pre-compiled.\nFound: " + slangFiles.size() +
-                    " slang files in path: \'" + directoryPath + "\' But managed to create slang models for only: " + slangModels.size());
+        int numberOfExecutables = slangFiles.size() - ignoredExecutables;
+        if(numberOfExecutables != slangModels.size()){
+            throw new RuntimeException("Some Slang files were not pre-compiled.\nFound: " + numberOfExecutables +
+                    " executable files in path: \'" + directoryPath + "\' But managed to create slang models for only: " + slangModels.size());
         }
         return slangModels;
     }
@@ -156,4 +167,18 @@ public class SlangContentVerifier {
                 "\' is invalid.\nIt should be identical to the file name: \'" + fileNameNoExtension + "\'";
         Validate.isTrue(fileNameNoExtension.equals(executable.getName()), executableNameErrorMessage);
     }
+
+    private boolean isSystemPropertyFile(SlangSource source) {
+        Object yamlObject = yaml.load(source.getSource());
+        if (yamlObject instanceof Map) {
+            Map yamlObjectAsMap = (Map) yamlObject;
+            return
+                    yamlObjectAsMap.containsKey(SlangTextualKeys.SYSTEM_PROPERTY_KEY) &&
+                            !yamlObjectAsMap.containsKey(SlangTextualKeys.FLOW_TYPE) &&
+                            !yamlObjectAsMap.containsKey(SlangTextualKeys.OPERATION_TYPE);
+        } else {
+            return false;
+        }
+    }
+
 }

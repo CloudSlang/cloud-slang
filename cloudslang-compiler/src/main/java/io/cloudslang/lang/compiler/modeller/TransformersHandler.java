@@ -26,6 +26,17 @@ import static org.hamcrest.Matchers.equalToIgnoringCase;
 @Component
 public class TransformersHandler {
 
+    public static String keyToTransform(Transformer transformer) {
+        String key;
+        if (transformer.keyToTransform() != null) {
+            key = transformer.keyToTransform();
+        } else {
+            String simpleClassName = transformer.getClass().getSimpleName();
+            key = StringUtils.substringBefore(simpleClassName, Transformer.class.getSimpleName());
+        }
+        return key.toLowerCase();
+    }
+
     public Map<String, Serializable> runTransformers(Map<String, Object> rawData, List<Transformer> scopeTransformers) {
         Map<String, Serializable> transformedData = new HashMap<>();
         for (Transformer transformer : scopeTransformers) {
@@ -105,14 +116,4 @@ public class TransformersHandler {
         }
     }
 
-    private String keyToTransform(Transformer transformer) {
-        String key;
-        if (transformer.keyToTransform() != null) {
-            key = transformer.keyToTransform();
-        } else {
-            String simpleClassName = transformer.getClass().getSimpleName();
-            key = StringUtils.substringBefore(simpleClassName, Transformer.class.getSimpleName());
-        }
-        return key.toLowerCase();
-    }
 }

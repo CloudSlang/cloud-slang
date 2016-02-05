@@ -11,22 +11,21 @@ package io.cloudslang.lang.runtime.bindings;
 
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * User: stoneo
@@ -37,6 +36,9 @@ import java.util.List;
 @ContextConfiguration(classes = ResultBindingTest.Config.class)
 public class ResultBindingTest {
 
+    @SuppressWarnings("unchecked")
+    private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
+    
     @Autowired
     private ResultsBinding resultsBinding;
 
@@ -46,7 +48,7 @@ public class ResultBindingTest {
                 createResult(ScoreLangConstants.SUCCESS_RESULT, true),
                 createResult(ScoreLangConstants.FAILURE_RESULT, "${ True and (not False) }")
         );
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), results, null);
+        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result);
     }
 
@@ -56,7 +58,7 @@ public class ResultBindingTest {
                 createResult(ScoreLangConstants.SUCCESS_RESULT, false),
                 createResult(ScoreLangConstants.FAILURE_RESULT, true)
         );
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), results, null);
+        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
@@ -66,7 +68,7 @@ public class ResultBindingTest {
                 createResult(ScoreLangConstants.SUCCESS_RESULT, Boolean.TRUE),
                 createResult(ScoreLangConstants.FAILURE_RESULT, "${ True and (not False) }")
         );
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), results, null);
+        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result);
     }
 
@@ -76,7 +78,7 @@ public class ResultBindingTest {
                 createResult(ScoreLangConstants.SUCCESS_RESULT, Boolean.FALSE),
                 createResult(ScoreLangConstants.FAILURE_RESULT, Boolean.TRUE)
         );
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), results, null);
+        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
@@ -84,7 +86,7 @@ public class ResultBindingTest {
     public void testConstExprChooseFirstResult() throws Exception {
         List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, "${ 1==1 }"),
                 createResult(ScoreLangConstants.FAILURE_RESULT, "${ True and (not False) }"));
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), results, null);
+        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result);
     }
 
@@ -92,7 +94,7 @@ public class ResultBindingTest {
     public void testConstExprChooseSecondAResult() throws Exception {
         List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, "${ 1==2 }"),
                                                 createResult(ScoreLangConstants.FAILURE_RESULT, "${ 1==1 }"));
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), results, null);
+        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
@@ -102,7 +104,7 @@ public class ResultBindingTest {
                                                 createResult(ScoreLangConstants.FAILURE_RESULT, "${ int(status) == -1 }"));
         HashMap<String, Serializable> context = new HashMap<>();
         context.put("status", "1");
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, results, null);
+        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result);
     }
 
@@ -112,7 +114,7 @@ public class ResultBindingTest {
                                                 createResult(ScoreLangConstants.FAILURE_RESULT, "${ int(status) == -1 }"));
         HashMap<String, Serializable> context = new HashMap<>();
         context.put("status", "-1");
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, results, null);
+        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
@@ -122,7 +124,7 @@ public class ResultBindingTest {
                                                 createResult(ScoreLangConstants.FAILURE_RESULT, "${ int(status) == -1 }"));
         HashMap<String, Serializable> context = new HashMap<>();
         context.put("status", "-1");
-        resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, results, null);
+        resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, EMPTY_SET, results, null);
     }
 
     @Test
@@ -131,7 +133,7 @@ public class ResultBindingTest {
                                                 createResult(ScoreLangConstants.FAILURE_RESULT, null));
         HashMap<String, Serializable> context = new HashMap<>();
         context.put("status", "-1");
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, results, null);
+        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
@@ -140,7 +142,7 @@ public class ResultBindingTest {
         List<Result> results = Arrays.asList();
         HashMap<String, Serializable> context = new HashMap<>();
         context.put("status", "-1");
-        resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, results, null);
+        resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, EMPTY_SET, results, null);
     }
 
     @Test(expected = RuntimeException.class)
@@ -149,7 +151,7 @@ public class ResultBindingTest {
                 createResult(ScoreLangConstants.FAILURE_RESULT, "${ int(status) == 0 }"));
         HashMap<String, Serializable> context = new HashMap<>();
         context.put("status", "-1");
-        resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, results, null);
+        resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, EMPTY_SET, results, null);
     }
 
     @Test
@@ -157,7 +159,7 @@ public class ResultBindingTest {
         List<Result> results = Arrays.asList(createEmptyResult(ScoreLangConstants.SUCCESS_RESULT),
                 createEmptyResult(ScoreLangConstants.FAILURE_RESULT));
         HashMap<String, Serializable> context = new HashMap<>();
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, results, ScoreLangConstants.FAILURE_RESULT);
+        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, EMPTY_SET, results, ScoreLangConstants.FAILURE_RESULT);
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
@@ -166,7 +168,7 @@ public class ResultBindingTest {
         List<Result> results = Arrays.asList(createEmptyResult(ScoreLangConstants.SUCCESS_RESULT),
                 createEmptyResult(ScoreLangConstants.FAILURE_RESULT));
         HashMap<String, Serializable> context = new HashMap<>();
-        resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, results, "IllegalResult");
+        resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, EMPTY_SET, results, "IllegalResult");
     }
 
     @Test(expected = RuntimeException.class)
@@ -175,7 +177,7 @@ public class ResultBindingTest {
                 createResult(ScoreLangConstants.FAILURE_RESULT, null));
         HashMap<String, Serializable> context = new HashMap<>();
         context.put("status", "-1");
-        resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, results, null);
+        resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, EMPTY_SET, results, null);
     }
 
     private Result createResult(String name, Serializable expression){
@@ -200,9 +202,10 @@ public class ResultBindingTest {
         }
 
         @Bean
-        public ScriptEngine scriptEngine(){
-            return  new ScriptEngineManager().getEngineByName("python");
+        public PythonInterpreter evalInterpreter(){
+            return new PythonInterpreter();
         }
+
     }
 
 }

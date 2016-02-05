@@ -9,11 +9,11 @@
 package io.cloudslang.lang.cli.utils;
 
 import ch.lambdaj.function.convert.Converter;
-
-
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.SystemProperty;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
@@ -28,17 +28,9 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import static ch.lambdaj.Lambda.*;
-
-import static org.hamcrest.Matchers.*;
+import static ch.lambdaj.Lambda.convert;
 
 /**
  * @author lesant
@@ -85,12 +77,16 @@ public class CompilerHelperImpl implements CompilerHelper{
         }
         for (String dependency:dependencies) {
             Collection<File> dependenciesFiles = FileUtils.listFiles(new File(dependency), SLANG_FILE_EXTENSIONS, true);
-            depsSources.addAll(convert(dependenciesFiles, new Converter<File, SlangSource>() {
-                @Override
-                public SlangSource convert(File from) {
-                    return SlangSource.fromFile(from);
+            for (File dependencyCandidate : dependenciesFiles) {
+                SlangSource source = SlangSource.fromFile(dependencyCandidate);
+                // exclude properties files
+                if (isExecutable(source)) {
+                    depsSources.add(source);
+                } else {
+                    logger.info("Ignoring dependency: " + source.getName() + " (not a valid executable)." +
+                            " Top level keys(" + SlangTextualKeys.FLOW_TYPE + ", " + SlangTextualKeys.OPERATION_TYPE + ") not found.");
                 }
-            }));
+            }
         }
         try {
             return slang.compile(SlangSource.fromFile(file), depsSources);
@@ -100,37 +96,34 @@ public class CompilerHelperImpl implements CompilerHelper{
         }
     }
 
-	@Override
-	public Map<String, ? extends Serializable> loadSystemProperties(List<String> systemPropertyFiles) {
-		return loadFiles(systemPropertyFiles, YAML_FILE_EXTENSIONS, SP_DIR);
-	}
-
     @Override
-    public Map<String, ? extends Serializable> loadInputsFromFile(List<String> inputFiles) {
-        return loadFiles(inputFiles, YAML_FILE_EXTENSIONS, INPUT_DIR);
+    public Set<SystemProperty> loadSystemProperties(List<String> systemPropertyFiles) {
+        return loadPropertiesFromFiles(convertToFiles(systemPropertyFiles), SLANG_FILE_EXTENSIONS, SP_DIR);
     }
 
-    private Map<String, ? extends Serializable> loadFiles(List<String> files, String[] extensions, String directory) {
+    @Override
+    public Map<String, Serializable> loadInputsFromFile(List<String> inputFiles) {
+        return loadMapsFromFiles(convertToFiles(inputFiles), YAML_FILE_EXTENSIONS, INPUT_DIR);
+    }
+
+    @Override
+    public boolean isExecutable(String filePath) {
+        return isExecutable(SlangSource.fromFile(new File(filePath)));
+    }
+
+    private Map<String, Serializable> loadMapsFromFiles(List<File> files, String[] extensions, String directory) {
+        Collection<File> fileCollection;
         if(CollectionUtils.isEmpty(files)) {
-            String appHome = System.getProperty("app.home", "");
-            String defaultDirectoryPath = appHome + File.separator + "bin" + File.separator + directory;
-            File defaultDirectory = new File(defaultDirectoryPath);
-            if (defaultDirectory.isDirectory()) {
-                Collection<File> implicitFiles = FileUtils.listFiles(defaultDirectory, extensions, false);
-                files = convert(implicitFiles, new Converter<File, String>() {
-                    @Override
-                    public String convert(File from) {
-                        return from.getPath();
-                    }
-                });
-            }
+            fileCollection = loadDefaultFiles(extensions, directory, false);
+            if(CollectionUtils.isEmpty(fileCollection)) return null;
+        } else {
+            fileCollection = files;
         }
-        if(CollectionUtils.isEmpty(files)) return null;
         Map<String, Serializable> result = new HashMap<>();
-		for(String inputFile : files) {
+		for(File inputFile : fileCollection) {
 			logger.info("Loading file: " + inputFile);
 			try {
-                String inputsFileContent = FileUtils.readFileToString(new File(inputFile));
+                String inputsFileContent = FileUtils.readFileToString(inputFile);
                 Boolean emptyContent = true;
                 if (StringUtils.isNotEmpty(inputsFileContent)) {
                     @SuppressWarnings("unchecked") Map<String, ? extends Serializable> inputFileYamlContent =
@@ -141,14 +134,56 @@ public class CompilerHelperImpl implements CompilerHelper{
                     }
                 }
                 if (emptyContent){
-                    throw new RuntimeException("Inputs / System properties file: " + inputFile + " is empty or does not contain valid YAML content.");
+                    throw new RuntimeException("Inputs file: " + inputFile + " is empty or does not contain valid YAML content.");
                 }
 			} catch(IOException ex) {
-				logger.error("Error loading file: " + inputFile, ex);
+				logger.error("Error loading file: " + inputFile + ". Nested exception is: " + ex.getMessage(), ex);
 				throw new RuntimeException(ex);
 			}
 		}
         return result;
+    }
+
+    private Set<SystemProperty> loadPropertiesFromFiles(List<File> files, String[] extensions, String directory) {
+        Collection<File> fileCollection;
+        if(CollectionUtils.isEmpty(files)) {
+            fileCollection = loadDefaultFiles(extensions, directory, true);
+            if(CollectionUtils.isEmpty(fileCollection)) return new HashSet<>();
+        } else {
+            fileCollection = files;
+        }
+        Set<SystemProperty> result = new HashSet<>();
+        for(File propFile : fileCollection) {
+            try {
+                SlangSource source = SlangSource.fromFile(propFile);
+                if (!isExecutable(source)) {
+                    logger.info("Loading file: " + propFile);
+                    Set<SystemProperty> propsFromFile = slang.loadSystemProperties(source);
+                    result.addAll(propsFromFile);
+                } else {
+                    logger.info("Ignoring file: " + source.getName() + " (not a valid properties file)." +
+                            " Top level keys(" + SlangTextualKeys.FLOW_TYPE + ", " + SlangTextualKeys.OPERATION_TYPE + ") found.");
+                }
+            } catch(Throwable ex) {
+                String errorMessage = "Error loading file: " + propFile + " nested exception is " + ex.getMessage();
+                logger.error(errorMessage, ex);
+                throw new RuntimeException(errorMessage, ex);
+            }
+        }
+        return result;
+    }
+
+    private Collection<File> loadDefaultFiles(String[] extensions, String directory, boolean recursive) {
+        Collection<File> files;
+        String appHome = System.getProperty("app.home", "");
+        String defaultDirectoryPath = appHome + File.separator + "bin" + File.separator + directory;
+        File defaultDirectory = new File(defaultDirectoryPath);
+        if (defaultDirectory.isDirectory()) {
+            files = FileUtils.listFiles(defaultDirectory, extensions, recursive);
+        } else {
+            files = Collections.emptyList();
+        }
+        return files;
     }
 
     private Boolean checkIsFileSupported(File file){
@@ -157,6 +192,27 @@ public class CompilerHelperImpl implements CompilerHelper{
             suffixes[i] = "." + SLANG_FILE_EXTENSIONS[i];
         }
         return new SuffixFileFilter(suffixes).accept(file);
+    }
+
+    private boolean isExecutable(SlangSource source) {
+        Object yamlObject = yaml.load(source.getSource());
+        if (yamlObject instanceof Map) {
+            Map yamlObjectAsMap = (Map) yamlObject;
+            return
+                    yamlObjectAsMap.containsKey(SlangTextualKeys.FLOW_TYPE) ||
+                            yamlObjectAsMap.containsKey(SlangTextualKeys.OPERATION_TYPE);
+        } else {
+            return false;
+        }
+    }
+
+    private List<File> convertToFiles(List<String> fileList) {
+        return convert(fileList, new Converter<String, File>() {
+            @Override
+            public File convert(String from) {
+                return new File(from);
+            }
+        });
     }
 
 }

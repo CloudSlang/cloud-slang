@@ -71,7 +71,7 @@ public class AsyncLoopSteps extends AbstractSteps {
         try {
             Context flowContext = runEnv.getStack().popContext();
 
-            List<Serializable> splitData = asyncLoopBinding.bindAsyncLoopList(asyncLoopStatement, flowContext, nodeName);
+            List<Serializable> splitData = asyncLoopBinding.bindAsyncLoopList(asyncLoopStatement, flowContext, runEnv.getSystemProperties(), nodeName);
 
             fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_SPLIT_BRANCHES,
                     "async loop expression bound", runEnv.getExecutionPath().getCurrentPath(),
@@ -219,7 +219,7 @@ public class AsyncLoopSteps extends AbstractSteps {
                 Pair.of(ScoreLangConstants.TASK_AGGREGATE_KEY, (Serializable) taskAggregateValues),
                 Pair.of(ScoreLangConstants.TASK_NAVIGATION_KEY, taskNavigationValues));
 
-        return outputsBinding.bindOutputs(contextBeforeSplit, aggregateContext, taskAggregateValues);
+        return outputsBinding.bindOutputs(contextBeforeSplit, aggregateContext, runEnv.getSystemProperties(), taskAggregateValues);
     }
 
     private void collectBranchesData(

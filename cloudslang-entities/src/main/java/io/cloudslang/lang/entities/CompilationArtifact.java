@@ -14,9 +14,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /*
  * Created by orius123 on 10/11/14.
@@ -26,9 +26,9 @@ public class CompilationArtifact {
     private final ExecutionPlan executionPlan;
     private final Map<String, ExecutionPlan> dependencies;
     private final List<Input> inputs;
-    private final Collection<Input> systemProperties;
+    private final Set<String> systemProperties;
 
-    public CompilationArtifact(ExecutionPlan executionPlan, Map<String, ExecutionPlan> dependencies, List<Input> inputs, Collection<Input> systemProperties) {
+    public CompilationArtifact(ExecutionPlan executionPlan, Map<String, ExecutionPlan> dependencies, List<Input> inputs, Set<String> systemProperties) {
         this.executionPlan = executionPlan;
         this.dependencies = dependencies;
         this.inputs = inputs;
@@ -47,7 +47,7 @@ public class CompilationArtifact {
         return inputs;
     }
 
-    public Collection<Input> getSystemProperties() {
+    public Set<String> getSystemProperties() {
         return systemProperties;
     }
 
@@ -86,4 +86,5 @@ public class CompilationArtifact {
                 .append(systemProperties)
                 .toHashCode();
     }
+
 }

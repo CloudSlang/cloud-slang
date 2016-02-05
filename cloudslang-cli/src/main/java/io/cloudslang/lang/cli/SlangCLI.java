@@ -8,18 +8,21 @@
  */
 package io.cloudslang.lang.cli;
 
+import com.google.common.collect.Lists;
 import io.cloudslang.lang.cli.services.ScoreServices;
 import io.cloudslang.lang.cli.utils.CompilerHelper;
 import io.cloudslang.lang.cli.utils.MetadataHelper;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +100,7 @@ public class SlangCLI implements CommandMarker {
         if (invalidVerboseInput(verbose)) throw new IllegalArgumentException("Verbose argument is invalid.");
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
-        Map<String, ? extends Serializable> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
+        Set<SystemProperty> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
         Map<String, ? extends Serializable> inputsFromFile = compilerHelper.loadInputsFromFile(inputFiles);
         Map<String, Serializable> mergedInputs = new HashMap<>();
 
@@ -132,6 +135,30 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = PATH_TO_FILENAME_HELP) final File executableFile
     ) throws IOException {
         return metadataHelper.extractMetadata(executableFile);
+    }
+
+    @CliCommand(value = "list", help = "List system properties from a properties file")
+    public String listSystemProperties(
+            @CliOption(key = {"", "f", "file"}, mandatory = true, help = PATH_TO_FILENAME_HELP) final String propertiesFile) {
+        Set<SystemProperty> systemProperties = compilerHelper.loadSystemProperties(Lists.newArrayList(propertiesFile));
+        return prettyPrintSystemProperties(systemProperties);
+    }
+
+    private String prettyPrintSystemProperties(Set<SystemProperty> systemProperties) {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (CollectionUtils.isEmpty(systemProperties)) {
+            stringBuilder.append("No system properties found.");
+        } else {
+            stringBuilder.append("Following system properties were loaded:\n");
+            for (SystemProperty systemProperty : systemProperties) {
+                stringBuilder.append("\t");
+                stringBuilder.append(systemProperty.getFullyQualifiedName());
+                stringBuilder.append(": ");
+                stringBuilder.append(systemProperty.getValue());
+                stringBuilder.append("\n");
+            }
+        }
+        return StringUtils.trim(stringBuilder.toString());
     }
 
     @CliCommand(value = "env", help = ENV_HELP)

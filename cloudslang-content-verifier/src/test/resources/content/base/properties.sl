@@ -6,5 +6,7 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 #
 ####################################################
+namespace: a.b
 
-base.prop1: Property number 1
+properties:
+  base.prop1: Property number 1

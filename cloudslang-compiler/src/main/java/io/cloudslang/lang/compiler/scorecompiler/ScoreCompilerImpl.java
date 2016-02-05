@@ -11,20 +11,24 @@ package io.cloudslang.lang.compiler.scorecompiler;
 import ch.lambdaj.function.convert.Converter;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.modeller.TransformersHandler;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Task;
-import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.compiler.modeller.transformers.AggregateTransformer;
+import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
+import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
+import io.cloudslang.lang.entities.bindings.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
 import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
 import io.cloudslang.lang.entities.CompilationArtifact;
-import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
@@ -47,6 +51,12 @@ public class ScoreCompilerImpl implements ScoreCompiler{
 
     @Autowired
     private DependenciesHelper dependenciesHelper;
+
+    @Autowired
+    private PublishTransformer publishTransformer;
+
+    @Autowired
+    private AggregateTransformer aggregateTransformer;
 
     @Override
     public CompilationArtifact compile(Executable executable, Set<Executable> path) {
@@ -84,7 +94,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         executables.add(executable);
 
         executionPlan.setSubflowsUUIDs(new HashSet<>(dependencies.keySet()));
-        return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemProperties(executables));
+        return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemPropertiesFromExecutables(executables));
     }
 
     /**
@@ -108,13 +118,13 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             String refId = task.getRefId();
             Executable reference = filteredDependencies.get(refId);
             Validate.notNull(reference, "Cannot compile flow: \'" + executable.getName() + "\' since for task: \'" + task.getName()
-                                        + "\', the dependency: \'" + refId + "\' is missing.");
+                    + "\', the dependency: \'" + refId + "\' is missing.");
             List<Result> refResults = reference.getResults();
             for(Result result : refResults){
                 String resultName = result.getName();
                 Validate.isTrue(taskNavigations.containsKey(resultName), "Cannot compile flow: \'" + executable.getName() +
-                                                "\' since for task: '" + task.getName() + "\', the result \'" + resultName+
-                                                "\' of its dependency: \'"+ refId + "\' has no matching navigation");
+                        "\' since for task: '" + task.getName() + "\', the result \'" + resultName+
+                        "\' of its dependency: \'"+ refId + "\' has no matching navigation");
             }
         }
     }
@@ -138,20 +148,78 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         }
     }
 
-	private static Collection<Input> getSystemProperties(Collection<Executable> executables) {
-		Collection<Input> result = new ArrayList<>();
-		for(Executable executable : executables) {
-			result.addAll(getSystemProperties(executable.getInputs()));
-		}
-		return result;
-	}
+    private Set<String> getSystemPropertiesFromExecutables(Collection<Executable> executables) {
+        Set<String> result = new HashSet<>();
+        for(Executable executable : executables) {
+            result.addAll(getSystemPropertiesFromExecutable(executable));
+            if (SlangTextualKeys.FLOW_TYPE.equals(executable.getType())) {
+                Deque<Task> tasks = ((Flow) executable).getWorkflow().getTasks();
+                for (Task task : tasks) {
+                    result.addAll(getSystemPropertiesFromTask(task));
+                }
+            }
+        }
+        return result;
+    }
 
-	private static Collection<Input> getSystemProperties(List<Input> inputs) {
-		Collection<Input> result = new ArrayList<>();
-		for(Input input : inputs) {
-			if(input.getSystemPropertyName() != null) result.add(input);
-		}
-		return result;
-	}
+    private Set<String> getSystemPropertiesFromExecutable(Executable executable) {
+        Set<String> result = new HashSet<>();
+        result.addAll(getSystemPropertiesFromInOutParam(executable.getInputs()));
+        result.addAll(getSystemPropertiesFromInOutParam(executable.getOutputs()));
+        result.addAll(getSystemPropertiesFromInOutParam(executable.getResults()));
+        return result;
+    }
+
+    private Set<String> getSystemPropertiesFromTask(Task task) {
+        Set<String> result = new HashSet<>();
+        List<Transformer> relevantTransformers = new ArrayList<>();
+        relevantTransformers.add(publishTransformer);
+        relevantTransformers.add(aggregateTransformer);
+
+        result.addAll(getSystemPropertiesFromInOutParam(task.getArguments()));
+        result.addAll(
+                getSystemPropertiesFromPostTaskActionData(
+                    task.getPostTaskActionData(),
+                    relevantTransformers
+                )
+        );
+
+        return result;
+    }
+
+    private Set<String> getSystemPropertiesFromInOutParam(List<? extends InOutParam> inOutParams) {
+        Set<String> result = new HashSet<>();
+        for(InOutParam inOutParam : inOutParams) {
+            Set<String> systemPropertyDependencies = inOutParam.getSystemPropertyDependencies();
+            if(CollectionUtils.isNotEmpty(systemPropertyDependencies)) {
+                result.addAll(systemPropertyDependencies);
+            }
+        }
+        return result;
+    }
+
+    private Set<String> getSystemPropertiesFromPostTaskActionData(
+            Map<String, Serializable> postTaskActionData,
+            List<Transformer> relevantTransformers) {
+        Set<String> result = new HashSet<>();
+        for (Transformer transformer : relevantTransformers) {
+            String key = TransformersHandler.keyToTransform(transformer);
+            Serializable item = postTaskActionData.get(key);
+            if (item instanceof Collection) {
+                Collection itemsCollection = (Collection) item;
+                for (Object itemAsObject : itemsCollection) {
+                    if (itemAsObject instanceof Output) {
+                        Output itemAsOutput = (Output) itemAsObject;
+                        result.addAll(itemAsOutput.getSystemPropertyDependencies());
+                    } else {
+                        throw new RuntimeException("Incorrect type for post task data items.");
+                    }
+                }
+            } else {
+                throw new RuntimeException("Incorrect type for post task data items.");
+            }
+        }
+        return result;
+    }
 
 }

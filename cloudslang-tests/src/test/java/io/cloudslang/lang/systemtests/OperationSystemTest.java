@@ -10,19 +10,19 @@
 
 package io.cloudslang.lang.systemtests;
 
-import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.score.events.ScoreEvent;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -33,16 +33,13 @@ import java.util.Map;
 
 public class OperationSystemTest extends SystemsTestsParent {
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     @Test
     public void testCompileAndRunOperationBasic() throws Exception {
         URL resource = getClass().getResource("/yaml/test_op.sl");
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), null);
         //Trigger ExecutionPlan
         Map<String, Serializable> userInputs = new HashMap<>();
-        ScoreEvent event = trigger(compilationArtifact, userInputs, null);
+        ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 
@@ -56,7 +53,7 @@ public class OperationSystemTest extends SystemsTestsParent {
         userInputs.put("input2", "value2");
         userInputs.put("input4", "value4");
         userInputs.put("input5", "value5");
-        ScoreEvent event = trigger(compilationArtifact, userInputs, null);
+        ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
     @Test
@@ -71,7 +68,7 @@ public class OperationSystemTest extends SystemsTestsParent {
         exception.expect(RuntimeException.class);
         exception.expectMessage("input1");
         exception.expectMessage("Required");
-        ScoreEvent event = trigger(compilationArtifact, userInputs, null);
+        ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 
@@ -84,7 +81,7 @@ public class OperationSystemTest extends SystemsTestsParent {
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("host", "localhost");
         userInputs.put("port", "8080");
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getTasks();
         StepData execStepData = stepsData.get(EXEC_START_PATH);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, execStepData.getResult());
         Assert.assertEquals("http://localhost:8080", execStepData.getOutputs().get("url"));
@@ -98,7 +95,7 @@ public class OperationSystemTest extends SystemsTestsParent {
 
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("string", "please print it");
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getTasks();
         StepData execStepData = stepsData.get(EXEC_START_PATH);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, execStepData.getResult());
         Assert.assertEquals(120, execStepData.getOutputs().get("dur"));
@@ -110,7 +107,7 @@ public class OperationSystemTest extends SystemsTestsParent {
 
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), null);
 
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, null, null).getTasks();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, null, new HashSet<SystemProperty>()).getTasks();
         StepData execStepData = stepsData.get(EXEC_START_PATH);
         Assert.assertEquals(true, execStepData.getOutputs().get("condition_1"));
         Assert.assertEquals(false, execStepData.getOutputs().get("condition_2"));

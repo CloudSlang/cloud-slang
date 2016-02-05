@@ -11,17 +11,17 @@
 package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Output;
 
+import io.cloudslang.lang.entities.utils.ExpressionUtils;
+import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Date: 11/7/2014
@@ -29,14 +29,16 @@ import java.util.Map;
  * @author Bonczidai Levente
  */
 @Component
-public class OutputsBinding extends Binding {
+public class OutputsBinding {
 
     @Autowired
     ScriptEvaluator scriptEvaluator;
 
-    public Map<String, Serializable> bindOutputs(Map<String, Serializable> inputs,
-                                           Map<String, Serializable> actionReturnValues,
-                                           List<Output> possibleOutputs) {
+    public Map<String, Serializable> bindOutputs(
+            Map<String, Serializable> inputs,
+            Map<String, Serializable> actionReturnValues,
+            Set<SystemProperty> systemProperties,
+            List<Output> possibleOutputs) {
 
         Map<String, Serializable> outputs = new LinkedHashMap<>();
         //construct script context
@@ -48,7 +50,7 @@ public class OutputsBinding extends Binding {
                 String outputKey = output.getName();
                 Serializable rawValue = output.getValue();
                 Serializable valueToAssign = rawValue;
-                String expressionToEvaluate = extractExpression(rawValue);
+                String expressionToEvaluate = ExpressionUtils.extractExpression(rawValue);
                 if (expressionToEvaluate != null) {
                     //declare the new output
                     if (!actionReturnValues.containsKey(outputKey)) {
@@ -61,7 +63,7 @@ public class OutputsBinding extends Binding {
 
                     try {
                         //evaluate expression
-                        valueToAssign = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext);
+                        valueToAssign = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, output.getFunctionDependencies());
                     } catch (Throwable t) {
                         throw new RuntimeException("Error binding output: '" + output.getName() + "',\n\tError is: " + t.getMessage(), t);
                     }

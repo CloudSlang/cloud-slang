@@ -18,7 +18,7 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.runtime.bindings.ArgumentsBinding;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
-import io.cloudslang.lang.runtime.bindings.ScriptEvaluator;
+import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.*;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
@@ -30,13 +30,13 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.python.google.common.collect.Lists;
+import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.script.ScriptEngine;
 import java.io.Serializable;
 import java.util.*;
 
@@ -117,7 +117,11 @@ public class TaskStepsTest {
         resultMap.put("input1", 5);
         resultMap.put("input2", 3);
 
-        when(argumentsBinding.bindArguments(eq(arguments), anyMapOf(String.class, Serializable.class))).thenReturn(resultMap);
+        when(argumentsBinding.bindArguments(
+                eq(arguments),
+                anyMapOf(String.class, Serializable.class),
+                eq(runEnv.getSystemProperties())
+        )).thenReturn(resultMap);
 
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
         taskSteps.beginTask(arguments, null, runEnv, runtimeServices, "task1", 1L, 2L, "2");
@@ -179,6 +183,7 @@ public class TaskStepsTest {
         when(outputsBinding.bindOutputs(
                 anyMapOf(String.class, Serializable.class),
                 anyMapOf(String.class, Serializable.class),
+                eq(runEnv.getSystemProperties()),
                 anyListOf(Output.class)))
                 .thenReturn(new HashMap<String, Serializable>());
 
@@ -219,7 +224,10 @@ public class TaskStepsTest {
         boundPublish.put("name", "John");
 
         when(outputsBinding.bindOutputs(
-                anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class), eq(possiblePublishValues)))
+                anyMapOf(String.class, Serializable.class),
+                anyMapOf(String.class, Serializable.class),
+                eq(runEnv.getSystemProperties()),
+                eq(possiblePublishValues)))
                 .thenReturn(boundPublish);
         HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
         taskNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, new ResultNavigation(0, ScoreLangConstants.SUCCESS_RESULT));
@@ -314,12 +322,12 @@ public class TaskStepsTest {
         LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
-        when(loopsBinding.getOrCreateLoopCondition(statement, context, nodeName))
-                .thenReturn(new ForLoopCondition(Arrays.asList("1", "2")));
         RunEnvironment runEnv = new RunEnvironment();
+        when(loopsBinding.getOrCreateLoopCondition(statement, context, runEnv.getSystemProperties(), nodeName))
+                .thenReturn(new ForLoopCondition(Arrays.asList("1", "2")));
         runEnv.getStack().pushContext(context);
         taskSteps.beginTask(new ArrayList<Argument>(), statement, runEnv, createRuntimeServices(), nodeName, 1L, 2L, "2");
-        verify(loopsBinding).getOrCreateLoopCondition(statement, context, nodeName);
+        verify(loopsBinding).getOrCreateLoopCondition(statement, context, runEnv.getSystemProperties(), nodeName);
     }
 
     @Test
@@ -329,10 +337,10 @@ public class TaskStepsTest {
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
-        when(mockLoopCondition.hasMore()).thenReturn(false);
-        when(loopsBinding.getOrCreateLoopCondition(statement, context, nodeName))
-                .thenReturn(mockLoopCondition);
         RunEnvironment runEnv = new RunEnvironment();
+        when(mockLoopCondition.hasMore()).thenReturn(false);
+        when(loopsBinding.getOrCreateLoopCondition(statement, context, runEnv.getSystemProperties(), nodeName))
+                .thenReturn(mockLoopCondition);
         runEnv.getStack().pushContext(context);
         Long nextStepId = 2L;
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
@@ -349,10 +357,10 @@ public class TaskStepsTest {
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
-        when(mockLoopCondition.hasMore()).thenReturn(true);
-        when(loopsBinding.getOrCreateLoopCondition(statement, context, nodeName))
-                .thenReturn(mockLoopCondition);
         RunEnvironment runEnv = new RunEnvironment();
+        when(mockLoopCondition.hasMore()).thenReturn(true);
+        when(loopsBinding.getOrCreateLoopCondition(statement, context, runEnv.getSystemProperties(), nodeName))
+                .thenReturn(mockLoopCondition);
         runEnv.getStack().pushContext(context);
         Long nextStepId = 2L;
         ExecutionRuntimeServices runtimeServices = mock(ExecutionRuntimeServices.class);
@@ -371,10 +379,10 @@ public class TaskStepsTest {
         String nodeName = "task1";
         Context context = new Context(new HashMap<String, Serializable>());
         ForLoopCondition mockLoopCondition = mock(ForLoopCondition.class);
-        when(mockLoopCondition.hasMore()).thenReturn(true);
-        when(loopsBinding.getOrCreateLoopCondition(statement, context, nodeName))
-                .thenReturn(mockLoopCondition);
         RunEnvironment runEnv = new RunEnvironment();
+        when(mockLoopCondition.hasMore()).thenReturn(true);
+        when(loopsBinding.getOrCreateLoopCondition(statement, context, runEnv.getSystemProperties(), nodeName))
+                .thenReturn(mockLoopCondition);
         runEnv.getStack().pushContext(context);
         taskSteps.beginTask(new ArrayList<Argument>(), statement, runEnv, createRuntimeServices(), nodeName, 1L, 2L, "2");
         verify(loopsBinding).incrementListForLoop("x", context, mockLoopCondition);
@@ -475,8 +483,8 @@ public class TaskStepsTest {
         }
 
         @Bean
-        public ScriptEngine scriptEngine(){
-            return mock(ScriptEngine.class);
+        public PythonInterpreter evalInterpreter(){
+            return mock(PythonInterpreter.class);
         }
 
         @Bean
