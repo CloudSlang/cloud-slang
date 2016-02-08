@@ -29,7 +29,8 @@ public abstract class Executable {
     protected final List<Input> inputs;
     protected final List<Output> outputs;
     protected final List<Result> results;
-    protected final Set<String> dependencies;
+    protected final Set<String> executableDependencies;
+    protected final Set<String> systemPropertyDependencies;
 
     protected Executable(Map<String, Serializable> preExecActionData,
                          Map<String, Serializable> postExecActionData,
@@ -38,7 +39,8 @@ public abstract class Executable {
                          List<Input> inputs,
                          List<Output> outputs,
                          List<Result> results,
-                         Set<String> dependencies) {
+                         Set<String> executableDependencies,
+                         Set<String> systemPropertyDependencies) {
         this.preExecActionData = preExecActionData;
         this.postExecActionData = postExecActionData;
         this.namespace = namespace;
@@ -46,7 +48,8 @@ public abstract class Executable {
         this.inputs = inputs;
         this.outputs = outputs;
         this.results = results;
-        this.dependencies = dependencies;
+        this.executableDependencies = executableDependencies;
+        this.systemPropertyDependencies = systemPropertyDependencies;
     }
 
     public Map<String, Serializable> getPreExecActionData() {
@@ -81,8 +84,12 @@ public abstract class Executable {
         return results;
     }
 
-    public Set<String> getDependencies() {
-        return dependencies;
+    public Set<String> getExecutableDependencies() {
+        return executableDependencies;
+    }
+
+    public Set<String> getSystemPropertyDependencies() {
+        return systemPropertyDependencies;
     }
 
     public abstract String getType();

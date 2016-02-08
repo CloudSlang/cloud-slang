@@ -83,7 +83,7 @@ public class CompileOperationTest {
         Assert.assertEquals("There is a different number of operation inputs than expected", 1, operation.getInputs().size());
         Assert.assertEquals("There is a different number of operation outputs than expected", 2, operation.getOutputs().size());
         Assert.assertEquals("There is a different number of operation results than expected", 1, operation.getResults().size());
-        Assert.assertEquals("There is a different number of operation dependencies than expected", 0, operation.getDependencies().size());
+        Assert.assertEquals("There is a different number of operation dependencies than expected", 0, operation.getExecutableDependencies().size());
     }
 
     @Test

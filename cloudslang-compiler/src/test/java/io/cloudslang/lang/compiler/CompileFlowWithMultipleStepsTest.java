@@ -64,7 +64,7 @@ public class CompileFlowWithMultipleStepsTest {
         Assert.assertEquals("There is a different number of flow inputs than expected", 0, flow.getInputs().size());
         Assert.assertEquals("There is a different number of flow outputs than expected", 0, flow.getOutputs().size());
         Assert.assertEquals("There is a different number of flow results than expected", 2, flow.getResults().size());
-        Assert.assertEquals("There is a different number of flow dependencies than expected", 3, flow.getDependencies().size());
+        Assert.assertEquals("There is a different number of flow dependencies than expected", 3, flow.getExecutableDependencies().size());
     }
 
 }

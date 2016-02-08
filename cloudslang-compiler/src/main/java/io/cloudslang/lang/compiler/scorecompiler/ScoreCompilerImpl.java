@@ -52,18 +52,12 @@ public class ScoreCompilerImpl implements ScoreCompiler{
     @Autowired
     private DependenciesHelper dependenciesHelper;
 
-    @Autowired
-    private PublishTransformer publishTransformer;
-
-    @Autowired
-    private AggregateTransformer aggregateTransformer;
-
     @Override
     public CompilationArtifact compile(Executable executable, Set<Executable> path) {
 
         Map<String, Executable> filteredDependencies = new HashMap<>();
         //we handle dependencies only if the file has imports
-        boolean hasDependencies = CollectionUtils.isNotEmpty(executable.getDependencies())
+        boolean hasDependencies = CollectionUtils.isNotEmpty(executable.getExecutableDependencies())
                 && executable.getType().equals(SlangTextualKeys.FLOW_TYPE);
         if (hasDependencies) {
             Validate.notEmpty(path, "Source " + executable.getName() + " has dependencies but no path was given to the compiler");
@@ -151,73 +145,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
     private Set<String> getSystemPropertiesFromExecutables(Collection<Executable> executables) {
         Set<String> result = new HashSet<>();
         for(Executable executable : executables) {
-            result.addAll(getSystemPropertiesFromExecutable(executable));
-            if (SlangTextualKeys.FLOW_TYPE.equals(executable.getType())) {
-                Deque<Task> tasks = ((Flow) executable).getWorkflow().getTasks();
-                for (Task task : tasks) {
-                    result.addAll(getSystemPropertiesFromTask(task));
-                }
-            }
-        }
-        return result;
-    }
-
-    private Set<String> getSystemPropertiesFromExecutable(Executable executable) {
-        Set<String> result = new HashSet<>();
-        result.addAll(getSystemPropertiesFromInOutParam(executable.getInputs()));
-        result.addAll(getSystemPropertiesFromInOutParam(executable.getOutputs()));
-        result.addAll(getSystemPropertiesFromInOutParam(executable.getResults()));
-        return result;
-    }
-
-    private Set<String> getSystemPropertiesFromTask(Task task) {
-        Set<String> result = new HashSet<>();
-        List<Transformer> relevantTransformers = new ArrayList<>();
-        relevantTransformers.add(publishTransformer);
-        relevantTransformers.add(aggregateTransformer);
-
-        result.addAll(getSystemPropertiesFromInOutParam(task.getArguments()));
-        result.addAll(
-                getSystemPropertiesFromPostTaskActionData(
-                    task.getPostTaskActionData(),
-                    relevantTransformers
-                )
-        );
-
-        return result;
-    }
-
-    private Set<String> getSystemPropertiesFromInOutParam(List<? extends InOutParam> inOutParams) {
-        Set<String> result = new HashSet<>();
-        for(InOutParam inOutParam : inOutParams) {
-            Set<String> systemPropertyDependencies = inOutParam.getSystemPropertyDependencies();
-            if(CollectionUtils.isNotEmpty(systemPropertyDependencies)) {
-                result.addAll(systemPropertyDependencies);
-            }
-        }
-        return result;
-    }
-
-    private Set<String> getSystemPropertiesFromPostTaskActionData(
-            Map<String, Serializable> postTaskActionData,
-            List<Transformer> relevantTransformers) {
-        Set<String> result = new HashSet<>();
-        for (Transformer transformer : relevantTransformers) {
-            String key = TransformersHandler.keyToTransform(transformer);
-            Serializable item = postTaskActionData.get(key);
-            if (item instanceof Collection) {
-                Collection itemsCollection = (Collection) item;
-                for (Object itemAsObject : itemsCollection) {
-                    if (itemAsObject instanceof Output) {
-                        Output itemAsOutput = (Output) itemAsObject;
-                        result.addAll(itemAsOutput.getSystemPropertyDependencies());
-                    } else {
-                        throw new RuntimeException("Incorrect type for post task data items.");
-                    }
-                }
-            } else {
-                throw new RuntimeException("Incorrect type for post task data items.");
-            }
+            result.addAll(executable.getSystemPropertyDependencies());
         }
         return result;
     }
