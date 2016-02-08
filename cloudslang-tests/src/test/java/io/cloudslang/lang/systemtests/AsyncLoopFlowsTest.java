@@ -104,7 +104,7 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
 
     private Set<SystemProperty> getSystemProperties() {
         return Sets.newHashSet(
-                SystemProperty.createSystemProperty("loop", "async.prop1", "aggregate_value")
+                new SystemProperty("loop", "async.prop1", "aggregate_value")
         );
     }
 

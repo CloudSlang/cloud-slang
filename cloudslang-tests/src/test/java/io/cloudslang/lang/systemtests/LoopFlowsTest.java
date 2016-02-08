@@ -36,7 +36,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Map<String, Serializable> userInputs = new HashMap<>();
         Set<SystemProperty> systemProperties = new HashSet<>();
         systemProperties.add(
-                SystemProperty.createSystemProperty("loop", "for.prop1", "for_value")
+                new SystemProperty("loop", "for.prop1", "for_value")
         );
 
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, systemProperties).getTasks();

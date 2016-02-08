@@ -91,7 +91,7 @@ public class ScoreServicesImplTest {
         Map<String, Serializable > inputs = new HashMap<>();
         inputs.put("a", 1);
         Set<SystemProperty> systemProperties  = Sets.newHashSet(
-            SystemProperty.createSystemProperty("ns", "b", "c")
+            new SystemProperty("ns", "b", "c")
         );
 
         long executionID = scoreServicesImpl.trigger(compilationArtifact, inputs, systemProperties);
@@ -107,7 +107,7 @@ public class ScoreServicesImplTest {
         Map<String, Serializable > inputs = new HashMap<>();
         inputs.put("a", 1);
         Set<SystemProperty> systemProperties  = Sets.newHashSet(
-                SystemProperty.createSystemProperty("ns", "b", "c")
+                new SystemProperty("ns", "b", "c")
         );
 
         /* stubbing subscribeEvents method - mocking the behaviour of the EventBus
@@ -150,7 +150,7 @@ public class ScoreServicesImplTest {
         Map<String, Serializable > inputs = new HashMap<>();
         inputs.put("a", 1);
         Set<SystemProperty> systemProperties  = Sets.newHashSet(
-                SystemProperty.createSystemProperty("ns", "b", "c")
+                new SystemProperty("ns", "b", "c")
         );
 
         /* stubbing subscribeEvents method - mocking the behaviour of the EventBus
@@ -197,7 +197,7 @@ public class ScoreServicesImplTest {
         Map<String, Serializable > inputs = new HashMap<>();
         inputs.put("a", 1);
         Set<SystemProperty> systemProperties  = Sets.newHashSet(
-                SystemProperty.createSystemProperty("ns", "b", "c")
+                new SystemProperty("ns", "b", "c")
         );
 
         doAnswer(new Answer<Object>() {

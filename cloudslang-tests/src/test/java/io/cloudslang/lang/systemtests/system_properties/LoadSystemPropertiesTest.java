@@ -82,9 +82,9 @@ public class LoadSystemPropertiesTest extends SystemsTestsParent {
 
     private Set<SystemProperty> getSystemPropertiesBasic(String namespace) {
         return Sets.newHashSet(
-                SystemProperty.createSystemProperty(namespace, "host", "localhost"),
-                SystemProperty.createSystemProperty(namespace, "c.name", "john doe"),
-                SystemProperty.createSystemProperty(namespace, "restrict.out.port", "8080")
+                new SystemProperty(namespace, "host", "localhost"),
+                new SystemProperty(namespace, "c.name", "john doe"),
+                new SystemProperty(namespace, "restrict.out.port", "8080")
         );
     }
     
