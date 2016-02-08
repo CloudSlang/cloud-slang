@@ -38,10 +38,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
@@ -55,6 +52,7 @@ import static org.mockito.Mockito.mock;
 @ContextConfiguration(classes = SlangBuildTest.Config.class)
 public class SlangBuildTest {
 
+    private static final Set<String> systemPropertyDependencies = Collections.emptySet();
 	private static final CompilationArtifact emptyCompilationArtifact =
             new CompilationArtifact(
                     new ExecutionPlan(),
@@ -62,7 +60,7 @@ public class SlangBuildTest {
                     new ArrayList<Input>(),
                     new HashSet<String>()
             );
-	private static final Flow emptyExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, null, new HashSet<String>());
+	private static final Flow emptyExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, null, new HashSet<String>(), systemPropertyDependencies);
 
     @Autowired
     private SlangBuilder slangBuilder;
@@ -164,7 +162,7 @@ public class SlangBuildTest {
         URI resource = getClass().getResource("/no_dependencies").toURI();
         Set<String> flowDependencies = new HashSet<>();
         flowDependencies.add("dep1");
-        Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, null, flowDependencies);
+        Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, null, flowDependencies, systemPropertyDependencies);
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
         Mockito.when(scoreCompiler.compile(newExecutable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
         exception.expect(RuntimeException.class);
@@ -178,9 +176,9 @@ public class SlangBuildTest {
         URI resource = getClass().getResource("/dependencies").toURI();
         Set<String> flowDependencies = new HashSet<>();
         flowDependencies.add("dependencies.dependency");
-        Flow emptyFlowExecutable = new Flow(null, null, null, "dependencies", "empty_flow", null, null, null, flowDependencies);
+        Flow emptyFlowExecutable = new Flow(null, null, null, "dependencies", "empty_flow", null, null, null, flowDependencies, systemPropertyDependencies);
         Mockito.when(slangCompiler.preCompile(new SlangSource("", "empty_flow.sl"))).thenReturn(emptyFlowExecutable);
-        Flow dependencyExecutable = new Flow(null, null, null, "dependencies", "dependency", null, null, null, new HashSet<String>());
+        Flow dependencyExecutable = new Flow(null, null, null, "dependencies", "dependency", null, null, null, new HashSet<String>(), systemPropertyDependencies);
         Mockito.when(slangCompiler.preCompile(new SlangSource("", "dependency.sl"))).thenReturn(dependencyExecutable);
         HashSet<Executable> dependencies = new HashSet<>();
         dependencies.add(dependencyExecutable);
@@ -194,7 +192,7 @@ public class SlangBuildTest {
     @Test
     public void testInvalidNamespaceFlow() throws Exception {
         URI resource = getClass().getResource("/no_dependencies").toURI();
-        Flow newExecutable = new Flow(null, null, null, "wrong.namespace", "empty_flow", null, null, null, new HashSet<String>());
+        Flow newExecutable = new Flow(null, null, null, "wrong.namespace", "empty_flow", null, null, null, new HashSet<String>(), systemPropertyDependencies);
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
         exception.expect(RuntimeException.class);
         exception.expectMessage("Namespace");
@@ -205,7 +203,7 @@ public class SlangBuildTest {
     @Test
     public void testInvalidFlowName() throws Exception {
         URI resource = getClass().getResource("/no_dependencies").toURI();
-        Flow newExecutable = new Flow(null, null, null, "no_dependencies", "wrong_name", null, null, null, new HashSet<String>());
+        Flow newExecutable = new Flow(null, null, null, "no_dependencies", "wrong_name", null, null, null, new HashSet<String>(), systemPropertyDependencies);
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
         exception.expect(RuntimeException.class);
         exception.expectMessage("Name");
@@ -226,7 +224,7 @@ public class SlangBuildTest {
     @Test
     public void testValidFlowNamespaceWithAllValidCharsTypes() throws Exception {
         URI resource = getClass().getResource("/no_dependencies-0123456789").toURI();
-        Flow executable = new Flow(null, null, null, "no_dependencies-0123456789", "empty_flow", null, null, null, new HashSet<String>());
+        Flow executable = new Flow(null, null, null, "no_dependencies-0123456789", "empty_flow", null, null, null, new HashSet<String>(), systemPropertyDependencies);
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(executable);
         Mockito.when(scoreCompiler.compile(executable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null);
@@ -237,7 +235,7 @@ public class SlangBuildTest {
     @Test
     public void testValidFlowNamespaceCaseInsensitive() throws Exception {
         URI resource = getClass().getResource("/no_dependencies").toURI();
-        Flow executable = new Flow(null, null, null, "No_Dependencies", "empty_flow", null, null, null, new HashSet<String>());
+        Flow executable = new Flow(null, null, null, "No_Dependencies", "empty_flow", null, null, null, new HashSet<String>(), systemPropertyDependencies);
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(executable);
         Mockito.when(scoreCompiler.compile(executable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null);
@@ -248,7 +246,7 @@ public class SlangBuildTest {
     @Test
     public void testNamespaceWithInvalidCharsFlow() throws Exception {
         URI resource = getClass().getResource("/invalid-chars$").toURI();
-        Flow newExecutable = new Flow(null, null, null, "invalid-chars$", "empty_flow", null, null, null, new HashSet<String>());
+        Flow newExecutable = new Flow(null, null, null, "invalid-chars$", "empty_flow", null, null, null, new HashSet<String>(), systemPropertyDependencies);
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
         exception.expect(RuntimeException.class);
         exception.expectMessage("invalid-chars$");
