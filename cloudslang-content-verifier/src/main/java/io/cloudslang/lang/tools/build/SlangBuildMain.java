@@ -86,13 +86,13 @@ public class SlangBuildMain {
                 printBuildFailureSummary(projectPath, failedTests);
                 System.exit(1);
             } else {
-                printBuildSuccessSummary(projectPath, buildResults, runTestsResults, skippedTests);
+                printBuildSuccessSummary(contentPath, buildResults, runTestsResults, skippedTests);
                 System.exit(0);
             }
         } catch (Throwable e) {
             log.error("");
             log.error("------------------------------------------------------------");
-            log.error("Exception: " + e.getMessage() + "\n\nFAILURE: Validation of slang files under directory: \""
+            log.error("Exception: " + e.getMessage() + "\n\nFAILURE: Validation of slang files for project: \""
                     + projectPath + "\" failed.");
             log.error("------------------------------------------------------------");
             log.error("");
@@ -140,13 +140,13 @@ public class SlangBuildMain {
         return shouldOutputCoverageData;
     }
 
-    private static void printBuildSuccessSummary(String projectPath, SlangBuildResults buildResults, RunTestsResults runTestsResults, Map<String, TestRun> skippedTests) {
+    private static void printBuildSuccessSummary(String contentPath, SlangBuildResults buildResults, RunTestsResults runTestsResults, Map<String, TestRun> skippedTests) {
         log.info("");
         log.info("------------------------------------------------------------");
         log.info("BUILD SUCCESS");
         log.info("------------------------------------------------------------");
         log.info("Found " + buildResults.getNumberOfCompiledSources()
-                + " slang files under directory: \"" + projectPath + "\" and all are valid.");
+                + " slang files under directory: \"" + contentPath + "\" and all are valid.");
         log.info(runTestsResults.getPassedTests().size() + " test cases passed");
         if(skippedTests.size() > 0){
             log.info(skippedTests.size() + " test cases skipped");
