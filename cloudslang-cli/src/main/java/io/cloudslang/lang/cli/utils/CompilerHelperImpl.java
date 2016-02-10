@@ -45,6 +45,7 @@ public class CompilerHelperImpl implements CompilerHelper{
     private static final String[] YAML_FILE_EXTENSIONS = {"yaml", "yml"};
     private static final String SP_DIR = "properties"; //TODO reconsider it after closing CloudSlang file extensions & some real usecases
     private static final String INPUT_DIR = "inputs";
+    private static final String CONFIG_DIR = "configuration";
 
     @Autowired
     private Slang slang;
@@ -98,12 +99,14 @@ public class CompilerHelperImpl implements CompilerHelper{
 
     @Override
     public Set<SystemProperty> loadSystemProperties(List<String> systemPropertyFiles) {
-        return loadPropertiesFromFiles(convertToFiles(systemPropertyFiles), SLANG_FILE_EXTENSIONS, SP_DIR);
+        String propertiesRelativePath = CONFIG_DIR + File.separator + SP_DIR;
+        return loadPropertiesFromFiles(convertToFiles(systemPropertyFiles), SLANG_FILE_EXTENSIONS, propertiesRelativePath);
     }
 
     @Override
     public Map<String, Serializable> loadInputsFromFile(List<String> inputFiles) {
-        return loadMapsFromFiles(convertToFiles(inputFiles), YAML_FILE_EXTENSIONS, INPUT_DIR);
+        String inputsRelativePath = CONFIG_DIR + File.separator + INPUT_DIR;
+        return loadMapsFromFiles(convertToFiles(inputFiles), YAML_FILE_EXTENSIONS, inputsRelativePath);
     }
 
     @Override
@@ -176,7 +179,7 @@ public class CompilerHelperImpl implements CompilerHelper{
     private Collection<File> loadDefaultFiles(String[] extensions, String directory, boolean recursive) {
         Collection<File> files;
         String appHome = System.getProperty("app.home", "");
-        String defaultDirectoryPath = appHome + File.separator + "bin" + File.separator + directory;
+        String defaultDirectoryPath = appHome + File.separator + directory;
         File defaultDirectory = new File(defaultDirectoryPath);
         if (defaultDirectory.isDirectory()) {
             files = FileUtils.listFiles(defaultDirectory, extensions, recursive);
