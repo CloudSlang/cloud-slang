@@ -11,7 +11,6 @@ package io.cloudslang.lang.tools.build.commands;
 
 import com.beust.jcommander.DynamicParameter;
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
 import com.beust.jcommander.converters.CommaParameterSplitter;
 
 import java.util.ArrayList;
@@ -45,9 +44,8 @@ public class ApplicationArgs {
             description = "Whether or not test coverage data should be outputted")
     public boolean coverage = false;
 
-
     @Parameter(names = {"--help", "-h"}, help = true,
-            description = "Print this message")
+            description = "Display help information")
     private boolean help;
 
     @DynamicParameter(names = "-D", description = "Dynamic parameters go here")
