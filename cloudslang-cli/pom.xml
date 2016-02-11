@@ -95,6 +95,12 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>io.cloudslang.content</groupId>
+			<artifactId>score-vmware</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
 		<!-- test -->
 		<dependency>
 			<groupId>org.mockito</groupId>
