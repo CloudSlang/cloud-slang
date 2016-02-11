@@ -35,7 +35,7 @@ public class MetadataExtractorImpl implements MetadataExtractor {
         Validate.notNull(source, "You must supply a source to extract the metadata from");
         Map<String, String> metadataMap = metadataParser.parse(source);
         Metadata metadata = metadataModeller.createModel(metadataMap);
-        if (metadataMap.size() > 0) {
+        if (metadataMap.size() > 1 && !"".equals(metadata.getNamespace())) {
             Validate.notEmpty(metadata.getDescription(),"Operation/Flow must have a description");
         }
         return metadata;

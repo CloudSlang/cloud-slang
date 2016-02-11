@@ -10,9 +10,9 @@ package io.cloudslang.lang.cli.utils;
 
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.DumperOptions;
@@ -62,6 +62,7 @@ public class MetadataHelperImpl implements MetadataHelper {
             String lineBreak = dumperOptions.getLineBreak().getString();
             String result = yaml.dump(cleanWhiteSpaces(metadata, lineBreak));
             result = result.substring(result.indexOf(lineBreak) + 1);
+            result = result.replaceAll("(?m)^" + SlangTextualKeys.NAMESPACE + ".*\n", "");
             return result;
         }
     }

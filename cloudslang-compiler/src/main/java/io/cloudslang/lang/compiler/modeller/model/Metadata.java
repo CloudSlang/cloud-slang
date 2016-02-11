@@ -10,6 +10,7 @@ public class Metadata {
 
     private String description;
     private String prerequisites;
+    private String namespace;
     private Map<String, String> inputs;
     private Map<String, String> outputs;
     private Map<String, String> results;
@@ -52,5 +53,13 @@ public class Metadata {
 
     public void setPrerequisites(String prerequisites) {
         this.prerequisites = prerequisites;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
     }
 }
