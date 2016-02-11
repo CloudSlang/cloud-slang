@@ -194,6 +194,13 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+            <dependency>
+                <groupId>io.cloudslang.content</groupId>
+                <artifactId>score-vmware</artifactId>
+                <version>0.0.1</version>
+            </dependency>
+
             <!--end of score content dependencies-->
 
             <dependency>
