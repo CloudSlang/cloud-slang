@@ -45,6 +45,7 @@ public class CompilerHelperImpl implements CompilerHelper{
     private static final String[] YAML_FILE_EXTENSIONS = {"yaml", "yml"};
     private static final String SP_DIR = "properties"; //TODO reconsider it after closing CloudSlang file extensions & some real usecases
     private static final String INPUT_DIR = "inputs";
+    private static final String CONFIG_DIR = "configuration";
 
     @Autowired
     private Slang slang;
@@ -90,12 +91,14 @@ public class CompilerHelperImpl implements CompilerHelper{
 
     @Override
     public Set<SystemProperty> loadSystemProperties(List<String> systemPropertyFiles) {
-        return loadPropertiesFromFiles(convertToFiles(systemPropertyFiles), PROPERTIES_FILE_EXTENSIONS, SP_DIR);
+        String propertiesRelativePath = CONFIG_DIR + File.separator + SP_DIR;
+        return loadPropertiesFromFiles(convertToFiles(systemPropertyFiles), PROPERTIES_FILE_EXTENSIONS, propertiesRelativePath);
     }
 
     @Override
     public Map<String, Serializable> loadInputsFromFile(List<String> inputFiles) {
-        return loadMapsFromFiles(convertToFiles(inputFiles), YAML_FILE_EXTENSIONS, INPUT_DIR);
+        String inputsRelativePath = CONFIG_DIR + File.separator + INPUT_DIR;
+        return loadMapsFromFiles(convertToFiles(inputFiles), YAML_FILE_EXTENSIONS, inputsRelativePath);
     }
 
     private Map<String, Serializable> loadMapsFromFiles(List<File> files, String[] extensions, String directory) {
@@ -161,7 +164,7 @@ public class CompilerHelperImpl implements CompilerHelper{
     private Collection<File> loadDefaultFiles(String[] extensions, String directory, boolean recursive) {
         Collection<File> files;
         String appHome = System.getProperty("app.home", "");
-        String defaultDirectoryPath = appHome + File.separator + "bin" + File.separator + directory;
+        String defaultDirectoryPath = appHome + File.separator + directory;
         File defaultDirectory = new File(defaultDirectoryPath);
         if (defaultDirectory.isDirectory()) {
             files = FileUtils.listFiles(defaultDirectory, extensions, recursive);
@@ -184,9 +187,21 @@ public class CompilerHelperImpl implements CompilerHelper{
     private Boolean hasExtension(File file, String[] extensions){
         String[] suffixes = new String[extensions.length];
         for(int i = 0; i < suffixes.length; ++i){
-            suffixes[i] = "." + extensions[i];
+            suffixes[i] = "." + SLANG_FILE_EXTENSIONS[i];
         }
         return new SuffixFileFilter(suffixes).accept(file);
+    }
+
+    private boolean isExecutable(SlangSource source) {
+        Object yamlObject = yaml.load(source.getSource());
+        if (yamlObject instanceof Map) {
+            Map yamlObjectAsMap = (Map) yamlObject;
+            return
+                    yamlObjectAsMap.containsKey(SlangTextualKeys.FLOW_TYPE) ||
+                            yamlObjectAsMap.containsKey(SlangTextualKeys.OPERATION_TYPE);
+        } else {
+            return false;
+        }
     }
 
     private List<File> convertToFiles(List<String> fileList) {
