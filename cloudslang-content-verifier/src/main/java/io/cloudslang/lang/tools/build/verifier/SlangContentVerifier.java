@@ -9,25 +9,19 @@
  */
 package io.cloudslang.lang.tools.build.verifier;
 
-import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.SlangCompiler;
+import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
+import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
+import io.cloudslang.lang.entities.CompilationArtifact;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
-import io.cloudslang.lang.compiler.SlangCompiler;
-import io.cloudslang.lang.compiler.SlangSource;
-import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
-import io.cloudslang.lang.entities.CompilationArtifact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +34,7 @@ public class SlangContentVerifier {
     private final static Logger log = Logger.getLogger(SlangContentVerifier.class);
 
     private String[] SLANG_FILE_EXTENSIONS = {"sl", "sl.yaml", "sl.yml"};
+    private static final String[] PROPERTIES_FILE_EXTENSIONS = {"prop.sl"};
 
     @Autowired
     private SlangCompiler slangCompiler;
@@ -47,37 +42,28 @@ public class SlangContentVerifier {
     @Autowired
     private ScoreCompiler scoreCompiler;
 
-    @Autowired
-    private Yaml yaml;
-
     public Map<String, Executable> createModelsAndValidate(String directoryPath) {
         Validate.notEmpty(directoryPath, "You must specify a path");
         Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" + directoryPath + "\' does not lead to a directory");
         Map<String, Executable> slangModels = new HashMap<>();
-        Collection<File> slangFiles = FileUtils.listFiles(new File(directoryPath), SLANG_FILE_EXTENSIONS, true);
+        Collection<File> slangFiles = listFiles(new File(directoryPath), SLANG_FILE_EXTENSIONS, true, PROPERTIES_FILE_EXTENSIONS);
         log.info("Start compiling all slang files under: " + directoryPath);
         log.info(slangFiles.size() + " .sl files were found");
         log.info("");
         int ignoredExecutables = 0;
         for(File slangFile: slangFiles){
             Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() + "\' must lead to a file");
-            if (isSystemPropertyFile(SlangSource.fromFile(slangFile))) {
-                ++ignoredExecutables;
-                log.info("Ignoring file: " + slangFile.getName() + " (not a valid executable)." +
-                        " Top level key '" + SlangTextualKeys.SYSTEM_PROPERTY_KEY + "' found instead of '" + SlangTextualKeys.FLOW_TYPE + "'/'" + SlangTextualKeys.OPERATION_TYPE + "'.");
-            } else {
-                Executable sourceModel;
-                try {
-                    sourceModel = slangCompiler.preCompile(SlangSource.fromFile(slangFile));
-                } catch (Exception e) {
-                    String errorMessage = "Failed creating Slang models for file: \'" + slangFile.getAbsoluteFile() + "\'.\n" + e.getMessage();
-                    log.error(errorMessage);
-                    throw new RuntimeException(errorMessage, e);
-                }
-                if (sourceModel != null) {
-                    staticSlangFileValidation(slangFile, sourceModel);
-                    slangModels.put(getUniqueName(sourceModel), sourceModel);
-                }
+            Executable sourceModel;
+            try {
+                sourceModel = slangCompiler.preCompile(SlangSource.fromFile(slangFile));
+            } catch (Exception e) {
+                String errorMessage = "Failed creating Slang models for file: \'" + slangFile.getAbsoluteFile() + "\'.\n" + e.getMessage();
+                log.error(errorMessage);
+                throw new RuntimeException(errorMessage, e);
+            }
+            if (sourceModel != null) {
+                staticSlangFileValidation(slangFile, sourceModel);
+                slangModels.put(getUniqueName(sourceModel), sourceModel);
             }
         }
         int numberOfExecutables = slangFiles.size() - ignoredExecutables;
@@ -168,17 +154,27 @@ public class SlangContentVerifier {
         Validate.isTrue(fileNameNoExtension.equals(executable.getName()), executableNameErrorMessage);
     }
 
-    private boolean isSystemPropertyFile(SlangSource source) {
-        Object yamlObject = yaml.load(source.getSource());
-        if (yamlObject instanceof Map) {
-            Map yamlObjectAsMap = (Map) yamlObject;
-            return
-                    yamlObjectAsMap.containsKey(SlangTextualKeys.SYSTEM_PROPERTY_KEY) &&
-                            !yamlObjectAsMap.containsKey(SlangTextualKeys.FLOW_TYPE) &&
-                            !yamlObjectAsMap.containsKey(SlangTextualKeys.OPERATION_TYPE);
-        } else {
-            return false;
+    // e.g. exclude .prop.sl from .sl set
+    private Collection<File> listFiles(
+            File directory,
+            String[] extensions,
+            boolean recursive,
+            String[] excludedExtensions) {
+        Collection<File> dependenciesFiles = FileUtils.listFiles(directory, extensions, recursive);
+        Collection<File> result = new ArrayList<>();
+        for (File file : dependenciesFiles) {
+            boolean accepted = true;
+            for (String excludedExtension : excludedExtensions) {
+                if (file.getName().endsWith("." + excludedExtension)) {
+                    accepted = false;
+                    break;
+                }
+            }
+            if (accepted) {
+                result.add(file);
+            }
         }
+        return result;
     }
 
 }
