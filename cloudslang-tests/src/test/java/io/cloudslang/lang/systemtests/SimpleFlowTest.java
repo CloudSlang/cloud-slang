@@ -31,9 +31,9 @@ public class SimpleFlowTest extends SystemsTestsParent {
     @SuppressWarnings("unchecked")
     private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
 	static {
-		SYS_PROPS.add(SystemProperty.createSystemProperty("user.sys", "props.host", "localhost"));
-        SYS_PROPS.add(SystemProperty.createSystemProperty("user.sys", "props.port", "22"));
-        SYS_PROPS.add(SystemProperty.createSystemProperty("user.sys", "props.alla", "balla"));
+		SYS_PROPS.add(new SystemProperty("user.sys", "props.host", "localhost"));
+        SYS_PROPS.add(new SystemProperty("user.sys", "props.port", "22"));
+        SYS_PROPS.add(new SystemProperty("user.sys", "props.alla", "balla"));
 	}
 
     private static final long DEFAULT_TIMEOUT = 20000;

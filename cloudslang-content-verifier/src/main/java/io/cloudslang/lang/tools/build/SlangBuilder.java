@@ -124,7 +124,7 @@ public class SlangBuilder {
             if(testFlowModel == null){
                 return;
             }
-            addAllDependenciesToCoveredContent(coveredContent, testFlowModel.getDependencies(), contentSlangModels);
+            addAllDependenciesToCoveredContent(coveredContent, testFlowModel.getExecutableDependencies(), contentSlangModels);
         }
         Set<String> contentExecutablesNames = contentSlangModels.keySet();
         // Add to the covered content set also all the direct test case's test flows, which are part of the tested content
@@ -161,7 +161,7 @@ public class SlangBuilder {
             Executable executable = contentSlangModels.get(dependency);
             // Executable will be null in case of a dependecy which is a test flow (and not patr of the content)
             if(executable != null) {
-                addAllDependenciesToCoveredContent(allDependencies, executable.getDependencies(), contentSlangModels);
+                addAllDependenciesToCoveredContent(allDependencies, executable.getExecutableDependencies(), contentSlangModels);
             }
         }
     }

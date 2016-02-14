@@ -29,10 +29,7 @@ public class SystemProperty implements Serializable {
     private final String fullyQualifiedName;
     private final String value;
 
-    public static SystemProperty createSystemProperty(
-            String namespace,
-            String key,
-            String value) {
+    public SystemProperty(String namespace, String key, String value) {
         Validate.notNull(namespace, "System property namespace cannot be null");
         Validate.notEmpty(key, "System property key cannot be empty");
 
@@ -43,13 +40,13 @@ public class SystemProperty implements Serializable {
             fullyQualifiedName = key;
         }
 
-        return new SystemProperty(namespace, fullyQualifiedName, value);
-    }
-
-    private SystemProperty(String namespace, String fullyQualifiedName, String value) {
         this.namespace = namespace;
         this.fullyQualifiedName = fullyQualifiedName;
         this.value = value;
+    }
+
+    public SystemProperty(String key, String value) {
+        this("", key, value);
     }
 
     /**
@@ -57,7 +54,9 @@ public class SystemProperty implements Serializable {
      */
     @SuppressWarnings("unused")
     private SystemProperty() {
-        this(null, null, null);
+        namespace = null;
+        fullyQualifiedName = null;
+        value = null;
     }
 
     public String getNamespace() {

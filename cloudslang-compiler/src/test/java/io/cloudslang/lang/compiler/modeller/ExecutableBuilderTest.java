@@ -1,6 +1,8 @@
 package io.cloudslang.lang.compiler.modeller;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.modeller.transformers.AggregateTransformer;
+import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import org.junit.*;
@@ -339,6 +341,21 @@ public class ExecutableBuilderTest {
         @Bean
         public Transformer transformer() {
             return Mockito.mock(Transformer.class);
+        }
+
+        @Bean
+        public DependenciesHelper dependenciesHelper() {
+            return Mockito.mock(DependenciesHelper.class);
+        }
+
+        @Bean
+        public PublishTransformer publishTransformer() {
+            return Mockito.mock(PublishTransformer.class);
+        }
+
+        @Bean
+        public AggregateTransformer aggregateTransformer() {
+            return Mockito.mock(AggregateTransformer.class);
         }
 
         @Bean

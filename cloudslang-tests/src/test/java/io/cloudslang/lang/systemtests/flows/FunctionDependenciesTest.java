@@ -167,15 +167,15 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
 
     private Set<SystemProperty> prepareSystemProperties() {
         return Sets.newHashSet(
-                SystemProperty.createSystemProperty("a.b", "c.host", "localhost"),
-                SystemProperty.createSystemProperty("cloudslang", "lang.key", "language"),
-                SystemProperty.createSystemProperty("", "a.b.c.null_value", null),
-                SystemProperty.createSystemProperty("propagate", "flow.input", "flowInput_"),
-                SystemProperty.createSystemProperty("propagate", "task.argument", "taskArg_"),
-                SystemProperty.createSystemProperty("propagate", "op.input", "opInput_"),
-                SystemProperty.createSystemProperty("propagate", "op.output", "opOutput_"),
-                SystemProperty.createSystemProperty("propagate", "task.publish", "taskPublish_"),
-                SystemProperty.createSystemProperty("propagate", "flow.output", "flowOutput_")
+                new SystemProperty("a.b", "c.host", "localhost"),
+                new SystemProperty("cloudslang", "lang.key", "language"),
+                new SystemProperty("", "a.b.c.null_value", null),
+                new SystemProperty("propagate", "flow.input", "flowInput_"),
+                new SystemProperty("propagate", "task.argument", "taskArg_"),
+                new SystemProperty("propagate", "op.input", "opInput_"),
+                new SystemProperty("propagate", "op.output", "opOutput_"),
+                new SystemProperty("propagate", "task.publish", "taskPublish_"),
+                new SystemProperty("propagate", "flow.output", "flowOutput_")
         );
     }
 

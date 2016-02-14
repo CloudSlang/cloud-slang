@@ -62,7 +62,7 @@ public class ScriptEvaluatorTest {
     @Test
     public void testEvalFunctions() throws Exception {
         Set<SystemProperty> props = new HashSet<>();
-        SystemProperty systemProperty = SystemProperty.createSystemProperty("a.b", "c.key", "value");
+        SystemProperty systemProperty = new SystemProperty("a.b", "c.key", "value");
         props.add(systemProperty);
         Map<String, String> propsAsMap = new HashMap<>();
         propsAsMap.put(systemProperty.getFullyQualifiedName(), systemProperty.getValue());

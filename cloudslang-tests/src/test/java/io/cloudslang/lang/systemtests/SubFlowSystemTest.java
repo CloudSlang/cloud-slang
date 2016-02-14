@@ -45,8 +45,8 @@ public class SubFlowSystemTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
         Assert.assertEquals("the system properties size is not as expected", 2, compilationArtifact.getSystemProperties().size());
 		Set<SystemProperty> systemProperties = new HashSet<>();
-        systemProperties.add(SystemProperty.createSystemProperty("user.sys", "props.port", "22"));
-        systemProperties.add(SystemProperty.createSystemProperty("user.sys", "props.alla", "balla"));
+        systemProperties.add(new SystemProperty("user.sys", "props.port", "22"));
+        systemProperties.add(new SystemProperty("user.sys", "props.alla", "balla"));
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("input1", "value1");
         ScoreEvent event = trigger(compilationArtifact, userInputs, systemProperties);

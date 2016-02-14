@@ -119,9 +119,9 @@ public class CompilerHelperTest {
 	@Test
 	public void testLoadSystemProperties() throws Exception {
 		Set<SystemProperty> systemProperties = Sets.newHashSet(
-                SystemProperty.createSystemProperty("user.sys", "props.host", "localhost"),
-                SystemProperty.createSystemProperty("user.sys", "props.port", "22"),
-                SystemProperty.createSystemProperty("user.sys", "props.alla", "balla")
+                new SystemProperty("user.sys", "props.host", "localhost"),
+                new SystemProperty("user.sys", "props.port", "22"),
+                new SystemProperty("user.sys", "props.alla", "balla")
         );
 		URI systemPropertyURI = getClass().getResource("/properties/system_properties.sl").toURI();
         SlangSource source = SlangSource.fromFile(systemPropertyURI);
