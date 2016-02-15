@@ -33,12 +33,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.*;
@@ -57,6 +52,8 @@ public class ExecutionPlanBuilderTest {
 
     @Mock
     private ExecutionStepFactory stepFactory;
+
+    private Set<String> systemPropertyDependencies = Collections.emptySet();
 
     private Task createSimpleCompiledAsyncTask(String taskName) {
         return createSimpleCompiledTask(taskName, true);
@@ -166,7 +163,7 @@ public class ExecutionPlanBuilderTest {
         List<Result> results = new ArrayList<>();
 
         Operation compiledOperation =
-                new Operation(preOpActionData, postOpActionData, action, opNamespace, operationName, inputs, outputs, results, null);
+                new Operation(preOpActionData, postOpActionData, action, opNamespace, operationName, inputs, outputs, results, null, systemPropertyDependencies);
 
         mockStartStep(compiledOperation);
         when(stepFactory.createActionStep(eq(2L), same(actionData))).thenReturn(new ExecutionStep(2L));
@@ -195,7 +192,7 @@ public class ExecutionPlanBuilderTest {
         List<Result> results = defaultFlowResults();
 
         Flow compiledFlow =
-                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null);
+                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null, systemPropertyDependencies);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
@@ -224,7 +221,7 @@ public class ExecutionPlanBuilderTest {
         List<Result> results = defaultFlowResults();
 
         Flow compiledFlow =
-                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null);
+                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null, systemPropertyDependencies);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
@@ -274,7 +271,7 @@ public class ExecutionPlanBuilderTest {
 
 
         Flow compiledFlow =
-                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null);
+                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null, systemPropertyDependencies);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
@@ -304,7 +301,7 @@ public class ExecutionPlanBuilderTest {
         List<Result> results = new ArrayList<>();
 
         Flow compiledFlow =
-                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null);
+                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null, systemPropertyDependencies);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);

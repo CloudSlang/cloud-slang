@@ -43,7 +43,7 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
 
     private Set<SystemProperty> getSystemProperties() {
         return Sets.newHashSet(
-                SystemProperty.createSystemProperty("user.sys", "props.host", "localhost")
+                new SystemProperty("user.sys", "props.host", "localhost")
         );
     }
 

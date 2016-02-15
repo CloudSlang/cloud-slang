@@ -101,7 +101,7 @@ public class SlangContentVerifier {
 
     private Set<Executable> getModelDependenciesRecursively(Map<String, Executable> slangModels, Executable slangModel) {
         Set<Executable> dependenciesModels = new HashSet<>();
-        for (String dependencyName : slangModel.getDependencies()) {
+        for (String dependencyName : slangModel.getExecutableDependencies()) {
             Executable dependency = slangModels.get(dependencyName);
             if(dependency == null){
                 throw new RuntimeException("Failed compiling slang source: " + slangModel.getNamespace() + "." +

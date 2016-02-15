@@ -98,7 +98,7 @@ public class SlangCompilerImpl implements SlangCompiler {
             Set<Map.Entry<String, Object>> entrySet = rawSystemProperties.entrySet();
             for (Map.Entry<String, Object> entry : entrySet) {
                 Object value = entry.getValue();
-                SystemProperty property = SystemProperty.createSystemProperty(
+                SystemProperty property = new SystemProperty(
                         namespace == null ? "" : namespace,
                         entry.getKey(),
                         value == null ? null : value.toString()

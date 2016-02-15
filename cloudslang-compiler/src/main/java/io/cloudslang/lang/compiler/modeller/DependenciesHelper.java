@@ -15,12 +15,21 @@ package io.cloudslang.lang.compiler.modeller;
 import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
+import io.cloudslang.lang.compiler.modeller.model.Task;
+import io.cloudslang.lang.compiler.modeller.transformers.AggregateTransformer;
+import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
+import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
+import io.cloudslang.lang.entities.bindings.InOutParam;
+import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.Result;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.Serializable;
+import java.util.*;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
@@ -28,6 +37,13 @@ import static org.hamcrest.Matchers.equalTo;
 
 @Component
 public class DependenciesHelper {
+
+    @Autowired
+    private PublishTransformer publishTransformer;
+
+    @Autowired
+    private AggregateTransformer aggregateTransformer;
+
     /**
      * recursive matches executables with their references
      *
@@ -43,7 +59,7 @@ public class DependenciesHelper {
     private Map<String, Executable> fetchFlowReferences(Executable executable,
                                                                 Collection<Executable> availableDependencies,
                                                                 Map<String, Executable> resolvedDependencies) {
-        for (String refId : executable.getDependencies()) {
+        for (String refId : executable.getExecutableDependencies()) {
             //if it is already in the references we do nothing
             if (resolvedDependencies.get(refId) == null) {
                 Executable matchingRef = Lambda.selectFirst(availableDependencies, having(on(Executable.class).getId(), equalTo(refId)));
@@ -61,6 +77,89 @@ public class DependenciesHelper {
             }
         }
         return resolvedDependencies;
+    }
+
+    public Set<String> getSystemPropertiesForFlow(
+            List<Input> inputs,
+            List<Output> outputs,
+            List<Result> results,
+            Deque<Task> tasks) {
+        Set<String> result = new HashSet<>();
+        result.addAll(getSystemPropertiesFromExecutable(inputs, outputs, results));
+        for (Task task : tasks) {
+            result.addAll(getSystemPropertiesFromTask(task));
+        }
+        return result;
+    }
+
+    public Set<String> getSystemPropertiesForOperation(
+            List<Input> inputs,
+            List<Output> outputs,
+            List<Result> results) {
+        return getSystemPropertiesFromExecutable(inputs, outputs, results);
+    }
+
+    private Set<String> getSystemPropertiesFromExecutable(
+            List<Input> inputs,
+            List<Output> outputs,
+            List<Result> results) {
+        Set<String> result = new HashSet<>();
+        result.addAll(getSystemPropertiesFromInOutParam(inputs));
+        result.addAll(getSystemPropertiesFromInOutParam(outputs));
+        result.addAll(getSystemPropertiesFromInOutParam(results));
+        return result;
+    }
+
+    private Set<String> getSystemPropertiesFromTask(Task task) {
+        Set<String> result = new HashSet<>();
+        List<Transformer> relevantTransformers = new ArrayList<>();
+        relevantTransformers.add(publishTransformer);
+        relevantTransformers.add(aggregateTransformer);
+
+        result.addAll(getSystemPropertiesFromInOutParam(task.getArguments()));
+        result.addAll(
+                getSystemPropertiesFromPostTaskActionData(
+                        task.getPostTaskActionData(),
+                        relevantTransformers
+                )
+        );
+
+        return result;
+    }
+
+    private Set<String> getSystemPropertiesFromInOutParam(List<? extends InOutParam> inOutParams) {
+        Set<String> result = new HashSet<>();
+        for(InOutParam inOutParam : inOutParams) {
+            Set<String> systemPropertyDependencies = inOutParam.getSystemPropertyDependencies();
+            if(CollectionUtils.isNotEmpty(systemPropertyDependencies)) {
+                result.addAll(systemPropertyDependencies);
+            }
+        }
+        return result;
+    }
+
+    private Set<String> getSystemPropertiesFromPostTaskActionData(
+            Map<String, Serializable> postTaskActionData,
+            List<Transformer> relevantTransformers) {
+        Set<String> result = new HashSet<>();
+        for (Transformer transformer : relevantTransformers) {
+            String key = TransformersHandler.keyToTransform(transformer);
+            Serializable item = postTaskActionData.get(key);
+            if (item instanceof Collection) {
+                Collection itemsCollection = (Collection) item;
+                for (Object itemAsObject : itemsCollection) {
+                    if (itemAsObject instanceof Output) {
+                        Output itemAsOutput = (Output) itemAsObject;
+                        result.addAll(itemAsOutput.getSystemPropertyDependencies());
+                    } else {
+                        throw new RuntimeException("Incorrect type for post task data items.");
+                    }
+                }
+            } else {
+                throw new RuntimeException("Incorrect type for post task data items.");
+            }
+        }
+        return result;
     }
 
 }
