@@ -77,10 +77,10 @@ public class CompilerHelperTest {
 
     @Test
 	public void testDependenciesFileParentFolder() throws Exception {
-		URI flowPath = getClass().getResource("/executables/dir3/flow.sl").toURI();
+        URI flowPath = getClass().getResource("/executables/dir3/flow.sl").toURI();
         URI opPath = getClass().getResource("/executables/dir3/dir3_1/test_op.sl").toURI();
-		compilerHelper.compile(flowPath.getPath(), null);
-		Mockito.verify(slang).compile(
+        compilerHelper.compile(flowPath.getPath(), null);
+        Mockito.verify(slang).compile(
                 SlangSource.fromFile(flowPath),
                 Sets.newHashSet(
                         SlangSource.fromFile(opPath),
