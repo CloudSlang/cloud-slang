@@ -11,7 +11,6 @@ package io.cloudslang.lang.cli.utils;
 import ch.lambdaj.function.convert.Converter;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
-import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import org.apache.commons.collections4.CollectionUtils;
@@ -188,21 +187,9 @@ public class CompilerHelperImpl implements CompilerHelper{
     private Boolean hasExtension(File file, String[] extensions){
         String[] suffixes = new String[extensions.length];
         for(int i = 0; i < suffixes.length; ++i){
-            suffixes[i] = "." + SLANG_FILE_EXTENSIONS[i];
+            suffixes[i] = "." + extensions[i];
         }
         return new SuffixFileFilter(suffixes).accept(file);
-    }
-
-    private boolean isExecutable(SlangSource source) {
-        Object yamlObject = yaml.load(source.getSource());
-        if (yamlObject instanceof Map) {
-            Map yamlObjectAsMap = (Map) yamlObject;
-            return
-                    yamlObjectAsMap.containsKey(SlangTextualKeys.FLOW_TYPE) ||
-                            yamlObjectAsMap.containsKey(SlangTextualKeys.OPERATION_TYPE);
-        } else {
-            return false;
-        }
     }
 
     private List<File> convertToFiles(List<String> fileList) {

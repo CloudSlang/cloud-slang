@@ -21,6 +21,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -32,19 +33,16 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = CompilerHelperTest.Config.class)
 public class CompilerHelperTest {
+
+    private static final String APP_HOME = "app.home";
 
     @Autowired
     private CompilerHelper compilerHelper;
@@ -105,8 +103,8 @@ public class CompilerHelperTest {
     public void testCompileMixedSlangFiles() throws Exception {
         URI flowFilePath = getClass().getResource("/flow.sl").toURI();
         URI folderPath = getClass().getResource("/mixed_sl_files/").toURI();
-        URI dependency1 = getClass().getResource("/mixed_sl_files/executables/test_flow.sl").toURI();
-        URI dependency2 = getClass().getResource("/mixed_sl_files/executables/test_op.sl").toURI();
+        URI dependency1 = getClass().getResource("/mixed_sl_files/configuration/properties/executables/test_flow.sl").toURI();
+        URI dependency2 = getClass().getResource("/mixed_sl_files/configuration/properties/executables/test_op.sl").toURI();
         compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(folderPath.getPath()));
         Mockito.verify(slang).compile(
                 SlangSource.fromFile(flowFilePath),
@@ -173,7 +171,23 @@ public class CompilerHelperTest {
 
     @Test
     public void testLoadSystemPropertiesDefaultFolder() throws Exception {
-        // TODO
+        String initialValue = System.getProperty(APP_HOME, "");
+        String defaultDirPath = getClass().getResource("/mixed_sl_files/").getPath();
+        System.setProperty(APP_HOME, defaultDirPath);
+
+        compilerHelper.loadSystemProperties(Collections.<String>emptyList());
+
+        ArgumentCaptor<SlangSource> sourceCaptor = ArgumentCaptor.forClass(SlangSource.class);
+        verify(slang, times((2))).loadSystemProperties(sourceCaptor.capture());
+
+        List<SlangSource> capturedSources = sourceCaptor.getAllValues();
+        List<SlangSource> expectedSources =  Lists.newArrayList(
+                SlangSource.fromFile(getClass().getResource("/mixed_sl_files/configuration/properties/properties/ubuntu.prop.sl").toURI()),
+                SlangSource.fromFile(getClass().getResource("/mixed_sl_files/configuration/properties/properties/windows.prop.sl").toURI())
+        );
+        Assert.assertEquals(expectedSources, capturedSources);
+
+        System.setProperty(APP_HOME, initialValue);
     }
 
     @Test
