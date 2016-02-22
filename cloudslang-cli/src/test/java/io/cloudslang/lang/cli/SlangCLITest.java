@@ -43,7 +43,7 @@ public class SlangCLITest {
     private final static String[] CONTEXT_PATH = { "classpath*:/META-INF/spring/test-spring-shell-plugin.xml" };
     private final static String FLOW_PATH_BACKSLASH_INPUT = "C:\\\\flow.yaml";
     private final static String FLOW_PATH_BACKSLASH = "C:\\flow.yaml";
-    private final static String DEPENDENCIES_PATH_BACKSLASH = "C:\\\\flowsdir\\\\";
+    private final static String DEPENDENCIES_PATH_BACKSLASH = "C:\\\\executables.dir1\\\\";
     private static final long DEFAULT_TIMEOUT = 10000;
     public static final String INPUT_FILE_PATH = "/inputs/inputs.yaml";
 

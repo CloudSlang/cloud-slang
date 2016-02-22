@@ -43,6 +43,7 @@ public class SlangBuilder {
     @Autowired
     private SlangTestRunner slangTestRunner;
 
+    public static final String[] PROPERTIES_FILE_EXTENSIONS = {"prop.sl"};
     private final static Logger log = Logger.getLogger(SlangBuilder.class);
 
     public SlangBuildResults buildSlangContent(String projectPath, String contentPath, String testsPath, List<String> testSuits){

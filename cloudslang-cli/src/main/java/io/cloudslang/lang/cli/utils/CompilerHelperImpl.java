@@ -11,7 +11,6 @@ package io.cloudslang.lang.cli.utils;
 import ch.lambdaj.function.convert.Converter;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
-import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import org.apache.commons.collections4.CollectionUtils;
@@ -41,7 +40,8 @@ import static ch.lambdaj.Lambda.convert;
 public class CompilerHelperImpl implements CompilerHelper{
 
     private static final Logger logger = Logger.getLogger(CompilerHelperImpl.class);
-    private String[] SLANG_FILE_EXTENSIONS = {"sl", "sl.yaml", "sl.yml"};
+    private static final String[] SLANG_FILE_EXTENSIONS = {"sl", "sl.yaml", "sl.yml"};
+    private static final String[] PROPERTIES_FILE_EXTENSIONS = {"prop.sl"};
     private static final String[] YAML_FILE_EXTENSIONS = {"yaml", "yml"};
     private static final String SP_DIR = "properties"; //TODO reconsider it after closing CloudSlang file extensions & some real usecases
     private static final String INPUT_DIR = "inputs";
@@ -58,9 +58,7 @@ public class CompilerHelperImpl implements CompilerHelper{
         Set<SlangSource> depsSources = new HashSet<>();
         File file = new File(filePath);
         Validate.isTrue(file.isFile(), "File: " + file.getName() + " was not found");
-
-        boolean validFileExtension = checkIsFileSupported(file);
-        Validate.isTrue(validFileExtension, "File: " + file.getName() + " must have one of the following extensions: sl, sl.yaml, sl.yml");
+        validateFileExtension(file, SLANG_FILE_EXTENSIONS);
 
         if (CollectionUtils.isEmpty(dependencies)) {
             dependencies = new ArrayList<>();
@@ -77,16 +75,10 @@ public class CompilerHelperImpl implements CompilerHelper{
             }
         }
         for (String dependency:dependencies) {
-            Collection<File> dependenciesFiles = FileUtils.listFiles(new File(dependency), SLANG_FILE_EXTENSIONS, true);
+            Collection<File> dependenciesFiles = listFiles(new File(dependency), SLANG_FILE_EXTENSIONS, true, PROPERTIES_FILE_EXTENSIONS);
             for (File dependencyCandidate : dependenciesFiles) {
                 SlangSource source = SlangSource.fromFile(dependencyCandidate);
-                // exclude properties files
-                if (isExecutable(source)) {
-                    depsSources.add(source);
-                } else {
-                    logger.info("Ignoring dependency: " + source.getName() + " (not a valid executable)." +
-                            " Top level keys(" + SlangTextualKeys.FLOW_TYPE + ", " + SlangTextualKeys.OPERATION_TYPE + ") not found.");
-                }
+                depsSources.add(source);
             }
         }
         try {
@@ -100,18 +92,13 @@ public class CompilerHelperImpl implements CompilerHelper{
     @Override
     public Set<SystemProperty> loadSystemProperties(List<String> systemPropertyFiles) {
         String propertiesRelativePath = CONFIG_DIR + File.separator + SP_DIR;
-        return loadPropertiesFromFiles(convertToFiles(systemPropertyFiles), SLANG_FILE_EXTENSIONS, propertiesRelativePath);
+        return loadPropertiesFromFiles(convertToFiles(systemPropertyFiles), PROPERTIES_FILE_EXTENSIONS, propertiesRelativePath);
     }
 
     @Override
     public Map<String, Serializable> loadInputsFromFile(List<String> inputFiles) {
         String inputsRelativePath = CONFIG_DIR + File.separator + INPUT_DIR;
         return loadMapsFromFiles(convertToFiles(inputFiles), YAML_FILE_EXTENSIONS, inputsRelativePath);
-    }
-
-    @Override
-    public boolean isExecutable(String filePath) {
-        return isExecutable(SlangSource.fromFile(new File(filePath)));
     }
 
     private Map<String, Serializable> loadMapsFromFiles(List<File> files, String[] extensions, String directory) {
@@ -154,19 +141,17 @@ public class CompilerHelperImpl implements CompilerHelper{
             if(CollectionUtils.isEmpty(fileCollection)) return new HashSet<>();
         } else {
             fileCollection = files;
+            for (File propertyFileCandidate : fileCollection) {
+                validateFileExtension(propertyFileCandidate, PROPERTIES_FILE_EXTENSIONS);
+            }
         }
         Set<SystemProperty> result = new HashSet<>();
         for(File propFile : fileCollection) {
             try {
                 SlangSource source = SlangSource.fromFile(propFile);
-                if (!isExecutable(source)) {
-                    logger.info("Loading file: " + propFile);
-                    Set<SystemProperty> propsFromFile = slang.loadSystemProperties(source);
-                    result.addAll(propsFromFile);
-                } else {
-                    logger.info("Ignoring file: " + source.getName() + " (not a valid properties file)." +
-                            " Top level keys(" + SlangTextualKeys.FLOW_TYPE + ", " + SlangTextualKeys.OPERATION_TYPE + ") found.");
-                }
+                logger.info("Loading file: " + propFile);
+                Set<SystemProperty> propsFromFile = slang.loadSystemProperties(source);
+                result.addAll(propsFromFile);
             } catch(Throwable ex) {
                 String errorMessage = "Error loading file: " + propFile + " nested exception is " + ex.getMessage();
                 logger.error(errorMessage, ex);
@@ -189,24 +174,22 @@ public class CompilerHelperImpl implements CompilerHelper{
         return files;
     }
 
-    private Boolean checkIsFileSupported(File file){
-        String[] suffixes = new String[SLANG_FILE_EXTENSIONS.length];
-        for(int i = 0; i < suffixes.length; ++i){
-            suffixes[i] = "." + SLANG_FILE_EXTENSIONS[i];
-        }
-        return new SuffixFileFilter(suffixes).accept(file);
+    private void validateFileExtension(File file, String[] extensions) {
+        boolean validFileExtension = hasExtension(file, extensions);
+        String extensionsAsString =  Arrays.toString(extensions);
+        Validate.isTrue(
+                validFileExtension,
+                "File: " + file.getName() + " must have one of the following extensions: " +
+                        extensionsAsString.substring(1, extensionsAsString.length() - 1) + "."
+        );
     }
 
-    private boolean isExecutable(SlangSource source) {
-        Object yamlObject = yaml.load(source.getSource());
-        if (yamlObject instanceof Map) {
-            Map yamlObjectAsMap = (Map) yamlObject;
-            return
-                    yamlObjectAsMap.containsKey(SlangTextualKeys.FLOW_TYPE) ||
-                            yamlObjectAsMap.containsKey(SlangTextualKeys.OPERATION_TYPE);
-        } else {
-            return false;
+    private Boolean hasExtension(File file, String[] extensions){
+        String[] suffixes = new String[extensions.length];
+        for(int i = 0; i < suffixes.length; ++i){
+            suffixes[i] = "." + extensions[i];
         }
+        return new SuffixFileFilter(suffixes).accept(file);
     }
 
     private List<File> convertToFiles(List<String> fileList) {
@@ -216,6 +199,22 @@ public class CompilerHelperImpl implements CompilerHelper{
                 return new File(from);
             }
         });
+    }
+
+    // e.g. exclude .prop.sl from .sl set
+    private Collection<File> listFiles(
+            File directory,
+            String[] extensions,
+            boolean recursive,
+            String[] excludedExtensions) {
+        Collection<File> dependenciesFiles = FileUtils.listFiles(directory, extensions, recursive);
+        Collection<File> result = new ArrayList<>();
+        for (File file : dependenciesFiles) {
+            if (!hasExtension(file, excludedExtensions)) {
+                result.add(file);
+            }
+        }
+        return result;
     }
 
 }

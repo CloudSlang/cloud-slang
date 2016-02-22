@@ -33,7 +33,7 @@ public class LoadSystemPropertiesTest extends SystemsTestsParent {
 
     @Test
     public void testValid() throws Exception {
-        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/valid.properties.sl").toURI();
+        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/valid.prop.sl").toURI();
         Set<SystemProperty> expectedSystemProperties = getSystemPropertiesValid();
         Set<SystemProperty> actualSystemProperties = loadSystemProperties(SlangSource.fromFile(propertiesURI));
         Assert.assertEquals(expectedSystemProperties, actualSystemProperties);
@@ -41,7 +41,7 @@ public class LoadSystemPropertiesTest extends SystemsTestsParent {
 
     @Test
     public void testValidEmptyNamespace() throws Exception {
-        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/valid_empty_namespace.properties.sl").toURI();
+        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/valid_empty_namespace.prop.sl").toURI();
         Set<SystemProperty> expectedSystemProperties = getSystemPropertiesValidEmptyNamespace();
         Set<SystemProperty> actualSystemProperties = loadSystemProperties(SlangSource.fromFile(propertiesURI));
         Assert.assertEquals(expectedSystemProperties, actualSystemProperties);
@@ -49,7 +49,7 @@ public class LoadSystemPropertiesTest extends SystemsTestsParent {
 
     @Test
     public void testValidMissingNamespaceKey() throws Exception {
-        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/valid_missing_namespace_key.properties.sl").toURI();
+        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/valid_missing_namespace_key.prop.sl").toURI();
         Set<SystemProperty> expectedSystemProperties = getSystemPropertiesValidEmptyNamespace();
         Set<SystemProperty> actualSystemProperties = loadSystemProperties(SlangSource.fromFile(propertiesURI));
         Assert.assertEquals(expectedSystemProperties, actualSystemProperties);
@@ -57,7 +57,7 @@ public class LoadSystemPropertiesTest extends SystemsTestsParent {
 
     @Test
     public void testValidNoProperties() throws Exception {
-        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/valid_no_properties.sl").toURI();
+        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/valid_no_prop.sl").toURI();
         Set<SystemProperty> expectedSystemProperties = EMPTY_PROPS;
         Set<SystemProperty> actualSystemProperties = loadSystemProperties(SlangSource.fromFile(propertiesURI));
         Assert.assertEquals(expectedSystemProperties, actualSystemProperties);
@@ -65,7 +65,7 @@ public class LoadSystemPropertiesTest extends SystemsTestsParent {
 
     @Test
     public void testInvalidMissingProperties() throws Exception {
-        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/invalid_missing_properties.properties.sl").toURI();
+        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/invalid_missing_properties.prop.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage("loading properties file");
         exception.expectMessage("no content associated");

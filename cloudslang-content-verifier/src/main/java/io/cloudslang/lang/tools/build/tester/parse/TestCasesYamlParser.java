@@ -19,7 +19,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.tools.build.SlangBuilder;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
@@ -29,10 +31,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static ch.lambdaj.Lambda.convertMap;
 
@@ -85,10 +84,29 @@ public class TestCasesYamlParser {
 
     public Set<SystemProperty> parseProperties(String fileName) {
         Set<SystemProperty> result = new HashSet<>();
-        if(StringUtils.isNotEmpty(fileName)) {
-                SlangSource source = SlangSource.fromFile(new File(fileName));
-                result.addAll(slang.loadSystemProperties(source));
-        }
+        File file = new File(fileName);
+        validateFileExtension(file, SlangBuilder.PROPERTIES_FILE_EXTENSIONS);
+        SlangSource source = SlangSource.fromFile(new File(fileName));
+        result.addAll(slang.loadSystemProperties(source));
         return result;
     }
+
+    private void validateFileExtension(File file, String[] extensions) {
+        boolean validFileExtension = hasExtension(file, extensions);
+        String extensionsAsString =  Arrays.toString(extensions);
+        org.apache.commons.lang.Validate.isTrue(
+                validFileExtension,
+                "File: " + file.getName() + " must have one of the following extensions: " +
+                        extensionsAsString.substring(1, extensionsAsString.length() - 1) + "."
+        );
+    }
+
+    private Boolean hasExtension(File file, String[] extensions){
+        String[] suffixes = new String[extensions.length];
+        for(int i = 0; i < suffixes.length; ++i){
+            suffixes[i] = "." + extensions[i];
+        }
+        return new SuffixFileFilter(suffixes).accept(file);
+    }
+
 }

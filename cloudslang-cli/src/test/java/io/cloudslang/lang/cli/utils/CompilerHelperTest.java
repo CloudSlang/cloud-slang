@@ -21,6 +21,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -30,23 +31,18 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
-import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = CompilerHelperTest.Config.class)
 public class CompilerHelperTest {
+
+    private static final String APP_HOME = "app.home";
 
     @Autowired
     private CompilerHelper compilerHelper;
@@ -80,27 +76,56 @@ public class CompilerHelperTest {
     }
 
     @Test
-	public void testFilePathValid() throws Exception {
-		URI flowFilePath = getClass().getResource("/flow.sl").toURI();
-		URI opFilePath = getClass().getResource("/test_op.sl").toURI();
-		URI flow2FilePath = getClass().getResource("/flowsdir/flow2.sl").toURI();
-		URI spFlow = getClass().getResource("/sp/flow.sl").toURI();
-		URI spOp = getClass().getResource("/sp/operation.sl").toURI();
-        URI metadata = getClass().getResource("/metadata/metadata.sl").toURI();
-        URI descriptionMissingMetadata = getClass().getResource("/metadata/metadata_full_description_missing.sl").toURI();
-		compilerHelper.compile(flowFilePath.getPath(), null);
-		Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath), Sets.newHashSet(SlangSource.fromFile(flowFilePath), SlangSource.fromFile(flow2FilePath),
-			SlangSource.fromFile(opFilePath), SlangSource.fromFile(spFlow), SlangSource.fromFile(spOp), SlangSource.fromFile(metadata), SlangSource.fromFile(descriptionMissingMetadata)));
+	public void testDependenciesFileParentFolder() throws Exception {
+        URI flowPath = getClass().getResource("/executables/dir3/flow.sl").toURI();
+        URI opPath = getClass().getResource("/executables/dir3/dir3_1/test_op.sl").toURI();
+        compilerHelper.compile(flowPath.getPath(), null);
+        Mockito.verify(slang).compile(
+                SlangSource.fromFile(flowPath),
+                Sets.newHashSet(
+                        SlangSource.fromFile(opPath),
+                        SlangSource.fromFile(flowPath)
+                )
+        );
 	}
 
     @Test
     public void testFilePathValidWithOtherPathForDependencies() throws Exception {
         URI flowFilePath = getClass().getResource("/flow.sl").toURI();
-        URI folderPath = getClass().getResource("/flowsdir/").toURI();
-        URI flow2FilePath = getClass().getResource("/flowsdir/flow2.sl").toURI();
+        URI folderPath = getClass().getResource("/executables/dir1/").toURI();
+        URI flow2FilePath = getClass().getResource("/executables/dir1/flow2.sl").toURI();
         compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(folderPath.getPath()));
         Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath),
                 Sets.newHashSet(SlangSource.fromFile(flow2FilePath)));
+    }
+
+    @Test
+    public void testCompileMixedSlangFiles() throws Exception {
+        URI flowFilePath = getClass().getResource("/flow.sl").toURI();
+        URI folderPath = getClass().getResource("/mixed_sl_files/").toURI();
+        URI dependency1 = getClass().getResource("/mixed_sl_files/configuration/properties/executables/test_flow.sl").toURI();
+        URI dependency2 = getClass().getResource("/mixed_sl_files/configuration/properties/executables/test_op.sl").toURI();
+        compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(folderPath.getPath()));
+        Mockito.verify(slang).compile(
+                SlangSource.fromFile(flowFilePath),
+                Sets.newHashSet(
+                        SlangSource.fromFile(dependency1),
+                        SlangSource.fromFile(dependency2)
+                )
+        );
+    }
+
+    // flowprop.sl is not recognized as properties file
+    @Test
+    public void testCompileDependencyPropPartOfFileName() throws Exception {
+        URI flowFilePath = getClass().getResource("/flow.sl").toURI();
+        URI folderPath = getClass().getResource("/executables/dir2/").toURI();
+        URI flow2FilePath = getClass().getResource("/executables/dir2/flowprop.sl").toURI();
+        compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(folderPath.getPath()));
+        Mockito.verify(slang).compile(
+                SlangSource.fromFile(flowFilePath),
+                Sets.newHashSet(SlangSource.fromFile(flow2FilePath))
+        );
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -123,14 +148,47 @@ public class CompilerHelperTest {
                 new SystemProperty("user.sys", "props.port", "22"),
                 new SystemProperty("user.sys", "props.alla", "balla")
         );
-		URI systemPropertyURI = getClass().getResource("/properties/system_properties.sl").toURI();
+		URI systemPropertyURI = getClass().getResource("/properties/system_properties.prop.sl").toURI();
         SlangSource source = SlangSource.fromFile(systemPropertyURI);
         when(slang.loadSystemProperties(eq(source))).thenReturn(systemProperties);
 
-		Set<SystemProperty> result = compilerHelper.loadSystemProperties(Arrays.asList(systemPropertyURI.getPath()));
+		compilerHelper.loadSystemProperties(Collections.singletonList(systemPropertyURI.getPath()));
 
         verify(slang).loadSystemProperties(eq(source));
 	}
+
+    @Test
+    public void testLoadSystemPropertiesInvalidExtension() throws Exception {
+        URI systemPropertyURI = getClass().getResource("/flow.sl").toURI();
+
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("flow.sl");
+        expectedException.expectMessage("extension");
+        expectedException.expectMessage("prop.sl");
+
+        compilerHelper.loadSystemProperties(Collections.singletonList(systemPropertyURI.getPath()));
+    }
+
+    @Test
+    public void testLoadSystemPropertiesDefaultFolder() throws Exception {
+        String initialValue = System.getProperty(APP_HOME, "");
+        String defaultDirPath = getClass().getResource("/mixed_sl_files/").getPath();
+        System.setProperty(APP_HOME, defaultDirPath);
+
+        compilerHelper.loadSystemProperties(Collections.<String>emptyList());
+
+        ArgumentCaptor<SlangSource> sourceCaptor = ArgumentCaptor.forClass(SlangSource.class);
+        verify(slang, times((2))).loadSystemProperties(sourceCaptor.capture());
+
+        List<SlangSource> capturedSources = sourceCaptor.getAllValues();
+        List<SlangSource> expectedSources =  Lists.newArrayList(
+                SlangSource.fromFile(getClass().getResource("/mixed_sl_files/configuration/properties/properties/ubuntu.prop.sl").toURI()),
+                SlangSource.fromFile(getClass().getResource("/mixed_sl_files/configuration/properties/properties/windows.prop.sl").toURI())
+        );
+        Assert.assertEquals(expectedSources, capturedSources);
+
+        System.setProperty(APP_HOME, initialValue);
+    }
 
     @Test
     public void testLoadInputsFromFile() throws Exception {

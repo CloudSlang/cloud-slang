@@ -186,6 +186,7 @@ public class SlangBuildTest {
         Mockito.when(scoreCompiler.compile(dependencyExecutable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
+        // properties file should be ignored
         Assert.assertEquals("Did not compile all Slang files. Expected to compile: 2, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 2);
     }
 

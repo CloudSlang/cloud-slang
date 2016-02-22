@@ -35,12 +35,4 @@ public interface CompilerHelper {
      */
     Map<String, ? extends Serializable> loadInputsFromFile(List<String> inputFiles) throws IOException;
 
-	/**
-	 * Check whether a slang file can be interpreted as an executable.
-	 * This is a high level check. For advanced processing, use / extend compiler capabilities.
-	 * @param filePath path to the slang file (executable / properties file)
-	 * @return whether the file can be interpreted as an executable
-	 */
-	boolean isExecutable(String filePath);
-
 }

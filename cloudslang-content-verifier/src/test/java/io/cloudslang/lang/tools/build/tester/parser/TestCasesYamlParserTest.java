@@ -77,12 +77,12 @@ public class TestCasesYamlParserTest {
 
     @Test
     public void testCaseFileParsingForNonTestCasesFile() throws Exception{
-        String filePath = "/content/base/properties.sl";
+        String filePath = "/content/base/properties.prop.sl";
         URI fileUri = getClass().getResource(filePath).toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage("problem");
         exception.expectMessage("parsing");
-        exception.expectMessage("properties.sl");
+        exception.expectMessage("properties.prop.sl");
         parser.parseTestCases(SlangSource.fromFile(fileUri));
     }
 
@@ -99,13 +99,25 @@ public class TestCasesYamlParserTest {
 
     @Test
     public void parseSystemPropertiesFile() throws Exception{
-        URI filePath = getClass().getResource("/content/base/properties.sl").toURI();
+        URI filePath = getClass().getResource("/content/base/properties.prop.sl").toURI();
         SlangSource source = SlangSource.fromFile(filePath);
         Set<SystemProperty> props = new HashSet<>();
 
         when(slang.loadSystemProperties(eq(source))).thenReturn(props);
         parser.parseProperties(filePath.getPath());
         verify(slang).loadSystemProperties(eq(source));
+    }
+
+    @Test
+    public void parseSystemPropertiesFileInvalidExtension() throws Exception{
+        URI filePath = getClass().getResource("/content/base/print_text.sl").toURI();
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("print_text.sl");
+        exception.expectMessage("extension");
+        exception.expectMessage("prop.sl");
+
+        parser.parseProperties(filePath.getPath());
     }
 
     @Configuration
