@@ -34,6 +34,7 @@ public class MetadataExtractorTest {
             "Passing an empty list ([]) will retrieve the entire json_input. - Example: [\"k1\", \"k2\", 1]" + NEWLINE +
             "More information after newline" + NEWLINE;
     public static final String PREREQUISITES = "jenkinsapi Python module" + NEWLINE;
+    public static final String NAMESPACE = "io.cloudslang.base.json";
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -48,6 +49,7 @@ public class MetadataExtractorTest {
         Assert.assertNotNull("metadata is null", metadata);
         Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
         Assert.assertEquals("different prerequisites", PREREQUISITES, metadata.getPrerequisites());
+        Assert.assertEquals("different namespace", NAMESPACE, metadata.getNamespace());
         Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
         Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
         Assert.assertEquals("different number of results", 2, metadata.getResults().size());
@@ -67,6 +69,7 @@ public class MetadataExtractorTest {
         Assert.assertNotNull("metadata is null", metadata);
         Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
         Assert.assertEquals("different prerequisites", "", metadata.getPrerequisites());
+        Assert.assertEquals("different namespace", NAMESPACE, metadata.getNamespace());
         Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
         Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
         Assert.assertEquals("different number of results", 2, metadata.getResults().size());
@@ -118,6 +121,7 @@ public class MetadataExtractorTest {
         Assert.assertNotNull("metadata is null", metadata);
         Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
         Assert.assertEquals("different prerequisites", PREREQUISITES, metadata.getPrerequisites());
+        Assert.assertEquals("different namespace", NAMESPACE, metadata.getNamespace());
         Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
         Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
         Assert.assertEquals("different number of results", 0, metadata.getResults().size());
@@ -133,6 +137,7 @@ public class MetadataExtractorTest {
         Assert.assertNotNull("metadata is null", metadata);
         Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
         Assert.assertEquals("different prerequisites", PREREQUISITES, metadata.getPrerequisites());
+        Assert.assertEquals("different namespace", NAMESPACE, metadata.getNamespace());
         Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
         Assert.assertEquals("different number of outputs", 0, metadata.getOutputs().size());
         Assert.assertEquals("different number of results", 2, metadata.getResults().size());
@@ -147,6 +152,7 @@ public class MetadataExtractorTest {
         Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
         Assert.assertNotNull("metadata is null", metadata);
         Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
+        Assert.assertEquals("different namespace", NAMESPACE, metadata.getNamespace());
         Assert.assertEquals("different number of inputs", 0, metadata.getInputs().size());
         Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
         Assert.assertEquals("different number of results", 2, metadata.getResults().size());
@@ -161,6 +167,7 @@ public class MetadataExtractorTest {
         Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
         Assert.assertNotNull("metadata is null", metadata);
         Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
+        Assert.assertEquals("different namespace", NAMESPACE, metadata.getNamespace());
         Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
         Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
         Assert.assertEquals("different number of results", 0, metadata.getResults().size());
@@ -175,11 +182,32 @@ public class MetadataExtractorTest {
         Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
         Assert.assertNotNull("metadata is null", metadata);
         Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
+        Assert.assertEquals("different namespace", NAMESPACE, metadata.getNamespace());
         Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
         Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
         Assert.assertEquals("different number of results", 1, metadata.getResults().size());
         Map.Entry<String, String> entry = metadata.getInputs().entrySet().iterator().next();
         Assert.assertEquals("different input name", "json_input", entry.getKey());
         Assert.assertEquals("different input value", FIRST_INPUT_VALUE, entry.getValue());
+    }
+
+    @Test
+    public void testExtractMetadataNamespaceMissing() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_namespace_missing.sl").toURI();
+        Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+        Assert.assertNotNull("metadata is null", metadata);
+        Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
+        Assert.assertEquals("different prerequisites", PREREQUISITES, metadata.getPrerequisites());
+        Assert.assertEquals("different namespace", "", metadata.getNamespace());
+        Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
+        Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
+        Assert.assertEquals("different number of results", 2, metadata.getResults().size());
+        Iterator<Map.Entry<String, String>> it = metadata.getInputs().entrySet().iterator();
+        Map.Entry<String, String> entry = it.next();
+        Assert.assertEquals("different input name", "json_input", entry.getKey());
+        Assert.assertEquals("different input value", FIRST_INPUT_VALUE, entry.getValue());
+        Map.Entry<String, String> entry2 = it.next();
+        Assert.assertEquals("different input name", "json_path", entry2.getKey());
+        Assert.assertEquals("different input value", SECOND_OUTPUT_VALUE, entry2.getValue());
     }
 }

@@ -1,6 +1,7 @@
 package io.cloudslang.lang.compiler.parser;
 
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -51,6 +52,8 @@ public class MetadataParserTest {
     public void fullDescriptionMissing() throws Exception {
         URI operation = getClass().getResource("/metadata/metadata_full_description_missing.sl").toURI();
         Map<String, String> metadataMap = metadataParser.parse(SlangSource.fromFile(operation));
-        Assert.assertTrue("metadata map should have size 0", metadataMap.size() == 0);
+        Assert.assertTrue("metadata map should have size 1", metadataMap.size() == 1);
+        Assert.assertEquals("metadata map should contain namespace only", "io.cloudslang.base.json",
+                metadataMap.get(SlangTextualKeys.NAMESPACE));
     }
 }

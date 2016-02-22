@@ -8,6 +8,7 @@
  */
 package io.cloudslang.lang.compiler.modeller;
 
+import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.compiler.parser.utils.DescriptionTag;
 import org.springframework.stereotype.Component;
@@ -30,14 +31,20 @@ public class MetadataModellerImpl implements MetadataModeller {
     private Metadata transformToMetadata(Map<String, String> fullMap) {
         Metadata metadata = new Metadata();
         String description = fullMap.get(DescriptionTag.DESCRIPTION.getValue());
-        metadata.setDescription(description != null ? description : "");
+        metadata.setDescription(getEmptyStringIfNull(description));
         String prerequisites = fullMap.get(DescriptionTag.PREREQUISITES.getValue());
-        metadata.setPrerequisites(prerequisites != null ? prerequisites : "");
+        metadata.setPrerequisites(getEmptyStringIfNull(prerequisites));
+        String namespace = fullMap.get(SlangTextualKeys.NAMESPACE);
+        metadata.setNamespace(getEmptyStringIfNull(namespace));
         metadata.setInputs(getTagMap(fullMap, DescriptionTag.INPUT));
         metadata.setOutputs(getTagMap(fullMap, DescriptionTag.OUTPUT));
         metadata.setResults(getTagMap(fullMap, DescriptionTag.RESULT));
 
         return metadata;
+    }
+
+    private String getEmptyStringIfNull(String value) {
+        return value != null ? value : "";
     }
 
     private Map<String, String> getTagMap(Map<String, String> fullMap, DescriptionTag tag) {

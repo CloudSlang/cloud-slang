@@ -23,6 +23,7 @@ public interface SlangTextualKeys {
     String OPERATION_TYPE = "operation";
 
     //flow
+    String NAMESPACE = "namespace";
     String EXECUTABLE_NAME_KEY = "name";
     String WORKFLOW_KEY = "workflow";
     String ON_FAILURE_KEY = "on_failure";

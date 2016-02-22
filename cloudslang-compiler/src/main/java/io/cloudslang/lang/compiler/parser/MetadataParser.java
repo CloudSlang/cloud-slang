@@ -10,6 +10,7 @@
 package io.cloudslang.lang.compiler.parser;
 
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.parser.utils.DescriptionTag;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import org.apache.commons.lang3.Validate;
@@ -20,6 +21,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * User: bancl
@@ -45,10 +48,21 @@ public class MetadataParser {
             String fullDescription = extractFullDescriptionString(source);
             Map<String, String> fullMap = extractFullTagMap(fullDescription);
             checkMapOrder(fullMap);
+            addNamespaceToFullMap(source, fullMap);
             return fullMap;
         } catch (Throwable e) {
             throw new RuntimeException("There was a problem parsing the description: " +
                     source.getName() + ".\n" + parserExceptionHandler.getErrorMessage(e), e);
+        }
+    }
+
+    private void addNamespaceToFullMap(SlangSource source, Map<String, String> fullMap) {
+        Matcher m = Pattern.compile("(?m)^" + SlangTextualKeys.NAMESPACE + ".*$").matcher(source.getSource());
+
+        if (m.find()) {
+            String line = m.group();
+            fullMap.put(SlangTextualKeys.NAMESPACE, line.substring(line.indexOf(SlangTextualKeys.NAMESPACE) +
+                    SlangTextualKeys.NAMESPACE.length() + 1).trim());
         }
     }
 
