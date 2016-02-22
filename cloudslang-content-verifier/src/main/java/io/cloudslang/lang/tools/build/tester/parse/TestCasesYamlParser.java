@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.tools.build.SlangBuilder;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +47,6 @@ public class TestCasesYamlParser {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private final static Logger log = Logger.getLogger(TestCasesYamlParser.class);
-    private static final String[] PROPERTIES_FILE_EXTENSIONS = {"prop.sl"};
 
     public Map<String, SlangTestCase> parseTestCases(SlangSource source) {
 
@@ -85,7 +85,7 @@ public class TestCasesYamlParser {
     public Set<SystemProperty> parseProperties(String fileName) {
         Set<SystemProperty> result = new HashSet<>();
         File file = new File(fileName);
-        validateFileExtension(file, PROPERTIES_FILE_EXTENSIONS);
+        validateFileExtension(file, SlangBuilder.PROPERTIES_FILE_EXTENSIONS);
         SlangSource source = SlangSource.fromFile(new File(fileName));
         result.addAll(slang.loadSystemProperties(source));
         return result;

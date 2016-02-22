@@ -14,6 +14,7 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.tools.build.SlangBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
@@ -34,7 +35,6 @@ public class SlangContentVerifier {
     private final static Logger log = Logger.getLogger(SlangContentVerifier.class);
 
     private String[] SLANG_FILE_EXTENSIONS = {"sl", "sl.yaml", "sl.yml"};
-    private static final String[] PROPERTIES_FILE_EXTENSIONS = {"prop.sl"};
 
     @Autowired
     private SlangCompiler slangCompiler;
@@ -46,7 +46,7 @@ public class SlangContentVerifier {
         Validate.notEmpty(directoryPath, "You must specify a path");
         Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" + directoryPath + "\' does not lead to a directory");
         Map<String, Executable> slangModels = new HashMap<>();
-        Collection<File> slangFiles = listFiles(new File(directoryPath), SLANG_FILE_EXTENSIONS, true, PROPERTIES_FILE_EXTENSIONS);
+        Collection<File> slangFiles = listFiles(new File(directoryPath), SLANG_FILE_EXTENSIONS, true, SlangBuilder.PROPERTIES_FILE_EXTENSIONS);
         log.info("Start compiling all slang files under: " + directoryPath);
         log.info(slangFiles.size() + " .sl files were found");
         log.info("");
