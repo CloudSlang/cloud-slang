@@ -26,14 +26,14 @@ public class MetadataExtractorTest {
     public static final String NEWLINE = System.lineSeparator();
 
     public static final String OPERATION_DESCRIPTION = "Parses the given JSON input to retrieve the" + NEWLINE +
-                                                       "corresponding value addressed by the json_path input." + NEWLINE;
+                                                       "corresponding value addressed by the json_path input.";
     public static final String FIRST_INPUT_VALUE = "JSON data input" + NEWLINE +
-                                                   "Example: '{\"k1\": {\"k2\": [\"v1\", \"v2\"]}}'" + NEWLINE;
-    public static final String FIRST_OUTPUT_VALUE = "the corresponding value of the key referred to by json_path" + NEWLINE;
+                                                   "Example: '{\"k1\": {\"k2\": [\"v1\", \"v2\"]}}'";
+    public static final String FIRST_OUTPUT_VALUE = "the corresponding value of the key referred to by json_path";
     public static final String SECOND_OUTPUT_VALUE = "path from which to retrieve value represented as a list of keys and/or indices." + NEWLINE +
             "Passing an empty list ([]) will retrieve the entire json_input. - Example: [\"k1\", \"k2\", 1]" + NEWLINE +
-            "More information after newline" + NEWLINE;
-    public static final String PREREQUISITES = "jenkinsapi Python module" + NEWLINE;
+            "More information after newline";
+    public static final String PREREQUISITES = "jenkinsapi Python module";
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
