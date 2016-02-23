@@ -110,6 +110,8 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedArguments.put("input_10", "localhost");
         expectedArguments.put("input_11", "default_str");
         expectedArguments.put("value_propagate", "flowInput_taskArg_");
+        expectedArguments.put("input_12", "hyphen_value");
+        expectedArguments.put("input_13", "hyphen_value");
         Map<String, Serializable> actualArguments = taskData.getInputs();
         Assert.assertEquals("task arguments not as expected", expectedArguments, actualArguments);
     }
@@ -134,6 +136,8 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedFlowInputs.put("input_10", "localhost");
         expectedFlowInputs.put("input_11", "default_str");
         expectedFlowInputs.put("value_propagate", "flowInput_");
+        expectedFlowInputs.put("input_12", "hyphen_value");
+        expectedFlowInputs.put("input_13", "hyphen_value");
         Map<String, Serializable> actualFlowInputs = flowData.getInputs();
         Assert.assertEquals("flow input values not as expected", expectedFlowInputs, actualFlowInputs);
     }
@@ -160,6 +164,8 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedPublishValues.put("output_7", "localhost");
         expectedPublishValues.put("output_8", "localhost");
         expectedPublishValues.put("output_9", "default_str");
+        expectedPublishValues.put("output_10", "hyphen_value");
+        expectedPublishValues.put("output_11", "hyphen_value");
         expectedPublishValues.put("value_propagate", "flowInput_taskArg_opInput_opOutput_taskPublish_");
         Map<String, Serializable> actualPublishValues = taskData.getOutputs();
         Assert.assertEquals("operation publish values not as expected", expectedPublishValues, actualPublishValues);
@@ -175,7 +181,8 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
                 new SystemProperty("propagate", "op.input", "opInput_"),
                 new SystemProperty("propagate", "op.output", "opOutput_"),
                 new SystemProperty("propagate", "task.publish", "taskPublish_"),
-                new SystemProperty("propagate", "flow.output", "flowOutput_")
+                new SystemProperty("propagate", "flow.output", "flowOutput_"),
+                new SystemProperty("chars-b", "c-hyphen", "hyphen_value")
         );
     }
 

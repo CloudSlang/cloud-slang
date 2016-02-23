@@ -49,6 +49,8 @@ flow:
     - input_10: ${get_sp('a.b.c.i_don_exist', get_sp('a.b.c.host'))}
     - input_11: ${get_sp('a.b.c.null_value', 'default_str')}
     - value_propagate: ${ get_sp('propagate.flow.input') }
+    - input_12: ${get_sp('chars-b.c-hyphen')}
+    - input_13: ${get_sp('chars-b.c-hyphen', 'default_str')}
   workflow:
     - Task1:
         do:
@@ -64,6 +66,8 @@ flow:
             - input_10: ${get_sp('a.b.c.i_don_exist', get_sp('a.b.c.host'))}
             - input_11: ${get_sp('a.b.c.null_value', 'default_str')}
             - value_propagate: ${ value_propagate + get_sp('propagate.task.argument') }
+            - input_12: ${get_sp('chars-b.c-hyphen')}
+            - input_13: ${get_sp('chars-b.c-hyphen', 'default_str')}
         publish:
           - output1_safe
           - output2_safe
@@ -77,6 +81,8 @@ flow:
           - output_7
           - output_8
           - output_9
+          - output_10
+          - output_11
           - value_propagate: ${ value_propagate + get_sp('propagate.task.publish') }
         navigate:
           FUNCTIONS_KEY_EXISTS: FUNCTIONS_KEY_EXISTS
