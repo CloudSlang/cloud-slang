@@ -86,7 +86,7 @@ public class MetadataParser {
                 valueStringBuilder.append(line.trim()).append(System.lineSeparator());
                 line = reader.readLine();
                 if (line == null || lineContainsATag(line)) {
-                    map.put(key, valueStringBuilder.toString());
+                    map.put(key, valueStringBuilder.toString().trim());
                     valueStringBuilder.setLength(0);
                 }
             }
