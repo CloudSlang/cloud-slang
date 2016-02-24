@@ -80,6 +80,14 @@ public class MetadataExtractorTest {
     }
 
     @Test
+    public void testExtractMetadataEmptyDescriptionSection() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_empty_description.sl").toURI();
+        Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+        Assert.assertNotNull("metadata is null", metadata);
+        Assert.assertEquals("different description", "", metadata.getDescription());
+    }
+
+    @Test
     public void testExtractMetadataWrongOrder() throws Exception {
         URI operation = getClass().getResource("/metadata/metadata_wrong_order.sl").toURI();
         exception.expect(RuntimeException.class);
@@ -97,9 +105,9 @@ public class MetadataExtractorTest {
 
     @Test
     public void colonMissing() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_colon_missing_after_name.sl").toURI();
+        URI operation = getClass().getResource("/metadata/metadata_colon_missing_after_tag_name.sl").toURI();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("does not contain colon after name.");
+        exception.expectMessage("does not contain colon after tag name.");
         metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
     }
 
