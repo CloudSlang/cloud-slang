@@ -180,8 +180,8 @@ public class CompilerHelperTest {
         ArgumentCaptor<SlangSource> sourceCaptor = ArgumentCaptor.forClass(SlangSource.class);
         verify(slang, times((2))).loadSystemProperties(sourceCaptor.capture());
 
-        List<SlangSource> capturedSources = sourceCaptor.getAllValues();
-        List<SlangSource> expectedSources =  Lists.newArrayList(
+        Set<SlangSource> capturedSources = new HashSet<>(sourceCaptor.getAllValues());
+        Set<SlangSource> expectedSources =  Sets.newHashSet(
                 SlangSource.fromFile(getClass().getResource("/mixed_sl_files/configuration/properties/properties/ubuntu.prop.sl").toURI()),
                 SlangSource.fromFile(getClass().getResource("/mixed_sl_files/configuration/properties/properties/windows.prop.sl").toURI())
         );
