@@ -30,8 +30,8 @@ public class MetadataParser {
 
     public static final String PREFIX = "#!";
     public static final int BEGIN_INDEX = 3;
-    public static final String BLOCK_END = "#!!#";
-    public static final String BLOCK_START = "#!!";
+    public static final String BLOCK_END_TAG = "#!!#";
+    public static final String BLOCK_START_TAG = "#!!";
     public static final String COLON = ":";
     public static final List<DescriptionTag> DESCRIPTION_TAGS_LIST = Collections.unmodifiableList(
             Arrays.asList(DescriptionTag.values()));
@@ -73,8 +73,8 @@ public class MetadataParser {
             String key = "";
             while (line != null) {
                 if (lineContainsATag(line)) {
-                    if (!line.contains(COLON)) throw new RuntimeException("Line \"" + line + "\" does not contain colon after name.");
                     tag = getContainedTag(line);
+                    checkTagIsFollowedByColon(line, tag);
                     if (isSingleTagType(tag)) {
                         line = line.substring(line.indexOf(COLON) + 1);
                         key = tag != null ? tag.getValue() : "";
@@ -85,15 +85,24 @@ public class MetadataParser {
                 }
                 valueStringBuilder.append(line.trim()).append(System.lineSeparator());
                 line = reader.readLine();
-                if (line == null || lineContainsATag(line)) {
-                    map.put(key, valueStringBuilder.toString().trim());
-                    valueStringBuilder.setLength(0);
-                }
+                putValueInMapAndResetBuilder(map, key, valueStringBuilder, line);
             }
         } catch (IOException e) {
             throw new RuntimeException("Error processing metadata, error extracting metadata from ", e);
         }
         return map;
+    }
+
+    private void checkTagIsFollowedByColon(String line, DescriptionTag tag) {
+        if (!line.contains(COLON))
+            throw new RuntimeException("Line \"" + line + "\" does not contain colon after tag name.");
+    }
+
+    private void putValueInMapAndResetBuilder(Map<String, String> map, String key, StringBuilder valueStringBuilder, String line) {
+        if (line == null || lineContainsATag(line)) {
+            map.put(key, valueStringBuilder.toString().trim());
+            valueStringBuilder.setLength(0);
+        }
     }
 
     private boolean isSingleTagType(DescriptionTag tag) {
@@ -116,26 +125,25 @@ public class MetadataParser {
 
     private String extractFullDescriptionString(SlangSource source) {
         StringBuilder sb = new StringBuilder();
-        boolean blockEndFound = false, blockStartFound = false;
+        boolean blockEndTagFound = false, blockStartTagFound = false;
         String firstLine = "";
         try (BufferedReader reader = new BufferedReader(new StringReader(source.getSource()))) {
             String line = getTrimmedLine(reader);
             while (line != null) {
-                if (line.startsWith(BLOCK_END)) {
-                    blockEndFound = true;
+                if (line.startsWith(BLOCK_END_TAG)) {
+                    blockEndTagFound = true;
                     break;
-                } else if (line.startsWith(BLOCK_START)) {
-                    blockStartFound = true;
+                } else if (line.startsWith(BLOCK_START_TAG)) {
+                    blockStartTagFound = true;
                     firstLine = line;
                     line = getTrimmedLine(reader);
+                    if (line.startsWith(BLOCK_END_TAG)) break;
                 }
 
-                if (blockStartFound && line.startsWith(PREFIX) && (line.length() > 2)) {
-                    sb.append(line.substring(BEGIN_INDEX)).append(System.lineSeparator());
-                }
+                appendValidLineToOutput(sb, blockStartTagFound, line);
                 line = getTrimmedLine(reader);
             }
-            checkStartingAndClosingTags(sb, firstLine, blockEndFound, blockStartFound);
+            checkStartingAndClosingTags(sb, firstLine, blockEndTagFound, blockStartTagFound);
         } catch (IOException e) {
             throw new RuntimeException("Error processing metadata, error extracting metadata from " +
                     source.getName(), e);
@@ -143,19 +151,26 @@ public class MetadataParser {
         return sb.toString();
     }
 
+    private void appendValidLineToOutput(StringBuilder sb, boolean blockStartTagFound, String line) {
+        if (blockStartTagFound && line.startsWith(PREFIX) && (line.length() > 2)) {
+            sb.append(line.substring(BEGIN_INDEX)).append(System.lineSeparator());
+        }
+    }
+
     private String getTrimmedLine(BufferedReader reader) throws IOException {
         String line = reader.readLine();
         return line != null ? line.trim() : null;
     }
 
-    private void checkStartingAndClosingTags(StringBuilder sb, String firstLine, boolean blockEndFound, boolean blockStartFound) {
-        if (firstLine.length() > BLOCK_START.length()) {
+    private void checkStartingAndClosingTags(StringBuilder sb, String firstLine, boolean blockEndTagFound,
+                                             boolean blockStartTagFound) {
+        if (firstLine.length() > BLOCK_START_TAG.length()) {
             throw new RuntimeException("Description is not accepted on the same line as the starting tag.");
         }
-        if (blockEndFound && !blockStartFound) {
+        if (blockEndTagFound && !blockStartTagFound) {
             throw new RuntimeException("Starting tag missing in the description.");
         }
-        if (!blockEndFound && sb.length() > 0) {
+        if (!blockEndTagFound && sb.length() > 0) {
             throw new RuntimeException("Closing tag missing in the description.");
         }
     }
