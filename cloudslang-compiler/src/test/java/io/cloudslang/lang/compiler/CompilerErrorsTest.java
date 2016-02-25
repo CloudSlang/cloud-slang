@@ -446,8 +446,7 @@ public class CompilerErrorsTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(subFlow));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("no_task_data_flow.sl");
-        exception.expectMessage("Error");
+        exception.expectMessage("task1");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 

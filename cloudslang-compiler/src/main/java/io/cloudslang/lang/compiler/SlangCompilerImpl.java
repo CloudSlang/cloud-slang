@@ -10,19 +10,20 @@ package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.modeller.SlangModeller;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
+import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.parser.YamlParser;
-import io.cloudslang.lang.entities.SystemProperty;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.Validate;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.SystemProperty;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
-import java.util.Set;
 import java.util.Map;
+import java.util.Set;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -57,16 +58,26 @@ public class SlangCompilerImpl implements SlangCompiler {
 
     @Override
     public Executable preCompile(SlangSource source) {
+        ExecutableModellingResult result = preCompileSource(source);
+        if (result.getErrors().size() > 0) {
+            throw result.getErrors().get(0);
+        }
+        return result.getExecutable();
+    }
+
+    @Override
+    public ExecutableModellingResult preCompileSource(SlangSource source) {
         Validate.notNull(source, "You must supply a source to compile");
 
         //first thing we parse the yaml file into java maps
         ParsedSlang parsedSlang = yamlParser.parse(source);
 
         // Then we transform the parsed Slang source to a Slang model
-        Executable executable = slangModeller.createModel(parsedSlang);
-        Validate.notEmpty(executable.getNamespace(),"Operation/Flow " +executable.getName() +" must have a namespace");
-
-        return executable;
+        ExecutableModellingResult result = slangModeller.createModel(parsedSlang);
+        if (result.getExecutable().getNamespace() == null || result.getExecutable().getNamespace().length() == 0) {
+            result.getErrors().add(new IllegalArgumentException("Operation/Flow " + result.getExecutable().getName() + " must have a namespace"));
+        }
+        return result;
     }
 
     @Override

@@ -1,6 +1,8 @@
 package io.cloudslang.lang.compiler.modeller;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.modeller.model.Executable;
+import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.AggregateTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
@@ -69,7 +71,7 @@ public class ExecutableBuilderTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage(flowName);
 
-        executableBuilder.transformToExecutable(mockParsedSlang, flowName, executableRawData);
+        transformToExecutable(mockParsedSlang, flowName, executableRawData);
     }
 
     @Test
@@ -82,7 +84,7 @@ public class ExecutableBuilderTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage(flowName);
 
-        executableBuilder.transformToExecutable(mockParsedSlang, flowName, executableRawData);
+        transformToExecutable(mockParsedSlang, flowName, executableRawData);
     }
 
     @Test
@@ -99,7 +101,7 @@ public class ExecutableBuilderTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage(taskName);
 
-        executableBuilder.transformToExecutable(mockParsedSlang, "flow1", executableRawData);
+        transformToExecutable(mockParsedSlang, "flow1", executableRawData);
     }
 
     @Test
@@ -117,7 +119,7 @@ public class ExecutableBuilderTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage(keyword);
 
-        executableBuilder.transformToExecutable(mockParsedSlang, "flow1", executableRawData);
+        transformToExecutable(mockParsedSlang, "flow1", executableRawData);
     }
 
     @Test
@@ -137,7 +139,7 @@ public class ExecutableBuilderTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage(keyword);
 
-        executableBuilder.transformToExecutable(mockParsedSlang, "flow1", executableRawData);
+        transformToExecutable(mockParsedSlang, "flow1", executableRawData);
     }
 
     @Test
@@ -158,7 +160,7 @@ public class ExecutableBuilderTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage(keyword);
 
-        executableBuilder.transformToExecutable(mockParsedSlang, "flow1", executableRawData);
+        transformToExecutable(mockParsedSlang, "flow1", executableRawData);
     }
 
     @Test
@@ -180,7 +182,7 @@ public class ExecutableBuilderTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage(taskName);
 
-        executableBuilder.transformToExecutable(mockParsedSlang, "flow1", executableRawData);
+        transformToExecutable(mockParsedSlang, "flow1", executableRawData);
     }
 
     @Test
@@ -200,7 +202,7 @@ public class ExecutableBuilderTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage(taskName);
 
-        executableBuilder.transformToExecutable(mockParsedSlang, "flow1", executableRawData);
+        transformToExecutable(mockParsedSlang, "flow1", executableRawData);
     }
 
     @Test
@@ -222,7 +224,7 @@ public class ExecutableBuilderTest {
         executableRawData.put(SlangTextualKeys.WORKFLOW_KEY, workFlowData);
 
         String flowName = "flow1";
-        Flow flow = (Flow) executableBuilder.transformToExecutable(mockParsedSlang, flowName, executableRawData);
+        Flow flow = (Flow) executableBuilder.transformToExecutable(mockParsedSlang, flowName, executableRawData).getExecutable();
         Assert.assertEquals(SlangTextualKeys.FLOW_TYPE, flow.getType());
         Assert.assertEquals(flowName, flow.getName());
         Deque<Task> tasks = flow.getWorkflow().getTasks();
@@ -251,7 +253,7 @@ public class ExecutableBuilderTest {
         executableRawData.put(SlangTextualKeys.WORKFLOW_KEY, workFlowData);
 
         String flowName = "flow1";
-        Flow flow = (Flow) executableBuilder.transformToExecutable(mockParsedSlang, flowName, executableRawData);
+        Flow flow = (Flow) executableBuilder.transformToExecutable(mockParsedSlang, flowName, executableRawData).getExecutable();
 
         Assert.assertEquals(SlangTextualKeys.FLOW_TYPE, flow.getType());
         Assert.assertEquals(flowName, flow.getName());
@@ -273,7 +275,7 @@ public class ExecutableBuilderTest {
         exception.expectMessage(operationName);
         exception.expectMessage(key);
 
-        Operation op = (Operation) executableBuilder.transformToExecutable(mockParsedSlang, operationName, executableRawData);
+        Operation op = (Operation) transformToExecutable(mockParsedSlang, operationName, executableRawData);
         Assert.assertNotNull(op);
     }
 
@@ -291,7 +293,7 @@ public class ExecutableBuilderTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage(operationName);
 
-        executableBuilder.transformToExecutable(mockParsedSlang, operationName, executableRawData);
+        transformToExecutable(mockParsedSlang, operationName, executableRawData);
     }
 
     @Test
@@ -307,7 +309,7 @@ public class ExecutableBuilderTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage(invalidKey);
 
-        executableBuilder.transformToExecutable(mockParsedSlang, "op1", executableRawData);
+        transformToExecutable(mockParsedSlang, "op1", executableRawData);
     }
 
     @Ignore("problem with the post construct no taking the mocks")
@@ -325,10 +327,18 @@ public class ExecutableBuilderTest {
         executableRawData.put(SlangTextualKeys.ACTION_KEY, actionRawData);
 
         String operationName = "op1";
-        Operation op = (Operation) executableBuilder.transformToExecutable(mockParsedSlang, operationName, executableRawData);
+        Operation op = (Operation) transformToExecutable(mockParsedSlang, operationName, executableRawData);
         Assert.assertNotNull(op);
         Assert.assertEquals(operationName, op.getName());
         Assert.assertNotNull(operationName, op.getAction().getActionData());
+    }
+
+    private Executable transformToExecutable(ParsedSlang mockParsedSlang, String flowName, Map<String, Object> executableRawData) {
+        ExecutableModellingResult modellingResult = executableBuilder.transformToExecutable(mockParsedSlang, flowName, executableRawData);
+        if (modellingResult.getErrors().size() > 0) {
+            throw modellingResult.getErrors().get(0);
+        }
+        return modellingResult.getExecutable();
     }
 
     @Configuration

@@ -9,39 +9,51 @@
 package io.cloudslang.lang.compiler.modeller;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.modeller.model.Action;
+import io.cloudslang.lang.compiler.modeller.model.Flow;
+import io.cloudslang.lang.compiler.modeller.model.Operation;
+import io.cloudslang.lang.compiler.modeller.model.Task;
+import io.cloudslang.lang.compiler.modeller.model.Workflow;
+import io.cloudslang.lang.compiler.modeller.result.ActionModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.TaskModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.WorkflowModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.Result;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.iterators.PeekingIterator;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
-import io.cloudslang.lang.compiler.modeller.model.Executable;
-import io.cloudslang.lang.compiler.modeller.model.Workflow;
-import io.cloudslang.lang.entities.bindings.Result;
-import io.cloudslang.lang.compiler.modeller.model.Action;
-import io.cloudslang.lang.compiler.modeller.model.Flow;
-import io.cloudslang.lang.compiler.modeller.model.Operation;
-import io.cloudslang.lang.compiler.modeller.model.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
-
-import static io.cloudslang.lang.compiler.SlangTextualKeys.*;
-import static io.cloudslang.lang.entities.ScoreLangConstants.*;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
+import static io.cloudslang.lang.entities.ScoreLangConstants.ASYNC_LOOP_KEY;
+import static io.cloudslang.lang.entities.ScoreLangConstants.LOOP_KEY;
+import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER;
 
 /*
  * Created by orius123 on 09/11/14.
@@ -80,7 +92,7 @@ public class ExecutableBuilder {
         //action transformers and keys
         actionTransformers = filterTransformers(Transformer.Scope.ACTION);
         //action keys excluding each other
-        actionTransformerConstraintGroups = Arrays.asList(Arrays.asList(ScoreLangConstants.PYTHON_SCRIPT_KEY, SlangTextualKeys.JAVA_ACTION));
+        actionTransformerConstraintGroups = Collections.singletonList(Arrays.asList(ScoreLangConstants.PYTHON_SCRIPT_KEY, SlangTextualKeys.JAVA_ACTION));
 
         //task transformers
         preTaskTransformers = filterTransformers(Transformer.Scope.BEFORE_TASK);
@@ -91,19 +103,33 @@ public class ExecutableBuilder {
         return filter(having(on(Transformer.class).getScopes().contains(scope)), transformers);
     }
 
-    public Executable transformToExecutable(ParsedSlang parsedSlang, String execName, Map<String, Object> executableRawData) {
+    @SuppressWarnings("unchecked")
+    public ExecutableModellingResult transformToExecutable(ParsedSlang parsedSlang, String execName, Map<String, Object> executableRawData) {
 
-        Validate.notEmpty(executableRawData, "Error compiling " + parsedSlang.getName() + ". Executable data for: \'" + execName + "\' is empty");
-        Validate.notNull(parsedSlang, "Slang source for: \'" + execName + "\' is null");
+        execName = execName == null ? "" : execName;
+        if (executableRawData == null) {
+            throw new IllegalArgumentException("Error compiling " + parsedSlang.getName() + ". Executable data is null");
+        }
+        if(parsedSlang == null) {
+            throw new IllegalArgumentException("Slang source for: \'" + execName + "\' is null");
+        }
+
+        List<RuntimeException> errors = new ArrayList<>();
+        if (StringUtils.isBlank(execName)) {
+            errors.add(new RuntimeException("Executable in source: " + parsedSlang.getName() + " has no name"));
+        }
+        if(executableRawData.size() == 0) {
+            errors.add(new IllegalArgumentException("Error compiling " + parsedSlang.getName() + ". Executable data for: \'" + execName + "\' is empty"));
+        }
 
         Map<String, Serializable> preExecutableActionData = new HashMap<>();
         Map<String, Serializable> postExecutableActionData = new HashMap<>();
 
-        transformersHandler.validateKeyWords(execName, executableRawData,
-                ListUtils.union(preExecTransformers, postExecTransformers), execAdditionalKeywords, null);
+        errors.addAll(transformersHandler.checkKeyWords(execName, executableRawData,
+                ListUtils.union(preExecTransformers, postExecTransformers), execAdditionalKeywords, null));
 
-        preExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, preExecTransformers));
-        postExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, postExecTransformers));
+        preExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, preExecTransformers, errors));
+        postExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, postExecTransformers, errors));
 
         @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) preExecutableActionData.remove(SlangTextualKeys.INPUTS_KEY);
         @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) postExecutableActionData.remove(SlangTextualKeys.OUTPUTS_KEY);
@@ -115,18 +141,20 @@ public class ExecutableBuilder {
         Set<String> systemPropertyDependencies;
         switch (parsedSlang.getType()) {
             case FLOW:
-
-                if(!executableRawData.containsKey(SlangTextualKeys.WORKFLOW_KEY)){
-                    throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + execName + " has no workflow property");
+                Object rawData = executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
+                if(rawData == null){
+                    rawData = new ArrayList<>();
+                    errors.add(new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + execName + " has no workflow property"));
                 }
                 List<Map<String, Map<String, Object>>> workFlowRawData;
                 try{
-                    workFlowRawData = (List) executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
+                    workFlowRawData = (List<Map<String, Map<String, Object>>>) rawData;
                 } catch (ClassCastException ex){
-                    throw new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'workflow' property there should be a list of tasks and not a map");
+                    workFlowRawData = new ArrayList<>();
+                    errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'workflow' property there should be a list of tasks and not a map"));
                 }
                 if (CollectionUtils.isEmpty(workFlowRawData)) {
-                    throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + execName + " has no workflow data");
+                    errors.add(new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + execName + " has no workflow data"));
                 }
 
                 Workflow onFailureWorkFlow = null;
@@ -138,26 +166,31 @@ public class ExecutableBuilder {
                     String taskName = taskData.keySet().iterator().next();
                     if(taskName.equals(SlangTextualKeys.ON_FAILURE_KEY)){
                         if (onFailureFound) {
-                            throw new RuntimeException("Flow: '" + execName + "' syntax is illegal.\n" + MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX);
+                            errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\n" + MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX));
                         } else {
                             onFailureFound = true;
                         }
                         try{
                             onFailureData = (List<Map<String, Map<String, Object>>>)taskData.values().iterator().next();
                         } catch (ClassCastException ex){
-                            throw new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a list of tasks and not a map");
+                            onFailureData = new ArrayList<>();
+                            errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a list of tasks and not a map"));
                         }
                         if (CollectionUtils.isNotEmpty(onFailureData)) {
-                            onFailureWorkFlow = compileWorkFlow(onFailureData, imports, null, true, namespace);
+                            WorkflowModellingResult workflowModellingResult = compileWorkFlow(onFailureData, imports, null, true, namespace);
+                            errors.addAll(workflowModellingResult.getErrors());
+                            onFailureWorkFlow = workflowModellingResult.getWorkflow();
                         }
                         tasksIterator.remove();
                     }
                 }
 
-                Workflow workflow = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false, namespace);
+                WorkflowModellingResult workflowModellingResult = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false, namespace);
+                errors.addAll(workflowModellingResult.getErrors());
+                Workflow workflow = workflowModellingResult.getWorkflow();
                 executableDependencies = fetchDirectTasksDependencies(workflow);
                 systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForFlow(inputs, outputs, results, workflow.getTasks());
-                return new Flow(
+                Flow flow = new Flow(
                         preExecutableActionData,
                         postExecutableActionData,
                         workflow,
@@ -169,22 +202,25 @@ public class ExecutableBuilder {
                         executableDependencies,
                         systemPropertyDependencies
                 );
+                return new ExecutableModellingResult(flow, errors);
 
             case OPERATION:
-                Map<String, Object> actionRawData;
+                Map<String, Object> actionRawData = null;
                 try{
                    actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
                 } catch (ClassCastException ex){
-                    throw new RuntimeException("Operation: '" + execName + "' syntax is illegal.\nBelow 'action' property there should be a map of values such as: 'python_script:' or 'java_action:'");
+                    errors.add(new RuntimeException("Operation: '" + execName + "' syntax is illegal.\nBelow 'action' property there should be a map of values such as: 'python_script:' or 'java_action:'"));
                 }
-
+                actionRawData = actionRawData == null ? new HashMap<String, Object>() : actionRawData;
                 if (MapUtils.isEmpty(actionRawData)) {
-                    throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Operation: " + execName + " has no action data");
+                    errors.add(new RuntimeException("Error compiling " + parsedSlang.getName() + ". Operation: " + execName + " has no action data"));
                 }
-                Action action = compileAction(actionRawData);
+                ActionModellingResult actionModellingResult = compileAction(actionRawData);
+                errors.addAll(actionModellingResult.getErrors());
+                Action action = actionModellingResult.getAction();
                 executableDependencies = new HashSet<>();
                 systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForOperation(inputs, outputs, results);
-                return new Operation(
+                Operation operation = new Operation(
                         preExecutableActionData,
                         postExecutableActionData,
                         action,
@@ -196,47 +232,47 @@ public class ExecutableBuilder {
                         executableDependencies,
                         systemPropertyDependencies
                 );
+                return new ExecutableModellingResult(operation, errors);
             default:
                 throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". It is not of flow or operations type");
         }
     }
 
-    private Action compileAction(Map<String, Object> actionRawData) {
+    private ActionModellingResult compileAction(Map<String, Object> actionRawData) {
         Map<String, Serializable> actionData = new HashMap<>();
 
-        transformersHandler.validateKeyWords("action data", actionRawData, actionTransformers, null, actionTransformerConstraintGroups);
+        List<RuntimeException> errors = transformersHandler.checkKeyWords("action data", actionRawData, actionTransformers, null, actionTransformerConstraintGroups);
 
-        actionData.putAll(transformersHandler.runTransformers(actionRawData, actionTransformers));
+        actionData.putAll(transformersHandler.runTransformers(actionRawData, actionTransformers, errors));
 
-        return new Action(actionData);
+        Action action = new Action(actionData);
+        return new ActionModellingResult(action, errors);
     }
 
-    private Workflow compileWorkFlow(List<Map<String, Map<String, Object>>> workFlowRawData,
-                                             Map<String, String> imports,
-                                             Workflow onFailureWorkFlow,
-                                             boolean onFailureSection,
-                                             String namespace) {
+    private WorkflowModellingResult compileWorkFlow(List<Map<String, Map<String, Object>>> workFlowRawData,
+                                                    Map<String, String> imports,
+                                                    Workflow onFailureWorkFlow,
+                                                    boolean onFailureSection,
+                                                    String namespace) {
+
+        List<RuntimeException> errors = new ArrayList<>();
+        if (workFlowRawData.isEmpty()) {
+            errors.add(new IllegalArgumentException("Flow must have tasks in its workflow"));
+        }
 
         Deque<Task> tasks = new LinkedList<>();
-
-        Validate.notEmpty(workFlowRawData, "Flow must have tasks in its workflow");
-
-        PeekingIterator<Map<String, Map<String, Object>>> iterator =
-                new PeekingIterator<>(workFlowRawData.iterator());
-
         boolean isOnFailureDefined = onFailureWorkFlow != null;
-
+        Set<String> taskNames = new HashSet<>();
         String defaultFailure = isOnFailureDefined ?
                 onFailureWorkFlow.getTasks().getFirst().getName() : ScoreLangConstants.FAILURE_RESULT;
 
-        Set<String> taskNames = new HashSet<>();
-
+        PeekingIterator<Map<String, Map<String, Object>>> iterator = new PeekingIterator<>(workFlowRawData.iterator());
         while (iterator.hasNext()) {
             Map<String, Map<String, Object>> taskRawData = iterator.next();
             Map<String, Map<String, Object>> nextTaskData = iterator.peek();
             String taskName = taskRawData.keySet().iterator().next();
-            if(taskNames.contains(taskName)){
-                throw new RuntimeException("Task name: \'" + taskName + "\' appears more than once in the workflow. Each task name in the workflow must be unique");
+            if (taskNames.contains(taskName)) {
+                errors.add(new RuntimeException("Task name: \'" + taskName + "\' appears more than once in the workflow. Each task name in the workflow must be unique"));
             }
             taskNames.add(taskName);
             Map<String, Object> taskRawDataValue;
@@ -248,9 +284,8 @@ public class ExecutableBuilder {
                     boolean asyncLoopKeyFound = taskRawDataValue.containsKey(ASYNC_LOOP_KEY);
                     if (loopKeyFound) {
                         if (asyncLoopKeyFound) {
-                            throw new RuntimeException("Task: " + taskName + " syntax is illegal.\nBelow task name, there can be either \'loop\' or \'aync_loop\' key.");
+                            errors.add(new RuntimeException("Task: " + taskName + " syntax is illegal.\nBelow task name, there can be either \'loop\' or \'aync_loop\' key."));
                         }
-
                         message = "Task: " + taskName + " syntax is illegal.\nBelow the 'loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
                         @SuppressWarnings("unchecked") Map<String, Object> loopRawData = (Map<String, Object>) taskRawDataValue.remove(LOOP_KEY);
                         taskRawDataValue.putAll(loopRawData);
@@ -262,8 +297,9 @@ public class ExecutableBuilder {
                         taskRawDataValue.putAll(asyncLoopRawData);
                     }
                 }
-            } catch (ClassCastException ex){
-                throw new RuntimeException(message);
+            } catch (ClassCastException ex) {
+                taskRawDataValue = new HashMap<>();
+                errors.add(new RuntimeException(message));
             }
 
             String defaultSuccess;
@@ -272,45 +308,53 @@ public class ExecutableBuilder {
             } else {
                 defaultSuccess = onFailureSection ? ScoreLangConstants.FAILURE_RESULT : ScoreLangConstants.SUCCESS_RESULT;
             }
-            Task task = compileTask(taskName, taskRawDataValue, defaultSuccess, imports, defaultFailure, namespace);
-            tasks.add(task);
+            TaskModellingResult taskModellingResult = compileTask(taskName, taskRawDataValue, defaultSuccess, imports, defaultFailure, namespace);
+            errors.addAll(taskModellingResult.getErrors());
+            tasks.add(taskModellingResult.getTask());
         }
 
         if (isOnFailureDefined) {
             tasks.addAll(onFailureWorkFlow.getTasks());
         }
 
-        return new Workflow(tasks);
+        return new WorkflowModellingResult(new Workflow(tasks), errors);
     }
 
-    private Task compileTask(String taskName, Map<String, Object> taskRawData, String defaultSuccess,
-                                     Map<String, String> imports, String defaultFailure, String namespace) {
+    private TaskModellingResult compileTask(String taskName, Map<String, Object> taskRawData, String defaultSuccess,
+                                            Map<String, String> imports, String defaultFailure, String namespace) {
 
+        List<RuntimeException> errors = new ArrayList<>();
         if (MapUtils.isEmpty(taskRawData)) {
-            throw new RuntimeException("Task: " + taskName + " has no data");
+            taskRawData = new HashMap<>();
+            errors.add(new RuntimeException("Task: " + taskName + " has no data"));
         }
 
         Map<String, Serializable> preTaskData = new HashMap<>();
         Map<String, Serializable> postTaskData = new HashMap<>();
 
-        transformersHandler.validateKeyWords(taskName, taskRawData, ListUtils.union(preTaskTransformers, postTaskTransformers), TaskAdditionalKeyWords, null);
+        errors.addAll(transformersHandler.checkKeyWords(taskName, taskRawData, ListUtils.union(preTaskTransformers, postTaskTransformers), TaskAdditionalKeyWords, null));
 
-        try {
-            preTaskData.putAll(transformersHandler.runTransformers(taskRawData, preTaskTransformers));
-            postTaskData.putAll(transformersHandler.runTransformers(taskRawData, postTaskTransformers));
-        } catch (Exception ex){
-            throw new RuntimeException("For task: " + taskName + " syntax is illegal.\n" + ex.getMessage(), ex);
-        }
+        String errorMessagePrefix = "For task: " + taskName + " syntax is illegal.\n";
+        preTaskData.putAll(transformersHandler.runTransformers(taskRawData, preTaskTransformers, errors, errorMessagePrefix));
+        postTaskData.putAll(transformersHandler.runTransformers(taskRawData, postTaskTransformers, errors, errorMessagePrefix));
 
         @SuppressWarnings("unchecked")
         List<Argument> arguments = (List<Argument>)preTaskData.get(SlangTextualKeys.DO_KEY);
 
-        @SuppressWarnings("unchecked") Map<String, Object> doRawData = (Map<String, Object>) taskRawData.get(SlangTextualKeys.DO_KEY);
-        if (MapUtils.isEmpty(doRawData)) {
-            throw new RuntimeException("Task: \'" + taskName + "\' has no reference information");
+        String refId = "";
+        Map<String, Object> doRawData;
+        try {
+            //noinspection unchecked
+            doRawData = (Map<String, Object>) taskRawData.get(SlangTextualKeys.DO_KEY);
+        } catch (ClassCastException ex) {
+            doRawData = new HashMap<>();
         }
-        String refString = doRawData.keySet().iterator().next();
-        String refId = resolveReferenceID(refString, imports, namespace);
+        if (MapUtils.isEmpty(doRawData)) {
+            errors.add(new RuntimeException("Task: \'" + taskName + "\' has no reference information"));
+        } else {
+            String refString = doRawData.keySet().iterator().next();
+            refId = resolveReferenceID(refString, imports, namespace);
+        }
 
         @SuppressWarnings("unchecked") Map<String, String> navigationStrings = (Map<String, String>) postTaskData.get(SlangTextualKeys.NAVIGATION_KEY);
 
@@ -321,7 +365,7 @@ public class ExecutableBuilder {
             navigationStrings.put(ScoreLangConstants.FAILURE_RESULT, defaultFailure);
         }
 
-        return new Task(
+        Task task = new Task(
                 taskName,
                 preTaskData,
                 postTaskData,
@@ -329,6 +373,7 @@ public class ExecutableBuilder {
                 navigationStrings,
                 refId,
                 preTaskData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
+        return new TaskModellingResult(task, errors);
     }
 
     private static String resolveReferenceID(String rawReferenceID, Map<String, String> imports, String namespace) {

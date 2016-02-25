@@ -8,11 +8,12 @@
  */
 package io.cloudslang.lang.compiler;
 
-import java.util.Set;
-
 import io.cloudslang.lang.compiler.modeller.model.Executable;
+import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
+
+import java.util.Set;
 
 public interface SlangCompiler {
 
@@ -27,9 +28,18 @@ public interface SlangCompiler {
     /**
      * Pre-compile a CloudSlang source into an {@link io.cloudslang.lang.compiler.modeller.model.Executable}
      * @param source the {@link SlangSource}
-     * @return an {@link io.cloudslang.lang.compiler.modeller.model.Executable} object, containing either a flow or operation in the file.
+     * @return an {@link io.cloudslang.lang.compiler.modeller.model.Executable} object, containing either a flow or
+     * operation in the file.
      */
     Executable preCompile(SlangSource source);
+
+    /**
+     * Pre-compile a CloudSlang source into an {@link ExecutableModellingResult}
+     * @param source the {@link SlangSource}
+     * @return an {@link ExecutableModellingResult} object, containing an executable
+     * which is either a flow or an operations in the file.
+     */
+    ExecutableModellingResult preCompileSource(SlangSource source);
 
     Set<SystemProperty> loadSystemProperties(SlangSource source);
 
