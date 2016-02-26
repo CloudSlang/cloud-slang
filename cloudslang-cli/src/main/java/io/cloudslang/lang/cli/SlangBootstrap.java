@@ -82,10 +82,7 @@ public class SlangBootstrap {
     private static void configureLogging(Properties userProperties) {
         String filePath = userProperties.getProperty(LOG4J_CONFIGURATION);
         if (StringUtils.isNotEmpty(filePath)) {
-            // load log4j properties from file
-            PropertyConfigurator.configure(filePath);
-            // log4j will not search for config files in classpath resources
-            System.setProperty("log4j.configuration", filePath);
+            System.setProperty(LOG4J_CONFIGURATION, filePath);
         }
     }
 
