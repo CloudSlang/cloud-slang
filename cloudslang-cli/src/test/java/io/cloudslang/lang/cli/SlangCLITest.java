@@ -41,8 +41,8 @@ public class SlangCLITest {
 
     static final CompilationArtifact emptyCompilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>(), new HashSet<String>());
     private final static String[] CONTEXT_PATH = { "classpath*:/META-INF/spring/test-spring-shell-plugin.xml" };
-    private final static String FLOW_PATH_BACKSLASH_INPUT = "C:\\\\flow.yaml";
-    private final static String FLOW_PATH_BACKSLASH = "C:\\flow.yaml";
+    private final static String FLOW_PATH_BACKSLASH_INPUT = "C:\\\\basic_flow.yaml";
+    private final static String FLOW_PATH_BACKSLASH = "C:\\basic_flow.yaml";
     private final static String DEPENDENCIES_PATH_BACKSLASH = "C:\\\\executables.dir1\\\\";
     private static final long DEFAULT_TIMEOUT = 10000;
     public static final String INPUT_FILE_PATH = "/inputs/inputs.yaml";
@@ -188,7 +188,7 @@ public class SlangCLITest {
         inputsMap.put("input1", "value1");
         inputsMap.put("input2", "value2");
 
-        Map fileInputsMap = new HashMap<>();
+        Map<String, String> fileInputsMap = new HashMap<>();
         fileInputsMap.put("host", "localhost");
         fileInputsMap.put("port", "22");
 
@@ -206,6 +206,7 @@ public class SlangCLITest {
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
+
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testRunAsyncWithInputsAndFileInputs() throws Exception {
         slangCLI.setEnvVar(true);
@@ -217,7 +218,7 @@ public class SlangCLITest {
         inputsMap.put("input1", "value1");
         inputsMap.put("input2", "value2");
 
-        Map fileInputsMap = new HashMap<>();
+        Map<String, String> fileInputsMap = new HashMap<>();
         fileInputsMap.put("host", "localhost");
         fileInputsMap.put("port", "22");
 
@@ -309,7 +310,7 @@ public class SlangCLITest {
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --if " + FLOW_PATH_BACKSLASH_INPUT);
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
-        verify(compilerHelperMock).loadInputsFromFile(Arrays.asList(FLOW_PATH_BACKSLASH));
+        verify(compilerHelperMock).loadInputsFromFile(Collections.singletonList(FLOW_PATH_BACKSLASH));
         verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Serializable.class), anySetOf(SystemProperty.class), eq(false), eq(false));
 
         Assert.assertEquals("method threw exception", null, cr.getException());
@@ -326,7 +327,7 @@ public class SlangCLITest {
 		CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --spf " + FLOW_PATH_BACKSLASH_INPUT);
 
 		verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
-		verify(compilerHelperMock).loadSystemProperties(Arrays.asList(FLOW_PATH_BACKSLASH));
+		verify(compilerHelperMock).loadSystemProperties(Collections.singletonList(FLOW_PATH_BACKSLASH));
 		verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Serializable.class), anySetOf(SystemProperty.class), eq(false), eq(false));
 
 		Assert.assertEquals("method threw exception", null, cr.getException());

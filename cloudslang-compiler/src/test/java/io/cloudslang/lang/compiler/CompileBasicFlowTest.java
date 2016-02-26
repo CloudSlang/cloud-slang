@@ -44,7 +44,7 @@ public class CompileBasicFlowTest {
 
     @Test
     public void testCompileFlowBasic() throws Exception {
-        URI flow = getClass().getResource("/flow.yaml").toURI();
+        URI flow = getClass().getResource("/basic_flow.yaml").toURI();
         URI operation = getClass().getResource("/test_op.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
@@ -113,7 +113,7 @@ public class CompileBasicFlowTest {
 
     @Test
     public void testPreCompileFlowBasic() throws Exception {
-        URI flowUri = getClass().getResource("/flow.yaml").toURI();
+        URI flowUri = getClass().getResource("/basic_flow.yaml").toURI();
         Executable flow = compiler.preCompile(SlangSource.fromFile(flowUri));
 
         Assert.assertNotNull("Pre-Compiled meta-data is null", flow);

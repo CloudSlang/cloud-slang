@@ -8,11 +8,25 @@
 namespace: user.flows.circular
 
 imports:
+  ops: user.ops
   flows: user.flows.circular
 
 flow:
-  name: circular_child_flow
+  name: circular_parent_flow
   workflow:
     - CheckWeather:
         do:
-          flows.circular_parent_flow:
+          ops.test_op:
+            - city: 'input_1'
+        publish:
+          - weather
+
+    - SubFlow:
+        do:
+          flows.circular_child_flow:
+            - city: 'input_1'
+        publish:
+          - weather
+  results:
+    - SUCCESS
+    - FAILURE

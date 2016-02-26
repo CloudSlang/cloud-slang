@@ -10,7 +10,7 @@ imports:
   ops: user.ops
 
 flow:
-  name: basic_flow
+  name: flow_with_missing_navigation_from_op_result
 
   workflow:
     - Task1:

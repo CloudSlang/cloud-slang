@@ -8,7 +8,7 @@
 namespace: system.ops
 
 operation:
-  name: binding_flow_op
+  name: binding_flow_int_op
   inputs:
     - base_input
     - bound_input:

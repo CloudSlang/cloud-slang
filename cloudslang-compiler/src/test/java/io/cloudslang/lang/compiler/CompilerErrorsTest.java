@@ -79,7 +79,7 @@ public class CompilerErrorsTest {
 
     @Test
     public void testSystemPropertiesAsDep() throws Exception {
-        URI flow = getClass().getResource("/flow.yaml").toURI();
+        URI flow = getClass().getResource("/basic_flow.yaml").toURI();
         URI operation = getClass().getResource("/test_op.sl").toURI();
 		URI systemProperties = getClass().getResource("/corrupted/system_properties.yaml").toURI();
         Set<SlangSource> path = new HashSet<>();
@@ -369,7 +369,7 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithMissingRefInPath() throws Exception {
-        URI resource = getClass().getResource("/flow.yaml").toURI();
+        URI resource = getClass().getResource("/basic_flow.yaml").toURI();
         URI op = getClass().getResource("/operation_with_data.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
