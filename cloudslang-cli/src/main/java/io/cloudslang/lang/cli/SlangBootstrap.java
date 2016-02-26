@@ -33,16 +33,14 @@ public class SlangBootstrap {
     private static final String USER_CONFIG_FILEPATH = USER_CONFIG_DIR + File.separator + USER_CONFIG_FILENAME;
     private static final String SUBSTITUTION_REGEX = "\\$\\{([^${}]+)\\}"; // ${VAR}
     private static final Pattern SUBSTITUTION_PATTERN = Pattern.compile(SUBSTITUTION_REGEX);
-    private static final String LOG4J_CONFIGURATION = "log4j.configuration";
 
     public static void main(String[] args) throws IOException {
-        Properties userProperties = loadUserProperties();
-        configureLogging(userProperties);
+        loadUserProperties();
         System.out.println("Loading..");
         Bootstrap.main(args);
     }
 
-    private static Properties loadUserProperties() throws IOException {
+    private static void loadUserProperties() throws IOException {
         String appHome = System.getProperty("app.home");
         String propertyFilePath = appHome + File.separator + USER_CONFIG_FILEPATH;
         File propertyFile = new File(propertyFilePath);
@@ -52,15 +50,13 @@ public class SlangBootstrap {
                 rawProperties.load(propertiesStream);
             }
         }
-        Properties processedProperties = new Properties();
         Enumeration<?> e = rawProperties.propertyNames();
         while (e.hasMoreElements()) {
             String key = (String) e.nextElement();
             String value = rawProperties.getProperty(key);
             value = substitutePropertyReferences(value);
-            processedProperties.setProperty(key, value);
+            System.setProperty(key, value);
         }
-        return processedProperties;
     }
 
     private static String substitutePropertyReferences(String value) {
@@ -76,13 +72,6 @@ public class SlangBootstrap {
             }
         }
         return value;
-    }
-
-    private static void configureLogging(Properties userProperties) {
-        String filePath = userProperties.getProperty(LOG4J_CONFIGURATION);
-        if (StringUtils.isNotEmpty(filePath)) {
-            System.setProperty(LOG4J_CONFIGURATION, filePath);
-        }
     }
 
 }
