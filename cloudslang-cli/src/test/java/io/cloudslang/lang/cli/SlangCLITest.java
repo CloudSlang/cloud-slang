@@ -188,7 +188,7 @@ public class SlangCLITest {
         inputsMap.put("input1", "value1");
         inputsMap.put("input2", "value2");
 
-        Map<String, Serializable> fileInputsMap = new HashMap<>();
+        Map fileInputsMap = new HashMap<>();
         fileInputsMap.put("host", "localhost");
         fileInputsMap.put("port", "22");
 
@@ -218,7 +218,7 @@ public class SlangCLITest {
         inputsMap.put("input1", "value1");
         inputsMap.put("input2", "value2");
 
-        Map<String, Serializable> fileInputsMap = new HashMap<>();
+        Map fileInputsMap = new HashMap<>();
         fileInputsMap.put("host", "localhost");
         fileInputsMap.put("port", "22");
 
