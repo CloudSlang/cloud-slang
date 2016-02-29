@@ -15,10 +15,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.shell.Bootstrap;
 
 import java.io.*;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,11 +31,16 @@ public class SlangBootstrap {
     private static final String USER_CONFIG_DIR = "configuration";
     private static final String USER_CONFIG_FILENAME = "cslang.properties";
     private static final String USER_CONFIG_FILEPATH = USER_CONFIG_DIR + File.separator + USER_CONFIG_FILENAME;
-    private static final String SUBSTITUTION_REGEX = "\\$\\{([^${}]+)\\}"; // ${VAR}
+    private static final String SUBSTITUTION_REGEX = "\\$\\{([^${}]+)\\}"; // ${system.property.name}
     private static final Pattern SUBSTITUTION_PATTERN = Pattern.compile(SUBSTITUTION_REGEX);
 
     public static void main(String[] args) throws IOException {
-        loadUserProperties();
+        try {
+            loadUserProperties();
+        } catch (Exception ex) {
+            System.out.println("Error occurred while loading user configuration: " + ex.getMessage());
+            ex.printStackTrace();
+        }
         System.out.println("Loading..");
         Bootstrap.main(args);
     }
@@ -45,26 +50,35 @@ public class SlangBootstrap {
         String propertyFilePath = appHome + File.separator + USER_CONFIG_FILEPATH;
         File propertyFile = new File(propertyFilePath);
         Properties rawProperties = new Properties();
-        if (propertyFile.exists()) {
+        if (propertyFile.isFile()) {
             try (InputStream propertiesStream = new FileInputStream(propertyFilePath)) {
                 rawProperties.load(propertiesStream);
             }
         }
-        Enumeration<?> e = rawProperties.propertyNames();
-        while (e.hasMoreElements()) {
-            String key = (String) e.nextElement();
-            String value = rawProperties.getProperty(key);
+        Set<Map.Entry<Object, Object>> propertyEntries = rawProperties.entrySet();
+        for (Map.Entry<Object, Object> property : propertyEntries) {
+            String key = (String) property.getKey();
+            String value = (String) property.getValue();
             value = substitutePropertyReferences(value);
             System.setProperty(key, value);
         }
     }
 
     private static String substitutePropertyReferences(String value) {
+        Set<String> variableNames = findPropertyReferences(value);
+        return replacePropertyReferences(value, variableNames);
+    }
+
+    private static Set<String> findPropertyReferences(String value) {
         Matcher mather = SUBSTITUTION_PATTERN.matcher(value);
         Set<String> variableNames = new HashSet<>();
         while (mather.find()) {
             variableNames.add(mather.group(1));
         }
+        return variableNames;
+    }
+
+    private static String replacePropertyReferences(String value, Set<String> variableNames) {
         for (String variableName : variableNames) {
             String variableValue = System.getProperty(variableName);
             if (StringUtils.isNotEmpty(variableValue)) {
