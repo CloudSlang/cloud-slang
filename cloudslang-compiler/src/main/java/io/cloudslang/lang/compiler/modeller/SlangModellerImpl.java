@@ -9,10 +9,9 @@
 package io.cloudslang.lang.compiler.modeller;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
-import io.cloudslang.lang.compiler.modeller.model.Executable;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
+import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +28,7 @@ public class SlangModellerImpl implements SlangModeller{
     private ExecutableBuilder executableBuilder;
 
     @Override
-    public Executable createModel(ParsedSlang parsedSlang) {
+    public ExecutableModellingResult createModel(ParsedSlang parsedSlang) {
         Validate.notNull(parsedSlang, "You must supply a parsed Slang source to compile");
 
         try {
@@ -47,16 +46,14 @@ public class SlangModellerImpl implements SlangModeller{
     }
 
     /**
-     * transform a parsed slang source {@link io.cloudslang.lang.compiler.parser.model.ParsedSlang} to an {@link io.cloudslang.lang.compiler.modeller.model.Executable}
+     * transform a parsed slang source {@link io.cloudslang.lang.compiler.parser.model.ParsedSlang} to
+     * an {@link ExecutableModellingResult}
      *
      * @param parsedSlang the source to transform the operations from
-     * @return {@link io.cloudslang.lang.compiler.modeller.model.Executable} representing the operation or flow in the source
+     * @return {@link ExecutableModellingResult} representing the operation or flow in the source
      */
-    private Executable transformToExecutable(ParsedSlang parsedSlang, Map<String, Object> rawData) {
+    private ExecutableModellingResult transformToExecutable(ParsedSlang parsedSlang, Map<String, Object> rawData) {
         String executableName = (String) rawData.get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
-        if (StringUtils.isBlank(executableName)) {
-            throw new RuntimeException("Executable in source: " + parsedSlang.getName() + " has no name");
-        }
         return executableBuilder.transformToExecutable(parsedSlang, executableName, rawData);
     }
 }

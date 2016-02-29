@@ -129,10 +129,12 @@ public class DependenciesHelper {
 
     private Set<String> getSystemPropertiesFromInOutParam(List<? extends InOutParam> inOutParams) {
         Set<String> result = new HashSet<>();
-        for(InOutParam inOutParam : inOutParams) {
-            Set<String> systemPropertyDependencies = inOutParam.getSystemPropertyDependencies();
-            if(CollectionUtils.isNotEmpty(systemPropertyDependencies)) {
-                result.addAll(systemPropertyDependencies);
+        if (inOutParams != null) {
+            for(InOutParam inOutParam : inOutParams) {
+                Set<String> systemPropertyDependencies = inOutParam.getSystemPropertyDependencies();
+                if(CollectionUtils.isNotEmpty(systemPropertyDependencies)) {
+                    result.addAll(systemPropertyDependencies);
+                }
             }
         }
         return result;
