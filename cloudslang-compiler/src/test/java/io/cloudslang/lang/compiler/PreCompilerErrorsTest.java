@@ -40,9 +40,21 @@ public class PreCompilerErrorsTest {
     @Test
     public void testNotOpFlowFile() throws Exception {
         URI resource = getClass().getResource("/corrupted/no_op_flow_file.sl").toURI();
+
         exception.expect(RuntimeException.class);
         exception.expectMessage("flow/operation");
         compiler.preCompileSource(SlangSource.fromFile(resource));
+    }
+
+    @Test
+    public void testOpWithMissingNamespace() throws Exception {
+        URI resource = getClass().getResource("/corrupted/op_without_namespace.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("must have a namespace");
+        throw result.getErrors().get(0);
     }
 
     @Test

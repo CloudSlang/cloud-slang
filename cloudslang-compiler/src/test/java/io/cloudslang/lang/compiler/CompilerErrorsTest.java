@@ -217,6 +217,16 @@ public class CompilerErrorsTest {
     }
 
     @Test
+    public void testOpWithMissingNamespace() throws Exception {
+        URI resource = getClass().getResource("/corrupted/op_without_namespace.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("must have a namespace");
+        compiler.compile(SlangSource.fromFile(resource), path);
+    }
+
+    @Test
     public void testFlowWithMissingName() throws Exception {
         URI resource = getClass().getResource("/corrupted/missing_name_flow.sl").toURI();
 
