@@ -27,6 +27,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.*;
 
 import static ch.lambdaj.Lambda.convert;
@@ -113,7 +114,7 @@ public class CompilerHelperImpl implements CompilerHelper{
 		for(File inputFile : fileCollection) {
 			logger.info("Loading file: " + inputFile);
 			try {
-                String inputsFileContent = FileUtils.readFileToString(inputFile);
+                String inputsFileContent = SlangSource.readFileToString(inputFile);
                 Boolean emptyContent = true;
                 if (StringUtils.isNotEmpty(inputsFileContent)) {
                     @SuppressWarnings("unchecked") Map<String, ? extends Serializable> inputFileYamlContent =

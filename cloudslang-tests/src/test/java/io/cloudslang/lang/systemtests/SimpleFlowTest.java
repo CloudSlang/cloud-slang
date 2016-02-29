@@ -13,12 +13,17 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.score.events.ScoreEvent;
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -118,7 +123,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
     }
 
     @Test
-    public void testFlowWithMissingNavigationFromOperationResult() throws Exception {
+     public void testFlowWithMissingNavigationFromOperationResult() throws Exception {
         URI resource = getClass().getResource("/yaml/flow_with_missing_navigation_from_op_result.sl").toURI();
         URI operations = getClass().getResource("/yaml/print_custom_result_op.sl").toURI();
 
@@ -130,6 +135,21 @@ public class SimpleFlowTest extends SystemsTestsParent {
         exception.expectMessage("navigation");
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
         trigger(compilationArtifact, new HashMap<String, Serializable>(), null);
+    }
+
+    @Test
+    public void testFlowWithRequiredInputUTF8() throws Exception {
+        URI resource = getClass().getResource("/yaml/flow_with_required_input.sl").toURI();
+        URI operations = getClass().getResource("/yaml/print.sl").toURI();
+        String inputValue = FileUtils.readFileToString(new File(getClass().getResource("/inputs/utf8_input.txt").getFile()),
+                StandardCharsets.UTF_8);
+        Map<String, Serializable> inputs = new HashMap<>();
+        inputs.put("input", inputValue);
+
+        SlangSource operationsSource = SlangSource.fromFile(operations);
+        Set<SlangSource> path = Sets.newHashSet(operationsSource);
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        trigger(compilationArtifact, inputs, SYS_PROPS);
     }
 
     @Test
