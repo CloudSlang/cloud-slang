@@ -8,6 +8,7 @@
 + CLI Enhancements
   + Inspect - The new `inspect` command displays a file's documentation including description, inputs, outputs and results.
 	+ Default Folder - The location of the default folders for automatically importing system properties files and input files has moved to `cslang/configuration/inputs` and `cslang/configuration/properties`.
+	+ Verbosity Level - The amount of information printed to the screen by the CLI can be changed using the `--v` flag.
 + Content
   + Restructuring - The folders in the content repository have been restructured.
 	+ Additions - Content has been added in the following areas:
