@@ -72,14 +72,19 @@ public class SlangCompilerImpl implements SlangCompiler {
 
     private void ValidateFileName(SlangSource source, ParsedSlang parsedSlang) {
         String fileName = source.getName().substring(0, source.getName().lastIndexOf("."));
+        String flowOrOperationName = getFlowOrOperationName(parsedSlang);
+        Validate.isTrue(fileName.equals(flowOrOperationName),
+                "Operation/Flow " + flowOrOperationName + " should be declared in a file named \"" + flowOrOperationName + ".sl\"");
+    }
+
+    private String getFlowOrOperationName(ParsedSlang parsedSlang) {
         String flowOrOperationName = "";
         if (parsedSlang.getFlow() != null) {
             flowOrOperationName = (String) parsedSlang.getFlow().get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
         } else if (parsedSlang.getOperation() != null) {
             flowOrOperationName = (String) parsedSlang.getOperation().get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
         }
-        Validate.isTrue(fileName.equals(flowOrOperationName),
-                "Operation/Flow " + flowOrOperationName + " should be declared in a file named \"" + flowOrOperationName + ".sl\"");
+        return flowOrOperationName;
     }
 
     @Override
