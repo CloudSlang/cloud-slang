@@ -103,7 +103,6 @@ public class ExecutableBuilder {
         return filter(having(on(Transformer.class).getScopes().contains(scope)), transformers);
     }
 
-    @SuppressWarnings("unchecked")
     public ExecutableModellingResult transformToExecutable(ParsedSlang parsedSlang, String execName, Map<String, Object> executableRawData) {
 
         execName = execName == null ? "" : execName;
@@ -128,8 +127,9 @@ public class ExecutableBuilder {
         errors.addAll(transformersHandler.checkKeyWords(execName, executableRawData,
                 ListUtils.union(preExecTransformers, postExecTransformers), execAdditionalKeywords, null));
 
-        preExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, preExecTransformers, errors));
-        postExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, postExecTransformers, errors));
+        String errorMessagePrefix = "For " + parsedSlang.getType().toString().toLowerCase() + " '" + execName + "' syntax is illegal.\n";
+        preExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, preExecTransformers, errors, errorMessagePrefix));
+        postExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, postExecTransformers, errors, errorMessagePrefix));
 
         @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) preExecutableActionData.remove(SlangTextualKeys.INPUTS_KEY);
         @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) postExecutableActionData.remove(SlangTextualKeys.OUTPUTS_KEY);
@@ -148,6 +148,7 @@ public class ExecutableBuilder {
                 }
                 List<Map<String, Map<String, Object>>> workFlowRawData;
                 try{
+                    //noinspection unchecked
                     workFlowRawData = (List<Map<String, Map<String, Object>>>) rawData;
                 } catch (ClassCastException ex){
                     workFlowRawData = new ArrayList<>();
@@ -171,6 +172,7 @@ public class ExecutableBuilder {
                             onFailureFound = true;
                         }
                         try{
+                            //noinspection unchecked
                             onFailureData = (List<Map<String, Map<String, Object>>>)taskData.values().iterator().next();
                         } catch (ClassCastException ex){
                             onFailureData = new ArrayList<>();
@@ -207,7 +209,8 @@ public class ExecutableBuilder {
             case OPERATION:
                 Map<String, Object> actionRawData = null;
                 try{
-                   actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
+                    //noinspection unchecked
+                    actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
                 } catch (ClassCastException ex){
                     errors.add(new RuntimeException("Operation: '" + execName + "' syntax is illegal.\nBelow 'action' property there should be a map of values such as: 'python_script:' or 'java_action:'"));
                 }
@@ -243,7 +246,8 @@ public class ExecutableBuilder {
 
         List<RuntimeException> errors = transformersHandler.checkKeyWords("action data", actionRawData, actionTransformers, null, actionTransformerConstraintGroups);
 
-        actionData.putAll(transformersHandler.runTransformers(actionRawData, actionTransformers, errors));
+        String errorMessagePrefix = "Action syntax is illegal.\n";
+        actionData.putAll(transformersHandler.runTransformers(actionRawData, actionTransformers, errors, errorMessagePrefix));
 
         Action action = new Action(actionData);
         return new ActionModellingResult(action, errors);
