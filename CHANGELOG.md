@@ -1,5 +1,22 @@
 #CHANGE LOG
 
+##Version 0.?
+
++ DSL Improvements
+  + Improved Documentation Style - The infile documentation of flows and operations has been changed to be more structured.
+	+ System Properties Files - System properties files now end with the .sl extension and their syntax has changed.
++ CLI Enhancements
+  + Inspect - The new `inspect` command displays a file's documentation including description, inputs, outputs and results.
+	+ Default Folder - The location of the default folders for automatically importing system properties files and input files has moved to `cslang/configuration/inputs` and `cslang/configuration/properties`.
++ Content
+  + Restructuring - The folders in the content repository have been restructured.
+	+ Additions - Content has been added in the following areas:
+    + Heroku
+		+ Operations Orchestration
+		+ VMware
++ Docker Image
+	+ A new CloudSlang dev image was added.
+
 ##Version 0.9
 
 + DSL Improvements
@@ -16,12 +33,12 @@
 	+  Events Logging - Events logging is now more comprehensive.
 + Content Additions - Content has been added in the following areas:
 	+ OpenShift
-    + Git
-    + OpenStack
-    + Stackato
-    + HP Cloud
-    + Chef
-    + Google Container Engine (added in beta mode)
+  + Git
+  + OpenStack
+  + Stackato
+  + HP Cloud
+  + Chef
+  + Google Container Engine (added in beta mode)
 	+ Amazon AWS
 	+ PowerShell
 	+ Base
