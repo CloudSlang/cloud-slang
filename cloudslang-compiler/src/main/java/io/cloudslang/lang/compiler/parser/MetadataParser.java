@@ -74,7 +74,7 @@ public class MetadataParser {
             while (line != null) {
                 if (lineContainsATag(line)) {
                     tag = getContainedTag(line);
-                    checkTagIsFollowedByColon(line, tag);
+                    checkTagIsFollowedByColon(line);
                     if (isSingleTagType(tag)) {
                         line = line.substring(line.indexOf(COLON) + 1);
                         key = tag != null ? tag.getValue() : "";
@@ -93,7 +93,7 @@ public class MetadataParser {
         return map;
     }
 
-    private void checkTagIsFollowedByColon(String line, DescriptionTag tag) {
+    private void checkTagIsFollowedByColon(String line) {
         if (!line.contains(COLON))
             throw new RuntimeException("Line \"" + line + "\" does not contain colon after tag name.");
     }

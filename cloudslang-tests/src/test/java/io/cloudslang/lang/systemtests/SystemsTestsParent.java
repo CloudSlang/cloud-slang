@@ -13,7 +13,9 @@ package io.cloudslang.lang.systemtests;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.runtime.RuntimeConstants;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
@@ -56,6 +58,10 @@ public abstract class SystemsTestsParent {
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
+
+    static {
+        System.setProperty(SlangSystemPropertyConstant.CSLANG_ENCODING.getValue(), "utf-8");
+    }
 
     protected ScoreEvent trigger(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Set<SystemProperty> systemProperties) {
         return triggerFlows.runSync(compilationArtifact, userInputs, systemProperties);

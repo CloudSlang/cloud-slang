@@ -9,7 +9,9 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler;
 
+import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -38,11 +40,25 @@ public class SlangSource {
 
         String source;
         try {
-            source = FileUtils.readFileToString(file, Charset.defaultCharset());
+            source = readFileToString(file);
         } catch (IOException e) {
-            throw new RuntimeException("There was a problem reading the yaml file: " + file.getName(), e);
+            throw new RuntimeException("There was a problem reading the file: " + file.getName(), e);
         }
         return new SlangSource(source, file.getName());
+    }
+
+    private static String readFileToString(File file) throws IOException {
+        Charset charset = getCharset();
+        return FileUtils.readFileToString(file, charset);
+    }
+
+    private static Charset getCharset() {
+        Charset charset = Charset.defaultCharset();
+        String cslangEncoding = System.getProperty(SlangSystemPropertyConstant.CSLANG_ENCODING.getValue());
+        if (!StringUtils.isEmpty(cslangEncoding)) {
+            charset = Charset.forName(cslangEncoding);
+        }
+        return charset;
     }
 
     public static SlangSource fromFile(URI uri) {
@@ -50,7 +66,7 @@ public class SlangSource {
     }
 
     public static SlangSource fromBytes(byte[] bytes, String name) {
-        return new SlangSource(new String(bytes), name);
+        return new SlangSource(new String(bytes, getCharset()), name);
     }
 
     public String getSource() {
