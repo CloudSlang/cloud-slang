@@ -27,6 +27,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.*;
 
 import static ch.lambdaj.Lambda.convert;
@@ -113,7 +114,7 @@ public class CompilerHelperImpl implements CompilerHelper{
 		for(File inputFile : fileCollection) {
 			logger.info("Loading file: " + inputFile);
 			try {
-                String inputsFileContent = FileUtils.readFileToString(inputFile);
+                String inputsFileContent = SlangSource.fromFile(inputFile).getSource();
                 Boolean emptyContent = true;
                 if (StringUtils.isNotEmpty(inputsFileContent)) {
                     @SuppressWarnings("unchecked") Map<String, ? extends Serializable> inputFileYamlContent =
@@ -123,11 +124,11 @@ public class CompilerHelperImpl implements CompilerHelper{
                         result.putAll(inputFileYamlContent);
                     }
                 }
-                if (emptyContent){
+                if (emptyContent) {
                     throw new RuntimeException("Inputs file: " + inputFile + " is empty or does not contain valid YAML content.");
                 }
-			} catch(IOException ex) {
-				logger.error("Error loading file: " + inputFile + ". Nested exception is: " + ex.getMessage(), ex);
+			} catch(RuntimeException ex) {
+                logger.error("Error loading file: " + inputFile + ". Nested exception is: " + ex.getMessage(), ex);
 				throw new RuntimeException(ex);
 			}
 		}
