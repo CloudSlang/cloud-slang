@@ -11,7 +11,10 @@ package io.cloudslang.lang.runtime.configuration;
 *******************************************************************************/
 
 
+import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
+import org.apache.commons.lang3.StringUtils;
 import org.python.core.Options;
+import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -23,6 +26,13 @@ public class SlangRuntimeSpringConfig {
 
     static {
         Options.importSite = false;
+        setPythonIOEncoding();
+    }
+
+    private static void setPythonIOEncoding() {
+        String encodingValue = System.getProperty(SlangSystemPropertyConstant.CSLANG_ENCODING.getValue());
+        if (!StringUtils.isEmpty(encodingValue))
+            System.getProperties().setProperty(PySystemState.PYTHON_IO_ENCODING, encodingValue);
     }
 
     @Bean
