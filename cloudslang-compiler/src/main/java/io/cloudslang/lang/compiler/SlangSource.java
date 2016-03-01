@@ -42,12 +42,12 @@ public class SlangSource {
         try {
             source = readFileToString(file);
         } catch (IOException e) {
-            throw new RuntimeException("There was a problem reading the yaml file: " + file.getName(), e);
+            throw new RuntimeException("There was a problem reading the file: " + file.getName(), e);
         }
         return new SlangSource(source, file.getName());
     }
 
-    public static String readFileToString(File file) throws IOException {
+    private static String readFileToString(File file) throws IOException {
         Charset charset = getCharset();
         return FileUtils.readFileToString(file, charset);
     }

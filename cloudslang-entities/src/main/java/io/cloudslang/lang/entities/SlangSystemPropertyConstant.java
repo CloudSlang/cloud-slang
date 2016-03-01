@@ -9,6 +9,7 @@ public enum SlangSystemPropertyConstant {
     LOG4J_CONFIGURATION("log4j.configuration");
 
     private final String value;
+
     SlangSystemPropertyConstant(String value) {
         this.value = value;
     }

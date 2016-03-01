@@ -18,8 +18,11 @@ flow:
         do:
           ops.print:
             - text: ${input}
+        publish:
+          - printed_text
   outputs:
     - returnResult: ${input}
+    - printed_text
   results:
     - SUCCESS
     - FAILURE

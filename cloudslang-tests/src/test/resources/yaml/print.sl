@@ -17,6 +17,6 @@ operation:
       print text
   outputs:
     - returnResult
-    - printedText : ${text}
+    - printed_text : ${text}
   results:
     - SUCCESS

@@ -14,6 +14,7 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.runtime.RuntimeConstants;
+import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
@@ -149,7 +150,10 @@ public class SimpleFlowTest extends SystemsTestsParent {
         SlangSource operationsSource = SlangSource.fromFile(operations);
         Set<SlangSource> path = Sets.newHashSet(operationsSource);
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
-        trigger(compilationArtifact, inputs, SYS_PROPS);
+
+        Serializable stepsData  = trigger(compilationArtifact, inputs, SYS_PROPS).getData();
+        Map<String, Serializable> outputs = ((LanguageEventData) stepsData).getOutputs();
+        Assert.assertEquals(outputs.get("returnResult"), outputs.get("printed_text"));
     }
 
     @Test
