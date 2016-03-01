@@ -8,7 +8,7 @@
  */
 package io.cloudslang.lang.compiler.modeller;
 
-import io.cloudslang.lang.compiler.modeller.model.Executable;
+import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 
 /*
@@ -22,9 +22,10 @@ import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 public interface SlangModeller {
 
     /**
-     * Pre-compile a Slang source into an {@link io.cloudslang.lang.compiler.modeller.model.Executable}
+     * Pre-compile a Slang source into an {@link ExecutableModellingResult}
      * @param parsedSlang the {@link io.cloudslang.lang.compiler.parser.model.ParsedSlang} source
-     * @return an {@link io.cloudslang.lang.compiler.modeller.model.Executable} object, containing either a flow or an operations in the file
+     * @return an {@link ExecutableModellingResult} object, containing an executable
+     * which is either a flow or an operations in the file
      */
-    Executable createModel(ParsedSlang parsedSlang);
+    ExecutableModellingResult createModel(ParsedSlang parsedSlang);
 }
