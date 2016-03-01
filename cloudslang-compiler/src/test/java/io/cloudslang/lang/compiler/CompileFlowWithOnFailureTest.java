@@ -92,6 +92,36 @@ public class CompileFlowWithOnFailureTest {
         compiler.compile(SlangSource.fromFile(flow), path);
     }
 
+    @Test
+    public void testCompileSameNameInFlowAndOnFailure() throws Exception {
+        URI flow = getClass().getResource("/corrupted/same_task_name_in_flow_and_on_failure.sl").toURI();
+        URI operation = getClass().getResource("/fail_on_input_op.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+
+        expectedException.expectMessage(ExecutableBuilder.UNIQUE_TASK_NAME_MESSAGE_SUFFIX);
+        expectedException.expectMessage("task_same_name");
+        expectedException.expect(RuntimeException.class);
+
+        compiler.compile(SlangSource.fromFile(flow), path);
+    }
+
+    @Test
+    public void testCompileSameNameOnFailure() throws Exception {
+        URI flow = getClass().getResource("/corrupted/same_task_name_on_failure.sl").toURI();
+        URI operation = getClass().getResource("/fail_on_input_op.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+
+        expectedException.expectMessage(ExecutableBuilder.UNIQUE_TASK_NAME_MESSAGE_SUFFIX);
+        expectedException.expectMessage("task_same_name_on_failure");
+        expectedException.expect(RuntimeException.class);
+
+        compiler.compile(SlangSource.fromFile(flow), path);
+    }
+
 	private long getFailureNavigationStepId(ExecutionStep firstStep) {
         Map<String, ResultNavigation> navigationData = getNavigationMap(firstStep);
         return navigationData.get(ScoreLangConstants.FAILURE_RESULT).getNextStepId();
