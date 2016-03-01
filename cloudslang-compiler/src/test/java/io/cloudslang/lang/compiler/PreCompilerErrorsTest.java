@@ -69,6 +69,61 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
+     public void testOperationWithWrongName() throws Exception {
+        URI resource = getClass().getResource("/corrupted/wrong_name_operation.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("should be declared in a file named");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+     public void testOperationWithWrongNameSLYAMLExtension() throws Exception {
+        URI resource = getClass().getResource("/corrupted/wrong_name_operation.sl.yaml").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("should be declared in a file named");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testOperationWithWrongNameSLYMLExtension() throws Exception {
+        URI resource = getClass().getResource("/corrupted/wrong_name_operation.sl.yml").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("should be declared in a file named");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testOperationWithWrongNameYAMLExtension() throws Exception {
+        URI resource = getClass().getResource("/corrupted/wrong_name_operation.yaml").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("should be declared in a file named");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testOperationWithWrongNameYMLExtension() throws Exception {
+        URI resource = getClass().getResource("/corrupted/wrong_name_operation.yml").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("should be declared in a file named");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
     public void testFlowWithInputsAsString() throws Exception {
         URI resource = getClass().getResource("/corrupted/inputs_type_string_flow.sl").toURI();
 

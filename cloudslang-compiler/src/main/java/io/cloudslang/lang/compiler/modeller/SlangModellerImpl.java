@@ -12,6 +12,7 @@ import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -54,6 +55,22 @@ public class SlangModellerImpl implements SlangModeller{
      */
     private ExecutableModellingResult transformToExecutable(ParsedSlang parsedSlang, Map<String, Object> rawData) {
         String executableName = (String) rawData.get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
-        return executableBuilder.transformToExecutable(parsedSlang, executableName, rawData);
+        ExecutableModellingResult result = executableBuilder.transformToExecutable(parsedSlang, executableName, rawData);
+        validateFileName(executableName, parsedSlang, result);
+        return result;
+    }
+
+    private void validateFileName(String executableName, ParsedSlang parsedSlang, ExecutableModellingResult result) {
+        String fileName = getFileName(parsedSlang);
+        if (!StringUtils.isEmpty(executableName) && !executableName.equals(fileName))
+            result.getErrors().add(new IllegalArgumentException("Operation/Flow " + executableName +
+                    " should be declared in a file named \"" + executableName + ".sl\""));
+    }
+
+    private String getFileName(ParsedSlang parsedSlang) {
+        String fileName = parsedSlang.getName().replaceAll(".yaml", "");
+        fileName = fileName.replaceAll(".sl", "");
+        fileName = fileName.replaceAll(".yml", "");
+        return fileName;
     }
 }
