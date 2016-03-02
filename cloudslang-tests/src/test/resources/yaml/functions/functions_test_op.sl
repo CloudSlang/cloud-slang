@@ -33,6 +33,8 @@ operation:
     - value_propagate: ${ self['value_propagate'] + get_sp('propagate.op.output') }
     - output_10: ${get_sp('chars-b.c-hyphen')}
     - output_11: ${get_sp('chars-b.c-hyphen', 'default_str')}
+    - output_12: ${get_sp("a.b.c.host")}
+    - output_13: ${get_sp("a.b.c.host", 'default_str')}
   results:
     - FUNCTIONS_KEY_EXISTS: ${ get(get_sp('cloudslang.lang.key'), 'output1_default') == 'CloudSlang' }
     - FUNCTIONS_KEY_EXISTS_PROBLEM

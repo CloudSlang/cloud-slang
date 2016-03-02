@@ -16,6 +16,8 @@ operation:
     - input4:
         default: ${get_sp('op.input.prop2')}
     - input_5: ${get_sp('op.input.prop3', 'default_str')}
+    - input6: ${get_sp("op.input.prop4")}
+    - input7: ${get_sp("op.input.prop5", 'default_str')}
   action:
     python_script: |
         language = 'CloudSlang'
