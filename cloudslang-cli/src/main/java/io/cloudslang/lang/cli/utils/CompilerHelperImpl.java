@@ -10,6 +10,7 @@ package io.cloudslang.lang.cli.utils;
 
 import ch.lambdaj.function.convert.Converter;
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
@@ -27,7 +28,6 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.nio.charset.Charset;
 import java.util.*;
 
 import static ch.lambdaj.Lambda.convert;
@@ -41,9 +41,6 @@ import static ch.lambdaj.Lambda.convert;
 public class CompilerHelperImpl implements CompilerHelper{
 
     private static final Logger logger = Logger.getLogger(CompilerHelperImpl.class);
-    private static final String[] SLANG_FILE_EXTENSIONS = {"sl", "sl.yaml", "sl.yml"};
-    private static final String[] PROPERTIES_FILE_EXTENSIONS = {"prop.sl"};
-    private static final String[] YAML_FILE_EXTENSIONS = {"yaml", "yml"};
     private static final String SP_DIR = "properties"; //TODO reconsider it after closing CloudSlang file extensions & some real usecases
     private static final String INPUT_DIR = "inputs";
     private static final String CONFIG_DIR = "configuration";
@@ -59,7 +56,7 @@ public class CompilerHelperImpl implements CompilerHelper{
         Set<SlangSource> depsSources = new HashSet<>();
         File file = new File(filePath);
         Validate.isTrue(file.isFile(), "File: " + file.getName() + " was not found");
-        validateFileExtension(file, SLANG_FILE_EXTENSIONS);
+        validateFileExtension(file, Extension.getSlangFileExtensionValues());
 
         if (CollectionUtils.isEmpty(dependencies)) {
             dependencies = new ArrayList<>();
@@ -76,7 +73,8 @@ public class CompilerHelperImpl implements CompilerHelper{
             }
         }
         for (String dependency:dependencies) {
-            Collection<File> dependenciesFiles = listFiles(new File(dependency), SLANG_FILE_EXTENSIONS, true, PROPERTIES_FILE_EXTENSIONS);
+            Collection<File> dependenciesFiles = listFiles(new File(dependency), Extension.getSlangFileExtensionValues(),
+                    true, Extension.getPropertiesFileExtensionValues());
             for (File dependencyCandidate : dependenciesFiles) {
                 SlangSource source = SlangSource.fromFile(dependencyCandidate);
                 depsSources.add(source);
@@ -93,13 +91,14 @@ public class CompilerHelperImpl implements CompilerHelper{
     @Override
     public Set<SystemProperty> loadSystemProperties(List<String> systemPropertyFiles) {
         String propertiesRelativePath = CONFIG_DIR + File.separator + SP_DIR;
-        return loadPropertiesFromFiles(convertToFiles(systemPropertyFiles), PROPERTIES_FILE_EXTENSIONS, propertiesRelativePath);
+        return loadPropertiesFromFiles(convertToFiles(systemPropertyFiles),
+                Extension.getPropertiesFileExtensionValues(), propertiesRelativePath);
     }
 
     @Override
     public Map<String, Serializable> loadInputsFromFile(List<String> inputFiles) {
         String inputsRelativePath = CONFIG_DIR + File.separator + INPUT_DIR;
-        return loadMapsFromFiles(convertToFiles(inputFiles), YAML_FILE_EXTENSIONS, inputsRelativePath);
+        return loadMapsFromFiles(convertToFiles(inputFiles), Extension.getYamlFileExtensionValues(), inputsRelativePath);
     }
 
     private Map<String, Serializable> loadMapsFromFiles(List<File> files, String[] extensions, String directory) {
@@ -143,7 +142,7 @@ public class CompilerHelperImpl implements CompilerHelper{
         } else {
             fileCollection = files;
             for (File propertyFileCandidate : fileCollection) {
-                validateFileExtension(propertyFileCandidate, PROPERTIES_FILE_EXTENSIONS);
+                validateFileExtension(propertyFileCandidate, Extension.getPropertiesFileExtensionValues());
             }
         }
         Set<SystemProperty> result = new HashSet<>();

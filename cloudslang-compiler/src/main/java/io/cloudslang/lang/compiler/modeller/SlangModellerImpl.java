@@ -61,16 +61,9 @@ public class SlangModellerImpl implements SlangModeller{
     }
 
     private void validateFileName(String executableName, ParsedSlang parsedSlang, ExecutableModellingResult result) {
-        String fileName = getFileName(parsedSlang);
-        if (!StringUtils.isEmpty(executableName) && !executableName.equals(fileName))
+        String fileName = parsedSlang.getName();
+        if (StringUtils.isNotEmpty(executableName) && !executableName.equals(fileName))
             result.getErrors().add(new IllegalArgumentException("Operation/Flow " + executableName +
                     " should be declared in a file named \"" + executableName + ".sl\""));
-    }
-
-    private String getFileName(ParsedSlang parsedSlang) {
-        String fileName = parsedSlang.getName().replaceAll(".yaml", "");
-        fileName = fileName.replaceAll(".sl", "");
-        fileName = fileName.replaceAll(".yml", "");
-        return fileName;
     }
 }
