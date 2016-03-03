@@ -82,7 +82,7 @@ public class TestCasesYamlParserTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("problem");
         exception.expectMessage("parsing");
-        exception.expectMessage("properties.prop.sl");
+        exception.expectMessage("properties");
         parser.parseTestCases(SlangSource.fromFile(fileUri));
     }
 
@@ -93,7 +93,7 @@ public class TestCasesYamlParserTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("slang");
         exception.expectMessage("parsing");
-        exception.expectMessage("invalid_test_case.yaml");
+        exception.expectMessage("invalid_test_case");
         parser.parseTestCases(SlangSource.fromFile(fileUri));
     }
 

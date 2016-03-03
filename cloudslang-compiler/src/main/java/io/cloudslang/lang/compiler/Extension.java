@@ -55,23 +55,13 @@ public enum Extension {
     }
 
     private static Extension findExtension(String fileName) {
-        String fileNameTail = fileName.substring(fileName.length() - getLargestExtensionLength() - 1,
-                fileName.length());
         Extension foundExtension = null;
         for (Extension extension : values()) {
-            if (fileNameTail.endsWith("." + extension.getValue()) &&
+            if (fileName.endsWith("." + extension.getValue()) &&
                     (foundExtension == null || extension.getValue().length() > foundExtension.getValue().length())) {
                 foundExtension = extension;
             }
         }
         return foundExtension;
-    }
-
-    private static int getLargestExtensionLength() {
-        int length = 0;
-        for (Extension extension : values()) {
-            if (extension.getValue().length() > length) length = extension.getValue().length();
-        }
-        return length;
     }
 }
