@@ -59,22 +59,21 @@ public enum Extension {
 
     public static void validateSlangFileExtension(String fileName) {
         Extension fileExtension = Extension.findExtension(fileName);
-        Extension[] slangFileExtensions = getSlangFileExtensions();
-        validateFileExtension(fileName, fileExtension, slangFileExtensions);
+        validateFileExtension(fileName, fileExtension, getSlangFileExtensions(), getSlangFileExtensionValues());
     }
 
     public static void validatePropertiesFileExtension(String fileName) {
         Extension fileExtension = Extension.findExtension(fileName);
-        Extension[] propertiesFileExtensions = getPropertiesFileExtensions();
-        validateFileExtension(fileName, fileExtension, propertiesFileExtensions);
+        validateFileExtension(fileName, fileExtension, getPropertiesFileExtensions(), getPropertiesFileExtensionValues());
     }
 
-    private static void validateFileExtension(String fileName, Extension fileExtension, Extension[] extensions) {
+    private static void validateFileExtension(String fileName, Extension fileExtension,
+                                              Extension[] extensions, String[] extensionValues) {
         boolean validFileExtension = false;
         for (Extension extension : extensions) {
             if (extension.equals(fileExtension)) validFileExtension = true;
         }
-        String extensionsAsString =  Arrays.toString(extensions);
+        String extensionsAsString =  Arrays.toString(extensionValues);
         Validate.isTrue(validFileExtension,
                 "File: " + fileName + " must have one of the following extensions: " +
                         extensionsAsString.substring(1, extensionsAsString.length() - 1) + "."
@@ -96,10 +95,5 @@ public enum Extension {
             }
         }
         return foundExtension;
-    }
-
-    @Override
-    public String toString() {
-        return value;
     }
 }
