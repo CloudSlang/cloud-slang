@@ -17,7 +17,6 @@ import io.cloudslang.lang.entities.SystemProperty;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -56,7 +55,7 @@ public class CompilerHelperImpl implements CompilerHelper{
         Set<SlangSource> depsSources = new HashSet<>();
         File file = new File(filePath);
         Validate.isTrue(file.isFile(), "File: " + file.getName() + " was not found");
-        validateFileExtension(file, Extension.getSlangFileExtensionValues());
+        Extension.validateSlangFileExtension(file.getName());
 
         if (CollectionUtils.isEmpty(dependencies)) {
             dependencies = new ArrayList<>();
@@ -73,8 +72,8 @@ public class CompilerHelperImpl implements CompilerHelper{
             }
         }
         for (String dependency:dependencies) {
-            Collection<File> dependenciesFiles = listFiles(new File(dependency), Extension.getSlangFileExtensionValues(),
-                    true, Extension.getPropertiesFileExtensionValues());
+            Collection<File> dependenciesFiles = listSlangFiles(new File(dependency),
+                    true);
             for (File dependencyCandidate : dependenciesFiles) {
                 SlangSource source = SlangSource.fromFile(dependencyCandidate);
                 depsSources.add(source);
@@ -142,7 +141,7 @@ public class CompilerHelperImpl implements CompilerHelper{
         } else {
             fileCollection = files;
             for (File propertyFileCandidate : fileCollection) {
-                validateFileExtension(propertyFileCandidate, Extension.getPropertiesFileExtensionValues());
+                Extension.validatePropertiesFileExtension(propertyFileCandidate.getName());
             }
         }
         Set<SystemProperty> result = new HashSet<>();
@@ -174,24 +173,6 @@ public class CompilerHelperImpl implements CompilerHelper{
         return files;
     }
 
-    private void validateFileExtension(File file, String[] extensions) {
-        boolean validFileExtension = hasExtension(file, extensions);
-        String extensionsAsString =  Arrays.toString(extensions);
-        Validate.isTrue(
-                validFileExtension,
-                "File: " + file.getName() + " must have one of the following extensions: " +
-                        extensionsAsString.substring(1, extensionsAsString.length() - 1) + "."
-        );
-    }
-
-    private Boolean hasExtension(File file, String[] extensions){
-        String[] suffixes = new String[extensions.length];
-        for(int i = 0; i < suffixes.length; ++i){
-            suffixes[i] = "." + extensions[i];
-        }
-        return new SuffixFileFilter(suffixes).accept(file);
-    }
-
     private List<File> convertToFiles(List<String> fileList) {
         return convert(fileList, new Converter<String, File>() {
             @Override
@@ -202,15 +183,11 @@ public class CompilerHelperImpl implements CompilerHelper{
     }
 
     // e.g. exclude .prop.sl from .sl set
-    private Collection<File> listFiles(
-            File directory,
-            String[] extensions,
-            boolean recursive,
-            String[] excludedExtensions) {
-        Collection<File> dependenciesFiles = FileUtils.listFiles(directory, extensions, recursive);
+    private Collection<File> listSlangFiles(File directory, boolean recursive) {
+        Collection<File> dependenciesFiles = FileUtils.listFiles(directory, Extension.getSlangFileExtensionValues(), recursive);
         Collection<File> result = new ArrayList<>();
         for (File file : dependenciesFiles) {
-            if (!hasExtension(file, excludedExtensions)) {
+            if (Extension.SL.equals(Extension.findExtension(file.getName()))) {
                 result.add(file);
             }
         }

@@ -9,12 +9,12 @@
  */
 package io.cloudslang.lang.tools.build.verifier;
 
+import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
-import io.cloudslang.lang.tools.build.SlangBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
@@ -34,8 +34,6 @@ public class SlangContentVerifier {
 
     private final static Logger log = Logger.getLogger(SlangContentVerifier.class);
 
-    private String[] SLANG_FILE_EXTENSIONS = {"sl", "sl.yaml", "sl.yml"};
-
     @Autowired
     private SlangCompiler slangCompiler;
 
@@ -46,7 +44,7 @@ public class SlangContentVerifier {
         Validate.notEmpty(directoryPath, "You must specify a path");
         Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" + directoryPath + "\' does not lead to a directory");
         Map<String, Executable> slangModels = new HashMap<>();
-        Collection<File> slangFiles = listFiles(new File(directoryPath), SLANG_FILE_EXTENSIONS, true, SlangBuilder.PROPERTIES_FILE_EXTENSIONS);
+        Collection<File> slangFiles = listSlangFiles(new File(directoryPath), true);
         log.info("Start compiling all slang files under: " + directoryPath);
         log.info(slangFiles.size() + " .sl files were found");
         log.info("");
@@ -146,8 +144,7 @@ public class SlangContentVerifier {
 
     private void validateExecutableName(File slangFile, Executable executable) {
         // Validate executable name is the same as the file name
-        String[] splitName = slangFile.getName().split("\\Q.");
-        String fileNameNoExtension = splitName[0];
+        String fileNameNoExtension = Extension.removeExtension(slangFile.getName());
         String executableNameErrorMessage = "Error validating Slang file: \'" + slangFile.getAbsoluteFile() +
                 "\'. Name of flow or operation: \'" + executable.getName() +
                 "\' is invalid.\nIt should be identical to the file name: \'" + fileNameNoExtension + "\'";
@@ -155,22 +152,11 @@ public class SlangContentVerifier {
     }
 
     // e.g. exclude .prop.sl from .sl set
-    private Collection<File> listFiles(
-            File directory,
-            String[] extensions,
-            boolean recursive,
-            String[] excludedExtensions) {
-        Collection<File> dependenciesFiles = FileUtils.listFiles(directory, extensions, recursive);
+    private Collection<File> listSlangFiles(File directory, boolean recursive) {
+        Collection<File> dependenciesFiles = FileUtils.listFiles(directory, Extension.getSlangFileExtensionValues(), recursive);
         Collection<File> result = new ArrayList<>();
         for (File file : dependenciesFiles) {
-            boolean accepted = true;
-            for (String excludedExtension : excludedExtensions) {
-                if (file.getName().endsWith("." + excludedExtension)) {
-                    accepted = false;
-                    break;
-                }
-            }
-            if (accepted) {
+            if (Extension.SL.equals(Extension.findExtension(file.getName()))) {
                 result.add(file);
             }
         }

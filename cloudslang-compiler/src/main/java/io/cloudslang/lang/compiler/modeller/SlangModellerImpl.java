@@ -8,6 +8,7 @@
  */
 package io.cloudslang.lang.compiler.modeller;
 
+import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
@@ -64,6 +65,6 @@ public class SlangModellerImpl implements SlangModeller{
         String fileName = parsedSlang.getName();
         if (StringUtils.isNotEmpty(executableName) && !executableName.equals(fileName))
             result.getErrors().add(new IllegalArgumentException("Operation/Flow " + executableName +
-                    " should be declared in a file named \"" + executableName + ".sl\""));
+                    " should be declared in a file named \"" + executableName + Extension.SL.getValue() + "\""));
     }
 }

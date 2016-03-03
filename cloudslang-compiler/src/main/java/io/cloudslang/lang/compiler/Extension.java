@@ -1,5 +1,6 @@
 package io.cloudslang.lang.compiler;
 
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -40,12 +41,44 @@ public enum Extension {
         return Arrays.copyOfRange(extensionValues, 0, 3);
     }
 
+    public static Extension[] getSlangFileExtensions() {
+        return Arrays.copyOfRange(values(), 0, 3);
+    }
+
     public static String[] getPropertiesFileExtensionValues() {
         return Arrays.copyOfRange(extensionValues, 3, 4);
     }
 
+    public static Extension[] getPropertiesFileExtensions() {
+        return Arrays.copyOfRange(values(), 3, 4);
+    }
+
     public static String[] getYamlFileExtensionValues() {
         return Arrays.copyOfRange(extensionValues, 4, extensionValues.length);
+    }
+
+    public static void validateSlangFileExtension(String fileName) {
+        Extension fileExtension = Extension.findExtension(fileName);
+        Extension[] slangFileExtensions = getSlangFileExtensions();
+        validateFileExtension(fileName, fileExtension, slangFileExtensions);
+    }
+
+    public static void validatePropertiesFileExtension(String fileName) {
+        Extension fileExtension = Extension.findExtension(fileName);
+        Extension[] propertiesFileExtensions = getPropertiesFileExtensions();
+        validateFileExtension(fileName, fileExtension, propertiesFileExtensions);
+    }
+
+    private static void validateFileExtension(String fileName, Extension fileExtension, Extension[] extensions) {
+        boolean validFileExtension = false;
+        for (Extension extension : extensions) {
+            if (extension.equals(fileExtension)) validFileExtension = true;
+        }
+        String extensionsAsString =  Arrays.toString(extensions);
+        Validate.isTrue(validFileExtension,
+                "File: " + fileName + " must have one of the following extensions: " +
+                        extensionsAsString.substring(1, extensionsAsString.length() - 1) + "."
+        );
     }
 
     public static String removeExtension(String fileName) {
@@ -54,7 +87,7 @@ public enum Extension {
         return fileName;
     }
 
-    private static Extension findExtension(String fileName) {
+    public static Extension findExtension(String fileName) {
         Extension foundExtension = null;
         for (Extension extension : values()) {
             if (fileName.endsWith("." + extension.getValue()) &&
@@ -63,5 +96,10 @@ public enum Extension {
             }
         }
         return foundExtension;
+    }
+
+    @Override
+    public String toString() {
+        return value;
     }
 }

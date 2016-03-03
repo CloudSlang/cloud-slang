@@ -22,11 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /*
  * Created by stoneo on 2/9/2015.
@@ -43,7 +39,6 @@ public class SlangBuilder {
     @Autowired
     private SlangTestRunner slangTestRunner;
 
-    public static final String[] PROPERTIES_FILE_EXTENSIONS = {"prop.sl"};
     private final static Logger log = Logger.getLogger(SlangBuilder.class);
 
     public SlangBuildResults buildSlangContent(String projectPath, String contentPath, String testsPath, List<String> testSuits){
