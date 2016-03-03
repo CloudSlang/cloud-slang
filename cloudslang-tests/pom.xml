@@ -20,7 +20,6 @@
     <artifactId>cloudslang-tests</artifactId>
 
     <dependencies>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cloudslang-all</artifactId>
@@ -34,6 +33,16 @@
         </dependency>
 
         <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
@@ -42,43 +51,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-ssh</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-powershell</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-mail</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-http-client</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-jClouds</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-vmware</artifactId>
-        </dependency>
-
     </dependencies>
-
 
 </project>
