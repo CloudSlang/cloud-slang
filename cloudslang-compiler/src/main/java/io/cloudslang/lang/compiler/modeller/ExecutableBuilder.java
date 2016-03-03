@@ -268,10 +268,7 @@ public class ExecutableBuilder {
         Deque<Task> tasks = new LinkedList<>();
         Set<String> taskNames = new HashSet<>();
         Deque<Task> onFailureTasks = !(onFailureSection || onFailureWorkFlow == null) ? onFailureWorkFlow.getTasks() : new LinkedList<Task>();
-        List<String> onFailureTaskNames =  new ArrayList<>();
-        for (Task task : onFailureTasks) {
-            onFailureTaskNames.add(task.getName());
-        }
+        List<String> onFailureTaskNames = getTaskNames(onFailureTasks);
         boolean onFailureTasksFound =  onFailureTaskNames.size() > 0;
         String defaultFailure = onFailureTasksFound ? onFailureTaskNames.get(0) : ScoreLangConstants.FAILURE_RESULT;
 
@@ -419,6 +416,14 @@ public class ExecutableBuilder {
             dependencies.add(task.getRefId());
         }
         return dependencies;
+    }
+
+    private List<String> getTaskNames(Deque<Task> tasks) {
+        List<String> taskNames =  new ArrayList<>();
+        for (Task task : tasks) {
+            taskNames.add(task.getName());
+        }
+        return taskNames;
     }
 
 }
