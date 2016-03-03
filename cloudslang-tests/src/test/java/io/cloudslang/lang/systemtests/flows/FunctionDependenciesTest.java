@@ -112,6 +112,8 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedArguments.put("value_propagate", "flowInput_taskArg_");
         expectedArguments.put("input_12", "hyphen_value");
         expectedArguments.put("input_13", "hyphen_value");
+        expectedArguments.put("input_14", "localhost");
+        expectedArguments.put("input_15", "localhost");
         Map<String, Serializable> actualArguments = taskData.getInputs();
         Assert.assertEquals("task arguments not as expected", expectedArguments, actualArguments);
     }
@@ -138,6 +140,8 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedFlowInputs.put("value_propagate", "flowInput_");
         expectedFlowInputs.put("input_12", "hyphen_value");
         expectedFlowInputs.put("input_13", "hyphen_value");
+        expectedFlowInputs.put("input_14", "localhost");
+        expectedFlowInputs.put("input_15", "localhost");
         Map<String, Serializable> actualFlowInputs = flowData.getInputs();
         Assert.assertEquals("flow input values not as expected", expectedFlowInputs, actualFlowInputs);
     }
@@ -166,6 +170,8 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedPublishValues.put("output_9", "default_str");
         expectedPublishValues.put("output_10", "hyphen_value");
         expectedPublishValues.put("output_11", "hyphen_value");
+        expectedPublishValues.put("output_12", "localhost");
+        expectedPublishValues.put("output_13", "localhost");
         expectedPublishValues.put("value_propagate", "flowInput_taskArg_opInput_opOutput_taskPublish_");
         Map<String, Serializable> actualPublishValues = taskData.getOutputs();
         Assert.assertEquals("operation publish values not as expected", expectedPublishValues, actualPublishValues);
@@ -197,14 +203,22 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
                 "flow.input.prop1",
                 "flow.input.prop2",
                 "flow.input.prop3",
+                "flow.input.prop4",
+                "flow.input.prop5",
                 "flow.output.prop1",
                 "task.input.prop1",
                 "task.input.prop2",
+                "task.input.prop3",
+                "task.input.prop4",
                 "task.publish.prop1",
                 "task.publish.prop2",
+                "task.publish.prop3",
+                "task.publish.prop4",
                 "op.input.prop1",
                 "op.input.prop2",
                 "op.input.prop3",
+                "op.input.prop4",
+                "op.input.prop5",
                 "op.output.prop1",
                 "op.result.prop1",
                 "async.aggregate.prop1",

@@ -18,7 +18,9 @@ flow:
     - input3: ${get_sp('flow.input.prop1')}
     - input4:
         default: ${get_sp('flow.input.prop2')}
-    - input_5: ${get_sp('flow.input.prop3', 'default_str')}
+    - input5: ${get_sp('flow.input.prop3', 'default_str')}
+    - input6: ${get_sp("flow.input.prop4")}
+    - input7: ${get_sp('flow.input.prop5', 'default_str')}
   workflow:
     - Task1:
         do:
@@ -27,11 +29,15 @@ flow:
             - input2: "get_sp('task.input.i_am_no_property')"
             - input3: ${get_sp('task.input.prop1')}
             - input4: ${get_sp('task.input.prop2', 'default_str')}
+            - input5: ${get_sp("task.input.prop3")}
+            - input6: ${get_sp("task.input.prop4", 'default_str')}
         publish:
             - publish_1
             - publish_2: "get_sp('task.publish.i_am_no_property')"
             - publish_3: ${get_sp('task.publish.prop1')}
             - publish_4: ${get_sp('task.publish.prop2', 'default_str')}
+            - publish_5: ${get_sp("task.publish.prop3")}
+            - publish_6: ${get_sp("task.publish.prop4", 'default_str')}
         navigate:
           FUNCTIONS_KEY_EXISTS: Task2
           FUNCTIONS_KEY_EXISTS_PROBLEM: FUNCTIONS_KEY_EXISTS_PROBLEM

@@ -36,15 +36,19 @@ public final class ExpressionUtils {
                     ScoreLangConstants.EXPRESSION_END_DELIMITER_ESCAPED +
                     "\\s*$";
     // match get_sp(key) function
-    private final static String SYSTEM_PROPERTY_REGEX = "get_sp\\(\\s*'([\\w\\-.]+)'\\s*\\)";
+    private final static String SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE = "get_sp\\(\\s*'([\\w\\-.]+)'\\s*\\)";
+    private final static String SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE = "get_sp\\(\\s*\"([\\w\\-.]+)\"\\s*\\)";
     // match get_sp(key, default) function
-    private final static String SYSTEM_PROPERTY_REGEX_WITH_DEFAULT = "get_sp\\(\\s*'([\\w\\-.]+)'\\s*,\\s*(.+?)\\)";
+    private final static String SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE = "get_sp\\(\\s*'([\\w\\-.]+)'\\s*,\\s*(.+?)\\)";
+    private final static String SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE = "get_sp\\(\\s*\"([\\w\\-.]+)\"\\s*,\\s*(.+?)\\)";
     // match get() function
     private final static String GET_REGEX = "get\\((.+?),(.+?)\\)";
 
     private final static Pattern EXPRESSION_PATTERN = Pattern.compile(EXPRESSION_REGEX, Pattern.DOTALL);
-    private final static Pattern SYSTEM_PROPERTY_PATTERN = Pattern.compile(SYSTEM_PROPERTY_REGEX);
-    private final static Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT = Pattern.compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT);
+    private final static Pattern SYSTEM_PROPERTY_PATTERN_SINGLE_QUOTE = Pattern.compile(SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE);
+    private final static Pattern SYSTEM_PROPERTY_PATTERN_DOUBLE_QUOTE = Pattern.compile(SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE);
+    private final static Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_SINGLE_QUOTE = Pattern.compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE);
+    private final static Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_DOUBLE_QUOTE = Pattern.compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE);
     private final static Pattern GET_PATTERN = Pattern.compile(GET_REGEX);
 
     public static String extractExpression(Serializable value) {
@@ -60,9 +64,10 @@ public final class ExpressionUtils {
     }
 
     public static Set<String> extractSystemProperties(String expression) {
-        Set<String> properties = matchFunction(SYSTEM_PROPERTY_PATTERN, expression, 1);
-        Set<String> propertiesWithDefault = matchFunction(SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT, expression, 1);
-        properties.addAll(propertiesWithDefault);
+        Set<String> properties = matchFunction(SYSTEM_PROPERTY_PATTERN_SINGLE_QUOTE, expression, 1);
+        properties.addAll(matchFunction(SYSTEM_PROPERTY_PATTERN_DOUBLE_QUOTE, expression, 1));
+        properties.addAll(matchFunction(SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_SINGLE_QUOTE, expression, 1));
+        properties.addAll(matchFunction(SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_DOUBLE_QUOTE, expression, 1));
         return properties;
     }
 
