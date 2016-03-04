@@ -5,14 +5,11 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: user.flows.circular
+namespace: user.ops
 
-imports:
-  flows: user.flows.circular
-
-flow:
-  name: circular_child_flow
-  workflow:
-    - CheckWeather:
-        do:
-          flows.circular_parent_flow:
+operation:
+  name: test_op
+  inputs:
+    - alla
+  action:
+    python_script: 'print "hello world"'

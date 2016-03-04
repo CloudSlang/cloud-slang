@@ -44,7 +44,7 @@ public class SlangSource {
         } catch (IOException e) {
             throw new RuntimeException("There was a problem reading the file: " + file.getName(), e);
         }
-        return new SlangSource(source, file.getName());
+        return new SlangSource(source, Extension.removeExtension(file.getName()));
     }
 
     private static String readFileToString(File file) throws IOException {

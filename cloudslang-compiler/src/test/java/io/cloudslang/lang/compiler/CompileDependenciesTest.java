@@ -47,20 +47,20 @@ public class CompileDependenciesTest {
 
     @Test(expected = RuntimeException.class)
     public void emptyPathButThereAreImports() throws Exception {
-        URI flow = getClass().getResource("/flow.yaml").toURI();
+        URI flow = getClass().getResource("/basic_flow.yaml").toURI();
         Set<SlangSource> path = new HashSet<>();
         compiler.compile(SlangSource.fromFile(flow), path);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullPathButThereAreImports() throws Exception {
-        URI flow = getClass().getResource("/flow.yaml").toURI();
+        URI flow = getClass().getResource("/basic_flow.yaml").toURI();
         compiler.compile(SlangSource.fromFile(flow), null);
     }
 
     @Test
     public void referenceDoesNoExistInPath() throws Exception {
-        URI flow = getClass().getResource("/flow.yaml").toURI();
+        URI flow = getClass().getResource("/basic_flow.yaml").toURI();
         URI operation = getClass().getResource("/operation_with_data.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
@@ -73,7 +73,7 @@ public class CompileDependenciesTest {
 
     @Test
     public void importHasAKeyThatDoesNotExistInPath() throws Exception {
-        URI flow = getClass().getResource("/flow.yaml").toURI();
+        URI flow = getClass().getResource("/basic_flow.yaml").toURI();
         URI operation = getClass().getResource("/flow_with_data.yaml").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
@@ -86,7 +86,7 @@ public class CompileDependenciesTest {
 
     @Test
     public void filesThatAreNotImportedShouldNotBeCompiled() throws Exception {
-        URI flow = getClass().getResource("/flow.yaml").toURI();
+        URI flow = getClass().getResource("/basic_flow.yaml").toURI();
         URI notImportedOperation = getClass().getResource("/flow_with_data.yaml").toURI();
         URI importedOperation = getClass().getResource("/test_op.sl").toURI();
         URI importedOperation2 = getClass().getResource("/check_Weather.sl").toURI();
@@ -144,7 +144,7 @@ public class CompileDependenciesTest {
 
     @Test
     public void circularDependencies() throws Exception {
-        URI flow = getClass().getResource("/circular-dependencies/parent_flow.yaml").toURI();
+        URI flow = getClass().getResource("/circular-dependencies/circular_parent_flow.yaml").toURI();
         URI child_flow = getClass().getResource("/circular-dependencies/circular_child_flow.yaml").toURI();
         URI operation = getClass().getResource("/test_op.sl").toURI();
         Set<SlangSource> path = new HashSet<>();

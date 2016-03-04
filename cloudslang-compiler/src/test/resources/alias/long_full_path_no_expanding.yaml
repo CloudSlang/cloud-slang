@@ -11,7 +11,7 @@ imports:
   ops: cloudslang.sample
 
 flow:
-  name: short_full_path_no_expanding
+  name: long_full_path_no_expanding
   workflow:
     - task1:
         do:

@@ -11,7 +11,7 @@ imports:
  ops: system.ops
 
 flow:
-  name: data_flow
+  name: bindings_flow
   inputs:
     - base_input
     - bound_input:

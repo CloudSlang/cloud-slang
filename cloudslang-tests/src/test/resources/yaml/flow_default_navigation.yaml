@@ -11,7 +11,7 @@ imports:
  ops: user.ops
 
 flow:
-  name: navigation_flow
+  name: flow_default_navigation
   inputs:
     - navigationType
     - emailHost

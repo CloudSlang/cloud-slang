@@ -74,7 +74,7 @@ public class OperationSystemTest extends SystemsTestsParent {
 
     @Test
     public void testOperationWithJavaAction() throws Exception {
-        URI resource = getClass().getResource("/yaml/java_action_op.sl").toURI();
+        URI resource = getClass().getResource("/yaml/java_action_test.sl").toURI();
 
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), null);
 
