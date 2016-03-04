@@ -6,7 +6,7 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 
 operation:
-  name: check_Weather
+  name: op_without_namespace
   inputs:
     - city
   action:

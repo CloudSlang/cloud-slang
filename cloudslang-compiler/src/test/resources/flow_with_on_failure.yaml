@@ -11,7 +11,7 @@ imports:
   ops: user.ops
 
 flow:
-  name: basic_flow
+  name: flow_with_on_failure
   inputs:
     - input1
   workflow:

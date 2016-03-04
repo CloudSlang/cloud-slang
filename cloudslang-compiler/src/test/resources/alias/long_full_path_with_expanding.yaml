@@ -11,7 +11,7 @@ imports:
   ops: a.b
 
 flow:
-  name: short_full_path_with_expanding
+  name: long_full_path_with_expanding
   workflow:
     - task1:
         do:

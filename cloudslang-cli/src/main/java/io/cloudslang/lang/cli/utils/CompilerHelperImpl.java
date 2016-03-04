@@ -10,13 +10,13 @@ package io.cloudslang.lang.cli.utils;
 
 import ch.lambdaj.function.convert.Converter;
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -27,7 +27,6 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.nio.charset.Charset;
 import java.util.*;
 
 import static ch.lambdaj.Lambda.convert;
@@ -41,9 +40,6 @@ import static ch.lambdaj.Lambda.convert;
 public class CompilerHelperImpl implements CompilerHelper{
 
     private static final Logger logger = Logger.getLogger(CompilerHelperImpl.class);
-    private static final String[] SLANG_FILE_EXTENSIONS = {"sl", "sl.yaml", "sl.yml"};
-    private static final String[] PROPERTIES_FILE_EXTENSIONS = {"prop.sl"};
-    private static final String[] YAML_FILE_EXTENSIONS = {"yaml", "yml"};
     private static final String SP_DIR = "properties"; //TODO reconsider it after closing CloudSlang file extensions & some real usecases
     private static final String INPUT_DIR = "inputs";
     private static final String CONFIG_DIR = "configuration";
@@ -59,7 +55,7 @@ public class CompilerHelperImpl implements CompilerHelper{
         Set<SlangSource> depsSources = new HashSet<>();
         File file = new File(filePath);
         Validate.isTrue(file.isFile(), "File: " + file.getName() + " was not found");
-        validateFileExtension(file, SLANG_FILE_EXTENSIONS);
+        Extension.validateSlangFileExtension(file.getName());
 
         if (CollectionUtils.isEmpty(dependencies)) {
             dependencies = new ArrayList<>();
@@ -76,7 +72,7 @@ public class CompilerHelperImpl implements CompilerHelper{
             }
         }
         for (String dependency:dependencies) {
-            Collection<File> dependenciesFiles = listFiles(new File(dependency), SLANG_FILE_EXTENSIONS, true, PROPERTIES_FILE_EXTENSIONS);
+            Collection<File> dependenciesFiles = listSlangFiles(new File(dependency), true);
             for (File dependencyCandidate : dependenciesFiles) {
                 SlangSource source = SlangSource.fromFile(dependencyCandidate);
                 depsSources.add(source);
@@ -93,13 +89,14 @@ public class CompilerHelperImpl implements CompilerHelper{
     @Override
     public Set<SystemProperty> loadSystemProperties(List<String> systemPropertyFiles) {
         String propertiesRelativePath = CONFIG_DIR + File.separator + SP_DIR;
-        return loadPropertiesFromFiles(convertToFiles(systemPropertyFiles), PROPERTIES_FILE_EXTENSIONS, propertiesRelativePath);
+        return loadPropertiesFromFiles(convertToFiles(systemPropertyFiles),
+                Extension.getPropertiesFileExtensionValues(), propertiesRelativePath);
     }
 
     @Override
     public Map<String, Serializable> loadInputsFromFile(List<String> inputFiles) {
         String inputsRelativePath = CONFIG_DIR + File.separator + INPUT_DIR;
-        return loadMapsFromFiles(convertToFiles(inputFiles), YAML_FILE_EXTENSIONS, inputsRelativePath);
+        return loadMapsFromFiles(convertToFiles(inputFiles), Extension.getYamlFileExtensionValues(), inputsRelativePath);
     }
 
     private Map<String, Serializable> loadMapsFromFiles(List<File> files, String[] extensions, String directory) {
@@ -143,7 +140,7 @@ public class CompilerHelperImpl implements CompilerHelper{
         } else {
             fileCollection = files;
             for (File propertyFileCandidate : fileCollection) {
-                validateFileExtension(propertyFileCandidate, PROPERTIES_FILE_EXTENSIONS);
+                Extension.validatePropertiesFileExtension(propertyFileCandidate.getName());
             }
         }
         Set<SystemProperty> result = new HashSet<>();
@@ -175,24 +172,6 @@ public class CompilerHelperImpl implements CompilerHelper{
         return files;
     }
 
-    private void validateFileExtension(File file, String[] extensions) {
-        boolean validFileExtension = hasExtension(file, extensions);
-        String extensionsAsString =  Arrays.toString(extensions);
-        Validate.isTrue(
-                validFileExtension,
-                "File: " + file.getName() + " must have one of the following extensions: " +
-                        extensionsAsString.substring(1, extensionsAsString.length() - 1) + "."
-        );
-    }
-
-    private Boolean hasExtension(File file, String[] extensions){
-        String[] suffixes = new String[extensions.length];
-        for(int i = 0; i < suffixes.length; ++i){
-            suffixes[i] = "." + extensions[i];
-        }
-        return new SuffixFileFilter(suffixes).accept(file);
-    }
-
     private List<File> convertToFiles(List<String> fileList) {
         return convert(fileList, new Converter<String, File>() {
             @Override
@@ -203,15 +182,11 @@ public class CompilerHelperImpl implements CompilerHelper{
     }
 
     // e.g. exclude .prop.sl from .sl set
-    private Collection<File> listFiles(
-            File directory,
-            String[] extensions,
-            boolean recursive,
-            String[] excludedExtensions) {
-        Collection<File> dependenciesFiles = FileUtils.listFiles(directory, extensions, recursive);
+    private Collection<File> listSlangFiles(File directory, boolean recursive) {
+        Collection<File> dependenciesFiles = FileUtils.listFiles(directory, Extension.getSlangFileExtensionValues(), recursive);
         Collection<File> result = new ArrayList<>();
         for (File file : dependenciesFiles) {
-            if (!hasExtension(file, excludedExtensions)) {
+            if (Extension.SL.equals(Extension.findExtension(file.getName()))) {
                 result.add(file);
             }
         }
