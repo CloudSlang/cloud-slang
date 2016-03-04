@@ -62,6 +62,7 @@ import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER
 public class ExecutableBuilder {
 
     public static final String MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX = "Multiple 'on_failure' properties found";
+    public static final String UNIQUE_TASK_NAME_MESSAGE_SUFFIX = "Each task name in the workflow must be unique";
 
     @Autowired
     private List<Transformer> transformers;
@@ -265,18 +266,19 @@ public class ExecutableBuilder {
         }
 
         Deque<Task> tasks = new LinkedList<>();
-        boolean isOnFailureDefined = onFailureWorkFlow != null;
         Set<String> taskNames = new HashSet<>();
-        String defaultFailure = isOnFailureDefined ?
-                onFailureWorkFlow.getTasks().getFirst().getName() : ScoreLangConstants.FAILURE_RESULT;
+        Deque<Task> onFailureTasks = !(onFailureSection || onFailureWorkFlow == null) ? onFailureWorkFlow.getTasks() : new LinkedList<Task>();
+        List<String> onFailureTaskNames = getTaskNames(onFailureTasks);
+        boolean onFailureTasksFound =  onFailureTaskNames.size() > 0;
+        String defaultFailure = onFailureTasksFound ? onFailureTaskNames.get(0) : ScoreLangConstants.FAILURE_RESULT;
 
         PeekingIterator<Map<String, Map<String, Object>>> iterator = new PeekingIterator<>(workFlowRawData.iterator());
         while (iterator.hasNext()) {
             Map<String, Map<String, Object>> taskRawData = iterator.next();
             Map<String, Map<String, Object>> nextTaskData = iterator.peek();
             String taskName = taskRawData.keySet().iterator().next();
-            if (taskNames.contains(taskName)) {
-                errors.add(new RuntimeException("Task name: \'" + taskName + "\' appears more than once in the workflow. Each task name in the workflow must be unique"));
+            if (taskNames.contains(taskName) || onFailureTaskNames.contains(taskName)) {
+                errors.add(new RuntimeException("Task name: \'" + taskName + "\' appears more than once in the workflow. " + UNIQUE_TASK_NAME_MESSAGE_SUFFIX));
             }
             taskNames.add(taskName);
             Map<String, Object> taskRawDataValue;
@@ -317,8 +319,8 @@ public class ExecutableBuilder {
             tasks.add(taskModellingResult.getTask());
         }
 
-        if (isOnFailureDefined) {
-            tasks.addAll(onFailureWorkFlow.getTasks());
+        if (onFailureTasksFound) {
+            tasks.addAll(onFailureTasks);
         }
 
         return new WorkflowModellingResult(new Workflow(tasks), errors);
@@ -414,6 +416,14 @@ public class ExecutableBuilder {
             dependencies.add(task.getRefId());
         }
         return dependencies;
+    }
+
+    private List<String> getTaskNames(Deque<Task> tasks) {
+        List<String> taskNames =  new ArrayList<>();
+        for (Task task : tasks) {
+            taskNames.add(task.getName());
+        }
+        return taskNames;
     }
 
 }
