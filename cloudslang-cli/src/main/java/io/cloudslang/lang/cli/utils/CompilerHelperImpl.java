@@ -72,8 +72,7 @@ public class CompilerHelperImpl implements CompilerHelper{
             }
         }
         for (String dependency:dependencies) {
-            Collection<File> dependenciesFiles = listSlangFiles(new File(dependency),
-                    true);
+            Collection<File> dependenciesFiles = listSlangFiles(new File(dependency), true);
             for (File dependencyCandidate : dependenciesFiles) {
                 SlangSource source = SlangSource.fromFile(dependencyCandidate);
                 depsSources.add(source);
