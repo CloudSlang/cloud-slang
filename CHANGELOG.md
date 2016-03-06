@@ -1,6 +1,5 @@
 #CHANGE LOG
 
-<<<<<<< HEAD
 ##Version 0.9.50
 
 + DSL Improvements
