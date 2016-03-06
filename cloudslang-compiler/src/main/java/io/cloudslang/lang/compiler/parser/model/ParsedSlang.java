@@ -18,6 +18,7 @@ public class ParsedSlang {
     private Map<String, String> imports;
     private Map<String, Object> flow;
     private Map<String, Object> operation;
+    private Map<String, Object> properties;
     private String namespace;
     private String name;
 
@@ -39,10 +40,20 @@ public class ParsedSlang {
         return operation;
     }
 
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
     public Type getType() {
         if(flow != null) return Type.FLOW;
         if(operation != null) return Type.OPERATION;
-        throw new RuntimeException("Source " + name + " has no " + Type.FLOW.key() + "/" + Type.OPERATION.key() + " property");
+        if(properties != null) return Type.SYSTEM_PROPERTY_FILE;
+        throw new RuntimeException(
+                "Source " + name + " has no content associated with " +
+                        Type.FLOW.key() + "/" +
+                        Type.OPERATION.key() + "/" +
+                        Type.SYSTEM_PROPERTY_FILE.key() + " property."
+        );
     }
 
     public String getName() {
@@ -55,7 +66,8 @@ public class ParsedSlang {
 
     public static enum Type {
         FLOW("flow"),
-        OPERATION("operation");
+        OPERATION("operation"),
+        SYSTEM_PROPERTY_FILE("properties");
 
         private String key;
 

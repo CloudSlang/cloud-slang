@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class ResultsTransformer implements Transformer<List, List<Result>> {
+public class ResultsTransformer extends InOutTransformer implements Transformer<List, List<Result>> {
 
     @Override
     public List<Result> transform(List rawData) {
@@ -65,8 +65,14 @@ public class ResultsTransformer implements Transformer<List, List<Result>> {
         return new Result(rawResult, null);
     }
 
-    private Result createExpressionResult(String resultName, Serializable resultExpression) {
-        return new Result(resultName, resultExpression);
+    private Result createExpressionResult(String resultName, Serializable resultValue) {
+        Accumulator accumulator = extractFunctionData(resultValue);
+        return new Result(
+                resultName,
+                resultValue,
+                accumulator.getFunctionDependencies(),
+                accumulator.getSystemPropertyDependencies()
+        );
     }
 }
 

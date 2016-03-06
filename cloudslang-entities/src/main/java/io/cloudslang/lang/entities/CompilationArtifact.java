@@ -8,14 +8,15 @@
  */
 package io.cloudslang.lang.entities;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.score.api.ExecutionPlan;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /*
  * Created by orius123 on 10/11/14.
@@ -25,9 +26,9 @@ public class CompilationArtifact {
     private final ExecutionPlan executionPlan;
     private final Map<String, ExecutionPlan> dependencies;
     private final List<Input> inputs;
-    private final Collection<Input> systemProperties;
+    private final Set<String> systemProperties;
 
-    public CompilationArtifact(ExecutionPlan executionPlan, Map<String, ExecutionPlan> dependencies, List<Input> inputs, Collection<Input> systemProperties) {
+    public CompilationArtifact(ExecutionPlan executionPlan, Map<String, ExecutionPlan> dependencies, List<Input> inputs, Set<String> systemProperties) {
         this.executionPlan = executionPlan;
         this.dependencies = dependencies;
         this.inputs = inputs;
@@ -46,18 +47,44 @@ public class CompilationArtifact {
         return inputs;
     }
 
-    public Collection<Input> getSystemProperties() {
+    public Set<String> getSystemProperties() {
         return systemProperties;
     }
 
     @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("executionPlan", executionPlan)
+                .append("dependencies", dependencies)
+                .append("inputs", inputs)
+                .append("systemProperties", systemProperties)
+                .toString();
+    }
+
+    @Override
     public boolean equals(Object o) {
-        return EqualsBuilder.reflectionEquals(this, o);
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CompilationArtifact that = (CompilationArtifact) o;
+
+        return new EqualsBuilder()
+                .append(executionPlan, that.executionPlan)
+                .append(dependencies, that.dependencies)
+                .append(inputs, that.inputs)
+                .append(systemProperties, that.systemProperties)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this);
+        return new HashCodeBuilder(17, 37)
+                .append(executionPlan)
+                .append(dependencies)
+                .append(inputs)
+                .append(systemProperties)
+                .toHashCode();
     }
 
 }

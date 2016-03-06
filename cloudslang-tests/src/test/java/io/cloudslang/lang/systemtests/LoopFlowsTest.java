@@ -12,17 +12,18 @@ package io.cloudslang.lang.systemtests;
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.SystemProperty;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class LoopFlowsTest extends SystemsTestsParent{
+    
+    @SuppressWarnings("unchecked")
+    private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
 
     @Test
     public void testFlowWithLoops() throws Exception {
@@ -33,13 +34,25 @@ public class LoopFlowsTest extends SystemsTestsParent{
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+        Set<SystemProperty> systemProperties = new HashSet<>();
+        systemProperties.add(
+                new SystemProperty("loop", "for.prop1", "for_value")
+        );
+
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, systemProperties).getTasks();
+
         StepData firstTask = stepsData.get(FIRST_STEP_PATH);
         StepData secondTask = stepsData.get(SECOND_STEP_KEY);
         StepData thirdTask = stepsData.get(THIRD_STEP_KEY);
-        Assert.assertTrue(firstTask.getInputs().containsValue(1));
-        Assert.assertTrue(secondTask.getInputs().containsValue(2));
-        Assert.assertTrue(thirdTask.getInputs().containsValue(3));
+
+        Map<String, Serializable> expectedInputs = new HashMap<>();
+        expectedInputs.put("text", 1);
+        expectedInputs.put("sp_arg", "for_value");
+        Assert.assertEquals(expectedInputs, firstTask.getInputs());
+        expectedInputs.put("text", 2);
+        Assert.assertEquals(expectedInputs, secondTask.getInputs());
+        expectedInputs.put("text", 3);
+        Assert.assertEquals(expectedInputs, thirdTask.getInputs());
     }
 
     @Test
@@ -51,7 +64,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getTasks();
         StepData thirdTask = stepsData.get(THIRD_STEP_KEY);
         Assert.assertEquals("print_other_values", thirdTask.getName());
     }
@@ -65,7 +78,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getTasks();
         List<String> actualTasks = getTasksOnly(stepsData);
         Assert.assertEquals(2, actualTasks.size());
     }
@@ -79,7 +92,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getTasks();
         List<String> actualTasks = getTasksOnly(stepsData);
         Assert.assertEquals(3, actualTasks.size());
     }
@@ -94,7 +107,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getTasks();
         List<String> actualTasks = getTasksOnly(stepsData);
         Assert.assertEquals(3, actualTasks.size());
         StepData thirdTask = stepsData.get(THIRD_STEP_KEY);
@@ -110,7 +123,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getTasks();
         verifyPersonMap(stepsData);
     }
 
@@ -128,7 +141,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         personMap.put("peter", "three");
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("person_map", (Serializable) personMap);
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getTasks();
         verifyPersonMap(stepsData);
     }
 
@@ -141,7 +154,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getTasks();
         StepData fourthTask = stepsData.get(FOURTH_STEP_KEY);
         Assert.assertEquals("print_other_values", fourthTask.getName());
     }
@@ -155,7 +168,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getTasks();
         List<String> actualTasks = getTasksOnly(stepsData);
         Assert.assertEquals(1, actualTasks.size());
     }
@@ -169,7 +182,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getTasks();
         List<String> actualTasks = getTasksOnly(stepsData);
         Assert.assertEquals(3, actualTasks.size());
     }
@@ -184,7 +197,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getTasks();
         List<String> actualTasks = getTasksOnly(stepsData);
         Assert.assertEquals(2, actualTasks.size());
         StepData secondTask = stepsData.get(SECOND_STEP_KEY);

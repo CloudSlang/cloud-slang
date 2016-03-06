@@ -12,15 +12,13 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.net.URL;
 import java.util.*;
 
 /**
@@ -29,15 +27,14 @@ import java.util.*;
  */
 public class SimpleFlowTest extends SystemsTestsParent {
 
-	private static final Map<String, Serializable> SYS_PROPS = new HashMap<>();
+	private static final Set<SystemProperty> SYS_PROPS = new HashSet<>();
+    @SuppressWarnings("unchecked")
+    private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
 	static {
-		SYS_PROPS.put("user.sys.props.host", "localhost");
-		SYS_PROPS.put("user.sys.props.port", 22);
-		SYS_PROPS.put("user.sys.props.alla", "balla");
+		SYS_PROPS.add(new SystemProperty("user.sys", "props.host", "localhost"));
+        SYS_PROPS.add(new SystemProperty("user.sys", "props.port", "22"));
+        SYS_PROPS.add(new SystemProperty("user.sys", "props.alla", "balla"));
 	}
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     private static final long DEFAULT_TIMEOUT = 20000;
 
@@ -50,7 +47,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
-    public void testSimpleFlowBasicOneLinerSyntax() throws Exception {
+    public void testOneLinerIsInvalid() throws Exception {
         Map<String, Serializable> inputs = new HashMap<>();
         inputs.put("input1", "-2");
         inputs.put("time_zone_as_string", "+2");
@@ -69,7 +66,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         exception.expect(RuntimeException.class);
         exception.expectMessage("input1");
         exception.expectMessage("Required");
-        compileAndRunSimpleFlow(new HashMap<String, Serializable>(), null);
+        compileAndRunSimpleFlow(new HashMap<String, Serializable>(), EMPTY_SET);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -80,7 +77,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         exception.expect(RuntimeException.class);
         exception.expectMessage("host");
         exception.expectMessage("Required");
-        compileAndRunSimpleFlow(inputs, null);
+        compileAndRunSimpleFlow(inputs, EMPTY_SET);
     }
 
     @Test
@@ -94,14 +91,14 @@ public class SimpleFlowTest extends SystemsTestsParent {
 
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("object_value", "SessionValue");
-        ScoreEvent event = trigger(compilationArtifact, userInputs, null);
+        ScoreEvent event = trigger(compilationArtifact, userInputs, EMPTY_SET);
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 
-	private void compileAndRunSimpleFlow(Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties) throws Exception {
+	private void compileAndRunSimpleFlow(Map<String, ? extends Serializable> inputs, Set<SystemProperty> systemProperties) throws Exception {
 		URI flow = getClass().getResource("/yaml/simple_flow.yaml").toURI();
 		URI operations1 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
-		URI operations2 = getClass().getResource("/yaml/comopute_daylight_time_zone.sl").toURI();
+		URI operations2 = getClass().getResource("/yaml/compute_daylight_time_zone.sl").toURI();
 		Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
 		CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
         Assert.assertEquals("the system properties size is not as expected", 2, compilationArtifact.getSystemProperties().size());
@@ -109,15 +106,15 @@ public class SimpleFlowTest extends SystemsTestsParent {
 		Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
 	}
 
-    private void compileAndRunSimpleFlowOneLinerSyntax(Map<String, ? extends Serializable> inputs, Map<String, ? extends Serializable> systemProperties) throws Exception {
+    private void compileAndRunSimpleFlowOneLinerSyntax(Map<String, ? extends Serializable> inputs, Set<SystemProperty> systemProperties) throws Exception {
         URI flow = getClass().getResource("/yaml/simple_flow_one_liner.yaml").toURI();
         URI operations1 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
-        URI operations2 = getClass().getResource("/yaml/comopute_daylight_time_zone.sl").toURI();
+        URI operations2 = getClass().getResource("/yaml/compute_daylight_time_zone.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Task arguments");
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
-        Assert.assertEquals("the system properties size is not as expected", 2, compilationArtifact.getSystemProperties().size());
         ScoreEvent event = trigger(compilationArtifact, inputs, systemProperties);
-        Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 
     @Test
@@ -148,7 +145,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         userInputs.put("first", "value");
         userInputs.put("second_string", "value");
 
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getTasks();
 
         List<String> actualTasks = getTasksOnly(stepsData);
         Assert.assertEquals(2, actualTasks.size());
@@ -156,64 +153,6 @@ public class SimpleFlowTest extends SystemsTestsParent {
         StepData secondTask = stepsData.get(SECOND_STEP_KEY);
         Assert.assertEquals("CheckBinding", firstTask.getName());
         Assert.assertEquals("TaskOnSuccess", secondTask.getName());
-    }
-
-    @Test
-    public void testGetFunctionBasic() throws Exception {
-        URL resource = getClass().getResource("/yaml/get_function_test_flow_basic.sl");
-        URI operation = getClass().getResource("/yaml/get_function_test_basic.sl").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
-
-        // trigger ExecutionPlan
-        Map<String, Serializable> userInputs = new HashMap<>();
-        RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, null);
-        Map<String, StepData> executionData = runtimeInformation.getTasks();
-
-        StepData flowData = executionData.get(EXEC_START_PATH);
-        StepData taskData = executionData.get(FIRST_STEP_PATH);
-        Assert.assertNotNull("flow data is null", flowData);
-        Assert.assertNotNull("task data is null", taskData);
-
-        // verify 'get' function worked in input binding and locals().get() works
-        Map<String, Serializable> expectedFlowInputs = new LinkedHashMap<>();
-        expectedFlowInputs.put("input1", null);
-        expectedFlowInputs.put("input1_safe", "input1_default");
-        expectedFlowInputs.put("input2", 22);
-        expectedFlowInputs.put("input2_safe", 22);
-        expectedFlowInputs.put("input_locals_found", 22);
-        expectedFlowInputs.put("input_locals_not_found", "input_locals_not_found_default");
-        Map<String, Serializable> actualFlowInputs = flowData.getInputs();
-        Assert.assertEquals("flow input values not as expected", expectedFlowInputs, actualFlowInputs);
-
-        // verify 'get' function worked in output binding
-        Map<String, Serializable> expectedOperationPublishValues = new LinkedHashMap<>();
-        expectedOperationPublishValues.put("output1_safe", "CloudSlang");
-        expectedOperationPublishValues.put("output2_safe", "output2_default");
-        expectedOperationPublishValues.put("output_same_name", "output_same_name_default");
-        Map<String, Serializable> actualOperationPublishValues = taskData.getOutputs();
-        Assert.assertEquals("operation publish values not as expected", expectedOperationPublishValues, actualOperationPublishValues);
-
-        // verify 'get' function worked in result expressions
-        Assert.assertEquals("Get function problem in result expression", "GET_FUNCTION_KEY_EXISTS", flowData.getResult());
-    }
-
-    @Test
-    public void testGetFunctionDefaultResult() throws Exception {
-        URL resource = getClass().getResource("/yaml/get_function_test_flow_default_result.sl");
-        URI operation = getClass().getResource("/yaml/get_function_test_default_result.sl").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
-
-        // trigger ExecutionPlan
-        Map<String, Serializable> userInputs = new HashMap<>();
-        RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, null);
-        Map<String, StepData> executionData = runtimeInformation.getTasks();
-
-        StepData flowData = executionData.get(EXEC_START_PATH);
-
-        // verify 'get' function worked in result expressions
-        Assert.assertEquals("Get function problem in result expression", "GET_FUNCTION_DEFAULT_VALUE", flowData.getResult());
     }
 
 }

@@ -13,6 +13,13 @@ imports:
 flow:
   name: values_flow
   inputs:
+    # snake-case to camel-case
+    - enable_option_for_action:
+         required: false
+    - enableOptionForAction:
+        default: ${get("enable_option_for_action", "default_value")}
+        overridable: false
+
     # helpers
     - output_no_expression: output_no_expression_value
     - authorized_keys_path: './auth'
@@ -22,8 +29,7 @@ flow:
     - input_no_expression
     - input_no_expression_not_required:
         required: false
-    - input_system_property:
-        system_property: user.sys.props.host
+    - input_system_property: ${get_sp('user.sys.props.host')}
     - input_not_overridable:
         default: 25
         overridable: false
@@ -52,7 +58,6 @@ flow:
     - b: b
     - b_copy: ${ b }
     - input_concat_1: ${'a' + b}
-    - input_concat_2_one_liner: ${'prefix_' + input_concat_1 + '_suffix'}
     - input_concat_2_folded: >
         ${
         'prefix_' +
@@ -89,7 +94,6 @@ flow:
             - b: b
             - b_copy: ${ b }
             - input_concat_1: ${'a' + b}
-            - input_concat_2_one_liner: ${'prefix_' + input_concat_1 + '_suffix'}
             - input_concat_2_folded: >
                 ${
                 'prefix_' +
@@ -102,9 +106,6 @@ flow:
           - publish_str: publish_str_value
           - publish_expression: ${ publish_str + '_suffix' }
 
-    - task_one_liner:
-        do:
-          ops.noop: input_no_expression, input_int = ${ 22 }, input_expression = ${ input_no_expression + '_suffix' }
   outputs:
     - output_no_expression
     - output_int: 22

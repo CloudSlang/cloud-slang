@@ -12,6 +12,7 @@ import java.util.Set;
 
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.SystemProperty;
 
 public interface SlangCompiler {
 
@@ -29,5 +30,7 @@ public interface SlangCompiler {
      * @return an {@link io.cloudslang.lang.compiler.modeller.model.Executable} object, containing either a flow or operation in the file.
      */
     Executable preCompile(SlangSource source);
+
+    Set<SystemProperty> loadSystemProperties(SlangSource source);
 
 }

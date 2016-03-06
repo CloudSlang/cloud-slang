@@ -1,5 +1,6 @@
 #CHANGE LOG
 
+<<<<<<< HEAD
 ##Version 0.9.50
 
 + DSL Improvements
@@ -14,9 +15,9 @@
 + Content
   + Restructuring - The folders in the content repository have been restructured.
 	+ Additions - Content has been added in the following areas:
-    + Heroku
-		+ Operations Orchestration
-		+ VMware
+      + Heroku
+		  + Operations Orchestration
+		  + VMware
 + Docker Image
 	+ A new CloudSlang dev image was added.
 

@@ -47,12 +47,6 @@ public class CompileOperationTest {
         Assert.assertEquals("there is a different number of steps than expected", 3, executionPlan.getSteps().size());
     }
 
-	@Test
-	public void testCompileOperationMissingImport() throws Exception {
-		URL resource = getClass().getResource("/operation_with_missing_sys_props_imports.sl");
-		compiler.compile(SlangSource.fromFile(resource.toURI()), null).getExecutionPlan();
-	}
-
     @Test
     public void testCompileOperationWithData() throws Exception {
         URL resource = getClass().getResource("/operation_with_data.sl");
@@ -89,7 +83,7 @@ public class CompileOperationTest {
         Assert.assertEquals("There is a different number of operation inputs than expected", 1, operation.getInputs().size());
         Assert.assertEquals("There is a different number of operation outputs than expected", 2, operation.getOutputs().size());
         Assert.assertEquals("There is a different number of operation results than expected", 1, operation.getResults().size());
-        Assert.assertEquals("There is a different number of operation dependencies than expected", 0, operation.getDependencies().size());
+        Assert.assertEquals("There is a different number of operation dependencies than expected", 0, operation.getExecutableDependencies().size());
     }
 
     @Test

@@ -10,37 +10,35 @@
 
 package io.cloudslang.lang.runtime.steps;
 
+import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Input;
-import io.cloudslang.lang.entities.bindings.Result;
-import io.cloudslang.lang.runtime.env.ReturnValues;
-import io.cloudslang.lang.runtime.env.RunEnvironment;
-import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.ResultsBinding;
-import io.cloudslang.lang.runtime.bindings.ScriptEvaluator;
+import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.ParentFlowData;
-import junit.framework.Assert;
+import io.cloudslang.lang.runtime.env.ReturnValues;
+import io.cloudslang.lang.runtime.env.RunEnvironment;
+import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.script.ScriptEngine;
 import java.io.Serializable;
 import java.util.*;
 
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -67,13 +65,13 @@ public class ExecutableStepsTest {
 
     @Test
     public void testStartWithInput() throws Exception {
-        List<Input> inputs = Arrays.asList(new Input("input1","input1"));
+        List<Input> inputs = Collections.singletonList(new Input.InputBuilder("input1", "input1").build());
         RunEnvironment runEnv = new RunEnvironment();
 
         Map<String,Serializable> resultMap = new HashMap<>();
         resultMap.put("input1",5);
 
-        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anyMap())).thenReturn(resultMap);
+        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anySet())).thenReturn(resultMap);
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Serializable>(), new ExecutionRuntimeServices(),"", 2L);
 
         Map<String,Serializable> opVars = runEnv.getStack().popContext().getImmutableViewOfVariables();
@@ -88,14 +86,21 @@ public class ExecutableStepsTest {
 
     @Test
     public void testBoundInputEvent(){
-        List<Input> inputs = Arrays.asList(new Input("input1","input1"),new Input("input2", "3", true, true, false, null));
+        List<Input> inputs = Arrays.asList(
+                new Input.InputBuilder("input1","input1").build(),
+                new Input.InputBuilder("input2", "3")
+                .withEncrypted(true)
+                .withRequired(true)
+                .withOverridable(false)
+                .build()
+        );
         RunEnvironment runEnv = new RunEnvironment();
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         Map<String,Serializable> resultMap = new HashMap<>();
         resultMap.put("input1", 5);
         resultMap.put("input2", 3);
 
-        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anyMap())).thenReturn(resultMap);
+        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anySet())).thenReturn(resultMap);
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Serializable>(), runtimeServices, "dockerizeStep", 2L);
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 
@@ -146,8 +151,14 @@ public class ExecutableStepsTest {
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Serializable>(), null));
         runEnv.getExecutionPath().down();
 
-        when(resultsBinding.resolveResult(isNull(Map.class), anyMapOf(String.class, Serializable.class), eq(results), isNull(String.class))).thenReturn(ScoreLangConstants.SUCCESS_RESULT);
-        executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), results, new ExecutionRuntimeServices(),"");
+        when(resultsBinding.resolveResult(
+                isNull(Map.class),
+                anyMapOf(String.class, Serializable.class),
+                eq(runEnv.getSystemProperties()),
+                eq(results),
+                isNull(String.class)
+        )).thenReturn(ScoreLangConstants.SUCCESS_RESULT);
+        executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), results, new ExecutionRuntimeServices(),"", ExecutableType.FLOW);
 
         ReturnValues returnValues= runEnv.removeReturnValues();
         Assert.assertTrue(returnValues.getResult().equals(ScoreLangConstants.SUCCESS_RESULT));
@@ -163,8 +174,13 @@ public class ExecutableStepsTest {
         Map<String, Serializable> boundOutputs = new HashMap<>();
         boundOutputs.put("name", "John");
 
-        when(outputsBinding.bindOutputs(isNull(Map.class), anyMapOf(String.class, Serializable.class), eq(possibleOutputs))).thenReturn(boundOutputs);
-        executableSteps.finishExecutable(runEnv, possibleOutputs, new ArrayList<Result>(), new ExecutionRuntimeServices(),"");
+        when(outputsBinding.bindOutputs(
+                isNull(Map.class),
+                anyMapOf(String.class, Serializable.class),
+                eq(runEnv.getSystemProperties()),
+                eq(possibleOutputs)
+        )).thenReturn(boundOutputs);
+        executableSteps.finishExecutable(runEnv, possibleOutputs, new ArrayList<Result>(), new ExecutionRuntimeServices(),"", ExecutableType.FLOW);
 
         ReturnValues returnValues= runEnv.removeReturnValues();
         Map<String, Serializable> outputs = returnValues.getOutputs();
@@ -180,7 +196,7 @@ public class ExecutableStepsTest {
         Long parentFirstStepPosition = 2L;
         runEnv.getParentFlowStack().pushParentFlowData(new ParentFlowData(111L, parentFirstStepPosition));
 
-        executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), new ArrayList<Result>(), new ExecutionRuntimeServices(), "");
+        executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), new ArrayList<Result>(), new ExecutionRuntimeServices(), "", ExecutableType.FLOW);
 
         Assert.assertEquals(parentFirstStepPosition, runEnv.removeNextStepPosition());
     }
@@ -191,7 +207,7 @@ public class ExecutableStepsTest {
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Serializable>(), null));
         runEnv.getExecutionPath().down();
 
-        executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), new ArrayList<Result>(), new ExecutionRuntimeServices(), "");
+        executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), new ArrayList<Result>(), new ExecutionRuntimeServices(), "", ExecutableType.FLOW);
 
         Assert.assertEquals(null, runEnv.removeNextStepPosition());
     }
@@ -209,11 +225,22 @@ public class ExecutableStepsTest {
         boundOutputs.put("name", "John");
         String boundResult = ScoreLangConstants.SUCCESS_RESULT;
 
-        when(outputsBinding.bindOutputs(isNull(Map.class), anyMapOf(String.class, Serializable.class), eq(possibleOutputs))).thenReturn(boundOutputs);
-        when(resultsBinding.resolveResult(isNull(Map.class), anyMapOf(String.class, Serializable.class), eq(possibleResults), isNull(String.class))).thenReturn(boundResult);
+        when(outputsBinding.bindOutputs(
+                isNull(Map.class),
+                anyMapOf(String.class, Serializable.class),
+                eq(runEnv.getSystemProperties()),
+                eq(possibleOutputs)
+        )).thenReturn(boundOutputs);
+        when(resultsBinding.resolveResult(
+                isNull(Map.class),
+                anyMapOf(String.class, Serializable.class),
+                eq(runEnv.getSystemProperties()),
+                eq(possibleResults),
+                isNull(String.class)
+        )).thenReturn(boundResult);
 
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
-        executableSteps.finishExecutable(runEnv, possibleOutputs, possibleResults, runtimeServices,"task1");
+        executableSteps.finishExecutable(runEnv, possibleOutputs, possibleResults, runtimeServices,"task1", ExecutableType.FLOW);
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 
@@ -283,8 +310,8 @@ public class ExecutableStepsTest {
         }
 
         @Bean
-        public ScriptEngine scriptEngine(){
-            return mock(ScriptEngine.class);
+        public PythonInterpreter evalInterpreter(){
+            return mock(PythonInterpreter.class);
         }
 
         @Bean

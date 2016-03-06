@@ -10,6 +10,13 @@ namespace: user.ops
 operation:
   name: values_op
   inputs:
+    # snake-case to camel-case
+    - enable_option_for_action:
+         required: false
+    - enableOptionForAction:
+        default: ${get("enable_option_for_action", "default_value")}
+        overridable: false
+
     # helpers
     - output_no_expression: output_no_expression_value
     - authorized_keys_path: './auth'
@@ -19,8 +26,7 @@ operation:
     - input_no_expression
     - input_no_expression_not_required:
         required: false
-    - input_system_property:
-        system_property: user.sys.props.host
+    - input_system_property: ${get_sp('user.sys.props.host')}
     - input_not_overridable:
         default: 25
         overridable: false
@@ -49,7 +55,6 @@ operation:
     - b: b
     - b_copy: ${ b }
     - input_concat_1: ${'a' + b}
-    - input_concat_2_one_liner: ${'prefix_' + input_concat_1 + '_suffix'}
     - input_concat_2_folded: >
         ${
         'prefix_' +

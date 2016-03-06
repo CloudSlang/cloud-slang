@@ -11,20 +11,24 @@ package io.cloudslang.lang.compiler.scorecompiler;
 import ch.lambdaj.function.convert.Converter;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.modeller.TransformersHandler;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Task;
-import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.compiler.modeller.transformers.AggregateTransformer;
+import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
+import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
+import io.cloudslang.lang.entities.bindings.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
 import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
 import io.cloudslang.lang.entities.CompilationArtifact;
-import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
@@ -53,7 +57,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
 
         Map<String, Executable> filteredDependencies = new HashMap<>();
         //we handle dependencies only if the file has imports
-        boolean hasDependencies = CollectionUtils.isNotEmpty(executable.getDependencies())
+        boolean hasDependencies = CollectionUtils.isNotEmpty(executable.getExecutableDependencies())
                 && executable.getType().equals(SlangTextualKeys.FLOW_TYPE);
         if (hasDependencies) {
             Validate.notEmpty(path, "Source " + executable.getName() + " has dependencies but no path was given to the compiler");
@@ -84,7 +88,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         executables.add(executable);
 
         executionPlan.setSubflowsUUIDs(new HashSet<>(dependencies.keySet()));
-        return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemProperties(executables));
+        return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemPropertiesFromExecutables(executables));
     }
 
     /**
@@ -108,13 +112,13 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             String refId = task.getRefId();
             Executable reference = filteredDependencies.get(refId);
             Validate.notNull(reference, "Cannot compile flow: \'" + executable.getName() + "\' since for task: \'" + task.getName()
-                                        + "\', the dependency: \'" + refId + "\' is missing.");
+                    + "\', the dependency: \'" + refId + "\' is missing.");
             List<Result> refResults = reference.getResults();
             for(Result result : refResults){
                 String resultName = result.getName();
                 Validate.isTrue(taskNavigations.containsKey(resultName), "Cannot compile flow: \'" + executable.getName() +
-                                                "\' since for task: '" + task.getName() + "\', the result \'" + resultName+
-                                                "\' of its dependency: \'"+ refId + "\' has no matching navigation");
+                        "\' since for task: '" + task.getName() + "\', the result \'" + resultName+
+                        "\' of its dependency: \'"+ refId + "\' has no matching navigation");
             }
         }
     }
@@ -138,20 +142,12 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         }
     }
 
-	private static Collection<Input> getSystemProperties(Collection<Executable> executables) {
-		Collection<Input> result = new ArrayList<>();
-		for(Executable executable : executables) {
-			result.addAll(getSystemProperties(executable.getInputs()));
-		}
-		return result;
-	}
-
-	private static Collection<Input> getSystemProperties(List<Input> inputs) {
-		Collection<Input> result = new ArrayList<>();
-		for(Input input : inputs) {
-			if(input.getSystemPropertyName() != null) result.add(input);
-		}
-		return result;
-	}
+    private Set<String> getSystemPropertiesFromExecutables(Collection<Executable> executables) {
+        Set<String> result = new HashSet<>();
+        for(Executable executable : executables) {
+            result.addAll(executable.getSystemPropertyDependencies());
+        }
+        return result;
+    }
 
 }

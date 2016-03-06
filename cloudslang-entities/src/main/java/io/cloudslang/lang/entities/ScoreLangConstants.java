@@ -18,11 +18,14 @@ public interface ScoreLangConstants {
     String RUN_ENV = "runEnv";
     String HOOKS = "hooks";
     String NODE_NAME_KEY = "nodeName";
+    String EXECUTABLE_TYPE = "executableType";
 
     String EXPRESSION_START_DELIMITER = "${";
     String EXPRESSION_START_DELIMITER_ESCAPED = "\\$\\{";
     String EXPRESSION_END_DELIMITER = "}";
     String EXPRESSION_END_DELIMITER_ESCAPED = "\\}";
+
+    String NAMESPACE_DELIMITER = ".";
 
     //action scope
     String ACTION_CLASS_KEY = "className";

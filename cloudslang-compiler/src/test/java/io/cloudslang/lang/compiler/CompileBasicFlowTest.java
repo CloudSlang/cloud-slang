@@ -55,7 +55,6 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());
         Assert.assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
         Assert.assertEquals("the inputs size is not as expected", 3, compilationArtifact.getInputs().size());
-        Assert.assertEquals("the system properties size is not as expected", 2, compilationArtifact.getSystemProperties().size());
     }
 
     @Test
@@ -123,7 +122,7 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("There is a different number of flow inputs than expected", 3, flow.getInputs().size());
         Assert.assertEquals("There is a different number of flow outputs than expected", 0, flow.getOutputs().size());
         Assert.assertEquals("There is a different number of flow results than expected", 2, flow.getResults().size());
-        Set<String> dependencies = flow.getDependencies();
+        Set<String> dependencies = flow.getExecutableDependencies();
         Assert.assertEquals("There is a different number of flow dependencies than expected", 1, dependencies.size());
         String dependency = dependencies.iterator().next();
         Assert.assertEquals("The flow dependency full name is wrong", "user.ops.test_op", dependency);

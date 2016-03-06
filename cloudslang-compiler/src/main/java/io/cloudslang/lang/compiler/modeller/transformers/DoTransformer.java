@@ -16,17 +16,13 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.entities.bindings.Argument;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.*;
 
 @Component
-public class DoTransformer implements Transformer<Map<String, Object>, List<Argument>> {
-
-    // every comma that is not preceded by '\' (escaped)
-    private static final String REGEX_COMMA_NOT_ESCAPED = "(?<!\\\\)(,)";
+public class DoTransformer extends InOutTransformer implements Transformer<Map<String, Object>, List<Argument>> {
 
     @Override
     public List<Argument> transform(Map<String, Object> rawData) {
@@ -46,9 +42,8 @@ public class DoTransformer implements Transformer<Map<String, Object>, List<Argu
                 Argument argument = transformListArgument(rawArgument);
                 result.add(argument);
             }
-        } else if (rawArguments instanceof String) {
-            // one liner syntax
-            result = transformOneLinerArguments((String) rawArguments);
+        } else if (rawArguments != null) {
+            throw new RuntimeException("Task arguments should be defined using a standard YAML list.");
         }
 
         return result;
@@ -81,44 +76,14 @@ public class DoTransformer implements Transformer<Map<String, Object>, List<Argu
                 );
             }
             // - some_input: some_expression
-            return new Argument(entry.getKey(), entryValue);
+            Accumulator accumulator = extractFunctionData(entryValue);
+            return new Argument(
+                    entry.getKey(),
+                    entryValue,
+                    accumulator.getFunctionDependencies(),
+                    accumulator.getSystemPropertyDependencies()
+            );
         }
         throw new RuntimeException("Could not transform task argument: " + rawArgument);
     }
-
-    private List<Argument> transformOneLinerArguments(String line) {
-        List<Argument> arguments = new ArrayList<>();
-
-        List<String> rawArguments = Arrays.asList(line.split(REGEX_COMMA_NOT_ESCAPED));
-
-        for (String rawArgument : rawArguments) {
-            // handle escaped comma characters
-            rawArgument = rawArgument.replaceAll("\\\\,", ",");
-            arguments.add(transformOneLinerArgument(rawArgument));
-        }
-
-        return  arguments;
-    }
-
-    private Argument transformOneLinerArgument(String rawArgument) {
-        Argument argument;
-        if (rawArgument.contains("=")) {
-            // case: argument_name = expression
-            String argumentName = StringUtils.trim(rawArgument.substring(0, rawArgument.indexOf("=")));
-            if (StringUtils.isEmpty(argumentName)) {
-                throw new RuntimeException("Could not transform task argument: " +
-                        rawArgument + ". Since it has no argument name.\n" +
-                        "Correct formats are:\n\targument_name\n\targument_name = expression"
-                );
-            }
-
-            String argumentExpression = StringUtils.trim(rawArgument.substring(rawArgument.indexOf("=") + 1));
-            argument = new Argument(argumentName, argumentExpression);
-        } else {
-            // case: argument_name
-            argument = new Argument(StringUtils.trim(rawArgument), null);
-        }
-        return argument;
-    }
-
 }

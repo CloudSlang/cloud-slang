@@ -10,7 +10,9 @@
 
 package io.cloudslang.lang.runtime.bindings;
 
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,8 +24,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import java.io.Serializable;
 import java.util.*;
 
@@ -37,6 +37,8 @@ import java.util.*;
 public class OutputsBindingTest {
 
     private static final long DEFAULT_TIMEOUT = 10000;
+    @SuppressWarnings("unchecked")
+    private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
 
     @Autowired
     private OutputsBinding outputsBinding;
@@ -47,7 +49,7 @@ public class OutputsBindingTest {
         Map<String, Serializable> actionReturnValues = new HashMap<>();
         List<Output> outputs = new LinkedList<>();
 
-        Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
+        Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, EMPTY_SET, outputs);
 
         Assert.assertTrue("result cannot be null", result != null);
         Assert.assertTrue("result should be empty", result.isEmpty());
@@ -59,7 +61,7 @@ public class OutputsBindingTest {
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(createNoExpressionOutput("host1"));
 
-        Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
+        Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, EMPTY_SET, outputs);
 
         Map<String, Serializable> expectedOutputs = new HashMap<>();
         expectedOutputs.put("host1", "valueHost1");
@@ -73,7 +75,7 @@ public class OutputsBindingTest {
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(createNoExpressionOutput("host1"), createNoExpressionOutput("host2"));
 
-        Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
+        Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, EMPTY_SET, outputs);
 
         Map<String, Serializable> expectedOutputs = new HashMap<>();
         expectedOutputs.put("host1", "valueHost1");
@@ -88,7 +90,7 @@ public class OutputsBindingTest {
         Map<String, Serializable> actionReturnValues = new HashMap<>();
         List<Output> outputs = Arrays.asList(createNoExpressionOutput("actionOutputKey1"));
 
-        Map<String, Serializable> boundOutputs = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
+        Map<String, Serializable> boundOutputs = outputsBinding.bindOutputs(operationContext, actionReturnValues, EMPTY_SET, outputs);
         Assert.assertTrue(boundOutputs.containsKey("actionOutputKey1"));
         Assert.assertEquals(null, boundOutputs.get("actionOutputKey1"));
     }
@@ -99,7 +101,7 @@ public class OutputsBindingTest {
         Map<String, Serializable> actionReturnValues = new HashMap<>();
         List<Output> outputs = Arrays.asList(createExpressionOutput("actionOutputKey1", "${ None + 'str' }"));
 
-        outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
+        outputsBinding.bindOutputs(operationContext, actionReturnValues, EMPTY_SET, outputs);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -108,7 +110,7 @@ public class OutputsBindingTest {
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(createExpressionOutput("hostFromExpression", "${ 'http://' + hostExpr + ':' + str(self['port']) }"));
 
-        Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
+        Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, EMPTY_SET, outputs);
 
         Map<String, Serializable> expectedOutputs = new HashMap<>();
         expectedOutputs.put("hostFromExpression", "http://hostExpr:9999");
@@ -126,7 +128,7 @@ public class OutputsBindingTest {
                 createExpressionOutput("output3", "3")
         );
 
-        Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
+        Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, EMPTY_SET, outputs);
 
         List<String> actualInputNames = Lists.newArrayList(result.keySet());
         List<String> expectedInputNames = Lists.newArrayList("output1", "output2", "output3");
@@ -140,7 +142,7 @@ public class OutputsBindingTest {
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(createExpressionOutput("hostFromExpression", "${ 'http://' + hostExpr + ':' + str(self[SHOULD_BE_STRING]) }"));
 
-        outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
+        outputsBinding.bindOutputs(operationContext, actionReturnValues, EMPTY_SET, outputs);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -151,7 +153,7 @@ public class OutputsBindingTest {
                 createNoExpressionOutput("host1"),
                 createExpressionOutput("hostFromExpression", "${ 'http://' + hostExpr + ':' + str(self['port']) }"));
 
-        Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, outputs);
+        Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, EMPTY_SET, outputs);
 
         Map<String, Serializable> expectedOutputs = new HashMap<>();
         expectedOutputs.put("hostFromExpression", "http://hostExpr:9999");
@@ -195,7 +197,7 @@ public class OutputsBindingTest {
         }
 
         @Bean
-        public PythonInterpreter interpreter() {
+        public PythonInterpreter evalInterpreter() {
             return new PythonInterpreter();
         }
 
@@ -203,12 +205,6 @@ public class OutputsBindingTest {
         public ScriptEvaluator scriptEvaluator() {
             return new ScriptEvaluator();
         }
-
-        @Bean
-        public ScriptEngine scriptEngine() {
-            return new ScriptEngineManager().getEngineByName("python");
-        }
-
 
     }
 }

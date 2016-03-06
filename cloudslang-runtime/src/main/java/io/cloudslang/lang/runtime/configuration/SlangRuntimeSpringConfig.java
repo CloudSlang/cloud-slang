@@ -17,9 +17,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-
 @Configuration
 @ComponentScan("io.cloudslang.lang.runtime")
 public class SlangRuntimeSpringConfig {
@@ -29,16 +26,16 @@ public class SlangRuntimeSpringConfig {
     }
 
     @Bean
-    public PythonInterpreter interpreter(){
-        PythonInterpreter interpreter = new PythonInterpreter();
-//        here to avoid jython preferring io.cloudslang package over python io package
-        interpreter.exec("import io");
-        return interpreter;
+    public PythonInterpreter evalInterpreter(){
+        return new PythonInterpreter();
     }
 
     @Bean
-    public ScriptEngine scriptEngine(){
-        return  new ScriptEngineManager().getEngineByName("python");
+    public PythonInterpreter execInterpreter(){
+        PythonInterpreter interpreter = new PythonInterpreter();
+        //here to avoid jython preferring io.cloudslang package over python io package
+        interpreter.exec("import io");
+        return interpreter;
     }
 
 }

@@ -1,7 +1,8 @@
 package io.cloudslang.lang.compiler.parser;
 
-import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -29,6 +30,9 @@ public class YamlParserTest {
 
     @Mock
     private Yaml yaml;
+
+    @Mock
+    private ParserExceptionHandler parserExceptionHandler;
 
     @Test
     public void throwExceptionWhenFileIsNotValid() throws Exception {

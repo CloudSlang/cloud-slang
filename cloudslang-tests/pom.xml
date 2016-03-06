@@ -13,7 +13,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.8.7-SNAPSHOT</version>
+        <version>0.9.15-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -59,11 +59,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>io.cloudslang.content</groupId>
             <artifactId>score-mail</artifactId>
         </dependency>
@@ -71,6 +66,16 @@
         <dependency>
             <groupId>io.cloudslang.content</groupId>
             <artifactId>score-http-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.cloudslang.content</groupId>
+            <artifactId>score-jClouds</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.cloudslang.content</groupId>
+            <artifactId>score-vmware</artifactId>
         </dependency>
 
     </dependencies>

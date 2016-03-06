@@ -14,8 +14,7 @@ flow:
   name: child_flow
   inputs:
     - input1: 'value'
-    - time_zone_as_string:
-        system_property: user.sys.props.port
+    - time_zone_as_string: ${get_sp('user.sys.props.port')}
   workflow:
     - task01:
         do:

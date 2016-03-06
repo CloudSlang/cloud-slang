@@ -8,28 +8,31 @@
  */
 package io.cloudslang.lang.cli.utils;
 
+import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.SystemProperty;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-
-import io.cloudslang.lang.entities.CompilationArtifact;
+import java.util.Set;
 
 public interface CompilerHelper {
 
-	public CompilationArtifact compile(String filePath, List<String> dependencies) throws IOException;
+	CompilationArtifact compile(String filePath, List<String> dependencies) throws IOException;
 
 	/**
 	 * Load system property sources written in yaml and map them to fully qualified names
 	 * @param systemPropertyFiles paths to the files containing the system properties
 	 * @return map containing all of the system properties with fully qualified keys
 	 */
-	public Map<String, ? extends Serializable> loadSystemProperties(List<String> systemPropertyFiles) throws IOException;
+	Set<SystemProperty> loadSystemProperties(List<String> systemPropertyFiles);
 
     /**
      * Load input sources written in yaml and map them to fully qualified names
      * @param inputFiles paths to the files containing the inputs
      * @return map containing all of the inputs with fully qualified keys
      */
-    public Map<String, ? extends Serializable> loadInputsFromFile(List<String> inputFiles) throws IOException;
+    Map<String, ? extends Serializable> loadInputsFromFile(List<String> inputFiles) throws IOException;
+
 }

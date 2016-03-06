@@ -8,7 +8,13 @@
  */
 package io.cloudslang.lang.entities.bindings;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author orius123
@@ -22,18 +28,17 @@ public class Input extends InOutParam {
 	private boolean encrypted;
 	private boolean required;
 	private boolean overridable;
-	private String systemPropertyName;
 
-	public Input(String name, Serializable value, boolean encrypted, boolean required, boolean overridable, String systemPropertyName) {
-		super(name, value);
-		this.encrypted = encrypted;
-		this.required = required;
-		this.overridable = overridable;
-		this.systemPropertyName = systemPropertyName;
-	}
-
-	public Input(String name, Serializable expression) {
-		this(name, expression, false, true, true, null);
+	private Input(InputBuilder inputBuilder) {
+		super(
+				inputBuilder.name,
+				inputBuilder.value,
+				inputBuilder.functionDependencies,
+				inputBuilder.systemPropertyDependencies
+		);
+		this.encrypted = inputBuilder.encrypted;
+		this.required = inputBuilder.required;
+		this.overridable = inputBuilder.overridable;
 	}
 
 	/**
@@ -54,8 +59,90 @@ public class Input extends InOutParam {
 		return overridable;
 	}
 
-	public String getSystemPropertyName() {
-		return this.systemPropertyName;
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this)
+				.appendSuper(super.toString())
+				.append("encrypted", encrypted)
+				.append("required", required)
+				.append("overridable", overridable)
+				.toString();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Input input = (Input) o;
+
+		return new EqualsBuilder()
+				.appendSuper(super.equals(o))
+				.append(encrypted, input.encrypted)
+				.append(required, input.required)
+				.append(overridable, input.overridable)
+				.isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(17, 37)
+				.appendSuper(super.hashCode())
+				.append(encrypted)
+				.append(required)
+				.append(overridable)
+				.toHashCode();
+	}
+
+	public static class InputBuilder {
+		private String name;
+		private Serializable value;
+		private boolean encrypted;
+		private boolean required;
+		private boolean overridable;
+		private Set<ScriptFunction> functionDependencies;
+		private Set<String> systemPropertyDependencies;
+
+		public InputBuilder(String name, Serializable value) {
+			this.name = name;
+			this.value = value;
+			encrypted = false;
+			required = true;
+			overridable = true;
+			functionDependencies = new HashSet<>();
+			systemPropertyDependencies = new HashSet<>();
+		}
+
+		public InputBuilder withEncrypted(boolean encrypted) {
+			this.encrypted = encrypted;
+			return this;
+		}
+
+		public InputBuilder withRequired(boolean required) {
+			this.required = required;
+			return this;
+		}
+
+		public InputBuilder withOverridable(boolean overridable) {
+			this.overridable = overridable;
+			return this;
+		}
+
+		public InputBuilder withFunctionDependencies(Set<ScriptFunction> functionDependencies) {
+			this.functionDependencies = functionDependencies;
+			return this;
+		}
+
+		public InputBuilder withSystemPropertyDependencies(Set<String> systemPropertyDependencies) {
+			this.systemPropertyDependencies = systemPropertyDependencies;
+			return this;
+		}
+
+		public Input build() {
+			return new Input(this);
+		}
+
 	}
 
 }

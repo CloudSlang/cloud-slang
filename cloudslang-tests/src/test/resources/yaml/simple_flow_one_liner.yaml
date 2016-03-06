@@ -16,8 +16,7 @@ flow:
     - input1
     - time_zone_as_string:
         required: false
-    - host:
-        system_property: user.sys.props.host
+    - host: ${'user.sys.props.host'}
     - port: 22
   workflow:
     - Task1:

@@ -64,7 +64,7 @@ And run it using:
 Install this globally and you'll have access to the `cslang` command anywhere on your system.
 
 ```shell
-npm install -g cslang-cli
+npm install -g cloudslang-cli
 ```
 
 Now you can just use the `cslang` command anywhere

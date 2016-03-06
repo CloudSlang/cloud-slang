@@ -14,7 +14,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.8.7-SNAPSHOT</version>
+        <version>0.9.15-SNAPSHOT</version>
     </parent>
 
 	<dependencies>
@@ -89,6 +89,17 @@
             <artifactId>score-rft</artifactId>
             <scope>runtime</scope>
         </dependency>
+		<dependency>
+			<groupId>io.cloudslang.content</groupId>
+			<artifactId>score-jClouds</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.cloudslang.content</groupId>
+			<artifactId>score-vmware</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 
 		<!-- test -->
 		<dependency>
@@ -126,7 +137,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>org.springframework.shell.Bootstrap</mainClass>
+							<mainClass>io.cloudslang.lang.cli.SlangBootstrap</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -150,7 +161,7 @@
 					<useWildcardClassPath>true</useWildcardClassPath>
 					<programs>
 						<program>
-							<mainClass>org.springframework.shell.Bootstrap</mainClass>
+							<mainClass>io.cloudslang.lang.cli.SlangBootstrap</mainClass>
 							<id>cslang</id>
 						</program>
 					</programs>

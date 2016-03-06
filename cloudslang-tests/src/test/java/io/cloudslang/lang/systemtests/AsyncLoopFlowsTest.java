@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.SystemProperty;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -47,7 +48,11 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
         URI operation1 = getClass().getResource("/yaml/loops/async_loop/print_branch.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
 
-        RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path);
+        RuntimeInformation runtimeInformation = triggerWithData(
+                SlangSource.fromFile(resource),
+                path,
+                getSystemProperties()
+        );
 
         List<StepData> branchesData = extractAsyncLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
@@ -81,7 +86,11 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
 
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
 
-        RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path);
+        RuntimeInformation runtimeInformation = triggerWithData(
+                SlangSource.fromFile(resource),
+                path,
+                getSystemProperties()
+        );
 
         List<StepData> branchesData = extractAsyncLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
@@ -93,11 +102,24 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
         verifyNavigation(runtimeInformation);
     }
 
-    private RuntimeInformation triggerWithData(SlangSource resource, Set<SlangSource> path) {
+    private Set<SystemProperty> getSystemProperties() {
+        return Sets.newHashSet(
+                new SystemProperty("loop", "async.prop1", "aggregate_value")
+        );
+    }
+
+    private RuntimeInformation triggerWithData(
+            SlangSource resource,
+            Set<SlangSource> path,
+            Set<SystemProperty> systemProperties) {
         CompilationArtifact compilationArtifact = slang.compile(resource, path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        return triggerWithData(compilationArtifact, userInputs, null);
+        return triggerWithData(compilationArtifact, userInputs, systemProperties);
+    }
+
+    private RuntimeInformation triggerWithData(SlangSource resource, Set<SlangSource> path) {
+        return triggerWithData(resource, path, new HashSet<SystemProperty>());
     }
 
     private List<StepData> extractAsyncLoopData(RuntimeInformation runtimeInformation) {
@@ -158,6 +180,12 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
         Assert.assertTrue(
                 "aggregate output does not have the expected value",
                 containsSameElementsWithoutOrdering(Lists.newArrayList(actualAggregateNameList), expectedNameOutputs)
+        );
+
+        Assert.assertEquals(
+                "Aggregate value not bound correctly from system property",
+                "aggregate_value",
+                aggregateValues.get("from_sp")
         );
     }
 

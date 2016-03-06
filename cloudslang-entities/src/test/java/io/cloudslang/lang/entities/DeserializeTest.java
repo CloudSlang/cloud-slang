@@ -1,10 +1,8 @@
 package io.cloudslang.lang.entities;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.cloudslang.lang.entities.bindings.Argument;
-import io.cloudslang.lang.entities.bindings.Input;
-import io.cloudslang.lang.entities.bindings.Output;
-import io.cloudslang.lang.entities.bindings.Result;
+import com.google.common.collect.Sets;
+import io.cloudslang.lang.entities.bindings.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,13 +28,13 @@ public class DeserializeTest {
 
     @Test
     public void testDeserializeInput() throws IOException {
-        Input input = new Input(
-                "new_input",
-                "some_expression",
-                true,
-                true,
-                true,
-                "system_property_ok_a_kind");
+        Input input = new Input.InputBuilder("new_input", "some_expression")
+                .withEncrypted(true)
+                .withRequired(true)
+                .withOverridable(true)
+                .withFunctionDependencies(Sets.newHashSet(ScriptFunction.GET))
+                .withSystemPropertyDependencies(Sets.newHashSet("a.b.c.prop1", "a.b.c.prop2"))
+                .build();
         testToAndFromJson(input, Input.class);
     }
 
@@ -89,6 +87,12 @@ public class DeserializeTest {
     public void testDeserializeAsyncLoopStatement() throws IOException {
         AsyncLoopStatement asyncLoopStatement = new AsyncLoopStatement("varName", "expression");
         testToAndFromJson(asyncLoopStatement, AsyncLoopStatement.class);
+    }
+
+    @Test
+    public void testDeserializeSystemProperty() throws IOException {
+        SystemProperty systemProperty = new SystemProperty("a.b", "c.host", "localhost");
+        testToAndFromJson(systemProperty, SystemProperty.class);
     }
 
 }

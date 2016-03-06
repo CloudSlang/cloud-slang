@@ -8,18 +8,21 @@
  */
 package io.cloudslang.lang.api;
 
-import org.apache.commons.lang.Validate;
-import org.apache.log4j.Logger;
+import io.cloudslang.lang.compiler.MetadataExtractor;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.score.api.Score;
 import io.cloudslang.score.api.TriggeringProperties;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEventListener;
+import org.apache.commons.lang.Validate;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
@@ -29,7 +32,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static ch.lambdaj.Lambda.filter;
-
 import static org.hamcrest.Matchers.notNullValue;
 
 /**
@@ -43,6 +45,8 @@ public class SlangImpl implements Slang {
 
     @Autowired
     private SlangCompiler compiler;
+    @Autowired
+    private MetadataExtractor metadataExtractor;
     @Autowired
     private Score score;
     @Autowired
@@ -62,8 +66,19 @@ public class SlangImpl implements Slang {
         }
     }
 
+    @Override
+    public Metadata extractMetadata(SlangSource source) {
+        Validate.notNull(source, "Source can not be null");
+        try {
+            return metadataExtractor.extractMetadata(source);
+        } catch (Exception e) {
+            logger.error("Failed metadata extraction for source : " + source.getName() + " ,Exception is : " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
 	@Override
-	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Map<String, ? extends Serializable> systemProperties) {
+	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Set<SystemProperty> systemProperties) {
 		Validate.notNull(compilationArtifact, "Compilation artifact can not be null");
 		if(runInputs == null) {
 			runInputs = new HashMap<>();
@@ -79,8 +94,11 @@ public class SlangImpl implements Slang {
 	}
 
 	@Override
-	public Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, ? extends Serializable> runInputs,
-		Map<String, ? extends Serializable> systemProperties) {
+	public Long compileAndRun(
+            SlangSource source,
+            Set<SlangSource> dependencies,
+            Map<String, ? extends Serializable> runInputs,
+            Set<SystemProperty> systemProperties) {
 		CompilationArtifact compilationArtifact = compile(source, dependencies);
 		return run(compilationArtifact, runInputs, systemProperties);
 	}
@@ -98,6 +116,12 @@ public class SlangImpl implements Slang {
     @Override
     public void subscribeOnAllEvents(ScoreEventListener eventListener) {
         subscribeOnEvents(eventListener, getAllEventTypes());
+    }
+
+    @Override
+    public Set<SystemProperty> loadSystemProperties(SlangSource source) {
+        Validate.notNull(source, "Source can not be null");
+        return compiler.loadSystemProperties(source);
     }
 
     private Set<String> getAllEventTypes() {

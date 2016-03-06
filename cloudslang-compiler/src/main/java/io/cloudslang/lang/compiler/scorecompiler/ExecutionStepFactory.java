@@ -12,6 +12,7 @@ package io.cloudslang.lang.compiler.scorecompiler;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.ActionType;
+import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
@@ -85,7 +86,7 @@ public class ExecutionStepFactory {
         return createGeneralStep(index, OPERATION_STEPS_CLASS, "startExecutable", actionData);
     }
 
-    public ExecutionStep createActionStep(Long index, Map<String, Serializable> actionRawData, String operationName) {
+    public ExecutionStep createActionStep(Long index, Map<String, Serializable> actionRawData) {
         Validate.notNull(actionRawData, "actionData is null");
         Map<String, Serializable> actionData = new HashMap<>();
         ActionType actionType;
@@ -108,12 +109,11 @@ public class ExecutionStepFactory {
 
         actionData.put(ScoreLangConstants.ACTION_TYPE, actionType);
         actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
-        actionData.put(ScoreLangConstants.OPERATION_NAME_KEY, operationName);
         return createGeneralStep(index, ACTION_STEPS_CLASS, "doAction", actionData);
     }
 
     public ExecutionStep createEndStep(Long index, Map<String, Serializable> postExecutableData,
-                                       List<Output> outputs, List<Result> results, String executableName) {
+                                       List<Output> outputs, List<Result> results, String executableName, ExecutableType executableType) {
         Validate.notNull(postExecutableData, "postExecutableData is null");
         Validate.notNull(outputs, "Executable outputs are null");
         Validate.notNull(results, "Executable results are null");
@@ -122,6 +122,7 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable) results);
         actionData.put(ScoreLangConstants.HOOKS, (Serializable) postExecutableData);
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, executableName);
+        actionData.put(ScoreLangConstants.EXECUTABLE_TYPE, executableType);
         return createGeneralStep(index, OPERATION_STEPS_CLASS, "finishExecutable", actionData);
     }
 

@@ -50,13 +50,15 @@ import static io.cloudslang.lang.entities.ScoreLangConstants.*;
 public class ExecutableBuilder {
 
     public static final String MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX = "Multiple 'on_failure' properties found";
-    public static final String NAMESPACE_DELIMITER = ".";
 
     @Autowired
     private List<Transformer> transformers;
 
     @Autowired
     private TransformersHandler transformersHandler;
+
+    @Autowired
+    private DependenciesHelper dependenciesHelper;
 
     private List<Transformer> preExecTransformers;
     private List<Transformer> postExecTransformers;
@@ -109,7 +111,8 @@ public class ExecutableBuilder {
 
         String namespace = parsedSlang.getNamespace();
         Map<String, String> imports = parsedSlang.getImports();
-        Set<String> dependencies;
+        Set<String> executableDependencies;
+        Set<String> systemPropertyDependencies;
         switch (parsedSlang.getType()) {
             case FLOW:
 
@@ -152,8 +155,20 @@ public class ExecutableBuilder {
                 }
 
                 Workflow workflow = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false, namespace);
-                dependencies = fetchDirectTasksDependencies(workflow);
-                return new Flow(preExecutableActionData, postExecutableActionData, workflow, namespace, execName, inputs, outputs, results, dependencies);
+                executableDependencies = fetchDirectTasksDependencies(workflow);
+                systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForFlow(inputs, outputs, results, workflow.getTasks());
+                return new Flow(
+                        preExecutableActionData,
+                        postExecutableActionData,
+                        workflow,
+                        namespace,
+                        execName,
+                        inputs,
+                        outputs,
+                        results,
+                        executableDependencies,
+                        systemPropertyDependencies
+                );
 
             case OPERATION:
                 Map<String, Object> actionRawData;
@@ -167,8 +182,20 @@ public class ExecutableBuilder {
                     throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". Operation: " + execName + " has no action data");
                 }
                 Action action = compileAction(actionRawData);
-                dependencies = new HashSet<>();
-                return new Operation(preExecutableActionData, postExecutableActionData, action, namespace, execName, inputs, outputs, results, dependencies);
+                executableDependencies = new HashSet<>();
+                systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForOperation(inputs, outputs, results);
+                return new Operation(
+                        preExecutableActionData,
+                        postExecutableActionData,
+                        action,
+                        namespace,
+                        execName,
+                        inputs,
+                        outputs,
+                        results,
+                        executableDependencies,
+                        systemPropertyDependencies
+                );
             default:
                 throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". It is not of flow or operations type");
         }

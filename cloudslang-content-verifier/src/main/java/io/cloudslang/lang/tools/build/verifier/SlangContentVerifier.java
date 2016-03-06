@@ -9,27 +9,22 @@
  */
 package io.cloudslang.lang.tools.build.verifier;
 
+import io.cloudslang.lang.compiler.SlangCompiler;
+import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
+import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
+import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.tools.build.SlangBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
-import io.cloudslang.lang.compiler.SlangCompiler;
-import io.cloudslang.lang.compiler.SlangSource;
-import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
-import io.cloudslang.lang.entities.CompilationArtifact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static io.cloudslang.lang.compiler.SlangSource.fromFile;
 
 /**
  * Created by stoneo on 3/15/2015.
@@ -51,10 +46,11 @@ public class SlangContentVerifier {
         Validate.notEmpty(directoryPath, "You must specify a path");
         Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" + directoryPath + "\' does not lead to a directory");
         Map<String, Executable> slangModels = new HashMap<>();
-        Collection<File> slangFiles = FileUtils.listFiles(new File(directoryPath), SLANG_FILE_EXTENSIONS, true);
+        Collection<File> slangFiles = listFiles(new File(directoryPath), SLANG_FILE_EXTENSIONS, true, SlangBuilder.PROPERTIES_FILE_EXTENSIONS);
         log.info("Start compiling all slang files under: " + directoryPath);
         log.info(slangFiles.size() + " .sl files were found");
         log.info("");
+        int ignoredExecutables = 0;
         for(File slangFile: slangFiles){
             Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() + "\' must lead to a file");
             Executable sourceModel;
@@ -65,14 +61,15 @@ public class SlangContentVerifier {
                 log.error(errorMessage);
                 throw new RuntimeException(errorMessage, e);
             }
-            if(sourceModel != null) {
+            if (sourceModel != null) {
                 staticSlangFileValidation(slangFile, sourceModel);
                 slangModels.put(getUniqueName(sourceModel), sourceModel);
             }
         }
-        if(slangFiles.size() != slangModels.size()){
-            throw new RuntimeException("Some Slang files were not pre-compiled.\nFound: " + slangFiles.size() +
-                    " slang files in path: \'" + directoryPath + "\' But managed to create slang models for only: " + slangModels.size());
+        int numberOfExecutables = slangFiles.size() - ignoredExecutables;
+        if(numberOfExecutables != slangModels.size()){
+            throw new RuntimeException("Some Slang files were not pre-compiled.\nFound: " + numberOfExecutables +
+                    " executable files in path: \'" + directoryPath + "\' But managed to create slang models for only: " + slangModels.size());
         }
         return slangModels;
     }
@@ -104,7 +101,7 @@ public class SlangContentVerifier {
 
     private Set<Executable> getModelDependenciesRecursively(Map<String, Executable> slangModels, Executable slangModel) {
         Set<Executable> dependenciesModels = new HashSet<>();
-        for (String dependencyName : slangModel.getDependencies()) {
+        for (String dependencyName : slangModel.getExecutableDependencies()) {
             Executable dependency = slangModels.get(dependencyName);
             if(dependency == null){
                 throw new RuntimeException("Failed compiling slang source: " + slangModel.getNamespace() + "." +
@@ -156,4 +153,28 @@ public class SlangContentVerifier {
                 "\' is invalid.\nIt should be identical to the file name: \'" + fileNameNoExtension + "\'";
         Validate.isTrue(fileNameNoExtension.equals(executable.getName()), executableNameErrorMessage);
     }
+
+    // e.g. exclude .prop.sl from .sl set
+    private Collection<File> listFiles(
+            File directory,
+            String[] extensions,
+            boolean recursive,
+            String[] excludedExtensions) {
+        Collection<File> dependenciesFiles = FileUtils.listFiles(directory, extensions, recursive);
+        Collection<File> result = new ArrayList<>();
+        for (File file : dependenciesFiles) {
+            boolean accepted = true;
+            for (String excludedExtension : excludedExtensions) {
+                if (file.getName().endsWith("." + excludedExtension)) {
+                    accepted = false;
+                    break;
+                }
+            }
+            if (accepted) {
+                result.add(file);
+            }
+        }
+        return result;
+    }
+
 }
