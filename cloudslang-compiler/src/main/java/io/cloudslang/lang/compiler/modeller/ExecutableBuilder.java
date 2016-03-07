@@ -180,7 +180,7 @@ public class ExecutableBuilder {
                             errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a list of tasks and not a map"));
                         }
                         if (CollectionUtils.isNotEmpty(onFailureData)) {
-                            WorkflowModellingResult workflowModellingResult = compileWorkFlow(onFailureData, imports, null, true, namespace);
+                            WorkflowModellingResult workflowModellingResult = compileWorkFlow(onFailureData, imports, null, true, namespace, execName);
                             errors.addAll(workflowModellingResult.getErrors());
                             onFailureWorkFlow = workflowModellingResult.getWorkflow();
                         }
@@ -188,7 +188,7 @@ public class ExecutableBuilder {
                     }
                 }
 
-                WorkflowModellingResult workflowModellingResult = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false, namespace);
+                WorkflowModellingResult workflowModellingResult = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false, namespace, execName);
                 errors.addAll(workflowModellingResult.getErrors());
                 Workflow workflow = workflowModellingResult.getWorkflow();
                 executableDependencies = fetchDirectTasksDependencies(workflow);
@@ -258,11 +258,12 @@ public class ExecutableBuilder {
                                                     Map<String, String> imports,
                                                     Workflow onFailureWorkFlow,
                                                     boolean onFailureSection,
-                                                    String namespace) {
+                                                    String namespace,
+                                                    String execName) {
 
         List<RuntimeException> errors = new ArrayList<>();
         if (workFlowRawData.isEmpty()) {
-            errors.add(new IllegalArgumentException("Flow must have tasks in its workflow"));
+            errors.add(new IllegalArgumentException("For flow: " + execName + " syntax is illegal. Flow must have tasks in its workflow."));
         }
 
         Deque<Task> tasks = new LinkedList<>();
