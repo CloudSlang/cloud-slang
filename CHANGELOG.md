@@ -6,12 +6,15 @@
     + Improved Documentation Style - The infile documentation of flows and operations has been changed to be more structured.
   	+ System Properties Files - System properties files now end with the .prop.sl extension and their syntax has changed.
     + System Properties Access - System properties are now accessed using the new get_sp() function.
+    + Flow and Operation Names - Matching between flow and operation names against their file names is now enforced.
 + CLI Enhancements
     + Inspect - The new `inspect` command displays a file's documentation including description, inputs, outputs and results.
   	+ List - The new `list` command lists the system properties contained in a system properties file.
   	+ Default Folder - The location of the default folders for automatically importing system properties files and input files has moved to `cslang/configuration/inputs` and `cslang/configuration/properties`.
   	+ Verbosity Level - The amount of information printed to the screen by the CLI can be changed using the `--v` flag.
   	+ Configuration - A new configuration file can be found at `cslang/configuration/cslang.properties`. The file currently includes configuration for character encoding and the location of the new logging configuration file, which is found at `cslang/configuration/logging/log4j.properties` by default.
++ Compiler Changes
+    + Error Handling - Executable files that are valid YAML but not valid CloudSlang, which previously failed in the pre-compilation stage, now pass pre-compilation and all errors are collected. 
 + Content
     + Restructuring - The folders in the content repository have been restructured.
   	+ Additions - Content has been added in the following areas:
