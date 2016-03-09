@@ -156,7 +156,7 @@ public class ExecutableBuilder {
                     errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'workflow' property there should be a list of tasks and not a map"));
                 }
                 if (CollectionUtils.isEmpty(workFlowRawData)) {
-                    errors.add(new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + execName + " has no workflow data"));
+                    errors.add(new RuntimeException("Error compiling source '" + parsedSlang.getName() + "'. Flow: '" + execName + "' has no workflow data"));
                 }
 
                 Workflow onFailureWorkFlow = null;
