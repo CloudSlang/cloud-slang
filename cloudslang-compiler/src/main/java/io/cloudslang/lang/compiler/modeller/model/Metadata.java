@@ -1,5 +1,11 @@
 package io.cloudslang.lang.compiler.modeller.model;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,5 +58,49 @@ public class Metadata {
 
     public void setPrerequisites(String prerequisites) {
         this.prerequisites = prerequisites;
+    }
+
+    public String prettyPrint() {
+        StringBuilder stringBuilder = new StringBuilder();
+        Field[] allFields = this.getClass().getDeclaredFields();
+        for (Field field : allFields) {
+            stringBuilder.append(field.getName()).append(": ");
+            appendFieldValue(stringBuilder, field);
+        }
+        return stringBuilder.toString();
+    }
+
+    private void appendFieldValue(StringBuilder stringBuilder, Field field) {
+        try {
+            field.setAccessible(true);
+            Object fieldValue = field.get(this);
+            if (fieldValue instanceof String) {
+                appendString(stringBuilder, (String) fieldValue, "  ");
+            } else if (fieldValue instanceof Map) {
+                appendMap(stringBuilder, (Map<String, String>) fieldValue);
+            }
+        } catch (IllegalAccessException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void appendMap(StringBuilder stringBuilder, Map<String, String> map) throws IOException {
+        stringBuilder.append(System.lineSeparator());
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            stringBuilder.append("  ").append(entry.getKey()).append(": ");
+            appendString(stringBuilder, entry.getValue(), "      ");
+        }
+    }
+
+    private static void appendString(StringBuilder stringBuilder, String fieldValue, String spacing) throws IOException {
+        List<String> lines = IOUtils.readLines(new StringReader(fieldValue));
+        if (lines.size() > 1) {
+            stringBuilder.append(System.lineSeparator());
+            for (String line : lines) {
+                stringBuilder.append(spacing).append(line).append(System.lineSeparator());
+            }
+        } else {
+            stringBuilder.append(fieldValue).append(System.lineSeparator());
+        }
     }
 }
