@@ -120,7 +120,8 @@ public class DependenciesHelper {
         result.addAll(
                 getSystemPropertiesFromPostTaskActionData(
                         task.getPostTaskActionData(),
-                        relevantTransformers
+                        relevantTransformers,
+                        task.getName()
                 )
         );
 
@@ -142,7 +143,8 @@ public class DependenciesHelper {
 
     private Set<String> getSystemPropertiesFromPostTaskActionData(
             Map<String, Serializable> postTaskActionData,
-            List<Transformer> relevantTransformers) {
+            List<Transformer> relevantTransformers,
+            String taskName) {
         Set<String> result = new HashSet<>();
         for (Transformer transformer : relevantTransformers) {
             String key = TransformersHandler.keyToTransform(transformer);
@@ -154,11 +156,11 @@ public class DependenciesHelper {
                         Output itemAsOutput = (Output) itemAsObject;
                         result.addAll(itemAsOutput.getSystemPropertyDependencies());
                     } else {
-                        throw new RuntimeException("Incorrect type for post task data items.");
+                        throw new RuntimeException("For task: " + taskName + " - Incorrect type for post task data items.");
                     }
                 }
             } else {
-                throw new RuntimeException("Incorrect type for post task data items.");
+                throw new RuntimeException("For task: " + taskName + " - Incorrect type for post task data items.");
             }
         }
         return result;
