@@ -341,7 +341,7 @@ public class ExecutableBuilder {
 
         errors.addAll(transformersHandler.checkKeyWords(taskName, taskRawData, ListUtils.union(preTaskTransformers, postTaskTransformers), TaskAdditionalKeyWords, null));
 
-        String errorMessagePrefix = "For task: " + taskName + " syntax is illegal.\n";
+        String errorMessagePrefix = "For task '" + taskName + "' syntax is illegal.\n";
         preTaskData.putAll(transformersHandler.runTransformers(taskRawData, preTaskTransformers, errors, errorMessagePrefix));
         postTaskData.putAll(transformersHandler.runTransformers(taskRawData, postTaskTransformers, errors, errorMessagePrefix));
 
