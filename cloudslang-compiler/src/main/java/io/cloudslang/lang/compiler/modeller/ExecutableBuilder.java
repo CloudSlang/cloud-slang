@@ -263,7 +263,7 @@ public class ExecutableBuilder {
 
         List<RuntimeException> errors = new ArrayList<>();
         if (workFlowRawData.isEmpty()) {
-            errors.add(new IllegalArgumentException("For flow: " + execName + " syntax is illegal. Flow must have tasks in its workflow."));
+            errors.add(new IllegalArgumentException("For flow '" + execName + "' syntax is illegal. Flow must have tasks in its workflow."));
         }
 
         Deque<Task> tasks = new LinkedList<>();
