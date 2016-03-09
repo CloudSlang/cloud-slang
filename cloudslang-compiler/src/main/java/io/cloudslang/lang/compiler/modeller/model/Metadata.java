@@ -1,6 +1,9 @@
 package io.cloudslang.lang.compiler.modeller.model;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -64,23 +67,36 @@ public class Metadata {
         StringBuilder stringBuilder = new StringBuilder();
         Field[] allFields = this.getClass().getDeclaredFields();
         for (Field field : allFields) {
-            stringBuilder.append(field.getName()).append(": ");
-            appendFieldValue(stringBuilder, field);
+            appendField(stringBuilder, field);
         }
         return stringBuilder.toString();
     }
 
-    private void appendFieldValue(StringBuilder stringBuilder, Field field) {
+    private void appendField(StringBuilder stringBuilder, Field field) {
         try {
             field.setAccessible(true);
             Object fieldValue = field.get(this);
             if (fieldValue instanceof String) {
-                appendString(stringBuilder, (String) fieldValue, "  ");
+                appendStringField(stringBuilder, field.getName(), (String) fieldValue);
             } else if (fieldValue instanceof Map) {
-                appendMap(stringBuilder, (Map<String, String>) fieldValue);
+                appendMapField(stringBuilder, field.getName(), (Map<String, String>) fieldValue);
             }
         } catch (IllegalAccessException | IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void appendStringField(StringBuilder stringBuilder, String fieldName, String fieldValue) throws IOException {
+        if (StringUtils.isNotEmpty(fieldValue)) {
+            stringBuilder.append(fieldName).append(": ");
+            appendString(stringBuilder, fieldValue, "  ");
+        }
+    }
+
+    private void appendMapField(StringBuilder stringBuilder, String fieldName, Map<String, String> fieldMap) throws IOException {
+        if (MapUtils.isNotEmpty(fieldMap)) {
+            stringBuilder.append(fieldName).append(": ");
+            appendMap(stringBuilder, fieldMap);
         }
     }
 

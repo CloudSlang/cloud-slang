@@ -16,8 +16,6 @@
 #! @output return_result: parsing was successful or not
 #! @output return_code: "0" if parsing was successful, "-1" otherwise
 #! @output error_message: error message if there was an error when executing, empty otherwise
-#! @result SUCCESS: parsing was successful (return_code == '0') and value was added
-#! @result FAILURE: parsing was unsuccessful or the path does not exist
 #!!#
 ####################################################
 

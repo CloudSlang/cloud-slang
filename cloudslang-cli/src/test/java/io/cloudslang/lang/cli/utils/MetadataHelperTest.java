@@ -39,6 +39,11 @@ public class MetadataHelperTest {
             "  corresponding value addressed by the json_path input." + System.lineSeparator() +
             "prerequisites: jenkinsapi Python module";
     private static final String JSON_INPUT_VALUE = "json_input: JSON data input - Example: '{\"k1\": {\"k2\": [\"v1\", \"v2\"]}}'";
+    private static final String PREREQUISITES_MISSING = "description: " + System.lineSeparator() +
+            "  Adds or replaces a value to the given JSON at the keys or indices represented by the json_path." + System.lineSeparator() +
+            "  If the last key in the path does not exist, the key is added as well." + System.lineSeparator() +
+            "inputs: ";
+    private static final String RESULTS = "results:";
 
     @Autowired
     private MetadataHelper metadataHelper;
@@ -69,6 +74,8 @@ public class MetadataHelperTest {
         Assert.assertNotNull(metadataToPrint);
         Assert.assertFalse(metadataToPrint.contains("io.cloudslang.lang.compiler.modeller.model.Metadata"));
         Assert.assertTrue(metadataToPrint.contains(JSON_INPUT_VALUE));
+        Assert.assertTrue(metadataToPrint.contains(PREREQUISITES_MISSING));
+        Assert.assertFalse(metadataToPrint.contains(RESULTS));
     }
 
     @Test
