@@ -112,6 +112,7 @@ public class TaskSteps extends AbstractSteps {
             );
 
             Map<String, Serializable> boundArguments = argumentsBinding.bindArguments(taskArguments, flowVariables, runEnv.getSystemProperties());
+            saveTaskArgumentsResultContext(flowContext, boundArguments);
 
             sendEndBindingArgumentsEvent(
                     taskArguments,
@@ -151,7 +152,6 @@ public class TaskSteps extends AbstractSteps {
 
         try {
             Context flowContext = runEnv.getStack().popContext();
-            Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
 
             ReturnValues executableReturnValues = runEnv.removeReturnValues();
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
@@ -160,9 +160,10 @@ public class TaskSteps extends AbstractSteps {
                     Pair.of(ScoreLangConstants.TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues),
                     Pair.of("operationReturnValues", executableReturnValues));
 
+            Map<String, Serializable> argumentsResultContext = removeTaskArgumentsResultContext(flowContext);
             Map<String, Serializable> publishValues =
                     outputsBinding.bindOutputs(
-                            flowVariables,
+                            argumentsResultContext,
                             executableReturnValues.getOutputs(),
                             runEnv.getSystemProperties(),
                             taskPublishValues
@@ -171,7 +172,7 @@ public class TaskSteps extends AbstractSteps {
             flowContext.putVariables(publishValues);
 
             //loops
-            Map<String, Serializable> langVariables = flowContext.getLangVariables();
+            Map<String, Serializable> langVariables = flowContext.getImmutableViewOfLanguageVariables();
             if (langVariables.containsKey(LoopCondition.LOOP_CONDITION_KEY)) {
                 LoopCondition loopCondition = (LoopCondition) langVariables.get(LoopCondition.LOOP_CONDITION_KEY);
                 if (!shouldBreakLoop(breakOn, executableReturnValues) && loopCondition.hasMore()) {
@@ -183,7 +184,7 @@ public class TaskSteps extends AbstractSteps {
                     runEnv.getExecutionPath().forward();
                     return;
                 } else {
-                    flowContext.getLangVariables().remove(LoopCondition.LOOP_CONDITION_KEY);
+                    flowContext.removeLanguageVariable(LoopCondition.LOOP_CONDITION_KEY);
                 }
             }
 
@@ -210,6 +211,7 @@ public class TaskSteps extends AbstractSteps {
 
             runEnv.putNextStepPosition(nextPosition);
 
+            Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
             HashMap<String, Serializable> outputs = new HashMap<>(flowVariables);
 
             ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : executableResult);
@@ -252,6 +254,17 @@ public class TaskSteps extends AbstractSteps {
         // request the score engine to switch the execution plan to the one with the given refId once it can
         Long subFlowRunningExecutionPlanId = executionRuntimeServices.getSubFlowRunningExecutionPlan(refId);
         executionRuntimeServices.requestToChangeExecutionPlan(subFlowRunningExecutionPlanId);
+    }
+
+    private void saveTaskArgumentsResultContext(Context context, Map<String, Serializable> taskArgumentsResultContext) {
+        context.putLanguageVariable(ScoreLangConstants.TASK_ARGUMENTS_RESULT_CONTEXT, (Serializable) taskArgumentsResultContext);
+    }
+
+    private Map<String, Serializable> removeTaskArgumentsResultContext(Context context) {
+        Serializable rawValue = context.removeLanguageVariable(ScoreLangConstants.TASK_ARGUMENTS_RESULT_CONTEXT);
+        @SuppressWarnings("unchecked")
+        Map<String, Serializable> taskArgumentsResultContext = rawValue == null ? null : (Map<String, Serializable>) rawValue;
+        return taskArgumentsResultContext;
     }
 
 }

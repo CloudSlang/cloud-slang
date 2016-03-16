@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,7 +130,6 @@ public class AsyncLoopSteps extends AbstractSteps {
             runEnv.getExecutionPath().up();
             List<Map<String, Serializable>> branchesContext = Lists.newArrayList();
             Context flowContext = runEnv.getStack().popContext();
-            Map<String, Serializable> contextBeforeSplit = flowContext.getImmutableViewOfVariables();
             List<String> branchesResult = Lists.newArrayList();
 
             collectBranchesData(executionRuntimeServices, nodeName, branchesContext, branchesResult);
@@ -139,9 +139,9 @@ public class AsyncLoopSteps extends AbstractSteps {
                             runEnv,
                             executionRuntimeServices,
                             taskAggregateValues,
-                            (Serializable) taskNavigationValues,
-                            nodeName, (Serializable) branchesContext,
-                            contextBeforeSplit
+                            taskNavigationValues,
+                            nodeName,
+                            branchesContext
                     );
 
             flowContext.putVariables(publishValues);
@@ -204,12 +204,12 @@ public class AsyncLoopSteps extends AbstractSteps {
             RunEnvironment runEnv,
             ExecutionRuntimeServices executionRuntimeServices,
             List<Output> taskAggregateValues,
-            Serializable taskNavigationValues,
-            String nodeName, Serializable branchesContext,
-            Map<String, Serializable> contextBeforeSplit) {
+            Map<String, ResultNavigation> taskNavigationValues,
+            String nodeName,
+            List<Map<String, Serializable>> branchesContext) {
 
         Map<String, Serializable> aggregateContext = new HashMap<>();
-        aggregateContext.put(RuntimeConstants.BRANCHES_CONTEXT_KEY, branchesContext);
+        aggregateContext.put(RuntimeConstants.BRANCHES_CONTEXT_KEY, (Serializable) branchesContext);
 
         fireEvent(
                 executionRuntimeServices,
@@ -217,9 +217,14 @@ public class AsyncLoopSteps extends AbstractSteps {
                 ScoreLangConstants.EVENT_JOIN_BRANCHES_START,
                 "Async loop output binding started", LanguageEventData.StepType.TASK, nodeName,
                 Pair.of(ScoreLangConstants.TASK_AGGREGATE_KEY, (Serializable) taskAggregateValues),
-                Pair.of(ScoreLangConstants.TASK_NAVIGATION_KEY, taskNavigationValues));
+                Pair.of(ScoreLangConstants.TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues));
 
-        return outputsBinding.bindOutputs(contextBeforeSplit, aggregateContext, runEnv.getSystemProperties(), taskAggregateValues);
+        return outputsBinding.bindOutputs(
+                Collections.<String, Serializable>emptyMap(),
+                aggregateContext,
+                runEnv.getSystemProperties(),
+                taskAggregateValues
+        );
     }
 
     private void collectBranchesData(

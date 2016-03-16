@@ -88,10 +88,10 @@ public class ResultsBinding {
                 return resultName;
             }
 
-            if(rawValue == Boolean.TRUE) {
+            if(Boolean.TRUE.equals(rawValue)) {
                 return resultName;
             }
-            if (rawValue == Boolean.FALSE) {
+            if (Boolean.FALSE.equals(rawValue)) {
                 continue;
             }
 
@@ -104,14 +104,7 @@ public class ResultsBinding {
                                     " expression " + ScoreLangConstants.EXPRESSION_END_DELIMITER);
                 }
 
-                //construct script context
-                Map<String, Serializable> scriptContext = new HashMap<>();
-                //put action outputs
-                scriptContext.putAll(context);
-                //put executable inputs as a map
-                if (MapUtils.isNotEmpty(inputs)) {
-                    scriptContext.put(ScoreLangConstants.BIND_OUTPUT_FROM_INPUTS_KEY, (Serializable) inputs);
-                }
+                Map<String, Serializable> scriptContext = mergeContexts(inputs, context);
 
                 try {
                     Serializable expressionResult = scriptEvaluator.evalExpr(expression, scriptContext, systemProperties, result.getFunctionDependencies());
@@ -137,6 +130,20 @@ public class ResultsBinding {
             }
         }
         throw new RuntimeException("No possible result was resolved");
+    }
+
+    private Map<String, Serializable> mergeContexts(
+            Map<String, Serializable> inputs,
+            Map<String, Serializable> context) {
+        //construct script context
+        Map<String, Serializable> scriptContext = new HashMap<>();
+        //put executable inputs
+        if (MapUtils.isNotEmpty(inputs)) {
+            scriptContext.putAll(inputs);
+        }
+        //put action outputs
+        scriptContext.putAll(context);
+        return scriptContext;
     }
 
 }
