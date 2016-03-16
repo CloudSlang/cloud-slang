@@ -18,5 +18,5 @@ operation:
   outputs:
     - session_object_value: ${ connection }
   results:
-    - SUCCESS: ${ connection == self['value'] }
+    - SUCCESS: ${ connection == value }
     - FAILURE

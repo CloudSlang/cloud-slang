@@ -24,4 +24,4 @@ flow:
         do:
           ops.test_op:
   outputs:
-    - val_output: ${ self['input1'] }
+    - val_output: ${ input1 }

@@ -13,5 +13,5 @@ operation:
   action:
     python_script: print text
   results:
-    - FAILURE: ${ self['text'] == 2 }
+    - FAILURE: ${ text == 2 }
     - SUCCESS
