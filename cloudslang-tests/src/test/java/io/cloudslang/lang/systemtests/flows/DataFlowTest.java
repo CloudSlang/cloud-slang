@@ -126,5 +126,10 @@ public class DataFlowTest extends SystemsTestsParent {
         Assert.assertEquals("weather1 not bound correctly", "New York", weatherOutput);
         Assert.assertEquals("weather2 not bound correctly", "New York", weather2Output);
         Assert.assertEquals("weather3 not bound correctly", "New York day", weather3Output);
+
+        Assert.assertTrue(flowOutputs.containsKey("null_output_no_expression"));
+        Assert.assertTrue(flowOutputs.containsKey("null_output_expression"));
+        Assert.assertNull(flowOutputs.get("null_output_no_expression"));
+        Assert.assertNull(flowOutputs.get("null_output_expression"));
     }
 }

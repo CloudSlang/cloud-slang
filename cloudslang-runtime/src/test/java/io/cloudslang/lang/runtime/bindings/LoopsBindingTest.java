@@ -48,14 +48,13 @@ public class LoopsBindingTest {
     public void whenValueIsNotThereItWillBeCreated() throws Exception {
         Context context = mock(Context.class);
         when(scriptEvaluator.evalExpr(
-                anyString(),
-                anyMapOf(String.class, Serializable.class),
-                anySetOf(SystemProperty.class))
+                        anyString(),
+                        anyMapOf(String.class, Serializable.class),
+                        anySetOf(SystemProperty.class))
         ).thenReturn(Lists.newArrayList(1));
-        HashMap<String, Serializable> langVars = new HashMap<>();
-        when(context.getLangVariables()).thenReturn(langVars);
+        when(context.getImmutableViewOfLanguageVariables()).thenReturn(Collections.<String, Serializable>emptyMap());
         loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, EMPTY_SET, "node");
-        Assert.assertEquals(true, context.getLangVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
+        verify(context).putLanguageVariable(eq(LoopCondition.LOOP_CONDITION_KEY), isA(ForLoopCondition.class));
     }
 
     @Test
@@ -63,8 +62,8 @@ public class LoopsBindingTest {
         Context context = mock(Context.class);
         when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Serializable.class), eq(EMPTY_SET)))
                 .thenReturn(Lists.newArrayList());
-        HashMap<String, Serializable> langVars = new HashMap<>();
-        when(context.getLangVariables()).thenReturn(langVars);
+        Map<String, Serializable> langVars = Collections.emptyMap();
+        when(context.getImmutableViewOfLanguageVariables()).thenReturn(langVars);
 
         exception.expectMessage("expression is empty");
         exception.expect(RuntimeException.class);
@@ -91,13 +90,13 @@ public class LoopsBindingTest {
         Context context = mock(Context.class);
         when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Serializable.class), eq(EMPTY_SET)))
                 .thenReturn(new ArrayList<>());
-        HashMap<String, Serializable> langVars = new HashMap<>();
+        Map<String, Serializable> langVars = new HashMap<>();
         ForLoopCondition forLoopCondition = mock(ForLoopCondition.class);
         langVars.put(LoopCondition.LOOP_CONDITION_KEY, forLoopCondition);
-        when(context.getLangVariables()).thenReturn(langVars);
+        when(context.getImmutableViewOfLanguageVariables()).thenReturn(Collections.unmodifiableMap(langVars));
         loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, EMPTY_SET, "node");
-        Assert.assertEquals(true, context.getLangVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
-        Assert.assertEquals(forLoopCondition, context.getLangVariables().get(LoopCondition.LOOP_CONDITION_KEY));
+        Assert.assertEquals(true, context.getImmutableViewOfLanguageVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
+        Assert.assertEquals(forLoopCondition, context.getImmutableViewOfLanguageVariables().get(LoopCondition.LOOP_CONDITION_KEY));
     }
 
     @Test
