@@ -48,7 +48,7 @@ operation:
   outputs:
     - output1: ${ input1 }
     - output2: ${ processId }
-    - output4
+    - output3
   results:
     - SUCCESS: ${ 1 != 123456 }
     - NO_ACTION: ${ true }
