@@ -1,5 +1,5 @@
 ############################################################
-# Dockerfile to build score cslang container image
+# Dockerfile to build score slang container image
 # Based on Ubuntu with pre-installed java
 ############################################################
 
