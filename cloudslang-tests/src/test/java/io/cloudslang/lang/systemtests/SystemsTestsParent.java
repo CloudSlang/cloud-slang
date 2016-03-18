@@ -11,15 +11,15 @@
 package io.cloudslang.lang.systemtests;
 
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
 import io.cloudslang.lang.entities.SystemProperty;
-import io.cloudslang.lang.runtime.RuntimeConstants;
+import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import io.cloudslang.score.events.ScoreEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -52,6 +52,9 @@ public abstract class SystemsTestsParent {
 
     @Autowired
     protected Slang slang;
+
+    @Autowired
+    protected SlangCompiler slangCompiler;
 
     @Autowired
     protected TriggerFlows triggerFlows;
