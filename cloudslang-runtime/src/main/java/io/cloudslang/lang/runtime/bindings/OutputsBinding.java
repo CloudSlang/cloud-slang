@@ -60,7 +60,7 @@ public class OutputsBinding {
                 }
                 try {
                     outputs.put(outputKey, valueToAssign);
-                    scriptContext.put(outputKey, valueToAssign); // TODO: decision: previously bound values
+                    scriptContext.put(outputKey, valueToAssign);
                 } catch (ClassCastException ex) {
                     throw new RuntimeException("The output value: " + rawValue + " is not serializable", ex);
                 }
