@@ -13,13 +13,18 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.utils.DescriptionTag;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.text.StrBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * User: bancl
@@ -28,13 +33,11 @@ import java.util.*;
 @Component
 public class MetadataParser {
 
-    public static final String PREFIX = "#!";
-    public static final int BEGIN_INDEX = 3;
-    public static final String BLOCK_END_TAG = "#!!#";
-    public static final String BLOCK_START_TAG = "#!!";
-    public static final String COLON = ":";
-    public static final List<DescriptionTag> DESCRIPTION_TAGS_LIST = Collections.unmodifiableList(
-            Arrays.asList(DescriptionTag.values()));
+    private static final String PREFIX = "#!";
+    private static final int BEGIN_INDEX = 3;
+    private static final String BLOCK_END_TAG = "#!!#";
+    private static final String BLOCK_START_TAG = "#!!";
+    private static final String COLON = ":";
 
     @Autowired
     private ParserExceptionHandler parserExceptionHandler;
@@ -42,40 +45,42 @@ public class MetadataParser {
     public Map<String, String> parse(SlangSource source) {
         Validate.notEmpty(source.getSource(), "Source " + source.getName() + " cannot be empty");
         try {
-            String fullDescription = extractFullDescriptionString(source);
-            Map<String, String> fullMap = extractFullTagMap(fullDescription);
-            checkMapOrder(fullMap);
-            return fullMap;
+            String description = extractDescriptionString(source);
+            Map<String, String> tagMap = extractTagMap(description);
+            checkMapOrder(tagMap);
+            return tagMap;
         } catch (Throwable e) {
             throw new RuntimeException("There was a problem parsing the description: " +
                     source.getName() + ".\n" + parserExceptionHandler.getErrorMessage(e), e);
         }
     }
 
-    private void checkMapOrder(Map<String, String> fullMap) {
-        if (fullMap.size() > 0) {
-            Iterator<String> it = fullMap.keySet().iterator();
-            int previousTagPosition = DESCRIPTION_TAGS_LIST.indexOf(getContainedTag(it.next()));
+    private void checkMapOrder(Map<String, String> tagMap) {
+        if (!tagMap.isEmpty()) {
+            Iterator<String> it = tagMap.keySet().iterator();
+            int previousTagPosition = DescriptionTag.asList().indexOf(DescriptionTag.getContainedTag(it.next()));
             while (it.hasNext()) {
-                int keyTagPosition = DESCRIPTION_TAGS_LIST.indexOf(getContainedTag(it.next()));
-                if (previousTagPosition > keyTagPosition) throw new RuntimeException("Order is not preserved.");
+                int keyTagPosition = DescriptionTag.asList().indexOf(DescriptionTag.getContainedTag(it.next()));
+                if (previousTagPosition > keyTagPosition) {
+                    throw new RuntimeException("Order is not preserved.");
+                }
                 previousTagPosition = keyTagPosition;
             }
         }
     }
 
-    private Map<String, String> extractFullTagMap(String text) {
+    private Map<String, String> extractTagMap(String text) {
         Map<String, String> map = new LinkedHashMap<>();
-        StringBuilder valueStringBuilder = new StringBuilder();
+        StrBuilder valueStringBuilder = new StrBuilder();
         DescriptionTag tag;
         try (BufferedReader reader = new BufferedReader(new StringReader(text))) {
             String line = reader.readLine();
             String key = "";
             while (line != null) {
-                if (lineContainsATag(line)) {
-                    tag = getContainedTag(line);
+                if (DescriptionTag.stringContainsTag(line)) {
+                    tag = DescriptionTag.getContainedTag(line);
                     checkTagIsFollowedByColon(line);
-                    if (isSingleTagType(tag)) {
+                    if (DescriptionTag.isUniqueTagType(tag)) {
                         line = line.substring(line.indexOf(COLON) + 1);
                         key = tag != null ? tag.getValue() : "";
                     } else {
@@ -83,7 +88,7 @@ public class MetadataParser {
                         line = line.substring(line.indexOf(COLON) + 1);
                     }
                 }
-                valueStringBuilder.append(line.trim()).append(System.lineSeparator());
+                valueStringBuilder.appendln(line.trim());
                 line = reader.readLine();
                 putValueInMapAndResetBuilder(map, key, valueStringBuilder, line);
             }
@@ -94,37 +99,22 @@ public class MetadataParser {
     }
 
     private void checkTagIsFollowedByColon(String line) {
-        if (!line.contains(COLON))
+        Pattern pattern = Pattern.compile("@[\\w\\s]+:");
+        Matcher matcher = pattern.matcher(line);
+        if (!matcher.lookingAt()) {
             throw new RuntimeException("Line \"" + line + "\" does not contain colon after tag name.");
-    }
-
-    private void putValueInMapAndResetBuilder(Map<String, String> map, String key, StringBuilder valueStringBuilder, String line) {
-        if (line == null || lineContainsATag(line)) {
-            map.put(key, valueStringBuilder.toString().trim());
-            valueStringBuilder.setLength(0);
         }
     }
 
-    private boolean isSingleTagType(DescriptionTag tag) {
-        return DescriptionTag.DESCRIPTION.equals(tag) || DescriptionTag.PREREQUISITES.equals(tag);
-    }
-
-    private DescriptionTag getContainedTag(String line) {
-        for (DescriptionTag descriptionTag : DESCRIPTION_TAGS_LIST) {
-            if (line.contains(descriptionTag.getValue())) return descriptionTag;
+    private void putValueInMapAndResetBuilder(Map<String, String> map, String key, StrBuilder valueStringBuilder, String line) {
+        if (line == null || DescriptionTag.stringContainsTag(line)) {
+            map.put(key, valueStringBuilder.trim().build());
+            valueStringBuilder.clear();
         }
-        return null;
     }
 
-    private boolean lineContainsATag(String line) {
-        for (DescriptionTag descriptionTag : DESCRIPTION_TAGS_LIST) {
-            if (line.contains(descriptionTag.getValue())) return true;
-        }
-        return false;
-    }
-
-    private String extractFullDescriptionString(SlangSource source) {
-        StringBuilder sb = new StringBuilder();
+    private String extractDescriptionString(SlangSource source) {
+        StrBuilder sb = new StrBuilder();
         boolean blockEndTagFound = false, blockStartTagFound = false;
         String firstLine = "";
         try (BufferedReader reader = new BufferedReader(new StringReader(source.getSource()))) {
@@ -137,7 +127,9 @@ public class MetadataParser {
                     blockStartTagFound = true;
                     firstLine = line;
                     line = getTrimmedLine(reader);
-                    if (line.startsWith(BLOCK_END_TAG)) break;
+                    if (line.startsWith(BLOCK_END_TAG)) {
+                        break;
+                    }
                 }
 
                 appendValidLineToOutput(sb, blockStartTagFound, line);
@@ -148,12 +140,12 @@ public class MetadataParser {
             throw new RuntimeException("Error processing metadata, error extracting metadata from " +
                     source.getName(), e);
         }
-        return sb.toString();
+        return sb.build();
     }
 
-    private void appendValidLineToOutput(StringBuilder sb, boolean blockStartTagFound, String line) {
+    private void appendValidLineToOutput(StrBuilder sb, boolean blockStartTagFound, String line) {
         if (blockStartTagFound && line.startsWith(PREFIX) && (line.length() > 2)) {
-            sb.append(line.substring(BEGIN_INDEX)).append(System.lineSeparator());
+            sb.appendln(line.substring(BEGIN_INDEX));
         }
     }
 
@@ -162,7 +154,7 @@ public class MetadataParser {
         return line != null ? line.trim() : null;
     }
 
-    private void checkStartingAndClosingTags(StringBuilder sb, String firstLine, boolean blockEndTagFound,
+    private void checkStartingAndClosingTags(StrBuilder sb, String firstLine, boolean blockEndTagFound,
                                              boolean blockStartTagFound) {
         if (firstLine.length() > BLOCK_START_TAG.length()) {
             throw new RuntimeException("Description is not accepted on the same line as the starting tag.");
