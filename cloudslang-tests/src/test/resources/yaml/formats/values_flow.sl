@@ -100,11 +100,13 @@ flow:
                 input_concat_1 +
                 '_suffix'
                 }
+            - task_argument_null: null # depends on operation input name, modify together
         publish:
           - output_no_expression
           - publish_int: 22
           - publish_str: publish_str_value
           - publish_expression: ${ publish_str + '_suffix' }
+          - output_task_argument_null
 
   outputs:
     - output_no_expression
