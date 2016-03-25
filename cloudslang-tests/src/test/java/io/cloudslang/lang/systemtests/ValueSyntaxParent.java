@@ -103,6 +103,7 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
                 "input_expression_characters",
                 "docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ./auth} -p 8888:22 --name test1 -v /data:"
         );
+        expectedInputs.put("task_argument_null", "task_argument_null_value");
 
         Assert.assertTrue("Executable inputs not bound correctly", includeAllPairs(flowData.getInputs(), expectedInputs));
     }
@@ -114,6 +115,7 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         expectedOutputs.put("output_int", 22);
         expectedOutputs.put("output_str", "output_str_value");
         expectedOutputs.put("output_expression", "output_str_value_suffix");
+        expectedOutputs.put("output_task_argument_null", "task_argument_null_value");
 
         Assert.assertEquals("Executable outputs not bound correctly", expectedOutputs, flowData.getOutputs());
     }
