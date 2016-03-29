@@ -114,6 +114,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedArguments.put("input_13", "hyphen_value");
         expectedArguments.put("input_14", "localhost");
         expectedArguments.put("input_15", "localhost");
+        expectedArguments.put("input_16", null);
         Map<String, Serializable> actualArguments = taskData.getInputs();
         Assert.assertEquals("task arguments not as expected", expectedArguments, actualArguments);
     }
@@ -142,6 +143,8 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedFlowInputs.put("input_13", "hyphen_value");
         expectedFlowInputs.put("input_14", "localhost");
         expectedFlowInputs.put("input_15", "localhost");
+        expectedFlowInputs.put("input_15", "localhost");
+        expectedFlowInputs.put("input_16", null);
         Map<String, Serializable> actualFlowInputs = flowData.getInputs();
         Assert.assertEquals("flow input values not as expected", expectedFlowInputs, actualFlowInputs);
     }
@@ -172,6 +175,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedPublishValues.put("output_11", "hyphen_value");
         expectedPublishValues.put("output_12", "localhost");
         expectedPublishValues.put("output_13", "localhost");
+        expectedPublishValues.put("output_14", null);
         expectedPublishValues.put("value_propagate", "flowInput_taskArg_opInput_opOutput_taskPublish_");
         Map<String, Serializable> actualPublishValues = taskData.getOutputs();
         Assert.assertEquals("operation publish values not as expected", expectedPublishValues, actualPublishValues);

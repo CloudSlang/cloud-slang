@@ -53,6 +53,10 @@ flow:
     - input_13: ${get_sp('chars-b.c-hyphen', 'default_str')}
     - input_14: ${get_sp("a.b.c.host")}
     - input_15: ${get_sp("a.b.c.host", 'default_str')}
+    - input_16:
+        default: ${get('i_dont_exist')}
+        overridable: false
+        required: false
   workflow:
     - Task1:
         do:
@@ -72,6 +76,7 @@ flow:
             - input_13: ${get_sp('chars-b.c-hyphen', 'default_str')}
             - input_14: ${get_sp("a.b.c.host")}
             - input_15: ${get_sp("a.b.c.host", 'default_str')}
+            - input_16: ${get('i_dont_exist')}
         publish:
           - output1_safe
           - output2_safe
@@ -89,6 +94,7 @@ flow:
           - output_11
           - output_12
           - output_13
+          - output_14
           - value_propagate: ${ value_propagate + get_sp('propagate.task.publish') }
         navigate:
           FUNCTIONS_KEY_EXISTS: FUNCTIONS_KEY_EXISTS

@@ -152,11 +152,6 @@ public class ExpressionUtilsTest {
     }
 
     @Test
-    public void testMatchGetFunctionNoMatch() throws Exception {
-        Assert.assertFalse(matchGetFunction("get(expression)"));
-    }
-
-    @Test
     public void testMatchGetFunctionFalsePositive() throws Exception {
         Assert.assertTrue(matchGetFunction("get('a', var, 'too_many_params')"));
     }
@@ -174,6 +169,21 @@ public class ExpressionUtilsTest {
     @Test
     public void testMatchGetFunctionMatchAtLeastOnce() throws Exception {
         Assert.assertTrue(matchGetFunction("exec('a', get(get(var, default_expr), default_expr))"));
+    }
+
+    @Test
+    public void testMatchGetFunctionWithoutDefault() throws Exception {
+        Assert.assertTrue(matchGetFunction("get(expression)"));
+    }
+
+    @Test
+    public void testMatchGetFunctionWithoutDefaultWhitespaces() throws Exception {
+        Assert.assertTrue(matchGetFunction("get( 'a'                    )"));
+    }
+
+    @Test
+    public void testMatchGetFunctionWithoutDefaultMatchAtLeastOnce() throws Exception {
+        Assert.assertTrue(matchGetFunction("exec(get(get(var, default_expr), default_expr))"));
     }
 
 }
