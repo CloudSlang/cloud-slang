@@ -61,12 +61,12 @@ public class ArgumentsBinding {
         try {
             argumentValue = srcContext.get(argumentName);
             if (!argument.isOverridable()) {
-                //we do not want to change original context map
-                Map<String, Serializable> scriptContext = new HashMap<>(srcContext);
-                scriptContext.put(argumentName, argumentValue);
                 Serializable rawValue = argument.getValue();
                 String expressionToEvaluate = ExpressionUtils.extractExpression(rawValue);
                 if (expressionToEvaluate != null) {
+                    //we do not want to change original context map
+                    Map<String, Serializable> scriptContext = new HashMap<>(srcContext);
+                    scriptContext.put(argumentName, argumentValue);
                     //so you can resolve previous arguments already bound
                     scriptContext.putAll(targetContext);
                     argumentValue = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, argument.getFunctionDependencies());
