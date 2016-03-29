@@ -43,6 +43,8 @@ public final class ExpressionUtils {
     private final static String SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE = "get_sp\\(\\s*\"([\\w\\-.]+)\"\\s*,\\s*(.+?)\\)";
     // match get() function
     private final static String GET_REGEX = "get\\((.+?),(.+?)\\)";
+    // match get_expr() function
+    private final static String GET_EXPR_REGEX = "get_expr\\((.+?),(.+?)\\)";
 
     private final static Pattern EXPRESSION_PATTERN = Pattern.compile(EXPRESSION_REGEX, Pattern.DOTALL);
     private final static Pattern SYSTEM_PROPERTY_PATTERN_SINGLE_QUOTE = Pattern.compile(SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE);
@@ -50,6 +52,7 @@ public final class ExpressionUtils {
     private final static Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_SINGLE_QUOTE = Pattern.compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE);
     private final static Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_DOUBLE_QUOTE = Pattern.compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE);
     private final static Pattern GET_PATTERN = Pattern.compile(GET_REGEX);
+    private final static Pattern GET_EXPR_PATTERN = Pattern.compile(GET_EXPR_REGEX);
 
     public static String extractExpression(Serializable value) {
         String expression = null;
@@ -72,7 +75,15 @@ public final class ExpressionUtils {
     }
 
     public static boolean matchGetFunction(String text) {
-        Matcher matcher = GET_PATTERN.matcher(text);
+        return matchPattern(GET_PATTERN, text);
+    }
+
+    public static boolean matchGetExprFunction(String text) {
+        return matchPattern(GET_EXPR_PATTERN, text);
+    }
+
+    private static boolean matchPattern(Pattern pattern, String text) {
+        Matcher matcher = pattern.matcher(text);
         return matcher.find();
     }
 
