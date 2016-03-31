@@ -70,9 +70,10 @@ public class ArgumentsBinding {
                     //so you can resolve previous arguments already bound
                     scriptContext.putAll(targetContext);
                     argumentValue = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, argument.getFunctionDependencies());
-                } else
+                } else {
                     argumentValue = rawValue;
                 }
+            }
         } catch (Throwable t) {
             throw new RuntimeException("Error binding task argument: '" + argumentName + "', \n\tError is: " + t.getMessage(), t);
         }
