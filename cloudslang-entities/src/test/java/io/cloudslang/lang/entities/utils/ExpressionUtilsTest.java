@@ -48,8 +48,13 @@ public class ExpressionUtilsTest {
     }
 
     @Test
-    public void testExtractExpressionWhitespacesAreKept() throws Exception {
-        Assert.assertEquals("   var + 'abc'      ", extractExpression("${   var + 'abc'      }"));
+    public void testExtractExpressionWhitespacesAreSkipped() throws Exception {
+        Assert.assertEquals("var + 'abc'", extractExpression("${   var + 'abc'      }"));
+    }
+
+    @Test
+    public void testExtractExpressionWhitespacesAll() throws Exception {
+        Assert.assertEquals("var + 'abc'", extractExpression("     ${   var + 'abc'      }"              ));
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

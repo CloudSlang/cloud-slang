@@ -32,7 +32,9 @@ public final class ExpressionUtils {
     private final static String EXPRESSION_REGEX =
             "^\\s*" +
                     ScoreLangConstants.EXPRESSION_START_DELIMITER_ESCAPED +
-                    "(.+)" +
+                    "\\s*" +
+                    "(.+?)" +
+                    "\\s*" +
                     ScoreLangConstants.EXPRESSION_END_DELIMITER_ESCAPED +
                     "\\s*$";
     // match get_sp(key) function
