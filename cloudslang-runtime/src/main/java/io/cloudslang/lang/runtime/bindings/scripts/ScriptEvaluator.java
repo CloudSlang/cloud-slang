@@ -38,6 +38,9 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
             "def get(key, default_value):" + LINE_SEPARATOR +
                     "  value = globals().get(key)" + LINE_SEPARATOR +
                     "  return default_value if value is None else value";
+    private static final String GET_EXPR_FUNCTION_DEFINITION =
+            "def get_expr(expr1, expr2=None):" + LINE_SEPARATOR +
+                    "  return expr2 if expr1 is None else expr1";
     private static final String GET_SP_FUNCTION_DEFINITION =
             "def get_sp(key, default_value=None):" + LINE_SEPARATOR +
                     "  property_value = __sys_prop__.get(key)" + LINE_SEPARATOR +
@@ -85,6 +88,10 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
             switch (function) {
                 case GET:
                     functions += GET_FUNCTION_DEFINITION;
+                    functions = appendDelimiterBetweenFunctions(functions);
+                    break;
+                case GET_EXPRESSION:
+                    functions += GET_EXPR_FUNCTION_DEFINITION;
                     functions = appendDelimiterBetweenFunctions(functions);
                     break;
                 case GET_SYSTEM_PROPERTY:

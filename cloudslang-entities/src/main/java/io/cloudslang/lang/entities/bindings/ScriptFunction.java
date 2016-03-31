@@ -15,6 +15,7 @@ package io.cloudslang.lang.entities.bindings;
  */
 public enum ScriptFunction {
     GET,
+    GET_EXPRESSION,
     GET_SYSTEM_PROPERTY,
     GET_SENSITIVE_DATA
 }

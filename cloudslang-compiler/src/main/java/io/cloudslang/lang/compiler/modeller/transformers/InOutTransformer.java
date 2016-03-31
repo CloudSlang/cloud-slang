@@ -38,6 +38,10 @@ public abstract class InOutTransformer {
             if (getFunctionFound) {
                 functionDependencies.add(ScriptFunction.GET);
             }
+            boolean getExpressionFunctionFound = ExpressionUtils.matchGetExprFunction(expression);
+            if (getExpressionFunctionFound) {
+                functionDependencies.add(ScriptFunction.GET_EXPRESSION);
+            }
         }
         return new Accumulator(functionDependencies, systemPropertyDependencies);
     }
