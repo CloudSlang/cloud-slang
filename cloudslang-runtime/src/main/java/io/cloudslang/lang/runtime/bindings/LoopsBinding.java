@@ -54,10 +54,10 @@ public class LoopsBinding {
         Validate.notNull(systemProperties, "system properties cannot be null");
         Validate.notNull(nodeName, "node name cannot be null");
 
-        Map<String, Serializable> langVariables = flowContext.getLangVariables();
+        Map<String, Serializable> langVariables = flowContext.getImmutableViewOfLanguageVariables();
         if (!langVariables.containsKey(LOOP_CONDITION_KEY)) {
             LoopCondition loopCondition = createForLoopCondition(forLoopStatement, flowContext, systemProperties, nodeName);
-            langVariables.put(LOOP_CONDITION_KEY, loopCondition);
+            flowContext.putLanguageVariable(LOOP_CONDITION_KEY, loopCondition);
         }
         return (LoopCondition) langVariables.get(LOOP_CONDITION_KEY);
     }

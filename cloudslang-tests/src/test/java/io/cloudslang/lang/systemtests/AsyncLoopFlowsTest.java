@@ -102,6 +102,19 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
         verifyNavigation(runtimeInformation);
     }
 
+    @Test
+    public void testFlowContextInAggregateSectionNotReachable() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/async_loop/async_loop_aggregate_flow_context.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/async_loop/print_branch.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("flow_var");
+        exception.expectMessage("not defined");
+
+        triggerWithData(SlangSource.fromFile(resource), path);
+    }
+
     private Set<SystemProperty> getSystemProperties() {
         return Sets.newHashSet(
                 new SystemProperty("loop", "async.prop1", "aggregate_value")

@@ -397,7 +397,7 @@ public class TaskStepsTest {
         Context context = new Context(new HashMap<String, Serializable>());
         runEnv.getStack().pushContext(context);
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
-        context.getLangVariables().put(LoopCondition.LOOP_CONDITION_KEY, mockLoopCondition);
+        context.putLanguageVariable(LoopCondition.LOOP_CONDITION_KEY, mockLoopCondition);
         when(mockLoopCondition.hasMore()).thenReturn(true);
 
         Long previousStepId = 1L;
@@ -418,7 +418,7 @@ public class TaskStepsTest {
         Context context = new Context(new HashMap<String, Serializable>());
         runEnv.getStack().pushContext(context);
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
-        context.getLangVariables().put(LoopCondition.LOOP_CONDITION_KEY, mockLoopCondition);
+        context.putLanguageVariable(LoopCondition.LOOP_CONDITION_KEY, mockLoopCondition);
         when(mockLoopCondition.hasMore()).thenReturn(true);
 
         Long previousStepId = 1L;
@@ -426,7 +426,7 @@ public class TaskStepsTest {
                 createRuntimeServices(), previousStepId, Collections.singletonList(ScoreLangConstants.SUCCESS_RESULT),"taskName", false);
 
         Assert.assertEquals(nextStepId, runEnv.removeNextStepPosition());
-        Assert.assertFalse(context.getLangVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
+        Assert.assertFalse(context.getImmutableViewOfLanguageVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
     }
 
     @Test
@@ -438,13 +438,13 @@ public class TaskStepsTest {
         Context context = new Context(new HashMap<String, Serializable>());
         runEnv.getStack().pushContext(context);
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
-        context.getLangVariables().put(LoopCondition.LOOP_CONDITION_KEY, mockLoopCondition);
+        context.putLanguageVariable(LoopCondition.LOOP_CONDITION_KEY, mockLoopCondition);
         when(mockLoopCondition.hasMore()).thenReturn(false);
 
         taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
                 createRuntimeServices(), 1L,  new ArrayList<String>(), "taskName", false);
 
-        Assert.assertFalse(context.getLangVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
+        Assert.assertFalse(context.getImmutableViewOfLanguageVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
     }
 
     private ExecutionRuntimeServices createRuntimeServices(){

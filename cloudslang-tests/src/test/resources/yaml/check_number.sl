@@ -17,7 +17,7 @@ operation:
       isEven = remainder == 0
       tooBig = int(number) > 512
   outputs:
-    - preprocessed_number: ${ str(int(self['number']) * 3) }
+    - preprocessed_number: ${ str(int(number) * 3) }
   results:
     - EVEN: ${ isEven and not tooBig }
     - ODD: ${ not(isEven or tooBig) }

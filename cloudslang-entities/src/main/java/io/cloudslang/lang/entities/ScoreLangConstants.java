@@ -42,7 +42,6 @@ public interface ScoreLangConstants {
 
     //operation scope
     String EXECUTABLE_INPUTS_KEY = "executableInputs";
-    String BIND_OUTPUT_FROM_INPUTS_KEY = "self";
     String USER_INPUTS_KEY = "userInputs";
     String EXECUTABLE_OUTPUTS_KEY = "executableOutputs";
     String EXECUTABLE_RESULTS_KEY = "executableResults";
@@ -54,6 +53,7 @@ public interface ScoreLangConstants {
     String REF_ID = "refId";
     String LOOP_KEY = "loop";
     String BREAK_LOOP_KEY = "breakOn";
+    String TASK_ARGUMENTS_RESULT_CONTEXT = "taskArgumentsResultContext";
 
     // async loop
     String ASYNC_LOOP_KEY = "async_loop";

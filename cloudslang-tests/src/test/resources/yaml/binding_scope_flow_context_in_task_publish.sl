@@ -11,17 +11,15 @@ imports:
   ops: user.ops
 
 flow:
-  name: child_flow
+  name: binding_scope_flow_context_in_task_publish
   inputs:
-    - input1: 'value'
-    - time_zone_as_string: ${get_sp('user.sys.props.port')}
+    - flow_var: 'flow_var_value'
   workflow:
-    - task01:
+    - task1:
         do:
-          ops.get_time_zone:
-            - time_zone_as_string
-    - task02:
-        do:
-          ops.test_op:
-  outputs:
-    - val_output: ${ input1 }
+          ops.binding_scope_op:
+            - op_input_1: "op_input_1_task"
+            - task_arg_1: "task_arg_1_value"
+            - op_output_2: "op_output_2_task"
+        publish:
+          - task1_publish_1: ${ flow_var }

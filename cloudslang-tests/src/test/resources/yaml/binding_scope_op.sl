@@ -3,15 +3,18 @@
 #   are made available under the terms of the Apache License v2.0 which accompany this distribution.
 #
 #   The Apache License is available at
-#   http://www.apache.org/licenses/LICENSE-2.0namespace: loops
+#   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: loops
+namespace: user.ops
 
 operation:
-  name: operation_that_goes_to_custom_when_value_is_2
-  inputs: ['text']
+  name: binding_scope_op
+  inputs:
+    - op_input_1: "op_input_1_value"
   action:
-    python_script: print text
+    python_script: pass
+  outputs:
+    - op_output_1: 'op_output_1_value'
+    - op_output_2: 'op_output_2_value'
   results:
-    - CUSTOM: ${ text == 2 }
     - SUCCESS

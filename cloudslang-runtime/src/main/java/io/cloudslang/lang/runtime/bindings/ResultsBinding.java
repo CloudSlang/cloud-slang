@@ -14,14 +14,13 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
+import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -88,10 +87,10 @@ public class ResultsBinding {
                 return resultName;
             }
 
-            if(rawValue == Boolean.TRUE) {
+            if(Boolean.TRUE.equals(rawValue)) {
                 return resultName;
             }
-            if (rawValue == Boolean.FALSE) {
+            if (Boolean.FALSE.equals(rawValue)) {
                 continue;
             }
 
@@ -104,14 +103,7 @@ public class ResultsBinding {
                                     " expression " + ScoreLangConstants.EXPRESSION_END_DELIMITER);
                 }
 
-                //construct script context
-                Map<String, Serializable> scriptContext = new HashMap<>();
-                //put action outputs
-                scriptContext.putAll(context);
-                //put executable inputs as a map
-                if (MapUtils.isNotEmpty(inputs)) {
-                    scriptContext.put(ScoreLangConstants.BIND_OUTPUT_FROM_INPUTS_KEY, (Serializable) inputs);
-                }
+                Map<String, Serializable> scriptContext = MapUtils.mergeMaps(inputs, context);
 
                 try {
                     Serializable expressionResult = scriptEvaluator.evalExpr(expression, scriptContext, systemProperties, result.getFunctionDependencies());

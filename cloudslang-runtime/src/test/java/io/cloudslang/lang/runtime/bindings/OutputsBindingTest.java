@@ -108,7 +108,7 @@ public class OutputsBindingTest {
     public void testOperationOutputsExpression() {
         Map<String, Serializable> operationContext = prepareOperationContext();
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
-        List<Output> outputs = Arrays.asList(createExpressionOutput("hostFromExpression", "${ 'http://' + hostExpr + ':' + str(self['port']) }"));
+        List<Output> outputs = Collections.singletonList(createExpressionOutput("hostFromExpression", "${ 'http://' + hostExpr + ':' + str(port) }"));
 
         Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, EMPTY_SET, outputs);
 
@@ -151,7 +151,7 @@ public class OutputsBindingTest {
         Map<String, Serializable> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(
                 createNoExpressionOutput("host1"),
-                createExpressionOutput("hostFromExpression", "${ 'http://' + hostExpr + ':' + str(self['port']) }"));
+                createExpressionOutput("hostFromExpression", "${ 'http://' + hostExpr + ':' + str(port) }"));
 
         Map<String, Serializable> result = outputsBinding.bindOutputs(operationContext, actionReturnValues, EMPTY_SET, outputs);
 
