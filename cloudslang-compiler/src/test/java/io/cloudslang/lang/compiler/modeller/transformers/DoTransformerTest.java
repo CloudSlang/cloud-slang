@@ -59,6 +59,18 @@ public class DoTransformerTest {
         Argument argument = arguments.iterator().next();
         Assert.assertEquals("city",argument.getName());
         Assert.assertEquals("city_name", argument.getValue());
+        Assert.assertEquals(false, argument.isOverridable());
+    }
+
+    @Test
+    public void testTransformNoValue() throws Exception {
+        Map doArgumentsMap = loadFirstTaskFromFile("/basic_flow.yaml");
+        @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap);
+        Assert.assertFalse(arguments.isEmpty());
+        Assert.assertEquals(2, arguments.size());
+        Argument argument = arguments.get(1);
+        Assert.assertEquals("port",argument.getName());
+        Assert.assertEquals(true, argument.isOverridable());
     }
 
     @Test
@@ -74,14 +86,14 @@ public class DoTransformerTest {
 
     @Test
     public void testTransformEmptyArgumentExpression() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("country");
-        exception.expectMessage("null");
-
         @SuppressWarnings("unchecked")
         Map<String, Object> doArgumentsMap = loadFirstTaskFromFile("/corrupted/flow_with_empty_argument_expression.yaml");
-
-        doTransformer.transform(doArgumentsMap);
+        @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap);
+        Assert.assertFalse(arguments.isEmpty());
+        Assert.assertEquals(2, arguments.size());
+        Argument argument = arguments.get(1);
+        Assert.assertEquals("country", argument.getName());
+        Assert.assertEquals(false, argument.isOverridable());
     }
 
     @Test

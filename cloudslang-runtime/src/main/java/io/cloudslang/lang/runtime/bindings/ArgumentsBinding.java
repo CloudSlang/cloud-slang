@@ -59,25 +59,24 @@ public class ArgumentsBinding {
         String argumentName = argument.getName();
 
         try {
-            //we do not want to change original context map
-            Map<String, Serializable> scriptContext = new HashMap<>(srcContext);
-
             argumentValue = srcContext.get(argumentName);
-            scriptContext.put(argumentName, argumentValue);
-
-            Serializable rawValue = argument.getValue();
-            String expressionToEvaluate = ExpressionUtils.extractExpression(rawValue);
-            if (expressionToEvaluate != null) {
-                //so you can resolve previous arguments already bound
-                scriptContext.putAll(targetContext);
-                argumentValue = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, argument.getFunctionDependencies());
-            } else if (rawValue != null) {
-                argumentValue = rawValue;
+            if (!argument.isOverridable()) {
+                Serializable rawValue = argument.getValue();
+                String expressionToEvaluate = ExpressionUtils.extractExpression(rawValue);
+                if (expressionToEvaluate != null) {
+                    //we do not want to change original context map
+                    Map<String, Serializable> scriptContext = new HashMap<>(srcContext);
+                    scriptContext.put(argumentName, argumentValue);
+                    //so you can resolve previous arguments already bound
+                    scriptContext.putAll(targetContext);
+                    argumentValue = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, argument.getFunctionDependencies());
+                } else {
+                    argumentValue = rawValue;
+                }
             }
         } catch (Throwable t) {
             throw new RuntimeException("Error binding task argument: '" + argumentName + "', \n\tError is: " + t.getMessage(), t);
         }
-
         targetContext.put(argumentName, argumentValue);
     }
 

@@ -64,17 +64,11 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
         // this is our default behaviour that if the user specifies only a key, the key is also the ref we look for
         if (rawArgument instanceof String) {
             String argumentName = (String) rawArgument;
-            return new Argument(argumentName, null);
+            return new Argument(argumentName);
         } else if (rawArgument instanceof Map) {
             @SuppressWarnings("unchecked")
             Map.Entry<String, Serializable> entry = ((Map<String, Serializable>) rawArgument).entrySet().iterator().next();
             Serializable entryValue = entry.getValue();
-            if(entryValue == null){
-                throw new RuntimeException("Could not transform task argument: " +
-                        rawArgument + ". Since it has a null value.\n" +
-                        "Make sure a value is specified or that indentation is properly done."
-                );
-            }
             // - some_input: some_expression
             Accumulator accumulator = extractFunctionData(entryValue);
             return new Argument(

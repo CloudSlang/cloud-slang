@@ -64,6 +64,7 @@ operation:
     - input_expression_characters: >
         ${ 'docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ' + authorized_keys_path + '} -p ' +
         scp_host_port + ':22 --name test1 -v /data:'}
+    - task_argument_null: "task_argument_null_value"
   action:
     python_script: result = 'success'
   outputs:
@@ -71,6 +72,7 @@ operation:
     - output_int: 22
     - output_str: output_str_value
     - output_expression: ${ output_str + '_suffix' }
+    - output_task_argument_null: ${task_argument_null}
   results:
     - SUCCESS: ${ result == 'success' }
     - FAILURE
