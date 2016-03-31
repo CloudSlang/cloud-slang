@@ -14,8 +14,8 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Output;
 
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
+import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
-import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -40,7 +40,7 @@ public class OutputsBinding {
             List<Output> possibleOutputs) {
 
         Map<String, Serializable> outputs = new LinkedHashMap<>();
-        Map<String, Serializable> scriptContext = mergeContexts(initialContext, returnContext);
+        Map<String, Serializable> scriptContext = MapUtils.mergeMaps(initialContext, returnContext);
 
         if (possibleOutputs != null) {
             for (Output output : possibleOutputs) {
@@ -67,20 +67,6 @@ public class OutputsBinding {
             }
         }
         return outputs;
-    }
-
-    private Map<String, Serializable> mergeContexts(
-            Map<String, Serializable> initialContext,
-            Map<String, Serializable> returnContext) {
-        //construct script context
-        Map<String, Serializable> scriptContext = new HashMap<>();
-        //put operation inputs
-        if(MapUtils.isNotEmpty(initialContext)) {
-            scriptContext.putAll(initialContext);
-        }
-        //put action outputs
-        scriptContext.putAll(returnContext);
-        return scriptContext;
     }
 
 }
