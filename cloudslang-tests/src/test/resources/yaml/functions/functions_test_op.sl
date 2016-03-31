@@ -35,6 +35,7 @@ operation:
     - output_11: ${get_sp('chars-b.c-hyphen', 'default_str')}
     - output_12: ${get_sp("a.b.c.host")}
     - output_13: ${get_sp("a.b.c.host", 'default_str')}
+    - output_14: ${get('i_dont_exist')}
   results:
     - FUNCTIONS_KEY_EXISTS: ${ get(get_sp('cloudslang.lang.key'), 'output1_default') == 'CloudSlang' }
     - FUNCTIONS_KEY_EXISTS_PROBLEM

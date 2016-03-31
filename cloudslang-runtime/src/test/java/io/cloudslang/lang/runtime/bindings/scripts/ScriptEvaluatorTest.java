@@ -25,7 +25,7 @@ public class ScriptEvaluatorTest {
 
     private static String LINE_SEPARATOR = System.lineSeparator();
     private static final String GET_FUNCTION_DEFINITION =
-            "def get(key, default_value):" + LINE_SEPARATOR +
+            "def get(key, default_value=None):" + LINE_SEPARATOR +
                     "  value = globals().get(key)" + LINE_SEPARATOR +
                     "  return default_value if value is None else value";
     private static final String GET_SP_FUNCTION_DEFINITION =
