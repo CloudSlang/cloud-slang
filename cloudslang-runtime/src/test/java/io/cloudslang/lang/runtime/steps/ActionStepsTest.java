@@ -425,9 +425,14 @@ public class ActionStepsTest {
         actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(),
                 "setNameOnNonSerializableSession", executionRuntimeServicesMock, null, 2L);
 
-        Map<String, Serializable> outputs = runEnv.removeReturnValues().getOutputs();
-        Assert.assertTrue(outputs.containsKey("name"));
-        Assert.assertEquals("David", outputs.get("name"));
+        Assert.assertTrue(nonSerializableExecutionData.containsKey("name"));
+
+        @SuppressWarnings("unchecked")
+        GlobalSessionObject<ContentTestActions.NonSerializableObject> updatedSessionObject =
+                (GlobalSessionObject<ContentTestActions.NonSerializableObject>) nonSerializableExecutionData.get("name");
+        ContentTestActions.NonSerializableObject nonSerializableObject = updatedSessionObject.get();
+        String actualName = nonSerializableObject.getName();
+        Assert.assertEquals("David", actualName);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
