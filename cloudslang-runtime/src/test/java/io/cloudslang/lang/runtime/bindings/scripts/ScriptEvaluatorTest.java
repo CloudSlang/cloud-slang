@@ -32,6 +32,9 @@ public class ScriptEvaluatorTest {
             "def get_sp(key, default_value=None):" + LINE_SEPARATOR +
                     "  property_value = __sys_prop__.get(key)" + LINE_SEPARATOR +
                     "  return default_value if property_value is None else property_value";
+    private static final String CHECK_EMPTY_FUNCTION_DEFINITION =
+            "def check_empty(value_to_check, default_value=None):" + LINE_SEPARATOR +
+                    "  return default_value if value_to_check is None else value_to_check";
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -66,7 +69,11 @@ public class ScriptEvaluatorTest {
         props.add(systemProperty);
         Map<String, String> propsAsMap = new HashMap<>();
         propsAsMap.put(systemProperty.getFullyQualifiedName(), systemProperty.getValue());
-        Set<ScriptFunction> functionDependencies = Sets.newHashSet(ScriptFunction.GET, ScriptFunction.GET_SYSTEM_PROPERTY);
+        Set<ScriptFunction> functionDependencies = Sets.newHashSet(
+                ScriptFunction.GET,
+                ScriptFunction.GET_SYSTEM_PROPERTY,
+                ScriptFunction.CHECK_EMPTY
+        );
         ArgumentCaptor<String> scriptCaptor = ArgumentCaptor.forClass(String.class);
 
         when(pythonInterpreter.getLocals()).thenReturn(new PyStringMap());
@@ -83,7 +90,8 @@ public class ScriptEvaluatorTest {
         Collections.addAll(actualFunctions, actualFunctionsArray);
         Set<String> expectedFunctions = Sets.newHashSet(
                 GET_FUNCTION_DEFINITION,
-                GET_SP_FUNCTION_DEFINITION
+                GET_SP_FUNCTION_DEFINITION,
+                CHECK_EMPTY_FUNCTION_DEFINITION
         );
         Assert.assertEquals(expectedFunctions, actualFunctions);
     }

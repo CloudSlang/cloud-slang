@@ -212,8 +212,10 @@ public class InputsTransformerTest {
         Set<String> props2 = Sets.newHashSet("a.b.c.key", "d.e.f.key");
         Set<ScriptFunction> emptySetScriptFunction = new HashSet<>();
         Set<String> emptySetString = new HashSet<>();
+        Set<ScriptFunction> setGetAndCheckEmpty = new HashSet<>(setGet);
+        setGetAndCheckEmpty.add(ScriptFunction.CHECK_EMPTY);
 
-        Assert.assertEquals("inputs size not as expected", 13, inputs.size());
+        Assert.assertEquals("inputs size not as expected", 14, inputs.size());
 
         verifyFunctionsAndSPDependencies(inputs, 0, emptySetScriptFunction, emptySetString);
         verifyFunctionsAndSPDependencies(inputs, 1, emptySetScriptFunction, emptySetString);
@@ -228,6 +230,7 @@ public class InputsTransformerTest {
         verifyFunctionsAndSPDependencies(inputs, 10, setSP, props1);
         verifyFunctionsAndSPDependencies(inputs, 11, setGet, emptySetString);
         verifyFunctionsAndSPDependencies(inputs, 12, setSP, props2);
+        verifyFunctionsAndSPDependencies(inputs, 13, setGetAndCheckEmpty, emptySetString);
     }
 
     private void verifyFunctionsAndSPDependencies(
