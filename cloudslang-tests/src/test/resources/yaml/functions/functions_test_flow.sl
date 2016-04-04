@@ -97,8 +97,8 @@ flow:
           - output_14
           - value_propagate: ${ value_propagate + get_sp('propagate.task.publish') }
         navigate:
-          FUNCTIONS_KEY_EXISTS: FUNCTIONS_KEY_EXISTS
-          FUNCTIONS_KEY_EXISTS_PROBLEM: FUNCTIONS_KEY_EXISTS_PROBLEM
+          - FUNCTIONS_KEY_EXISTS: FUNCTIONS_KEY_EXISTS
+          - FUNCTIONS_KEY_EXISTS_PROBLEM: FUNCTIONS_KEY_EXISTS_PROBLEM
   outputs:
     - value_propagate: ${ value_propagate + get_sp('propagate.flow.output') }
   results:

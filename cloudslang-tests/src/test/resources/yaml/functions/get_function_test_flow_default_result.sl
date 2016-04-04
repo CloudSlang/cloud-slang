@@ -17,8 +17,8 @@ flow:
         do:
           ops.get_function_test_default_result: []
         navigate:
-          GET_FUNCTION_DEFAULT_VALUE: GET_FUNCTION_DEFAULT_VALUE
-          GET_FUNCTION_PROBLEM: GET_FUNCTION_PROBLEM
+          - GET_FUNCTION_DEFAULT_VALUE: GET_FUNCTION_DEFAULT_VALUE
+          - GET_FUNCTION_PROBLEM: GET_FUNCTION_PROBLEM
   results:
     - GET_FUNCTION_DEFAULT_VALUE
     - GET_FUNCTION_PROBLEM

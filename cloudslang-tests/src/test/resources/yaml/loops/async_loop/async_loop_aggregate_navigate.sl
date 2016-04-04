@@ -29,8 +29,8 @@ flow:
             - number_from_last_branch: ${ branches_context[-1]['number'] }
             - from_sp: ${get_sp('loop.async.prop1')}
         navigate:
-            SUCCESS: print_list
-            FAILURE: FAILURE
+            - SUCCESS: print_list
+            - FAILURE: FAILURE
 
     - print_list:
         do:

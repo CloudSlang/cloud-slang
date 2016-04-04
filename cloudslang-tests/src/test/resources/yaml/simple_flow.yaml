@@ -27,8 +27,8 @@ flow:
         publish:
           - time_zone: ${ time_zone }
         navigate:
-          SUCCESS: Task2
-          NEGATIVE: FAILURE
+          - SUCCESS: Task2
+          - NEGATIVE: FAILURE
 
     - Task2:
         do:

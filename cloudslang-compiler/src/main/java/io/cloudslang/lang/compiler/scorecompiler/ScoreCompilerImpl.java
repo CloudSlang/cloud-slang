@@ -108,7 +108,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         Flow flow = (Flow)executable;
         Deque<Task> tasks = flow.getWorkflow().getTasks();
         for(Task task : tasks){
-            Map<String, String> taskNavigations = task.getNavigationStrings();
+            List<Map<String, String>> taskNavigations = task.getNavigationStrings();
             String refId = task.getRefId();
             Executable reference = filteredDependencies.get(refId);
             Validate.notNull(reference, "Cannot compile flow: \'" + executable.getName() + "\' since for task: \'" + task.getName()
@@ -116,11 +116,18 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             List<Result> refResults = reference.getResults();
             for(Result result : refResults){
                 String resultName = result.getName();
-                Validate.isTrue(taskNavigations.containsKey(resultName), "Cannot compile flow: \'" + executable.getName() +
+                Validate.isTrue(navigationListContainsKey(taskNavigations, resultName), "Cannot compile flow: \'" + executable.getName() +
                         "\' since for task: '" + task.getName() + "\', the result \'" + resultName+
                         "\' of its dependency: \'"+ refId + "\' has no matching navigation");
             }
         }
+    }
+
+    private boolean navigationListContainsKey(List<Map<String, String>> taskNavigations, String resultName) {
+        for (Map<String, String> map : taskNavigations) {
+            if (map.containsKey(resultName)) return true;
+        }
+        return false;
     }
 
     /**

@@ -347,7 +347,7 @@ public class PreCompilerErrorsTest {
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("'navigate'");
-        exception.expectMessage("map");
+        exception.expectMessage("list");
         exception.expectMessage("string");
         throw result.getErrors().get(0);
     }
