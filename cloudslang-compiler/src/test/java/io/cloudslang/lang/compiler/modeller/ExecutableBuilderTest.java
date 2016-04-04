@@ -7,6 +7,7 @@ import io.cloudslang.lang.compiler.modeller.transformers.AggregateTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+import io.cloudslang.lang.entities.bindings.Result;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
@@ -20,8 +21,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.Serializable;
 import java.util.*;
 
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.any;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -36,6 +42,10 @@ public class ExecutableBuilderTest {
 
     @Autowired
     private Transformer transformer;
+
+    @Autowired
+    private TransformersHandler transformersHandler;
+
     private static final String FILE_NAME = "filename";
     private static final String NAMESPACE = "io.cloudslang";
 
@@ -52,6 +62,13 @@ public class ExecutableBuilderTest {
         imports.put("ops", "ops");
         Mockito.when(parsedSlang.getImports()).thenReturn(imports);
         Mockito.when(parsedSlang.getNamespace()).thenReturn(NAMESPACE);
+
+        List<Result> results = new ArrayList<>();
+        Map<String, Serializable> postExecutableActionData = new HashMap<>();
+        postExecutableActionData.put(SlangTextualKeys.RESULTS_KEY, (Serializable) results);
+        Mockito.when(transformersHandler.runTransformers(anyMap(), anyList(), anyList(), anyString())).thenReturn(postExecutableActionData);
+        Mockito.when(transformersHandler.checkKeyWords(eq("action data"), anyMap(), anyList(), anyList(), anyList())).thenCallRealMethod();
+
         return parsedSlang;
     }
 
@@ -370,7 +387,7 @@ public class ExecutableBuilderTest {
 
         @Bean
         public TransformersHandler transformersHandler(){
-            return new TransformersHandler();
+            return Mockito.mock(TransformersHandler.class);
         }
     }
 }
