@@ -99,9 +99,9 @@ public class CompileForLoopsFlowTest {
         ListForLoopStatement listForLoopStatement  = validateListForLoopStatement(forStatement);
         assertEquals("values", listForLoopStatement.getExpression());
         assertEquals("value", listForLoopStatement.getVarName());
-        @SuppressWarnings("unchecked") Map<String, String> actual = (Map<String, String>) task.getPostTaskActionData()
+        @SuppressWarnings("unchecked") List<Map<String, String>> actual = (List<Map<String, String>>) task.getPostTaskActionData()
                                                                                 .get(SlangTextualKeys.NAVIGATION_KEY);
-        assertEquals("print_other_values", actual.get(ScoreLangConstants.SUCCESS_RESULT));
+        assertEquals("print_other_values", actual.get(0).get(ScoreLangConstants.SUCCESS_RESULT));
     }
 
     @Test
@@ -193,9 +193,9 @@ public class CompileForLoopsFlowTest {
         assertEquals("person_map", mapForLoopStatement.getExpression());
         assertEquals("k", mapForLoopStatement.getKeyName());
         assertEquals("v", mapForLoopStatement.getValueName());
-        @SuppressWarnings("unchecked") Map<String, String> actual = (Map<String, String>) task.getPostTaskActionData()
+        @SuppressWarnings("unchecked") List<Map<String, String>> actual = (List<Map<String, String>>) task.getPostTaskActionData()
                 .get(SlangTextualKeys.NAVIGATION_KEY);
-        assertEquals("print_other_values", actual.get(ScoreLangConstants.SUCCESS_RESULT));
+        assertEquals("print_other_values", actual.get(0).get(ScoreLangConstants.SUCCESS_RESULT));
     }
 
     @Test

@@ -58,9 +58,13 @@ public class CompileAsyncLoopFlowTest {
         List<Output> publishValues = getPublishOutputs(task);
         assertEquals("aggregate list is not empty", 0, publishValues.size());
 
-        Map<String, String> expectedNavigationStrings = new HashMap<>();
-        expectedNavigationStrings.put("SUCCESS", "SUCCESS");
-        expectedNavigationStrings.put("FAILURE", "FAILURE");
+        List<Map<String, String>> expectedNavigationStrings = new ArrayList<>();
+        Map<String, String> successMap = new HashMap<>();
+        successMap.put(ScoreLangConstants.SUCCESS_RESULT, "SUCCESS");
+        Map<String, String> failureMap = new HashMap<>();
+        failureMap.put(ScoreLangConstants.FAILURE_RESULT, "FAILURE");
+        expectedNavigationStrings.add(successMap);
+        expectedNavigationStrings.add(failureMap);
         verifyNavigationStrings(expectedNavigationStrings, task);
 
         assertTrue(task.isAsync());
@@ -80,9 +84,13 @@ public class CompileAsyncLoopFlowTest {
         assertEquals("aggregate list is not empty", 2, publishValues.size());
         assertEquals("${name}", publishValues.get(0).getValue());
 
-        Map<String, String> expectedNavigationStrings = new HashMap<>();
-        expectedNavigationStrings.put("SUCCESS", "SUCCESS");
-        expectedNavigationStrings.put("FAILURE", "FAILURE");
+        List<Map<String, String>> expectedNavigationStrings = new ArrayList<>();
+        Map<String, String> successMap = new HashMap<>();
+        successMap.put(ScoreLangConstants.SUCCESS_RESULT, "SUCCESS");
+        Map<String, String> failureMap = new HashMap<>();
+        failureMap.put(ScoreLangConstants.FAILURE_RESULT, "FAILURE");
+        expectedNavigationStrings.add(successMap);
+        expectedNavigationStrings.add(failureMap);
         verifyNavigationStrings(expectedNavigationStrings, task);
 
         assertTrue(task.isAsync());
@@ -103,9 +111,13 @@ public class CompileAsyncLoopFlowTest {
         List<Output> publishValues = getPublishOutputs(asyncTask);
         assertEquals("aggregate list is not empty", 0, publishValues.size());
 
-        Map<String, String> expectedNavigationStrings = new HashMap<>();
-        expectedNavigationStrings.put("SUCCESS", "print_list");
-        expectedNavigationStrings.put("FAILURE", "FAILURE");
+        List<Map<String, String>> expectedNavigationStrings = new ArrayList<>();
+        Map<String, String> successMap = new HashMap<>();
+        successMap.put(ScoreLangConstants.SUCCESS_RESULT, "print_list");
+        Map<String, String> failureMap = new HashMap<>();
+        failureMap.put(ScoreLangConstants.FAILURE_RESULT, "FAILURE");
+        expectedNavigationStrings.add(successMap);
+        expectedNavigationStrings.add(failureMap);
         verifyNavigationStrings(expectedNavigationStrings, asyncTask);
 
         assertTrue(asyncTask.isAsync());
@@ -128,9 +140,13 @@ public class CompileAsyncLoopFlowTest {
         assertEquals("aggregate list is not empty", 2, publishValues.size());
         assertEquals("${name}", publishValues.get(0).getValue());
 
-        Map<String, String> expectedNavigationStrings = new HashMap<>();
-        expectedNavigationStrings.put("SUCCESS", "print_list");
-        expectedNavigationStrings.put("FAILURE", "FAILURE");
+        List<Map<String, String>> expectedNavigationStrings = new ArrayList<>();
+        Map<String, String> successMap = new HashMap<>();
+        successMap.put(ScoreLangConstants.SUCCESS_RESULT, "print_list");
+        Map<String, String> failureMap = new HashMap<>();
+        failureMap.put(ScoreLangConstants.FAILURE_RESULT, "FAILURE");
+        expectedNavigationStrings.add(successMap);
+        expectedNavigationStrings.add(failureMap);
         verifyNavigationStrings(expectedNavigationStrings, asyncTask);
 
         assertTrue(asyncTask.isAsync());
@@ -336,8 +352,8 @@ public class CompileAsyncLoopFlowTest {
         return publishValues;
     }
 
-    private void verifyNavigationStrings(Map<String, String> expectedNavigationStrings, Task task) {
-        Map<String, String> actualNavigationStrings = task.getNavigationStrings();
+    private void verifyNavigationStrings(List<Map<String, String>> expectedNavigationStrings, Task task) {
+        List<Map<String, String>> actualNavigationStrings = task.getNavigationStrings();
         assertEquals(expectedNavigationStrings, actualNavigationStrings);
     }
 

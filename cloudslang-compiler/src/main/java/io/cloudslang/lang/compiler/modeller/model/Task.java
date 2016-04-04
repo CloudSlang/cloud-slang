@@ -23,7 +23,7 @@ public class Task {
     private final Map<String, Serializable> preTaskActionData;
     private final Map<String, Serializable> postTaskActionData;
     private final List<Argument> arguments;
-    private final Map<String, String> navigationStrings;
+    private final List<Map<String, String>> navigationStrings;
     private final String refId;
     private final boolean async;
 
@@ -32,7 +32,7 @@ public class Task {
             Map<String, Serializable> preTaskActionData,
             Map<String, Serializable> postTaskActionData,
             List<Argument> arguments,
-            Map<String, String> navigationStrings,
+            List<Map<String, String>> navigationStrings,
             String refId,
             boolean async) {
         this.name = name;
@@ -60,7 +60,7 @@ public class Task {
         return arguments;
     }
 
-    public Map<String, String> getNavigationStrings() {
+    public List<Map<String, String>> getNavigationStrings() {
         return navigationStrings;
     }
 

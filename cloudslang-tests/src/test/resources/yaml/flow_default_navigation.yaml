@@ -29,7 +29,7 @@ flow:
           ops.check_weather:
             - city: 'AwesomeCity'
         navigate:
-          SUCCESS: SUCCESS # end flow with success result
+          - SUCCESS: SUCCESS # end flow with success result
 
     - on_failure: # default navigation: go to this step on failure
         - send_error_mail:
@@ -42,5 +42,5 @@ flow:
                 - subject: 'Flow failure'
                 - body: 'Default failure navigation here'
             navigate:
-              SUCCESS: FAILURE # end flow with failure result
-              FAILURE: FAILURE
+              - SUCCESS: FAILURE # end flow with failure result
+              - FAILURE: FAILURE

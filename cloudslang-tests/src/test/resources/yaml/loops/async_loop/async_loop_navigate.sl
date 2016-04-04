@@ -22,8 +22,8 @@ flow:
             ops.print_branch:
               - ID: ${ value }
         navigate:
-            SUCCESS: print_list
-            FAILURE: FAILURE
+            - SUCCESS: print_list
+            - FAILURE: FAILURE
 
     - print_list:
         do:

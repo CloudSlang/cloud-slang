@@ -39,8 +39,8 @@ flow:
             - publish_5: ${get_sp("task.publish.prop3")}
             - publish_6: ${get_sp("task.publish.prop4", 'default_str')}
         navigate:
-          FUNCTIONS_KEY_EXISTS: Task2
-          FUNCTIONS_KEY_EXISTS_PROBLEM: FUNCTIONS_KEY_EXISTS_PROBLEM
+          - FUNCTIONS_KEY_EXISTS: Task2
+          - FUNCTIONS_KEY_EXISTS_PROBLEM: FUNCTIONS_KEY_EXISTS_PROBLEM
           
     - Task2:
         async_loop:
@@ -53,8 +53,8 @@ flow:
             - aggregate_3: ${get_sp('async.aggregate.prop1')}
             - aggregate_4: ${get_sp('async.aggregate.prop2', 'default_str')}
         navigate:
-          FUNCTIONS_KEY_EXISTS: FUNCTIONS_KEY_EXISTS
-          FUNCTIONS_KEY_EXISTS_PROBLEM: FUNCTIONS_KEY_EXISTS_PROBLEM
+          - FUNCTIONS_KEY_EXISTS: FUNCTIONS_KEY_EXISTS
+          - FUNCTIONS_KEY_EXISTS_PROBLEM: FUNCTIONS_KEY_EXISTS_PROBLEM
           
     - Task3:
         loop:
@@ -71,8 +71,8 @@ flow:
               - publish_3: ${get_sp('for.publish.prop1')}
               - publish_4: ${get_sp('for.publish.prop2', 'default_str')}
         navigate:
-          FUNCTIONS_KEY_EXISTS: FUNCTIONS_KEY_EXISTS
-          FUNCTIONS_KEY_EXISTS_PROBLEM: FUNCTIONS_KEY_EXISTS_PROBLEM
+          - FUNCTIONS_KEY_EXISTS: FUNCTIONS_KEY_EXISTS
+          - FUNCTIONS_KEY_EXISTS_PROBLEM: FUNCTIONS_KEY_EXISTS_PROBLEM
   outputs:
     - output_1: ${get(    'i_don_exist',        get_sp('flow.output.prop1')       )}
   results:

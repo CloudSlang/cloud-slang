@@ -63,19 +63,23 @@ public class ExecutionPlanBuilderTest {
         return createSimpleCompiledTask(taskName, false);
     }
 
-    private Task createSimpleCompiledTask(String taskName, Map<String, String> navigationStrings) {
+    private Task createSimpleCompiledTask(String taskName, List<Map<String, String>> navigationStrings) {
         return createSimpleCompiledTask(taskName, false, navigationStrings);
     }
 
     private Task createSimpleCompiledTask(String taskName, boolean isAsync) {
-        Map<String, String> navigationStrings = new HashMap<>();
-        navigationStrings.put(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.SUCCESS_RESULT);
-        navigationStrings.put(ScoreLangConstants.FAILURE_RESULT, ScoreLangConstants.FAILURE_RESULT);
+        List<Map<String, String>> navigationStrings = new ArrayList<>();
+        Map<String, String> successMap = new HashMap<>();
+        successMap.put(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.SUCCESS_RESULT);
+        Map<String, String> failureMap = new HashMap<>();
+        failureMap.put(ScoreLangConstants.FAILURE_RESULT, ScoreLangConstants.FAILURE_RESULT);
+        navigationStrings.add(successMap);
+        navigationStrings.add(failureMap);
 
         return createSimpleCompiledTask(taskName, isAsync, navigationStrings);
     }
 
-    private Task createSimpleCompiledTask(String taskName, boolean isAsync, Map<String, String> navigationStrings) {
+    private Task createSimpleCompiledTask(String taskName, boolean isAsync, List<Map<String, String>> navigationStrings) {
         Map<String, Serializable> preTaskActionData = new HashMap<>();
 
         if (isAsync) {
@@ -252,9 +256,13 @@ public class ExecutionPlanBuilderTest {
     public void createFlowWithTwoTasks() throws Exception {
         Deque<Task> tasks = new LinkedList<>();
         String secondTaskName = "2ndTask";
-        HashMap<String, String> navigationStrings = new HashMap<>();
-        navigationStrings.put(ScoreLangConstants.SUCCESS_RESULT, secondTaskName);
-        navigationStrings.put(ScoreLangConstants.FAILURE_RESULT, ScoreLangConstants.FAILURE_RESULT);
+        List<Map<String, String>> navigationStrings = new ArrayList<>();
+        Map<String, String> successMap = new HashMap<>();
+        successMap.put(ScoreLangConstants.SUCCESS_RESULT, secondTaskName);
+        Map<String, String> failureMap = new HashMap<>();
+        failureMap.put(ScoreLangConstants.FAILURE_RESULT, ScoreLangConstants.FAILURE_RESULT);
+        navigationStrings.add(successMap);
+        navigationStrings.add(failureMap);
         Task firstTask = createSimpleCompiledTask("firstTaskName", navigationStrings);
         Task secondTask = createSimpleCompiledTask(secondTaskName);
         tasks.add(firstTask);

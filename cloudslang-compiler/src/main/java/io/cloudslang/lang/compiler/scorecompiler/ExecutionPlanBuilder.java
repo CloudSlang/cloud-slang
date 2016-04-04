@@ -123,7 +123,8 @@ public class ExecutionPlanBuilder {
 
         //End Task
         Map<String, ResultNavigation> navigationValues = new HashMap<>();
-        for (Map.Entry<String, String> entry : task.getNavigationStrings().entrySet()) {
+        for (Map<String, String> map : task.getNavigationStrings()) {
+            Map.Entry<String, String> entry = map.entrySet().iterator().next();
             String nextStepName = entry.getValue();
             if (taskReferences.get(nextStepName) == null) {
                 Task nextTaskToCompile = Lambda.selectFirst(tasks, having(on(Task.class).getName(), equalTo(nextStepName)));

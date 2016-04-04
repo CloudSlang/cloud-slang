@@ -22,8 +22,8 @@ flow:
             - first_string: ${ 'prefix_' + first }
             - second_string: ${ 'prefix_' + second_string }
         navigate:
-          SUCCESS: TaskOnSuccess
-          FAILURE: TaskOnFailure
+          - SUCCESS: TaskOnSuccess
+          - FAILURE: TaskOnFailure
 
     - TaskOnFailure:
         do:
