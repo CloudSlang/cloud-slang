@@ -42,6 +42,9 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
             "def get_sp(key, default_value=None):" + LINE_SEPARATOR +
                     "  property_value = __sys_prop__.get(key)" + LINE_SEPARATOR +
                     "  return default_value if property_value is None else property_value";
+    private static final String CHECK_EMPTY_FUNCTION_DEFINITION =
+            "def check_empty(value_to_check, default_value=None):" + LINE_SEPARATOR +
+                    "  return default_value if value_to_check is None else value_to_check";
 
     @Autowired
     @Qualifier("evalInterpreter")
@@ -92,6 +95,12 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
                     functions += GET_SP_FUNCTION_DEFINITION;
                     functions = appendDelimiterBetweenFunctions(functions);
                     break;
+                case CHECK_EMPTY:
+                    functions += CHECK_EMPTY_FUNCTION_DEFINITION;
+                    functions = appendDelimiterBetweenFunctions(functions);
+                    break;
+                default:
+                    throw new RuntimeException("Error adding function to context: '" + function.getValue() + "' is not valid.");
             }
         }
 

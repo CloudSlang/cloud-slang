@@ -46,6 +46,7 @@ public final class ExpressionUtils {
     // match get() function
     private final static String GET_REGEX = "get\\((.+)\\)";
     private final static String GET_REGEX_WITH_DEFAULT = "get\\((.+?),(.+?)\\)";
+    private final static String CHECK_EMPTY_REGEX = "check_empty\\((.+?),(.+?)\\)";
 
     private final static Pattern EXPRESSION_PATTERN = Pattern.compile(EXPRESSION_REGEX, Pattern.DOTALL);
     private final static Pattern SYSTEM_PROPERTY_PATTERN_SINGLE_QUOTE = Pattern.compile(SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE);
@@ -54,6 +55,7 @@ public final class ExpressionUtils {
     private final static Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_DOUBLE_QUOTE = Pattern.compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE);
     private final static Pattern GET_PATTERN = Pattern.compile(GET_REGEX);
     private final static Pattern GET_PATTERN_WITH_DEFAULT = Pattern.compile(GET_REGEX_WITH_DEFAULT);
+    private final static Pattern CHECK_EMPTY_PATTERN = Pattern.compile(CHECK_EMPTY_REGEX);
 
     public static String extractExpression(Serializable value) {
         String expression = null;
@@ -76,7 +78,16 @@ public final class ExpressionUtils {
     }
 
     public static boolean matchGetFunction(String text) {
-        return GET_PATTERN_WITH_DEFAULT.matcher(text).find() || GET_PATTERN.matcher(text).find();
+        return matchPattern(GET_PATTERN_WITH_DEFAULT, text) || matchPattern(GET_PATTERN, text);
+    }
+
+    public static boolean matchCheckEmptyFunction(String text) {
+        return matchPattern(CHECK_EMPTY_PATTERN, text);
+    }
+
+    private static boolean matchPattern(Pattern pattern, String text) {
+        Matcher matcher = pattern.matcher(text);
+        return matcher.find();
     }
 
     private static Set<String> matchFunction(Pattern functionPattern, String text, int parameterGroup) {
