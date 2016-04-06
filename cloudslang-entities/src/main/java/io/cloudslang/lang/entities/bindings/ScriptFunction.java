@@ -14,7 +14,19 @@ package io.cloudslang.lang.entities.bindings;
  * @since 1/18/2016
  */
 public enum ScriptFunction {
-    GET,
-    GET_SYSTEM_PROPERTY,
-    GET_SENSITIVE_DATA
+    GET("get"),
+    GET_SYSTEM_PROPERTY("get_system_property"),
+    GET_SENSITIVE_DATA("get_sensitive_data"),
+    CHECK_EMPTY("check_empty");
+
+    private final String value;
+
+    ScriptFunction(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
 }

@@ -57,6 +57,7 @@ flow:
         default: ${get('i_dont_exist')}
         overridable: false
         required: false
+    - input_17: ${check_empty(get('i_dont_exist'), 'default_str')}
   workflow:
     - Task1:
         do:
@@ -77,6 +78,7 @@ flow:
             - input_14: ${get_sp("a.b.c.host")}
             - input_15: ${get_sp("a.b.c.host", 'default_str')}
             - input_16: ${get('i_dont_exist')}
+            - input_17: ${check_empty(get('i_dont_exist'), 'default_str')}
         publish:
           - output1_safe
           - output2_safe
@@ -95,6 +97,7 @@ flow:
           - output_12
           - output_13
           - output_14
+          - output_15
           - value_propagate: ${ value_propagate + get_sp('propagate.task.publish') }
         navigate:
           FUNCTIONS_KEY_EXISTS: FUNCTIONS_KEY_EXISTS
