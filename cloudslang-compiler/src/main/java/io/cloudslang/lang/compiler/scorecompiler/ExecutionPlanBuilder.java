@@ -135,7 +135,10 @@ public class ExecutionPlanBuilder {
             }
             long nextStepId = taskReferences.get(nextStepName);
             String presetResult = (FLOW_END_STEP_ID == nextStepId) ? nextStepName : null;
-            navigationValues.put(entry.getKey(), new ResultNavigation(nextStepId, presetResult));
+            String navigationKey = entry.getKey();
+            if (!navigationValues.containsKey(navigationKey)) {
+                navigationValues.put(navigationKey, new ResultNavigation(nextStepId, presetResult));
+            }
         }
         if (isAsync) {
             taskExecutionSteps.add(
