@@ -63,6 +63,8 @@ public class ExecutableBuilder {
 
     public static final String MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX = "Multiple 'on_failure' properties found";
     public static final String UNIQUE_TASK_NAME_MESSAGE_SUFFIX = "Each task name in the workflow must be unique";
+    public static final String FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE =
+            "Explicit values are not allowed for flow results. Correct format is:";
 
     @Autowired
     private List<Transformer> transformers;
@@ -191,6 +193,9 @@ public class ExecutableBuilder {
                 WorkflowModellingResult workflowModellingResult = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false, namespace, execName);
                 errors.addAll(workflowModellingResult.getErrors());
                 Workflow workflow = workflowModellingResult.getWorkflow();
+
+                errors.addAll(validateFlowResultsHaveNoExpression(results, execName));
+
                 executableDependencies = fetchDirectTasksDependencies(workflow);
                 systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForFlow(inputs, outputs, results, workflow.getTasks());
                 Flow flow = new Flow(
@@ -425,6 +430,22 @@ public class ExecutableBuilder {
             taskNames.add(task.getName());
         }
         return taskNames;
+    }
+
+    private List<RuntimeException> validateFlowResultsHaveNoExpression(List<Result> results, String flowName) {
+        List<RuntimeException> errors = new ArrayList<>();
+        for (Result result : results) {
+            if (result.getValue() != null) {
+                errors.add(
+                    new RuntimeException(
+                            "Flow: '" + flowName + "' syntax is illegal. Error compiling result: '" +
+                                    result.getName() + "'. " + FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE +
+                                    " '- " + result.getName() + "'."
+                    )
+                );
+            }
+        }
+        return errors;
     }
 
 }
