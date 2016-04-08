@@ -134,7 +134,7 @@ public class TaskStepsTest {
         Assert.assertEquals(3,events.size());
         Iterator<ScoreEvent> eventsIterator = events.iterator();
         ScoreEvent taskStartEvent = eventsIterator.next();
-        Assert.assertEquals(ScoreLangConstants.EVENT_TASK_START, taskStartEvent.getEventType());
+        Assert.assertEquals(ScoreLangConstants.EVENT_STEP_START, taskStartEvent.getEventType());
         ScoreEvent inputStartEvent = eventsIterator.next();
         Assert.assertEquals(ScoreLangConstants.EVENT_ARGUMENT_START, inputStartEvent.getEventType());
         ScoreEvent inputEndEvent = eventsIterator.next();

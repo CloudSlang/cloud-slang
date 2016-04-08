@@ -80,7 +80,7 @@ public class SyncTriggerEventListener implements ScoreEventListener{
             case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
                 errorMessage.set(SLANG_STEP_ERROR_MSG + data.get(LanguageEventData.EXCEPTION));
                 break;
-            case ScoreLangConstants.EVENT_TASK_START:
+            case ScoreLangConstants.EVENT_STEP_START:
                 LanguageEventData eventData = (LanguageEventData) data;
                 if(eventData.getStepType() == LanguageEventData.StepType.TASK){
                     String taskName = eventData.getStepName();
