@@ -129,7 +129,7 @@ public class CompileFlowWithOnFailureTest {
 
     private Map<String, ResultNavigation> getNavigationMap(ExecutionStep firstStep) {
         @SuppressWarnings("unchecked") Map<String, ResultNavigation> stringResultNavigationMap =
-                (Map<String, ResultNavigation>) firstStep.getActionData().get(ScoreLangConstants.TASK_NAVIGATION_KEY);
+                (Map<String, ResultNavigation>) firstStep.getActionData().get(ScoreLangConstants.STEP_NAVIGATION_KEY);
         return stringResultNavigationMap;
     }
 

@@ -57,7 +57,7 @@ public class StepExecutionData extends AbstractExecutionData {
     private static final Logger logger = Logger.getLogger(StepExecutionData.class);
 
     @SuppressWarnings("unused")
-    public void beginTask(@Param(ScoreLangConstants.TASK_ARGUMENTS_KEY) List<Argument> taskArguments,
+    public void beginStep(@Param(ScoreLangConstants.STEP_INPUTS_KEY) List<Argument> taskArguments,
                           @Param(ScoreLangConstants.LOOP_KEY) LoopStatement loop,
                           @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
@@ -141,9 +141,9 @@ public class StepExecutionData extends AbstractExecutionData {
     }
 
     @SuppressWarnings("unused")
-    public void endTask(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
-                        @Param(ScoreLangConstants.TASK_PUBLISH_KEY) List<Output> taskPublishValues,
-                        @Param(ScoreLangConstants.TASK_NAVIGATION_KEY) Map<String, ResultNavigation> taskNavigationValues,
+    public void endStep(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
+                        @Param(ScoreLangConstants.STEP_PUBLISH_KEY) List<Output> taskPublishValues,
+                        @Param(ScoreLangConstants.STEP_NAVIGATION_KEY) Map<String, ResultNavigation> taskNavigationValues,
                         @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                         @Param(ScoreLangConstants.PREVIOUS_STEP_ID_KEY) Long previousStepId,
                         @Param(ScoreLangConstants.BREAK_LOOP_KEY) List<String> breakOn,
@@ -156,8 +156,8 @@ public class StepExecutionData extends AbstractExecutionData {
             ReturnValues executableReturnValues = runEnv.removeReturnValues();
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
                     LanguageEventData.StepType.STEP, nodeName,
-                    Pair.of(ScoreLangConstants.TASK_PUBLISH_KEY, (Serializable) taskPublishValues),
-                    Pair.of(ScoreLangConstants.TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues),
+                    Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable) taskPublishValues),
+                    Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) taskNavigationValues),
                     Pair.of("operationReturnValues", executableReturnValues));
 
             Map<String, Serializable> argumentsResultContext = removeTaskArgumentsResultContext(flowContext);

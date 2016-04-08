@@ -205,8 +205,8 @@ public class ExecutionStepFactoryTest {
                 "joinStep");
 
         @SuppressWarnings("unchecked") Map<String, Serializable> actionData = (Map<String, Serializable>) executionStep.getActionData();
-        Assert.assertTrue(actionData.containsKey(ScoreLangConstants.TASK_AGGREGATE_KEY));
-        Assert.assertTrue(actionData.containsKey(ScoreLangConstants.TASK_NAVIGATION_KEY));
+        Assert.assertTrue(actionData.containsKey(ScoreLangConstants.STEP_AGGREGATE_KEY));
+        Assert.assertTrue(actionData.containsKey(ScoreLangConstants.STEP_NAVIGATION_KEY));
         Assert.assertTrue(actionData.containsKey(ScoreLangConstants.NODE_NAME_KEY));
     }
 

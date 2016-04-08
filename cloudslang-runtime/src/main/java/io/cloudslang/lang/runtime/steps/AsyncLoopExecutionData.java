@@ -123,8 +123,8 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
 
     public void joinBranches(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                              @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
-                             @Param(ScoreLangConstants.TASK_AGGREGATE_KEY) List<Output> taskAggregateValues,
-                             @Param(ScoreLangConstants.TASK_NAVIGATION_KEY) Map<String, ResultNavigation> taskNavigationValues,
+                             @Param(ScoreLangConstants.STEP_AGGREGATE_KEY) List<Output> taskAggregateValues,
+                             @Param(ScoreLangConstants.STEP_NAVIGATION_KEY) Map<String, ResultNavigation> taskNavigationValues,
                              @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName) {
         try {
             runEnv.getExecutionPath().up();
@@ -216,8 +216,8 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
                 runEnv,
                 ScoreLangConstants.EVENT_JOIN_BRANCHES_START,
                 "Async loop output binding started", LanguageEventData.StepType.STEP, nodeName,
-                Pair.of(ScoreLangConstants.TASK_AGGREGATE_KEY, (Serializable) taskAggregateValues),
-                Pair.of(ScoreLangConstants.TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues));
+                Pair.of(ScoreLangConstants.STEP_AGGREGATE_KEY, (Serializable) taskAggregateValues),
+                Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) taskNavigationValues));
 
         return outputsBinding.bindOutputs(
                 Collections.<String, Serializable>emptyMap(),

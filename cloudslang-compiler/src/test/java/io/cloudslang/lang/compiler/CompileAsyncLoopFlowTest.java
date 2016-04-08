@@ -269,7 +269,7 @@ public class CompileAsyncLoopFlowTest {
 
     private void verifyPublishValues(Map<String, ?> branchEndTaskActionData) {
         @SuppressWarnings("unchecked") List<Output> actualPublishOutputs =
-                (List<Output>) branchEndTaskActionData.get(ScoreLangConstants.TASK_PUBLISH_KEY);
+                (List<Output>) branchEndTaskActionData.get(ScoreLangConstants.STEP_PUBLISH_KEY);
         List<Output> expectedPublishOutputs = new ArrayList<>();
         expectedPublishOutputs.add(new Output("name", "${name}"));
         expectedPublishOutputs.add(new Output("number", "${ int_output }"));
@@ -277,9 +277,9 @@ public class CompileAsyncLoopFlowTest {
     }
 
     private void verifyNavigationValues(Map<String, ?> joinBranchesActionData) {
-        assertTrue(joinBranchesActionData.containsKey(ScoreLangConstants.TASK_NAVIGATION_KEY));
+        assertTrue(joinBranchesActionData.containsKey(ScoreLangConstants.STEP_NAVIGATION_KEY));
         @SuppressWarnings("unchecked") Map<String, ResultNavigation> actualNavigateValues =
-                (Map<String, ResultNavigation>) joinBranchesActionData.get(ScoreLangConstants.TASK_NAVIGATION_KEY);
+                (Map<String, ResultNavigation>) joinBranchesActionData.get(ScoreLangConstants.STEP_NAVIGATION_KEY);
         Map<String, ResultNavigation> expectedNavigationValues = new HashMap<>();
         expectedNavigationValues.put("SUCCESS", new ResultNavigation(6L, null));
         expectedNavigationValues.put("FAILURE", new ResultNavigation(0L, "FAILURE"));
@@ -287,9 +287,9 @@ public class CompileAsyncLoopFlowTest {
     }
 
     private void verifyAggregateValues(Map<String, ?> joinBranchesActionData) {
-        assertTrue(joinBranchesActionData.containsKey(ScoreLangConstants.TASK_AGGREGATE_KEY));
+        assertTrue(joinBranchesActionData.containsKey(ScoreLangConstants.STEP_AGGREGATE_KEY));
         @SuppressWarnings("unchecked") List<Output> actualAggregateOutputs =
-                (List<Output>) joinBranchesActionData.get(ScoreLangConstants.TASK_AGGREGATE_KEY);
+                (List<Output>) joinBranchesActionData.get(ScoreLangConstants.STEP_AGGREGATE_KEY);
         List<Output> expectedAggregateOutputs = new ArrayList<>();
         expectedAggregateOutputs.add(new Output("name_list", "${ map(lambda x:str(x['name']), branches_context) }"));
         expectedAggregateOutputs.add(new Output("number_from_last_branch", "${ branches_context[-1]['number'] }"));

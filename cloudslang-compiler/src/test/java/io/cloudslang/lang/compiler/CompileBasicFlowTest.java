@@ -79,7 +79,7 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("there is a different number of inputs than expected", 1, inputs.size());
 
         ExecutionStep beginTaskStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") List<Argument> taskArguments = (List<Argument>) beginTaskStep.getActionData().get(ScoreLangConstants.TASK_ARGUMENTS_KEY);
+        @SuppressWarnings("unchecked") List<Argument> taskArguments = (List<Argument>) beginTaskStep.getActionData().get(ScoreLangConstants.STEP_INPUTS_KEY);
         Assert.assertNotNull("arguments doesn't exist", taskArguments);
         Assert.assertEquals("there is a different number of arguments than expected", 2, taskArguments.size());
         Assert.assertEquals("city", taskArguments.get(0).getName());
@@ -87,9 +87,9 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("CheckWeather", beginTaskStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
 
         ExecutionStep FinishTaskSteps = executionPlan.getStep(3L);
-        @SuppressWarnings("unchecked") List<Output> publish = (List<Output>) FinishTaskSteps.getActionData().get(ScoreLangConstants.TASK_PUBLISH_KEY);
+        @SuppressWarnings("unchecked") List<Output> publish = (List<Output>) FinishTaskSteps.getActionData().get(ScoreLangConstants.STEP_PUBLISH_KEY);
         @SuppressWarnings("unchecked") Map<String, ResultNavigation> navigate =
-                (Map<String, ResultNavigation>) FinishTaskSteps.getActionData().get(ScoreLangConstants.TASK_NAVIGATION_KEY);
+                (Map<String, ResultNavigation>) FinishTaskSteps.getActionData().get(ScoreLangConstants.STEP_NAVIGATION_KEY);
         Assert.assertEquals("CheckWeather", FinishTaskSteps.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
 
         Assert.assertNotNull("publish don't exist", publish);
@@ -144,7 +144,7 @@ public class CompileBasicFlowTest {
 
         ExecutionStep finishTaskStep = executionPlan.getStep(3L);
         @SuppressWarnings("unchecked") Map<String, ResultNavigation> actualNavigationValues =
-                (Map<String, ResultNavigation>) finishTaskStep.getActionData().get(ScoreLangConstants.TASK_NAVIGATION_KEY);
+                (Map<String, ResultNavigation>) finishTaskStep.getActionData().get(ScoreLangConstants.STEP_NAVIGATION_KEY);
         Map<String, ResultNavigation> expectedNavigationValues = new HashMap<>();
         expectedNavigationValues.put("SUCCESS", new ResultNavigation(0, "RESULT1")); // first in list is taken
         expectedNavigationValues.put("FAILURE", new ResultNavigation(0, "RESULT2"));

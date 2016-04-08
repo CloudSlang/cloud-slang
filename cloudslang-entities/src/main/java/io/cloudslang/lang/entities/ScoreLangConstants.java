@@ -47,9 +47,9 @@ public interface ScoreLangConstants {
     String EXECUTABLE_RESULTS_KEY = "executableResults";
 
     //task scope
-    String TASK_ARGUMENTS_KEY = "taskArguments";
-    String TASK_PUBLISH_KEY = "taskPublishValues";
-    String TASK_NAVIGATION_KEY = "taskNavigationValues";
+    String STEP_INPUTS_KEY = "taskArguments";
+    String STEP_PUBLISH_KEY = "taskPublishValues";
+    String STEP_NAVIGATION_KEY = "taskNavigationValues";
     String REF_ID = "refId";
     String LOOP_KEY = "loop";
     String BREAK_LOOP_KEY = "breakOn";
@@ -58,7 +58,7 @@ public interface ScoreLangConstants {
     // async loop
     String ASYNC_LOOP_KEY = "async_loop";
     String ASYNC_LOOP_STATEMENT_KEY = "asyncLoopStatement";
-    String TASK_AGGREGATE_KEY = "taskAggregateValues";
+    String STEP_AGGREGATE_KEY = "taskAggregateValues";
     String BRANCH_BEGIN_STEP_ID_KEY = "branchBeginStep";
 
     // Events types
