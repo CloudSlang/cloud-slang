@@ -38,6 +38,10 @@ public abstract class InOutTransformer {
             if (getFunctionFound) {
                 functionDependencies.add(ScriptFunction.GET);
             }
+            boolean checkEmptyFunctionFound = ExpressionUtils.matchCheckEmptyFunction(expression);
+            if (checkEmptyFunctionFound) {
+                functionDependencies.add(ScriptFunction.CHECK_EMPTY);
+            }
         }
         return new Accumulator(functionDependencies, systemPropertyDependencies);
     }
