@@ -331,8 +331,8 @@ public class CompileAsyncLoopFlowTest {
     }
 
     private void verifyAsyncLoopStatement(Step step) {
-        assertTrue(step.getPreTaskActionData().containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
-        AsyncLoopStatement asyncLoopStatement = (AsyncLoopStatement) step.getPreTaskActionData()
+        assertTrue(step.getPreStepActionData().containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
+        AsyncLoopStatement asyncLoopStatement = (AsyncLoopStatement) step.getPreStepActionData()
                 .get(ScoreLangConstants.ASYNC_LOOP_KEY);
         assertEquals("values", asyncLoopStatement.getExpression());
         assertEquals("value", asyncLoopStatement.getVarName());

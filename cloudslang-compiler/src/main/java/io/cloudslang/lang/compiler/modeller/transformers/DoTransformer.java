@@ -78,6 +78,6 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
                     accumulator.getSystemPropertyDependencies()
             );
         }
-        throw new RuntimeException("Could not transform task argument: " + rawArgument);
+        throw new RuntimeException("Could not transform step argument: " + rawArgument);
     }
 }

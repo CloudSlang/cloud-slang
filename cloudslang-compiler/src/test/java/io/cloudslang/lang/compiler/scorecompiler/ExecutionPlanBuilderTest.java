@@ -135,14 +135,14 @@ public class ExecutionPlanBuilderTest {
     }
 
     private void mockBeginTask(Long stepId, Step step) {
-        Map<String, Serializable> preTaskActionData = step.getPreTaskActionData();
+        Map<String, Serializable> preTaskActionData = step.getPreStepActionData();
         String refId = step.getRefId();
         String name = step.getName();
         when(stepFactory.createBeginTaskStep(eq(stepId), anyListOf(Argument.class), eq(preTaskActionData), eq(refId), eq(name))).thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockAddBranchesStep(Long stepId, Long nextStepID, Long branchBeginStepID, Step step, Flow flow) {
-        Map<String, Serializable> preTaskActionData = step.getPreTaskActionData();
+        Map<String, Serializable> preTaskActionData = step.getPreStepActionData();
         String refId = flow.getId();
         String name = step.getName();
         when(stepFactory.createAddBranchesStep(eq(stepId), eq(nextStepID), eq(branchBeginStepID), eq(preTaskActionData), eq(refId), eq(name))).thenReturn(new ExecutionStep(stepId));
@@ -239,10 +239,10 @@ public class ExecutionPlanBuilderTest {
                 eq(2L),
                 eq(5L),
                 eq(3L),
-                eq(step.getPreTaskActionData()),
+                eq(step.getPreStepActionData()),
                 eq(compiledFlow.getId()),
                 eq(step.getName()));
-        verify(stepFactory).createBeginTaskStep(eq(3L), anyListOf(Argument.class), eq(step.getPreTaskActionData()), eq(step.getRefId()), eq(step.getName()));
+        verify(stepFactory).createBeginTaskStep(eq(3L), anyListOf(Argument.class), eq(step.getPreStepActionData()), eq(step.getRefId()), eq(step.getName()));
         verify(stepFactory).createFinishTaskStep(eq(4L), eq(step.getPostStepActionData()), anyMapOf(String.class, ResultNavigation.class), eq(step.getName()), eq(step.isAsync()));
         verify(stepFactory).createJoinBranchesStep(eq(5L), eq(step.getPostStepActionData()), anyMapOf(String.class, ResultNavigation.class), eq(step.getName()));
 

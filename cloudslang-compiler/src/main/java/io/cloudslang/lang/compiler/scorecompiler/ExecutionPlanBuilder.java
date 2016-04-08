@@ -112,13 +112,13 @@ public class ExecutionPlanBuilder {
             Long joinStepID = currentId + NUMBER_OF_ASYNC_LOOP_EXECUTION_STEPS + 1;
             taskExecutionSteps.add(
                     stepFactory.createAddBranchesStep(currentId++, joinStepID, currentId,
-                            step.getPreTaskActionData(), compiledFlow.getId(), taskName
+                            step.getPreStepActionData(), compiledFlow.getId(), taskName
                     )
             );
         }
         taskExecutionSteps.add(
                 stepFactory.createBeginTaskStep(currentId++, step.getArguments(),
-                        step.getPreTaskActionData(), step.getRefId(), taskName)
+                        step.getPreStepActionData(), step.getRefId(), taskName)
         );
 
         //End Step

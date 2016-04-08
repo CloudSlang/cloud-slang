@@ -20,8 +20,8 @@ import java.util.Map;
 public class Step {
 
     private final String name;
-    private final Map<String, Serializable> preTaskActionData;
-    private final Map<String, Serializable> postTaskActionData;
+    private final Map<String, Serializable> preStepActionData;
+    private final Map<String, Serializable> postStepActionData;
     private final List<Argument> arguments;
     private final List<Map<String, String>> navigationStrings;
     private final String refId;
@@ -29,15 +29,15 @@ public class Step {
 
     public Step(
             String name,
-            Map<String, Serializable> preTaskActionData,
-            Map<String, Serializable> postTaskActionData,
+            Map<String, Serializable> preStepActionData,
+            Map<String, Serializable> postStepActionData,
             List<Argument> arguments,
             List<Map<String, String>> navigationStrings,
             String refId,
             boolean async) {
         this.name = name;
-        this.preTaskActionData = preTaskActionData;
-        this.postTaskActionData = postTaskActionData;
+        this.preStepActionData = preStepActionData;
+        this.postStepActionData = postStepActionData;
         this.arguments = arguments;
         this.navigationStrings = navigationStrings;
         this.refId = refId;
@@ -48,12 +48,12 @@ public class Step {
         return name;
     }
 
-    public Map<String, Serializable> getPreTaskActionData() {
-        return preTaskActionData;
+    public Map<String, Serializable> getPreStepActionData() {
+        return preStepActionData;
     }
 
     public Map<String, Serializable> getPostStepActionData() {
-        return postTaskActionData;
+        return postStepActionData;
     }
 
     public List<Argument> getArguments() {

@@ -59,8 +59,8 @@ public class CompileForLoopsFlowTest {
         Step step = ((Flow) executable).getWorkflow()
                                         .getSteps()
                                         .getFirst();
-        assertTrue(step.getPreTaskActionData().containsKey(SlangTextualKeys.FOR_KEY));
-        LoopStatement forStatement = (LoopStatement) step.getPreTaskActionData()
+        assertTrue(step.getPreStepActionData().containsKey(SlangTextualKeys.FOR_KEY));
+        LoopStatement forStatement = (LoopStatement) step.getPreStepActionData()
                                 .get(SlangTextualKeys.FOR_KEY);
         ListForLoopStatement listForLoopStatement  = validateListForLoopStatement(forStatement);
         assertEquals("values", listForLoopStatement.getExpression());
@@ -93,8 +93,8 @@ public class CompileForLoopsFlowTest {
         Step step = ((Flow) executable).getWorkflow()
                                        .getSteps()
                                        .getFirst();
-        assertTrue(step.getPreTaskActionData().containsKey(SlangTextualKeys.FOR_KEY));
-        LoopStatement forStatement = (LoopStatement) step.getPreTaskActionData()
+        assertTrue(step.getPreStepActionData().containsKey(SlangTextualKeys.FOR_KEY));
+        LoopStatement forStatement = (LoopStatement) step.getPreStepActionData()
                                                          .get(SlangTextualKeys.FOR_KEY);
         ListForLoopStatement listForLoopStatement  = validateListForLoopStatement(forStatement);
         assertEquals("values", listForLoopStatement.getExpression());
@@ -152,8 +152,8 @@ public class CompileForLoopsFlowTest {
         Step step = ((Flow) executable).getWorkflow()
                 .getSteps()
                 .getFirst();
-        assertTrue(step.getPreTaskActionData().containsKey(SlangTextualKeys.FOR_KEY));
-        LoopStatement forStatement = (LoopStatement) step.getPreTaskActionData()
+        assertTrue(step.getPreStepActionData().containsKey(SlangTextualKeys.FOR_KEY));
+        LoopStatement forStatement = (LoopStatement) step.getPreStepActionData()
                 .get(SlangTextualKeys.FOR_KEY);
         MapForLoopStatement mapForLoopStatement  = validateMapForLoopStatement(forStatement);
         assertEquals("person_map", mapForLoopStatement.getExpression());
@@ -186,8 +186,8 @@ public class CompileForLoopsFlowTest {
         Step step = ((Flow) executable).getWorkflow()
                 .getSteps()
                 .getFirst();
-        assertTrue(step.getPreTaskActionData().containsKey(SlangTextualKeys.FOR_KEY));
-        LoopStatement forStatement = (LoopStatement) step.getPreTaskActionData()
+        assertTrue(step.getPreStepActionData().containsKey(SlangTextualKeys.FOR_KEY));
+        LoopStatement forStatement = (LoopStatement) step.getPreStepActionData()
                 .get(SlangTextualKeys.FOR_KEY);
         MapForLoopStatement mapForLoopStatement  = validateMapForLoopStatement(forStatement);
         assertEquals("person_map", mapForLoopStatement.getExpression());
