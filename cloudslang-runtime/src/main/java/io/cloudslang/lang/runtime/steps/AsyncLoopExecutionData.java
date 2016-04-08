@@ -48,7 +48,7 @@ import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUT
  * @author Bonczidai Levente
  */
 @Component
-public class AsyncLoopSteps extends AbstractSteps {
+public class AsyncLoopExecutionData extends AbstractExecutionData {
 
     public static final String BRANCH_EXCEPTION_PREFIX = "Error running branch";
 
@@ -58,7 +58,7 @@ public class AsyncLoopSteps extends AbstractSteps {
     @Autowired
     private OutputsBinding outputsBinding;
 
-    private static final Logger logger = Logger.getLogger(AsyncLoopSteps.class);
+    private static final Logger logger = Logger.getLogger(AsyncLoopExecutionData.class);
 
     public void addBranches(@Param(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY) AsyncLoopStatement asyncLoopStatement,
                             @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,

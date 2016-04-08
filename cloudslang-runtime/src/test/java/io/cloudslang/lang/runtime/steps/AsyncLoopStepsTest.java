@@ -60,7 +60,7 @@ public class AsyncLoopStepsTest {
     public static final String BRANCH_EXCEPTION_MESSAGE = "Exception details placeholder";
 
     @Autowired
-    private AsyncLoopSteps asyncLoopSteps;
+    private AsyncLoopExecutionData asyncLoopSteps;
 
     @Autowired
     private AsyncLoopBinding asyncLoopBinding;
@@ -510,8 +510,8 @@ public class AsyncLoopStepsTest {
         }
 
         @Bean
-        public AsyncLoopSteps asyncLoopSteps() {
-            return new AsyncLoopSteps();
+        public AsyncLoopExecutionData asyncLoopSteps() {
+            return new AsyncLoopExecutionData();
         }
 
         @Bean

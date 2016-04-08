@@ -47,11 +47,11 @@ import static org.mockito.Mockito.anyListOf;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = TaskStepsTest.Config.class)
-public class TaskStepsTest {
+@ContextConfiguration(classes = StepExecutionDataTest.Config.class)
+public class StepExecutionDataTest {
 
     @Autowired
-    private TaskSteps taskSteps;
+    private StepExecutionData stepExecutionData;
 
     @Autowired
     private ArgumentsBinding argumentsBinding;
@@ -83,7 +83,7 @@ public class TaskStepsTest {
     @Test
     public void testBeginTaskEmptyInputs() throws Exception {
         RunEnvironment runEnv = createRunEnvironment();
-        taskSteps.beginTask(new ArrayList<Argument>(), null, runEnv, createRuntimeServices(),"task1", 1L, 2L, "2");
+        stepExecutionData.beginTask(new ArrayList<Argument>(), null, runEnv, createRuntimeServices(),"task1", 1L, 2L, "2");
         Map<String,Serializable> callArgs = runEnv.removeCallArguments();
         Assert.assertTrue(callArgs.isEmpty());
     }
@@ -101,7 +101,7 @@ public class TaskStepsTest {
         HashMap<String, Long> beginStepsIds = new HashMap<>();
         beginStepsIds.put(refExecutionPlanId, subflowBeginStepId);
         ExecutionRuntimeServices runtimeServices = createRuntimeServicesWithSubflows(runningPlansIds, beginStepsIds);
-        taskSteps.beginTask(new ArrayList<Argument>(), null, runEnv, runtimeServices, "task1", runningExecutionPlanId, nextStepId, refExecutionPlanId);
+        stepExecutionData.beginTask(new ArrayList<Argument>(), null, runEnv, runtimeServices, "task1", runningExecutionPlanId, nextStepId, refExecutionPlanId);
 
         ParentFlowData parentFlowData = runEnv.getParentFlowStack().popParentFlowData();
         Assert.assertEquals(runningExecutionPlanId, parentFlowData.getRunningExecutionPlanId());
@@ -124,7 +124,7 @@ public class TaskStepsTest {
         )).thenReturn(resultMap);
 
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
-        taskSteps.beginTask(arguments, null, runEnv, runtimeServices, "task1", 1L, 2L, "2");
+        stepExecutionData.beginTask(arguments, null, runEnv, runtimeServices, "task1", 1L, 2L, "2");
         Map<String,Serializable> callArgs = runEnv.removeCallArguments();
         Assert.assertFalse(callArgs.isEmpty());
         Assert.assertEquals(5, callArgs.get("input1"));
@@ -190,7 +190,7 @@ public class TaskStepsTest {
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
         HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
         taskNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, new ResultNavigation(0, ScoreLangConstants.SUCCESS_RESULT));
-        taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
+        stepExecutionData.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
                 runtimeServices, 1L, new ArrayList<String>(), "task1", false);
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
@@ -231,7 +231,7 @@ public class TaskStepsTest {
                 .thenReturn(boundPublish);
         HashMap<String, ResultNavigation> taskNavigationValues = new HashMap<>();
         taskNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, new ResultNavigation(0, ScoreLangConstants.SUCCESS_RESULT));
-        taskSteps.endTask(runEnv, possiblePublishValues, taskNavigationValues,
+        stepExecutionData.endTask(runEnv, possiblePublishValues, taskNavigationValues,
                 createRuntimeServices(), 1L, new ArrayList<String>(), "task1", false);
 
         Map<String,Serializable> flowVars = runEnv.getStack().popContext().getImmutableViewOfVariables();
@@ -254,7 +254,7 @@ public class TaskStepsTest {
         taskNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
         ResultNavigation failureNavigation = new ResultNavigation(1, null);
         taskNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
-        taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
+        stepExecutionData.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
                 createRuntimeServices(), 1L, new ArrayList<String>(),"task1", false);
 
         Assert.assertEquals(runEnv.removeNextStepPosition(), nextStepPosition);
@@ -279,7 +279,7 @@ public class TaskStepsTest {
         exception.expectMessage("Task1");
         exception.expectMessage("CUSTOM");
         exception.expectMessage("navigation");
-        taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
+        stepExecutionData.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
                 createRuntimeServices(), 1L, new ArrayList<String>(), "Task1", false);
     }
 
@@ -297,7 +297,7 @@ public class TaskStepsTest {
         taskNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
         ResultNavigation failureNavigation = new ResultNavigation(1, "CUSTOM2");
         taskNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
-        taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
+        stepExecutionData.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
                 createRuntimeServices(), 1L, new ArrayList<String>(),"task1", true);
 
         Assert.assertEquals(
@@ -326,7 +326,7 @@ public class TaskStepsTest {
         when(loopsBinding.getOrCreateLoopCondition(statement, context, runEnv.getSystemProperties(), nodeName))
                 .thenReturn(new ForLoopCondition(Arrays.asList("1", "2")));
         runEnv.getStack().pushContext(context);
-        taskSteps.beginTask(new ArrayList<Argument>(), statement, runEnv, createRuntimeServices(), nodeName, 1L, 2L, "2");
+        stepExecutionData.beginTask(new ArrayList<Argument>(), statement, runEnv, createRuntimeServices(), nodeName, 1L, 2L, "2");
         verify(loopsBinding).getOrCreateLoopCondition(statement, context, runEnv.getSystemProperties(), nodeName);
     }
 
@@ -344,7 +344,7 @@ public class TaskStepsTest {
         runEnv.getStack().pushContext(context);
         Long nextStepId = 2L;
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
-        taskSteps.beginTask(new ArrayList<Argument>(), statement, runEnv, runtimeServices, nodeName, 1L, nextStepId, "2");
+        stepExecutionData.beginTask(new ArrayList<Argument>(), statement, runEnv, runtimeServices, nodeName, 1L, nextStepId, "2");
         Assert.assertEquals(nextStepId, runEnv.removeNextStepPosition());
         Assert.assertEquals(context, runEnv.getStack().popContext());
         Assert.assertNull(runtimeServices.pullRequestForChangingExecutionPlan());
@@ -366,7 +366,7 @@ public class TaskStepsTest {
         ExecutionRuntimeServices runtimeServices = mock(ExecutionRuntimeServices.class);
         Long subflowFirstStepId = 11L;
         when(runtimeServices.getSubFlowBeginStep(anyString())).thenReturn(subflowFirstStepId);
-        taskSteps.beginTask(new ArrayList<Argument>(), statement, runEnv, runtimeServices, nodeName, 1L, nextStepId, "2");
+        stepExecutionData.beginTask(new ArrayList<Argument>(), statement, runEnv, runtimeServices, nodeName, 1L, nextStepId, "2");
         Assert.assertEquals(subflowFirstStepId, runEnv.removeNextStepPosition());
         Assert.assertEquals(context, runEnv.getStack().popContext());
         Assert.assertNotNull(runtimeServices.pullRequestForChangingExecutionPlan());
@@ -384,7 +384,7 @@ public class TaskStepsTest {
         when(loopsBinding.getOrCreateLoopCondition(statement, context, runEnv.getSystemProperties(), nodeName))
                 .thenReturn(mockLoopCondition);
         runEnv.getStack().pushContext(context);
-        taskSteps.beginTask(new ArrayList<Argument>(), statement, runEnv, createRuntimeServices(), nodeName, 1L, 2L, "2");
+        stepExecutionData.beginTask(new ArrayList<Argument>(), statement, runEnv, createRuntimeServices(), nodeName, 1L, 2L, "2");
         verify(loopsBinding).incrementListForLoop("x", context, mockLoopCondition);
     }
 
@@ -401,7 +401,7 @@ public class TaskStepsTest {
         when(mockLoopCondition.hasMore()).thenReturn(true);
 
         Long previousStepId = 1L;
-        taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
+        stepExecutionData.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
                 createRuntimeServices(), previousStepId, new ArrayList<String>(),"taskName", false);
 
         Assert.assertEquals(previousStepId, runEnv.removeNextStepPosition());
@@ -422,7 +422,7 @@ public class TaskStepsTest {
         when(mockLoopCondition.hasMore()).thenReturn(true);
 
         Long previousStepId = 1L;
-        taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
+        stepExecutionData.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
                 createRuntimeServices(), previousStepId, Collections.singletonList(ScoreLangConstants.SUCCESS_RESULT),"taskName", false);
 
         Assert.assertEquals(nextStepId, runEnv.removeNextStepPosition());
@@ -441,7 +441,7 @@ public class TaskStepsTest {
         context.putLanguageVariable(LoopCondition.LOOP_CONDITION_KEY, mockLoopCondition);
         when(mockLoopCondition.hasMore()).thenReturn(false);
 
-        taskSteps.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
+        stepExecutionData.endTask(runEnv, new ArrayList<Output>(), taskNavigationValues,
                 createRuntimeServices(), 1L,  new ArrayList<String>(), "taskName", false);
 
         Assert.assertFalse(context.getImmutableViewOfLanguageVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
@@ -488,8 +488,8 @@ public class TaskStepsTest {
         }
 
         @Bean
-        public TaskSteps taskSteps(){
-            return new TaskSteps();
+        public StepExecutionData taskSteps(){
+            return new StepExecutionData();
         }
 
     }

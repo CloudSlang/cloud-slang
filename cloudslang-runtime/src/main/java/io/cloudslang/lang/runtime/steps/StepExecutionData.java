@@ -43,7 +43,7 @@ import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUT
  * Time: 10:23
  */
 @Component
-public class TaskSteps extends AbstractSteps {
+public class StepExecutionData extends AbstractExecutionData {
 
     @Autowired
     private ArgumentsBinding argumentsBinding;
@@ -54,7 +54,7 @@ public class TaskSteps extends AbstractSteps {
     @Autowired
     private LoopsBinding loopsBinding;
     
-    private static final Logger logger = Logger.getLogger(TaskSteps.class);
+    private static final Logger logger = Logger.getLogger(StepExecutionData.class);
 
     @SuppressWarnings("unused")
     public void beginTask(@Param(ScoreLangConstants.TASK_ARGUMENTS_KEY) List<Argument> taskArguments,

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public abstract class AbstractSteps {
+public abstract class AbstractExecutionData {
 
     public void sendStartBindingInputsEvent(List<Input> inputs,
                                           RunEnvironment runEnv,

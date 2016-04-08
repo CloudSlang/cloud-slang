@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
 public class ExecutableStepsTest {
 
     @Autowired
-    private ExecutableSteps executableSteps;
+    private ExecutableExecutionData executableSteps;
 
     @Autowired
     private InputsBinding inputsBinding;
@@ -315,8 +315,8 @@ public class ExecutableStepsTest {
         }
 
         @Bean
-        public ExecutableSteps operationSteps(){
-            return new ExecutableSteps();
+        public ExecutableExecutionData operationSteps(){
+            return new ExecutableExecutionData();
         }
 
     }
