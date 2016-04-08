@@ -7,12 +7,12 @@ import java.util.List;
 /**
  * Created by Ifat Gavish on 24/02/2016
  */
-public class TaskModellingResult implements ModellingResult {
+public class StepModellingResult implements ModellingResult {
 
     private final Step step;
     private final List<RuntimeException> errors;
 
-    public TaskModellingResult(Step step, List<RuntimeException> errors) {
+    public StepModellingResult(Step step, List<RuntimeException> errors) {
         this.step = step;
         this.errors = errors;
     }

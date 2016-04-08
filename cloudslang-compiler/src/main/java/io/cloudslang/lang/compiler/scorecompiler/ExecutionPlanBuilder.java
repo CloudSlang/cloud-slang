@@ -142,16 +142,16 @@ public class ExecutionPlanBuilder {
         }
         if (isAsync) {
             taskExecutionSteps.add(
-                    stepFactory.createFinishTaskStep(currentId++, step.getPostTaskActionData(),
+                    stepFactory.createFinishTaskStep(currentId++, step.getPostStepActionData(),
                             new HashMap<String, ResultNavigation>(), taskName, true)
             );
             taskExecutionSteps.add(
-                    stepFactory.createJoinBranchesStep(currentId, step.getPostTaskActionData(),
+                    stepFactory.createJoinBranchesStep(currentId, step.getPostStepActionData(),
                             navigationValues, taskName)
             );
         } else {
             taskExecutionSteps.add(
-                    stepFactory.createFinishTaskStep(currentId, step.getPostTaskActionData(),
+                    stepFactory.createFinishTaskStep(currentId, step.getPostStepActionData(),
                             navigationValues, taskName, false)
             );
         }

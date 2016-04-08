@@ -100,7 +100,7 @@ public class CompileFlowWithOnFailureTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
 
-        expectedException.expectMessage(ExecutableBuilder.UNIQUE_TASK_NAME_MESSAGE_SUFFIX);
+        expectedException.expectMessage(ExecutableBuilder.UNIQUE_STEP_NAME_MESSAGE_SUFFIX);
         expectedException.expectMessage("task_same_name");
         expectedException.expect(RuntimeException.class);
 
@@ -115,7 +115,7 @@ public class CompileFlowWithOnFailureTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
 
-        expectedException.expectMessage(ExecutableBuilder.UNIQUE_TASK_NAME_MESSAGE_SUFFIX);
+        expectedException.expectMessage(ExecutableBuilder.UNIQUE_STEP_NAME_MESSAGE_SUFFIX);
         expectedException.expectMessage("task_same_name_on_failure");
         expectedException.expect(RuntimeException.class);
 

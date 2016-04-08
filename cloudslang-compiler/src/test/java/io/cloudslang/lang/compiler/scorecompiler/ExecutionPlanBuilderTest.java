@@ -129,7 +129,7 @@ public class ExecutionPlanBuilderTest {
     }
 
     private void mockFinishTask(Long stepId, Step step, boolean isAsync) {
-        Map<String, Serializable> postTaskActionData = step.getPostTaskActionData();
+        Map<String, Serializable> postTaskActionData = step.getPostStepActionData();
         String taskName = step.getName();
         when(stepFactory.createFinishTaskStep(eq(stepId), eq(postTaskActionData), anyMapOf(String.class, ResultNavigation.class), eq(taskName), eq(isAsync))).thenReturn(new ExecutionStep(stepId));
     }
@@ -149,7 +149,7 @@ public class ExecutionPlanBuilderTest {
     }
 
     private void mockJoinBranchesStep(Long stepId, Step step) {
-        Map<String, Serializable> postTaskActionData = step.getPostTaskActionData();
+        Map<String, Serializable> postTaskActionData = step.getPostStepActionData();
         String taskName = step.getName();
         when(stepFactory.createJoinBranchesStep(eq(stepId), eq(postTaskActionData), anyMapOf(String.class, ResultNavigation.class), eq(taskName))).thenReturn(new ExecutionStep(stepId));
     }
@@ -243,8 +243,8 @@ public class ExecutionPlanBuilderTest {
                 eq(compiledFlow.getId()),
                 eq(step.getName()));
         verify(stepFactory).createBeginTaskStep(eq(3L), anyListOf(Argument.class), eq(step.getPreTaskActionData()), eq(step.getRefId()), eq(step.getName()));
-        verify(stepFactory).createFinishTaskStep(eq(4L), eq(step.getPostTaskActionData()), anyMapOf(String.class, ResultNavigation.class), eq(step.getName()), eq(step.isAsync()));
-        verify(stepFactory).createJoinBranchesStep(eq(5L), eq(step.getPostTaskActionData()), anyMapOf(String.class, ResultNavigation.class), eq(step.getName()));
+        verify(stepFactory).createFinishTaskStep(eq(4L), eq(step.getPostStepActionData()), anyMapOf(String.class, ResultNavigation.class), eq(step.getName()), eq(step.isAsync()));
+        verify(stepFactory).createJoinBranchesStep(eq(5L), eq(step.getPostStepActionData()), anyMapOf(String.class, ResultNavigation.class), eq(step.getName()));
 
         assertEquals("different number of execution steps than expected", 6, executionPlan.getSteps().size());
         assertEquals("flow name is different than expected", flowName, executionPlan.getName());

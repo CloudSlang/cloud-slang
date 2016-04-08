@@ -339,15 +339,15 @@ public class CompileAsyncLoopFlowTest {
     }
 
     private List<Output> getAggregateOutputs(Step step) {
-        assertTrue(step.getPostTaskActionData().containsKey(SlangTextualKeys.AGGREGATE_KEY));
-        @SuppressWarnings("unchecked") List<Output> aggregateValues = (List<Output>) step.getPostTaskActionData().get(SlangTextualKeys.AGGREGATE_KEY);
+        assertTrue(step.getPostStepActionData().containsKey(SlangTextualKeys.AGGREGATE_KEY));
+        @SuppressWarnings("unchecked") List<Output> aggregateValues = (List<Output>) step.getPostStepActionData().get(SlangTextualKeys.AGGREGATE_KEY);
         assertNotNull("aggregate list is null", aggregateValues);
         return aggregateValues;
     }
 
     private List<Output> getPublishOutputs(Step step) {
-        assertTrue(step.getPostTaskActionData().containsKey(SlangTextualKeys.PUBLISH_KEY));
-        @SuppressWarnings("unchecked") List<Output> publishValues = (List<Output>) step.getPostTaskActionData().get(SlangTextualKeys.PUBLISH_KEY);
+        assertTrue(step.getPostStepActionData().containsKey(SlangTextualKeys.PUBLISH_KEY));
+        @SuppressWarnings("unchecked") List<Output> publishValues = (List<Output>) step.getPostStepActionData().get(SlangTextualKeys.PUBLISH_KEY);
         assertNotNull("publish list is null", publishValues);
         return publishValues;
     }

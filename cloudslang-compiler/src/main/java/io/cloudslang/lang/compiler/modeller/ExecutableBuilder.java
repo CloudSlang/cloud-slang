@@ -16,7 +16,7 @@ import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.model.Workflow;
 import io.cloudslang.lang.compiler.modeller.result.ActionModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
-import io.cloudslang.lang.compiler.modeller.result.TaskModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.StepModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.WorkflowModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
@@ -62,7 +62,7 @@ import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER
 public class ExecutableBuilder {
 
     public static final String MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX = "Multiple 'on_failure' properties found";
-    public static final String UNIQUE_TASK_NAME_MESSAGE_SUFFIX = "Each step name in the workflow must be unique";
+    public static final String UNIQUE_STEP_NAME_MESSAGE_SUFFIX = "Each step name in the workflow must be unique";
     public static final String FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE =
             "Explicit values are not allowed for flow results. Correct format is:";
 
@@ -82,9 +82,9 @@ public class ExecutableBuilder {
     private List<Transformer> actionTransformers;
     private List<List<String>> actionTransformerConstraintGroups;
 
-    private List<Transformer> preTaskTransformers;
-    private List<Transformer> postTaskTransformers;
-    private List<String> TaskAdditionalKeyWords = Arrays.asList(ScoreLangConstants.LOOP_KEY, SlangTextualKeys.DO_KEY, SlangTextualKeys.NAVIGATION_KEY);
+    private List<Transformer> preStepTransformers;
+    private List<Transformer> postStepTransformers;
+    private List<String> stepAdditionalKeyWords = Arrays.asList(ScoreLangConstants.LOOP_KEY, SlangTextualKeys.DO_KEY, SlangTextualKeys.NAVIGATION_KEY);
 
     @PostConstruct
     public void initScopedTransformersAndKeys() {
@@ -98,8 +98,8 @@ public class ExecutableBuilder {
         actionTransformerConstraintGroups = Collections.singletonList(Arrays.asList(ScoreLangConstants.PYTHON_SCRIPT_KEY, SlangTextualKeys.JAVA_ACTION));
 
         //step transformers
-        preTaskTransformers = filterTransformers(Transformer.Scope.BEFORE_TASK);
-        postTaskTransformers = filterTransformers(Transformer.Scope.AFTER_TASK);
+        preStepTransformers = filterTransformers(Transformer.Scope.BEFORE_STEP);
+        postStepTransformers = filterTransformers(Transformer.Scope.AFTER_STEP);
     }
 
     private List<Transformer> filterTransformers(Transformer.Scope scope) {
@@ -142,7 +142,7 @@ public class ExecutableBuilder {
 
                 errors.addAll(validateFlowResultsHaveNoExpression(results, execName));
 
-                executableDependencies = fetchDirectTasksDependencies(workflow);
+                executableDependencies = fetchDirectStepsDependencies(workflow);
                 systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForFlow(inputs, outputs, results, workflow.getSteps());
                 Flow flow = new Flow(
                         preExecutableActionData,
@@ -240,10 +240,10 @@ public class ExecutableBuilder {
                                           String namespace, String execName) {
         Workflow onFailureWorkFlow = null;
         List<Map<String, Map<String, Object>>> onFailureData;
-        Iterator<Map<String, Map<String, Object>>> tasksIterator = workFlowRawData.iterator();
+        Iterator<Map<String, Map<String, Object>>> stepsIterator = workFlowRawData.iterator();
         boolean onFailureFound = false;
-        while(tasksIterator.hasNext()){
-            Map<String, Map<String, Object>> taskData = tasksIterator.next();
+        while(stepsIterator.hasNext()){
+            Map<String, Map<String, Object>> taskData = stepsIterator.next();
             String taskName = taskData.keySet().iterator().next();
             if(taskName.equals(SlangTextualKeys.ON_FAILURE_KEY)){
                 if (onFailureFound) {
@@ -263,7 +263,7 @@ public class ExecutableBuilder {
                     errors.addAll(workflowModellingResult.getErrors());
                     onFailureWorkFlow = workflowModellingResult.getWorkflow();
                 }
-                tasksIterator.remove();
+                stepsIterator.remove();
             }
         }
         return onFailureWorkFlow;
@@ -306,7 +306,7 @@ public class ExecutableBuilder {
             Map<String, Map<String, Object>> nextTaskData = iterator.peek();
             String taskName = taskRawData.keySet().iterator().next();
             if (taskNames.contains(taskName) || onFailureTaskNames.contains(taskName)) {
-                errors.add(new RuntimeException("Step name: \'" + taskName + "\' appears more than once in the workflow. " + UNIQUE_TASK_NAME_MESSAGE_SUFFIX));
+                errors.add(new RuntimeException("Step name: \'" + taskName + "\' appears more than once in the workflow. " + UNIQUE_STEP_NAME_MESSAGE_SUFFIX));
             }
             taskNames.add(taskName);
             Map<String, Object> taskRawDataValue;
@@ -342,9 +342,9 @@ public class ExecutableBuilder {
             } else {
                 defaultSuccess = onFailureSection ? ScoreLangConstants.FAILURE_RESULT : ScoreLangConstants.SUCCESS_RESULT;
             }
-            TaskModellingResult taskModellingResult = compileTask(taskName, taskRawDataValue, defaultSuccess, imports, defaultFailure, namespace);
-            errors.addAll(taskModellingResult.getErrors());
-            steps.add(taskModellingResult.getStep());
+            StepModellingResult stepModellingResult = compileTask(taskName, taskRawDataValue, defaultSuccess, imports, defaultFailure, namespace);
+            errors.addAll(stepModellingResult.getErrors());
+            steps.add(stepModellingResult.getStep());
         }
 
         if (onFailureTasksFound) {
@@ -354,7 +354,7 @@ public class ExecutableBuilder {
         return new WorkflowModellingResult(new Workflow(steps), errors);
     }
 
-    private TaskModellingResult compileTask(String taskName, Map<String, Object> taskRawData, String defaultSuccess,
+    private StepModellingResult compileTask(String taskName, Map<String, Object> taskRawData, String defaultSuccess,
                                             Map<String, String> imports, String defaultFailure, String namespace) {
 
         List<RuntimeException> errors = new ArrayList<>();
@@ -366,11 +366,11 @@ public class ExecutableBuilder {
         Map<String, Serializable> preTaskData = new HashMap<>();
         Map<String, Serializable> postTaskData = new HashMap<>();
 
-        errors.addAll(transformersHandler.checkKeyWords(taskName, taskRawData, ListUtils.union(preTaskTransformers, postTaskTransformers), TaskAdditionalKeyWords, null));
+        errors.addAll(transformersHandler.checkKeyWords(taskName, taskRawData, ListUtils.union(preStepTransformers, postStepTransformers), stepAdditionalKeyWords, null));
 
         String errorMessagePrefix = "For step '" + taskName + "' syntax is illegal.\n";
-        preTaskData.putAll(transformersHandler.runTransformers(taskRawData, preTaskTransformers, errors, errorMessagePrefix));
-        postTaskData.putAll(transformersHandler.runTransformers(taskRawData, postTaskTransformers, errors, errorMessagePrefix));
+        preTaskData.putAll(transformersHandler.runTransformers(taskRawData, preStepTransformers, errors, errorMessagePrefix));
+        postTaskData.putAll(transformersHandler.runTransformers(taskRawData, postStepTransformers, errors, errorMessagePrefix));
 
         @SuppressWarnings("unchecked")
         List<Argument> arguments = (List<Argument>)preTaskData.get(SlangTextualKeys.DO_KEY);
@@ -400,7 +400,7 @@ public class ExecutableBuilder {
                 navigationStrings,
                 refId,
                 preTaskData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
-        return new TaskModellingResult(step, errors);
+        return new StepModellingResult(step, errors);
     }
 
     private List<Map<String, String>> getNavigationStrings(Map<String, Serializable> postTaskData, String defaultSuccess, String defaultFailure) {
@@ -447,7 +447,7 @@ public class ExecutableBuilder {
      * @param workflow the workflow of the flow
      * @return a map of dependencies. Key - dependency full name, value - type
      */
-    private Set<String> fetchDirectTasksDependencies(Workflow workflow){
+    private Set<String> fetchDirectStepsDependencies(Workflow workflow){
         Set<String> dependencies = new HashSet<>();
         Deque<Step> steps = workflow.getSteps();
         for (Step step : steps) {

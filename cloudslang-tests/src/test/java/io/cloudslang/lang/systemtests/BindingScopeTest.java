@@ -84,7 +84,7 @@ public class BindingScopeTest extends SystemsTestsParent {
                 .getWorkflow()
                 .getSteps()
                 .getFirst()
-                .getPostTaskActionData()
+                .getPostStepActionData()
                 .get(SlangTextualKeys.PUBLISH_KEY);
         Assert.assertEquals(
                 "Step expression should contain: " + flowVarName,

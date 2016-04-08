@@ -51,7 +51,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
 
     @Override
     public List<Scope> getScopes() {
-        return Collections.singletonList(Scope.BEFORE_TASK);
+        return Collections.singletonList(Scope.BEFORE_STEP);
     }
 
     @Override

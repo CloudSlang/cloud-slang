@@ -87,7 +87,7 @@ public class DependenciesHelper {
         Set<String> result = new HashSet<>();
         result.addAll(getSystemPropertiesFromExecutable(inputs, outputs, results));
         for (Step step : steps) {
-            result.addAll(getSystemPropertiesFromTask(step));
+            result.addAll(getSystemPropertiesFromStep(step));
         }
         return result;
     }
@@ -110,7 +110,7 @@ public class DependenciesHelper {
         return result;
     }
 
-    private Set<String> getSystemPropertiesFromTask(Step step) {
+    private Set<String> getSystemPropertiesFromStep(Step step) {
         Set<String> result = new HashSet<>();
         List<Transformer> relevantTransformers = new ArrayList<>();
         relevantTransformers.add(publishTransformer);
@@ -118,8 +118,8 @@ public class DependenciesHelper {
 
         result.addAll(getSystemPropertiesFromInOutParam(step.getArguments()));
         result.addAll(
-                getSystemPropertiesFromPostTaskActionData(
-                        step.getPostTaskActionData(),
+                getSystemPropertiesFromPostStepActionData(
+                        step.getPostStepActionData(),
                         relevantTransformers,
                         step.getName()
                 )
@@ -141,14 +141,14 @@ public class DependenciesHelper {
         return result;
     }
 
-    private Set<String> getSystemPropertiesFromPostTaskActionData(
-            Map<String, Serializable> postTaskActionData,
+    private Set<String> getSystemPropertiesFromPostStepActionData(
+            Map<String, Serializable> postStepActionData,
             List<Transformer> relevantTransformers,
-            String taskName) {
+            String stepName) {
         Set<String> result = new HashSet<>();
         for (Transformer transformer : relevantTransformers) {
             String key = TransformersHandler.keyToTransform(transformer);
-            Serializable item = postTaskActionData.get(key);
+            Serializable item = postStepActionData.get(key);
             if (item instanceof Collection) {
                 Collection itemsCollection = (Collection) item;
                 for (Object itemAsObject : itemsCollection) {
@@ -156,11 +156,11 @@ public class DependenciesHelper {
                         Output itemAsOutput = (Output) itemAsObject;
                         result.addAll(itemAsOutput.getSystemPropertyDependencies());
                     } else {
-                        throw new RuntimeException("For step: " + taskName + " - Incorrect type for post step data items.");
+                        throw new RuntimeException("For step: " + stepName + " - Incorrect type for post step data items.");
                     }
                 }
             } else {
-                throw new RuntimeException("For step: " + taskName + " - Incorrect type for post step data items.");
+                throw new RuntimeException("For step: " + stepName + " - Incorrect type for post step data items.");
             }
         }
         return result;

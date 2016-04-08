@@ -184,7 +184,7 @@ public class ExecutableBuilderTest {
     public void taskWithNoDoEntranceThrowsException() throws Exception {
         String keyword = "a";
         Mockito.when(transformer.keyToTransform()).thenReturn(keyword);
-        Mockito.when(transformer.getScopes()).thenReturn(Arrays.asList(Transformer.Scope.BEFORE_TASK));
+        Mockito.when(transformer.getScopes()).thenReturn(Arrays.asList(Transformer.Scope.BEFORE_STEP));
         ParsedSlang mockParsedSlang = mockFlowSlangFile();
         Map<String, Object> executableRawData = new HashMap<>();
         List<Map<String, Object>> workFlowData = new ArrayList<>();

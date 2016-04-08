@@ -59,7 +59,7 @@ public class NavigateTransformer implements Transformer<List<Object>, List<Map<S
 
     @Override
     public List<Scope> getScopes() {
-        return Collections.singletonList(Scope.AFTER_TASK);
+        return Collections.singletonList(Scope.AFTER_STEP);
     }
 
     @Override

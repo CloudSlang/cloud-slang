@@ -52,7 +52,7 @@ public class Step {
         return preTaskActionData;
     }
 
-    public Map<String, Serializable> getPostTaskActionData() {
+    public Map<String, Serializable> getPostStepActionData() {
         return postTaskActionData;
     }
 
