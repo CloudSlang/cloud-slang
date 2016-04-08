@@ -45,16 +45,16 @@ public class RunDataAggregatorListener extends AbstractAggregatorListener {
     }
 
     private StepData buildStepData(List<LanguageEventData> data) {
-        List<LanguageEventData> taskEvents = selectByStepType(data, LanguageEventData.StepType.STEP);
+        List<LanguageEventData> stepEvents = selectByStepType(data, LanguageEventData.StepType.STEP);
         List<LanguageEventData> executableEvents = selectByStepType(data, LanguageEventData.StepType.EXECUTABLE);
 
         LanguageEventData inputsEvent;
         LanguageEventData outputsEvent;
 
-        boolean taskStep = CollectionUtils.isNotEmpty(taskEvents);
-        if (taskStep) {
-            inputsEvent = selectByEventType(taskEvents, ScoreLangConstants.EVENT_ARGUMENT_END);
-            outputsEvent = selectByEventType(taskEvents, ScoreLangConstants.EVENT_OUTPUT_END);
+        boolean isStep = CollectionUtils.isNotEmpty(stepEvents);
+        if (isStep) {
+            inputsEvent = selectByEventType(stepEvents, ScoreLangConstants.EVENT_ARGUMENT_END);
+            outputsEvent = selectByEventType(stepEvents, ScoreLangConstants.EVENT_OUTPUT_END);
         } else {
             inputsEvent = selectByEventType(executableEvents, ScoreLangConstants.EVENT_INPUT_END);
             outputsEvent = selectByEventType(executableEvents, ScoreLangConstants.EVENT_OUTPUT_END);
@@ -62,7 +62,7 @@ public class RunDataAggregatorListener extends AbstractAggregatorListener {
         String path = inputsEvent.getPath();
         String stepName = inputsEvent.getStepName();
         Map<String, Serializable> inputs;
-        if (taskStep) {
+        if (isStep) {
             inputs = inputsEvent.getArguments();
         } else {
             inputs = inputsEvent.getInputs();

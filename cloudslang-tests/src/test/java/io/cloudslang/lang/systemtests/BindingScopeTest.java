@@ -48,7 +48,7 @@ public class BindingScopeTest extends SystemsTestsParent {
         // trigger ExecutionPlan
         RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, systemProperties);
 
-        Map<String, StepData> executionData = runtimeInformation.getTasks();
+        Map<String, StepData> executionData = runtimeInformation.getSteps();
 
         StepData taskData = executionData.get(FIRST_STEP_PATH);
         Assert.assertNotNull("task data is null", taskData);

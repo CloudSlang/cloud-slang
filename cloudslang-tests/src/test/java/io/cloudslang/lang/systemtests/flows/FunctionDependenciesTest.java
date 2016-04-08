@@ -62,7 +62,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         // trigger ExecutionPlan
         RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, systemProperties);
 
-        Map<String, StepData> executionData = runtimeInformation.getTasks();
+        Map<String, StepData> executionData = runtimeInformation.getSteps();
 
         StepData flowData = executionData.get(EXEC_START_PATH);
         StepData taskData = executionData.get(FIRST_STEP_PATH);
@@ -88,7 +88,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         // trigger ExecutionPlan
         Map<String, Serializable> userInputs = new HashMap<>();
         RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, EMPTY_SET);
-        Map<String, StepData> executionData = runtimeInformation.getTasks();
+        Map<String, StepData> executionData = runtimeInformation.getSteps();
 
         StepData flowData = executionData.get(EXEC_START_PATH);
 

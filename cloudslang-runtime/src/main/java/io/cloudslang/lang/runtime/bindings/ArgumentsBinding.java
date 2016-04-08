@@ -55,29 +55,29 @@ public class ArgumentsBinding {
             Map<String, ? extends Serializable> srcContext,
             Set<SystemProperty> systemProperties,
             Map<String, Serializable> targetContext) {
-        Serializable argumentValue;
-        String argumentName = argument.getName();
+        Serializable inputValue;
+        String inputName = argument.getName();
 
         try {
-            argumentValue = srcContext.get(argumentName);
+            inputValue = srcContext.get(inputName);
             if (!argument.isOverridable()) {
                 Serializable rawValue = argument.getValue();
                 String expressionToEvaluate = ExpressionUtils.extractExpression(rawValue);
                 if (expressionToEvaluate != null) {
                     //we do not want to change original context map
                     Map<String, Serializable> scriptContext = new HashMap<>(srcContext);
-                    scriptContext.put(argumentName, argumentValue);
+                    scriptContext.put(inputName, inputValue);
                     //so you can resolve previous arguments already bound
                     scriptContext.putAll(targetContext);
-                    argumentValue = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, argument.getFunctionDependencies());
+                    inputValue = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, argument.getFunctionDependencies());
                 } else {
-                    argumentValue = rawValue;
+                    inputValue = rawValue;
                 }
             }
         } catch (Throwable t) {
-            throw new RuntimeException("Error binding task argument: '" + argumentName + "', \n\tError is: " + t.getMessage(), t);
+            throw new RuntimeException("Error binding step input: '" + inputName + "', \n\tError is: " + t.getMessage(), t);
         }
-        targetContext.put(argumentName, argumentValue);
+        targetContext.put(inputName, inputValue);
     }
 
 }

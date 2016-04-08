@@ -65,7 +65,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             //than we match the references to the actual dependencies
             filteredDependencies = dependenciesHelper.matchReferences(executable, availableExecutables);
 
-            // Validate that all the tasks of a flow have navigations for all the reference's results
+            // Validate that all the steps of a flow have navigations for all the reference's results
             validateAllDependenciesResultsHaveMatchingNavigations(executable, filteredDependencies);
         }
 
@@ -87,11 +87,11 @@ public class ScoreCompilerImpl implements ScoreCompiler{
     }
 
     /**
-     * Validate that for all the tasks in the flow, all results from the referenced operation or flow have matching navigations
+     * Validate that for all the steps in the flow, all results from the referenced operation or flow have matching navigations
      * If the given {@link io.cloudslang.lang.compiler.modeller.model.Executable} is an operation, the method does nothing
      * Throws {@link java.lang.IllegalArgumentException} if:
      *      - Any reference of the executable is missing
-     *      - There is a missing navigation for one of the tasks' references' results
+     *      - There is a missing navigation for one of the steps' references' results
      *
      * @param executable the flow to validate
      * @param filteredDependencies a map holding for each reference name, its {@link io.cloudslang.lang.compiler.modeller.model.Executable} object
@@ -103,7 +103,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         Flow flow = (Flow)executable;
         Deque<Step> steps = flow.getWorkflow().getSteps();
         for(Step step : steps){
-            List<Map<String, String>> taskNavigations = step.getNavigationStrings();
+            List<Map<String, String>> stepNavigations = step.getNavigationStrings();
             String refId = step.getRefId();
             Executable reference = filteredDependencies.get(refId);
             Validate.notNull(reference, "Cannot compile flow: \'" + executable.getName() + "\' since for step: \'" + step.getName()
@@ -111,15 +111,15 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             List<Result> refResults = reference.getResults();
             for(Result result : refResults){
                 String resultName = result.getName();
-                Validate.isTrue(navigationListContainsKey(taskNavigations, resultName), "Cannot compile flow: \'" + executable.getName() +
+                Validate.isTrue(navigationListContainsKey(stepNavigations, resultName), "Cannot compile flow: \'" + executable.getName() +
                         "\' since for step: '" + step.getName() + "\', the result \'" + resultName+
                         "\' of its dependency: \'"+ refId + "\' has no matching navigation");
             }
         }
     }
 
-    private boolean navigationListContainsKey(List<Map<String, String>> taskNavigations, String resultName) {
-        for (Map<String, String> map : taskNavigations) {
+    private boolean navigationListContainsKey(List<Map<String, String>> stepNavigations, String resultName) {
+        for (Map<String, String> map : stepNavigations) {
             if (map.containsKey(resultName)) return true;
         }
         return false;

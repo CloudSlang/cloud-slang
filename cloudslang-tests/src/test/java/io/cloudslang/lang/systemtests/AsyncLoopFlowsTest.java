@@ -182,7 +182,7 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
 
     private void verifyAggregateValues(RuntimeInformation runtimeInformation, List<String> expectedNameOutputs) {
         // aggregate
-        Map<String, StepData> asyncTasks = runtimeInformation.getAsyncTasks();
+        Map<String, StepData> asyncTasks = runtimeInformation.getAsyncSteps();
         StepData asyncTask = asyncTasks.get(FIRST_STEP_PATH);
 
         Map<String, Serializable> aggregateValues = asyncTask.getOutputs();
@@ -203,7 +203,7 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
     }
 
     private void verifyNavigation(RuntimeInformation runtimeInformation) {
-        Map<String, StepData> tasksData = runtimeInformation.getTasks();
+        Map<String, StepData> tasksData = runtimeInformation.getSteps();
         StepData taskAfterAsyncLoop = tasksData.get(SECOND_STEP_KEY);
         Assert.assertEquals("navigation not as expected", "print_list", taskAfterAsyncLoop.getName());
     }

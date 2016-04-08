@@ -31,14 +31,14 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
 
     protected Map<String, StepData> prepareAndRun(CompilationArtifact compilationArtifact) {
         // trigger
-        return triggerWithData(compilationArtifact, getUserInputs(), getSystemProperties()).getTasks();
+        return triggerWithData(compilationArtifact, getUserInputs(), getSystemProperties()).getSteps();
     }
 
     protected Map<String, StepData> prepareAndRunDefault(CompilationArtifact compilationArtifact) {
         Map<String, Serializable> userInputs = getUserInputs();
         userInputs.put("enable_option_for_action", null);
 
-        return triggerWithData(compilationArtifact, userInputs, getSystemProperties()).getTasks();
+        return triggerWithData(compilationArtifact, userInputs, getSystemProperties()).getSteps();
     }
 
     private Set<SystemProperty> getSystemProperties() {

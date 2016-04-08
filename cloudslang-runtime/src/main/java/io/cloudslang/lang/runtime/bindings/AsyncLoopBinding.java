@@ -31,7 +31,7 @@ import java.util.Set;
 @Component
 public class AsyncLoopBinding {
 
-    public static final String ASYNC_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating async loop expression in task";
+    public static final String ASYNC_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating async loop expression in step";
 
     @Autowired
     private ScriptEvaluator scriptEvaluator;

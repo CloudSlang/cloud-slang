@@ -46,19 +46,19 @@ public interface ScoreLangConstants {
     String EXECUTABLE_OUTPUTS_KEY = "executableOutputs";
     String EXECUTABLE_RESULTS_KEY = "executableResults";
 
-    //task scope
-    String STEP_INPUTS_KEY = "taskArguments";
-    String STEP_PUBLISH_KEY = "taskPublishValues";
-    String STEP_NAVIGATION_KEY = "taskNavigationValues";
+    //step scope
+    String STEP_INPUTS_KEY = "stepInputs";
+    String STEP_PUBLISH_KEY = "stepPublishValues";
+    String STEP_NAVIGATION_KEY = "stepNavigationValues";
     String REF_ID = "refId";
     String LOOP_KEY = "loop";
     String BREAK_LOOP_KEY = "breakOn";
-    String TASK_ARGUMENTS_RESULT_CONTEXT = "taskArgumentsResultContext";
+    String STEP_INPUTS_RESULT_CONTEXT = "stepInputsResultContext";
 
     // async loop
     String ASYNC_LOOP_KEY = "async_loop";
     String ASYNC_LOOP_STATEMENT_KEY = "asyncLoopStatement";
-    String STEP_AGGREGATE_KEY = "taskAggregateValues";
+    String STEP_AGGREGATE_KEY = "stepAggregateValues";
     String BRANCH_BEGIN_STEP_ID_KEY = "branchBeginStep";
 
     // Events types

@@ -13,7 +13,6 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
-import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
 import org.apache.commons.io.FileUtils;
@@ -23,7 +22,6 @@ import org.junit.Test;
 import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -169,7 +167,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         userInputs.put("first", "value");
         userInputs.put("second_string", "value");
 
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getTasks();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
 
         List<String> actualTasks = getTasksOnly(stepsData);
         Assert.assertEquals(2, actualTasks.size());
