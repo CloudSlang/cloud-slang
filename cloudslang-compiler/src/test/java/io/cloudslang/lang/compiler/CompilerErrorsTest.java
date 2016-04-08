@@ -467,7 +467,7 @@ public class CompilerErrorsTest {
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("'navigate'");
-        exception.expectMessage("map");
+        exception.expectMessage("list");
         exception.expectMessage("string");
         compiler.compile(SlangSource.fromFile(resource), path);
     }

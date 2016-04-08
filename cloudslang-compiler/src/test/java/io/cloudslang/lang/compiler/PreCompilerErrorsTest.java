@@ -350,7 +350,7 @@ public class PreCompilerErrorsTest {
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("'navigate'");
-        exception.expectMessage("map");
+        exception.expectMessage("list");
         exception.expectMessage("string");
         throw result.getErrors().get(0);
     }
@@ -425,6 +425,61 @@ public class PreCompilerErrorsTest {
         assertTrue(errorMessage.contains(flowName));
         assertTrue(errorMessage.contains(resultName));
         assertTrue(errorMessage.contains(expressionMessage));
+    }
+
+
+    @Test
+    public void testFlowNavigateNull() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_navigate_map.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Task1");
+        exception.expectMessage("navigate");
+        exception.expectMessage("instead there is a map");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testFlowNavigateMultipleElementsForRule() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_navigate_multiple_elements_for_rule.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Task1");
+        exception.expectMessage("navigate");
+        exception.expectMessage("exactly one key:value pair");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testFlowNavigateIntKey() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_navigate_int_key.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Task1");
+        exception.expectMessage("navigate");
+        exception.expectMessage("key");
+        exception.expectMessage("string");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testFlowNavigateIntValue() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_navigate_int_value.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Task1");
+        exception.expectMessage("navigate");
+        exception.expectMessage("value");
+        exception.expectMessage("string");
+        throw result.getErrors().get(0);
     }
 
 }

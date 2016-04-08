@@ -35,6 +35,6 @@ flow:
           ops.check_number:
             - number: 4
         navigate:
-          EVEN: SUCCESS
-          ODD: SUCCESS
-          FAILURE: FAILURE
+          - EVEN: SUCCESS
+          - ODD: SUCCESS
+          - FAILURE: FAILURE

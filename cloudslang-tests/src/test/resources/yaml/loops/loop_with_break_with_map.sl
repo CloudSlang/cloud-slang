@@ -25,8 +25,8 @@ flow:
           break:
             - CUSTOM
         navigate:
-          CUSTOM: print_other_values
-          SUCCESS: SUCCESS
+          - CUSTOM: print_other_values
+          - SUCCESS: SUCCESS
 
     - task_that_doesnt_run:
         do:

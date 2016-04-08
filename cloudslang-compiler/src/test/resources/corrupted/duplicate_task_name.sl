@@ -17,11 +17,11 @@ flow:
         do:
           ops.java_op:
         navigate:
-          SUCCESS: SUCCESS
-          FAILURE: FAILURE
+          - SUCCESS: SUCCESS
+          - FAILURE: FAILURE
     - Task1:
         do:
           ops.java_op:
         navigate:
-          SUCCESS: SUCCESS
-          FAILURE: FAILURE
+          - SUCCESS: SUCCESS
+          - FAILURE: FAILURE

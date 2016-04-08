@@ -5,20 +5,31 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: user.flows
+namespace: slang.sample.flows
 
 imports:
   ops: user.ops
 
 flow:
-  name: get_function_test_flow_default_result
+  name: flow_navigate_duplicate_keys
+  inputs:
+  - city_name
+
   workflow:
-    - Task1:
+    - CheckWeather1:
         do:
-          ops.get_function_test_default_result: []
+          ops.check_Weather:
+            - city: city_name
+            - country: 'Israel'
+        publish:
+          - weather
         navigate:
-          - GET_FUNCTION_DEFAULT_VALUE: GET_FUNCTION_DEFAULT_VALUE
-          - GET_FUNCTION_PROBLEM: GET_FUNCTION_PROBLEM
+          - SUCCESS: RESULT1
+          - FAILURE: RESULT2
+          - SUCCESS: RESULT3
+  outputs:
+    - weather
   results:
-    - GET_FUNCTION_DEFAULT_VALUE
-    - GET_FUNCTION_PROBLEM
+    - RESULT1
+    - RESULT2
+    - RESULT3

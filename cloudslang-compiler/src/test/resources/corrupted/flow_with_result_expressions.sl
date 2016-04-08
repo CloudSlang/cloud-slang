@@ -25,8 +25,8 @@ flow:
         publish:
           - weather
         navigate:
-          SUCCESS: SUCCESS
-          FAILURE: FAILURE
+          - SUCCESS: SUCCESS
+          - FAILURE: FAILURE
   results:
     - SUCCESS: ${ 1 == 1 }
     - CUSTOM: ''

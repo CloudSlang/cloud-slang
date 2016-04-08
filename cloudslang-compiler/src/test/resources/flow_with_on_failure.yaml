@@ -37,5 +37,5 @@ flow:
           ops.test_op:
             - city: 'input_1'
         navigate:
-          SUCCESS: SUCCESS
-          FAILURE: FAILURE
+          - SUCCESS: SUCCESS
+          - FAILURE: FAILURE

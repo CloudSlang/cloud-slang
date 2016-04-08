@@ -4,18 +4,19 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
+
 namespace: io.cloudslang
 
-imports:
-  ops: user.ops
-
 flow:
-  name: flow_with_navigation_to_missing_task
+ name: flow_navigate_int_value
 
-  workflow:
-    - Task1:
-        do:
-          ops.java_op:
-        navigate:
-          - SUCCESS: Task2
-          - FAILURE: FAILURE
+ workflow:
+   - Task1:
+       do:
+         ops.java_op:
+       navigate:
+         - SUCCESS: 123
+         - FAILURE: FAILURE
+ results:
+  - SUCCESS
+  - FAILURE

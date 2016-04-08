@@ -15,6 +15,7 @@ import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import java.util.HashMap;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -126,6 +127,28 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("There is a different number of flow dependencies than expected", 1, dependencies.size());
         String dependency = dependencies.iterator().next();
         Assert.assertEquals("The flow dependency full name is wrong", "user.ops.test_op", dependency);
+    }
+
+    @Test
+    public void testCompileFlowNavigateDuplicateKeysFirstIsTaken() throws Exception {
+        URI flow = getClass().getResource("/flow_navigate_duplicate_keys.sl").toURI();
+        URI operation = getClass().getResource("/check_Weather.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+
+        CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
+        ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
+        Assert.assertNotNull("execution plan is null", executionPlan);
+        Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
+
+        ExecutionStep finishTaskStep = executionPlan.getStep(3L);
+        @SuppressWarnings("unchecked") Map<String, ResultNavigation> actualNavigationValues =
+                (Map<String, ResultNavigation>) finishTaskStep.getActionData().get(ScoreLangConstants.TASK_NAVIGATION_KEY);
+        Map<String, ResultNavigation> expectedNavigationValues = new HashMap<>();
+        expectedNavigationValues.put("SUCCESS", new ResultNavigation(0, "RESULT1")); // first in list is taken
+        expectedNavigationValues.put("FAILURE", new ResultNavigation(0, "RESULT2"));
+        Assert.assertEquals("navigation values not as expected", expectedNavigationValues, actualNavigationValues);
     }
 
 }

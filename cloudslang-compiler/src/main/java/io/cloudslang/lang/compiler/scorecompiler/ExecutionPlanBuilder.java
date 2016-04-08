@@ -123,7 +123,8 @@ public class ExecutionPlanBuilder {
 
         //End Task
         Map<String, ResultNavigation> navigationValues = new HashMap<>();
-        for (Map.Entry<String, String> entry : task.getNavigationStrings().entrySet()) {
+        for (Map<String, String> map : task.getNavigationStrings()) {
+            Map.Entry<String, String> entry = map.entrySet().iterator().next();
             String nextStepName = entry.getValue();
             if (taskReferences.get(nextStepName) == null) {
                 Task nextTaskToCompile = Lambda.selectFirst(tasks, having(on(Task.class).getName(), equalTo(nextStepName)));
@@ -134,7 +135,10 @@ public class ExecutionPlanBuilder {
             }
             long nextStepId = taskReferences.get(nextStepName);
             String presetResult = (FLOW_END_STEP_ID == nextStepId) ? nextStepName : null;
-            navigationValues.put(entry.getKey(), new ResultNavigation(nextStepId, presetResult));
+            String navigationKey = entry.getKey();
+            if (!navigationValues.containsKey(navigationKey)) {
+                navigationValues.put(navigationKey, new ResultNavigation(nextStepId, presetResult));
+            }
         }
         if (isAsync) {
             taskExecutionSteps.add(
