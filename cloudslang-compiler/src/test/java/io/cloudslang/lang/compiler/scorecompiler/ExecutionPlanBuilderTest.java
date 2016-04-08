@@ -131,14 +131,14 @@ public class ExecutionPlanBuilderTest {
     private void mockFinishTask(Long stepId, Step step, boolean isAsync) {
         Map<String, Serializable> postTaskActionData = step.getPostStepActionData();
         String taskName = step.getName();
-        when(stepFactory.createFinishTaskStep(eq(stepId), eq(postTaskActionData), anyMapOf(String.class, ResultNavigation.class), eq(taskName), eq(isAsync))).thenReturn(new ExecutionStep(stepId));
+        when(stepFactory.createFinishStepStep(eq(stepId), eq(postTaskActionData), anyMapOf(String.class, ResultNavigation.class), eq(taskName), eq(isAsync))).thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockBeginTask(Long stepId, Step step) {
         Map<String, Serializable> preTaskActionData = step.getPreStepActionData();
         String refId = step.getRefId();
         String name = step.getName();
-        when(stepFactory.createBeginTaskStep(eq(stepId), anyListOf(Argument.class), eq(preTaskActionData), eq(refId), eq(name))).thenReturn(new ExecutionStep(stepId));
+        when(stepFactory.createBeginStepStep(eq(stepId), anyListOf(Argument.class), eq(preTaskActionData), eq(refId), eq(name))).thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockAddBranchesStep(Long stepId, Long nextStepID, Long branchBeginStepID, Step step, Flow flow) {
@@ -242,8 +242,8 @@ public class ExecutionPlanBuilderTest {
                 eq(step.getPreStepActionData()),
                 eq(compiledFlow.getId()),
                 eq(step.getName()));
-        verify(stepFactory).createBeginTaskStep(eq(3L), anyListOf(Argument.class), eq(step.getPreStepActionData()), eq(step.getRefId()), eq(step.getName()));
-        verify(stepFactory).createFinishTaskStep(eq(4L), eq(step.getPostStepActionData()), anyMapOf(String.class, ResultNavigation.class), eq(step.getName()), eq(step.isAsync()));
+        verify(stepFactory).createBeginStepStep(eq(3L), anyListOf(Argument.class), eq(step.getPreStepActionData()), eq(step.getRefId()), eq(step.getName()));
+        verify(stepFactory).createFinishStepStep(eq(4L), eq(step.getPostStepActionData()), anyMapOf(String.class, ResultNavigation.class), eq(step.getName()), eq(step.isAsync()));
         verify(stepFactory).createJoinBranchesStep(eq(5L), eq(step.getPostStepActionData()), anyMapOf(String.class, ResultNavigation.class), eq(step.getName()));
 
         assertEquals("different number of execution steps than expected", 6, executionPlan.getSteps().size());

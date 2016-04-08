@@ -38,7 +38,7 @@ import java.util.Map;
 public class ExecutionStepFactory {
 
     private static final String STEPS_PACKAGE = "io.cloudslang.lang.runtime.steps";
-    private static final String TASK_STEPS_CLASS = STEPS_PACKAGE + ".TaskSteps";
+    private static final String STEP_STEPS_CLASS = STEPS_PACKAGE + ".TaskSteps";
     private static final String OPERATION_STEPS_CLASS = STEPS_PACKAGE + ".ExecutableSteps";
     private static final String ACTION_STEPS_CLASS = STEPS_PACKAGE + ".ActionSteps";
     private static final String ASYNC_LOOP_STEPS_CLASS = STEPS_PACKAGE + ".AsyncLoopSteps";
@@ -46,7 +46,7 @@ public class ExecutionStepFactory {
     private static final String SIMPLE_NAVIGATION_METHOD = "navigate";
 
 
-    public ExecutionStep createBeginTaskStep(Long index, List<Argument> arguments, Map<String, Serializable> preTaskData, String refId, String taskName) {
+    public ExecutionStep createBeginStepStep(Long index, List<Argument> arguments, Map<String, Serializable> preTaskData, String refId, String taskName) {
         Validate.notNull(preTaskData, "preTaskData is null");
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.TASK_ARGUMENTS_KEY, (Serializable) arguments);
@@ -55,10 +55,10 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, taskName);
         actionData.put(ScoreLangConstants.REF_ID, refId);
         actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
-        return createGeneralStep(index, TASK_STEPS_CLASS, "beginTask", actionData);
+        return createGeneralStep(index, STEP_STEPS_CLASS, "beginTask", actionData);
     }
 
-    public ExecutionStep createFinishTaskStep(Long index, Map<String, Serializable> postTaskData,
+    public ExecutionStep createFinishStepStep(Long index, Map<String, Serializable> postTaskData,
                                               Map<String, ResultNavigation> navigationValues, String taskName, boolean isAsync) {
         Validate.notNull(postTaskData, "postTaskData is null");
         Map<String, Serializable> actionData = new HashMap<>();
@@ -69,7 +69,7 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, taskName);
         actionData.put(ScoreLangConstants.ASYNC_LOOP_KEY, isAsync);
-        ExecutionStep finishTask = createGeneralStep(index, TASK_STEPS_CLASS, "endTask", actionData);
+        ExecutionStep finishTask = createGeneralStep(index, STEP_STEPS_CLASS, "endTask", actionData);
         finishTask.setNavigationData(null);
         return finishTask;
     }
