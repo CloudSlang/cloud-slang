@@ -14,7 +14,7 @@ flow:
   name: flow_with_same_input_name_as_task
   inputs:
     - first # normal input
-    - second_string # same as task input
+    - second_string # same as step input
   workflow:
     - CheckBinding:
         do:

@@ -82,12 +82,12 @@ public class BindingScopeTest extends SystemsTestsParent {
         @SuppressWarnings("unchecked")
         List<Output> taskPublishValues = (List<Output>) ((Flow) flowExecutable)
                 .getWorkflow()
-                .getTasks()
+                .getSteps()
                 .getFirst()
                 .getPostTaskActionData()
                 .get(SlangTextualKeys.PUBLISH_KEY);
         Assert.assertEquals(
-                "Task expression should contain: " + flowVarName,
+                "Step expression should contain: " + flowVarName,
                 flowVarName,
                 StringUtils.trim(ExpressionUtils.extractExpression(taskPublishValues.get(0).getValue()))
         );

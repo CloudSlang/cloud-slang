@@ -30,7 +30,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
         if (MapUtils.isEmpty(rawData)) {
             return result;
         } else if (rawData.size() > 1) {
-            throw new RuntimeException("Task has to many keys under the 'do' keyword,\n" +
+            throw new RuntimeException("Step has to many keys under the 'do' keyword,\n" +
                     "May happen due to wrong indentation");
         }
         Map.Entry<String, Object> argumentsEntry = rawData.entrySet().iterator().next();
@@ -43,7 +43,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
                 result.add(argument);
             }
         } else if (rawArguments != null) {
-            throw new RuntimeException("Task arguments should be defined using a standard YAML list.");
+            throw new RuntimeException("Step arguments should be defined using a standard YAML list.");
         }
 
         return result;

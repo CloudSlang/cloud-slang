@@ -89,7 +89,7 @@ public class ValueSyntaxInFlowTest extends ValueSyntaxParent {
         expectedTaskArguments.put("input_concat_2_folded", "prefix_ab_suffix");
         expectedTaskArguments.put("task_argument_null", null);
 
-        Assert.assertTrue("Task arguments not bound correctly", includeAllPairs(taskData.getInputs(), expectedTaskArguments));
+        Assert.assertTrue("Step arguments not bound correctly", includeAllPairs(taskData.getInputs(), expectedTaskArguments));
     }
 
     private void verifyTaskPublishValues(StepData taskData) {
@@ -101,6 +101,6 @@ public class ValueSyntaxInFlowTest extends ValueSyntaxParent {
         expectedTaskPublishValues.put("publish_expression", "publish_str_value_suffix");
         expectedTaskPublishValues.put("output_task_argument_null", "task_argument_null_value");
 
-        Assert.assertEquals("Task publish values not bound correctly", expectedTaskPublishValues, taskData.getOutputs());
+        Assert.assertEquals("Step publish values not bound correctly", expectedTaskPublishValues, taskData.getOutputs());
     }
 }

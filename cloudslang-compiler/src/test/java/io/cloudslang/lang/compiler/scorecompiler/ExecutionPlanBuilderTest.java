@@ -20,7 +20,7 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.compiler.modeller.model.Action;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
-import io.cloudslang.lang.compiler.modeller.model.Task;
+import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
@@ -55,19 +55,19 @@ public class ExecutionPlanBuilderTest {
 
     private Set<String> systemPropertyDependencies = Collections.emptySet();
 
-    private Task createSimpleCompiledAsyncTask(String taskName) {
+    private Step createSimpleCompiledAsyncTask(String taskName) {
         return createSimpleCompiledTask(taskName, true);
     }
 
-    private Task createSimpleCompiledTask(String taskName) {
+    private Step createSimpleCompiledTask(String taskName) {
         return createSimpleCompiledTask(taskName, false);
     }
 
-    private Task createSimpleCompiledTask(String taskName, List<Map<String, String>> navigationStrings) {
+    private Step createSimpleCompiledTask(String taskName, List<Map<String, String>> navigationStrings) {
         return createSimpleCompiledTask(taskName, false, navigationStrings);
     }
 
-    private Task createSimpleCompiledTask(String taskName, boolean isAsync) {
+    private Step createSimpleCompiledTask(String taskName, boolean isAsync) {
         List<Map<String, String>> navigationStrings = new ArrayList<>();
         Map<String, String> successMap = new HashMap<>();
         successMap.put(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.SUCCESS_RESULT);
@@ -79,7 +79,7 @@ public class ExecutionPlanBuilderTest {
         return createSimpleCompiledTask(taskName, isAsync, navigationStrings);
     }
 
-    private Task createSimpleCompiledTask(String taskName, boolean isAsync, List<Map<String, String>> navigationStrings) {
+    private Step createSimpleCompiledTask(String taskName, boolean isAsync, List<Map<String, String>> navigationStrings) {
         Map<String, Serializable> preTaskActionData = new HashMap<>();
 
         if (isAsync) {
@@ -88,7 +88,7 @@ public class ExecutionPlanBuilderTest {
 
         Map<String, Serializable> postTaskActionData = new HashMap<>();
         String refId = "refId";
-        return new Task(
+        return new Step(
                 taskName,
                 preTaskActionData,
                 postTaskActionData,
@@ -120,37 +120,37 @@ public class ExecutionPlanBuilderTest {
         when(stepFactory.createEndStep(eq(stepId), same(postExecActionData), same(outputs), same(results), same(execName), same(executableType))).thenReturn(new ExecutionStep(stepId));
     }
 
-    private void mockFinishTask(Long stepId, Task task) {
-        mockFinishTask(stepId, task, false);
+    private void mockFinishTask(Long stepId, Step step) {
+        mockFinishTask(stepId, step, false);
     }
 
-    private void mockFinishAsyncTask(Long stepId, Task task) {
-        mockFinishTask(stepId, task, true);
+    private void mockFinishAsyncTask(Long stepId, Step step) {
+        mockFinishTask(stepId, step, true);
     }
 
-    private void mockFinishTask(Long stepId, Task task, boolean isAsync) {
-        Map<String, Serializable> postTaskActionData = task.getPostTaskActionData();
-        String taskName = task.getName();
+    private void mockFinishTask(Long stepId, Step step, boolean isAsync) {
+        Map<String, Serializable> postTaskActionData = step.getPostTaskActionData();
+        String taskName = step.getName();
         when(stepFactory.createFinishTaskStep(eq(stepId), eq(postTaskActionData), anyMapOf(String.class, ResultNavigation.class), eq(taskName), eq(isAsync))).thenReturn(new ExecutionStep(stepId));
     }
 
-    private void mockBeginTask(Long stepId, Task task) {
-        Map<String, Serializable> preTaskActionData = task.getPreTaskActionData();
-        String refId = task.getRefId();
-        String name = task.getName();
+    private void mockBeginTask(Long stepId, Step step) {
+        Map<String, Serializable> preTaskActionData = step.getPreTaskActionData();
+        String refId = step.getRefId();
+        String name = step.getName();
         when(stepFactory.createBeginTaskStep(eq(stepId), anyListOf(Argument.class), eq(preTaskActionData), eq(refId), eq(name))).thenReturn(new ExecutionStep(stepId));
     }
 
-    private void mockAddBranchesStep(Long stepId, Long nextStepID, Long branchBeginStepID, Task task, Flow flow) {
-        Map<String, Serializable> preTaskActionData = task.getPreTaskActionData();
+    private void mockAddBranchesStep(Long stepId, Long nextStepID, Long branchBeginStepID, Step step, Flow flow) {
+        Map<String, Serializable> preTaskActionData = step.getPreTaskActionData();
         String refId = flow.getId();
-        String name = task.getName();
+        String name = step.getName();
         when(stepFactory.createAddBranchesStep(eq(stepId), eq(nextStepID), eq(branchBeginStepID), eq(preTaskActionData), eq(refId), eq(name))).thenReturn(new ExecutionStep(stepId));
     }
 
-    private void mockJoinBranchesStep(Long stepId, Task task) {
-        Map<String, Serializable> postTaskActionData = task.getPostTaskActionData();
-        String taskName = task.getName();
+    private void mockJoinBranchesStep(Long stepId, Step step) {
+        Map<String, Serializable> postTaskActionData = step.getPostTaskActionData();
+        String taskName = step.getName();
         when(stepFactory.createJoinBranchesStep(eq(stepId), eq(postTaskActionData), anyMapOf(String.class, ResultNavigation.class), eq(taskName))).thenReturn(new ExecutionStep(stepId));
     }
 
@@ -185,10 +185,10 @@ public class ExecutionPlanBuilderTest {
     public void createSimpleFlow() throws Exception {
         Map<String, Serializable> preFlowActionData = new HashMap<>();
         Map<String, Serializable> postFlowActionData = new HashMap<>();
-        Deque<Task> tasks = new LinkedList<>();
-        Task task = createSimpleCompiledTask("taskName");
-        tasks.add(task);
-        Workflow workflow = new Workflow(tasks);
+        Deque<Step> steps = new LinkedList<>();
+        Step step = createSimpleCompiledTask("taskName");
+        steps.add(step);
+        Workflow workflow = new Workflow(steps);
         String flowName = "flowName";
         String flowNamespace = "user.flows";
         List<Input> inputs = new ArrayList<>();
@@ -200,8 +200,8 @@ public class ExecutionPlanBuilderTest {
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
-        mockBeginTask(2L, task);
-        mockFinishTask(3L, task);
+        mockBeginTask(2L, step);
+        mockFinishTask(3L, step);
         ExecutionPlan executionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFlow);
 
         assertEquals("different number of execution steps than expected", 4, executionPlan.getSteps().size());
@@ -214,10 +214,10 @@ public class ExecutionPlanBuilderTest {
     public void createSimpleFlowWithAsyncLoop() throws Exception {
         Map<String, Serializable> preFlowActionData = new HashMap<>();
         Map<String, Serializable> postFlowActionData = new HashMap<>();
-        Deque<Task> tasks = new LinkedList<>();
-        Task task = createSimpleCompiledAsyncTask("taskName");
-        tasks.add(task);
-        Workflow workflow = new Workflow(tasks);
+        Deque<Step> steps = new LinkedList<>();
+        Step step = createSimpleCompiledAsyncTask("taskName");
+        steps.add(step);
+        Workflow workflow = new Workflow(steps);
         String flowName = "flowName";
         String flowNamespace = "user.flows";
         List<Input> inputs = new ArrayList<>();
@@ -229,22 +229,22 @@ public class ExecutionPlanBuilderTest {
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
-        mockAddBranchesStep(2L, 5L, 3L, task, compiledFlow);
-        mockBeginTask(3L, task);
-        mockFinishAsyncTask(4L, task);
-        mockJoinBranchesStep(5L, task);
+        mockAddBranchesStep(2L, 5L, 3L, step, compiledFlow);
+        mockBeginTask(3L, step);
+        mockFinishAsyncTask(4L, step);
+        mockJoinBranchesStep(5L, step);
         ExecutionPlan executionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFlow);
 
         verify(stepFactory).createAddBranchesStep(
                 eq(2L),
                 eq(5L),
                 eq(3L),
-                eq(task.getPreTaskActionData()),
+                eq(step.getPreTaskActionData()),
                 eq(compiledFlow.getId()),
-                eq(task.getName()));
-        verify(stepFactory).createBeginTaskStep(eq(3L), anyListOf(Argument.class), eq(task.getPreTaskActionData()), eq(task.getRefId()), eq(task.getName()));
-        verify(stepFactory).createFinishTaskStep(eq(4L), eq(task.getPostTaskActionData()), anyMapOf(String.class, ResultNavigation.class), eq(task.getName()), eq(task.isAsync()));
-        verify(stepFactory).createJoinBranchesStep(eq(5L), eq(task.getPostTaskActionData()), anyMapOf(String.class, ResultNavigation.class), eq(task.getName()));
+                eq(step.getName()));
+        verify(stepFactory).createBeginTaskStep(eq(3L), anyListOf(Argument.class), eq(step.getPreTaskActionData()), eq(step.getRefId()), eq(step.getName()));
+        verify(stepFactory).createFinishTaskStep(eq(4L), eq(step.getPostTaskActionData()), anyMapOf(String.class, ResultNavigation.class), eq(step.getName()), eq(step.isAsync()));
+        verify(stepFactory).createJoinBranchesStep(eq(5L), eq(step.getPostTaskActionData()), anyMapOf(String.class, ResultNavigation.class), eq(step.getName()));
 
         assertEquals("different number of execution steps than expected", 6, executionPlan.getSteps().size());
         assertEquals("flow name is different than expected", flowName, executionPlan.getName());
@@ -254,7 +254,7 @@ public class ExecutionPlanBuilderTest {
 
     @Test
     public void createFlowWithTwoTasks() throws Exception {
-        Deque<Task> tasks = new LinkedList<>();
+        Deque<Step> steps = new LinkedList<>();
         String secondTaskName = "2ndTask";
         List<Map<String, String>> navigationStrings = new ArrayList<>();
         Map<String, String> successMap = new HashMap<>();
@@ -263,14 +263,14 @@ public class ExecutionPlanBuilderTest {
         failureMap.put(ScoreLangConstants.FAILURE_RESULT, ScoreLangConstants.FAILURE_RESULT);
         navigationStrings.add(successMap);
         navigationStrings.add(failureMap);
-        Task firstTask = createSimpleCompiledTask("firstTaskName", navigationStrings);
-        Task secondTask = createSimpleCompiledTask(secondTaskName);
-        tasks.add(firstTask);
-        tasks.add(secondTask);
+        Step firstStep = createSimpleCompiledTask("firstTaskName", navigationStrings);
+        Step secondStep = createSimpleCompiledTask(secondTaskName);
+        steps.add(firstStep);
+        steps.add(secondStep);
         Map<String, Serializable> preFlowActionData = new HashMap<>();
         Map<String, Serializable> postFlowActionData = new HashMap<>();
 
-        Workflow workflow = new Workflow(tasks);
+        Workflow workflow = new Workflow(steps);
         String flowName = "flowName";
         String flowNamespace = "user.flows";
         List<Input> inputs = new ArrayList<>();
@@ -284,10 +284,10 @@ public class ExecutionPlanBuilderTest {
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
 
-        mockBeginTask(2L, firstTask);
-        mockFinishTask(3L, firstTask);
-        mockBeginTask(4L, secondTask);
-        mockFinishTask(5L, secondTask);
+        mockBeginTask(2L, firstStep);
+        mockFinishTask(3L, firstStep);
+        mockBeginTask(4L, secondStep);
+        mockFinishTask(5L, secondStep);
         ExecutionPlan executionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFlow);
 
         assertEquals("different number of execution steps than expected", 6, executionPlan.getSteps().size());
@@ -300,8 +300,8 @@ public class ExecutionPlanBuilderTest {
     public void createFlowWithNoTasksShouldThrowException() throws Exception {
         Map<String, Serializable> preFlowActionData = new HashMap<>();
         Map<String, Serializable> postFlowActionData = new HashMap<>();
-        Deque<Task> tasks = new LinkedList<>();
-        Workflow workflow = new Workflow(tasks);
+        Deque<Step> steps = new LinkedList<>();
+        Workflow workflow = new Workflow(steps);
         String flowName = "flowName";
         String flowNamespace = "user.flows";
         List<Input> inputs = new ArrayList<>();

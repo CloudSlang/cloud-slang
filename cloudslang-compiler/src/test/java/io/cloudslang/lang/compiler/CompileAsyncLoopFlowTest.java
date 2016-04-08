@@ -12,7 +12,7 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
-import io.cloudslang.lang.compiler.modeller.model.Task;
+import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.entities.AsyncLoopStatement;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ResultNavigation;
@@ -48,14 +48,14 @@ public class CompileAsyncLoopFlowTest {
 
     @Test
     public void testPreCompileAsyncLoopFlow() throws Exception {
-        Task task = getTasksAfterPrecompileFlow("/loops/async_loop/simple_async_loop.sl").getFirst();
+        Step step = getTasksAfterPrecompileFlow("/loops/async_loop/simple_async_loop.sl").getFirst();
 
-        verifyAsyncLoopStatement(task);
+        verifyAsyncLoopStatement(step);
 
-        List<Output> aggregateValues = getAggregateOutputs(task);
+        List<Output> aggregateValues = getAggregateOutputs(step);
         assertEquals("aggregate list is not empty", 0, aggregateValues.size());
 
-        List<Output> publishValues = getPublishOutputs(task);
+        List<Output> publishValues = getPublishOutputs(step);
         assertEquals("aggregate list is not empty", 0, publishValues.size());
 
         List<Map<String, String>> expectedNavigationStrings = new ArrayList<>();
@@ -65,22 +65,22 @@ public class CompileAsyncLoopFlowTest {
         failureMap.put(ScoreLangConstants.FAILURE_RESULT, "FAILURE");
         expectedNavigationStrings.add(successMap);
         expectedNavigationStrings.add(failureMap);
-        verifyNavigationStrings(expectedNavigationStrings, task);
+        verifyNavigationStrings(expectedNavigationStrings, step);
 
-        assertTrue(task.isAsync());
+        assertTrue(step.isAsync());
     }
 
     @Test
     public void testPreCompileAsyncLoopFlowAggregate() throws Exception {
-        Task task = getTasksAfterPrecompileFlow("/loops/async_loop/async_loop_aggregate.sl").getFirst();
+        Step step = getTasksAfterPrecompileFlow("/loops/async_loop/async_loop_aggregate.sl").getFirst();
 
-        verifyAsyncLoopStatement(task);
+        verifyAsyncLoopStatement(step);
 
-        List<Output> aggregateValues = getAggregateOutputs(task);
+        List<Output> aggregateValues = getAggregateOutputs(step);
         assertEquals(2, aggregateValues.size());
         assertEquals("${ map(lambda x:str(x['name']), branches_context) }", aggregateValues.get(0).getValue());
 
-        List<Output> publishValues = getPublishOutputs(task);
+        List<Output> publishValues = getPublishOutputs(step);
         assertEquals("aggregate list is not empty", 2, publishValues.size());
         assertEquals("${name}", publishValues.get(0).getValue());
 
@@ -91,24 +91,24 @@ public class CompileAsyncLoopFlowTest {
         failureMap.put(ScoreLangConstants.FAILURE_RESULT, "FAILURE");
         expectedNavigationStrings.add(successMap);
         expectedNavigationStrings.add(failureMap);
-        verifyNavigationStrings(expectedNavigationStrings, task);
+        verifyNavigationStrings(expectedNavigationStrings, step);
 
-        assertTrue(task.isAsync());
+        assertTrue(step.isAsync());
     }
 
     @Test
     public void testPreCompileAsyncLoopFlowNavigate() throws Exception {
-        Deque<Task> tasks = getTasksAfterPrecompileFlow("/loops/async_loop/async_loop_navigate.sl");
-        assertEquals(2, tasks.size());
+        Deque<Step> steps = getTasksAfterPrecompileFlow("/loops/async_loop/async_loop_navigate.sl");
+        assertEquals(2, steps.size());
 
-        Task asyncTask = tasks.getFirst();
+        Step asyncStep = steps.getFirst();
 
-        verifyAsyncLoopStatement(asyncTask);
+        verifyAsyncLoopStatement(asyncStep);
 
-        List<Output> aggregateValues = getAggregateOutputs(asyncTask);
+        List<Output> aggregateValues = getAggregateOutputs(asyncStep);
         assertEquals(0, aggregateValues.size());
 
-        List<Output> publishValues = getPublishOutputs(asyncTask);
+        List<Output> publishValues = getPublishOutputs(asyncStep);
         assertEquals("aggregate list is not empty", 0, publishValues.size());
 
         List<Map<String, String>> expectedNavigationStrings = new ArrayList<>();
@@ -118,25 +118,25 @@ public class CompileAsyncLoopFlowTest {
         failureMap.put(ScoreLangConstants.FAILURE_RESULT, "FAILURE");
         expectedNavigationStrings.add(successMap);
         expectedNavigationStrings.add(failureMap);
-        verifyNavigationStrings(expectedNavigationStrings, asyncTask);
+        verifyNavigationStrings(expectedNavigationStrings, asyncStep);
 
-        assertTrue(asyncTask.isAsync());
+        assertTrue(asyncStep.isAsync());
     }
 
     @Test
     public void testPreCompileAsyncLoopFlowAggregateNavigate() throws Exception {
-        Deque<Task> tasks = getTasksAfterPrecompileFlow("/loops/async_loop/async_loop_aggregate_navigate.sl");
-        assertEquals(2, tasks.size());
+        Deque<Step> steps = getTasksAfterPrecompileFlow("/loops/async_loop/async_loop_aggregate_navigate.sl");
+        assertEquals(2, steps.size());
 
-        Task asyncTask = tasks.getFirst();
+        Step asyncStep = steps.getFirst();
 
-        verifyAsyncLoopStatement(asyncTask);
+        verifyAsyncLoopStatement(asyncStep);
 
-        List<Output> aggregateValues = getAggregateOutputs(asyncTask);
+        List<Output> aggregateValues = getAggregateOutputs(asyncStep);
         assertEquals(2, aggregateValues.size());
         assertEquals("${ map(lambda x:str(x['name']), branches_context) }", aggregateValues.get(0).getValue());
 
-        List<Output> publishValues = getPublishOutputs(asyncTask);
+        List<Output> publishValues = getPublishOutputs(asyncStep);
         assertEquals("aggregate list is not empty", 2, publishValues.size());
         assertEquals("${name}", publishValues.get(0).getValue());
 
@@ -147,9 +147,9 @@ public class CompileAsyncLoopFlowTest {
         failureMap.put(ScoreLangConstants.FAILURE_RESULT, "FAILURE");
         expectedNavigationStrings.add(successMap);
         expectedNavigationStrings.add(failureMap);
-        verifyNavigationStrings(expectedNavigationStrings, asyncTask);
+        verifyNavigationStrings(expectedNavigationStrings, asyncStep);
 
-        assertTrue(asyncTask.isAsync());
+        assertTrue(asyncStep.isAsync());
     }
 
     @Test
@@ -169,8 +169,8 @@ public class CompileAsyncLoopFlowTest {
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
         verifyAsyncLoopStatement(addBranchesActionData);
 
-        assertNotNull("branch begin task method not found", executionPlan.getStep(3L));
-        assertNotNull("branch end task method not found", executionPlan.getStep(4L));
+        assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
+        assertNotNull("branch end step method not found", executionPlan.getStep(4L));
         assertNotNull("join branches method not found", executionPlan.getStep(5L));
     }
 
@@ -197,9 +197,9 @@ public class CompileAsyncLoopFlowTest {
 
         verifyAggregateValues(joinBranchesActionData);
 
-        assertNotNull("branch begin task method not found", executionPlan.getStep(3L));
+        assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
         ExecutionStep branchEndTaskStep = executionPlan.getStep(4L);
-        assertNotNull("branch end task method not found", branchEndTaskStep);
+        assertNotNull("branch end step method not found", branchEndTaskStep);
 
         verifyPublishValues(branchEndTaskStep.getActionData());
     }
@@ -229,8 +229,8 @@ public class CompileAsyncLoopFlowTest {
 
         verifyNavigationValues(joinBranchesActionData);
 
-        assertNotNull("branch begin task method not found", executionPlan.getStep(3L));
-        assertNotNull("branch end task method not found", executionPlan.getStep(4L));
+        assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
+        assertNotNull("branch end step method not found", executionPlan.getStep(4L));
     }
 
     @Test
@@ -260,9 +260,9 @@ public class CompileAsyncLoopFlowTest {
 
         verifyNavigationValues(joinBranchesActionData);
 
-        assertNotNull("branch begin task method not found", executionPlan.getStep(3L));
+        assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
         ExecutionStep branchEndTaskStep = executionPlan.getStep(4L);
-        assertNotNull("branch end task method not found", branchEndTaskStep);
+        assertNotNull("branch end step method not found", branchEndTaskStep);
 
         verifyPublishValues(branchEndTaskStep.getActionData());
     }
@@ -322,38 +322,38 @@ public class CompileAsyncLoopFlowTest {
         assertEquals("async loop statement expression not as expected", "values", asyncLoopStatement.getExpression());
     }
 
-    private Deque<Task> getTasksAfterPrecompileFlow(String flowPath) throws URISyntaxException {
+    private Deque<Step> getTasksAfterPrecompileFlow(String flowPath) throws URISyntaxException {
         URI flow = getClass().getResource(flowPath).toURI();
         Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
         assertNotNull("executable is null", executable);
 
-        return ((Flow) executable).getWorkflow().getTasks();
+        return ((Flow) executable).getWorkflow().getSteps();
     }
 
-    private void verifyAsyncLoopStatement(Task task) {
-        assertTrue(task.getPreTaskActionData().containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
-        AsyncLoopStatement asyncLoopStatement = (AsyncLoopStatement) task.getPreTaskActionData()
+    private void verifyAsyncLoopStatement(Step step) {
+        assertTrue(step.getPreTaskActionData().containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
+        AsyncLoopStatement asyncLoopStatement = (AsyncLoopStatement) step.getPreTaskActionData()
                 .get(ScoreLangConstants.ASYNC_LOOP_KEY);
         assertEquals("values", asyncLoopStatement.getExpression());
         assertEquals("value", asyncLoopStatement.getVarName());
     }
 
-    private List<Output> getAggregateOutputs(Task task) {
-        assertTrue(task.getPostTaskActionData().containsKey(SlangTextualKeys.AGGREGATE_KEY));
-        @SuppressWarnings("unchecked") List<Output> aggregateValues = (List<Output>) task.getPostTaskActionData().get(SlangTextualKeys.AGGREGATE_KEY);
+    private List<Output> getAggregateOutputs(Step step) {
+        assertTrue(step.getPostTaskActionData().containsKey(SlangTextualKeys.AGGREGATE_KEY));
+        @SuppressWarnings("unchecked") List<Output> aggregateValues = (List<Output>) step.getPostTaskActionData().get(SlangTextualKeys.AGGREGATE_KEY);
         assertNotNull("aggregate list is null", aggregateValues);
         return aggregateValues;
     }
 
-    private List<Output> getPublishOutputs(Task task) {
-        assertTrue(task.getPostTaskActionData().containsKey(SlangTextualKeys.PUBLISH_KEY));
-        @SuppressWarnings("unchecked") List<Output> publishValues = (List<Output>) task.getPostTaskActionData().get(SlangTextualKeys.PUBLISH_KEY);
+    private List<Output> getPublishOutputs(Step step) {
+        assertTrue(step.getPostTaskActionData().containsKey(SlangTextualKeys.PUBLISH_KEY));
+        @SuppressWarnings("unchecked") List<Output> publishValues = (List<Output>) step.getPostTaskActionData().get(SlangTextualKeys.PUBLISH_KEY);
         assertNotNull("publish list is null", publishValues);
         return publishValues;
     }
 
-    private void verifyNavigationStrings(List<Map<String, String>> expectedNavigationStrings, Task task) {
-        List<Map<String, String>> actualNavigationStrings = task.getNavigationStrings();
+    private void verifyNavigationStrings(List<Map<String, String>> expectedNavigationStrings, Step step) {
+        List<Map<String, String>> actualNavigationStrings = step.getNavigationStrings();
         assertEquals(expectedNavigationStrings, actualNavigationStrings);
     }
 

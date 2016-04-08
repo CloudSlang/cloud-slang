@@ -13,7 +13,7 @@ package io.cloudslang.lang.compiler.scorecompiler;
 import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
-import io.cloudslang.lang.compiler.modeller.model.Task;
+import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.bindings.Result;
@@ -83,55 +83,55 @@ public class ExecutionPlanBuilder {
             taskReferences.put(result.getName(), FLOW_END_STEP_ID);
         }
 
-        Deque<Task> tasks = compiledFlow.getWorkflow().getTasks();
+        Deque<Step> steps = compiledFlow.getWorkflow().getSteps();
 
-        if (CollectionUtils.isEmpty(tasks)) {
-            throw new RuntimeException("Flow: " + compiledFlow.getName() + " has no tasks");
+        if (CollectionUtils.isEmpty(steps)) {
+            throw new RuntimeException("Flow: " + compiledFlow.getName() + " has no steps");
         }
 
-        List<ExecutionStep> taskExecutionSteps = buildTaskExecutionSteps(tasks.getFirst(), taskReferences, tasks, compiledFlow);
+        List<ExecutionStep> taskExecutionSteps = buildTaskExecutionSteps(steps.getFirst(), taskReferences, steps, compiledFlow);
         executionPlan.addSteps(taskExecutionSteps);
 
         return executionPlan;
     }
 
     private List<ExecutionStep> buildTaskExecutionSteps(
-            Task task,
-            Map<String, Long> taskReferences, Deque<Task> tasks,
+            Step step,
+            Map<String, Long> taskReferences, Deque<Step> steps,
             Flow compiledFlow) {
 
         List<ExecutionStep> taskExecutionSteps = new ArrayList<>();
 
-        String taskName = task.getName();
-        Long currentId = getCurrentId(taskReferences, tasks);
-        boolean isAsync = task.isAsync();
+        String taskName = step.getName();
+        Long currentId = getCurrentId(taskReferences, steps);
+        boolean isAsync = step.isAsync();
 
-        //Begin Task
+        //Begin Step
         taskReferences.put(taskName, currentId);
         if (isAsync) {
             Long joinStepID = currentId + NUMBER_OF_ASYNC_LOOP_EXECUTION_STEPS + 1;
             taskExecutionSteps.add(
                     stepFactory.createAddBranchesStep(currentId++, joinStepID, currentId,
-                            task.getPreTaskActionData(), compiledFlow.getId(), taskName
+                            step.getPreTaskActionData(), compiledFlow.getId(), taskName
                     )
             );
         }
         taskExecutionSteps.add(
-                stepFactory.createBeginTaskStep(currentId++, task.getArguments(),
-                        task.getPreTaskActionData(), task.getRefId(), taskName)
+                stepFactory.createBeginTaskStep(currentId++, step.getArguments(),
+                        step.getPreTaskActionData(), step.getRefId(), taskName)
         );
 
-        //End Task
+        //End Step
         Map<String, ResultNavigation> navigationValues = new HashMap<>();
-        for (Map<String, String> map : task.getNavigationStrings()) {
+        for (Map<String, String> map : step.getNavigationStrings()) {
             Map.Entry<String, String> entry = map.entrySet().iterator().next();
             String nextStepName = entry.getValue();
             if (taskReferences.get(nextStepName) == null) {
-                Task nextTaskToCompile = Lambda.selectFirst(tasks, having(on(Task.class).getName(), equalTo(nextStepName)));
-                if (nextTaskToCompile == null) {
-                    throw new RuntimeException("Failed to compile task: " + taskName + ". The task/result name: " + entry.getValue() + " of navigation: " + entry.getKey() + " -> " + entry.getValue() + " is missing");
+                Step nextStepToCompile = Lambda.selectFirst(steps, having(on(Step.class).getName(), equalTo(nextStepName)));
+                if (nextStepToCompile == null) {
+                    throw new RuntimeException("Failed to compile step: " + taskName + ". The step/result name: " + entry.getValue() + " of navigation: " + entry.getKey() + " -> " + entry.getValue() + " is missing");
                 }
-                taskExecutionSteps.addAll(buildTaskExecutionSteps(nextTaskToCompile, taskReferences, tasks, compiledFlow));
+                taskExecutionSteps.addAll(buildTaskExecutionSteps(nextStepToCompile, taskReferences, steps, compiledFlow));
             }
             long nextStepId = taskReferences.get(nextStepName);
             String presetResult = (FLOW_END_STEP_ID == nextStepId) ? nextStepName : null;
@@ -142,41 +142,41 @@ public class ExecutionPlanBuilder {
         }
         if (isAsync) {
             taskExecutionSteps.add(
-                    stepFactory.createFinishTaskStep(currentId++, task.getPostTaskActionData(),
+                    stepFactory.createFinishTaskStep(currentId++, step.getPostTaskActionData(),
                             new HashMap<String, ResultNavigation>(), taskName, true)
             );
             taskExecutionSteps.add(
-                    stepFactory.createJoinBranchesStep(currentId, task.getPostTaskActionData(),
+                    stepFactory.createJoinBranchesStep(currentId, step.getPostTaskActionData(),
                             navigationValues, taskName)
             );
         } else {
             taskExecutionSteps.add(
-                    stepFactory.createFinishTaskStep(currentId, task.getPostTaskActionData(),
+                    stepFactory.createFinishTaskStep(currentId, step.getPostTaskActionData(),
                             navigationValues, taskName, false)
             );
         }
         return taskExecutionSteps;
     }
 
-    private Long getCurrentId(Map<String, Long> taskReferences, Deque<Task> tasks) {
+    private Long getCurrentId(Map<String, Long> taskReferences, Deque<Step> steps) {
         Long currentID;
 
         Long max = Lambda.max(taskReferences);
         Map.Entry maxEntry = Lambda.selectFirst(taskReferences.entrySet(), having(on(Map.Entry.class).getValue(), equalTo(max)));
         String referenceKey = (String) (maxEntry).getKey();
-        Task task = null;
-        for (Task taskItem : tasks) {
-            if (taskItem.getName().equals(referenceKey)) {
-                task = taskItem;
+        Step step = null;
+        for (Step stepItem : steps) {
+            if (stepItem.getName().equals(referenceKey)) {
+                step = stepItem;
                 break;
             }
         }
 
-        if (task == null || !task.isAsync()) {
-            // the reference is not a task or is not an async task
+        if (step == null || !step.isAsync()) {
+            // the reference is not a step or is not an async step
             currentID = max + NUMBER_OF_TASK_EXECUTION_STEPS;
         } else {
-            //async task
+            //async step
             currentID = max + NUMBER_OF_TASK_EXECUTION_STEPS + NUMBER_OF_ASYNC_LOOP_EXECUTION_STEPS;
         }
 

@@ -14,7 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
-import io.cloudslang.lang.compiler.modeller.model.Task;
+import io.cloudslang.lang.compiler.modeller.model.Step;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -244,10 +244,10 @@ public class ExecutableBuilderTest {
         Flow flow = (Flow) executableBuilder.transformToExecutable(mockParsedSlang, flowName, executableRawData).getExecutable();
         Assert.assertEquals(SlangTextualKeys.FLOW_TYPE, flow.getType());
         Assert.assertEquals(flowName, flow.getName());
-        Deque<Task> tasks = flow.getWorkflow().getTasks();
-        Assert.assertEquals(1, tasks.size());
-        Assert.assertEquals(taskName, tasks.getFirst().getName());
-        Assert.assertEquals(refId, tasks.getFirst().getRefId());
+        Deque<Step> steps = flow.getWorkflow().getSteps();
+        Assert.assertEquals(1, steps.size());
+        Assert.assertEquals(taskName, steps.getFirst().getName());
+        Assert.assertEquals(refId, steps.getFirst().getRefId());
 
     }
 
@@ -274,10 +274,10 @@ public class ExecutableBuilderTest {
 
         Assert.assertEquals(SlangTextualKeys.FLOW_TYPE, flow.getType());
         Assert.assertEquals(flowName, flow.getName());
-        Deque<Task> tasks = flow.getWorkflow().getTasks();
-        Assert.assertEquals(1, tasks.size());
-        Assert.assertEquals(taskName, tasks.getFirst().getName());
-        Assert.assertEquals(NAMESPACE + "." + refString, tasks.getFirst().getRefId());
+        Deque<Step> steps = flow.getWorkflow().getSteps();
+        Assert.assertEquals(1, steps.size());
+        Assert.assertEquals(taskName, steps.getFirst().getName());
+        Assert.assertEquals(NAMESPACE + "." + refString, steps.getFirst().getRefId());
     }
 
     @Test

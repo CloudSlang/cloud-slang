@@ -68,7 +68,7 @@ public class TaskSteps extends AbstractSteps {
         try {
 
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_STEP_START,
-                    "Task step started", LanguageEventData.StepType.TASK, nodeName);
+                    "Task step started", LanguageEventData.StepType.STEP, nodeName);
 
             runEnv.removeCallArguments();
             runEnv.removeReturnValues();
@@ -155,7 +155,7 @@ public class TaskSteps extends AbstractSteps {
 
             ReturnValues executableReturnValues = runEnv.removeReturnValues();
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
-                    LanguageEventData.StepType.TASK, nodeName,
+                    LanguageEventData.StepType.STEP, nodeName,
                     Pair.of(ScoreLangConstants.TASK_PUBLISH_KEY, (Serializable) taskPublishValues),
                     Pair.of(ScoreLangConstants.TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues),
                     Pair.of("operationReturnValues", executableReturnValues));
@@ -234,7 +234,7 @@ public class TaskSteps extends AbstractSteps {
                                      Long nextPosition,
                                      ReturnValues returnValues) {
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
-                LanguageEventData.StepType.TASK, nodeName,
+                LanguageEventData.StepType.STEP, nodeName,
                 Pair.of(LanguageEventData.OUTPUTS, publishValues),
                 Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
                 Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition));

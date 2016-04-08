@@ -27,19 +27,19 @@ flow:
         do:
           ops.system_property_dependencies_op:
             - input1
-            - input2: "get_sp('task.input.i_am_no_property')"
-            - input3: ${get_sp('task.input.prop1')}
-            - input4: ${get_sp('task.input.prop2', 'default_str')}
-            - input5: ${get_sp("task.input.prop3")}
-            - input6: ${get_sp("task.input.prop4", 'default_str')}
+            - input2: "get_sp('step.input.i_am_no_property')"
+            - input3: ${get_sp('step.input.prop1')}
+            - input4: ${get_sp('step.input.prop2', 'default_str')}
+            - input5: ${get_sp("step.input.prop3")}
+            - input6: ${get_sp("step.input.prop4", 'default_str')}
             - input7: ${check_empty(get('i_dont_exist'), 'default_str')}
         publish:
             - publish_1
-            - publish_2: "get_sp('task.publish.i_am_no_property')"
-            - publish_3: ${get_sp('task.publish.prop1')}
-            - publish_4: ${get_sp('task.publish.prop2', 'default_str')}
-            - publish_5: ${get_sp("task.publish.prop3")}
-            - publish_6: ${get_sp("task.publish.prop4", 'default_str')}
+            - publish_2: "get_sp('step.publish.i_am_no_property')"
+            - publish_3: ${get_sp('step.publish.prop1')}
+            - publish_4: ${get_sp('step.publish.prop2', 'default_str')}
+            - publish_5: ${get_sp("step.publish.prop3")}
+            - publish_6: ${get_sp("step.publish.prop4", 'default_str')}
             - publish_7: ${check_empty(get('i_dont_exist'), 'default_str')}
         navigate:
           - FUNCTIONS_KEY_EXISTS: Task2

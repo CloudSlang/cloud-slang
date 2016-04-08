@@ -118,7 +118,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         URI operations2 = getClass().getResource("/yaml/compute_daylight_time_zone.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Task arguments");
+        exception.expectMessage("Step arguments");
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
         ScoreEvent event = trigger(compilationArtifact, inputs, systemProperties);
     }

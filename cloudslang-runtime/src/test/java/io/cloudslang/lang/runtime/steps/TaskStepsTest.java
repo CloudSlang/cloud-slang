@@ -142,7 +142,7 @@ public class TaskStepsTest {
 
         LanguageEventData startBindingEventData = (LanguageEventData)inputStartEvent.getData();
         Assert.assertEquals("task1",startBindingEventData.getStepName());
-        Assert.assertEquals(LanguageEventData.StepType.TASK, startBindingEventData.getStepType());
+        Assert.assertEquals(LanguageEventData.StepType.STEP, startBindingEventData.getStepType());
 
         @SuppressWarnings("unchecked")
         List<String> inputsToBind = (List<String>)startBindingEventData.get(LanguageEventData.ARGUMENTS);
@@ -154,7 +154,7 @@ public class TaskStepsTest {
 
         LanguageEventData eventData = (LanguageEventData)inputEndEvent.getData();
         Assert.assertEquals("task1",eventData.getStepName());
-        Assert.assertEquals(LanguageEventData.StepType.TASK,eventData.getStepType());
+        Assert.assertEquals(LanguageEventData.StepType.STEP,eventData.getStepType());
 
         @SuppressWarnings("unchecked")
         Map<String, Serializable> boundInputs = (Map<String,Serializable>)eventData.get(LanguageEventData.BOUND_ARGUMENTS);
@@ -201,14 +201,14 @@ public class TaskStepsTest {
 
         LanguageEventData eventData = (LanguageEventData)outputStart.getData();
         Assert.assertEquals("task1",eventData.getStepName());
-        Assert.assertEquals(LanguageEventData.StepType.TASK,eventData.getStepType());
+        Assert.assertEquals(LanguageEventData.StepType.STEP,eventData.getStepType());
 
         ScoreEvent outputEnd = eventsIter.next();
         Assert.assertEquals(ScoreLangConstants.EVENT_OUTPUT_END,outputEnd.getEventType());
 
         eventData = (LanguageEventData)outputEnd.getData();
         Assert.assertEquals("task1",eventData.getStepName());
-        Assert.assertEquals(LanguageEventData.StepType.TASK,eventData.getStepType());
+        Assert.assertEquals(LanguageEventData.StepType.STEP,eventData.getStepType());
 
     }
 

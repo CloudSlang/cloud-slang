@@ -11,12 +11,8 @@ package io.cloudslang.lang.compiler.scorecompiler;
 import ch.lambdaj.function.convert.Converter;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
-import io.cloudslang.lang.compiler.modeller.TransformersHandler;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
-import io.cloudslang.lang.compiler.modeller.model.Task;
-import io.cloudslang.lang.compiler.modeller.transformers.AggregateTransformer;
-import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
-import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
+import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.entities.bindings.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
@@ -28,7 +24,6 @@ import io.cloudslang.lang.compiler.modeller.model.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
@@ -106,18 +101,18 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             return;
         }
         Flow flow = (Flow)executable;
-        Deque<Task> tasks = flow.getWorkflow().getTasks();
-        for(Task task : tasks){
-            List<Map<String, String>> taskNavigations = task.getNavigationStrings();
-            String refId = task.getRefId();
+        Deque<Step> steps = flow.getWorkflow().getSteps();
+        for(Step step : steps){
+            List<Map<String, String>> taskNavigations = step.getNavigationStrings();
+            String refId = step.getRefId();
             Executable reference = filteredDependencies.get(refId);
-            Validate.notNull(reference, "Cannot compile flow: \'" + executable.getName() + "\' since for task: \'" + task.getName()
+            Validate.notNull(reference, "Cannot compile flow: \'" + executable.getName() + "\' since for step: \'" + step.getName()
                     + "\', the dependency: \'" + refId + "\' is missing.");
             List<Result> refResults = reference.getResults();
             for(Result result : refResults){
                 String resultName = result.getName();
                 Validate.isTrue(navigationListContainsKey(taskNavigations, resultName), "Cannot compile flow: \'" + executable.getName() +
-                        "\' since for task: '" + task.getName() + "\', the result \'" + resultName+
+                        "\' since for step: '" + step.getName() + "\', the result \'" + resultName+
                         "\' of its dependency: \'"+ refId + "\' has no matching navigation");
             }
         }

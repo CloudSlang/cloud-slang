@@ -17,7 +17,7 @@ import java.util.Map;
 /*
  * Created by orius123 on 06/11/14.
  */
-public class Task {
+public class Step {
 
     private final String name;
     private final Map<String, Serializable> preTaskActionData;
@@ -27,7 +27,7 @@ public class Task {
     private final String refId;
     private final boolean async;
 
-    public Task(
+    public Step(
             String name,
             Map<String, Serializable> preTaskActionData,
             Map<String, Serializable> postTaskActionData,

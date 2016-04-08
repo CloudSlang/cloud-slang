@@ -45,7 +45,7 @@ public class RunDataAggregatorListener extends AbstractAggregatorListener {
     }
 
     private StepData buildStepData(List<LanguageEventData> data) {
-        List<LanguageEventData> taskEvents = selectByStepType(data, LanguageEventData.StepType.TASK);
+        List<LanguageEventData> taskEvents = selectByStepType(data, LanguageEventData.StepType.STEP);
         List<LanguageEventData> executableEvents = selectByStepType(data, LanguageEventData.StepType.EXECUTABLE);
 
         LanguageEventData inputsEvent;

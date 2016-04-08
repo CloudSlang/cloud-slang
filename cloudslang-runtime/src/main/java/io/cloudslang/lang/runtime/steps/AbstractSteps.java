@@ -77,7 +77,7 @@ public abstract class AbstractSteps {
                 runEnv,
                 ScoreLangConstants.EVENT_ARGUMENT_START,
                 description,
-                LanguageEventData.StepType.TASK,
+                LanguageEventData.StepType.STEP,
                 stepName,
                 Pair.of(LanguageEventData.ARGUMENTS, argumentNames)
         );
@@ -100,7 +100,7 @@ public abstract class AbstractSteps {
                 executionRuntimeServices,
                 runEnv, ScoreLangConstants.EVENT_ARGUMENT_END,
                 description,
-                LanguageEventData.StepType.TASK,
+                LanguageEventData.StepType.STEP,
                 stepName,
                 Pair.of(LanguageEventData.BOUND_ARGUMENTS, (Serializable) argumentsForEvent)
         );

@@ -111,7 +111,7 @@ public class DoTransformerTest {
     @Test
     public void testOneLinerTransformIsInvalid() throws Exception {
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Task arguments should be defined using a standard YAML list.");
+        exception.expectMessage("Step arguments should be defined using a standard YAML list.");
 
         @SuppressWarnings("unchecked")
         Map<String, Object> doArgumentsMap = loadFirstTaskFromFile("/task-args-in-list/flow_arguments_one_liner.yaml");

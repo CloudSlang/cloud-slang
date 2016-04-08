@@ -33,7 +33,7 @@ public interface SlangTextualKeys {
     //operation
     String ACTION_KEY = "action";
 
-    //task
+    //step
     String DO_KEY = "do";
     String FOR_KEY = "for";
     String BREAK_KEY = "break";
