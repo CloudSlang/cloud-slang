@@ -191,75 +191,75 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
-    public void testFlowTaskWithNoData() throws Exception {
+    public void testFlowStepWithNoData() throws Exception {
         URI resource = getClass().getResource("/corrupted/no_step_data_flow.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("task1");
+        exception.expectMessage("step1");
         exception.expectMessage("data");
         throw result.getErrors().get(0);
     }
 
     @Test
-    public void testFlowTaskWithTwoKeysUnderDo() throws Exception {
+    public void testFlowStepWithTwoKeysUnderDo() throws Exception {
         URI resource = getClass().getResource("/corrupted/multiple_keys_under_do.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("task1");
+        exception.expectMessage("step1");
         exception.expectMessage("to many keys");
         throw result.getErrors().get(0);
     }
 
     @Test
-    public void testFlowWithTasksAsList() throws Exception {
+    public void testFlowWithStepsAsList() throws Exception {
         URI resource = getClass().getResource("/corrupted/workflow_with_step_map.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("workflow_with_task_map");
+        exception.expectMessage("workflow_with_step_map");
         exception.expectMessage("map");
         exception.expectMessage("list");
         throw result.getErrors().get(0);
     }
 
     @Test
-    public void testFlowWithOnFailureTasksAsList() throws Exception {
+    public void testFlowWithOnFailureStepsAsList() throws Exception {
         URI resource = getClass().getResource("/corrupted/on_failure_with_step_map.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("on_failure_with_task_map");
+        exception.expectMessage("on_failure_with_step_map");
         exception.expectMessage("map");
         exception.expectMessage("list");
         throw result.getErrors().get(0);
     }
 
     @Test
-    public void testFlowWithNoRefTask() throws Exception {
+    public void testFlowWithNoRefStep() throws Exception {
         URI resource = getClass().getResource("/corrupted/step_with_no_ref_flow.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("task1");
+        exception.expectMessage("step1");
         exception.expectMessage("reference");
         throw result.getErrors().get(0);
     }
 
     @Test
-    public void testTaskWithListOfOps() throws Exception {
+    public void testStepWithListOfOps() throws Exception {
         URI resource = getClass().getResource("/corrupted/step_with_list_of_ops.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("task1");
+        exception.expectMessage("step1");
         exception.expectMessage("map");
         exception.expectMessage("list");
         exception.expectMessage("-");
@@ -267,13 +267,13 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
-    public void testTaskWithListOfDos() throws Exception {
+    public void testStepWithListOfDos() throws Exception {
         URI resource = getClass().getResource("/corrupted/step_with_list_of_do_flow.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("task1");
+        exception.expectMessage("step1");
         exception.expectMessage("map");
         exception.expectMessage("do:");
         throw result.getErrors().get(0);
@@ -338,12 +338,12 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(subFlow));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("task1");
+        exception.expectMessage("step1");
         throw result.getErrors().get(0);
     }
 
     @Test
-    public void testTaskWithNavigateAsString() throws Exception {
+    public void testStepWithNavigateAsString() throws Exception {
         URI resource = getClass().getResource("/corrupted/step_with_string_navigate_value.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
@@ -356,26 +356,26 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
-    public void testTaskWithIllegalTypeOfNavigate() throws Exception {
+    public void testStepWithIllegalTypeOfNavigate() throws Exception {
         URI resource = getClass().getResource("/corrupted/step_with_illegal_navigate_type.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("task1");
+        exception.expectMessage("step1");
         exception.expectMessage("navigate");
         exception.expectMessage("3");
         throw result.getErrors().get(0);
     }
 
     @Test
-    public void testDuplicateTaskNamesInFlow() throws Exception {
+    public void testDuplicateStepNamesInFlow() throws Exception {
         URI resource = getClass().getResource("/corrupted/duplicate_step_name.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Task1");
+        exception.expectMessage("Step1");
         exception.expectMessage("unique");
         throw result.getErrors().get(0);
     }
@@ -435,7 +435,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Task1");
+        exception.expectMessage("Step1");
         exception.expectMessage("navigate");
         exception.expectMessage("instead there is a map");
         throw result.getErrors().get(0);
@@ -448,7 +448,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Task1");
+        exception.expectMessage("Step1");
         exception.expectMessage("navigate");
         exception.expectMessage("exactly one key:value pair");
         throw result.getErrors().get(0);
@@ -461,7 +461,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Task1");
+        exception.expectMessage("Step1");
         exception.expectMessage("navigate");
         exception.expectMessage("key");
         exception.expectMessage("string");
@@ -475,7 +475,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Task1");
+        exception.expectMessage("Step1");
         exception.expectMessage("navigate");
         exception.expectMessage("value");
         exception.expectMessage("string");
