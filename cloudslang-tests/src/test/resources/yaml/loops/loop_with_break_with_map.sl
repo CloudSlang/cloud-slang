@@ -28,7 +28,7 @@ flow:
           - CUSTOM: print_other_values
           - SUCCESS: SUCCESS
 
-    - task_that_doesnt_run:
+    - step_that_doesnt_run:
         do:
           ops.print:
             - text: "I don't run"

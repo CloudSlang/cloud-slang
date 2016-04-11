@@ -10,7 +10,7 @@ imports:
   ops: io.cloudslang
 
 flow:
-  name: no_task_data
+  name: no_step_data
   workflow:
     - step1:
         do:

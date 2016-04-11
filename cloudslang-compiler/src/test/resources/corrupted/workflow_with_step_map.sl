@@ -12,6 +12,6 @@ imports:
 flow:
   name: workflow_with_step_map
   workflow:
-    task1:
+    step1:
       do:
         ops.op1:

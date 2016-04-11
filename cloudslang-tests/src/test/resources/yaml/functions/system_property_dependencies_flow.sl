@@ -23,7 +23,7 @@ flow:
     - input7: ${get_sp('flow.input.prop5', 'default_str')}
     - input8: ${check_empty(get('i_dont_exist'), 'default_str')}
   workflow:
-    - Task1:
+    - Step1:
         do:
           ops.system_property_dependencies_op:
             - input1
@@ -42,10 +42,10 @@ flow:
             - publish_6: ${get_sp("step.publish.prop4", 'default_str')}
             - publish_7: ${check_empty(get('i_dont_exist'), 'default_str')}
         navigate:
-          - FUNCTIONS_KEY_EXISTS: Task2
+          - FUNCTIONS_KEY_EXISTS: Step2
           - FUNCTIONS_KEY_EXISTS_PROBLEM: FUNCTIONS_KEY_EXISTS_PROBLEM
           
-    - Task2:
+    - Step2:
         async_loop:
           for: value in [1,2,3]
           do:
@@ -59,7 +59,7 @@ flow:
           - FUNCTIONS_KEY_EXISTS: FUNCTIONS_KEY_EXISTS
           - FUNCTIONS_KEY_EXISTS_PROBLEM: FUNCTIONS_KEY_EXISTS_PROBLEM
           
-    - Task3:
+    - Step3:
         loop:
           for: value in [1,2,3]
           do:

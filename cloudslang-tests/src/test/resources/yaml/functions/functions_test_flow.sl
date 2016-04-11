@@ -59,7 +59,7 @@ flow:
         required: false
     - input_17: ${check_empty(get('i_dont_exist'), 'default_str')}
   workflow:
-    - Task1:
+    - Step1:
         do:
           ops.functions_test_op:
             - exist

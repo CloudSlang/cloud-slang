@@ -13,7 +13,7 @@ imports:
 flow:
   name: get_function_test_flow_default_result
   workflow:
-    - Task1:
+    - Step1:
         do:
           ops.get_function_test_default_result: []
         navigate:
