@@ -67,9 +67,9 @@ flow:
     - input_expression_characters: >
         ${ 'docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ' + authorized_keys_path + '} -p ' +
         scp_host_port + ':22 --name test1 -v /data:'}
-    - task_argument_null: "task_argument_null_value"
+    - step_argument_null: "step_argument_null_value"
   workflow:
-    - task_standard:
+    - step_standard:
         do:
           ops.values_op:
             # properties
@@ -101,20 +101,20 @@ flow:
                 input_concat_1 +
                 '_suffix'
                 }
-            - task_argument_null: null
+            - step_argument_null: null
         publish:
           - output_no_expression
           - publish_int: 22
           - publish_str: publish_str_value
           - publish_expression: ${ publish_str + '_suffix' }
-          - output_task_argument_null
+          - output_step_argument_null
 
   outputs:
     - output_no_expression
     - output_int: 22
     - output_str: output_str_value
     - output_expression: ${ output_str + '_suffix' }
-    - output_task_argument_null
+    - output_step_argument_null
   results:
     - SUCCESS
     - FAILURE

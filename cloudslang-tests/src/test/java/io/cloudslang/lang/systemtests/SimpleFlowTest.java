@@ -129,7 +129,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         SlangSource operationsSource = SlangSource.fromFile(operations);
         Set<SlangSource> path = Sets.newHashSet(operationsSource);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Task1");
+        exception.expectMessage("Step1");
         exception.expectMessage("CUSTOM");
         exception.expectMessage("navigation");
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
@@ -155,8 +155,8 @@ public class SimpleFlowTest extends SystemsTestsParent {
     }
 
     @Test
-    public void testFlowWithSameInputNameAsTask() throws Exception {
-        URI resource = getClass().getResource("/yaml/flow_with_same_input_name_as_task.sl").toURI();
+    public void testFlowWithSameInputNameAsStep() throws Exception {
+        URI resource = getClass().getResource("/yaml/flow_with_same_input_name_as_step.sl").toURI();
         URI operation1 = getClass().getResource("/yaml/string_equals.sl").toURI();
         URI operation2 = getClass().getResource("/yaml/test_op.sl").toURI();
 
@@ -169,12 +169,12 @@ public class SimpleFlowTest extends SystemsTestsParent {
 
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
 
-        List<String> actualTasks = getTasksOnly(stepsData);
-        Assert.assertEquals(2, actualTasks.size());
-        StepData firstTask = stepsData.get(FIRST_STEP_PATH);
-        StepData secondTask = stepsData.get(SECOND_STEP_KEY);
-        Assert.assertEquals("CheckBinding", firstTask.getName());
-        Assert.assertEquals("TaskOnSuccess", secondTask.getName());
+        List<String> actualSteps = getStepsOnly(stepsData);
+        Assert.assertEquals(2, actualSteps.size());
+        StepData firstStep = stepsData.get(FIRST_STEP_PATH);
+        StepData secondStep = stepsData.get(SECOND_STEP_KEY);
+        Assert.assertEquals("CheckBinding", firstStep.getName());
+        Assert.assertEquals("StepOnSuccess", secondStep.getName());
     }
 
 }
