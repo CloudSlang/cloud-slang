@@ -192,7 +192,7 @@ public class PreCompilerErrorsTest {
 
     @Test
     public void testFlowTaskWithNoData() throws Exception {
-        URI resource = getClass().getResource("/corrupted/no_task_data_flow.sl").toURI();
+        URI resource = getClass().getResource("/corrupted/no_step_data_flow.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
@@ -216,7 +216,7 @@ public class PreCompilerErrorsTest {
 
     @Test
     public void testFlowWithTasksAsList() throws Exception {
-        URI resource = getClass().getResource("/corrupted/workflow_with_task_map.sl").toURI();
+        URI resource = getClass().getResource("/corrupted/workflow_with_step_map.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
@@ -229,7 +229,7 @@ public class PreCompilerErrorsTest {
 
     @Test
     public void testFlowWithOnFailureTasksAsList() throws Exception {
-        URI resource = getClass().getResource("/corrupted/on_failure_with_task_map.sl").toURI();
+        URI resource = getClass().getResource("/corrupted/on_failure_with_step_map.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
@@ -242,7 +242,7 @@ public class PreCompilerErrorsTest {
 
     @Test
     public void testFlowWithNoRefTask() throws Exception {
-        URI resource = getClass().getResource("/corrupted/task_with_no_ref_flow.sl").toURI();
+        URI resource = getClass().getResource("/corrupted/step_with_no_ref_flow.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
@@ -254,7 +254,7 @@ public class PreCompilerErrorsTest {
 
     @Test
     public void testTaskWithListOfOps() throws Exception {
-        URI resource = getClass().getResource("/corrupted/task_with_list_of_ops.sl").toURI();
+        URI resource = getClass().getResource("/corrupted/step_with_list_of_ops.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
@@ -268,7 +268,7 @@ public class PreCompilerErrorsTest {
 
     @Test
     public void testTaskWithListOfDos() throws Exception {
-        URI resource = getClass().getResource("/corrupted/task_with_list_of_do_flow.sl").toURI();
+        URI resource = getClass().getResource("/corrupted/step_with_list_of_do_flow.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
@@ -333,7 +333,7 @@ public class PreCompilerErrorsTest {
 
     @Test
     public void testParentFlowWithCorruptedSubFlow() throws Exception {
-        URI subFlow = getClass().getResource("/corrupted/no_task_data_flow.sl").toURI();
+        URI subFlow = getClass().getResource("/corrupted/no_step_data_flow.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(subFlow));
         assertTrue(result.getErrors().size() > 0);
@@ -344,7 +344,7 @@ public class PreCompilerErrorsTest {
 
     @Test
     public void testTaskWithNavigateAsString() throws Exception {
-        URI resource = getClass().getResource("/corrupted/task_with_string_navigate_value.sl").toURI();
+        URI resource = getClass().getResource("/corrupted/step_with_string_navigate_value.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
@@ -357,7 +357,7 @@ public class PreCompilerErrorsTest {
 
     @Test
     public void testTaskWithIllegalTypeOfNavigate() throws Exception {
-        URI resource = getClass().getResource("/corrupted/task_with_illegal_navigate_type.sl").toURI();
+        URI resource = getClass().getResource("/corrupted/step_with_illegal_navigate_type.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
@@ -370,7 +370,7 @@ public class PreCompilerErrorsTest {
 
     @Test
     public void testDuplicateTaskNamesInFlow() throws Exception {
-        URI resource = getClass().getResource("/corrupted/duplicate_task_name.sl").toURI();
+        URI resource = getClass().getResource("/corrupted/duplicate_step_name.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);

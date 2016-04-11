@@ -48,7 +48,7 @@ public class CompileAsyncLoopFlowTest {
 
     @Test
     public void testPreCompileAsyncLoopFlow() throws Exception {
-        Step step = getTasksAfterPrecompileFlow("/loops/async_loop/simple_async_loop.sl").getFirst();
+        Step step = getStepsAfterPrecompileFlow("/loops/async_loop/simple_async_loop.sl").getFirst();
 
         verifyAsyncLoopStatement(step);
 
@@ -72,7 +72,7 @@ public class CompileAsyncLoopFlowTest {
 
     @Test
     public void testPreCompileAsyncLoopFlowAggregate() throws Exception {
-        Step step = getTasksAfterPrecompileFlow("/loops/async_loop/async_loop_aggregate.sl").getFirst();
+        Step step = getStepsAfterPrecompileFlow("/loops/async_loop/async_loop_aggregate.sl").getFirst();
 
         verifyAsyncLoopStatement(step);
 
@@ -98,7 +98,7 @@ public class CompileAsyncLoopFlowTest {
 
     @Test
     public void testPreCompileAsyncLoopFlowNavigate() throws Exception {
-        Deque<Step> steps = getTasksAfterPrecompileFlow("/loops/async_loop/async_loop_navigate.sl");
+        Deque<Step> steps = getStepsAfterPrecompileFlow("/loops/async_loop/async_loop_navigate.sl");
         assertEquals(2, steps.size());
 
         Step asyncStep = steps.getFirst();
@@ -125,7 +125,7 @@ public class CompileAsyncLoopFlowTest {
 
     @Test
     public void testPreCompileAsyncLoopFlowAggregateNavigate() throws Exception {
-        Deque<Step> steps = getTasksAfterPrecompileFlow("/loops/async_loop/async_loop_aggregate_navigate.sl");
+        Deque<Step> steps = getStepsAfterPrecompileFlow("/loops/async_loop/async_loop_aggregate_navigate.sl");
         assertEquals(2, steps.size());
 
         Step asyncStep = steps.getFirst();
@@ -198,10 +198,10 @@ public class CompileAsyncLoopFlowTest {
         verifyAggregateValues(joinBranchesActionData);
 
         assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
-        ExecutionStep branchEndTaskStep = executionPlan.getStep(4L);
-        assertNotNull("branch end step method not found", branchEndTaskStep);
+        ExecutionStep branchEndStepExecutionStep = executionPlan.getStep(4L);
+        assertNotNull("branch end step method not found", branchEndStepExecutionStep);
 
-        verifyPublishValues(branchEndTaskStep.getActionData());
+        verifyPublishValues(branchEndStepExecutionStep.getActionData());
     }
 
     @Test
@@ -261,15 +261,15 @@ public class CompileAsyncLoopFlowTest {
         verifyNavigationValues(joinBranchesActionData);
 
         assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
-        ExecutionStep branchEndTaskStep = executionPlan.getStep(4L);
-        assertNotNull("branch end step method not found", branchEndTaskStep);
+        ExecutionStep branchEndStepExecutionStep = executionPlan.getStep(4L);
+        assertNotNull("branch end step method not found", branchEndStepExecutionStep);
 
-        verifyPublishValues(branchEndTaskStep.getActionData());
+        verifyPublishValues(branchEndStepExecutionStep.getActionData());
     }
 
-    private void verifyPublishValues(Map<String, ?> branchEndTaskActionData) {
+    private void verifyPublishValues(Map<String, ?> branchEndStepActionData) {
         @SuppressWarnings("unchecked") List<Output> actualPublishOutputs =
-                (List<Output>) branchEndTaskActionData.get(ScoreLangConstants.STEP_PUBLISH_KEY);
+                (List<Output>) branchEndStepActionData.get(ScoreLangConstants.STEP_PUBLISH_KEY);
         List<Output> expectedPublishOutputs = new ArrayList<>();
         expectedPublishOutputs.add(new Output("name", "${name}"));
         expectedPublishOutputs.add(new Output("number", "${ int_output }"));
@@ -322,7 +322,7 @@ public class CompileAsyncLoopFlowTest {
         assertEquals("async loop statement expression not as expected", "values", asyncLoopStatement.getExpression());
     }
 
-    private Deque<Step> getTasksAfterPrecompileFlow(String flowPath) throws URISyntaxException {
+    private Deque<Step> getStepsAfterPrecompileFlow(String flowPath) throws URISyntaxException {
         URI flow = getClass().getResource(flowPath).toURI();
         Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
         assertNotNull("executable is null", executable);

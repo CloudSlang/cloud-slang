@@ -10,12 +10,7 @@ imports:
   ops: io.cloudslang
 
 flow:
-  name: on_failure_with_task_map
+  name: step_with_no_ref_flow
   workflow:
-    - task1:
+    - step1:
         do:
-          ops.op1:
-    - on_failure:
-        task2:
-          do:
-            ops.op1

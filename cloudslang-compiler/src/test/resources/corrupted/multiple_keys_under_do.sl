@@ -12,7 +12,7 @@ imports:
 flow:
   name: no_task_data
   workflow:
-    - task1:
+    - step1:
         do:
           ops.test_op:
             - alla: 'hello'

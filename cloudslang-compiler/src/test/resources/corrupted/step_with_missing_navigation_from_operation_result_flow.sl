@@ -10,18 +10,10 @@ imports:
   ops: user.ops
 
 flow:
-  name: duplicate_task_name
-
+  name: step_with_missing_navigation_from_operation_result_flow
   workflow:
-    - Task1:
+    - step1:
         do:
           ops.java_op:
         navigate:
           - SUCCESS: SUCCESS
-          - FAILURE: FAILURE
-    - Task1:
-        do:
-          ops.java_op:
-        navigate:
-          - SUCCESS: SUCCESS
-          - FAILURE: FAILURE

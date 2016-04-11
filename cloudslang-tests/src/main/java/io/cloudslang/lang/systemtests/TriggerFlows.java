@@ -99,11 +99,11 @@ public class TriggerFlows {
             e.printStackTrace();
         }
 
-        Map<String, StepData> tasks = runDataAggregatorListener.aggregate();
+        Map<String, StepData> steps = runDataAggregatorListener.aggregate();
         Map<String, List<StepData>> branchesByPath = branchAggregatorListener.aggregate();
-        Map<String, StepData> asyncTasks = joinAggregatorListener.aggregate();
+        Map<String, StepData> asyncSteps = joinAggregatorListener.aggregate();
 
-        RuntimeInformation runtimeInformation = new RuntimeInformation(tasks, branchesByPath, asyncTasks);
+        RuntimeInformation runtimeInformation = new RuntimeInformation(steps, branchesByPath, asyncSteps);
 
         slang.unSubscribeOnEvents(joinAggregatorListener);
         slang.unSubscribeOnEvents(branchAggregatorListener);

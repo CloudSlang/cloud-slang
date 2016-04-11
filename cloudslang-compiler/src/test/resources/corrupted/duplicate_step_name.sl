@@ -7,12 +7,21 @@
 namespace: io.cloudslang
 
 imports:
-  flows: io.cloudslang
+  ops: user.ops
 
 flow:
-  name: parent_flow_to_no_task_data_flow
+  name: duplicate_step_name
 
   workflow:
-    - missing_name_subflow:
+    - Step1:
         do:
-          flows.no_task_data:
+          ops.java_op:
+        navigate:
+          - SUCCESS: SUCCESS
+          - FAILURE: FAILURE
+    - Step1:
+        do:
+          ops.java_op:
+        navigate:
+          - SUCCESS: SUCCESS
+          - FAILURE: FAILURE

@@ -4,24 +4,18 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-
-namespace: user.flows
+namespace: io.cloudslang
 
 imports:
   ops: user.ops
 
 flow:
-  name: same_task_name_on_failure
+  name: flow_with_navigation_to_missing_step
+
   workflow:
-    - other_task:
+    - Step1:
         do:
-          ops.fail_on_input_op: [nr: 1]
-
-    - on_failure:
-        - task_same_name_on_failure:
-            do:
-              ops.fail_on_input_op: [nr: 0]
-
-        - task_same_name_on_failure:
-            do:
-              ops.fail_on_input_op: [nr: 0]
+          ops.java_op:
+        navigate:
+          - SUCCESS: Step2
+          - FAILURE: FAILURE
