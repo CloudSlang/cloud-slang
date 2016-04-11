@@ -13,7 +13,7 @@ imports:
 flow:
   name: long_full_path_no_expanding
   workflow:
-    - task1:
+    - step1:
         do:
           a.b.c.d.print:
             - cool_input: 25
