@@ -182,10 +182,10 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
 
     private void verifyAggregateValues(RuntimeInformation runtimeInformation, List<String> expectedNameOutputs) {
         // aggregate
-        Map<String, StepData> asyncTasks = runtimeInformation.getAsyncSteps();
-        StepData asyncTask = asyncTasks.get(FIRST_STEP_PATH);
+        Map<String, StepData> asyncSteps = runtimeInformation.getAsyncSteps();
+        StepData asyncStep = asyncSteps.get(FIRST_STEP_PATH);
 
-        Map<String, Serializable> aggregateValues = asyncTask.getOutputs();
+        Map<String, Serializable> aggregateValues = asyncStep.getOutputs();
         Assert.assertTrue("aggregate name not found in async loop outputs", aggregateValues.containsKey("name_list"));
         @SuppressWarnings("unchecked")
         List<String> actualAggregateNameList = (List<String>) aggregateValues.get("name_list");
@@ -203,9 +203,9 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
     }
 
     private void verifyNavigation(RuntimeInformation runtimeInformation) {
-        Map<String, StepData> tasksData = runtimeInformation.getSteps();
-        StepData taskAfterAsyncLoop = tasksData.get(SECOND_STEP_KEY);
-        Assert.assertEquals("navigation not as expected", "print_list", taskAfterAsyncLoop.getName());
+        Map<String, StepData> stepsData = runtimeInformation.getSteps();
+        StepData stepAfterAsyncLoop = stepsData.get(SECOND_STEP_KEY);
+        Assert.assertEquals("navigation not as expected", "print_list", stepAfterAsyncLoop.getName());
     }
 
 }

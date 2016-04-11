@@ -240,7 +240,7 @@ public class ExecutableStepsTest {
         )).thenReturn(boundResult);
 
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
-        executableSteps.finishExecutable(runEnv, possibleOutputs, possibleResults, runtimeServices,"task1", ExecutableType.FLOW);
+        executableSteps.finishExecutable(runEnv, possibleOutputs, possibleResults, runtimeServices,"step1", ExecutableType.FLOW);
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 
@@ -271,7 +271,7 @@ public class ExecutableStepsTest {
         Assert.assertTrue(eventData.containsKey(LanguageEventData.OUTPUTS));
         Map<String, Serializable> returnOutputs= eventData.getOutputs();
         String returnResult= (String)eventData.get(LanguageEventData.RESULT);
-        Assert.assertEquals("task1",eventData.getStepName());
+        Assert.assertEquals("step1",eventData.getStepName());
         Assert.assertEquals(LanguageEventData.StepType.EXECUTABLE, eventData.getStepType());
         Assert.assertEquals(1, returnOutputs.size());
         Assert.assertEquals("John", returnOutputs.get("name"));

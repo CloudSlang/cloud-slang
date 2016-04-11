@@ -185,13 +185,13 @@ public class AsyncLoopStepsTest {
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> taskAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
+        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
 
-        Map<String, ResultNavigation> taskNavigationValues = new HashMap<>();
+        Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, ScoreLangConstants.SUCCESS_RESULT);
         ResultNavigation failureNavigation = new ResultNavigation(0L, ScoreLangConstants.FAILURE_RESULT);
-        taskNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
-        taskNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
+        stepNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
+        stepNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
 
         String nodeName = "nodeName";
 
@@ -213,8 +213,8 @@ public class AsyncLoopStepsTest {
         asyncLoopSteps.joinBranches(
                 runEnvironment,
                 executionRuntimeServices,
-                taskAggregateValues,
-                taskNavigationValues,
+                stepAggregateValues,
+                stepNavigationValues,
                 nodeName
         );
 
@@ -224,7 +224,7 @@ public class AsyncLoopStepsTest {
                 eq(context.getImmutableViewOfVariables()),
                 aggregateContextArgumentCaptor.capture(),
                 eq(runEnvironment.getSystemProperties()),
-                eq(taskAggregateValues)
+                eq(stepAggregateValues)
         );
 
         @SuppressWarnings("unchecked")
@@ -247,13 +247,13 @@ public class AsyncLoopStepsTest {
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> taskAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
+        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
 
-        Map<String, ResultNavigation> taskNavigationValues = new HashMap<>();
+        Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, "CUSTOM_SUCCESS");
         ResultNavigation failureNavigation = new ResultNavigation(0L, "CUSTOM_FAILURE");
-        taskNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
-        taskNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
+        stepNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
+        stepNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
 
         String nodeName = "nodeName";
 
@@ -275,8 +275,8 @@ public class AsyncLoopStepsTest {
         asyncLoopSteps.joinBranches(
                 runEnvironment,
                 executionRuntimeServices,
-                taskAggregateValues,
-                taskNavigationValues,
+                stepAggregateValues,
+                stepNavigationValues,
                 nodeName
         );
 
@@ -297,13 +297,13 @@ public class AsyncLoopStepsTest {
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> taskAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
+        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
 
-        Map<String, ResultNavigation> taskNavigationValues = new HashMap<>();
+        Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, "CUSTOM_SUCCESS");
         ResultNavigation failureNavigation = new ResultNavigation(0L, "CUSTOM_FAILURE");
-        taskNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
-        taskNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
+        stepNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
+        stepNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
 
         String nodeName = "nodeName";
 
@@ -331,8 +331,8 @@ public class AsyncLoopStepsTest {
         asyncLoopSteps.joinBranches(
                 runEnvironment,
                 executionRuntimeServices,
-                taskAggregateValues,
-                taskNavigationValues,
+                stepAggregateValues,
+                stepNavigationValues,
                 nodeName
         );
 
@@ -353,13 +353,13 @@ public class AsyncLoopStepsTest {
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> taskAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
+        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
 
-        Map<String, ResultNavigation> taskNavigationValues = new HashMap<>();
+        Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, ScoreLangConstants.SUCCESS_RESULT);
         ResultNavigation failureNavigation = new ResultNavigation(0L, ScoreLangConstants.FAILURE_RESULT);
-        taskNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
-        taskNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
+        stepNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
+        stepNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
 
         String nodeName = "nodeName";
 
@@ -381,8 +381,8 @@ public class AsyncLoopStepsTest {
         asyncLoopSteps.joinBranches(
                 runEnvironment,
                 executionRuntimeServices,
-                taskAggregateValues,
-                taskNavigationValues,
+                stepAggregateValues,
+                stepNavigationValues,
                 nodeName
         );
 

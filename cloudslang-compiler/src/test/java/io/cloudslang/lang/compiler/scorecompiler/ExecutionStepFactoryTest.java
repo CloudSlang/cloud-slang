@@ -52,9 +52,9 @@ public class ExecutionStepFactoryTest {
     @Test
     public void testCreateStartStepPutForUnderTheRightKey() throws Exception {
         LoopStatement statement = new ListForLoopStatement("1", "2");
-        HashMap<String, Serializable> preTaskData = new HashMap<>();
-        preTaskData.put(SlangTextualKeys.FOR_KEY, statement);
-        ExecutionStep startStep = factory.createBeginStepStep(1L, new ArrayList<Argument>(), preTaskData, "", "");
+        HashMap<String, Serializable> preStepData = new HashMap<>();
+        preStepData.put(SlangTextualKeys.FOR_KEY, statement);
+        ExecutionStep startStep = factory.createBeginStepStep(1L, new ArrayList<Argument>(), preStepData, "", "");
         LoopStatement actualStatement = (LoopStatement) startStep.getActionData()
                                  .get(ScoreLangConstants.LOOP_KEY);
         Assert.assertNotNull("for key is null", actualStatement);
@@ -63,14 +63,14 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateFinishTakStep(){
-        ExecutionStep finishTaskStep = factory.createFinishStepStep(
+        ExecutionStep finishStepStep = factory.createFinishStepStep(
                 1L,
                 new HashMap<String, Serializable>(),
                 new HashMap<String, ResultNavigation>(),
-                "taskName",
+                "stepName",
                 false);
-        Assert.assertTrue(finishTaskStep.getActionData().containsKey(ScoreLangConstants.PREVIOUS_STEP_ID_KEY));
-        Assert.assertTrue(finishTaskStep.getActionData().containsKey(ScoreLangConstants.BREAK_LOOP_KEY));
+        Assert.assertTrue(finishStepStep.getActionData().containsKey(ScoreLangConstants.PREVIOUS_STEP_ID_KEY));
+        Assert.assertTrue(finishStepStep.getActionData().containsKey(ScoreLangConstants.BREAK_LOOP_KEY));
 
     }
 
@@ -184,9 +184,9 @@ public class ExecutionStepFactoryTest {
     @Test
     public void testCreateAddBranchesStepPutAsyncLoopUnderTheRightKey() throws Exception {
         AsyncLoopStatement statement = new AsyncLoopStatement("value", "values");
-        HashMap<String, Serializable> preTaskData = new HashMap<>();
-        preTaskData.put(ScoreLangConstants.ASYNC_LOOP_KEY, statement);
-        ExecutionStep startStep =  factory.createAddBranchesStep(2L, 5L, 3L, preTaskData, "refID", "evenCoolerStep");
+        HashMap<String, Serializable> preStepData = new HashMap<>();
+        preStepData.put(ScoreLangConstants.ASYNC_LOOP_KEY, statement);
+        ExecutionStep startStep =  factory.createAddBranchesStep(2L, 5L, 3L, preStepData, "refID", "evenCoolerStep");
         AsyncLoopStatement actualStatement = (AsyncLoopStatement) startStep.getActionData()
                 .get(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY);
         Assert.assertNotNull("async loop statement not found in action data", actualStatement);
@@ -195,12 +195,12 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateJoinBranchesStep() throws Exception {
-        Map<String, Serializable> postTaskData = new HashMap<>();
-        postTaskData.put(SlangTextualKeys.AGGREGATE_KEY, new ArrayList<>());
+        Map<String, Serializable> postStepData = new HashMap<>();
+        postStepData.put(SlangTextualKeys.AGGREGATE_KEY, new ArrayList<>());
 
         ExecutionStep executionStep = factory.createJoinBranchesStep(
                 0L,
-                postTaskData,
+                postStepData,
                 new HashMap<String, ResultNavigation>(),
                 "joinStep");
 
