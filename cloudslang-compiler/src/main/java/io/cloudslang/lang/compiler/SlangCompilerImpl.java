@@ -24,13 +24,14 @@ import org.springframework.stereotype.Component;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Map;
-import java.util.Set;
 
 /*
  * Created by orius123 on 05/11/14.
  */
 @Component
 public class SlangCompilerImpl implements SlangCompiler {
+
+    public static final String NOT_A_VALID_SYSTEM_PROPERTY_FILE_ERROR_MESSAGE_SUFFIX = "is not a valid system property file.";
 
     @Autowired
     private YamlParser yamlParser;
@@ -97,7 +98,7 @@ public class SlangCompilerImpl implements SlangCompiler {
     private ParsedSlang parseSystemPropertiesFile(SlangSource source) {
         ParsedSlang parsedSlang = yamlParser.parse(source);
         if (!ParsedSlang.Type.SYSTEM_PROPERTY_FILE.equals(parsedSlang.getType())) {
-            throw new RuntimeException("Source: " + parsedSlang.getName() + " is not a valid system property file.");
+            throw new RuntimeException("Source: " + parsedSlang.getName() + " " + NOT_A_VALID_SYSTEM_PROPERTY_FILE_ERROR_MESSAGE_SUFFIX);
         }
         return parsedSlang;
     }
