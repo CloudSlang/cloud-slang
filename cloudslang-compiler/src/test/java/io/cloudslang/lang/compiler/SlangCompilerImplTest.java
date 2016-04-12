@@ -100,7 +100,6 @@ public class SlangCompilerImplTest {
         Assert.assertEquals(expectedSystemProperties, actualSystemProperties);
     }
 
-    @Configuration
     static class Config {
 
         @Bean
