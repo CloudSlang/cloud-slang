@@ -26,8 +26,8 @@ public interface Transformer<F, T> {
     String keyToTransform();
 
     enum Scope {
-        BEFORE_TASK,
-        AFTER_TASK,
+        BEFORE_STEP,
+        AFTER_STEP,
         BEFORE_EXECUTABLE,
         AFTER_EXECUTABLE,
         ACTION

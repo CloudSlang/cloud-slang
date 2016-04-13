@@ -16,13 +16,13 @@ import java.util.Deque;
  */
 public class Workflow {
 
-    private final Deque<Task> tasks;
+    private final Deque<Step> steps;
 
-    public Workflow(Deque<Task> tasks) {
-        this.tasks = tasks;
+    public Workflow(Deque<Step> steps) {
+        this.steps = steps;
     }
 
-    public Deque<Task> getTasks() {
-        return tasks;
+    public Deque<Step> getSteps() {
+        return steps;
     }
 }

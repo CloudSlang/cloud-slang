@@ -25,14 +25,14 @@ flow:
             do:
               ops.test_op:
 
-    - first_task:
+    - first_step:
         do:
           ops.test_op:
             - city: 'input_1'
         publish:
           - weather
 
-    - second_task:
+    - second_step:
         do:
           ops.test_op:
             - city: 'input_1'

@@ -52,7 +52,7 @@ public class DoTransformerTest {
 
     @Test
     public void testTransformExpression() throws Exception {
-        Map doArgumentsMap = loadFirstTaskFromFile("/flow_with_data.yaml");
+        Map doArgumentsMap = loadFirstStepFromFile("/flow_with_data.yaml");
         @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap);
         Assert.assertFalse(arguments.isEmpty());
         Assert.assertEquals(2, arguments.size());
@@ -64,7 +64,7 @@ public class DoTransformerTest {
 
     @Test
     public void testTransformNoValue() throws Exception {
-        Map doArgumentsMap = loadFirstTaskFromFile("/basic_flow.yaml");
+        Map doArgumentsMap = loadFirstStepFromFile("/basic_flow.yaml");
         @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap);
         Assert.assertFalse(arguments.isEmpty());
         Assert.assertEquals(2, arguments.size());
@@ -75,7 +75,7 @@ public class DoTransformerTest {
 
     @Test
     public void testTransformConst() throws Exception {
-        Map doArgumentsMap = loadFirstTaskFromFile("/flow_with_data.yaml");
+        Map doArgumentsMap = loadFirstStepFromFile("/flow_with_data.yaml");
         @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap);
         Assert.assertFalse(arguments.isEmpty());
         Assert.assertEquals(2, arguments.size());
@@ -87,7 +87,7 @@ public class DoTransformerTest {
     @Test
     public void testTransformEmptyArgumentExpression() throws Exception {
         @SuppressWarnings("unchecked")
-        Map<String, Object> doArgumentsMap = loadFirstTaskFromFile("/corrupted/flow_with_empty_argument_expression.yaml");
+        Map<String, Object> doArgumentsMap = loadFirstStepFromFile("/corrupted/flow_with_empty_argument_expression.yaml");
         @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap);
         Assert.assertFalse(arguments.isEmpty());
         Assert.assertEquals(2, arguments.size());
@@ -103,7 +103,7 @@ public class DoTransformerTest {
         exception.expectMessage("22");
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> doArgumentsMap = loadFirstTaskFromFile("/corrupted/flow_with_invalid_argument.yaml");
+        Map<String, Object> doArgumentsMap = loadFirstStepFromFile("/corrupted/flow_with_invalid_argument.yaml");
 
         doTransformer.transform(doArgumentsMap);
     }
@@ -111,25 +111,25 @@ public class DoTransformerTest {
     @Test
     public void testOneLinerTransformIsInvalid() throws Exception {
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Task arguments should be defined using a standard YAML list.");
+        exception.expectMessage("Step arguments should be defined using a standard YAML list.");
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> doArgumentsMap = loadFirstTaskFromFile("/task-args-in-list/flow_arguments_one_liner.yaml");
+        Map<String, Object> doArgumentsMap = loadFirstStepFromFile("/step-args-in-list/flow_arguments_one_liner.yaml");
 
         doTransformer.transform(doArgumentsMap);
 
     }
 
-    private Map loadFirstTaskFromFile(String path) throws URISyntaxException {
+    private Map loadFirstStepFromFile(String path) throws URISyntaxException {
         Map doArgumentsMap = new LinkedHashMap();
         URL resource = getClass().getResource(path);
         File file = new File(resource.toURI());
         ParsedSlang parsedSlang = yamlParser.parse(SlangSource.fromFile(file));
         @SuppressWarnings("unchecked")
         List<Map<String, Map>> flow = (List<Map<String, Map>>) parsedSlang.getFlow().get(SlangTextualKeys.WORKFLOW_KEY);
-        for(Map<String, Map> task : flow){
-            if(task.keySet().iterator().next().equals("CheckWeather")){
-                doArgumentsMap = (Map) task.values().iterator().next().get(SlangTextualKeys.DO_KEY);
+        for(Map<String, Map> step : flow){
+            if(step.keySet().iterator().next().equals("CheckWeather")){
+                doArgumentsMap = (Map) step.values().iterator().next().get(SlangTextualKeys.DO_KEY);
                 return doArgumentsMap;
             }
         }

@@ -55,10 +55,10 @@ public class CompileFlowReferenceIDTest {
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
-        ExecutionStep beginTaskStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceID = (String) beginTaskStep.getActionData().get(ScoreLangConstants.REF_ID);
+        ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
+        @SuppressWarnings("unchecked") String referenceID = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
-        Assert.assertEquals("Wrong reference ID for task", "cloudslang.sample.simple_op", referenceID);
+        Assert.assertEquals("Wrong reference ID for step", "cloudslang.sample.simple_op", referenceID);
     }
 
     @Test
@@ -75,10 +75,10 @@ public class CompileFlowReferenceIDTest {
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
-        ExecutionStep beginTaskStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceID = (String) beginTaskStep.getActionData().get(ScoreLangConstants.REF_ID);
+        ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
+        @SuppressWarnings("unchecked") String referenceID = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
-        Assert.assertEquals("Wrong reference ID for task", "cloudslang.sample.simple_op", referenceID);
+        Assert.assertEquals("Wrong reference ID for step", "cloudslang.sample.simple_op", referenceID);
     }
 
     @Test
@@ -95,10 +95,10 @@ public class CompileFlowReferenceIDTest {
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
-        ExecutionStep beginTaskStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceID = (String) beginTaskStep.getActionData().get(ScoreLangConstants.REF_ID);
+        ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
+        @SuppressWarnings("unchecked") String referenceID = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
-        Assert.assertEquals("Wrong reference ID for task", "cloud.cloud_op", referenceID);
+        Assert.assertEquals("Wrong reference ID for step", "cloud.cloud_op", referenceID);
     }
 
     @Test
@@ -115,10 +115,10 @@ public class CompileFlowReferenceIDTest {
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
-        ExecutionStep beginTaskStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceID = (String) beginTaskStep.getActionData().get(ScoreLangConstants.REF_ID);
+        ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
+        @SuppressWarnings("unchecked") String referenceID = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
-        Assert.assertEquals("Wrong reference ID for task", "a.b.c.d.print", referenceID);
+        Assert.assertEquals("Wrong reference ID for step", "a.b.c.d.print", referenceID);
     }
 
     @Test
@@ -135,10 +135,10 @@ public class CompileFlowReferenceIDTest {
         Assert.assertNotNull("execution plan is null", executionPlan);
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
-        ExecutionStep beginTaskStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceID = (String) beginTaskStep.getActionData().get(ScoreLangConstants.REF_ID);
+        ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
+        @SuppressWarnings("unchecked") String referenceID = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
-        Assert.assertEquals("Wrong reference ID for task", "a.b.c.d.print", referenceID);
+        Assert.assertEquals("Wrong reference ID for step", "a.b.c.d.print", referenceID);
     }
 
     @Test

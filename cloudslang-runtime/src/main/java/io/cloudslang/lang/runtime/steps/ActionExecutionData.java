@@ -45,9 +45,9 @@ import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUT
  * Time: 10:25
  */
 @Component
-public class ActionSteps extends AbstractSteps {
+public class ActionExecutionData extends AbstractExecutionData {
 
-    private static final Logger logger = Logger.getLogger(ActionSteps.class);
+    private static final Logger logger = Logger.getLogger(ActionExecutionData.class);
 
     @Autowired
     private ScriptExecutor scriptExecutor;

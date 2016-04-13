@@ -16,11 +16,11 @@ flow:
     - input1: 'value'
     - time_zone_as_string: ${get_sp('user.sys.props.port')}
   workflow:
-    - task01:
+    - step01:
         do:
           ops.get_time_zone:
             - time_zone_as_string
-    - task02:
+    - step02:
         do:
           ops.test_op:
   outputs:

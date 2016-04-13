@@ -13,7 +13,6 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
-import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
 import org.apache.commons.io.FileUtils;
@@ -23,7 +22,6 @@ import org.junit.Test;
 import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -118,7 +116,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         URI operations2 = getClass().getResource("/yaml/compute_daylight_time_zone.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Task arguments");
+        exception.expectMessage("Step arguments");
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
         ScoreEvent event = trigger(compilationArtifact, inputs, systemProperties);
     }
@@ -131,7 +129,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         SlangSource operationsSource = SlangSource.fromFile(operations);
         Set<SlangSource> path = Sets.newHashSet(operationsSource);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Task1");
+        exception.expectMessage("Step1");
         exception.expectMessage("CUSTOM");
         exception.expectMessage("navigation");
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
@@ -157,8 +155,8 @@ public class SimpleFlowTest extends SystemsTestsParent {
     }
 
     @Test
-    public void testFlowWithSameInputNameAsTask() throws Exception {
-        URI resource = getClass().getResource("/yaml/flow_with_same_input_name_as_task.sl").toURI();
+    public void testFlowWithSameInputNameAsStep() throws Exception {
+        URI resource = getClass().getResource("/yaml/flow_with_same_input_name_as_step.sl").toURI();
         URI operation1 = getClass().getResource("/yaml/string_equals.sl").toURI();
         URI operation2 = getClass().getResource("/yaml/test_op.sl").toURI();
 
@@ -169,14 +167,14 @@ public class SimpleFlowTest extends SystemsTestsParent {
         userInputs.put("first", "value");
         userInputs.put("second_string", "value");
 
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getTasks();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
 
-        List<String> actualTasks = getTasksOnly(stepsData);
-        Assert.assertEquals(2, actualTasks.size());
-        StepData firstTask = stepsData.get(FIRST_STEP_PATH);
-        StepData secondTask = stepsData.get(SECOND_STEP_KEY);
-        Assert.assertEquals("CheckBinding", firstTask.getName());
-        Assert.assertEquals("TaskOnSuccess", secondTask.getName());
+        List<String> actualSteps = getStepsOnly(stepsData);
+        Assert.assertEquals(2, actualSteps.size());
+        StepData firstStep = stepsData.get(FIRST_STEP_PATH);
+        StepData secondStep = stepsData.get(SECOND_STEP_KEY);
+        Assert.assertEquals("CheckBinding", firstStep.getName());
+        Assert.assertEquals("StepOnSuccess", secondStep.getName());
     }
 
 }

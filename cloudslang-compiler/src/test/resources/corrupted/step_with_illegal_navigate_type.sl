@@ -10,9 +10,9 @@ imports:
   ops: io.cloudslang
 
 flow:
-  name: task_with_illegal_navigate_type
+  name: step_with_illegal_navigate_type
   workflow:
-    - task1:
+    - step1:
         do:
           ops.op1:
         navigate: 3

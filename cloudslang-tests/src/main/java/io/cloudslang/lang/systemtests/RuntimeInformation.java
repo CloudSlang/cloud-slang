@@ -18,25 +18,25 @@ import java.util.Map;
  * @author Bonczidai Levente
  */
 public class RuntimeInformation {
-    private final Map<String, StepData> tasks;
+    private final Map<String, StepData> steps;
     private final Map<String, List<StepData>> branchesByPath;
-    private final Map<String, StepData> asyncTasks;
+    private final Map<String, StepData> asyncSteps;
 
-    public RuntimeInformation(Map<String, StepData> tasks, Map<String, List<StepData>> branchesByPath, Map<String, StepData> asyncTasks) {
-        this.tasks = tasks;
+    public RuntimeInformation(Map<String, StepData> steps, Map<String, List<StepData>> branchesByPath, Map<String, StepData> asyncSteps) {
+        this.steps = steps;
         this.branchesByPath = branchesByPath;
-        this.asyncTasks = asyncTasks;
+        this.asyncSteps = asyncSteps;
     }
 
-    public Map<String, StepData> getTasks() {
-        return tasks;
+    public Map<String, StepData> getSteps() {
+        return steps;
     }
 
     public Map<String, List<StepData>> getBranchesByPath() {
         return branchesByPath;
     }
 
-    public Map<String, StepData> getAsyncTasks() {
-        return asyncTasks;
+    public Map<String, StepData> getAsyncSteps() {
+        return asyncSteps;
     }
 }

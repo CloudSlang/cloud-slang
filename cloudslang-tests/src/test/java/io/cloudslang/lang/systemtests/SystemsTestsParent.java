@@ -74,7 +74,7 @@ public abstract class SystemsTestsParent {
 		return triggerFlows.runWithData(compilationArtifact, userInputs, systemProperties);
 	}
 
-    protected List<String> getTasksOnly(Map<String, StepData> stepsData) {
+    protected List<String> getStepsOnly(Map<String, StepData> stepsData) {
         return select(stepsData.keySet(), startsWith("0."));
     }
 

@@ -63,7 +63,7 @@ public class ResultsBinding {
             throw new RuntimeException("No results were found");
         }
 
-        // In case of calculating the result of a flow, we already have a preset result from the last task of the flow,
+        // In case of calculating the result of a flow, we already have a preset result from the last step of the flow,
         // we look for it in the possible results of the flow.
         // If the flow has it as a possible result, we return it as the resolved result.
         // If not, we throw an exception
@@ -73,7 +73,7 @@ public class ResultsBinding {
                     return presetResult;
                 }
             }
-            throw new RuntimeException("Result: " + presetResult + " that was calculated in the last task is not a possible result of the flow.");
+            throw new RuntimeException("Result: " + presetResult + " that was calculated in the last step is not a possible result of the flow.");
         }
 
         // In the case of operation, we resolve the result by searching for the first result with a true expression

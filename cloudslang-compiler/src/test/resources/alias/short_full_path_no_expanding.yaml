@@ -10,7 +10,7 @@ namespace: cloudslang.integrations
 flow:
   name: short_full_path_no_expanding
   workflow:
-    - task1:
+    - step1:
         do:
           cloud.cloud_op:
             - cool_input: 25

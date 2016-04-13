@@ -15,13 +15,13 @@ flow:
  name: flow_where_map_cannot_be_created
 
  workflow:
-   - Task1:
+   - Step1:
        do:
          ops.java_op:
        navigate:
          SUCCESS: SUCCESS
          FAILURE: FAILURE
-   - Task2:
+   - Step2:
        do:
          flows.SimpleFlow:
            - city_name: 'New York'

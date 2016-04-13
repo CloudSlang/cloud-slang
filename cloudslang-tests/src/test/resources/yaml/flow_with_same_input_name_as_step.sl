@@ -11,10 +11,10 @@ imports:
   ops: user.ops
 
 flow:
-  name: flow_with_same_input_name_as_task
+  name: flow_with_same_input_name_as_step
   inputs:
     - first # normal input
-    - second_string # same as task input
+    - second_string # same as step input
   workflow:
     - CheckBinding:
         do:
@@ -22,13 +22,13 @@ flow:
             - first_string: ${ 'prefix_' + first }
             - second_string: ${ 'prefix_' + second_string }
         navigate:
-          - SUCCESS: TaskOnSuccess
-          - FAILURE: TaskOnFailure
+          - SUCCESS: StepOnSuccess
+          - FAILURE: StepOnFailure
 
-    - TaskOnFailure:
+    - StepOnFailure:
         do:
           ops.test_op:
 
-    - TaskOnSuccess:
+    - StepOnSuccess:
         do:
           ops.test_op:

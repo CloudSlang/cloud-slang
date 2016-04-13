@@ -42,7 +42,7 @@ import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUT
  * Time: 10:24
  */
 @Component
-public class ExecutableSteps extends AbstractSteps {
+public class ExecutableExecutionData extends AbstractExecutionData {
 
     public static final String ACTION_RETURN_VALUES_KEY = "actionReturnValues";
 
@@ -55,7 +55,7 @@ public class ExecutableSteps extends AbstractSteps {
     @Autowired
     private OutputsBinding outputsBinding;
 
-    private static final Logger logger = Logger.getLogger(ExecutableSteps.class);
+    private static final Logger logger = Logger.getLogger(ExecutableExecutionData.class);
 
     public void startExecutable(@Param(ScoreLangConstants.EXECUTABLE_INPUTS_KEY) List<Input> executableInputs,
                                 @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,

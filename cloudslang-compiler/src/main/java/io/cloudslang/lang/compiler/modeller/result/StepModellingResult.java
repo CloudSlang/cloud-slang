@@ -1,24 +1,24 @@
 package io.cloudslang.lang.compiler.modeller.result;
 
-import io.cloudslang.lang.compiler.modeller.model.Task;
+import io.cloudslang.lang.compiler.modeller.model.Step;
 
 import java.util.List;
 
 /**
  * Created by Ifat Gavish on 24/02/2016
  */
-public class TaskModellingResult implements ModellingResult {
+public class StepModellingResult implements ModellingResult {
 
-    private final Task task;
+    private final Step step;
     private final List<RuntimeException> errors;
 
-    public TaskModellingResult(Task task, List<RuntimeException> errors) {
-        this.task = task;
+    public StepModellingResult(Step step, List<RuntimeException> errors) {
+        this.step = step;
         this.errors = errors;
     }
 
-    public Task getTask() {
-        return task;
+    public Step getStep() {
+        return step;
     }
 
     public List<RuntimeException> getErrors() {

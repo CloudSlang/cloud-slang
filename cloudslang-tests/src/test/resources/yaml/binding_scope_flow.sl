@@ -13,12 +13,12 @@ imports:
 flow:
   name: binding_scope_flow
   workflow:
-    - task1:
+    - step1:
         do:
           ops.binding_scope_op:
-            - op_input_1: "op_input_1_task"
-            - task_arg_1: "task_arg_1_value"
-            - op_output_2: "op_output_2_task"
+            - op_input_1: "op_input_1_step"
+            - step_arg_1: "step_arg_1_value"
+            - op_output_2: "op_output_2_step"
         publish:
-          - task1_publish_1: ${ op_output_1 + ' ' + op_input_1 + ' ' + task_arg_1 }
-          - task1_publish_2_conflict: ${ op_output_2 }
+          - step1_publish_1: ${ op_output_1 + ' ' + op_input_1 + ' ' + step_arg_1 }
+          - step1_publish_2_conflict: ${ op_output_2 }

@@ -10,9 +10,9 @@ imports:
   ops: io.cloudslang
 
 flow:
-  name: no_task_data
+  name: no_step_data
   workflow:
-    - task1:
+    - step1:
         do:
           ops.test_op:
             - alla: 'hello'

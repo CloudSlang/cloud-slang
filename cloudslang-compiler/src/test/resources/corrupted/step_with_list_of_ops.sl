@@ -6,13 +6,9 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 namespace: io.cloudslang
 
-imports:
-  ops: io.cloudslang
-
 flow:
-  name: task_with_string_navigate_value
+  name: step_with_list_of_ops
   workflow:
-    - task1:
+    - step1:
         do:
-          ops.op1:
-        navigate: 'hi'
+          - ops.op1:

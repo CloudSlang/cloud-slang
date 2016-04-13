@@ -55,10 +55,10 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailSender", "user@host.com");
         userInputs.put("emailRecipient", "user@host.com");
 
-        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getTasks();
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
 
-        Assert.assertEquals("check_number", tasks.get(FIRST_STEP_PATH).getName());
-        Assert.assertEquals("process_even_number", tasks.get(SECOND_STEP_KEY).getName());
+        Assert.assertEquals("check_number", steps.get(FIRST_STEP_PATH).getName());
+        Assert.assertEquals("process_even_number", steps.get(SECOND_STEP_KEY).getName());
     }
 
     @Test
@@ -83,10 +83,10 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailSender", "user@host.com");
         userInputs.put("emailRecipient", "user@host.com");
 
-        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getTasks();
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
 
-        Assert.assertEquals("check_number", tasks.get(FIRST_STEP_PATH).getName());
-        Assert.assertEquals("process_odd_number", tasks.get(SECOND_STEP_KEY).getName());
+        Assert.assertEquals("check_number", steps.get(FIRST_STEP_PATH).getName());
+        Assert.assertEquals("process_odd_number", steps.get(SECOND_STEP_KEY).getName());
     }
 
     @Test
@@ -111,10 +111,10 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailSender", "user@host.com");
         userInputs.put("emailRecipient", "user@host.com");
 
-        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getTasks();
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
 
-        Assert.assertEquals("check_number", tasks.get(FIRST_STEP_PATH).getName());
-        Assert.assertEquals("send_error_mail", tasks.get(SECOND_STEP_KEY).getName());
+        Assert.assertEquals("check_number", steps.get(FIRST_STEP_PATH).getName());
+        Assert.assertEquals("send_error_mail", steps.get(SECOND_STEP_KEY).getName());
     }
 
     @Test
@@ -135,10 +135,10 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailSender", "user@host.com");
         userInputs.put("emailRecipient", "user@host.com");
 
-        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getTasks();
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
 
-        Assert.assertEquals("produce_default_navigation", tasks.get(FIRST_STEP_PATH).getName());
-        Assert.assertEquals("check_weather", tasks.get(SECOND_STEP_KEY).getName());
+        Assert.assertEquals("produce_default_navigation", steps.get(FIRST_STEP_PATH).getName());
+        Assert.assertEquals("check_weather", steps.get(SECOND_STEP_KEY).getName());
     }
 
     @Test
@@ -159,9 +159,9 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailSender", "user@host.com");
         userInputs.put("emailRecipient", "user@host.com");
 
-        Map<String, StepData> tasks = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getTasks();
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
 
-        Assert.assertEquals("produce_default_navigation", tasks.get(FIRST_STEP_PATH).getName());
-        Assert.assertEquals("send_error_mail", tasks.get(SECOND_STEP_KEY).getName());
+        Assert.assertEquals("produce_default_navigation", steps.get(FIRST_STEP_PATH).getName());
+        Assert.assertEquals("send_error_mail", steps.get(SECOND_STEP_KEY).getName());
     }
 }
