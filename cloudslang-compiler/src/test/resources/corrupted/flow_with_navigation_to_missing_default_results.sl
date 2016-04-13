@@ -13,7 +13,7 @@ flow:
   name: flow_with_navigation_to_missing_default_results
 
   workflow:
-    - Task1:
+    - Step1:
         do:
           ops.java_op:
         navigate:

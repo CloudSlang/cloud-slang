@@ -48,7 +48,7 @@ import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUT
  * @author Bonczidai Levente
  */
 @Component
-public class AsyncLoopSteps extends AbstractSteps {
+public class AsyncLoopExecutionData extends AbstractExecutionData {
 
     public static final String BRANCH_EXCEPTION_PREFIX = "Error running branch";
 
@@ -58,7 +58,7 @@ public class AsyncLoopSteps extends AbstractSteps {
     @Autowired
     private OutputsBinding outputsBinding;
 
-    private static final Logger logger = Logger.getLogger(AsyncLoopSteps.class);
+    private static final Logger logger = Logger.getLogger(AsyncLoopExecutionData.class);
 
     public void addBranches(@Param(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY) AsyncLoopStatement asyncLoopStatement,
                             @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
@@ -76,7 +76,7 @@ public class AsyncLoopSteps extends AbstractSteps {
 
             fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_SPLIT_BRANCHES,
                     "async loop expression bound", runEnv.getExecutionPath().getCurrentPath(),
-                    LanguageEventData.StepType.TASK, nodeName,
+                    LanguageEventData.StepType.STEP, nodeName,
                     Pair.of(LanguageEventData.BOUND_ASYNC_LOOP_EXPRESSION, (Serializable) splitData));
 
             runEnv.putNextStepPosition(nextStepId);
@@ -87,7 +87,7 @@ public class AsyncLoopSteps extends AbstractSteps {
                 // first fire event
                 fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_BRANCH_START,
                         "async loop branch created", runEnv.getExecutionPath().getCurrentPath(),
-                        LanguageEventData.StepType.TASK, nodeName, Pair.of(ScoreLangConstants.REF_ID, refId),
+                        LanguageEventData.StepType.STEP, nodeName, Pair.of(ScoreLangConstants.REF_ID, refId),
                         Pair.of(RuntimeConstants.SPLIT_ITEM_KEY, splitItem));
                 // take path down one level
                 runEnv.getExecutionPath().down();
@@ -123,8 +123,8 @@ public class AsyncLoopSteps extends AbstractSteps {
 
     public void joinBranches(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                              @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
-                             @Param(ScoreLangConstants.TASK_AGGREGATE_KEY) List<Output> taskAggregateValues,
-                             @Param(ScoreLangConstants.TASK_NAVIGATION_KEY) Map<String, ResultNavigation> taskNavigationValues,
+                             @Param(ScoreLangConstants.STEP_AGGREGATE_KEY) List<Output> stepAggregateValues,
+                             @Param(ScoreLangConstants.STEP_NAVIGATION_KEY) Map<String, ResultNavigation> stepNavigationValues,
                              @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName) {
         try {
             runEnv.getExecutionPath().up();
@@ -138,8 +138,8 @@ public class AsyncLoopSteps extends AbstractSteps {
                     bindAggregateOutputs(
                             runEnv,
                             executionRuntimeServices,
-                            taskAggregateValues,
-                            taskNavigationValues,
+                            stepAggregateValues,
+                            stepNavigationValues,
                             nodeName,
                             branchesContext
                     );
@@ -148,12 +148,12 @@ public class AsyncLoopSteps extends AbstractSteps {
 
             String asyncLoopResult = getAsyncLoopResult(branchesResult);
 
-            handleNavigationAndReturnValues(runEnv, executionRuntimeServices, taskNavigationValues, nodeName, publishValues, asyncLoopResult);
+            handleNavigationAndReturnValues(runEnv, executionRuntimeServices, stepNavigationValues, nodeName, publishValues, asyncLoopResult);
 
             runEnv.getStack().pushContext(flowContext);
             runEnv.getExecutionPath().forward();
         } catch (RuntimeException e) {
-            logger.error("There was an error running the end task execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
+            logger.error("There was an error running the joinBranches execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\': \n" + e.getMessage(), e);
         }
     }
@@ -161,16 +161,16 @@ public class AsyncLoopSteps extends AbstractSteps {
     private void handleNavigationAndReturnValues(
             RunEnvironment runEnv,
             ExecutionRuntimeServices executionRuntimeServices,
-            Map<String, ResultNavigation> taskNavigationValues,
+            Map<String, ResultNavigation> stepNavigationValues,
             String nodeName,
             Map<String, Serializable> publishValues,
             String asyncLoopResult) {
         // set the position of the next step - for the use of the navigation
         // find in the navigation values the correct next step position, according to the async loop result, and set it
-        ResultNavigation navigation = taskNavigationValues.get(asyncLoopResult);
+        ResultNavigation navigation = stepNavigationValues.get(asyncLoopResult);
         if (navigation == null) {
-            // should always have the executable response mapped to a navigation by the task, if not, it is an error
-            throw new RuntimeException("Task: " + nodeName + " has no matching navigation for the async loop result: " + asyncLoopResult);
+            // should always have the executable response mapped to a navigation by the step, if not, it is an error
+            throw new RuntimeException("Step: " + nodeName + " has no matching navigation for the async loop result: " + asyncLoopResult);
         }
         Long nextStepPosition = navigation.getNextStepId();
         String presetResult = navigation.getPresetResult();
@@ -179,7 +179,7 @@ public class AsyncLoopSteps extends AbstractSteps {
         ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : asyncLoopResult);
 
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_JOIN_BRANCHES_END,
-                "Async loop output binding finished", LanguageEventData.StepType.TASK, nodeName,
+                "Async loop output binding finished", LanguageEventData.StepType.STEP, nodeName,
                 Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
                 Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
                 Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextStepPosition));
@@ -203,8 +203,8 @@ public class AsyncLoopSteps extends AbstractSteps {
     private Map<String, Serializable> bindAggregateOutputs(
             RunEnvironment runEnv,
             ExecutionRuntimeServices executionRuntimeServices,
-            List<Output> taskAggregateValues,
-            Map<String, ResultNavigation> taskNavigationValues,
+            List<Output> stepAggregateValues,
+            Map<String, ResultNavigation> stepNavigationValues,
             String nodeName,
             List<Map<String, Serializable>> branchesContext) {
 
@@ -215,15 +215,15 @@ public class AsyncLoopSteps extends AbstractSteps {
                 executionRuntimeServices,
                 runEnv,
                 ScoreLangConstants.EVENT_JOIN_BRANCHES_START,
-                "Async loop output binding started", LanguageEventData.StepType.TASK, nodeName,
-                Pair.of(ScoreLangConstants.TASK_AGGREGATE_KEY, (Serializable) taskAggregateValues),
-                Pair.of(ScoreLangConstants.TASK_NAVIGATION_KEY, (Serializable) taskNavigationValues));
+                "Async loop output binding started", LanguageEventData.StepType.STEP, nodeName,
+                Pair.of(ScoreLangConstants.STEP_AGGREGATE_KEY, (Serializable) stepAggregateValues),
+                Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues));
 
         return outputsBinding.bindOutputs(
                 Collections.<String, Serializable>emptyMap(),
                 aggregateContext,
                 runEnv.getSystemProperties(),
-                taskAggregateValues
+                stepAggregateValues
         );
     }
 
@@ -262,7 +262,7 @@ public class AsyncLoopSteps extends AbstractSteps {
             branchRuntimeEnvironment.getExecutionPath().up();
 
             fireEvent(executionRuntimeServices, branchRuntimeEnvironment, ScoreLangConstants.EVENT_BRANCH_END,
-                    "async loop branch ended", LanguageEventData.StepType.TASK, nodeName,
+                    "async loop branch ended", LanguageEventData.StepType.STEP, nodeName,
                     Pair.of(RuntimeConstants.BRANCH_RETURN_VALUES_KEY, executableReturnValues)
             );
         }

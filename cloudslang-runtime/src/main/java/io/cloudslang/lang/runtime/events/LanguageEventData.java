@@ -43,7 +43,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     public static final String STEP_NAME = "STEP_NAME";
 
     public enum StepType {
-        TASK,
+        STEP,
         EXECUTABLE,
         ACTION,
         NAVIGATION

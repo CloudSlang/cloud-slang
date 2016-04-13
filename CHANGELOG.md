@@ -93,7 +93,7 @@
   	+ Python - Support 3rd party Python libraries.
 + DSL Syntax changes
   	+ Operations - Aligned to flow structure with one operation per file and `name` property
-  	+ Tasks - Changed from maps to list of tasks.
+  	+ Tasks - Changed from maps to list of steps.
   	+ Overridable - Former `override` input property changed to `overridable` with opposite meaning.
 + CLI Enhancements
   	+ Error messages - Error messages are more clear with helpful guidance on how to fix common errors

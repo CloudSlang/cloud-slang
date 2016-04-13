@@ -4,20 +4,18 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-
-namespace: user.flows
+namespace: io.cloudslang
 
 imports:
-  ops: user.ops
+  ops: io.cloudslang
 
 flow:
-  name: same_task_name_in_flow_and_on_failure
+  name: on_failure_with_step_map
   workflow:
-    - task_same_name:
+    - step1:
         do:
-          ops.fail_on_input_op: [nr: 1]
-
+          ops.op1:
     - on_failure:
-        - task_same_name:
-            do:
-              ops.fail_on_input_op: [nr: 0]
+        step2:
+          do:
+            ops.op1

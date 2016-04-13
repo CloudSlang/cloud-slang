@@ -11,7 +11,7 @@ imports:
   ops: user.ops
 
 flow:
-  name: invalid_publish_from_task_flow
+  name: invalid_publish_from_step_flow
   inputs:
   - city_name
 

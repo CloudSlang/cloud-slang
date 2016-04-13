@@ -13,7 +13,7 @@ imports:
 flow:
   name: basic_alias
   workflow:
-    - task1:
+    - step1:
         do:
           sample.simple_op:
             - cool_input: 25

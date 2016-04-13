@@ -13,7 +13,7 @@ imports:
 flow:
   name: reference_not_found_flow
   workflow:
-    - task1:
+    - step1:
         do:
           sample_typo.simple_op:
             - cool_input: 25

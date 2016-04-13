@@ -7,13 +7,12 @@
 namespace: io.cloudslang
 
 imports:
-  ops: user.ops
+  flows: io.cloudslang
 
 flow:
-  name: task_with_missing_navigation_from_operation_result_flow
+  name: parent_flow_to_no_step_data_flow
+
   workflow:
-    - task1:
+    - missing_name_subflow:
         do:
-          ops.java_op:
-        navigate:
-          - SUCCESS: SUCCESS
+          flows.no_step_data:

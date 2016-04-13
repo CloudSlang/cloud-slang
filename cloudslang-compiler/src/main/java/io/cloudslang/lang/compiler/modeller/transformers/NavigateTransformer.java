@@ -36,7 +36,7 @@ public class NavigateTransformer implements Transformer<List<Object>, List<Map<S
                 if (elementAsMap.size() != 1) {
                     throw new RuntimeException("Each list item in the navigate section should contain exactly one key:value pair.");
                 }
-                // - SUCCESS: some_task
+                // - SUCCESS: some_step
                 Map.Entry navigationEntry = (Map.Entry) elementAsMap.entrySet().iterator().next();
                 Object navigationKey = navigationEntry.getKey();
                 Object navigationValue = navigationEntry.getValue();
@@ -59,7 +59,7 @@ public class NavigateTransformer implements Transformer<List<Object>, List<Map<S
 
     @Override
     public List<Scope> getScopes() {
-        return Collections.singletonList(Scope.AFTER_TASK);
+        return Collections.singletonList(Scope.AFTER_STEP);
     }
 
     @Override

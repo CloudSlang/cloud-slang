@@ -11,7 +11,7 @@ flow:
  name: flow_navigate_map
 
  workflow:
-   - Task1:
+   - Step1:
        do:
          ops.java_op:
        navigate:

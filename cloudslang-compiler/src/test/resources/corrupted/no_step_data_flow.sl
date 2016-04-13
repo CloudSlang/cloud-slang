@@ -6,8 +6,10 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 namespace: io.cloudslang
 
+imports:
+  ops: io.cloudslang
+
 flow:
-  name: task_with_list_of_do_flow
+  name: no_step_data
   workflow:
-    - task1:
-        - do:
+    - step1:

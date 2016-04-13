@@ -62,16 +62,16 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         // trigger ExecutionPlan
         RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, systemProperties);
 
-        Map<String, StepData> executionData = runtimeInformation.getTasks();
+        Map<String, StepData> executionData = runtimeInformation.getSteps();
 
         StepData flowData = executionData.get(EXEC_START_PATH);
-        StepData taskData = executionData.get(FIRST_STEP_PATH);
+        StepData stepData = executionData.get(FIRST_STEP_PATH);
         Assert.assertNotNull("flow data is null", flowData);
-        Assert.assertNotNull("task data is null", taskData);
+        Assert.assertNotNull("step data is null", stepData);
 
         verifyFlowInputs(flowData);
-        verifyTaskArguments(taskData);
-        verifyTaskPublishValues(taskData);
+        verifyStepArguments(stepData);
+        verifyStepPublishValues(stepData);
         verifyFlowOutputs(flowData);
 
         // verify 'get' function worked in result expressions
@@ -88,7 +88,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         // trigger ExecutionPlan
         Map<String, Serializable> userInputs = new HashMap<>();
         RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, EMPTY_SET);
-        Map<String, StepData> executionData = runtimeInformation.getTasks();
+        Map<String, StepData> executionData = runtimeInformation.getSteps();
 
         StepData flowData = executionData.get(EXEC_START_PATH);
 
@@ -96,7 +96,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         Assert.assertEquals("Get function problem in result expression", "GET_FUNCTION_DEFAULT_VALUE", flowData.getResult());
     }
 
-    private void verifyTaskArguments(StepData taskData) {
+    private void verifyStepArguments(StepData stepData) {
         // verify `get`, `get_sp()`, `locals().get()` and mixed mode works
         Map<String, Serializable> expectedArguments = new LinkedHashMap<>();
         expectedArguments.put("exist", "exist_value");
@@ -109,15 +109,15 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedArguments.put("input_9", "localhost");
         expectedArguments.put("input_10", "localhost");
         expectedArguments.put("input_11", "default_str");
-        expectedArguments.put("value_propagate", "flowInput_taskArg_");
+        expectedArguments.put("value_propagate", "flowInput_stepArg_");
         expectedArguments.put("input_12", "hyphen_value");
         expectedArguments.put("input_13", "hyphen_value");
         expectedArguments.put("input_14", "localhost");
         expectedArguments.put("input_15", "localhost");
         expectedArguments.put("input_16", null);
         expectedArguments.put("input_17", "default_str");
-        Map<String, Serializable> actualArguments = taskData.getInputs();
-        Assert.assertEquals("task arguments not as expected", expectedArguments, actualArguments);
+        Map<String, Serializable> actualArguments = stepData.getInputs();
+        Assert.assertEquals("step arguments not as expected", expectedArguments, actualArguments);
     }
 
     private void verifyFlowInputs(StepData flowData) {
@@ -153,12 +153,12 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
 
     private void verifyFlowOutputs(StepData flowData) {
         Map<String, Serializable> expectedFlowOutputs = new LinkedHashMap<>();
-        expectedFlowOutputs.put("value_propagate", "flowInput_taskArg_opInput_opOutput_taskPublish_flowOutput_");
+        expectedFlowOutputs.put("value_propagate", "flowInput_stepArg_opInput_opOutput_stepPublish_flowOutput_");
         Map<String, Serializable> actualFlowOutputs = flowData.getOutputs();
         Assert.assertEquals("flow output values not as expected", expectedFlowOutputs, actualFlowOutputs);
     }
 
-    private void verifyTaskPublishValues(StepData taskData) {
+    private void verifyStepPublishValues(StepData stepData) {
         // verify `get`, `get_sp()` and mixed mode works
         Map<String, Serializable> expectedPublishValues = new LinkedHashMap<>();
         expectedPublishValues.put("output1_safe", "CloudSlang");
@@ -179,8 +179,8 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedPublishValues.put("output_13", "localhost");
         expectedPublishValues.put("output_14", null);
         expectedPublishValues.put("output_15", "default_str");
-        expectedPublishValues.put("value_propagate", "flowInput_taskArg_opInput_opOutput_taskPublish_");
-        Map<String, Serializable> actualPublishValues = taskData.getOutputs();
+        expectedPublishValues.put("value_propagate", "flowInput_stepArg_opInput_opOutput_stepPublish_");
+        Map<String, Serializable> actualPublishValues = stepData.getOutputs();
         Assert.assertEquals("operation publish values not as expected", expectedPublishValues, actualPublishValues);
     }
 
@@ -190,10 +190,10 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
                 new SystemProperty("cloudslang", "lang.key", "language"),
                 new SystemProperty("", "a.b.c.null_value", null),
                 new SystemProperty("propagate", "flow.input", "flowInput_"),
-                new SystemProperty("propagate", "task.argument", "taskArg_"),
+                new SystemProperty("propagate", "step.argument", "stepArg_"),
                 new SystemProperty("propagate", "op.input", "opInput_"),
                 new SystemProperty("propagate", "op.output", "opOutput_"),
-                new SystemProperty("propagate", "task.publish", "taskPublish_"),
+                new SystemProperty("propagate", "step.publish", "stepPublish_"),
                 new SystemProperty("propagate", "flow.output", "flowOutput_"),
                 new SystemProperty("chars-b", "c-hyphen", "hyphen_value")
         );
@@ -213,14 +213,14 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
                 "flow.input.prop4",
                 "flow.input.prop5",
                 "flow.output.prop1",
-                "task.input.prop1",
-                "task.input.prop2",
-                "task.input.prop3",
-                "task.input.prop4",
-                "task.publish.prop1",
-                "task.publish.prop2",
-                "task.publish.prop3",
-                "task.publish.prop4",
+                "step.input.prop1",
+                "step.input.prop2",
+                "step.input.prop3",
+                "step.input.prop4",
+                "step.publish.prop1",
+                "step.publish.prop2",
+                "step.publish.prop3",
+                "step.publish.prop4",
                 "op.input.prop1",
                 "op.input.prop2",
                 "op.input.prop3",

@@ -94,14 +94,14 @@ public class CompileFlowWithOnFailureTest {
 
     @Test
     public void testCompileSameNameInFlowAndOnFailure() throws Exception {
-        URI flow = getClass().getResource("/corrupted/same_task_name_in_flow_and_on_failure.sl").toURI();
+        URI flow = getClass().getResource("/corrupted/same_step_name_in_flow_and_on_failure.sl").toURI();
         URI operation = getClass().getResource("/fail_on_input_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
 
-        expectedException.expectMessage(ExecutableBuilder.UNIQUE_TASK_NAME_MESSAGE_SUFFIX);
-        expectedException.expectMessage("task_same_name");
+        expectedException.expectMessage(ExecutableBuilder.UNIQUE_STEP_NAME_MESSAGE_SUFFIX);
+        expectedException.expectMessage("step_same_name");
         expectedException.expect(RuntimeException.class);
 
         compiler.compile(SlangSource.fromFile(flow), path);
@@ -109,14 +109,14 @@ public class CompileFlowWithOnFailureTest {
 
     @Test
     public void testCompileSameNameOnFailure() throws Exception {
-        URI flow = getClass().getResource("/corrupted/same_task_name_on_failure.sl").toURI();
+        URI flow = getClass().getResource("/corrupted/same_step_name_on_failure.sl").toURI();
         URI operation = getClass().getResource("/fail_on_input_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
 
-        expectedException.expectMessage(ExecutableBuilder.UNIQUE_TASK_NAME_MESSAGE_SUFFIX);
-        expectedException.expectMessage("task_same_name_on_failure");
+        expectedException.expectMessage(ExecutableBuilder.UNIQUE_STEP_NAME_MESSAGE_SUFFIX);
+        expectedException.expectMessage("step_same_name_on_failure");
         expectedException.expect(RuntimeException.class);
 
         compiler.compile(SlangSource.fromFile(flow), path);
@@ -129,7 +129,7 @@ public class CompileFlowWithOnFailureTest {
 
     private Map<String, ResultNavigation> getNavigationMap(ExecutionStep firstStep) {
         @SuppressWarnings("unchecked") Map<String, ResultNavigation> stringResultNavigationMap =
-                (Map<String, ResultNavigation>) firstStep.getActionData().get(ScoreLangConstants.TASK_NAVIGATION_KEY);
+                (Map<String, ResultNavigation>) firstStep.getActionData().get(ScoreLangConstants.STEP_NAVIGATION_KEY);
         return stringResultNavigationMap;
     }
 

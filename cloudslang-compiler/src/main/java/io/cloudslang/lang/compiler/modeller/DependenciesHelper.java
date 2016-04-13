@@ -15,7 +15,7 @@ package io.cloudslang.lang.compiler.modeller;
 import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
-import io.cloudslang.lang.compiler.modeller.model.Task;
+import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.transformers.AggregateTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
@@ -83,11 +83,11 @@ public class DependenciesHelper {
             List<Input> inputs,
             List<Output> outputs,
             List<Result> results,
-            Deque<Task> tasks) {
+            Deque<Step> steps) {
         Set<String> result = new HashSet<>();
         result.addAll(getSystemPropertiesFromExecutable(inputs, outputs, results));
-        for (Task task : tasks) {
-            result.addAll(getSystemPropertiesFromTask(task));
+        for (Step step : steps) {
+            result.addAll(getSystemPropertiesFromStep(step));
         }
         return result;
     }
@@ -110,18 +110,18 @@ public class DependenciesHelper {
         return result;
     }
 
-    private Set<String> getSystemPropertiesFromTask(Task task) {
+    private Set<String> getSystemPropertiesFromStep(Step step) {
         Set<String> result = new HashSet<>();
         List<Transformer> relevantTransformers = new ArrayList<>();
         relevantTransformers.add(publishTransformer);
         relevantTransformers.add(aggregateTransformer);
 
-        result.addAll(getSystemPropertiesFromInOutParam(task.getArguments()));
+        result.addAll(getSystemPropertiesFromInOutParam(step.getArguments()));
         result.addAll(
-                getSystemPropertiesFromPostTaskActionData(
-                        task.getPostTaskActionData(),
+                getSystemPropertiesFromPostStepActionData(
+                        step.getPostStepActionData(),
                         relevantTransformers,
-                        task.getName()
+                        step.getName()
                 )
         );
 
@@ -141,14 +141,14 @@ public class DependenciesHelper {
         return result;
     }
 
-    private Set<String> getSystemPropertiesFromPostTaskActionData(
-            Map<String, Serializable> postTaskActionData,
+    private Set<String> getSystemPropertiesFromPostStepActionData(
+            Map<String, Serializable> postStepActionData,
             List<Transformer> relevantTransformers,
-            String taskName) {
+            String stepName) {
         Set<String> result = new HashSet<>();
         for (Transformer transformer : relevantTransformers) {
             String key = TransformersHandler.keyToTransform(transformer);
-            Serializable item = postTaskActionData.get(key);
+            Serializable item = postStepActionData.get(key);
             if (item instanceof Collection) {
                 Collection itemsCollection = (Collection) item;
                 for (Object itemAsObject : itemsCollection) {
@@ -156,11 +156,11 @@ public class DependenciesHelper {
                         Output itemAsOutput = (Output) itemAsObject;
                         result.addAll(itemAsOutput.getSystemPropertyDependencies());
                     } else {
-                        throw new RuntimeException("For task: " + taskName + " - Incorrect type for post task data items.");
+                        throw new RuntimeException("For step: " + stepName + " - Incorrect type for post step data items.");
                     }
                 }
             } else {
-                throw new RuntimeException("For task: " + taskName + " - Incorrect type for post task data items.");
+                throw new RuntimeException("For step: " + stepName + " - Incorrect type for post step data items.");
             }
         }
         return result;

@@ -59,7 +59,7 @@ flow:
         required: false
     - input_17: ${check_empty(get('i_dont_exist'), 'default_str')}
   workflow:
-    - Task1:
+    - Step1:
         do:
           ops.functions_test_op:
             - exist
@@ -72,7 +72,7 @@ flow:
             - input_9: ${get(    'i_don_exist',        get_sp('a.b.c.host')       )}
             - input_10: ${get_sp('a.b.c.i_don_exist', get_sp('a.b.c.host'))}
             - input_11: ${get_sp('a.b.c.null_value', 'default_str')}
-            - value_propagate: ${ value_propagate + get_sp('propagate.task.argument') }
+            - value_propagate: ${ value_propagate + get_sp('propagate.step.argument') }
             - input_12: ${get_sp('chars-b.c-hyphen')}
             - input_13: ${get_sp('chars-b.c-hyphen', 'default_str')}
             - input_14: ${get_sp("a.b.c.host")}
@@ -98,7 +98,7 @@ flow:
           - output_13
           - output_14
           - output_15
-          - value_propagate: ${ value_propagate + get_sp('propagate.task.publish') }
+          - value_propagate: ${ value_propagate + get_sp('propagate.step.publish') }
         navigate:
           - FUNCTIONS_KEY_EXISTS: FUNCTIONS_KEY_EXISTS
           - FUNCTIONS_KEY_EXISTS_PROBLEM: FUNCTIONS_KEY_EXISTS_PROBLEM

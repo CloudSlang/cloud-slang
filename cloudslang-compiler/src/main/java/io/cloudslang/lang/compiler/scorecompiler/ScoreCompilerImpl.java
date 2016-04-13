@@ -11,12 +11,8 @@ package io.cloudslang.lang.compiler.scorecompiler;
 import ch.lambdaj.function.convert.Converter;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
-import io.cloudslang.lang.compiler.modeller.TransformersHandler;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
-import io.cloudslang.lang.compiler.modeller.model.Task;
-import io.cloudslang.lang.compiler.modeller.transformers.AggregateTransformer;
-import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
-import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
+import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.entities.bindings.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
@@ -28,7 +24,6 @@ import io.cloudslang.lang.compiler.modeller.model.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
@@ -70,7 +65,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             //than we match the references to the actual dependencies
             filteredDependencies = dependenciesHelper.matchReferences(executable, availableExecutables);
 
-            // Validate that all the tasks of a flow have navigations for all the reference's results
+            // Validate that all the steps of a flow have navigations for all the reference's results
             validateAllDependenciesResultsHaveMatchingNavigations(executable, filteredDependencies);
         }
 
@@ -92,11 +87,11 @@ public class ScoreCompilerImpl implements ScoreCompiler{
     }
 
     /**
-     * Validate that for all the tasks in the flow, all results from the referenced operation or flow have matching navigations
+     * Validate that for all the steps in the flow, all results from the referenced operation or flow have matching navigations
      * If the given {@link io.cloudslang.lang.compiler.modeller.model.Executable} is an operation, the method does nothing
      * Throws {@link java.lang.IllegalArgumentException} if:
      *      - Any reference of the executable is missing
-     *      - There is a missing navigation for one of the tasks' references' results
+     *      - There is a missing navigation for one of the steps' references' results
      *
      * @param executable the flow to validate
      * @param filteredDependencies a map holding for each reference name, its {@link io.cloudslang.lang.compiler.modeller.model.Executable} object
@@ -106,25 +101,25 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             return;
         }
         Flow flow = (Flow)executable;
-        Deque<Task> tasks = flow.getWorkflow().getTasks();
-        for(Task task : tasks){
-            List<Map<String, String>> taskNavigations = task.getNavigationStrings();
-            String refId = task.getRefId();
+        Deque<Step> steps = flow.getWorkflow().getSteps();
+        for(Step step : steps){
+            List<Map<String, String>> stepNavigations = step.getNavigationStrings();
+            String refId = step.getRefId();
             Executable reference = filteredDependencies.get(refId);
-            Validate.notNull(reference, "Cannot compile flow: \'" + executable.getName() + "\' since for task: \'" + task.getName()
+            Validate.notNull(reference, "Cannot compile flow: \'" + executable.getName() + "\' since for step: \'" + step.getName()
                     + "\', the dependency: \'" + refId + "\' is missing.");
             List<Result> refResults = reference.getResults();
             for(Result result : refResults){
                 String resultName = result.getName();
-                Validate.isTrue(navigationListContainsKey(taskNavigations, resultName), "Cannot compile flow: \'" + executable.getName() +
-                        "\' since for task: '" + task.getName() + "\', the result \'" + resultName+
+                Validate.isTrue(navigationListContainsKey(stepNavigations, resultName), "Cannot compile flow: \'" + executable.getName() +
+                        "\' since for step: '" + step.getName() + "\', the result \'" + resultName+
                         "\' of its dependency: \'"+ refId + "\' has no matching navigation");
             }
         }
     }
 
-    private boolean navigationListContainsKey(List<Map<String, String>> taskNavigations, String resultName) {
-        for (Map<String, String> map : taskNavigations) {
+    private boolean navigationListContainsKey(List<Map<String, String>> stepNavigations, String resultName) {
+        for (Map<String, String> map : stepNavigations) {
             if (map.containsKey(resultName)) return true;
         }
         return false;

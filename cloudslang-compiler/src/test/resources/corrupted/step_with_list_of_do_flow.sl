@@ -6,12 +6,8 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 namespace: io.cloudslang
 
-imports:
-  ops: io.cloudslang
-
 flow:
-  name: workflow_with_task_map
+  name: step_with_list_of_do_flow
   workflow:
-    task1:
-      do:
-        ops.op1:
+    - step1:
+        - do:

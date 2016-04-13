@@ -11,7 +11,7 @@ flow:
  name: flow_navigate_multiple_elements_for_rule
 
  workflow:
-   - Task1:
+   - Step1:
        do:
          ops.java_op:
        navigate:

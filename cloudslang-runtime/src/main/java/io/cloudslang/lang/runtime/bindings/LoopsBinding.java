@@ -36,7 +36,7 @@ import static io.cloudslang.lang.runtime.env.LoopCondition.LOOP_CONDITION_KEY;
 @Component
 public class LoopsBinding {
 
-    public static final String FOR_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating for loop expression in task";
+    public static final String FOR_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating for loop expression in step";
     public static final String INVALID_MAP_EXPRESSION_MESSAGE = "Invalid expression for iterating maps";
 
     private final Logger logger = Logger.getLogger(getClass());
@@ -118,7 +118,7 @@ public class LoopsBinding {
         ForLoopCondition forLoopCondition = createForLoopCondition(evalResult);
         if (forLoopCondition == null) {
             throw new RuntimeException("collection expression: '" + collectionExpression + "' in the 'for' loop " +
-                    "in task: '" + nodeName + "' " +
+                    "in step: '" + nodeName + "' " +
                     "doesn't return an iterable, other types are not supported");
         }
         if (!forLoopCondition.hasMore()) {

@@ -7,15 +7,11 @@
 namespace: io.cloudslang
 
 imports:
-  ops: user.ops
+  ops: io.cloudslang
 
 flow:
-  name: flow_with_navigation_to_missing_task
-
+  name: workflow_with_step_map
   workflow:
-    - Task1:
-        do:
-          ops.java_op:
-        navigate:
-          - SUCCESS: Task2
-          - FAILURE: FAILURE
+    step1:
+      do:
+        ops.op1:

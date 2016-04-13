@@ -63,7 +63,7 @@ public class ActionStepsTest {
     public ExpectedException exception = ExpectedException.none();
 
     @Autowired
-    private ActionSteps actionSteps;
+    private ActionExecutionData actionSteps;
 
 	ExecutionRuntimeServices executionRuntimeServicesMock = mock(ExecutionRuntimeServices.class);
 
@@ -685,8 +685,8 @@ public class ActionStepsTest {
     static class Config {
 
         @Bean
-        public ActionSteps actionSteps() {
-            return new ActionSteps();
+        public ActionExecutionData actionSteps() {
+            return new ActionExecutionData();
         }
 
         @Bean

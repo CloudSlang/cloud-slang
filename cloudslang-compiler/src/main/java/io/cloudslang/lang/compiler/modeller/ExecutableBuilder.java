@@ -12,11 +12,11 @@ import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Action;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
-import io.cloudslang.lang.compiler.modeller.model.Task;
+import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.model.Workflow;
 import io.cloudslang.lang.compiler.modeller.result.ActionModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
-import io.cloudslang.lang.compiler.modeller.result.TaskModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.StepModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.WorkflowModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
@@ -62,7 +62,7 @@ import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER
 public class ExecutableBuilder {
 
     public static final String MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX = "Multiple 'on_failure' properties found";
-    public static final String UNIQUE_TASK_NAME_MESSAGE_SUFFIX = "Each task name in the workflow must be unique";
+    public static final String UNIQUE_STEP_NAME_MESSAGE_SUFFIX = "Each step name in the workflow must be unique";
     public static final String FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE =
             "Explicit values are not allowed for flow results. Correct format is:";
 
@@ -82,9 +82,9 @@ public class ExecutableBuilder {
     private List<Transformer> actionTransformers;
     private List<List<String>> actionTransformerConstraintGroups;
 
-    private List<Transformer> preTaskTransformers;
-    private List<Transformer> postTaskTransformers;
-    private List<String> TaskAdditionalKeyWords = Arrays.asList(ScoreLangConstants.LOOP_KEY, SlangTextualKeys.DO_KEY, SlangTextualKeys.NAVIGATION_KEY);
+    private List<Transformer> preStepTransformers;
+    private List<Transformer> postStepTransformers;
+    private List<String> stepAdditionalKeyWords = Arrays.asList(ScoreLangConstants.LOOP_KEY, SlangTextualKeys.DO_KEY, SlangTextualKeys.NAVIGATION_KEY);
 
     @PostConstruct
     public void initScopedTransformersAndKeys() {
@@ -97,9 +97,9 @@ public class ExecutableBuilder {
         //action keys excluding each other
         actionTransformerConstraintGroups = Collections.singletonList(Arrays.asList(ScoreLangConstants.PYTHON_SCRIPT_KEY, SlangTextualKeys.JAVA_ACTION));
 
-        //task transformers
-        preTaskTransformers = filterTransformers(Transformer.Scope.BEFORE_TASK);
-        postTaskTransformers = filterTransformers(Transformer.Scope.AFTER_TASK);
+        //step transformers
+        preStepTransformers = filterTransformers(Transformer.Scope.BEFORE_STEP);
+        postStepTransformers = filterTransformers(Transformer.Scope.AFTER_STEP);
     }
 
     private List<Transformer> filterTransformers(Transformer.Scope scope) {
@@ -142,8 +142,8 @@ public class ExecutableBuilder {
 
                 errors.addAll(validateFlowResultsHaveNoExpression(results, execName));
 
-                executableDependencies = fetchDirectTasksDependencies(workflow);
-                systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForFlow(inputs, outputs, results, workflow.getTasks());
+                executableDependencies = fetchDirectStepsDependencies(workflow);
+                systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForFlow(inputs, outputs, results, workflow.getSteps());
                 Flow flow = new Flow(
                         preExecutableActionData,
                         postExecutableActionData,
@@ -228,7 +228,7 @@ public class ExecutableBuilder {
             workFlowRawData = (List<Map<String, Map<String, Object>>>) rawData;
         } catch (ClassCastException ex){
             workFlowRawData = new ArrayList<>();
-            errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'workflow' property there should be a list of tasks and not a map"));
+            errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'workflow' property there should be a list of steps and not a map"));
         }
         if (CollectionUtils.isEmpty(workFlowRawData)) {
             errors.add(new RuntimeException("Error compiling source '" + parsedSlang.getName() + "'. Flow: '" + execName + "' has no workflow data"));
@@ -240,12 +240,12 @@ public class ExecutableBuilder {
                                           String namespace, String execName) {
         Workflow onFailureWorkFlow = null;
         List<Map<String, Map<String, Object>>> onFailureData;
-        Iterator<Map<String, Map<String, Object>>> tasksIterator = workFlowRawData.iterator();
+        Iterator<Map<String, Map<String, Object>>> stepsIterator = workFlowRawData.iterator();
         boolean onFailureFound = false;
-        while(tasksIterator.hasNext()){
-            Map<String, Map<String, Object>> taskData = tasksIterator.next();
-            String taskName = taskData.keySet().iterator().next();
-            if(taskName.equals(SlangTextualKeys.ON_FAILURE_KEY)){
+        while(stepsIterator.hasNext()){
+            Map<String, Map<String, Object>> stepData = stepsIterator.next();
+            String stepName = stepData.keySet().iterator().next();
+            if(stepName.equals(SlangTextualKeys.ON_FAILURE_KEY)){
                 if (onFailureFound) {
                     errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\n" + MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX));
                 } else {
@@ -253,17 +253,17 @@ public class ExecutableBuilder {
                 }
                 try{
                     //noinspection unchecked
-                    onFailureData = (List<Map<String, Map<String, Object>>>)taskData.values().iterator().next();
+                    onFailureData = (List<Map<String, Map<String, Object>>>)stepData.values().iterator().next();
                 } catch (ClassCastException ex){
                     onFailureData = new ArrayList<>();
-                    errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a list of tasks and not a map"));
+                    errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a list of steps and not a map"));
                 }
                 if (CollectionUtils.isNotEmpty(onFailureData)) {
                     WorkflowModellingResult workflowModellingResult = compileWorkFlow(onFailureData, imports, null, true, namespace, execName);
                     errors.addAll(workflowModellingResult.getErrors());
                     onFailureWorkFlow = workflowModellingResult.getWorkflow();
                 }
-                tasksIterator.remove();
+                stepsIterator.remove();
             }
         }
         return onFailureWorkFlow;
@@ -290,122 +290,122 @@ public class ExecutableBuilder {
 
         List<RuntimeException> errors = new ArrayList<>();
         if (workFlowRawData.isEmpty()) {
-            errors.add(new IllegalArgumentException("For flow '" + execName + "' syntax is illegal. Flow must have tasks in its workflow."));
+            errors.add(new IllegalArgumentException("For flow '" + execName + "' syntax is illegal. Flow must have steps in its workflow."));
         }
 
-        Deque<Task> tasks = new LinkedList<>();
-        Set<String> taskNames = new HashSet<>();
-        Deque<Task> onFailureTasks = !(onFailureSection || onFailureWorkFlow == null) ? onFailureWorkFlow.getTasks() : new LinkedList<Task>();
-        List<String> onFailureTaskNames = getTaskNames(onFailureTasks);
-        boolean onFailureTasksFound =  onFailureTaskNames.size() > 0;
-        String defaultFailure = onFailureTasksFound ? onFailureTaskNames.get(0) : ScoreLangConstants.FAILURE_RESULT;
+        Deque<Step> steps = new LinkedList<>();
+        Set<String> stepNames = new HashSet<>();
+        Deque<Step> onFailureSteps = !(onFailureSection || onFailureWorkFlow == null) ? onFailureWorkFlow.getSteps() : new LinkedList<Step>();
+        List<String> onFailureStepNames = getStepNames(onFailureSteps);
+        boolean onFailureStepFound =  onFailureStepNames.size() > 0;
+        String defaultFailure = onFailureStepFound ? onFailureStepNames.get(0) : ScoreLangConstants.FAILURE_RESULT;
 
         PeekingIterator<Map<String, Map<String, Object>>> iterator = new PeekingIterator<>(workFlowRawData.iterator());
         while (iterator.hasNext()) {
-            Map<String, Map<String, Object>> taskRawData = iterator.next();
-            Map<String, Map<String, Object>> nextTaskData = iterator.peek();
-            String taskName = taskRawData.keySet().iterator().next();
-            if (taskNames.contains(taskName) || onFailureTaskNames.contains(taskName)) {
-                errors.add(new RuntimeException("Task name: \'" + taskName + "\' appears more than once in the workflow. " + UNIQUE_TASK_NAME_MESSAGE_SUFFIX));
+            Map<String, Map<String, Object>> stepRawData = iterator.next();
+            Map<String, Map<String, Object>> nextStepData = iterator.peek();
+            String stepName = stepRawData.keySet().iterator().next();
+            if (stepNames.contains(stepName) || onFailureStepNames.contains(stepName)) {
+                errors.add(new RuntimeException("Step name: \'" + stepName + "\' appears more than once in the workflow. " + UNIQUE_STEP_NAME_MESSAGE_SUFFIX));
             }
-            taskNames.add(taskName);
-            Map<String, Object> taskRawDataValue;
-            String message = "Task: " + taskName + " syntax is illegal.\nBelow task name, there should be a map of values in the format:\ndo:\n\top_name:";
+            stepNames.add(stepName);
+            Map<String, Object> stepRawDataValue;
+            String message = "Step: " + stepName + " syntax is illegal.\nBelow step name, there should be a map of values in the format:\ndo:\n\top_name:";
             try {
-                taskRawDataValue = taskRawData.values().iterator().next();
-                if (MapUtils.isNotEmpty(taskRawDataValue)) {
-                    boolean loopKeyFound = taskRawDataValue.containsKey(LOOP_KEY);
-                    boolean asyncLoopKeyFound = taskRawDataValue.containsKey(ASYNC_LOOP_KEY);
+                stepRawDataValue = stepRawData.values().iterator().next();
+                if (MapUtils.isNotEmpty(stepRawDataValue)) {
+                    boolean loopKeyFound = stepRawDataValue.containsKey(LOOP_KEY);
+                    boolean asyncLoopKeyFound = stepRawDataValue.containsKey(ASYNC_LOOP_KEY);
                     if (loopKeyFound) {
                         if (asyncLoopKeyFound) {
-                            errors.add(new RuntimeException("Task: " + taskName + " syntax is illegal.\nBelow task name, there can be either \'loop\' or \'aync_loop\' key."));
+                            errors.add(new RuntimeException("Step: " + stepName + " syntax is illegal.\nBelow step name, there can be either \'loop\' or \'aync_loop\' key."));
                         }
-                        message = "Task: " + taskName + " syntax is illegal.\nBelow the 'loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
-                        @SuppressWarnings("unchecked") Map<String, Object> loopRawData = (Map<String, Object>) taskRawDataValue.remove(LOOP_KEY);
-                        taskRawDataValue.putAll(loopRawData);
+                        message = "Step: " + stepName + " syntax is illegal.\nBelow the 'loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
+                        @SuppressWarnings("unchecked") Map<String, Object> loopRawData = (Map<String, Object>) stepRawDataValue.remove(LOOP_KEY);
+                        stepRawDataValue.putAll(loopRawData);
                     }
                     if (asyncLoopKeyFound) {
-                        message = "Task: " + taskName + " syntax is illegal.\nBelow the 'async_loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
-                        @SuppressWarnings("unchecked") Map<String, Object> asyncLoopRawData = (Map<String, Object>) taskRawDataValue.remove(ASYNC_LOOP_KEY);
+                        message = "Step: " + stepName + " syntax is illegal.\nBelow the 'async_loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
+                        @SuppressWarnings("unchecked") Map<String, Object> asyncLoopRawData = (Map<String, Object>) stepRawDataValue.remove(ASYNC_LOOP_KEY);
                         asyncLoopRawData.put(ASYNC_LOOP_KEY, asyncLoopRawData.remove(FOR_KEY));
-                        taskRawDataValue.putAll(asyncLoopRawData);
+                        stepRawDataValue.putAll(asyncLoopRawData);
                     }
                 }
             } catch (ClassCastException ex) {
-                taskRawDataValue = new HashMap<>();
+                stepRawDataValue = new HashMap<>();
                 errors.add(new RuntimeException(message));
             }
 
             String defaultSuccess;
-            if (nextTaskData != null) {
-                defaultSuccess = nextTaskData.keySet().iterator().next();
+            if (nextStepData != null) {
+                defaultSuccess = nextStepData.keySet().iterator().next();
             } else {
                 defaultSuccess = onFailureSection ? ScoreLangConstants.FAILURE_RESULT : ScoreLangConstants.SUCCESS_RESULT;
             }
-            TaskModellingResult taskModellingResult = compileTask(taskName, taskRawDataValue, defaultSuccess, imports, defaultFailure, namespace);
-            errors.addAll(taskModellingResult.getErrors());
-            tasks.add(taskModellingResult.getTask());
+            StepModellingResult stepModellingResult = compileStep(stepName, stepRawDataValue, defaultSuccess, imports, defaultFailure, namespace);
+            errors.addAll(stepModellingResult.getErrors());
+            steps.add(stepModellingResult.getStep());
         }
 
-        if (onFailureTasksFound) {
-            tasks.addAll(onFailureTasks);
+        if (onFailureStepFound) {
+            steps.addAll(onFailureSteps);
         }
 
-        return new WorkflowModellingResult(new Workflow(tasks), errors);
+        return new WorkflowModellingResult(new Workflow(steps), errors);
     }
 
-    private TaskModellingResult compileTask(String taskName, Map<String, Object> taskRawData, String defaultSuccess,
+    private StepModellingResult compileStep(String stepName, Map<String, Object> stepRawData, String defaultSuccess,
                                             Map<String, String> imports, String defaultFailure, String namespace) {
 
         List<RuntimeException> errors = new ArrayList<>();
-        if (MapUtils.isEmpty(taskRawData)) {
-            taskRawData = new HashMap<>();
-            errors.add(new RuntimeException("Task: " + taskName + " has no data"));
+        if (MapUtils.isEmpty(stepRawData)) {
+            stepRawData = new HashMap<>();
+            errors.add(new RuntimeException("Step: " + stepName + " has no data"));
         }
 
-        Map<String, Serializable> preTaskData = new HashMap<>();
-        Map<String, Serializable> postTaskData = new HashMap<>();
+        Map<String, Serializable> preStepData = new HashMap<>();
+        Map<String, Serializable> postStepData = new HashMap<>();
 
-        errors.addAll(transformersHandler.checkKeyWords(taskName, taskRawData, ListUtils.union(preTaskTransformers, postTaskTransformers), TaskAdditionalKeyWords, null));
+        errors.addAll(transformersHandler.checkKeyWords(stepName, stepRawData, ListUtils.union(preStepTransformers, postStepTransformers), stepAdditionalKeyWords, null));
 
-        String errorMessagePrefix = "For task '" + taskName + "' syntax is illegal.\n";
-        preTaskData.putAll(transformersHandler.runTransformers(taskRawData, preTaskTransformers, errors, errorMessagePrefix));
-        postTaskData.putAll(transformersHandler.runTransformers(taskRawData, postTaskTransformers, errors, errorMessagePrefix));
+        String errorMessagePrefix = "For step '" + stepName + "' syntax is illegal.\n";
+        preStepData.putAll(transformersHandler.runTransformers(stepRawData, preStepTransformers, errors, errorMessagePrefix));
+        postStepData.putAll(transformersHandler.runTransformers(stepRawData, postStepTransformers, errors, errorMessagePrefix));
 
         @SuppressWarnings("unchecked")
-        List<Argument> arguments = (List<Argument>)preTaskData.get(SlangTextualKeys.DO_KEY);
+        List<Argument> arguments = (List<Argument>)preStepData.get(SlangTextualKeys.DO_KEY);
 
         String refId = "";
         Map<String, Object> doRawData;
         try {
             //noinspection unchecked
-            doRawData = (Map<String, Object>) taskRawData.get(SlangTextualKeys.DO_KEY);
+            doRawData = (Map<String, Object>) stepRawData.get(SlangTextualKeys.DO_KEY);
         } catch (ClassCastException ex) {
             doRawData = new HashMap<>();
         }
         if (MapUtils.isEmpty(doRawData)) {
-            errors.add(new RuntimeException("Task: \'" + taskName + "\' has no reference information"));
+            errors.add(new RuntimeException("Step: \'" + stepName + "\' has no reference information"));
         } else {
             String refString = doRawData.keySet().iterator().next();
             refId = resolveReferenceID(refString, imports, namespace);
         }
 
-        List<Map<String, String>> navigationStrings = getNavigationStrings(postTaskData, defaultSuccess, defaultFailure);
+        List<Map<String, String>> navigationStrings = getNavigationStrings(postStepData, defaultSuccess, defaultFailure);
 
-        Task task = new Task(
-                taskName,
-                preTaskData,
-                postTaskData,
+        Step step = new Step(
+                stepName,
+                preStepData,
+                postStepData,
                 arguments,
                 navigationStrings,
                 refId,
-                preTaskData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
-        return new TaskModellingResult(task, errors);
+                preStepData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
+        return new StepModellingResult(step, errors);
     }
 
-    private List<Map<String, String>> getNavigationStrings(Map<String, Serializable> postTaskData, String defaultSuccess, String defaultFailure) {
+    private List<Map<String, String>> getNavigationStrings(Map<String, Serializable> postStepData, String defaultSuccess, String defaultFailure) {
         @SuppressWarnings("unchecked") List<Map<String, String>> navigationStrings =
-                (List<Map<String, String>>) postTaskData.get(SlangTextualKeys.NAVIGATION_KEY);
+                (List<Map<String, String>>) postStepData.get(SlangTextualKeys.NAVIGATION_KEY);
 
         //default navigation
         if (CollectionUtils.isEmpty(navigationStrings)) {
@@ -447,21 +447,21 @@ public class ExecutableBuilder {
      * @param workflow the workflow of the flow
      * @return a map of dependencies. Key - dependency full name, value - type
      */
-    private Set<String> fetchDirectTasksDependencies(Workflow workflow){
+    private Set<String> fetchDirectStepsDependencies(Workflow workflow){
         Set<String> dependencies = new HashSet<>();
-        Deque<Task> tasks = workflow.getTasks();
-        for (Task task : tasks) {
-            dependencies.add(task.getRefId());
+        Deque<Step> steps = workflow.getSteps();
+        for (Step step : steps) {
+            dependencies.add(step.getRefId());
         }
         return dependencies;
     }
 
-    private List<String> getTaskNames(Deque<Task> tasks) {
-        List<String> taskNames =  new ArrayList<>();
-        for (Task task : tasks) {
-            taskNames.add(task.getName());
+    private List<String> getStepNames(Deque<Step> steps) {
+        List<String> stepNames =  new ArrayList<>();
+        for (Step step : steps) {
+            stepNames.add(step.getName());
         }
-        return taskNames;
+        return stepNames;
     }
 
     private List<RuntimeException> validateFlowResultsHaveNoExpression(List<Result> results, String flowName) {

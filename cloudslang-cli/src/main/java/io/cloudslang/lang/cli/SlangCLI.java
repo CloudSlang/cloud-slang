@@ -94,7 +94,7 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP) final List<String> classPath,
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = INPUTS_HELP) final Map<String,? extends Serializable> inputs,
             @CliOption(key = {"if", "input-file"}, mandatory = false, help = INPUT_FILE_HELP) final List<String> inputFiles,
-            @CliOption(key = {"v", "verbose"}, mandatory = false, help = "default, quiet, debug(print each task outputs). e.g. run --f c:/.../your_flow.sl --v quiet", specifiedDefaultValue = "debug", unspecifiedDefaultValue = "default") final String verbose,
+            @CliOption(key = {"v", "verbose"}, mandatory = false, help = "default, quiet, debug(print each step outputs). e.g. run --f c:/.../your_flow.sl --v quiet", specifiedDefaultValue = "debug", unspecifiedDefaultValue = "default") final String verbose,
             @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = SYSTEM_PROPERTY_FILE_HELP) final List<String> systemPropertyFiles) throws IOException {
 
         if (invalidVerboseInput(verbose)) throw new IllegalArgumentException("Verbose argument is invalid.");
@@ -207,7 +207,7 @@ public class SlangCLI implements CommandMarker {
         slangHandlerTypes.add(ScoreLangConstants.EVENT_ACTION_START);
         slangHandlerTypes.add(ScoreLangConstants.EVENT_ACTION_END);
         slangHandlerTypes.add(ScoreLangConstants.EVENT_ACTION_ERROR);
-        slangHandlerTypes.add(ScoreLangConstants.EVENT_TASK_START);
+        slangHandlerTypes.add(ScoreLangConstants.EVENT_STEP_START);
         slangHandlerTypes.add(ScoreLangConstants.EVENT_INPUT_START);
         slangHandlerTypes.add(ScoreLangConstants.EVENT_INPUT_END);
         slangHandlerTypes.add(ScoreLangConstants.EVENT_ARGUMENT_START);

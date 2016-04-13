@@ -36,7 +36,7 @@ import java.util.*;
 public class BindingScopeTest extends SystemsTestsParent {
 
     @Test
-    public void testTaskPublishValues() throws Exception {
+    public void testStepPublishValues() throws Exception {
         URL resource = getClass().getResource("/yaml/binding_scope_flow.sl");
         URI operation = getClass().getResource("/yaml/binding_scope_op.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation));
@@ -48,29 +48,29 @@ public class BindingScopeTest extends SystemsTestsParent {
         // trigger ExecutionPlan
         RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, systemProperties);
 
-        Map<String, StepData> executionData = runtimeInformation.getTasks();
+        Map<String, StepData> executionData = runtimeInformation.getSteps();
 
-        StepData taskData = executionData.get(FIRST_STEP_PATH);
-        Assert.assertNotNull("task data is null", taskData);
+        StepData stepData = executionData.get(FIRST_STEP_PATH);
+        Assert.assertNotNull("step data is null", stepData);
 
-        verifyTaskPublishValues(taskData);
+        verifyStepPublishValues(stepData);
     }
 
-    private void verifyTaskPublishValues(StepData taskData) {
+    private void verifyStepPublishValues(StepData stepData) {
         Map<String, Serializable> expectedPublishValues = new LinkedHashMap<>();
-        expectedPublishValues.put("task1_publish_1", "op_output_1_value op_input_1_task task_arg_1_value");
-        expectedPublishValues.put("task1_publish_2_conflict", "op_output_2_value");
-        Map<String, Serializable> actualPublishValues = taskData.getOutputs();
-        Assert.assertEquals("task publish values not as expected", expectedPublishValues, actualPublishValues);
+        expectedPublishValues.put("step1_publish_1", "op_output_1_value op_input_1_step step_arg_1_value");
+        expectedPublishValues.put("step1_publish_2_conflict", "op_output_2_value");
+        Map<String, Serializable> actualPublishValues = stepData.getOutputs();
+        Assert.assertEquals("step publish values not as expected", expectedPublishValues, actualPublishValues);
     }
 
     @Test
-    public void testFlowContextInTaskPublishSection() throws Exception {
-        URL resource = getClass().getResource("/yaml/binding_scope_flow_context_in_task_publish.sl");
+    public void testFlowContextInStepPublishSection() throws Exception {
+        URL resource = getClass().getResource("/yaml/binding_scope_flow_context_in_step_publish.sl");
         URI operation = getClass().getResource("/yaml/binding_scope_op.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation));
 
-        // pre-validation - task expression uses flow var name
+        // pre-validation - step expression uses flow var name
         SlangSource flowSource = SlangSource.fromFile(resource.toURI());
         Executable flowExecutable = slangCompiler.preCompile(flowSource);
         String flowVarName = "flow_var";
@@ -80,16 +80,16 @@ public class BindingScopeTest extends SystemsTestsParent {
                 flowExecutable.getInputs().get(0).getName()
         );
         @SuppressWarnings("unchecked")
-        List<Output> taskPublishValues = (List<Output>) ((Flow) flowExecutable)
+        List<Output> stepPublishValues = (List<Output>) ((Flow) flowExecutable)
                 .getWorkflow()
-                .getTasks()
+                .getSteps()
                 .getFirst()
-                .getPostTaskActionData()
+                .getPostStepActionData()
                 .get(SlangTextualKeys.PUBLISH_KEY);
         Assert.assertEquals(
-                "Task expression should contain: " + flowVarName,
+                "Step expression should contain: " + flowVarName,
                 flowVarName,
-                StringUtils.trim(ExpressionUtils.extractExpression(taskPublishValues.get(0).getValue()))
+                StringUtils.trim(ExpressionUtils.extractExpression(stepPublishValues.get(0).getValue()))
         );
 
         CompilationArtifact compilationArtifact = slang.compile(flowSource, path);

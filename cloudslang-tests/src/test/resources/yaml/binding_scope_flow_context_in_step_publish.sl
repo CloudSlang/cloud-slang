@@ -11,15 +11,15 @@ imports:
   ops: user.ops
 
 flow:
-  name: binding_scope_flow_context_in_task_publish
+  name: binding_scope_flow_context_in_step_publish
   inputs:
     - flow_var: 'flow_var_value'
   workflow:
-    - task1:
+    - step1:
         do:
           ops.binding_scope_op:
-            - op_input_1: "op_input_1_task"
-            - task_arg_1: "task_arg_1_value"
-            - op_output_2: "op_output_2_task"
+            - op_input_1: "op_input_1_step"
+            - step_arg_1: "step_arg_1_value"
+            - op_output_2: "op_output_2_step"
         publish:
-          - task1_publish_1: ${ flow_var }
+          - step1_publish_1: ${ flow_var }

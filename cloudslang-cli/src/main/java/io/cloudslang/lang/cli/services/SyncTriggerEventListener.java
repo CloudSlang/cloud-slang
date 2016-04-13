@@ -42,7 +42,7 @@ public class SyncTriggerEventListener implements ScoreEventListener{
     public static final String FLOW_FINISHED_WITH_FAILURE_MSG = "Flow finished with failure";
     public static final String EXEC_START_PATH = "0";
     public static final int OUTPUT_VALUE_LIMIT = 100;
-    private final static String TASK_PATH_PREFIX = "- ";
+    private final static String STEP_PATH_PREFIX = "- ";
     public static final String FLOW_OUTPUTS = "Flow outputs:";
     public static final String OPERATION_OUTPUTS = "Operation outputs:";
     public static final String FINISHED_WITH_RESULT = " finished with result: ";
@@ -80,27 +80,27 @@ public class SyncTriggerEventListener implements ScoreEventListener{
             case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
                 errorMessage.set(SLANG_STEP_ERROR_MSG + data.get(LanguageEventData.EXCEPTION));
                 break;
-            case ScoreLangConstants.EVENT_TASK_START:
+            case ScoreLangConstants.EVENT_STEP_START:
                 LanguageEventData eventData = (LanguageEventData) data;
-                if(eventData.getStepType() == LanguageEventData.StepType.TASK){
-                    String taskName = eventData.getStepName();
+                if(eventData.getStepType() == LanguageEventData.StepType.STEP){
+                    String stepName = eventData.getStepName();
                     String path = eventData.getPath();
                     int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
-                    String prefix = StringUtils.repeat(TASK_PATH_PREFIX, matches);
-                    printWithColor(Ansi.Color.YELLOW, prefix + taskName);
+                    String prefix = StringUtils.repeat(STEP_PATH_PREFIX, matches);
+                    printWithColor(Ansi.Color.YELLOW, prefix + stepName);
                 }
                 break;
             case ScoreLangConstants.EVENT_OUTPUT_END:
-                // Task end case
-                if((data.get(LanguageEventData.STEP_TYPE)).equals((LanguageEventData.StepType.TASK))) {
+                // Step end case
+                if((data.get(LanguageEventData.STEP_TYPE)).equals((LanguageEventData.StepType.STEP))) {
                     if (this.isDebugMode) {
-                        Map<String, Serializable> taskOutputs = extractNotEmptyOutputs(data);
+                        Map<String, Serializable> stepOutputs = extractNotEmptyOutputs(data);
                         String path = ((LanguageEventData) data).getPath();
                         int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
-                        String prefix = StringUtils.repeat(TASK_PATH_PREFIX, matches);
+                        String prefix = StringUtils.repeat(STEP_PATH_PREFIX, matches);
 
-                        for (String key : taskOutputs.keySet()) {
-                            printWithColor(Ansi.Color.WHITE, prefix + key + " = " + taskOutputs.get(key));
+                        for (String key : stepOutputs.keySet()) {
+                            printWithColor(Ansi.Color.WHITE, prefix + key + " = " + stepOutputs.get(key));
                         }
                     }
                 }

@@ -70,7 +70,7 @@ public class ScoreServicesImpl implements ScoreServices{
             handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
             handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
             handlerTypes.add(EVENT_EXECUTION_FINISHED);
-            handlerTypes.add(EVENT_TASK_START);
+            handlerTypes.add(EVENT_STEP_START);
             handlerTypes.add(EVENT_OUTPUT_END);
         }
 
