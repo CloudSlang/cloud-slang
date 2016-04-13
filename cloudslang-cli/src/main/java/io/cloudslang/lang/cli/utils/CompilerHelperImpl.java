@@ -39,6 +39,7 @@ import static ch.lambdaj.Lambda.convert;
 @Component
 public class CompilerHelperImpl implements CompilerHelper{
 
+    public static final String INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX = "' is not a directory";
     private static final Logger logger = Logger.getLogger(CompilerHelperImpl.class);
     private static final String SP_DIR = "properties"; //TODO reconsider it after closing CloudSlang file extensions & some real usecases
     private static final String INPUT_DIR = "inputs";
@@ -183,6 +184,7 @@ public class CompilerHelperImpl implements CompilerHelper{
 
     // e.g. exclude .prop.sl from .sl set
     private Collection<File> listSlangFiles(File directory, boolean recursive) {
+        Validate.isTrue(directory.isDirectory(), "Parameter '" + directory.getPath() + INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX);
         Collection<File> dependenciesFiles = FileUtils.listFiles(directory, Extension.getSlangFileExtensionValues(), recursive);
         Collection<File> result = new ArrayList<>();
         for (File file : dependenciesFiles) {

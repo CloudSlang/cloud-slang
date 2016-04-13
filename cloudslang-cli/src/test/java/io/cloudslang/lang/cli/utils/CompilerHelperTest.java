@@ -14,6 +14,7 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.SystemProperty;
+import java.io.File;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -128,16 +129,27 @@ public class CompilerHelperTest {
         );
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testInvalidDirPathForDependencies() throws Exception {
         String flowFilePath = getClass().getResource("/flow.sl").getPath();
-        String invalidDirPath = getClass().getResource("").getPath().concat("xxx");
+        String currentDirPath =  getClass().getResource("").getPath();
+        String invalidDirPath = currentDirPath.concat("xxx");
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("xxx");
+        expectedException.expectMessage(CompilerHelperImpl.INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX);
+
         compilerHelper.compile(flowFilePath, Lists.newArrayList(invalidDirPath));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testInvalidDirPathForDependencies2() throws Exception {
         String flowFilePath = getClass().getResource("/flow.sl").getPath();
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("flow.sl");
+        expectedException.expectMessage(CompilerHelperImpl.INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX);
+
         compilerHelper.compile(flowFilePath, Lists.newArrayList(flowFilePath));
     }
 
