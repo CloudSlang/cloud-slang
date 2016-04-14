@@ -11,7 +11,7 @@ imports:
   ops: user.ops
 
 flow:
-  name: unwired_task_wired_from_on_failure
+  name: unreachable_task_reachable_from_on_failure
   workflow:
     - print_message1:
         do:
