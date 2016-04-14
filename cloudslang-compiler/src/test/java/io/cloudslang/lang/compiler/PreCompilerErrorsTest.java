@@ -482,4 +482,45 @@ public class PreCompilerErrorsTest {
         throw result.getErrors().get(0);
     }
 
+    @Test
+    public void testFlowWithUnwiredTasks() throws Exception {
+        URI resource = getClass().getResource("/corrupted/unwired_tasks.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Step");
+        exception.expectMessage("print_message2");
+        exception.expectMessage("unreachable");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testFlowWithUnwiredOnFailureTask() throws Exception {
+        URI resource = getClass().getResource("/corrupted/unwired_on_failure_task.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() == 0);
+    }
+
+    @Test
+    public void testFlowWithUnwiredTaskWiredFromOnFailureTask() throws Exception {
+        URI resource = getClass().getResource("/corrupted/unwired_task_wired_from_on_failure.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() == 0);
+    }
+
+    @Test
+    public void testFlowWithUnwiredTasksOneWiredFromOnFailureTask() throws Exception {
+        URI resource = getClass().getResource("/corrupted/unwired_tasks_one_wired_from_on_failure.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Step");
+        exception.expectMessage("print_message2");
+        exception.expectMessage("unreachable");
+        throw result.getErrors().get(0);
+    }
 }

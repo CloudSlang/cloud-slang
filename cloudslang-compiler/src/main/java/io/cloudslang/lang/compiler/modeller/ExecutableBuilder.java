@@ -8,6 +8,7 @@
  */
 package io.cloudslang.lang.compiler.modeller;
 
+import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Action;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
@@ -42,6 +43,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +52,7 @@ import java.util.Set;
 import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
+import static org.hamcrest.Matchers.equalTo;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.ASYNC_LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.LOOP_KEY;
@@ -351,6 +354,11 @@ public class ExecutableBuilder {
             steps.addAll(onFailureSteps);
         }
 
+        List<Step> unwiredSteps = getUnwiredSteps(steps, onFailureSteps);
+        for (Step step : unwiredSteps) {
+            errors.add(new RuntimeException("Step: " + step.getName() + " is unreachable"));
+        }
+
         return new WorkflowModellingResult(new Workflow(steps), errors);
     }
 
@@ -480,4 +488,33 @@ public class ExecutableBuilder {
         return errors;
     }
 
+    private List<Step> getUnwiredSteps(Deque<Step> steps, Deque<Step> onFailureSteps) {
+        List<Step> unwiredSteps = new ArrayList<>();
+        if (steps.size() > 0) {
+            Map<String, Step> wiredSteps = new LinkedHashMap<>();
+            getWiredSteps(steps.getFirst(), steps, wiredSteps);
+            Step onFailureStep = onFailureSteps.size() == 0 ? null : onFailureSteps.getFirst();
+            for (Step step : steps) {
+                boolean isOnFailureStep = onFailureStep != null && onFailureStep.getName().equals(step.getName());
+                if (wiredSteps.get(step.getName()) == null && !isOnFailureStep) {
+                    unwiredSteps.add(step);
+                }
+            }
+        }
+        return unwiredSteps;
+    }
+
+    private void getWiredSteps(Step step, Deque<Step> steps, Map<String, Step> wiredSteps) {
+        wiredSteps.put(step.getName(), step);
+        for (Map<String, String> map : step.getNavigationStrings()) {
+            Map.Entry<String, String> entry = map.entrySet().iterator().next();
+            String nextStepName = entry.getValue();
+            if (wiredSteps.get(nextStepName) == null) {
+                Step nextStepToCompile = Lambda.selectFirst(steps, having(on(Step.class).getName(), equalTo(nextStepName)));
+                if (nextStepToCompile != null) {
+                    getWiredSteps(nextStepToCompile, steps, wiredSteps);
+                }
+            }
+        }
+    }
 }
