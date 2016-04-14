@@ -51,9 +51,12 @@ import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.ASYNC_LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER;
+import static io.cloudslang.lang.entities.ScoreLangConstants.FAILURE_RESULT;
 
 /*
  * Created by orius123 on 09/11/14.
@@ -259,6 +262,9 @@ public class ExecutableBuilder {
                     errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a list of steps and not a map"));
                 }
                 if (CollectionUtils.isNotEmpty(onFailureData)) {
+                    if (onFailureData.size() > 1) {
+                        errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be only one step"));
+                    }
                     WorkflowModellingResult workflowModellingResult = compileWorkFlow(onFailureData, imports, null, true, namespace, execName);
                     errors.addAll(workflowModellingResult.getErrors());
                     onFailureWorkFlow = workflowModellingResult.getWorkflow();
@@ -316,6 +322,7 @@ public class ExecutableBuilder {
                 if (MapUtils.isNotEmpty(stepRawDataValue)) {
                     boolean loopKeyFound = stepRawDataValue.containsKey(LOOP_KEY);
                     boolean asyncLoopKeyFound = stepRawDataValue.containsKey(ASYNC_LOOP_KEY);
+                    boolean navigateKeyFound = stepRawDataValue.containsKey(NAVIGATION_KEY);
                     if (loopKeyFound) {
                         if (asyncLoopKeyFound) {
                             errors.add(new RuntimeException("Step: " + stepName + " syntax is illegal.\nBelow step name, there can be either \'loop\' or \'aync_loop\' key."));
@@ -329,6 +336,16 @@ public class ExecutableBuilder {
                         @SuppressWarnings("unchecked") Map<String, Object> asyncLoopRawData = (Map<String, Object>) stepRawDataValue.remove(ASYNC_LOOP_KEY);
                         asyncLoopRawData.put(ASYNC_LOOP_KEY, asyncLoopRawData.remove(FOR_KEY));
                         stepRawDataValue.putAll(asyncLoopRawData);
+                    }
+                    if (navigateKeyFound) {
+                        if (stepRawDataValue.containsKey(NAVIGATION_KEY)) {
+                            @SuppressWarnings("unchecked") ArrayList<Map<String, String>> navigation = (ArrayList<Map<String, String>>) stepRawDataValue.get(NAVIGATION_KEY);
+                            for (Map<String, String> el : navigation) {
+                                if (el.containsValue(ON_FAILURE_KEY)) {
+                                   el.put(FAILURE_RESULT, onFailureStepNames.get(0));
+                                }
+                            }
+                        }
                     }
                 }
             } catch (ClassCastException ex) {
