@@ -56,7 +56,7 @@ flow:
             - aggregate_3: ${get_sp('async.aggregate.prop1')}
             - aggregate_4: ${get_sp('async.aggregate.prop2', 'default_str')}
         navigate:
-          - FUNCTIONS_KEY_EXISTS: FUNCTIONS_KEY_EXISTS
+          - FUNCTIONS_KEY_EXISTS: Step3
           - FUNCTIONS_KEY_EXISTS_PROBLEM: FUNCTIONS_KEY_EXISTS_PROBLEM
           
     - Step3:
