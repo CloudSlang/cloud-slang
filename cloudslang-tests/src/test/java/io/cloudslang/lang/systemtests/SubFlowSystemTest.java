@@ -86,38 +86,6 @@ public class SubFlowSystemTest extends SystemsTestsParent {
         }
 
     }
-    @Test
-    /*
-    * A flow with step inputs which collide with a subflow/operation outputs validation
-    * */
-
-    public void testSubFlowInputsOutputsCollision() throws Exception {
-        URI resource = getClass().getResource("/yaml/sub-flow/parent_flow_inputs_outputs_collision.yaml").toURI();
-        URI subFlow = getClass().getResource("/yaml/sub-flow/child_flow.yaml").toURI();
-        URI operation1 = getClass().getResource("/yaml/test_op.sl").toURI();
-        URI operation2 = getClass().getResource("/yaml/check_weather.sl").toURI();
-        URI operation3 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
-        URI operation4 = getClass().getResource("/yaml/check_number.sl").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(subFlow),
-                SlangSource.fromFile(operation1),
-                SlangSource.fromFile(operation2),
-                SlangSource.fromFile(operation3),
-                SlangSource.fromFile(operation4));
-        try {
-            slang.compile(SlangSource.fromFile(resource), path);
-            Assert.fail();
-        }catch (RuntimeException e){
-            Assert.assertNotNull(e.getCause());
-            Assert.assertTrue("got wrong error type: expected [" + IllegalArgumentException.class + "] got [" + e.getCause().getClass() + "]", e.getCause() instanceof IllegalArgumentException);
-            String errorMessage = e.getCause().getMessage();
-            Assert.assertNotNull(errorMessage);
-            Assert.assertTrue("Did not get error from expected parent flow [parent_flow_inputs_outputs_collision]", errorMessage.contains("parent_flow_inputs_outputs_collision"));
-            Assert.assertTrue("Did not get error from expected step [step1]", errorMessage.contains("step1"));
-            Assert.assertTrue("Did not get error from expected missing input [weather]", errorMessage.contains("weather"));
-            Assert.assertTrue("Did not get error from expected subflow [user.ops.check_weather]", errorMessage.contains("user.ops.check_weather"));
-        }
-
-    }
 
 
 }

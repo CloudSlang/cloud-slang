@@ -55,7 +55,7 @@ public class DoTransformerTest {
         Map doArgumentsMap = loadFirstStepFromFile("/flow_with_data.yaml");
         @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap);
         Assert.assertFalse(arguments.isEmpty());
-        Assert.assertEquals(2, arguments.size());
+        Assert.assertEquals(3, arguments.size());
         Argument argument = arguments.iterator().next();
         Assert.assertEquals("city",argument.getName());
         Assert.assertEquals("city_name", argument.getValue());
@@ -67,7 +67,7 @@ public class DoTransformerTest {
         Map doArgumentsMap = loadFirstStepFromFile("/basic_flow.yaml");
         @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap);
         Assert.assertFalse(arguments.isEmpty());
-        Assert.assertEquals(2, arguments.size());
+        Assert.assertEquals(3, arguments.size());
         Argument argument = arguments.get(1);
         Assert.assertEquals("port",argument.getName());
         Assert.assertEquals(true, argument.isOverridable());
@@ -78,7 +78,7 @@ public class DoTransformerTest {
         Map doArgumentsMap = loadFirstStepFromFile("/flow_with_data.yaml");
         @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap);
         Assert.assertFalse(arguments.isEmpty());
-        Assert.assertEquals(2, arguments.size());
+        Assert.assertEquals(3, arguments.size());
         Argument argument = arguments.get(1);
         Assert.assertEquals("country", argument.getName());
         Assert.assertEquals("Israel", argument.getValue());

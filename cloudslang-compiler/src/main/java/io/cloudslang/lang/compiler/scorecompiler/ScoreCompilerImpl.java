@@ -70,7 +70,6 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             if(SlangTextualKeys.FLOW_TYPE.equals(executable.getType())){
                 //validate that all required & overridable parmateres provided by parent flow to subflow
                 validateAllRequiredOverridableInputs(executable, path);
-                validateInputsStepOutputsCollision(executable, path);
             }
 
             // Validate that all the steps of a flow have navigations for all the reference's results
@@ -95,48 +94,46 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemPropertiesFromExecutables(executables));
     }
 
-    private void validateInputsStepOutputsCollision(Executable executable, Set<Executable> path) {
-        // Get all the steps of the flow
-        Collection<Step> steps = ((Flow) executable).getWorkflow().getSteps();
-        path.stream().forEach((e) -> {
-            //get all required & overidable input names that do not have default value
-            List<String> outputs = e.getOutputs().stream().map(InOutParam::getName).collect(Collectors.toList());
 
-            if(!outputs.isEmpty()) {
-                //get all step that have reference to the current executable depenedency (sub flow/op)
-                List<Step> allStepsWithDependencyReference = steps.stream().filter((i) -> i.getRefId().equals(e.getId())).collect(Collectors.toList());
-                //find the missing inputs
-                allStepsWithDependencyReference.stream().forEach((s) -> {
-                    Collection<String> argumentNames = s.getArguments().stream().map(Argument::getName).collect(Collectors.toList());
-                    List<String> inputOutputCollisions = outputs.stream().filter(argumentNames::contains).collect(Collectors.toList());
-
-                    String errorMessage = "Cannot compile flow \'" + executable.getName() + "\', Step \'" + s.getName() + "\' has inputs " + inputOutputCollisions + " which collide with outputs for subflow/operation \'" + e.getId() + "\'";
-                    Validate.isTrue(inputOutputCollisions.isEmpty(), errorMessage);
-                });
-            }
-        });
-    }
 
     private void validateAllRequiredOverridableInputs(Executable executable, Set<Executable> path) {
         // Get all the steps of the flow
         Collection<Step> steps = ((Flow) executable).getWorkflow().getSteps();
 
-        path.stream().forEach((e) -> {
+        for(Executable e:path) {
             //get all required & overidable input names that do not have default value
-            List<String> requiredOveridableInputsNames = e.getInputs().stream().filter((i) -> i.isOverridable() && i.isRequired() && (i.getValue() == null)).map(InOutParam::getName).collect(Collectors.toList());
+            List<String> requiredOveridableInputsNames = new ArrayList<>();
+            for(Input i: e.getInputs()) {
+                if(i.isOverridable() && i.isRequired() && (i.getValue() == null)) {
+                    requiredOveridableInputsNames.add(i.getName());
+                }
+            }
             if(!requiredOveridableInputsNames.isEmpty()) {
                 //get all step that have reference to the current executable depenedency (sub flow/op)
-                List<Step> allStepsWithDependencyReference = steps.stream().filter((i) -> i.getRefId().equals(e.getId())).collect(Collectors.toList());
-            //find the missing inputs
-                allStepsWithDependencyReference.stream().forEach((s) -> {
-                    Collection<String> argumentNames = s.getArguments().stream().map(Argument::getName).collect(Collectors.toList());
-                    List<String> missingInputs = requiredOveridableInputsNames.stream().filter((n)-> !argumentNames.contains(n)).collect(Collectors.toList());
+                List<Step> allStepsWithDependencyReference = new ArrayList<>();
+                for (Step s : ((Flow) executable).getWorkflow().getSteps()) {
+                    if (s.getRefId().equals(e.getId())) {
+                        allStepsWithDependencyReference.add(s);
+                    }
+                }
+                //find the missing inputs
+                for(Step s:allStepsWithDependencyReference) {
+                    Set<String> argumentNames = new HashSet<>();
+                    for (Argument a: s.getArguments()) {
+                        argumentNames.add(a.getName());
+                    }
+                    List<String> missingInputs = new ArrayList<>();
+                    for(String i: requiredOveridableInputsNames) {
+                        if(!argumentNames.contains(i)) {
+                            missingInputs.add(i);
+                        }
+                    }
 
                     String errorMessage = "Cannot compile flow \'" + executable.getName() + "\', Step \'" + s.getName() + "\' has missing required inputs " + missingInputs + " for subflow/operation \'" + e.getId() + "\'";
                     Validate.isTrue(missingInputs.isEmpty(), errorMessage);
-                });
+                };
             }
-        });
+        };
     }
 
     /**
