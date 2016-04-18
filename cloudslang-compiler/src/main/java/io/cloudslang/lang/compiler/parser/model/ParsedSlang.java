@@ -21,6 +21,7 @@ public class ParsedSlang {
     private Map<String, Object> properties;
     private String namespace;
     private String name;
+    private Object extensions;
 
     //todo add constructor?
 
@@ -42,6 +43,10 @@ public class ParsedSlang {
 
     public Map<String, Object> getProperties() {
         return properties;
+    }
+
+    public Object getExtensions() {
+        return extensions;
     }
 
     public Type getType() {
