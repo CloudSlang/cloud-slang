@@ -53,4 +53,39 @@ public class SubFlowSystemTest extends SystemsTestsParent {
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 
+    @Test
+    /*
+    * Parent flow 'parent_flow_missing_inputs' does not provide a required & overidable with no default value input parameter 'city'
+    * for subflow/operation 'check_weather'
+    * */
+
+    public void testSubFlowMissingRequiredInputs() throws Exception {
+        URI resource = getClass().getResource("/yaml/sub-flow/parent_flow_missing_inputs.yaml").toURI();
+        URI subFlow = getClass().getResource("/yaml/sub-flow/child_flow.yaml").toURI();
+        URI operation1 = getClass().getResource("/yaml/test_op.sl").toURI();
+        URI operation2 = getClass().getResource("/yaml/check_weather.sl").toURI();
+        URI operation3 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
+        URI operation4 = getClass().getResource("/yaml/check_number.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(subFlow),
+                SlangSource.fromFile(operation1),
+                SlangSource.fromFile(operation2),
+                SlangSource.fromFile(operation3),
+                SlangSource.fromFile(operation4));
+        try {
+            slang.compile(SlangSource.fromFile(resource), path);
+            Assert.fail();
+        }catch (RuntimeException e){
+            Assert.assertNotNull(e.getCause());
+            Assert.assertTrue("got wrong error type: expected [" + IllegalArgumentException.class + "] got [" + e.getCause().getClass() + "]", e.getCause() instanceof IllegalArgumentException);
+            String errorMessage = e.getCause().getMessage();
+            Assert.assertNotNull(errorMessage);
+            Assert.assertTrue("Did not get error from expected parent flow [parent_flow_missing_inputs]", errorMessage.contains("parent_flow_missing_inputs"));
+            Assert.assertTrue("Did not get error from expected step [step1]", errorMessage.contains("step1"));
+            Assert.assertTrue("Did not get error from expected missing input [city]", errorMessage.contains("city"));
+            Assert.assertTrue("Did not get error from expected subflow [user.ops.check_weather]", errorMessage.contains("user.ops.check_weather"));
+        }
+
+    }
+
+
 }

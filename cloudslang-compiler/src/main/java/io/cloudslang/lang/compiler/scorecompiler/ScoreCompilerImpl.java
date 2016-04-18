@@ -13,6 +13,7 @@ import ch.lambdaj.function.convert.Converter;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Step;
+import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.entities.bindings.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
@@ -32,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static ch.lambdaj.Lambda.convertMap;
 
@@ -65,8 +67,14 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             //than we match the references to the actual dependencies
             filteredDependencies = dependenciesHelper.matchReferences(executable, availableExecutables);
 
+            if(SlangTextualKeys.FLOW_TYPE.equals(executable.getType())){
+                //validate that all required & overridable parmateres provided by parent flow to subflow
+                validateAllRequiredOverridableInputs(executable, path);
+            }
+
             // Validate that all the steps of a flow have navigations for all the reference's results
             validateAllDependenciesResultsHaveMatchingNavigations(executable, filteredDependencies);
+
         }
 
         //next we create an execution plan for the required executable
@@ -84,6 +92,48 @@ public class ScoreCompilerImpl implements ScoreCompiler{
 
         executionPlan.setSubflowsUUIDs(new HashSet<>(dependencies.keySet()));
         return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemPropertiesFromExecutables(executables));
+    }
+
+
+
+    private void validateAllRequiredOverridableInputs(Executable executable, Set<Executable> path) {
+        // Get all the steps of the flow
+        Collection<Step> steps = ((Flow) executable).getWorkflow().getSteps();
+
+        for(Executable e:path) {
+            //get all required & overidable input names that do not have default value
+            List<String> requiredOveridableInputsNames = new ArrayList<>();
+            for(Input i: e.getInputs()) {
+                if(i.isOverridable() && i.isRequired() && (i.getValue() == null)) {
+                    requiredOveridableInputsNames.add(i.getName());
+                }
+            }
+            if(!requiredOveridableInputsNames.isEmpty()) {
+                //get all step that have reference to the current executable depenedency (sub flow/op)
+                List<Step> allStepsWithDependencyReference = new ArrayList<>();
+                for (Step s : ((Flow) executable).getWorkflow().getSteps()) {
+                    if (s.getRefId().equals(e.getId())) {
+                        allStepsWithDependencyReference.add(s);
+                    }
+                }
+                //find the missing inputs
+                for(Step s:allStepsWithDependencyReference) {
+                    Set<String> argumentNames = new HashSet<>();
+                    for (Argument a: s.getArguments()) {
+                        argumentNames.add(a.getName());
+                    }
+                    List<String> missingInputs = new ArrayList<>();
+                    for(String i: requiredOveridableInputsNames) {
+                        if(!argumentNames.contains(i)) {
+                            missingInputs.add(i);
+                        }
+                    }
+
+                    String errorMessage = "Cannot compile flow \'" + executable.getName() + "\', Step \'" + s.getName() + "\' has missing required inputs " + missingInputs + " for subflow/operation \'" + e.getId() + "\'";
+                    Validate.isTrue(missingInputs.isEmpty(), errorMessage);
+                };
+            }
+        };
     }
 
     /**
