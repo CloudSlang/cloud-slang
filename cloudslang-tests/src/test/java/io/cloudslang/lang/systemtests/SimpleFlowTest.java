@@ -177,4 +177,16 @@ public class SimpleFlowTest extends SystemsTestsParent {
         Assert.assertEquals("StepOnSuccess", secondStep.getName());
     }
 
+    @Test
+    public void testFlowWithExtensionsTagIgnored() throws Exception {
+        URI resource = getClass().getResource("/yaml/flow_with_extensions_tag.sl").toURI();
+        URI operation = getClass().getResource("/yaml/noop.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Map<String, Serializable> userInputs = new HashMap<>();
+        triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
+    }
+
 }
