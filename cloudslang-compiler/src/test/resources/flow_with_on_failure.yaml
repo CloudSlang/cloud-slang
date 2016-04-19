@@ -20,10 +20,7 @@ flow:
             do:
               ops.test_op:
                 - city: 'a'
-
-        - send_mail:
-            do:
-              ops.test_op:
+                - alla: 'a'
 
     - first_step:
         do:
