@@ -21,10 +21,6 @@ flow:
               ops.test_op:
                 - city: 'a'
 
-        - send_mail:
-            do:
-              ops.test_op:
-
     - first_step:
         do:
           ops.test_op:

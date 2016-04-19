@@ -322,7 +322,6 @@ public class ExecutableBuilder {
                 if (MapUtils.isNotEmpty(stepRawDataValue)) {
                     boolean loopKeyFound = stepRawDataValue.containsKey(LOOP_KEY);
                     boolean asyncLoopKeyFound = stepRawDataValue.containsKey(ASYNC_LOOP_KEY);
-                    boolean navigateKeyFound = stepRawDataValue.containsKey(NAVIGATION_KEY);
                     if (loopKeyFound) {
                         if (asyncLoopKeyFound) {
                             errors.add(new RuntimeException("Step: " + stepName + " syntax is illegal.\nBelow step name, there can be either \'loop\' or \'aync_loop\' key."));
@@ -337,16 +336,6 @@ public class ExecutableBuilder {
                         asyncLoopRawData.put(ASYNC_LOOP_KEY, asyncLoopRawData.remove(FOR_KEY));
                         stepRawDataValue.putAll(asyncLoopRawData);
                     }
-                    if (navigateKeyFound) {
-                        if (stepRawDataValue.containsKey(NAVIGATION_KEY)) {
-                            @SuppressWarnings("unchecked") ArrayList<Map<String, String>> navigation = (ArrayList<Map<String, String>>) stepRawDataValue.get(NAVIGATION_KEY);
-                            for (Map<String, String> el : navigation) {
-                                if (el.containsValue(ON_FAILURE_KEY)) {
-                                   el.put(FAILURE_RESULT, onFailureStepNames.get(0));
-                                }
-                            }
-                        }
-                    }
                 }
             } catch (ClassCastException ex) {
                 stepRawDataValue = new HashMap<>();
@@ -359,7 +348,18 @@ public class ExecutableBuilder {
             } else {
                 defaultSuccess = onFailureSection ? ScoreLangConstants.FAILURE_RESULT : ScoreLangConstants.SUCCESS_RESULT;
             }
-            StepModellingResult stepModellingResult = compileStep(stepName, stepRawDataValue, defaultSuccess, imports, defaultFailure, namespace);
+
+            String onFailureStepName = onFailureStepFound ? onFailureStepNames.get(0) : null;
+            StepModellingResult stepModellingResult = compileStep(
+                    stepName,
+                    stepRawDataValue,
+                    defaultSuccess,
+                    imports,
+                    defaultFailure,
+                    namespace,
+                    onFailureStepName
+            );
+
             errors.addAll(stepModellingResult.getErrors());
             steps.add(stepModellingResult.getStep());
         }
@@ -371,8 +371,14 @@ public class ExecutableBuilder {
         return new WorkflowModellingResult(new Workflow(steps), errors);
     }
 
-    private StepModellingResult compileStep(String stepName, Map<String, Object> stepRawData, String defaultSuccess,
-                                            Map<String, String> imports, String defaultFailure, String namespace) {
+    private StepModellingResult compileStep(
+            String stepName, Map<String,
+            Object> stepRawData,
+            String defaultSuccess,
+            Map<String, String> imports,
+            String defaultFailure,
+            String namespace,
+            String onFailureStepName) {
 
         List<RuntimeException> errors = new ArrayList<>();
         if (MapUtils.isEmpty(stepRawData)) {
@@ -388,6 +394,8 @@ public class ExecutableBuilder {
         String errorMessagePrefix = "For step '" + stepName + "' syntax is illegal.\n";
         preStepData.putAll(transformersHandler.runTransformers(stepRawData, preStepTransformers, errors, errorMessagePrefix));
         postStepData.putAll(transformersHandler.runTransformers(stepRawData, postStepTransformers, errors, errorMessagePrefix));
+
+        replaceOnFailureReference(postStepData, onFailureStepName, stepName);
 
         @SuppressWarnings("unchecked")
         List<Argument> arguments = (List<Argument>)preStepData.get(SlangTextualKeys.DO_KEY);
@@ -418,6 +426,38 @@ public class ExecutableBuilder {
                 refId,
                 preStepData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
         return new StepModellingResult(step, errors);
+    }
+
+    private void replaceOnFailureReference(
+            Map<String, Serializable> postStepData,
+            String onFailureStepName,
+            String stepName) {
+        Serializable navigationData = postStepData.get(NAVIGATION_KEY);
+        if (navigationData != null) {
+            @SuppressWarnings("unchecked") // from NavigateTransformer
+                    List<Map<String, String>> navigationStrings = (List<Map<String, String>>) navigationData;
+            List<Map<String, String>> transformedNavigationStrings = new ArrayList<>();
+
+            for (Map<String, String> navigation : navigationStrings) {
+                Map.Entry<String, String> navigationEntry = navigation.entrySet().iterator().next();
+                Map<String, String> transformedNavigation = new HashMap<>(navigation);
+                if (navigationEntry.getValue().equals(ON_FAILURE_KEY)) {
+                    if (StringUtils.isEmpty(onFailureStepName)) {
+                        throw new RuntimeException(
+                                "Failed to compile step: '" + stepName +
+                                        "'. Navigation: '" + navigationEntry.getKey() + " -> " + navigationEntry.getValue()
+                                        + "' is illegal. 'on_failure' section is not defined."
+                        );
+                    } else {
+                        transformedNavigation.put(navigationEntry.getKey(), onFailureStepName);
+                    }
+                } else {
+                    transformedNavigation.put(navigationEntry.getKey(), navigationEntry.getValue());
+                }
+                transformedNavigationStrings.add(transformedNavigation);
+            }
+            postStepData.put(NAVIGATION_KEY, (Serializable) transformedNavigationStrings);
+        }
     }
 
     private List<Map<String, String>> getNavigationStrings(Map<String, Serializable> postStepData, String defaultSuccess, String defaultFailure) {

@@ -34,8 +34,9 @@ import org.junit.rules.ExpectedException;
  * @author Bonczidai Levente
  */
 public class NavigationTest extends SystemsTestsParent {
+
     @Rule
-    public static ExpectedException expectedEx = ExpectedException.none();
+    public ExpectedException expectedEx = ExpectedException.none();
 
     @Test
     public void testComplexNavigationEvenNumber() throws Exception {
@@ -210,4 +211,19 @@ public class NavigationTest extends SystemsTestsParent {
         Assert.assertEquals("check_number", steps.get(FIRST_STEP_PATH).getName());
         Assert.assertEquals("send_error_mail", steps.get(SECOND_STEP_KEY).getName());
     }
+
+    @Test
+    public void testNavigationOnFailureNotDefined() throws Exception {
+        expectedEx.expect(RuntimeException.class);
+        expectedEx.expectMessage("navigation");
+        expectedEx.expectMessage("on_failure");
+        expectedEx.expectMessage("section is not defined");
+
+        URI resource = getClass().getResource("/yaml/on_failure_not_defined.sl").toURI();
+        URI operationPython = getClass().getResource("/yaml/produce_default_navigation.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operationPython));
+        slang.compile(SlangSource.fromFile(resource), path);
+    }
+
 }
