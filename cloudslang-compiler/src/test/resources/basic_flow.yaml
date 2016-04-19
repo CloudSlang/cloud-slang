@@ -22,6 +22,7 @@ flow:
           ops.test_op:
             - city: 'input_1'
             - port
+            - alla: 'walla'
         publish:
           - weather
         navigate:

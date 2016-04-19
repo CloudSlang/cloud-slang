@@ -20,15 +20,16 @@ flow:
             do:
               ops.test_op:
                 - city: 'a'
-
+                - alla: 'walla'
         - send_mail:
             do:
               ops.test_op:
-
+                - alla: 'walla'
     - first_step:
         do:
           ops.test_op:
             - city: 'input_1'
+            - alla: 'walla'
         publish:
           - weather
 
@@ -36,6 +37,7 @@ flow:
         do:
           ops.test_op:
             - city: 'input_1'
+            - alla: 'walla'
         navigate:
           - SUCCESS: SUCCESS
           - FAILURE: FAILURE
