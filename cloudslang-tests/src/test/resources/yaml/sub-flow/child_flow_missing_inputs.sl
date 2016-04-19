@@ -5,24 +5,23 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: slang.sample.flows
+namespace: user.flows
 
 imports:
   ops: user.ops
 
 flow:
-  name: flow_with_data
+  name: child_flow_missing_inputs
   inputs:
-  - city_name
-
+    - input1: 'value'
+    - time_zone_as_string: ${get_sp('user.sys.props.port')}
   workflow:
-    - CheckWeather:
+    - step01:
         do:
-          ops.check_Weather:
-            - city: city_name
-            - country: 'Israel'
-            - alla: 'walla'
-        publish:
-          - weather
+          ops.get_time_zone:
+            - missing_time_zone_as_string
+    - step02:
+        do:
+          ops.test_op:
   outputs:
-    - weather
+    - val_output: ${ input1 }

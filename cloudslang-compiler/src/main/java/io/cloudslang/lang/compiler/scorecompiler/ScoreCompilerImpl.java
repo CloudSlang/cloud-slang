@@ -9,21 +9,17 @@
 package io.cloudslang.lang.compiler.scorecompiler;
 
 import ch.lambdaj.function.convert.Converter;
-
 import io.cloudslang.lang.compiler.SlangTextualKeys;
-import io.cloudslang.lang.compiler.modeller.model.Executable;
-import io.cloudslang.lang.compiler.modeller.model.Step;
-import io.cloudslang.lang.entities.bindings.*;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.Validate;
 import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
-import io.cloudslang.lang.entities.CompilationArtifact;
-import io.cloudslang.score.api.ExecutionPlan;
+import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
+import io.cloudslang.lang.compiler.modeller.model.Step;
+import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.score.api.ExecutionPlan;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
@@ -32,6 +28,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import static ch.lambdaj.Lambda.convertMap;
 
@@ -65,8 +66,11 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             //than we match the references to the actual dependencies
             filteredDependencies = dependenciesHelper.matchReferences(executable, availableExecutables);
 
+            validateRequiredOverridableInputs(executable, filteredDependencies);
+
             // Validate that all the steps of a flow have navigations for all the reference's results
             validateAllDependenciesResultsHaveMatchingNavigations(executable, filteredDependencies);
+
         }
 
         //next we create an execution plan for the required executable
@@ -84,6 +88,94 @@ public class ScoreCompilerImpl implements ScoreCompiler{
 
         executionPlan.setSubflowsUUIDs(new HashSet<>(dependencies.keySet()));
         return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemPropertiesFromExecutables(executables));
+    }
+
+    private void validateRequiredOverridableInputs(
+            Executable executable,
+            Map<String, Executable> filteredDependencies) {
+        Map<String, Executable> dependencies = new HashMap<>(filteredDependencies);
+        dependencies.put(executable.getId(), executable);
+        Set<Executable> verifiedExecutables = new HashSet<>();
+        validateRequiredOverridableInputs(executable, dependencies, verifiedExecutables);
+    }
+
+    private void validateRequiredOverridableInputs(
+            Executable executable,
+            Map<String, Executable> dependencies,
+            Set<Executable> verifiedExecutables) {
+        //validate that all required & overridable parameters with no default value of a reference are provided
+        if(!SlangTextualKeys.FLOW_TYPE.equals(executable.getType()) || verifiedExecutables.contains(executable)){
+            return;
+        }
+        verifiedExecutables.add(executable);
+
+        Flow flow = (Flow) executable;
+        Collection<Step> steps = flow.getWorkflow().getSteps();
+        Set<Executable> flowReferences = new HashSet<>();
+
+        for (Step step : steps) {
+            Executable reference = dependencies.get(step.getRefId());
+            List<String> mandatoryInputNames = getMandatoryInputNames(reference);
+            List<String> stepInputNames = getStepInputNames(step);
+            List<String> inputsNotWired = getInputsNotWired(mandatoryInputNames, stepInputNames);
+
+            validateInputNamesEmpty(inputsNotWired, flow, step, reference);
+
+            flowReferences.add(reference);
+        }
+
+        for (Executable reference : flowReferences) {
+            validateRequiredOverridableInputs(reference, dependencies, verifiedExecutables);
+        }
+    }
+
+    private List<String> getMandatoryInputNames(Executable executable) {
+        List<String> inputNames = new ArrayList<>();
+        for (Input input : executable.getInputs()) {
+            if (input.isOverridable() && input.isRequired() && input.getValue() == null) {
+                inputNames.add(input.getName());
+            }
+        }
+        return inputNames;
+    }
+
+    private List<String> getStepInputNames(Step step) {
+        List<String> inputNames = new ArrayList<>();
+        for (Argument argument : step.getArguments()) {
+            inputNames.add(argument.getName());
+        }
+        return inputNames;
+    }
+
+    private List<String> getInputsNotWired(List<String> mandatoryInputNames, List<String> stepInputNames) {
+        List<String> inputsNotWired = new ArrayList<>(mandatoryInputNames);
+        inputsNotWired.removeAll(stepInputNames);
+        return inputsNotWired;
+    }
+
+    private void validateInputNamesEmpty(List<String> inputsNotWired, Flow flow, Step step, Executable reference) {
+        Validate.isTrue(
+                CollectionUtils.isEmpty(inputsNotWired),
+                prepareErrorMessageValidateInputNamesEmpty(inputsNotWired, flow, step, reference)
+        );
+    }
+
+    private String prepareErrorMessageValidateInputNamesEmpty(List<String> inputsNotWired, Flow flow, Step step, Executable reference) {
+        StringBuilder inputsNotWiredBuilder = new StringBuilder();
+        for (String inputName : inputsNotWired) {
+            inputsNotWiredBuilder.append(inputName);
+            inputsNotWiredBuilder.append(", ");
+        }
+        String inputsNotWiredAsString = inputsNotWiredBuilder.toString();
+        if (StringUtils.isNotEmpty(inputsNotWiredAsString)) {
+            inputsNotWiredAsString = inputsNotWiredAsString.substring(0, inputsNotWiredAsString.length() - 2);
+        }
+        return "Cannot compile flow '" + flow.getId() +
+                "'. Step '" + step.getName() +
+                "' does not declare all the mandatory inputs of its reference." +
+                " The following inputs of '" + reference.getId() +
+                "' are overridable, required and with no default value: " +
+                inputsNotWiredAsString + ".";
     }
 
     /**

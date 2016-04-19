@@ -17,6 +17,7 @@ flow:
         do:
           ops.test_op:
             - city: 'input_1'
+            - alla: 'placeholder'
         publish:
           - weather
         navigate:

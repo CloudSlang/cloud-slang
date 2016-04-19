@@ -18,6 +18,7 @@ flow:
         do:
           ops.test_op:
             - city: 'input_1'
+            - alla: 'walla'
         publish:
           - weather
 
