@@ -49,7 +49,8 @@ flow:
         async_loop:
           for: value in [1,2,3]
           do:
-            ops.system_property_dependencies_op: []
+            ops.system_property_dependencies_op:
+                - input1: 'kuku'
         aggregate:
             - aggregate_1
             - aggregate_2: "get_sp('async.aggregate.i_am_no_property')"
