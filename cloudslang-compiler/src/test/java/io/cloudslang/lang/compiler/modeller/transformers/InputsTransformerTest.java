@@ -156,9 +156,9 @@ public class InputsTransformerTest {
     }
 
     @Test
-    public void testNonPrivateInputWithoutDefault() throws Exception {
+    public void testPrivateInputWithoutDefault() throws Exception {
         exception.expect(RuntimeException.class);
-        exception.expectMessage("not private");
+        exception.expectMessage("private");
         exception.expectMessage("default");
         exception.expectMessage("input_without_default");
         List inputs = getInputsFormSl("/private_input_without_default.sl");

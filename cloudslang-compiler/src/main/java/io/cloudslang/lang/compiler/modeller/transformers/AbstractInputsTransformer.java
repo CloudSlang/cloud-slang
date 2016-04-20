@@ -80,7 +80,7 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
     private Input createInput(
             String name,
             Serializable value) {
-        return createInput(name, value, false, true, true);
+        return createInput(name, value, false, true, false);
     }
 
     private Input createInput(

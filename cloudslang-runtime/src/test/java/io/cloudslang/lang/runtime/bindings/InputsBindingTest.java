@@ -232,7 +232,7 @@ public class InputsBindingTest {
         Input input = new Input.InputBuilder("input1", "${ input2 }")
                 .withEncrypted(false)
                 .withRequired(false)
-                .withPrivateInput(false)
+                .withPrivateInput(true)
                 .build();
         List<Input> inputs = Collections.singletonList(input);
 
@@ -252,7 +252,7 @@ public class InputsBindingTest {
         Input input = new Input.InputBuilder("input1", 3)
                 .withEncrypted(false)
                 .withRequired(false)
-                .withPrivateInput(false)
+                .withPrivateInput(true)
                 .build();
         List<Input> inputs = Collections.singletonList(input);
 
@@ -270,7 +270,7 @@ public class InputsBindingTest {
         Input input = new Input.InputBuilder("input1", null)
                 .withEncrypted(false)
                 .withRequired(false)
-                .withPrivateInput(false)
+                .withPrivateInput(true)
                 .build();
         List<Input> inputs = Collections.singletonList(input);
 
