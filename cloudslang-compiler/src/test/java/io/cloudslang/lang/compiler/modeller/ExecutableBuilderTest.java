@@ -358,7 +358,7 @@ public class ExecutableBuilderTest {
         return modellingResult.getExecutable();
     }
 
-    @Configuration
+//    @Configuration
     static class Config {
         @Bean
         public ExecutableBuilder executableBuilder() {
