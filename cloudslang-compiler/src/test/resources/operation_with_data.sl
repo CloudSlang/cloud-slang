@@ -26,7 +26,7 @@ operation:
         default: ${ input6 }
     - input9:
         default: ${ input6 }
-        overridable: false
+        private: true
     - input10:
         default: ${ input5 }
     - input11: ${ 5 + 6 }

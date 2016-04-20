@@ -161,7 +161,7 @@ public class InputsTransformerTest {
         exception.expectMessage("not private");
         exception.expectMessage("default");
         exception.expectMessage("input_without_default");
-        List inputs = getInputsFormSl("/non_overridable_input_without_default.sl");
+        List inputs = getInputsFormSl("/private_input_without_default.sl");
         inputTransformer.transform(inputs);
     }
 

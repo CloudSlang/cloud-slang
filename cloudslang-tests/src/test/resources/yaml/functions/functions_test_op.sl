@@ -13,7 +13,7 @@ operation:
     - exist
     - value_propagate:
         default: ${ value_propagate + get_sp('propagate.op.input') }
-        overridable: false
+        private: true
   action:
     python_script: |
         language = 'CloudSlang'

@@ -13,7 +13,7 @@ operation:
     - opMessage
     - unchangableMessage:
         default:  'defaultString'
-        overridable: false
+        private: true
     - message: ${ opMessage }
 
   action:

@@ -8,10 +8,9 @@
 namespace: user.ops
 
 operation:
-  name: non_overridable_input_with_sys_prop
+  name: private_input_without_default
   inputs:
-    - input_without_non_overidable_sys_prop:
-        overridable: false
-        system_property: booya
+    - input_without_default:
+        private: true
   action:
     python_script: print "hi"

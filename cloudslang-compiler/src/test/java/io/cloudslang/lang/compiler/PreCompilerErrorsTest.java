@@ -281,7 +281,7 @@ public class PreCompilerErrorsTest {
 
     @Test
     public void testInputPrivateAndNoDefault() throws Exception {
-        URI resource = getClass().getResource("/non_overridable_input_without_default.sl").toURI();
+        URI resource = getClass().getResource("/private_input_without_default.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);

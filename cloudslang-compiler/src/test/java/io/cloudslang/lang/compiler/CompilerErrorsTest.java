@@ -394,7 +394,7 @@ public class CompilerErrorsTest {
 
     @Test
     public void testInputPrivateAndNoDefault() throws Exception {
-        URI resource = getClass().getResource("/non_overridable_input_without_default.sl").toURI();
+        URI resource = getClass().getResource("/private_input_without_default.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("not private");

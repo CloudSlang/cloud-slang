@@ -103,7 +103,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             Executable executable,
             Map<String, Executable> dependencies,
             Set<Executable> verifiedExecutables) {
-        //validate that all required & overridable parameters with no default value of a reference are provided
+        //validate that all required & non private parameters with no default value of a reference are provided
         if(!SlangTextualKeys.FLOW_TYPE.equals(executable.getType()) || verifiedExecutables.contains(executable)){
             return;
         }
