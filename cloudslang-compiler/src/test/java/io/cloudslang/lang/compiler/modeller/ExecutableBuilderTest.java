@@ -17,7 +17,6 @@ import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -358,7 +357,6 @@ public class ExecutableBuilderTest {
         return modellingResult.getExecutable();
     }
 
-    @Configuration
     static class Config {
         @Bean
         public ExecutableBuilder executableBuilder() {
