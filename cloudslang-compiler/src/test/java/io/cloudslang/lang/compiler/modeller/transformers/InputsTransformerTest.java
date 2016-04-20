@@ -156,7 +156,7 @@ public class InputsTransformerTest {
     }
 
     @Test
-    public void testOverridableInputWithoutDefault() throws Exception {
+    public void testNonPrivateInputWithoutDefault() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage("not private");
         exception.expectMessage("default");

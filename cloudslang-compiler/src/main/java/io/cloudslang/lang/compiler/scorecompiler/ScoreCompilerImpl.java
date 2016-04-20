@@ -66,7 +66,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             //than we match the references to the actual dependencies
             filteredDependencies = dependenciesHelper.matchReferences(executable, availableExecutables);
 
-            validateRequiredOverridableInputs(executable, filteredDependencies);
+            validateRequiredNonPrivateInputs(executable, filteredDependencies);
 
             // Validate that all the steps of a flow have navigations for all the reference's results
             validateAllDependenciesResultsHaveMatchingNavigations(executable, filteredDependencies);
@@ -90,16 +90,16 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemPropertiesFromExecutables(executables));
     }
 
-    private void validateRequiredOverridableInputs(
+    private void validateRequiredNonPrivateInputs(
             Executable executable,
             Map<String, Executable> filteredDependencies) {
         Map<String, Executable> dependencies = new HashMap<>(filteredDependencies);
         dependencies.put(executable.getId(), executable);
         Set<Executable> verifiedExecutables = new HashSet<>();
-        validateRequiredOverridableInputs(executable, dependencies, verifiedExecutables);
+        validateRequiredNonPrivateInputs(executable, dependencies, verifiedExecutables);
     }
 
-    private void validateRequiredOverridableInputs(
+    private void validateRequiredNonPrivateInputs(
             Executable executable,
             Map<String, Executable> dependencies,
             Set<Executable> verifiedExecutables) {
@@ -125,7 +125,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         }
 
         for (Executable reference : flowReferences) {
-            validateRequiredOverridableInputs(reference, dependencies, verifiedExecutables);
+            validateRequiredNonPrivateInputs(reference, dependencies, verifiedExecutables);
         }
     }
 
@@ -174,7 +174,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
                 "'. Step '" + step.getName() +
                 "' does not declare all the mandatory inputs of its reference." +
                 " The following inputs of '" + reference.getId() +
-                "' are overridable, required and with no default value: " +
+                "' are not private, required and with no default value: " +
                 inputsNotWiredAsString + ".";
     }
 
