@@ -375,8 +375,7 @@ public class SlangCLITest {
     public void testGetFlowInputsWithOverride() throws Exception {
         List<Input> inputsList = Lists.newArrayList(
                 new Input.InputBuilder("input1", "expression1").build(),
-                new Input.InputBuilder("input_override", "expression_override")
-                .withEncrypted(false)
+                new Input.InputBuilder("input_override", "expression_override", false)
                 .withRequired(true)
                 .withOverridable(false)
                 .build(),

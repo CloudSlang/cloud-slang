@@ -110,7 +110,7 @@ public class InputsTransformerTest {
         Input input = inputs.get(4);
         Assert.assertEquals("input5", input.getName());
         Assert.assertEquals(null, input.getValue());
-        Assert.assertEquals(true, input.isEncrypted());
+        Assert.assertEquals(true, input.isSensitive());
         Assert.assertEquals(true, input.isRequired());
     }
 
@@ -120,7 +120,7 @@ public class InputsTransformerTest {
         Input input = inputs.get(5);
         Assert.assertEquals("input6", input.getName());
         Assert.assertEquals("${ 1 + 5 }", input.getValue());
-        Assert.assertEquals(false, input.isEncrypted());
+        Assert.assertEquals(false, input.isSensitive());
         Assert.assertEquals(false, input.isRequired());
     }
 
@@ -130,7 +130,7 @@ public class InputsTransformerTest {
         Input input = inputs.get(6);
         Assert.assertEquals("input7", input.getName());
         Assert.assertEquals(77, input.getValue());
-        Assert.assertEquals(false, input.isEncrypted());
+        Assert.assertEquals(false, input.isSensitive());
         Assert.assertEquals(true, input.isRequired());
     }
 
@@ -140,7 +140,7 @@ public class InputsTransformerTest {
         Input input = inputs.get(7);
         Assert.assertEquals("input8", input.getName());
         Assert.assertEquals("${ input6 }", input.getValue());
-        Assert.assertEquals(false, input.isEncrypted());
+        Assert.assertEquals(false, input.isSensitive());
         Assert.assertEquals(true, input.isRequired());
     }
 
@@ -151,7 +151,7 @@ public class InputsTransformerTest {
         Assert.assertEquals("input9", input.getName());
         Assert.assertEquals("${ input6 }", input.getValue());
         Assert.assertFalse(input.isOverridable());
-        Assert.assertFalse(input.isEncrypted());
+        Assert.assertFalse(input.isSensitive());
         Assert.assertTrue(input.isRequired());
     }
 

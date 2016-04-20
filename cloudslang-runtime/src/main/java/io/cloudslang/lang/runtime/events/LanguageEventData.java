@@ -38,7 +38,6 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     public static final String BOUND_ASYNC_LOOP_EXPRESSION = "BOUND_ASYNC_LOOP_EXPRESSION";
     public static final String RETURN_VALUES = "RETURN_VALUES";
     public static final String NEXT_STEP_POSITION = "nextPosition";
-    public static final String ENCRYPTED_VALUE = "*****";
     public static final String STEP_TYPE = "STEP_TYPE";
     public static final String STEP_NAME = "STEP_NAME";
 

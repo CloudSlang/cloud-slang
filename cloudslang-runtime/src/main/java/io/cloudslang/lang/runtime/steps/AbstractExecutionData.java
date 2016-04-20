@@ -52,11 +52,7 @@ public abstract class AbstractExecutionData {
         for (Input input : inputs) {
             String inputName = input.getName();
             Serializable inputValue = context.get(inputName);
-            if (input.isEncrypted()) {
-                inputsForEvent.put(inputName, LanguageEventData.ENCRYPTED_VALUE);
-            } else {
-                inputsForEvent.put(inputName, inputValue);
-            }
+            inputsForEvent.put(inputName, inputValue);
         }
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_INPUT_END, desc, stepType, stepName,
                 Pair.of(LanguageEventData.BOUND_INPUTS, (Serializable) inputsForEvent));

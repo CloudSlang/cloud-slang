@@ -30,7 +30,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
         if (MapUtils.isEmpty(rawData)) {
             return result;
         } else if (rawData.size() > 1) {
-            throw new RuntimeException("Step has to many keys under the 'do' keyword,\n" +
+            throw new RuntimeException("Step has too many keys under the 'do' keyword,\n" +
                     "May happen due to wrong indentation");
         }
         Map.Entry<String, Object> argumentsEntry = rawData.entrySet().iterator().next();

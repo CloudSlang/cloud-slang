@@ -28,8 +28,7 @@ public class DeserializeTest {
 
     @Test
     public void testDeserializeInput() throws IOException {
-        Input input = new Input.InputBuilder("new_input", "some_expression")
-                .withEncrypted(true)
+        Input input = new Input.InputBuilder("new_input", "some_expression", true)
                 .withRequired(true)
                 .withOverridable(true)
                 .withFunctionDependencies(Sets.newHashSet(ScriptFunction.GET))

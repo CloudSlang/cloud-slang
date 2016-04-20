@@ -15,6 +15,7 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.bindings.SensitiveValue;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.ResultsBinding;
@@ -88,8 +89,7 @@ public class ExecutableStepsTest {
     public void testBoundInputEvent(){
         List<Input> inputs = Arrays.asList(
                 new Input.InputBuilder("input1","input1").build(),
-                new Input.InputBuilder("input2", "3")
-                .withEncrypted(true)
+                new Input.InputBuilder("input2", "3", true)
                 .withRequired(true)
                 .withOverridable(false)
                 .build()
@@ -130,7 +130,7 @@ public class ExecutableStepsTest {
 
         Map.Entry<String, Serializable> secondInput =  inputNamesIterator.next();
         org.junit.Assert.assertEquals("Inputs are not in defined order in end inputs binding event", "input2", secondInput.getKey());
-        org.junit.Assert.assertEquals(LanguageEventData.ENCRYPTED_VALUE, secondInput.getValue());
+        org.junit.Assert.assertEquals(new SensitiveValue("").toString(), secondInput.getValue());
     }
 
     @Test

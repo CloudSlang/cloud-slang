@@ -25,18 +25,15 @@ public class Input extends InOutParam {
 
 	private static final long serialVersionUID = -2411446962609754342L;
 
-	private boolean encrypted;
 	private boolean required;
 	private boolean overridable;
 
 	private Input(InputBuilder inputBuilder) {
-		super(
-				inputBuilder.name,
+		super(inputBuilder.name,
 				inputBuilder.value,
 				inputBuilder.functionDependencies,
 				inputBuilder.systemPropertyDependencies
 		);
-		this.encrypted = inputBuilder.encrypted;
 		this.required = inputBuilder.required;
 		this.overridable = inputBuilder.overridable;
 	}
@@ -46,10 +43,6 @@ public class Input extends InOutParam {
 	 */
 	@SuppressWarnings("unused")
 	private Input() {}
-
-	public boolean isEncrypted() {
-		return encrypted;
-	}
 
 	public boolean isRequired() {
 		return required;
@@ -63,7 +56,6 @@ public class Input extends InOutParam {
 	public String toString() {
 		return new ToStringBuilder(this)
 				.appendSuper(super.toString())
-				.append("encrypted", encrypted)
 				.append("required", required)
 				.append("overridable", overridable)
 				.toString();
@@ -79,7 +71,6 @@ public class Input extends InOutParam {
 
 		return new EqualsBuilder()
 				.appendSuper(super.equals(o))
-				.append(encrypted, input.encrypted)
 				.append(required, input.required)
 				.append(overridable, input.overridable)
 				.isEquals();
@@ -89,7 +80,6 @@ public class Input extends InOutParam {
 	public int hashCode() {
 		return new HashCodeBuilder(17, 37)
 				.appendSuper(super.hashCode())
-				.append(encrypted)
 				.append(required)
 				.append(overridable)
 				.toHashCode();
@@ -97,26 +87,23 @@ public class Input extends InOutParam {
 
 	public static class InputBuilder {
 		private String name;
-		private Serializable value;
-		private boolean encrypted;
+		private Value value;
 		private boolean required;
 		private boolean overridable;
 		private Set<ScriptFunction> functionDependencies;
 		private Set<String> systemPropertyDependencies;
 
-		public InputBuilder(String name, Serializable value) {
-			this.name = name;
-			this.value = value;
-			encrypted = false;
-			required = true;
-			overridable = true;
-			functionDependencies = new HashSet<>();
-			systemPropertyDependencies = new HashSet<>();
+		public InputBuilder(String name, Serializable serializable) {
+			this(name, serializable, false);
 		}
 
-		public InputBuilder withEncrypted(boolean encrypted) {
-			this.encrypted = encrypted;
-			return this;
+		public InputBuilder(String name, Serializable serializable, boolean sensitive) {
+			this.name = name;
+			this.value = createValue(serializable, sensitive);
+			this.required = true;
+			this.overridable = true;
+			this.functionDependencies = new HashSet<>();
+			this.systemPropertyDependencies = new HashSet<>();
 		}
 
 		public InputBuilder withRequired(boolean required) {
@@ -139,10 +126,13 @@ public class Input extends InOutParam {
 			return this;
 		}
 
+		private Value createValue(Serializable serializable, boolean sensitive) {
+			return sensitive ? new SensitiveValue(serializable) : new SimpleValue(serializable);
+		}
+
 		public Input build() {
 			return new Input(this);
 		}
-
 	}
 
 }

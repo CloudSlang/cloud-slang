@@ -45,7 +45,7 @@ public interface SlangTextualKeys {
     //inputs
     String DEFAULT_KEY = "default";
     String REQUIRED_KEY = "required";
-    String ENCRYPTED_KEY = "encrypted";
+    String SENSITIVE_KEY = "sensitive";
     String OVERRIDABLE_KEY = "overridable";
 
     // system properties

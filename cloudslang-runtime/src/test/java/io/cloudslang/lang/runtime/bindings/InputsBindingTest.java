@@ -92,13 +92,11 @@ public class InputsBindingTest {
 
     @Test
     public void testAssignFromInput() {
-        Input input1 = new Input.InputBuilder("input1", "${ input1 }")
-                .withEncrypted(false)
+        Input input1 = new Input.InputBuilder("input1", "${ input1 }", false)
                 .withRequired(false)
                 .withOverridable(true)
                 .build();
-        Input input2 = new Input.InputBuilder("input2", "${ input1 }")
-                .withEncrypted(false)
+        Input input2 = new Input.InputBuilder("input2", "${ input1 }", false)
                 .withRequired(false)
                 .withOverridable(true)
                 .build();
@@ -229,8 +227,7 @@ public class InputsBindingTest {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input2",3);
         context.put("input1",5);
-        Input input = new Input.InputBuilder("input1", "${ input2 }")
-                .withEncrypted(false)
+        Input input = new Input.InputBuilder("input1", "${ input2 }", false)
                 .withRequired(false)
                 .withOverridable(false)
                 .build();
@@ -249,8 +246,7 @@ public class InputsBindingTest {
     public void testOverrideAssignFrom2(){
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1", 5);
-        Input input = new Input.InputBuilder("input1", 3)
-                .withEncrypted(false)
+        Input input = new Input.InputBuilder("input1", 3, false)
                 .withRequired(false)
                 .withOverridable(false)
                 .build();
@@ -267,8 +263,7 @@ public class InputsBindingTest {
     public void testOverrideAssignFrom3() {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1",5);
-        Input input = new Input.InputBuilder("input1", null)
-                .withEncrypted(false)
+        Input input = new Input.InputBuilder("input1", null, false)
                 .withRequired(false)
                 .withOverridable(false)
                 .build();
@@ -299,8 +294,7 @@ public class InputsBindingTest {
     public void testExpressionWithWrongRef() {
         Map<String,Serializable> context = new HashMap<>();
 
-        Input input = new Input.InputBuilder("input1", "${ input2 }")
-                .withEncrypted(false)
+        Input input = new Input.InputBuilder("input1", "${ input2 }", false)
                 .withRequired(false)
                 .withOverridable(true)
                 .build();
