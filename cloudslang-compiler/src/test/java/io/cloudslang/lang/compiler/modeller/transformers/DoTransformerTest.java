@@ -59,7 +59,7 @@ public class DoTransformerTest {
         Argument argument = arguments.iterator().next();
         Assert.assertEquals("city",argument.getName());
         Assert.assertEquals("city_name", argument.getValue());
-        Assert.assertEquals(false, argument.isOverridable());
+        Assert.assertEquals(true, argument.isPrivateArgument());
     }
 
     @Test
@@ -70,7 +70,7 @@ public class DoTransformerTest {
         Assert.assertEquals(3, arguments.size());
         Argument argument = arguments.get(1);
         Assert.assertEquals("port",argument.getName());
-        Assert.assertEquals(true, argument.isOverridable());
+        Assert.assertEquals(false, argument.isPrivateArgument());
     }
 
     @Test
@@ -93,7 +93,7 @@ public class DoTransformerTest {
         Assert.assertEquals(2, arguments.size());
         Argument argument = arguments.get(1);
         Assert.assertEquals("country", argument.getName());
-        Assert.assertEquals(false, argument.isOverridable());
+        Assert.assertEquals(true, argument.isPrivateArgument());
     }
 
     @Test

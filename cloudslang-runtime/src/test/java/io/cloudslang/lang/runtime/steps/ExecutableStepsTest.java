@@ -91,7 +91,7 @@ public class ExecutableStepsTest {
                 new Input.InputBuilder("input2", "3")
                 .withEncrypted(true)
                 .withRequired(true)
-                .withOverridable(false)
+                .withPrivateInput(false)
                 .build()
         );
         RunEnvironment runEnv = new RunEnvironment();

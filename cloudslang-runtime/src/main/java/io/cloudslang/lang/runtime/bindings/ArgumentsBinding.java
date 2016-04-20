@@ -60,7 +60,7 @@ public class ArgumentsBinding {
 
         try {
             inputValue = srcContext.get(inputName);
-            if (!argument.isOverridable()) {
+            if (argument.isPrivateArgument()) {
                 Serializable rawValue = argument.getValue();
                 String expressionToEvaluate = ExpressionUtils.extractExpression(rawValue);
                 if (expressionToEvaluate != null) {

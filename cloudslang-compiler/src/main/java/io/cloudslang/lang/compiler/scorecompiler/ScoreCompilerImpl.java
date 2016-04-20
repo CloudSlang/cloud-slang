@@ -132,7 +132,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
     private List<String> getMandatoryInputNames(Executable executable) {
         List<String> inputNames = new ArrayList<>();
         for (Input input : executable.getInputs()) {
-            if (input.isOverridable() && input.isRequired() && input.getValue() == null) {
+            if (!input.isPrivateInput() && input.isRequired() && input.getValue() == null) {
                 inputNames.add(input.getName());
             }
         }

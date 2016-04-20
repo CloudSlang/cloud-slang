@@ -177,7 +177,7 @@ public class SlangCLI implements CommandMarker {
         List<Input> inputs = compilationArtifact.getInputs();
         List<String> inputsResult = new ArrayList<>();
         for (Input input : inputs) {
-            if (input.isOverridable()) {
+            if (!input.isPrivateInput()) {
                 inputsResult.add(input.getName());
             }
         }

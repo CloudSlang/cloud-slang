@@ -8,10 +8,7 @@
  */
 package io.cloudslang.lang.compiler.modeller.transformers;
 
-import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.entities.bindings.Input;
-import io.cloudslang.lang.entities.bindings.ScriptFunction;
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.Serializable;
 import java.util.*;
@@ -96,7 +93,7 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
         return new Input.InputBuilder(name, value)
                 .withEncrypted(encrypted)
                 .withRequired(required)
-                .withOverridable(overridable)
+                .withPrivateInput(overridable)
                 .withFunctionDependencies(dependencyAccumulator.getFunctionDependencies())
                 .withSystemPropertyDependencies(dependencyAccumulator.getSystemPropertyDependencies())
                 .build();
