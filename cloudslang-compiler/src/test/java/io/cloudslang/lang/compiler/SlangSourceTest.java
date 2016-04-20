@@ -203,4 +203,15 @@ public class SlangSourceTest {
     public void testFromBytes() throws Exception {
         assertSourceEquals(SlangSource.fromBytes(sourceString.getBytes(), sourceName));
     }
+
+    @Test
+    public void testFromBytesWithExtension() throws Exception {
+        SlangSource source = SlangSource.fromBytes(
+                sourceString.getBytes(),
+                sourceName + "." + Extension.SL.getValue()
+        );
+        Assert.assertEquals(sourceString, source.getSource());
+        Assert.assertEquals(sourceName, source.getName());
+    }
+
 }
