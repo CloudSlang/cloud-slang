@@ -65,8 +65,8 @@ public class SlangSource {
         return fromFile(new File(uri));
     }
 
-    public static SlangSource fromBytes(byte[] bytes, String name) {
-        return new SlangSource(new String(bytes, getCharset()), name);
+    public static SlangSource fromBytes(byte[] bytes, String fileName) {
+        return new SlangSource(new String(bytes, getCharset()), Extension.removeExtension(fileName));
     }
 
     public String getSource() {
