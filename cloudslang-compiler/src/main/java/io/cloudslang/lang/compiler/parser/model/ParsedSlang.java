@@ -18,7 +18,7 @@ public class ParsedSlang {
     private Map<String, String> imports;
     private Map<String, Object> flow;
     private Map<String, Object> operation;
-    private Map<String, Object> properties;
+    private Object properties;
     private String namespace;
     private String name;
     private Object extensions;
@@ -41,7 +41,7 @@ public class ParsedSlang {
         return operation;
     }
 
-    public Map<String, Object> getProperties() {
+    public Object getProperties() {
         return properties;
     }
 

@@ -1,3 +1,3 @@
 namespace: a.b
 
-properties: {}
+properties: []

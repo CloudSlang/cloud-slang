@@ -2,5 +2,5 @@ namespace: a.b
 
 properties:
   - host: 'localhost'
-  - c.name: 'john doe'
+  - i_am_string
   - restrict.out.port: 8080
