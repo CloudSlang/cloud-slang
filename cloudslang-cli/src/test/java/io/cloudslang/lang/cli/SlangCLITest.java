@@ -378,7 +378,7 @@ public class SlangCLITest {
                 new Input.InputBuilder("input_override", "expression_override")
                 .withEncrypted(false)
                 .withRequired(true)
-                .withOverridable(false)
+                .withPrivateInput(true)
                 .build(),
                 new Input.InputBuilder("input2", "expression2").build()
         );

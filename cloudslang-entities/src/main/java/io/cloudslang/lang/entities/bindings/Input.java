@@ -27,7 +27,7 @@ public class Input extends InOutParam {
 
 	private boolean encrypted;
 	private boolean required;
-	private boolean overridable;
+	private boolean privateInput;
 
 	private Input(InputBuilder inputBuilder) {
 		super(
@@ -38,7 +38,7 @@ public class Input extends InOutParam {
 		);
 		this.encrypted = inputBuilder.encrypted;
 		this.required = inputBuilder.required;
-		this.overridable = inputBuilder.overridable;
+		this.privateInput = inputBuilder.privateInput;
 	}
 
 	/**
@@ -55,8 +55,8 @@ public class Input extends InOutParam {
 		return required;
 	}
 
-	public boolean isOverridable() {
-		return overridable;
+	public boolean isPrivateInput() {
+		return privateInput;
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class Input extends InOutParam {
 				.appendSuper(super.toString())
 				.append("encrypted", encrypted)
 				.append("required", required)
-				.append("overridable", overridable)
+				.append("privateInput", privateInput)
 				.toString();
 	}
 
@@ -81,7 +81,7 @@ public class Input extends InOutParam {
 				.appendSuper(super.equals(o))
 				.append(encrypted, input.encrypted)
 				.append(required, input.required)
-				.append(overridable, input.overridable)
+				.append(privateInput, input.privateInput)
 				.isEquals();
 	}
 
@@ -91,7 +91,7 @@ public class Input extends InOutParam {
 				.appendSuper(super.hashCode())
 				.append(encrypted)
 				.append(required)
-				.append(overridable)
+				.append(privateInput)
 				.toHashCode();
 	}
 
@@ -100,7 +100,7 @@ public class Input extends InOutParam {
 		private Serializable value;
 		private boolean encrypted;
 		private boolean required;
-		private boolean overridable;
+		private boolean privateInput;
 		private Set<ScriptFunction> functionDependencies;
 		private Set<String> systemPropertyDependencies;
 
@@ -109,7 +109,7 @@ public class Input extends InOutParam {
 			this.value = value;
 			encrypted = false;
 			required = true;
-			overridable = true;
+			privateInput = false;
 			functionDependencies = new HashSet<>();
 			systemPropertyDependencies = new HashSet<>();
 		}
@@ -124,8 +124,8 @@ public class Input extends InOutParam {
 			return this;
 		}
 
-		public InputBuilder withOverridable(boolean overridable) {
-			this.overridable = overridable;
+		public InputBuilder withPrivateInput(boolean privateInput) {
+			this.privateInput = privateInput;
 			return this;
 		}
 

@@ -167,7 +167,7 @@ public class ArgumentsBindingTest {
     }
 
     @Test
-    public void testOverridableFalseBehaviour() {
+    public void testPrivateBehaviour() {
         Map<String,Serializable> context = new HashMap<>();
         context.put("argument1",3);
 		Argument argument = new Argument("argument1", "${ 5+7 }");

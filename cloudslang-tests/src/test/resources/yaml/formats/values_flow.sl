@@ -18,7 +18,7 @@ flow:
          required: false
     - enableOptionForAction:
         default: ${get("enable_option_for_action", "default_value")}
-        overridable: false
+        private: true
 
     # helpers
     - output_no_expression: output_no_expression_value
@@ -30,9 +30,9 @@ flow:
     - input_no_expression_not_required:
         required: false
     - input_system_property: ${get_sp('user.sys.props.host')}
-    - input_not_overridable:
+    - input_private:
         default: 25
-        overridable: false
+        private: true
 
     # loaded by Yaml
     - input_int: 22

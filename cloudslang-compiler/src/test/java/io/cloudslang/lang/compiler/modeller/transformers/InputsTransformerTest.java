@@ -150,18 +150,18 @@ public class InputsTransformerTest {
         Input input = inputs.get(8);
         Assert.assertEquals("input9", input.getName());
         Assert.assertEquals("${ input6 }", input.getValue());
-        Assert.assertFalse(input.isOverridable());
+        Assert.assertFalse(!input.isPrivateInput());
         Assert.assertFalse(input.isEncrypted());
         Assert.assertTrue(input.isRequired());
     }
 
     @Test
-    public void testOverridableInputWithoutDefault() throws Exception {
+    public void testPrivateInputWithoutDefault() throws Exception {
         exception.expect(RuntimeException.class);
-        exception.expectMessage("overridable");
+        exception.expectMessage("private");
         exception.expectMessage("default");
         exception.expectMessage("input_without_default");
-        List inputs = getInputsFormSl("/non_overridable_input_without_default.sl");
+        List inputs = getInputsFormSl("/private_input_without_default.sl");
         inputTransformer.transform(inputs);
     }
 

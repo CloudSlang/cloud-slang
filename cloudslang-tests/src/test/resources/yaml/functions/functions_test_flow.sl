@@ -15,26 +15,26 @@ flow:
   inputs:
     - input1:
         default: null
-        overridable: false
+        private: true
         required: false
     - input1_safe:
         default: ${ get('input1', 'input1_default') }
-        overridable: false
+        private: true
         required: false
     - input2:
         default: 22
-        overridable: false
+        private: true
     - input2_safe:
         default: ${ get('input2', 'input2_default') }
-        overridable: false
+        private: true
         required: false
     - input_locals_found:
         default: ${ locals().get('input2', 'input_locals_found_default') }
-        overridable: false
+        private: true
         required: false
     - input_locals_not_found:
         default: ${ locals().get('input2_i_dont_exist', 'input_locals_not_found_default') }
-        overridable: false
+        private: true
         required: false
     - exist
     - input_3:
@@ -55,7 +55,7 @@ flow:
     - input_15: ${get_sp("a.b.c.host", 'default_str')}
     - input_16:
         default: ${get('i_dont_exist')}
-        overridable: false
+        private: true
         required: false
     - input_17: ${check_empty(get('i_dont_exist'), 'default_str')}
   workflow:

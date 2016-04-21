@@ -86,7 +86,7 @@ public class InputsBinding {
 
         String inputName = input.getName();
         Serializable valueFromContext = context.get(inputName);
-        if (input.isOverridable()) {
+        if (!input.isPrivateInput()) {
             value = valueFromContext;
         }
 

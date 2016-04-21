@@ -393,11 +393,11 @@ public class CompilerErrorsTest {
     }
 
     @Test
-    public void testInputNotOverridableAndNoDefault() throws Exception {
-        URI resource = getClass().getResource("/non_overridable_input_without_default.sl").toURI();
+    public void testInputPrivateAndNoDefault() throws Exception {
+        URI resource = getClass().getResource("/private_input_without_default.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("overridable");
+        exception.expectMessage("private");
         exception.expectMessage("default");
         exception.expectMessage("input_without_default");
         compiler.compile(SlangSource.fromFile(resource), path);

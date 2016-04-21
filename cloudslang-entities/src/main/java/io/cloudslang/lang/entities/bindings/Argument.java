@@ -18,11 +18,11 @@ import java.util.Set;
  */
 public class Argument extends InOutParam {
 
-    private boolean overridable;
+    private boolean privateArgument;
 
     public Argument(String name, Serializable value) {
         super(name, value);
-        overridable = false;
+        privateArgument = true;
     }
 
     public Argument(
@@ -31,12 +31,12 @@ public class Argument extends InOutParam {
             Set<ScriptFunction> scriptFunctions,
             Set<String> systemPropertyDependencies) {
         super(name, value, scriptFunctions, systemPropertyDependencies);
-        overridable = false;
+        privateArgument = true;
     }
 
     public Argument(String name) {
         super(name, null);
-        overridable = true;
+        privateArgument = false;
     }
 
     /**
@@ -46,8 +46,8 @@ public class Argument extends InOutParam {
     private Argument() {
     }
 
-    public boolean isOverridable() {
-        return overridable;
+    public boolean isPrivateArgument() {
+        return privateArgument;
     }
 
 }

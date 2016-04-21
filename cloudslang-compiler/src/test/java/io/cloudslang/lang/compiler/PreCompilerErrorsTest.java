@@ -280,13 +280,13 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
-    public void testInputNotOverridableAndNoDefault() throws Exception {
-        URI resource = getClass().getResource("/non_overridable_input_without_default.sl").toURI();
+    public void testInputPrivateAndNoDefault() throws Exception {
+        URI resource = getClass().getResource("/private_input_without_default.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("overridable");
+        exception.expectMessage("private");
         exception.expectMessage("default");
         exception.expectMessage("input_without_default");
         throw result.getErrors().get(0);
