@@ -95,13 +95,22 @@ public class SlangBuilder {
         // Compiling all the test flows
         Map<String, CompilationArtifact> compiledFlows = slangContentVerifier.compileSlangModels(allTestedFlowModels);
 
-        Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath);
+        Set<String> allTestedFlowsFQN = mapExecutablesToFullyQualifiedName(allTestedFlowModels.values());
+        Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath, allTestedFlowsFQN);
         log.info("");
         log.info("--- running tests ---");
         log.info("Found " + testCases.size() + " tests");
         RunTestsResults runTestsResults = slangTestRunner.runAllTests(projectPath, testCases, compiledFlows, testSuites);
         addCoverageDataToRunTestsResults(contentSlangModels, testFlowModels, testCases, runTestsResults);
         return runTestsResults;
+    }
+
+    private Set<String> mapExecutablesToFullyQualifiedName(Collection<Executable> executables) {
+        Set<String> fullyQualifiedNames = new HashSet<>();
+        for (Executable executable : executables) {
+            fullyQualifiedNames.add(executable.getId());
+        }
+        return fullyQualifiedNames;
     }
 
     private void addCoverageDataToRunTestsResults(Map<String, Executable> contentSlangModels, Map<String, Executable> testFlowModels,
@@ -118,7 +127,7 @@ public class SlangBuilder {
                 testFlowModel = contentSlangModels.get(testFlowPath);
             }
             if(testFlowModel == null){
-                return;
+                continue;
             }
             addAllDependenciesToCoveredContent(coveredContent, testFlowModel.getExecutableDependencies(), contentSlangModels);
         }
