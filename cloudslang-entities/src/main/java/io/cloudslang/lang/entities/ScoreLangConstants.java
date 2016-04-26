@@ -30,6 +30,7 @@ public interface ScoreLangConstants {
     //action scope
     String ACTION_CLASS_KEY = "className";
     String ACTION_TYPE = "actionType";
+    String ACTION_DEPENDENCIES = "dependencies";
 
     String ACTION_METHOD_KEY = "methodName";
     String PYTHON_SCRIPT_KEY = "python_script";

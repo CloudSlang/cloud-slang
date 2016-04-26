@@ -91,11 +91,13 @@ public class ExecutionStepFactory {
         Map<String, Serializable> actionData = new HashMap<>();
         ActionType actionType;
 
+        @SuppressWarnings("unchecked") List<String> actionDependencies = (List<String>) actionRawData.get(SlangTextualKeys.ACTION_DEPENDENCIES);
         @SuppressWarnings("unchecked") Map<String, String> javaActionData = (Map<String, String>) actionRawData.get(SlangTextualKeys.JAVA_ACTION);
         @SuppressWarnings("unchecked") String pythonScript = (String) actionRawData.get(ScoreLangConstants.PYTHON_SCRIPT_KEY);
         boolean javaActionFound = MapUtils.isNotEmpty(javaActionData);
         boolean pythonScriptFound = StringUtils.isNotEmpty(pythonScript);
 
+        actionData.put(ScoreLangConstants.ACTION_DEPENDENCIES, (Serializable) actionDependencies);
         if (javaActionFound) {
             actionType = ActionType.JAVA;
             actionData.putAll(javaActionData);

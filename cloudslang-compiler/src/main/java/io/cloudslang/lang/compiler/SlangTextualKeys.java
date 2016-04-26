@@ -33,6 +33,8 @@ public interface SlangTextualKeys {
 
     //operation
     String ACTION_KEY = "action";
+    //dependencies
+    String ACTION_DEPENDENCIES = "dependencies";
 
     //step
     String DO_KEY = "do";
