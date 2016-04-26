@@ -25,11 +25,6 @@ flow:
           - SUCCESS: print_other_values
           - FAILURE: FAILURE
 
-    - step_that_doesnt_run:
-        do:
-          ops.print:
-            - text: "I don't run"
-
     - print_other_values:
         do:
           ops.print:
