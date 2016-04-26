@@ -11,27 +11,31 @@ imports:
   ops: user.ops
 
 flow:
-  name: unreachable_on_failure_task
+  name: unreachable_step_reachable_from_on_failure
   workflow:
     - print_message1:
         do:
           ops.test_op:
             - alla: 'message 1'
         navigate:
-          - SUCCESS: print_message2
-          - FAILURE: print_message2
+          - SUCCESS: print_message3
+          - FAILURE: print_message3
 
     - print_message2:
         do:
           ops.test_op:
+            - alla: 'message 2'
+
+    - print_message3:
+        do:
+          ops.test_op:
             - alla: 'message 3'
-        navigate:
-          - SUCCESS: SUCCESS
-          - FAILURE: SUCCESS
 
     - on_failure:
         - print_on_failure_1:
             do:
               ops.test_op:
                 - alla: 'on_failure 1'
-
+            navigate:
+              - SUCCESS: print_message2
+              - FAILURE: FAILURE
