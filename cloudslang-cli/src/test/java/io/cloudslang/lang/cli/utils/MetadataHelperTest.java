@@ -44,6 +44,7 @@ public class MetadataHelperTest {
             "  If the last key in the path does not exist, the key is added as well." + System.lineSeparator() +
             "inputs: ";
     private static final String RESULTS = "results:";
+    public static final String SOME_OTHER_RESULT = "SOME_OTHER_RESULT";
 
     @Autowired
     private MetadataHelper metadataHelper;
@@ -65,6 +66,8 @@ public class MetadataHelperTest {
         Assert.assertNotNull(metadataToPrint);
         Assert.assertFalse(metadataToPrint.contains("io.cloudslang.lang.compiler.modeller.model.Metadata"));
         Assert.assertTrue(metadataToPrint.contains(DESCRIPTION_AND_PREREQUISITES));
+        Assert.assertTrue(metadataToPrint.contains(SOME_OTHER_RESULT));
+        Assert.assertFalse(metadataToPrint.contains(SOME_OTHER_RESULT + ":"));
     }
 
     @Test

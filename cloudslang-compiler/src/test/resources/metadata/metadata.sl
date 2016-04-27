@@ -25,6 +25,7 @@
 #!                        empty otherwise
 #! @result SUCCESS: parsing was successful (return_code == '0')
 #! @result FAILURE: otherwise
+#! @result SOME_OTHER_RESULT
 #!!#
 #####################################################sdfdf
 #!#! comment
