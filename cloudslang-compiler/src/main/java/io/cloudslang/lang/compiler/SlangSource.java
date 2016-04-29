@@ -28,12 +28,12 @@ public class SlangSource {
     private final String name;
     private final Extension fileExtension;
 
-    public SlangSource(String source, String name, Extension extension) {
+    public SlangSource(String source, String fileName) {
         Validate.notNull(source, "Source cannot be null");
 
         this.source = source;
-        this.name = name;
-        this.fileExtension = extension;
+        this.name = Extension.removeExtension(fileName);
+        this.fileExtension = Extension.findExtension(fileName);
     }
 
     public static SlangSource fromFile(File file) {
@@ -46,7 +46,7 @@ public class SlangSource {
         } catch (IOException e) {
             throw new RuntimeException("There was a problem reading the file: " + file.getName(), e);
         }
-        return new SlangSource(source, Extension.removeExtension(file.getName()), Extension.findExtension(file.getName()));
+        return new SlangSource(source, file.getName());
     }
 
     private static String readFileToString(File file) throws IOException {
@@ -68,7 +68,7 @@ public class SlangSource {
     }
 
     public static SlangSource fromBytes(byte[] bytes, String fileName) {
-        return new SlangSource(new String(bytes, getCharset()), Extension.removeExtension(fileName), Extension.findExtension(fileName));
+        return new SlangSource(new String(bytes, getCharset()), fileName);
     }
 
     public String getSource() {

@@ -57,7 +57,7 @@ public class SlangCompilerImplTest {
 
     @Before
     public void setUp() {
-        slangSource = new SlangSource("source_content", "source_name", Extension.SL);
+        slangSource = new SlangSource("source_content", "source_name");
     }
 
     @Test

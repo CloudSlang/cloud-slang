@@ -34,7 +34,7 @@ public class MetadataParserTest {
     public void throwExceptionWhenSourceIsEmpty() throws Exception {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("empty");
-        metadataParser.parse(new SlangSource("", null, Extension.SL));
+        metadataParser.parse(new SlangSource("", null));
     }
 
     @Test

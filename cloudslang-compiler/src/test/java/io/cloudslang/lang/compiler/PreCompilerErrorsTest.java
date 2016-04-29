@@ -72,6 +72,17 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
+    public void testOperationWithNullFileName() throws Exception {
+        URI resource = getClass().getResource("/corrupted/wrong_name_operation.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(new SlangSource(SlangSource.fromFile(resource).getSource(), null));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("should be declared in a file named \"test_op\" plus a valid extension");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
      public void testOperationWithWrongName() throws Exception {
         URI resource = getClass().getResource("/corrupted/wrong_name_operation.sl").toURI();
 

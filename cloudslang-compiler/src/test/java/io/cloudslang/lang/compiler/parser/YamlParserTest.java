@@ -40,13 +40,13 @@ public class YamlParserTest {
         Mockito.when(yaml.loadAs(any(InputStream.class), eq(ParsedSlang.class))).thenThrow(IOException.class);
         exception.expect(RuntimeException.class);
         exception.expectMessage("parsing");
-        yamlParser.parse(new SlangSource("a", "b", Extension.SL));
+        yamlParser.parse(new SlangSource("a", "b"));
     }
 
     @Test
     public void throwExceptionWhenSourceIsEmpty() throws Exception {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("empty");
-        yamlParser.parse(new SlangSource("", null, Extension.SL));
+        yamlParser.parse(new SlangSource("", null));
     }
 }
