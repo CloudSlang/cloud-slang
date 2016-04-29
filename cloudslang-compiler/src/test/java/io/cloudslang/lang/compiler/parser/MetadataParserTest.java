@@ -1,5 +1,6 @@
 package io.cloudslang.lang.compiler.parser;
 
+import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import org.junit.Assert;
@@ -33,7 +34,7 @@ public class MetadataParserTest {
     public void throwExceptionWhenSourceIsEmpty() throws Exception {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("empty");
-        metadataParser.parse(new SlangSource("", null));
+        metadataParser.parse(new SlangSource("", null, Extension.SL));
     }
 
     @Test

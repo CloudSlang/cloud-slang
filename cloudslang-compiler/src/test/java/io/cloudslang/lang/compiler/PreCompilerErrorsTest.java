@@ -78,7 +78,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("should be declared in a file named");
+        exception.expectMessage("should be declared in a file named \"test_op.sl\"");
         throw result.getErrors().get(0);
     }
 
@@ -89,7 +89,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("should be declared in a file named");
+        exception.expectMessage("should be declared in a file named \"test_op.sl.yaml\"");
         throw result.getErrors().get(0);
     }
 
@@ -100,7 +100,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("should be declared in a file named");
+        exception.expectMessage("should be declared in a file named \"test_op.sl.yml\"");
         throw result.getErrors().get(0);
     }
 
@@ -111,7 +111,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("should be declared in a file named");
+        exception.expectMessage("should be declared in a file named \"test_op.yaml\"");
         throw result.getErrors().get(0);
     }
 
@@ -122,7 +122,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("should be declared in a file named");
+        exception.expectMessage("should be declared in a file named \"test_op.yml\"");
         throw result.getErrors().get(0);
     }
 

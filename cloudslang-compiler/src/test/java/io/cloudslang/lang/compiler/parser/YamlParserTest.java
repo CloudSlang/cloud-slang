@@ -1,5 +1,6 @@
 package io.cloudslang.lang.compiler.parser;
 
+import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
@@ -39,13 +40,13 @@ public class YamlParserTest {
         Mockito.when(yaml.loadAs(any(InputStream.class), eq(ParsedSlang.class))).thenThrow(IOException.class);
         exception.expect(RuntimeException.class);
         exception.expectMessage("parsing");
-        yamlParser.parse(new SlangSource("a", "b"));
+        yamlParser.parse(new SlangSource("a", "b", Extension.SL));
     }
 
     @Test
     public void throwExceptionWhenSourceIsEmpty() throws Exception {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("empty");
-        yamlParser.parse(new SlangSource("", null));
+        yamlParser.parse(new SlangSource("", null, Extension.SL));
     }
 }

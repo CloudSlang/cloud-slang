@@ -63,9 +63,10 @@ public class SlangModellerImpl implements SlangModeller{
 
     private void validateFileName(String executableName, ParsedSlang parsedSlang, ExecutableModellingResult result) {
         String fileName = parsedSlang.getName();
+        Extension fileExtension = parsedSlang.getFileExtension();
         if (StringUtils.isNotEmpty(executableName) && !executableName.equals(fileName))
             result.getErrors().add(new IllegalArgumentException("Operation/Flow " + executableName +
-                    " is declared in a file named \"" + fileName + "." + Extension.SL.getValue() + "\"" +
-                    ", it should be declared in a file named \"" + executableName + "." + Extension.SL.getValue() + "\""));
+                    " is declared in a file named \"" + fileName + "." + fileExtension.getValue() + "\"" +
+                    ", it should be declared in a file named \"" + executableName + "." + fileExtension.getValue() + "\""));
     }
 }

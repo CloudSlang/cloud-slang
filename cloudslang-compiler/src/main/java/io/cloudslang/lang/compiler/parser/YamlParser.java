@@ -40,6 +40,7 @@ public class YamlParser {
                 throw new RuntimeException("Source " + source.getName() + " does not contain YAML content");
             }
             parsedSlang.setName(source.getName());
+            parsedSlang.setFileExtension(source.getFileExtension());
             return parsedSlang;
         } catch (Throwable e) {
             throw new RuntimeException("There was a problem parsing the YAML source: " +
