@@ -9,7 +9,6 @@
 package io.cloudslang.lang.tools.build;
 
 import io.cloudslang.lang.api.Slang;
-import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
