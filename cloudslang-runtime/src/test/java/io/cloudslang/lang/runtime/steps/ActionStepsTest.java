@@ -12,15 +12,24 @@ package io.cloudslang.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
+import io.cloudslang.dependency.api.services.DependencyService;
+import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptExecutor;
-import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.env.ReturnValues;
+import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import org.junit.Assert;
+import io.cloudslang.runtime.api.java.JavaRuntimeService;
+import io.cloudslang.runtime.impl.java.JavaRuntimeServiceImpl;
+import io.cloudslang.runtime.impl.java.JavaExecutorPool;
+import io.cloudslang.dependency.api.services.DependencyService;
+import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
+import io.cloudslang.runtime.api.java.JavaRuntimeService;
+import io.cloudslang.runtime.impl.java.JavaRuntimeServiceImpl;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -700,5 +709,19 @@ public class ActionStepsTest {
             return new PythonInterpreter();
         }
 
+        @Bean
+        public DependencyService mavenRepositoryService() {
+            return new DependencyServiceImpl();
+        }
+
+        @Bean
+        public JavaExecutorPool javaExecutorPool() {
+            return new JavaExecutorPool();
+        }
+
+        @Bean
+        public JavaRuntimeService javaExecutionService() {
+            return new JavaRuntimeServiceImpl();
+        }
     }
 }

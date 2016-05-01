@@ -6,7 +6,6 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.score.api.ExecutionStep;
 import io.cloudslang.score.events.ScoreEvent;
-import static org.junit.Assert.*;
 import org.junit.Test;
 
 import java.io.Serializable;
@@ -15,6 +14,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 public class OperationWithDependenciesSystemTest extends SystemsTestsParent {
     @Test

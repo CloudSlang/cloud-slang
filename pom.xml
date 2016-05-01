@@ -203,6 +203,32 @@
             <!--end of score content dependencies-->
 
             <dependency>
+                <groupId>io.cloudslang</groupId>
+                <artifactId>runtime-support-api</artifactId>
+                <version>0.3.17-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.cloudslang</groupId>
+                <artifactId>runtime-support-impl</artifactId>
+                <version>0.3.17-SNAPSHOT</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>io.cloudslang</groupId>
+                <artifactId>dependency-support-api</artifactId>
+                <version>0.3.17-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.cloudslang</groupId>
+                <artifactId>dependency-support-impl</artifactId>
+                <version>0.3.17-SNAPSHOT</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>1.2.17</version>

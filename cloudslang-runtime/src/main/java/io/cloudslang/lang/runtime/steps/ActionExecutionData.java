@@ -20,6 +20,7 @@ import io.cloudslang.lang.runtime.bindings.scripts.ScriptExecutor;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
+import io.cloudslang.runtime.api.java.JavaRuntimeService;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import org.apache.commons.lang.StringUtils;
@@ -52,6 +53,9 @@ public class ActionExecutionData extends AbstractExecutionData {
     @Autowired
     private ScriptExecutor scriptExecutor;
 
+    @Autowired
+    private JavaRuntimeService javaExecutionService;
+
     public void doAction(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                          @Param(ExecutionParametersConsts.NON_SERIALIZABLE_EXECUTION_DATA) Map<String, Object> nonSerializableExecutionData,
                          @Param(ScoreLangConstants.ACTION_TYPE) ActionType actionType,
@@ -82,7 +86,8 @@ public class ActionExecutionData extends AbstractExecutionData {
         try {
             switch (actionType) {
                 case JAVA:
-                    returnValue = runJavaAction(serializableSessionData, callArguments, nonSerializableExecutionData, className, methodName);
+                    returnValue = runJavaAction(serializableSessionData, callArguments, nonSerializableExecutionData,
+                            className, methodName, actionDependencies);
                     break;
                 case PYTHON:
                     returnValue = prepareAndRunPythonAction(callArguments, python_script);
@@ -113,14 +118,17 @@ public class ActionExecutionData extends AbstractExecutionData {
                                                     Map<String, Serializable> currentContext,
                                                     Map<String, Object> nonSerializableExecutionData,
                                                     String className,
-                                                    String methodName) {
-
-        Object[] actualParameters = extractMethodData(serializableSessionData, currentContext, nonSerializableExecutionData, className, methodName);
-
-        return invokeActionMethod(className, methodName, actualParameters);
+                                                    String methodName,
+                                                    List<String> actionDependencies) {
+        List<Object> actualParameters = extractMethodData(serializableSessionData, currentContext, nonSerializableExecutionData, className, methodName);
+        Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService.execute(className, methodName, actualParameters, actionDependencies);
+        if (returnMap == null) {
+            throw new RuntimeException("Action method did not return Map<String,String>");
+        }
+        return returnMap;
     }
 
-    private Object[] extractMethodData(Map<String, SerializableSessionObject> serializableSessionData,
+    private List<Object> extractMethodData(Map<String, SerializableSessionObject> serializableSessionData,
                                        Map<String, Serializable> currentContext,
                                        Map<String, Object> nonSerializableExecutionData,
                                        String className,
@@ -134,23 +142,6 @@ public class ActionExecutionData extends AbstractExecutionData {
 
         //extract the parameters from execution context
         return resolveActionArguments(serializableSessionData, actionMethod, currentContext, nonSerializableExecutionData);
-    }
-
-
-    private Map<String, Serializable> invokeActionMethod(String className, String methodName, Object... parameters) {
-        Method actionMethod = getMethodByName(className, methodName);
-        Class actionClass = getActionClass(className);
-        Object returnObject;
-        try {
-            returnObject = actionMethod.invoke(actionClass.newInstance(), parameters);
-        } catch (Exception e) {
-            throw new RuntimeException("Invocation of method " + methodName + " of class " + className + " threw an exception", e);
-        }
-        @SuppressWarnings("unchecked") Map<String, Serializable> returnMap = (Map<String, Serializable>) returnObject;
-        if (returnMap == null) {
-            throw new RuntimeException("Action method did not return Map<String,String>");
-        }
-        return returnMap;
     }
 
     private Class getActionClass(String className) {
@@ -175,7 +166,7 @@ public class ActionExecutionData extends AbstractExecutionData {
         return actionMethod;
     }
 
-    protected Object[] resolveActionArguments(Map<String, SerializableSessionObject> serializableSessionData,
+    protected List<Object> resolveActionArguments(Map<String, SerializableSessionObject> serializableSessionData,
                                               Method actionMethod,
                                               Map<String, Serializable> currentContext,
                                               Map<String, Object> nonSerializableExecutionData) {
@@ -216,7 +207,7 @@ public class ActionExecutionData extends AbstractExecutionData {
                 throw new RuntimeException("All action arguments should be annotated with @Param");
             }
         }
-        return args.toArray(new Object[args.size()]);
+        return args;
     }
 
     private void handleNonSerializableSessionContextArgument(Map<String, Object> nonSerializableExecutionData, List<Object> args, Param annotation) {
