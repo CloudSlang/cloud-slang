@@ -34,6 +34,7 @@ public class MetadataExtractorTest {
             "Passing an empty list ([]) will retrieve the entire json_input. - Example: [\"k1\", \"k2\", 1]" + NEWLINE +
             "More information after newline";
     public static final String PREREQUISITES = "jenkinsapi Python module";
+    public static final String SOME_OTHER_RESULT = "SOME_OTHER_RESULT";
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -50,7 +51,7 @@ public class MetadataExtractorTest {
         Assert.assertEquals("different prerequisites", PREREQUISITES, metadata.getPrerequisites());
         Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
         Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
-        Assert.assertEquals("different number of results", 2, metadata.getResults().size());
+        Assert.assertEquals("different number of results", 3, metadata.getResults().size());
         Iterator<Map.Entry<String, String>> it = metadata.getInputs().entrySet().iterator();
         Map.Entry<String, String> entry = it.next();
         Assert.assertEquals("different input name", "json_input", entry.getKey());
@@ -58,6 +59,7 @@ public class MetadataExtractorTest {
         Map.Entry<String, String> entry2 = it.next();
         Assert.assertEquals("different input name", "json_path", entry2.getKey());
         Assert.assertEquals("different input value", SECOND_OUTPUT_VALUE, entry2.getValue());
+        Assert.assertEquals("different result value", "", metadata.getResults().get(SOME_OTHER_RESULT));
     }
 
     @Test
@@ -104,10 +106,24 @@ public class MetadataExtractorTest {
     }
 
     @Test
-    public void colonMissing() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_colon_missing_after_tag_name.sl").toURI();
+    public void colonMissingSingleTag() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_colon_missing_after_tag_name1.sl").toURI();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("does not contain colon after tag name.");
+        exception.expectMessage("does not contain colon the tag name and the description of the tag.");
+        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+    }
+
+    @Test
+    public void colonMissingRegularTag() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_colon_missing_after_tag_name2.sl").toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("does not contain colon the tag name and the description of the tag.");
+        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+    }
+
+    @Test
+    public void colonMissingOkScenario() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_colon_missing_after_tag_name_ok.sl").toURI();
         metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
     }
 

@@ -8,20 +8,21 @@
 namespace: user.flows
 
 imports:
-  ops: user.ops
+ ops: user.ops
 
 flow:
-  name: same_step_name_on_failure
+  name: on_failure_not_defined
+  inputs:
+    - navigationType
+    - emailHost
+    - emailPort
+    - emailSender
+    - emailRecipient
   workflow:
-    - other_step:
+    - produce_default_navigation:
         do:
-          ops.fail_on_input_op: [nr: 1]
-
-    - on_failure:
-        - step_same_name_on_failure:
-            do:
-              ops.fail_on_input_op: [nr: 0]
-
-        - step_same_name_on_failure:
-            do:
-              ops.fail_on_input_op: [nr: 0]
+          ops.produce_default_navigation:
+            - navigationType
+        navigate:
+          - SUCCESS: SUCCESS
+          - FAILURE: on_failure

@@ -103,7 +103,10 @@ public class Metadata {
     private void appendMap(StringBuilder stringBuilder, Map<String, String> map) throws IOException {
         stringBuilder.append(System.lineSeparator());
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            stringBuilder.append("  ").append(entry.getKey()).append(": ");
+            stringBuilder.append("  ").append(entry.getKey());
+            if (StringUtils.isNotEmpty(entry.getValue())) {
+                stringBuilder.append(": ");
+            }
             appendString(stringBuilder, entry.getValue(), "      ");
         }
     }

@@ -12,6 +12,7 @@ package io.cloudslang.lang.compiler.parser;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.utils.DescriptionTag;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.text.StrBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import java.io.StringReader;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -79,13 +81,16 @@ public class MetadataParser {
             while (line != null) {
                 if (DescriptionTag.stringContainsTag(line)) {
                     tag = DescriptionTag.getContainedTag(line);
-                    checkTagIsFollowedByColon(line);
-                    if (DescriptionTag.isUniqueTagType(tag)) {
-                        line = line.substring(line.indexOf(COLON) + 1);
-                        key = tag != null ? tag.getValue() : "";
+                    if (checkTagIsFollowedByColon(line, tag)) {
+                        if (DescriptionTag.isUniqueTagType(tag)) {
+                            line = line.substring(line.indexOf(COLON) + 1);
+                            key = tag != null ? tag.getValue() : "";
+                        } else {
+                            key = line.substring(0, line.indexOf(COLON)).trim();
+                            line = line.substring(line.indexOf(COLON) + 1);
+                        }
                     } else {
-                        key = line.substring(0, line.indexOf(COLON)).trim();
-                        line = line.substring(line.indexOf(COLON) + 1);
+                        key = line;
                     }
                 }
                 valueStringBuilder.appendln(line.trim());
@@ -98,17 +103,33 @@ public class MetadataParser {
         return map;
     }
 
-    private void checkTagIsFollowedByColon(String line) {
+    private boolean checkTagIsFollowedByColon(String line, DescriptionTag tag) {
         Pattern pattern = Pattern.compile("@[\\w\\s]+:");
         Matcher matcher = pattern.matcher(line);
         if (!matcher.lookingAt()) {
-            throw new RuntimeException("Line \"" + line + "\" does not contain colon after tag name.");
+            throwExceptionIfColonMissing(line, tag);
+            return false;
+        }
+        return true;
+    }
+
+    private void throwExceptionIfColonMissing(String line, DescriptionTag tag) {
+        String lineWithoutTag = line.replace(tag.getValue(), "").trim();
+        StringTokenizer stringTokenizer = new StringTokenizer(lineWithoutTag);
+        if ((DescriptionTag.isUniqueTagType(tag) && stringTokenizer.countTokens() == 1) ||
+                stringTokenizer.countTokens() > 1) {
+            throw new RuntimeException("Line \"" + line + "\" does not contain colon the tag name and the description of the tag.");
         }
     }
 
     private void putValueInMapAndResetBuilder(Map<String, String> map, String key, StrBuilder valueStringBuilder, String line) {
         if (line == null || DescriptionTag.stringContainsTag(line)) {
-            map.put(key, valueStringBuilder.trim().build());
+            String value = valueStringBuilder.trim().build();
+            if (StringUtils.equals(key, value)) {
+                map.put(key, "");
+            } else {
+                map.put(key, value);
+            }
             valueStringBuilder.clear();
         }
     }
