@@ -84,7 +84,7 @@ public class ActionExecutionData extends AbstractExecutionData {
             switch (actionType) {
                 case JAVA:
                     returnValue = runJavaAction(serializableSessionData, callArguments, nonSerializableExecutionData,
-                            className, methodName, actionDependencies);
+                            className, methodName, dependencies);
                     break;
                 case PYTHON:
                     returnValue = prepareAndRunPythonAction(callArguments, python_script);
@@ -117,10 +117,11 @@ public class ActionExecutionData extends AbstractExecutionData {
                                                     Map<String, Object> nonSerializableExecutionData,
                                                     String className,
                                                     String methodName,
-                                                    List<String> actionDependencies) {
+                                                    List<String> dependencies) {
         List<Object> actualParameters = extractMethodData(serializableSessionData, currentContext, nonSerializableExecutionData, className, methodName);
-        Set<String> dependencies = actionDependencies == null ? new HashSet<String>() : new HashSet<>(actionDependencies);
-        Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService.execute(dependencies, className, methodName, actualParameters.toArray(new Object[actualParameters.size()]));
+        Set<String> dependenciesSet = (dependencies == null) ? new HashSet<String>() : new HashSet<>(dependencies);
+        Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService.execute(dependenciesSet,
+                className, methodName, actualParameters.toArray(new Object[actualParameters.size()]));
         if (returnMap == null) {
             throw new RuntimeException("Action method did not return Map<String,String>");
         }
