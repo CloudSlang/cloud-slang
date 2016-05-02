@@ -8,6 +8,7 @@
  */
 package io.cloudslang.lang.compiler.modeller;
 
+import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Action;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
@@ -42,6 +43,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -50,10 +52,14 @@ import java.util.Set;
 import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
+import static org.hamcrest.Matchers.equalTo;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.ASYNC_LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER;
+import static io.cloudslang.lang.entities.ScoreLangConstants.FAILURE_RESULT;
 
 /*
  * Created by orius123 on 09/11/14.
@@ -259,6 +265,9 @@ public class ExecutableBuilder {
                     errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a list of steps and not a map"));
                 }
                 if (CollectionUtils.isNotEmpty(onFailureData)) {
+                    if (onFailureData.size() > 1) {
+                        errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be only one step"));
+                    }
                     WorkflowModellingResult workflowModellingResult = compileWorkFlow(onFailureData, imports, null, true, namespace, execName);
                     errors.addAll(workflowModellingResult.getErrors());
                     onFailureWorkFlow = workflowModellingResult.getWorkflow();
@@ -342,7 +351,18 @@ public class ExecutableBuilder {
             } else {
                 defaultSuccess = onFailureSection ? ScoreLangConstants.FAILURE_RESULT : ScoreLangConstants.SUCCESS_RESULT;
             }
-            StepModellingResult stepModellingResult = compileStep(stepName, stepRawDataValue, defaultSuccess, imports, defaultFailure, namespace);
+
+            String onFailureStepName = onFailureStepFound ? onFailureStepNames.get(0) : null;
+            StepModellingResult stepModellingResult = compileStep(
+                    stepName,
+                    stepRawDataValue,
+                    defaultSuccess,
+                    imports,
+                    defaultFailure,
+                    namespace,
+                    onFailureStepName
+            );
+
             errors.addAll(stepModellingResult.getErrors());
             steps.add(stepModellingResult.getStep());
         }
@@ -351,11 +371,22 @@ public class ExecutableBuilder {
             steps.addAll(onFailureSteps);
         }
 
+        List<Step> unreachableSteps = getUnreachableSteps(steps, onFailureSteps);
+        for (Step step : unreachableSteps) {
+            errors.add(new RuntimeException("Step: " + step.getName() + " is unreachable"));
+        }
+
         return new WorkflowModellingResult(new Workflow(steps), errors);
     }
 
-    private StepModellingResult compileStep(String stepName, Map<String, Object> stepRawData, String defaultSuccess,
-                                            Map<String, String> imports, String defaultFailure, String namespace) {
+    private StepModellingResult compileStep(
+            String stepName, Map<String,
+            Object> stepRawData,
+            String defaultSuccess,
+            Map<String, String> imports,
+            String defaultFailure,
+            String namespace,
+            String onFailureStepName) {
 
         List<RuntimeException> errors = new ArrayList<>();
         if (MapUtils.isEmpty(stepRawData)) {
@@ -371,6 +402,8 @@ public class ExecutableBuilder {
         String errorMessagePrefix = "For step '" + stepName + "' syntax is illegal.\n";
         preStepData.putAll(transformersHandler.runTransformers(stepRawData, preStepTransformers, errors, errorMessagePrefix));
         postStepData.putAll(transformersHandler.runTransformers(stepRawData, postStepTransformers, errors, errorMessagePrefix));
+
+        replaceOnFailureReference(postStepData, onFailureStepName, stepName);
 
         @SuppressWarnings("unchecked")
         List<Argument> arguments = (List<Argument>)preStepData.get(SlangTextualKeys.DO_KEY);
@@ -401,6 +434,38 @@ public class ExecutableBuilder {
                 refId,
                 preStepData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
         return new StepModellingResult(step, errors);
+    }
+
+    private void replaceOnFailureReference(
+            Map<String, Serializable> postStepData,
+            String onFailureStepName,
+            String stepName) {
+        Serializable navigationData = postStepData.get(NAVIGATION_KEY);
+        if (navigationData != null) {
+            @SuppressWarnings("unchecked") // from NavigateTransformer
+                    List<Map<String, String>> navigationStrings = (List<Map<String, String>>) navigationData;
+            List<Map<String, String>> transformedNavigationStrings = new ArrayList<>();
+
+            for (Map<String, String> navigation : navigationStrings) {
+                Map.Entry<String, String> navigationEntry = navigation.entrySet().iterator().next();
+                Map<String, String> transformedNavigation = new HashMap<>(navigation);
+                if (navigationEntry.getValue().equals(ON_FAILURE_KEY)) {
+                    if (StringUtils.isEmpty(onFailureStepName)) {
+                        throw new RuntimeException(
+                                "Failed to compile step: '" + stepName +
+                                        "'. Navigation: '" + navigationEntry.getKey() + " -> " + navigationEntry.getValue()
+                                        + "' is illegal. 'on_failure' section is not defined."
+                        );
+                    } else {
+                        transformedNavigation.put(navigationEntry.getKey(), onFailureStepName);
+                    }
+                } else {
+                    transformedNavigation.put(navigationEntry.getKey(), navigationEntry.getValue());
+                }
+                transformedNavigationStrings.add(transformedNavigation);
+            }
+            postStepData.put(NAVIGATION_KEY, (Serializable) transformedNavigationStrings);
+        }
     }
 
     private List<Map<String, String>> getNavigationStrings(Map<String, Serializable> postStepData, String defaultSuccess, String defaultFailure) {
@@ -480,4 +545,33 @@ public class ExecutableBuilder {
         return errors;
     }
 
+    private List<Step> getUnreachableSteps(Deque<Step> steps, Deque<Step> onFailureSteps) {
+        List<Step> unreachableSteps = new ArrayList<>();
+        if (steps.size() > 0) {
+            Map<String, Step> reachableSteps = new LinkedHashMap<>();
+            getReachableSteps(steps.getFirst(), steps, reachableSteps);
+            Step onFailureStep = onFailureSteps.size() == 0 ? null : onFailureSteps.getFirst();
+            for (Step step : steps) {
+                boolean isOnFailureStep = onFailureStep != null && onFailureStep.getName().equals(step.getName());
+                if (reachableSteps.get(step.getName()) == null && !isOnFailureStep) {
+                    unreachableSteps.add(step);
+                }
+            }
+        }
+        return unreachableSteps;
+    }
+
+    private void getReachableSteps(Step step, Deque<Step> steps, Map<String, Step> reachableSteps) {
+        reachableSteps.put(step.getName(), step);
+        for (Map<String, String> map : step.getNavigationStrings()) {
+            Map.Entry<String, String> entry = map.entrySet().iterator().next();
+            String nextStepName = entry.getValue();
+            if (reachableSteps.get(nextStepName) == null) {
+                Step nextStepToCompile = Lambda.selectFirst(steps, having(on(Step.class).getName(), equalTo(nextStepName)));
+                if (nextStepToCompile != null) {
+                    getReachableSteps(nextStepToCompile, steps, reachableSteps);
+                }
+            }
+        }
+    }
 }

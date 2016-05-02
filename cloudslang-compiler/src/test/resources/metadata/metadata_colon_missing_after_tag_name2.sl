@@ -7,7 +7,7 @@
 #
 #####################################################
 #!!
-#! @description: Parses the given JSON input to retrieve the
+ #! @description: Parses the given JSON input to retrieve the
 #!               corresponding value addressed by the json_path input.
 #! @prerequisites: jenkinsapi Python module
 #! @input json_input: JSON data input
@@ -20,12 +20,11 @@
 
 #! @output value: the corresponding value of the key referred to by json_path
 #! @output return_result: parsing was successful or not
-#! @output return_code: is '0' if parsing was successful, '-1' otherwise
+#! @output return_code: '0' if parsing was successful, '-1' otherwise
 #! @output error_message: error message if there was an error when executing,
 #!                        empty otherwise
-#! @result SUCCESS: parsing was successful (return_code == '0')
+#! @result SUCCESS parsing was successful (return_code == '0')
 #! @result FAILURE: otherwise
-#! @result SOME_OTHER_RESULT
 #!!#
 #####################################################sdfdf
 #!#! comment

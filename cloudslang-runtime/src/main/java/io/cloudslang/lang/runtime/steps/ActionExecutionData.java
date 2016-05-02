@@ -56,7 +56,7 @@ public class ActionExecutionData extends AbstractExecutionData {
     public void doAction(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                          @Param(ExecutionParametersConsts.NON_SERIALIZABLE_EXECUTION_DATA) Map<String, Object> nonSerializableExecutionData,
                          @Param(ScoreLangConstants.ACTION_TYPE) ActionType actionType,
-                         @Param(ScoreLangConstants.ACTION_DEPENDENCIES) List<String> actionDependencies,
+                         @Param(ScoreLangConstants.ACTION_DEPENDENCIES) List<String> dependencies,
                          @Param(ScoreLangConstants.ACTION_CLASS_KEY) String className,
                          @Param(ScoreLangConstants.ACTION_METHOD_KEY) String methodName,
                          @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
@@ -77,7 +77,7 @@ public class ActionExecutionData extends AbstractExecutionData {
                 Pair.of(LanguageEventData.CALL_ARGUMENTS, (Serializable) callArgumentsDeepCopy));
 
         if(logger.isDebugEnabled()) {
-            logger.debug("Going to executing [" + actionType.name() + "] action with dependencies [" + actionDependencies + "]");
+            logger.debug("Going to executing [" + actionType.name() + "] action with dependencies [" + dependencies + "]");
         }
 
         try {

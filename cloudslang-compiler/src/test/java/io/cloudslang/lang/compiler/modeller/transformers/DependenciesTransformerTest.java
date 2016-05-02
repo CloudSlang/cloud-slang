@@ -7,13 +7,16 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class DependenciesTransformerTest {
     @Test
     public void testTransformWithoutDependencies() throws Exception {
         DependenciesTransformer transformer = new DependenciesTransformer();
-        assertTrue(transformer.transform(null).isEmpty());
+        List<String> transform = transformer.transform(null);
+        assertNotNull(transform);
+        assertTrue(transform.isEmpty());
     }
 
     @Test
@@ -22,7 +25,23 @@ public class DependenciesTransformerTest {
 
         List<String> list = Lists.newArrayList();
         List<String> transform = transformer.transform(list);
+        assertNotNull(transform);
         assertTrue(transform.isEmpty());
+        assertEquals(list, transform);
+    }
+
+    @Test
+    public void testTransformWithNotEmptyDependencies() throws Exception {
+        DependenciesTransformer transformer = new DependenciesTransformer();
+
+        String dep1 = "g1:a2:v3";
+        String dep2 = "g2:a3:v4";
+        List<String> list = Lists.newArrayList(dep1, dep2);
+        List<String> transform = transformer.transform(list);
+        assertNotNull(transform);
+        assertTrue(transform.size() == 2);
+        assertEquals(dep1, transform.get(0));
+        assertEquals(dep2, transform.get(1));
         assertEquals(list, transform);
     }
 

@@ -482,4 +482,45 @@ public class PreCompilerErrorsTest {
         throw result.getErrors().get(0);
     }
 
+    @Test
+    public void testFlowWithUnreachableSteps() throws Exception {
+        URI resource = getClass().getResource("/corrupted/unreachable_steps.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Step");
+        exception.expectMessage("print_message2");
+        exception.expectMessage("unreachable");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testFlowWithUnreachableOnFailureStep() throws Exception {
+        URI resource = getClass().getResource("/corrupted/unreachable_on_failure_step.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() == 0);
+    }
+
+    @Test
+    public void testFlowWithUnreachableStepReachableFromOnFailureStep() throws Exception {
+        URI resource = getClass().getResource("/corrupted/unreachable_step_reachable_from_on_failure.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() == 0);
+    }
+
+    @Test
+    public void testFlowWithUnreachableTasksOneReachableFromOnFailureTask() throws Exception {
+        URI resource = getClass().getResource("/corrupted/unreachable_tasks_one_reachable_from_on_failure.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Step");
+        exception.expectMessage("print_message2");
+        exception.expectMessage("unreachable");
+        throw result.getErrors().get(0);
+    }
 }

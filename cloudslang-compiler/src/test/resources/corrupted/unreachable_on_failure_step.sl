@@ -5,36 +5,33 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: user.ops
+namespace: io.cloudslang
 
 imports:
   ops: user.ops
 
 flow:
-  name: flow_with_on_failure
-  inputs:
-    - input1
+  name: unreachable_on_failure_step
   workflow:
-    - on_failure:
-        - check_something:
-            do:
-              ops.test_op:
-                - city: 'a'
-                - alla: 'a'
-
-    - first_step:
+    - print_message1:
         do:
           ops.test_op:
-            - city: 'input_1'
-            - alla: 'walla'
-        publish:
-          - weather
+            - alla: 'message 1'
+        navigate:
+          - SUCCESS: print_message2
+          - FAILURE: print_message2
 
-    - second_step:
+    - print_message2:
         do:
           ops.test_op:
-            - city: 'input_1'
-            - alla: 'walla'
+            - alla: 'message 3'
         navigate:
           - SUCCESS: SUCCESS
-          - FAILURE: FAILURE
+          - FAILURE: SUCCESS
+
+    - on_failure:
+        - print_on_failure_1:
+            do:
+              ops.test_op:
+                - alla: 'on_failure 1'
+
