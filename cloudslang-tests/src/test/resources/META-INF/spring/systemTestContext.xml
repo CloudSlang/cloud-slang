@@ -24,6 +24,6 @@
     <bean class="io.cloudslang.lang.systemtests.TriggerFlows"/>
 
     <bean name="dependencyService" class="io.cloudslang.dependency.impl.services.DependencyServiceImpl"/>
-    <bean name="javaExecutorPool" class="io.cloudslang.runtime.impl.java.JavaExecutorPool"/>
+    <bean name="javaExecutorPool" class="io.cloudslang.runtime.impl.java.JavaCachedExecutorProvider"/>
     <bean name="javaRuntimeService" class="io.cloudslang.runtime.impl.java.JavaRuntimeServiceImpl"/>
 </beans>

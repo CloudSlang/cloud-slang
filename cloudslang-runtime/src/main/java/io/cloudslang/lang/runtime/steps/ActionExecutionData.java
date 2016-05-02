@@ -33,10 +33,7 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
@@ -114,6 +111,7 @@ public class ActionExecutionData extends AbstractExecutionData {
         runEnv.putNextStepPosition(nextStepId);
     }
 
+    @SuppressWarnings("unchecked")
     private Map<String, Serializable> runJavaAction(Map<String, SerializableSessionObject> serializableSessionData,
                                                     Map<String, Serializable> currentContext,
                                                     Map<String, Object> nonSerializableExecutionData,
@@ -121,7 +119,8 @@ public class ActionExecutionData extends AbstractExecutionData {
                                                     String methodName,
                                                     List<String> actionDependencies) {
         List<Object> actualParameters = extractMethodData(serializableSessionData, currentContext, nonSerializableExecutionData, className, methodName);
-        Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService.execute(className, methodName, actualParameters, actionDependencies);
+        Set<String> dependencies = actionDependencies == null ? new HashSet<String>() : new HashSet<>(actionDependencies);
+        Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService.execute(dependencies, className, methodName, actualParameters.toArray(new Object[actualParameters.size()]));
         if (returnMap == null) {
             throw new RuntimeException("Action method did not return Map<String,String>");
         }

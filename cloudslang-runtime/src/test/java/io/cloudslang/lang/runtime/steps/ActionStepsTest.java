@@ -20,8 +20,9 @@ import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.runtime.api.java.JavaRuntimeService;
+import io.cloudslang.runtime.impl.java.JavaCachedExecutorProvider;
+import io.cloudslang.runtime.impl.java.JavaExecutorProvider;
 import io.cloudslang.runtime.impl.java.JavaRuntimeServiceImpl;
-import io.cloudslang.runtime.impl.java.JavaExecutorPool;
 import io.cloudslang.dependency.api.services.DependencyService;
 import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
 import io.cloudslang.runtime.api.java.JavaRuntimeService;
@@ -715,8 +716,8 @@ public class ActionStepsTest {
         }
 
         @Bean
-        public JavaExecutorPool javaExecutorPool() {
-            return new JavaExecutorPool();
+        public JavaExecutorProvider javaExecutorProvider() {
+            return new JavaCachedExecutorProvider();
         }
 
         @Bean
