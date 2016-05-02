@@ -47,6 +47,11 @@ http://www.apache.org/licenses/LICENSE-2.0
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 

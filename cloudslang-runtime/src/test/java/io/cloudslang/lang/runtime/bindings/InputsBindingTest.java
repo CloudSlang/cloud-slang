@@ -12,6 +12,10 @@ package io.cloudslang.lang.runtime.bindings;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
+import io.cloudslang.runtime.api.python.PythonRuntimeService;
+import io.cloudslang.runtime.impl.python.PythonEvaluator;
+import io.cloudslang.runtime.impl.python.PythonExecutor;
+import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -391,9 +395,28 @@ public class InputsBindingTest {
         }
 
         @Bean
-        public PythonInterpreter evalInterpreter(){
+        public PythonRuntimeService pythonRuntimeService(){
+            return new PythonRuntimeServiceImpl();
+        }
+
+        @Bean
+        public PythonEvaluator pythonEvaluator(){
+            return new PythonEvaluator();
+        }
+
+        @Bean
+        public PythonExecutor pythonExecutor(){
+            return new PythonExecutor();
+        }
+
+        @Bean
+        public PythonInterpreter execInterpreter(){
             return new PythonInterpreter();
         }
 
+        @Bean
+        public PythonInterpreter evalInterpreter(){
+            return new PythonInterpreter();
+        }
     }
 }

@@ -23,6 +23,10 @@ import io.cloudslang.lang.runtime.env.ParentFlowData;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
+import io.cloudslang.runtime.api.python.PythonRuntimeService;
+import io.cloudslang.runtime.impl.python.PythonEvaluator;
+import io.cloudslang.runtime.impl.python.PythonExecutor;
+import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import junit.framework.Assert;
@@ -310,8 +314,28 @@ public class ExecutableStepsTest {
         }
 
         @Bean
+        public PythonRuntimeService pythonRuntimeService(){
+            return new PythonRuntimeServiceImpl();
+        }
+
+        @Bean
+        public PythonEvaluator pythonEvaluator(){
+            return new PythonEvaluator();
+        }
+
+        @Bean
+        public PythonExecutor pythonExecutor(){
+            return new PythonExecutor();
+        }
+
+        @Bean
+        public PythonInterpreter execInterpreter(){
+            return new PythonInterpreter();
+        }
+
+        @Bean
         public PythonInterpreter evalInterpreter(){
-            return mock(PythonInterpreter.class);
+            return new PythonInterpreter();
         }
 
         @Bean

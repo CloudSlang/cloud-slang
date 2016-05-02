@@ -15,8 +15,6 @@ import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.python.core.Options;
 import org.python.core.PySystemState;
-import org.python.util.PythonInterpreter;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -34,18 +32,4 @@ public class SlangRuntimeSpringConfig {
         if (!StringUtils.isEmpty(encodingValue))
             System.getProperties().setProperty(PySystemState.PYTHON_IO_ENCODING, encodingValue);
     }
-
-    @Bean
-    public PythonInterpreter evalInterpreter(){
-        return new PythonInterpreter();
-    }
-
-    @Bean
-    public PythonInterpreter execInterpreter(){
-        PythonInterpreter interpreter = new PythonInterpreter();
-        //here to avoid jython preferring io.cloudslang package over python io package
-        interpreter.exec("import io");
-        return interpreter;
-    }
-
 }
