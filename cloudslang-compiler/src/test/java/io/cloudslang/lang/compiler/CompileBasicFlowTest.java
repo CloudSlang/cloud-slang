@@ -130,6 +130,21 @@ public class CompileBasicFlowTest {
     }
 
     @Test
+    public void testValidateSlangModelWithDependenciesBasic() throws Exception {
+        URI flowUri = getClass().getResource("/basic_flow.yaml").toURI();
+        Executable flow = compiler.preCompile(SlangSource.fromFile(flowUri));
+
+        URI operationUri = getClass().getResource("/test_op.sl").toURI();
+        Executable op = compiler.preCompile(SlangSource.fromFile(operationUri));
+
+        Set<Executable> dependencies = new HashSet();
+        dependencies.add(op);
+        List<RuntimeException> errors = compiler.validateSlangModelWithDependencies(flow, dependencies);
+
+        Assert.assertEquals("", 0, errors.size());
+    }
+
+    @Test
     public void testCompileFlowNavigateDuplicateKeysFirstIsTaken() throws Exception {
         URI flow = getClass().getResource("/flow_navigate_duplicate_keys.sl").toURI();
         URI operation = getClass().getResource("/check_Weather.sl").toURI();
