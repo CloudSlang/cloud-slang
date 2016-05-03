@@ -90,6 +90,11 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     @Override
+    public List<RuntimeException> validateSlangModelWithDependencies(Executable slangModel, Set<Executable> dependenciesModels) {
+        return scoreCompiler.validateSlangModelWithDependencies(slangModel,dependenciesModels);
+    }
+
+    @Override
     public Set<SystemProperty> loadSystemProperties(SlangSource source) {
         try {
             ParsedSlang parsedSlang = parseSystemPropertiesFile(source);
