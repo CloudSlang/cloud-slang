@@ -119,8 +119,8 @@ public class ActionExecutionData extends AbstractExecutionData {
                                                     String methodName,
                                                     List<String> dependencies) {
         List<Object> actualParameters = extractMethodData(serializableSessionData, currentContext, nonSerializableExecutionData, className, methodName);
-        Set<String> dependenciesSet = (dependencies == null) ? new HashSet<String>() : new HashSet<>(dependencies);
-        Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService.execute(dependenciesSet,
+        String dependency = (dependencies == null || dependencies.isEmpty()) ? "" : dependencies.get(0);
+        Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService.execute(dependency,
                 className, methodName, actualParameters.toArray(new Object[actualParameters.size()]));
         if (returnMap == null) {
             throw new RuntimeException("Action method did not return Map<String,String>");

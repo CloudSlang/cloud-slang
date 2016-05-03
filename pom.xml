@@ -204,27 +204,31 @@
 
             <dependency>
                 <groupId>io.cloudslang</groupId>
-                <artifactId>runtime-support-api</artifactId>
+                <artifactId>runtime-management-api</artifactId>
                 <version>0.3.17-SNAPSHOT</version>
+                <!--version>${score.version}</version-->
             </dependency>
 
             <dependency>
                 <groupId>io.cloudslang</groupId>
-                <artifactId>runtime-support-impl</artifactId>
+                <artifactId>runtime-management-impl</artifactId>
                 <version>0.3.17-SNAPSHOT</version>
+                <!--version>${score.version}</version-->
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>io.cloudslang</groupId>
-                <artifactId>dependency-support-api</artifactId>
+                <artifactId>dependency-management-api</artifactId>
                 <version>0.3.17-SNAPSHOT</version>
+                <!--version>${score.version}</version-->
             </dependency>
 
             <dependency>
                 <groupId>io.cloudslang</groupId>
-                <artifactId>dependency-support-impl</artifactId>
+                <artifactId>dependency-management-impl</artifactId>
                 <version>0.3.17-SNAPSHOT</version>
+                <!--version>${score.version}</version-->
                 <scope>test</scope>
             </dependency>
 
