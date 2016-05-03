@@ -55,4 +55,7 @@ public interface SlangCompiler {
      * @return a list of the exceptions that were found (if any)
      */
     List<RuntimeException> validateSlangModelWithDependencies(Executable slangModel, Set<Executable> dependenciesModels);
+
+    Set<SystemProperty> loadSystemProperties(SlangSource source);
+
 }
