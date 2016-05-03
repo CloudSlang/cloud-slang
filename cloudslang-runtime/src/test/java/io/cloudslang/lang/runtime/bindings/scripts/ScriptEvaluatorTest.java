@@ -1,26 +1,35 @@
 package io.cloudslang.lang.runtime.bindings.scripts;
 
+import io.cloudslang.dependency.api.services.DependencyService;
+import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import io.cloudslang.runtime.api.python.PythonRuntimeService;
+import io.cloudslang.runtime.impl.python.PythonEvaluator;
+import io.cloudslang.runtime.impl.python.PythonExecutor;
+import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.python.core.PyStringMap;
 import org.python.google.common.collect.Sets;
 import org.python.util.PythonInterpreter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.Serializable;
 import java.util.*;
 
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = ScriptEvaluatorTest.Config.class)
 public class ScriptEvaluatorTest {
 
     private static String LINE_SEPARATOR = System.lineSeparator();
@@ -39,23 +48,25 @@ public class ScriptEvaluatorTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    @InjectMocks
-    private ScriptEvaluator scriptEvaluator = new ScriptEvaluator();
+    @Autowired
+    private ScriptEvaluator scriptEvaluator;
 
-    @Mock
-    private PythonInterpreter pythonInterpreter;
+    @Autowired
+    private PythonInterpreter evalInterpreter;
 
     @Test
     public void testEvalExpr() throws Exception {
+        reset(evalInterpreter);
         scriptEvaluator.evalExpr("", new HashMap<String, Serializable>(), new HashSet<SystemProperty>());
-        verify(pythonInterpreter).eval(eq(""));
-        verify(pythonInterpreter).set("true", Boolean.TRUE);
-        verify(pythonInterpreter).set("false", Boolean.FALSE);
+        verify(evalInterpreter).eval(eq(""));
+        verify(evalInterpreter).set("true", Boolean.TRUE);
+        verify(evalInterpreter).set("false", Boolean.FALSE);
     }
 
     @Test
     public void testEvalExprError() throws Exception {
-        when(pythonInterpreter.eval(anyString())).thenThrow(new RuntimeException("error from interpreter"));
+        reset(evalInterpreter);
+        when(evalInterpreter.eval(anyString())).thenThrow(new RuntimeException("error from interpreter"));
         exception.expect(RuntimeException.class);
         exception.expectMessage("input_expression");
         exception.expectMessage("error from interpreter");
@@ -64,6 +75,7 @@ public class ScriptEvaluatorTest {
 
     @Test
     public void testEvalFunctions() throws Exception {
+        reset(evalInterpreter);
         Set<SystemProperty> props = new HashSet<>();
         SystemProperty systemProperty = new SystemProperty("a.b", "c.key", "value");
         props.add(systemProperty);
@@ -76,14 +88,14 @@ public class ScriptEvaluatorTest {
         );
         ArgumentCaptor<String> scriptCaptor = ArgumentCaptor.forClass(String.class);
 
-        when(pythonInterpreter.getLocals()).thenReturn(new PyStringMap());
+        when(evalInterpreter.getLocals()).thenReturn(new PyStringMap());
 
         scriptEvaluator.evalExpr("", new HashMap<String, Serializable>(), props, functionDependencies);
 
-        verify(pythonInterpreter).eval(eq(""));
-        verify(pythonInterpreter, atLeastOnce()).set("__sys_prop__", propsAsMap);
+        verify(evalInterpreter).eval(eq(""));
+        verify(evalInterpreter, atLeastOnce()).set("__sys_prop__", propsAsMap);
 
-        verify(pythonInterpreter).exec(scriptCaptor.capture());
+        verify(evalInterpreter).exec(scriptCaptor.capture());
         String actualScript = scriptCaptor.getValue();
         String[] actualFunctionsArray = actualScript.split(LINE_SEPARATOR + LINE_SEPARATOR);
         Set<String> actualFunctions = new HashSet<>();
@@ -96,4 +108,46 @@ public class ScriptEvaluatorTest {
         Assert.assertEquals(expectedFunctions, actualFunctions);
     }
 
+    @Configuration
+    static class Config {
+        @Bean
+        public ScriptExecutor scriptExecutor() {
+            return new ScriptExecutor();
+        }
+
+        @Bean
+        public ScriptEvaluator scriptEvaluator() {
+            return new ScriptEvaluator();
+        }
+
+        @Bean
+        public PythonEvaluator pythonEvaluator(){
+            return new PythonEvaluator();
+        }
+
+        @Bean
+        public PythonExecutor pythonExecutor(){
+            return new PythonExecutor();
+        }
+
+        @Bean
+        public PythonInterpreter execInterpreter(){
+            return mock(PythonInterpreter.class);
+        }
+
+        @Bean
+        public PythonInterpreter evalInterpreter(){
+            return mock(PythonInterpreter.class);
+        }
+
+        @Bean
+        public DependencyService mavenRepositoryService() {
+            return new DependencyServiceImpl();
+        }
+
+        @Bean
+        public PythonRuntimeService pythonRuntimeService() {
+            return new PythonRuntimeServiceImpl();
+        }
+    }
 }

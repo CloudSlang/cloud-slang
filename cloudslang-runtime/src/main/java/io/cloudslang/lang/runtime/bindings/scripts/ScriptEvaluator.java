@@ -70,12 +70,10 @@ public class ScriptEvaluator {
             }
 
             return result;
-        } catch (Exception e) {
-            Throwable exception = e.getCause() != null ? e.getCause() : e;
-            String message = exception.getMessage();
+        } catch (Exception exception) {
             throw new RuntimeException(
                     "Error in running script expression: '"
-                            + expr + "',\n\tException is: " + handleExceptionSpecialCases(message), exception);
+                            + expr + "',\n\tException is: " + handleExceptionSpecialCases(exception.getMessage()), exception);
         }
     }
 
