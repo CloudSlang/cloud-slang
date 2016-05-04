@@ -21,8 +21,7 @@ import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.runtime.api.java.JavaRuntimeService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
-import io.cloudslang.runtime.impl.java.JavaCachedExecutorProvider;
-import io.cloudslang.runtime.impl.java.JavaExecutorProvider;
+import io.cloudslang.runtime.impl.java.JavaCachedStaticsSharedExecutionEngine;
 import io.cloudslang.runtime.impl.java.JavaRuntimeServiceImpl;
 import io.cloudslang.runtime.impl.python.PythonEvaluator;
 import io.cloudslang.runtime.impl.python.PythonExecutor;
@@ -736,8 +735,8 @@ public class ActionStepsTest {
         }
 
         @Bean
-        public JavaExecutorProvider javaExecutorProvider() {
-            return new JavaCachedExecutorProvider();
+        public JavaCachedStaticsSharedExecutionEngine javaExecutorProvider() {
+            return new JavaCachedStaticsSharedExecutionEngine();
         }
 
         @Bean
