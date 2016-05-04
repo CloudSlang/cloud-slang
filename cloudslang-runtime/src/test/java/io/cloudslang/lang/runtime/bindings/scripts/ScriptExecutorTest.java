@@ -1,9 +1,12 @@
 package io.cloudslang.lang.runtime.bindings.scripts;
 
 import io.cloudslang.dependency.api.services.DependencyService;
+import io.cloudslang.dependency.api.services.MavenConfig;
 import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
+import io.cloudslang.dependency.impl.services.MavenConfigImpl;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
-import io.cloudslang.runtime.impl.python.PythonEvaluator;
+import io.cloudslang.runtime.impl.python.PythonCachedStaticsSharedExecutionEngine;
+import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutor;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import junit.framework.Assert;
@@ -24,20 +27,20 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ScriptExecutorTest.Config.class)
 public class ScriptExecutorTest {
+    private static PythonInterpreter execInterpreter = mock(PythonInterpreter.class);
+
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
     @Autowired
     private ScriptExecutor scriptExecutor;
-
-    @Autowired
-    private PythonInterpreter execInterpreter;
 
     @Test
     public void testExecuteScript() throws Exception {
@@ -90,33 +93,31 @@ public class ScriptExecutorTest {
         }
 
         @Bean
-        public PythonEvaluator pythonEvaluator(){
-            return new PythonEvaluator();
-        }
-
-        @Bean
-        public PythonExecutor pythonExecutor(){
-            return new PythonExecutor();
-        }
-
-        @Bean
-        public PythonInterpreter execInterpreter(){
-            return mock(PythonInterpreter.class);
-        }
-
-        @Bean
-        public PythonInterpreter evalInterpreter(){
-            return mock(PythonInterpreter.class);
-        }
-
-        @Bean
         public DependencyService mavenRepositoryService() {
             return new DependencyServiceImpl();
         }
 
         @Bean
+        public MavenConfig mavenConfig() {
+            return new MavenConfigImpl();
+        }
+
+        @Bean
         public PythonRuntimeService pythonRuntimeService() {
             return new PythonRuntimeServiceImpl();
+        }
+
+        @Bean
+        public PythonExecutionEngine pythonExecutionEngine(){
+            return new PythonCachedStaticsSharedExecutionEngine() {
+                protected PythonExecutor createNewExecutor(Set<String> filePaths) {
+                    return new PythonExecutor(filePaths) {
+                        protected PythonInterpreter initInterpreter(Set<String> dependencies) {
+                            return execInterpreter;
+                        }
+                    };
+                }
+            };
         }
     }
 }

@@ -10,6 +10,10 @@
 
 package io.cloudslang.lang.runtime.steps;
 
+import io.cloudslang.dependency.api.services.DependencyService;
+import io.cloudslang.dependency.api.services.MavenConfig;
+import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
+import io.cloudslang.dependency.impl.services.MavenConfigImpl;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Input;
@@ -24,15 +28,14 @@ import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
-import io.cloudslang.runtime.impl.python.PythonEvaluator;
-import io.cloudslang.runtime.impl.python.PythonExecutor;
+import io.cloudslang.runtime.impl.python.PythonCachedStaticsSharedExecutionEngine;
+import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -314,28 +317,23 @@ public class ExecutableStepsTest {
         }
 
         @Bean
+        public DependencyService mavenRepositoryService() {
+            return new DependencyServiceImpl();
+        }
+
+        @Bean
+        public MavenConfig mavenConfig() {
+            return new MavenConfigImpl();
+        }
+
+        @Bean
         public PythonRuntimeService pythonRuntimeService(){
             return new PythonRuntimeServiceImpl();
         }
 
         @Bean
-        public PythonEvaluator pythonEvaluator(){
-            return new PythonEvaluator();
-        }
-
-        @Bean
-        public PythonExecutor pythonExecutor(){
-            return new PythonExecutor();
-        }
-
-        @Bean
-        public PythonInterpreter execInterpreter(){
-            return new PythonInterpreter();
-        }
-
-        @Bean
-        public PythonInterpreter evalInterpreter(){
-            return new PythonInterpreter();
+        public PythonExecutionEngine pythonExecutionEngine(){
+            return new PythonCachedStaticsSharedExecutionEngine();
         }
 
         @Bean

@@ -24,13 +24,10 @@
     <bean class="io.cloudslang.lang.systemtests.TriggerFlows"/>
 
     <bean name="dependencyService" class="io.cloudslang.dependency.impl.services.DependencyServiceImpl"/>
+    <bean name="mavenConfigImpl" class="io.cloudslang.dependency.impl.services.MavenConfigImpl"/>
     <bean name="javaExecutorPool" class="io.cloudslang.runtime.impl.java.JavaCachedStaticsSharedExecutionEngine"/>
     <bean name="javaRuntimeService" class="io.cloudslang.runtime.impl.java.JavaRuntimeServiceImpl"/>
 
     <bean name="pythonRuntimeServiceImpl" class="io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl"/>
-    <bean name="pythonExecutor" class="io.cloudslang.runtime.impl.python.PythonExecutor"/>
-    <bean name="pythonEvaluator" class="io.cloudslang.runtime.impl.python.PythonEvaluator"/>
-    <bean name="execInterpreter" class="org.python.util.PythonInterpreter"/>
-    <bean name="evalInterpreter" class="org.python.util.PythonInterpreter"/>
-
+    <bean name="pythonExecutor" class="io.cloudslang.runtime.impl.python.PythonCachedStaticsSharedExecutionEngine"/>
 </beans>

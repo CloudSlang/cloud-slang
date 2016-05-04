@@ -13,6 +13,7 @@ package io.cloudslang.lang.runtime.configuration;
 
 import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
 import org.apache.commons.lang3.StringUtils;
+import org.python.core.Options;
 import org.python.core.PySystemState;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,7 @@ import org.springframework.context.annotation.Configuration;
 public class SlangRuntimeSpringConfig {
 
     static {
+        Options.importSite = false;
         setPythonIOEncoding();
     }
 
