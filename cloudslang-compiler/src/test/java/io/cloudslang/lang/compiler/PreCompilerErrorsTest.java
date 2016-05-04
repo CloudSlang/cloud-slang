@@ -78,7 +78,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(new SlangSource(SlangSource.fromFile(resource).getSource(), null));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("should be declared in a file named \"test_op\" plus a valid extension");
+        exception.expectMessage("should be declared in a file named \"test_op\" " +
+                "plus a valid extension(sl, sl.yaml, sl.yml, prop.sl, yaml, yml)");
         throw result.getErrors().get(0);
     }
 

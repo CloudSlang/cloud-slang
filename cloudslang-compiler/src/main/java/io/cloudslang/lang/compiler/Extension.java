@@ -57,6 +57,10 @@ public enum Extension {
         return Arrays.copyOfRange(extensionValues, 4, extensionValues.length);
     }
 
+    public static String getExtensionValuesAsString() {
+        return StringUtils.join(extensionValues, ", ");
+    }
+
     public static void validateSlangFileExtension(String fileName) {
         Extension fileExtension = Extension.findExtension(fileName);
         validateFileExtension(fileName, fileExtension, getSlangFileExtensions(), getSlangFileExtensionValues());

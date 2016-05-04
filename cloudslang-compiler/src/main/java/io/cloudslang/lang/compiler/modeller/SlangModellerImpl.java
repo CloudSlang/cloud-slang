@@ -69,7 +69,7 @@ public class SlangModellerImpl implements SlangModeller{
                 result.getErrors().add(new IllegalArgumentException("Operation/Flow " + executableName +
                         " is declared in a file named \"" + fileName + "\"," +
                         " it should be declared in a file named \"" + executableName + "\" plus a valid " +
-                        "extension(\"sl\", \"sl.yaml\", \"sl.yml\", \"prop.sl\", \"yaml\", \"yml\") separated by \".\""));
+                        "extension(" + Extension.getExtensionValuesAsString() + ") separated by \".\""));
             } else {
                 result.getErrors().add(new IllegalArgumentException("Operation/Flow " + executableName +
                         " is declared in a file named \"" + fileName + "." + fileExtension.getValue() + "\"" +
