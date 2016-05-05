@@ -7,10 +7,20 @@
 
 namespace: io.cloudslang
 
-operation:
-  name: check_op
-  inputs:
-    - alla:
-        ${get_sp('user.sys.props.alla')}
-  action:
-    python_script: 'print "hello world"'
+imports:
+  ops: user.ops
+
+flow:
+  name: flow_missing_dependency_required_input_in_step
+  workflow:
+    - explicit_alias:
+        do:
+          ops.test_op:
+            - city: 'input_1'
+            - port: '22'
+
+    - implicit_alias:
+        do:
+          check_op:
+            - city: 'input_1'
+            - port: '22'

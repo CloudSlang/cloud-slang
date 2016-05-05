@@ -66,10 +66,10 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             //than we match the references to the actual dependencies
             filteredDependencies = dependenciesHelper.matchReferences(executable, availableExecutables);
 
-            validateRequiredNonPrivateInputs(executable, filteredDependencies);
-
-            // Validate that all the steps of a flow have navigations for all the reference's results
-            validateAllDependenciesResultsHaveMatchingNavigations(executable, filteredDependencies);
+            List<RuntimeException> errors = validateModelWithDependencies(executable, filteredDependencies);
+            if (errors.size() > 0) {
+                throw errors.get(0);
+            }
 
         }
 
@@ -90,22 +90,42 @@ public class ScoreCompilerImpl implements ScoreCompiler{
         return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemPropertiesFromExecutables(executables));
     }
 
-    private void validateRequiredNonPrivateInputs(
+    @Override
+    public List<RuntimeException> validateSlangModelWithDependencies(Executable slangModel, Set<Executable> dependenciesModels) {
+        Map<String, Executable> dependenciesMap = new HashMap<>();
+        for (Executable dependency : dependenciesModels) {
+            dependenciesMap.put(dependency.getId(), dependency);
+        }
+        return validateModelWithDependencies(slangModel, dependenciesMap);
+    }
+
+    private List<RuntimeException> validateModelWithDependencies(Executable executable, Map<String, Executable> dependencies) {
+
+        List<RuntimeException> errors = validateRequiredNonPrivateInputs(executable, dependencies);
+
+        // Validate that all the steps of a flow have navigations for all the reference's results
+        errors.addAll(validateAllDependenciesResultsHaveMatchingNavigations(executable, dependencies));
+
+        return errors;
+    }
+
+    private List<RuntimeException> validateRequiredNonPrivateInputs(
             Executable executable,
             Map<String, Executable> filteredDependencies) {
         Map<String, Executable> dependencies = new HashMap<>(filteredDependencies);
         dependencies.put(executable.getId(), executable);
         Set<Executable> verifiedExecutables = new HashSet<>();
-        validateRequiredNonPrivateInputs(executable, dependencies, verifiedExecutables);
+        return validateRequiredNonPrivateInputs(executable, dependencies, verifiedExecutables, new ArrayList<RuntimeException>());
     }
 
-    private void validateRequiredNonPrivateInputs(
+    private List<RuntimeException> validateRequiredNonPrivateInputs(
             Executable executable,
             Map<String, Executable> dependencies,
-            Set<Executable> verifiedExecutables) {
+            Set<Executable> verifiedExecutables,
+            List<RuntimeException> errors) {
         //validate that all required & non private parameters with no default value of a reference are provided
         if(!SlangTextualKeys.FLOW_TYPE.equals(executable.getType()) || verifiedExecutables.contains(executable)){
-            return;
+            return errors;
         }
         verifiedExecutables.add(executable);
 
@@ -119,14 +139,19 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             List<String> stepInputNames = getStepInputNames(step);
             List<String> inputsNotWired = getInputsNotWired(mandatoryInputNames, stepInputNames);
 
-            validateInputNamesEmpty(inputsNotWired, flow, step, reference);
+            try {
+                validateInputNamesEmpty(inputsNotWired, flow, step, reference);
+            } catch (RuntimeException e) {
+                errors.add(e);
+            }
 
             flowReferences.add(reference);
         }
 
         for (Executable reference : flowReferences) {
-            validateRequiredNonPrivateInputs(reference, dependencies, verifiedExecutables);
+            validateRequiredNonPrivateInputs(reference, dependencies, verifiedExecutables, errors);
         }
+        return errors;
     }
 
     private List<String> getMandatoryInputNames(Executable executable) {
@@ -188,9 +213,10 @@ public class ScoreCompilerImpl implements ScoreCompiler{
      * @param executable the flow to validate
      * @param filteredDependencies a map holding for each reference name, its {@link io.cloudslang.lang.compiler.modeller.model.Executable} object
      */
-    private void validateAllDependenciesResultsHaveMatchingNavigations(Executable executable, Map<String, Executable> filteredDependencies) {
+    private List<RuntimeException> validateAllDependenciesResultsHaveMatchingNavigations(Executable executable, Map<String, Executable> filteredDependencies) {
+        List<RuntimeException> errors = new ArrayList<>();
         if(executable.getType().equals(SlangTextualKeys.OPERATION_TYPE)){
-            return;
+            return errors;
         }
         Flow flow = (Flow)executable;
         Deque<Step> steps = flow.getWorkflow().getSteps();
@@ -198,16 +224,21 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             List<Map<String, String>> stepNavigations = step.getNavigationStrings();
             String refId = step.getRefId();
             Executable reference = filteredDependencies.get(refId);
-            Validate.notNull(reference, "Cannot compile flow: \'" + executable.getName() + "\' since for step: \'" + step.getName()
-                    + "\', the dependency: \'" + refId + "\' is missing.");
+            if (reference == null) {
+                errors.add(new IllegalArgumentException("Cannot compile flow: \'" + executable.getName() + "\' since for step: \'" + step.getName()
+                        + "\', the dependency: \'" + refId + "\' is missing."));
+            }
             List<Result> refResults = reference.getResults();
             for(Result result : refResults){
                 String resultName = result.getName();
-                Validate.isTrue(navigationListContainsKey(stepNavigations, resultName), "Cannot compile flow: \'" + executable.getName() +
-                        "\' since for step: '" + step.getName() + "\', the result \'" + resultName+
-                        "\' of its dependency: \'"+ refId + "\' has no matching navigation");
+                if (!navigationListContainsKey(stepNavigations, resultName)){
+                    errors.add(new IllegalArgumentException("Cannot compile flow: \'" + executable.getName() +
+                            "\' since for step: '" + step.getName() + "\', the result \'" + resultName+
+                            "\' of its dependency: \'"+ refId + "\' has no matching navigation"));
+                }
             }
         }
+        return errors;
     }
 
     private boolean navigationListContainsKey(List<Map<String, String>> stepNavigations, String resultName) {
