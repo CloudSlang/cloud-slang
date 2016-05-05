@@ -23,9 +23,9 @@ import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.runtime.api.java.JavaRuntimeService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
-import io.cloudslang.runtime.impl.java.JavaCachedStaticsSharedExecutionEngine;
+import io.cloudslang.runtime.impl.java.JavaExecutionCachedEngine;
 import io.cloudslang.runtime.impl.java.JavaRuntimeServiceImpl;
-import io.cloudslang.runtime.impl.python.PythonCachedStaticsSharedExecutionEngine;
+import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
@@ -712,7 +712,7 @@ public class ActionStepsTest {
 
         @Bean
         public PythonExecutionEngine pythonExecutionEngine(){
-            return new PythonCachedStaticsSharedExecutionEngine();
+            return new PythonExecutionCachedEngine();
         }
 
         @Bean
@@ -726,8 +726,8 @@ public class ActionStepsTest {
         }
 
         @Bean
-        public JavaCachedStaticsSharedExecutionEngine javaExecutorProvider() {
-            return new JavaCachedStaticsSharedExecutionEngine();
+        public JavaExecutionCachedEngine javaExecutionEngine() {
+            return new JavaExecutionCachedEngine();
         }
 
         @Bean

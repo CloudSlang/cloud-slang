@@ -18,7 +18,7 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
-import io.cloudslang.runtime.impl.python.PythonCachedStaticsSharedExecutionEngine;
+import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import junit.framework.Assert;
@@ -225,7 +225,7 @@ public class OutputsBindingTest {
 
         @Bean
         public PythonExecutionEngine pythonExecutionEngine(){
-            return new PythonCachedStaticsSharedExecutionEngine();
+            return new PythonExecutionCachedEngine();
         }
     }
 }

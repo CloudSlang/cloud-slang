@@ -7,7 +7,7 @@ import io.cloudslang.dependency.impl.services.MavenConfigImpl;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
-import io.cloudslang.runtime.impl.python.PythonCachedStaticsSharedExecutionEngine;
+import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutor;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
@@ -139,7 +139,7 @@ public class ScriptEvaluatorTest {
 
         @Bean
         public PythonExecutionEngine pythonExecutionEngine(){
-            return new PythonCachedStaticsSharedExecutionEngine() {
+            return new PythonExecutionCachedEngine() {
                 protected PythonExecutor createNewExecutor(Set<String> filePaths) {
                     return new PythonExecutor(filePaths) {
                         protected PythonInterpreter initInterpreter(Set<String> dependencies) {

@@ -26,7 +26,7 @@ import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.*;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
-import io.cloudslang.runtime.impl.python.PythonCachedStaticsSharedExecutionEngine;
+import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.score.events.ScoreEvent;
@@ -506,7 +506,7 @@ public class StepExecutionDataTest {
 
         @Bean
         public PythonExecutionEngine pythonExecutionEngine(){
-            return new PythonCachedStaticsSharedExecutionEngine();
+            return new PythonExecutionCachedEngine();
         }
 
         @Bean
