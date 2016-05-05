@@ -26,7 +26,7 @@ public class SlangSourceTest {
 
     private void assertSourceEquals(SlangSource source) {
         Assert.assertEquals(sourceString, source.getSource());
-        Assert.assertEquals(sourceName, source.getName());
+        Assert.assertEquals(sourceName, source.getFileName());
     }
 
     @Test
@@ -44,7 +44,7 @@ public class SlangSourceTest {
 
         SlangSource source = SlangSource.fromFile(file);
         Assert.assertEquals(sourceString, source.getSource());
-        Assert.assertEquals(sourceName + "." + Extension.YAML.getValue(), source.getName());
+        Assert.assertEquals(sourceName + "." + Extension.YAML.getValue(), source.getFileName());
     }
 
     @Test
@@ -54,7 +54,7 @@ public class SlangSourceTest {
 
         SlangSource source = SlangSource.fromFile(file);
         Assert.assertEquals(sourceString, source.getSource());
-        Assert.assertEquals(sourceName + "." + Extension.YAML.getValue(), source.getName());
+        Assert.assertEquals(sourceName + "." + Extension.YAML.getValue(), source.getFileName());
     }
 
     @Test
@@ -64,7 +64,7 @@ public class SlangSourceTest {
 
         SlangSource source = SlangSource.fromFile(file);
         Assert.assertEquals(sourceString, source.getSource());
-        Assert.assertEquals(sourceName + "." + Extension.YML.getValue(), source.getName());
+        Assert.assertEquals(sourceName + "." + Extension.YML.getValue(), source.getFileName());
     }
 
     @Test
@@ -74,7 +74,7 @@ public class SlangSourceTest {
 
         SlangSource source = SlangSource.fromFile(file);
         Assert.assertEquals(sourceString, source.getSource());
-        Assert.assertEquals(sourceName + "." + Extension.YML.getValue(), source.getName());
+        Assert.assertEquals(sourceName + "." + Extension.YML.getValue(), source.getFileName());
     }
 
     @Test
@@ -84,7 +84,7 @@ public class SlangSourceTest {
 
         SlangSource source = SlangSource.fromFile(file);
         Assert.assertEquals(sourceString, source.getSource());
-        Assert.assertEquals(sourceName + "." + Extension.YML.getValue(), source.getName());
+        Assert.assertEquals(sourceName + "." + Extension.YML.getValue(), source.getFileName());
     }
 
     @Test
@@ -94,7 +94,7 @@ public class SlangSourceTest {
 
         SlangSource source = SlangSource.fromFile(file);
         Assert.assertEquals(sourceString, source.getSource());
-        Assert.assertEquals(sourceName + "." + Extension.SL.getValue(), source.getName());
+        Assert.assertEquals(sourceName + "." + Extension.SL.getValue(), source.getFileName());
     }
 
     @Test
@@ -104,7 +104,7 @@ public class SlangSourceTest {
 
         SlangSource source = SlangSource.fromFile(file);
         Assert.assertEquals(sourceString, source.getSource());
-        Assert.assertEquals(sourceName + "." + Extension.PROP_SL.getValue(), source.getName());
+        Assert.assertEquals(sourceName + "." + Extension.PROP_SL.getValue(), source.getFileName());
     }
 
     @Test
@@ -211,7 +211,7 @@ public class SlangSourceTest {
                 sourceName + "." + Extension.SL.getValue()
         );
         Assert.assertEquals(sourceString, source.getSource());
-        Assert.assertEquals(sourceName, source.getName());
+        Assert.assertEquals(sourceName, source.getFileName());
     }
 
 }

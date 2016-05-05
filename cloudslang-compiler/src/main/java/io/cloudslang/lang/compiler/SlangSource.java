@@ -25,14 +25,14 @@ import java.nio.charset.Charset;
 public class SlangSource {
 
     private final String source;
-    private final String name;
+    private final String fileName;
     private final Extension fileExtension;
 
     public SlangSource(String source, String fileName) {
         Validate.notNull(source, "Source cannot be null");
 
         this.source = source;
-        this.name = Extension.removeExtension(fileName);
+        this.fileName = Extension.removeExtension(fileName);
         this.fileExtension = Extension.findExtension(fileName);
     }
 
@@ -75,8 +75,8 @@ public class SlangSource {
         return source;
     }
 
-    public String getName() {
-        return name;
+    public String getFileName() {
+        return fileName;
     }
 
     public Extension getFileExtension() {
@@ -87,7 +87,7 @@ public class SlangSource {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("source", source)
-                .append("name", name)
+                .append("fileName", fileName)
                 .toString();
     }
 
@@ -100,7 +100,7 @@ public class SlangSource {
 
         return new EqualsBuilder()
                 .append(source, that.source)
-                .append(name, that.name)
+                .append(fileName, that.fileName)
                 .isEquals();
     }
 
@@ -108,7 +108,7 @@ public class SlangSource {
     public int hashCode() {
         return new HashCodeBuilder()
                 .append(source)
-                .append(name)
+                .append(fileName)
                 .toHashCode();
     }
 }

@@ -139,6 +139,18 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
+    public void testOperationWithWrongNameWrongExtension() throws Exception {
+        URI resource = getClass().getResource("/corrupted/wrong_name_operation.wrong").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("it should be declared in a file named \"test_op\" " +
+                "plus a valid extension(sl, sl.yaml, sl.yml, prop.sl, yaml, yml)");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
     public void testFlowWithInputsAsString() throws Exception {
         URI resource = getClass().getResource("/corrupted/inputs_type_string_flow.sl").toURI();
 

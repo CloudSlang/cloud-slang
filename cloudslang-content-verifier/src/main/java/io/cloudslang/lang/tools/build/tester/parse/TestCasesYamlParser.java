@@ -53,15 +53,15 @@ public class TestCasesYamlParser {
     public Map<String, SlangTestCase> parseTestCases(SlangSource source) {
 
         if(StringUtils.isEmpty(source.getSource())){
-            log.info("No tests cases were found in: " + source.getName());
+            log.info("No tests cases were found in: " + source.getFileName());
             return new HashMap<>();
         }
-        Validate.notEmpty(source.getSource(), "Source " + source.getName() + " cannot be empty");
+        Validate.notEmpty(source.getSource(), "Source " + source.getFileName() + " cannot be empty");
 
         try {
             @SuppressWarnings("unchecked") Map<String, Map> parsedTestCases = yaml.loadAs(source.getSource(), Map.class);
             if (MapUtils.isEmpty(parsedTestCases)){
-                log.info("No tests cases were found in: " + source.getName());
+                log.info("No tests cases were found in: " + source.getFileName());
                 return new HashMap<>();
             }
             return convertMap(parsedTestCases, new Converter<Map, SlangTestCase>() {
@@ -71,7 +71,7 @@ public class TestCasesYamlParser {
                 }
             });
         } catch (Throwable e) {
-            throw new RuntimeException("There was a problem parsing the YAML source: " + source.getName() + ".\n" + e.getMessage(), e);
+            throw new RuntimeException("There was a problem parsing the YAML source: " + source.getFileName() + ".\n" + e.getMessage(), e);
         }
     }
 
