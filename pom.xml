@@ -217,7 +217,6 @@
                 <groupId>io.cloudslang</groupId>
                 <artifactId>runtime-management-impl</artifactId>
                 <version>${score.version}</version>
-                <scope>test</scope>
             </dependency>
 
             <dependency>
@@ -230,7 +229,6 @@
                 <groupId>io.cloudslang</groupId>
                 <artifactId>dependency-management-impl</artifactId>
                 <version>${score.version}</version>
-                <scope>test</scope>
             </dependency>
 
             <dependency>
