@@ -73,7 +73,6 @@
         <dependency>
             <groupId>${score.group}</groupId>
             <artifactId>dependency-management-impl</artifactId>
-            <scope>test</scope>
         </dependency>
 
         <!-- For tests -->
