@@ -99,6 +99,11 @@
             <artifactId>score-vmware</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>io.cloudslang.content</groupId>
+            <artifactId>score-xml</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
     </dependencies>
 
