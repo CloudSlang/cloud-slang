@@ -80,24 +80,23 @@ public class ResultsBinding {
         // In the case of operation, we resolve the result by searching for the first result with a true expression
         // An empty expression passes as true
         for(Result result : possibleResults){
-            Value rawValue = result.getValue();
-            Serializable rawValueContent = rawValue == null ? null : rawValue.get();
+            Serializable rawValue = result.getValue() == null ? null : result.getValue().get();
             String resultName = result.getName();
 
             // If the answer has no expression, we treat it as a true expression, and choose it
-            if(rawValueContent == null) {
+            if(rawValue == null) {
                 return resultName;
             }
 
-            if(Boolean.TRUE.equals(rawValueContent)) {
+            if(Boolean.TRUE.equals(rawValue)) {
                 return resultName;
             }
-            if (Boolean.FALSE.equals(rawValueContent)) {
+            if (Boolean.FALSE.equals(rawValue)) {
                 continue;
             }
 
-            if (rawValueContent instanceof String) {
-                String expression = ExpressionUtils.extractExpression(rawValueContent);
+            if (rawValue instanceof String) {
+                String expression = ExpressionUtils.extractExpression(rawValue);
                 if (expression == null) {
                     throw new RuntimeException(
                             "Error resolving the result. The expression: '" + rawValue + "' is not valid." +

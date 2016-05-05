@@ -67,7 +67,7 @@ public class ActionExecutionData extends AbstractExecutionData {
         Map<String, Value> callArgumentsDeepCopy = new HashMap<>();
 
         for (Map.Entry<String, Value> entry : callArguments.entrySet()) {
-            callArgumentsDeepCopy.put(entry.getKey(), ValueFactory.create(entry.getValue() == null ? null : entry.getValue().get()));
+            callArgumentsDeepCopy.put(entry.getKey(), ValueFactory.create(entry.getValue()));
         }
 
         Map<String, SerializableSessionObject> serializableSessionData = runEnv.getSerializableDataMap();

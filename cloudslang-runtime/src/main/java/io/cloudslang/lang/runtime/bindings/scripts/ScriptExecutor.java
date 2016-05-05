@@ -12,6 +12,7 @@
 package io.cloudslang.lang.runtime.bindings.scripts;
 
 import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,7 +44,7 @@ public class ScriptExecutor extends AbstractScriptInterpreter {
 
     private void prepareInterpreterContext(Map<String, Value> context) {
         for (Map.Entry<String, Value> entry : context.entrySet()) {
-            interpreter.set(entry.getKey(), entry.getValue() == null ? null : entry.getValue().get());
+            interpreter.set(entry.getKey(), ValueFactory.createPyObjectValue(entry.getValue()));
         }
     }
 
