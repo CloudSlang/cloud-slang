@@ -40,7 +40,6 @@
         <dependency>
             <groupId>${score.group}</groupId>
             <artifactId>runtime-management-impl</artifactId>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -51,7 +50,6 @@
         <dependency>
             <groupId>${score.group}</groupId>
             <artifactId>dependency-management-impl</artifactId>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
