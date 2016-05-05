@@ -3,6 +3,8 @@ package io.cloudslang.lang.runtime.bindings;
 import io.cloudslang.lang.entities.ListForLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ForLoopCondition;
@@ -49,20 +51,20 @@ public class LoopsBindingTest {
         Context context = mock(Context.class);
         when(scriptEvaluator.evalExpr(
                         anyString(),
-                        anyMapOf(String.class, Serializable.class),
+                        anyMapOf(String.class, Value.class),
                         anySetOf(SystemProperty.class))
-        ).thenReturn(Lists.newArrayList(1));
-        when(context.getImmutableViewOfLanguageVariables()).thenReturn(Collections.<String, Serializable>emptyMap());
+        ).thenReturn(ValueFactory.create(Lists.newArrayList(ValueFactory.create(1))));
+        when(context.getImmutableViewOfLanguageVariables()).thenReturn(Collections.<String, Value>emptyMap());
         loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, EMPTY_SET, "node");
-        verify(context).putLanguageVariable(eq(LoopCondition.LOOP_CONDITION_KEY), isA(ForLoopCondition.class));
+        verify(context).putLanguageVariable(eq(LoopCondition.LOOP_CONDITION_KEY), ValueFactory.create(isA(ForLoopCondition.class)));
     }
 
     @Test
     public void whenExpressionIsEmptyThrowsException() throws Exception {
         Context context = mock(Context.class);
-        when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Serializable.class), eq(EMPTY_SET)))
-                .thenReturn(Lists.newArrayList());
-        Map<String, Serializable> langVars = Collections.emptyMap();
+        when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Value.class), eq(EMPTY_SET)))
+                .thenReturn(ValueFactory.create(Lists.newArrayList()));
+        Map<String, Value> langVars = Collections.emptyMap();
         when(context.getImmutableViewOfLanguageVariables()).thenReturn(langVars);
 
         exception.expectMessage("expression is empty");
@@ -88,15 +90,15 @@ public class LoopsBindingTest {
     @Test
     public void whenValueIsThereItWillBeReturned() throws Exception {
         Context context = mock(Context.class);
-        when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Serializable.class), eq(EMPTY_SET)))
-                .thenReturn(new ArrayList<>());
-        Map<String, Serializable> langVars = new HashMap<>();
+        when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Value.class), eq(EMPTY_SET)))
+                .thenReturn(ValueFactory.create(new ArrayList<>()));
+        Map<String, Value> langVars = new HashMap<>();
         ForLoopCondition forLoopCondition = mock(ForLoopCondition.class);
-        langVars.put(LoopCondition.LOOP_CONDITION_KEY, forLoopCondition);
+        langVars.put(LoopCondition.LOOP_CONDITION_KEY, ValueFactory.create(forLoopCondition));
         when(context.getImmutableViewOfLanguageVariables()).thenReturn(Collections.unmodifiableMap(langVars));
         loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, EMPTY_SET, "node");
         Assert.assertEquals(true, context.getImmutableViewOfLanguageVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
-        Assert.assertEquals(forLoopCondition, context.getImmutableViewOfLanguageVariables().get(LoopCondition.LOOP_CONDITION_KEY));
+        Assert.assertEquals(forLoopCondition, context.getImmutableViewOfLanguageVariables().get(LoopCondition.LOOP_CONDITION_KEY).get());
     }
 
     @Test
@@ -104,25 +106,25 @@ public class LoopsBindingTest {
         Serializable nextValue = "1";
         Context context = mock(Context.class);
         ForLoopCondition forLoopCondition = mock(ForLoopCondition.class);
-        when(forLoopCondition.next()).thenReturn(nextValue);
+        when(forLoopCondition.next()).thenReturn(ValueFactory.create(nextValue));
 
         loopsBinding.incrementListForLoop("varName", context, forLoopCondition);
 
         verify(forLoopCondition).next();
-        verify(context).putVariable("varName", nextValue);
+        verify(context).putVariable("varName", ValueFactory.create(nextValue));
     }
 
     @Test
     public void testIncrementMapForLoop() throws Exception {
         Context context = mock(Context.class);
         ForLoopCondition forLoopCondition = mock(ForLoopCondition.class);
-        when(forLoopCondition.next()).thenReturn(Pair.of("john", 1));
+        when(forLoopCondition.next()).thenReturn(ValueFactory.create(Pair.of(ValueFactory.create("john"), ValueFactory.create(1))));
 
         loopsBinding.incrementMapForLoop("k", "v", context, forLoopCondition);
 
         verify(forLoopCondition).next();
-        verify(context).putVariable("k", "john");
-        verify(context).putVariable("v", 1);
+        verify(context).putVariable("k", ValueFactory.create("john"));
+        verify(context).putVariable("v", ValueFactory.create(1));
     }
 
 }

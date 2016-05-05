@@ -13,14 +13,16 @@ package io.cloudslang.lang.runtime.steps;
 import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptExecutor;
-import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.env.ReturnValues;
+import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import org.junit.Assert;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -71,9 +73,9 @@ public class ActionStepsTest {
     public void doActionJavaTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
-        Map<String, Serializable> initialCallArguments = new HashMap<>();
-        initialCallArguments.put("name", "nameTest");
-        initialCallArguments.put("role", "roleTest");
+        Map<String, Value> initialCallArguments = new HashMap<>();
+        initialCallArguments.put("name", ValueFactory.create("nameTest"));
+        initialCallArguments.put("role", ValueFactory.create("roleTest"));
         runEnv.putCallArguments(initialCallArguments);
 
         Map<String, Object> nonSerializableExecutionData = new HashMap<>();
@@ -82,13 +84,13 @@ public class ActionStepsTest {
 		actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(), "doJavaSampleAction", executionRuntimeServicesMock, null, 2L);
 
         //construct expected outputs
-        Map<String, String> expectedOutputs = new HashMap<>();
-        expectedOutputs.put("name", "nameTest");
-        expectedOutputs.put("role", "roleTest");
+        Map<String, Value> expectedOutputs = new HashMap<>();
+        expectedOutputs.put("name", ValueFactory.create("nameTest"));
+        expectedOutputs.put("role", ValueFactory.create("roleTest"));
 
         //extract actual outputs
         ReturnValues actualReturnValues = runEnv.removeReturnValues();
-        Map<String, Serializable> actualOutputs = actualReturnValues.getOutputs();
+        Map<String, Value> actualOutputs = actualReturnValues.getOutputs();
 
         //verify matching
         Assert.assertEquals("Java action outputs are not as expected", expectedOutputs, actualOutputs);
@@ -98,9 +100,9 @@ public class ActionStepsTest {
     public void doActionSetNextPositionTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
-        Map<String, Serializable> initialCallArguments = new HashMap<>();
-        initialCallArguments.put("name", "nameTest");
-        initialCallArguments.put("role", "roleTest");
+        Map<String, Value> initialCallArguments = new HashMap<>();
+        initialCallArguments.put("name", ValueFactory.create("nameTest"));
+        initialCallArguments.put("role", ValueFactory.create("roleTest"));
         runEnv.putCallArguments(initialCallArguments);
 
         Long nextStepPosition = 2L;
@@ -143,8 +145,8 @@ public class ActionStepsTest {
         RunEnvironment runEnv = new RunEnvironment();
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
 
-        Map<String, Serializable> callArguments = new HashMap<>();
-        callArguments.put("index", 1);
+        Map<String, Value> callArguments = new HashMap<>();
+        callArguments.put("index", ValueFactory.create(1));
         runEnv.putCallArguments(callArguments);
 
         String userPythonScript = "var= \"hello\"";
@@ -165,7 +167,7 @@ public class ActionStepsTest {
 
         Assert.assertNotNull(eventActionStart);
         LanguageEventData data = (LanguageEventData)eventActionStart.getData();
-        Map<String, Serializable> actualCallArguments = data.getCallArguments();
+        Map<String, Value> actualCallArguments = data.getCallArguments();
         Assert.assertEquals("Python action call arguments are not as expected", callArguments, actualCallArguments);
     }
 
@@ -175,8 +177,8 @@ public class ActionStepsTest {
         RunEnvironment runEnv = new RunEnvironment();
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
 
-        Map<String, Serializable> callArguments = new HashMap<>();
-        callArguments.put("index", 1);
+        Map<String, Value> callArguments = new HashMap<>();
+        callArguments.put("index", ValueFactory.create(1));
         runEnv.putCallArguments(callArguments);
 
         //invoke doAction
@@ -195,7 +197,7 @@ public class ActionStepsTest {
 
         Assert.assertNotNull(eventActionStart);
         LanguageEventData data = (LanguageEventData)eventActionStart.getData();
-        Map<String, Serializable> actualCallArguments = data.getCallArguments();
+        Map<String, Value> actualCallArguments = data.getCallArguments();
         Assert.assertEquals("Java action call arguments are not as expected", callArguments, actualCallArguments);
     }
 
@@ -285,8 +287,8 @@ public class ActionStepsTest {
     public void doActionJavaMissingInputTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
-        Map<String, Serializable> initialCallArguments = new HashMap<>();
-        initialCallArguments.put("name", "nameTest");
+        Map<String, Value> initialCallArguments = new HashMap<>();
+        initialCallArguments.put("name", ValueFactory.create("nameTest"));
         // missing role
         runEnv.putCallArguments(initialCallArguments);
 
@@ -296,13 +298,13 @@ public class ActionStepsTest {
         actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(), "doJavaSampleAction", executionRuntimeServicesMock, null, 2L);
 
         //construct expected outputs
-        Map<String, String> expectedOutputs = new HashMap<>();
-        expectedOutputs.put("name", "nameTest");
-        expectedOutputs.put("role", null);
+        Map<String, Value> expectedOutputs = new HashMap<>();
+        expectedOutputs.put("name", ValueFactory.create("nameTest"));
+        expectedOutputs.put("role", ValueFactory.create((Serializable)null));
 
         //extract actual outputs
         ReturnValues actualReturnValues = runEnv.removeReturnValues();
-        Map<String, Serializable> actualOutputs = actualReturnValues.getOutputs();
+        Map<String, Value> actualOutputs = actualReturnValues.getOutputs();
 
         //verify matching
         Assert.assertEquals("Java action outputs are not as expected", expectedOutputs, actualOutputs);
@@ -312,8 +314,8 @@ public class ActionStepsTest {
     public void doJavaActionParameterTypeMismatch() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
-        Map<String, Serializable> initialCallArguments = new HashMap<>();
-        initialCallArguments.put("port", 5); //should be string
+        Map<String, Value> initialCallArguments = new HashMap<>();
+        initialCallArguments.put("port", ValueFactory.create(5)); //should be string
         runEnv.putCallArguments(initialCallArguments);
 
         Map<String, Object> nonSerializableExecutionData = new HashMap<>();
@@ -326,8 +328,8 @@ public class ActionStepsTest {
     public void doJavaActionParameterAndReturnTypeInteger() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
-        Map<String, Serializable> initialCallArguments = new HashMap<>();
-        initialCallArguments.put("port", 5);
+        Map<String, Value> initialCallArguments = new HashMap<>();
+        initialCallArguments.put("port", ValueFactory.create(5));
         runEnv.putCallArguments(initialCallArguments);
 
         Map<String, Object> nonSerializableExecutionData = new HashMap<>();
@@ -335,17 +337,16 @@ public class ActionStepsTest {
         //invoke doAction
         actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(), "doJavaNumbersAction", executionRuntimeServicesMock, null, 2L);
         ReturnValues returnValues = runEnv.removeReturnValues();
-        Assert.assertEquals(5, returnValues.getOutputs()
-                .get("port"));
+        Assert.assertEquals(5, returnValues.getOutputs() .get("port").get());
     }
 
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void doActionJavaMissingActionTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
-        Map<String, Serializable> initialCallArguments = new HashMap<>();
-        initialCallArguments.put("name", "nameTest");
-        initialCallArguments.put("role", "roleTest");
+        Map<String, Value> initialCallArguments = new HashMap<>();
+        initialCallArguments.put("name", ValueFactory.create("nameTest"));
+        initialCallArguments.put("role", ValueFactory.create("roleTest"));
         runEnv.putCallArguments(initialCallArguments);
 
         Map<String, Object> nonSerializableExecutionData = new HashMap<>();
@@ -354,11 +355,11 @@ public class ActionStepsTest {
         actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(), "doJavaSampleAction_NOT_FOUND", executionRuntimeServicesMock, null, 2L);
 
         //construct expected outputs
-        Map<String, String> expectedOutputs = new HashMap<>();
+        Map<String, Value> expectedOutputs = new HashMap<>();
 
         //extract actual outputs
         ReturnValues actualReturnValues = runEnv.removeReturnValues();
-        Map<String, Serializable> actualOutputs = actualReturnValues.getOutputs();
+        Map<String, Value> actualOutputs = actualReturnValues.getOutputs();
 
         //verify matching
         Assert.assertEquals("Java action output should be empty map", expectedOutputs, actualOutputs);
@@ -368,9 +369,9 @@ public class ActionStepsTest {
     public void doActionJavaMissingActionAnnotationTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
-        Map<String, Serializable> initialCallArguments = new HashMap<>();
-        initialCallArguments.put("name", "nameTest");
-        initialCallArguments.put("role", "roleTest");
+        Map<String, Value> initialCallArguments = new HashMap<>();
+        initialCallArguments.put("name", ValueFactory.create("nameTest"));
+        initialCallArguments.put("role", ValueFactory.create("roleTest"));
         runEnv.putCallArguments(initialCallArguments);
 
         Map<String, Object> nonSerializableExecutionData = new HashMap<>();
@@ -379,11 +380,11 @@ public class ActionStepsTest {
         actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(), "doJavaActionMissingAnnotation", executionRuntimeServicesMock, null, 2L);
 
         //construct expected outputs
-        Map<String, String> expectedOutputs = new HashMap<>();
+        Map<String, Value> expectedOutputs = new HashMap<>();
 
         //extract actual outputs
         ReturnValues actualReturnValues = runEnv.removeReturnValues();
-        Map<String, Serializable> actualOutputs = actualReturnValues.getOutputs();
+        Map<String, Value> actualOutputs = actualReturnValues.getOutputs();
 
         //verify matching
         Assert.assertEquals("Java action output should be empty map", expectedOutputs, actualOutputs);
@@ -403,9 +404,9 @@ public class ActionStepsTest {
         actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(),
                 "getNameFromNonSerializableSession", executionRuntimeServicesMock, null, 2L);
 
-        Map<String, Serializable> outputs = runEnv.removeReturnValues().getOutputs();
+        Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
         Assert.assertTrue(outputs.containsKey("name"));
-        Assert.assertEquals("John", outputs.get("name"));
+        Assert.assertEquals("John", outputs.get("name").get());
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -417,8 +418,8 @@ public class ActionStepsTest {
         ContentTestActions.NonSerializableObject employee = new ContentTestActions.NonSerializableObject("John");
         sessionObject.setResource(new ContentTestActions.NonSerializableSessionResource(employee));
         nonSerializableExecutionData.put("name", sessionObject);
-        Map<String, Serializable> initialCallArguments = new HashMap<>();
-        initialCallArguments.put("value", "David");
+        Map<String, Value> initialCallArguments = new HashMap<>();
+        initialCallArguments.put("value", ValueFactory.create("David"));
         runEnv.putCallArguments(initialCallArguments);
 
         //invoke doAction
@@ -445,7 +446,7 @@ public class ActionStepsTest {
         actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, ContentTestActions.class.getName(),
                 "getNameFromNonSerializableSession", executionRuntimeServicesMock, null, 2L);
 
-        Map<String, Serializable> outputs = runEnv.removeReturnValues().getOutputs();
+        Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
         Assert.assertTrue(outputs.containsKey("name"));
         Assert.assertNull(outputs.get("name"));
     }
@@ -454,7 +455,7 @@ public class ActionStepsTest {
     public void doJavaActionGetKeyFromSerializableSessionTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
-        Map<String, Serializable> initialCallArguments = new HashMap<>();
+        Map<String, Value> initialCallArguments = new HashMap<>();
         HashMap<String, SerializableSessionObject> serializableExecutionData = new HashMap<>();
         SerializableSessionObject sessionObject = new SerializableSessionObject();
         sessionObject.setName("John");
@@ -466,25 +467,25 @@ public class ActionStepsTest {
         actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, ContentTestActions.class.getName(),
                 "getNameFromSerializableSession", executionRuntimeServicesMock, null, 2L);
 
-        Map<String, Serializable> outputs = runEnv.removeReturnValues().getOutputs();
+        Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
         Assert.assertTrue(outputs.containsKey("name"));
-        Assert.assertEquals("John", outputs.get("name"));
+        Assert.assertEquals("John", outputs.get("name").get());
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void doJavaActionGetNonExistingKeyFromSerializableSessionTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
-        Map<String, Serializable> initialCallArguments = new HashMap<>();
+        Map<String, Value> initialCallArguments = new HashMap<>();
         HashMap<String, Object> serializableExecutionData = new HashMap<>();
-        initialCallArguments.put(ExecutionParametersConsts.SERIALIZABLE_SESSION_CONTEXT, serializableExecutionData);
+        initialCallArguments.put(ExecutionParametersConsts.SERIALIZABLE_SESSION_CONTEXT, ValueFactory.create(serializableExecutionData));
         runEnv.putCallArguments(initialCallArguments);
 
         //invoke doAction
         actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, ContentTestActions.class.getName(),
                 "getNameFromSerializableSession", executionRuntimeServicesMock, null, 2L);
 
-        Map<String, Serializable> outputs = runEnv.removeReturnValues().getOutputs();
+        Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
         Assert.assertTrue(outputs.containsKey("name"));
         Assert.assertNull(outputs.get("name"));
     }
@@ -493,7 +494,7 @@ public class ActionStepsTest {
     public void doJavaActionGetNonExistingKeyFromNonExistingSerializableSessionTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
-        Map<String, Serializable> initialCallArguments = new HashMap<>();
+        Map<String, Value> initialCallArguments = new HashMap<>();
         runEnv.putCallArguments(initialCallArguments);
 
         //invoke doAction
@@ -508,9 +509,9 @@ public class ActionStepsTest {
     public void doActionPythonTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
-        Map<String, Serializable> initialCallArguments = new HashMap<>();
-        initialCallArguments.put("host", "localhost");
-        initialCallArguments.put("port", "8080");
+        Map<String, Value> initialCallArguments = new HashMap<>();
+        initialCallArguments.put("host", ValueFactory.create("localhost"));
+        initialCallArguments.put("port", ValueFactory.create("8080"));
         runEnv.putCallArguments(initialCallArguments);
 
         Map<String, Object> nonSerializableExecutionData = new HashMap<>();
@@ -531,17 +532,17 @@ public class ActionStepsTest {
         actionSteps.doAction(runEnv, nonSerializableExecutionData, PYTHON, "", "", executionRuntimeServicesMock, userPythonScript, 2L);
 
         //construct expected outputs
-        Map<String, Serializable> expectedOutputs = new HashMap<>();
-        expectedOutputs.put("host", "localhost");
-        expectedOutputs.put("port", 8081);
-        expectedOutputs.put("url", "http://localhost:8080");
-        expectedOutputs.put("url2", "http://localhost:8080/oo");
-        expectedOutputs.put("another", "just a string");
-        expectedOutputs.put("condition", true);
+        Map<String, Value> expectedOutputs = new HashMap<>();
+        expectedOutputs.put("host", ValueFactory.create("localhost"));
+        expectedOutputs.put("port", ValueFactory.create(8081));
+        expectedOutputs.put("url", ValueFactory.create("http://localhost:8080"));
+        expectedOutputs.put("url2", ValueFactory.create("http://localhost:8080/oo"));
+        expectedOutputs.put("another", ValueFactory.create("just a string"));
+        expectedOutputs.put("condition", ValueFactory.create(true));
 
         //extract actual outputs
         ReturnValues actualReturnValues = runEnv.removeReturnValues();
-        Map<String, Serializable> actualOutputs = actualReturnValues.getOutputs();
+        Map<String, Value> actualOutputs = actualReturnValues.getOutputs();
 
         //verify matching
         Assert.assertEquals("Python action outputs are not as expected", expectedOutputs, actualOutputs);
@@ -569,7 +570,7 @@ public class ActionStepsTest {
 
         //extract actual outputs
         ReturnValues actualReturnValues = runEnv.removeReturnValues();
-        Map<String, Serializable> actualOutputs = actualReturnValues.getOutputs();
+        Map<String, Value> actualOutputs = actualReturnValues.getOutputs();
 
         //verify matching
         Assert.assertEquals("Invalid types passed exclusion",
@@ -581,7 +582,7 @@ public class ActionStepsTest {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
         //missing inputs
-        Map<String, Serializable> initialCallArguments = new HashMap<>();
+        Map<String, Value> initialCallArguments = new HashMap<>();
         runEnv.putCallArguments(initialCallArguments);
 
         Map<String, Object> nonSerializableExecutionData = new HashMap<>();
@@ -622,8 +623,8 @@ public class ActionStepsTest {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
         //missing inputs
-        Map<String, Serializable> initialCallArguments = new HashMap<>();
-        initialCallArguments.put("port", 8080); //should be string
+        Map<String, Value> initialCallArguments = new HashMap<>();
+        initialCallArguments.put("port", ValueFactory.create(8080)); //should be string
         runEnv.putCallArguments(initialCallArguments);
 
         Map<String, Object> nonSerializableExecutionData = new HashMap<>();
@@ -639,9 +640,9 @@ public class ActionStepsTest {
     public void doActionPythonEmptyScript() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
-        Map<String, Serializable> initialCallArguments = new HashMap<>();
-        initialCallArguments.put("host", "localhost");
-        initialCallArguments.put("port", "8080");
+        Map<String, Value> initialCallArguments = new HashMap<>();
+        initialCallArguments.put("host", ValueFactory.create("localhost"));
+        initialCallArguments.put("port", ValueFactory.create("8080"));
         runEnv.putCallArguments(initialCallArguments);
 
         Map<String, Object> nonSerializableExecutionData = new HashMap<>();
@@ -654,9 +655,9 @@ public class ActionStepsTest {
     public void doActionPythonMissingScript() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
-        Map<String, Serializable> initialCallArguments = new HashMap<>();
-        initialCallArguments.put("host", "localhost");
-        initialCallArguments.put("port", "8080");
+        Map<String, Value> initialCallArguments = new HashMap<>();
+        initialCallArguments.put("host", ValueFactory.create("localhost"));
+        initialCallArguments.put("port", ValueFactory.create("8080"));
         runEnv.putCallArguments(initialCallArguments);
 
         Map<String, Object> nonSerializableExecutionData = new HashMap<>();
@@ -668,7 +669,7 @@ public class ActionStepsTest {
     @Test
     public void testPythonOutputSerializationErrorMessage() {
         RunEnvironment runEnv = new RunEnvironment();
-        runEnv.putCallArguments(new HashMap<String, Serializable>());
+        runEnv.putCallArguments(new HashMap<String, Value>());
         Map<String, Object> nonSerializableExecutionData = new HashMap<>();
         String userPythonScript =
                 "from datetime import datetime\n" +

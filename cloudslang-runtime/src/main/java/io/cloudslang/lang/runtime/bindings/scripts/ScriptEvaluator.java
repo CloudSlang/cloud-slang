@@ -12,6 +12,8 @@ package io.cloudslang.lang.runtime.bindings.scripts;
 
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.python.core.PyException;
 import org.python.util.PythonInterpreter;
@@ -19,8 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author stoneo
@@ -50,19 +54,13 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
     @Qualifier("evalInterpreter")
     private PythonInterpreter interpreter;
 
-    public Serializable evalExpr(
-            String expr,
-            Map<String, ? extends Serializable> context,
-            Set<SystemProperty> systemProperties){
+    public Value evalExpr(String expr, Map<String, ? extends Value> context, Set<SystemProperty> systemProperties){
         return evalExpr(expr, context, systemProperties, new HashSet<ScriptFunction>());
     }
 
     //we need this method to be synchronized so we will not have multiple scripts run in parallel on the same context
-    public synchronized Serializable evalExpr(
-            String expr,
-            Map<String, ? extends Serializable> context,
-            Set<SystemProperty> systemProperties,
-            Set<ScriptFunction> functionDependencies) {
+    public synchronized Value evalExpr(String expr, Map<String, ? extends Value> context,
+            Set<SystemProperty> systemProperties, Set<ScriptFunction> functionDependencies) {
         try {
             cleanInterpreter(interpreter);
             prepareInterpreterContext(context);
@@ -110,9 +108,9 @@ public class ScriptEvaluator extends AbstractScriptInterpreter {
         }
     }
 
-    private void prepareInterpreterContext(Map<String, ? extends Serializable> context) {
-        for (Map.Entry<String, ? extends Serializable> entry : context.entrySet()) {
-            interpreter.set(entry.getKey(), entry.getValue());
+    private void prepareInterpreterContext(Map<String, ? extends Value> context) {
+        for (Map.Entry<String, ? extends Value> entry : context.entrySet()) {
+            interpreter.set(entry.getKey(), ValueFactory.createPyObjectValue(entry.getValue()));
         }
         if (interpreter.get(TRUE) == null)
             interpreter.set(TRUE, Boolean.TRUE);

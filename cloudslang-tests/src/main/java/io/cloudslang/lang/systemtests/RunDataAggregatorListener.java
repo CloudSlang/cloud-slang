@@ -14,15 +14,20 @@ package io.cloudslang.lang.systemtests;
 
 import ch.lambdaj.group.Group;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static ch.lambdaj.Lambda.*;
+import static ch.lambdaj.Lambda.by;
+import static ch.lambdaj.Lambda.group;
+import static ch.lambdaj.Lambda.having;
+import static ch.lambdaj.Lambda.on;
+import static ch.lambdaj.Lambda.select;
+import static ch.lambdaj.Lambda.selectFirst;
 import static org.hamcrest.Matchers.equalTo;
 
 /*
@@ -61,14 +66,14 @@ public class RunDataAggregatorListener extends AbstractAggregatorListener {
         }
         String path = inputsEvent.getPath();
         String stepName = inputsEvent.getStepName();
-        Map<String, Serializable> inputs;
+        Map<String, Value> inputs;
         if (isStep) {
             inputs = inputsEvent.getArguments();
         } else {
             inputs = inputsEvent.getInputs();
         }
 
-        Map<String, Serializable> outputs = outputsEvent == null ? null : outputsEvent.getOutputs();
+        Map<String, Value> outputs = outputsEvent == null ? null : outputsEvent.getOutputs();
         String result = outputsEvent == null ? null : (String) outputsEvent.get(LanguageEventData.RESULT);
 
         String executableName = executableEvents.get(0).getStepName();

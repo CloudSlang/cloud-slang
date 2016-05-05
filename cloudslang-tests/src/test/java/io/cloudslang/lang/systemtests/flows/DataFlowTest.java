@@ -15,13 +15,14 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.SystemsTestsParent;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,9 +49,9 @@ public class DataFlowTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
 
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("myMessage", "hello world");
-        userInputs.put("tryToChangeMessage", "changed");
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("myMessage", ValueFactory.create("hello world"));
+        userInputs.put("tryToChangeMessage", ValueFactory.create("changed"));
 
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, SYSTEM_PROPERTIES).getSteps();
 
@@ -67,13 +68,13 @@ public class DataFlowTest extends SystemsTestsParent {
         Set<SlangSource> path = Sets.newHashSet(dep);
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("base_input", ">");
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("base_input", ValueFactory.create(">"));
 
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, SYSTEM_PROPERTIES).getSteps();
 
-        Map<String, Serializable> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
-        String final_output = (String) flowOutputs.get("final_output");
+        Map<String, Value> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
+        String final_output = (String) flowOutputs.get("final_output").get();
         Assert.assertEquals("some of the inputs or outputs were not bound correctly",
                 13, final_output.length());
         Assert.assertEquals("some of the inputs were not bound correctly",
@@ -93,13 +94,13 @@ public class DataFlowTest extends SystemsTestsParent {
         Set<SlangSource> path = Sets.newHashSet(dep);
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("base_input", 1);
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("base_input", ValueFactory.create(1));
 
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, SYSTEM_PROPERTIES).getSteps();
 
-        Map<String, Serializable> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
-        int final_output = (int) flowOutputs.get("final_output");
+        Map<String, Value> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
+        int final_output = (int) flowOutputs.get("final_output").get();
         Assert.assertEquals("some of the inputs or outputs were not bound correctly",
                 13, final_output);
     }
@@ -113,15 +114,15 @@ public class DataFlowTest extends SystemsTestsParent {
         Set<SlangSource> path = Sets.newHashSet(dep);
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("city_name", "New York");
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("city_name", ValueFactory.create("New York"));
 
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, SYSTEM_PROPERTIES).getSteps();
 
-        Map<String, Serializable> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
-        String weatherOutput = (String) flowOutputs.get("weather1");
-        String weather2Output = (String) flowOutputs.get("weather2");
-        String weather3Output = (String) flowOutputs.get("weather3");
+        Map<String, Value> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
+        String weatherOutput = (String) flowOutputs.get("weather1").get();
+        String weather2Output = (String) flowOutputs.get("weather2").get();
+        String weather3Output = (String) flowOutputs.get("weather3").get();
 
         Assert.assertEquals("weather1 not bound correctly", "New York", weatherOutput);
         Assert.assertEquals("weather2 not bound correctly", "New York", weather2Output);

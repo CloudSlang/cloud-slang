@@ -10,6 +10,8 @@
 package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
@@ -54,10 +56,10 @@ public class LoopsBinding {
         Validate.notNull(systemProperties, "system properties cannot be null");
         Validate.notNull(nodeName, "node name cannot be null");
 
-        Map<String, Serializable> langVariables = flowContext.getImmutableViewOfLanguageVariables();
+        Map<String, Value> langVariables = flowContext.getImmutableViewOfLanguageVariables();
         if (!langVariables.containsKey(LOOP_CONDITION_KEY)) {
             LoopCondition loopCondition = createForLoopCondition(forLoopStatement, flowContext, systemProperties, nodeName);
-            flowContext.putLanguageVariable(LOOP_CONDITION_KEY, loopCondition);
+            flowContext.putLanguageVariable(LOOP_CONDITION_KEY, ValueFactory.create(loopCondition));
         }
         return (LoopCondition) langVariables.get(LOOP_CONDITION_KEY);
     }
@@ -67,7 +69,7 @@ public class LoopsBinding {
         Validate.notNull(flowContext, "flow context cannot be null");
         Validate.notNull(forLoopCondition, "for condition cannot be null");
 
-        Serializable varValue = forLoopCondition.next();
+        Value varValue = forLoopCondition.next();
         flowContext.putVariable(varName, varValue);
         logger.debug("name: " + varName + ", value: " + varValue);
     }
@@ -78,9 +80,9 @@ public class LoopsBinding {
         Validate.notNull(flowContext, "flow context cannot be null");
         Validate.notNull(forLoopCondition, "for condition cannot be null");
 
-        @SuppressWarnings("unchecked") Map.Entry<Serializable, Serializable> entry = (Map.Entry<Serializable, Serializable>) forLoopCondition.next();
-        Serializable keyFromIteration = entry.getKey();
-        Serializable valueFromIteration = entry.getValue();
+        @SuppressWarnings("unchecked") Map.Entry<Value, Value> entry = (Map.Entry<Value, Value>) forLoopCondition.next();
+        Value keyFromIteration = entry.getKey();
+        Value valueFromIteration = entry.getValue();
 
         flowContext.putVariable(keyName, keyFromIteration);
         flowContext.putVariable(valueName, valueFromIteration);
@@ -93,8 +95,8 @@ public class LoopsBinding {
             Context flowContext,
             Set<SystemProperty> systemProperties,
             String nodeName) {
-        Map<String, Serializable> variables = flowContext.getImmutableViewOfVariables();
-        Serializable evalResult;
+        Map<String, Value> variables = flowContext.getImmutableViewOfVariables();
+        Value evalResult;
         String collectionExpression = forLoopStatement.getExpression();
         try {
             evalResult = scriptEvaluator.evalExpr(collectionExpression, variables, systemProperties);
@@ -104,12 +106,12 @@ public class LoopsBinding {
 
         if (forLoopStatement instanceof MapForLoopStatement) {
             if (evalResult instanceof Map) {
-                List<Map.Entry<Serializable, Serializable>> entriesAsSerializable = new ArrayList<>();
+                List<Map.Entry<Value, Value>> entriesAsSerializable = new ArrayList<>();
                 @SuppressWarnings("unchecked") Set<Map.Entry<Serializable, Serializable>> entrySet = ((Map) evalResult).entrySet();
                 for (Map.Entry<Serializable, Serializable> entry : entrySet) {
-                    entriesAsSerializable.add(Pair.of(entry.getKey(), entry.getValue()));
+                    entriesAsSerializable.add(Pair.of(ValueFactory.create(entry.getKey()), ValueFactory.create(entry.getValue())));
                 }
-                evalResult = (Serializable) entriesAsSerializable;
+                evalResult = ValueFactory.create((Serializable)entriesAsSerializable);
             } else {
                 throw new RuntimeException(INVALID_MAP_EXPRESSION_MESSAGE + ": " + collectionExpression);
             }
@@ -127,21 +129,32 @@ public class LoopsBinding {
         return forLoopCondition;
     }
 
-    private ForLoopCondition createForLoopCondition(Serializable loopCollection){
-        Iterable<? extends Serializable> iterable;
+    private ForLoopCondition createForLoopCondition(Value loopCollection){
+        Iterable<Value> iterable;
 
-        if (loopCollection instanceof Iterable) {
-            iterable = (Iterable<Serializable>) loopCollection;
-        } else if (loopCollection instanceof String) {
-            String[] strings = ((String) loopCollection).split(Pattern.quote(","));
-            iterable = Arrays.asList(strings);
-        } else if (loopCollection instanceof PyObject) {
-            PyObject pyObject = (PyObject) loopCollection;
-            iterable = pyObject.asIterable();
+        Serializable loopCollectionContent = loopCollection.get();
+        if (loopCollectionContent instanceof Iterable) {
+            //noinspection unchecked
+            iterable = (Iterable<Value>) loopCollection;
+        } else if (loopCollectionContent instanceof String) {
+            String[] strings = ((String) loopCollectionContent).split(Pattern.quote(","));
+            iterable = convert(Arrays.asList(strings));
+        } else if (loopCollectionContent instanceof PyObject) {
+            PyObject pyObject = (PyObject) loopCollectionContent;
+            iterable = convert(pyObject.asIterable());
         } else {
             return null;
         }
 
         return new ForLoopCondition(iterable);
+    }
+
+    private Iterable<Value> convert(Iterable<? extends Serializable> iterable) {
+        List<Value> values = new ArrayList<>();
+        for (Serializable serializable : iterable) {
+            Value value = serializable instanceof Value ? (Value)serializable : ValueFactory.create(serializable);
+            values.add(value);
+        }
+        return values;
     }
 }

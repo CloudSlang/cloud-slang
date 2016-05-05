@@ -9,7 +9,8 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities.bindings;
 
-import java.io.Serializable;
+import io.cloudslang.lang.entities.bindings.values.Value;
+
 import java.util.Set;
 
 /**
@@ -20,14 +21,14 @@ public class Argument extends InOutParam {
 
     private boolean overridable;
 
-    public Argument(String name, Serializable value) {
+    public Argument(String name, Value value) {
         super(name, value);
         overridable = false;
     }
 
     public Argument(
             String name,
-            Serializable value,
+            Value value,
             Set<ScriptFunction> scriptFunctions,
             Set<String> systemPropertyDependencies) {
         super(name, value, scriptFunctions, systemPropertyDependencies);

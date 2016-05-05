@@ -13,11 +13,12 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,8 +48,8 @@ public class SubFlowSystemTest extends SystemsTestsParent {
 		Set<SystemProperty> systemProperties = new HashSet<>();
         systemProperties.add(new SystemProperty("user.sys", "props.port", "22"));
         systemProperties.add(new SystemProperty("user.sys", "props.alla", "balla"));
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("input1", "value1");
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("input1", ValueFactory.create("value1"));
         ScoreEvent event = trigger(compilationArtifact, userInputs, systemProperties);
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }

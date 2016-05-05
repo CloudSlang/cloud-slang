@@ -9,31 +9,31 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.env;
 
+import io.cloudslang.lang.entities.bindings.values.Value;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.io.Serializable;
 import java.util.Iterator;
 
 public class ForLoopCondition implements LoopCondition {
 
-    private final Iterable<? extends Serializable> iterable;
+    private final Iterable<Value> iterable;
     private int index = 0;
 
-    public ForLoopCondition(Iterable<? extends Serializable> iterable) {
+    public ForLoopCondition(Iterable<Value> iterable) {
         this.iterable = iterable;
     }
 
-    private Iterator<? extends Serializable> loopToCurrentObject() {
-        Iterator<? extends Serializable> iterator = iterable.iterator();
+    private Iterator<? extends Value> loopToCurrentObject() {
+        Iterator<? extends Value> iterator = iterable.iterator();
         for (int i = 0; i < index; i++) {
             iterator.next();
         }
         return iterator;
     }
 
-    public Serializable next() {
-        Serializable next = loopToCurrentObject().next();
+    public Value next() {
+        Value next = loopToCurrentObject().next();
         index++;
         return next;
     }
@@ -64,5 +64,10 @@ public class ForLoopCondition implements LoopCondition {
                 .append(iterable)
                 .append(index)
                 .toHashCode();
+    }
+
+    @Override
+    public Iterator<Value> iterator() {
+        return iterable.iterator();
     }
 }

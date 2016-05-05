@@ -14,12 +14,13 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.SystemsTestsParent;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,12 +49,12 @@ public class NavigationTest extends SystemsTestsParent {
                 SlangSource.fromFile(operation4Python));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("userNumber", "12");
-        userInputs.put("emailHost", "emailHost");
-        userInputs.put("emailPort", "25");
-        userInputs.put("emailSender", "user@host.com");
-        userInputs.put("emailRecipient", "user@host.com");
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("userNumber", ValueFactory.create("12"));
+        userInputs.put("emailHost", ValueFactory.create("emailHost"));
+        userInputs.put("emailPort", ValueFactory.create("25"));
+        userInputs.put("emailSender", ValueFactory.create("user@host.com"));
+        userInputs.put("emailRecipient", ValueFactory.create("user@host.com"));
 
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
 
@@ -76,12 +77,12 @@ public class NavigationTest extends SystemsTestsParent {
                                                 SlangSource.fromFile(operation4Python));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("userNumber", "13");
-        userInputs.put("emailHost", "emailHost");
-        userInputs.put("emailPort", "25");
-        userInputs.put("emailSender", "user@host.com");
-        userInputs.put("emailRecipient", "user@host.com");
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("userNumber", ValueFactory.create("13"));
+        userInputs.put("emailHost", ValueFactory.create("emailHost"));
+        userInputs.put("emailPort", ValueFactory.create("25"));
+        userInputs.put("emailSender", ValueFactory.create("user@host.com"));
+        userInputs.put("emailRecipient", ValueFactory.create("user@host.com"));
 
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
 
@@ -104,12 +105,12 @@ public class NavigationTest extends SystemsTestsParent {
                 SlangSource.fromFile(operation4Python));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("userNumber", "1024");
-        userInputs.put("emailHost", "emailHost");
-        userInputs.put("emailPort", "25");
-        userInputs.put("emailSender", "user@host.com");
-        userInputs.put("emailRecipient", "user@host.com");
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("userNumber", ValueFactory.create("1024"));
+        userInputs.put("emailHost", ValueFactory.create("emailHost"));
+        userInputs.put("emailPort", ValueFactory.create("25"));
+        userInputs.put("emailSender", ValueFactory.create("user@host.com"));
+        userInputs.put("emailRecipient", ValueFactory.create("user@host.com"));
 
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
 
@@ -128,12 +129,12 @@ public class NavigationTest extends SystemsTestsParent {
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operationPython), SlangSource.fromFile(operation2Python), SlangSource.fromFile(operation3Python));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("navigationType", "success");
-        userInputs.put("emailHost", "emailHost");
-        userInputs.put("emailPort", "25");
-        userInputs.put("emailSender", "user@host.com");
-        userInputs.put("emailRecipient", "user@host.com");
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("navigationType", ValueFactory.create("success"));
+        userInputs.put("emailHost", ValueFactory.create("emailHost"));
+        userInputs.put("emailPort", ValueFactory.create("25"));
+        userInputs.put("emailSender", ValueFactory.create("user@host.com"));
+        userInputs.put("emailRecipient", ValueFactory.create("user@host.com"));
 
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
 
@@ -152,12 +153,12 @@ public class NavigationTest extends SystemsTestsParent {
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operationPython), SlangSource.fromFile(operation2Python), SlangSource.fromFile(operation3Python));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("navigationType", "failure");
-        userInputs.put("emailHost", "emailHost");
-        userInputs.put("emailPort", "25");
-        userInputs.put("emailSender", "user@host.com");
-        userInputs.put("emailRecipient", "user@host.com");
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("navigationType", ValueFactory.create("failure"));
+        userInputs.put("emailHost", ValueFactory.create("emailHost"));
+        userInputs.put("emailPort", ValueFactory.create("25"));
+        userInputs.put("emailSender", ValueFactory.create("user@host.com"));
+        userInputs.put("emailRecipient", ValueFactory.create("user@host.com"));
 
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
 

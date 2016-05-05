@@ -10,20 +10,21 @@
 
  package io.cloudslang.lang.systemtests;
 
-import java.io.Serializable;
+import io.cloudslang.lang.entities.bindings.values.Value;
+
 import java.util.Map;
 
 public class StepData {
 
     private final String path;
     private final String name;
-    private final Map<String, Serializable> inputs;
-    private final Map<String, Serializable> outputs;
+    private final Map<String, Value> inputs;
+    private final Map<String, Value> outputs;
     private final String executableName;
     private final String result;
 
-    public StepData(String path, String name, Map<String, Serializable> inputs,
-                    Map<String, Serializable> outputs, String executableName, String result) {
+    public StepData(String path, String name, Map<String, Value> inputs,
+                    Map<String, Value> outputs, String executableName, String result) {
         this.path = path;
         this.name = name;
         this.inputs = inputs;
@@ -40,11 +41,11 @@ public class StepData {
         return name;
     }
 
-    public Map<String, Serializable> getInputs() {
+    public Map<String, Value> getInputs() {
         return inputs;
     }
 
-    public Map<String, Serializable> getOutputs() {
+    public Map<String, Value> getOutputs() {
         return outputs;
     }
 

@@ -14,12 +14,17 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.Serializable;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Date: 3/25/2015
@@ -127,7 +132,7 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
             Set<SystemProperty> systemProperties) {
         CompilationArtifact compilationArtifact = slang.compile(resource, path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Value> userInputs = new HashMap<>();
         return triggerWithData(compilationArtifact, userInputs, systemProperties);
     }
 
@@ -155,11 +160,11 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
         List<String> actualNameOutputsOfBranches = Lists.newArrayList();
         List<Integer> actualNumberOutputsOfBranches = Lists.newArrayList();
         for (StepData branchData : branchesData) {
-            Map<String, Serializable> outputs = branchData.getOutputs();
+            Map<String, Value> outputs = branchData.getOutputs();
             Assert.assertTrue(outputs.containsKey("name"));
             Assert.assertTrue(outputs.containsKey("number"));
-            actualNameOutputsOfBranches.add((String) outputs.get("name"));
-            actualNumberOutputsOfBranches.add((Integer) outputs.get("number"));
+            actualNameOutputsOfBranches.add((String) outputs.get("name").get());
+            actualNumberOutputsOfBranches.add((Integer) outputs.get("number").get());
         }
 
         List<String> expectedNameOutputs = Lists.newArrayList();
@@ -185,7 +190,7 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
         Map<String, StepData> asyncSteps = runtimeInformation.getAsyncSteps();
         StepData asyncStep = asyncSteps.get(FIRST_STEP_PATH);
 
-        Map<String, Serializable> aggregateValues = asyncStep.getOutputs();
+        Map<String, Value> aggregateValues = asyncStep.getOutputs();
         Assert.assertTrue("aggregate name not found in async loop outputs", aggregateValues.containsKey("name_list"));
         @SuppressWarnings("unchecked")
         List<String> actualAggregateNameList = (List<String>) aggregateValues.get("name_list");
@@ -198,7 +203,7 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
         Assert.assertEquals(
                 "Aggregate value not bound correctly from system property",
                 "aggregate_value",
-                aggregateValues.get("from_sp")
+                aggregateValues.get("from_sp").get()
         );
     }
 

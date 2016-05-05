@@ -1,4 +1,4 @@
-package io.cloudslang.lang.entities.bindings;
+package io.cloudslang.lang.entities.bindings.values;
 
 import java.io.Serializable;
 
@@ -13,6 +13,16 @@ public class SimpleValue implements Value {
 
     public SimpleValue(Serializable content) {
         this.content = content;
+    }
+
+    @Override
+    public Serializable get() {
+        return content;
+    }
+
+    @Override
+    public boolean isSensitive() {
+        return false;
     }
 
     @Override
@@ -31,10 +41,5 @@ public class SimpleValue implements Value {
     @Override
     public String toString() {
         return content == null ? "null" : content.toString();
-    }
-
-    @Override
-    public Serializable get() {
-        return null;
     }
 }

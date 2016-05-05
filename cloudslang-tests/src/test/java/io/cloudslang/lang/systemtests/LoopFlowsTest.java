@@ -13,12 +13,19 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class LoopFlowsTest extends SystemsTestsParent{
     
@@ -33,7 +40,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Value> userInputs = new HashMap<>();
         Set<SystemProperty> systemProperties = new HashSet<>();
         systemProperties.add(
                 new SystemProperty("loop", "for.prop1", "for_value")
@@ -45,13 +52,13 @@ public class LoopFlowsTest extends SystemsTestsParent{
         StepData secondStep = stepsData.get(SECOND_STEP_KEY);
         StepData thirdStep = stepsData.get(THIRD_STEP_KEY);
 
-        Map<String, Serializable> expectedInputs = new HashMap<>();
-        expectedInputs.put("text", 1);
-        expectedInputs.put("sp_arg", "for_value");
+        Map<String, Value> expectedInputs = new HashMap<>();
+        expectedInputs.put("text", ValueFactory.create(1));
+        expectedInputs.put("sp_arg", ValueFactory.create("for_value"));
         Assert.assertEquals(expectedInputs, firstStep.getInputs());
-        expectedInputs.put("text", 2);
+        expectedInputs.put("text", ValueFactory.create(2));
         Assert.assertEquals(expectedInputs, secondStep.getInputs());
-        expectedInputs.put("text", 3);
+        expectedInputs.put("text", ValueFactory.create(3));
         Assert.assertEquals(expectedInputs, thirdStep.getInputs());
     }
 
@@ -63,7 +70,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Value> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
         StepData thirdStep = stepsData.get(THIRD_STEP_KEY);
         Assert.assertEquals("print_other_values", thirdStep.getName());
@@ -77,7 +84,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Value> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
         List<String> actualSteps = getStepsOnly(stepsData);
         Assert.assertEquals(2, actualSteps.size());
@@ -91,7 +98,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Value> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
         List<String> actualSteps = getStepsOnly(stepsData);
         Assert.assertEquals(3, actualSteps.size());
@@ -106,7 +113,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Value> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
         List<String> actualSteps = getStepsOnly(stepsData);
         Assert.assertEquals(3, actualSteps.size());
@@ -122,7 +129,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Value> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
         verifyPersonMap(stepsData);
     }
@@ -135,12 +142,12 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> personMap = new HashMap<>();
-        personMap.put("john", 1);
-        personMap.put("jane", 2);
-        personMap.put("peter", "three");
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("person_map", (Serializable) personMap);
+        Map<String, Value> personMap = new HashMap<>();
+        personMap.put("john", ValueFactory.create(1));
+        personMap.put("jane", ValueFactory.create(2));
+        personMap.put("peter", ValueFactory.create("three"));
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("person_map", ValueFactory.create((Serializable)personMap));
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
         verifyPersonMap(stepsData);
     }
@@ -153,7 +160,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Value> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
         StepData fourthStep = stepsData.get(FOURTH_STEP_KEY);
         Assert.assertEquals("print_other_values", fourthStep.getName());
@@ -167,7 +174,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Value> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
         List<String> actualSteps = getStepsOnly(stepsData);
         Assert.assertEquals(1, actualSteps.size());
@@ -181,7 +188,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Value> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
         List<String> actualSteps = getStepsOnly(stepsData);
         Assert.assertEquals(3, actualSteps.size());
@@ -196,7 +203,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Value> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
         List<String> actualSteps = getStepsOnly(stepsData);
         Assert.assertEquals(2, actualSteps.size());
@@ -209,23 +216,23 @@ public class LoopFlowsTest extends SystemsTestsParent{
         StepData secondStep = stepsData.get(SECOND_STEP_KEY);
         StepData thirdStep = stepsData.get(THIRD_STEP_KEY);
         @SuppressWarnings("unchecked")
-        Set<Map<String, Serializable>> actualContextSet = Sets.newHashSet(
+        Set<Map<String, Value>> actualContextSet = Sets.newHashSet(
                 firstStep.getInputs(),
                 secondStep.getInputs(),
                 thirdStep.getInputs()
         );
 
-        Map<String, Serializable> context1 = new HashMap<>();
-        context1.put("text", "john");
-        context1.put("text2", 1);
-        Map<String, Serializable> context2 = new HashMap<>();
-        context2.put("text", "jane");
-        context2.put("text2", 2);
-        Map<String, Serializable> context3 = new HashMap<>();
-        context3.put("text", "peter");
-        context3.put("text2", "three");
+        Map<String, Value> context1 = new HashMap<>();
+        context1.put("text", ValueFactory.create("john"));
+        context1.put("text2", ValueFactory.create(1));
+        Map<String, Value> context2 = new HashMap<>();
+        context2.put("text", ValueFactory.create("jane"));
+        context2.put("text2", ValueFactory.create(2));
+        Map<String, Value> context3 = new HashMap<>();
+        context3.put("text", ValueFactory.create("peter"));
+        context3.put("text2", ValueFactory.create("three"));
         @SuppressWarnings("unchecked")
-        Set<Map<String, Serializable>> expectedContextSet = Sets.newHashSet(
+        Set<Map<String, Value>> expectedContextSet = Sets.newHashSet(
                 context1,
                 context2,
                 context3

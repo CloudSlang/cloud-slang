@@ -15,6 +15,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.ValueSyntaxParent;
 import org.junit.Assert;
@@ -59,35 +61,35 @@ public class ValueSyntaxInFlowTest extends ValueSyntaxParent {
     }
 
     private void verifyStepInputs(StepData stepData) {
-        Map<String, Serializable> expectedStepArguments = new HashMap<>();
+        Map<String, Value> expectedStepArguments = new HashMap<>();
 
         // properties
-        expectedStepArguments.put("input_no_expression", "input_no_expression_value");
+        expectedStepArguments.put("input_no_expression", ValueFactory.create("input_no_expression_value"));
 
         // loaded by Yaml
-        expectedStepArguments.put("input_int", 22);
-        expectedStepArguments.put("input_str_no_quotes", "Hi");
-        expectedStepArguments.put("input_str_single", "Hi");
-        expectedStepArguments.put("input_str_double", "Hi");
-        expectedStepArguments.put("input_yaml_list", Lists.newArrayList(1, 2, 3));
-        HashMap<String, Serializable> expectedYamlMapFolded = new HashMap<>();
-        expectedYamlMapFolded.put("key1", "medium");
-        expectedYamlMapFolded.put("key2", false);
-        expectedStepArguments.put("input_yaml_map_folded", expectedYamlMapFolded);
+        expectedStepArguments.put("input_int", ValueFactory.create(22));
+        expectedStepArguments.put("input_str_no_quotes", ValueFactory.create("Hi"));
+        expectedStepArguments.put("input_str_single", ValueFactory.create("Hi"));
+        expectedStepArguments.put("input_str_double", ValueFactory.create("Hi"));
+        expectedStepArguments.put("input_yaml_list", ValueFactory.create(Lists.newArrayList(1, 2, 3)));
+        HashMap<String, Value> expectedYamlMapFolded = new HashMap<>();
+        expectedYamlMapFolded.put("key1", ValueFactory.create("medium"));
+        expectedYamlMapFolded.put("key2", ValueFactory.create(false));
+        expectedStepArguments.put("input_yaml_map_folded", ValueFactory.create(expectedYamlMapFolded));
 
         // evaluated via Python
-        expectedStepArguments.put("input_python_null", null);
-        expectedStepArguments.put("input_python_list", Lists.newArrayList(1, 2, 3));
-        HashMap<String, Serializable> expectedInputPythonMap = new HashMap<>();
-        expectedInputPythonMap.put("key1", "value1");
-        expectedInputPythonMap.put("key2", "value2");
-        expectedInputPythonMap.put("key3", "value3");
-        expectedStepArguments.put("input_python_map", expectedInputPythonMap);
-        expectedStepArguments.put("b", "b");
-        expectedStepArguments.put("b_copy", "b");
-        expectedStepArguments.put("input_concat_1", "ab");
-        expectedStepArguments.put("input_concat_2_folded", "prefix_ab_suffix");
-        expectedStepArguments.put("step_argument_null", null);
+        expectedStepArguments.put("input_python_null", ValueFactory.create(null));
+        expectedStepArguments.put("input_python_list", ValueFactory.create(Lists.newArrayList(1, 2, 3)));
+        HashMap<String, Value> expectedInputPythonMap = new HashMap<>();
+        expectedInputPythonMap.put("key1", ValueFactory.create("value1"));
+        expectedInputPythonMap.put("key2", ValueFactory.create("value2"));
+        expectedInputPythonMap.put("key3", ValueFactory.create("value3"));
+        expectedStepArguments.put("input_python_map", ValueFactory.create(expectedInputPythonMap));
+        expectedStepArguments.put("b", ValueFactory.create("b"));
+        expectedStepArguments.put("b_copy", ValueFactory.create("b"));
+        expectedStepArguments.put("input_concat_1", ValueFactory.create("ab"));
+        expectedStepArguments.put("input_concat_2_folded", ValueFactory.create("prefix_ab_suffix"));
+        expectedStepArguments.put("step_argument_null", ValueFactory.create(null));
 
         Assert.assertTrue("Step arguments not bound correctly", includeAllPairs(stepData.getInputs(), expectedStepArguments));
     }

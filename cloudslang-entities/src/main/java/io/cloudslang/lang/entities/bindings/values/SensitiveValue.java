@@ -1,4 +1,4 @@
-package io.cloudslang.lang.entities.bindings;
+package io.cloudslang.lang.entities.bindings.values;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -17,8 +17,18 @@ public class SensitiveValue implements Value {
 
     private byte[] content;
 
-    public SensitiveValue(Serializable serializable) {
-        this.content = serialize(serializable);
+    public SensitiveValue(Serializable content) {
+        this.content = serialize(content);
+    }
+
+    @Override
+    public Serializable get() {
+        return deserialize(content);
+    }
+
+    @Override
+    public boolean isSensitive() {
+        return true;
     }
 
     @Override
@@ -39,12 +49,7 @@ public class SensitiveValue implements Value {
         return "********";
     }
 
-    @Override
-    public Serializable get() {
-        return (Serializable)deserialize(content);
-    }
-
-    private byte[] serialize(Object content) {
+    private byte[] serialize(Serializable content) {
         try {
             if (content == null) {
                 return null;
@@ -57,14 +62,14 @@ public class SensitiveValue implements Value {
             throw new RuntimeException("Failed to serialize content", e);
         }
     }
-    private Object deserialize(byte[] content) {
+    private Serializable deserialize(byte[] content) {
         try {
             if (content == null) {
                 return null;
             }
             ByteArrayInputStream in = new ByteArrayInputStream(content);
             ObjectInputStream is = new ObjectInputStream(in);
-            return is.readObject();
+            return (Serializable)is.readObject();
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException("Failed to deserialize content", e);
         }

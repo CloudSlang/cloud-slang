@@ -11,290 +11,869 @@ imports:
   ops: user.ops
 
 flow:
-  name: sensitive_values_flow
+  name: sensitive_values_flow  
   inputs:
-    # snake-case to camel-case
-    - enable_option_for_action:
+    - input_no_value:  
+         required: false
+         sensitive: false
+    - input_no_value_sensitive:  
          required: false
          sensitive: true
-    - enableOptionForAction:
-        default: ${get("enable_option_for_action", "default_value")}
+
+    - input_get_input_no_value:
+        default: ${input_no_value}
+        overridable: false
+    - input_get_input_no_value_sensitive:
+        default: ${input_no_value}
         overridable: false
         sensitive: true
-
-    # helpers
-    - output_no_expression:
-        default: output_no_expression_value
-        sensitive: true
-    - authorized_keys_path:
-        default: './auth'
-        sensitive: true
-    - scp_host_port:
-        default: '8888'
+    - input_get_sensitive_input_no_value:
+        default: ${input_no_value_sensitive}
+    - input_get_sensitive_input_no_value_sensitive:
+        default: ${input_no_value_sensitive}
         sensitive: true
 
-    # properties
-    - input_no_expression:
+    - input_python_get_input_no_value:
+        default: ${get("input_no_value", "default_value")}
+        overridable: false
+    - input_python_get_input_no_value_sensitive:
+        default: ${get("input_no_value", "default_value")}
+        overridable: false
         sensitive: true
-    - input_no_expression_not_required:
-        required: false
+    - input_python_get_sensitive_input_no_value:
+        default: ${get("input_no_value_sensitive", "default_value")}
+    - input_python_get_sensitive_input_no_value_sensitive:
+        default: ${get("input_no_value_sensitive", "default_value")}
         sensitive: true
+
+    - input_with_value:  
+        default: 'aaa'
+    - input_with_value_sensitive:  
+        default: 'aaa'
+        sensitive: true
+
+    - input_get_input_with_value:
+        default: ${input_with_value}
+        overridable: false
+    - input_get_input_with_value_sensitive:
+        default: ${input_with_value}
+        overridable: false
+        sensitive: true
+    - input_get_sensitive_input_with_value:
+        default: ${input_with_value_sensitive}
+    - input_get_sensitive_input_with_value_sensitive:
+        default: ${input_with_value_sensitive}
+        sensitive: true
+   
+    - input_python_get_input_with_value:
+        default: ${get("input_with_value", "default_value")}
+        overridable: false
+    - input_python_get_input_with_value_sensitive:
+        default: ${get("input_with_value", "default_value")}
+        overridable: false
+        sensitive: true
+    - input_python_get_sensitive_input_with_value:
+        default: ${get("input_with_value_sensitive", "default_value")}
+    - input_python_get_sensitive_input_with_value_sensitive:
+        default: ${get("input_with_value_sensitive", "default_value")}
+        sensitive: true
+   
     - input_system_property:
         default: ${get_sp('user.sys.props.host')}
+    - input_system_property_sensitive:
+        default: ${get_sp('user.sys.props.host')}
         sensitive: true
+
+    - input_get_input_system_property:
+        default: ${input_system_property}
+    - input_get_input_system_property_sensitive:
+        default: ${input_system_property}
+        sensitive: true
+    - input_get_sensitive_input_system_property:
+        default: ${input_system_property_sensitive}
+    - input_get_sensitive_input_system_property_sensitive:
+        default: ${input_system_property_sensitive}
+        sensitive: true
+
+    - input_python_get_input_system_property:
+        default: ${get("input_system_property", "default_value")}
+    - input_python_get_input_system_property_sensitive:
+        default: ${get("input_system_property", "default_value")}
+        sensitive: true
+    - input_python_get_sensitive_input_system_property:
+        default: ${get("input_system_property_sensitive", "default_value")}
+    - input_python_get_sensitive_input_system_property_sensitive:
+        default: ${get("input_system_property_sensitive", "default_value")}
+        sensitive: true
+        
+    - input_authorized_keys_path:
+        default: './auth'
+        sensitive: false
+    - input_authorized_keys_path_sensitive:
+        default: './auth'
+        sensitive: true
+        
+    - input_scp_host_port:
+        default: '8888'
+    - input_scp_host_port_sensitive:
+        default: '8888'
+        sensitive: true
+        
     - input_not_overridable:
-        default: 25
+        default: 10
+        overridable: false
+        sensitive: false
+    - input_not_overridable_sensitive:
+        default: 10
         overridable: false
         sensitive: true
 
-    # loaded by Yaml
-    - input_int:
-        default: 22
-        sensitive: true
-    - input_str_no_quotes:
+    - input_overridable_hi1:
         default: Hi
+        overridable: true
+        sensitive: false
+    - input_overridable_hi1_sensitive:
+        default: Hi
+        overridable: true
         sensitive: true
-    - input_str_single:
+
+    - input_overridable_hi2:
         default: 'Hi'
+        overridable: true
+        sensitive: false
+    - input_overridable_hi2_sensitive:
+        default: 'Hi'
+        overridable: true
         sensitive: true
-    - input_str_double:
+
+    - input_overridable_hi3:
         default: "Hi"
+        overridable: true
+        sensitive: false
+    - input_overridable_hi3_sensitive:
+        default: "Hi"
+        overridable: true
         sensitive: true
+    
     - input_yaml_list:
         default: [1, 2, 3]
+    - input_yaml_list_sensitive:
+        default: [1, 2, 3]
         sensitive: true
-    - input_properties_yaml_map_folded:
-        default: {default: medium, required: false}
-        sensitive: true
+
     - input_yaml_map:
+        default: {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
+    - input_yaml_map_sensitive:
         default: {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
         sensitive: true
 
-    # evalauted via Python
+    - input_properties_yaml_map_folded:
+        default: {default: medium, required: false}
+    - input_properties_yaml_map_folded_sensitive:
+        default: {default: medium, required: false}
+        sensitive: true
+
     - input_python_null:
         default: ${ None }
         required: false
+    - input_python_null_sensitive:
+        default: ${ None }
+        required: false
         sensitive: true
+
     - input_python_list:
         default: ${[1, 2, 3]}
+    - input_python_list_sensitive:
+        default: ${[1, 2, 3]}
         sensitive: true
-    - input_python_map: >
-        ${{
-        'key1': 'value1',
-        'key2': 'value2',
-        'key3': 'value3'
-        }}
+
+    - input_python_map:
+        default: >
+          ${{
+          'key1': 'value1',
+          'key2': 'value2',
+          'key3': 'value3'
+          }}
+    - input_python_map_sensitive:
+        default: >
+          ${{
+          'key1': 'value1',
+          'key2': 'value2',
+          'key3': 'value3'
+          }}
         sensitive: true
-    - input_b:
-        default: b
+
+    - input_x: x
+    - input_x_sensitive:
+        default: x
         sensitive: true
-    - input_b_copy: ${ input_b }
-    - input_concat_1: ${'a' + input_b}
-    - input_concat_2_folded: >
+        
+    - input_x_copy: ${ input_x }
+    - input_x_copy_sensitive: 
+        default: ${ input_x }    
+        sensitive: true        
+    - input_sensitive_x_copy: 
+        default: ${ input_x_sensitive }
+    - input_sensitive_x_copy_sensitive: 
+        default: ${ input_x_sensitive }    
+        sensitive: true
+        
+    - input_concat_x: ${'a' + input_x}
+    - input_concat_x_sensitive:
+        default: ${'a' + input_x}
+        sensitive: true
+    - input_sensitive_concat_x: ${'a' + input_x_sensitive}
+    - input_sensitive_concat_x_sensitive:
+        default: ${'a' + input_x_sensitive}
+        sensitive: true
+
+    - input_y: 'y'
+    - input_y_sensitive:
+        default: 'y'
+        sensitive: true
+
+    - input_concat_y: ${input_y + "b"}
+    - input_concat_y_sensitive:
+        default: ${input_y + "b"}
+        sensitive: true
+    - input_sensitive_concat_y: ${input_y_sensitive + "b"}
+    - input_sensitive_concat_y_sensitive:
+        default: ${input_y_sensitive + "b"}
+        sensitive: true
+
+    - input_concat_x_folded: >
         ${
         'prefix_' +
-        input_concat_1 +
+        input_concat_x +
         '_suffix'
         }
-    - input_expression_characters: >
-        ${ 'docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ' + authorized_keys_path + '} -p ' +
-        scp_host_port + ':22 --name test1 -v /data:'}
+    - input_concat_x_folded_sensitive: 
+        default: > 
+          ${
+          'prefix_' +
+          input_concat_x +
+          '_suffix'
+          }
+        sensitive: true   
+    - input_sensitive_concat_x_folded: >
+        ${
+        'prefix_' +
+        input_concat_x_sensitive +
+        '_suffix'
+        }
+    - input_sensitive_concat_x_folded_sensitive: 
+        default: > 
+          ${
+          'prefix_' +
+          input_concat_x_sensitive +
+          '_suffix'
+          }
+        sensitive: true   
+        
+    - input_concat_x_folded_copy: 
+        default: ${ input_concat_x_folded }
+    - input_concat_x_folded_copy_sensitive: 
+        default: ${ input_concat_x_folded }    
+        sensitive: true        
+    - input_sensitive_concat_x_folded_copy: 
+        default: ${ input_concat_x_folded_sensitive }
+    - input_sensitive_concat_x_folded_sensitive: 
+        default: ${ input_concat_x_folded_sensitive }    
+        sensitive: true        
+        
+    - input_expression_characters:
+        default: ${'docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ' + input_authorized_keys_path + '} -p ' + input_scp_host_port + ':22 --name test1 -v /data:'}
+    - input_expression_characters_sensitive:
+        default: ${'docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ' + input_authorized_keys_path + '} -p ' + input_scp_host_port + ':22 --name test1 -v /data:'}
         sensitive: true
-    - input_step_argument_null:
-        default: "step_argument_null_value"
+    - input_sensitive_expression_characters:
+        default: ${'docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ' + input_authorized_keys_path_sensitive + '} -p ' + input_scp_host_port_sensitive + ':22 --name test1 -v /data:'}
+    - input_sensitive_expression_characters_sensitive:
+        default: ${'docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ' + input_authorized_keys_path_sensitive + '} -p ' + input_scp_host_port_sensitive + ':22 --name test1 -v /data:'}
         sensitive: true
+
   workflow:
     - get_data:
         do:
           ops.noop:
-            # properties
-            - argument_no_expression
-            - sensitive_argument_no_expression: ${input_no_expression}
+            - argument_no_value        
+            - argument_input_no_value:                                              ${input_no_value}             
+            - argument_input_no_value_sensitive:                                    ${input_no_value_sensitive} 
 
-            # loaded by Yaml
-            - argument_int: 22
-            - sensitive_argument_int: ${input_int}
+            - argument_input_get_input_no_value:                                    ${input_get_input_no_value}
+            - argument_input_get_input_no_value_sensitive:                          ${input_get_input_no_value_sensitive}
+            - argument_input_get_sensitive_input_no_value:                          ${input_get_sensitive_input_no_value}
+            - argument_input_get_sensitive_input_no_value_sensitive:                ${input_get_sensitive_input_no_value_sensitive}
+            
+            - argument_python_get_input_no_value                                    ${get("input_no_value", "default_value")}
+            - argument_python_get_sensitive_input_no_value:                         ${get("input_no_value_sensitive", "default_value")}
+            - argument_input_python_get_input_no_value:                             ${input_python_get_input_no_value}
+            - argument_input_python_get_input_no_value_sensitive:                   ${input_python_get_input_no_value_sensitive}
+            - argument_input_python_get_sensitive_input_no_value:                   ${input_python_get_sensitive_input_no_value}
+            - argument_input_python_get_sensitive_input_no_value_sensitive:         ${input_python_get_sensitive_input_no_value_sensitive}
 
-            - argument_str_no_quotes: Hi
-            - sensitive_argument_str_no_quotes: ${input_str_no_quotes}
+            - argument_with_value:                                                  'bbb'
+            - argument_input_with_value:                                            ${input_with_value}  
+            - argument_input_with_value_sensitive:                                  ${input_with_value_sensitive}  
+            
+            - argument_input_get_input_with_value:                                  ${input_get_input_with_value}
+            - argument_input_get_input_with_value_sensitive:                        ${input_get_input_with_value_sensitive}
+            - argument_input_get_sensitive_input_with_value:                        ${input_get_sensitive_input_with_value}
+            - argument_input_get_sensitive_input_with_value_sensitive:              ${input_get_sensitive_input_with_value_sensitive}
+            
+            - argument_python_get_input_with_value:                                 ${get("input_with_value", "default_value")}
+            - argument_python_get_input_with_value_sensitive:                       ${get("input_no_value_sensitive", "default_value")}
+            - argument_input_python_get_input_with_value:                           ${input_python_get_input_with_value}
+            - argument_input_python_get_input_with_value_sensitive:                 ${input_python_get_input_with_value_sensitive}
+            - argument_input_python_get_sensitive_input_with_value:                 ${input_python_get_sensitive_input_with_value}
+            - argument_input_python_get_sensitive_input_with_value_sensitive:       ${input_python_get_sensitive_input_with_value_sensitive}
+            
+            - argument_system_property:                                             ${get_sp('user.sys.props.host')}            
+            - argument_input_system_property:                                       ${input_system_property}
+            - argument_input_system_property_sensitive:                             ${input_system_property_sensitive}
 
-            - argument_str_single: 'Hi'
-            - sensitive_argument_str_single: ${input_str_single}
+            - argument_get_input_system_property:                                   ${input_system_property}
+            - argument_get_input_system_property_sensitive:                         ${input_system_property_sensitive}
+            - argument_input_get_input_system_property:                             ${input_get_input_system_property}
+            - argument_input_get_input_system_property_sensitive:                   ${input_get_input_system_property_sensitive}
+            - argument_input_get_sensitive_input_system_property:                   ${input_get_sensitive_input_system_property}
+            - argument_input_get_sensitive_input_system_property_sensitive:         ${input_get_sensitive_input_system_property_sensitive}
+            
+            - argument_python_get_input_system_property:                            ${get("input_system_property", "default_value")}
+            - argument_python_get_input_system_property_sensitive:                  ${get("input_system_property_sensitive", "default_value")}
+            - argument_input_python_get_input_system_property:                      ${input_python_get_input_system_property}
+            - argument_input_python_get_input_system_property_sensitive:            ${input_python_get_input_system_property_sensitive}
+            - argument_input_python_get_sensitive_input_system_property:            ${input_python_get_sensitive_input_system_property}
+            - argument_input_python_get_sensitive_input_system_property_sensitive:  ${input_python_get_sensitive_input_system_property_sensitive}
 
-            - argument_str_double: "Hi"
-            - sensitive_argument_str_double: ${input_str_double}
+            - argument_authorized_keys_path:                                        './auth'
+            - argument_input_authorized_keys_path:                                  ${input_authorized_keys_path}
+            - argument_input_authorized_keys_path_sensitive:                        ${input_authorized_keys_path_sensitive}
 
-            - argument_yaml_list: [1, 2, 3]
-            - sensitive_argument_yaml_list: ${input_yaml_list}
+            - argument_scp_host_port:                                               '9999'
+            - argument_input_scp_host_port:                                         ${input_scp_host_port}
+            - argument_input_scp_host_port_sensitive:                               ${input_scp_host_port_sensitive}
+            
+            - argument_input_not_overridable:                                       ${input_not_overridable}
+            - argument_input_not_overridable_sensitive:                             ${input_not_overridable_sensitive}
+            
+            - argument_overridable_hi1:                                             Hi
+            - argument_input_overridable_hi1:                                       ${input_overridable_hi1}
+            - argument_input_overridable_hi1_sensitive:                             ${input_overridable_hi1_sensitive}
 
-            - argument_properties_yaml_map_folded: {key1: medium, key2: false}
-            - sensitive_argument_properties_yaml_map_folded: ${input_properties_yaml_map_folded}
+            - argument_overridable_hi2:                                             'Hi'
+            - argument_input_overridable_hi2:                                       ${input_overridable_hi2}
+            - argument_input_overridable_hi2_sensitive:                             ${input_overridable_hi2_sensitive}
 
-            # evalauted via Python
-            - argument_python_null: ${ None }
-            - sensitive_argument_python_null: ${input_python_null}
+            - argument_overridable_hi3:                                             "Hi"
+            - argument_input_overridable_hi3:                                       ${input_overridable_hi3}
+            - argument_input_overridable_hi3_sensitive:                             ${input_overridable_hi3_sensitive}
 
-            - argument_python_list: ${[1, 2, 3]}
-            - sensitive_argument_python_list: ${input_python_list}
+            - argument_yaml_list:                                                   [1, 2, 3]
+            - argument_input_yaml_list:                                             ${input_yaml_list}
+            - argument_input_yaml_list_sensitive:                                   ${input_yaml_list_sensitive}
+            
+            - argument_yaml_map:                                                    {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
+            - argument_input_yaml_map:                                              ${input_yaml_map}
+            - argument_input_yaml_map_sensitive:                                    ${input_yaml_map_sensitive}
+            
+            - argument_properties_yaml_map_folded:                                  {default: medium, required: false}
+            - argument_input_properties_yaml_map_folded:                            ${input_properties_yaml_map_folded}
+            - argument_input_properties_yaml_map_folded_sensitive:                  ${input_properties_yaml_map_folded_sensitive}
+            
+            - argument_python_null:                                                 ${ None }
+            - argument_input_python_null:                                           ${input_python_null}
+            - argument_input_python_null_sensitive:                                 ${input_python_null_sensitive}
 
-            - argument_python_map: >
-                ${{
-                'key1': 'value1',
-                'key2': 'value2',
-                'key3': 'value3'
-                }}
-            - sensitive_argument_python_map: ${input_python_map}
+            - argument_python_list:                                                 ${[1, 2, 3]}
+            - argument_input_python_list:                                           ${input_python_list}
+            - argument_input_python_list_sensitive:                                 ${input_python_list_sensitive}
 
-            - argument_b: b
-            - sensitive_argument_b: ${input_b}
+            - argument_python_map:                                                  ${{'key1':'value1', 'key2':'value2', 'key3':'value3'}}
+            - argument_input_python_map:                                            ${input_python_map}
+            - argument_input_python_map_sensitive:                                  ${input_python_map_sensitive}
 
-            - argument_b_copy: ${ argument_b }
-            - sensitive_argument_b_copy: ${input_b_copy}
+            - argument_x:                                                           x
+            - argument_input_x:                                                     ${input_x}
+            - argument_input_x_sensitive:                                           ${input_x_sensitive}
+            - argument_input_x_copy:                                                ${input_x_copy}
+            - argument_input_x_copy_sensitive:                                      ${input_x_copy_sensitive} 
+            - argument_input_sensitive_x_copy:                                      ${input_sensitive_x_copy} 
+            - argument_input_sensitive_x_copy_sensitive:                            ${input_sensitive_x_copy_sensitive} 
 
-            - argument_concat_1: ${'a' + argument_b}
-            - sensitive_argument_concat_1: ${input_concat_1}
+            - argument_concat_x:                                                    ${'a' + input_x}
+            - argument_input_concat_x:                                              ${input_concat_x}
+            - argument_input_concat_x_sensitive:                                    ${input_concat_x_sensitive} 
+            - argument_input_sensitive_concat_x:                                    ${input_sensitive_concat_x}
+            - argument_input_sensitive_concat_x_sensitive:                          ${input_sensitive_concat_x_sensitive}                         
 
-            - argument_concat_2_folded: >
-                ${
-                'prefix_' +
-                argument_concat_1 +
-                '_suffix'
-                }
-            - sensitive_argument_concat_2_folded: ${input_concat_2_folded}
+            - argument_y:                                                           y
+            - argument_concat_y:                                                    ${input_y + "b"}
+            - argument_input_concat_y:                                              ${input_concat_y}
+            - argument_input_concat_y_sensitive:                                    ${input_concat_y_sensitive}
+            - argument_input_sensitive_concat_y:                                    ${input_sensitive_concat_y}
+            - argument_input_sensitive_concat_y_sensitive:                          ${input_sensitive_concat_y_sensitive}
 
-            - argument_step_argument_null: null
-            - sensitive_argument_step_argument_null: ${input_step_argument_null}
+            - argument_concat_x_folded:                                             ${'prefix_' + input_concat_x + '_suffix'}
+            - argument_input_concat_x_folded:                                       ${input_concat_x_folded} 
+            - argument_input_concat_x_folded_sensitive:                             ${input_concat_x_folded_sensitive} 
+            - argument_input_sensitive_concat_x_folded:                             ${input_sensitive_concat_x_folded} 
+            - argument_input_sensitive_concat_x_folded_sensitive:                   ${input_sensitive_concat_x_folded_sensitive}            
+            - argument_input_concat_x_folded_copy:                                  ${input_concat_x_folded_copy} 
+            - argument_input_concat_x_folded_copy_sensitive:                        ${input_concat_x_folded_copy_sensitive} 
+            - argument_input_sensitive_concat_x_folded_copy:                        ${input_sensitive_concat_x_folded_copy} 
+            - argument_input_sensitive_concat_x_folded_sensitive:                   ${input_sensitive_concat_x_folded_sensitive} 
+            
+            - argument_expression_characters:                                       ${'docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ' + input_authorized_keys_path + '} -p ' + input_scp_host_port + ':22 --name test1 -v /data:'}
+            - argument_input_expression_characters:                                 ${input_expression_characters}
+            - argument_input_expression_characters_sensitive:                       ${input_expression_characters_sensitive}
+            - argument_input_sensitive_expression_characters:                       ${input_sensitive_expression_characters}
+            - argument_input_sensitive_expression_characters_sensitive:             ${input_sensitive_expression_characters_sensitive}
+
         publish:
-          - argument_no_expression
-          - sensitive_argument_no_expression
-          - argument_int
-          - sensitive_argument_int
-          - argument_str_no_quotes
-          - sensitive_argument_str_no_quotes
-          - argument_str_single
-          - sensitive_argument_str_single
-          - argument_str_double
-          - sensitive_argument_str_double
+          - argument_no_value        
+          - argument_input_no_value
+          - argument_input_no_value_sensitive
+          - argument_input_get_input_no_value
+          - argument_input_get_input_no_value_sensitive
+          - argument_input_get_sensitive_input_no_value
+          - argument_input_get_sensitive_input_no_value_sensitive
+          - argument_python_get_input_no_value                              
+          - argument_python_get_sensitive_input_no_value
+          - argument_input_python_get_input_no_value
+          - argument_input_python_get_input_no_value_sensitive
+          - argument_input_python_get_sensitive_input_no_value
+          - argument_input_python_get_sensitive_input_no_value_sensitive
+          - argument_with_value
+          - argument_input_with_value
+          - argument_input_with_value_sensitive
+          - argument_input_get_input_with_value
+          - argument_input_get_input_with_value_sensitive
+          - argument_input_get_sensitive_input_with_value
+          - argument_input_get_sensitive_input_with_value_sensitive
+          - argument_python_get_input_with_value
+          - argument_python_get_input_with_value_sensitive
+          - argument_input_python_get_input_with_value
+          - argument_input_python_get_input_with_value_sensitive
+          - argument_input_python_get_sensitive_input_with_value
+          - argument_input_python_get_sensitive_input_with_value_sensitive
+          - argument_system_property
+          - argument_input_system_property
+          - argument_input_system_property_sensitive
+          - argument_get_input_system_property
+          - argument_get_input_system_property_sensitive
+          - argument_input_get_input_system_property
+          - argument_input_get_input_system_property_sensitive
+          - argument_input_get_sensitive_input_system_property
+          - argument_input_get_sensitive_input_system_property_sensitive
+          - argument_python_get_input_system_property
+          - argument_python_get_input_system_property_sensitive
+          - argument_input_python_get_input_system_property
+          - argument_input_python_get_input_system_property_sensitive
+          - argument_input_python_get_sensitive_input_system_property
+          - argument_input_python_get_sensitive_input_system_property_sensitive
+          - argument_authorized_keys_path
+          - argument_input_authorized_keys_path
+          - argument_input_authorized_keys_path_sensitive
+          - argument_scp_host_port
+          - argument_input_scp_host_port
+          - argument_input_scp_host_port_sensitive
+          - argument_input_not_overridable
+          - argument_input_not_overridable_sensitive
+          - argument_overridable_hi1
+          - argument_input_overridable_hi1
+          - argument_input_overridable_hi1_sensitive
+          - argument_overridable_hi2
+          - argument_input_overridable_hi2
+          - argument_input_overridable_hi2_sensitive
+          - argument_overridable_hi3
+          - argument_input_overridable_hi3
+          - argument_input_overridable_hi3_sensitive
           - argument_yaml_list
-          - sensitive_argument_yaml_list
+          - argument_input_yaml_list
+          - argument_input_yaml_list_sensitive
+          - argument_yaml_map
+          - argument_input_yaml_map
+          - argument_input_yaml_map_sensitive
           - argument_properties_yaml_map_folded
-          - sensitive_argument_properties_yaml_map_folded
+          - argument_input_properties_yaml_map_folded
+          - argument_input_properties_yaml_map_folded_sensitive
           - argument_python_null
-          - sensitive_argument_python_null
+          - argument_input_python_null
+          - argument_input_python_null_sensitive
           - argument_python_list
-          - sensitive_argument_python_list
+          - argument_input_python_list
+          - argument_input_python_list_sensitive
           - argument_python_map
-          - sensitive_argument_python_map
-          - argument_b
-          - sensitive_argument_b
-          - argument_b_copy
-          - sensitive_argument_b_copy
-          - argument_concat_1
-          - sensitive_argument_concat_1
-          - argument_concat_2_folded
-          - sensitive_argument_concat_2_folded
-          - argument_step_argument_null
-          - sensitive_argument_step_argument_null
+          - argument_input_python_map
+          - argument_input_python_map_sensitive
+          - argument_x
+          - argument_input_x
+          - argument_input_x_sensitive
+          - argument_input_x_copy
+          - argument_input_x_copy_sensitive
+          - argument_input_sensitive_x_copy
+          - argument_input_sensitive_x_copy_sensitive
+          - argument_concat_x
+          - argument_input_concat_x
+          - argument_input_concat_x_sensitive
+          - argument_input_sensitive_concat_x
+          - argument_input_sensitive_concat_x_sensitive
+          - argument_y
+          - argument_concat_y
+          - argument_input_concat_y
+          - argument_input_concat_y_sensitive
+          - argument_input_sensitive_concat_y
+          - argument_input_sensitive_concat_y_sensitive
+          - argument_concat_x_folded
+          - argument_input_concat_x_folded
+          - argument_input_concat_x_folded_sensitive
+          - argument_input_sensitive_concat_x_folded
+          - argument_input_sensitive_concat_x_folded_sensitive
+          - argument_input_concat_x_folded_copy
+          - argument_input_concat_x_folded_copy_sensitive
+          - argument_input_sensitive_concat_x_folded_copy
+          - argument_input_sensitive_concat_x_folded_sensitive
+          - argument_expression_characters
+          - argument_input_expression_characters
+          - argument_input_expression_characters_sensitive
+          - argument_input_sensitive_expression_characters
+          - argument_input_sensitive_expression_characters_sensitive
 
     - print_raw_data:
         do:
           ops.print:
-            - argument_no_expression: ${argument_no_expression}
-            - sensitive_argument_no_expression: ${sensitive_argument_no_expression}
-            - argument_int: ${argument_int}
-            - sensitive_argument_int: ${sensitive_argument_int}
-            - argument_str_no_quotes: ${argument_str_no_quotes}
-            - sensitive_argument_str_no_quotes: ${sensitive_argument_str_no_quotes}
-            - argument_str_single: ${argument_str_single}
-            - sensitive_argument_str_single: ${sensitive_argument_str_single}
-            - argument_str_double: ${argument_str_double}
-            - sensitive_argument_str_double: ${sensitive_argument_str_double}
-            - argument_yaml_list: ${argument_yaml_list}
-            - sensitive_argument_yaml_list: ${sensitive_argument_yaml_list}
-            - argument_properties_yaml_map_folded: ${argument_properties_yaml_map_folded}
-            - sensitive_argument_properties_yaml_map_folded: ${sensitive_argument_properties_yaml_map_folded}
-            - argument_python_null: ${argument_python_null}
-            - sensitive_argument_python_null: ${sensitive_argument_python_null}
-            - argument_python_list: ${argument_python_list}
-            - sensitive_argument_python_list: ${sensitive_argument_python_list}
-            - argument_python_map: ${argument_python_map}
-            - sensitive_argument_python_map: ${sensitive_argument_python_map}
-            - argument_b: ${argument_b}
-            - sensitive_argument_b: ${sensitive_argument_b}
-            - argument_b_copy: ${argument_b_copy}
-            - sensitive_argument_b_copy: ${sensitive_argument_b_copy}
-            - argument_concat_1: ${argument_concat_1}
-            - sensitive_argument_concat_1: ${sensitive_argument_concat_1}
-            - argument_concat_2_folded: ${argument_concat_2_folded}
-            - sensitive_argument_concat_2_folded: ${sensitive_argument_concat_2_folded}
-            - argument_step_argument_null: ${argument_step_argument_null}
-            - sensitive_argument_step_argument_null: ${sensitive_argument_step_argument_null}
-
+            - argument_no_value:                                                    ${argument_no_value}
+            - argument_input_no_value:                                              ${argument_input_no_value}                                               
+            - argument_input_no_value_sensitive:                                    ${argument_input_no_value_sensitive}
+            - argument_input_get_input_no_value:                                    ${argument_input_get_input_no_value}                                    
+            - argument_input_get_input_no_value_sensitive:                          ${argument_input_get_input_no_value_sensitive}                        
+            - argument_input_get_sensitive_input_no_value:                          ${argument_input_get_sensitive_input_no_value}                        
+            - argument_input_get_sensitive_input_no_value_sensitive:                ${argument_input_get_sensitive_input_no_value_sensitive}
+            - argument_python_get_input_no_value:                                   ${argument_python_get_input_no_value}
+            - argument_python_get_sensitive_input_no_value:                         ${argument_python_get_sensitive_input_no_value}                     
+            - argument_input_python_get_input_no_value:                             ${argument_input_python_get_input_no_value}                           
+            - argument_input_python_get_input_no_value_sensitive:                   ${argument_input_python_get_input_no_value_sensitive}               
+            - argument_input_python_get_sensitive_input_no_value:                   ${argument_input_python_get_sensitive_input_no_value}               
+            - argument_input_python_get_sensitive_input_no_value_sensitive:         ${argument_input_python_get_sensitive_input_no_value_sensitive}
+            - argument_with_value:                                                  ${argument_with_value}                                                  
+            - argument_input_with_value:                                            ${argument_input_with_value}                                            
+            - argument_input_with_value_sensitive:                                  ${argument_input_with_value_sensitive}
+            - argument_input_get_input_with_value:                                  ${argument_input_get_input_with_value}                                
+            - argument_input_get_input_with_value_sensitive:                        ${argument_input_get_input_with_value_sensitive}                    
+            - argument_input_get_sensitive_input_with_value:                        ${argument_input_get_sensitive_input_with_value}                    
+            - argument_input_get_sensitive_input_with_value_sensitive:              ${argument_input_get_sensitive_input_with_value_sensitive}
+            - argument_python_get_input_with_value:                                 ${argument_python_get_input_with_value}                               
+            - argument_python_get_input_with_value_sensitive:                       ${argument_python_get_input_with_value_sensitive}                   
+            - argument_input_python_get_input_with_value:                           ${argument_input_python_get_input_with_value}                         
+            - argument_input_python_get_input_with_value_sensitive:                 ${argument_input_python_get_input_with_value_sensitive}             
+            - argument_input_python_get_sensitive_input_with_value:                 ${argument_input_python_get_sensitive_input_with_value}             
+            - argument_input_python_get_sensitive_input_with_value_sensitive:       ${argument_input_python_get_sensitive_input_with_value_sensitive}
+            - argument_system_property:                                             ${argument_system_property}                                             
+            - argument_input_system_property:                                       ${argument_input_system_property}                                       
+            - argument_input_system_property_sensitive:                             ${argument_input_system_property_sensitive}
+            - argument_get_input_system_property:                                   ${argument_get_input_system_property}                                 
+            - argument_get_input_system_property_sensitive:                         ${argument_get_input_system_property_sensitive}                     
+            - argument_input_get_input_system_property:                             ${argument_input_get_input_system_property}                           
+            - argument_input_get_input_system_property_sensitive:                   ${argument_input_get_input_system_property_sensitive}               
+            - argument_input_get_sensitive_input_system_property:                   ${argument_input_get_sensitive_input_system_property}               
+            - argument_input_get_sensitive_input_system_property_sensitive:         ${argument_input_get_sensitive_input_system_property_sensitive}
+            - argument_python_get_input_system_property:                            ${argument_python_get_input_system_property}                          
+            - argument_python_get_input_system_property_sensitive:                  ${argument_python_get_input_system_property_sensitive}              
+            - argument_input_python_get_input_system_property:                      ${argument_input_python_get_input_system_property}                  
+            - argument_input_python_get_input_system_property_sensitive:            ${argument_input_python_get_input_system_property_sensitive}      
+            - argument_input_python_get_sensitive_input_system_property:            ${argument_input_python_get_sensitive_input_system_property}      
+            - argument_input_python_get_sensitive_input_system_property_sensitive:  ${argument_input_python_get_sensitive_input_system_property_sensitive}
+            - argument_authorized_keys_path:                                        ${argument_authorized_keys_path}
+            - argument_input_authorized_keys_path:                                  ${argument_input_authorized_keys_path}                                       
+            - argument_input_authorized_keys_path_sensitive:                        ${argument_input_authorized_keys_path_sensitive}
+            - argument_scp_host_port:                                               ${argument_scp_host_port}                                                      
+            - argument_input_scp_host_port:                                         ${argument_input_scp_host_port}                                                
+            - argument_input_scp_host_port_sensitive:                               ${argument_input_scp_host_port_sensitive}
+            - argument_input_not_overridable:                                       ${argument_input_not_overridable}                                            
+            - argument_input_not_overridable_sensitive:                             ${argument_input_not_overridable_sensitive}
+            - argument_overridable_hi1:                                             ${argument_overridable_hi1}                                                    
+            - argument_input_overridable_hi1:                                       ${argument_input_overridable_hi1}                                            
+            - argument_input_overridable_hi1_sensitive:                             ${argument_input_overridable_hi1_sensitive}
+            - argument_overridable_hi2:                                             ${argument_overridable_hi2}                                                    
+            - argument_input_overridable_hi2:                                       ${argument_input_overridable_hi2}                                            
+            - argument_input_overridable_hi2_sensitive:                             ${argument_input_overridable_hi2_sensitive}
+            - argument_overridable_hi3:                                             ${argument_overridable_hi3}                                                    
+            - argument_input_overridable_hi3:                                       ${argument_input_overridable_hi3}                                            
+            - argument_input_overridable_hi3_sensitive:                             ${argument_input_overridable_hi3_sensitive}
+            - argument_yaml_list:                                                   ${argument_yaml_list}                                                            
+            - argument_input_yaml_list:                                             ${argument_input_yaml_list}                                                    
+            - argument_input_yaml_list_sensitive:                                   ${argument_input_yaml_list_sensitive}
+            - argument_yaml_map:                                                    ${argument_yaml_map}                                                             
+            - argument_input_yaml_map:                                              ${argument_input_yaml_map}                                                     
+            - argument_input_yaml_map_sensitive:                                    ${argument_input_yaml_map_sensitive}
+            - argument_properties_yaml_map_folded:                                  ${argument_properties_yaml_map_folded}                                       
+            - argument_input_properties_yaml_map_folded:                            ${argument_input_properties_yaml_map_folded}                               
+            - argument_input_properties_yaml_map_folded_sensitive:                  ${argument_input_properties_yaml_map_folded_sensitive}
+            - argument_python_null:                                                 ${argument_python_null}                                                        
+            - argument_input_python_null:                                           ${argument_input_python_null}                                                  
+            - argument_input_python_null_sensitive:                                 ${argument_input_python_null_sensitive}
+            - argument_python_list:                                                 ${argument_python_list}                                                        
+            - argument_input_python_list:                                           ${argument_input_python_list}                                                  
+            - argument_input_python_list_sensitive:                                 ${argument_input_python_list_sensitive}
+            - argument_python_map:                                                  ${argument_python_map}                                                         
+            - argument_input_python_map:                                            ${argument_input_python_map}                                                   
+            - argument_input_python_map_sensitive:                                  ${argument_input_python_map_sensitive}
+            - argument_x:                                                           ${argument_x}                                                                    
+            - argument_input_x:                                                     ${argument_input_x}                                                              
+            - argument_input_x_sensitive:                                           ${argument_input_x_sensitive}                                                  
+            - argument_input_x_copy:                                                ${argument_input_x_copy}                                                       
+            - argument_input_x_copy_sensitive:                                      ${argument_input_x_copy_sensitive}                                           
+            - argument_input_sensitive_x_copy:                                      ${argument_input_sensitive_x_copy}                                           
+            - argument_input_sensitive_x_copy_sensitive:                            ${argument_input_sensitive_x_copy_sensitive}
+            - argument_concat_x:                                                    ${argument_concat_x}                                                             
+            - argument_input_concat_x:                                              ${argument_input_concat_x}                                                     
+            - argument_input_concat_x_sensitive:                                    ${argument_input_concat_x_sensitive}                                         
+            - argument_input_sensitive_concat_x:                                    ${argument_input_sensitive_concat_x}                                         
+            - argument_input_sensitive_concat_x_sensitive:                          ${argument_input_sensitive_concat_x_sensitive}
+            - argument_y                                                            ${argument_y}
+            - argument_concat_y                                                     ${argument_concat_y}
+            - argument_input_concat_y                                               ${argument_input_concat_y}
+            - argument_input_concat_y_sensitive                                     ${argument_input_concat_y_sensitive}
+            - argument_input_sensitive_concat_y                                     ${argument_input_sensitive_concat_y}
+            - argument_input_sensitive_concat_y_sensitive                           ${argument_input_sensitive_concat_y_sensitive}
+            - argument_concat_x_folded:                                             ${argument_concat_x_folded}                                                    
+            - argument_input_concat_x_folded:                                       ${argument_input_concat_x_folded}                                            
+            - argument_input_concat_x_folded_sensitive:                             ${argument_input_concat_x_folded_sensitive}                                
+            - argument_input_sensitive_concat_x_folded:                             ${argument_input_sensitive_concat_x_folded}                                
+            - argument_input_sensitive_concat_x_folded_sensitive:                   ${argument_input_sensitive_concat_x_folded_sensitive}                    
+            - argument_input_concat_x_folded_copy:                                  ${argument_input_concat_x_folded_copy}                                       
+            - argument_input_concat_x_folded_copy_sensitive:                        ${argument_input_concat_x_folded_copy_sensitive}                           
+            - argument_input_sensitive_concat_x_folded_copy:                        ${argument_input_sensitive_concat_x_folded_copy}                           
+            - argument_input_sensitive_concat_x_folded_sensitive:                   ${argument_input_sensitive_concat_x_folded_sensitive}
+            - argument_expression_characters:                                       ${argument_expression_characters}                 
+            - argument_input_expression_characters:                                 ${argument_input_expression_characters}           
+            - argument_input_expression_characters_sensitive:                       ${argument_input_expression_characters_sensitive}
+            - argument_input_sensitive_expression_characters                        ${argument_input_sensitive_expression_characters}
+            - argument_input_sensitive_expression_characters_sensitive              ${argument_input_sensitive_expression_characters_sensitive}
+            
     - print_clear_text_data:
         do:
           ops.print:
-            - argument_no_expression: ${argument_no_expression}
-            - sensitive_argument_no_expression: ${sensitive_argument_no_expression}
-            - argument_int: ${argument_int}
-            - sensitive_argument_int: ${sensitive_argument_int}
-            - argument_str_no_quotes: ${argument_str_no_quotes}
-            - sensitive_argument_str_no_quotes: ${sensitive_argument_str_no_quotes}
-            - argument_str_single: ${argument_str_single}
-            - sensitive_argument_str_single: ${sensitive_argument_str_single}
-            - argument_str_double: ${argument_str_double}
-            - sensitive_argument_str_double: ${sensitive_argument_str_double}
-            - argument_yaml_list: ${argument_yaml_list}
-            - sensitive_argument_yaml_list: ${sensitive_argument_yaml_list}
-            - argument_properties_yaml_map_folded: ${argument_properties_yaml_map_folded}
-            - sensitive_argument_properties_yaml_map_folded: ${sensitive_argument_properties_yaml_map_folded}
-            - argument_python_null: ${argument_python_null}
-            - sensitive_argument_python_null: ${sensitive_argument_python_null}
-            - argument_python_list: ${argument_python_list}
-            - sensitive_argument_python_list: ${sensitive_argument_python_list}
-            - argument_python_map: ${argument_python_map}
-            - sensitive_argument_python_map: ${sensitive_argument_python_map}
-            - argument_b: ${argument_b}
-            - sensitive_argument_b: ${sensitive_argument_b}
-            - argument_b_copy: ${argument_b_copy}
-            - sensitive_argument_b_copy: ${sensitive_argument_b_copy}
-            - argument_concat_1: ${argument_concat_1}
-            - sensitive_argument_concat_1: ${sensitive_argument_concat_1}
-            - argument_concat_2_folded: ${argument_concat_2_folded}
-            - sensitive_argument_concat_2_folded: ${sensitive_argument_concat_2_folded}
-            - argument_step_argument_null: ${argument_step_argument_null}
-            - sensitive_argument_step_argument_null: ${sensitive_argument_step_argument_null}
+            - argument_no_value:                                                    ${argument_no_value}
+            - argument_input_no_value:                                              ${argument_input_no_value}                                               
+            - argument_input_no_value_sensitive:                                    ${argument_input_no_value_sensitive}
+            - argument_input_get_input_no_value:                                    ${argument_input_get_input_no_value}                                    
+            - argument_input_get_input_no_value_sensitive:                          ${argument_input_get_input_no_value_sensitive}                        
+            - argument_input_get_sensitive_input_no_value:                          ${argument_input_get_sensitive_input_no_value}                        
+            - argument_input_get_sensitive_input_no_value_sensitive:                ${argument_input_get_sensitive_input_no_value_sensitive}
+            - argument_python_get_input_no_value:                                   ${argument_python_get_input_no_value}                                    
+            - argument_python_get_sensitive_input_no_value:                         ${argument_python_get_sensitive_input_no_value}                     
+            - argument_input_python_get_input_no_value:                             ${argument_input_python_get_input_no_value}                           
+            - argument_input_python_get_input_no_value_sensitive:                   ${argument_input_python_get_input_no_value_sensitive}               
+            - argument_input_python_get_sensitive_input_no_value:                   ${argument_input_python_get_sensitive_input_no_value}               
+            - argument_input_python_get_sensitive_input_no_value_sensitive:         ${argument_input_python_get_sensitive_input_no_value_sensitive}
+            - argument_with_value:                                                  ${argument_with_value}                                                  
+            - argument_input_with_value:                                            ${argument_input_with_value}                                            
+            - argument_input_with_value_sensitive:                                  ${argument_input_with_value_sensitive}
+            - argument_input_get_input_with_value:                                  ${argument_input_get_input_with_value}                                
+            - argument_input_get_input_with_value_sensitive:                        ${argument_input_get_input_with_value_sensitive}                    
+            - argument_input_get_sensitive_input_with_value:                        ${argument_input_get_sensitive_input_with_value}                    
+            - argument_input_get_sensitive_input_with_value_sensitive:              ${argument_input_get_sensitive_input_with_value_sensitive}
+            - argument_python_get_input_with_value:                                 ${argument_python_get_input_with_value}                               
+            - argument_python_get_input_with_value_sensitive:                       ${argument_python_get_input_with_value_sensitive}                   
+            - argument_input_python_get_input_with_value:                           ${argument_input_python_get_input_with_value}                         
+            - argument_input_python_get_input_with_value_sensitive:                 ${argument_input_python_get_input_with_value_sensitive}             
+            - argument_input_python_get_sensitive_input_with_value:                 ${argument_input_python_get_sensitive_input_with_value}             
+            - argument_input_python_get_sensitive_input_with_value_sensitive:       ${argument_input_python_get_sensitive_input_with_value_sensitive}
+            - argument_system_property:                                             ${argument_system_property}                                             
+            - argument_input_system_property:                                       ${argument_input_system_property}                                       
+            - argument_input_system_property_sensitive:                             ${argument_input_system_property_sensitive}
+            - argument_get_input_system_property:                                   ${argument_get_input_system_property}                                 
+            - argument_get_input_system_property_sensitive:                         ${argument_get_input_system_property_sensitive}                     
+            - argument_input_get_input_system_property:                             ${argument_input_get_input_system_property}                           
+            - argument_input_get_input_system_property_sensitive:                   ${argument_input_get_input_system_property_sensitive}               
+            - argument_input_get_sensitive_input_system_property:                   ${argument_input_get_sensitive_input_system_property}               
+            - argument_input_get_sensitive_input_system_property_sensitive:         ${argument_input_get_sensitive_input_system_property_sensitive}
+            - argument_python_get_input_system_property:                            ${argument_python_get_input_system_property}                          
+            - argument_python_get_input_system_property_sensitive:                  ${argument_python_get_input_system_property_sensitive}              
+            - argument_input_python_get_input_system_property:                      ${argument_input_python_get_input_system_property}                  
+            - argument_input_python_get_input_system_property_sensitive:            ${argument_input_python_get_input_system_property_sensitive}      
+            - argument_input_python_get_sensitive_input_system_property:            ${argument_input_python_get_sensitive_input_system_property}      
+            - argument_input_python_get_sensitive_input_system_property_sensitive:  ${argument_input_python_get_sensitive_input_system_property_sensitive}
+            - argument_authorized_keys_path:                                        ${argument_authorized_keys_path}                                            
+            - argument_input_authorized_keys_path:                                  ${argument_input_authorized_keys_path}                                       
+            - argument_input_authorized_keys_path_sensitive:                        ${argument_input_authorized_keys_path_sensitive}
+            - argument_scp_host_port:                                               ${argument_scp_host_port}                                                      
+            - argument_input_scp_host_port:                                         ${argument_input_scp_host_port}                                                
+            - argument_input_scp_host_port_sensitive:                               ${argument_input_scp_host_port_sensitive}
+            - argument_input_not_overridable:                                       ${argument_input_not_overridable}                                            
+            - argument_input_not_overridable_sensitive:                             ${argument_input_not_overridable_sensitive}
+            - argument_overridable_hi1:                                             ${argument_overridable_hi1}                                                    
+            - argument_input_overridable_hi1:                                       ${argument_input_overridable_hi1}                                            
+            - argument_input_overridable_hi1_sensitive:                             ${argument_input_overridable_hi1_sensitive}
+            - argument_overridable_hi2:                                             ${argument_overridable_hi2}                                                    
+            - argument_input_overridable_hi2:                                       ${argument_input_overridable_hi2}                                            
+            - argument_input_overridable_hi2_sensitive:                             ${argument_input_overridable_hi2_sensitive}
+            - argument_overridable_hi3:                                             ${argument_overridable_hi3}                                                    
+            - argument_input_overridable_hi3:                                       ${argument_input_overridable_hi3}                                            
+            - argument_input_overridable_hi3_sensitive:                             ${argument_input_overridable_hi3_sensitive}
+            - argument_yaml_list:                                                   ${argument_yaml_list}                                                            
+            - argument_input_yaml_list:                                             ${argument_input_yaml_list}                                                    
+            - argument_input_yaml_list_sensitive:                                   ${argument_input_yaml_list_sensitive}
+            - argument_yaml_map:                                                    ${argument_yaml_map}                                                             
+            - argument_input_yaml_map:                                              ${argument_input_yaml_map}                                                     
+            - argument_input_yaml_map_sensitive:                                    ${argument_input_yaml_map_sensitive}
+            - argument_properties_yaml_map_folded:                                  ${argument_properties_yaml_map_folded}                                       
+            - argument_input_properties_yaml_map_folded:                            ${argument_input_properties_yaml_map_folded}                               
+            - argument_input_properties_yaml_map_folded_sensitive:                  ${argument_input_properties_yaml_map_folded_sensitive}
+            - argument_python_null:                                                 ${argument_python_null}                                                        
+            - argument_input_python_null:                                           ${argument_input_python_null}                                                  
+            - argument_input_python_null_sensitive:                                 ${argument_input_python_null_sensitive}
+            - argument_python_list:                                                 ${argument_python_list}                                                        
+            - argument_input_python_list:                                           ${argument_input_python_list}                                                  
+            - argument_input_python_list_sensitive:                                 ${argument_input_python_list_sensitive}
+            - argument_python_map:                                                  ${argument_python_map}                                                         
+            - argument_input_python_map:                                            ${argument_input_python_map}                                                   
+            - argument_input_python_map_sensitive:                                  ${argument_input_python_map_sensitive}
+            - argument_x:                                                           ${argument_x}                                                                    
+            - argument_input_x:                                                     ${argument_input_x}                                                              
+            - argument_input_x_sensitive:                                           ${argument_input_x_sensitive}                                                  
+            - argument_input_x_copy:                                                ${argument_input_x_copy}                                                       
+            - argument_input_x_copy_sensitive:                                      ${argument_input_x_copy_sensitive}                                           
+            - argument_input_sensitive_x_copy:                                      ${argument_input_sensitive_x_copy}                                           
+            - argument_input_sensitive_x_copy_sensitive:                            ${argument_input_sensitive_x_copy_sensitive}
+            - argument_concat_x:                                                    ${argument_concat_x}                                                             
+            - argument_input_concat_x:                                              ${argument_input_concat_x}                                                     
+            - argument_input_concat_x_sensitive:                                    ${argument_input_concat_x_sensitive}                                         
+            - argument_input_sensitive_concat_x:                                    ${argument_input_sensitive_concat_x}                                         
+            - argument_input_sensitive_concat_x_sensitive:                          ${argument_input_sensitive_concat_x_sensitive}
+            - argument_y                                                            ${argument_y}
+            - argument_concat_y                                                     ${argument_concat_y}
+            - argument_input_concat_y                                               ${argument_input_concat_y}
+            - argument_input_concat_y_sensitive                                     ${argument_input_concat_y_sensitive}
+            - argument_input_sensitive_concat_y                                     ${argument_input_sensitive_concat_y}
+            - argument_input_sensitive_concat_y_sensitive                           ${argument_input_sensitive_concat_y_sensitive}
+            - argument_concat_x_folded:                                             ${argument_concat_x_folded}
+            - argument_input_concat_x_folded:                                       ${argument_input_concat_x_folded}                                            
+            - argument_input_concat_x_folded_sensitive:                             ${argument_input_concat_x_folded_sensitive}                                
+            - argument_input_sensitive_concat_x_folded:                             ${argument_input_sensitive_concat_x_folded}                                
+            - argument_input_sensitive_concat_x_folded_sensitive:                   ${argument_input_sensitive_concat_x_folded_sensitive}                    
+            - argument_input_concat_x_folded_copy:                                  ${argument_input_concat_x_folded_copy}                                       
+            - argument_input_concat_x_folded_copy_sensitive:                        ${argument_input_concat_x_folded_copy_sensitive}                           
+            - argument_input_sensitive_concat_x_folded_copy:                        ${argument_input_sensitive_concat_x_folded_copy}                           
+            - argument_input_sensitive_concat_x_folded_sensitive:                   ${argument_input_sensitive_concat_x_folded_sensitive}
+            - argument_expression_characters:                                       ${argument_expression_characters}                 
+            - argument_input_expression_characters:                                 ${argument_input_expression_characters}           
+            - argument_input_expression_characters_sensitive:                       ${argument_input_expression_characters_sensitive} 
+            - argument_input_sensitive_expression_characters                        ${argument_input_sensitive_expression_characters}
+            - argument_input_sensitive_expression_characters_sensitive              ${argument_input_sensitive_expression_characters_sensitive}
 
   outputs:
-    - argument_no_expression
-    - sensitive_argument_no_expression
-    - argument_int
-    - sensitive_argument_int
-    - argument_str_no_quotes
-    - sensitive_argument_str_no_quotes
-    - argument_str_single
-    - sensitive_argument_str_single
-    - argument_str_double
-    - sensitive_argument_str_double
+    - argument_no_value
+    - argument_input_no_value
+    - argument_input_no_value_sensitive
+    - argument_input_get_input_no_value
+    - argument_input_get_input_no_value_sensitive
+    - argument_input_get_sensitive_input_no_value
+    - argument_input_get_sensitive_input_no_value_sensitive
+    - argument_python_get_input_no_value
+    - argument_python_get_sensitive_input_no_value
+    - argument_input_python_get_input_no_value
+    - argument_input_python_get_input_no_value_sensitive
+    - argument_input_python_get_sensitive_input_no_value
+    - argument_input_python_get_sensitive_input_no_value_sensitive
+    - argument_with_value
+    - argument_input_with_value
+    - argument_input_with_value_sensitive
+    - argument_input_get_input_with_value
+    - argument_input_get_input_with_value_sensitive
+    - argument_input_get_sensitive_input_with_value
+    - argument_input_get_sensitive_input_with_value_sensitive
+    - argument_python_get_input_with_value
+    - argument_python_get_input_with_value_sensitive
+    - argument_input_python_get_input_with_value
+    - argument_input_python_get_input_with_value_sensitive
+    - argument_input_python_get_sensitive_input_with_value
+    - argument_input_python_get_sensitive_input_with_value_sensitive
+    - argument_system_property
+    - argument_input_system_property
+    - argument_input_system_property_sensitive
+    - argument_get_input_system_property
+    - argument_get_input_system_property_sensitive
+    - argument_input_get_input_system_property
+    - argument_input_get_input_system_property_sensitive
+    - argument_input_get_sensitive_input_system_property
+    - argument_input_get_sensitive_input_system_property_sensitive
+    - argument_python_get_input_system_property
+    - argument_python_get_input_system_property_sensitive
+    - argument_input_python_get_input_system_property
+    - argument_input_python_get_input_system_property_sensitive
+    - argument_input_python_get_sensitive_input_system_property
+    - argument_input_python_get_sensitive_input_system_property_sensitive
+    - argument_authorized_keys_path
+    - argument_input_authorized_keys_path
+    - argument_input_authorized_keys_path_sensitive
+    - argument_scp_host_port
+    - argument_input_scp_host_port
+    - argument_input_scp_host_port_sensitive
+    - argument_input_not_overridable
+    - argument_input_not_overridable_sensitive
+    - argument_overridable_hi1
+    - argument_input_overridable_hi1
+    - argument_input_overridable_hi1_sensitive
+    - argument_overridable_hi2
+    - argument_input_overridable_hi2
+    - argument_input_overridable_hi2_sensitive
+    - argument_overridable_hi3
+    - argument_input_overridable_hi3
+    - argument_input_overridable_hi3_sensitive
     - argument_yaml_list
-    - sensitive_argument_yaml_list
+    - argument_input_yaml_list
+    - argument_input_yaml_list_sensitive
+    - argument_yaml_map
+    - argument_input_yaml_map
+    - argument_input_yaml_map_sensitive
     - argument_properties_yaml_map_folded
-    - sensitive_argument_properties_yaml_map_folded
+    - argument_input_properties_yaml_map_folded
+    - argument_input_properties_yaml_map_folded_sensitive
     - argument_python_null
-    - sensitive_argument_python_null
+    - argument_input_python_null
+    - argument_input_python_null_sensitive
     - argument_python_list
-    - sensitive_argument_python_list
+    - argument_input_python_list
+    - argument_input_python_list_sensitive
     - argument_python_map
-    - sensitive_argument_python_map
-    - argument_b
-    - sensitive_argument_b
-    - argument_b_copy
-    - sensitive_argument_b_copy
-    - argument_concat_1
-    - sensitive_argument_concat_1
-    - argument_concat_2_folded
-    - sensitive_argument_concat_2_folded
-    - argument_step_argument_null
-    - sensitive_argument_step_argument_null
+    - argument_input_python_map
+    - argument_input_python_map_sensitive
+    - argument_x
+    - argument_input_x
+    - argument_input_x_sensitive
+    - argument_input_x_copy
+    - argument_input_x_copy_sensitive
+    - argument_input_sensitive_x_copy
+    - argument_input_sensitive_x_copy_sensitive
+    - argument_concat_x
+    - argument_input_concat_x
+    - argument_input_concat_x_sensitive
+    - argument_input_sensitive_concat_x
+    - argument_input_sensitive_concat_x_sensitive
+    - argument_y
+    - argument_concat_y
+    - argument_input_concat_y
+    - argument_input_concat_y_sensitive
+    - argument_input_sensitive_concat_y
+    - argument_input_sensitive_concat_y_sensitive
+    - argument_concat_x_folded
+    - argument_input_concat_x_folded
+    - argument_input_concat_x_folded_sensitive
+    - argument_input_sensitive_concat_x_folded
+    - argument_input_sensitive_concat_x_folded_sensitive
+    - argument_input_concat_x_folded_copy
+    - argument_input_concat_x_folded_copy_sensitive
+    - argument_input_sensitive_concat_x_folded_copy
+    - argument_input_sensitive_concat_x_folded_sensitive
+    - argument_expression_characters
+    - argument_input_expression_characters
+    - argument_input_expression_characters_sensitive
+    - argument_input_sensitive_expression_characters
+    - argument_input_sensitive_expression_characters_sensitive
+
   results:
     - SUCCESS
     - FAILURE

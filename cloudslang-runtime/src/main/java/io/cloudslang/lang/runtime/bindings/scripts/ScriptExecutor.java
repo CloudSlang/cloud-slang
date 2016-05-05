@@ -11,12 +11,12 @@
  */
 package io.cloudslang.lang.runtime.bindings.scripts;
 
+import io.cloudslang.lang.entities.bindings.values.Value;
 import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -31,9 +31,7 @@ public class ScriptExecutor extends AbstractScriptInterpreter {
     private PythonInterpreter interpreter;
 
     //we need this method to be synchronized so we will not have multiple scripts run in parallel on the same context
-    public synchronized Map<String, Serializable> executeScript(
-            String script,
-            Map<String, Serializable> callArguments) {
+    public synchronized Map<String, Value> executeScript(String script, Map<String, Value> callArguments) {
         try {
             cleanInterpreter(interpreter);
             prepareInterpreterContext(callArguments);
@@ -43,9 +41,9 @@ public class ScriptExecutor extends AbstractScriptInterpreter {
         }
     }
 
-    private void prepareInterpreterContext(Map<String, Serializable> context) {
-        for (Map.Entry<String, Serializable> entry : context.entrySet()) {
-            interpreter.set(entry.getKey(), entry.getValue());
+    private void prepareInterpreterContext(Map<String, Value> context) {
+        for (Map.Entry<String, Value> entry : context.entrySet()) {
+            interpreter.set(entry.getKey(), entry.getValue() == null ? null : entry.getValue().get());
         }
     }
 

@@ -1,5 +1,7 @@
 package io.cloudslang.lang.runtime.bindings.scripts;
 
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,9 +36,9 @@ public class ScriptExecutorTest {
     @Test
     public void testExecuteScript() throws Exception {
         String script = "pass";
-        Map<String, Serializable> scriptInputValues = new HashMap<>();
-        scriptInputValues.put("input1", "value1");
-        scriptInputValues.put("input2", "value2");
+        Map<String, Value> scriptInputValues = new HashMap<>();
+        scriptInputValues.put("input1", ValueFactory.create("value1"));
+        scriptInputValues.put("input2", ValueFactory.create("value2"));
         Map<Object, PyObject> scriptOutputValues = new HashMap<>();
         scriptOutputValues.put("output1", new PyString("value1"));
         scriptOutputValues.put("output2", new PyString("value2"));
@@ -47,7 +49,7 @@ public class ScriptExecutorTest {
         expectedScriptOutputs.put("output1", "value1");
         expectedScriptOutputs.put("output2", "value2");
 
-        Map<String, Serializable> outputs = scriptExecutor.executeScript(script, scriptInputValues);
+        Map<String, Value> outputs = scriptExecutor.executeScript(script, scriptInputValues);
 
         verify(pythonInterpreter).set("input1", "value1");
         verify(pythonInterpreter).set("input2", "value2");
@@ -64,7 +66,7 @@ public class ScriptExecutorTest {
         exception.expectMessage("error from interpreter");
         exception.expectMessage("Error executing python script");
 
-        scriptExecutor.executeScript(script, new HashMap<String, Serializable>());
+        scriptExecutor.executeScript(script, new HashMap<String, Value>());
     }
 
 }

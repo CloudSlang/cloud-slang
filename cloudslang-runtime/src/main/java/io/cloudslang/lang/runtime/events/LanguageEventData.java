@@ -9,6 +9,8 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.events;
 
+import io.cloudslang.lang.entities.bindings.values.Value;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,6 +22,7 @@ import java.util.Map;
  * @version $Id$
  * @since 03/11/2014
  */
+@SuppressWarnings("unchecked")
 public class LanguageEventData extends HashMap<String, Serializable> {
 
     public static final String TYPE = "TYPE";
@@ -120,40 +123,41 @@ public class LanguageEventData extends HashMap<String, Serializable> {
         put(EXCEPTION, exceptionMessage);
     }
 
-    public Map<String, Serializable> getInputs() {
-        return (Map<String, Serializable>) get(BOUND_INPUTS);
+    public Map<String, Value> getInputs() {
+        return (Map<String, Value>) get(BOUND_INPUTS);
     }
 
-    public void setInputs(Map<String, Serializable> inputs) {
+    public void setInputs(Map<String, Value> inputs) {
         put(BOUND_INPUTS, (Serializable) inputs);
     }
 
-    public Map<String, Serializable> getArguments() {
-        return (Map<String, Serializable>) get(BOUND_ARGUMENTS);
+    public Map<String, Value> getArguments() {
+        return (Map<String, Value>) get(BOUND_ARGUMENTS);
     }
 
-    public void setArguments(Map<String, Serializable> arguments) {
+    public void setArguments(Map<String, Value> arguments) {
         put(BOUND_ARGUMENTS, (Serializable) arguments);
     }
 
-    public Map<String, Serializable> getOutputs() {
-        return (Map<String, Serializable>) get(OUTPUTS);
+    public Map<String, Value> getOutputs() {
+        return (Map<String, Value>) get(OUTPUTS);
     }
 
-    public void setOutputs(Map<String, Serializable> outputs) {
+    public void setOutputs(Map<String, Value> outputs) {
         put(OUTPUTS, (Serializable) outputs);
     }
 
-    public List<Serializable> getAsyncLoopBoundExpression() {
-        return (List<Serializable>) get(BOUND_ASYNC_LOOP_EXPRESSION);
+    public List<Value> getAsyncLoopBoundExpression() {
+        return (List<Value>) get(BOUND_ASYNC_LOOP_EXPRESSION);
     }
 
-    public void setAsyncLoopBoundExpression(List<Serializable> asyncLoopBoundExpression) {
-        put(BOUND_ASYNC_LOOP_EXPRESSION, (Serializable) asyncLoopBoundExpression);
+    public void setAsyncLoopBoundExpression(List<Value> asyncLoopBoundExpression) {
+        put(BOUND_ASYNC_LOOP_EXPRESSION, (Serializable)asyncLoopBoundExpression);
     }
 
-    public Map<String, Serializable> getCallArguments() {return (Map<String, Serializable>) get(CALL_ARGUMENTS);}
+    public Map<String, Value> getCallArguments() {return (Map<String, Value>) get(CALL_ARGUMENTS);}
 
-    public void setCallArguments(Map<String, Serializable> callArguments) {put(CALL_ARGUMENTS, (Serializable) callArguments);
+    public void setCallArguments(Map<String, Value> callArguments) {
+        put(CALL_ARGUMENTS, (Serializable)callArguments);
     }
 }

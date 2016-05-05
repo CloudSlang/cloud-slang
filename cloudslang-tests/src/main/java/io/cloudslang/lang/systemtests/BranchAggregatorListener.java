@@ -11,16 +11,18 @@ package io.cloudslang.lang.systemtests;
 
 import ch.lambdaj.group.Group;
 import com.google.common.collect.Lists;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static ch.lambdaj.Lambda.*;
+import static ch.lambdaj.Lambda.by;
+import static ch.lambdaj.Lambda.group;
+import static ch.lambdaj.Lambda.on;
 
 /**
  * Date: 4/8/2015
@@ -54,7 +56,7 @@ public class BranchAggregatorListener extends AbstractAggregatorListener {
                     new StepData(
                             path,
                             stepName,
-                            new HashMap<String, Serializable>(),
+                            new HashMap<String, Value>(),
                             returnValues.getOutputs(),
                             null, returnValues.getResult()
                     )

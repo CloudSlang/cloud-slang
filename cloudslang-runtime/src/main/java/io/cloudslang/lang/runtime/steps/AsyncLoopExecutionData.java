@@ -14,6 +14,8 @@ import io.cloudslang.lang.entities.AsyncLoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.lang.runtime.bindings.AsyncLoopBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
@@ -72,22 +74,22 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
         try {
             Context flowContext = runEnv.getStack().popContext();
 
-            List<Serializable> splitData = asyncLoopBinding.bindAsyncLoopList(asyncLoopStatement, flowContext, runEnv.getSystemProperties(), nodeName);
+            List<Value> splitData = asyncLoopBinding.bindAsyncLoopList(asyncLoopStatement, flowContext, runEnv.getSystemProperties(), nodeName);
 
             fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_SPLIT_BRANCHES,
                     "async loop expression bound", runEnv.getExecutionPath().getCurrentPath(),
                     LanguageEventData.StepType.STEP, nodeName,
-                    Pair.of(LanguageEventData.BOUND_ASYNC_LOOP_EXPRESSION, (Serializable) splitData));
+                    Pair.of(LanguageEventData.BOUND_ASYNC_LOOP_EXPRESSION, ValueFactory.create((Serializable) splitData)));
 
             runEnv.putNextStepPosition(nextStepId);
             runEnv.getExecutionPath().down();
 
-            for (Serializable splitItem : splitData) {
+            for (Value splitItem : splitData) {
 
                 // first fire event
                 fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_BRANCH_START,
                         "async loop branch created", runEnv.getExecutionPath().getCurrentPath(),
-                        LanguageEventData.StepType.STEP, nodeName, Pair.of(ScoreLangConstants.REF_ID, refId),
+                        LanguageEventData.StepType.STEP, nodeName, Pair.of(ScoreLangConstants.REF_ID, ValueFactory.create(refId)),
                         Pair.of(RuntimeConstants.SPLIT_ITEM_KEY, splitItem));
                 // take path down one level
                 runEnv.getExecutionPath().down();
@@ -98,7 +100,7 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
                 Context branchContext = (Context) SerializationUtils.clone(flowContext);
                 branchContext.putVariable(asyncLoopStatement.getVarName(), splitItem);
                 updateCallArgumentsAndPushContextToStack(branchRuntimeEnvironment,
-                        branchContext, new HashMap<String, Serializable>());
+                        branchContext, new HashMap<String, Value>());
 
                 createBranch(
                         branchRuntimeEnvironment,
@@ -113,7 +115,7 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
                 runEnv.getExecutionPath().forward();
             }
 
-            updateCallArgumentsAndPushContextToStack(runEnv, flowContext, new HashMap<String, Serializable>());
+            updateCallArgumentsAndPushContextToStack(runEnv, flowContext, new HashMap<String, Value>());
         } catch (RuntimeException e) {
             logger.error("There was an error running the add branches execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
@@ -134,7 +136,7 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
 
             collectBranchesData(executionRuntimeServices, nodeName, branchesContext, branchesResult);
 
-            Map<String, Serializable> publishValues =
+            Map<String, Value> publishValues =
                     bindAggregateOutputs(
                             runEnv,
                             executionRuntimeServices,
@@ -163,7 +165,7 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
             ExecutionRuntimeServices executionRuntimeServices,
             Map<String, ResultNavigation> stepNavigationValues,
             String nodeName,
-            Map<String, Serializable> publishValues,
+            Map<String, Value> publishValues,
             String asyncLoopResult) {
         // set the position of the next step - for the use of the navigation
         // find in the navigation values the correct next step position, according to the async loop result, and set it
@@ -175,14 +177,14 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
         Long nextStepPosition = navigation.getNextStepId();
         String presetResult = navigation.getPresetResult();
 
-        HashMap<String, Serializable> outputs = new HashMap<>(publishValues);
+        HashMap<String, Value> outputs = new HashMap<>(publishValues);
         ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : asyncLoopResult);
 
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_JOIN_BRANCHES_END,
                 "Async loop output binding finished", LanguageEventData.StepType.STEP, nodeName,
-                Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
-                Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
-                Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextStepPosition));
+                Pair.of(LanguageEventData.OUTPUTS, ValueFactory.create((Serializable) publishValues)),
+                Pair.of(LanguageEventData.RESULT, ValueFactory.create(returnValues.getResult())),
+                Pair.of(LanguageEventData.NEXT_STEP_POSITION, ValueFactory.create(nextStepPosition)));
 
         runEnv.putReturnValues(returnValues);
         runEnv.putNextStepPosition(nextStepPosition);
@@ -200,7 +202,7 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
         return asyncLoopResult;
     }
 
-    private Map<String, Serializable> bindAggregateOutputs(
+    private Map<String, Value> bindAggregateOutputs(
             RunEnvironment runEnv,
             ExecutionRuntimeServices executionRuntimeServices,
             List<Output> stepAggregateValues,
@@ -208,19 +210,19 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
             String nodeName,
             List<Map<String, Serializable>> branchesContext) {
 
-        Map<String, Serializable> aggregateContext = new HashMap<>();
-        aggregateContext.put(RuntimeConstants.BRANCHES_CONTEXT_KEY, (Serializable) branchesContext);
+        Map<String, Value> aggregateContext = new HashMap<>();
+        aggregateContext.put(RuntimeConstants.BRANCHES_CONTEXT_KEY, ValueFactory.create((Serializable) branchesContext));
 
         fireEvent(
                 executionRuntimeServices,
                 runEnv,
                 ScoreLangConstants.EVENT_JOIN_BRANCHES_START,
                 "Async loop output binding started", LanguageEventData.StepType.STEP, nodeName,
-                Pair.of(ScoreLangConstants.STEP_AGGREGATE_KEY, (Serializable) stepAggregateValues),
-                Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues));
+                Pair.of(ScoreLangConstants.STEP_AGGREGATE_KEY, ValueFactory.create((Serializable) stepAggregateValues)),
+                Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, ValueFactory.create((Serializable) stepNavigationValues)));
 
         return outputsBinding.bindOutputs(
-                Collections.<String, Serializable>emptyMap(),
+                Collections.<String, Value>emptyMap(),
                 aggregateContext,
                 runEnv.getSystemProperties(),
                 stepAggregateValues
@@ -253,7 +255,7 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
 
             RunEnvironment branchRuntimeEnvironment = (RunEnvironment) branchContext.get(ScoreLangConstants.RUN_ENV);
 
-            branchesContext.add(branchRuntimeEnvironment.getStack().popContext().getImmutableViewOfVariables());
+            branchesContext.add(convert(branchRuntimeEnvironment.getStack().popContext().getImmutableViewOfVariables()));
 
             ReturnValues executableReturnValues = branchRuntimeEnvironment.removeReturnValues();
             branchesResult.add(executableReturnValues.getResult());
@@ -263,7 +265,7 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
 
             fireEvent(executionRuntimeServices, branchRuntimeEnvironment, ScoreLangConstants.EVENT_BRANCH_END,
                     "async loop branch ended", LanguageEventData.StepType.STEP, nodeName,
-                    Pair.of(RuntimeConstants.BRANCH_RETURN_VALUES_KEY, executableReturnValues)
+                    Pair.of(RuntimeConstants.BRANCH_RETURN_VALUES_KEY, ValueFactory.create(executableReturnValues))
             );
         }
     }
@@ -275,5 +277,13 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
         Map<String, Serializable> branchContext = new HashMap<>();
         branchContext.put(ScoreLangConstants.RUN_ENV, runEnv);
         executionRuntimeServices.addBranch(branchBeginStep, refId, branchContext);
+    }
+
+    private Map<String, Serializable> convert(Map<String, Value> map) {
+        Map<String, Serializable> result = new HashMap<>(map.size());
+        for (Map.Entry<String, Value> entry : map.entrySet()) {
+            result.put(entry.getKey(), entry.getValue() == null ? null : entry.getValue().get());
+        }
+        return result;
     }
 }

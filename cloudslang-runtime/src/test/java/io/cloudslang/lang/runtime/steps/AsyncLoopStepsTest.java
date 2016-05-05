@@ -13,6 +13,8 @@ import io.cloudslang.lang.entities.AsyncLoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.lang.runtime.bindings.AsyncLoopBinding;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
@@ -46,7 +48,12 @@ import java.util.List;
 import java.util.Map;
 
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
 * Date: 4/7/2015
@@ -87,7 +94,7 @@ public class AsyncLoopStepsTest {
         AsyncLoopStatement asyncLoopStatement = new AsyncLoopStatement("varName", "expression");
 
         RunEnvironment runEnvironment = new RunEnvironment();
-        Map<String, Serializable> variables = new HashMap<>();
+        Map<String, Value> variables = new HashMap<>();
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
@@ -96,7 +103,7 @@ public class AsyncLoopStepsTest {
 
         // prepare mocks
         ExecutionRuntimeServices executionRuntimeServices = mock(ExecutionRuntimeServices.class);
-        List<Serializable> expectedSplitData = Lists.newArrayList((Serializable) 1, 2, 3);
+        List<Value> expectedSplitData = Lists.newArrayList(ValueFactory.create(1), ValueFactory.create(2), ValueFactory.create(3));
         when(asyncLoopBinding.bindAsyncLoopList(eq(asyncLoopStatement), eq(context), eq(runEnvironment.getSystemProperties()), eq(nodeName))).thenReturn(expectedSplitData);
         Long branchBeginStepID = 3L;
 
@@ -114,14 +121,15 @@ public class AsyncLoopStepsTest {
 
         // verify expected behaviour
         ArgumentCaptor<Map> branchContextArgumentCaptor = ArgumentCaptor.forClass(Map.class);
+        //noinspection unchecked
         verify(executionRuntimeServices, times(3)).addBranch(eq(branchBeginStepID), eq(refId), branchContextArgumentCaptor.capture());
 
         List<Map> branchContexts = branchContextArgumentCaptor.getAllValues();
-        List<Serializable> actualSplitData = Lists.newArrayList();
+        List<Value> actualSplitData = Lists.newArrayList();
         for (Map branchContext : branchContexts) {
             Assert.assertTrue("runtime environment not found in branch context", branchContext.containsKey(ScoreLangConstants.RUN_ENV));
             RunEnvironment branchRunEnvironment = (RunEnvironment) branchContext.get(ScoreLangConstants.RUN_ENV);
-            Map<String, Serializable> branchVariables = branchRunEnvironment.getStack().popContext().getImmutableViewOfVariables();
+            Map<String, Value> branchVariables = branchRunEnvironment.getStack().popContext().getImmutableViewOfVariables();
             actualSplitData.add(branchVariables.get("varName"));
         }
         Assert.assertEquals(expectedSplitData, actualSplitData);
@@ -135,7 +143,7 @@ public class AsyncLoopStepsTest {
         AsyncLoopStatement asyncLoopStatement = new AsyncLoopStatement("varName", "expression");
 
         RunEnvironment runEnvironment = new RunEnvironment();
-        Map<String, Serializable> variables = new HashMap<>();
+        Map<String, Value> variables = new HashMap<>();
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
@@ -144,7 +152,7 @@ public class AsyncLoopStepsTest {
 
         // prepare mocks
         ExecutionRuntimeServices executionRuntimeServices = mock(ExecutionRuntimeServices.class);
-        List<Serializable> expectedSplitData = Lists.newArrayList((Serializable) 1, 2, 3);
+        List<Value> expectedSplitData = Lists.newArrayList(ValueFactory.create(1), ValueFactory.create(2), ValueFactory.create(3));
         when(asyncLoopBinding.bindAsyncLoopList(eq(asyncLoopStatement), eq(context), eq(runEnvironment.getSystemProperties()), eq(nodeName))).thenReturn(expectedSplitData);
         Long branchBeginStepID = 0L;
 
@@ -181,11 +189,11 @@ public class AsyncLoopStepsTest {
         // prepare arguments
         RunEnvironment runEnvironment = new RunEnvironment();
         runEnvironment.getExecutionPath().down();
-        Map<String, Serializable> variables = new HashMap<>();
+        Map<String, Value> variables = new HashMap<>();
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
+        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", ValueFactory.create("outputExpression")));
 
         Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, ScoreLangConstants.SUCCESS_RESULT);
@@ -220,6 +228,7 @@ public class AsyncLoopStepsTest {
 
         // verify expected behaviour
         ArgumentCaptor<Map> aggregateContextArgumentCaptor = ArgumentCaptor.forClass(Map.class);
+        //noinspection unchecked
         verify(outputsBinding).bindOutputs(
                 eq(context.getImmutableViewOfVariables()),
                 aggregateContextArgumentCaptor.capture(),
@@ -230,11 +239,11 @@ public class AsyncLoopStepsTest {
         @SuppressWarnings("unchecked")
         List<Map<String, Serializable>> expectedBranchContexts = Lists.newArrayList(runtimeContext1, runtimeContext2, runtimeContext3);
         @SuppressWarnings("unchecked")
-        Map<String, Serializable> aggregateContext = aggregateContextArgumentCaptor.getValue();
+        Map<String, Value> aggregateContext = aggregateContextArgumentCaptor.getValue();
         Assert.assertTrue(aggregateContext.containsKey(RuntimeConstants.BRANCHES_CONTEXT_KEY));
         @SuppressWarnings("unchecked")
-        List<Map<String, Serializable>> actualBranchesContexts =
-                (List<Map<String, Serializable>>) aggregateContext.get(RuntimeConstants.BRANCHES_CONTEXT_KEY);
+        List<Map<String, Value>> actualBranchesContexts =
+                (List<Map<String, Value>>) aggregateContext.get(RuntimeConstants.BRANCHES_CONTEXT_KEY);
         Assert.assertEquals(expectedBranchContexts, actualBranchesContexts);
     }
 
@@ -243,11 +252,11 @@ public class AsyncLoopStepsTest {
         // prepare arguments
         RunEnvironment runEnvironment = new RunEnvironment();
         runEnvironment.getExecutionPath().down();
-        Map<String, Serializable> variables = new HashMap<>();
+        Map<String, Value> variables = new HashMap<>();
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
+        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", ValueFactory.create("outputExpression")));
 
         Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, "CUSTOM_SUCCESS");
@@ -293,11 +302,11 @@ public class AsyncLoopStepsTest {
         // prepare arguments
         RunEnvironment runEnvironment = new RunEnvironment();
         runEnvironment.getExecutionPath().down();
-        Map<String, Serializable> variables = new HashMap<>();
+        Map<String, Value> variables = new HashMap<>();
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
+        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", ValueFactory.create("outputExpression")));
 
         Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, "CUSTOM_SUCCESS");
@@ -315,9 +324,9 @@ public class AsyncLoopStepsTest {
         runtimeContext2.put("branch2Output", 2);
         runtimeContext3.put("branch3Output", 3);
 
-        ReturnValues returnValues1 = new ReturnValues(new HashMap<String, Serializable>(), ScoreLangConstants.SUCCESS_RESULT);
-        ReturnValues returnValues2 = new ReturnValues(new HashMap<String, Serializable>(), ScoreLangConstants.FAILURE_RESULT);
-        ReturnValues returnValues3 = new ReturnValues(new HashMap<String, Serializable>(), ScoreLangConstants.SUCCESS_RESULT);
+        ReturnValues returnValues1 = new ReturnValues(new HashMap<String, Value>(), ScoreLangConstants.SUCCESS_RESULT);
+        ReturnValues returnValues2 = new ReturnValues(new HashMap<String, Value>(), ScoreLangConstants.FAILURE_RESULT);
+        ReturnValues returnValues3 = new ReturnValues(new HashMap<String, Value>(), ScoreLangConstants.SUCCESS_RESULT);
         ExecutionRuntimeServices executionRuntimeServices = createAndConfigureExecutionRuntimeServicesMock(
                 runtimeContext1,
                 runtimeContext2,
@@ -349,11 +358,11 @@ public class AsyncLoopStepsTest {
         // prepare arguments
         RunEnvironment runEnvironment = new RunEnvironment();
         runEnvironment.getExecutionPath().down();
-        Map<String, Serializable> variables = new HashMap<>();
+        Map<String, Value> variables = new HashMap<>();
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
+        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", ValueFactory.create("outputExpression")));
 
         Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, ScoreLangConstants.SUCCESS_RESULT);
@@ -406,7 +415,7 @@ public class AsyncLoopStepsTest {
         // prepare arguments
         RunEnvironment runEnvironment = new RunEnvironment();
         runEnvironment.getExecutionPath().down();
-        Map<String, Serializable> variables = new HashMap<>();
+        Map<String, Value> variables = new HashMap<>();
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
@@ -428,9 +437,9 @@ public class AsyncLoopStepsTest {
             Map<String, Serializable> runtimeContext1,
             Map<String, Serializable> runtimeContext2,
             Map<String, Serializable> runtimeContext3) {
-        ReturnValues returnValues1 = new ReturnValues(new HashMap<String, Serializable>(), ScoreLangConstants.SUCCESS_RESULT);
-        ReturnValues returnValues2 = new ReturnValues(new HashMap<String, Serializable>(), ScoreLangConstants.SUCCESS_RESULT);
-        ReturnValues returnValues3 = new ReturnValues(new HashMap<String, Serializable>(), ScoreLangConstants.SUCCESS_RESULT);
+        ReturnValues returnValues1 = new ReturnValues(new HashMap<String, Value>(), ScoreLangConstants.SUCCESS_RESULT);
+        ReturnValues returnValues2 = new ReturnValues(new HashMap<String, Value>(), ScoreLangConstants.SUCCESS_RESULT);
+        ReturnValues returnValues3 = new ReturnValues(new HashMap<String, Value>(), ScoreLangConstants.SUCCESS_RESULT);
 
         return createAndConfigureExecutionRuntimeServicesMock(
                 runtimeContext1,
@@ -460,9 +469,9 @@ public class AsyncLoopStepsTest {
         branchRuntimeEnvironment1.getExecutionPath().down();
         branchRuntimeEnvironment2.getExecutionPath().down();
         branchRuntimeEnvironment3.getExecutionPath().down();
-        branchRuntimeEnvironment1.getStack().pushContext(new Context(runtimeContext1));
-        branchRuntimeEnvironment2.getStack().pushContext(new Context(runtimeContext2));
-        branchRuntimeEnvironment3.getStack().pushContext(new Context(runtimeContext3));
+        branchRuntimeEnvironment1.getStack().pushContext(createContext(runtimeContext1));
+        branchRuntimeEnvironment2.getStack().pushContext(createContext(runtimeContext2));
+        branchRuntimeEnvironment3.getStack().pushContext(createContext(runtimeContext3));
         branchRuntimeEnvironment1.putReturnValues(returnValues1);
         branchRuntimeEnvironment2.putReturnValues(returnValues2);
         branchRuntimeEnvironment3.putReturnValues(returnValues3);
@@ -477,6 +486,14 @@ public class AsyncLoopStepsTest {
         );
         when(executionRuntimeServices.getFinishedChildBranchesData()).thenReturn(branchesContainers);
         return executionRuntimeServices;
+    }
+
+    private Context createContext(Map<String, Serializable> runtimeContext) {
+        Map<String, Value> context = new HashMap<>(runtimeContext.size());
+        for (Map.Entry<String, Serializable> entry : runtimeContext.entrySet()) {
+            context.put(entry.getKey(), ValueFactory.create(entry.getValue()));
+        }
+        return new Context(context);
     }
 
     private ExecutionRuntimeServices createExecutionRuntimeServicesMockWithBranchException() {
@@ -523,6 +540,5 @@ public class AsyncLoopStepsTest {
         public PythonInterpreter evalInterpreter(){
             return mock(PythonInterpreter.class);
         }
-
     }
 }

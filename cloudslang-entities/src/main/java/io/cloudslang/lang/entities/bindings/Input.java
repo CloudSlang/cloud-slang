@@ -8,6 +8,8 @@
  */
 package io.cloudslang.lang.entities.bindings;
 
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -99,7 +101,7 @@ public class Input extends InOutParam {
 
 		public InputBuilder(String name, Serializable serializable, boolean sensitive) {
 			this.name = name;
-			this.value = createValue(serializable, sensitive);
+			this.value = ValueFactory.create(serializable, sensitive);
 			this.required = true;
 			this.overridable = true;
 			this.functionDependencies = new HashSet<>();
@@ -124,10 +126,6 @@ public class Input extends InOutParam {
 		public InputBuilder withSystemPropertyDependencies(Set<String> systemPropertyDependencies) {
 			this.systemPropertyDependencies = systemPropertyDependencies;
 			return this;
-		}
-
-		private Value createValue(Serializable serializable, boolean sensitive) {
-			return sensitive ? new SensitiveValue(serializable) : new SimpleValue(serializable);
 		}
 
 		public Input build() {

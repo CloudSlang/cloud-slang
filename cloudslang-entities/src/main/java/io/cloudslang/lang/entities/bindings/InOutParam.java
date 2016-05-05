@@ -8,6 +8,7 @@
  */
 package io.cloudslang.lang.entities.bindings;
 
+import io.cloudslang.lang.entities.bindings.values.Value;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -26,13 +27,13 @@ public abstract class InOutParam implements Serializable {
 	private static final long serialVersionUID = -7712676295781864973L;
 
 	private String name;
-	private Serializable value;
+	private Value value;
 	private Set<ScriptFunction> functionDependencies;
 	private Set<String> systemPropertyDependencies;
 
 	public InOutParam(
 			String name,
-			Serializable value,
+			Value value,
 			Set<ScriptFunction> functionDependencies,
 			Set<String> systemPropertyDependencies) {
 		this.name = name;
@@ -41,7 +42,7 @@ public abstract class InOutParam implements Serializable {
 		this.systemPropertyDependencies = systemPropertyDependencies;
 	}
 
-	public InOutParam(String name, Serializable value) {
+	public InOutParam(String name, Value value) {
 		this(name, value, new HashSet<ScriptFunction>(), new HashSet<String>());
 	}
 
@@ -54,12 +55,12 @@ public abstract class InOutParam implements Serializable {
 		return name;
 	}
 
-	public Serializable getValue() {
+	public Value getValue() {
 		return value;
 	}
 
 	public boolean isSensitive() {
-		return value instanceof SensitiveValue;
+		return value != null && value.isSensitive();
 	}
 
 	public Set<ScriptFunction> getFunctionDependencies() {

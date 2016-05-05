@@ -15,16 +15,21 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.systemtests.RuntimeInformation;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.ValueSyntaxParent;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Bonczidai Levente
@@ -56,7 +61,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
 
-        Map<String, Serializable> userInputs = prepareUserInputs();
+        Map<String, Value> userInputs = prepareUserInputs();
         Set<SystemProperty> systemProperties = prepareSystemProperties();
 
         // trigger ExecutionPlan
@@ -86,7 +91,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
 
         // trigger ExecutionPlan
-        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Value> userInputs = new HashMap<>();
         RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, EMPTY_SET);
         Map<String, StepData> executionData = runtimeInformation.getSteps();
 
@@ -98,89 +103,89 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
 
     private void verifyStepArguments(StepData stepData) {
         // verify `get`, `get_sp()`, `locals().get()` and mixed mode works
-        Map<String, Serializable> expectedArguments = new LinkedHashMap<>();
-        expectedArguments.put("exist", "exist_value");
-        expectedArguments.put("input_3", null);
-        expectedArguments.put("input_4", "default_str");
-        expectedArguments.put("input_5", "localhost");
-        expectedArguments.put("input_6", "localhost");
-        expectedArguments.put("input_7", "localhost");
-        expectedArguments.put("input_8", "exist_value");
-        expectedArguments.put("input_9", "localhost");
-        expectedArguments.put("input_10", "localhost");
-        expectedArguments.put("input_11", "default_str");
-        expectedArguments.put("value_propagate", "flowInput_stepArg_");
-        expectedArguments.put("input_12", "hyphen_value");
-        expectedArguments.put("input_13", "hyphen_value");
-        expectedArguments.put("input_14", "localhost");
-        expectedArguments.put("input_15", "localhost");
-        expectedArguments.put("input_16", null);
-        expectedArguments.put("input_17", "default_str");
-        Map<String, Serializable> actualArguments = stepData.getInputs();
+        Map<String, Value> expectedArguments = new LinkedHashMap<>();
+        expectedArguments.put("exist", ValueFactory.create("exist_value"));
+        expectedArguments.put("input_3", ValueFactory.create(null));
+        expectedArguments.put("input_4", ValueFactory.create("default_str"));
+        expectedArguments.put("input_5", ValueFactory.create("localhost"));
+        expectedArguments.put("input_6", ValueFactory.create("localhost"));
+        expectedArguments.put("input_7", ValueFactory.create("localhost"));
+        expectedArguments.put("input_8", ValueFactory.create("exist_value"));
+        expectedArguments.put("input_9", ValueFactory.create("localhost"));
+        expectedArguments.put("input_10", ValueFactory.create("localhost"));
+        expectedArguments.put("input_11", ValueFactory.create("default_str"));
+        expectedArguments.put("value_propagate", ValueFactory.create("flowInput_stepArg_"));
+        expectedArguments.put("input_12", ValueFactory.create("hyphen_value"));
+        expectedArguments.put("input_13", ValueFactory.create("hyphen_value"));
+        expectedArguments.put("input_14", ValueFactory.create("localhost"));
+        expectedArguments.put("input_15", ValueFactory.create("localhost"));
+        expectedArguments.put("input_16", ValueFactory.create(null));
+        expectedArguments.put("input_17", ValueFactory.create("default_str"));
+        Map<String, Value> actualArguments = stepData.getInputs();
         Assert.assertEquals("step arguments not as expected", expectedArguments, actualArguments);
     }
 
     private void verifyFlowInputs(StepData flowData) {
         // verify `get`, `get_sp()`, `locals().get()` and mixed mode works
-        Map<String, Serializable> expectedFlowInputs = new LinkedHashMap<>();
-        expectedFlowInputs.put("input1", null);
-        expectedFlowInputs.put("input1_safe", "input1_default");
-        expectedFlowInputs.put("input2", 22);
-        expectedFlowInputs.put("input2_safe", 22);
-        expectedFlowInputs.put("input_locals_found", 22);
-        expectedFlowInputs.put("input_locals_not_found", "input_locals_not_found_default");
-        expectedFlowInputs.put("exist", "exist_value");
-        expectedFlowInputs.put("input_3", null);
-        expectedFlowInputs.put("input_4", "default_str");
-        expectedFlowInputs.put("input_5", "localhost");
-        expectedFlowInputs.put("input_6", "localhost");
-        expectedFlowInputs.put("input_7", "localhost");
-        expectedFlowInputs.put("input_8", "exist_value");
-        expectedFlowInputs.put("input_9", "localhost");
-        expectedFlowInputs.put("input_10", "localhost");
-        expectedFlowInputs.put("input_11", "default_str");
-        expectedFlowInputs.put("value_propagate", "flowInput_");
-        expectedFlowInputs.put("input_12", "hyphen_value");
-        expectedFlowInputs.put("input_13", "hyphen_value");
-        expectedFlowInputs.put("input_14", "localhost");
-        expectedFlowInputs.put("input_15", "localhost");
-        expectedFlowInputs.put("input_15", "localhost");
-        expectedFlowInputs.put("input_16", null);
-        expectedFlowInputs.put("input_17", "default_str");
-        Map<String, Serializable> actualFlowInputs = flowData.getInputs();
+        Map<String, Value> expectedFlowInputs = new LinkedHashMap<>();
+        expectedFlowInputs.put("input1", ValueFactory.create(null));
+        expectedFlowInputs.put("input1_safe", ValueFactory.create("input1_default"));
+        expectedFlowInputs.put("input2", ValueFactory.create(22));
+        expectedFlowInputs.put("input2_safe", ValueFactory.create(22));
+        expectedFlowInputs.put("input_locals_found", ValueFactory.create(22));
+        expectedFlowInputs.put("input_locals_not_found", ValueFactory.create("input_locals_not_found_default"));
+        expectedFlowInputs.put("exist", ValueFactory.create("exist_value"));
+        expectedFlowInputs.put("input_3", ValueFactory.create(null));
+        expectedFlowInputs.put("input_4", ValueFactory.create("default_str"));
+        expectedFlowInputs.put("input_5", ValueFactory.create("localhost"));
+        expectedFlowInputs.put("input_6", ValueFactory.create("localhost"));
+        expectedFlowInputs.put("input_7", ValueFactory.create("localhost"));
+        expectedFlowInputs.put("input_8", ValueFactory.create("exist_value"));
+        expectedFlowInputs.put("input_9", ValueFactory.create("localhost"));
+        expectedFlowInputs.put("input_10", ValueFactory.create("localhost"));
+        expectedFlowInputs.put("input_11", ValueFactory.create("default_str"));
+        expectedFlowInputs.put("value_propagate", ValueFactory.create("flowInput_"));
+        expectedFlowInputs.put("input_12", ValueFactory.create("hyphen_value"));
+        expectedFlowInputs.put("input_13", ValueFactory.create("hyphen_value"));
+        expectedFlowInputs.put("input_14", ValueFactory.create("localhost"));
+        expectedFlowInputs.put("input_15", ValueFactory.create("localhost"));
+        expectedFlowInputs.put("input_15", ValueFactory.create("localhost"));
+        expectedFlowInputs.put("input_16", ValueFactory.create(null));
+        expectedFlowInputs.put("input_17", ValueFactory.create("default_str"));
+        Map<String, Value> actualFlowInputs = flowData.getInputs();
         Assert.assertEquals("flow input values not as expected", expectedFlowInputs, actualFlowInputs);
     }
 
     private void verifyFlowOutputs(StepData flowData) {
-        Map<String, Serializable> expectedFlowOutputs = new LinkedHashMap<>();
-        expectedFlowOutputs.put("value_propagate", "flowInput_stepArg_opInput_opOutput_stepPublish_flowOutput_");
-        Map<String, Serializable> actualFlowOutputs = flowData.getOutputs();
+        Map<String, Value> expectedFlowOutputs = new LinkedHashMap<>();
+        expectedFlowOutputs.put("value_propagate", ValueFactory.create("flowInput_stepArg_opInput_opOutput_stepPublish_flowOutput_"));
+        Map<String, Value> actualFlowOutputs = flowData.getOutputs();
         Assert.assertEquals("flow output values not as expected", expectedFlowOutputs, actualFlowOutputs);
     }
 
     private void verifyStepPublishValues(StepData stepData) {
         // verify `get`, `get_sp()` and mixed mode works
-        Map<String, Serializable> expectedPublishValues = new LinkedHashMap<>();
-        expectedPublishValues.put("output1_safe", "CloudSlang");
-        expectedPublishValues.put("output2_safe", "output2_default");
-        expectedPublishValues.put("output_same_name", "output_same_name_default");
-        expectedPublishValues.put("output_1", null);
-        expectedPublishValues.put("output_2", "default_str");
-        expectedPublishValues.put("output_3", "localhost");
-        expectedPublishValues.put("output_4", "localhost");
-        expectedPublishValues.put("output_5", "localhost");
-        expectedPublishValues.put("output_6", "exist_value");
-        expectedPublishValues.put("output_7", "localhost");
-        expectedPublishValues.put("output_8", "localhost");
-        expectedPublishValues.put("output_9", "default_str");
-        expectedPublishValues.put("output_10", "hyphen_value");
-        expectedPublishValues.put("output_11", "hyphen_value");
-        expectedPublishValues.put("output_12", "localhost");
-        expectedPublishValues.put("output_13", "localhost");
-        expectedPublishValues.put("output_14", null);
-        expectedPublishValues.put("output_15", "default_str");
-        expectedPublishValues.put("value_propagate", "flowInput_stepArg_opInput_opOutput_stepPublish_");
-        Map<String, Serializable> actualPublishValues = stepData.getOutputs();
+        Map<String, Value> expectedPublishValues = new LinkedHashMap<>();
+        expectedPublishValues.put("output1_safe", ValueFactory.create("CloudSlang"));
+        expectedPublishValues.put("output2_safe", ValueFactory.create("output2_default"));
+        expectedPublishValues.put("output_same_name", ValueFactory.create("output_same_name_default"));
+        expectedPublishValues.put("output_1", ValueFactory.create(null));
+        expectedPublishValues.put("output_2", ValueFactory.create("default_str"));
+        expectedPublishValues.put("output_3", ValueFactory.create("localhost"));
+        expectedPublishValues.put("output_4", ValueFactory.create("localhost"));
+        expectedPublishValues.put("output_5", ValueFactory.create("localhost"));
+        expectedPublishValues.put("output_6", ValueFactory.create("exist_value"));
+        expectedPublishValues.put("output_7", ValueFactory.create("localhost"));
+        expectedPublishValues.put("output_8", ValueFactory.create("localhost"));
+        expectedPublishValues.put("output_9", ValueFactory.create("default_str"));
+        expectedPublishValues.put("output_10", ValueFactory.create("hyphen_value"));
+        expectedPublishValues.put("output_11", ValueFactory.create("hyphen_value"));
+        expectedPublishValues.put("output_12", ValueFactory.create("localhost"));
+        expectedPublishValues.put("output_13", ValueFactory.create("localhost"));
+        expectedPublishValues.put("output_14", ValueFactory.create(null));
+        expectedPublishValues.put("output_15", ValueFactory.create("default_str"));
+        expectedPublishValues.put("value_propagate", ValueFactory.create("flowInput_stepArg_opInput_opOutput_stepPublish_"));
+        Map<String, Value> actualPublishValues = stepData.getOutputs();
         Assert.assertEquals("operation publish values not as expected", expectedPublishValues, actualPublishValues);
     }
 
@@ -199,9 +204,9 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         );
     }
 
-    private Map<String, Serializable> prepareUserInputs() {
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("exist", "exist_value");
+    private Map<String, Value> prepareUserInputs() {
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("exist", ValueFactory.create("exist_value"));
         return userInputs;
     }
 

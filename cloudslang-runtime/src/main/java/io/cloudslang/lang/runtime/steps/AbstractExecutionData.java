@@ -12,6 +12,8 @@ package io.cloudslang.lang.runtime.steps;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.env.*;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import org.apache.commons.lang3.tuple.Pair;
@@ -38,24 +40,24 @@ public abstract class AbstractExecutionData {
             inputNames.add(input.getName());
         }
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_INPUT_START, desc, stepType, stepName,
-                Pair.of(LanguageEventData.INPUTS, inputNames));
+                Pair.of(LanguageEventData.INPUTS, ValueFactory.create(inputNames)));
     }
 
     public void sendEndBindingInputsEvent(List<Input> inputs,
-                                          final Map<String, Serializable> context,
+                                          final Map<String, Value> context,
                                           RunEnvironment runEnv,
                                           ExecutionRuntimeServices executionRuntimeServices,
                                           String desc,
                                           LanguageEventData.StepType stepType,
                                           String stepName) {
-        Map<String, Serializable> inputsForEvent = new LinkedHashMap<>();
+        Map<String, Value> inputsForEvent = new LinkedHashMap<>();
         for (Input input : inputs) {
             String inputName = input.getName();
-            Serializable inputValue = context.get(inputName);
+            Value inputValue = context.get(inputName);
             inputsForEvent.put(inputName, inputValue);
         }
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_INPUT_END, desc, stepType, stepName,
-                Pair.of(LanguageEventData.BOUND_INPUTS, (Serializable) inputsForEvent));
+                Pair.of(LanguageEventData.BOUND_INPUTS, ValueFactory.create((Serializable)inputsForEvent)));
     }
 
     public void sendStartBindingArgumentsEvent(
@@ -75,21 +77,21 @@ public abstract class AbstractExecutionData {
                 description,
                 LanguageEventData.StepType.STEP,
                 stepName,
-                Pair.of(LanguageEventData.ARGUMENTS, argumentNames)
+                Pair.of(LanguageEventData.ARGUMENTS, ValueFactory.create(argumentNames))
         );
     }
 
     public void sendEndBindingArgumentsEvent(
             List<Argument> arguments,
-            final Map<String, Serializable> context,
+            final Map<String, Value> context,
             RunEnvironment runEnv,
             ExecutionRuntimeServices executionRuntimeServices,
             String description,
             String stepName) {
-        Map<String, Serializable> argumentsForEvent = new LinkedHashMap<>();
+        Map<String, Value> argumentsForEvent = new LinkedHashMap<>();
         for (Argument argument : arguments) {
             String argumentName = argument.getName();
-            Serializable argumentValue = context.get(argumentName);
+            Value argumentValue = context.get(argumentName);
             argumentsForEvent.put(argumentName, argumentValue);
         }
         fireEvent(
@@ -98,7 +100,7 @@ public abstract class AbstractExecutionData {
                 description,
                 LanguageEventData.StepType.STEP,
                 stepName,
-                Pair.of(LanguageEventData.BOUND_ARGUMENTS, (Serializable) argumentsForEvent)
+                Pair.of(LanguageEventData.BOUND_ARGUMENTS, ValueFactory.create((Serializable) argumentsForEvent))
         );
     }
 
@@ -109,7 +111,7 @@ public abstract class AbstractExecutionData {
                                  String description,
                                  LanguageEventData.StepType stepType,
                                  String stepName,
-                                 Map.Entry<String, ? extends Serializable>... fields) {
+                                 Map.Entry<String, ? extends Value>... fields) {
         fireEvent(runtimeServices, type, description,
                 runEnvironment.getExecutionPath().getCurrentPath(), stepType, stepName, fields);
     }
@@ -121,7 +123,7 @@ public abstract class AbstractExecutionData {
                                  String path,
                                  LanguageEventData.StepType stepType,
                                  String stepName,
-                                 Map.Entry<String, ? extends Serializable>... fields) {
+                                 Map.Entry<String, ? extends Value>... fields) {
         LanguageEventData eventData = new LanguageEventData();
         eventData.setStepType(stepType);
         eventData.setStepName(stepName);
@@ -130,13 +132,13 @@ public abstract class AbstractExecutionData {
         eventData.setTimeStamp(new Date());
         eventData.setExecutionId(runtimeServices.getExecutionId());
         eventData.setPath(path);
-        for (Entry<String, ? extends Serializable> field : fields) {
+        for (Entry<String, ? extends Value> field : fields) {
             eventData.put(field.getKey(), field.getValue());
         }
         runtimeServices.addEvent(type, eventData);
     }
 
-    protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment, Context currentContext, Map<String, Serializable> callArguments) {
+    protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment, Context currentContext, Map<String, Value> callArguments) {
         ContextStack contextStack = runEnvironment.getStack();
         contextStack.pushContext(currentContext);
         //TODO: put a deep clone of the new context

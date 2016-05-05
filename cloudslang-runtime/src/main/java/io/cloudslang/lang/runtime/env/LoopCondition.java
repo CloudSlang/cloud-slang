@@ -9,12 +9,15 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.env;
 
+import io.cloudslang.lang.entities.bindings.values.Value;
+
 import java.io.Serializable;
 
-public interface LoopCondition extends Serializable {
+public interface LoopCondition extends Serializable, Iterable<Value> {
 
     String LOOP_CONDITION_KEY = "loop.condition";
 
     boolean hasMore();
 
+    Value next();
 }

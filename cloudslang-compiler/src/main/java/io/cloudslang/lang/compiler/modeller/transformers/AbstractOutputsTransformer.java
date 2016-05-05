@@ -12,6 +12,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.Serializable;
@@ -48,14 +49,14 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
     }
 
     private Output createRefOutput(String rawOutput) {
-        return new Output(rawOutput, transformNameToExpression(rawOutput));
+        return new Output(rawOutput, ValueFactory.create(transformNameToExpression(rawOutput)));
     }
 
     private Output createExpressionOutput(String outputName, Serializable outputExpression){
         Accumulator accumulator = extractFunctionData(outputExpression);
         return new Output(
                 outputName,
-                outputExpression,
+                ValueFactory.create(outputExpression),
                 accumulator.getFunctionDependencies(),
                 accumulator.getSystemPropertyDependencies()
         );

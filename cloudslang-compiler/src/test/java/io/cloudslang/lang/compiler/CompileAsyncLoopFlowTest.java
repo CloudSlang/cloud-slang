@@ -18,6 +18,7 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
 import org.junit.Test;
@@ -28,7 +29,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -78,11 +85,11 @@ public class CompileAsyncLoopFlowTest {
 
         List<Output> aggregateValues = getAggregateOutputs(step);
         assertEquals(2, aggregateValues.size());
-        assertEquals("${ map(lambda x:str(x['name']), branches_context) }", aggregateValues.get(0).getValue());
+        assertEquals("${ map(lambda x:str(x['name']), branches_context) }", aggregateValues.get(0).getValue().get());
 
         List<Output> publishValues = getPublishOutputs(step);
         assertEquals("aggregate list is not empty", 2, publishValues.size());
-        assertEquals("${name}", publishValues.get(0).getValue());
+        assertEquals("${name}", publishValues.get(0).getValue().get());
 
         List<Map<String, String>> expectedNavigationStrings = new ArrayList<>();
         Map<String, String> successMap = new HashMap<>();
@@ -134,11 +141,11 @@ public class CompileAsyncLoopFlowTest {
 
         List<Output> aggregateValues = getAggregateOutputs(asyncStep);
         assertEquals(2, aggregateValues.size());
-        assertEquals("${ map(lambda x:str(x['name']), branches_context) }", aggregateValues.get(0).getValue());
+        assertEquals("${ map(lambda x:str(x['name']), branches_context) }", aggregateValues.get(0).getValue().get());
 
         List<Output> publishValues = getPublishOutputs(asyncStep);
         assertEquals("aggregate list is not empty", 2, publishValues.size());
-        assertEquals("${name}", publishValues.get(0).getValue());
+        assertEquals("${name}", publishValues.get(0).getValue().get());
 
         List<Map<String, String>> expectedNavigationStrings = new ArrayList<>();
         Map<String, String> successMap = new HashMap<>();
@@ -271,8 +278,8 @@ public class CompileAsyncLoopFlowTest {
         @SuppressWarnings("unchecked") List<Output> actualPublishOutputs =
                 (List<Output>) branchEndStepActionData.get(ScoreLangConstants.STEP_PUBLISH_KEY);
         List<Output> expectedPublishOutputs = new ArrayList<>();
-        expectedPublishOutputs.add(new Output("name", "${name}"));
-        expectedPublishOutputs.add(new Output("number", "${ int_output }"));
+        expectedPublishOutputs.add(new Output("name", ValueFactory.create("${name}")));
+        expectedPublishOutputs.add(new Output("number", ValueFactory.create("${ int_output }")));
         assertEquals("publish outputs not as expected", expectedPublishOutputs, actualPublishOutputs);
     }
 
@@ -291,8 +298,8 @@ public class CompileAsyncLoopFlowTest {
         @SuppressWarnings("unchecked") List<Output> actualAggregateOutputs =
                 (List<Output>) joinBranchesActionData.get(ScoreLangConstants.STEP_AGGREGATE_KEY);
         List<Output> expectedAggregateOutputs = new ArrayList<>();
-        expectedAggregateOutputs.add(new Output("name_list", "${ map(lambda x:str(x['name']), branches_context) }"));
-        expectedAggregateOutputs.add(new Output("number_from_last_branch", "${ branches_context[-1]['number'] }"));
+        expectedAggregateOutputs.add(new Output("name_list", ValueFactory.create("${ map(lambda x:str(x['name']), branches_context) }")));
+        expectedAggregateOutputs.add(new Output("number_from_last_branch", ValueFactory.create("${ branches_context[-1]['number'] }")));
         assertEquals("aggregate outputs not as expected", expectedAggregateOutputs, actualAggregateOutputs);
     }
 

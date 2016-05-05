@@ -16,9 +16,10 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.junit.Assert;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +36,7 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
     }
 
     protected Map<String, StepData> prepareAndRunDefault(CompilationArtifact compilationArtifact) {
-        Map<String, Serializable> userInputs = getUserInputs();
+        Map<String, Value> userInputs = getUserInputs();
         userInputs.put("enable_option_for_action", null);
 
         return triggerWithData(compilationArtifact, userInputs, getSystemProperties()).getSteps();
@@ -47,75 +48,75 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         );
     }
 
-    private Map<String, Serializable> getUserInputs() {
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("input_no_expression", "input_no_expression_value");
-        userInputs.put("input_not_overridable", "i_should_not_be_assigned");
-        userInputs.put("enable_option_for_action", "enable_option_for_action_value");
+    private Map<String, Value> getUserInputs() {
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("input_no_expression", ValueFactory.create("input_no_expression_value"));
+        userInputs.put("input_not_overridable", ValueFactory.create("i_should_not_be_assigned"));
+        userInputs.put("enable_option_for_action", ValueFactory.create("enable_option_for_action_value"));
         return userInputs;
     }
 
     protected void verifyExecutableInputsDefault(StepData flowData) {
-        Map<String, Serializable> expectedInputs = new HashMap<>();
+        Map<String, Value> expectedInputs = new HashMap<>();
 
         // snake-case to camel-case
-        expectedInputs.put("enable_option_for_action", null);
-        expectedInputs.put("enableOptionForAction", "default_value");
+        expectedInputs.put("enable_option_for_action", ValueFactory.create(null));
+        expectedInputs.put("enableOptionForAction", ValueFactory.create("default_value"));
 
         Assert.assertTrue("Executable inputs not bound correctly", includeAllPairs(flowData.getInputs(), expectedInputs));
     }
 
     protected void verifyExecutableInputs(StepData flowData) {
-        Map<String, Serializable> expectedInputs = new HashMap<>();
+        Map<String, Value> expectedInputs = new HashMap<>();
 
         // snake-case to camel-case
-        expectedInputs.put("enable_option_for_action", "enable_option_for_action_value");
-        expectedInputs.put("enableOptionForAction", "enable_option_for_action_value");
+        expectedInputs.put("enable_option_for_action", ValueFactory.create("enable_option_for_action_value"));
+        expectedInputs.put("enableOptionForAction", ValueFactory.create("enable_option_for_action_value"));
 
         // properties
-        expectedInputs.put("input_no_expression", "input_no_expression_value");
-        expectedInputs.put("input_no_expression_not_required", null);
-        expectedInputs.put("input_system_property", "localhost");
-        expectedInputs.put("input_not_overridable", 25);
+        expectedInputs.put("input_no_expression", ValueFactory.create("input_no_expression_value"));
+        expectedInputs.put("input_no_expression_not_required", ValueFactory.create(null));
+        expectedInputs.put("input_system_property", ValueFactory.create("localhost"));
+        expectedInputs.put("input_not_overridable", ValueFactory.create(25));
 
         // loaded by Yaml
-        expectedInputs.put("input_int", 22);
-        expectedInputs.put("input_str_no_quotes", "Hi");
-        expectedInputs.put("input_str_single", "Hi");
-        expectedInputs.put("input_str_double", "Hi");
-        expectedInputs.put("input_yaml_list", Lists.newArrayList(1, 2, 3));
-        expectedInputs.put("input_properties_yaml_map_folded", "medium");
-        HashMap<String, Serializable> expectedInputMap = new HashMap<>();
-        expectedInputMap.put("key1", "value1");
-        expectedInputMap.put("key2", "value2");
-        expectedInputMap.put("key3", "value3");
-        expectedInputs.put("input_yaml_map", expectedInputMap);
+        expectedInputs.put("input_int", ValueFactory.create(22));
+        expectedInputs.put("input_str_no_quotes", ValueFactory.create("Hi"));
+        expectedInputs.put("input_str_single", ValueFactory.create("Hi"));
+        expectedInputs.put("input_str_double", ValueFactory.create("Hi"));
+        expectedInputs.put("input_yaml_list", ValueFactory.create(Lists.newArrayList(1, 2, 3)));
+        expectedInputs.put("input_properties_yaml_map_folded", ValueFactory.create("medium"));
+        HashMap<String, Value> expectedInputMap = new HashMap<>();
+        expectedInputMap.put("key1", ValueFactory.create("value1"));
+        expectedInputMap.put("key2", ValueFactory.create("value2"));
+        expectedInputMap.put("key3", ValueFactory.create("value3"));
+        expectedInputs.put("input_yaml_map", ValueFactory.create(expectedInputMap));
 
         // evaluated via Python
-        expectedInputs.put("input_python_null", null);
-        expectedInputs.put("input_python_list",  Lists.newArrayList(1, 2, 3));
-        expectedInputs.put("input_python_map", expectedInputMap);
-        expectedInputs.put("b", "b");
-        expectedInputs.put("b_copy", "b");
-        expectedInputs.put("input_concat_1", "ab");
-        expectedInputs.put("input_concat_2_folded", "prefix_ab_suffix");
+        expectedInputs.put("input_python_null", ValueFactory.create(null));
+        expectedInputs.put("input_python_list",  ValueFactory.create(Lists.newArrayList(1, 2, 3)));
+        expectedInputs.put("input_python_map", ValueFactory.create(expectedInputMap));
+        expectedInputs.put("b", ValueFactory.create("b"));
+        expectedInputs.put("b_copy", ValueFactory.create("b"));
+        expectedInputs.put("input_concat_1", ValueFactory.create("ab"));
+        expectedInputs.put("input_concat_2_folded", ValueFactory.create("prefix_ab_suffix"));
         expectedInputs.put(
                 "input_expression_characters",
-                "docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ./auth} -p 8888:22 --name test1 -v /data:"
-        );
-        expectedInputs.put("step_argument_null", "step_argument_null_value");
+                ValueFactory.create("docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ./auth} -p 8888:22 --name test1 -v /data:"
+        ));
+        expectedInputs.put("step_argument_null", ValueFactory.create("step_argument_null_value"));
 
         Assert.assertTrue("Executable inputs not bound correctly", includeAllPairs(flowData.getInputs(), expectedInputs));
     }
 
     protected void verifyExecutableOutputs(StepData flowData) {
-        Map<String, Serializable> expectedOutputs = new HashMap<>();
+        Map<String, Value> expectedOutputs = new HashMap<>();
 
-        expectedOutputs.put("output_no_expression", "output_no_expression_value");
-        expectedOutputs.put("output_int", 22);
-        expectedOutputs.put("output_str", "output_str_value");
-        expectedOutputs.put("output_expression", "output_str_value_suffix");
-        expectedOutputs.put("output_step_argument_null", "step_argument_null_value");
+        expectedOutputs.put("output_no_expression", ValueFactory.create("output_no_expression_value"));
+        expectedOutputs.put("output_int", ValueFactory.create(22));
+        expectedOutputs.put("output_str", ValueFactory.create("output_str_value"));
+        expectedOutputs.put("output_expression", ValueFactory.create("output_str_value_suffix"));
+        expectedOutputs.put("output_step_argument_null", ValueFactory.create("step_argument_null_value"));
 
         Assert.assertEquals("Executable outputs not bound correctly", expectedOutputs, flowData.getOutputs());
     }
@@ -124,8 +125,8 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, stepData.getResult());
     }
 
-    protected boolean includeAllPairs(Map<String, Serializable> map1, Map<String, Serializable> map2) {
-        Map<String, Serializable> accumulator = new HashMap<>(map1);
+    protected boolean includeAllPairs(Map<String, Value> map1, Map<String, Value> map2) {
+        Map<String, Value> accumulator = new HashMap<>(map1);
         accumulator.putAll(map2);
         return accumulator.equals(map1);
     }
