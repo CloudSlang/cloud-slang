@@ -8,6 +8,10 @@
 namespace: user.ops
 
 operation:
-  name: operation_action_invalid_type
-  action:
-    workflow:
+  name: java_action_with_dependencies
+  java_action:
+    gav: 'g:a:v'
+    class_name: com.hp.thing
+    method_name: someMethod
+  results:
+    - SUCCESS

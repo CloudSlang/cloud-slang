@@ -312,43 +312,6 @@ public class ExecutableBuilderTest {
         transformToExecutable(mockParsedSlang, operationName, executableRawData);
     }
 
-    @Test
-    public void invalidKeysInActionThrowsException() throws Exception {
-        ParsedSlang mockParsedSlang = mockOperationsSlangFile();
-        Map<String, Object> executableRawData = new HashMap<>();
-        Map<String, Object> actionRawData = new HashMap<>();
-
-
-        String invalidKey = "a";
-        actionRawData.put(invalidKey, "b");
-        executableRawData.put(SlangTextualKeys.ACTION_KEY, actionRawData);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(invalidKey);
-
-        transformToExecutable(mockParsedSlang, "op1", executableRawData);
-    }
-
-    @Ignore("problem with the post construct no taking the mocks")
-    @Test
-    public void simpleOp() throws Exception {
-        String keyword = "a";
-        Mockito.when(transformer.keyToTransform()).thenReturn(keyword);
-        Mockito.when(transformer.getScopes()).thenReturn(Arrays.asList(Transformer.Scope.ACTION));
-
-        ParsedSlang mockParsedSlang = mockOperationsSlangFile();
-        Map<String, Object> executableRawData = new HashMap<>();
-        Map<String, Object> actionRawData = new HashMap<>();
-
-        actionRawData.put(keyword, "b");
-        executableRawData.put(SlangTextualKeys.ACTION_KEY, actionRawData);
-
-        String operationName = "op1";
-        Operation op = (Operation) transformToExecutable(mockParsedSlang, operationName, executableRawData);
-        Assert.assertNotNull(op);
-        Assert.assertEquals(operationName, op.getName());
-        Assert.assertNotNull(operationName, op.getAction().getActionData());
-    }
-
     private Executable transformToExecutable(ParsedSlang mockParsedSlang, String flowName, Map<String, Object> executableRawData) {
         ExecutableModellingResult modellingResult = executableBuilder.transformToExecutable(mockParsedSlang, flowName, executableRawData);
         if (modellingResult.getErrors().size() > 0) {

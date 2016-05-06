@@ -12,5 +12,5 @@ operation:
   inputs:
     - alla:
         ${get_sp('user.sys.props.alla')}
-  action:
-    python_script: 'print "hello world"'
+  python_action:
+    script: 'print "hello world"'

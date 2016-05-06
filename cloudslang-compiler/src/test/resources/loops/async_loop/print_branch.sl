@@ -11,8 +11,8 @@ operation:
   name: print_branch
   inputs:
      - ID
-  action:
-    python_script: |
+  python_action:
+    script: |
         name = 'branch ' + str(ID)
         int_output = len(name) + int(ID)
         print 'Hello from ' + name

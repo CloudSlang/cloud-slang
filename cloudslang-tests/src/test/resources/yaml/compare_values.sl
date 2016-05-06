@@ -13,8 +13,8 @@ operation:
     - eq_str_bla
     - eq_int_22
     - eq_bool_true
-  action:
-    python_script: |
+  python_action:
+    script: |
       result = (eq_str_bla == 'bla') and (eq_int_22 == 22) and (eq_bool_true)
   results:
     - SUCCESS: ${ result }

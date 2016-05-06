@@ -11,8 +11,8 @@ operation:
   name: produce_default_navigation
   inputs:
     - navigationType
-  action:
-    python_script:
+  python_action:
+    script:
       print 'Producing default navigation based on input'
   results:
     - SUCCESS: ${ navigationType == 'success' }

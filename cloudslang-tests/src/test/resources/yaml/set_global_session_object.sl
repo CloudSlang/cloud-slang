@@ -11,7 +11,6 @@ operation:
   name: set_global_session_object
   inputs:
     - value
-  action:
-    java_action:
-      className: io.cloudslang.lang.systemtests.actions.LangTestActions
-      methodName: setConnectionOnNonSerializableSession
+  java_action:
+    class_name: io.cloudslang.lang.systemtests.actions.LangTestActions
+    method_name: setConnectionOnNonSerializableSession
