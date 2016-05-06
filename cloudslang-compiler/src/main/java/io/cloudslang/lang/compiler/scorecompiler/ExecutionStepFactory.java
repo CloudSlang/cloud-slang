@@ -91,17 +91,19 @@ public class ExecutionStepFactory {
         Map<String, Serializable> actionData = new HashMap<>();
         ActionType actionType;
 
-        @SuppressWarnings("unchecked") Map<String, String> javaActionData = (Map<String, String>) actionRawData.get(SlangTextualKeys.JAVA_ACTION);
-        @SuppressWarnings("unchecked") String pythonScript = (String) actionRawData.get(ScoreLangConstants.PYTHON_SCRIPT_KEY);
+        @SuppressWarnings("unchecked")
+        Map<String, Serializable> javaActionData = (Map<String, Serializable>) actionRawData.get(SlangTextualKeys.JAVA_ACTION_KEY);
+        @SuppressWarnings("unchecked")
+        Map<String, Serializable> pythonActionData = (Map<String, Serializable>) actionRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY);
         boolean javaActionFound = MapUtils.isNotEmpty(javaActionData);
-        boolean pythonScriptFound = StringUtils.isNotEmpty(pythonScript);
+        boolean pythonActionFound = MapUtils.isNotEmpty(pythonActionData);
 
         if (javaActionFound) {
             actionType = ActionType.JAVA;
             actionData.putAll(javaActionData);
-        } else  if (pythonScriptFound) {
+        } else  if (pythonActionFound) {
             actionType = ActionType.PYTHON;
-            actionData.putAll(actionRawData);
+            actionData.putAll(pythonActionData);
         } else {
             // java action or python script data is missing
             throw new RuntimeException("Invalid action data");
