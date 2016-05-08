@@ -79,7 +79,7 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
             fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_SPLIT_BRANCHES,
                     "async loop expression bound", runEnv.getExecutionPath().getCurrentPath(),
                     LanguageEventData.StepType.STEP, nodeName,
-                    Pair.of(LanguageEventData.BOUND_ASYNC_LOOP_EXPRESSION, ValueFactory.create((Serializable) splitData)));
+                    Pair.of(LanguageEventData.BOUND_ASYNC_LOOP_EXPRESSION, (Serializable) splitData));
 
             runEnv.putNextStepPosition(nextStepId);
             runEnv.getExecutionPath().down();
@@ -89,7 +89,7 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
                 // first fire event
                 fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_BRANCH_START,
                         "async loop branch created", runEnv.getExecutionPath().getCurrentPath(),
-                        LanguageEventData.StepType.STEP, nodeName, Pair.of(ScoreLangConstants.REF_ID, ValueFactory.create(refId)),
+                        LanguageEventData.StepType.STEP, nodeName, Pair.of(ScoreLangConstants.REF_ID, refId),
                         Pair.of(RuntimeConstants.SPLIT_ITEM_KEY, splitItem));
                 // take path down one level
                 runEnv.getExecutionPath().down();
@@ -182,9 +182,9 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
 
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_JOIN_BRANCHES_END,
                 "Async loop output binding finished", LanguageEventData.StepType.STEP, nodeName,
-                Pair.of(LanguageEventData.OUTPUTS, ValueFactory.create((Serializable) publishValues)),
-                Pair.of(LanguageEventData.RESULT, ValueFactory.create(returnValues.getResult())),
-                Pair.of(LanguageEventData.NEXT_STEP_POSITION, ValueFactory.create(nextStepPosition)));
+                Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
+                Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
+                Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextStepPosition));
 
         runEnv.putReturnValues(returnValues);
         runEnv.putNextStepPosition(nextStepPosition);
@@ -218,8 +218,8 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
                 runEnv,
                 ScoreLangConstants.EVENT_JOIN_BRANCHES_START,
                 "Async loop output binding started", LanguageEventData.StepType.STEP, nodeName,
-                Pair.of(ScoreLangConstants.STEP_AGGREGATE_KEY, ValueFactory.create((Serializable) stepAggregateValues)),
-                Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, ValueFactory.create((Serializable) stepNavigationValues)));
+                Pair.of(ScoreLangConstants.STEP_AGGREGATE_KEY, (Serializable) stepAggregateValues),
+                Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues));
 
         return outputsBinding.bindOutputs(
                 Collections.<String, Value>emptyMap(),
@@ -265,7 +265,7 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
 
             fireEvent(executionRuntimeServices, branchRuntimeEnvironment, ScoreLangConstants.EVENT_BRANCH_END,
                     "async loop branch ended", LanguageEventData.StepType.STEP, nodeName,
-                    Pair.of(RuntimeConstants.BRANCH_RETURN_VALUES_KEY, ValueFactory.create(executableReturnValues))
+                    Pair.of(RuntimeConstants.BRANCH_RETURN_VALUES_KEY, executableReturnValues)
             );
         }
     }

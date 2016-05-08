@@ -13,11 +13,14 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.values.Value;
-import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import io.cloudslang.lang.runtime.env.*;
+import io.cloudslang.lang.runtime.env.Context;
+import io.cloudslang.lang.runtime.env.ContextStack;
+import io.cloudslang.lang.runtime.env.ParentFlowData;
+import io.cloudslang.lang.runtime.env.ParentFlowStack;
+import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import org.apache.commons.lang3.tuple.Pair;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -40,7 +43,7 @@ public abstract class AbstractExecutionData {
             inputNames.add(input.getName());
         }
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_INPUT_START, desc, stepType, stepName,
-                Pair.of(LanguageEventData.INPUTS, ValueFactory.create(inputNames)));
+                Pair.of(LanguageEventData.INPUTS, inputNames));
     }
 
     public void sendEndBindingInputsEvent(List<Input> inputs,
@@ -57,7 +60,7 @@ public abstract class AbstractExecutionData {
             inputsForEvent.put(inputName, inputValue);
         }
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_INPUT_END, desc, stepType, stepName,
-                Pair.of(LanguageEventData.BOUND_INPUTS, ValueFactory.create((Serializable)inputsForEvent)));
+                Pair.of(LanguageEventData.BOUND_INPUTS, (Serializable)inputsForEvent));
     }
 
     public void sendStartBindingArgumentsEvent(
@@ -77,7 +80,7 @@ public abstract class AbstractExecutionData {
                 description,
                 LanguageEventData.StepType.STEP,
                 stepName,
-                Pair.of(LanguageEventData.ARGUMENTS, ValueFactory.create(argumentNames))
+                Pair.of(LanguageEventData.ARGUMENTS, argumentNames)
         );
     }
 
@@ -100,7 +103,7 @@ public abstract class AbstractExecutionData {
                 description,
                 LanguageEventData.StepType.STEP,
                 stepName,
-                Pair.of(LanguageEventData.BOUND_ARGUMENTS, ValueFactory.create((Serializable) argumentsForEvent))
+                Pair.of(LanguageEventData.BOUND_ARGUMENTS, (Serializable) argumentsForEvent)
         );
     }
 
@@ -111,7 +114,7 @@ public abstract class AbstractExecutionData {
                                  String description,
                                  LanguageEventData.StepType stepType,
                                  String stepName,
-                                 Map.Entry<String, ? extends Value>... fields) {
+                                 Map.Entry<String, ? extends Serializable>... fields) {
         fireEvent(runtimeServices, type, description,
                 runEnvironment.getExecutionPath().getCurrentPath(), stepType, stepName, fields);
     }
@@ -123,7 +126,7 @@ public abstract class AbstractExecutionData {
                                  String path,
                                  LanguageEventData.StepType stepType,
                                  String stepName,
-                                 Map.Entry<String, ? extends Value>... fields) {
+                                 Map.Entry<String, ? extends Serializable>... fields) {
         LanguageEventData eventData = new LanguageEventData();
         eventData.setStepType(stepType);
         eventData.setStepName(stepName);
@@ -132,7 +135,7 @@ public abstract class AbstractExecutionData {
         eventData.setTimeStamp(new Date());
         eventData.setExecutionId(runtimeServices.getExecutionId());
         eventData.setPath(path);
-        for (Entry<String, ? extends Value> field : fields) {
+        for (Entry<String, ? extends Serializable> field : fields) {
             eventData.put(field.getKey(), field.getValue());
         }
         runtimeServices.addEvent(type, eventData);

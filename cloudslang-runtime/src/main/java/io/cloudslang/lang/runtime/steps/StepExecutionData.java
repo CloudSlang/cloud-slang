@@ -158,9 +158,9 @@ public class StepExecutionData extends AbstractExecutionData {
             ReturnValues executableReturnValues = runEnv.removeReturnValues();
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
                     LanguageEventData.StepType.STEP, nodeName,
-                    Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, ValueFactory.create((Serializable)stepPublishValues)),
-                    Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, ValueFactory.create((Serializable)stepNavigationValues, false)),
-                    Pair.of("operationReturnValues", ValueFactory.create(executableReturnValues)));
+                    Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable)stepPublishValues),
+                    Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable)stepNavigationValues),
+                    Pair.of("operationReturnValues", executableReturnValues));
 
             Map<String, Value> argumentsResultContext = removeStepInputsResultContext(flowContext);
             Map<String, Value> publishValues =
@@ -236,9 +236,9 @@ public class StepExecutionData extends AbstractExecutionData {
                                      ReturnValues returnValues) {
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
                 LanguageEventData.StepType.STEP, nodeName,
-                Pair.of(LanguageEventData.OUTPUTS, ValueFactory.create((Serializable)publishValues)),
-                Pair.of(LanguageEventData.RESULT, ValueFactory.create(returnValues.getResult())),
-                Pair.of(LanguageEventData.NEXT_STEP_POSITION, ValueFactory.create(nextPosition)));
+                Pair.of(LanguageEventData.OUTPUTS, (Serializable)publishValues),
+                Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
+                Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition));
     }
 
     private boolean shouldBreakLoop(List<String> breakOn, ReturnValues executableReturnValues) {

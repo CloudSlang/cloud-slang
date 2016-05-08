@@ -19,8 +19,11 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.junit.Assert;
+import org.python.core.PyDictionary;
 
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -86,16 +89,18 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         expectedInputs.put("input_str_double", ValueFactory.create("Hi"));
         expectedInputs.put("input_yaml_list", ValueFactory.create(Lists.newArrayList(1, 2, 3)));
         expectedInputs.put("input_properties_yaml_map_folded", ValueFactory.create("medium"));
-        HashMap<String, Value> expectedInputMap = new HashMap<>();
-        expectedInputMap.put("key1", ValueFactory.create("value1"));
-        expectedInputMap.put("key2", ValueFactory.create("value2"));
-        expectedInputMap.put("key3", ValueFactory.create("value3"));
+        HashMap<String, Serializable> expectedInputMap = new LinkedHashMap<>();
+        expectedInputMap.put("key1", "value1");
+        expectedInputMap.put("key2", "value2");
+        expectedInputMap.put("key3", "value3");
         expectedInputs.put("input_yaml_map", ValueFactory.create(expectedInputMap));
 
         // evaluated via Python
         expectedInputs.put("input_python_null", ValueFactory.create(null));
         expectedInputs.put("input_python_list",  ValueFactory.create(Lists.newArrayList(1, 2, 3)));
-        expectedInputs.put("input_python_map", ValueFactory.create(expectedInputMap));
+        PyDictionary expectedInputPyDictionary = new PyDictionary();
+        expectedInputPyDictionary.putAll(expectedInputMap);
+        expectedInputs.put("input_python_map", ValueFactory.create(expectedInputPyDictionary));
         expectedInputs.put("b", ValueFactory.create("b"));
         expectedInputs.put("b_copy", ValueFactory.create("b"));
         expectedInputs.put("input_concat_1", ValueFactory.create("ab"));

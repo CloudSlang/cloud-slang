@@ -60,6 +60,9 @@ public class InputsBinding {
         Validate.notEmpty(inputName);
 
         try {
+
+            System.out.println("\nbindInput: " + inputName + " ( "+ (input.getValue() == null ? null : input.getValue().get()) + " )");
+
             value = resolveValue(input, context, targetContext, systemProperties);
         } catch (Throwable t) {
             throw new RuntimeException("Error binding input: '" + inputName + "', \n\tError is: " + t.getMessage(), t);

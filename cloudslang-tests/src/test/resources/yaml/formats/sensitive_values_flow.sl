@@ -241,6 +241,28 @@ flow:
         default: ${input_y_sensitive + "b"}
         sensitive: true
 
+    - input_concat_ab: ${'a' + 'b'}
+    - input_concat_ab_sensitive:
+        default: ${'a' + 'b'}
+        sensitive: true
+
+    - input_concat_xy: ${input_x + input_y}
+    - input_concat_xy_sensitive:
+        default: ${input_x + input_y}
+        sensitive: true
+    - input_concat_x_sensitive_y: ${input_x_sensitive + input_y}
+    - input_concat_x_sensitive_y_sensitive:
+        default: ${input_x_sensitive + input_y}
+        sensitive: true
+    - input_concat_x_y_sensitive: ${input_x + input_y_sensitive}
+    - input_concat_x_y_sensitive_sensitive:
+        default: ${input_x + input_y_sensitive}
+        sensitive: true
+    - input_concat_x_sensitive_y_sensitive: ${input_x_sensitive + input_y_sensitive}
+    - input_concat_x_sensitive_y_sensitive_sensitive:
+        default: ${input_x_sensitive + input_y_sensitive}
+        sensitive: true
+
     - input_concat_x_folded: >
         ${
         'prefix_' +
@@ -322,7 +344,7 @@ flow:
             - argument_input_get_sensitive_input_with_value_sensitive:              ${input_get_sensitive_input_with_value_sensitive}
             
             - argument_python_get_input_with_value:                                 ${get("input_with_value", "default_value")}
-            - argument_python_get_input_with_value_sensitive:                       ${get("input_no_value_sensitive", "default_value")}
+            - argument_python_get_input_with_value_sensitive:                       ${get("input_with_value_sensitive", "default_value")}
             - argument_input_python_get_input_with_value:                           ${input_python_get_input_with_value}
             - argument_input_python_get_input_with_value_sensitive:                 ${input_python_get_input_with_value_sensitive}
             - argument_input_python_get_sensitive_input_with_value:                 ${input_python_get_sensitive_input_with_value}
@@ -413,6 +435,23 @@ flow:
             - argument_input_concat_y_sensitive:                                    ${input_concat_y_sensitive}
             - argument_input_sensitive_concat_y:                                    ${input_sensitive_concat_y}
             - argument_input_sensitive_concat_y_sensitive:                          ${input_sensitive_concat_y_sensitive}
+
+            - argument_concat_ab:                                                   ${'a' + 'b'}
+            - argument_input_concat_ab:                                             ${input_concat_ab}
+            - argument_input_concat_ab_sensitive:                                   ${input_concat_ab_sensitive}
+
+            - argument_concat_xy:                                                   ${input_x + input_y}
+            - argument_input_concat_xy:                                             ${input_concat_xy}
+            - argument_input_concat_xy_sensitive:                                   ${input_concat_xy_sensitive}
+            - argument_concat_x_sensitive_y:                                        ${input_x_sensitive + input_y}
+            - argument_input_concat_x_sensitive_y:                                  ${input_concat_x_sensitive_y}
+            - argument_input_concat_x_sensitive_y_sensitive:                        ${input_concat_x_sensitive_y_sensitive}
+            - argument_concat_x_y_sensitive:                                        ${input_x_sensitive + input_y}
+            - argument_input_concat_x_y_sensitive:                                  ${input_concat_x_y_sensitive}
+            - argument_input_concat_x_y_sensitive_sensitive:                        ${input_concat_x_y_sensitive_sensitive}
+            - argument_concat_x_sensitive_y_sensitive:                              ${input_x_sensitive + input_y_sensitive}
+            - argument_input_concat_x_sensitive_y_sensitive:                        ${input_concat_x_sensitive_y_sensitive}
+            - argument_input_concat_x_sensitive_y_sensitive_sensitive:              ${input_concat_x_sensitive_y_sensitive_sensitive}
 
             - argument_concat_x_folded:                                             ${'prefix_' + input_concat_x + '_suffix'}
             - argument_input_concat_x_folded:                                       ${input_concat_x_folded} 
@@ -525,6 +564,21 @@ flow:
           - argument_input_concat_y_sensitive
           - argument_input_sensitive_concat_y
           - argument_input_sensitive_concat_y_sensitive
+          - argument_concat_ab
+          - argument_input_concat_ab
+          - argument_input_concat_ab_sensitive
+          - argument_concat_xy
+          - argument_input_concat_xy
+          - argument_input_concat_xy_sensitive
+          - argument_concat_x_sensitive_y
+          - argument_input_concat_x_sensitive_y
+          - argument_input_concat_x_sensitive_y_sensitive
+          - argument_concat_x_y_sensitive
+          - argument_input_concat_x_y_sensitive
+          - argument_input_concat_x_y_sensitive_sensitive
+          - argument_concat_x_sensitive_y_sensitive
+          - argument_input_concat_x_sensitive_y_sensitive
+          - argument_input_concat_x_sensitive_y_sensitive_sensitive
           - argument_concat_x_folded
           - argument_input_concat_x_folded
           - argument_input_concat_x_folded_sensitive
@@ -637,7 +691,22 @@ flow:
             - argument_input_concat_y_sensitive                                     ${argument_input_concat_y_sensitive}
             - argument_input_sensitive_concat_y                                     ${argument_input_sensitive_concat_y}
             - argument_input_sensitive_concat_y_sensitive                           ${argument_input_sensitive_concat_y_sensitive}
-            - argument_concat_x_folded:                                             ${argument_concat_x_folded}                                                    
+            - argument_concat_ab                                                    ${argument_concat_ab}
+            - argument_input_concat_ab                                              ${argument_input_concat_ab}
+            - argument_input_concat_ab_sensitive                                    ${argument_input_concat_ab_sensitive}
+            - argument_concat_xy                                                    ${argument_concat_xy}
+            - argument_input_concat_xy                                              ${argument_input_concat_xy}
+            - argument_input_concat_xy_sensitive                                    ${argument_input_concat_xy_sensitive}
+            - argument_concat_x_sensitive_y                                         ${argument_concat_x_sensitive_y}
+            - argument_input_concat_x_sensitive_y                                   ${argument_input_concat_x_sensitive_y}
+            - argument_input_concat_x_sensitive_y_sensitive                         ${argument_input_concat_x_sensitive_y_sensitive}
+            - argument_concat_x_y_sensitive                                         ${argument_concat_x_y_sensitive}
+            - argument_input_concat_x_y_sensitive                                   ${argument_input_concat_x_y_sensitive}
+            - argument_input_concat_x_y_sensitive_sensitive                         ${argument_input_concat_x_y_sensitive_sensitive}
+            - argument_concat_x_sensitive_y_sensitive                               ${argument_concat_x_sensitive_y_sensitive}
+            - argument_input_concat_x_sensitive_y_sensitive                         ${argument_input_concat_x_sensitive_y_sensitive}
+            - argument_input_concat_x_sensitive_y_sensitive_sensitive               ${argument_input_concat_x_sensitive_y_sensitive_sensitive}
+            - argument_concat_x_folded:                                             ${argument_concat_x_folded}
             - argument_input_concat_x_folded:                                       ${argument_input_concat_x_folded}                                            
             - argument_input_concat_x_folded_sensitive:                             ${argument_input_concat_x_folded_sensitive}                                
             - argument_input_sensitive_concat_x_folded:                             ${argument_input_sensitive_concat_x_folded}                                
@@ -749,6 +818,21 @@ flow:
             - argument_input_concat_y_sensitive                                     ${argument_input_concat_y_sensitive}
             - argument_input_sensitive_concat_y                                     ${argument_input_sensitive_concat_y}
             - argument_input_sensitive_concat_y_sensitive                           ${argument_input_sensitive_concat_y_sensitive}
+            - argument_concat_ab                                                    ${argument_concat_ab}
+            - argument_input_concat_ab                                              ${argument_input_concat_ab}
+            - argument_input_concat_ab_sensitive                                    ${argument_input_concat_ab_sensitive}
+            - argument_concat_xy                                                    ${argument_concat_xy}
+            - argument_input_concat_xy                                              ${argument_input_concat_xy}
+            - argument_input_concat_xy_sensitive                                    ${argument_input_concat_xy_sensitive}
+            - argument_concat_x_sensitive_y                                         ${argument_concat_x_sensitive_y}
+            - argument_input_concat_x_sensitive_y                                   ${argument_input_concat_x_sensitive_y}
+            - argument_input_concat_x_sensitive_y_sensitive                         ${argument_input_concat_x_sensitive_y_sensitive}
+            - argument_concat_x_y_sensitive                                         ${argument_concat_x_y_sensitive}
+            - argument_input_concat_x_y_sensitive                                   ${argument_input_concat_x_y_sensitive}
+            - argument_input_concat_x_y_sensitive_sensitive                         ${argument_input_concat_x_y_sensitive_sensitive}
+            - argument_concat_x_sensitive_y_sensitive                               ${argument_concat_x_sensitive_y_sensitive}
+            - argument_input_concat_x_sensitive_y_sensitive                         ${argument_input_concat_x_sensitive_y_sensitive}
+            - argument_input_concat_x_sensitive_y_sensitive_sensitive               ${argument_input_concat_x_sensitive_y_sensitive_sensitive}
             - argument_concat_x_folded:                                             ${argument_concat_x_folded}
             - argument_input_concat_x_folded:                                       ${argument_input_concat_x_folded}                                            
             - argument_input_concat_x_folded_sensitive:                             ${argument_input_concat_x_folded_sensitive}                                
@@ -859,6 +943,21 @@ flow:
     - argument_input_concat_y_sensitive
     - argument_input_sensitive_concat_y
     - argument_input_sensitive_concat_y_sensitive
+    - argument_concat_ab
+    - argument_input_concat_ab
+    - argument_input_concat_ab_sensitive
+    - argument_concat_xy
+    - argument_input_concat_xy
+    - argument_input_concat_xy_sensitive
+    - argument_concat_x_sensitive_y
+    - argument_input_concat_x_sensitive_y
+    - argument_input_concat_x_sensitive_y_sensitive
+    - argument_concat_x_y_sensitive
+    - argument_input_concat_x_y_sensitive
+    - argument_input_concat_x_y_sensitive_sensitive
+    - argument_concat_x_sensitive_y_sensitive
+    - argument_input_concat_x_sensitive_y_sensitive
+    - argument_input_concat_x_sensitive_y_sensitive_sensitive
     - argument_concat_x_folded
     - argument_input_concat_x_folded
     - argument_input_concat_x_folded_sensitive

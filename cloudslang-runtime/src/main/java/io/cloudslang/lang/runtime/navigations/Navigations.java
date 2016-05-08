@@ -11,7 +11,6 @@ package io.cloudslang.lang.runtime.navigations;
 
 import com.hp.oo.sdk.content.annotations.Param;
 import io.cloudslang.lang.entities.ScoreLangConstants;
-import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.runtime.steps.AbstractExecutionData;
@@ -42,7 +41,7 @@ public class Navigations {
 		if(executionRuntimeServices.hasStepErrorKey()) {
 			AbstractExecutionData.fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.SLANG_EXECUTION_EXCEPTION,
 					"Error detected during step", LanguageEventData.StepType.NAVIGATION, null,
-					Pair.of(LanguageEventData.EXCEPTION, ValueFactory.create(executionRuntimeServices.getStepErrorKey())));
+					Pair.of(LanguageEventData.EXCEPTION, executionRuntimeServices.getStepErrorKey()));
 			throw new RuntimeException(executionRuntimeServices.getStepErrorKey());
 		}
 

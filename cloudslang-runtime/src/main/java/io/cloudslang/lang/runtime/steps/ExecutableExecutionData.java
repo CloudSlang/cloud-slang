@@ -15,7 +15,6 @@ import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.values.Value;
-import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.ResultsBinding;
@@ -122,9 +121,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             ReturnValues actionReturnValues = runEnv.removeReturnValues();
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
                     LanguageEventData.StepType.EXECUTABLE, nodeName,
-                    Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, ValueFactory.create((Serializable)executableOutputs)),
-                    Pair.of(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, ValueFactory.create((Serializable)executableResults)),
-                    Pair.of(ACTION_RETURN_VALUES_KEY, ValueFactory.create(actionReturnValues)));
+                    Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable)executableOutputs),
+                    Pair.of(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable)executableResults),
+                    Pair.of(ACTION_RETURN_VALUES_KEY, actionReturnValues));
 
             // Resolving the result of the operation/flow
             String result = resultsBinding.resolveResult(
@@ -149,9 +148,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             runEnv.putReturnValues(returnValues);
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
                     LanguageEventData.StepType.EXECUTABLE, nodeName,
-                    Pair.of(LanguageEventData.OUTPUTS, ValueFactory.create((Serializable)operationReturnOutputs)),
-                    Pair.of(LanguageEventData.RESULT, ValueFactory.create(returnValues.getResult())),
-                    Pair.of(ScoreLangConstants.EXECUTABLE_TYPE, ValueFactory.create(executableType)));
+                    Pair.of(LanguageEventData.OUTPUTS, (Serializable)operationReturnOutputs),
+                    Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
+                    Pair.of(ScoreLangConstants.EXECUTABLE_TYPE, executableType));
 
             // If we have parent flow data on the stack, we pop it and request the score engine to switch to the parent
             // execution plan id once it can, and we set the next position that was stored there for the use of the navigation
@@ -160,9 +159,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             } else {
                 fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_EXECUTION_FINISHED,
                         "Execution finished running", LanguageEventData.StepType.EXECUTABLE, nodeName,
-                        Pair.of(LanguageEventData.RESULT, ValueFactory.create(returnValues.getResult())),
-                        Pair.of(LanguageEventData.OUTPUTS, ValueFactory.create((Serializable)operationReturnOutputs)),
-                        Pair.of(ScoreLangConstants.EXECUTABLE_TYPE, ValueFactory.create(executableType)));
+                        Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
+                        Pair.of(LanguageEventData.OUTPUTS, (Serializable)operationReturnOutputs),
+                        Pair.of(ScoreLangConstants.EXECUTABLE_TYPE, executableType));
             }
         } catch (RuntimeException e){
             logger.error("There was an error running the finish executable execution step of: \'" + nodeName + "\'.\n\tError is: " + e.getMessage());
