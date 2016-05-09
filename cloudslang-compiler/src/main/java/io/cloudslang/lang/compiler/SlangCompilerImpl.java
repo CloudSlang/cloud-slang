@@ -101,7 +101,7 @@ public class SlangCompilerImpl implements SlangCompiler {
             return extractProperties(parsedSlang);
         } catch (Throwable ex) {
             throw new RuntimeException(
-                    ERROR_LOADING_PROPERTIES_FILE_MESSAGE + source.getName() + "'. Nested exception is: " + ex.getMessage(),
+                    ERROR_LOADING_PROPERTIES_FILE_MESSAGE + source.getFileName() + "'. Nested exception is: " + ex.getMessage(),
                     ex
             );
         }
