@@ -158,7 +158,7 @@ public class PreCompilerErrorsTest {
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("Inputs and outputs names should be different. " +
-                "Please rename input/output \"json_path\"");
+                "Please rename input/output \"json_path\" for io.cloudslang.base.json.get_value");
         throw result.getErrors().get(0);
     }
 
