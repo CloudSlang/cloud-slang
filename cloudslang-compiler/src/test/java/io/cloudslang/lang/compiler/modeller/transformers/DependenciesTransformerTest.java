@@ -51,7 +51,7 @@ public class DependenciesTransformerTest {
         List<Transformer.Scope> scopes = transformer.getScopes();
         assertTrue(scopes.size() == 1);
         assertEquals(Transformer.Scope.ACTION, scopes.get(0));
-        assertEquals(SlangTextualKeys.ACTION_DEPENDENCIES, transformer.keyToTransform());
+        assertEquals(SlangTextualKeys.PYTHON_ACTION_DEPENDENCIES_KEY, transformer.keyToTransform());
     }
 
 }

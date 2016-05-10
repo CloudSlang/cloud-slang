@@ -33,5 +33,5 @@ public class DependenciesTransformer implements Transformer<List<String>, List<S
     public List<Scope> getScopes() {return Arrays.asList(Scope.ACTION);}
 
     @Override
-    public String keyToTransform() {return SlangTextualKeys.ACTION_DEPENDENCIES;}
+    public String keyToTransform() {return SlangTextualKeys.PYTHON_ACTION_DEPENDENCIES_KEY;}
 }
