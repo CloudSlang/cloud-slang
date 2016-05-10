@@ -11,8 +11,8 @@ operation:
   name: check_number
   inputs:
     - number
-  action:
-    python_script: |
+  python_action:
+    script: |
       remainder = int(number) % 2
       isEven = remainder == 0
       tooBig = int(number) > 512

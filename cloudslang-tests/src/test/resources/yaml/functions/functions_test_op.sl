@@ -14,9 +14,9 @@ operation:
     - value_propagate:
         default: ${ value_propagate + get_sp('propagate.op.input') }
         private: true
-  action:
-    python_script: |
-        language = 'CloudSlang'
+  python_action:
+    script: |
+      language = 'CloudSlang'
   outputs:
     - output1_safe: ${ get('language', 'output1_default') }
     - output2_safe: ${ get('not_defined_key', 'output2_default') }

@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
+import org.python.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -53,15 +54,16 @@ public class ActionExecutionData extends AbstractExecutionData {
     @Autowired
     private JavaRuntimeService javaExecutionService;
 
-    public void doAction(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
+    public void doAction(@Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
+                         @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                          @Param(ExecutionParametersConsts.NON_SERIALIZABLE_EXECUTION_DATA) Map<String, Object> nonSerializableExecutionData,
+                         @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
                          @Param(ScoreLangConstants.ACTION_TYPE) ActionType actionType,
-                         @Param(ScoreLangConstants.ACTION_DEPENDENCIES) List<String> dependencies,
-                         @Param(ScoreLangConstants.ACTION_CLASS_KEY) String className,
-                         @Param(ScoreLangConstants.ACTION_METHOD_KEY) String methodName,
-                         @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
-                         @Param(ScoreLangConstants.PYTHON_SCRIPT_KEY) String python_script,
-                         @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId) {
+                         @Param(ScoreLangConstants.JAVA_ACTION_CLASS_KEY) String className,
+                         @Param(ScoreLangConstants.JAVA_ACTION_METHOD_KEY) String methodName,
+                         @Param(ScoreLangConstants.JAVA_ACTION_GAV_KEY) String gav,
+                         @Param(ScoreLangConstants.PYTHON_ACTION_SCRIPT_KEY) String script,
+                         @Param(ScoreLangConstants.PYTHON_ACTION_DEPENDENCIES_KEY) Collection<String> dependencies) {
 
         Map<String, Serializable> returnValue = new HashMap<>();
         Map<String, Serializable> callArguments = runEnv.removeCallArguments();
@@ -84,10 +86,10 @@ public class ActionExecutionData extends AbstractExecutionData {
             switch (actionType) {
                 case JAVA:
                     returnValue = runJavaAction(serializableSessionData, callArguments, nonSerializableExecutionData,
-                            className, methodName, dependencies);
+                            gav, className, methodName);
                     break;
                 case PYTHON:
-                    returnValue = prepareAndRunPythonAction(callArguments, python_script);
+                    returnValue = prepareAndRunPythonAction(dependencies, script, callArguments);
                     break;
                 default:
                     break;
@@ -99,8 +101,6 @@ public class ActionExecutionData extends AbstractExecutionData {
             logger.error(ex);
             throw (ex);
         }
-
-        //todo: hook
 
         ReturnValues returnValues = new ReturnValues(returnValue, null);
         runEnv.putReturnValues(returnValues);
@@ -115,13 +115,10 @@ public class ActionExecutionData extends AbstractExecutionData {
     private Map<String, Serializable> runJavaAction(Map<String, SerializableSessionObject> serializableSessionData,
                                                     Map<String, Serializable> currentContext,
                                                     Map<String, Object> nonSerializableExecutionData,
-                                                    String className,
-                                                    String methodName,
-                                                    List<String> dependencies) {
+                                                    String gav, String className, String methodName) {
         List<Object> actualParameters = extractMethodData(serializableSessionData, currentContext, nonSerializableExecutionData, className, methodName);
-        String dependency = (dependencies == null || dependencies.isEmpty()) ? "" : dependencies.get(0);
-        Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService.execute(dependency,
-                className, methodName, actualParameters.toArray(new Object[actualParameters.size()]));
+        Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService.execute(gav, className, methodName,
+                actualParameters.toArray(new Object[actualParameters.size()]));
         if (returnMap == null) {
             throw new RuntimeException("Action method did not return Map<String,String>");
         }
@@ -231,12 +228,10 @@ public class ActionExecutionData extends AbstractExecutionData {
         args.add(serializableSessionContextObject);
     }
 
-    private Map<String, Serializable> prepareAndRunPythonAction(
-            Map<String, Serializable> callArguments,
-            String pythonScript) {
-
+    private Map<String, Serializable> prepareAndRunPythonAction(Collection<String> dependencies, String pythonScript, Map<String, Serializable> callArguments) {
         if (StringUtils.isNotBlank(pythonScript)) {
-            return scriptExecutor.executeScript(pythonScript, callArguments);
+            Set<String> pythonDependencies = dependencies == null || dependencies.isEmpty() ? Sets.<String>newHashSet() : new HashSet<>(dependencies);
+            return scriptExecutor.executeScript(pythonDependencies, pythonScript, callArguments);
         }
 
         throw new RuntimeException("Python script not found in action data");

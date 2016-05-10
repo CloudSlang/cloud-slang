@@ -59,7 +59,6 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.ASYNC_LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER;
-import static io.cloudslang.lang.entities.ScoreLangConstants.FAILURE_RESULT;
 
 /*
  * Created by orius123 on 09/11/14.
@@ -83,10 +82,15 @@ public class ExecutableBuilder {
 
     private List<Transformer> preExecTransformers;
     private List<Transformer> postExecTransformers;
-    private List<String> execAdditionalKeywords = Arrays.asList(SlangTextualKeys.ACTION_KEY, SlangTextualKeys.WORKFLOW_KEY, SlangTextualKeys.EXECUTABLE_NAME_KEY);
+    private List<String> execAdditionalKeywords = Arrays.asList(
+            SlangTextualKeys.JAVA_ACTION_KEY,
+            SlangTextualKeys.PYTHON_ACTION_KEY,
+            SlangTextualKeys.WORKFLOW_KEY,
+            SlangTextualKeys.EXECUTABLE_NAME_KEY
+    );
 
     private List<Transformer> actionTransformers;
-    private List<List<String>> actionTransformerConstraintGroups;
+    private List<List<String>> actionKeyConstraintGroups;
 
     private List<Transformer> preStepTransformers;
     private List<Transformer> postStepTransformers;
@@ -100,8 +104,12 @@ public class ExecutableBuilder {
 
         //action transformers and keys
         actionTransformers = filterTransformers(Transformer.Scope.ACTION);
-        //action keys excluding each other
-        actionTransformerConstraintGroups = Collections.singletonList(Arrays.asList(ScoreLangConstants.PYTHON_SCRIPT_KEY, SlangTextualKeys.JAVA_ACTION));
+        //action keys (Java / Python) excluding each other
+        actionKeyConstraintGroups = Collections.singletonList(
+                Arrays.asList(
+                        SlangTextualKeys.PYTHON_ACTION_KEY,
+                        SlangTextualKeys.JAVA_ACTION_KEY)
+        );
 
         //step transformers
         preStepTransformers = filterTransformers(Transformer.Scope.BEFORE_STEP);
@@ -121,8 +129,13 @@ public class ExecutableBuilder {
         Map<String, Serializable> preExecutableActionData = new HashMap<>();
         Map<String, Serializable> postExecutableActionData = new HashMap<>();
 
-        errors.addAll(transformersHandler.checkKeyWords(execName, executableRawData,
-                ListUtils.union(preExecTransformers, postExecTransformers), execAdditionalKeywords, null));
+        errors.addAll(transformersHandler.checkKeyWords(
+                execName,
+                executableRawData,
+                ListUtils.union(preExecTransformers, postExecTransformers),
+                execAdditionalKeywords,
+                actionKeyConstraintGroups)
+        );
 
         String errorMessagePrefix = "For " + parsedSlang.getType().toString().toLowerCase() + " '" + execName + "' syntax is illegal.\n";
         preExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, preExecTransformers, errors, errorMessagePrefix));
@@ -205,16 +218,19 @@ public class ExecutableBuilder {
         }
     }
 
-    private Map<String, Object> getActionRawData(Map<String, Object> executableRawData, List<RuntimeException> errors,
-                                                 ParsedSlang parsedSlang, String execName) {
-        Map<String, Object> actionRawData = null;
-        try{
-            //noinspection unchecked
-            actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
-        } catch (ClassCastException ex){
-            errors.add(new RuntimeException("Operation: '" + execName + "' syntax is illegal.\nBelow 'action' property there should be a map of values such as: 'python_script:' or 'java_action:'"));
+    private Map<String, Object> getActionRawData(
+            Map<String, Object> executableRawData,
+            List<RuntimeException> errors,
+            ParsedSlang parsedSlang, String execName) {
+        Map<String, Object> actionRawData = new HashMap<>();
+        Object javaActionRawData = executableRawData.get(SlangTextualKeys.JAVA_ACTION_KEY);
+        Object pythonActionRawData = executableRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY);
+        if (javaActionRawData != null) {
+            actionRawData.put(SlangTextualKeys.JAVA_ACTION_KEY, executableRawData.get(SlangTextualKeys.JAVA_ACTION_KEY));
         }
-        actionRawData = actionRawData == null ? new HashMap<String, Object>() : actionRawData;
+        if (pythonActionRawData != null) {
+            actionRawData.put(SlangTextualKeys.PYTHON_ACTION_KEY, executableRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY));
+        }
         if (MapUtils.isEmpty(actionRawData)) {
             errors.add(new RuntimeException("Error compiling " + parsedSlang.getName() + ". Operation: " + execName + " has no action data"));
         }
@@ -281,7 +297,7 @@ public class ExecutableBuilder {
     private ActionModellingResult compileAction(Map<String, Object> actionRawData) {
         Map<String, Serializable> actionData = new HashMap<>();
 
-        List<RuntimeException> errors = transformersHandler.checkKeyWords("action data", actionRawData, actionTransformers, null, actionTransformerConstraintGroups);
+        List<RuntimeException> errors = transformersHandler.checkKeyWords("action data", actionRawData, actionTransformers, null, null);
 
         String errorMessagePrefix = "Action syntax is illegal.\n";
         actionData.putAll(transformersHandler.runTransformers(actionRawData, actionTransformers, errors, errorMessagePrefix));

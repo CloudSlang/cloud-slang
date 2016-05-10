@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Bonczidai Levente
@@ -28,8 +29,11 @@ public class ScriptExecutor {
     @Autowired
     private PythonRuntimeService pythonRuntimeService;
 
-    //we need this method to be synchronized so we will not have multiple scripts run in parallel on the same context
     public Map<String, Serializable> executeScript (String script, Map<String, Serializable> callArguments) {
         return pythonRuntimeService.exec(Collections.<String>emptySet(), script, callArguments);
+    }
+
+    public Map<String, Serializable> executeScript (Set dependencies, String script, Map<String, Serializable> callArguments) {
+        return pythonRuntimeService.exec(dependencies, script, callArguments);
     }
 }

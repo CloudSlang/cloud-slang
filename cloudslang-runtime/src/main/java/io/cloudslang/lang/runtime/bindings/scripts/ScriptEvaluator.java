@@ -54,7 +54,6 @@ public class ScriptEvaluator {
         return evalExpr(expr, context, systemProperties, new HashSet<ScriptFunction>());
     }
 
-    //we need this method to be synchronized so we will not have multiple scripts run in parallel on the same context
     public Serializable evalExpr(
             String expr,
             Map<String, Serializable> context,

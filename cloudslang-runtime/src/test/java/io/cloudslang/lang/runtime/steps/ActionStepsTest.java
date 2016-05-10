@@ -32,6 +32,7 @@ import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -46,10 +47,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static io.cloudslang.lang.entities.ActionType.JAVA;
 import static io.cloudslang.lang.entities.ActionType.PYTHON;
@@ -66,6 +64,11 @@ public class ActionStepsTest {
 
     private static final long DEFAULT_TIMEOUT = 10000;
     private static final String NON_SERIALIZABLE_VARIABLE_NAME = "current_time";
+//    private static final String GAV_DEFAULT = "g:a:v";
+    private static final String GAV_DEFAULT = "";
+//    private static final ArrayList<String> DEPENDENCIES_DEFAULT = Lists.newArrayList("dep1", "dep2");
+    private static final List<String> DEPENDENCIES_DEFAULT = Collections.emptyList();
+    private Map<String, Object> nonSerializableExecutionData;
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -78,7 +81,12 @@ public class ActionStepsTest {
 
 	ExecutionRuntimeServices executionRuntimeServicesMock = mock(ExecutionRuntimeServices.class);
 
-    @Test(timeout = DEFAULT_TIMEOUT)
+    @Before
+    public void setUp() {
+        nonSerializableExecutionData = new HashMap<>();
+    }
+
+    @Test//(timeout = DEFAULT_TIMEOUT)
     public void doActionJavaTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
@@ -87,10 +95,19 @@ public class ActionStepsTest {
         initialCallArguments.put("role", "roleTest");
         runEnv.putCallArguments(initialCallArguments);
 
-        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
-
         //invoke doAction
-		actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, Collections.<String>emptyList(), ContentTestActions.class.getName(), "doJavaSampleAction", executionRuntimeServicesMock, null, 2L);
+		actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                JAVA,
+                ContentTestActions.class.getName(),
+                "doJavaSampleAction",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT
+        );
 
         //construct expected outputs
         Map<String, String> expectedOutputs = new HashMap<>();
@@ -117,7 +134,18 @@ public class ActionStepsTest {
         Long nextStepPosition = 2L;
 
         //invoke doAction
-        actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, Collections.<String>emptyList(), ContentTestActions.class.getName(), "doJavaSampleAction", executionRuntimeServicesMock, null, nextStepPosition);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                nextStepPosition,
+                JAVA,
+                ContentTestActions.class.getName(),
+                "doJavaSampleAction",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT
+        );
 
         //verify matching
         Assert.assertEquals(nextStepPosition, runEnv.removeNextStepPosition());
@@ -130,7 +158,18 @@ public class ActionStepsTest {
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
 
         //invoke doAction
-        actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, Collections.<String>emptyList(), "MissingClassName", "doJavaSampleAction", runtimeServices, null, 2L);
+        actionSteps.doAction(
+                runtimeServices,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                JAVA,
+                "MissingClassName",
+                "doJavaSampleAction",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT
+        );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 
@@ -161,7 +200,18 @@ public class ActionStepsTest {
         String userPythonScript = "var= \"hello\"";
 
         //invoke doAction
-        actionSteps.doAction(runEnv,new HashMap<String, Object>(), PYTHON, Collections.<String>emptyList(), "", "", runtimeServices, userPythonScript, 2L);
+        actionSteps.doAction(
+                runtimeServices,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                PYTHON,
+                "",
+                "",
+                GAV_DEFAULT,
+                userPythonScript,
+                DEPENDENCIES_DEFAULT
+        );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 
@@ -191,7 +241,18 @@ public class ActionStepsTest {
         runEnv.putCallArguments(callArguments);
 
         //invoke doAction
-        actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, Collections.<String>emptyList(), ContentTestActions.class.getName(), "doJavaSampleAction", runtimeServices, null, 2L);
+        actionSteps.doAction(
+                runtimeServices,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                JAVA,
+                ContentTestActions.class.getName(),
+                "doJavaSampleAction",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT
+        );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 
@@ -217,7 +278,18 @@ public class ActionStepsTest {
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
 
         //invoke doAction
-        actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, Collections.<String>emptyList(), ContentTestActions.class.getName(), "wrongMethodName", runtimeServices, null, 2L);
+        actionSteps.doAction(
+                runtimeServices,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                JAVA,
+                ContentTestActions.class.getName(),
+                "wrongMethodName",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT
+        );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 
@@ -244,7 +316,18 @@ public class ActionStepsTest {
         boolean exceptionThrown = false;
         try {
             //invoke doAction
-            actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, Collections.<String>emptyList(), ContentTestActions.class.getName(), "doJavaActionExceptionMethod", runtimeServices, null, 2L);
+            actionSteps.doAction(
+                    runtimeServices,
+                    runEnv,
+                    nonSerializableExecutionData,
+                    2L,
+                    JAVA,
+                    ContentTestActions.class.getName(),
+                    "doJavaActionExceptionMethod",
+                    GAV_DEFAULT,
+                    null,
+                    DEPENDENCIES_DEFAULT
+            );
         } catch (RuntimeException ex){
             exceptionThrown = true;
         }
@@ -274,7 +357,18 @@ public class ActionStepsTest {
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
 
         //invoke doAction
-        actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, Collections.<String>emptyList(), ContentTestActions.class.getName(), "doJavaActionWrongReturnType", runtimeServices, null, 2L);
+        actionSteps.doAction(
+                runtimeServices,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                JAVA,
+                ContentTestActions.class.getName(),
+                "doJavaActionWrongReturnType",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT
+        );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 
@@ -301,10 +395,19 @@ public class ActionStepsTest {
         // missing role
         runEnv.putCallArguments(initialCallArguments);
 
-        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
-
         //invoke doAction
-        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, Collections.<String>emptyList(), ContentTestActions.class.getName(), "doJavaSampleAction", executionRuntimeServicesMock, null, 2L);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                JAVA,
+                ContentTestActions.class.getName(),
+                "doJavaSampleAction",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT
+        );
 
         //construct expected outputs
         Map<String, String> expectedOutputs = new HashMap<>();
@@ -327,10 +430,19 @@ public class ActionStepsTest {
         initialCallArguments.put("port", 5); //should be string
         runEnv.putCallArguments(initialCallArguments);
 
-        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
-
         //invoke doAction
-        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, Collections.<String>emptyList(), ContentTestActions.class.getName(), "doJavaNumberAsString", executionRuntimeServicesMock, null, 2L);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                JAVA,
+                ContentTestActions.class.getName(),
+                "doJavaNumberAsString",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT
+        );
     }
 
     @Test
@@ -341,10 +453,19 @@ public class ActionStepsTest {
         initialCallArguments.put("port", 5);
         runEnv.putCallArguments(initialCallArguments);
 
-        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
-
         //invoke doAction
-        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, Collections.<String>emptyList(), ContentTestActions.class.getName(), "doJavaNumbersAction", executionRuntimeServicesMock, null, 2L);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                JAVA,
+                ContentTestActions.class.getName(),
+                "doJavaNumbersAction",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT
+        );
         ReturnValues returnValues = runEnv.removeReturnValues();
         Assert.assertEquals(5, returnValues.getOutputs()
                 .get("port"));
@@ -359,10 +480,19 @@ public class ActionStepsTest {
         initialCallArguments.put("role", "roleTest");
         runEnv.putCallArguments(initialCallArguments);
 
-        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
-
         //invoke doAction
-        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, Collections.<String>emptyList(), ContentTestActions.class.getName(), "doJavaSampleAction_NOT_FOUND", executionRuntimeServicesMock, null, 2L);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                JAVA,
+                ContentTestActions.class.getName(),
+                "doJavaSampleAction_NOT_FOUND",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT
+        );
 
         //construct expected outputs
         Map<String, String> expectedOutputs = new HashMap<>();
@@ -384,10 +514,19 @@ public class ActionStepsTest {
         initialCallArguments.put("role", "roleTest");
         runEnv.putCallArguments(initialCallArguments);
 
-        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
-
         //invoke doAction
-        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, Collections.<String>emptyList(), ContentTestActions.class.getName(), "doJavaActionMissingAnnotation", executionRuntimeServicesMock, null, 2L);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                JAVA,
+                ContentTestActions.class.getName(),
+                "doJavaActionMissingAnnotation",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT
+        );
 
         //construct expected outputs
         Map<String, String> expectedOutputs = new HashMap<>();
@@ -411,8 +550,18 @@ public class ActionStepsTest {
         nonSerializableExecutionData.put("name", sessionObject);
 
         //invoke doAction
-        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, Collections.<String>emptyList(), ContentTestActions.class.getName(),
-                "getNameFromNonSerializableSession", executionRuntimeServicesMock, null, 2L);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                JAVA,
+                ContentTestActions.class.getName(),
+                "getNameFromNonSerializableSession",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT
+        );
 
         Map<String, Serializable> outputs = runEnv.removeReturnValues().getOutputs();
         Assert.assertTrue(outputs.containsKey("name"));
@@ -433,8 +582,18 @@ public class ActionStepsTest {
         runEnv.putCallArguments(initialCallArguments);
 
         //invoke doAction
-        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, Collections.<String>emptyList(), ContentTestActions.class.getName(),
-                "setNameOnNonSerializableSession", executionRuntimeServicesMock, null, 2L);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                JAVA,
+                ContentTestActions.class.getName(),
+                "setNameOnNonSerializableSession",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT
+        );
 
         Assert.assertTrue(nonSerializableExecutionData.containsKey("name"));
 
@@ -450,11 +609,20 @@ public class ActionStepsTest {
     public void doJavaActionGetNonExistingKeyFromNonSerializableSessionTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
-        HashMap<String, Object> nonSerializableExecutionData = new HashMap<>();
 
         //invoke doAction
-        actionSteps.doAction(runEnv, nonSerializableExecutionData, JAVA, Collections.<String>emptyList(), ContentTestActions.class.getName(),
-                "getNameFromNonSerializableSession", executionRuntimeServicesMock, null, 2L);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                JAVA,
+                ContentTestActions.class.getName(),
+                "getNameFromNonSerializableSession",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT
+        );
 
         Map<String, Serializable> outputs = runEnv.removeReturnValues().getOutputs();
         Assert.assertTrue(outputs.containsKey("name"));
@@ -474,8 +642,18 @@ public class ActionStepsTest {
         runEnv.putCallArguments(initialCallArguments);
 
         //invoke doAction
-        actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, Collections.<String>emptyList(), ContentTestActions.class.getName(),
-                "getNameFromSerializableSession", executionRuntimeServicesMock, null, 2L);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                JAVA,
+                ContentTestActions.class.getName(),
+                "getNameFromSerializableSession",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT
+        );
 
         Map<String, Serializable> outputs = runEnv.removeReturnValues().getOutputs();
         Assert.assertTrue(outputs.containsKey("name"));
@@ -492,8 +670,18 @@ public class ActionStepsTest {
         runEnv.putCallArguments(initialCallArguments);
 
         //invoke doAction
-        actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, Collections.<String>emptyList(), ContentTestActions.class.getName(),
-                "getNameFromSerializableSession", executionRuntimeServicesMock, null, 2L);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                JAVA,
+                ContentTestActions.class.getName(),
+                "getNameFromSerializableSession",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT
+        );
 
         Map<String, Serializable> outputs = runEnv.removeReturnValues().getOutputs();
         Assert.assertTrue(outputs.containsKey("name"));
@@ -508,8 +696,18 @@ public class ActionStepsTest {
         runEnv.putCallArguments(initialCallArguments);
 
         //invoke doAction
-        actionSteps.doAction(runEnv, new HashMap<String, Object>(), JAVA, Collections.<String>emptyList(), ContentTestActions.class.getName(),
-                "getNameFromSerializableSession", executionRuntimeServicesMock, null, 2L);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                JAVA,
+                ContentTestActions.class.getName(),
+                "getNameFromSerializableSession",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT
+        );
 
         Map<String, SerializableSessionObject> serializableSessionMap = runEnv.getSerializableDataMap();
         Assert.assertTrue(serializableSessionMap.containsKey("name"));
@@ -539,7 +737,18 @@ public class ActionStepsTest {
                 "print url";
 
         //invoke doAction
-        actionSteps.doAction(runEnv, nonSerializableExecutionData, PYTHON, Collections.<String>emptyList(), "", "", executionRuntimeServicesMock, userPythonScript, 2L);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                PYTHON,
+                "",
+                "",
+                GAV_DEFAULT,
+                userPythonScript,
+                DEPENDENCIES_DEFAULT
+        );
 
         //construct expected outputs
         Map<String, Serializable> expectedOutputs = new HashMap<>();
@@ -576,7 +785,18 @@ public class ActionStepsTest {
                 "  print 'a'\n\n";
 
         //invoke doAction
-        actionSteps.doAction(runEnv, new HashMap<String, Object>(), PYTHON, Collections.<String>emptyList(), "", "", executionRuntimeServicesMock, userPythonScript, 2L);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                PYTHON,
+                "",
+                "",
+                GAV_DEFAULT,
+                userPythonScript,
+                DEPENDENCIES_DEFAULT
+        );
 
         //extract actual outputs
         ReturnValues actualReturnValues = runEnv.removeReturnValues();
@@ -595,8 +815,6 @@ public class ActionStepsTest {
         Map<String, Serializable> initialCallArguments = new HashMap<>();
         runEnv.putCallArguments(initialCallArguments);
 
-        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
-
         String userPythonScript = "import os\n" +
                 "print host\n" +
                 "print port\n" +
@@ -608,7 +826,18 @@ public class ActionStepsTest {
                 "print url";
 
         //invoke doAction
-        actionSteps.doAction(runEnv, nonSerializableExecutionData, PYTHON, Collections.<String>emptyList(), "", "", executionRuntimeServicesMock, userPythonScript, 2L);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                PYTHON,
+                "",
+                "",
+                GAV_DEFAULT,
+                userPythonScript,
+                DEPENDENCIES_DEFAULT
+        );
     }
 
 
@@ -624,8 +853,17 @@ public class ActionStepsTest {
 
         //invoke doAction
         actionSteps.doAction(
-                runEnv, new HashMap<String, Object>(), PYTHON, Collections.<String>emptyList(), "", "",
-                executionRuntimeServicesMock, userPythonScript, 2L);
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                PYTHON,
+                "",
+                "",
+                GAV_DEFAULT,
+                userPythonScript,
+                DEPENDENCIES_DEFAULT
+        );
     }
 
     @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
@@ -637,13 +875,22 @@ public class ActionStepsTest {
         initialCallArguments.put("port", 8080); //should be string
         runEnv.putCallArguments(initialCallArguments);
 
-        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
-
         //expects port as string
         String userPythonScript = "print('localhost:' + port)";
 
         //invoke doAction
-        actionSteps.doAction(runEnv, nonSerializableExecutionData, PYTHON, Collections.<String>emptyList(), "", "", executionRuntimeServicesMock, userPythonScript, 2L);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                PYTHON,
+                "",
+                "",
+                GAV_DEFAULT,
+                userPythonScript,
+                DEPENDENCIES_DEFAULT
+        );
     }
 
     @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
@@ -655,10 +902,19 @@ public class ActionStepsTest {
         initialCallArguments.put("port", "8080");
         runEnv.putCallArguments(initialCallArguments);
 
-        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
-
         //invoke doAction
-        actionSteps.doAction(runEnv, nonSerializableExecutionData, PYTHON, Collections.<String>emptyList(), "", "", executionRuntimeServicesMock, "", 2L);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                PYTHON,
+                "",
+                "",
+                GAV_DEFAULT,
+                "",
+                DEPENDENCIES_DEFAULT
+        );
     }
 
     @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
@@ -670,17 +926,25 @@ public class ActionStepsTest {
         initialCallArguments.put("port", "8080");
         runEnv.putCallArguments(initialCallArguments);
 
-        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
-
         //invoke doAction
-        actionSteps.doAction(runEnv, nonSerializableExecutionData, PYTHON, Collections.<String>emptyList(), "", "", executionRuntimeServicesMock, null, 2L);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                PYTHON,
+                "",
+                "",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT
+        );
     }
 
     @Test
     public void testPythonOutputSerializationErrorMessage() {
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.putCallArguments(new HashMap<String, Serializable>());
-        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
         String userPythonScript =
                 "from datetime import datetime\n" +
                 NON_SERIALIZABLE_VARIABLE_NAME + " = datetime.utcnow()";
@@ -689,7 +953,18 @@ public class ActionStepsTest {
         exception.expectMessage(NON_SERIALIZABLE_VARIABLE_NAME);
         exception.expectMessage("serializable");
 
-        actionSteps.doAction(runEnv, nonSerializableExecutionData, PYTHON, Collections.<String>emptyList(), "", "", executionRuntimeServicesMock, userPythonScript, 2L);
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                PYTHON,
+                "",
+                "",
+                GAV_DEFAULT,
+                userPythonScript,
+                DEPENDENCIES_DEFAULT
+        );
     }
 
     @Configuration

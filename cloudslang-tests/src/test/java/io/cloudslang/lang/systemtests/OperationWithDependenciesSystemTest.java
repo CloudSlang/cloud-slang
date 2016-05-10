@@ -24,9 +24,7 @@ public class OperationWithDependenciesSystemTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), null);
 
         ExecutionStep step = compilationArtifact.getExecutionPlan().getStep(2L);
-        List<String> dependencies = (List<String>) step.getActionData().get(ScoreLangConstants.ACTION_DEPENDENCIES);
-        assertNotNull(dependencies);
-        assertTrue(dependencies.isEmpty());
+        assertNull(step.getActionData().get(ScoreLangConstants.JAVA_ACTION_GAV_KEY));
 
         //Trigger ExecutionPlan
         Map<String, Serializable> userInputs = new HashMap<>();
@@ -39,24 +37,9 @@ public class OperationWithDependenciesSystemTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), null);
 
         ExecutionStep step = compilationArtifact.getExecutionPlan().getStep(2L);
-        List<String> dependencies = (List<String>) step.getActionData().get(ScoreLangConstants.ACTION_DEPENDENCIES);
-        assertNotNull(dependencies);
-
-        assertTrue(dependencies.size() == 1);
-        assertEquals("io.cloudslang:content.actions:1.1", dependencies.get(0));
-
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // we are not supporting dependency resolution yet :(
-        // once we do - we will change all tests
-        dependencies.clear();
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-        //Trigger ExecutionPlan
-        Map<String, Serializable> userInputs = new HashMap<>();
-        ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
-        assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
+        String gav = (String) step.getActionData().get(ScoreLangConstants.JAVA_ACTION_GAV_KEY);
+        assertNotNull(gav);
+        assertEquals("io.cloudslang:content.actions:1.1", gav);
     }
 
     @Test
@@ -65,9 +48,7 @@ public class OperationWithDependenciesSystemTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), null);
 
         ExecutionStep step = compilationArtifact.getExecutionPlan().getStep(2L);
-        List<String> dependencies = (List<String>) step.getActionData().get(ScoreLangConstants.ACTION_DEPENDENCIES);
-        assertNotNull(dependencies);
-        assertTrue(dependencies.isEmpty());
+        assertNull(step.getActionData().get(ScoreLangConstants.ACTION_DEPENDENCIES));
 
         //Trigger ExecutionPlan
         Map<String, Serializable> userInputs = new HashMap<>();
@@ -86,10 +67,5 @@ public class OperationWithDependenciesSystemTest extends SystemsTestsParent {
         assertTrue(dependencies.size() == 2);
         assertEquals("some.group:some.artifact:some_version-1.1", dependencies.get(0));
         assertEquals("some.group1:some.artifact:some_version-2.1", dependencies.get(1));
-
-        //Trigger ExecutionPlan
-        Map<String, Serializable> userInputs = new HashMap<>();
-        ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
-        assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 }
