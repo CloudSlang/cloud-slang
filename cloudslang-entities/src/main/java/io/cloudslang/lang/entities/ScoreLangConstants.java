@@ -28,13 +28,14 @@ public interface ScoreLangConstants {
     String NAMESPACE_DELIMITER = ".";
 
     //action scope
-    String ACTION_CLASS_KEY = "className";
     String ACTION_TYPE = "actionType";
 
-    String ACTION_METHOD_KEY = "methodName";
-    String PYTHON_SCRIPT_KEY = "python_script";
+    String JAVA_ACTION_CLASS_KEY = "className";
+    String JAVA_ACTION_METHOD_KEY = "methodName";
+    String JAVA_ACTION_GAV_KEY = "gav";
 
-    String OPERATION_NAME_KEY = "operationName";
+    String PYTHON_ACTION_SCRIPT_KEY = "script";
+    String PYTHON_ACTION_DEPENDENCIES_KEY = "dependencies";
 
     //navigation
     String NEXT_STEP_ID_KEY = "nextStepId";

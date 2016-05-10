@@ -11,7 +11,7 @@ operation:
   name: print_list
   inputs:
      - words_list
-  action:
-    python_script: |
-        if words_list != None and len(words_list) > 0:
-            print words_list
+  python_action:
+    script: |
+      if words_list != None and len(words_list) > 0:
+          print words_list

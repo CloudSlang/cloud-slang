@@ -9,7 +9,6 @@ namespace: user.ops
 
 operation:
   name: java_op
-  action:
-    java_action:
-      className: com.hp.thing
-      methodName: someMethod
+  java_action:
+    class_name: com.hp.thing
+    method_name: someMethod

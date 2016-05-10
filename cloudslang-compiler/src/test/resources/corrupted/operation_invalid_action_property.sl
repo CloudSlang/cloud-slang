@@ -9,8 +9,7 @@ namespace: user.ops
 
 operation:
   name: operation_invalid_action_property
-  action:
-    java_action:
-      className: com.hp.thing
-      methodName: someMethod
-      IDontBelongHere: blah
+  java_action:
+    class_name: com.hp.thing
+    method_name: someMethod
+    IDontBelongHere: blah
