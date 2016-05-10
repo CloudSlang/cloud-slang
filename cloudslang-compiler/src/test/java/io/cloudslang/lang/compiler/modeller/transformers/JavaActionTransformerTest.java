@@ -17,7 +17,6 @@ import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import java.io.File;
-import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
@@ -53,8 +52,8 @@ public class JavaActionTransformerTest {
     private Map initialJavaActionSimple;
     private Map initialJavaActionWithDependencies;
     private Map initialJavaActionInvalidKey;
-    private Map<String, Serializable> expectedJavaActionSimple;
-    private Map<String, Serializable> expectedJavaActionWithDependencies;
+    private Map<String, String> expectedJavaActionSimple;
+    private Map<String, String> expectedJavaActionWithDependencies;
 
     @Before
     public void init() throws URISyntaxException {
@@ -72,14 +71,14 @@ public class JavaActionTransformerTest {
     @Test
     public void testTransformSimple() throws Exception {
         @SuppressWarnings("unchecked")
-        Map<String, Serializable> actualJavaActionSimple = javaActionTransformer.transform(initialJavaActionSimple);
+        Map<String, String> actualJavaActionSimple = javaActionTransformer.transform(initialJavaActionSimple);
         Assert.assertEquals(expectedJavaActionSimple, actualJavaActionSimple);
     }
 
     @Test
     public void testTransformWithDependencies() throws Exception {
         @SuppressWarnings("unchecked")
-        Map<String, Serializable> actualJavaActionSimple = javaActionTransformer.transform(initialJavaActionWithDependencies);
+        Map<String, String> actualJavaActionSimple = javaActionTransformer.transform(initialJavaActionWithDependencies);
         Assert.assertEquals(expectedJavaActionWithDependencies, actualJavaActionSimple);
     }
 

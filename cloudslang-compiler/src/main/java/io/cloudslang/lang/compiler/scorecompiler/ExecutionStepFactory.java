@@ -92,7 +92,7 @@ public class ExecutionStepFactory {
         ActionType actionType;
 
         @SuppressWarnings("unchecked")
-        Map<String, Serializable> javaActionData = (Map<String, Serializable>) actionRawData.get(SlangTextualKeys.JAVA_ACTION_KEY);
+        Map<String, String> javaActionData = (Map<String, String>) actionRawData.get(SlangTextualKeys.JAVA_ACTION_KEY);
         @SuppressWarnings("unchecked")
         Map<String, Serializable> pythonActionData = (Map<String, Serializable>) actionRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY);
         boolean javaActionFound = MapUtils.isNotEmpty(javaActionData);

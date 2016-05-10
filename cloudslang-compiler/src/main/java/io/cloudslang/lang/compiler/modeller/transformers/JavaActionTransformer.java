@@ -17,7 +17,6 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.ScoreLangConstants;
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JavaActionTransformer extends AbstractTransformer implements Transformer<Map<String, Serializable>, Map<String, Serializable>> {
+public class JavaActionTransformer extends AbstractTransformer implements Transformer<Map<String, String>, Map<String, String>> {
 
     private static Set<String> mandatoryKeySet = Sets.newHashSet(
             SlangTextualKeys.JAVA_ACTION_CLASS_NAME_KEY,
@@ -34,7 +33,7 @@ public class JavaActionTransformer extends AbstractTransformer implements Transf
     private static Set<String> optionalKeySet = Sets.newHashSet(SlangTextualKeys.JAVA_ACTION_GAV_KEY);
 
     @Override
-    public Map<String, Serializable> transform(Map<String, Serializable> rawData) {
+    public Map<String, String> transform(Map<String, String> rawData) {
         if (rawData != null) {
             validateKeySet(
                     rawData.keySet(),
@@ -57,7 +56,7 @@ public class JavaActionTransformer extends AbstractTransformer implements Transf
         return SlangTextualKeys.JAVA_ACTION_KEY;
     }
 
-    private void transformKeys(Map<String, Serializable> rawData) {
+    private void transformKeys(Map<String, String> rawData) {
         // snake_case -> camelCase
         rawData.put(
                 ScoreLangConstants.JAVA_ACTION_CLASS_KEY,
