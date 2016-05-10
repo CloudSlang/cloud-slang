@@ -90,7 +90,7 @@ public class CompileOperationTest {
     public void testCompileOperationMissingClassName() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_missing_class_name.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("class_name");
+        exception.expectMessage(SlangTextualKeys.JAVA_ACTION_CLASS_NAME_KEY);
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 
@@ -98,7 +98,7 @@ public class CompileOperationTest {
     public void testCompileOperationMissingMethodName() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_missing_method_name.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("method_name");
+        exception.expectMessage(SlangTextualKeys.JAVA_ACTION_METHOD_NAME_KEY);
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 
