@@ -151,6 +151,18 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
+    public void testFlowSameInputAndOutputName() throws Exception {
+        URI resource = getClass().getResource("/corrupted/same_input_and_output_name.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Inputs and outputs names should be different. " +
+                "Please rename input/output \"json_path\"");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
     public void testFlowWithInputsAsString() throws Exception {
         URI resource = getClass().getResource("/corrupted/inputs_type_string_flow.sl").toURI();
 

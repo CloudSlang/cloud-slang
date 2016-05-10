@@ -18,7 +18,7 @@ operation:
         private: true
 
     # helpers
-    - output_no_expression: output_no_expression_value
+    - output_no_expression_input: output_no_expression_value
     - authorized_keys_path: './auth'
     - scp_host_port: '8888'
 
@@ -68,7 +68,7 @@ operation:
   action:
     python_script: result = 'success'
   outputs:
-    - output_no_expression
+    - output_no_expression: ${output_no_expression_input}
     - output_int: 22
     - output_str: output_str_value
     - output_expression: ${ output_str + '_suffix' }

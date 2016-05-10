@@ -12,11 +12,15 @@ import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.Output;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 
 /*
@@ -57,8 +61,22 @@ public class SlangModellerImpl implements SlangModeller{
     private ExecutableModellingResult transformToExecutable(ParsedSlang parsedSlang, Map<String, Object> rawData) {
         String executableName = (String) rawData.get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
         ExecutableModellingResult result = executableBuilder.transformToExecutable(parsedSlang, executableName, rawData);
+        validateInputNamesDifferentFromOutputNames(result);
         validateFileName(executableName, parsedSlang, result);
         return result;
+    }
+
+    private void validateInputNamesDifferentFromOutputNames(ExecutableModellingResult result) {
+        List<Input> inputs = result.getExecutable().getInputs();
+        List<Output> outputs = result.getExecutable().getOutputs();
+        for (Input input : CollectionUtils.emptyIfNull(inputs)) {
+            for (Output output : CollectionUtils.emptyIfNull(outputs)) {
+                if (input.getName().equals(output.getName())) {
+                    result.getErrors().add(new RuntimeException("Inputs and outputs names should be different. " +
+                            "Please rename input/output \"" + input.getName() + "\""));
+                }
+            }
+        }
     }
 
     private void validateFileName(String executableName, ParsedSlang parsedSlang, ExecutableModellingResult result) {
