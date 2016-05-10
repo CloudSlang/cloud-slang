@@ -57,7 +57,7 @@ public class SlangCompilerImplTest {
 
     @Before
     public void setUp() {
-        slangSource = new SlangSource("source_content","source_name");
+        slangSource = new SlangSource("source_content", "source_name");
     }
 
     @Test

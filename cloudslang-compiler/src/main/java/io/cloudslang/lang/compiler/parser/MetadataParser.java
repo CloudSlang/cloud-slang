@@ -45,7 +45,7 @@ public class MetadataParser {
     private ParserExceptionHandler parserExceptionHandler;
 
     public Map<String, String> parse(SlangSource source) {
-        Validate.notEmpty(source.getSource(), "Source " + source.getName() + " cannot be empty");
+        Validate.notEmpty(source.getSource(), "Source " + source.getFileName() + " cannot be empty");
         try {
             String description = extractDescriptionString(source);
             Map<String, String> tagMap = extractTagMap(description);
@@ -53,7 +53,7 @@ public class MetadataParser {
             return tagMap;
         } catch (Throwable e) {
             throw new RuntimeException("There was a problem parsing the description: " +
-                    source.getName() + ".\n" + parserExceptionHandler.getErrorMessage(e), e);
+                    source.getFileName() + ".\n" + parserExceptionHandler.getErrorMessage(e), e);
         }
     }
 
@@ -159,7 +159,7 @@ public class MetadataParser {
             checkStartingAndClosingTags(sb, firstLine, blockEndTagFound, blockStartTagFound);
         } catch (IOException e) {
             throw new RuntimeException("Error processing metadata, error extracting metadata from " +
-                    source.getName(), e);
+                    source.getFileName(), e);
         }
         return sb.build();
     }
