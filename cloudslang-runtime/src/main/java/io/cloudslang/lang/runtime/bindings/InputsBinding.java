@@ -68,7 +68,7 @@ public class InputsBinding {
             throw new RuntimeException("Error binding input: '" + inputName + "', \n\tError is: " + t.getMessage(), t);
         }
 
-        if (input.isRequired() && value == null) {
+        if (input.isRequired() && (value == null || value.get() == null)) {
             String errorMessage = "Input with name: \'" + inputName + "\' is Required, but value is empty";
             throw new RuntimeException(errorMessage);
         }

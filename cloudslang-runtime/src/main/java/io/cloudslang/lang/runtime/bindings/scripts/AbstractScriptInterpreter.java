@@ -48,13 +48,15 @@ public abstract class AbstractScriptInterpreter {
     }
 
     private boolean getSensitive(PythonInterpreter interpreter) {
-        for (PyObject pyObject : interpreter.getLocals().asIterable()) {
-            String key = pyObject.asString();
-            PyObject value = interpreter.get(key);
-            if (value != null && value instanceof PyObjectValue) {
-                PyObjectValue pyObjectValue = (PyObjectValue) value;
-                if (pyObjectValue.isSensitive() && pyObjectValue.isAccessed()) {
-                    return true;
+        if (interpreter.getLocals() != null) {
+            for (PyObject pyObject : interpreter.getLocals().asIterable()) {
+                String key = pyObject.asString();
+                PyObject value = interpreter.get(key);
+                if (value != null && value instanceof PyObjectValue) {
+                    PyObjectValue pyObjectValue = (PyObjectValue) value;
+                    if (pyObjectValue.isSensitive() && pyObjectValue.isAccessed()) {
+                        return true;
+                    }
                 }
             }
         }

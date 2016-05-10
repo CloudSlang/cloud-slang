@@ -14,6 +14,7 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.tools.build.SlangBuildMain;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
@@ -250,7 +251,7 @@ public class SlangTestRunner {
             throw new RuntimeException(message);
         }
 
-        Map<String, Serializable> executionOutputs = executionReturnValues.getOutputs();
+        Map<String, Value> executionOutputs = executionReturnValues.getOutputs();
         if (MapUtils.isNotEmpty(outputs)){
             for(Map.Entry<String, Serializable> output: outputs.entrySet()) {
                 String outputName = output.getKey();

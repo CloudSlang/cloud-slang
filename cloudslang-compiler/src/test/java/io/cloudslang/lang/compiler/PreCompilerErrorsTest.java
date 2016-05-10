@@ -210,7 +210,7 @@ public class PreCompilerErrorsTest {
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("step1");
-        exception.expectMessage("to many keys");
+        exception.expectMessage("too many keys");
         throw result.getErrors().get(0);
     }
 

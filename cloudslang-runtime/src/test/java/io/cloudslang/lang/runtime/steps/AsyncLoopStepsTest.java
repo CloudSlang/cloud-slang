@@ -243,7 +243,7 @@ public class AsyncLoopStepsTest {
         Assert.assertTrue(aggregateContext.containsKey(RuntimeConstants.BRANCHES_CONTEXT_KEY));
         @SuppressWarnings("unchecked")
         List<Map<String, Value>> actualBranchesContexts =
-                (List<Map<String, Value>>) aggregateContext.get(RuntimeConstants.BRANCHES_CONTEXT_KEY);
+                (List<Map<String, Value>>) aggregateContext.get(RuntimeConstants.BRANCHES_CONTEXT_KEY).get();
         Assert.assertEquals(expectedBranchContexts, actualBranchesContexts);
     }
 

@@ -1,5 +1,7 @@
 package io.cloudslang.lang.entities.bindings.values;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 
 /**
@@ -11,7 +13,19 @@ public class SimpleValue implements Value {
 
     private Serializable content;
 
+    @SuppressWarnings("unused")
+    protected SimpleValue() {
+    }
+
     public SimpleValue(Serializable content) {
+        this.content = content;
+    }
+
+    public Serializable getContent() {
+        return content;
+    }
+
+    public void setContent(Serializable content) {
         this.content = content;
     }
 
@@ -20,6 +34,7 @@ public class SimpleValue implements Value {
         return content;
     }
 
+    @JsonIgnore
     @Override
     public boolean isSensitive() {
         return false;

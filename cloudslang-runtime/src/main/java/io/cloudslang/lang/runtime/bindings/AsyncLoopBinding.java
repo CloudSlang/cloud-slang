@@ -12,6 +12,7 @@ package io.cloudslang.lang.runtime.bindings;
 import io.cloudslang.lang.entities.AsyncLoopStatement;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
 import org.apache.commons.collections4.CollectionUtils;
@@ -19,6 +20,8 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -49,19 +52,22 @@ public class AsyncLoopBinding {
         Validate.notNull(systemProperties, "system properties cannot be null");
         Validate.notNull(nodeName, "node name cannot be null");
 
-        List<Value> evalResult;
+        List<Value> result = new ArrayList<>();
         try {
-            //noinspection unchecked
-            evalResult = (List<Value>) scriptEvaluator.evalExpr(
-                    asyncLoopStatement.getExpression(),
-                    flowContext.getImmutableViewOfVariables(),
-                    systemProperties).get();
+            Value evalResult = scriptEvaluator.evalExpr(asyncLoopStatement.getExpression(), flowContext.getImmutableViewOfVariables(), systemProperties);
+            if (evalResult.get() != null) {
+                //noinspection unchecked
+                for (Serializable serializable : ((List<Serializable>)evalResult.get())) {
+                    Value value = serializable instanceof Value ? (Value)serializable : ValueFactory.create(serializable, evalResult.isSensitive());
+                    result.add(value);
+                }
+            }
         } catch (Throwable t) {
             throw new RuntimeException(generateAsyncLoopExpressionMessage(nodeName, t.getMessage()), t);
         }
-        if (CollectionUtils.isEmpty(evalResult)) {
+        if (CollectionUtils.isEmpty(result)) {
             throw new RuntimeException(generateAsyncLoopExpressionMessage(nodeName, "expression is empty"));
         }
-        return evalResult;
+        return result;
     }
 }

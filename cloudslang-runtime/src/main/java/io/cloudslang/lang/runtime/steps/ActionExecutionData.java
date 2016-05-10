@@ -201,7 +201,7 @@ public class ActionExecutionData extends AbstractExecutionData {
                         String parameterName = ((Param) annotation).value();
                         Value value = currentContext.get(parameterName);
                         Class parameterClass = parameterTypes[index - 1];
-                        if (parameterClass.isInstance(value) || value == null) {
+                        if (value == null || parameterClass.isInstance(value.get())) {
                             args.add(value);
                         } else {
                             //noinspection StringBufferReplaceableByString

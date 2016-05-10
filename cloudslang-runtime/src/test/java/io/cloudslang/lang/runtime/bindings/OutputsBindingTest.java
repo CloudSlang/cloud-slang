@@ -99,7 +99,7 @@ public class OutputsBindingTest {
 
         Map<String, Value> boundOutputs = outputsBinding.bindOutputs(operationContext, actionReturnValues, EMPTY_SET, outputs);
         Assert.assertTrue(boundOutputs.containsKey("actionOutputKey1"));
-        Assert.assertEquals(null, boundOutputs.get("actionOutputKey1"));
+        Assert.assertEquals(null, boundOutputs.get("actionOutputKey1").get());
     }
 
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)

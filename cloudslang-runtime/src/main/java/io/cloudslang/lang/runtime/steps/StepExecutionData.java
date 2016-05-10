@@ -80,7 +80,7 @@ public class StepExecutionData extends AbstractExecutionData {
             //loops
             if (loopStatementExist(loop)) {
                 LoopCondition loopCondition = loopsBinding.getOrCreateLoopCondition(loop, flowContext, runEnv.getSystemProperties(), nodeName);
-                if (!loopCondition.hasMore()) {
+                if (loopCondition == null || !loopCondition.hasMore()) {
                     runEnv.putNextStepPosition(nextStepId);
                     runEnv.getStack().pushContext(flowContext);
                     return;
@@ -176,7 +176,7 @@ public class StepExecutionData extends AbstractExecutionData {
             //loops
             Map<String, Value> langVariables = flowContext.getImmutableViewOfLanguageVariables();
             if (langVariables.containsKey(LoopCondition.LOOP_CONDITION_KEY)) {
-                LoopCondition loopCondition = (LoopCondition) langVariables.get(LoopCondition.LOOP_CONDITION_KEY);
+                LoopCondition loopCondition = (LoopCondition) langVariables.get(LoopCondition.LOOP_CONDITION_KEY).get();
                 if (!shouldBreakLoop(breakOn, executableReturnValues) && loopCondition.hasMore()) {
                     runEnv.putNextStepPosition(previousStepId);
                     runEnv.getStack().pushContext(flowContext);

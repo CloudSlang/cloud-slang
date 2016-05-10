@@ -58,7 +58,7 @@ public class DoTransformerTest {
         Assert.assertEquals(2, arguments.size());
         Argument argument = arguments.iterator().next();
         Assert.assertEquals("city",argument.getName());
-        Assert.assertEquals("city_name", argument.getValue());
+        Assert.assertEquals("city_name", argument.getValue().get());
         Assert.assertEquals(false, argument.isOverridable());
     }
 
@@ -81,7 +81,7 @@ public class DoTransformerTest {
         Assert.assertEquals(2, arguments.size());
         Argument argument = arguments.get(1);
         Assert.assertEquals("country", argument.getName());
-        Assert.assertEquals("Israel", argument.getValue());
+        Assert.assertEquals("Israel", argument.getValue().get());
     }
 
     @Test

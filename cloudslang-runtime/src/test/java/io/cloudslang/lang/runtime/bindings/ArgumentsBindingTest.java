@@ -112,9 +112,9 @@ public class ArgumentsBindingTest {
         Map<String,Value> result = bindArguments(arguments);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
-        Assert.assertEquals(null, result.get("argument1"));
+        Assert.assertEquals(null, result.get("argument1").get());
         Assert.assertTrue(result.containsKey("argument2"));
-        Assert.assertEquals(null, result.get("argument2"));
+        Assert.assertEquals(null, result.get("argument2").get());
     }
 
     @Test

@@ -1,5 +1,7 @@
 package io.cloudslang.lang.entities.bindings.values;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,8 +19,20 @@ public class SensitiveValue implements Value {
 
     private byte[] content;
 
+    @SuppressWarnings("unused")
+    public SensitiveValue() {
+    }
+
     public SensitiveValue(Serializable content) {
         this.content = serialize(content);
+    }
+
+    public byte[] getContent() {
+        return content;
+    }
+
+    public void setContent(byte[] content) {
+        this.content = content;
     }
 
     @Override
@@ -26,6 +40,7 @@ public class SensitiveValue implements Value {
         return deserialize(content);
     }
 
+    @JsonIgnore
     @Override
     public boolean isSensitive() {
         return true;

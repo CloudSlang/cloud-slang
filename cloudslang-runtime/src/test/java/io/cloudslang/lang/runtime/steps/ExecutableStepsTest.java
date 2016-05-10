@@ -37,7 +37,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -101,8 +100,8 @@ public class ExecutableStepsTest {
     @Test
     public void testBoundInputEvent(){
         List<Input> inputs = Arrays.asList(
-                new Input.InputBuilder("input1","input1").build(),
-                new Input.InputBuilder("input2", "3", true)
+                new Input.InputBuilder("input1",5).build(),
+                new Input.InputBuilder("input2",3, true)
                 .withRequired(true)
                 .withOverridable(false)
                 .build()
@@ -110,8 +109,8 @@ public class ExecutableStepsTest {
         RunEnvironment runEnv = new RunEnvironment();
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         Map<String,Value> resultMap = new HashMap<>();
-        resultMap.put("input1", ValueFactory.create(5));
-        resultMap.put("input2", ValueFactory.create(3));
+        resultMap.put("input1", ValueFactory.create(inputs.get(0).getValue()));
+        resultMap.put("input2", ValueFactory.create(inputs.get(1).getValue()));
 
         when(inputsBinding.bindInputs(eq(inputs), anyMap(), anySet())).thenReturn(resultMap);
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(), runtimeServices, "dockerizeStep", 2L);
@@ -127,23 +126,25 @@ public class ExecutableStepsTest {
         Assert.assertNotNull(boundInputEvent);
         LanguageEventData eventData = (LanguageEventData)boundInputEvent.getData();
         Assert.assertTrue(eventData.containsKey(LanguageEventData.BOUND_INPUTS));
-        Map<String,Serializable> inputsBounded = (Map<String,Serializable>)eventData.get(LanguageEventData.BOUND_INPUTS);
+        @SuppressWarnings("unchecked") Map<String, Value> inputsBounded = (Map<String, Value>)eventData.get(LanguageEventData.BOUND_INPUTS);
 
         Assert.assertNotNull(eventData.getStepName());
         Assert.assertEquals(LanguageEventData.StepType.EXECUTABLE, eventData.getStepType());
         Assert.assertEquals("dockerizeStep", eventData.getStepName());
 
         // verify input names are in defined order and have the expected value
-        Set<Map.Entry<String, Serializable>> inputEntries = inputsBounded.entrySet();
-        Iterator<Map.Entry<String, Serializable>> inputNamesIterator = inputEntries.iterator();
+        Set<Map.Entry<String, Value>> inputEntries = inputsBounded.entrySet();
+        Iterator<Map.Entry<String, Value>> inputNamesIterator = inputEntries.iterator();
 
-        Map.Entry<String, Serializable> firstInput =  inputNamesIterator.next();
+        Map.Entry<String, Value> firstInput =  inputNamesIterator.next();
         org.junit.Assert.assertEquals("Inputs are not in defined order in end inputs binding event", "input1", firstInput.getKey());
-        org.junit.Assert.assertEquals(5, firstInput.getValue());
+        org.junit.Assert.assertEquals(5, firstInput.getValue().get());
+        org.junit.Assert.assertFalse(firstInput.getValue().isSensitive());
 
-        Map.Entry<String, Serializable> secondInput =  inputNamesIterator.next();
+        Map.Entry<String, Value> secondInput =  inputNamesIterator.next();
         org.junit.Assert.assertEquals("Inputs are not in defined order in end inputs binding event", "input2", secondInput.getKey());
-        org.junit.Assert.assertEquals(ValueFactory.create("").toString(), secondInput.getValue());
+        org.junit.Assert.assertEquals(3, secondInput.getValue().get());
+        org.junit.Assert.assertTrue(secondInput.getValue().isSensitive());
     }
 
     @Test
@@ -198,7 +199,7 @@ public class ExecutableStepsTest {
         ReturnValues returnValues= runEnv.removeReturnValues();
         Map<String, Value> outputs = returnValues.getOutputs();
         Assert.assertEquals(1, outputs.size());
-        Assert.assertEquals("John", outputs.get("name"));
+        Assert.assertEquals("John", outputs.get("name").get());
     }
 
     @Test

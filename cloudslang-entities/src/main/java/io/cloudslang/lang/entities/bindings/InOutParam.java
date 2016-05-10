@@ -8,6 +8,7 @@
  */
 package io.cloudslang.lang.entities.bindings;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -59,6 +60,7 @@ public abstract class InOutParam implements Serializable {
 		return value;
 	}
 
+	@JsonIgnore
 	public boolean isSensitive() {
 		return value != null && value.isSensitive();
 	}

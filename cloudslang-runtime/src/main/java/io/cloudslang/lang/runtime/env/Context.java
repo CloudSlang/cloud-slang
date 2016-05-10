@@ -28,6 +28,10 @@ public class Context implements Serializable{
         langVariables = new HashMap<>();
     }
 
+    public Value getVariable(String name) {
+        return variables.get(name);
+    }
+
     public void putVariable(String name, Value value) {
         variables.put(name, value);
     }
@@ -38,6 +42,10 @@ public class Context implements Serializable{
 
     public Map<String, Value> getImmutableViewOfLanguageVariables() {
         return Collections.unmodifiableMap(langVariables);
+    }
+
+    public Value getLanguageVariable(String name) {
+        return langVariables.get(name);
     }
 
     public void putLanguageVariable(String name, Value value) {

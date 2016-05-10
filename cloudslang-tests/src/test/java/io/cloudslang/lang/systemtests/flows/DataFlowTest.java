@@ -130,7 +130,7 @@ public class DataFlowTest extends SystemsTestsParent {
 
         Assert.assertTrue(flowOutputs.containsKey("null_output_no_expression"));
         Assert.assertTrue(flowOutputs.containsKey("null_output_expression"));
-        Assert.assertNull(flowOutputs.get("null_output_no_expression"));
-        Assert.assertNull(flowOutputs.get("null_output_expression"));
+        Assert.assertNull(flowOutputs.get("null_output_no_expression").get());
+        Assert.assertNull(flowOutputs.get("null_output_expression").get());
     }
 }

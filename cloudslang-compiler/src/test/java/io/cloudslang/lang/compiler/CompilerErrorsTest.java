@@ -314,7 +314,7 @@ public class CompilerErrorsTest {
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("step1");
-        exception.expectMessage("to many keys");
+        exception.expectMessage("too many keys");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 

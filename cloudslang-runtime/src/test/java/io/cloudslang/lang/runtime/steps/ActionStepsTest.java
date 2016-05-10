@@ -448,7 +448,7 @@ public class ActionStepsTest {
 
         Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
         Assert.assertTrue(outputs.containsKey("name"));
-        Assert.assertNull(outputs.get("name"));
+        Assert.assertNull(outputs.get("name").get());
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -487,7 +487,7 @@ public class ActionStepsTest {
 
         Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
         Assert.assertTrue(outputs.containsKey("name"));
-        Assert.assertNull(outputs.get("name"));
+        Assert.assertNull(outputs.get("name").get());
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)

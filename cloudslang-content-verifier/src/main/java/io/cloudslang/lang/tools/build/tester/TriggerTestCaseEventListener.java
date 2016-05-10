@@ -19,6 +19,7 @@ package io.cloudslang.lang.tools.build.tester;
 */
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import org.apache.commons.collections4.MapUtils;
 import io.cloudslang.score.events.EventConstants;
@@ -45,7 +46,7 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
     private AtomicBoolean flowFinished = new AtomicBoolean(false);
     private AtomicReference<String> errorMessage = new AtomicReference<>("");
     private String result;
-    private Map<String, Serializable> outputs = new HashMap<>();
+    private Map<String, Value> outputs = new HashMap<>();
 
 
     public boolean isFlowFinished() {
@@ -75,7 +76,7 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
                 break;
             case ScoreLangConstants.EVENT_OUTPUT_END:
                 eventData = (LanguageEventData) data;
-                Map<String, Serializable> extractOutputs = extractOutputs(eventData);
+                Map<String, Value> extractOutputs = extractOutputs(eventData);
                 if(MapUtils.isNotEmpty(extractOutputs)) {
                     outputs = extractOutputs;
                 }
@@ -87,9 +88,9 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
         return new ReturnValues(outputs, result);
     }
 
-    private static Map<String, Serializable> extractOutputs(LanguageEventData data) {
+    private static Map<String, Value> extractOutputs(LanguageEventData data) {
 
-        Map<String, Serializable> outputsMap = new HashMap<>();
+        Map<String, Value> outputsMap = new HashMap<>();
 
         boolean thereAreOutputsForRootPath =
                 data.containsKey(LanguageEventData.OUTPUTS)
@@ -97,7 +98,7 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
                 && data.getPath().equals(EXEC_START_PATH);
 
         if (thereAreOutputsForRootPath) {
-            Map<String, Serializable> outputs = data.getOutputs();
+            Map<String, Value> outputs = data.getOutputs();
             if (MapUtils.isNotEmpty(outputs)) outputsMap.putAll(outputs);
         }
 

@@ -49,14 +49,18 @@ public class LoopsBindingTest {
     @Test
     public void whenValueIsNotThereItWillBeCreated() throws Exception {
         Context context = mock(Context.class);
+        ArrayList<Value> result = Lists.newArrayList(ValueFactory.create(1));
         when(scriptEvaluator.evalExpr(
                         anyString(),
                         anyMapOf(String.class, Value.class),
                         anySetOf(SystemProperty.class))
-        ).thenReturn(ValueFactory.create(Lists.newArrayList(ValueFactory.create(1))));
-        when(context.getImmutableViewOfLanguageVariables()).thenReturn(Collections.<String, Value>emptyMap());
+        ).thenReturn(ValueFactory.create(result));
+        Value loopCondition = ValueFactory.create(new ForLoopCondition(result));
+        when(context.getLanguageVariable(LoopCondition.LOOP_CONDITION_KEY)).thenReturn(null);
+        context.putLanguageVariable(LoopCondition.LOOP_CONDITION_KEY, loopCondition);
+        when(context.getLanguageVariable(LoopCondition.LOOP_CONDITION_KEY)).thenReturn(loopCondition);
         loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, EMPTY_SET, "node");
-        verify(context).putLanguageVariable(eq(LoopCondition.LOOP_CONDITION_KEY), ValueFactory.create(isA(ForLoopCondition.class)));
+        verify(context).putLanguageVariable(LoopCondition.LOOP_CONDITION_KEY, loopCondition);
     }
 
     @Test
@@ -90,11 +94,13 @@ public class LoopsBindingTest {
     @Test
     public void whenValueIsThereItWillBeReturned() throws Exception {
         Context context = mock(Context.class);
+        ArrayList<Value> result = Lists.newArrayList(ValueFactory.create(1));
         when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Value.class), eq(EMPTY_SET)))
-                .thenReturn(ValueFactory.create(new ArrayList<>()));
+                .thenReturn(ValueFactory.create(result));
         Map<String, Value> langVars = new HashMap<>();
-        ForLoopCondition forLoopCondition = mock(ForLoopCondition.class);
+        ForLoopCondition forLoopCondition = new ForLoopCondition(result);
         langVars.put(LoopCondition.LOOP_CONDITION_KEY, ValueFactory.create(forLoopCondition));
+        when(context.getLanguageVariable(LoopCondition.LOOP_CONDITION_KEY)).thenReturn(langVars.get(LoopCondition.LOOP_CONDITION_KEY));
         when(context.getImmutableViewOfLanguageVariables()).thenReturn(Collections.unmodifiableMap(langVars));
         loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, EMPTY_SET, "node");
         Assert.assertEquals(true, context.getImmutableViewOfLanguageVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));

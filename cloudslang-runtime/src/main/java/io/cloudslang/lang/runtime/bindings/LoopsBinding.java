@@ -56,12 +56,12 @@ public class LoopsBinding {
         Validate.notNull(systemProperties, "system properties cannot be null");
         Validate.notNull(nodeName, "node name cannot be null");
 
-        Map<String, Value> langVariables = flowContext.getImmutableViewOfLanguageVariables();
-        if (!langVariables.containsKey(LOOP_CONDITION_KEY)) {
+        Value LoopConditionValue = flowContext.getLanguageVariable(LOOP_CONDITION_KEY);
+        if (LoopConditionValue == null) {
             LoopCondition loopCondition = createForLoopCondition(forLoopStatement, flowContext, systemProperties, nodeName);
             flowContext.putLanguageVariable(LOOP_CONDITION_KEY, ValueFactory.create(loopCondition));
         }
-        return (LoopCondition) langVariables.get(LOOP_CONDITION_KEY);
+        return (LoopCondition) flowContext.getLanguageVariable(LOOP_CONDITION_KEY).get();
     }
 
     public void incrementListForLoop(String varName, Context flowContext, ForLoopCondition forLoopCondition) {
@@ -80,7 +80,7 @@ public class LoopsBinding {
         Validate.notNull(flowContext, "flow context cannot be null");
         Validate.notNull(forLoopCondition, "for condition cannot be null");
 
-        @SuppressWarnings("unchecked") Map.Entry<Value, Value> entry = (Map.Entry<Value, Value>) forLoopCondition.next();
+        @SuppressWarnings("unchecked") Map.Entry<Value, Value> entry = (Map.Entry<Value, Value>) forLoopCondition.next().get();
         Value keyFromIteration = entry.getKey();
         Value valueFromIteration = entry.getValue();
 
@@ -135,7 +135,7 @@ public class LoopsBinding {
         Serializable loopCollectionContent = loopCollection.get();
         if (loopCollectionContent instanceof Iterable) {
             //noinspection unchecked
-            iterable = (Iterable<Value>) loopCollection;
+            iterable = (Iterable<Value>) loopCollectionContent;
         } else if (loopCollectionContent instanceof String) {
             String[] strings = ((String) loopCollectionContent).split(Pattern.quote(","));
             iterable = convert(Arrays.asList(strings));

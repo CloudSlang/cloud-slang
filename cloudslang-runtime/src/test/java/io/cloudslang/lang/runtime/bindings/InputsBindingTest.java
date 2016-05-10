@@ -110,9 +110,9 @@ public class InputsBindingTest {
         Map<String,Value> result = bindInputs(inputs);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(null, result.get("input1"));
+        Assert.assertEquals(null, result.get("input1").get());
         Assert.assertTrue(result.containsKey("input2"));
-        Assert.assertEquals(null, result.get("input2"));
+        Assert.assertEquals(null, result.get("input2").get());
     }
 
     @Test
@@ -278,7 +278,7 @@ public class InputsBindingTest {
         Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals("overridable disables the assignFrom func...",null, result.get("input1"));
+        Assert.assertEquals("overridable disables the assignFrom func...",null, result.get("input1").get());
         Assert.assertEquals(1, result.size());
     }
 
