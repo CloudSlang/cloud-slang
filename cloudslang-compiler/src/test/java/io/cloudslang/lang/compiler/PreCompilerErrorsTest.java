@@ -157,8 +157,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Inputs and outputs names should be different. " +
-                "Please rename input/output \"json_path\" for io.cloudslang.base.json.get_value");
+        exception.expectMessage("Inputs and outputs names should be different for \"io.cloudslang.base.json.get_value\". " +
+                "Please rename input/output \"json_path\"");
         throw result.getErrors().get(0);
     }
 

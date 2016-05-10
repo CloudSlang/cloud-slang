@@ -72,8 +72,9 @@ public class SlangModellerImpl implements SlangModeller{
         for (Input input : CollectionUtils.emptyIfNull(inputs)) {
             for (Output output : CollectionUtils.emptyIfNull(outputs)) {
                 if (input.getName().equals(output.getName())) {
-                    result.getErrors().add(new RuntimeException("Inputs and outputs names should be different. " +
-                            "Please rename input/output \"" + input.getName() + "\" for " + result.getExecutable().getId()));
+                    result.getErrors().add(new RuntimeException("Inputs and outputs names should be different for \"" +
+                            result.getExecutable().getId() + "\". " +
+                            "Please rename input/output \"" + input.getName() + "\""));
                 }
             }
         }
