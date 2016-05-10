@@ -8,6 +8,8 @@
  */
 package io.cloudslang.lang.compiler.parser.model;
 
+import io.cloudslang.lang.compiler.Extension;
+
 import java.util.Map;
 
 /*
@@ -21,6 +23,7 @@ public class ParsedSlang {
     private Object properties;
     private String namespace;
     private String name;
+    private Extension fileExtension;
     private Object extensions;
 
     //todo add constructor?
@@ -67,6 +70,14 @@ public class ParsedSlang {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Extension getFileExtension() {
+        return fileExtension;
+    }
+
+    public void setFileExtension(Extension extension) {
+        this.fileExtension = extension;
     }
 
     public static enum Type {
