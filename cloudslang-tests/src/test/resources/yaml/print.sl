@@ -11,8 +11,8 @@ operation:
   name: print
   inputs:
     - text
-  action:
-    python_script: |
+  python_action:
+    script: |
       returnResult="Wow man"
       print text
   outputs:

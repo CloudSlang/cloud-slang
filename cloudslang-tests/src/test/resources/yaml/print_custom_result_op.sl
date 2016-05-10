@@ -9,7 +9,7 @@ namespace: user.ops
 
 operation:
   name: print_custom_result_op
-  action:
-    python_script: 'print "hello world"'
+  python_action:
+    script: 'print "hello world"'
   results:
     - CUSTOM: ${ 1==1 }

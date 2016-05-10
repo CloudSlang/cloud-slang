@@ -94,7 +94,7 @@ public class ExecutionStepFactoryTest {
         HashMap<String, Serializable> actionRawData = new HashMap<>();
         HashMap<String, String> javaActionData = new HashMap<>();
         javaActionData.put("key", "value");
-        actionRawData.put(SlangTextualKeys.JAVA_ACTION, javaActionData);
+        actionRawData.put(SlangTextualKeys.JAVA_ACTION_KEY, javaActionData);
         ExecutionStep actionStep = factory.createActionStep(1L, actionRawData);
         Assert.assertNotNull("step should not be null", actionStep);
         Assert.assertEquals(actionStep.getActionData().get("key"), "value");
@@ -102,11 +102,13 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreatePythonActionStep() throws Exception {
+        HashMap<String, Serializable> pythonActionData = new HashMap<>();
+        pythonActionData.put(ScoreLangConstants.PYTHON_ACTION_SCRIPT_KEY, "print 'Hi there'");
         HashMap<String, Serializable> actionRawData = new HashMap<>();
-        actionRawData.put(ScoreLangConstants.PYTHON_SCRIPT_KEY, "print 'Hi there'");
+        actionRawData.put(SlangTextualKeys.PYTHON_ACTION_KEY, pythonActionData);
         ExecutionStep actionStep = factory.createActionStep(1L, actionRawData);
         Assert.assertNotNull("step should not be null", actionStep);
-        Assert.assertEquals(actionStep.getActionData().get(ScoreLangConstants.PYTHON_SCRIPT_KEY), "print 'Hi there'");
+        Assert.assertEquals(actionStep.getActionData().get(ScoreLangConstants.PYTHON_ACTION_SCRIPT_KEY), "print 'Hi there'");
     }
 
     @Test(expected = IllegalArgumentException.class)

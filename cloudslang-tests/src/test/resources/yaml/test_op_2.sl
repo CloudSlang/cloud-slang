@@ -31,21 +31,21 @@ operation:
         default: true
         required: False
 
-  action:
-    python_script: |
-            # this is python amigos!!
-            import os
-            processId = os.getpid()
-            print processId
-            print input1
-            input1 = "new input"
-            print input1
-            print input2
-            print input3
-            print input4
-            output4 = input4
-            print input5
-            print input6
+  python_action:
+    script: |
+      # this is python amigos!!
+      import os
+      processId = os.getpid()
+      print processId
+      print input1
+      input1 = "new input"
+      print input1
+      print input2
+      print input3
+      print input4
+      output4 = input4
+      print input5
+      print input6
   outputs:
     - output1: ${ input1 }
     - output2: ${ processId }

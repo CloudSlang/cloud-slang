@@ -52,15 +52,16 @@ public class ActionExecutionData extends AbstractExecutionData {
     @Autowired
     private ScriptExecutor scriptExecutor;
 
-    public void doAction(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
+    public void doAction(@Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
+                         @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                          @Param(ExecutionParametersConsts.NON_SERIALIZABLE_EXECUTION_DATA) Map<String, Object> nonSerializableExecutionData,
+                         @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
                          @Param(ScoreLangConstants.ACTION_TYPE) ActionType actionType,
-                         @Param(ScoreLangConstants.ACTION_DEPENDENCIES) List<String> dependencies,
-                         @Param(ScoreLangConstants.ACTION_CLASS_KEY) String className,
-                         @Param(ScoreLangConstants.ACTION_METHOD_KEY) String methodName,
-                         @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
-                         @Param(ScoreLangConstants.PYTHON_SCRIPT_KEY) String python_script,
-                         @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId) {
+                         @Param(ScoreLangConstants.JAVA_ACTION_CLASS_KEY) String className,
+                         @Param(ScoreLangConstants.JAVA_ACTION_METHOD_KEY) String methodName,
+                         @Param(ScoreLangConstants.JAVA_ACTION_GAV_KEY) String gav,
+                         @Param(ScoreLangConstants.PYTHON_ACTION_SCRIPT_KEY) String script,
+                         @Param(ScoreLangConstants.PYTHON_ACTION_DEPENDENCIES_KEY) Serializable dependencies) {
 
         Map<String, Serializable> returnValue = new HashMap<>();
         Map<String, Serializable> callArguments = runEnv.removeCallArguments();
@@ -74,18 +75,13 @@ public class ActionExecutionData extends AbstractExecutionData {
         fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_ACTION_START, "Preparing to run action " + actionType,
                 runEnv.getExecutionPath().getParentPath(), LanguageEventData.StepType.ACTION, null,
                 Pair.of(LanguageEventData.CALL_ARGUMENTS, (Serializable) callArgumentsDeepCopy));
-
-        if(logger.isDebugEnabled()) {
-            logger.debug("Going to executing [" + actionType.name() + "] action with dependencies [" + dependencies + "]");
-        }
-
         try {
             switch (actionType) {
                 case JAVA:
                     returnValue = runJavaAction(serializableSessionData, callArguments, nonSerializableExecutionData, className, methodName);
                     break;
                 case PYTHON:
-                    returnValue = prepareAndRunPythonAction(callArguments, python_script);
+                    returnValue = prepareAndRunPythonAction(callArguments, script);
                     break;
                 default:
                     break;
@@ -97,8 +93,6 @@ public class ActionExecutionData extends AbstractExecutionData {
             logger.error(ex);
             throw (ex);
         }
-
-        //todo: hook
 
         ReturnValues returnValues = new ReturnValues(returnValue, null);
         runEnv.putReturnValues(returnValues);
