@@ -446,9 +446,8 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("operation_with_list_of_action_types");
-        exception.expectMessage("'action'");
-        exception.expectMessage("'python_script:'");
+        exception.expectMessage("'python_action'");
+        exception.expectMessage("there should be a map of values, but instead there is a list");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 

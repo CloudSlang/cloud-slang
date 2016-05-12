@@ -11,8 +11,8 @@ operation:
   name: check_Weather
   inputs:
     - city
-  action:
-    python_script: 'print "weather thing"'
+  python_action:
+    script: 'print "weather thing"'
   outputs:
     - weather: "great!!"
     - temperature: "30"

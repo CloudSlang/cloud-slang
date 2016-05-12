@@ -33,8 +33,8 @@ operation:
     - input12: ${ "mighty" + " max"   + varX }
     - input13: true
 
-  action:
-    python_script: |
+  python_action:
+    script: |
             # this is python amigos!!
             import os
             processId = os.getpid()

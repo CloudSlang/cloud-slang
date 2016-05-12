@@ -9,9 +9,8 @@ namespace: user.ops
 
 operation:
   name: operation_action_multiple_types
-  action:
-    python_script:
-      print 'why am I here?'
-    java_action:
-      className: com.hp.thing
-      methodName: someMethod
+  python_action:
+    print 'why am I here?'
+  java_action:
+    class_name: com.hp.thing
+    method_name: someMethod

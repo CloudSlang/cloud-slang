@@ -9,8 +9,8 @@ operation:
   name: op_without_namespace
   inputs:
     - city
-  action:
-    python_script: 'print "weather thing"'
+  python_action:
+    script: 'print "weather thing"'
   outputs:
     - weather: "great!!"
     - temperature: "30"

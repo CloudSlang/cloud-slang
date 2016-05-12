@@ -11,8 +11,8 @@ operation:
   name: check_weather
   inputs:
     - city
-  action:
-    python_script: |
+  python_action:
+    script: |
       weather = "weather thing"
       print city
   outputs:

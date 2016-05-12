@@ -9,13 +9,13 @@ namespace: user.ops
 
 operation:
   name: python_op_with_boolean
-  action:
-    python_script: |
-        condition_1 = True
-        condition_2 = 1!=1
-        condition_3 = 1==1 and False
-        condition_4 = 1<>1 or bool(1)
-        an_int = 1
+  python_action:
+    script: |
+      condition_1 = True
+      condition_2 = 1!=1
+      condition_3 = 1==1 and False
+      condition_4 = 1<>1 or bool(1)
+      an_int = 1
   outputs:
     - condition_1
     - condition_2

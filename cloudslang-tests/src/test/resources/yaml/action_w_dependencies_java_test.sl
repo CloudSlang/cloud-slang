@@ -8,6 +8,18 @@
 namespace: user.ops
 
 operation:
-  name: operation_action_invalid_type
+  name: action_w_dependencies_java_test
+  inputs:
+    - host: 'localhost'
+    - port: '8080'
   action:
-    workflow:
+    dependencies:
+      - 'io.cloudslang:content.actions:1.1'
+    java_action:
+      className: io.cloudslang.lang.systemtests.actions.LangTestActions
+      methodName: parseUrl
+  outputs:
+    - url
+  results:
+    - SUCCESS: ${ url is not None }
+    - FAILURE

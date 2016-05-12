@@ -65,8 +65,8 @@ operation:
         ${ 'docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ' + authorized_keys_path + '} -p ' +
         scp_host_port + ':22 --name test1 -v /data:'}
     - step_argument_null: "step_argument_null_value"
-  action:
-    python_script: result = 'success'
+  python_action:
+    script: result = 'success'
   outputs:
     - output_no_expression: ${output_no_expression_input}
     - output_int: 22
