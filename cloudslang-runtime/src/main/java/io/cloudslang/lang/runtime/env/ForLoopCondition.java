@@ -10,22 +10,24 @@
 package io.cloudslang.lang.runtime.env;
 
 import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
 public class ForLoopCondition implements LoopCondition {
 
-    private final Iterable<Value> iterable;
+    private final Iterable<? extends Serializable> iterable;
     private int index = 0;
 
-    public ForLoopCondition(Iterable<Value> iterable) {
+    public ForLoopCondition(Iterable<? extends Serializable> iterable) {
         this.iterable = iterable;
     }
 
-    private Iterator<? extends Value> loopToCurrentObject() {
-        Iterator<? extends Value> iterator = iterable.iterator();
+    private Iterator<? extends Serializable> loopToCurrentObject() {
+        Iterator<? extends Serializable> iterator = iterable.iterator();
         for (int i = 0; i < index; i++) {
             iterator.next();
         }
@@ -33,7 +35,8 @@ public class ForLoopCondition implements LoopCondition {
     }
 
     public Value next() {
-        Value next = loopToCurrentObject().next();
+        Serializable serializable = loopToCurrentObject().next();
+        Value next = serializable instanceof Value ? (Value)serializable : ValueFactory.create(serializable);
         index++;
         return next;
     }
@@ -64,10 +67,5 @@ public class ForLoopCondition implements LoopCondition {
                 .append(iterable)
                 .append(index)
                 .toHashCode();
-    }
-
-    @Override
-    public Iterator<Value> iterator() {
-        return iterable.iterator();
     }
 }

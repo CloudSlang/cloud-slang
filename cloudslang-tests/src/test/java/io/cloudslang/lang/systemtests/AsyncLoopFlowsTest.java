@@ -193,7 +193,7 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
         Map<String, Value> aggregateValues = asyncStep.getOutputs();
         Assert.assertTrue("aggregate name not found in async loop outputs", aggregateValues.containsKey("name_list"));
         @SuppressWarnings("unchecked")
-        List<String> actualAggregateNameList = (List<String>) aggregateValues.get("name_list");
+        List<String> actualAggregateNameList = (List<String>) aggregateValues.get("name_list").get();
 
         Assert.assertTrue(
                 "aggregate output does not have the expected value",

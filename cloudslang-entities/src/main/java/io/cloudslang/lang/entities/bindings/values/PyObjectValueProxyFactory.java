@@ -1,10 +1,12 @@
 package io.cloudslang.lang.entities.bindings.values;
 
+import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;
 import org.apache.commons.lang.ClassUtils;
 import org.python.core.Py;
 import org.python.core.PyObject;
+import org.python.core.PyObjectDerived;
 import org.python.core.PyType;
 
 import java.io.Serializable;
@@ -19,20 +21,22 @@ import java.lang.reflect.Method;
 public class PyObjectValueProxyFactory {
 
     private static ProxyFactory factory = new ProxyFactory();
+    private static MethodFilter methodFilter = new PyObjectValueMethodFilter();
 
     public static PyObjectValue create(Serializable content, boolean sensitive) {
         PyObject pyObject = Py.java2py(content);
         MethodHandler methodHandler = new PyObjectValueMethodHandler(content, sensitive, pyObject);
         return pyObject.getClass().getConstructors().length == 0 ?
-                createProxyToSingleInstance(methodHandler) :
+                createProxyToSingleInstance(pyObject, methodHandler) :
                 createProxyToNewInstance(pyObject, methodHandler);
     }
 
-    private static PyObjectValue createProxyToSingleInstance(MethodHandler methodHandler) {
+    private static PyObjectValue createProxyToSingleInstance(PyObject pyObject, MethodHandler methodHandler) {
         try {
-            factory.setSuperclass(PyObject.class);
+            factory.setSuperclass(PyObjectDerived.class);
             factory.setInterfaces(new Class[]{PyObjectValue.class});
-            return (PyObjectValue) factory.create(new Class[0], new Object[0], methodHandler);
+            factory.setFilter(methodFilter);
+            return (PyObjectValue) factory.create(new Class[]{PyType.class}, new Object[]{pyObject.getType()}, methodHandler);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create a proxy for PyObjectValue", e);
         }
@@ -55,13 +59,14 @@ public class PyObjectValueProxyFactory {
             }
             factory.setSuperclass(pyObject.getClass());
             factory.setInterfaces(new Class[]{PyObjectValue.class});
+            factory.setFilter(methodFilter);
             return (PyObjectValue) factory.create(constructor.getParameterTypes(), args, methodHandler);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create a proxy for PyObjectValue", e);
         }
     }
 
-    private static class PyObjectValueMethodHandler implements MethodHandler {
+    private static class PyObjectValueMethodHandler implements MethodHandler, Serializable {
 
         private Value value;
         private PyObject pyObject;
@@ -82,14 +87,20 @@ public class PyObjectValueProxyFactory {
                 return valueMethod.invoke(value, args);
             } else if (PyObject.class.isAssignableFrom(thisMethod.getDeclaringClass())) {
                 Method pyObjectMethod = pyObject.getClass().getMethod(thisMethod.getName(), thisMethod.getParameterTypes());
-                if (!thisMethod.getName().equals("toString")) {
-                    System.out.println("MethodHandler: " + thisMethod.getName() + ". " + thisMethod.toString());
-                    accessed = true;
-                }
+                System.out.println("MethodHandler: " + thisMethod.getName() + ". " + thisMethod.toString());
+                accessed = true;
                 return pyObjectMethod.invoke(pyObject, args);
             } else {
                 throw new RuntimeException("Failed to invoke PyObjectValue method. Implementing class not found");
             }
+        }
+    }
+
+    private static class PyObjectValueMethodFilter implements MethodFilter {
+
+        @Override
+        public boolean isHandled(Method method) {
+            return !method.getName().equals("finalize") && !method.getName().equals("toString");
         }
     }
 }

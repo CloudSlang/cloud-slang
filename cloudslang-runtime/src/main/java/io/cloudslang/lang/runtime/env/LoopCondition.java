@@ -13,7 +13,7 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 
 import java.io.Serializable;
 
-public interface LoopCondition extends Serializable, Iterable<Value> {
+public interface LoopCondition extends Serializable {
 
     String LOOP_CONDITION_KEY = "loop.condition";
 

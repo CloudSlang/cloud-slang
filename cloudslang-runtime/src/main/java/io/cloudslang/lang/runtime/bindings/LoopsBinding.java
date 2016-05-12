@@ -87,7 +87,7 @@ public class LoopsBinding {
         flowContext.putVariable(keyName, keyFromIteration);
         flowContext.putVariable(valueName, valueFromIteration);
         logger.debug("key name: " + keyName + ", value: " + keyFromIteration);
-        logger.debug("value name: " + keyName + ", value: " + valueFromIteration);
+        logger.debug("value name: " + valueName + ", value: " + valueFromIteration);
     }
 
     private LoopCondition createForLoopCondition(
@@ -105,13 +105,13 @@ public class LoopsBinding {
         }
 
         if (forLoopStatement instanceof MapForLoopStatement) {
-            if (evalResult instanceof Map) {
-                List<Map.Entry<Value, Value>> entriesAsSerializable = new ArrayList<>();
-                @SuppressWarnings("unchecked") Set<Map.Entry<Serializable, Serializable>> entrySet = ((Map) evalResult).entrySet();
+            if (evalResult != null && evalResult.get() instanceof Map) {
+                List<Map.Entry<Value, Value>> entriesAsValues = new ArrayList<>();
+                @SuppressWarnings("unchecked") Set<Map.Entry<Serializable, Serializable>> entrySet = ((Map) evalResult.get()).entrySet();
                 for (Map.Entry<Serializable, Serializable> entry : entrySet) {
-                    entriesAsSerializable.add(Pair.of(ValueFactory.create(entry.getKey()), ValueFactory.create(entry.getValue())));
+                    entriesAsValues.add(Pair.of(getValue(entry.getKey(), evalResult.isSensitive()), getValue(entry.getValue(), evalResult.isSensitive())));
                 }
-                evalResult = ValueFactory.create((Serializable)entriesAsSerializable);
+                evalResult = ValueFactory.create((Serializable)entriesAsValues);
             } else {
                 throw new RuntimeException(INVALID_MAP_EXPRESSION_MESSAGE + ": " + collectionExpression);
             }
@@ -127,6 +127,12 @@ public class LoopsBinding {
             throw new RuntimeException(FOR_LOOP_EXPRESSION_ERROR_MESSAGE + " '" + nodeName + "',\n\tError is: expression is empty");
         }
         return forLoopCondition;
+    }
+
+    private Value getValue(Serializable serializable, boolean sensitive) {
+        return serializable instanceof Value ?
+                ValueFactory.create(((Value) serializable).get(), sensitive || ((Value) serializable).isSensitive()) :
+                ValueFactory.create(serializable, sensitive);
     }
 
     private ForLoopCondition createForLoopCondition(Value loopCollection){
