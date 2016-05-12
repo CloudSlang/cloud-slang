@@ -10,15 +10,14 @@ package io.cloudslang.lang.compiler.scorecompiler;
 
 import ch.lambdaj.function.convert.Converter;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.Validator;
 import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.entities.CompilationArtifact;
-import io.cloudslang.lang.entities.bindings.Argument;
-import io.cloudslang.lang.entities.bindings.Input;
-import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.bindings.*;
 import io.cloudslang.score.api.ExecutionPlan;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,13 +39,16 @@ import static ch.lambdaj.Lambda.convertMap;
  * Created by stoneo on 2/2/2015.
  */
 @Component
-public class ScoreCompilerImpl implements ScoreCompiler{
+public class ScoreCompilerImpl implements ScoreCompiler {
 
     @Autowired
     private ExecutionPlanBuilder executionPlanBuilder;
 
     @Autowired
     private DependenciesHelper dependenciesHelper;
+
+    @Autowired
+    private Validator validator;
 
     @Override
     public CompilationArtifact compile(Executable executable, Set<Executable> path) {
@@ -141,6 +143,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
 
             try {
                 validateInputNamesEmpty(inputsNotWired, flow, step, reference);
+                validateStepInputNamesDifferentFromDependencyOutputNames(flow, step, reference);
             } catch (RuntimeException e) {
                 errors.add(e);
             }
@@ -152,6 +155,16 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             validateRequiredNonPrivateInputs(reference, dependencies, verifiedExecutables, errors);
         }
         return errors;
+    }
+
+    private void validateStepInputNamesDifferentFromDependencyOutputNames(Flow flow, Step step, Executable reference) {
+        List<Argument> stepArguments = step.getArguments();
+        List<Output> outputs = reference.getOutputs();
+        String errorMessage = "Cannot compile flow '" + flow.getId() +
+                "'. Step '" + step.getName() +
+                "' has input '" + "placeholder01" +
+                "' with the same name as the one of the outputs of '" + reference.getId() + "'.";
+        validator.validateListsHaveMutuallyExclusiveNames(stepArguments, outputs, errorMessage);
     }
 
     private List<String> getMandatoryInputNames(Executable executable) {
@@ -227,14 +240,15 @@ public class ScoreCompilerImpl implements ScoreCompiler{
             if (reference == null) {
                 errors.add(new IllegalArgumentException("Cannot compile flow: \'" + executable.getName() + "\' since for step: \'" + step.getName()
                         + "\', the dependency: \'" + refId + "\' is missing."));
-            }
-            List<Result> refResults = reference.getResults();
-            for(Result result : refResults){
-                String resultName = result.getName();
-                if (!navigationListContainsKey(stepNavigations, resultName)){
-                    errors.add(new IllegalArgumentException("Cannot compile flow: \'" + executable.getName() +
-                            "\' since for step: '" + step.getName() + "\', the result \'" + resultName+
-                            "\' of its dependency: \'"+ refId + "\' has no matching navigation"));
+            } else {
+                List<Result> refResults = reference.getResults();
+                for(Result result : refResults){
+                    String resultName = result.getName();
+                    if (!navigationListContainsKey(stepNavigations, resultName)){
+                        errors.add(new IllegalArgumentException("Cannot compile flow: \'" + executable.getName() +
+                                "\' since for step: '" + step.getName() + "\', the result \'" + resultName+
+                                "\' of its dependency: \'"+ refId + "\' has no matching navigation"));
+                    }
                 }
             }
         }

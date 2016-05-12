@@ -13,3 +13,5 @@ operation:
     - alla
   action:
     python_script: 'print "hello world"'
+  outputs:
+    - balla: 'some value'
