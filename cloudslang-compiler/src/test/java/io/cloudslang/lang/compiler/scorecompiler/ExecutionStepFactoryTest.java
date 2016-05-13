@@ -52,9 +52,9 @@ public class ExecutionStepFactoryTest {
     @Test
     public void testCreateStartStepPutForUnderTheRightKey() throws Exception {
         LoopStatement statement = new ListForLoopStatement("1", "2");
-        HashMap<String, Serializable> preTaskData = new HashMap<>();
-        preTaskData.put(SlangTextualKeys.FOR_KEY, statement);
-        ExecutionStep startStep = factory.createBeginTaskStep(1L, new ArrayList<Argument>(), preTaskData, "", "");
+        HashMap<String, Serializable> preStepData = new HashMap<>();
+        preStepData.put(SlangTextualKeys.FOR_KEY, statement);
+        ExecutionStep startStep = factory.createBeginStepStep(1L, new ArrayList<Argument>(), preStepData, "", "");
         LoopStatement actualStatement = (LoopStatement) startStep.getActionData()
                                  .get(ScoreLangConstants.LOOP_KEY);
         Assert.assertNotNull("for key is null", actualStatement);
@@ -63,20 +63,20 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateFinishTakStep(){
-        ExecutionStep finishTaskStep = factory.createFinishTaskStep(
+        ExecutionStep finishStepStep = factory.createFinishStepStep(
                 1L,
                 new HashMap<String, Serializable>(),
                 new HashMap<String, ResultNavigation>(),
-                "taskName",
+                "stepName",
                 false);
-        Assert.assertTrue(finishTaskStep.getActionData().containsKey(ScoreLangConstants.PREVIOUS_STEP_ID_KEY));
-        Assert.assertTrue(finishTaskStep.getActionData().containsKey(ScoreLangConstants.BREAK_LOOP_KEY));
+        Assert.assertTrue(finishStepStep.getActionData().containsKey(ScoreLangConstants.PREVIOUS_STEP_ID_KEY));
+        Assert.assertTrue(finishStepStep.getActionData().containsKey(ScoreLangConstants.BREAK_LOOP_KEY));
 
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateStartStepWithNullData() throws Exception {
-        factory.createStartStep(1L, null, new ArrayList<Input>(),"");
+        factory.createStartStep(1L, null, new ArrayList<Input>(), "");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -86,7 +86,7 @@ public class ExecutionStepFactoryTest {
 
     @Test (expected = RuntimeException.class)
     public void testCreateActionStepWithEmptyData() throws Exception {
-        factory.createActionStep(1L, new HashMap<String, Serializable>(), "operationName");
+        factory.createActionStep(1L, new HashMap<String, Serializable>());
     }
 
     @Test
@@ -94,36 +94,38 @@ public class ExecutionStepFactoryTest {
         HashMap<String, Serializable> actionRawData = new HashMap<>();
         HashMap<String, String> javaActionData = new HashMap<>();
         javaActionData.put("key", "value");
-        actionRawData.put(SlangTextualKeys.JAVA_ACTION, javaActionData);
-        ExecutionStep actionStep = factory.createActionStep(1L, actionRawData, "operationName");
+        actionRawData.put(SlangTextualKeys.JAVA_ACTION_KEY, javaActionData);
+        ExecutionStep actionStep = factory.createActionStep(1L, actionRawData);
         Assert.assertNotNull("step should not be null", actionStep);
         Assert.assertEquals(actionStep.getActionData().get("key"), "value");
     }
 
     @Test
     public void testCreatePythonActionStep() throws Exception {
+        HashMap<String, Serializable> pythonActionData = new HashMap<>();
+        pythonActionData.put(ScoreLangConstants.PYTHON_ACTION_SCRIPT_KEY, "print 'Hi there'");
         HashMap<String, Serializable> actionRawData = new HashMap<>();
-        actionRawData.put(ScoreLangConstants.PYTHON_SCRIPT_KEY, "print 'Hi there'");
-        ExecutionStep actionStep = factory.createActionStep(1L, actionRawData, "operationName");
+        actionRawData.put(SlangTextualKeys.PYTHON_ACTION_KEY, pythonActionData);
+        ExecutionStep actionStep = factory.createActionStep(1L, actionRawData);
         Assert.assertNotNull("step should not be null", actionStep);
-        Assert.assertEquals(actionStep.getActionData().get(ScoreLangConstants.PYTHON_SCRIPT_KEY), "print 'Hi there'");
+        Assert.assertEquals(actionStep.getActionData().get(ScoreLangConstants.PYTHON_ACTION_SCRIPT_KEY), "print 'Hi there'");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateActionStepWithNullData() throws Exception {
-        factory.createActionStep(1L, null, "operationName");
+        factory.createActionStep(1L, null);
     }
 
     @Test
     public void testCreateEndStep() throws Exception {
-        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), new ArrayList<Result>(),"");
+        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), new ArrayList<Result>(),"", ExecutableType.FLOW);
         Assert.assertNotNull("step should not be null", endStep);
     }
 
     @Test
     public void testCreateEndStepPutOutputsUnderTheRightKey() throws Exception {
         ArrayList<Output> outputs = new ArrayList<>();
-        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), outputs, new ArrayList<Result>(),"");
+        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), outputs, new ArrayList<Result>(),"", ExecutableType.FLOW);
         Assert.assertNotNull("outputs key is null", endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY));
         Assert.assertSame("outputs are not set under their key", outputs, endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY));
     }
@@ -131,32 +133,40 @@ public class ExecutionStepFactoryTest {
     @Test
     public void testCreateEndStepPutResultsUnderTheRightKey() throws Exception {
         ArrayList<Result> results = new ArrayList<>();
-        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), results,"");
+        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), results,"", ExecutableType.FLOW);
         Assert.assertNotNull("results key is null", endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_RESULTS_KEY));
         Assert.assertSame("results are not set under their key", results, endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_RESULTS_KEY));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateEndStepWithNullData() throws Exception {
-        factory.createEndStep(1L, null, new ArrayList<Output>(), new ArrayList<Result>(),"");
+        factory.createEndStep(1L, null, new ArrayList<Output>(), new ArrayList<Result>(), "", ExecutableType.FLOW);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateEndStepWithNullOutputs() throws Exception {
-        factory.createEndStep(1L, new HashMap<String, Serializable>(), null, new ArrayList<Result>(),"");
+        factory.createEndStep(1L, new HashMap<String, Serializable>(), null, new ArrayList<Result>(),"", ExecutableType.FLOW);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateEndStepWithNullResults() throws Exception {
-        factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), null,"");
+        factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), null,"", ExecutableType.FLOW);
     }
 
     @Test
     public void testStepName() throws Exception {
         ArrayList<Result> results = new ArrayList<>();
-        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), results,"stepX");
+        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), results,"stepX", ExecutableType.FLOW);
         Assert.assertNotNull("results key is null", endStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
         Assert.assertEquals("stepX", endStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
+    }
+
+    @Test
+    public void testExecutableType() throws Exception {
+        ArrayList<Result> results = new ArrayList<>();
+        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), results,"stepX", ExecutableType.FLOW);
+        Assert.assertNotNull("key is null", endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_TYPE));
+        Assert.assertEquals(ExecutableType.FLOW, endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_TYPE));
     }
 
     @Test
@@ -176,9 +186,9 @@ public class ExecutionStepFactoryTest {
     @Test
     public void testCreateAddBranchesStepPutAsyncLoopUnderTheRightKey() throws Exception {
         AsyncLoopStatement statement = new AsyncLoopStatement("value", "values");
-        HashMap<String, Serializable> preTaskData = new HashMap<>();
-        preTaskData.put(ScoreLangConstants.ASYNC_LOOP_KEY, statement);
-        ExecutionStep startStep =  factory.createAddBranchesStep(2L, 5L, 3L, preTaskData, "refID", "evenCoolerStep");
+        HashMap<String, Serializable> preStepData = new HashMap<>();
+        preStepData.put(ScoreLangConstants.ASYNC_LOOP_KEY, statement);
+        ExecutionStep startStep =  factory.createAddBranchesStep(2L, 5L, 3L, preStepData, "refID", "evenCoolerStep");
         AsyncLoopStatement actualStatement = (AsyncLoopStatement) startStep.getActionData()
                 .get(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY);
         Assert.assertNotNull("async loop statement not found in action data", actualStatement);
@@ -187,18 +197,19 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateJoinBranchesStep() throws Exception {
-        Map<String, Serializable> postTaskData = new HashMap<>();
-        postTaskData.put(SlangTextualKeys.AGGREGATE_KEY, new ArrayList<>());
+        Map<String, Serializable> postStepData = new HashMap<>();
+        postStepData.put(SlangTextualKeys.AGGREGATE_KEY, new ArrayList<>());
 
         ExecutionStep executionStep = factory.createJoinBranchesStep(
                 0L,
-                postTaskData,
+                postStepData,
                 new HashMap<String, ResultNavigation>(),
                 "joinStep");
 
         @SuppressWarnings("unchecked") Map<String, Serializable> actionData = (Map<String, Serializable>) executionStep.getActionData();
-        Assert.assertTrue(actionData.containsKey(ScoreLangConstants.TASK_AGGREGATE_KEY));
-        Assert.assertTrue(actionData.containsKey(ScoreLangConstants.TASK_NAVIGATION_KEY));
+        Assert.assertTrue(actionData.containsKey(ScoreLangConstants.STEP_AGGREGATE_KEY));
+        Assert.assertTrue(actionData.containsKey(ScoreLangConstants.STEP_NAVIGATION_KEY));
         Assert.assertTrue(actionData.containsKey(ScoreLangConstants.NODE_NAME_KEY));
     }
+
 }

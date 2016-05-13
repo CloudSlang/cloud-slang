@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.SystemProperty;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -47,7 +48,11 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
         URI operation1 = getClass().getResource("/yaml/loops/async_loop/print_branch.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
 
-        RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path);
+        RuntimeInformation runtimeInformation = triggerWithData(
+                SlangSource.fromFile(resource),
+                path,
+                getSystemProperties()
+        );
 
         List<StepData> branchesData = extractAsyncLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
@@ -81,7 +86,11 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
 
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
 
-        RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path);
+        RuntimeInformation runtimeInformation = triggerWithData(
+                SlangSource.fromFile(resource),
+                path,
+                getSystemProperties()
+        );
 
         List<StepData> branchesData = extractAsyncLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
@@ -93,11 +102,37 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
         verifyNavigation(runtimeInformation);
     }
 
-    private RuntimeInformation triggerWithData(SlangSource resource, Set<SlangSource> path) {
+    @Test
+    public void testFlowContextInAggregateSectionNotReachable() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/async_loop/async_loop_aggregate_flow_context.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/async_loop/print_branch.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("flow_var");
+        exception.expectMessage("not defined");
+
+        triggerWithData(SlangSource.fromFile(resource), path);
+    }
+
+    private Set<SystemProperty> getSystemProperties() {
+        return Sets.newHashSet(
+                new SystemProperty("loop", "async.prop1", "aggregate_value")
+        );
+    }
+
+    private RuntimeInformation triggerWithData(
+            SlangSource resource,
+            Set<SlangSource> path,
+            Set<SystemProperty> systemProperties) {
         CompilationArtifact compilationArtifact = slang.compile(resource, path);
 
         Map<String, Serializable> userInputs = new HashMap<>();
-        return triggerWithData(compilationArtifact, userInputs, null);
+        return triggerWithData(compilationArtifact, userInputs, systemProperties);
+    }
+
+    private RuntimeInformation triggerWithData(SlangSource resource, Set<SlangSource> path) {
+        return triggerWithData(resource, path, new HashSet<SystemProperty>());
     }
 
     private List<StepData> extractAsyncLoopData(RuntimeInformation runtimeInformation) {
@@ -147,10 +182,10 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
 
     private void verifyAggregateValues(RuntimeInformation runtimeInformation, List<String> expectedNameOutputs) {
         // aggregate
-        Map<String, StepData> asyncTasks = runtimeInformation.getAsyncTasks();
-        StepData asyncTask = asyncTasks.get(FIRST_STEP_PATH);
+        Map<String, StepData> asyncSteps = runtimeInformation.getAsyncSteps();
+        StepData asyncStep = asyncSteps.get(FIRST_STEP_PATH);
 
-        Map<String, Serializable> aggregateValues = asyncTask.getOutputs();
+        Map<String, Serializable> aggregateValues = asyncStep.getOutputs();
         Assert.assertTrue("aggregate name not found in async loop outputs", aggregateValues.containsKey("name_list"));
         @SuppressWarnings("unchecked")
         List<String> actualAggregateNameList = (List<String>) aggregateValues.get("name_list");
@@ -159,12 +194,18 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
                 "aggregate output does not have the expected value",
                 containsSameElementsWithoutOrdering(Lists.newArrayList(actualAggregateNameList), expectedNameOutputs)
         );
+
+        Assert.assertEquals(
+                "Aggregate value not bound correctly from system property",
+                "aggregate_value",
+                aggregateValues.get("from_sp")
+        );
     }
 
     private void verifyNavigation(RuntimeInformation runtimeInformation) {
-        Map<String, StepData> tasksData = runtimeInformation.getTasks();
-        StepData taskAfterAsyncLoop = tasksData.get(SECOND_STEP_KEY);
-        Assert.assertEquals("navigation not as expected", "print_list", taskAfterAsyncLoop.getName());
+        Map<String, StepData> stepsData = runtimeInformation.getSteps();
+        StepData stepAfterAsyncLoop = stepsData.get(SECOND_STEP_KEY);
+        Assert.assertEquals("navigation not as expected", "print_list", stepAfterAsyncLoop.getName());
     }
 
 }

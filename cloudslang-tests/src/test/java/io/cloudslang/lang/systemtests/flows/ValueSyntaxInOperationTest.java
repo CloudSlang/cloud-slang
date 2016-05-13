@@ -18,6 +18,7 @@ import io.cloudslang.lang.systemtests.ValueSyntaxParent;
 import org.junit.Test;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -29,11 +30,7 @@ public class ValueSyntaxInOperationTest extends ValueSyntaxParent {
 
     @Test
     public void testValues() throws Exception {
-        // compile
-        URI resource = getClass().getResource("/yaml/formats/values_op.sl").toURI();
-
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), new HashSet<SlangSource>());
-        Map<String, StepData> steps = prepareAndRun(compilationArtifact);
+        Map<String, StepData> steps = prepareAndRun(getCompilationArtifact());
 
         // verify
         StepData operationData = steps.get(EXEC_START_PATH);
@@ -41,6 +38,24 @@ public class ValueSyntaxInOperationTest extends ValueSyntaxParent {
         verifyExecutableInputs(operationData);
         verifyExecutableOutputs(operationData);
         verifySuccessResult(operationData);
+    }
+
+    @Test
+    public void testValuesCamelCaseDefault() throws Exception {
+        Map<String, StepData> steps = prepareAndRunDefault(getCompilationArtifact());
+
+        // verify
+        StepData operationData = steps.get(EXEC_START_PATH);
+
+        verifyExecutableInputsDefault(operationData);
+        verifyExecutableOutputs(operationData);
+        verifySuccessResult(operationData);
+    }
+
+    private CompilationArtifact getCompilationArtifact() throws URISyntaxException {
+        // compile
+        URI resource = getClass().getResource("/yaml/formats/values_op.sl").toURI();
+        return slang.compile(SlangSource.fromFile(resource), new HashSet<SlangSource>());
     }
 
 }

@@ -22,7 +22,7 @@ import java.io.Serializable;
 import java.util.*;
 
 @Component
-public class DoTransformer implements Transformer<Map<String, Object>, List<Argument>> {
+public class DoTransformer extends InOutTransformer implements Transformer<Map<String, Object>, List<Argument>> {
 
     @Override
     public List<Argument> transform(Map<String, Object> rawData) {
@@ -30,7 +30,7 @@ public class DoTransformer implements Transformer<Map<String, Object>, List<Argu
         if (MapUtils.isEmpty(rawData)) {
             return result;
         } else if (rawData.size() > 1) {
-            throw new RuntimeException("Task has to many keys under the 'do' keyword,\n" +
+            throw new RuntimeException("Step has to many keys under the 'do' keyword,\n" +
                     "May happen due to wrong indentation");
         }
         Map.Entry<String, Object> argumentsEntry = rawData.entrySet().iterator().next();
@@ -43,7 +43,7 @@ public class DoTransformer implements Transformer<Map<String, Object>, List<Argu
                 result.add(argument);
             }
         } else if (rawArguments != null) {
-            throw new RuntimeException("Task arguments should be defined using a standard YAML list.");
+            throw new RuntimeException("Step arguments should be defined using a standard YAML list.");
         }
 
         return result;
@@ -51,7 +51,7 @@ public class DoTransformer implements Transformer<Map<String, Object>, List<Argu
 
     @Override
     public List<Scope> getScopes() {
-        return Collections.singletonList(Scope.BEFORE_TASK);
+        return Collections.singletonList(Scope.BEFORE_STEP);
     }
 
     @Override
@@ -64,20 +64,20 @@ public class DoTransformer implements Transformer<Map<String, Object>, List<Argu
         // this is our default behaviour that if the user specifies only a key, the key is also the ref we look for
         if (rawArgument instanceof String) {
             String argumentName = (String) rawArgument;
-            return new Argument(argumentName, null);
+            return new Argument(argumentName);
         } else if (rawArgument instanceof Map) {
             @SuppressWarnings("unchecked")
             Map.Entry<String, Serializable> entry = ((Map<String, Serializable>) rawArgument).entrySet().iterator().next();
             Serializable entryValue = entry.getValue();
-            if(entryValue == null){
-                throw new RuntimeException("Could not transform task argument: " +
-                        rawArgument + ". Since it has a null value.\n" +
-                        "Make sure a value is specified or that indentation is properly done."
-                );
-            }
             // - some_input: some_expression
-            return new Argument(entry.getKey(), entryValue);
+            Accumulator accumulator = extractFunctionData(entryValue);
+            return new Argument(
+                    entry.getKey(),
+                    entryValue,
+                    accumulator.getFunctionDependencies(),
+                    accumulator.getSystemPropertyDependencies()
+            );
         }
-        throw new RuntimeException("Could not transform task argument: " + rawArgument);
+        throw new RuntimeException("Could not transform step argument: " + rawArgument);
     }
 }

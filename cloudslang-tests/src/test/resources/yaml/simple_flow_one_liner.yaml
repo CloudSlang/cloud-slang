@@ -16,11 +16,10 @@ flow:
     - input1
     - time_zone_as_string:
         required: false
-    - host:
-        system_property: user.sys.props.host
+    - host: ${'user.sys.props.host'}
     - port: 22
   workflow:
-    - Task1:
+    - Step1:
         do:
           ops.get_time_zone: >
             time_zone_as_string = ${ time_zone_as_string if time_zone_as_string is not None else input1 },
@@ -28,10 +27,10 @@ flow:
         publish:
           - time_zone: ${ time_zone }
         navigate:
-          SUCCESS: Task2
+          SUCCESS: Step2
           NEGATIVE: FAILURE
 
-    - Task2:
+    - Step2:
         do:
           ops.compute_daylight_time_zone: time_zone_as_string = ${ time_zone }, not_used = 'I am not used'
         publish:

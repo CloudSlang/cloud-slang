@@ -9,6 +9,8 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.bindings;
 
+import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
 import io.cloudslang.lang.entities.MapForLoopStatement;
@@ -34,7 +36,7 @@ import static io.cloudslang.lang.runtime.env.LoopCondition.LOOP_CONDITION_KEY;
 @Component
 public class LoopsBinding {
 
-    public static final String FOR_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating for loop expression in task";
+    public static final String FOR_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating for loop expression in step";
     public static final String INVALID_MAP_EXPRESSION_MESSAGE = "Invalid expression for iterating maps";
 
     private final Logger logger = Logger.getLogger(getClass());
@@ -42,15 +44,20 @@ public class LoopsBinding {
     @Autowired
     private ScriptEvaluator scriptEvaluator;
 
-    public LoopCondition getOrCreateLoopCondition(LoopStatement forLoopStatement, Context flowContext, String nodeName) {
+    public LoopCondition getOrCreateLoopCondition(
+            LoopStatement forLoopStatement,
+            Context flowContext,
+            Set<SystemProperty> systemProperties,
+            String nodeName) {
         Validate.notNull(forLoopStatement, "loop statement cannot be null");
         Validate.notNull(flowContext, "flow context cannot be null");
+        Validate.notNull(systemProperties, "system properties cannot be null");
         Validate.notNull(nodeName, "node name cannot be null");
 
-        Map<String, Serializable> langVariables = flowContext.getLangVariables();
+        Map<String, Serializable> langVariables = flowContext.getImmutableViewOfLanguageVariables();
         if (!langVariables.containsKey(LOOP_CONDITION_KEY)) {
-            LoopCondition loopCondition = createForLoopCondition(forLoopStatement, flowContext, nodeName);
-            langVariables.put(LOOP_CONDITION_KEY, loopCondition);
+            LoopCondition loopCondition = createForLoopCondition(forLoopStatement, flowContext, systemProperties, nodeName);
+            flowContext.putLanguageVariable(LOOP_CONDITION_KEY, loopCondition);
         }
         return (LoopCondition) langVariables.get(LOOP_CONDITION_KEY);
     }
@@ -81,12 +88,16 @@ public class LoopsBinding {
         logger.debug("value name: " + keyName + ", value: " + valueFromIteration);
     }
 
-    private LoopCondition createForLoopCondition(LoopStatement forLoopStatement, Context flowContext, String nodeName) {
+    private LoopCondition createForLoopCondition(
+            LoopStatement forLoopStatement,
+            Context flowContext,
+            Set<SystemProperty> systemProperties,
+            String nodeName) {
         Map<String, Serializable> variables = flowContext.getImmutableViewOfVariables();
         Serializable evalResult;
         String collectionExpression = forLoopStatement.getExpression();
         try {
-            evalResult = scriptEvaluator.evalExpr(collectionExpression, variables);
+            evalResult = scriptEvaluator.evalExpr(collectionExpression, variables, systemProperties);
         } catch (Throwable t) {
             throw new RuntimeException(FOR_LOOP_EXPRESSION_ERROR_MESSAGE + " '" + nodeName + "',\n\tError is: " + t.getMessage(), t);
         }
@@ -107,7 +118,7 @@ public class LoopsBinding {
         ForLoopCondition forLoopCondition = createForLoopCondition(evalResult);
         if (forLoopCondition == null) {
             throw new RuntimeException("collection expression: '" + collectionExpression + "' in the 'for' loop " +
-                    "in task: '" + nodeName + "' " +
+                    "in step: '" + nodeName + "' " +
                     "doesn't return an iterable, other types are not supported");
         }
         if (!forLoopCondition.hasMore()) {

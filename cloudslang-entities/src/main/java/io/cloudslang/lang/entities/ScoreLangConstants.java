@@ -18,20 +18,24 @@ public interface ScoreLangConstants {
     String RUN_ENV = "runEnv";
     String HOOKS = "hooks";
     String NODE_NAME_KEY = "nodeName";
+    String EXECUTABLE_TYPE = "executableType";
 
     String EXPRESSION_START_DELIMITER = "${";
     String EXPRESSION_START_DELIMITER_ESCAPED = "\\$\\{";
     String EXPRESSION_END_DELIMITER = "}";
     String EXPRESSION_END_DELIMITER_ESCAPED = "\\}";
 
+    String NAMESPACE_DELIMITER = ".";
+
     //action scope
-    String ACTION_CLASS_KEY = "className";
     String ACTION_TYPE = "actionType";
 
-    String ACTION_METHOD_KEY = "methodName";
-    String PYTHON_SCRIPT_KEY = "python_script";
+    String JAVA_ACTION_CLASS_KEY = "className";
+    String JAVA_ACTION_METHOD_KEY = "methodName";
+    String JAVA_ACTION_GAV_KEY = "gav";
 
-    String OPERATION_NAME_KEY = "operationName";
+    String PYTHON_ACTION_SCRIPT_KEY = "script";
+    String PYTHON_ACTION_DEPENDENCIES_KEY = "dependencies";
 
     //navigation
     String NEXT_STEP_ID_KEY = "nextStepId";
@@ -39,23 +43,23 @@ public interface ScoreLangConstants {
 
     //operation scope
     String EXECUTABLE_INPUTS_KEY = "executableInputs";
-    String BIND_OUTPUT_FROM_INPUTS_KEY = "self";
     String USER_INPUTS_KEY = "userInputs";
     String EXECUTABLE_OUTPUTS_KEY = "executableOutputs";
     String EXECUTABLE_RESULTS_KEY = "executableResults";
 
-    //task scope
-    String TASK_ARGUMENTS_KEY = "taskArguments";
-    String TASK_PUBLISH_KEY = "taskPublishValues";
-    String TASK_NAVIGATION_KEY = "taskNavigationValues";
+    //step scope
+    String STEP_INPUTS_KEY = "stepInputs";
+    String STEP_PUBLISH_KEY = "stepPublishValues";
+    String STEP_NAVIGATION_KEY = "stepNavigationValues";
     String REF_ID = "refId";
     String LOOP_KEY = "loop";
     String BREAK_LOOP_KEY = "breakOn";
+    String STEP_INPUTS_RESULT_CONTEXT = "stepInputsResultContext";
 
     // async loop
     String ASYNC_LOOP_KEY = "async_loop";
     String ASYNC_LOOP_STATEMENT_KEY = "asyncLoopStatement";
-    String TASK_AGGREGATE_KEY = "taskAggregateValues";
+    String STEP_AGGREGATE_KEY = "stepAggregateValues";
     String BRANCH_BEGIN_STEP_ID_KEY = "branchBeginStep";
 
     // Events types
@@ -65,7 +69,7 @@ public interface ScoreLangConstants {
     String EVENT_ACTION_ERROR = "EVENT_ACTION_ERROR";
     String EVENT_INPUT_START = "EVENT_INPUT_START";
     String EVENT_INPUT_END = "EVENT_INPUT_END";
-    String EVENT_TASK_START = "EVENT_TASK_START";
+    String EVENT_STEP_START = "EVENT_STEP_START";
     String EVENT_ARGUMENT_START = "EVENT_ARGUMENT_START";
     String EVENT_ARGUMENT_END = "EVENT_ARGUMENT_END";
     String EVENT_OUTPUT_START = "EVENT_OUTPUT_START";

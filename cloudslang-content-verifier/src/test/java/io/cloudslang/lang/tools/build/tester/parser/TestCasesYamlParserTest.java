@@ -9,8 +9,11 @@
  */
 package io.cloudslang.lang.tools.build.tester.parser;
 
+import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.YamlParser;
+import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import org.junit.Assert;
@@ -29,10 +32,10 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by stoneo on 3/16/2015.
@@ -43,6 +46,9 @@ public class TestCasesYamlParserTest {
 
     @Autowired
     private TestCasesYamlParser parser;
+
+    @Autowired
+    private Slang slang;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -71,12 +77,12 @@ public class TestCasesYamlParserTest {
 
     @Test
     public void testCaseFileParsingForNonTestCasesFile() throws Exception{
-        String filePath = "/content/base/properties.yaml";
+        String filePath = "/content/base/properties.prop.sl";
         URI fileUri = getClass().getResource(filePath).toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage("problem");
         exception.expectMessage("parsing");
-        exception.expectMessage("properties.yaml");
+        exception.expectMessage("properties");
         parser.parseTestCases(SlangSource.fromFile(fileUri));
     }
 
@@ -87,25 +93,31 @@ public class TestCasesYamlParserTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("slang");
         exception.expectMessage("parsing");
-        exception.expectMessage("invalid_test_case.yaml");
+        exception.expectMessage("invalid_test_case");
         parser.parseTestCases(SlangSource.fromFile(fileUri));
     }
 
     @Test
     public void parseSystemPropertiesFile() throws Exception{
-        String filePath = getClass().getResource("/content/base/properties.yaml").toURI().getPath();
-        Map<String, Serializable> sysProperties = parser.parseProperties(filePath);
-        Assert.assertEquals("One system property should be parsed", 1, sysProperties.size());
+        URI filePath = getClass().getResource("/content/base/properties.prop.sl").toURI();
+        SlangSource source = SlangSource.fromFile(filePath);
+        Set<SystemProperty> props = new HashSet<>();
+
+        when(slang.loadSystemProperties(eq(source))).thenReturn(props);
+        parser.parseProperties(filePath.getPath());
+        verify(slang).loadSystemProperties(eq(source));
     }
 
     @Test
-    public void parseNotFoundSystemPropertiesFile(){
-        String filePath = "wrongPath";
+    public void parseSystemPropertiesFileInvalidExtension() throws Exception{
+        URI filePath = getClass().getResource("/content/base/print_text.sl").toURI();
+
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error");
-        exception.expectMessage("loading");
-        exception.expectMessage("wrongPath");
-        parser.parseProperties(filePath);
+        exception.expectMessage("print_text.sl");
+        exception.expectMessage("extension");
+        exception.expectMessage("prop.sl");
+
+        parser.parseProperties(filePath.getPath());
     }
 
     @Configuration
@@ -119,6 +131,16 @@ public class TestCasesYamlParserTest {
         @Bean
         public YamlParser yamlParser(){
             return new YamlParser();
+        }
+
+        @Bean
+        public Slang slang() {
+            return mock(Slang.class);
+        }
+
+        @Bean
+        public ParserExceptionHandler parserExceptionHandler() {
+            return new ParserExceptionHandler();
         }
 
         @Bean

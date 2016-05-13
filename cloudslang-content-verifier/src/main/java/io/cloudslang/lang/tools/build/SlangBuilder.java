@@ -22,11 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /*
  * Created by stoneo on 2/9/2015.
@@ -99,13 +95,22 @@ public class SlangBuilder {
         // Compiling all the test flows
         Map<String, CompilationArtifact> compiledFlows = slangContentVerifier.compileSlangModels(allTestedFlowModels);
 
-        Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath);
+        Set<String> allTestedFlowsFQN = mapExecutablesToFullyQualifiedName(allTestedFlowModels.values());
+        Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath, allTestedFlowsFQN);
         log.info("");
         log.info("--- running tests ---");
         log.info("Found " + testCases.size() + " tests");
         RunTestsResults runTestsResults = slangTestRunner.runAllTests(projectPath, testCases, compiledFlows, testSuites);
         addCoverageDataToRunTestsResults(contentSlangModels, testFlowModels, testCases, runTestsResults);
         return runTestsResults;
+    }
+
+    private Set<String> mapExecutablesToFullyQualifiedName(Collection<Executable> executables) {
+        Set<String> fullyQualifiedNames = new HashSet<>();
+        for (Executable executable : executables) {
+            fullyQualifiedNames.add(executable.getId());
+        }
+        return fullyQualifiedNames;
     }
 
     private void addCoverageDataToRunTestsResults(Map<String, Executable> contentSlangModels, Map<String, Executable> testFlowModels,
@@ -122,9 +127,9 @@ public class SlangBuilder {
                 testFlowModel = contentSlangModels.get(testFlowPath);
             }
             if(testFlowModel == null){
-                return;
+                continue;
             }
-            addAllDependenciesToCoveredContent(coveredContent, testFlowModel.getDependencies(), contentSlangModels);
+            addAllDependenciesToCoveredContent(coveredContent, testFlowModel.getExecutableDependencies(), contentSlangModels);
         }
         Set<String> contentExecutablesNames = contentSlangModels.keySet();
         // Add to the covered content set also all the direct test case's test flows, which are part of the tested content
@@ -161,7 +166,7 @@ public class SlangBuilder {
             Executable executable = contentSlangModels.get(dependency);
             // Executable will be null in case of a dependecy which is a test flow (and not patr of the content)
             if(executable != null) {
-                addAllDependenciesToCoveredContent(allDependencies, executable.getDependencies(), contentSlangModels);
+                addAllDependenciesToCoveredContent(allDependencies, executable.getExecutableDependencies(), contentSlangModels);
             }
         }
     }

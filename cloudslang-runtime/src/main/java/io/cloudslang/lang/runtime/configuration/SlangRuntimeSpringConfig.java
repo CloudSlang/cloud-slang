@@ -11,14 +11,14 @@ package io.cloudslang.lang.runtime.configuration;
 *******************************************************************************/
 
 
+import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
+import org.apache.commons.lang3.StringUtils;
 import org.python.core.Options;
+import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 
 @Configuration
 @ComponentScan("io.cloudslang.lang.runtime")
@@ -26,19 +26,26 @@ public class SlangRuntimeSpringConfig {
 
     static {
         Options.importSite = false;
+        setPythonIOEncoding();
+    }
+
+    private static void setPythonIOEncoding() {
+        String encodingValue = System.getProperty(SlangSystemPropertyConstant.CSLANG_ENCODING.getValue());
+        if (!StringUtils.isEmpty(encodingValue))
+            System.getProperties().setProperty(PySystemState.PYTHON_IO_ENCODING, encodingValue);
     }
 
     @Bean
-    public PythonInterpreter interpreter(){
+    public PythonInterpreter evalInterpreter(){
+        return new PythonInterpreter();
+    }
+
+    @Bean
+    public PythonInterpreter execInterpreter(){
         PythonInterpreter interpreter = new PythonInterpreter();
-//        here to avoid jython preferring io.cloudslang package over python io package
+        //here to avoid jython preferring io.cloudslang package over python io package
         interpreter.exec("import io");
         return interpreter;
-    }
-
-    @Bean
-    public ScriptEngine scriptEngine(){
-        return  new ScriptEngineManager().getEngineByName("python");
     }
 
 }

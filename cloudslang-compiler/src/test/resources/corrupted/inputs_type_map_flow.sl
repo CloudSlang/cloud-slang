@@ -14,6 +14,6 @@ flow:
   inputs:
     input1:
   workflow:
-    - task1:
+    - step1:
         do:
           ops.op1:

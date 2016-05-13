@@ -11,7 +11,7 @@ imports:
   ops: user.ops
 
 flow:
-  name: basic_flow
+  name: flow_with_on_failure
   inputs:
     - input1
   workflow:
@@ -20,22 +20,21 @@ flow:
             do:
               ops.test_op:
                 - city: 'a'
+                - alla: 'a'
 
-        - send_mail:
-            do:
-              ops.test_op:
-
-    - first_task:
+    - first_step:
         do:
           ops.test_op:
             - city: 'input_1'
+            - alla: 'walla'
         publish:
           - weather
 
-    - second_task:
+    - second_step:
         do:
           ops.test_op:
             - city: 'input_1'
+            - alla: 'walla'
         navigate:
-          SUCCESS: SUCCESS
-          FAILURE: FAILURE
+          - SUCCESS: SUCCESS
+          - FAILURE: FAILURE

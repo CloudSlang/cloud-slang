@@ -26,15 +26,15 @@ operation:
         default: ${ input6 }
     - input9:
         default: ${ input6 }
-        overridable: false
+        private: true
     - input10:
         default: ${ input5 }
     - input11: ${ 5 + 6 }
     - input12: ${ "mighty" + " max"   + varX }
     - input13: true
 
-  action:
-    python_script: |
+  python_action:
+    script: |
             # this is python amigos!!
             import os
             processId = os.getpid()
@@ -48,8 +48,7 @@ operation:
   outputs:
     - output1: ${ input1 }
     - output2: ${ processId }
-    - output3: ${ self['input1'] }
-    - output4
+    - output3
   results:
     - SUCCESS: ${ 1 != 123456 }
     - NO_ACTION: ${ true }

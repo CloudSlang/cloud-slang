@@ -6,11 +6,11 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 
 operation:
-  name: check_Weather
+  name: op_without_namespace
   inputs:
     - city
-  action:
-    python_script: 'print "weather thing"'
+  python_action:
+    script: 'print "weather thing"'
   outputs:
     - weather: "great!!"
     - temperature: "30"

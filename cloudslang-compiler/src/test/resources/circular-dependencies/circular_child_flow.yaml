@@ -11,8 +11,8 @@ imports:
   flows: user.flows.circular
 
 flow:
-  name: child_flow
+  name: circular_child_flow
   workflow:
     - CheckWeather:
         do:
-          flows.parent_flow:
+          flows.circular_parent_flow:

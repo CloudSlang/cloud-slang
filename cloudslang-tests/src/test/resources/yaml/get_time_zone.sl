@@ -11,12 +11,11 @@ operation:
   name: get_time_zone
   inputs:
     - time_zone_as_string
-    - alla:
-        system_property: user.sys.props.alla
-  action:
-    python_script: |
-        time_zone_as_int = int(time_zone_as_string)
-        print 'time zone is: ' + str(time_zone_as_int)
+    - alla: ${get_sp('user.sys.props.alla')}
+  python_action:
+    script: |
+      time_zone_as_int = int(time_zone_as_string)
+      print 'time zone is: ' + str(time_zone_as_int)
   outputs:
     - time_zone: ${ time_zone_as_int }
   results:

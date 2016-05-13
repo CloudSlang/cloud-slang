@@ -15,6 +15,7 @@ import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import java.util.HashMap;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,7 +45,7 @@ public class CompileBasicFlowTest {
 
     @Test
     public void testCompileFlowBasic() throws Exception {
-        URI flow = getClass().getResource("/flow.yaml").toURI();
+        URI flow = getClass().getResource("/basic_flow.yaml").toURI();
         URI operation = getClass().getResource("/test_op.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
@@ -55,7 +56,6 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());
         Assert.assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
         Assert.assertEquals("the inputs size is not as expected", 3, compilationArtifact.getInputs().size());
-        Assert.assertEquals("the system properties size is not as expected", 2, compilationArtifact.getSystemProperties().size());
     }
 
     @Test
@@ -78,19 +78,19 @@ public class CompileBasicFlowTest {
         Assert.assertNotNull("inputs doesn't exist", inputs);
         Assert.assertEquals("there is a different number of inputs than expected", 1, inputs.size());
 
-        ExecutionStep beginTaskStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") List<Argument> taskArguments = (List<Argument>) beginTaskStep.getActionData().get(ScoreLangConstants.TASK_ARGUMENTS_KEY);
-        Assert.assertNotNull("arguments doesn't exist", taskArguments);
-        Assert.assertEquals("there is a different number of arguments than expected", 2, taskArguments.size());
-        Assert.assertEquals("city", taskArguments.get(0).getName());
-        Assert.assertEquals("country", taskArguments.get(1).getName());
-        Assert.assertEquals("CheckWeather", beginTaskStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
+        ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
+        @SuppressWarnings("unchecked") List<Argument> stepInputs = (List<Argument>) beginStepExecutionStep.getActionData().get(ScoreLangConstants.STEP_INPUTS_KEY);
+        Assert.assertNotNull("arguments doesn't exist", stepInputs);
+        Assert.assertEquals("there is a different number of arguments than expected", 3, stepInputs.size());
+        Assert.assertEquals("city", stepInputs.get(0).getName());
+        Assert.assertEquals("country", stepInputs.get(1).getName());
+        Assert.assertEquals("CheckWeather", beginStepExecutionStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
 
-        ExecutionStep FinishTaskSteps = executionPlan.getStep(3L);
-        @SuppressWarnings("unchecked") List<Output> publish = (List<Output>) FinishTaskSteps.getActionData().get(ScoreLangConstants.TASK_PUBLISH_KEY);
+        ExecutionStep endStepExecutionStep = executionPlan.getStep(3L);
+        @SuppressWarnings("unchecked") List<Output> publish = (List<Output>) endStepExecutionStep.getActionData().get(ScoreLangConstants.STEP_PUBLISH_KEY);
         @SuppressWarnings("unchecked") Map<String, ResultNavigation> navigate =
-                (Map<String, ResultNavigation>) FinishTaskSteps.getActionData().get(ScoreLangConstants.TASK_NAVIGATION_KEY);
-        Assert.assertEquals("CheckWeather", FinishTaskSteps.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
+                (Map<String, ResultNavigation>) endStepExecutionStep.getActionData().get(ScoreLangConstants.STEP_NAVIGATION_KEY);
+        Assert.assertEquals("CheckWeather", endStepExecutionStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
 
         Assert.assertNotNull("publish don't exist", publish);
         Assert.assertEquals("there is a different number of publish values than expected", 1, publish.size());
@@ -114,7 +114,7 @@ public class CompileBasicFlowTest {
 
     @Test
     public void testPreCompileFlowBasic() throws Exception {
-        URI flowUri = getClass().getResource("/flow.yaml").toURI();
+        URI flowUri = getClass().getResource("/basic_flow.yaml").toURI();
         Executable flow = compiler.preCompile(SlangSource.fromFile(flowUri));
 
         Assert.assertNotNull("Pre-Compiled meta-data is null", flow);
@@ -123,10 +123,47 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("There is a different number of flow inputs than expected", 3, flow.getInputs().size());
         Assert.assertEquals("There is a different number of flow outputs than expected", 0, flow.getOutputs().size());
         Assert.assertEquals("There is a different number of flow results than expected", 2, flow.getResults().size());
-        Set<String> dependencies = flow.getDependencies();
+        Set<String> dependencies = flow.getExecutableDependencies();
         Assert.assertEquals("There is a different number of flow dependencies than expected", 1, dependencies.size());
         String dependency = dependencies.iterator().next();
         Assert.assertEquals("The flow dependency full name is wrong", "user.ops.test_op", dependency);
+    }
+
+    @Test
+    public void testValidateSlangModelWithDependenciesBasic() throws Exception {
+        URI flowUri = getClass().getResource("/basic_flow.yaml").toURI();
+        Executable flow = compiler.preCompile(SlangSource.fromFile(flowUri));
+
+        URI operationUri = getClass().getResource("/test_op.sl").toURI();
+        Executable op = compiler.preCompile(SlangSource.fromFile(operationUri));
+
+        Set<Executable> dependencies = new HashSet();
+        dependencies.add(op);
+        List<RuntimeException> errors = compiler.validateSlangModelWithDependencies(flow, dependencies);
+
+        Assert.assertEquals("", 0, errors.size());
+    }
+
+    @Test
+    public void testCompileFlowNavigateDuplicateKeysFirstIsTaken() throws Exception {
+        URI flow = getClass().getResource("/flow_navigate_duplicate_keys.sl").toURI();
+        URI operation = getClass().getResource("/check_Weather.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+
+        CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
+        ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
+        Assert.assertNotNull("execution plan is null", executionPlan);
+        Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
+
+        ExecutionStep endStepExecutionStep = executionPlan.getStep(3L);
+        @SuppressWarnings("unchecked") Map<String, ResultNavigation> actualNavigationValues =
+                (Map<String, ResultNavigation>) endStepExecutionStep.getActionData().get(ScoreLangConstants.STEP_NAVIGATION_KEY);
+        Map<String, ResultNavigation> expectedNavigationValues = new HashMap<>();
+        expectedNavigationValues.put("SUCCESS", new ResultNavigation(0, "RESULT1")); // first in list is taken
+        expectedNavigationValues.put("FAILURE", new ResultNavigation(0, "RESULT2"));
+        Assert.assertEquals("navigation values not as expected", expectedNavigationValues, actualNavigationValues);
     }
 
 }

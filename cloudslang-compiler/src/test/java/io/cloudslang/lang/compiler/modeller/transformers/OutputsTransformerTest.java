@@ -10,12 +10,13 @@
 
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.parser.YamlParser;
+import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.entities.bindings.Output;
 import junit.framework.Assert;
-import io.cloudslang.lang.compiler.SlangSource;
-import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -74,9 +75,9 @@ public class OutputsTransformerTest {
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testNoExpression() throws Exception {
         @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
-        Output output = outputs.get(3);
-        Assert.assertEquals("output4", output.getName());
-        Assert.assertEquals("${output4}", output.getValue());
+        Output output = outputs.get(2);
+        Assert.assertEquals("output3", output.getName());
+        Assert.assertEquals("${output3}", output.getValue());
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
@@ -85,14 +86,6 @@ public class OutputsTransformerTest {
         Output output = outputs.get(0);
         Assert.assertEquals("output1", output.getName());
         Assert.assertEquals("${ input1 }", output.getValue());
-    }
-
-    @Test (timeout = DEFAULT_TIMEOUT)
-    public void testInputExpression() {
-        @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
-        Output output = outputs.get(2);
-        Assert.assertEquals("output3", output.getName());
-        Assert.assertEquals("${ self['input1'] }", output.getValue());
     }
 
     @Configuration
@@ -108,6 +101,11 @@ public class OutputsTransformerTest {
         @Bean
         public YamlParser yamlParser() {
             return new YamlParser();
+        }
+
+        @Bean
+        public ParserExceptionHandler parserExceptionHandler() {
+            return new ParserExceptionHandler();
         }
 
         @Bean

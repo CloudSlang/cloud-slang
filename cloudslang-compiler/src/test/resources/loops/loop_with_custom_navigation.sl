@@ -22,7 +22,7 @@ flow:
             ops.print:
               - text: ${ value }
         navigate:
-          SUCCESS: print_other_values
+          - SUCCESS: print_other_values
 
     - print_other_values:
         do:

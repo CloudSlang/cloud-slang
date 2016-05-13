@@ -25,13 +25,131 @@ public class SlangSourceTest {
     private final static String sourceString = "someString";
 
     private void assertSourceEquals(SlangSource source) {
-        Assert.assertEquals(source.getSource(), sourceString);
-        Assert.assertEquals(source.getName(), sourceName);
+        Assert.assertEquals(sourceString, source.getSource());
+        Assert.assertEquals(sourceName, source.getFileName());
     }
 
     @Test
     public void testFromFile() throws Exception {
         File file = folder.newFile(sourceName);
+        FileUtils.writeStringToFile(file, sourceString);
+
+        assertSourceEquals(SlangSource.fromFile(file));
+    }
+
+    @Test
+    public void testFromFileYAML_SLExtension() throws Exception {
+        File file = folder.newFile(sourceName + "." + Extension.YAML.getValue() + "." + Extension.SL.getValue());
+        FileUtils.writeStringToFile(file, sourceString);
+
+        SlangSource source = SlangSource.fromFile(file);
+        Assert.assertEquals(sourceString, source.getSource());
+        Assert.assertEquals(sourceName + "." + Extension.YAML.getValue(), source.getFileName());
+    }
+
+    @Test
+    public void testFromFileYAML_YMLExtension() throws Exception {
+        File file = folder.newFile(sourceName + "." + Extension.YAML.getValue() + "." + Extension.YML.getValue());
+        FileUtils.writeStringToFile(file, sourceString);
+
+        SlangSource source = SlangSource.fromFile(file);
+        Assert.assertEquals(sourceString, source.getSource());
+        Assert.assertEquals(sourceName + "." + Extension.YAML.getValue(), source.getFileName());
+    }
+
+    @Test
+    public void testFromFileYML_SLExtension() throws Exception {
+        File file = folder.newFile(sourceName + "." + Extension.YML.getValue() + "." + Extension.SL.getValue());
+        FileUtils.writeStringToFile(file, sourceString);
+
+        SlangSource source = SlangSource.fromFile(file);
+        Assert.assertEquals(sourceString, source.getSource());
+        Assert.assertEquals(sourceName + "." + Extension.YML.getValue(), source.getFileName());
+    }
+
+    @Test
+    public void testFromFileYML_SL_YAMLExtension() throws Exception {
+        File file = folder.newFile(sourceName + "." + Extension.YML.getValue() + "." + Extension.SL_YAML.getValue());
+        FileUtils.writeStringToFile(file, sourceString);
+
+        SlangSource source = SlangSource.fromFile(file);
+        Assert.assertEquals(sourceString, source.getSource());
+        Assert.assertEquals(sourceName + "." + Extension.YML.getValue(), source.getFileName());
+    }
+
+    @Test
+    public void testFromFileYML_SL_YMLExtension() throws Exception {
+        File file = folder.newFile(sourceName + "." + Extension.YML.getValue() + "." + Extension.SL_YML.getValue());
+        FileUtils.writeStringToFile(file, sourceString);
+
+        SlangSource source = SlangSource.fromFile(file);
+        Assert.assertEquals(sourceString, source.getSource());
+        Assert.assertEquals(sourceName + "." + Extension.YML.getValue(), source.getFileName());
+    }
+
+    @Test
+    public void testFromFileSL_PROP_SLExtension() throws Exception {
+        File file = folder.newFile(sourceName + "." + Extension.SL.getValue() + "." + Extension.PROP_SL.getValue());
+        FileUtils.writeStringToFile(file, sourceString);
+
+        SlangSource source = SlangSource.fromFile(file);
+        Assert.assertEquals(sourceString, source.getSource());
+        Assert.assertEquals(sourceName + "." + Extension.SL.getValue(), source.getFileName());
+    }
+
+    @Test
+    public void testFromFilePROP_SL_SLExtension() throws Exception {
+        File file = folder.newFile(sourceName + "." + Extension.PROP_SL.getValue() + "." + Extension.SL.getValue());
+        FileUtils.writeStringToFile(file, sourceString);
+
+        SlangSource source = SlangSource.fromFile(file);
+        Assert.assertEquals(sourceString, source.getSource());
+        Assert.assertEquals(sourceName + "." + Extension.PROP_SL.getValue(), source.getFileName());
+    }
+
+    @Test
+    public void testFromFileSLExtension() throws Exception {
+        File file = folder.newFile(sourceName + "." + Extension.SL.getValue());
+        FileUtils.writeStringToFile(file, sourceString);
+
+        assertSourceEquals(SlangSource.fromFile(file));
+    }
+
+    @Test
+    public void testFromFileSL_YAMLExtension() throws Exception {
+        File file = folder.newFile(sourceName + "." + Extension.SL_YAML.getValue());
+        FileUtils.writeStringToFile(file, sourceString);
+
+        assertSourceEquals(SlangSource.fromFile(file));
+    }
+
+    @Test
+    public void testFromFileSL_YMLExtension() throws Exception {
+        File file = folder.newFile(sourceName + "." + Extension.SL_YML.getValue());
+        FileUtils.writeStringToFile(file, sourceString);
+
+        assertSourceEquals(SlangSource.fromFile(file));
+    }
+
+    @Test
+    public void testFromFilePROP_SLExtension() throws Exception {
+        File file = folder.newFile(sourceName + "." + Extension.PROP_SL.getValue());
+        FileUtils.writeStringToFile(file, sourceString);
+
+        assertSourceEquals(SlangSource.fromFile(file));
+    }
+
+    @Test
+    public void testFromFileYAMLExtension() throws Exception {
+        File file = folder.newFile(sourceName + "." + Extension.YAML.getValue());
+        FileUtils.writeStringToFile(file, sourceString);
+
+        assertSourceEquals(SlangSource.fromFile(file));
+    }
+
+    @Test
+    public void testFromFileYMLExtension() throws Exception {
+        File file = folder.newFile(sourceName + "." + Extension.YML.getValue());
         FileUtils.writeStringToFile(file, sourceString);
 
         assertSourceEquals(SlangSource.fromFile(file));
@@ -85,4 +203,15 @@ public class SlangSourceTest {
     public void testFromBytes() throws Exception {
         assertSourceEquals(SlangSource.fromBytes(sourceString.getBytes(), sourceName));
     }
+
+    @Test
+    public void testFromBytesWithExtension() throws Exception {
+        SlangSource source = SlangSource.fromBytes(
+                sourceString.getBytes(),
+                sourceName + "." + Extension.SL.getValue()
+        );
+        Assert.assertEquals(sourceString, source.getSource());
+        Assert.assertEquals(sourceName, source.getFileName());
+    }
+
 }

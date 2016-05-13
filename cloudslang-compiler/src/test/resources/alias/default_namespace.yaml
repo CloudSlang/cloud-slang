@@ -10,7 +10,7 @@ namespace: cloudslang.sample
 flow:
   name: default_namespace
   workflow:
-    - task1:
+    - step1:
         do:
           simple_op:
             - cool_input: 25

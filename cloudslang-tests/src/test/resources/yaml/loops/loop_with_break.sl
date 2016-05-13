@@ -24,10 +24,10 @@ flow:
           break:
             - CUSTOM
         navigate:
-          CUSTOM: print_other_values
-          SUCCESS: task_that_doesnt_run
+          - CUSTOM: print_other_values
+          - SUCCESS: step_that_doesnt_run
 
-    - task_that_doesnt_run:
+    - step_that_doesnt_run:
         do:
           ops.print:
             - text: "I don't run"

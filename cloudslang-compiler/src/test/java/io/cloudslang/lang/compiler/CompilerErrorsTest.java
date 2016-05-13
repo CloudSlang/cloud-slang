@@ -10,18 +10,21 @@
 
 package io.cloudslang.lang.compiler;
 
-import io.cloudslang.lang.compiler.parser.YamlParser;
+import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
+import io.cloudslang.lang.compiler.modeller.model.Executable;
+import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URI;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -79,7 +82,7 @@ public class CompilerErrorsTest {
 
     @Test
     public void testSystemPropertiesAsDep() throws Exception {
-        URI flow = getClass().getResource("/flow.yaml").toURI();
+        URI flow = getClass().getResource("/basic_flow.yaml").toURI();
         URI operation = getClass().getResource("/test_op.sl").toURI();
 		URI systemProperties = getClass().getResource("/corrupted/system_properties.yaml").toURI();
         Set<SlangSource> path = new HashSet<>();
@@ -91,18 +94,19 @@ public class CompilerErrorsTest {
     }
 
     @Test
-    public void testFlowWithNavigationToMissingTask() throws Exception {
-        URI resource = getClass().getResource("/corrupted/flow_with_navigation_to_missing_task.sl").toURI();
+    public void testFlowWithNavigationToMissingStep() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_with_navigation_to_missing_step.sl").toURI();
         URI operations = getClass().getResource("/java_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Task1");
-        exception.expectMessage("Task2");
+        exception.expectMessage("Step1");
+        exception.expectMessage("Step2");
         exception.expectMessage("navigation");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
+
     @Test
     public void testFlowWithMissingSpaceBeforeFirstImport() throws Exception {
         //covers "mapping values are not allowed here" error
@@ -117,8 +121,8 @@ public class CompilerErrorsTest {
         path.add(SlangSource.fromFile(flows));
         path.add(SlangSource.fromFile(checkWeather));
         exception.expect(RuntimeException.class);
-        exception.expectMessage(YamlParser.MAPPING_VALUES_NOT_ALLOWED_HERE_ERROR);
-        exception.expectMessage(YamlParser.KEY_VALUE_PAIR_MISSING_OR_INDENTATION_PROBLEM_MSG);
+        exception.expectMessage(ParserExceptionHandler.MAPPING_VALUES_NOT_ALLOWED_HERE_ERROR);
+        exception.expectMessage(ParserExceptionHandler.KEY_VALUE_PAIR_MISSING_OR_INDENTATION_PROBLEM_MSG);
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -136,7 +140,7 @@ public class CompilerErrorsTest {
         path.add(SlangSource.fromFile(flows));
         path.add(SlangSource.fromFile(checkWeather));
         exception.expect(RuntimeException.class);
-        exception.expectMessage(YamlParser.CANNOT_CREATE_PROPERTY_ERROR);
+        exception.expectMessage(ParserExceptionHandler.CANNOT_CREATE_PROPERTY_ERROR);
         exception.expectMessage("not supported by CloudSlang");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
@@ -155,8 +159,8 @@ public class CompilerErrorsTest {
         path.add(SlangSource.fromFile(flows));
         path.add(SlangSource.fromFile(checkWeather));
         exception.expect(RuntimeException.class);
-        exception.expectMessage(YamlParser.CANNOT_CREATE_PROPERTY_ERROR);
-        exception.expectMessage(YamlParser.KEY_VALUE_PAIR_MISSING_OR_INDENTATION_PROBLEM_MSG);
+        exception.expectMessage(ParserExceptionHandler.CANNOT_CREATE_PROPERTY_ERROR);
+        exception.expectMessage(ParserExceptionHandler.KEY_VALUE_PAIR_MISSING_OR_INDENTATION_PROBLEM_MSG);
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -172,8 +176,8 @@ public class CompilerErrorsTest {
         path.add(SlangSource.fromFile(operations));
         path.add(SlangSource.fromFile(flows));
         exception.expect(RuntimeException.class);
-        exception.expectMessage(YamlParser.SCANNING_A_SIMPLE_KEY_ERROR);
-        exception.expectMessage(YamlParser.KEY_VALUE_PAIR_MISSING_OR_INDENTATION_PROBLEM_MSG);
+        exception.expectMessage(ParserExceptionHandler.SCANNING_A_SIMPLE_KEY_ERROR);
+        exception.expectMessage(ParserExceptionHandler.KEY_VALUE_PAIR_MISSING_OR_INDENTATION_PROBLEM_MSG);
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -185,7 +189,7 @@ public class CompilerErrorsTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Task1");
+        exception.expectMessage("Step1");
         exception.expectMessage("SUCCESS");
         exception.expectMessage("navigation");
         compiler.compile(SlangSource.fromFile(resource), path);
@@ -193,13 +197,13 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithMissingNavigationFromOperationResult() throws Exception {
-        URI resource = getClass().getResource("/corrupted/task_with_missing_navigation_from_operation_result_flow.sl").toURI();
+        URI resource = getClass().getResource("/corrupted/step_with_missing_navigation_from_operation_result_flow.sl").toURI();
         URI operations = getClass().getResource("/java_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("task1");
+        exception.expectMessage("step1");
         exception.expectMessage("FAILURE");
         exception.expectMessage("user.ops.java_op");
         exception.expectMessage("navigation");
@@ -213,6 +217,16 @@ public class CompilerErrorsTest {
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("imports");
+        compiler.compile(SlangSource.fromFile(resource), path);
+    }
+
+    @Test
+    public void testOpWithMissingNamespace() throws Exception {
+        URI resource = getClass().getResource("/corrupted/op_without_namespace.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("must have a namespace");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -286,69 +300,69 @@ public class CompilerErrorsTest {
     }
 
     @Test
-    public void testFlowTaskWithNoData() throws Exception {
-        URI resource = getClass().getResource("/corrupted/no_task_data_flow.sl").toURI();
+    public void testFlowStepWithNoData() throws Exception {
+        URI resource = getClass().getResource("/corrupted/no_step_data_flow.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("task1");
+        exception.expectMessage("step1");
         exception.expectMessage("data");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
-    public void testFlowTaskWithTwoKeysUnderDo() throws Exception {
+    public void testFlowStepWithTwoKeysUnderDo() throws Exception {
         URI resource = getClass().getResource("/corrupted/multiple_keys_under_do.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("task1");
+        exception.expectMessage("step1");
         exception.expectMessage("to many keys");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
-    public void testFlowWithTasksAsList() throws Exception {
-        URI resource = getClass().getResource("/corrupted/workflow_with_task_map.sl").toURI();
+    public void testFlowWithStepsAsList() throws Exception {
+        URI resource = getClass().getResource("/corrupted/workflow_with_step_map.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("workflow_with_task_map");
+        exception.expectMessage("workflow_with_step_map");
         exception.expectMessage("map");
         exception.expectMessage("list");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
-    public void testFlowWithOnFailureTasksAsList() throws Exception {
-        URI resource = getClass().getResource("/corrupted/on_failure_with_task_map.sl").toURI();
+    public void testFlowWithOnFailureStepsAsList() throws Exception {
+        URI resource = getClass().getResource("/corrupted/on_failure_with_step_map.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("on_failure_with_task_map");
+        exception.expectMessage("on_failure_with_step_map");
         exception.expectMessage("map");
         exception.expectMessage("list");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
-    public void testFlowWithNoRefTask() throws Exception {
-        URI resource = getClass().getResource("/corrupted/task_with_no_ref_flow.sl").toURI();
+    public void testFlowWithNoRefStep() throws Exception {
+        URI resource = getClass().getResource("/corrupted/step_with_no_ref_flow.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("task1");
+        exception.expectMessage("step1");
         exception.expectMessage("reference");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
-    public void testTaskWithListOfOps() throws Exception {
-        URI resource = getClass().getResource("/corrupted/task_with_list_of_ops.sl").toURI();
+    public void testStepWithListOfOps() throws Exception {
+        URI resource = getClass().getResource("/corrupted/step_with_list_of_ops.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("task1");
+        exception.expectMessage("step1");
         exception.expectMessage("map");
         exception.expectMessage("list");
         exception.expectMessage("-");
@@ -356,12 +370,12 @@ public class CompilerErrorsTest {
     }
 
     @Test
-    public void testTaskWithListOfDos() throws Exception {
-        URI resource = getClass().getResource("/corrupted/task_with_list_of_do_flow.sl").toURI();
+    public void testStepWithListOfDos() throws Exception {
+        URI resource = getClass().getResource("/corrupted/step_with_list_of_do_flow.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("task1");
+        exception.expectMessage("step1");
         exception.expectMessage("map");
         exception.expectMessage("do:");
         compiler.compile(SlangSource.fromFile(resource), path);
@@ -369,7 +383,7 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithMissingRefInPath() throws Exception {
-        URI resource = getClass().getResource("/flow.yaml").toURI();
+        URI resource = getClass().getResource("/basic_flow.yaml").toURI();
         URI op = getClass().getResource("/operation_with_data.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
@@ -382,11 +396,11 @@ public class CompilerErrorsTest {
     }
 
     @Test
-    public void testInputNotOverridableAndNoDefault() throws Exception {
-        URI resource = getClass().getResource("/non_overridable_input_without_default.sl").toURI();
+    public void testInputPrivateAndNoDefault() throws Exception {
+        URI resource = getClass().getResource("/private_input_without_default.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("overridable");
+        exception.expectMessage("private");
         exception.expectMessage("default");
         exception.expectMessage("input_without_default");
         compiler.compile(SlangSource.fromFile(resource), path);
@@ -432,56 +446,54 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("operation_with_list_of_action_types");
-        exception.expectMessage("'action'");
-        exception.expectMessage("'python_script:'");
+        exception.expectMessage("'python_action'");
+        exception.expectMessage("there should be a map of values, but instead there is a list");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
     public void testParentFlowWithCorruptedSubFlow() throws Exception {
-        URI resource = getClass().getResource("/corrupted/parent_flow_to_no_task_data_flow.sl").toURI();
-        URI subFlow = getClass().getResource("/corrupted/no_task_data_flow.sl").toURI();
+        URI resource = getClass().getResource("/corrupted/parent_flow_to_no_step_data_flow.sl").toURI();
+        URI subFlow = getClass().getResource("/corrupted/no_step_data_flow.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(subFlow));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("no_task_data_flow.sl");
-        exception.expectMessage("Error");
+        exception.expectMessage("step1");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
-    public void testTaskWithNavigateAsString() throws Exception {
-        URI resource = getClass().getResource("/corrupted/task_with_string_navigate_value.sl").toURI();
+    public void testStepWithNavigateAsString() throws Exception {
+        URI resource = getClass().getResource("/corrupted/step_with_string_navigate_value.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("'navigate'");
-        exception.expectMessage("map");
+        exception.expectMessage("list");
         exception.expectMessage("string");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
-    public void testTaskWithIllegalTypeOfNavigate() throws Exception {
-        URI resource = getClass().getResource("/corrupted/task_with_illegal_navigate_type.sl").toURI();
+    public void testStepWithIllegalTypeOfNavigate() throws Exception {
+        URI resource = getClass().getResource("/corrupted/step_with_illegal_navigate_type.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("task1");
+        exception.expectMessage("step1");
         exception.expectMessage("navigate");
         exception.expectMessage("3");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
-    public void testDuplicateTaskNamesInFlow() throws Exception {
-        URI resource = getClass().getResource("/corrupted/duplicate_task_name.sl").toURI();
+    public void testDuplicateStepNamesInFlow() throws Exception {
+        URI resource = getClass().getResource("/corrupted/duplicate_step_name.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Task1");
+        exception.expectMessage("Step1");
         exception.expectMessage("unique");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
@@ -496,5 +508,49 @@ public class CompilerErrorsTest {
         exception.expectMessage("input1");
         exception.expectMessage("null");
         compiler.compile(SlangSource.fromFile(resource), path);
+    }
+
+    @Test
+    public void testValidationOfFlowWithMissingNavigationFromOperationResult()throws Exception {
+        URI flowUri = getClass().getResource("/corrupted/step_with_missing_navigation_from_operation_result_flow.sl").toURI();
+        Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
+
+        URI operationUri = getClass().getResource("/java_op.sl").toURI();
+        Executable operationModel = compiler.preCompile(SlangSource.fromFile(operationUri));
+        Set<Executable> dependencies = new HashSet<>();
+        dependencies.add(operationModel);
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("step1");
+        exception.expectMessage("FAILURE");
+        exception.expectMessage("user.ops.java_op");
+        exception.expectMessage("navigation");
+        List<RuntimeException> errors = compiler.validateSlangModelWithDependencies(flowModel, dependencies);
+        Assert.assertEquals(1, errors.size());
+        throw errors.get(0);
+    }
+
+    @Test
+    public void testValidationOfFlowWithMissingDependencyRequiredInputInStep()throws Exception {
+        URI flowUri = getClass().getResource("/corrupted/flow_missing_dependency_required_input_in_step.sl").toURI();
+        Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
+
+        URI operation1Uri = getClass().getResource("/test_op.sl").toURI();
+        Executable operation1Model = compiler.preCompile(SlangSource.fromFile(operation1Uri));
+        URI operation2Uri = getClass().getResource("/check_op.sl").toURI();
+        Executable operation2Model = compiler.preCompile(SlangSource.fromFile(operation2Uri));
+        Set<Executable> dependencies = new HashSet<>();
+        dependencies.add(operation1Model);
+        dependencies.add(operation2Model);
+
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("explicit_alias");
+        exception.expectMessage("user.ops.test_op");
+        exception.expectMessage("mandatory");
+        exception.expectMessage("inputs");
+        exception.expectMessage("alla");
+        List<RuntimeException> errors = compiler.validateSlangModelWithDependencies(flowModel, dependencies);
+        Assert.assertEquals(1, errors.size());
+        throw errors.get(0);
     }
 }

@@ -28,8 +28,8 @@ flow:
             - name_list: ${ map(lambda x:str(x['name']), branches_context) }
             - number_from_last_branch: ${ branches_context[-1]['number'] }
         navigate:
-            SUCCESS: print_list
-            FAILURE: FAILURE
+            - SUCCESS: print_list
+            - FAILURE: FAILURE
 
     - print_list:
         do:

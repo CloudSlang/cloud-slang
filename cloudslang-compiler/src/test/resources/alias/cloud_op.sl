@@ -11,5 +11,5 @@ operation:
   name: cloud_op
   inputs:
     - cool_input: 1992
-  action:
-    python_script: 'print "hello world"'
+  python_action:
+    script: 'print "hello world"'

@@ -34,5 +34,18 @@ curl -X POST -s -H "Authorization:token ${GHUSERTOKEN}" -H "Content-Type:applica
 FILESIZE=`stat -c '%s' "$CLI_GZIP_PATH"`
 curl -X POST -s -H "Authorization:token ${GHUSERTOKEN}" -H "Content-Type:application/gzip" --data-binary "@${CLI_GZIP_PATH}" "${UPLOAD_URL}?name=cslang-cli-with-content.tar.gzip&size=$FILESIZE"
 
-echo -e "\n\nRemoving pre-release from release"
-curl -XPATCH -H "Authorization:token ${GHUSERTOKEN}" -d '{"prerelease": false}' "${RELEASES_URL}/${RELEASEID}"
+# Processing pre-release
+PRE_RELEASE_VALUE='false'
+PRE_RELEASE_MESSAGE="\n\nMarking as release"
+for VALUE in 'true' 'True' 'TRUE' 'yes'
+do
+  if [ "${PRE_RELEASE}" = "${VALUE}" ]
+  then
+    PRE_RELEASE_VALUE='true'
+    PRE_RELEASE_MESSAGE="\n\nMarking as pre-release"
+    continue
+  fi
+done
+echo -e ${PRE_RELEASE_MESSAGE}
+REQUEST_BODY='{"prerelease": '${PRE_RELEASE_VALUE}'}'
+curl -XPATCH -H "Authorization:token ${GHUSERTOKEN}" -d "${REQUEST_BODY}" "${RELEASES_URL}/${RELEASEID}"

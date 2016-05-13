@@ -11,17 +11,19 @@ package io.cloudslang.lang.runtime.bindings;
 
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.utils.ExpressionUtils;
+import io.cloudslang.lang.entities.utils.MapUtils;
+import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * User: stoneo
@@ -29,7 +31,7 @@ import java.util.Map;
  * Time: 09:32
  */
 @Component
-public class ResultsBinding extends Binding {
+public class ResultsBinding {
 
     @Autowired
     public ScriptEvaluator scriptEvaluator;
@@ -52,6 +54,7 @@ public class ResultsBinding extends Binding {
      */
     public String resolveResult(Map<String, Serializable> inputs,
                                 Map<String, Serializable> context,
+                                Set<SystemProperty> systemProperties,
                                 List<Result> possibleResults,
                                 String presetResult) {
 
@@ -60,7 +63,7 @@ public class ResultsBinding extends Binding {
             throw new RuntimeException("No results were found");
         }
 
-        // In case of calculating the result of a flow, we already have a preset result from the last task of the flow,
+        // In case of calculating the result of a flow, we already have a preset result from the last step of the flow,
         // we look for it in the possible results of the flow.
         // If the flow has it as a possible result, we return it as the resolved result.
         // If not, we throw an exception
@@ -70,7 +73,7 @@ public class ResultsBinding extends Binding {
                     return presetResult;
                 }
             }
-            throw new RuntimeException("Result: " + presetResult + " that was calculated in the last task is not a possible result of the flow.");
+            throw new RuntimeException("Result: " + presetResult + " that was calculated in the last step is not a possible result of the flow.");
         }
 
         // In the case of operation, we resolve the result by searching for the first result with a true expression
@@ -84,15 +87,15 @@ public class ResultsBinding extends Binding {
                 return resultName;
             }
 
-            if(rawValue == Boolean.TRUE) {
+            if(Boolean.TRUE.equals(rawValue)) {
                 return resultName;
             }
-            if (rawValue == Boolean.FALSE) {
+            if (Boolean.FALSE.equals(rawValue)) {
                 continue;
             }
 
             if (rawValue instanceof String) {
-                String expression = extractExpression(rawValue);
+                String expression = ExpressionUtils.extractExpression(rawValue);
                 if (expression == null) {
                     throw new RuntimeException(
                             "Error resolving the result. The expression: '" + rawValue + "' is not valid." +
@@ -100,17 +103,10 @@ public class ResultsBinding extends Binding {
                                     " expression " + ScoreLangConstants.EXPRESSION_END_DELIMITER);
                 }
 
-                //construct script context
-                Map<String, Serializable> scriptContext = new HashMap<>();
-                //put action outputs
-                scriptContext.putAll(context);
-                //put executable inputs as a map
-                if (MapUtils.isNotEmpty(inputs)) {
-                    scriptContext.put(ScoreLangConstants.BIND_OUTPUT_FROM_INPUTS_KEY, (Serializable) inputs);
-                }
+                Map<String, Serializable> scriptContext = MapUtils.mergeMaps(inputs, context);
 
                 try {
-                    Serializable expressionResult = scriptEvaluator.evalExpr(expression, scriptContext);
+                    Serializable expressionResult = scriptEvaluator.evalExpr(expression, scriptContext, systemProperties, result.getFunctionDependencies());
                     Boolean evaluatedResult;
                     if (expressionResult instanceof Integer) {
                         evaluatedResult = (Integer) expressionResult != 0;

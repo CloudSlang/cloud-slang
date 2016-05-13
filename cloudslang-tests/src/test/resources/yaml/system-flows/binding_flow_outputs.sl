@@ -24,6 +24,8 @@ flow:
         publish:
           - weather
   outputs:
-    - weather1: ${ self['city_name'] }
+    - weather1: ${ city_name }
     - weather2: ${ weather1 }
     - weather3: ${ weather1 + " day" }
+    - null_output_no_expression
+    - null_output_expression: ${ null_output_expression }

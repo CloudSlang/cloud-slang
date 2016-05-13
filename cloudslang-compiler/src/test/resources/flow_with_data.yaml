@@ -21,6 +21,7 @@ flow:
           ops.check_Weather:
             - city: city_name
             - country: 'Israel'
+            - alla: 'walla'
         publish:
           - weather
   outputs:

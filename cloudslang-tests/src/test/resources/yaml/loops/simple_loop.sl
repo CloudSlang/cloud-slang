@@ -21,3 +21,4 @@ flow:
           do:
             ops.print:
               - text: ${ value }
+              - sp_arg: ${get_sp('loop.for.prop1')}

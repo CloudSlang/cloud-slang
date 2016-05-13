@@ -11,21 +11,21 @@ imports:
  ops: system.ops
 
 flow:
-  name: data_flow
+  name: bindings_flow
   inputs:
     - base_input
     - bound_input:
         default: ${ base_input + ">" }
 
   workflow:
-    - Task_1:
+    - Step_1:
         do:
           ops.binding_flow_op:
             - base_input: ${ bound_input + ">" }
         publish:
           - bound_input: ${ bound_output + "<" }
 
-    - Task_2:
+    - Step_2:
         do:
           ops.binding_flow_op:
             - base_input: ${ bound_input + ">" }

@@ -9,15 +9,14 @@
 package io.cloudslang.lang.cli.utils;
 
 import ch.lambdaj.function.convert.Converter;
-
-
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.SystemProperty;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -28,17 +27,9 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import static ch.lambdaj.Lambda.*;
-
-import static org.hamcrest.Matchers.*;
+import static ch.lambdaj.Lambda.convert;
 
 /**
  * @author lesant
@@ -48,11 +39,11 @@ import static org.hamcrest.Matchers.*;
 @Component
 public class CompilerHelperImpl implements CompilerHelper{
 
+    public static final String INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX = "' is not a directory";
     private static final Logger logger = Logger.getLogger(CompilerHelperImpl.class);
-    private String[] SLANG_FILE_EXTENSIONS = {"sl", "sl.yaml", "sl.yml"};
-    private static final String[] YAML_FILE_EXTENSIONS = {"yaml", "yml"};
     private static final String SP_DIR = "properties"; //TODO reconsider it after closing CloudSlang file extensions & some real usecases
     private static final String INPUT_DIR = "inputs";
+    private static final String CONFIG_DIR = "configuration";
 
     @Autowired
     private Slang slang;
@@ -65,9 +56,7 @@ public class CompilerHelperImpl implements CompilerHelper{
         Set<SlangSource> depsSources = new HashSet<>();
         File file = new File(filePath);
         Validate.isTrue(file.isFile(), "File: " + file.getName() + " was not found");
-
-        boolean validFileExtension = checkIsFileSupported(file);
-        Validate.isTrue(validFileExtension, "File: " + file.getName() + " must have one of the following extensions: sl, sl.yaml, sl.yml");
+        Extension.validateSlangFileExtension(file.getName());
 
         if (CollectionUtils.isEmpty(dependencies)) {
             dependencies = new ArrayList<>();
@@ -84,13 +73,11 @@ public class CompilerHelperImpl implements CompilerHelper{
             }
         }
         for (String dependency:dependencies) {
-            Collection<File> dependenciesFiles = FileUtils.listFiles(new File(dependency), SLANG_FILE_EXTENSIONS, true);
-            depsSources.addAll(convert(dependenciesFiles, new Converter<File, SlangSource>() {
-                @Override
-                public SlangSource convert(File from) {
-                    return SlangSource.fromFile(from);
-                }
-            }));
+            Collection<File> dependenciesFiles = listSlangFiles(new File(dependency), true);
+            for (File dependencyCandidate : dependenciesFiles) {
+                SlangSource source = SlangSource.fromFile(dependencyCandidate);
+                depsSources.add(source);
+            }
         }
         try {
             return slang.compile(SlangSource.fromFile(file), depsSources);
@@ -100,33 +87,32 @@ public class CompilerHelperImpl implements CompilerHelper{
         }
     }
 
-	@Override
-	public Map<String, ? extends Serializable> loadSystemProperties(List<String> systemPropertyFiles) {
-		return loadFiles(systemPropertyFiles, YAML_FILE_EXTENSIONS, SP_DIR);
-	}
-
     @Override
-    public Map<String, ? extends Serializable> loadInputsFromFile(List<String> inputFiles) {
-        return loadFiles(inputFiles, YAML_FILE_EXTENSIONS, INPUT_DIR);
+    public Set<SystemProperty> loadSystemProperties(List<String> systemPropertyFiles) {
+        String propertiesRelativePath = CONFIG_DIR + File.separator + SP_DIR;
+        return loadPropertiesFromFiles(convertToFiles(systemPropertyFiles),
+                Extension.getPropertiesFileExtensionValues(), propertiesRelativePath);
     }
 
-    private Map<String, ? extends Serializable> loadFiles(List<String> files, String[] extensions, String directory) {
+    @Override
+    public Map<String, Serializable> loadInputsFromFile(List<String> inputFiles) {
+        String inputsRelativePath = CONFIG_DIR + File.separator + INPUT_DIR;
+        return loadMapsFromFiles(convertToFiles(inputFiles), Extension.getYamlFileExtensionValues(), inputsRelativePath);
+    }
+
+    private Map<String, Serializable> loadMapsFromFiles(List<File> files, String[] extensions, String directory) {
+        Collection<File> fileCollection;
         if(CollectionUtils.isEmpty(files)) {
-            Collection<File> implicitFiles = FileUtils.listFiles(new File("."), extensions, false);
-            implicitFiles = select(implicitFiles, having(on(File.class).getPath(), containsString(directory)));
-            files = convert(implicitFiles, new Converter<File, String>() {
-                @Override
-                public String convert(File from) {
-                    return from.getPath();
-                }
-            });
+            fileCollection = loadDefaultFiles(extensions, directory, false);
+            if(CollectionUtils.isEmpty(fileCollection)) return null;
+        } else {
+            fileCollection = files;
         }
-        if(CollectionUtils.isEmpty(files)) return null;
         Map<String, Serializable> result = new HashMap<>();
-		for(String inputFile : files) {
+		for(File inputFile : fileCollection) {
 			logger.info("Loading file: " + inputFile);
 			try {
-                String inputsFileContent = FileUtils.readFileToString(new File(inputFile));
+                String inputsFileContent = SlangSource.fromFile(inputFile).getSource();
                 Boolean emptyContent = true;
                 if (StringUtils.isNotEmpty(inputsFileContent)) {
                     @SuppressWarnings("unchecked") Map<String, ? extends Serializable> inputFileYamlContent =
@@ -136,22 +122,77 @@ public class CompilerHelperImpl implements CompilerHelper{
                         result.putAll(inputFileYamlContent);
                     }
                 }
-                if (emptyContent){
-                    throw new RuntimeException("Inputs / System properties file: " + inputFile + " is empty or does not contain valid YAML content.");
+                if (emptyContent) {
+                    throw new RuntimeException("Inputs file: " + inputFile + " is empty or does not contain valid YAML content.");
                 }
-			} catch(IOException ex) {
-				logger.error("Error loading file: " + inputFile, ex);
+			} catch(RuntimeException ex) {
+                logger.error("Error loading file: " + inputFile + ". Nested exception is: " + ex.getMessage(), ex);
 				throw new RuntimeException(ex);
 			}
 		}
         return result;
     }
-    private Boolean checkIsFileSupported(File file){
-        String[] suffixes = new String[SLANG_FILE_EXTENSIONS.length];
-        for(int i = 0; i < suffixes.length; ++i){
-            suffixes[i] = "." + SLANG_FILE_EXTENSIONS[i];
+
+    private Set<SystemProperty> loadPropertiesFromFiles(List<File> files, String[] extensions, String directory) {
+        Collection<File> fileCollection;
+        if(CollectionUtils.isEmpty(files)) {
+            fileCollection = loadDefaultFiles(extensions, directory, true);
+            if(CollectionUtils.isEmpty(fileCollection)) return new HashSet<>();
+        } else {
+            fileCollection = files;
+            for (File propertyFileCandidate : fileCollection) {
+                Extension.validatePropertiesFileExtension(propertyFileCandidate.getName());
+            }
         }
-        return new SuffixFileFilter(suffixes).accept(file);
+        Set<SystemProperty> result = new HashSet<>();
+        for(File propFile : fileCollection) {
+            try {
+                SlangSource source = SlangSource.fromFile(propFile);
+                logger.info("Loading file: " + propFile);
+                Set<SystemProperty> propsFromFile = slang.loadSystemProperties(source);
+                result.addAll(propsFromFile);
+            } catch(Throwable ex) {
+                String errorMessage = "Error loading file: " + propFile + " nested exception is " + ex.getMessage();
+                logger.error(errorMessage, ex);
+                throw new RuntimeException(errorMessage, ex);
+            }
+        }
+        return result;
+    }
+
+    private Collection<File> loadDefaultFiles(String[] extensions, String directory, boolean recursive) {
+        Collection<File> files;
+        String appHome = System.getProperty("app.home", "");
+        String defaultDirectoryPath = appHome + File.separator + directory;
+        File defaultDirectory = new File(defaultDirectoryPath);
+        if (defaultDirectory.isDirectory()) {
+            files = FileUtils.listFiles(defaultDirectory, extensions, recursive);
+        } else {
+            files = Collections.emptyList();
+        }
+        return files;
+    }
+
+    private List<File> convertToFiles(List<String> fileList) {
+        return convert(fileList, new Converter<String, File>() {
+            @Override
+            public File convert(String from) {
+                return new File(from);
+            }
+        });
+    }
+
+    // e.g. exclude .prop.sl from .sl set
+    private Collection<File> listSlangFiles(File directory, boolean recursive) {
+        Validate.isTrue(directory.isDirectory(), "Parameter '" + directory.getPath() + INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX);
+        Collection<File> dependenciesFiles = FileUtils.listFiles(directory, Extension.getSlangFileExtensionValues(), recursive);
+        Collection<File> result = new ArrayList<>();
+        for (File file : dependenciesFiles) {
+            if (Extension.SL.equals(Extension.findExtension(file.getName()))) {
+                result.add(file);
+            }
+        }
+        return result;
     }
 
 }

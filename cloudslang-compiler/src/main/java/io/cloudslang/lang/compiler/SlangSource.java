@@ -9,10 +9,13 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler;
 
+import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,13 +25,15 @@ import java.nio.charset.Charset;
 public class SlangSource {
 
     private final String source;
-    private final String name;
+    private final String fileName;
+    private final Extension fileExtension;
 
-    public SlangSource(String source, String name) {
+    public SlangSource(String source, String fileName) {
         Validate.notNull(source, "Source cannot be null");
 
         this.source = source;
-        this.name = name;
+        this.fileName = Extension.removeExtension(fileName);
+        this.fileExtension = Extension.findExtension(fileName);
     }
 
     public static SlangSource fromFile(File file) {
@@ -37,27 +42,53 @@ public class SlangSource {
 
         String source;
         try {
-            source = FileUtils.readFileToString(file, Charset.defaultCharset());
+            source = readFileToString(file);
         } catch (IOException e) {
-            throw new RuntimeException("There was a problem reading the yaml file: " + file.getName(), e);
+            throw new RuntimeException("There was a problem reading the file: " + file.getName(), e);
         }
         return new SlangSource(source, file.getName());
+    }
+
+    private static String readFileToString(File file) throws IOException {
+        Charset charset = getCharset();
+        return FileUtils.readFileToString(file, charset);
+    }
+
+    private static Charset getCharset() {
+        Charset charset = Charset.defaultCharset();
+        String cslangEncoding = System.getProperty(SlangSystemPropertyConstant.CSLANG_ENCODING.getValue());
+        if (!StringUtils.isEmpty(cslangEncoding)) {
+            charset = Charset.forName(cslangEncoding);
+        }
+        return charset;
     }
 
     public static SlangSource fromFile(URI uri) {
         return fromFile(new File(uri));
     }
 
-    public static SlangSource fromBytes(byte[] bytes, String name) {
-        return new SlangSource(new String(bytes), name);
+    public static SlangSource fromBytes(byte[] bytes, String fileName) {
+        return new SlangSource(new String(bytes, getCharset()), fileName);
     }
 
     public String getSource() {
         return source;
     }
 
-    public String getName() {
-        return name;
+    public String getFileName() {
+        return fileName;
+    }
+
+    public Extension getFileExtension() {
+        return fileExtension;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("source", source)
+                .append("fileName", fileName)
+                .toString();
     }
 
     @Override
@@ -69,7 +100,7 @@ public class SlangSource {
 
         return new EqualsBuilder()
                 .append(source, that.source)
-                .append(name, that.name)
+                .append(fileName, that.fileName)
                 .isEquals();
     }
 
@@ -77,7 +108,7 @@ public class SlangSource {
     public int hashCode() {
         return new HashCodeBuilder()
                 .append(source)
-                .append(name)
+                .append(fileName)
                 .toHashCode();
     }
 }

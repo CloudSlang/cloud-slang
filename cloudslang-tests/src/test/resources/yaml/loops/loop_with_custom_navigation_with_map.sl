@@ -24,13 +24,8 @@ flow:
                 - text: ${ k }
                 - text2: ${ v }
         navigate:
-          SUCCESS: print_other_values
-          FAILURE: FAILURE
-
-    - task_that_doesnt_run:
-        do:
-          ops.print:
-            - text: "I don't run"
+          - SUCCESS: print_other_values
+          - FAILURE: FAILURE
 
     - print_other_values:
         do:

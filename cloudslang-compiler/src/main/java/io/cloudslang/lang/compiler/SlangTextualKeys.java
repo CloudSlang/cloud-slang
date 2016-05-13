@@ -21,6 +21,7 @@ public interface SlangTextualKeys {
     String OUTPUTS_KEY = "outputs";
     String FLOW_TYPE = "flow";
     String OPERATION_TYPE = "operation";
+    String EXTENSIONS_KEY = "extensions";
 
     //flow
     String EXECUTABLE_NAME_KEY = "name";
@@ -28,12 +29,15 @@ public interface SlangTextualKeys {
     String ON_FAILURE_KEY = "on_failure";
 
     //action
-    String JAVA_ACTION = "java_action";
+    String JAVA_ACTION_KEY = "java_action";
+    String JAVA_ACTION_CLASS_NAME_KEY = "class_name";
+    String JAVA_ACTION_METHOD_NAME_KEY = "method_name";
+    String JAVA_ACTION_GAV_KEY = "gav";
+    String PYTHON_ACTION_KEY = "python_action";
+    String PYTHON_ACTION_SCRIPT_KEY = "script";
+    String PYTHON_ACTION_DEPENDENCIES_KEY = "dependencies";
 
-    //operation
-    String ACTION_KEY = "action";
-
-    //task
+    //step
     String DO_KEY = "do";
     String FOR_KEY = "for";
     String BREAK_KEY = "break";
@@ -45,8 +49,9 @@ public interface SlangTextualKeys {
     String DEFAULT_KEY = "default";
     String REQUIRED_KEY = "required";
     String ENCRYPTED_KEY = "encrypted";
-    String OVERRIDABLE_KEY = "overridable";
-    String SYSTEM_PROPERTY_KEY = "system_property";
+    String PRIVATE_INPUT_KEY = "private";
+
+    // system properties
+    String SYSTEM_PROPERTY_KEY = "properties";
 
 }
-

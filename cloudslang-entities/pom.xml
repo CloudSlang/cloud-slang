@@ -14,7 +14,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.8.8-SNAPSHOT</version>
+        <version>0.9.58-SNAPSHOT</version>
     </parent>
 
 	<dependencies>
@@ -22,10 +22,16 @@
 			<groupId>${score.group}</groupId>
 			<artifactId>score-api</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+        </dependency>
 
         <!--test deps-->
 
@@ -37,6 +43,12 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <scope>test</scope>
         </dependency>
 	</dependencies>
 </project>

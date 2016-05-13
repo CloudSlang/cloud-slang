@@ -70,11 +70,11 @@ public class SyncTriggerEventListenerTest {
     }
 
     @Test
-    public void testExtractTaskOutputs() throws InterruptedException {
+    public void testExtractStepOutputs() throws InterruptedException {
         outputs.put(RETURN_RESULT, RESULT);
         outputs.put(ERROR_MESSAGE, StringUtils.EMPTY);
         data.put(LanguageEventData.OUTPUTS, (Serializable)outputs);
-        data.put(LanguageEventData.STEP_TYPE, LanguageEventData.StepType.TASK);
+        data.put(LanguageEventData.STEP_TYPE, LanguageEventData.StepType.STEP);
 
         expectedFilteredOutputs = new HashMap<>();
         expectedFilteredOutputs.put(RETURN_RESULT, RESULT);
@@ -85,10 +85,10 @@ public class SyncTriggerEventListenerTest {
     }
 
     @Test
-    public void testExtractTaskOutputsEmpty() throws InterruptedException {
+    public void testExtractStepOutputsEmpty() throws InterruptedException {
         outputs.put(ERROR_MESSAGE, StringUtils.EMPTY);
         data.put(LanguageEventData.OUTPUTS, (Serializable)outputs);
-        data.put(LanguageEventData.STEP_TYPE, LanguageEventData.StepType.TASK);
+        data.put(LanguageEventData.STEP_TYPE, LanguageEventData.StepType.STEP);
 
         actualFilteredOutputs = SyncTriggerEventListener.extractNotEmptyOutputs(data);
 

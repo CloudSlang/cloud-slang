@@ -55,8 +55,8 @@ public class CompileFlowWithOnFailureTest {
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
-        Assert.assertEquals("there is a different number of steps than expected", 10, executionPlan.getSteps().size());
-        Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());
+        Assert.assertEquals("there is a different number of steps than expected", 8, executionPlan.getSteps().size());
+        Assert.assertEquals("execution plan name is different than expected", "flow_with_on_failure", executionPlan.getName());
         Assert.assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
         Assert.assertEquals("the inputs size is not as expected", 1, compilationArtifact.getInputs().size());
 
@@ -69,13 +69,6 @@ public class CompileFlowWithOnFailureTest {
         Assert.assertEquals(endFlowStep, getFailureNavigationStepId(secondStep));
         ExecutionStep firstOnFailStep = executionPlan.getStep(7L);
         Assert.assertEquals(endFlowStep, getFailureNavigationStepId(firstOnFailStep));
-        ExecutionStep secondOnFailStep = executionPlan.getStep(9L);
-        Assert.assertEquals(endFlowStep, getFailureNavigationStepId(secondOnFailStep));
-        Map<String, ResultNavigation> secondOnFailStepNavigationMap = getNavigationMap(secondOnFailStep);
-        ResultNavigation secondOnFailStepResultSuccessNavigation =
-                secondOnFailStepNavigationMap.get(ScoreLangConstants.SUCCESS_RESULT);
-        Assert.assertEquals("on failure success should navigate to failure",
-                ScoreLangConstants.FAILURE_RESULT, secondOnFailStepResultSuccessNavigation.getPresetResult());
     }
 
     @Test
@@ -92,6 +85,21 @@ public class CompileFlowWithOnFailureTest {
         compiler.compile(SlangSource.fromFile(flow), path);
     }
 
+    @Test
+    public void testCompileSameNameInFlowAndOnFailure() throws Exception {
+        URI flow = getClass().getResource("/corrupted/same_step_name_in_flow_and_on_failure.sl").toURI();
+        URI operation = getClass().getResource("/fail_on_input_op.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+
+        expectedException.expectMessage(ExecutableBuilder.UNIQUE_STEP_NAME_MESSAGE_SUFFIX);
+        expectedException.expectMessage("step_same_name");
+        expectedException.expect(RuntimeException.class);
+
+        compiler.compile(SlangSource.fromFile(flow), path);
+    }
+
 	private long getFailureNavigationStepId(ExecutionStep firstStep) {
         Map<String, ResultNavigation> navigationData = getNavigationMap(firstStep);
         return navigationData.get(ScoreLangConstants.FAILURE_RESULT).getNextStepId();
@@ -99,7 +107,7 @@ public class CompileFlowWithOnFailureTest {
 
     private Map<String, ResultNavigation> getNavigationMap(ExecutionStep firstStep) {
         @SuppressWarnings("unchecked") Map<String, ResultNavigation> stringResultNavigationMap =
-                (Map<String, ResultNavigation>) firstStep.getActionData().get(ScoreLangConstants.TASK_NAVIGATION_KEY);
+                (Map<String, ResultNavigation>) firstStep.getActionData().get(ScoreLangConstants.STEP_NAVIGATION_KEY);
         return stringResultNavigationMap;
     }
 

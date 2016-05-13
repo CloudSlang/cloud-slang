@@ -11,9 +11,15 @@
 package io.cloudslang.lang.systemtests;
 
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.compiler.SlangCompiler;
+import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
-import org.junit.runner.RunWith;
+import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.score.events.ScoreEvent;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -21,6 +27,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static ch.lambdaj.Lambda.select;
 import static org.hamcrest.Matchers.startsWith;
@@ -47,18 +54,32 @@ public abstract class SystemsTestsParent {
     protected Slang slang;
 
     @Autowired
+    protected SlangCompiler slangCompiler;
+
+    @Autowired
     protected TriggerFlows triggerFlows;
 
-    protected ScoreEvent trigger(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> systemProperties) {
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
+    static {
+        System.setProperty(SlangSystemPropertyConstant.CSLANG_ENCODING.getValue(), "utf-8");
+    }
+
+    protected ScoreEvent trigger(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Set<SystemProperty> systemProperties) {
         return triggerFlows.runSync(compilationArtifact, userInputs, systemProperties);
     }
 
-	public RuntimeInformation triggerWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Map<String, ? extends Serializable> systemProperties) {
+	public RuntimeInformation triggerWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Set<SystemProperty> systemProperties) {
 		return triggerFlows.runWithData(compilationArtifact, userInputs, systemProperties);
 	}
 
-    protected List<String> getTasksOnly(Map<String, StepData> stepsData) {
+    protected List<String> getStepsOnly(Map<String, StepData> stepsData) {
         return select(stepsData.keySet(), startsWith("0."));
+    }
+
+    protected Set<SystemProperty> loadSystemProperties(SlangSource source) {
+        return slang.loadSystemProperties(source);
     }
 
 }

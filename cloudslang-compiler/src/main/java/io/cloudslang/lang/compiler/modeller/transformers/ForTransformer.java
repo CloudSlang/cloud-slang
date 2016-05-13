@@ -25,7 +25,7 @@ public class ForTransformer extends AbstractForTransformer implements Transforme
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Scope.BEFORE_TASK);
+        return Arrays.asList(Scope.BEFORE_STEP);
     }
 
     @Override

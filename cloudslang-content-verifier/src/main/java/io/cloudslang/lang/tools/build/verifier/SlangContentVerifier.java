@@ -9,27 +9,22 @@
  */
 package io.cloudslang.lang.tools.build.verifier;
 
+import io.cloudslang.lang.compiler.Extension;
+import io.cloudslang.lang.compiler.SlangCompiler;
+import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
+import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
+import io.cloudslang.lang.entities.CompilationArtifact;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
-import io.cloudslang.lang.compiler.SlangCompiler;
-import io.cloudslang.lang.compiler.SlangSource;
-import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
-import io.cloudslang.lang.entities.CompilationArtifact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static io.cloudslang.lang.compiler.SlangSource.fromFile;
 
 /**
  * Created by stoneo on 3/15/2015.
@@ -38,8 +33,6 @@ import static io.cloudslang.lang.compiler.SlangSource.fromFile;
 public class SlangContentVerifier {
 
     private final static Logger log = Logger.getLogger(SlangContentVerifier.class);
-
-    private String[] SLANG_FILE_EXTENSIONS = {"sl", "sl.yaml", "sl.yml"};
 
     @Autowired
     private SlangCompiler slangCompiler;
@@ -51,10 +44,11 @@ public class SlangContentVerifier {
         Validate.notEmpty(directoryPath, "You must specify a path");
         Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" + directoryPath + "\' does not lead to a directory");
         Map<String, Executable> slangModels = new HashMap<>();
-        Collection<File> slangFiles = FileUtils.listFiles(new File(directoryPath), SLANG_FILE_EXTENSIONS, true);
+        Collection<File> slangFiles = listSlangFiles(new File(directoryPath), true);
         log.info("Start compiling all slang files under: " + directoryPath);
         log.info(slangFiles.size() + " .sl files were found");
         log.info("");
+        int ignoredExecutables = 0;
         for(File slangFile: slangFiles){
             Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() + "\' must lead to a file");
             Executable sourceModel;
@@ -65,14 +59,15 @@ public class SlangContentVerifier {
                 log.error(errorMessage);
                 throw new RuntimeException(errorMessage, e);
             }
-            if(sourceModel != null) {
+            if (sourceModel != null) {
                 staticSlangFileValidation(slangFile, sourceModel);
                 slangModels.put(getUniqueName(sourceModel), sourceModel);
             }
         }
-        if(slangFiles.size() != slangModels.size()){
-            throw new RuntimeException("Some Slang files were not pre-compiled.\nFound: " + slangFiles.size() +
-                    " slang files in path: \'" + directoryPath + "\' But managed to create slang models for only: " + slangModels.size());
+        int numberOfExecutables = slangFiles.size() - ignoredExecutables;
+        if(numberOfExecutables != slangModels.size()){
+            throw new RuntimeException("Some Slang files were not pre-compiled.\nFound: " + numberOfExecutables +
+                    " executable files in path: \'" + directoryPath + "\' But managed to create slang models for only: " + slangModels.size());
         }
         return slangModels;
     }
@@ -104,7 +99,7 @@ public class SlangContentVerifier {
 
     private Set<Executable> getModelDependenciesRecursively(Map<String, Executable> slangModels, Executable slangModel) {
         Set<Executable> dependenciesModels = new HashSet<>();
-        for (String dependencyName : slangModel.getDependencies()) {
+        for (String dependencyName : slangModel.getExecutableDependencies()) {
             Executable dependency = slangModels.get(dependencyName);
             if(dependency == null){
                 throw new RuntimeException("Failed compiling slang source: " + slangModel.getNamespace() + "." +
@@ -149,11 +144,23 @@ public class SlangContentVerifier {
 
     private void validateExecutableName(File slangFile, Executable executable) {
         // Validate executable name is the same as the file name
-        String[] splitName = slangFile.getName().split("\\Q.");
-        String fileNameNoExtension = splitName[0];
+        String fileNameNoExtension = Extension.removeExtension(slangFile.getName());
         String executableNameErrorMessage = "Error validating Slang file: \'" + slangFile.getAbsoluteFile() +
                 "\'. Name of flow or operation: \'" + executable.getName() +
                 "\' is invalid.\nIt should be identical to the file name: \'" + fileNameNoExtension + "\'";
         Validate.isTrue(fileNameNoExtension.equals(executable.getName()), executableNameErrorMessage);
     }
+
+    // e.g. exclude .prop.sl from .sl set
+    private Collection<File> listSlangFiles(File directory, boolean recursive) {
+        Collection<File> dependenciesFiles = FileUtils.listFiles(directory, Extension.getSlangFileExtensionValues(), recursive);
+        Collection<File> result = new ArrayList<>();
+        for (File file : dependenciesFiles) {
+            if (Extension.SL.equals(Extension.findExtension(file.getName()))) {
+                result.add(file);
+            }
+        }
+        return result;
+    }
+
 }

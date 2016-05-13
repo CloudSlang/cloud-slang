@@ -12,13 +12,16 @@
 package io.cloudslang.lang.systemtests;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import org.junit.Assert;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Bonczidai Levente
@@ -28,23 +31,52 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
 
     protected Map<String, StepData> prepareAndRun(CompilationArtifact compilationArtifact) {
         // trigger
+        return triggerWithData(compilationArtifact, getUserInputs(), getSystemProperties()).getSteps();
+    }
+
+    protected Map<String, StepData> prepareAndRunDefault(CompilationArtifact compilationArtifact) {
+        Map<String, Serializable> userInputs = getUserInputs();
+        userInputs.put("enable_option_for_action", null);
+
+        return triggerWithData(compilationArtifact, userInputs, getSystemProperties()).getSteps();
+    }
+
+    private Set<SystemProperty> getSystemProperties() {
+        return Sets.newHashSet(
+                new SystemProperty("user.sys", "props.host", "localhost")
+        );
+    }
+
+    private Map<String, Serializable> getUserInputs() {
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("input_no_expression", "input_no_expression_value");
-        userInputs.put("input_not_overridable", "i_should_not_be_assigned");
-        Map<String, Serializable> systemProperties = new HashMap<>();
-        systemProperties.put("user.sys.props.host", "localhost");
+        userInputs.put("input_private", "i_should_not_be_assigned");
+        userInputs.put("enable_option_for_action", "enable_option_for_action_value");
+        return userInputs;
+    }
 
-        return triggerWithData(compilationArtifact, userInputs, systemProperties).getTasks();
+    protected void verifyExecutableInputsDefault(StepData flowData) {
+        Map<String, Serializable> expectedInputs = new HashMap<>();
+
+        // snake-case to camel-case
+        expectedInputs.put("enable_option_for_action", null);
+        expectedInputs.put("enableOptionForAction", "default_value");
+
+        Assert.assertTrue("Executable inputs not bound correctly", includeAllPairs(flowData.getInputs(), expectedInputs));
     }
 
     protected void verifyExecutableInputs(StepData flowData) {
         Map<String, Serializable> expectedInputs = new HashMap<>();
 
+        // snake-case to camel-case
+        expectedInputs.put("enable_option_for_action", "enable_option_for_action_value");
+        expectedInputs.put("enableOptionForAction", "enable_option_for_action_value");
+
         // properties
         expectedInputs.put("input_no_expression", "input_no_expression_value");
         expectedInputs.put("input_no_expression_not_required", null);
         expectedInputs.put("input_system_property", "localhost");
-        expectedInputs.put("input_not_overridable", 25);
+        expectedInputs.put("input_private", 25);
 
         // loaded by Yaml
         expectedInputs.put("input_int", 22);
@@ -71,6 +103,7 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
                 "input_expression_characters",
                 "docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ./auth} -p 8888:22 --name test1 -v /data:"
         );
+        expectedInputs.put("step_argument_null", "step_argument_null_value");
 
         Assert.assertTrue("Executable inputs not bound correctly", includeAllPairs(flowData.getInputs(), expectedInputs));
     }
@@ -82,6 +115,7 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         expectedOutputs.put("output_int", 22);
         expectedOutputs.put("output_str", "output_str_value");
         expectedOutputs.put("output_expression", "output_str_value_suffix");
+        expectedOutputs.put("output_step_argument_null", "step_argument_null_value");
 
         Assert.assertEquals("Executable outputs not bound correctly", expectedOutputs, flowData.getOutputs());
     }

@@ -8,14 +8,14 @@
 namespace: system.ops
 
 operation:
-  name: binding_flow_op
+  name: binding_flow_int_op
   inputs:
     - base_input
     - bound_input:
         default: ${ base_input + 1 }
 
-  action:
-    python_script: |
+  python_action:
+    script: |
       bound_result = bound_input + 1
   outputs:
     - bound_output: ${ bound_result + 1 }

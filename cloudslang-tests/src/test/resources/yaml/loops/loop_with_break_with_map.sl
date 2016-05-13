@@ -25,13 +25,8 @@ flow:
           break:
             - CUSTOM
         navigate:
-          CUSTOM: print_other_values
-          SUCCESS: SUCCESS
-
-    - task_that_doesnt_run:
-        do:
-          ops.print:
-            - text: "I don't run"
+          - CUSTOM: print_other_values
+          - SUCCESS: SUCCESS
 
     - print_other_values:
         do:

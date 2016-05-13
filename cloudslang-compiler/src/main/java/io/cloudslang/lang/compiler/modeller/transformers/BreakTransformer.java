@@ -29,7 +29,7 @@ public class BreakTransformer implements Transformer<List<String>, List<String>>
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Scope.AFTER_TASK);
+        return Arrays.asList(Scope.AFTER_STEP);
     }
 
     @Override

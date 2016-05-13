@@ -8,18 +8,15 @@
  */
 package io.cloudslang.lang.api;
 
+import io.cloudslang.lang.compiler.MetadataExtractor;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
-import io.cloudslang.lang.entities.ScoreLangConstants;
-import io.cloudslang.lang.runtime.env.RunEnvironment;
+import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Input;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
+import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.Score;
 import io.cloudslang.score.api.TriggeringProperties;
@@ -27,6 +24,13 @@ import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.python.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +41,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -53,7 +56,7 @@ import static org.mockito.Matchers.*;
 @ContextConfiguration(classes = SlangImplTest.Config.class)
 public class SlangImplTest {
 
-    static final CompilationArtifact emptyCompilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>(), new ArrayList<Input>());
+    static final CompilationArtifact emptyCompilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>(), new HashSet<String>());
     private static final int ALL_EVENTS_SIZE = 24;
 
     @Autowired
@@ -61,6 +64,9 @@ public class SlangImplTest {
 
     @Autowired
     private SlangCompiler compiler;
+
+    @Autowired
+    private MetadataExtractor metadataExtractor;
 
     @Autowired
     private Score score;
@@ -73,6 +79,19 @@ public class SlangImplTest {
         Mockito.reset(score, compiler);
     }
 
+    @Test
+    public void testExtractMetadata() throws IOException {
+        SlangSource tempFile = createTempFile();
+        Mockito.when(metadataExtractor.extractMetadata(any(SlangSource.class))).thenReturn(new Metadata());
+        Metadata metadata = slang.extractMetadata(tempFile);
+        Assert.assertNotNull(metadata);
+        Mockito.verify(metadataExtractor).extractMetadata(tempFile);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testExtractMetadataNoFilePath(){
+        slang.extractMetadata(null);
+    }
 
     @Test
     public void testCompile() throws IOException {
@@ -128,8 +147,12 @@ public class SlangImplTest {
 
     @Test
     public void testRun(){
-		String fqspn = "docker.sys.props.port";
-        Long executionId = slang.run(emptyCompilationArtifact, new HashMap<String, Serializable>(), Collections.singletonMap(fqspn, 22));
+        SystemProperty expectedSystemProperty = new SystemProperty("docker.sys", "props.port", "22");
+        Long executionId = slang.run(
+                emptyCompilationArtifact,
+                new HashMap<String, Serializable>(),
+                Sets.newHashSet(expectedSystemProperty)
+        );
         Assert.assertNotNull(executionId);
 
         ArgumentCaptor<TriggeringProperties> argumentCaptor = ArgumentCaptor.forClass(TriggeringProperties.class);
@@ -139,12 +162,12 @@ public class SlangImplTest {
         RunEnvironment runEnv = (RunEnvironment)triggeringProperties.getContext().get(ScoreLangConstants.RUN_ENV);
         Assert.assertNotNull(runEnv);
         Assert.assertTrue(triggeringProperties.getContext().containsKey(ScoreLangConstants.USER_INPUTS_KEY));
-        Assert.assertTrue(runEnv.getSystemProperties().containsKey(fqspn));
+        Assert.assertTrue(runEnv.getSystemProperties().contains(expectedSystemProperty));
     }
 
     @Test
     public void testRunWithNullInputs(){
-        Long executionId = slang.run(emptyCompilationArtifact, null, null);
+        Long executionId = slang.run(emptyCompilationArtifact, null, new HashSet<SystemProperty>());
         Assert.assertNotNull(executionId);
     }
 
@@ -160,10 +183,10 @@ public class SlangImplTest {
         Slang mockSlang = Mockito.mock(SlangImpl.class);
         SlangSource tempFile = createTempFile();
         Mockito.when(mockSlang.compile(tempFile, new HashSet<SlangSource>())).thenReturn(emptyCompilationArtifact);
-        Mockito.when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class))).thenCallRealMethod();
-        Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
+        Mockito.when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class), anySetOf(SystemProperty.class))).thenCallRealMethod();
+        Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashSet<SystemProperty>());
         Assert.assertNotNull(id);
-        Mockito.verify(mockSlang).run(emptyCompilationArtifact, new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
+        Mockito.verify(mockSlang).run(emptyCompilationArtifact, new HashMap<String, Serializable>(), new HashSet<SystemProperty>());
     }
 
     @Test
@@ -171,10 +194,10 @@ public class SlangImplTest {
         Slang mockSlang = Mockito.mock(SlangImpl.class);
         SlangSource tempFile = createTempFile();
 
-        Mockito.when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class), anyMapOf(String.class, Serializable.class))).thenCallRealMethod();
-        Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
+        Mockito.when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class), anySetOf(SystemProperty.class))).thenCallRealMethod();
+        Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashSet<SystemProperty>());
         Assert.assertNotNull(id);
-        Mockito.verify(mockSlang).compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashMap<String, Serializable>());
+        Mockito.verify(mockSlang).compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashSet<SystemProperty>());
     }
 
     // tests for subscribeOnEvents() method
@@ -232,6 +255,11 @@ public class SlangImplTest {
         @Bean
         public SlangImpl slang(){
             return new SlangImpl();
+        }
+
+        @Bean
+        public MetadataExtractor metadataExtractor() {
+            return Mockito.mock(MetadataExtractor.class);
         }
 
         @Bean

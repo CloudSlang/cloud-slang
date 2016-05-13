@@ -13,6 +13,13 @@ imports:
 flow:
   name: values_flow
   inputs:
+    # snake-case to camel-case
+    - enable_option_for_action:
+         required: false
+    - enableOptionForAction:
+        default: ${get("enable_option_for_action", "default_value")}
+        private: true
+
     # helpers
     - output_no_expression: output_no_expression_value
     - authorized_keys_path: './auth'
@@ -22,11 +29,10 @@ flow:
     - input_no_expression
     - input_no_expression_not_required:
         required: false
-    - input_system_property:
-        system_property: user.sys.props.host
-    - input_not_overridable:
+    - input_system_property: ${get_sp('user.sys.props.host')}
+    - input_private:
         default: 25
-        overridable: false
+        private: true
 
     # loaded by Yaml
     - input_int: 22
@@ -61,8 +67,9 @@ flow:
     - input_expression_characters: >
         ${ 'docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ' + authorized_keys_path + '} -p ' +
         scp_host_port + ':22 --name test1 -v /data:'}
+    - step_argument_null: "step_argument_null_value"
   workflow:
-    - task_standard:
+    - step_standard:
         do:
           ops.values_op:
             # properties
@@ -94,17 +101,20 @@ flow:
                 input_concat_1 +
                 '_suffix'
                 }
+            - step_argument_null: null
         publish:
           - output_no_expression
           - publish_int: 22
           - publish_str: publish_str_value
           - publish_expression: ${ publish_str + '_suffix' }
+          - output_step_argument_null
 
   outputs:
     - output_no_expression
     - output_int: 22
     - output_str: output_str_value
     - output_expression: ${ output_str + '_suffix' }
+    - output_step_argument_null
   results:
     - SUCCESS
     - FAILURE

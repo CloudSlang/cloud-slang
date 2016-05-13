@@ -10,6 +10,7 @@
 package io.cloudslang.lang.entities.bindings;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * @author Bonczidai Levente
@@ -17,8 +18,25 @@ import java.io.Serializable;
  */
 public class Argument extends InOutParam {
 
+    private boolean privateArgument;
+
     public Argument(String name, Serializable value) {
         super(name, value);
+        privateArgument = true;
+    }
+
+    public Argument(
+            String name,
+            Serializable value,
+            Set<ScriptFunction> scriptFunctions,
+            Set<String> systemPropertyDependencies) {
+        super(name, value, scriptFunctions, systemPropertyDependencies);
+        privateArgument = true;
+    }
+
+    public Argument(String name) {
+        super(name, null);
+        privateArgument = false;
     }
 
     /**
@@ -26,6 +44,10 @@ public class Argument extends InOutParam {
      */
     @SuppressWarnings("unused")
     private Argument() {
+    }
+
+    public boolean isPrivateArgument() {
+        return privateArgument;
     }
 
 }

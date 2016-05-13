@@ -14,15 +14,16 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.SystemsTestsParent;
-import io.cloudslang.score.events.ScoreEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +34,9 @@ import java.util.Set;
  * @author lesant
  */
 public class DataFlowTest extends SystemsTestsParent {
+
+    @SuppressWarnings("unchecked")
+    private static final Set<SystemProperty> SYSTEM_PROPERTIES = Collections.EMPTY_SET;
 
     @Test
     public void testDataFlow() throws Exception {
@@ -48,7 +52,7 @@ public class DataFlowTest extends SystemsTestsParent {
         userInputs.put("myMessage", "hello world");
         userInputs.put("tryToChangeMessage", "changed");
 
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, SYSTEM_PROPERTIES).getSteps();
 
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, steps.get(EXEC_START_PATH).getResult());
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, steps.get(FIRST_STEP_PATH).getResult());
@@ -66,7 +70,7 @@ public class DataFlowTest extends SystemsTestsParent {
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("base_input", ">");
 
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, SYSTEM_PROPERTIES).getSteps();
 
         Map<String, Serializable> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
         String final_output = (String) flowOutputs.get("final_output");
@@ -92,7 +96,7 @@ public class DataFlowTest extends SystemsTestsParent {
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("base_input", 1);
 
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, SYSTEM_PROPERTIES).getSteps();
 
         Map<String, Serializable> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
         int final_output = (int) flowOutputs.get("final_output");
@@ -112,7 +116,7 @@ public class DataFlowTest extends SystemsTestsParent {
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("city_name", "New York");
 
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, null).getTasks();
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, SYSTEM_PROPERTIES).getSteps();
 
         Map<String, Serializable> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
         String weatherOutput = (String) flowOutputs.get("weather1");
@@ -122,5 +126,10 @@ public class DataFlowTest extends SystemsTestsParent {
         Assert.assertEquals("weather1 not bound correctly", "New York", weatherOutput);
         Assert.assertEquals("weather2 not bound correctly", "New York", weather2Output);
         Assert.assertEquals("weather3 not bound correctly", "New York day", weather3Output);
+
+        Assert.assertTrue(flowOutputs.containsKey("null_output_no_expression"));
+        Assert.assertTrue(flowOutputs.containsKey("null_output_expression"));
+        Assert.assertNull(flowOutputs.get("null_output_no_expression"));
+        Assert.assertNull(flowOutputs.get("null_output_expression"));
     }
 }

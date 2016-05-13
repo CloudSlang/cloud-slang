@@ -14,7 +14,10 @@ import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.runtime.RuntimeConstants;
-import io.cloudslang.lang.runtime.bindings.*;
+import io.cloudslang.lang.runtime.bindings.AsyncLoopBinding;
+import io.cloudslang.lang.runtime.bindings.LoopsBinding;
+import io.cloudslang.lang.runtime.bindings.OutputsBinding;
+import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
@@ -29,13 +32,13 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.python.google.common.collect.Lists;
+import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.script.ScriptEngine;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,7 +60,7 @@ public class AsyncLoopStepsTest {
     public static final String BRANCH_EXCEPTION_MESSAGE = "Exception details placeholder";
 
     @Autowired
-    private AsyncLoopSteps asyncLoopSteps;
+    private AsyncLoopExecutionData asyncLoopSteps;
 
     @Autowired
     private AsyncLoopBinding asyncLoopBinding;
@@ -94,7 +97,7 @@ public class AsyncLoopStepsTest {
         // prepare mocks
         ExecutionRuntimeServices executionRuntimeServices = mock(ExecutionRuntimeServices.class);
         List<Serializable> expectedSplitData = Lists.newArrayList((Serializable) 1, 2, 3);
-        when(asyncLoopBinding.bindAsyncLoopList(eq(asyncLoopStatement), eq(context), eq(nodeName))).thenReturn(expectedSplitData);
+        when(asyncLoopBinding.bindAsyncLoopList(eq(asyncLoopStatement), eq(context), eq(runEnvironment.getSystemProperties()), eq(nodeName))).thenReturn(expectedSplitData);
         Long branchBeginStepID = 3L;
 
         // call method
@@ -142,7 +145,7 @@ public class AsyncLoopStepsTest {
         // prepare mocks
         ExecutionRuntimeServices executionRuntimeServices = mock(ExecutionRuntimeServices.class);
         List<Serializable> expectedSplitData = Lists.newArrayList((Serializable) 1, 2, 3);
-        when(asyncLoopBinding.bindAsyncLoopList(eq(asyncLoopStatement), eq(context), eq(nodeName))).thenReturn(expectedSplitData);
+        when(asyncLoopBinding.bindAsyncLoopList(eq(asyncLoopStatement), eq(context), eq(runEnvironment.getSystemProperties()), eq(nodeName))).thenReturn(expectedSplitData);
         Long branchBeginStepID = 0L;
 
         // call method
@@ -182,13 +185,13 @@ public class AsyncLoopStepsTest {
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> taskAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
+        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
 
-        Map<String, ResultNavigation> taskNavigationValues = new HashMap<>();
+        Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, ScoreLangConstants.SUCCESS_RESULT);
         ResultNavigation failureNavigation = new ResultNavigation(0L, ScoreLangConstants.FAILURE_RESULT);
-        taskNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
-        taskNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
+        stepNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
+        stepNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
 
         String nodeName = "nodeName";
 
@@ -210,14 +213,19 @@ public class AsyncLoopStepsTest {
         asyncLoopSteps.joinBranches(
                 runEnvironment,
                 executionRuntimeServices,
-                taskAggregateValues,
-                taskNavigationValues,
+                stepAggregateValues,
+                stepNavigationValues,
                 nodeName
         );
 
         // verify expected behaviour
         ArgumentCaptor<Map> aggregateContextArgumentCaptor = ArgumentCaptor.forClass(Map.class);
-        verify(outputsBinding).bindOutputs(eq(context.getImmutableViewOfVariables()), aggregateContextArgumentCaptor.capture(), eq(taskAggregateValues));
+        verify(outputsBinding).bindOutputs(
+                eq(context.getImmutableViewOfVariables()),
+                aggregateContextArgumentCaptor.capture(),
+                eq(runEnvironment.getSystemProperties()),
+                eq(stepAggregateValues)
+        );
 
         @SuppressWarnings("unchecked")
         List<Map<String, Serializable>> expectedBranchContexts = Lists.newArrayList(runtimeContext1, runtimeContext2, runtimeContext3);
@@ -239,13 +247,13 @@ public class AsyncLoopStepsTest {
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> taskAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
+        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
 
-        Map<String, ResultNavigation> taskNavigationValues = new HashMap<>();
+        Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, "CUSTOM_SUCCESS");
         ResultNavigation failureNavigation = new ResultNavigation(0L, "CUSTOM_FAILURE");
-        taskNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
-        taskNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
+        stepNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
+        stepNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
 
         String nodeName = "nodeName";
 
@@ -267,8 +275,8 @@ public class AsyncLoopStepsTest {
         asyncLoopSteps.joinBranches(
                 runEnvironment,
                 executionRuntimeServices,
-                taskAggregateValues,
-                taskNavigationValues,
+                stepAggregateValues,
+                stepNavigationValues,
                 nodeName
         );
 
@@ -289,13 +297,13 @@ public class AsyncLoopStepsTest {
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> taskAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
+        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
 
-        Map<String, ResultNavigation> taskNavigationValues = new HashMap<>();
+        Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, "CUSTOM_SUCCESS");
         ResultNavigation failureNavigation = new ResultNavigation(0L, "CUSTOM_FAILURE");
-        taskNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
-        taskNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
+        stepNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
+        stepNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
 
         String nodeName = "nodeName";
 
@@ -323,8 +331,8 @@ public class AsyncLoopStepsTest {
         asyncLoopSteps.joinBranches(
                 runEnvironment,
                 executionRuntimeServices,
-                taskAggregateValues,
-                taskNavigationValues,
+                stepAggregateValues,
+                stepNavigationValues,
                 nodeName
         );
 
@@ -345,13 +353,13 @@ public class AsyncLoopStepsTest {
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> taskAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
+        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
 
-        Map<String, ResultNavigation> taskNavigationValues = new HashMap<>();
+        Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, ScoreLangConstants.SUCCESS_RESULT);
         ResultNavigation failureNavigation = new ResultNavigation(0L, ScoreLangConstants.FAILURE_RESULT);
-        taskNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
-        taskNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
+        stepNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
+        stepNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
 
         String nodeName = "nodeName";
 
@@ -373,8 +381,8 @@ public class AsyncLoopStepsTest {
         asyncLoopSteps.joinBranches(
                 runEnvironment,
                 executionRuntimeServices,
-                taskAggregateValues,
-                taskNavigationValues,
+                stepAggregateValues,
+                stepNavigationValues,
                 nodeName
         );
 
@@ -502,8 +510,8 @@ public class AsyncLoopStepsTest {
         }
 
         @Bean
-        public AsyncLoopSteps asyncLoopSteps() {
-            return new AsyncLoopSteps();
+        public AsyncLoopExecutionData asyncLoopSteps() {
+            return new AsyncLoopExecutionData();
         }
 
         @Bean
@@ -512,8 +520,8 @@ public class AsyncLoopStepsTest {
         }
 
         @Bean
-        public ScriptEngine scriptEngine(){
-            return mock(ScriptEngine.class);
+        public PythonInterpreter evalInterpreter(){
+            return mock(PythonInterpreter.class);
         }
 
     }

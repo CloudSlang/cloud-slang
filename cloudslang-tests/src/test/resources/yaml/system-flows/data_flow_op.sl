@@ -13,11 +13,11 @@ operation:
     - opMessage
     - unchangableMessage:
         default:  'defaultString'
-        overridable: false
+        private: true
     - message: ${ opMessage }
 
-  action:
-    python_script: |
+  python_action:
+    script: |
       if message != 'hello world':
         returnCode = '-1'
       elif unchangableMessage != 'defaultString':

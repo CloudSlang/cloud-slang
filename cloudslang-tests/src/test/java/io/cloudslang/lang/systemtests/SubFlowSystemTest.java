@@ -12,6 +12,7 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,6 +20,7 @@ import org.junit.Test;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,26 +31,89 @@ public class SubFlowSystemTest extends SystemsTestsParent {
 
     @Test
     public void testCompileAndRunSubFlowBasic() throws Exception {
-        URI resource = getClass().getResource("/yaml/sub-flow/parent_flow.yaml").toURI();
-        URI subFlow = getClass().getResource("/yaml/sub-flow/child_flow.yaml").toURI();
+        URI resource = getClass().getResource("/yaml/sub-flow/parent_flow.sl").toURI();
+        URI subFlow = getClass().getResource("/yaml/sub-flow/child_flow.sl").toURI();
         URI operation1 = getClass().getResource("/yaml/test_op.sl").toURI();
         URI operation2 = getClass().getResource("/yaml/check_weather.sl").toURI();
         URI operation3 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
         URI operation4 = getClass().getResource("/yaml/check_number.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(subFlow),
-                                                SlangSource.fromFile(operation1),
-                                                SlangSource.fromFile(operation2),
-                                                SlangSource.fromFile(operation3),
-                                                SlangSource.fromFile(operation4));
+                SlangSource.fromFile(operation1),
+                SlangSource.fromFile(operation2),
+                SlangSource.fromFile(operation3),
+                SlangSource.fromFile(operation4));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
         Assert.assertEquals("the system properties size is not as expected", 2, compilationArtifact.getSystemProperties().size());
-		Map<String, Serializable> systemProperties = new HashMap<>();
-		systemProperties.put("user.sys.props.port", 22);
-		systemProperties.put("user.sys.props.alla", "balla");
+		Set<SystemProperty> systemProperties = new HashSet<>();
+        systemProperties.add(new SystemProperty("user.sys", "props.port", "22"));
+        systemProperties.add(new SystemProperty("user.sys", "props.alla", "balla"));
         Map<String, Serializable> userInputs = new HashMap<>();
         userInputs.put("input1", "value1");
         ScoreEvent event = trigger(compilationArtifact, userInputs, systemProperties);
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
+    }
+
+    @Test
+    public void testSubFlowMissingRequiredInputs() throws Exception {
+        URI resource = getClass().getResource("/yaml/sub-flow/parent_flow_missing_inputs.sl").toURI();
+        URI subFlow = getClass().getResource("/yaml/sub-flow/child_flow.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/test_op.sl").toURI();
+        URI operation2 = getClass().getResource("/yaml/check_weather.sl").toURI();
+        URI operation3 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
+        URI operation4 = getClass().getResource("/yaml/check_number.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(subFlow),
+                SlangSource.fromFile(operation1),
+                SlangSource.fromFile(operation2),
+                SlangSource.fromFile(operation3),
+                SlangSource.fromFile(operation4));
+        try {
+            slang.compile(SlangSource.fromFile(resource), path);
+            Assert.fail();
+        } catch (RuntimeException e){
+            Assert.assertNotNull(e.getCause());
+            Assert.assertTrue("got wrong error type: expected [" + IllegalArgumentException.class + "] got [" + e.getCause().getClass() + "]", e.getCause() instanceof IllegalArgumentException);
+            String errorMessage = e.getCause().getMessage();
+            Assert.assertNotNull(errorMessage);
+            Assert.assertTrue("Did not get error from expected parent flow [user.flows.parent_flow_missing_inputs]", errorMessage.contains("user.flows.parent_flow_missing_inputs"));
+            Assert.assertTrue("Did not get error from expected step [step1]", errorMessage.contains("step1"));
+            Assert.assertTrue("Did not get error from expected missing input [city]", errorMessage.contains("city"));
+            Assert.assertTrue("Did not get error from expected subflow [user.ops.check_weather]", errorMessage.contains("user.ops.check_weather"));
+        }
+
+    }
+
+    @Test
+    public void testSubFlowMissingRequiredInputsRecursive() throws Exception {
+        URI resource = getClass().getResource("/yaml/sub-flow/parent_flow_for_child_flow_missing_inputs.sl").toURI();
+        URI subFlow = getClass().getResource("/yaml/sub-flow/child_flow_missing_inputs.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/test_op.sl").toURI();
+        URI operation2 = getClass().getResource("/yaml/check_weather.sl").toURI();
+        URI operation3 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
+        URI operation4 = getClass().getResource("/yaml/check_number.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(subFlow),
+                SlangSource.fromFile(operation1),
+                SlangSource.fromFile(operation2),
+                SlangSource.fromFile(operation3),
+                SlangSource.fromFile(operation4));
+        try {
+            slang.compile(SlangSource.fromFile(resource), path);
+            Assert.fail();
+        } catch (RuntimeException e){
+            Assert.assertNotNull(e.getCause());
+            Assert.assertTrue("got wrong error type: expected [" + IllegalArgumentException.class + "] got [" + e.getCause().getClass() + "]", e.getCause() instanceof IllegalArgumentException);
+            String errorMessage = e.getCause().getMessage();
+            Assert.assertNotNull(errorMessage);
+            Assert.assertTrue(
+                    "Did not get error from expected parent flow [user.flows.child_flow_missing_inputs]",
+                    errorMessage.contains("user.flows.child_flow_missing_inputs")
+            );
+            Assert.assertTrue("Did not get error from expected step [step01]", errorMessage.contains("step01"));
+            Assert.assertTrue("Did not get error from expected missing input [time_zone_as_string]", errorMessage.contains("time_zone_as_string"));
+            Assert.assertTrue(
+                    "Did not get error from expected subflow [user.ops.get_time_zone]",
+                    errorMessage.contains("user.ops.get_time_zone")
+            );
+        }
     }
 
 }

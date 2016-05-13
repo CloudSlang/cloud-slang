@@ -17,11 +17,12 @@ flow:
         do:
           ops.test_op:
             - city: 'input_1'
+            - alla: 'placeholder'
         publish:
           - weather
         navigate:
-          SUCCESS: SUCCESS
-          FAILURE: FAILURE
+          - SUCCESS: SUCCESS
+          - FAILURE: FAILURE
   results:
     - SUCCESS
     - FAILURE

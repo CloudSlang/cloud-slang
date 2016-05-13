@@ -10,8 +10,8 @@ namespace: loops
 operation:
   name: operation_that_fails_when_value_is_2
   inputs: ['text']
-  action:
-    python_script: print text
+  python_action:
+    script: print text
   results:
-    - FAILURE: ${ self['text'] == 2 }
+    - FAILURE: ${ text == 2 }
     - SUCCESS

@@ -9,26 +9,30 @@
  */
 package io.cloudslang.lang.runtime.bindings;
 
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import java.io.Serializable;
 import java.util.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ArgumentsBindingTest.Config.class)
 public class ArgumentsBindingTest {
+
+    @SuppressWarnings("unchecked")
+    private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
 
     @Autowired
     private ArgumentsBinding argumentsBinding;
@@ -163,7 +167,7 @@ public class ArgumentsBindingTest {
     }
 
     @Test
-    public void testOverridableFalseBehaviour() {
+    public void testPrivateBehaviour() {
         Map<String,Serializable> context = new HashMap<>();
         context.put("argument1",3);
 		Argument argument = new Argument("argument1", "${ 5+7 }");
@@ -212,7 +216,7 @@ public class ArgumentsBindingTest {
         Map<String,Serializable> context = new HashMap<>();
 
 		Argument argument = new Argument("argument1", "${ argument2 }");
-        List<Argument> arguments = Arrays.asList(argument);
+        List<Argument> arguments = Collections.singletonList(argument);
 
         bindArguments(arguments, context);
     }
@@ -276,7 +280,7 @@ public class ArgumentsBindingTest {
 	private Map<String, Serializable> bindArguments(
             List<Argument> arguments,
             Map<String, ? extends Serializable> context) {
-		return argumentsBinding.bindArguments(arguments, context);
+		return argumentsBinding.bindArguments(arguments, context, EMPTY_SET);
 	}
 
 	private Map<String, Serializable> bindArguments(List<Argument> arguments) {
@@ -297,8 +301,9 @@ public class ArgumentsBindingTest {
         }
 
         @Bean
-        public ScriptEngine scriptEngine(){
-            return  new ScriptEngineManager().getEngineByName("python");
+        public PythonInterpreter evalInterpreter(){
+            return new PythonInterpreter();
         }
+
     }
 }

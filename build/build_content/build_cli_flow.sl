@@ -83,7 +83,7 @@ flow:
             - target_builder
             - content_branch
         navigate:
-          SUCCESS: copy_changelog_to_cloudslang_cli
+          SUCCESS: copy_config_dir_cli
           COMPILE_CONTENT_LINUX_PROBLEM: GET_CLOUDSLANG_CONTENT_PROBLEM
           COMPILE_CONTENT_WINDOWS_PROBLEM: GET_CLOUDSLANG_CONTENT_PROBLEM
           COPY_CONTENT_TO_CLOUDSLANG_CLI_PROBLEM: GET_CLOUDSLANG_CONTENT_PROBLEM
@@ -91,6 +91,32 @@ flow:
           COPY_CONTENT_DOCS_TO_CLOUDSLANG_CLI_PROBLEM: GET_CLOUDSLANG_CONTENT_PROBLEM
           PIP_INSTALL_PROBLEM: GET_CLOUDSLANG_CONTENT_PROBLEM
           CLONE_CONTENT_PROBLEM: GET_CLOUDSLANG_CONTENT_PROBLEM
+
+    - copy_config_dir_cli:
+        do:
+          files.copy:
+            - source: ${language_codebase + '/build/config/cli'}
+            - destination: ${target_cli + '/configuration'}
+        navigate:
+          SUCCESS: create_log4j_folder
+          FAILURE: COPY_CONFIG_DIR_CLI_PROBLEM
+
+    - create_log4j_folder:
+        do:
+          files.create_folder:
+            - folder_name: ${target_cli + '/configuration/logging/'}
+        navigate:
+          SUCCESS: copy_log4j_file
+          FAILURE: CREATE_LOG4J_FOLDER_PROBLEM
+
+    - copy_log4j_file:
+        do:
+          files.copy:
+            - source: ${language_codebase + '/cloudslang-cli/src/main/resources/log4j.properties'}
+            - destination: ${target_cli + '/configuration/logging/log4j.properties'}
+        navigate:
+          SUCCESS: copy_changelog_to_cloudslang_cli
+          FAILURE: COPY_LOG4J_FILE_PROBLEM
 
     - copy_changelog_to_cloudslang_cli:
         do:
@@ -147,13 +173,22 @@ flow:
             - expression: ${include_content}
         navigate:
           IS: SUCCESS
-          IS_NOT: create_builder_zip
+          IS_NOT: copy_config_dir_builder
+
+    - copy_config_dir_builder:
+        do:
+          files.copy:
+            - source: ${language_codebase + '/build/config/builder'}
+            - destination: ${target_builder + '/configuration'}
+        navigate:
+          SUCCESS: create_builder_zip
+          FAILURE: COPY_CONFIG_DIR_BUILDER_PROBLEM
 
     - create_builder_zip:
         do:
           files.zip_folder:
             - archive_name: 'cslang-builder'
-            - folder_path: ${target_dir + "/cslang-builder"}
+            - folder_path: ${target_builder}
         navigate:
           SUCCESS: SUCCESS
           FAILURE: CREATE_BUILDER_ZIP_PROBLEM
@@ -162,8 +197,12 @@ flow:
     - COPY_CLI_PROBLEM
     - COPY_BUILDER_PROBLEM
     - GET_CLOUDSLANG_CONTENT_PROBLEM
+    - COPY_CONFIG_DIR_CLI_PROBLEM
+    - CREATE_LOG4J_FOLDER_PROBLEM
+    - COPY_LOG4J_FILE_PROBLEM
     - COPY_CHANGELOG_TO_CLOUDSLANG_CLI_PROBLEM
     - CHMOD_CLOUDSLANG_EXEC_FAILURE
     - CREATE_CLI_ZIP_PROBLEM
     - CREATE_CLI_TAR_GZ_PROBLEM
     - CREATE_BUILDER_ZIP_PROBLEM
+    - COPY_CONFIG_DIR_BUILDER_PROBLEM

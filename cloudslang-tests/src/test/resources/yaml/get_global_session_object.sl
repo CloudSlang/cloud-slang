@@ -11,12 +11,11 @@ operation:
   name: get_global_session_object
   inputs:
     - value
-  action:
-    java_action:
-      className: io.cloudslang.lang.systemtests.actions.LangTestActions
-      methodName: getConnectionFromNonSerializableSession
+  java_action:
+    class_name: io.cloudslang.lang.systemtests.actions.LangTestActions
+    method_name: getConnectionFromNonSerializableSession
   outputs:
     - session_object_value: ${ connection }
   results:
-    - SUCCESS: ${ connection == self['value'] }
+    - SUCCESS: ${ connection == value }
     - FAILURE

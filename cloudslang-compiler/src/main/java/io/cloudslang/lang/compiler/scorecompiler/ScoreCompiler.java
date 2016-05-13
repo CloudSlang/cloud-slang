@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler.scorecompiler;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
 
+import java.util.List;
 import java.util.Set;
 
 /*
@@ -20,7 +21,7 @@ import java.util.Set;
 /**
  * Score Compiler - compiles CloudSlang {@link io.cloudslang.lang.compiler.modeller.model.Executable} model
  * to a {@link io.cloudslang.lang.entities.CompilationArtifact}
- * {@link io.cloudslang.lang.entities.CompilationArtifact} is an object holding an {@link io.cloudslang.api.ExecutionPlan}:
+ * {@link io.cloudslang.lang.entities.CompilationArtifact} is an object holding an {@link io.cloudslang.score.api.ExecutionPlan}:
  * compilation result of a workflow
  * in the score format. This object can be run on score engine.
  */
@@ -34,5 +35,17 @@ public interface ScoreCompiler {
      * @return the compiled {@link io.cloudslang.lang.entities.CompilationArtifact}
      */
     CompilationArtifact compile(Executable source, Set<Executable> path);
+
+    /**
+     * Validate that the given {@Link io.cloudslang.lang.compiler.modeller.model.Executable} is valid regarding
+     * its wiring to its dependencies
+     * Current validations:
+     *      - Validates that required inputs of the dependency have a matching input in the step
+     *      - Validate that every result of teh dependency has a matching navigation in the step
+     * @param slangModel the CloudSlang model to validate
+     * @param dependenciesModels the CloudSlang models of the direct dependencies
+     * @return a list of the exceptions that were found (if any)
+     */
+    List<RuntimeException> validateSlangModelWithDependencies(Executable slangModel, Set<Executable> dependenciesModels);
 
 }

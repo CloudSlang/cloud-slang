@@ -10,7 +10,6 @@ namespace: user.ops
 operation:
   name: test_op
   inputs:
-    - alla:
-        system_property: user.sys.props.alla
-  action:
-    python_script: 'print "hello world"'
+    - alla
+  python_action:
+    script: 'print "hello world"'

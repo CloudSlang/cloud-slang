@@ -17,8 +17,14 @@ flow:
         do:
           ops.test_op:
             - city: 'input_1'
+            - alla: 'walla'
         publish:
           - weather
+          - temp: ${temperature}
+          - publish_str: 'publish_str_value'
+        navigate:
+          - SUCCESS: RealCheckWeather
+          - FAILURE: FAILURE
 
     - RealCheckWeather:
         do:
@@ -27,8 +33,8 @@ flow:
         publish:
           - weather
         navigate:
-          SUCCESS: RealRealCheckWeather
-          FAILURE: FAILURE
+          - SUCCESS: RealRealCheckWeather
+          - FAILURE: FAILURE
 
     - RealRealCheckWeather:
         do:
@@ -39,8 +45,8 @@ flow:
           - temp: ${temperature}
           - publish_str: 'publish_str_value'
         navigate:
-          SUCCESS: SUCCESS
-          FAILURE: NotRealCheckWeather
+          - SUCCESS: SUCCESS
+          - FAILURE: NotRealCheckWeather
 
     - NotRealCheckWeather:
         do:

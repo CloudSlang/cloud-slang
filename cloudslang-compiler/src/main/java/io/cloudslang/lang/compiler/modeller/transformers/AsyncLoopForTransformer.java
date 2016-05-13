@@ -31,7 +31,7 @@ public class AsyncLoopForTransformer extends AbstractForTransformer implements T
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Transformer.Scope.BEFORE_TASK);
+        return Arrays.asList(Transformer.Scope.BEFORE_STEP);
     }
 
     @Override

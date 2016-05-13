@@ -13,6 +13,7 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.entities.bindings.Output;
 import junit.framework.Assert;
 import org.junit.Before;
@@ -61,9 +62,9 @@ public class PublishTransformerTest {
         URL resource = getClass().getResource("/flow_with_multiple_steps.yaml");
         ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
         List<Map<String, Map>> flow = (List<Map<String, Map>>) file.getFlow().get(SlangTextualKeys.WORKFLOW_KEY);
-        for(Map<String, Map> task : flow){
-            if(task.keySet().iterator().next().equals("RealRealCheckWeather")){
-                publishMap = (List) task.values().iterator().next().get(SlangTextualKeys.PUBLISH_KEY);
+        for(Map<String, Map> step : flow){
+            if(step.keySet().iterator().next().equals("RealRealCheckWeather")){
+                publishMap = (List) step.values().iterator().next().get(SlangTextualKeys.PUBLISH_KEY);
                 break;
             }
         }
@@ -112,6 +113,11 @@ public class PublishTransformerTest {
         @Bean
         public YamlParser yamlParser() {
             return new YamlParser();
+        }
+
+        @Bean
+        public ParserExceptionHandler parserExceptionHandler() {
+            return new ParserExceptionHandler();
         }
 
         @Bean

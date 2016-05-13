@@ -13,7 +13,7 @@ import com.hp.oo.sdk.content.annotations.Param;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import io.cloudslang.lang.runtime.steps.AbstractSteps;
+import io.cloudslang.lang.runtime.steps.AbstractExecutionData;
 import org.apache.commons.lang3.tuple.Pair;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 
@@ -39,9 +39,9 @@ public class Navigations {
 
         // If we have an error key stored, we fire an error event and return null as the next position
 		if(executionRuntimeServices.hasStepErrorKey()) {
-			AbstractSteps.fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.SLANG_EXECUTION_EXCEPTION,
-                    "Error detected during step", LanguageEventData.StepType.NAVIGATION, null,
-                    Pair.of(LanguageEventData.EXCEPTION, executionRuntimeServices.getStepErrorKey()));
+			AbstractExecutionData.fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.SLANG_EXECUTION_EXCEPTION,
+					"Error detected during step", LanguageEventData.StepType.NAVIGATION, null,
+					Pair.of(LanguageEventData.EXCEPTION, executionRuntimeServices.getStepErrorKey()));
 			throw new RuntimeException(executionRuntimeServices.getStepErrorKey());
 		}
 

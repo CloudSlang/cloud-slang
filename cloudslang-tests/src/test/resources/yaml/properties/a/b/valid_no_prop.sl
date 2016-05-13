@@ -1,0 +1,3 @@
+namespace: a.b
+
+properties: []

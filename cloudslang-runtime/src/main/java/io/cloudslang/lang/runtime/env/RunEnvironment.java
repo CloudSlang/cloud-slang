@@ -11,11 +11,14 @@
 package io.cloudslang.lang.runtime.env;
 
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
-import org.apache.commons.lang.SerializationUtils;
+import io.cloudslang.lang.entities.SystemProperty;
+import org.apache.commons.lang3.Validate;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * User: stoneo
@@ -40,13 +43,16 @@ public class RunEnvironment implements Serializable{
     private ParentFlowStack parentFlowStack;
 
     private ExecutionPath executionPath;
-    private final Map<String, ? extends Serializable> systemProperties;
+
+    private final Set<SystemProperty> systemProperties;
+
     // Map holding serializable data that is common for the entire run
     // This is data that should be shared between different actions with the ability to change the data
     private Map<String, SerializableSessionObject> serializableDataMap;
 
 
-    public RunEnvironment(Map<String, ? extends Serializable> systemProperties) {
+    public RunEnvironment(Set<SystemProperty> systemProperties) {
+        Validate.notNull(systemProperties, "system properties cannot be null");
         contextStack = new ContextStack();
         parentFlowStack = new ParentFlowStack();
         callArguments = new HashMap<>();
@@ -56,7 +62,7 @@ public class RunEnvironment implements Serializable{
     }
 
     public RunEnvironment() {
-        this(null);
+        this(new HashSet<SystemProperty>());
     }
 
     public ContextStack getStack(){
@@ -101,7 +107,7 @@ public class RunEnvironment implements Serializable{
         return this.executionPath;
     }
 
-    public Map<String, ? extends Serializable> getSystemProperties() {
+    public Set<SystemProperty> getSystemProperties() {
         return systemProperties;
     }
 
