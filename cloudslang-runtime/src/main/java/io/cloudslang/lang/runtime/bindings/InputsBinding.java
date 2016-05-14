@@ -87,7 +87,7 @@ public class InputsBinding {
         Value valueFromContext = context.get(inputName);
         boolean sensitive = input.getValue() != null && input.getValue().isSensitive() || valueFromContext != null && valueFromContext.isSensitive();
         if (input.isOverridable()) {
-            value = ValueFactory.create(valueFromContext == null ? null : valueFromContext.get(), sensitive);
+            value = ValueFactory.create(valueFromContext, sensitive);
         }
 
         if (value == null || value.get() == null) {
@@ -98,7 +98,7 @@ public class InputsBinding {
                 //so you can resolve previous inputs already bound
                 scriptContext.putAll(targetContext);
                 value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, input.getFunctionDependencies());
-                value = ValueFactory.create(value == null ? null : value.get(), (value != null && value.isSensitive()) || sensitive);
+                value = ValueFactory.create(value, sensitive);
             } else {
                 value = rawValue;
             }

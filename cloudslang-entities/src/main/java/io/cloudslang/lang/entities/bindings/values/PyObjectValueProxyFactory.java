@@ -85,8 +85,10 @@ public class PyObjectValueProxyFactory {
                 return valueMethod.invoke(value, args);
             } else if (PyObject.class.isAssignableFrom(thisMethod.getDeclaringClass())) {
                 Method pyObjectMethod = pyObject.getClass().getMethod(thisMethod.getName(), thisMethod.getParameterTypes());
-                System.out.println("MethodHandler: " + thisMethod.getName() + ". " + thisMethod.toString());
-                accessed = true;
+                if (!thisMethod.getName().equals("toString")) {
+                    System.out.println("MethodHandler: " + thisMethod.getName() + ". " + thisMethod.toString());
+                    accessed = true;
+                }
                 return pyObjectMethod.invoke(pyObject, args);
             } else {
                 throw new RuntimeException("Failed to invoke PyObjectValue method. Implementing class not found");
@@ -98,7 +100,9 @@ public class PyObjectValueProxyFactory {
 
         @Override
         public boolean isHandled(Method method) {
-            return !method.getName().equals("finalize") && !method.getName().equals("toString");
+            return !(method.getName().equals("finalize") &&
+                    method.getParameterTypes().length == 0 &&
+                    method.getReturnType() == Void.TYPE);
         }
     }
 }

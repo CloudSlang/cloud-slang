@@ -55,10 +55,10 @@ public class AsyncLoopBinding {
         List<Value> result = new ArrayList<>();
         try {
             Value evalResult = scriptEvaluator.evalExpr(asyncLoopStatement.getExpression(), flowContext.getImmutableViewOfVariables(), systemProperties);
-            if (evalResult.get() != null) {
+            if (evalResult != null && evalResult.get() != null) {
                 //noinspection unchecked
                 for (Serializable serializable : ((List<Serializable>)evalResult.get())) {
-                    Value value = serializable instanceof Value ? (Value)serializable : ValueFactory.create(serializable, evalResult.isSensitive());
+                    Value value = ValueFactory.create(serializable, evalResult.isSensitive());
                     result.add(value);
                 }
             }

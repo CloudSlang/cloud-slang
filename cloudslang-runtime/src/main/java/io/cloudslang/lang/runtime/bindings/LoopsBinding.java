@@ -109,7 +109,9 @@ public class LoopsBinding {
                 List<Map.Entry<Value, Value>> entriesAsValues = new ArrayList<>();
                 @SuppressWarnings("unchecked") Set<Map.Entry<Serializable, Serializable>> entrySet = ((Map) evalResult.get()).entrySet();
                 for (Map.Entry<Serializable, Serializable> entry : entrySet) {
-                    entriesAsValues.add(Pair.of(getValue(entry.getKey(), evalResult.isSensitive()), getValue(entry.getValue(), evalResult.isSensitive())));
+                    entriesAsValues.add(Pair.of(
+                            ValueFactory.create(entry.getKey(), evalResult.isSensitive()),
+                            ValueFactory.create(entry.getValue(), evalResult.isSensitive())));
                 }
                 evalResult = ValueFactory.create((Serializable)entriesAsValues);
             } else {
@@ -129,12 +131,6 @@ public class LoopsBinding {
         return forLoopCondition;
     }
 
-    private Value getValue(Serializable serializable, boolean sensitive) {
-        return serializable instanceof Value ?
-                ValueFactory.create(((Value) serializable).get(), sensitive || ((Value) serializable).isSensitive()) :
-                ValueFactory.create(serializable, sensitive);
-    }
-
     private ForLoopCondition createForLoopCondition(Value loopCollection){
         Iterable<Value> iterable;
 
@@ -144,10 +140,10 @@ public class LoopsBinding {
             iterable = (Iterable<Value>) loopCollectionContent;
         } else if (loopCollectionContent instanceof String) {
             String[] strings = ((String) loopCollectionContent).split(Pattern.quote(","));
-            iterable = convert(Arrays.asList(strings));
+            iterable = convert(Arrays.asList(strings), loopCollection.isSensitive());
         } else if (loopCollectionContent instanceof PyObject) {
             PyObject pyObject = (PyObject) loopCollectionContent;
-            iterable = convert(pyObject.asIterable());
+            iterable = convert(pyObject.asIterable(), loopCollection.isSensitive());
         } else {
             return null;
         }
@@ -155,11 +151,10 @@ public class LoopsBinding {
         return new ForLoopCondition(iterable);
     }
 
-    private Iterable<Value> convert(Iterable<? extends Serializable> iterable) {
+    private Iterable<Value> convert(Iterable<? extends Serializable> iterable, boolean sensitive) {
         List<Value> values = new ArrayList<>();
         for (Serializable serializable : iterable) {
-            Value value = serializable instanceof Value ? (Value)serializable : ValueFactory.create(serializable);
-            values.add(value);
+            values.add(ValueFactory.create(serializable, sensitive));
         }
         return values;
     }

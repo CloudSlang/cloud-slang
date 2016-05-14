@@ -95,7 +95,7 @@ public abstract class AbstractScriptInterpreter {
         if (value == null) {
             return null;
         } else if (value instanceof Value) {
-            return ValueFactory.create(((Value)value).get(), ((Value)value).isSensitive() || getSensitive(interpreter));
+            return ValueFactory.create(value, getSensitive(interpreter));
         } else {
             try {
                 Serializable serializable = (Serializable)toJava(value);
