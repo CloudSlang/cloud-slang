@@ -6,7 +6,6 @@ import javassist.util.proxy.ProxyFactory;
 import org.apache.commons.lang.ClassUtils;
 import org.python.core.Py;
 import org.python.core.PyObject;
-import org.python.core.PyObjectDerived;
 import org.python.core.PyType;
 
 import java.io.Serializable;
@@ -20,9 +19,6 @@ import java.lang.reflect.Method;
  */
 public class PyObjectValueProxyFactory {
 
-    private static ProxyFactory factory = new ProxyFactory();
-    private static MethodFilter methodFilter = new PyObjectValueMethodFilter();
-
     public static PyObjectValue create(Serializable content, boolean sensitive) {
         PyObject pyObject = Py.java2py(content);
         MethodHandler methodHandler = new PyObjectValueMethodHandler(content, sensitive, pyObject);
@@ -33,12 +29,13 @@ public class PyObjectValueProxyFactory {
 
     private static PyObjectValue createProxyToSingleInstance(PyObject pyObject, MethodHandler methodHandler) {
         try {
-            factory.setSuperclass(PyObjectDerived.class);
+            ProxyFactory factory = new ProxyFactory();
+            factory.setSuperclass(PyObject.class);
             factory.setInterfaces(new Class[]{PyObjectValue.class});
-            factory.setFilter(methodFilter);
-            return (PyObjectValue) factory.create(new Class[]{PyType.class}, new Object[]{pyObject.getType()}, methodHandler);
+            factory.setFilter(new PyObjectValueMethodFilter());
+            return (PyObjectValue) factory.create(new Class[0], new Object[0], methodHandler);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to create a proxy for PyObjectValue", e);
+            throw new RuntimeException("Failed to create a proxy to single instance for PyObjectValue and " + pyObject.getClass().getSimpleName(), e);
         }
     }
 
@@ -57,12 +54,13 @@ public class PyObjectValueProxyFactory {
                 args[index] = parameterType.equals(PyType.class) ? pyObject.getType() :
                         !parameterType.isPrimitive() ? null : ClassUtils.primitiveToWrapper(parameterType).getConstructor(String.class).newInstance("0");
             }
+            ProxyFactory factory = new ProxyFactory();
             factory.setSuperclass(pyObject.getClass());
             factory.setInterfaces(new Class[]{PyObjectValue.class});
-            factory.setFilter(methodFilter);
+            factory.setFilter(new PyObjectValueMethodFilter());
             return (PyObjectValue) factory.create(constructor.getParameterTypes(), args, methodHandler);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to create a proxy for PyObjectValue", e);
+            throw new RuntimeException("Failed to create a proxy to new instance for PyObjectValue and " + pyObject.getClass().getSimpleName(), e);
         }
     }
 

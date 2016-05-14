@@ -1,12 +1,8 @@
 package io.cloudslang.lang.entities.bindings.values;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.lang.SerializationUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -24,7 +20,7 @@ public class SensitiveValue implements Value {
     }
 
     public SensitiveValue(Serializable content) {
-        this.content = serialize(content);
+        this.content = SerializationUtils.serialize(content);
     }
 
     public byte[] getContent() {
@@ -37,7 +33,7 @@ public class SensitiveValue implements Value {
 
     @Override
     public Serializable get() {
-        return deserialize(content);
+        return (Serializable)SerializationUtils.deserialize(content);
     }
 
     @JsonIgnore
@@ -62,31 +58,5 @@ public class SensitiveValue implements Value {
     @Override
     public String toString() {
         return "********";
-    }
-
-    private byte[] serialize(Serializable content) {
-        try {
-            if (content == null) {
-                return null;
-            }
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            ObjectOutputStream os = new ObjectOutputStream(out);
-            os.writeObject(content);
-            return out.toByteArray();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to serialize content", e);
-        }
-    }
-    private Serializable deserialize(byte[] content) {
-        try {
-            if (content == null) {
-                return null;
-            }
-            ByteArrayInputStream in = new ByteArrayInputStream(content);
-            ObjectInputStream is = new ObjectInputStream(in);
-            return (Serializable)is.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("Failed to deserialize content", e);
-        }
     }
 }

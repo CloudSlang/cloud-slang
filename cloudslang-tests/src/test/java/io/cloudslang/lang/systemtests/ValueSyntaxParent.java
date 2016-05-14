@@ -19,7 +19,6 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.junit.Assert;
-import org.python.core.PyDictionary;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -98,9 +97,7 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         // evaluated via Python
         expectedInputs.put("input_python_null", ValueFactory.create(null));
         expectedInputs.put("input_python_list",  ValueFactory.create(Lists.newArrayList(1, 2, 3)));
-        PyDictionary expectedInputPyDictionary = new PyDictionary();
-        expectedInputPyDictionary.putAll(expectedInputMap);
-        expectedInputs.put("input_python_map", ValueFactory.create(expectedInputPyDictionary));
+        expectedInputs.put("input_python_map", ValueFactory.create(expectedInputMap));
         expectedInputs.put("b", ValueFactory.create("b"));
         expectedInputs.put("b_copy", ValueFactory.create("b"));
         expectedInputs.put("input_concat_1", ValueFactory.create("ab"));

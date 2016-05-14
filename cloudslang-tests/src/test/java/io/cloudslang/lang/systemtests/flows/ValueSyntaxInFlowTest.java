@@ -21,7 +21,6 @@ import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.ValueSyntaxParent;
 import org.junit.Assert;
 import org.junit.Test;
-import org.python.core.PyDictionary;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -82,11 +81,11 @@ public class ValueSyntaxInFlowTest extends ValueSyntaxParent {
         // evaluated via Python
         expectedStepArguments.put("input_python_null", ValueFactory.create(null));
         expectedStepArguments.put("input_python_list", ValueFactory.create(Lists.newArrayList(1, 2, 3)));
-        PyDictionary expectedInputPythonPyDictionary = new PyDictionary();
-        expectedInputPythonPyDictionary.put("key1", "value1");
-        expectedInputPythonPyDictionary.put("key2", "value2");
-        expectedInputPythonPyDictionary.put("key3", "value3");
-        expectedStepArguments.put("input_python_map", ValueFactory.create(expectedInputPythonPyDictionary));
+        HashMap<String, Serializable> expectedInputPythonMap = new HashMap<>();
+        expectedInputPythonMap.put("key1", "value1");
+        expectedInputPythonMap.put("key2", "value2");
+        expectedInputPythonMap.put("key3", "value3");
+        expectedStepArguments.put("input_python_map", ValueFactory.create(expectedInputPythonMap));
         expectedStepArguments.put("b", ValueFactory.create("b"));
         expectedStepArguments.put("b_copy", ValueFactory.create("b"));
         expectedStepArguments.put("input_concat_1", ValueFactory.create("ab"));
