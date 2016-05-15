@@ -11,6 +11,6 @@ operation:
   name: process_odd_number
   inputs:
     - odd_number
-  action:
-    python_script:
+  python_action:
+    script:
       print 'Odd number processed. Result= ' + str(odd_number)

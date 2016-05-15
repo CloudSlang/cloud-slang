@@ -19,9 +19,9 @@ operation:
     - input6: ${get_sp("op.input.prop4")}
     - input7: ${get_sp("op.input.prop5", 'default_str')}
     - input8: ${check_empty(get('i_dont_exist'), 'default_str')}
-  action:
-    python_script: |
-        language = 'CloudSlang'
+  python_action:
+    script: |
+      language = 'CloudSlang'
   outputs:
     - output_7: ${get(    'i_don_exist',        get_sp('op.output.prop1')       )}
   results:

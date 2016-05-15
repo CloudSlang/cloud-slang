@@ -9,9 +9,9 @@ namespace: user.ops
 
 operation:
   name: get_function_test_default_result
-  action:
-    python_script: |
-        language = 'CloudSlang'
+  python_action:
+    script: |
+      language = 'CloudSlang'
   results:
     - GET_FUNCTION_DEFAULT_VALUE: ${ get('key_not_found', 'key_not_found_default') == 'key_not_found_default' }
     - GET_FUNCTION_PROBLEM

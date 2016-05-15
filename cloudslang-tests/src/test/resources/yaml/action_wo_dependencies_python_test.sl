@@ -9,5 +9,5 @@ namespace: user.ops
 
 operation:
   name: action_wo_dependencies_python_test
-  action:
-    python_script: 'print "hello world"'
+  python_action:
+    script: 'print "hello world"'

@@ -8,14 +8,10 @@
 namespace: user.ops
 
 operation:
-  name: java_action_serializable_op
-  inputs:
-    - string
+  name: java_action_invalid_key
   java_action:
-    class_name: io.cloudslang.lang.systemtests.actions.LangTestActions
-    method_name: printAndReturnDur
-  outputs:
-    - dur
+    invalid_key: 'data'
+    class_name: com.hp.thing
+    method_name: someMethod
   results:
-    - SUCCESS: ${ dur == 120 }
-    - FAILURE
+    - SUCCESS
