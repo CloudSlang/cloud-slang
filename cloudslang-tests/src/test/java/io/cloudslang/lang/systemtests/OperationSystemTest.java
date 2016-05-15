@@ -86,6 +86,23 @@ public class OperationSystemTest extends SystemsTestsParent {
         StepData execStepData = stepsData.get(EXEC_START_PATH);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, execStepData.getResult());
         Assert.assertEquals("http://localhost:8080", execStepData.getOutputs().get("url").get());
+        Assert.assertFalse(execStepData.getOutputs().get("url").isSensitive());
+    }
+
+    @Test
+    public void testOperationWithJavaActionSensitive() throws Exception {
+        URI resource = getClass().getResource("/yaml/java_action_sensitive_input_test.sl").toURI();
+
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), null);
+
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("host", ValueFactory.create("localhost"));
+        userInputs.put("port", ValueFactory.create("8080"));
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
+        StepData execStepData = stepsData.get(EXEC_START_PATH);
+        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, execStepData.getResult());
+        Assert.assertEquals("http://localhost:8080", execStepData.getOutputs().get("url").get());
+        Assert.assertTrue(execStepData.getOutputs().get("url").isSensitive());
     }
 
     @Test
