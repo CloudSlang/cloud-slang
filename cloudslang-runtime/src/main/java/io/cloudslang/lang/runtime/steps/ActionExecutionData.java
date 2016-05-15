@@ -77,11 +77,6 @@ public class ActionExecutionData extends AbstractExecutionData {
         fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_ACTION_START, "Preparing to run action " + actionType,
                 runEnv.getExecutionPath().getParentPath(), LanguageEventData.StepType.ACTION, null,
                 Pair.of(LanguageEventData.CALL_ARGUMENTS, (Serializable) callArgumentsDeepCopy));
-
-        if(logger.isDebugEnabled()) {
-            logger.debug("Going to executing [" + actionType.name() + "] action with dependencies [" + dependencies + "]");
-        }
-
         try {
             switch (actionType) {
                 case JAVA:
