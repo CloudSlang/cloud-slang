@@ -8,14 +8,11 @@
 namespace: user.ops
 
 operation:
-  name: java_action_serializable_op
-  inputs:
-    - string
-  java_action:
-    class_name: io.cloudslang.lang.systemtests.actions.LangTestActions
-    method_name: printAndReturnDur
-  outputs:
-    - dur
+  name: python_action_with_dependencies
+  python_action:
+    dependencies:
+      - dep1
+      - dep2
+    script: 'pass'
   results:
-    - SUCCESS: ${ dur == 120 }
-    - FAILURE
+    - SUCCESS

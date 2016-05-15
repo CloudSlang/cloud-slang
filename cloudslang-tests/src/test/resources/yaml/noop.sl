@@ -9,5 +9,5 @@ namespace: user.ops
 
 operation:
   name: noop
-  action:
-    python_script: 'pass'
+  python_action:
+    script: 'pass'

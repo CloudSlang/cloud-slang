@@ -12,5 +12,5 @@ operation:
   inputs:
     - input_with_illegal_key:
         karambula: fruit
-  action:
-    python_script: print "hi"
+  python_action:
+    script: print "hi"

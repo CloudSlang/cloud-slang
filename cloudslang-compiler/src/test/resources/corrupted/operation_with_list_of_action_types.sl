@@ -8,5 +8,5 @@ namespace: io.cloudslang
 
 operation:
   name: operation_with_list_of_action_types
-  action:
-    - python_script: 'print "hello world"'
+  python_action:
+    - script: 'print "hello world"'

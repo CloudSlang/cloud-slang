@@ -11,11 +11,11 @@ operation:
   name: print_branch
   inputs:
      - ID
-  action:
-    python_script: |
-        name = 'branch ' + str(ID)
-        int_output = int(ID)
-        print 'Hello from ' + name
+  python_action:
+    script: |
+      name = 'branch ' + str(ID)
+      int_output = int(ID)
+      print 'Hello from ' + name
   outputs:
     - name
     - int_output

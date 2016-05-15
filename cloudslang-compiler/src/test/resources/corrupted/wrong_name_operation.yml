@@ -11,5 +11,5 @@ operation:
   name: test_op
   inputs:
     - alla
-  action:
-    python_script: 'print "hello world"'
+  python_action:
+    script: 'print "hello world"'

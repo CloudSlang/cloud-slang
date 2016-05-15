@@ -9,8 +9,8 @@ namespace: user.ops
 
 operation:
   name: action_w_dependencies_python_test
-  action:
+  python_action:
     dependencies:
       - 'some.group:some.artifact:some_version-1.1'
       - 'some.group1:some.artifact:some_version-2.1'
-    python_script: 'print "hello world"'
+    script: 'print "hello world"'
