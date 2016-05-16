@@ -553,4 +553,25 @@ public class CompilerErrorsTest {
         Assert.assertEquals(1, errors.size());
         throw errors.get(0);
     }
+
+    @Test
+    public void testValidationOfFlowInputInStepWithSameNameAsDependencyOutput()throws Exception {
+        URI flowUri = getClass().getResource("/corrupted/flow_input_in_step_same_name_as_dependency_output.sl").toURI();
+        Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
+
+        URI operation1Uri = getClass().getResource("/test_op.sl").toURI();
+        Executable operation1Model = compiler.preCompile(SlangSource.fromFile(operation1Uri));
+        URI operation2Uri = getClass().getResource("/check_op.sl").toURI();
+        Executable operation2Model = compiler.preCompile(SlangSource.fromFile(operation2Uri));
+        Set<Executable> dependencies = new HashSet<>();
+        dependencies.add(operation1Model);
+        dependencies.add(operation2Model);
+
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Cannot compile flow 'io.cloudslang.flow_input_in_step_same_name_as_dependency_output'. " +
+                "Step 'explicit_alias' has input 'balla' with the same name as the one of the outputs of 'user.ops.test_op'.");
+        List<RuntimeException> errors = compiler.validateSlangModelWithDependencies(flowModel, dependencies);
+        Assert.assertEquals(1, errors.size());
+        throw errors.get(0);
+    }
 }

@@ -8,10 +8,18 @@
 namespace: user.ops
 
 operation:
-  name: test_op
+  name: action_w_dependencies_java_test
   inputs:
-    - alla
-  python_action:
-    script: 'print "hello world"'
+    - host: 'localhost'
+    - port: '8080'
+  action:
+    dependencies:
+      - 'io.cloudslang:content.actions:1.1'
+    java_action:
+      className: io.cloudslang.lang.systemtests.actions.LangTestActions
+      methodName: parseUrl
   outputs:
-    - balla: 'some value'
+    - url
+  results:
+    - SUCCESS: ${ url is not None }
+    - FAILURE

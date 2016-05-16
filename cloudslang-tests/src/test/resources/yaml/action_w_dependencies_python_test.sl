@@ -8,10 +8,9 @@
 namespace: user.ops
 
 operation:
-  name: test_op
-  inputs:
-    - alla
-  python_action:
-    script: 'print "hello world"'
-  outputs:
-    - balla: 'some value'
+  name: action_w_dependencies_python_test
+  action:
+    dependencies:
+      - 'some.group:some.artifact:some_version-1.1'
+      - 'some.group1:some.artifact:some_version-2.1'
+    python_script: 'print "hello world"'

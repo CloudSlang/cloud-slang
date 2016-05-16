@@ -8,10 +8,6 @@
 namespace: user.ops
 
 operation:
-  name: test_op
-  inputs:
-    - alla
-  python_action:
-    script: 'print "hello world"'
-  outputs:
-    - balla: 'some value'
+  name: action_wo_dependencies_python_test
+  action:
+    python_script: 'print "hello world"'

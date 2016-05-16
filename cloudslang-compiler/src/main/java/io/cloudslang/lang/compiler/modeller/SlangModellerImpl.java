@@ -10,13 +10,20 @@ package io.cloudslang.lang.compiler.modeller;
 
 import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.Validator;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.InOutParam;
+import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.Output;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 
 /*
@@ -28,6 +35,9 @@ public class SlangModellerImpl implements SlangModeller{
 
     @Autowired
     private ExecutableBuilder executableBuilder;
+
+    @Autowired
+    private Validator validator;
 
     @Override
     public ExecutableModellingResult createModel(ParsedSlang parsedSlang) {
@@ -57,8 +67,22 @@ public class SlangModellerImpl implements SlangModeller{
     private ExecutableModellingResult transformToExecutable(ParsedSlang parsedSlang, Map<String, Object> rawData) {
         String executableName = (String) rawData.get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
         ExecutableModellingResult result = executableBuilder.transformToExecutable(parsedSlang, executableName, rawData);
+        validateInputNamesDifferentFromOutputNames(result);
         validateFileName(executableName, parsedSlang, result);
         return result;
+    }
+
+    private void validateInputNamesDifferentFromOutputNames(ExecutableModellingResult result) {
+        List<Input> inputs = result.getExecutable().getInputs();
+        List<Output> outputs = result.getExecutable().getOutputs();
+        String errorMessage = "Inputs and outputs names should be different for \"" +
+                result.getExecutable().getId() + "\". " +
+                "Please rename input/output \"" + "placeholder01" + "\"";
+        try {
+            validator.validateListsHaveMutuallyExclusiveNames(inputs, outputs, errorMessage);
+        } catch (RuntimeException e) {
+            result.getErrors().add(e);
+        }
     }
 
     private void validateFileName(String executableName, ParsedSlang parsedSlang, ExecutableModellingResult result) {

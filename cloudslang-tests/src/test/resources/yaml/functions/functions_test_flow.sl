@@ -48,7 +48,7 @@ flow:
     - input_9: ${get(    'i_don_exist',        get_sp('a.b.c.host')       )}
     - input_10: ${get_sp('a.b.c.i_don_exist', get_sp('a.b.c.host'))}
     - input_11: ${get_sp('a.b.c.null_value', 'default_str')}
-    - value_propagate: ${ get_sp('propagate.flow.input') }
+    - value_propagate_input: ${ get_sp('propagate.flow.input') }
     - input_12: ${get_sp('chars-b.c-hyphen')}
     - input_13: ${get_sp('chars-b.c-hyphen', 'default_str')}
     - input_14: ${get_sp("a.b.c.host")}
@@ -72,7 +72,7 @@ flow:
             - input_9: ${get(    'i_don_exist',        get_sp('a.b.c.host')       )}
             - input_10: ${get_sp('a.b.c.i_don_exist', get_sp('a.b.c.host'))}
             - input_11: ${get_sp('a.b.c.null_value', 'default_str')}
-            - value_propagate: ${ value_propagate + get_sp('propagate.step.argument') }
+            - value_propagate_input: ${ value_propagate_input + get_sp('propagate.step.argument') }
             - input_12: ${get_sp('chars-b.c-hyphen')}
             - input_13: ${get_sp('chars-b.c-hyphen', 'default_str')}
             - input_14: ${get_sp("a.b.c.host")}

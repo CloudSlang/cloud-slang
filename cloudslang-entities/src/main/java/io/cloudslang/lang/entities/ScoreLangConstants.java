@@ -29,6 +29,7 @@ public interface ScoreLangConstants {
 
     //action scope
     String ACTION_TYPE = "actionType";
+    String ACTION_DEPENDENCIES = "dependencies";
 
     String JAVA_ACTION_CLASS_KEY = "className";
     String JAVA_ACTION_METHOD_KEY = "methodName";
