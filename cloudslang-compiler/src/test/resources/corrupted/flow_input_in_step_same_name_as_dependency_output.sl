@@ -5,21 +5,22 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: user.flows
+namespace: io.cloudslang
 
 imports:
   ops: user.ops
 
 flow:
-  name: binding_scope_flow_context_in_step_publish
-  inputs:
-    - flow_var: 'flow_var_value'
+  name: flow_input_in_step_same_name_as_dependency_output
   workflow:
-    - step1:
+    - explicit_alias:
         do:
-          ops.binding_scope_op:
-            - op_input_1: "op_input_1_step"
-            - step_arg_1: "step_arg_1_value"
-            - op_output_2_step: "op_output_2_step"
-        publish:
-          - step1_publish_1: ${ flow_var }
+          ops.test_op:
+            - alla: 'input_1'
+            - balla: '22'
+
+    - implicit_alias:
+        do:
+          check_op:
+            - city: 'input_1'
+            - port: '22'
