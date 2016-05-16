@@ -13,14 +13,12 @@ import io.cloudslang.dependency.api.services.DependencyService;
 import io.cloudslang.dependency.api.services.MavenConfig;
 import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
 import io.cloudslang.dependency.impl.services.MavenConfigImpl;
+import io.cloudslang.dependency.impl.services.utils.UnzipUtil;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
-import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
-import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
-import io.cloudslang.runtime.impl.python.PythonExecutor;
-import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
+import io.cloudslang.runtime.impl.python.*;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,12 +30,44 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.*;
+
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ArgumentsBindingTest.Config.class)
 public class ArgumentsBindingTest {
+    static {
+        ClassLoader classLoader = ArgumentsBindingTest.class.getClassLoader();
+
+        String settingsXmlPath = classLoader.getResource("settings.xml").getPath();
+        File rootHome = new File(settingsXmlPath).getParentFile();
+        File mavenHome = new File(rootHome, "maven");
+        File mavenRepo = new File(rootHome, "test-mvn-repo");
+        mavenRepo.mkdirs();
+
+        UnzipUtil.unzipToFolder(mavenHome.getAbsolutePath(), classLoader.getResourceAsStream("maven.zip"));
+
+        System.setProperty(MavenConfigImpl.MAVEN_HOME, mavenHome.getAbsolutePath());
+
+        System.setProperty(MavenConfigImpl.MAVEN_REPO_LOCAL, mavenRepo.getAbsolutePath());
+        System.setProperty(MavenConfigImpl.MAVEN_REMOTE_URL, "http://mydtbld0034.hpeswlab.net:8081/nexus/content/groups/oo-public");
+        System.setProperty(MavenConfigImpl.MAVEN_PLUGINS_URL, "http://mydphdb0166.hpswlabs.adapps.hp.com:8081/nexus/content/repositories/snapshots/");
+        System.setProperty("maven.home", classLoader.getResource("maven").getPath());
+
+        System.setProperty(MavenConfigImpl.MAVEN_PROXY_PROTOCOL, "https");
+        System.setProperty(MavenConfigImpl.MAVEN_PROXY_HOST, "proxy.bbn.hp.com");
+        System.setProperty(MavenConfigImpl.MAVEN_PROXY_PORT, "8080");
+        System.setProperty(MavenConfigImpl.MAVEN_PROXY_NON_PROXY_HOSTS, "*.hp.com");
+
+        System.setProperty(MavenConfigImpl.MAVEN_SETTINGS_PATH, settingsXmlPath);
+        System.setProperty(MavenConfigImpl.MAVEN_M2_CONF_PATH, classLoader.getResource("m2.conf").getPath());
+
+        String provideralAlreadyConfigured = System.setProperty("python.executor.engine", PythonExecutionNotCachedEngine.class.getSimpleName());
+        assertNull("python.executor.engine was configured before this test!!!!!!!", provideralAlreadyConfigured);
+    }
 
     @SuppressWarnings("unchecked")
     private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
