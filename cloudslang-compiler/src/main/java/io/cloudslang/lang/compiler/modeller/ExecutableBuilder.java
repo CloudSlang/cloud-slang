@@ -56,7 +56,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
-import static io.cloudslang.lang.entities.ScoreLangConstants.ASYNC_LOOP_KEY;
+import static io.cloudslang.lang.entities.ScoreLangConstants.PARALLEL_LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER;
 
@@ -340,7 +340,7 @@ public class ExecutableBuilder {
                 stepRawDataValue = stepRawData.values().iterator().next();
                 if (MapUtils.isNotEmpty(stepRawDataValue)) {
                     boolean loopKeyFound = stepRawDataValue.containsKey(LOOP_KEY);
-                    boolean parallelLoopKeyFound = stepRawDataValue.containsKey(ASYNC_LOOP_KEY);
+                    boolean parallelLoopKeyFound = stepRawDataValue.containsKey(PARALLEL_LOOP_KEY);
                     if (loopKeyFound) {
                         if (parallelLoopKeyFound) {
                             errors.add(new RuntimeException("Step: " + stepName + " syntax is illegal.\nBelow step name, there can be either \'loop\' or \'aync_loop\' key."));
@@ -351,8 +351,8 @@ public class ExecutableBuilder {
                     }
                     if (parallelLoopKeyFound) {
                         message = "Step: " + stepName + " syntax is illegal.\nBelow the 'async_loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
-                        @SuppressWarnings("unchecked") Map<String, Object> parallelLoopRawData = (Map<String, Object>) stepRawDataValue.remove(ASYNC_LOOP_KEY);
-                        parallelLoopRawData.put(ASYNC_LOOP_KEY, parallelLoopRawData.remove(FOR_KEY));
+                        @SuppressWarnings("unchecked") Map<String, Object> parallelLoopRawData = (Map<String, Object>) stepRawDataValue.remove(PARALLEL_LOOP_KEY);
+                        parallelLoopRawData.put(PARALLEL_LOOP_KEY, parallelLoopRawData.remove(FOR_KEY));
                         stepRawDataValue.putAll(parallelLoopRawData);
                     }
                 }
@@ -448,7 +448,7 @@ public class ExecutableBuilder {
                 arguments,
                 navigationStrings,
                 refId,
-                preStepData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
+                preStepData.containsKey(ScoreLangConstants.PARALLEL_LOOP_KEY));
         return new StepModellingResult(step, errors);
     }
 

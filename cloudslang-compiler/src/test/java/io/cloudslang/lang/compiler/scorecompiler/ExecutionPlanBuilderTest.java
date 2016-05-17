@@ -83,7 +83,7 @@ public class ExecutionPlanBuilderTest {
         Map<String, Serializable> preStepActionData = new HashMap<>();
 
         if (isAsync) {
-            preStepActionData.put(ScoreLangConstants.ASYNC_LOOP_KEY, "value in values");
+            preStepActionData.put(ScoreLangConstants.PARALLEL_LOOP_KEY, "value in values");
         }
 
         Map<String, Serializable> postStepActionData = new HashMap<>();

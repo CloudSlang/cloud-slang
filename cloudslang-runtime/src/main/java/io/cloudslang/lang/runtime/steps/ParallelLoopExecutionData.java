@@ -60,7 +60,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
     private static final Logger logger = Logger.getLogger(ParallelLoopExecutionData.class);
 
-    public void addBranches(@Param(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY) ParallelLoopStatement parallelLoopStatement,
+    public void addBranches(@Param(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY) ParallelLoopStatement parallelLoopStatement,
                             @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                             @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                             @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
@@ -77,7 +77,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_SPLIT_BRANCHES,
                     "async loop expression bound", runEnv.getExecutionPath().getCurrentPath(),
                     LanguageEventData.StepType.STEP, nodeName,
-                    Pair.of(LanguageEventData.BOUND_ASYNC_LOOP_EXPRESSION, (Serializable) splitData));
+                    Pair.of(LanguageEventData.BOUND_PARALLEL_LOOP_EXPRESSION, (Serializable) splitData));
 
             runEnv.putNextStepPosition(nextStepId);
             runEnv.getExecutionPath().down();

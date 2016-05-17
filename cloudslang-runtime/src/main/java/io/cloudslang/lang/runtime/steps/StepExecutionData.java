@@ -148,7 +148,7 @@ public class StepExecutionData extends AbstractExecutionData {
                         @Param(ScoreLangConstants.PREVIOUS_STEP_ID_KEY) Long previousStepId,
                         @Param(ScoreLangConstants.BREAK_LOOP_KEY) List<String> breakOn,
                         @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
-                        @Param(ScoreLangConstants.ASYNC_LOOP_KEY) boolean async_loop) {
+                        @Param(ScoreLangConstants.PARALLEL_LOOP_KEY) boolean async_loop) {
 
         try {
             Context flowContext = runEnv.getStack().popContext();

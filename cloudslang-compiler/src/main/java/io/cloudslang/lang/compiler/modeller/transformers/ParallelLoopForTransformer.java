@@ -36,7 +36,7 @@ public class ParallelLoopForTransformer extends AbstractForTransformer implement
 
     @Override
     public String keyToTransform() {
-        return ScoreLangConstants.ASYNC_LOOP_KEY;
+        return ScoreLangConstants.PARALLEL_LOOP_KEY;
     }
 
 }

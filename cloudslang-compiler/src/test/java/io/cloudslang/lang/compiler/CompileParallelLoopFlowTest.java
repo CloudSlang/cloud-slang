@@ -315,9 +315,9 @@ public class CompileParallelLoopFlowTest {
     }
 
     private void verifyParallelLoopStatement(Map<String, ?> addBranchesActionData) {
-        assertTrue(addBranchesActionData.containsKey(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY));
+        assertTrue(addBranchesActionData.containsKey(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY));
         ParallelLoopStatement parallelLoopStatement =
-                (ParallelLoopStatement) addBranchesActionData.get(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY);
+                (ParallelLoopStatement) addBranchesActionData.get(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY);
         assertEquals("async loop statement value not as expected", "value", parallelLoopStatement.getVarName());
         assertEquals("async loop statement expression not as expected", "values", parallelLoopStatement.getExpression());
     }
@@ -331,9 +331,9 @@ public class CompileParallelLoopFlowTest {
     }
 
     private void verifyParallelLoopStatement(Step step) {
-        assertTrue(step.getPreStepActionData().containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
+        assertTrue(step.getPreStepActionData().containsKey(ScoreLangConstants.PARALLEL_LOOP_KEY));
         ParallelLoopStatement parallelLoopStatement = (ParallelLoopStatement) step.getPreStepActionData()
-                .get(ScoreLangConstants.ASYNC_LOOP_KEY);
+                .get(ScoreLangConstants.PARALLEL_LOOP_KEY);
         assertEquals("values", parallelLoopStatement.getExpression());
         assertEquals("value", parallelLoopStatement.getVarName());
     }

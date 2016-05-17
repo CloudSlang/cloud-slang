@@ -31,13 +31,13 @@ import java.util.Set;
 @Component
 public class ParallelLoopBinding {
 
-    public static final String ASYNC_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating async loop expression in step";
+    public static final String PARALLEL_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating async loop expression in step";
 
     @Autowired
     private ScriptEvaluator scriptEvaluator;
 
     public static String generateParallelLoopExpressionMessage(String nodeName, String message) {
-        return ASYNC_LOOP_EXPRESSION_ERROR_MESSAGE + " '" + nodeName + "', error is: \n" + message;
+        return PARALLEL_LOOP_EXPRESSION_ERROR_MESSAGE + " '" + nodeName + "', error is: \n" + message;
     }
 
     public List<Serializable> bindParallelLoopList(
