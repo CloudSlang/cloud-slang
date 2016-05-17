@@ -10,12 +10,12 @@
 package io.cloudslang.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
-import io.cloudslang.lang.entities.AsyncLoopStatement;
+import io.cloudslang.lang.entities.ParallelLoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.runtime.RuntimeConstants;
-import io.cloudslang.lang.runtime.bindings.AsyncLoopBinding;
+import io.cloudslang.lang.runtime.bindings.ParallelLoopBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ReturnValues;
@@ -48,19 +48,19 @@ import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUT
  * @author Bonczidai Levente
  */
 @Component
-public class AsyncLoopExecutionData extends AbstractExecutionData {
+public class ParallelLoopExecutionData extends AbstractExecutionData {
 
     public static final String BRANCH_EXCEPTION_PREFIX = "Error running branch";
 
     @Autowired
-    private AsyncLoopBinding asyncLoopBinding;
+    private ParallelLoopBinding asyncLoopBinding;
 
     @Autowired
     private OutputsBinding outputsBinding;
 
-    private static final Logger logger = Logger.getLogger(AsyncLoopExecutionData.class);
+    private static final Logger logger = Logger.getLogger(ParallelLoopExecutionData.class);
 
-    public void addBranches(@Param(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY) AsyncLoopStatement asyncLoopStatement,
+    public void addBranches(@Param(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY) ParallelLoopStatement asyncLoopStatement,
                             @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                             @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                             @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
@@ -72,7 +72,7 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
         try {
             Context flowContext = runEnv.getStack().popContext();
 
-            List<Serializable> splitData = asyncLoopBinding.bindAsyncLoopList(asyncLoopStatement, flowContext, runEnv.getSystemProperties(), nodeName);
+            List<Serializable> splitData = asyncLoopBinding.bindParallelLoopList(asyncLoopStatement, flowContext, runEnv.getSystemProperties(), nodeName);
 
             fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_SPLIT_BRANCHES,
                     "async loop expression bound", runEnv.getExecutionPath().getCurrentPath(),
@@ -146,7 +146,7 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
 
             flowContext.putVariables(publishValues);
 
-            String asyncLoopResult = getAsyncLoopResult(branchesResult);
+            String asyncLoopResult = getParallelLoopResult(branchesResult);
 
             handleNavigationAndReturnValues(runEnv, executionRuntimeServices, stepNavigationValues, nodeName, publishValues, asyncLoopResult);
 
@@ -188,7 +188,7 @@ public class AsyncLoopExecutionData extends AbstractExecutionData {
         runEnv.putNextStepPosition(nextStepPosition);
     }
 
-    private String getAsyncLoopResult(List<String> branchesResult) {
+    private String getParallelLoopResult(List<String> branchesResult) {
         // if one of the branches failed then return with FAILURE, otherwise return with SUCCESS
         String asyncLoopResult = ScoreLangConstants.SUCCESS_RESULT;
         for (String branchResult : branchesResult) {

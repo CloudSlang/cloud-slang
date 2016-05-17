@@ -13,7 +13,7 @@ import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Step;
-import io.cloudslang.lang.entities.AsyncLoopStatement;
+import io.cloudslang.lang.entities.ParallelLoopStatement;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
@@ -41,16 +41,16 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
-public class CompileAsyncLoopFlowTest {
+public class CompileParallelLoopFlowTest {
 
     @Autowired
     private SlangCompiler compiler;
 
     @Test
-    public void testPreCompileAsyncLoopFlow() throws Exception {
+    public void testPreCompileParallelLoopFlow() throws Exception {
         Step step = getStepsAfterPrecompileFlow("/loops/async_loop/simple_async_loop.sl").getFirst();
 
-        verifyAsyncLoopStatement(step);
+        verifyParallelLoopStatement(step);
 
         List<Output> aggregateValues = getAggregateOutputs(step);
         assertEquals("aggregate list is not empty", 0, aggregateValues.size());
@@ -71,10 +71,10 @@ public class CompileAsyncLoopFlowTest {
     }
 
     @Test
-    public void testPreCompileAsyncLoopFlowAggregate() throws Exception {
+    public void testPreCompileParallelLoopFlowAggregate() throws Exception {
         Step step = getStepsAfterPrecompileFlow("/loops/async_loop/async_loop_aggregate.sl").getFirst();
 
-        verifyAsyncLoopStatement(step);
+        verifyParallelLoopStatement(step);
 
         List<Output> aggregateValues = getAggregateOutputs(step);
         assertEquals(2, aggregateValues.size());
@@ -97,13 +97,13 @@ public class CompileAsyncLoopFlowTest {
     }
 
     @Test
-    public void testPreCompileAsyncLoopFlowNavigate() throws Exception {
+    public void testPreCompileParallelLoopFlowNavigate() throws Exception {
         Deque<Step> steps = getStepsAfterPrecompileFlow("/loops/async_loop/async_loop_navigate.sl");
         assertEquals(2, steps.size());
 
         Step asyncStep = steps.getFirst();
 
-        verifyAsyncLoopStatement(asyncStep);
+        verifyParallelLoopStatement(asyncStep);
 
         List<Output> aggregateValues = getAggregateOutputs(asyncStep);
         assertEquals(0, aggregateValues.size());
@@ -124,13 +124,13 @@ public class CompileAsyncLoopFlowTest {
     }
 
     @Test
-    public void testPreCompileAsyncLoopFlowAggregateNavigate() throws Exception {
+    public void testPreCompileParallelLoopFlowAggregateNavigate() throws Exception {
         Deque<Step> steps = getStepsAfterPrecompileFlow("/loops/async_loop/async_loop_aggregate_navigate.sl");
         assertEquals(2, steps.size());
 
         Step asyncStep = steps.getFirst();
 
-        verifyAsyncLoopStatement(asyncStep);
+        verifyParallelLoopStatement(asyncStep);
 
         List<Output> aggregateValues = getAggregateOutputs(asyncStep);
         assertEquals(2, aggregateValues.size());
@@ -153,7 +153,7 @@ public class CompileAsyncLoopFlowTest {
     }
 
     @Test
-    public void testCompileAsyncLoopFlow() throws Exception {
+    public void testCompileParallelLoopFlow() throws Exception {
         URI flow = getClass().getResource("/loops/async_loop/simple_async_loop.sl").toURI();
         URI operation = getClass().getResource("/loops/async_loop/print_branch.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
@@ -167,7 +167,7 @@ public class CompileAsyncLoopFlowTest {
         ExecutionStep addBranchesStep = executionPlan.getStep(2L);
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
-        verifyAsyncLoopStatement(addBranchesActionData);
+        verifyParallelLoopStatement(addBranchesActionData);
 
         assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
         assertNotNull("branch end step method not found", executionPlan.getStep(4L));
@@ -175,7 +175,7 @@ public class CompileAsyncLoopFlowTest {
     }
 
     @Test
-    public void testCompileAsyncLoopFlowAggregate() throws Exception {
+    public void testCompileParallelLoopFlowAggregate() throws Exception {
         URI flow = getClass().getResource("/loops/async_loop/async_loop_aggregate.sl").toURI();
         URI operation = getClass().getResource("/loops/async_loop/print_branch.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
@@ -190,7 +190,7 @@ public class CompileAsyncLoopFlowTest {
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
 
-        verifyAsyncLoopStatement(addBranchesActionData);
+        verifyParallelLoopStatement(addBranchesActionData);
 
         ExecutionStep joinBranchesStep = executionPlan.getStep(5L);
         Map<String, ?> joinBranchesActionData = joinBranchesStep.getActionData();
@@ -205,7 +205,7 @@ public class CompileAsyncLoopFlowTest {
     }
 
     @Test
-    public void testCompileAsyncLoopFlowNavigate() throws Exception {
+    public void testCompileParallelLoopFlowNavigate() throws Exception {
         URI flow = getClass().getResource("/loops/async_loop/async_loop_navigate.sl").toURI();
         URI operation1 = getClass().getResource("/loops/async_loop/print_branch.sl").toURI();
         URI operation2 = getClass().getResource("/loops/async_loop/print_list.sl").toURI();
@@ -222,7 +222,7 @@ public class CompileAsyncLoopFlowTest {
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
 
-        verifyAsyncLoopStatement(addBranchesActionData);
+        verifyParallelLoopStatement(addBranchesActionData);
 
         ExecutionStep joinBranchesStep = executionPlan.getStep(5L);
         Map<String, ?> joinBranchesActionData = joinBranchesStep.getActionData();
@@ -234,7 +234,7 @@ public class CompileAsyncLoopFlowTest {
     }
 
     @Test
-    public void testCompileAsyncLoopFlowAggregateNavigate() throws Exception {
+    public void testCompileParallelLoopFlowAggregateNavigate() throws Exception {
         URI flow = getClass().getResource("/loops/async_loop/async_loop_aggregate_navigate.sl").toURI();
         URI operation1 = getClass().getResource("/loops/async_loop/print_branch.sl").toURI();
         URI operation2 = getClass().getResource("/loops/async_loop/print_list.sl").toURI();
@@ -251,7 +251,7 @@ public class CompileAsyncLoopFlowTest {
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
 
-        verifyAsyncLoopStatement(addBranchesActionData);
+        verifyParallelLoopStatement(addBranchesActionData);
 
         ExecutionStep joinBranchesStep = executionPlan.getStep(5L);
         Map<String, ?> joinBranchesActionData = joinBranchesStep.getActionData();
@@ -314,10 +314,10 @@ public class CompileAsyncLoopFlowTest {
         return branchExecutionPlan.getSteps();
     }
 
-    private void verifyAsyncLoopStatement(Map<String, ?> addBranchesActionData) {
+    private void verifyParallelLoopStatement(Map<String, ?> addBranchesActionData) {
         assertTrue(addBranchesActionData.containsKey(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY));
-        AsyncLoopStatement asyncLoopStatement =
-                (AsyncLoopStatement) addBranchesActionData.get(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY);
+        ParallelLoopStatement asyncLoopStatement =
+                (ParallelLoopStatement) addBranchesActionData.get(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY);
         assertEquals("async loop statement value not as expected", "value", asyncLoopStatement.getVarName());
         assertEquals("async loop statement expression not as expected", "values", asyncLoopStatement.getExpression());
     }
@@ -330,9 +330,9 @@ public class CompileAsyncLoopFlowTest {
         return ((Flow) executable).getWorkflow().getSteps();
     }
 
-    private void verifyAsyncLoopStatement(Step step) {
+    private void verifyParallelLoopStatement(Step step) {
         assertTrue(step.getPreStepActionData().containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
-        AsyncLoopStatement asyncLoopStatement = (AsyncLoopStatement) step.getPreStepActionData()
+        ParallelLoopStatement asyncLoopStatement = (ParallelLoopStatement) step.getPreStepActionData()
                 .get(ScoreLangConstants.ASYNC_LOOP_KEY);
         assertEquals("values", asyncLoopStatement.getExpression());
         assertEquals("value", asyncLoopStatement.getVarName());

@@ -9,7 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
-import io.cloudslang.lang.entities.AsyncLoopStatement;
+import io.cloudslang.lang.entities.ParallelLoopStatement;
 import io.cloudslang.lang.entities.ListForLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.MapForLoopStatement;
@@ -31,7 +31,7 @@ public abstract class AbstractForTransformer {
     private final static String KEY_VALUE_PAIR_REGEX = "^(\\s+)?(\\w+)(\\s+)?(,)(\\s+)?(\\w+)(\\s+)?$";
     private final static String FOR_IN_KEYWORD= " in ";
 
-    public LoopStatement transformToLoopStatement(String rawData, boolean isAsyncLoop) {
+    public LoopStatement transformToLoopStatement(String rawData, boolean isParallelLoop) {
         if (StringUtils.isEmpty(rawData)) {
             return null;
         }
@@ -47,8 +47,8 @@ public abstract class AbstractForTransformer {
             // case: value in variable_name
             varName = matcherSimpleFor.group(2);
             collectionExpression = matcherSimpleFor.group(4);
-            if (isAsyncLoop) {
-                loopStatement = new AsyncLoopStatement(varName, collectionExpression);
+            if (isParallelLoop) {
+                loopStatement = new ParallelLoopStatement(varName, collectionExpression);
             } else {
                 loopStatement = new ListForLoopStatement(varName, collectionExpression);
             }
@@ -74,8 +74,8 @@ public abstract class AbstractForTransformer {
                 if (isContainInvalidChars(varName)) {
                     throw new RuntimeException("for loop var name cannot contain invalid chars");
                 }
-                if (isAsyncLoop) {
-                    loopStatement = new AsyncLoopStatement(varName, collectionExpression);
+                if (isParallelLoop) {
+                    loopStatement = new ParallelLoopStatement(varName, collectionExpression);
                 } else {
                     loopStatement = new ListForLoopStatement(varName, collectionExpression);
                 }

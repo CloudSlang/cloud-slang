@@ -41,7 +41,7 @@ public class ExecutionStepFactory {
     private static final String STEP_EXECUTION_DATA_CLASS = STEPS_PACKAGE + ".StepExecutionData";
     private static final String OPERATION_STEPS_CLASS = STEPS_PACKAGE + ".ExecutableExecutionData";
     private static final String ACTION_STEPS_CLASS = STEPS_PACKAGE + ".ActionExecutionData";
-    private static final String ASYNC_LOOP_STEPS_CLASS = STEPS_PACKAGE + ".AsyncLoopExecutionData";
+    private static final String ASYNC_LOOP_STEPS_CLASS = STEPS_PACKAGE + ".ParallelLoopExecutionData";
     private static final String NAVIGATION_ACTIONS_CLASS = "io.cloudslang.lang.runtime.navigations.Navigations";
     private static final String SIMPLE_NAVIGATION_METHOD = "navigate";
 

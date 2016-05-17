@@ -21,11 +21,11 @@ import java.io.Serializable;
  *
  * @author Bonczidai Levente
  */
-public class AsyncLoopStatement extends LoopStatement implements Serializable {
+public class ParallelLoopStatement extends LoopStatement implements Serializable {
 
     private final String varName;
 
-    public AsyncLoopStatement(String varName, String expression) {
+    public ParallelLoopStatement(String varName, String expression) {
         super(expression);
 
         Validate.notBlank(varName, "async loop var name cannot be empty");
@@ -36,7 +36,7 @@ public class AsyncLoopStatement extends LoopStatement implements Serializable {
      * only here to satisfy serialization libraries
      */
     @SuppressWarnings("unused")
-    private AsyncLoopStatement() {
+    private ParallelLoopStatement() {
         varName = null;
     }
 
@@ -58,7 +58,7 @@ public class AsyncLoopStatement extends LoopStatement implements Serializable {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        AsyncLoopStatement that = (AsyncLoopStatement) o;
+        ParallelLoopStatement that = (ParallelLoopStatement) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))

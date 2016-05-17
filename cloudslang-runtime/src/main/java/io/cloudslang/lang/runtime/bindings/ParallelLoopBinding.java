@@ -9,7 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.bindings;
 
-import io.cloudslang.lang.entities.AsyncLoopStatement;
+import io.cloudslang.lang.entities.ParallelLoopStatement;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
@@ -29,19 +29,19 @@ import java.util.Set;
  * @author Bonczidai Levente
  */
 @Component
-public class AsyncLoopBinding {
+public class ParallelLoopBinding {
 
     public static final String ASYNC_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating async loop expression in step";
 
     @Autowired
     private ScriptEvaluator scriptEvaluator;
 
-    public static String generateAsyncLoopExpressionMessage(String nodeName, String message) {
+    public static String generateParallelLoopExpressionMessage(String nodeName, String message) {
         return ASYNC_LOOP_EXPRESSION_ERROR_MESSAGE + " '" + nodeName + "', error is: \n" + message;
     }
 
-    public List<Serializable> bindAsyncLoopList(
-            AsyncLoopStatement asyncLoopStatement,
+    public List<Serializable> bindParallelLoopList(
+            ParallelLoopStatement asyncLoopStatement,
             Context flowContext,
             Set<SystemProperty> systemProperties,
             String nodeName) {
@@ -57,10 +57,10 @@ public class AsyncLoopBinding {
                     flowContext.getImmutableViewOfVariables(),
                     systemProperties);
         } catch (Throwable t) {
-            throw new RuntimeException(generateAsyncLoopExpressionMessage(nodeName, t.getMessage()), t);
+            throw new RuntimeException(generateParallelLoopExpressionMessage(nodeName, t.getMessage()), t);
         }
         if (CollectionUtils.isEmpty(evalResult)) {
-            throw new RuntimeException(generateAsyncLoopExpressionMessage(nodeName, "expression is empty"));
+            throw new RuntimeException(generateParallelLoopExpressionMessage(nodeName, "expression is empty"));
         }
         return evalResult;
     }

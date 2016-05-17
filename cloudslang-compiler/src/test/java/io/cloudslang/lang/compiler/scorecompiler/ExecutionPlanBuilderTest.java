@@ -211,7 +211,7 @@ public class ExecutionPlanBuilderTest {
     }
 
     @Test
-    public void createSimpleFlowWithAsyncLoop() throws Exception {
+    public void createSimpleFlowWithParallelLoop() throws Exception {
         Map<String, Serializable> preFlowActionData = new HashMap<>();
         Map<String, Serializable> postFlowActionData = new HashMap<>();
         Deque<Step> steps = new LinkedList<>();
