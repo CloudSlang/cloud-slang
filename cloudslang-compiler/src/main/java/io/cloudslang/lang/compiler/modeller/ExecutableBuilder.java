@@ -340,20 +340,20 @@ public class ExecutableBuilder {
                 stepRawDataValue = stepRawData.values().iterator().next();
                 if (MapUtils.isNotEmpty(stepRawDataValue)) {
                     boolean loopKeyFound = stepRawDataValue.containsKey(LOOP_KEY);
-                    boolean asyncLoopKeyFound = stepRawDataValue.containsKey(ASYNC_LOOP_KEY);
+                    boolean parallelLoopKeyFound = stepRawDataValue.containsKey(ASYNC_LOOP_KEY);
                     if (loopKeyFound) {
-                        if (asyncLoopKeyFound) {
+                        if (parallelLoopKeyFound) {
                             errors.add(new RuntimeException("Step: " + stepName + " syntax is illegal.\nBelow step name, there can be either \'loop\' or \'aync_loop\' key."));
                         }
                         message = "Step: " + stepName + " syntax is illegal.\nBelow the 'loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
                         @SuppressWarnings("unchecked") Map<String, Object> loopRawData = (Map<String, Object>) stepRawDataValue.remove(LOOP_KEY);
                         stepRawDataValue.putAll(loopRawData);
                     }
-                    if (asyncLoopKeyFound) {
+                    if (parallelLoopKeyFound) {
                         message = "Step: " + stepName + " syntax is illegal.\nBelow the 'async_loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
-                        @SuppressWarnings("unchecked") Map<String, Object> asyncLoopRawData = (Map<String, Object>) stepRawDataValue.remove(ASYNC_LOOP_KEY);
-                        asyncLoopRawData.put(ASYNC_LOOP_KEY, asyncLoopRawData.remove(FOR_KEY));
-                        stepRawDataValue.putAll(asyncLoopRawData);
+                        @SuppressWarnings("unchecked") Map<String, Object> parallelLoopRawData = (Map<String, Object>) stepRawDataValue.remove(ASYNC_LOOP_KEY);
+                        parallelLoopRawData.put(ASYNC_LOOP_KEY, parallelLoopRawData.remove(FOR_KEY));
+                        stepRawDataValue.putAll(parallelLoopRawData);
                     }
                 }
             } catch (ClassCastException ex) {

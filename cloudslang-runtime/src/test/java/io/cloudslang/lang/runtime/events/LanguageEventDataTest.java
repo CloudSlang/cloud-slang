@@ -187,10 +187,10 @@ public class LanguageEventDataTest {
      */
     @Test
     public void testParallelLoopBoundExpression() {
-        List<Serializable> asyncLoopBoundExpression = new ArrayList<Serializable>(Arrays.asList("a", "b", "c"));
-        eventData.setParallelLoopBoundExpression(asyncLoopBoundExpression);
-        assertEquals(asyncLoopBoundExpression, eventData.getParallelLoopBoundExpression());
-        assertEquals(asyncLoopBoundExpression, eventData.get(LanguageEventData.BOUND_ASYNC_LOOP_EXPRESSION));
+        List<Serializable> parallelLoopBoundExpression = new ArrayList<Serializable>(Arrays.asList("a", "b", "c"));
+        eventData.setParallelLoopBoundExpression(parallelLoopBoundExpression);
+        assertEquals(parallelLoopBoundExpression, eventData.getParallelLoopBoundExpression());
+        assertEquals(parallelLoopBoundExpression, eventData.get(LanguageEventData.BOUND_ASYNC_LOOP_EXPRESSION));
     }
 
 

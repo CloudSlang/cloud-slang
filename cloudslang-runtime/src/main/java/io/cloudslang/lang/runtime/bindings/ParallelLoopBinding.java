@@ -41,11 +41,11 @@ public class ParallelLoopBinding {
     }
 
     public List<Serializable> bindParallelLoopList(
-            ParallelLoopStatement asyncLoopStatement,
+            ParallelLoopStatement parallelLoopStatement,
             Context flowContext,
             Set<SystemProperty> systemProperties,
             String nodeName) {
-        Validate.notNull(asyncLoopStatement, "async loop statement cannot be null");
+        Validate.notNull(parallelLoopStatement, "async loop statement cannot be null");
         Validate.notNull(flowContext, "flow context cannot be null");
         Validate.notNull(systemProperties, "system properties cannot be null");
         Validate.notNull(nodeName, "node name cannot be null");
@@ -53,7 +53,7 @@ public class ParallelLoopBinding {
         List<Serializable> evalResult;
         try {
             evalResult = (List<Serializable>) scriptEvaluator.evalExpr(
-                    asyncLoopStatement.getExpression(),
+                    parallelLoopStatement.getExpression(),
                     flowContext.getImmutableViewOfVariables(),
                     systemProperties);
         } catch (Throwable t) {

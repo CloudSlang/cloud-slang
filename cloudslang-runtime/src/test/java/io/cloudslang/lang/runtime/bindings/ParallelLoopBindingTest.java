@@ -31,7 +31,7 @@ public class ParallelLoopBindingTest {
     public ExpectedException exception = ExpectedException.none();
 
     @InjectMocks
-    private ParallelLoopBinding asyncLoopBinding = new ParallelLoopBinding();
+    private ParallelLoopBinding parallelLoopBinding = new ParallelLoopBinding();
 
     @Mock
     private ScriptEvaluator scriptEvaluator;
@@ -39,19 +39,19 @@ public class ParallelLoopBindingTest {
     @Test
     public void passingNullParallelLoopStatementThrowsException() throws Exception {
         exception.expect(RuntimeException.class);
-        asyncLoopBinding.bindParallelLoopList(null, new Context(new HashMap<String, Serializable>()), EMPTY_SET, "nodeName");
+        parallelLoopBinding.bindParallelLoopList(null, new Context(new HashMap<String, Serializable>()), EMPTY_SET, "nodeName");
     }
 
     @Test
     public void passingNullContextThrowsException() throws Exception {
         exception.expect(RuntimeException.class);
-        asyncLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), null, EMPTY_SET, "nodeName");
+        parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), null, EMPTY_SET, "nodeName");
     }
 
     @Test
     public void passingNullNodeNameThrowsException() throws Exception {
         exception.expect(RuntimeException.class);
-        asyncLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), new Context(new HashMap<String, Serializable>()), EMPTY_SET, null);
+        parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), new Context(new HashMap<String, Serializable>()), EMPTY_SET, null);
     }
 
     @Test
@@ -64,7 +64,7 @@ public class ParallelLoopBindingTest {
 
         when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET))).thenReturn((Serializable) expectedList);
 
-        List<Serializable> actualList = asyncLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), context, EMPTY_SET, "nodeName");
+        List<Serializable> actualList = parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), context, EMPTY_SET, "nodeName");
 
         verify(scriptEvaluator).evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET));
         assertEquals("returned async loop list not as expected", expectedList, actualList);
@@ -82,7 +82,7 @@ public class ParallelLoopBindingTest {
         exception.expectMessage("expression is empty");
         exception.expect(RuntimeException.class);
 
-        asyncLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), context, EMPTY_SET, "nodeName");
+        parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), context, EMPTY_SET, "nodeName");
     }
 
     @Test
@@ -94,7 +94,7 @@ public class ParallelLoopBindingTest {
         exception.expectMessage("nodeName");
         exception.expect(RuntimeException.class);
 
-        asyncLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), new Context(variables), EMPTY_SET, "nodeName");
+        parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), new Context(variables), EMPTY_SET, "nodeName");
     }
 
     private ParallelLoopStatement createBasicSyncLoopStatement() {

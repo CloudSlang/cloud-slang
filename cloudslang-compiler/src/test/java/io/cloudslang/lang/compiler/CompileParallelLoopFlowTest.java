@@ -316,10 +316,10 @@ public class CompileParallelLoopFlowTest {
 
     private void verifyParallelLoopStatement(Map<String, ?> addBranchesActionData) {
         assertTrue(addBranchesActionData.containsKey(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY));
-        ParallelLoopStatement asyncLoopStatement =
+        ParallelLoopStatement parallelLoopStatement =
                 (ParallelLoopStatement) addBranchesActionData.get(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY);
-        assertEquals("async loop statement value not as expected", "value", asyncLoopStatement.getVarName());
-        assertEquals("async loop statement expression not as expected", "values", asyncLoopStatement.getExpression());
+        assertEquals("async loop statement value not as expected", "value", parallelLoopStatement.getVarName());
+        assertEquals("async loop statement expression not as expected", "values", parallelLoopStatement.getExpression());
     }
 
     private Deque<Step> getStepsAfterPrecompileFlow(String flowPath) throws URISyntaxException {
@@ -332,10 +332,10 @@ public class CompileParallelLoopFlowTest {
 
     private void verifyParallelLoopStatement(Step step) {
         assertTrue(step.getPreStepActionData().containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
-        ParallelLoopStatement asyncLoopStatement = (ParallelLoopStatement) step.getPreStepActionData()
+        ParallelLoopStatement parallelLoopStatement = (ParallelLoopStatement) step.getPreStepActionData()
                 .get(ScoreLangConstants.ASYNC_LOOP_KEY);
-        assertEquals("values", asyncLoopStatement.getExpression());
-        assertEquals("value", asyncLoopStatement.getVarName());
+        assertEquals("values", parallelLoopStatement.getExpression());
+        assertEquals("value", parallelLoopStatement.getVarName());
     }
 
     private List<Output> getAggregateOutputs(Step step) {
