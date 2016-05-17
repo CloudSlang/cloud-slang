@@ -64,7 +64,7 @@ public class ScoreCompilerImpl implements ScoreCompiler {
             //than we match the references to the actual dependencies
             filteredDependencies = dependenciesHelper.matchReferences(executable, availableExecutables);
 
-            List<RuntimeException> errors = validateModelWithDependencies(executable, filteredDependencies);
+            List<RuntimeException> errors = validator.validateModelWithDependencies(executable, filteredDependencies);
             if (errors.size() > 0) {
                 throw errors.get(0);
             }
@@ -94,17 +94,7 @@ public class ScoreCompilerImpl implements ScoreCompiler {
         for (Executable dependency : dependenciesModels) {
             dependenciesMap.put(dependency.getId(), dependency);
         }
-        return validateModelWithDependencies(slangModel, dependenciesMap);
-    }
-
-    private List<RuntimeException> validateModelWithDependencies(Executable executable, Map<String, Executable> dependencies) {
-
-        List<RuntimeException> errors = validator.validateRequiredNonPrivateInputs(executable, dependencies);
-
-        // Validate that all the steps of a flow have navigations for all the reference's results
-        errors.addAll(validator.validateAllDependenciesResultsHaveMatchingNavigations(executable, dependencies));
-
-        return errors;
+        return validator.validateModelWithDependencies(slangModel, dependenciesMap);
     }
 
     /**

@@ -55,43 +55,13 @@ public class ValidatorImpl implements Validator {
     }
 
     @Override
-    public List<RuntimeException> validateRequiredNonPrivateInputs(
+    public List<RuntimeException> validateModelWithDependencies(
             Executable executable,
             Map<String, Executable> filteredDependencies) {
         Map<String, Executable> dependencies = new HashMap<>(filteredDependencies);
         dependencies.put(executable.getId(), executable);
         Set<Executable> verifiedExecutables = new HashSet<>();
         return validateRequiredNonPrivateInputs(executable, dependencies, verifiedExecutables, new ArrayList<RuntimeException>());
-    }
-
-    @Override
-    public List<RuntimeException> validateAllDependenciesResultsHaveMatchingNavigations(Executable executable, Map<String, Executable> filteredDependencies) {
-        List<RuntimeException> errors = new ArrayList<>();
-        if(executable.getType().equals(SlangTextualKeys.OPERATION_TYPE)){
-            return errors;
-        }
-        Flow flow = (Flow)executable;
-        Deque<Step> steps = flow.getWorkflow().getSteps();
-        for(Step step : steps){
-            List<Map<String, String>> stepNavigations = step.getNavigationStrings();
-            String refId = step.getRefId();
-            Executable reference = filteredDependencies.get(refId);
-            if (reference == null) {
-                errors.add(new IllegalArgumentException("Cannot compile flow: \'" + executable.getName() + "\' since for step: \'" + step.getName()
-                        + "\', the dependency: \'" + refId + "\' is missing."));
-            } else {
-                List<Result> refResults = reference.getResults();
-                for(Result result : refResults){
-                    String resultName = result.getName();
-                    if (!navigationListContainsKey(stepNavigations, resultName)){
-                        errors.add(new IllegalArgumentException("Cannot compile flow: \'" + executable.getName() +
-                                "\' since for step: '" + step.getName() + "\', the result \'" + resultName+
-                                "\' of its dependency: \'"+ refId + "\' has no matching navigation"));
-                    }
-                }
-            }
-        }
-        return errors;
     }
 
     private boolean navigationListContainsKey(List<Map<String, String>> stepNavigations, String resultName) {
@@ -117,7 +87,8 @@ public class ValidatorImpl implements Validator {
         Set<Executable> flowReferences = new HashSet<>();
 
         for (Step step : steps) {
-            Executable reference = dependencies.get(step.getRefId());
+            String refId = step.getRefId();
+            Executable reference = dependencies.get(refId);
             List<String> mandatoryInputNames = getMandatoryInputNames(reference);
             List<String> stepInputNames = getStepInputNames(step);
             List<String> inputsNotWired = getInputsNotWired(mandatoryInputNames, stepInputNames);
@@ -125,6 +96,7 @@ public class ValidatorImpl implements Validator {
             try {
                 validateInputNamesEmpty(inputsNotWired, flow, step, reference);
                 validateStepInputNamesDifferentFromDependencyOutputNames(flow, step, reference);
+                validateDependenciesResultsHaveMatchingNavigations(executable, refId, step, reference);
             } catch (RuntimeException e) {
                 errors.add(e);
             }
@@ -136,6 +108,29 @@ public class ValidatorImpl implements Validator {
             validateRequiredNonPrivateInputs(reference, dependencies, verifiedExecutables, errors);
         }
         return errors;
+    }
+
+    private void validateDependenciesResultsHaveMatchingNavigations(Executable executable, String refId, Step step, Executable reference) {
+        if (!StringUtils.equals(refId, executable.getId())) {
+            if(executable.getType().equals(SlangTextualKeys.OPERATION_TYPE)){
+                return;
+            }
+            List<Map<String, String>> stepNavigationStrings = step.getNavigationStrings();
+            if (reference == null) {
+                throw new IllegalArgumentException("Cannot compile flow: \'" + executable.getName() + "\' since for step: \'" + step.getName()
+                        + "\', the dependency: \'" + refId + "\' is missing.");
+            } else {
+                List<Result> refResults = reference.getResults();
+                for(Result result : refResults){
+                    String resultName = result.getName();
+                    if (!navigationListContainsKey(stepNavigationStrings, resultName)){
+                        throw new IllegalArgumentException("Cannot compile flow: \'" + executable.getName() +
+                                "\' since for step: '" + step.getName() + "\', the result \'" + resultName+
+                                "\' of its dependency: \'"+ refId + "\' has no matching navigation");
+                    }
+                }
+            }
+        }
     }
 
     private void validateStepInputNamesDifferentFromDependencyOutputNames(Flow flow, Step step, Executable reference) {

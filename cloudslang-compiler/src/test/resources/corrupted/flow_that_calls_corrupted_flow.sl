@@ -7,22 +7,10 @@
 
 namespace: io.cloudslang
 
-imports:
-  ops: user.ops
-
 flow:
-  name: flow_input_in_step_same_name_as_dependency_output
-  inputs:
-    - input1
+  name: flow_that_calls_corrupted_flow
   workflow:
-    - explicit_alias:
+    - call_to_other_flow:
         do:
-          ops.test_op:
-            - alla: 'input_1'
-            - balla: '22'
-
-    - implicit_alias:
-        do:
-          check_op:
-            - city: 'input_1'
-            - port: '22'
+          flow_input_in_step_same_name_as_dependency_output:
+            - input1

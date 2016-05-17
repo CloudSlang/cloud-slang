@@ -16,20 +16,8 @@ public interface Validator {
 
     void validateInputNamesDifferentFromOutputNames(ExecutableModellingResult result);
 
-    List<RuntimeException> validateRequiredNonPrivateInputs(
+    List<RuntimeException> validateModelWithDependencies(
             Executable executable,
             Map<String, Executable> filteredDependencies);
 
-    /**
-     * Validate that for all the steps in the flow, all results from the referenced operation or flow have matching navigations
-     * If the given {@link io.cloudslang.lang.compiler.modeller.model.Executable} is an operation, the method does nothing
-     * Throws {@link java.lang.IllegalArgumentException} if:
-     *      - Any reference of the executable is missing
-     *      - There is a missing navigation for one of the steps' references' results
-     *
-     * @param executable the flow to validate
-     * @param filteredDependencies a map holding for each reference name, its {@link io.cloudslang.lang.compiler.modeller.model.Executable} object
-     */
-    List<RuntimeException> validateAllDependenciesResultsHaveMatchingNavigations(Executable executable,
-                                                                                 Map<String, Executable> filteredDependencies);
 }
