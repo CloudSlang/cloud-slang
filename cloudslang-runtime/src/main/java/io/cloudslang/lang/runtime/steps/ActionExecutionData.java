@@ -12,7 +12,6 @@
 package io.cloudslang.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
-import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import io.cloudslang.lang.entities.ActionType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
@@ -32,8 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.*;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
@@ -111,116 +108,12 @@ public class ActionExecutionData extends AbstractExecutionData {
                                                     Map<String, Serializable> currentContext,
                                                     Map<String, Object> nonSerializableExecutionData,
                                                     String gav, String className, String methodName) {
-        List<Object> actualParameters = extractMethodData(serializableSessionData, currentContext, nonSerializableExecutionData, className, methodName);
         Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService.execute(gav, className, methodName,
-                actualParameters.toArray(new Object[actualParameters.size()]));
+                new CloudSlangJavaExecutionParameterProvider(serializableSessionData, currentContext, nonSerializableExecutionData));
         if (returnMap == null) {
             throw new RuntimeException("Action method did not return Map<String,String>");
         }
         return returnMap;
-    }
-
-    private List<Object> extractMethodData(Map<String, SerializableSessionObject> serializableSessionData,
-                                       Map<String, Serializable> currentContext,
-                                       Map<String, Object> nonSerializableExecutionData,
-                                       String className,
-                                       String methodName) {
-
-        //get the Method object
-        Method actionMethod = getMethodByName(className, methodName);
-        if (actionMethod == null) {
-            throw new RuntimeException("Method " + methodName + " is not part of class " + className);
-        }
-
-        //extract the parameters from execution context
-        return resolveActionArguments(serializableSessionData, actionMethod, currentContext, nonSerializableExecutionData);
-    }
-
-    private Class getActionClass(String className) {
-        Class actionClass;
-        try {
-            actionClass = Class.forName(className);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Class name " + className + " was not found", e);
-        }
-        return actionClass;
-    }
-
-    private Method getMethodByName(String className, String methodName) {
-        Class actionClass = getActionClass(className);
-        Method[] methods = actionClass.getDeclaredMethods();
-        Method actionMethod = null;
-        for (Method m : methods) {
-            if (m.getName().equals(methodName)) {
-                actionMethod = m;
-            }
-        }
-        return actionMethod;
-    }
-
-    protected List<Object> resolveActionArguments(Map<String, SerializableSessionObject> serializableSessionData,
-                                              Method actionMethod,
-                                              Map<String, Serializable> currentContext,
-                                              Map<String, Object> nonSerializableExecutionData) {
-        List<Object> args = new ArrayList<>();
-
-        int index = 0;
-        Class[] parameterTypes = actionMethod.getParameterTypes();
-        for (Annotation[] annotations : actionMethod.getParameterAnnotations()) {
-            index++;
-            for (Annotation annotation : annotations) {
-                if (annotation instanceof Param) {
-                    if (parameterTypes[index - 1].equals(GlobalSessionObject.class)) {
-                        handleNonSerializableSessionContextArgument(nonSerializableExecutionData, args, (Param) annotation);
-                    } else if (parameterTypes[index - 1].equals(SerializableSessionObject.class)) {
-                        handleSerializableSessionContextArgument(serializableSessionData, args, (Param) annotation);
-                    } else {
-                        String parameterName = ((Param) annotation).value();
-                        Serializable value = currentContext.get(parameterName);
-                        Class parameterClass = parameterTypes[index - 1];
-                        if (parameterClass.isInstance(value) || value == null) {
-                            args.add(value);
-                        } else {
-                            StringBuilder exceptionMessageBuilder = new StringBuilder();
-                            exceptionMessageBuilder.append("Parameter type mismatch for action ");
-                            exceptionMessageBuilder.append(actionMethod.getName());
-                            exceptionMessageBuilder.append(" of class ");
-                            exceptionMessageBuilder.append(actionMethod.getDeclaringClass().getName());
-                            exceptionMessageBuilder.append(". Parameter ");
-                            exceptionMessageBuilder.append(parameterName);
-                            exceptionMessageBuilder.append(" expects type ");
-                            exceptionMessageBuilder.append(parameterClass.getName());
-                            throw new RuntimeException(exceptionMessageBuilder.toString());
-                        }
-                    }
-                }
-            }
-            if (args.size() != index) {
-                throw new RuntimeException("All action arguments should be annotated with @Param");
-            }
-        }
-        return args;
-    }
-
-    private void handleNonSerializableSessionContextArgument(Map<String, Object> nonSerializableExecutionData, List<Object> args, Param annotation) {
-        String key = annotation.value();
-        Object nonSerializableSessionContextObject = nonSerializableExecutionData.get(key);
-        if (nonSerializableSessionContextObject == null) {
-            nonSerializableSessionContextObject = new GlobalSessionObject<>();
-            nonSerializableExecutionData.put(key, nonSerializableSessionContextObject);
-        }
-        args.add(nonSerializableSessionContextObject);
-    }
-
-    private void handleSerializableSessionContextArgument(Map<String, SerializableSessionObject> serializableSessionData, List<Object> args, Param annotation) {
-        String key = annotation.value();
-        SerializableSessionObject serializableSessionContextObject = serializableSessionData.get(key);
-        if (serializableSessionContextObject == null) {
-            serializableSessionContextObject = new SerializableSessionObject();
-            //noinspection unchecked
-            serializableSessionData.put(key, serializableSessionContextObject);
-        }
-        args.add(serializableSessionContextObject);
     }
 
     private Map<String, Serializable> prepareAndRunPythonAction(Collection<String> dependencies, String pythonScript, Map<String, Serializable> callArguments) {
