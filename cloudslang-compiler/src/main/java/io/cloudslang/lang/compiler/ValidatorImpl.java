@@ -20,6 +20,8 @@ import java.util.*;
 @Component
 public class ValidatorImpl implements Validator {
 
+    public static final String NAME_PLACEHOLDER = "name_placeholder01";
+
     @Override
     public void validateFileName(String executableName, ParsedSlang parsedSlang, ExecutableModellingResult result) {
         String fileName = parsedSlang.getName();
@@ -44,7 +46,7 @@ public class ValidatorImpl implements Validator {
         List<Output> outputs = result.getExecutable().getOutputs();
         String errorMessage = "Inputs and outputs names should be different for \"" +
                 result.getExecutable().getId() + "\". " +
-                "Please rename input/output \"" + "placeholder01" + "\"";
+                "Please rename input/output \"" + NAME_PLACEHOLDER + "\"";
         try {
             validateListsHaveMutuallyExclusiveNames(inputs, outputs, errorMessage);
         } catch (RuntimeException e) {
@@ -141,7 +143,7 @@ public class ValidatorImpl implements Validator {
         List<Output> outputs = reference.getOutputs();
         String errorMessage = "Cannot compile flow '" + flow.getId() +
                 "'. Step '" + step.getName() +
-                "' has input '" + "placeholder01" +
+                "' has input '" + NAME_PLACEHOLDER +
                 "' with the same name as the one of the outputs of '" + reference.getId() + "'.";
         validateListsHaveMutuallyExclusiveNames(stepArguments, outputs, errorMessage);
     }
@@ -150,7 +152,7 @@ public class ValidatorImpl implements Validator {
         for (InOutParam inOutParam : CollectionUtils.emptyIfNull(inOutParams)) {
             for (Output output : CollectionUtils.emptyIfNull(outputs)) {
                 if (StringUtils.equalsIgnoreCase(inOutParam.getName(), output.getName())) {
-                    throw new IllegalArgumentException(errorMessage.replace("placeholder01", inOutParam.getName()));
+                    throw new IllegalArgumentException(errorMessage.replace(NAME_PLACEHOLDER, inOutParam.getName()));
                 }
             }
         }
