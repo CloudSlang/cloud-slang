@@ -5,19 +5,27 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: loops.async_loop
+namespace: loops.parallel_loop
 
 imports:
-  ops: loops.async_loop
+  ops: loops.parallel_loop
 
 flow:
-  name: simple_async_loop
+  name: parallel_loop_navigate
   inputs:
     - values: ${ range(1, 11) }
   workflow:
     - print_values:
-        async_loop:
+        parallel_loop:
           for: value in values
           do:
             ops.print_branch:
               - ID: ${ value }
+        navigate:
+            - SUCCESS: print_list
+            - FAILURE: FAILURE
+
+    - print_list:
+        do:
+            ops.print_list:
+                - words_list: []

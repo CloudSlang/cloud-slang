@@ -32,8 +32,8 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
     @Test
     public void testFlowWithParallelLoop() throws Exception {
-        URI resource = getClass().getResource("/yaml/loops/async_loop/simple_async_loop.sl").toURI();
-        URI operation1 = getClass().getResource("/yaml/loops/async_loop/print_branch.sl").toURI();
+        URI resource = getClass().getResource("/yaml/loops/parallel_loop/simple_parallel_loop.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
 
         RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path);
@@ -44,8 +44,8 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
     @Test
     public void testFlowWithParallelLoopAggregate() throws Exception {
-        URI resource = getClass().getResource("/yaml/loops/async_loop/async_loop_aggregate.sl").toURI();
-        URI operation1 = getClass().getResource("/yaml/loops/async_loop/print_branch.sl").toURI();
+        URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_aggregate.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
 
         RuntimeInformation runtimeInformation = triggerWithData(
@@ -64,9 +64,9 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
     @Test
     public void testFlowWithParallelLoopNavigate() throws Exception {
-        URI resource = getClass().getResource("/yaml/loops/async_loop/async_loop_navigate.sl").toURI();
-        URI operation1 = getClass().getResource("/yaml/loops/async_loop/print_branch.sl").toURI();
-        URI operation2 = getClass().getResource("/yaml/loops/async_loop/print_list.sl").toURI();
+        URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_navigate.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
+        URI operation2 = getClass().getResource("/yaml/loops/parallel_loop/print_list.sl").toURI();
 
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
 
@@ -80,9 +80,9 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
     @Test
     public void testFlowWithParallelLoopAggregateNavigate() throws Exception {
-        URI resource = getClass().getResource("/yaml/loops/async_loop/async_loop_aggregate_navigate.sl").toURI();
-        URI operation1 = getClass().getResource("/yaml/loops/async_loop/print_branch.sl").toURI();
-        URI operation2 = getClass().getResource("/yaml/loops/async_loop/print_list.sl").toURI();
+        URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_aggregate_navigate.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
+        URI operation2 = getClass().getResource("/yaml/loops/parallel_loop/print_list.sl").toURI();
 
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
 
@@ -104,8 +104,8 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
     @Test
     public void testFlowContextInAggregateSectionNotReachable() throws Exception {
-        URI resource = getClass().getResource("/yaml/loops/async_loop/async_loop_aggregate_flow_context.sl").toURI();
-        URI operation1 = getClass().getResource("/yaml/loops/async_loop/print_branch.sl").toURI();
+        URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_aggregate_flow_context.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
 
         exception.expect(RuntimeException.class);

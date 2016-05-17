@@ -48,7 +48,7 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testPreCompileParallelLoopFlow() throws Exception {
-        Step step = getStepsAfterPrecompileFlow("/loops/async_loop/simple_async_loop.sl").getFirst();
+        Step step = getStepsAfterPrecompileFlow("/loops/parallel_loop/simple_parallel_loop.sl").getFirst();
 
         verifyParallelLoopStatement(step);
 
@@ -72,7 +72,7 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testPreCompileParallelLoopFlowAggregate() throws Exception {
-        Step step = getStepsAfterPrecompileFlow("/loops/async_loop/async_loop_aggregate.sl").getFirst();
+        Step step = getStepsAfterPrecompileFlow("/loops/parallel_loop/parallel_loop_aggregate.sl").getFirst();
 
         verifyParallelLoopStatement(step);
 
@@ -98,7 +98,7 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testPreCompileParallelLoopFlowNavigate() throws Exception {
-        Deque<Step> steps = getStepsAfterPrecompileFlow("/loops/async_loop/async_loop_navigate.sl");
+        Deque<Step> steps = getStepsAfterPrecompileFlow("/loops/parallel_loop/parallel_loop_navigate.sl");
         assertEquals(2, steps.size());
 
         Step asyncStep = steps.getFirst();
@@ -125,7 +125,7 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testPreCompileParallelLoopFlowAggregateNavigate() throws Exception {
-        Deque<Step> steps = getStepsAfterPrecompileFlow("/loops/async_loop/async_loop_aggregate_navigate.sl");
+        Deque<Step> steps = getStepsAfterPrecompileFlow("/loops/parallel_loop/parallel_loop_aggregate_navigate.sl");
         assertEquals(2, steps.size());
 
         Step asyncStep = steps.getFirst();
@@ -154,8 +154,8 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testCompileParallelLoopFlow() throws Exception {
-        URI flow = getClass().getResource("/loops/async_loop/simple_async_loop.sl").toURI();
-        URI operation = getClass().getResource("/loops/async_loop/print_branch.sl").toURI();
+        URI flow = getClass().getResource("/loops/parallel_loop/simple_parallel_loop.sl").toURI();
+        URI operation = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
         CompilationArtifact artifact = compiler.compile(SlangSource.fromFile(flow), path);
@@ -176,8 +176,8 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testCompileParallelLoopFlowAggregate() throws Exception {
-        URI flow = getClass().getResource("/loops/async_loop/async_loop_aggregate.sl").toURI();
-        URI operation = getClass().getResource("/loops/async_loop/print_branch.sl").toURI();
+        URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_aggregate.sl").toURI();
+        URI operation = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
         CompilationArtifact artifact = compiler.compile(SlangSource.fromFile(flow), path);
@@ -206,9 +206,9 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testCompileParallelLoopFlowNavigate() throws Exception {
-        URI flow = getClass().getResource("/loops/async_loop/async_loop_navigate.sl").toURI();
-        URI operation1 = getClass().getResource("/loops/async_loop/print_branch.sl").toURI();
-        URI operation2 = getClass().getResource("/loops/async_loop/print_list.sl").toURI();
+        URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate.sl").toURI();
+        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
+        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation1));
         path.add(SlangSource.fromFile(operation2));
@@ -235,9 +235,9 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testCompileParallelLoopFlowAggregateNavigate() throws Exception {
-        URI flow = getClass().getResource("/loops/async_loop/async_loop_aggregate_navigate.sl").toURI();
-        URI operation1 = getClass().getResource("/loops/async_loop/print_branch.sl").toURI();
-        URI operation2 = getClass().getResource("/loops/async_loop/print_list.sl").toURI();
+        URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_aggregate_navigate.sl").toURI();
+        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
+        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation1));
         path.add(SlangSource.fromFile(operation2));

@@ -350,7 +350,7 @@ public class ExecutableBuilder {
                         stepRawDataValue.putAll(loopRawData);
                     }
                     if (parallelLoopKeyFound) {
-                        message = "Step: " + stepName + " syntax is illegal.\nBelow the 'async_loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
+                        message = "Step: " + stepName + " syntax is illegal.\nBelow the 'parallel_loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
                         @SuppressWarnings("unchecked") Map<String, Object> parallelLoopRawData = (Map<String, Object>) stepRawDataValue.remove(PARALLEL_LOOP_KEY);
                         parallelLoopRawData.put(PARALLEL_LOOP_KEY, parallelLoopRawData.remove(FOR_KEY));
                         stepRawDataValue.putAll(parallelLoopRawData);

@@ -148,7 +148,7 @@ public class StepExecutionData extends AbstractExecutionData {
                         @Param(ScoreLangConstants.PREVIOUS_STEP_ID_KEY) Long previousStepId,
                         @Param(ScoreLangConstants.BREAK_LOOP_KEY) List<String> breakOn,
                         @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
-                        @Param(ScoreLangConstants.PARALLEL_LOOP_KEY) boolean async_loop) {
+                        @Param(ScoreLangConstants.PARALLEL_LOOP_KEY) boolean parallel_loop) {
 
         try {
             Context flowContext = runEnv.getStack().popContext();
@@ -196,7 +196,7 @@ public class StepExecutionData extends AbstractExecutionData {
             String executableResult = executableReturnValues.getResult();
             String presetResult = executableResult;
 
-            if (!async_loop) {
+            if (!parallel_loop) {
                 // set the position of the next step - for the use of the navigation
                 // find in the navigation values the correct next step position, according to the operation result, and set it
                 ResultNavigation navigation = stepNavigationValues.get(executableResult);
