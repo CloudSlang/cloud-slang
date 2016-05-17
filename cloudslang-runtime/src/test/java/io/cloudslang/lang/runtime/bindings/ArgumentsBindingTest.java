@@ -39,6 +39,7 @@ import static org.junit.Assert.assertNull;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ArgumentsBindingTest.Config.class)
 public class ArgumentsBindingTest {
+    private static boolean shouldRunMaven;
     static {
         ClassLoader classLoader = ArgumentsBindingTest.class.getClassLoader();
 
@@ -53,14 +54,10 @@ public class ArgumentsBindingTest {
         System.setProperty(MavenConfigImpl.MAVEN_HOME, mavenHome.getAbsolutePath());
 
         System.setProperty(MavenConfigImpl.MAVEN_REPO_LOCAL, mavenRepo.getAbsolutePath());
-        System.setProperty(MavenConfigImpl.MAVEN_REMOTE_URL, "http://mydtbld0034.hpeswlab.net:8081/nexus/content/groups/oo-public");
-        System.setProperty(MavenConfigImpl.MAVEN_PLUGINS_URL, "http://mydphdb0166.hpswlabs.adapps.hp.com:8081/nexus/content/repositories/snapshots/");
         System.setProperty("maven.home", classLoader.getResource("maven").getPath());
 
-        System.setProperty(MavenConfigImpl.MAVEN_PROXY_PROTOCOL, "https");
-        System.setProperty(MavenConfigImpl.MAVEN_PROXY_HOST, "proxy.bbn.hp.com");
-        System.setProperty(MavenConfigImpl.MAVEN_PROXY_PORT, "8080");
-        System.setProperty(MavenConfigImpl.MAVEN_PROXY_NON_PROXY_HOSTS, "*.hp.com");
+        shouldRunMaven = System.getProperties().containsKey(MavenConfigImpl.MAVEN_REMOTE_URL) &&
+                System.getProperties().containsKey(MavenConfigImpl.MAVEN_PLUGINS_URL);
 
         System.setProperty(MavenConfigImpl.MAVEN_SETTINGS_PATH, settingsXmlPath);
         System.setProperty(MavenConfigImpl.MAVEN_M2_CONF_PATH, classLoader.getResource("m2.conf").getPath());

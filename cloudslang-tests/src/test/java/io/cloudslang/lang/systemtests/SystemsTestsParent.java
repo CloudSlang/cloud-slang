@@ -18,7 +18,7 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
 import io.cloudslang.lang.entities.SystemProperty;
-import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
+import io.cloudslang.runtime.impl.python.PythonExecutionNotCachedEngine;
 import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
@@ -43,6 +43,7 @@ import static org.junit.Assert.assertNull;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:/META-INF/spring/systemTestContext.xml")
 public abstract class SystemsTestsParent {
+    private static boolean shouldRunMaven;
 
     protected static final String EXEC_START_PATH = "0";
     protected static final String FIRST_STEP_PATH = "0.0";
@@ -69,19 +70,15 @@ public abstract class SystemsTestsParent {
         System.setProperty(MavenConfigImpl.MAVEN_HOME, mavenHome.getAbsolutePath());
 
         System.setProperty(MavenConfigImpl.MAVEN_REPO_LOCAL, mavenRepo.getAbsolutePath());
-        System.setProperty(MavenConfigImpl.MAVEN_REMOTE_URL, "http://mydtbld0034.hpeswlab.net:8081/nexus/content/groups/oo-public");
-        System.setProperty(MavenConfigImpl.MAVEN_PLUGINS_URL, "http://mydphdb0166.hpswlabs.adapps.hp.com:8081/nexus/content/repositories/snapshots/");
         System.setProperty("maven.home", classLoader.getResource("maven").getPath());
 
-        System.setProperty(MavenConfigImpl.MAVEN_PROXY_PROTOCOL, "https");
-        System.setProperty(MavenConfigImpl.MAVEN_PROXY_HOST, "proxy.bbn.hp.com");
-        System.setProperty(MavenConfigImpl.MAVEN_PROXY_PORT, "8080");
-        System.setProperty(MavenConfigImpl.MAVEN_PROXY_NON_PROXY_HOSTS, "*.hp.com");
+        shouldRunMaven = System.getProperties().containsKey(MavenConfigImpl.MAVEN_REMOTE_URL) &&
+                System.getProperties().containsKey(MavenConfigImpl.MAVEN_PLUGINS_URL);
 
         System.setProperty(MavenConfigImpl.MAVEN_SETTINGS_PATH, settingsXmlPath);
         System.setProperty(MavenConfigImpl.MAVEN_M2_CONF_PATH, classLoader.getResource("m2.conf").getPath());
 
-        String provideralAlreadyConfigured = System.setProperty("python.executor.engine", PythonExecutionCachedEngine.class.getSimpleName());
+        String provideralAlreadyConfigured = System.setProperty("python.executor.engine", PythonExecutionNotCachedEngine.class.getSimpleName());
         assertNull("python.executor.engine was configured before this test!!!!!!!", provideralAlreadyConfigured);
     }
 
