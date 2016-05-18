@@ -59,7 +59,7 @@ public class DoTransformerTest {
         Argument argument = arguments.iterator().next();
         Assert.assertEquals("city",argument.getName());
         Assert.assertEquals("city_name", argument.getValue().get());
-        Assert.assertEquals(false, argument.isPrivateArgument());
+        Assert.assertEquals(true, argument.isPrivateArgument());
     }
 
     @Test

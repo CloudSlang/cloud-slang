@@ -56,7 +56,7 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
     private Map<String, Value> getUserInputs() {
         Map<String, Value> userInputs = new HashMap<>();
         userInputs.put("input_no_expression", ValueFactory.create("input_no_expression_value"));
-        userInputs.put("input_not_overridable", ValueFactory.create("i_should_not_be_assigned"));
+        userInputs.put("input_private", ValueFactory.create("i_should_not_be_assigned"));
         userInputs.put("enable_option_for_action", ValueFactory.create("enable_option_for_action_value"));
         return userInputs;
     }
@@ -82,7 +82,7 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         expectedInputs.put("input_no_expression", ValueFactory.create("input_no_expression_value"));
         expectedInputs.put("input_no_expression_not_required", ValueFactory.create(null));
         expectedInputs.put("input_system_property", ValueFactory.create("localhost"));
-        expectedInputs.put("input_not_overridable", ValueFactory.create(25));
+        expectedInputs.put("input_private", ValueFactory.create(25));
 
         // loaded by Yaml
         expectedInputs.put("input_int", ValueFactory.create(22));

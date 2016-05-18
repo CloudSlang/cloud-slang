@@ -200,12 +200,12 @@ public class NavigationTest extends SystemsTestsParent {
                 SlangSource.fromFile(operation4Python));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("userNumber", "1024");
-        userInputs.put("emailHost", "emailHost");
-        userInputs.put("emailPort", "25");
-        userInputs.put("emailSender", "user@host.com");
-        userInputs.put("emailRecipient", "user@host.com");
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("userNumber", ValueFactory.create("1024"));
+        userInputs.put("emailHost", ValueFactory.create("emailHost"));
+        userInputs.put("emailPort", ValueFactory.create("25"));
+        userInputs.put("emailSender", ValueFactory.create("user@host.com"));
+        userInputs.put("emailRecipient", ValueFactory.create("user@host.com"));
 
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
 

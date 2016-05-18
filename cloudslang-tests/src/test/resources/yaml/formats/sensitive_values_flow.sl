@@ -23,11 +23,11 @@ flow:
     - input_get_input_no_value:
         default: ${input_no_value}
         required: false
-        overridable: false
+        private: true
     - input_get_input_no_value_sensitive:
         default: ${input_no_value}
         required: false
-        overridable: false
+        private: true
         sensitive: true
     - input_get_sensitive_input_no_value:
         default: ${input_no_value_sensitive}
@@ -39,10 +39,10 @@ flow:
 
     - input_python_get_input_no_value:
         default: ${get("input_no_value", "default_value")}
-        overridable: false
+        private: true
     - input_python_get_input_no_value_sensitive:
         default: ${get("input_no_value", "default_value")}
-        overridable: false
+        private: true
         sensitive: true
     - input_python_get_sensitive_input_no_value:
         default: ${get("input_no_value_sensitive", "default_value")}
@@ -58,10 +58,10 @@ flow:
 
     - input_get_input_with_value:
         default: ${input_with_value}
-        overridable: false
+        private: true
     - input_get_input_with_value_sensitive:
         default: ${input_with_value}
-        overridable: false
+        private: true
         sensitive: true
     - input_get_sensitive_input_with_value:
         default: ${input_with_value_sensitive}
@@ -71,10 +71,10 @@ flow:
    
     - input_python_get_input_with_value:
         default: ${get("input_with_value", "default_value")}
-        overridable: false
+        private: true
     - input_python_get_input_with_value_sensitive:
         default: ${get("input_with_value", "default_value")}
-        overridable: false
+        private: true
         sensitive: true
     - input_python_get_sensitive_input_with_value:
         default: ${get("input_with_value_sensitive", "default_value")}
@@ -125,38 +125,38 @@ flow:
         
     - input_not_overridable:
         default: 10
-        overridable: false
+        private: true
         sensitive: false
     - input_not_overridable_sensitive:
         default: 10
-        overridable: false
+        private: true
         sensitive: true
 
     - input_overridable_hi1:
         default: Hi
-        overridable: true
+        private: false
         sensitive: false
     - input_overridable_hi1_sensitive:
         default: Hi
-        overridable: true
+        private: false
         sensitive: true
 
     - input_overridable_hi2:
         default: 'Hi'
-        overridable: true
+        private: false
         sensitive: false
     - input_overridable_hi2_sensitive:
         default: 'Hi'
-        overridable: true
+        private: false
         sensitive: true
 
     - input_overridable_hi3:
         default: "Hi"
-        overridable: true
+        private: false
         sensitive: false
     - input_overridable_hi3_sensitive:
         default: "Hi"
-        overridable: true
+        private: false
         sensitive: true
     
     - input_yaml_list:

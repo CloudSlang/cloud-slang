@@ -13,10 +13,9 @@ operation:
     - host:
         sensitive: true
     - port
-  action:
-    java_action:
-      className: io.cloudslang.lang.systemtests.actions.LangTestActions
-      methodName: parseUrl
+  java_action:
+    class_name: io.cloudslang.lang.systemtests.actions.LangTestActions
+    method_name: parseUrl
   outputs:
     - url
   results:

@@ -64,7 +64,7 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
         // default is sensitive=false
         boolean sensitive = props.containsKey(SENSITIVE_KEY) &&
                 (boolean) props.get(SENSITIVE_KEY);
-        // default is overridable=true
+        // default is private=false
         boolean privateInput = props.containsKey(PRIVATE_INPUT_KEY) &&
                 (boolean) props.get(PRIVATE_INPUT_KEY);
         boolean defaultSpecified = props.containsKey(DEFAULT_KEY);

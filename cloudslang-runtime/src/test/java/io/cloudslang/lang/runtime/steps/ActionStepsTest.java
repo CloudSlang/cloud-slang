@@ -19,11 +19,10 @@ import io.cloudslang.lang.runtime.bindings.scripts.ScriptExecutor;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import java.util.ArrayList;
-import org.junit.Assert;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,7 +39,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -406,7 +405,7 @@ public class ActionStepsTest {
         //construct expected outputs
         Map<String, Value> expectedOutputs = new HashMap<>();
         expectedOutputs.put("name", ValueFactory.create("nameTest"));
-        expectedOutputs.put("role", ValueFactory.create((Serializable)null));
+        expectedOutputs.put("role", ValueFactory.create(null));
 
         //extract actual outputs
         ReturnValues actualReturnValues = runEnv.removeReturnValues();
@@ -808,8 +807,6 @@ public class ActionStepsTest {
         Map<String, Value> initialCallArguments = new HashMap<>();
         runEnv.putCallArguments(initialCallArguments);
 
-        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
-
         String userPythonScript = "import os\n" +
                 "print host\n" +
                 "print port\n" +
@@ -870,8 +867,6 @@ public class ActionStepsTest {
         initialCallArguments.put("port", ValueFactory.create(8080)); //should be string
         runEnv.putCallArguments(initialCallArguments);
 
-        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
-
         //expects port as string
         String userPythonScript = "print('localhost:' + port)";
 
@@ -899,8 +894,6 @@ public class ActionStepsTest {
         initialCallArguments.put("port", ValueFactory.create("8080"));
         runEnv.putCallArguments(initialCallArguments);
 
-        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
-
         //invoke doAction
         actionSteps.doAction(
                 executionRuntimeServicesMock,
@@ -924,8 +917,6 @@ public class ActionStepsTest {
         initialCallArguments.put("host", ValueFactory.create("localhost"));
         initialCallArguments.put("port", ValueFactory.create("8080"));
         runEnv.putCallArguments(initialCallArguments);
-
-        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
 
         //invoke doAction
         actionSteps.doAction(

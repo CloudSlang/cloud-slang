@@ -20,6 +20,12 @@ import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ExecutionPlan;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
@@ -28,11 +34,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.Validate;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import static ch.lambdaj.Lambda.convertMap;
 
@@ -157,7 +158,7 @@ public class ScoreCompilerImpl implements ScoreCompiler{
     private List<String> getMandatoryInputNames(Executable executable) {
         List<String> inputNames = new ArrayList<>();
         for (Input input : executable.getInputs()) {
-            if (!input.isPrivateInput() && input.isRequired() && input.getValue() == null) {
+            if (!input.isPrivateInput() && input.isRequired() && (input.getValue() == null || input.getValue().get() == null)) {
                 inputNames.add(input.getName());
             }
         }
