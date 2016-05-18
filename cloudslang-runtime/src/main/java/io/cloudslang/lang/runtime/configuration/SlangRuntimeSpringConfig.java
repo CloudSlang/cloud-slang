@@ -12,16 +12,17 @@ package io.cloudslang.lang.runtime.configuration;
 
 
 import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
+import io.cloudslang.runtime.impl.RuntimeManagementConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.python.core.Options;
 import org.python.core.PySystemState;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import io.cloudslang.runtime.impl.RuntimeManagementConfiguration;
+
 @Configuration
-@ComponentScan("io.cloudslang.lang.runtime")
 @Import({RuntimeManagementConfiguration.class})
+@ComponentScan("io.cloudslang.lang.runtime")
 public class SlangRuntimeSpringConfig {
 
     static {

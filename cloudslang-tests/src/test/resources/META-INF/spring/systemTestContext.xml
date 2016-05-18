@@ -22,10 +22,4 @@
     <score:worker uuid="-1"/>
 
     <bean class="io.cloudslang.lang.systemtests.TriggerFlows"/>
-    <bean name="mavenConfig" class="io.cloudslang.dependency.impl.services.MavenConfigImpl"/>
-    <bean name="dependencyService" class="io.cloudslang.dependency.impl.services.DependencyServiceImpl"/>
-    <bean name="pythonRuntimeService" class="io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl"/>
-    <bean name="pythonExecutionEngine" class="io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine"/>
-    <bean name="javaRuntimeServiceImpl" class="io.cloudslang.runtime.impl.java.JavaRuntimeServiceImpl"/>
-    <bean name="javaExecutionCachedEngine" class="io.cloudslang.runtime.impl.java.JavaExecutionCachedEngine"/>
 </beans>
