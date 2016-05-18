@@ -8,6 +8,9 @@
 namespace: user.ops
 
 operation:
-  name: operation_action_invalid_type
+  name: private_input_without_default
+  inputs:
+    - input_without_default:
+        private: true
   action:
-    workflow:
+    python_script: print "hi"

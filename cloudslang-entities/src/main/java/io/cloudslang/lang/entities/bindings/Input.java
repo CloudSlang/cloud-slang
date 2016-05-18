@@ -28,7 +28,7 @@ public class Input extends InOutParam {
 	private static final long serialVersionUID = -2411446962609754342L;
 
 	private boolean required;
-	private boolean overridable;
+	private boolean privateInput;
 
 	private Input(InputBuilder inputBuilder) {
 		super(inputBuilder.name,
@@ -37,7 +37,7 @@ public class Input extends InOutParam {
 				inputBuilder.systemPropertyDependencies
 		);
 		this.required = inputBuilder.required;
-		this.overridable = inputBuilder.overridable;
+		this.privateInput = inputBuilder.privateInput;
 	}
 
 	/**
@@ -50,8 +50,8 @@ public class Input extends InOutParam {
 		return required;
 	}
 
-	public boolean isOverridable() {
-		return overridable;
+	public boolean isPrivateInput() {
+		return privateInput;
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class Input extends InOutParam {
 		return new ToStringBuilder(this)
 				.appendSuper(super.toString())
 				.append("required", required)
-				.append("overridable", overridable)
+				.append("privateInput", privateInput)
 				.toString();
 	}
 
@@ -74,7 +74,7 @@ public class Input extends InOutParam {
 		return new EqualsBuilder()
 				.appendSuper(super.equals(o))
 				.append(required, input.required)
-				.append(overridable, input.overridable)
+				.append(privateInput, input.privateInput)
 				.isEquals();
 	}
 
@@ -83,7 +83,7 @@ public class Input extends InOutParam {
 		return new HashCodeBuilder(17, 37)
 				.appendSuper(super.hashCode())
 				.append(required)
-				.append(overridable)
+				.append(privateInput)
 				.toHashCode();
 	}
 
@@ -91,7 +91,7 @@ public class Input extends InOutParam {
 		private String name;
 		private Value value;
 		private boolean required;
-		private boolean overridable;
+		private boolean privateInput;
 		private Set<ScriptFunction> functionDependencies;
 		private Set<String> systemPropertyDependencies;
 
@@ -103,7 +103,7 @@ public class Input extends InOutParam {
 			this.name = name;
 			this.value = ValueFactory.create(serializable, sensitive);
 			this.required = true;
-			this.overridable = true;
+			this.privateInput = false;
 			this.functionDependencies = new HashSet<>();
 			this.systemPropertyDependencies = new HashSet<>();
 		}
@@ -113,8 +113,8 @@ public class Input extends InOutParam {
 			return this;
 		}
 
-		public InputBuilder withOverridable(boolean overridable) {
-			this.overridable = overridable;
+		public InputBuilder withPrivateInput(boolean privateInput) {
+			this.privateInput = privateInput;
 			return this;
 		}
 

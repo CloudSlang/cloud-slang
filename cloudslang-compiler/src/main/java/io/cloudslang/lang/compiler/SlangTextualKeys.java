@@ -29,10 +29,13 @@ public interface SlangTextualKeys {
     String ON_FAILURE_KEY = "on_failure";
 
     //action
-    String JAVA_ACTION = "java_action";
-
-    //operation
-    String ACTION_KEY = "action";
+    String JAVA_ACTION_KEY = "java_action";
+    String JAVA_ACTION_CLASS_NAME_KEY = "class_name";
+    String JAVA_ACTION_METHOD_NAME_KEY = "method_name";
+    String JAVA_ACTION_GAV_KEY = "gav";
+    String PYTHON_ACTION_KEY = "python_action";
+    String PYTHON_ACTION_SCRIPT_KEY = "script";
+    String PYTHON_ACTION_DEPENDENCIES_KEY = "dependencies";
 
     //step
     String DO_KEY = "do";
@@ -46,7 +49,7 @@ public interface SlangTextualKeys {
     String DEFAULT_KEY = "default";
     String REQUIRED_KEY = "required";
     String SENSITIVE_KEY = "sensitive";
-    String OVERRIDABLE_KEY = "overridable";
+    String PRIVATE_INPUT_KEY = "private";
 
     // system properties
     String SYSTEM_PROPERTY_KEY = "properties";

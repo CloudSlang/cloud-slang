@@ -60,7 +60,7 @@ public class ArgumentsBinding {
 
         try {
             inputValue = srcContext.get(inputName);
-            if (!argument.isOverridable()) {
+            if (argument.isPrivateArgument()) {
                 Value rawValue = argument.getValue();
 
                 // ToDo remove

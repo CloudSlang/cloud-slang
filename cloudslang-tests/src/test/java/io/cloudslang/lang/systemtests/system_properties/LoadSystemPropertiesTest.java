@@ -12,7 +12,9 @@
 package io.cloudslang.lang.systemtests.system_properties;
 
 import com.google.common.collect.Sets;
+import io.cloudslang.lang.compiler.SlangCompilerImpl;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.systemtests.SystemsTestsParent;
 import org.junit.Assert;
@@ -67,8 +69,71 @@ public class LoadSystemPropertiesTest extends SystemsTestsParent {
     public void testInvalidMissingProperties() throws Exception {
         URI propertiesURI = getClass().getResource("/yaml/properties/a/b/invalid_missing_properties.prop.sl").toURI();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("loading properties file");
+        exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
         exception.expectMessage("no content associated");
+        loadSystemProperties(SlangSource.fromFile(propertiesURI));
+    }
+
+    @Test
+    public void testMapUnderProperties() throws Exception {
+        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/map_under_properties.prop.sl").toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
+        exception.expectMessage(SlangTextualKeys.SYSTEM_PROPERTY_KEY);
+        exception.expectMessage("list");
+        exception.expectMessage("Map");
+        loadSystemProperties(SlangSource.fromFile(propertiesURI));
+    }
+
+    @Test
+    public void testListElementNotMap() throws Exception {
+        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/list_element_not_map.prop.sl").toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
+        exception.expectMessage(SlangCompilerImpl.PROPERTY_LIST_ELEMENT_WRONG_TYPE_ERROR_MESSAGE_PREFIX);
+        exception.expectMessage("i_am_string(java.lang.String)");
+        loadSystemProperties(SlangSource.fromFile(propertiesURI));
+    }
+
+    @Test
+    public void testListElementNull() throws Exception {
+        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/list_element_null.prop.sl").toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
+        exception.expectMessage(SlangCompilerImpl.PROPERTY_LIST_ELEMENT_WRONG_TYPE_ERROR_MESSAGE_PREFIX);
+        exception.expectMessage("null");
+        loadSystemProperties(SlangSource.fromFile(propertiesURI));
+    }
+
+    @Test
+    public void testListElementMapWithMultipleEntries() throws Exception {
+        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/map_with_multiple_entries.prop.sl").toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
+        exception.expectMessage(SlangCompilerImpl.SIZE_OF_SYSTEM_PROPERTY_ERROR_MESSAGE_PREFIX);
+        exception.expectMessage("{key1=val1, key2=val2}");
+        exception.expectMessage("2");
+        loadSystemProperties(SlangSource.fromFile(propertiesURI));
+    }
+
+    @Test
+    public void testWrongSystemPropertyKeyType() throws Exception {
+        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/wrong_key_type.prop.sl").toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
+        exception.expectMessage(SlangCompilerImpl.SYSTEM_PROPERTY_KEY_WRONG_TYPE_ERROR_MESSAGE_PREFIX);
+        exception.expectMessage("123");
+        exception.expectMessage("Integer");
+        loadSystemProperties(SlangSource.fromFile(propertiesURI));
+    }
+
+    @Test
+    public void testDuplicateKey() throws Exception {
+        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/duplicate_key.prop.sl").toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
+        exception.expectMessage(SlangCompilerImpl.DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX);
+        exception.expectMessage("host");
         loadSystemProperties(SlangSource.fromFile(propertiesURI));
     }
 

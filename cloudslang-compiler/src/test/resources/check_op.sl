@@ -11,6 +11,6 @@ operation:
   name: check_op
   inputs:
     - alla:
-        system_property: user.sys.props.alla
-  action:
-    python_script: 'print "hello world"'
+        ${get_sp('user.sys.props.alla')}
+  python_action:
+    script: 'print "hello world"'

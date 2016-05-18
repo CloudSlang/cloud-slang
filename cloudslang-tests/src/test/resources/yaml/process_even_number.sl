@@ -12,7 +12,7 @@ operation:
   inputs:
     - even_number
     - offset: 32
-  action:
-    python_script: |
+  python_action:
+    script: |
       processing_result = int(even_number) + offset
       print 'Even number processed. Result= ' + str(processing_result)

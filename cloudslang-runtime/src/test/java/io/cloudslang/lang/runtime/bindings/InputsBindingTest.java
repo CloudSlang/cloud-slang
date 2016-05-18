@@ -100,11 +100,11 @@ public class InputsBindingTest {
     public void testAssignFromInput() {
         Input input1 = new Input.InputBuilder("input1", "${ input1 }", false)
                 .withRequired(false)
-                .withOverridable(true)
+                .withPrivateInput(true)
                 .build();
         Input input2 = new Input.InputBuilder("input2", "${ input1 }", false)
                 .withRequired(false)
-                .withOverridable(true)
+                .withPrivateInput(true)
                 .build();
         List<Input> inputs = Arrays.asList(input1, input2);
         Map<String,Value> result = bindInputs(inputs);
@@ -235,7 +235,7 @@ public class InputsBindingTest {
         context.put("input1",ValueFactory.create(5));
         Input input = new Input.InputBuilder("input1", "${ input2 }", false)
                 .withRequired(false)
-                .withOverridable(false)
+                .withPrivateInput(true)
                 .build();
         List<Input> inputs = Collections.singletonList(input);
 
@@ -254,7 +254,7 @@ public class InputsBindingTest {
         context.put("input1", ValueFactory.create(5));
         Input input = new Input.InputBuilder("input1", 3, false)
                 .withRequired(false)
-                .withOverridable(false)
+                .withPrivateInput(true)
                 .build();
         List<Input> inputs = Collections.singletonList(input);
 
@@ -271,14 +271,14 @@ public class InputsBindingTest {
         context.put("input1",ValueFactory.create(5));
         Input input = new Input.InputBuilder("input1", null, false)
                 .withRequired(false)
-                .withOverridable(false)
+                .withPrivateInput(true)
                 .build();
         List<Input> inputs = Collections.singletonList(input);
 
         Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals("overridable disables the assignFrom func...",null, result.get("input1").get());
+        Assert.assertEquals("'not private' disables the assignFrom func...",null, result.get("input1").get());
         Assert.assertEquals(1, result.size());
     }
 
@@ -302,7 +302,7 @@ public class InputsBindingTest {
 
         Input input = new Input.InputBuilder("input1", "${ input2 }", false)
                 .withRequired(false)
-                .withOverridable(true)
+                .withPrivateInput(true)
                 .build();
         List<Input> inputs = Collections.singletonList(input);
 

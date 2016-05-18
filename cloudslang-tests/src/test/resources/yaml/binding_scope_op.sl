@@ -11,8 +11,8 @@ operation:
   name: binding_scope_op
   inputs:
     - op_input_1: "op_input_1_value"
-  action:
-    python_script: pass
+  python_action:
+    script: pass
   outputs:
     - op_output_1: 'op_output_1_value'
     - op_output_2: 'op_output_2_value'

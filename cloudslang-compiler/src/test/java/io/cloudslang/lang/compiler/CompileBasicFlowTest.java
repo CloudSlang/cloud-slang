@@ -81,7 +81,7 @@ public class CompileBasicFlowTest {
         ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
         @SuppressWarnings("unchecked") List<Argument> stepInputs = (List<Argument>) beginStepExecutionStep.getActionData().get(ScoreLangConstants.STEP_INPUTS_KEY);
         Assert.assertNotNull("arguments doesn't exist", stepInputs);
-        Assert.assertEquals("there is a different number of arguments than expected", 2, stepInputs.size());
+        Assert.assertEquals("there is a different number of arguments than expected", 3, stepInputs.size());
         Assert.assertEquals("city", stepInputs.get(0).getName());
         Assert.assertEquals("country", stepInputs.get(1).getName());
         Assert.assertEquals("CheckWeather", beginStepExecutionStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
@@ -127,6 +127,21 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("There is a different number of flow dependencies than expected", 1, dependencies.size());
         String dependency = dependencies.iterator().next();
         Assert.assertEquals("The flow dependency full name is wrong", "user.ops.test_op", dependency);
+    }
+
+    @Test
+    public void testValidateSlangModelWithDependenciesBasic() throws Exception {
+        URI flowUri = getClass().getResource("/basic_flow.yaml").toURI();
+        Executable flow = compiler.preCompile(SlangSource.fromFile(flowUri));
+
+        URI operationUri = getClass().getResource("/test_op.sl").toURI();
+        Executable op = compiler.preCompile(SlangSource.fromFile(operationUri));
+
+        Set<Executable> dependencies = new HashSet();
+        dependencies.add(op);
+        List<RuntimeException> errors = compiler.validateSlangModelWithDependencies(flow, dependencies);
+
+        Assert.assertEquals("", 0, errors.size());
     }
 
     @Test

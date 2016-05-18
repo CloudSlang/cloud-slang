@@ -8,6 +8,8 @@
  */
 package io.cloudslang.lang.compiler.parser.model;
 
+import io.cloudslang.lang.compiler.Extension;
+
 import java.util.Map;
 
 /*
@@ -18,9 +20,10 @@ public class ParsedSlang {
     private Map<String, String> imports;
     private Map<String, Object> flow;
     private Map<String, Object> operation;
-    private Map<String, Object> properties;
+    private Object properties;
     private String namespace;
     private String name;
+    private Extension fileExtension;
     private Object extensions;
 
     //todo add constructor?
@@ -41,7 +44,7 @@ public class ParsedSlang {
         return operation;
     }
 
-    public Map<String, Object> getProperties() {
+    public Object getProperties() {
         return properties;
     }
 
@@ -67,6 +70,14 @@ public class ParsedSlang {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Extension getFileExtension() {
+        return fileExtension;
+    }
+
+    public void setFileExtension(Extension extension) {
+        this.fileExtension = extension;
     }
 
     public static enum Type {

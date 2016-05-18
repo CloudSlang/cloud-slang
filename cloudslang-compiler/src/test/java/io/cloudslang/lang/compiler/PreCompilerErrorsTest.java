@@ -72,13 +72,25 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
+    public void testOperationWithNullFileName() throws Exception {
+        URI resource = getClass().getResource("/corrupted/wrong_name_operation.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(new SlangSource(SlangSource.fromFile(resource).getSource(), null));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("should be declared in a file named \"test_op\" " +
+                "plus a valid extension(sl, sl.yaml, sl.yml, prop.sl, yaml, yml)");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
      public void testOperationWithWrongName() throws Exception {
         URI resource = getClass().getResource("/corrupted/wrong_name_operation.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("should be declared in a file named");
+        exception.expectMessage("should be declared in a file named \"test_op.sl\"");
         throw result.getErrors().get(0);
     }
 
@@ -89,7 +101,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("should be declared in a file named");
+        exception.expectMessage("should be declared in a file named \"test_op.sl.yaml\"");
         throw result.getErrors().get(0);
     }
 
@@ -100,7 +112,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("should be declared in a file named");
+        exception.expectMessage("should be declared in a file named \"test_op.sl.yml\"");
         throw result.getErrors().get(0);
     }
 
@@ -111,7 +123,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("should be declared in a file named");
+        exception.expectMessage("should be declared in a file named \"test_op.yaml\"");
         throw result.getErrors().get(0);
     }
 
@@ -122,7 +134,19 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("should be declared in a file named");
+        exception.expectMessage("should be declared in a file named \"test_op.yml\"");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testOperationWithWrongNameWrongExtension() throws Exception {
+        URI resource = getClass().getResource("/corrupted/wrong_name_operation.wrong").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("it should be declared in a file named \"test_op\" " +
+                "plus a valid extension(sl, sl.yaml, sl.yml, prop.sl, yaml, yml)");
         throw result.getErrors().get(0);
     }
 
@@ -280,13 +304,13 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
-    public void testInputNotOverridableAndNoDefault() throws Exception {
-        URI resource = getClass().getResource("/non_overridable_input_without_default.sl").toURI();
+    public void testInputPrivateAndNoDefault() throws Exception {
+        URI resource = getClass().getResource("/private_input_without_default.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("overridable");
+        exception.expectMessage("private");
         exception.expectMessage("default");
         exception.expectMessage("input_without_default");
         throw result.getErrors().get(0);
@@ -325,9 +349,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("operation_with_list_of_action_types");
-        exception.expectMessage("'action'");
-        exception.expectMessage("'python_script:'");
+        exception.expectMessage("'python_action'");
+        exception.expectMessage("there should be a map of values, but instead there is a list");
         throw result.getErrors().get(0);
     }
 
@@ -482,4 +505,45 @@ public class PreCompilerErrorsTest {
         throw result.getErrors().get(0);
     }
 
+    @Test
+    public void testFlowWithUnreachableSteps() throws Exception {
+        URI resource = getClass().getResource("/corrupted/unreachable_steps.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Step");
+        exception.expectMessage("print_message2");
+        exception.expectMessage("unreachable");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testFlowWithUnreachableOnFailureStep() throws Exception {
+        URI resource = getClass().getResource("/corrupted/unreachable_on_failure_step.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() == 0);
+    }
+
+    @Test
+    public void testFlowWithUnreachableStepReachableFromOnFailureStep() throws Exception {
+        URI resource = getClass().getResource("/corrupted/unreachable_step_reachable_from_on_failure.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() == 0);
+    }
+
+    @Test
+    public void testFlowWithUnreachableTasksOneReachableFromOnFailureTask() throws Exception {
+        URI resource = getClass().getResource("/corrupted/unreachable_tasks_one_reachable_from_on_failure.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Step");
+        exception.expectMessage("print_message2");
+        exception.expectMessage("unreachable");
+        throw result.getErrors().get(0);
+    }
 }

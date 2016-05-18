@@ -8,6 +8,7 @@
  */
 package io.cloudslang.lang.compiler.modeller;
 
+import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Action;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
@@ -42,6 +43,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +52,10 @@ import java.util.Set;
 import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
+import static org.hamcrest.Matchers.equalTo;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.ASYNC_LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER;
@@ -77,10 +82,15 @@ public class ExecutableBuilder {
 
     private List<Transformer> preExecTransformers;
     private List<Transformer> postExecTransformers;
-    private List<String> execAdditionalKeywords = Arrays.asList(SlangTextualKeys.ACTION_KEY, SlangTextualKeys.WORKFLOW_KEY, SlangTextualKeys.EXECUTABLE_NAME_KEY);
+    private List<String> execAdditionalKeywords = Arrays.asList(
+            SlangTextualKeys.JAVA_ACTION_KEY,
+            SlangTextualKeys.PYTHON_ACTION_KEY,
+            SlangTextualKeys.WORKFLOW_KEY,
+            SlangTextualKeys.EXECUTABLE_NAME_KEY
+    );
 
     private List<Transformer> actionTransformers;
-    private List<List<String>> actionTransformerConstraintGroups;
+    private List<List<String>> actionKeyConstraintGroups;
 
     private List<Transformer> preStepTransformers;
     private List<Transformer> postStepTransformers;
@@ -94,8 +104,12 @@ public class ExecutableBuilder {
 
         //action transformers and keys
         actionTransformers = filterTransformers(Transformer.Scope.ACTION);
-        //action keys excluding each other
-        actionTransformerConstraintGroups = Collections.singletonList(Arrays.asList(ScoreLangConstants.PYTHON_SCRIPT_KEY, SlangTextualKeys.JAVA_ACTION));
+        //action keys (Java / Python) excluding each other
+        actionKeyConstraintGroups = Collections.singletonList(
+                Arrays.asList(
+                        SlangTextualKeys.PYTHON_ACTION_KEY,
+                        SlangTextualKeys.JAVA_ACTION_KEY)
+        );
 
         //step transformers
         preStepTransformers = filterTransformers(Transformer.Scope.BEFORE_STEP);
@@ -115,8 +129,13 @@ public class ExecutableBuilder {
         Map<String, Serializable> preExecutableActionData = new HashMap<>();
         Map<String, Serializable> postExecutableActionData = new HashMap<>();
 
-        errors.addAll(transformersHandler.checkKeyWords(execName, executableRawData,
-                ListUtils.union(preExecTransformers, postExecTransformers), execAdditionalKeywords, null));
+        errors.addAll(transformersHandler.checkKeyWords(
+                execName,
+                executableRawData,
+                ListUtils.union(preExecTransformers, postExecTransformers),
+                execAdditionalKeywords,
+                actionKeyConstraintGroups)
+        );
 
         String errorMessagePrefix = "For " + parsedSlang.getType().toString().toLowerCase() + " '" + execName + "' syntax is illegal.\n";
         preExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, preExecTransformers, errors, errorMessagePrefix));
@@ -199,16 +218,19 @@ public class ExecutableBuilder {
         }
     }
 
-    private Map<String, Object> getActionRawData(Map<String, Object> executableRawData, List<RuntimeException> errors,
-                                                 ParsedSlang parsedSlang, String execName) {
-        Map<String, Object> actionRawData = null;
-        try{
-            //noinspection unchecked
-            actionRawData = (Map<String, Object>) executableRawData.get(SlangTextualKeys.ACTION_KEY);
-        } catch (ClassCastException ex){
-            errors.add(new RuntimeException("Operation: '" + execName + "' syntax is illegal.\nBelow 'action' property there should be a map of values such as: 'python_script:' or 'java_action:'"));
+    private Map<String, Object> getActionRawData(
+            Map<String, Object> executableRawData,
+            List<RuntimeException> errors,
+            ParsedSlang parsedSlang, String execName) {
+        Map<String, Object> actionRawData = new HashMap<>();
+        Object javaActionRawData = executableRawData.get(SlangTextualKeys.JAVA_ACTION_KEY);
+        Object pythonActionRawData = executableRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY);
+        if (javaActionRawData != null) {
+            actionRawData.put(SlangTextualKeys.JAVA_ACTION_KEY, executableRawData.get(SlangTextualKeys.JAVA_ACTION_KEY));
         }
-        actionRawData = actionRawData == null ? new HashMap<String, Object>() : actionRawData;
+        if (pythonActionRawData != null) {
+            actionRawData.put(SlangTextualKeys.PYTHON_ACTION_KEY, executableRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY));
+        }
         if (MapUtils.isEmpty(actionRawData)) {
             errors.add(new RuntimeException("Error compiling " + parsedSlang.getName() + ". Operation: " + execName + " has no action data"));
         }
@@ -259,6 +281,9 @@ public class ExecutableBuilder {
                     errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a list of steps and not a map"));
                 }
                 if (CollectionUtils.isNotEmpty(onFailureData)) {
+                    if (onFailureData.size() > 1) {
+                        errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be only one step"));
+                    }
                     WorkflowModellingResult workflowModellingResult = compileWorkFlow(onFailureData, imports, null, true, namespace, execName);
                     errors.addAll(workflowModellingResult.getErrors());
                     onFailureWorkFlow = workflowModellingResult.getWorkflow();
@@ -272,7 +297,7 @@ public class ExecutableBuilder {
     private ActionModellingResult compileAction(Map<String, Object> actionRawData) {
         Map<String, Serializable> actionData = new HashMap<>();
 
-        List<RuntimeException> errors = transformersHandler.checkKeyWords("action data", actionRawData, actionTransformers, null, actionTransformerConstraintGroups);
+        List<RuntimeException> errors = transformersHandler.checkKeyWords("action data", actionRawData, actionTransformers, null, null);
 
         String errorMessagePrefix = "Action syntax is illegal.\n";
         actionData.putAll(transformersHandler.runTransformers(actionRawData, actionTransformers, errors, errorMessagePrefix));
@@ -342,7 +367,18 @@ public class ExecutableBuilder {
             } else {
                 defaultSuccess = onFailureSection ? ScoreLangConstants.FAILURE_RESULT : ScoreLangConstants.SUCCESS_RESULT;
             }
-            StepModellingResult stepModellingResult = compileStep(stepName, stepRawDataValue, defaultSuccess, imports, defaultFailure, namespace);
+
+            String onFailureStepName = onFailureStepFound ? onFailureStepNames.get(0) : null;
+            StepModellingResult stepModellingResult = compileStep(
+                    stepName,
+                    stepRawDataValue,
+                    defaultSuccess,
+                    imports,
+                    defaultFailure,
+                    namespace,
+                    onFailureStepName
+            );
+
             errors.addAll(stepModellingResult.getErrors());
             steps.add(stepModellingResult.getStep());
         }
@@ -351,11 +387,22 @@ public class ExecutableBuilder {
             steps.addAll(onFailureSteps);
         }
 
+        List<Step> unreachableSteps = getUnreachableSteps(steps, onFailureSteps);
+        for (Step step : unreachableSteps) {
+            errors.add(new RuntimeException("Step: " + step.getName() + " is unreachable"));
+        }
+
         return new WorkflowModellingResult(new Workflow(steps), errors);
     }
 
-    private StepModellingResult compileStep(String stepName, Map<String, Object> stepRawData, String defaultSuccess,
-                                            Map<String, String> imports, String defaultFailure, String namespace) {
+    private StepModellingResult compileStep(
+            String stepName, Map<String,
+            Object> stepRawData,
+            String defaultSuccess,
+            Map<String, String> imports,
+            String defaultFailure,
+            String namespace,
+            String onFailureStepName) {
 
         List<RuntimeException> errors = new ArrayList<>();
         if (MapUtils.isEmpty(stepRawData)) {
@@ -371,6 +418,8 @@ public class ExecutableBuilder {
         String errorMessagePrefix = "For step '" + stepName + "' syntax is illegal.\n";
         preStepData.putAll(transformersHandler.runTransformers(stepRawData, preStepTransformers, errors, errorMessagePrefix));
         postStepData.putAll(transformersHandler.runTransformers(stepRawData, postStepTransformers, errors, errorMessagePrefix));
+
+        replaceOnFailureReference(postStepData, onFailureStepName, stepName);
 
         @SuppressWarnings("unchecked")
         List<Argument> arguments = (List<Argument>)preStepData.get(SlangTextualKeys.DO_KEY);
@@ -401,6 +450,38 @@ public class ExecutableBuilder {
                 refId,
                 preStepData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
         return new StepModellingResult(step, errors);
+    }
+
+    private void replaceOnFailureReference(
+            Map<String, Serializable> postStepData,
+            String onFailureStepName,
+            String stepName) {
+        Serializable navigationData = postStepData.get(NAVIGATION_KEY);
+        if (navigationData != null) {
+            @SuppressWarnings("unchecked") // from NavigateTransformer
+                    List<Map<String, String>> navigationStrings = (List<Map<String, String>>) navigationData;
+            List<Map<String, String>> transformedNavigationStrings = new ArrayList<>();
+
+            for (Map<String, String> navigation : navigationStrings) {
+                Map.Entry<String, String> navigationEntry = navigation.entrySet().iterator().next();
+                Map<String, String> transformedNavigation = new HashMap<>(navigation);
+                if (navigationEntry.getValue().equals(ON_FAILURE_KEY)) {
+                    if (StringUtils.isEmpty(onFailureStepName)) {
+                        throw new RuntimeException(
+                                "Failed to compile step: '" + stepName +
+                                        "'. Navigation: '" + navigationEntry.getKey() + " -> " + navigationEntry.getValue()
+                                        + "' is illegal. 'on_failure' section is not defined."
+                        );
+                    } else {
+                        transformedNavigation.put(navigationEntry.getKey(), onFailureStepName);
+                    }
+                } else {
+                    transformedNavigation.put(navigationEntry.getKey(), navigationEntry.getValue());
+                }
+                transformedNavigationStrings.add(transformedNavigation);
+            }
+            postStepData.put(NAVIGATION_KEY, (Serializable) transformedNavigationStrings);
+        }
     }
 
     private List<Map<String, String>> getNavigationStrings(Map<String, Serializable> postStepData, String defaultSuccess, String defaultFailure) {
@@ -480,4 +561,33 @@ public class ExecutableBuilder {
         return errors;
     }
 
+    private List<Step> getUnreachableSteps(Deque<Step> steps, Deque<Step> onFailureSteps) {
+        List<Step> unreachableSteps = new ArrayList<>();
+        if (steps.size() > 0) {
+            Map<String, Step> reachableSteps = new LinkedHashMap<>();
+            getReachableSteps(steps.getFirst(), steps, reachableSteps);
+            Step onFailureStep = onFailureSteps.size() == 0 ? null : onFailureSteps.getFirst();
+            for (Step step : steps) {
+                boolean isOnFailureStep = onFailureStep != null && onFailureStep.getName().equals(step.getName());
+                if (reachableSteps.get(step.getName()) == null && !isOnFailureStep) {
+                    unreachableSteps.add(step);
+                }
+            }
+        }
+        return unreachableSteps;
+    }
+
+    private void getReachableSteps(Step step, Deque<Step> steps, Map<String, Step> reachableSteps) {
+        reachableSteps.put(step.getName(), step);
+        for (Map<String, String> map : step.getNavigationStrings()) {
+            Map.Entry<String, String> entry = map.entrySet().iterator().next();
+            String nextStepName = entry.getValue();
+            if (reachableSteps.get(nextStepName) == null) {
+                Step nextStepToCompile = Lambda.selectFirst(steps, having(on(Step.class).getName(), equalTo(nextStepName)));
+                if (nextStepToCompile != null) {
+                    getReachableSteps(nextStepToCompile, steps, reachableSteps);
+                }
+            }
+        }
+    }
 }

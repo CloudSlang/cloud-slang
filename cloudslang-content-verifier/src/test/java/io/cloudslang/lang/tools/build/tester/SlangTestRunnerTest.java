@@ -13,7 +13,9 @@ import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
+import java.util.Set;
 import junit.framework.Assert;
+import org.apache.commons.collections4.SetUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -65,6 +67,7 @@ public class SlangTestRunnerTest {
     private List<String> specialTestSuite = Collections.singletonList("special");
     private List<String> specialRuntimeTestSuite = Arrays.asList("special","default");
     private List<String> defaultTestSuite = Collections.singletonList("default");
+    private Set<String> allAvailableExecutables = SetUtils.emptySet();
 
 
     @Before
@@ -77,27 +80,27 @@ public class SlangTestRunnerTest {
     public void createTestCaseWithNullTestPath() {
         exception.expect(NullPointerException.class);
         exception.expectMessage("path");
-        slangTestRunner.createTestCases(null);
+        slangTestRunner.createTestCases(null, allAvailableExecutables);
     }
 
     @Test
     public void createTestCaseWithEmptyTestPath(){
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("path");
-        slangTestRunner.createTestCases("");
+        slangTestRunner.createTestCases("", allAvailableExecutables);
     }
 
     @Test
     public void createTestCaseWithInvalidTestPath() {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("directory");
-        slangTestRunner.createTestCases("aaa");
+        slangTestRunner.createTestCases("aaa", allAvailableExecutables);
     }
 
     @Test
     public void createTestCaseWithPathWithNoTests() throws Exception {
         URI resource = getClass().getResource("/dependencies").toURI();
-        Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(resource.getPath());
+        Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(resource.getPath(), allAvailableExecutables);
         Assert.assertEquals("No test cases were supposed to be created", 0, testCases.size());
     }
 
@@ -107,7 +110,7 @@ public class SlangTestRunnerTest {
         Map<String, SlangTestCase> testCases = new HashMap<>();
         testCases.put("", new SlangTestCase("", "path", "desc", null, null, null, null, null, null));
         when(parser.parseTestCases(Mockito.any(SlangSource.class))).thenReturn(testCases);
-        Map<String, SlangTestCase> foundTestCases = slangTestRunner.createTestCases(resource.getPath());
+        Map<String, SlangTestCase> foundTestCases = slangTestRunner.createTestCases(resource.getPath(), allAvailableExecutables);
         Assert.assertEquals("1 test case was supposed to be created", 1, foundTestCases.size());
     }
 
@@ -117,7 +120,7 @@ public class SlangTestRunnerTest {
         Map<String, SlangTestCase> testCases = new HashMap<>();
         testCases.put("Test1", new SlangTestCase("Test1", "path", "desc", null, null, null, null, null, null));
         when(parser.parseTestCases(Mockito.any(SlangSource.class))).thenReturn(testCases);
-        Map<String, SlangTestCase> foundTestCases = slangTestRunner.createTestCases(resource.getPath());
+        Map<String, SlangTestCase> foundTestCases = slangTestRunner.createTestCases(resource.getPath(), allAvailableExecutables);
         Assert.assertEquals("1 test case was supposed to be created", 1, foundTestCases.size());
     }
 
@@ -132,7 +135,7 @@ public class SlangTestRunnerTest {
         exception.expectMessage("name");
         exception.expectMessage("Test1");
         exception.expectMessage("exists");
-        slangTestRunner.createTestCases(resource.getPath());
+        slangTestRunner.createTestCases(resource.getPath(), allAvailableExecutables);
     }
 
     @Test
@@ -141,7 +144,7 @@ public class SlangTestRunnerTest {
         Map<String, SlangTestCase> testCases = new HashMap<>();
         testCases.put("Test1", new SlangTestCase("Test1", "path-FAILURE", "desc", null, null, null, null, null, null));
         when(parser.parseTestCases(Mockito.any(SlangSource.class))).thenReturn(testCases);
-        Map<String, SlangTestCase> foundTestCases = slangTestRunner.createTestCases(resource.getPath());
+        Map<String, SlangTestCase> foundTestCases = slangTestRunner.createTestCases(resource.getPath(), allAvailableExecutables);
         Assert.assertEquals("1 test case was supposed to be created", 1, foundTestCases.size());
         SlangTestCase testCase = foundTestCases.values().iterator().next();
         Assert.assertEquals("Test case should get the result value from the file name (FAILURE)", "FAILURE", testCase.getResult());

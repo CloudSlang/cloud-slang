@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.DEFAULT_KEY;
-import static io.cloudslang.lang.compiler.SlangTextualKeys.OVERRIDABLE_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.PRIVATE_INPUT_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.REQUIRED_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 
@@ -50,7 +50,7 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
 
     private Input createPropInput(Map.Entry<String, Map<String, Serializable>> entry) {
         Map<String, Serializable> props = entry.getValue();
-        List<String> knownKeys = Arrays.asList(REQUIRED_KEY, SENSITIVE_KEY, OVERRIDABLE_KEY, DEFAULT_KEY);
+        List<String> knownKeys = Arrays.asList(REQUIRED_KEY, SENSITIVE_KEY, PRIVATE_INPUT_KEY, DEFAULT_KEY);
 
         for (String key : props.keySet()) {
             if (!knownKeys.contains(key)) {
@@ -65,24 +65,24 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
         boolean sensitive = props.containsKey(SENSITIVE_KEY) &&
                 (boolean) props.get(SENSITIVE_KEY);
         // default is overridable=true
-        boolean overridable = !props.containsKey(OVERRIDABLE_KEY) ||
-                (boolean) props.get(OVERRIDABLE_KEY);
+        boolean privateInput = props.containsKey(PRIVATE_INPUT_KEY) &&
+                (boolean) props.get(PRIVATE_INPUT_KEY);
         boolean defaultSpecified = props.containsKey(DEFAULT_KEY);
         String inputName = entry.getKey();
         Serializable value = defaultSpecified ? props.get(DEFAULT_KEY) : null;
 
-        if (!overridable && !defaultSpecified) {
+        if (privateInput && !defaultSpecified) {
             throw new RuntimeException(
-                    "input: " + inputName + " is not overridable but no default value was specified");
+                    "input: " + inputName + " is private but no default value was specified");
         }
 
-        return createInput(inputName, value, sensitive, required, overridable);
+        return createInput(inputName, value, sensitive, required, privateInput);
     }
 
     private Input createInput(
             String name,
             Serializable value) {
-        return createInput(name, value, false, true, true);
+        return createInput(name, value, false, true, false);
     }
 
     private Input createInput(
@@ -90,11 +90,11 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
             Serializable value,
             boolean sensitive,
             boolean required,
-            boolean overridable) {
+            boolean privateInput) {
         Accumulator dependencyAccumulator = extractFunctionData(value);
         return new Input.InputBuilder(name, value, sensitive)
                 .withRequired(required)
-                .withOverridable(overridable)
+                .withPrivateInput(privateInput)
                 .withFunctionDependencies(dependencyAccumulator.getFunctionDependencies())
                 .withSystemPropertyDependencies(dependencyAccumulator.getSystemPropertyDependencies())
                 .build();

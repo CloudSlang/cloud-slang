@@ -25,13 +25,15 @@ import java.nio.charset.Charset;
 public class SlangSource {
 
     private final String source;
-    private final String name;
+    private final String fileName;
+    private final Extension fileExtension;
 
-    public SlangSource(String source, String name) {
+    public SlangSource(String source, String fileName) {
         Validate.notNull(source, "Source cannot be null");
 
         this.source = source;
-        this.name = name;
+        this.fileName = Extension.removeExtension(fileName);
+        this.fileExtension = Extension.findExtension(fileName);
     }
 
     public static SlangSource fromFile(File file) {
@@ -44,7 +46,7 @@ public class SlangSource {
         } catch (IOException e) {
             throw new RuntimeException("There was a problem reading the file: " + file.getName(), e);
         }
-        return new SlangSource(source, Extension.removeExtension(file.getName()));
+        return new SlangSource(source, file.getName());
     }
 
     private static String readFileToString(File file) throws IOException {
@@ -65,23 +67,27 @@ public class SlangSource {
         return fromFile(new File(uri));
     }
 
-    public static SlangSource fromBytes(byte[] bytes, String name) {
-        return new SlangSource(new String(bytes, getCharset()), name);
+    public static SlangSource fromBytes(byte[] bytes, String fileName) {
+        return new SlangSource(new String(bytes, getCharset()), fileName);
     }
 
     public String getSource() {
         return source;
     }
 
-    public String getName() {
-        return name;
+    public String getFileName() {
+        return fileName;
+    }
+
+    public Extension getFileExtension() {
+        return fileExtension;
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .append("source", source)
-                .append("name", name)
+                .append("fileName", fileName)
                 .toString();
     }
 
@@ -94,7 +100,7 @@ public class SlangSource {
 
         return new EqualsBuilder()
                 .append(source, that.source)
-                .append(name, that.name)
+                .append(fileName, that.fileName)
                 .isEquals();
     }
 
@@ -102,7 +108,7 @@ public class SlangSource {
     public int hashCode() {
         return new HashCodeBuilder()
                 .append(source)
-                .append(name)
+                .append(fileName)
                 .toHashCode();
     }
 }

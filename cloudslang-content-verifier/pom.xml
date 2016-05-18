@@ -3,7 +3,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.9.54-SNAPSHOT</version>
+        <version>0.9.58-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -97,6 +97,11 @@
         <dependency>
             <groupId>io.cloudslang.content</groupId>
             <artifactId>score-vmware</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cloudslang.content</groupId>
+            <artifactId>score-xml</artifactId>
             <scope>runtime</scope>
         </dependency>
 

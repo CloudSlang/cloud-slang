@@ -11,10 +11,9 @@ operation:
   name: java_action_serializable_op
   inputs:
     - string
-  action:
-    java_action:
-      className: io.cloudslang.lang.systemtests.actions.LangTestActions
-      methodName: printAndReturnDur
+  java_action:
+    class_name: io.cloudslang.lang.systemtests.actions.LangTestActions
+    method_name: printAndReturnDur
   outputs:
     - dur
   results:

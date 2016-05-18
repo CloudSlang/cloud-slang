@@ -13,7 +13,7 @@ operation:
      - text
      - text2:
         default: 'default value'
-  action:
-    python_script: |
-        print text
-        print text2
+  python_action:
+    script: |
+      print text
+      print text2

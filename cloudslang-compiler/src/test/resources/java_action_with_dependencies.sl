@@ -8,10 +8,10 @@
 namespace: user.ops
 
 operation:
-  name: non_overridable_input_with_sys_prop
-  inputs:
-    - input_without_non_overidable_sys_prop:
-        overridable: false
-        system_property: booya
-  action:
-    python_script: print "hi"
+  name: java_action_with_dependencies
+  java_action:
+    gav: 'g:a:v'
+    class_name: com.hp.thing
+    method_name: someMethod
+  results:
+    - SUCCESS

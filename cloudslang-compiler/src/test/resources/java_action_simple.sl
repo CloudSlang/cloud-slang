@@ -8,9 +8,9 @@
 namespace: user.ops
 
 operation:
-  name: non_overridable_input_without_default
-  inputs:
-    - input_without_default:
-        overridable: false
-  action:
-    python_script: print "hi"
+  name: java_action_simple
+  java_action:
+    class_name: com.hp.thing
+    method_name: someMethod
+  results:
+    - SUCCESS

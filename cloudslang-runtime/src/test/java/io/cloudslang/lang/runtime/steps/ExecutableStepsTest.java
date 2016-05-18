@@ -103,7 +103,7 @@ public class ExecutableStepsTest {
                 new Input.InputBuilder("input1",5).build(),
                 new Input.InputBuilder("input2",3, true)
                 .withRequired(true)
-                .withOverridable(false)
+                .withPrivateInput(false)
                 .build()
         );
         RunEnvironment runEnv = new RunEnvironment();

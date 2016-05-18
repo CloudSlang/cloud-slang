@@ -13,10 +13,10 @@ operation:
     - exist
     - value_propagate:
         default: ${ value_propagate + get_sp('propagate.op.input') }
-        overridable: false
-  action:
-    python_script: |
-        language = 'CloudSlang'
+        private: true
+  python_action:
+    script: |
+      language = 'CloudSlang'
   outputs:
     - output1_safe: ${ get('language', 'output1_default') }
     - output2_safe: ${ get('not_defined_key', 'output2_default') }

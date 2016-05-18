@@ -16,8 +16,8 @@ operation:
      - recipient
      - subject
      - body
-  action:
-    python_script: |
+  python_action:
+    script: |
       print 'Send email mock'
       print 'hostname: ' + hostname
       print 'port: ' + port

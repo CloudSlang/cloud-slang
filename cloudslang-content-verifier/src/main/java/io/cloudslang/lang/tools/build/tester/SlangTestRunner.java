@@ -20,6 +20,14 @@ import io.cloudslang.lang.tools.build.SlangBuildMain;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import io.cloudslang.score.events.EventConstants;
+import java.io.File;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
@@ -29,15 +37,6 @@ import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.File;
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by stoneo on 3/15/2015.
@@ -60,7 +59,7 @@ public class SlangTestRunner {
     private final static Logger log = Logger.getLogger(SlangTestRunner.class);
     private final String UNAVAILABLE_NAME = "N/A";
 
-    public Map<String, SlangTestCase> createTestCases(String testPath) {
+    public Map<String, SlangTestCase> createTestCases(String testPath, Set<String> allAvailableExecutables) {
         Validate.notEmpty(testPath, "You must specify a path for tests");
         File testPathDir = new File(testPath);
         Validate.isTrue(testPathDir.isDirectory(),
@@ -73,6 +72,7 @@ public class SlangTestRunner {
         log.info(testCasesFiles.size() + " test cases files were found");
 
         Map<String, SlangTestCase> testCases = new HashMap<>();
+        Set<SlangTestCase> testCasesWithMissingReference = new HashSet<>();
         for (File testCaseFile : testCasesFiles) {
             Validate.isTrue(testCaseFile.isFile(),
                     "file path \'" + testCaseFile.getAbsolutePath() + "\' must lead to a file");
@@ -81,10 +81,11 @@ public class SlangTestRunner {
             for (Map.Entry<String, SlangTestCase> currentTestCaseEntry : testCasesFromCurrentFile.entrySet()) {
                 SlangTestCase currentTestCase = currentTestCaseEntry.getValue();
                 String currentTestCaseName = currentTestCaseEntry.getKey();
+                String testFlowPath = currentTestCase.getTestFlowPath();
                 //todo: temporary solution
                 currentTestCase.setName(currentTestCaseName);
                 if(StringUtils.isBlank(currentTestCase.getResult())){
-                    currentTestCase.setResult(getResultFromFileName(currentTestCase.getTestFlowPath()));
+                    currentTestCase.setResult(getResultFromFileName(testFlowPath));
                 }
                 if(currentTestCase.getThrowsException() == null){
                     currentTestCase.setThrowsException(false);
@@ -94,9 +95,13 @@ public class SlangTestRunner {
                     throw new RuntimeException("Test case with the name: " + currentTestCaseName + " already exists. Test case name should be unique across the project"
                     );
                 }
+                if (!allAvailableExecutables.contains(testFlowPath)) {
+                    testCasesWithMissingReference.add(currentTestCase);
+                }
                 testCases.put(currentTestCaseName, currentTestCase);
             }
         }
+        printTestCasesWithMissingReference(testCasesWithMissingReference);
         return testCases;
     }
 
@@ -138,6 +143,21 @@ public class SlangTestRunner {
             }
         }
         return runTestsResults;
+    }
+
+    private void printTestCasesWithMissingReference(Set<SlangTestCase> testCasesWithMissingReference) {
+        int testCasesWithMissingReferenceSize = testCasesWithMissingReference.size();
+        if (testCasesWithMissingReferenceSize > 0) {
+            log.info("");
+            log.info(testCasesWithMissingReferenceSize + " test cases have missing test flow references:");
+            for (SlangTestCase slangTestCase : testCasesWithMissingReference) {
+                log.info(
+                        "For test case: " + slangTestCase.getName() +
+                                " testFlowPath reference not found: " +
+                                slangTestCase.getTestFlowPath()
+                );
+            }
+        }
     }
 
     private static CompilationArtifact getCompiledTestFlow(Map<String, CompilationArtifact> compiledFlows, SlangTestCase testCase) {

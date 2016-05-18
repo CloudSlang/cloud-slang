@@ -13,7 +13,7 @@ operation:
     - city:
         system_property: user.sys.props.city
         default: "'Bangkok'"
-        overridable: false
+        private: true
     - weather:
         system_property: user.sys.props.weather
         default: "'hot'"

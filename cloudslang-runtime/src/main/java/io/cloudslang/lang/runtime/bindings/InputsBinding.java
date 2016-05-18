@@ -86,7 +86,7 @@ public class InputsBinding {
         String inputName = input.getName();
         Value valueFromContext = context.get(inputName);
         boolean sensitive = input.getValue() != null && input.getValue().isSensitive() || valueFromContext != null && valueFromContext.isSensitive();
-        if (input.isOverridable()) {
+        if (!input.isPrivateInput()) {
             value = ValueFactory.create(valueFromContext, sensitive);
         }
 

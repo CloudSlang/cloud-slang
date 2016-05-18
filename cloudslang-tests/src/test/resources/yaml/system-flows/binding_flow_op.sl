@@ -14,8 +14,8 @@ operation:
     - bound_input:
         default: ${ base_input + ">" }
 
-  action:
-    python_script: |
+  python_action:
+    script: |
       bound_result = bound_input + "|"
   outputs:
     - bound_output: ${ bound_result + "<" }

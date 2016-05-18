@@ -11,7 +11,9 @@
 package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
+import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -22,6 +24,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URI;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -393,11 +396,11 @@ public class CompilerErrorsTest {
     }
 
     @Test
-    public void testInputNotOverridableAndNoDefault() throws Exception {
-        URI resource = getClass().getResource("/non_overridable_input_without_default.sl").toURI();
+    public void testInputPrivateAndNoDefault() throws Exception {
+        URI resource = getClass().getResource("/private_input_without_default.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("overridable");
+        exception.expectMessage("private");
         exception.expectMessage("default");
         exception.expectMessage("input_without_default");
         compiler.compile(SlangSource.fromFile(resource), path);
@@ -443,9 +446,8 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("operation_with_list_of_action_types");
-        exception.expectMessage("'action'");
-        exception.expectMessage("'python_script:'");
+        exception.expectMessage("'python_action'");
+        exception.expectMessage("there should be a map of values, but instead there is a list");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -506,5 +508,49 @@ public class CompilerErrorsTest {
         exception.expectMessage("input1");
         exception.expectMessage("null");
         compiler.compile(SlangSource.fromFile(resource), path);
+    }
+
+    @Test
+    public void testValidationOfFlowWithMissingNavigationFromOperationResult()throws Exception {
+        URI flowUri = getClass().getResource("/corrupted/step_with_missing_navigation_from_operation_result_flow.sl").toURI();
+        Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
+
+        URI operationUri = getClass().getResource("/java_op.sl").toURI();
+        Executable operationModel = compiler.preCompile(SlangSource.fromFile(operationUri));
+        Set<Executable> dependencies = new HashSet<>();
+        dependencies.add(operationModel);
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("step1");
+        exception.expectMessage("FAILURE");
+        exception.expectMessage("user.ops.java_op");
+        exception.expectMessage("navigation");
+        List<RuntimeException> errors = compiler.validateSlangModelWithDependencies(flowModel, dependencies);
+        Assert.assertEquals(1, errors.size());
+        throw errors.get(0);
+    }
+
+    @Test
+    public void testValidationOfFlowWithMissingDependencyRequiredInputInStep()throws Exception {
+        URI flowUri = getClass().getResource("/corrupted/flow_missing_dependency_required_input_in_step.sl").toURI();
+        Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
+
+        URI operation1Uri = getClass().getResource("/test_op.sl").toURI();
+        Executable operation1Model = compiler.preCompile(SlangSource.fromFile(operation1Uri));
+        URI operation2Uri = getClass().getResource("/check_op.sl").toURI();
+        Executable operation2Model = compiler.preCompile(SlangSource.fromFile(operation2Uri));
+        Set<Executable> dependencies = new HashSet<>();
+        dependencies.add(operation1Model);
+        dependencies.add(operation2Model);
+
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("explicit_alias");
+        exception.expectMessage("user.ops.test_op");
+        exception.expectMessage("mandatory");
+        exception.expectMessage("inputs");
+        exception.expectMessage("alla");
+        List<RuntimeException> errors = compiler.validateSlangModelWithDependencies(flowModel, dependencies);
+        Assert.assertEquals(1, errors.size());
+        throw errors.get(0);
     }
 }
