@@ -109,7 +109,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedArguments.put("input_9", "localhost");
         expectedArguments.put("input_10", "localhost");
         expectedArguments.put("input_11", "default_str");
-        expectedArguments.put("value_propagate", "flowInput_stepArg_");
+        expectedArguments.put("value_propagate_input", "flowInput_stepArg_");
         expectedArguments.put("input_12", "hyphen_value");
         expectedArguments.put("input_13", "hyphen_value");
         expectedArguments.put("input_14", "localhost");
@@ -139,7 +139,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedFlowInputs.put("input_9", "localhost");
         expectedFlowInputs.put("input_10", "localhost");
         expectedFlowInputs.put("input_11", "default_str");
-        expectedFlowInputs.put("value_propagate", "flowInput_");
+        expectedFlowInputs.put("value_propagate_input", "flowInput_");
         expectedFlowInputs.put("input_12", "hyphen_value");
         expectedFlowInputs.put("input_13", "hyphen_value");
         expectedFlowInputs.put("input_14", "localhost");

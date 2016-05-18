@@ -8,10 +8,14 @@
 namespace: user.ops
 
 operation:
-  name: test_op
+  name: check_weather
   inputs:
-    - alla
+    - city
   python_action:
-    script: 'print "hello world"'
+    script: |
+      weather = "weather thing"
+      print city
   outputs:
-    - balla: 'some value'
+    - weather: ${ weather }
+  results:
+    - SUCCESS: ${ weather == "weather thing" }

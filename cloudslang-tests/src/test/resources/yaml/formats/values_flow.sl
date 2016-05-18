@@ -21,7 +21,7 @@ flow:
         private: true
 
     # helpers
-    - output_no_expression: output_no_expression_value
+    - output_no_expression_input: 'output_no_expression_value'
     - authorized_keys_path: './auth'
     - scp_host_port: '8888'
 

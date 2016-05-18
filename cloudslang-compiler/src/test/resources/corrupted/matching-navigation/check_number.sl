@@ -8,10 +8,17 @@
 namespace: user.ops
 
 operation:
-  name: test_op
+  name: check_number
   inputs:
-    - alla
+    - number
   python_action:
-    script: 'print "hello world"'
+    script: |
+      remainder = int(number) % 2
+      isEven = remainder == 0
+      tooBig = int(number) > 512
   outputs:
-    - balla: 'some value'
+    - preprocessed_number: ${ str(int(number) * 3) }
+  results:
+    - EVEN: ${ isEven and not tooBig }
+    - ODD: ${ not(isEven or tooBig) }
+    - FAILURE # report failure if the number is too big

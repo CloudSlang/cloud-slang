@@ -5,13 +5,12 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: user.ops
+namespace: io.cloudslang
 
-operation:
-  name: test_op
-  inputs:
-    - alla
-  python_action:
-    script: 'print "hello world"'
-  outputs:
-    - balla: 'some value'
+flow:
+  name: flow_that_calls_corrupted_flow
+  workflow:
+    - call_to_other_flow:
+        do:
+          flow_input_in_step_same_name_as_dependency_output:
+            - input1
