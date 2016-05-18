@@ -89,12 +89,9 @@ public class ValidatorImpl implements Validator {
         for (Step step : steps) {
             String refId = step.getRefId();
             Executable reference = dependencies.get(refId);
-            List<String> mandatoryInputNames = getMandatoryInputNames(reference);
-            List<String> stepInputNames = getStepInputNames(step);
-            List<String> inputsNotWired = getInputsNotWired(mandatoryInputNames, stepInputNames);
 
             try {
-                validateInputNamesEmpty(inputsNotWired, flow, step, reference);
+                validateMandatoryInputsAreWired(flow, step, reference);
                 validateStepInputNamesDifferentFromDependencyOutputNames(flow, step, reference);
                 validateDependenciesResultsHaveMatchingNavigations(executable, refId, step, reference);
             } catch (RuntimeException e) {
@@ -177,7 +174,10 @@ public class ValidatorImpl implements Validator {
         return inputsNotWired;
     }
 
-    private void validateInputNamesEmpty(List<String> inputsNotWired, Flow flow, Step step, Executable reference) {
+    private void validateMandatoryInputsAreWired(Flow flow, Step step, Executable reference) {
+        List<String> mandatoryInputNames = getMandatoryInputNames(reference);
+        List<String> stepInputNames = getStepInputNames(step);
+        List<String> inputsNotWired = getInputsNotWired(mandatoryInputNames, stepInputNames);
         Validate.isTrue(
                 CollectionUtils.isEmpty(inputsNotWired),
                 prepareErrorMessageValidateInputNamesEmpty(inputsNotWired, flow, step, reference)
