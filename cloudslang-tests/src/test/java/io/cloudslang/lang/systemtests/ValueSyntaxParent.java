@@ -26,6 +26,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Bonczidai Levente
  * @since 11/13/2015
@@ -133,4 +136,24 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         return accumulator.equals(map1);
     }
 
+    protected void verifyInOutParams(Map<String, Value> params) {
+        for (Map.Entry<String, Value> entry : params.entrySet()) {
+            String name = entry.getKey();
+            Serializable value = entry.getValue() == null ? null : entry.getValue().get();
+            boolean sensitive = entry.getValue() != null && entry.getValue().isSensitive();
+            assertTrue(name.contains("sensitive") && sensitive || !name.contains("sensitive") && !sensitive);
+            if (!name.contains("sensitive")) {
+                for (Map.Entry<String, Value> otherEntry : params.entrySet()) {
+                    if (otherEntry.getKey().replaceAll("_sensitive", "").equals(name)) {
+                        Serializable otherValue = otherEntry.getValue() == null ? null : otherEntry.getValue().get();
+                        if (value == null) {
+                            assertTrue(otherValue == null || otherValue.equals("default_value"));
+                        } else {
+                            assertEquals(value, otherValue);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

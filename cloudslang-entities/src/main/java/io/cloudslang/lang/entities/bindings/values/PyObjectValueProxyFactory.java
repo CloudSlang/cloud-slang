@@ -11,6 +11,7 @@ import org.python.core.PyType;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * PyObjectValue proxy factory
@@ -19,47 +20,22 @@ import java.lang.reflect.Method;
  */
 public class PyObjectValueProxyFactory {
 
+    @SuppressWarnings("unchecked")
     public static PyObjectValue create(Serializable content, boolean sensitive) {
         PyObject pyObject = Py.java2py(content);
-        MethodHandler methodHandler = new PyObjectValueMethodHandler(content, sensitive, pyObject);
-        return pyObject.getClass().getConstructors().length == 0 ?
-                createProxyToSingleInstance(pyObject, methodHandler) :
-                createProxyToNewInstance(pyObject, methodHandler);
-    }
-
-    private static PyObjectValue createProxyToSingleInstance(PyObject pyObject, MethodHandler methodHandler) {
         try {
-            ProxyFactory factory = new ProxyFactory();
-            factory.setSuperclass(PyObject.class);
-            factory.setInterfaces(new Class[]{PyObjectValue.class});
-            factory.setFilter(new PyObjectValueMethodFilter());
-            return (PyObjectValue) factory.create(new Class[0], new Object[0], methodHandler);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create a proxy to single instance for PyObjectValue and " + pyObject.getClass().getSimpleName(), e);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static PyObjectValue createProxyToNewInstance(PyObject pyObject, MethodHandler methodHandler) {
-        try {
-            Constructor<?> constructor = pyObject.getClass().getConstructors()[0];
-            for (Constructor<?> con : pyObject.getClass().getConstructors()) {
-                if (con.getParameterCount() < constructor.getParameterCount()) {
-                    constructor = con;
-                }
-            }
-            Object[] args = new Object[constructor.getParameterCount()];
-            for (int index = 0; index < constructor.getParameterCount(); index++) {
-                Class<?> parameterType = constructor.getParameterTypes()[index];
-                args[index] = parameterType.equals(PyType.class) ? pyObject.getType() :
-                        !parameterType.isPrimitive() ? null : ClassUtils.primitiveToWrapper(parameterType).getConstructor(String.class).newInstance("0");
-            }
             ProxyFactory factory = new ProxyFactory();
             factory.setSuperclass(pyObject.getClass());
             factory.setInterfaces(new Class[]{PyObjectValue.class});
             factory.setFilter(new PyObjectValueMethodFilter());
-            return (PyObjectValue) factory.create(constructor.getParameterTypes(), args, methodHandler);
+            PyObjectConstructor constructor = getConstructor(pyObject);
+            MethodHandler methodHandler = new PyObjectValueMethodHandler(content, sensitive, pyObject);
+            return (PyObjectValue) factory.create(constructor.constructor.getParameterTypes(), constructor.params, methodHandler);
         } catch (Exception e) {
+            // ToDo remove
+            System.out.println("\nError in PyObjectValueProxyFactory\n");
+            e.printStackTrace();
+
             throw new RuntimeException("Failed to create a proxy to new instance for PyObjectValue and " + pyObject.getClass().getSimpleName(), e);
         }
     }
@@ -86,6 +62,7 @@ public class PyObjectValueProxyFactory {
             } else if (PyObject.class.isAssignableFrom(thisMethod.getDeclaringClass())) {
                 Method pyObjectMethod = pyObject.getClass().getMethod(thisMethod.getName(), thisMethod.getParameterTypes());
                 if (!thisMethod.getName().equals("toString")) {
+                    // ToDo remove
                     System.out.println("MethodHandler: " + thisMethod.getName() + ". " + thisMethod.toString());
                     accessed = true;
                 }
@@ -100,9 +77,44 @@ public class PyObjectValueProxyFactory {
 
         @Override
         public boolean isHandled(Method method) {
-            return !(method.getName().equals("finalize") &&
-                    method.getParameterTypes().length == 0 &&
-                    method.getReturnType() == Void.TYPE);
+            return Modifier.isPublic(method.getModifiers());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static PyObjectConstructor getConstructor(PyObject pyObject) {
+        try {
+            PyObjectConstructor pyObjectConstructor = new PyObjectConstructor(PyObject.class.getConstructor(), new Object[]{});
+            if (pyObject.getClass().getConstructors().length > 0) {
+                Constructor constructor = pyObject.getClass().getConstructors()[0];
+                for (Constructor<?> con : pyObject.getClass().getConstructors()) {
+                    if (con.getParameterCount() < constructor.getParameterCount()) {
+                        constructor = con;
+                    }
+                }
+                Object[] params = new Object[constructor.getParameterCount()];
+                for (int index = 0; index < constructor.getParameterCount(); index++) {
+                    Class<?> parameterType = constructor.getParameterTypes()[index];
+                    params[index] = parameterType.equals(PyType.class) ? pyObject.getType() :
+                            !parameterType.isPrimitive() ? null : ClassUtils.primitiveToWrapper(parameterType).getConstructor(String.class).newInstance("0");
+                }
+                pyObjectConstructor = new PyObjectConstructor(constructor, params);
+            }
+            return pyObjectConstructor;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get PyObject constructor", e);
+        }
+
+    }
+
+    private static class PyObjectConstructor {
+
+        Constructor<?> constructor;
+        Object[] params;
+
+        public PyObjectConstructor(Constructor<?> constructor, Object[] params) {
+            this.constructor = constructor;
+            this.params = params;
         }
     }
 }

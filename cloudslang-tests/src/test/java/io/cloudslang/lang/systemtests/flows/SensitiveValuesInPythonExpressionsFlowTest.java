@@ -16,6 +16,7 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.ValueSyntaxParent;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.URI;
@@ -23,16 +24,17 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Sensitive value test
+ * Sensitive values in python expressions
  *
  * Created by Ifat Gavish on 19/04/2016
  */
-public class SensitiveValueSyntaxInFlowTest extends ValueSyntaxParent {
+public class SensitiveValuesInPythonExpressionsFlowTest extends ValueSyntaxParent {
 
     @Test
+    @Ignore
     public void testValues() throws Exception {
         // compile
-        URI resource = getClass().getResource("/yaml/formats/sensitive_values_flow.sl").toURI();
+        URI resource = getClass().getResource("/yaml/formats/sensitive_values_in_python_expressions_flow.sl").toURI();
         URI op1 = getClass().getResource("/yaml/noop.sl").toURI();
         URI op2 = getClass().getResource("/yaml/print.sl").toURI();
 

@@ -62,6 +62,10 @@ public class ArgumentsBinding {
             inputValue = srcContext.get(inputName);
             if (!argument.isOverridable()) {
                 Value rawValue = argument.getValue();
+
+                // ToDo remove
+                System.out.println("\nbindArgument: " + inputName + " ( "+ (rawValue == null ? null : rawValue.get()) + " )");
+
                 String expressionToEvaluate = ExpressionUtils.extractExpression(rawValue == null ? null : rawValue.get());
                 if (expressionToEvaluate != null) {
                     //we do not want to change original context map

@@ -146,6 +146,9 @@ public abstract class AbstractScriptInterpreter {
         if (value instanceof PyArray) {
             return SerializationUtils.clone((Serializable)((PyArray) value).getArray());
         }
+        if (value instanceof PyType) {
+            return ((PyType) value).getName();
+        }
         return Py.tojava(value, Serializable.class);
     }
 
