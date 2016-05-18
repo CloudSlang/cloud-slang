@@ -9,7 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
-import io.cloudslang.lang.entities.AsyncLoopStatement;
+import io.cloudslang.lang.entities.ParallelLoopStatement;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import org.springframework.stereotype.Component;
 
@@ -22,11 +22,11 @@ import java.util.List;
  * @author Bonczidai Levente
  */
 @Component
-public class AsyncLoopForTransformer extends AbstractForTransformer implements Transformer<String, AsyncLoopStatement> {
+public class ParallelLoopForTransformer extends AbstractForTransformer implements Transformer<String, ParallelLoopStatement> {
 
     @Override
-    public AsyncLoopStatement transform(String rawData) {
-        return (AsyncLoopStatement) transformToLoopStatement(rawData, true);
+    public ParallelLoopStatement transform(String rawData) {
+        return (ParallelLoopStatement) transformToLoopStatement(rawData, true);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class AsyncLoopForTransformer extends AbstractForTransformer implements T
 
     @Override
     public String keyToTransform() {
-        return ScoreLangConstants.ASYNC_LOOP_KEY;
+        return ScoreLangConstants.PARALLEL_LOOP_KEY;
     }
 
 }

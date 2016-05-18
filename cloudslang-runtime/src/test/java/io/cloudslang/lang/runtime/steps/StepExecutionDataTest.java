@@ -284,7 +284,7 @@ public class StepExecutionDataTest {
     }
 
     @Test
-    public void testEndStepAsyncLoopReturnValues() throws Exception {
+    public void testEndStepParallelLoopReturnValues() throws Exception {
         RunEnvironment runEnv = createRunEnvironment();
         String result = ScoreLangConstants.SUCCESS_RESULT;
         Context context = new Context(new HashMap<String, Serializable>());

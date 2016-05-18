@@ -5,19 +5,13 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: loops.async_loop
+namespace: loops.parallel_loop
 
-imports:
-  ops: loops.async_loop
-
-flow:
-  name: simple_async_loop
+operation:
+  name: print_list
   inputs:
-    - values: ${ range(1, 4) }
-  workflow:
-    - print_values:
-        async_loop:
-          for: value in values
-          do:
-            ops.print_branch:
-              - ID: ${ value }
+     - words_list
+  python_action:
+    script: |
+      if words_list != None and len(words_list) > 0:
+          print words_list

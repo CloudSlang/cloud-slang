@@ -26,26 +26,26 @@ import java.util.*;
  *
  * @author Bonczidai Levente
  */
-public class AsyncLoopFlowsTest extends SystemsTestsParent {
+public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
     private static final String BRANCH_MESSAGE = "branch ";
 
     @Test
-    public void testFlowWithAsyncLoop() throws Exception {
-        URI resource = getClass().getResource("/yaml/loops/async_loop/simple_async_loop.sl").toURI();
-        URI operation1 = getClass().getResource("/yaml/loops/async_loop/print_branch.sl").toURI();
+    public void testFlowWithParallelLoop() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/parallel_loop/simple_parallel_loop.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
 
         RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path);
 
-        List<StepData> branchesData = extractAsyncLoopData(runtimeInformation);
+        List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
     }
 
     @Test
-    public void testFlowWithAsyncLoopAggregate() throws Exception {
-        URI resource = getClass().getResource("/yaml/loops/async_loop/async_loop_aggregate.sl").toURI();
-        URI operation1 = getClass().getResource("/yaml/loops/async_loop/print_branch.sl").toURI();
+    public void testFlowWithParallelLoopAggregate() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_aggregate.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
 
         RuntimeInformation runtimeInformation = triggerWithData(
@@ -54,7 +54,7 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
                 getSystemProperties()
         );
 
-        List<StepData> branchesData = extractAsyncLoopData(runtimeInformation);
+        List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
 
         List<String> expectedNameOutputs = verifyPublishValues(branchesData);
@@ -63,26 +63,26 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
     }
 
     @Test
-    public void testFlowWithAsyncLoopNavigate() throws Exception {
-        URI resource = getClass().getResource("/yaml/loops/async_loop/async_loop_navigate.sl").toURI();
-        URI operation1 = getClass().getResource("/yaml/loops/async_loop/print_branch.sl").toURI();
-        URI operation2 = getClass().getResource("/yaml/loops/async_loop/print_list.sl").toURI();
+    public void testFlowWithParallelLoopNavigate() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_navigate.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
+        URI operation2 = getClass().getResource("/yaml/loops/parallel_loop/print_list.sl").toURI();
 
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
 
         RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path);
 
-        List<StepData> branchesData = extractAsyncLoopData(runtimeInformation);
+        List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
 
         verifyNavigation(runtimeInformation);
     }
 
     @Test
-    public void testFlowWithAsyncLoopAggregateNavigate() throws Exception {
-        URI resource = getClass().getResource("/yaml/loops/async_loop/async_loop_aggregate_navigate.sl").toURI();
-        URI operation1 = getClass().getResource("/yaml/loops/async_loop/print_branch.sl").toURI();
-        URI operation2 = getClass().getResource("/yaml/loops/async_loop/print_list.sl").toURI();
+    public void testFlowWithParallelLoopAggregateNavigate() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_aggregate_navigate.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
+        URI operation2 = getClass().getResource("/yaml/loops/parallel_loop/print_list.sl").toURI();
 
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
 
@@ -92,7 +92,7 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
                 getSystemProperties()
         );
 
-        List<StepData> branchesData = extractAsyncLoopData(runtimeInformation);
+        List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
 
         List<String> expectedNameOutputs = verifyPublishValues(branchesData);
@@ -104,8 +104,8 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
 
     @Test
     public void testFlowContextInAggregateSectionNotReachable() throws Exception {
-        URI resource = getClass().getResource("/yaml/loops/async_loop/async_loop_aggregate_flow_context.sl").toURI();
-        URI operation1 = getClass().getResource("/yaml/loops/async_loop/print_branch.sl").toURI();
+        URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_aggregate_flow_context.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
 
         exception.expect(RuntimeException.class);
@@ -135,7 +135,7 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
         return triggerWithData(resource, path, new HashSet<SystemProperty>());
     }
 
-    private List<StepData> extractAsyncLoopData(RuntimeInformation runtimeInformation) {
+    private List<StepData> extractParallelLoopData(RuntimeInformation runtimeInformation) {
         Map<String, List<StepData>> branchesByPath = runtimeInformation.getBranchesByPath();
         Assert.assertTrue("async loop data not found", branchesByPath.containsKey(BRANCH_FIRST_STEP_PATH));
         List<StepData> stepDataList = new ArrayList<>();
@@ -204,8 +204,8 @@ public class AsyncLoopFlowsTest extends SystemsTestsParent {
 
     private void verifyNavigation(RuntimeInformation runtimeInformation) {
         Map<String, StepData> stepsData = runtimeInformation.getSteps();
-        StepData stepAfterAsyncLoop = stepsData.get(SECOND_STEP_KEY);
-        Assert.assertEquals("navigation not as expected", "print_list", stepAfterAsyncLoop.getName());
+        StepData stepAfterParallelLoop = stepsData.get(SECOND_STEP_KEY);
+        Assert.assertEquals("navigation not as expected", "print_list", stepAfterParallelLoop.getName());
     }
 
 }

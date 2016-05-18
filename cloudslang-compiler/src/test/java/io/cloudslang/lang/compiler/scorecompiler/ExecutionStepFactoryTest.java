@@ -184,13 +184,13 @@ public class ExecutionStepFactoryTest {
     }
 
     @Test
-    public void testCreateAddBranchesStepPutAsyncLoopUnderTheRightKey() throws Exception {
-        AsyncLoopStatement statement = new AsyncLoopStatement("value", "values");
+    public void testCreateAddBranchesStepPutParallelLoopUnderTheRightKey() throws Exception {
+        ParallelLoopStatement statement = new ParallelLoopStatement("value", "values");
         HashMap<String, Serializable> preStepData = new HashMap<>();
-        preStepData.put(ScoreLangConstants.ASYNC_LOOP_KEY, statement);
+        preStepData.put(ScoreLangConstants.PARALLEL_LOOP_KEY, statement);
         ExecutionStep startStep =  factory.createAddBranchesStep(2L, 5L, 3L, preStepData, "refID", "evenCoolerStep");
-        AsyncLoopStatement actualStatement = (AsyncLoopStatement) startStep.getActionData()
-                .get(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY);
+        ParallelLoopStatement actualStatement = (ParallelLoopStatement) startStep.getActionData()
+                .get(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY);
         Assert.assertNotNull("async loop statement not found in action data", actualStatement);
         Assert.assertSame("async loop statement in not correctly set under the key", statement, actualStatement);
     }

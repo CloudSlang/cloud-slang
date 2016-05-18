@@ -5,17 +5,19 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: loops.async_loop
+namespace: loops.parallel_loop
 
-operation:
-  name: print_branch
+imports:
+  ops: loops.parallel_loop
+
+flow:
+  name: simple_parallel_loop
   inputs:
-     - ID
-  python_action:
-    script: |
-        name = 'branch ' + str(ID)
-        int_output = len(name) + int(ID)
-        print 'Hello from ' + name
-  outputs:
-    - name
-    - int_output
+    - values: ${ range(1, 4) }
+  workflow:
+    - print_values:
+        parallel_loop:
+          for: value in values
+          do:
+            ops.print_branch:
+              - ID: ${ value }
