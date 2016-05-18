@@ -61,7 +61,7 @@ public class ValidatorImpl implements Validator {
         Map<String, Executable> dependencies = new HashMap<>(filteredDependencies);
         dependencies.put(executable.getId(), executable);
         Set<Executable> verifiedExecutables = new HashSet<>();
-        return validateRequiredNonPrivateInputs(executable, dependencies, verifiedExecutables, new ArrayList<RuntimeException>());
+        return validateModelWithDependencies(executable, dependencies, verifiedExecutables, new ArrayList<RuntimeException>());
     }
 
     private boolean navigationListContainsKey(List<Map<String, String>> stepNavigations, String resultName) {
@@ -71,7 +71,7 @@ public class ValidatorImpl implements Validator {
         return false;
     }
 
-    private List<RuntimeException> validateRequiredNonPrivateInputs(
+    private List<RuntimeException> validateModelWithDependencies(
             Executable executable,
             Map<String, Executable> dependencies,
             Set<Executable> verifiedExecutables,
@@ -105,7 +105,7 @@ public class ValidatorImpl implements Validator {
         }
 
         for (Executable reference : flowReferences) {
-            validateRequiredNonPrivateInputs(reference, dependencies, verifiedExecutables, errors);
+            validateModelWithDependencies(reference, dependencies, verifiedExecutables, errors);
         }
         return errors;
     }
