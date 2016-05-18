@@ -109,9 +109,6 @@ public class ValidatorImpl implements Validator {
 
     private void validateDependenciesResultsHaveMatchingNavigations(Executable executable, String refId, Step step, Executable reference) {
         if (!StringUtils.equals(refId, executable.getId())) {
-            if(executable.getType().equals(SlangTextualKeys.OPERATION_TYPE)){
-                return;
-            }
             List<Map<String, String>> stepNavigationStrings = step.getNavigationStrings();
             if (reference == null) {
                 throw new IllegalArgumentException("Cannot compile flow: \'" + executable.getName() + "\' since for step: \'" + step.getName()
