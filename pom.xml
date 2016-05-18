@@ -214,19 +214,19 @@
             </dependency>
 
             <dependency>
-                <groupId>io.cloudslang</groupId>
+                <groupId>${score.group}</groupId>
                 <artifactId>runtime-management-impl</artifactId>
                 <version>${score.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.cloudslang</groupId>
+                <groupId>${score.group}</groupId>
                 <artifactId>dependency-management-api</artifactId>
                 <version>${score.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.cloudslang</groupId>
+                <groupId>${score.group}</groupId>
                 <artifactId>dependency-management-impl</artifactId>
                 <version>${score.version}</version>
             </dependency>
