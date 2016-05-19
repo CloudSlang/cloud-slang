@@ -41,7 +41,7 @@ public class ExecutionStepFactory {
     private static final String STEP_EXECUTION_DATA_CLASS = STEPS_PACKAGE + ".StepExecutionData";
     private static final String OPERATION_STEPS_CLASS = STEPS_PACKAGE + ".ExecutableExecutionData";
     private static final String ACTION_STEPS_CLASS = STEPS_PACKAGE + ".ActionExecutionData";
-    private static final String ASYNC_LOOP_STEPS_CLASS = STEPS_PACKAGE + ".AsyncLoopExecutionData";
+    private static final String PARALLEL_LOOP_STEPS_CLASS = STEPS_PACKAGE + ".ParallelLoopExecutionData";
     private static final String NAVIGATION_ACTIONS_CLASS = "io.cloudslang.lang.runtime.navigations.Navigations";
     private static final String SIMPLE_NAVIGATION_METHOD = "navigate";
 
@@ -68,7 +68,7 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.STEP_NAVIGATION_KEY, new HashMap<>(navigationValues));
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
-        actionData.put(ScoreLangConstants.ASYNC_LOOP_KEY, isAsync);
+        actionData.put(ScoreLangConstants.PARALLEL_LOOP_KEY, isAsync);
         ExecutionStep finishStep = createGeneralStep(index, STEP_EXECUTION_DATA_CLASS, "endStep", actionData);
         finishStep.setNavigationData(null);
         return finishStep;
@@ -135,8 +135,8 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.REF_ID, refId);
         actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, nextStepID);
         actionData.put(ScoreLangConstants.BRANCH_BEGIN_STEP_ID_KEY, branchBeginStepID);
-        actionData.put(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY, preStepData.get(ScoreLangConstants.ASYNC_LOOP_KEY));
-        ExecutionStep executionStep = createGeneralStep(currentStepID, ASYNC_LOOP_STEPS_CLASS, "addBranches", actionData);
+        actionData.put(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY, preStepData.get(ScoreLangConstants.PARALLEL_LOOP_KEY));
+        ExecutionStep executionStep = createGeneralStep(currentStepID, PARALLEL_LOOP_STEPS_CLASS, "addBranches", actionData);
         executionStep.setSplitStep(true);
         return executionStep;
     }
@@ -150,7 +150,7 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.STEP_NAVIGATION_KEY, new HashMap<>(navigationValues));
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
 
-        return createGeneralStep(index, ASYNC_LOOP_STEPS_CLASS, "joinBranches", actionData);
+        return createGeneralStep(index, PARALLEL_LOOP_STEPS_CLASS, "joinBranches", actionData);
     }
 
     private ExecutionStep createGeneralStep(

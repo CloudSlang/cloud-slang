@@ -5,19 +5,24 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: loops.async_loop
+namespace: io.cloudslang
 
 imports:
-  ops: loops.async_loop
+  ops: user.ops
 
 flow:
-  name: simple_async_loop
+  name: flow_input_in_step_same_name_as_dependency_output
   inputs:
-    - values: ${ range(1, 11) }
+    - input1
   workflow:
-    - print_values:
-        async_loop:
-          for: value in values
-          do:
-            ops.print_branch:
-              - ID: ${ value }
+    - explicit_alias:
+        do:
+          ops.test_op:
+            - alla: 'input_1'
+            - balla: '22'
+
+    - implicit_alias:
+        do:
+          check_op:
+            - city: 'input_1'
+            - port: '22'

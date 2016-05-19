@@ -5,13 +5,17 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: user.ops
+namespace: loops.parallel_loop
 
 operation:
-  name: test_op
+  name: print_branch
   inputs:
-    - alla
+     - ID
   python_action:
-    script: 'print "hello world"'
+    script: |
+      name = 'branch ' + str(ID)
+      int_output = int(ID)
+      print 'Hello from ' + name
   outputs:
-    - balla: 'some value'
+    - name
+    - int_output

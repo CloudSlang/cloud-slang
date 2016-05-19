@@ -5,17 +5,23 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: loops.async_loop
+namespace: user.flows
 
-operation:
-  name: print_branch
+imports:
+  ops: user.ops
+
+flow:
+  name: child_flow
   inputs:
-     - ID
-  python_action:
-    script: |
-      name = 'branch ' + str(ID)
-      int_output = int(ID)
-      print 'Hello from ' + name
+    - input1: 'value'
+    - time_zone_as_string: ${get_sp('user.sys.props.port')}
+  workflow:
+    - step01:
+        do:
+          ops.get_time_zone:
+            - time_zone_as_string
+    - step02:
+        do:
+          ops.test_op:
   outputs:
-    - name
-    - int_output
+    - val_output: ${ input1 }

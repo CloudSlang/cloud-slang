@@ -5,13 +5,13 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: user.ops
+namespace: loops.parallel_loop
 
 operation:
-  name: test_op
+  name: print_list
   inputs:
-    - alla
+     - words_list
   python_action:
-    script: 'print "hello world"'
-  outputs:
-    - balla: 'some value'
+    script: |
+      if words_list != None and len(words_list) > 0:
+          print words_list

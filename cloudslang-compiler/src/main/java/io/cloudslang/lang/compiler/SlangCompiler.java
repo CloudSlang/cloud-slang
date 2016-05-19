@@ -49,7 +49,8 @@ public interface SlangCompiler {
      * its wiring to its dependencies
      * Current validations:
      *      - Validates that required inputs of the dependency have a matching input in the step
-     *      - Validate that every result of teh dependency has a matching navigation in the step
+     *      - Validate that every result of the dependency has a matching navigation in the step
+     *      - Validate step input names are different from dependency output names
      * @param slangModel the CloudSlang model to validate
      * @param dependenciesModels the CloudSlang models of the direct dependencies
      * @return a list of the exceptions that were found (if any)

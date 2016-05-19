@@ -10,15 +10,15 @@
 package io.cloudslang.lang.runtime.steps;
 
 import io.cloudslang.dependency.api.services.DependencyService;
+import io.cloudslang.lang.entities.ParallelLoopStatement;
 import io.cloudslang.dependency.api.services.MavenConfig;
 import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
 import io.cloudslang.dependency.impl.services.MavenConfigImpl;
-import io.cloudslang.lang.entities.AsyncLoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.runtime.RuntimeConstants;
-import io.cloudslang.lang.runtime.bindings.AsyncLoopBinding;
+import io.cloudslang.lang.runtime.bindings.ParallelLoopBinding;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
@@ -61,16 +61,16 @@ import static org.mockito.Mockito.*;
 * @author Bonczidai Levente
 */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = AsyncLoopStepsTest.Config.class)
-public class AsyncLoopStepsTest {
+@ContextConfiguration(classes = ParallelLoopStepsTest.Config.class)
+public class ParallelLoopStepsTest {
 
     public static final String BRANCH_EXCEPTION_MESSAGE = "Exception details placeholder";
 
     @Autowired
-    private AsyncLoopExecutionData asyncLoopSteps;
+    private ParallelLoopExecutionData parallelLoopSteps;
 
     @Autowired
-    private AsyncLoopBinding asyncLoopBinding;
+    private ParallelLoopBinding parallelLoopBinding;
 
     @Autowired
     private OutputsBinding outputsBinding;
@@ -83,7 +83,7 @@ public class AsyncLoopStepsTest {
 
     @Before
     public void resetMocks() {
-        reset(asyncLoopBinding);
+        reset(parallelLoopBinding);
         reset(outputsBinding);
         reset(loopsBinding);
     }
@@ -91,7 +91,7 @@ public class AsyncLoopStepsTest {
     @Test
     public void testBranchesAreCreated() throws Exception {
         // prepare arguments
-        AsyncLoopStatement asyncLoopStatement = new AsyncLoopStatement("varName", "expression");
+        ParallelLoopStatement parallelLoopStatement = new ParallelLoopStatement("varName", "expression");
 
         RunEnvironment runEnvironment = new RunEnvironment();
         Map<String, Serializable> variables = new HashMap<>();
@@ -104,12 +104,12 @@ public class AsyncLoopStepsTest {
         // prepare mocks
         ExecutionRuntimeServices executionRuntimeServices = mock(ExecutionRuntimeServices.class);
         List<Serializable> expectedSplitData = Lists.newArrayList((Serializable) 1, 2, 3);
-        when(asyncLoopBinding.bindAsyncLoopList(eq(asyncLoopStatement), eq(context), eq(runEnvironment.getSystemProperties()), eq(nodeName))).thenReturn(expectedSplitData);
+        when(parallelLoopBinding.bindParallelLoopList(eq(parallelLoopStatement), eq(context), eq(runEnvironment.getSystemProperties()), eq(nodeName))).thenReturn(expectedSplitData);
         Long branchBeginStepID = 3L;
 
         // call method
-        asyncLoopSteps.addBranches(
-                asyncLoopStatement,
+        parallelLoopSteps.addBranches(
+                parallelLoopStatement,
                 runEnvironment,
                 executionRuntimeServices,
                 nodeName,
@@ -139,7 +139,7 @@ public class AsyncLoopStepsTest {
     @Test
     public void testAddBranchesEventsAreFired() throws Exception {
         // prepare arguments
-        AsyncLoopStatement asyncLoopStatement = new AsyncLoopStatement("varName", "expression");
+        ParallelLoopStatement parallelLoopStatement = new ParallelLoopStatement("varName", "expression");
 
         RunEnvironment runEnvironment = new RunEnvironment();
         Map<String, Serializable> variables = new HashMap<>();
@@ -152,12 +152,12 @@ public class AsyncLoopStepsTest {
         // prepare mocks
         ExecutionRuntimeServices executionRuntimeServices = mock(ExecutionRuntimeServices.class);
         List<Serializable> expectedSplitData = Lists.newArrayList((Serializable) 1, 2, 3);
-        when(asyncLoopBinding.bindAsyncLoopList(eq(asyncLoopStatement), eq(context), eq(runEnvironment.getSystemProperties()), eq(nodeName))).thenReturn(expectedSplitData);
+        when(parallelLoopBinding.bindParallelLoopList(eq(parallelLoopStatement), eq(context), eq(runEnvironment.getSystemProperties()), eq(nodeName))).thenReturn(expectedSplitData);
         Long branchBeginStepID = 0L;
 
         // call method
-        asyncLoopSteps.addBranches(
-                asyncLoopStatement,
+        parallelLoopSteps.addBranches(
+                parallelLoopStatement,
                 runEnvironment,
                 executionRuntimeServices,
                 nodeName,
@@ -217,7 +217,7 @@ public class AsyncLoopStepsTest {
         );
 
         // call method
-        asyncLoopSteps.joinBranches(
+        parallelLoopSteps.joinBranches(
                 runEnvironment,
                 executionRuntimeServices,
                 stepAggregateValues,
@@ -279,7 +279,7 @@ public class AsyncLoopStepsTest {
         );
 
         // call method
-        asyncLoopSteps.joinBranches(
+        parallelLoopSteps.joinBranches(
                 runEnvironment,
                 executionRuntimeServices,
                 stepAggregateValues,
@@ -335,7 +335,7 @@ public class AsyncLoopStepsTest {
         );
 
         // call method
-        asyncLoopSteps.joinBranches(
+        parallelLoopSteps.joinBranches(
                 runEnvironment,
                 executionRuntimeServices,
                 stepAggregateValues,
@@ -385,7 +385,7 @@ public class AsyncLoopStepsTest {
         );
 
         // call method
-        asyncLoopSteps.joinBranches(
+        parallelLoopSteps.joinBranches(
                 runEnvironment,
                 executionRuntimeServices,
                 stepAggregateValues,
@@ -422,7 +422,7 @@ public class AsyncLoopStepsTest {
         exception.expectMessage(BRANCH_EXCEPTION_MESSAGE);
         exception.expect(RuntimeException.class);
 
-        asyncLoopSteps.joinBranches(
+        parallelLoopSteps.joinBranches(
                 runEnvironment,
                 executionRuntimeServices,
                 new ArrayList<Output>(0),
@@ -502,8 +502,8 @@ public class AsyncLoopStepsTest {
     static class Config {
 
         @Bean
-        public AsyncLoopBinding asyncLoopBinding() {
-            return mock(AsyncLoopBinding.class);
+        public ParallelLoopBinding parallelLoopBinding() {
+            return mock(ParallelLoopBinding.class);
         }
 
         @Bean
@@ -517,8 +517,8 @@ public class AsyncLoopStepsTest {
         }
 
         @Bean
-        public AsyncLoopExecutionData asyncLoopSteps() {
-            return new AsyncLoopExecutionData();
+        public ParallelLoopExecutionData parallelLoopSteps() {
+            return new ParallelLoopExecutionData();
         }
 
         @Bean

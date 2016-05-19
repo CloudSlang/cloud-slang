@@ -5,19 +5,9 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: loops.async_loop
+namespace: user.ops
 
-imports:
-  ops: loops.async_loop
-
-flow:
-  name: simple_async_loop
-  inputs:
-    - values: ${ range(1, 4) }
-  workflow:
-    - print_values:
-        async_loop:
-          for: value in values
-          do:
-            ops.print_branch:
-              - ID: ${ value }
+operation:
+  name: test_op
+  python_action:
+    script: 'print "hello world"'

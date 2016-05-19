@@ -5,17 +5,13 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: loops.async_loop
+namespace: loops.parallel_loop
 
 operation:
-  name: print_branch
+  name: print_list
   inputs:
-     - ID
+     - words_list
   python_action:
     script: |
-        name = 'branch ' + str(ID)
-        int_output = len(name) + int(ID)
-        print 'Hello from ' + name
-  outputs:
-    - name
-    - int_output
+      if words_list != None and len(words_list) > 0:
+          print words_list
