@@ -11,7 +11,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.ParallelLoopStatement;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +30,7 @@ public class ParallelLoopForTransformer extends AbstractForTransformer implement
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Transformer.Scope.BEFORE_STEP);
+        return Collections.singletonList(Scope.BEFORE_STEP);
     }
 
     @Override

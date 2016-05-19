@@ -30,7 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -51,6 +53,9 @@ public class CompileParallelLoopFlowTest {
 
     @Autowired
     private SlangCompiler compiler;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void testPreCompileParallelLoopFlow() throws Exception {
@@ -257,6 +262,36 @@ public class CompileParallelLoopFlowTest {
         assertNotNull("branch end step method not found", branchEndStepExecutionStep);
 
         verifyBranchPublishValuesIsEmpty(branchEndStepExecutionStep.getActionData());
+    }
+
+    @Test
+    public void testPublishOnBranchThrowsException() throws Exception {
+        URI flow = getClass().getResource("/corrupted/loops/parallel_loop/parallel_loop_publish_on_branch.sl").toURI();
+        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
+        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation1));
+        path.add(SlangSource.fromFile(operation2));
+
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("Property 'publish' under 'parallel_loop' at 'print_values' is illegal");
+
+        compiler.compile(SlangSource.fromFile(flow), path);
+    }
+
+    @Test
+    public void testAggregateKeyThrowsException() throws Exception {
+        URI flow = getClass().getResource("/corrupted/loops/parallel_loop/parallel_loop_aggregate_key.sl").toURI();
+        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
+        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation1));
+        path.add(SlangSource.fromFile(operation2));
+
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("Property 'aggregate' at 'print_values' is illegal");
+
+        compiler.compile(SlangSource.fromFile(flow), path);
     }
 
     private void verifyPublishValues(Map<String, ?> joinBranchesActionData) {
