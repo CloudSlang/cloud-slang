@@ -43,8 +43,8 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
     }
 
     @Test
-    public void testFlowWithParallelLoopAggregate() throws Exception {
-        URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_aggregate.sl").toURI();
+    public void testFlowWithParallelLoopPublish() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_publish.sl").toURI();
         URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
 
@@ -59,7 +59,7 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
         List<String> expectedNameOutputs = verifyPublishValues(branchesData);
 
-        verifyAggregateValues(runtimeInformation, expectedNameOutputs);
+        verifyPublishValues(runtimeInformation, expectedNameOutputs);
     }
 
     @Test
@@ -79,8 +79,8 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
     }
 
     @Test
-    public void testFlowWithParallelLoopAggregateNavigate() throws Exception {
-        URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_aggregate_navigate.sl").toURI();
+    public void testFlowWithParallelLoopPublishNavigate() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_publish_navigate.sl").toURI();
         URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
         URI operation2 = getClass().getResource("/yaml/loops/parallel_loop/print_list.sl").toURI();
 
@@ -97,14 +97,14 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
         List<String> expectedNameOutputs = verifyPublishValues(branchesData);
 
-        verifyAggregateValues(runtimeInformation, expectedNameOutputs);
+        verifyPublishValues(runtimeInformation, expectedNameOutputs);
 
         verifyNavigation(runtimeInformation);
     }
 
     @Test
-    public void testFlowContextInAggregateSectionNotReachable() throws Exception {
-        URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_aggregate_flow_context.sl").toURI();
+    public void testFlowContextInPublishSectionNotReachable() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_publish_flow_context.sl").toURI();
         URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
 
@@ -117,7 +117,7 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
     private Set<SystemProperty> getSystemProperties() {
         return Sets.newHashSet(
-                new SystemProperty("loop", "async.prop1", "aggregate_value")
+                new SystemProperty("loop", "parallel.prop1", "publish_value")
         );
     }
 
@@ -137,7 +137,7 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
     private List<StepData> extractParallelLoopData(RuntimeInformation runtimeInformation) {
         Map<String, List<StepData>> branchesByPath = runtimeInformation.getBranchesByPath();
-        Assert.assertTrue("async loop data not found", branchesByPath.containsKey(BRANCH_FIRST_STEP_PATH));
+        Assert.assertTrue("parallel loop data not found", branchesByPath.containsKey(BRANCH_FIRST_STEP_PATH));
         List<StepData> stepDataList = new ArrayList<>();
         for (List<StepData> list : branchesByPath.values()){
             stepDataList.add(list.get(0));
@@ -157,9 +157,9 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         for (StepData branchData : branchesData) {
             Map<String, Serializable> outputs = branchData.getOutputs();
             Assert.assertTrue(outputs.containsKey("name"));
-            Assert.assertTrue(outputs.containsKey("number"));
+            Assert.assertTrue(outputs.containsKey("int_output"));
             actualNameOutputsOfBranches.add((String) outputs.get("name"));
-            actualNumberOutputsOfBranches.add((Integer) outputs.get("number"));
+            actualNumberOutputsOfBranches.add((Integer) outputs.get("int_output"));
         }
 
         List<String> expectedNameOutputs = Lists.newArrayList();
@@ -180,25 +180,25 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         return expectedNameOutputs;
     }
 
-    private void verifyAggregateValues(RuntimeInformation runtimeInformation, List<String> expectedNameOutputs) {
-        // aggregate
-        Map<String, StepData> asyncSteps = runtimeInformation.getAsyncSteps();
-        StepData asyncStep = asyncSteps.get(FIRST_STEP_PATH);
+    private void verifyPublishValues(RuntimeInformation runtimeInformation, List<String> expectedNameOutputs) {
+        // publish
+        Map<String, StepData> parallelLoopSteps = runtimeInformation.getParallelSteps();
+        StepData parallelLoopStep = parallelLoopSteps.get(FIRST_STEP_PATH);
 
-        Map<String, Serializable> aggregateValues = asyncStep.getOutputs();
-        Assert.assertTrue("aggregate name not found in async loop outputs", aggregateValues.containsKey("name_list"));
+        Map<String, Serializable> publishValues = parallelLoopStep.getOutputs();
+        Assert.assertTrue("publish name not found in parallel loop outputs", publishValues.containsKey("name_list"));
         @SuppressWarnings("unchecked")
-        List<String> actualAggregateNameList = (List<String>) aggregateValues.get("name_list");
+        List<String> actualPublishNameList = (List<String>) publishValues.get("name_list");
 
         Assert.assertTrue(
-                "aggregate output does not have the expected value",
-                containsSameElementsWithoutOrdering(Lists.newArrayList(actualAggregateNameList), expectedNameOutputs)
+                "publish value does not have the expected value",
+                containsSameElementsWithoutOrdering(Lists.newArrayList(actualPublishNameList), expectedNameOutputs)
         );
 
         Assert.assertEquals(
-                "Aggregate value not bound correctly from system property",
-                "aggregate_value",
-                aggregateValues.get("from_sp")
+                "Publish value not bound correctly from system property",
+                "publish_value",
+                publishValues.get("from_sp")
         );
     }
 

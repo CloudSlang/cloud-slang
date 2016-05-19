@@ -191,14 +191,14 @@ public class ExecutionStepFactoryTest {
         ExecutionStep startStep =  factory.createAddBranchesStep(2L, 5L, 3L, preStepData, "refID", "evenCoolerStep");
         ParallelLoopStatement actualStatement = (ParallelLoopStatement) startStep.getActionData()
                 .get(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY);
-        Assert.assertNotNull("async loop statement not found in action data", actualStatement);
-        Assert.assertSame("async loop statement in not correctly set under the key", statement, actualStatement);
+        Assert.assertNotNull("parallel loop statement not found in action data", actualStatement);
+        Assert.assertSame("parallel loop statement in not correctly set under the key", statement, actualStatement);
     }
 
     @Test
     public void testCreateJoinBranchesStep() throws Exception {
         Map<String, Serializable> postStepData = new HashMap<>();
-        postStepData.put(SlangTextualKeys.AGGREGATE_KEY, new ArrayList<>());
+        postStepData.put(SlangTextualKeys.PUBLISH_KEY, new ArrayList<>());
 
         ExecutionStep executionStep = factory.createJoinBranchesStep(
                 0L,
@@ -207,7 +207,7 @@ public class ExecutionStepFactoryTest {
                 "joinStep");
 
         @SuppressWarnings("unchecked") Map<String, Serializable> actionData = (Map<String, Serializable>) executionStep.getActionData();
-        Assert.assertTrue(actionData.containsKey(ScoreLangConstants.STEP_AGGREGATE_KEY));
+        Assert.assertTrue(actionData.containsKey(ScoreLangConstants.STEP_PUBLISH_KEY));
         Assert.assertTrue(actionData.containsKey(ScoreLangConstants.STEP_NAVIGATION_KEY));
         Assert.assertTrue(actionData.containsKey(ScoreLangConstants.NODE_NAME_KEY));
     }

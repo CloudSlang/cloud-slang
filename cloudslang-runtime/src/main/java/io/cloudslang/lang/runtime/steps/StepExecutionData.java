@@ -158,17 +158,23 @@ public class StepExecutionData extends AbstractExecutionData {
                     LanguageEventData.StepType.STEP, nodeName,
                     Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable) stepPublishValues),
                     Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues),
-                    Pair.of("operationReturnValues", executableReturnValues));
+                    Pair.of("executableReturnValues", executableReturnValues),
+                    Pair.of("parallelLoop", parallel_loop)
+            );
 
             Map<String, Serializable> argumentsResultContext = removeStepInputsResultContext(flowContext);
-            Map<String, Serializable> publishValues =
-                    outputsBinding.bindOutputs(
-                            argumentsResultContext,
-                            executableReturnValues.getOutputs(),
-                            runEnv.getSystemProperties(),
-                            stepPublishValues
-                    );
-
+            Map<String, Serializable> publishValues;
+            if (parallel_loop) {
+                publishValues = new HashMap<>(executableReturnValues.getOutputs());
+            } else {
+                publishValues =
+                        outputsBinding.bindOutputs(
+                                argumentsResultContext,
+                                executableReturnValues.getOutputs(),
+                                runEnv.getSystemProperties(),
+                                stepPublishValues
+                        );
+            }
             flowContext.putVariables(publishValues);
 
             //loops

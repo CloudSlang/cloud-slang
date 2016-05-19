@@ -16,7 +16,6 @@ import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Step;
-import io.cloudslang.lang.compiler.modeller.transformers.AggregateTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.entities.bindings.InOutParam;
@@ -40,9 +39,6 @@ public class DependenciesHelper {
 
     @Autowired
     private PublishTransformer publishTransformer;
-
-    @Autowired
-    private AggregateTransformer aggregateTransformer;
 
     /**
      * recursive matches executables with their references
@@ -114,7 +110,6 @@ public class DependenciesHelper {
         Set<String> result = new HashSet<>();
         List<Transformer> relevantTransformers = new ArrayList<>();
         relevantTransformers.add(publishTransformer);
-        relevantTransformers.add(aggregateTransformer);
 
         result.addAll(getSystemPropertiesFromInOutParam(step.getArguments()));
         result.addAll(

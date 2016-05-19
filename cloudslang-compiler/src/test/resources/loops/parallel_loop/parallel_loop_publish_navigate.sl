@@ -11,9 +11,9 @@ imports:
   ops: loops.parallel_loop
 
 flow:
-  name: parallel_loop_aggregate
+  name: parallel_loop_publish_navigate
   inputs:
-    - values: ${ range(1, 4) }
+    - values: ${ range(1, 11) }
   workflow:
     - print_values:
         parallel_loop:
@@ -21,10 +21,14 @@ flow:
           do:
             ops.print_branch:
               - ID: ${ value }
-          publish:
-            - name
-            - number: ${ int_output }
-        aggregate:
+        publish:
             - name_list: ${ map(lambda x:str(x['name']), branches_context) }
             - number_from_last_branch: ${ branches_context[-1]['number'] }
-            - from_sp: ${get_sp('loop.async.prop1')}
+        navigate:
+            - SUCCESS: print_list
+            - FAILURE: FAILURE
+
+    - print_list:
+        do:
+            ops.print_list:
+                - words_list: ${ [name_list, number_from_last_branch] }

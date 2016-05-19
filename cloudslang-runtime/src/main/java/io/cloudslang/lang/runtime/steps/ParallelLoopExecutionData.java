@@ -75,7 +75,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             List<Serializable> splitData = parallelLoopBinding.bindParallelLoopList(parallelLoopStatement, flowContext, runEnv.getSystemProperties(), nodeName);
 
             fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_SPLIT_BRANCHES,
-                    "async loop expression bound", runEnv.getExecutionPath().getCurrentPath(),
+                    "parallel loop expression bound", runEnv.getExecutionPath().getCurrentPath(),
                     LanguageEventData.StepType.STEP, nodeName,
                     Pair.of(LanguageEventData.BOUND_PARALLEL_LOOP_EXPRESSION, (Serializable) splitData));
 
@@ -86,7 +86,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
                 // first fire event
                 fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_BRANCH_START,
-                        "async loop branch created", runEnv.getExecutionPath().getCurrentPath(),
+                        "parallel loop branch created", runEnv.getExecutionPath().getCurrentPath(),
                         LanguageEventData.StepType.STEP, nodeName, Pair.of(ScoreLangConstants.REF_ID, refId),
                         Pair.of(RuntimeConstants.SPLIT_ITEM_KEY, splitItem));
                 // take path down one level
@@ -123,7 +123,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
     public void joinBranches(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                              @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
-                             @Param(ScoreLangConstants.STEP_AGGREGATE_KEY) List<Output> stepAggregateValues,
+                             @Param(ScoreLangConstants.STEP_PUBLISH_KEY) List<Output> stepPublishValues,
                              @Param(ScoreLangConstants.STEP_NAVIGATION_KEY) Map<String, ResultNavigation> stepNavigationValues,
                              @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName) {
         try {
@@ -135,10 +135,10 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             collectBranchesData(executionRuntimeServices, nodeName, branchesContext, branchesResult);
 
             Map<String, Serializable> publishValues =
-                    bindAggregateOutputs(
+                    bindPublishValues(
                             runEnv,
                             executionRuntimeServices,
-                            stepAggregateValues,
+                            stepPublishValues,
                             stepNavigationValues,
                             nodeName,
                             branchesContext
@@ -166,11 +166,11 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             Map<String, Serializable> publishValues,
             String parallelLoopResult) {
         // set the position of the next step - for the use of the navigation
-        // find in the navigation values the correct next step position, according to the async loop result, and set it
+        // find in the navigation values the correct next step position, according to the parallel loop result, and set it
         ResultNavigation navigation = stepNavigationValues.get(parallelLoopResult);
         if (navigation == null) {
             // should always have the executable response mapped to a navigation by the step, if not, it is an error
-            throw new RuntimeException("Step: " + nodeName + " has no matching navigation for the async loop result: " + parallelLoopResult);
+            throw new RuntimeException("Step: " + nodeName + " has no matching navigation for the parallel loop result: " + parallelLoopResult);
         }
         Long nextStepPosition = navigation.getNextStepId();
         String presetResult = navigation.getPresetResult();
@@ -179,7 +179,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : parallelLoopResult);
 
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_JOIN_BRANCHES_END,
-                "Async loop output binding finished", LanguageEventData.StepType.STEP, nodeName,
+                "Parallel loop output binding finished", LanguageEventData.StepType.STEP, nodeName,
                 Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
                 Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
                 Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextStepPosition));
@@ -200,30 +200,30 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         return parallelLoopResult;
     }
 
-    private Map<String, Serializable> bindAggregateOutputs(
+    private Map<String, Serializable> bindPublishValues(
             RunEnvironment runEnv,
             ExecutionRuntimeServices executionRuntimeServices,
-            List<Output> stepAggregateValues,
+            List<Output> stepPublishValues,
             Map<String, ResultNavigation> stepNavigationValues,
             String nodeName,
             List<Map<String, Serializable>> branchesContext) {
 
-        Map<String, Serializable> aggregateContext = new HashMap<>();
-        aggregateContext.put(RuntimeConstants.BRANCHES_CONTEXT_KEY, (Serializable) branchesContext);
+        Map<String, Serializable> publishContext = new HashMap<>();
+        publishContext.put(RuntimeConstants.BRANCHES_CONTEXT_KEY, (Serializable) branchesContext);
 
         fireEvent(
                 executionRuntimeServices,
                 runEnv,
                 ScoreLangConstants.EVENT_JOIN_BRANCHES_START,
-                "Async loop output binding started", LanguageEventData.StepType.STEP, nodeName,
-                Pair.of(ScoreLangConstants.STEP_AGGREGATE_KEY, (Serializable) stepAggregateValues),
+                "Parallel loop output binding started", LanguageEventData.StepType.STEP, nodeName,
+                Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable) stepPublishValues),
                 Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues));
 
         return outputsBinding.bindOutputs(
                 Collections.<String, Serializable>emptyMap(),
-                aggregateContext,
+                publishContext,
                 runEnv.getSystemProperties(),
-                stepAggregateValues
+                stepPublishValues
         );
     }
 
@@ -262,7 +262,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             branchRuntimeEnvironment.getExecutionPath().up();
 
             fireEvent(executionRuntimeServices, branchRuntimeEnvironment, ScoreLangConstants.EVENT_BRANCH_END,
-                    "async loop branch ended", LanguageEventData.StepType.STEP, nodeName,
+                    "Parallel loop branch ended", LanguageEventData.StepType.STEP, nodeName,
                     Pair.of(RuntimeConstants.BRANCH_RETURN_VALUES_KEY, executableReturnValues)
             );
         }

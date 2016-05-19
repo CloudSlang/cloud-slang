@@ -11,9 +11,10 @@ imports:
   ops: loops.parallel_loop
 
 flow:
-  name: parallel_loop_aggregate
+  name: parallel_loop_publish_flow_context
   inputs:
     - values: ${ range(1, 4) }
+    - flow_var: 'FLOW VARIABLE VALUE'
   workflow:
     - print_values:
         parallel_loop:
@@ -21,9 +22,5 @@ flow:
           do:
             ops.print_branch:
               - ID: ${ value }
-          publish:
-            - name
-            - number: ${ int_output }
-        aggregate:
-            - name_list: ${ map(lambda x:str(x['name']), branches_context) }
-            - number_from_last_branch: ${ branches_context[-1]['number'] }
+        publish:
+            - output_from_flow_context: ${ flow_var }

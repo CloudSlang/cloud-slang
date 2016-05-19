@@ -18,7 +18,6 @@ import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
-import org.apache.commons.lang3.StringUtils;
 import io.cloudslang.lang.entities.ResultNavigation;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.Validate;
@@ -59,16 +58,21 @@ public class ExecutionStepFactory {
     }
 
     public ExecutionStep createFinishStepStep(Long index, Map<String, Serializable> postStepData,
-                                              Map<String, ResultNavigation> navigationValues, String stepName, boolean isAsync) {
+                                              Map<String, ResultNavigation> navigationValues, String stepName, boolean parallelLoop) {
         Validate.notNull(postStepData, "postStepData is null");
         Map<String, Serializable> actionData = new HashMap<>();
-        actionData.put(ScoreLangConstants.STEP_PUBLISH_KEY, postStepData.get(SlangTextualKeys.PUBLISH_KEY));
+
+        if (!parallelLoop) {
+            actionData.put(ScoreLangConstants.STEP_PUBLISH_KEY, postStepData.get(SlangTextualKeys.PUBLISH_KEY));
+        }
+
         actionData.put(ScoreLangConstants.PREVIOUS_STEP_ID_KEY, index - 1);
         actionData.put(ScoreLangConstants.BREAK_LOOP_KEY, postStepData.get(SlangTextualKeys.BREAK_KEY));
         actionData.put(ScoreLangConstants.STEP_NAVIGATION_KEY, new HashMap<>(navigationValues));
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
-        actionData.put(ScoreLangConstants.PARALLEL_LOOP_KEY, isAsync);
+        actionData.put(ScoreLangConstants.PARALLEL_LOOP_KEY, parallelLoop);
+
         ExecutionStep finishStep = createGeneralStep(index, STEP_EXECUTION_DATA_CLASS, "endStep", actionData);
         finishStep.setNavigationData(null);
         return finishStep;
@@ -146,7 +150,7 @@ public class ExecutionStepFactory {
         Validate.notNull(postStepData, "postStepData is null");
         Validate.notNull(navigationValues, "navigationValues is null");
         Map<String, Serializable> actionData = new HashMap<>();
-        actionData.put(ScoreLangConstants.STEP_AGGREGATE_KEY, postStepData.get(SlangTextualKeys.AGGREGATE_KEY));
+        actionData.put(ScoreLangConstants.STEP_PUBLISH_KEY, postStepData.get(SlangTextualKeys.PUBLISH_KEY));
         actionData.put(ScoreLangConstants.STEP_NAVIGATION_KEY, new HashMap<>(navigationValues));
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
 
