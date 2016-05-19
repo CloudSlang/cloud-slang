@@ -46,7 +46,7 @@ flow:
           - FUNCTIONS_KEY_EXISTS_PROBLEM: FUNCTIONS_KEY_EXISTS_PROBLEM
           
     - Step2:
-        async_loop:
+        parallel_loop:
           for: value in [1,2,3]
           do:
             ops.system_property_dependencies_op:

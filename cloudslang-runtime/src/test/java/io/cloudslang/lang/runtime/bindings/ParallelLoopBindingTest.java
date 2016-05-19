@@ -1,6 +1,6 @@
 package io.cloudslang.lang.runtime.bindings;
 
-import io.cloudslang.lang.entities.AsyncLoopStatement;
+import io.cloudslang.lang.entities.ParallelLoopStatement;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AsyncLoopBindingTest {
+public class ParallelLoopBindingTest {
 
     @SuppressWarnings("unchecked")
     private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
@@ -31,31 +31,31 @@ public class AsyncLoopBindingTest {
     public ExpectedException exception = ExpectedException.none();
 
     @InjectMocks
-    private AsyncLoopBinding asyncLoopBinding = new AsyncLoopBinding();
+    private ParallelLoopBinding parallelLoopBinding = new ParallelLoopBinding();
 
     @Mock
     private ScriptEvaluator scriptEvaluator;
 
     @Test
-    public void passingNullAsyncLoopStatementThrowsException() throws Exception {
+    public void passingNullParallelLoopStatementThrowsException() throws Exception {
         exception.expect(RuntimeException.class);
-        asyncLoopBinding.bindAsyncLoopList(null, new Context(new HashMap<String, Serializable>()), EMPTY_SET, "nodeName");
+        parallelLoopBinding.bindParallelLoopList(null, new Context(new HashMap<String, Serializable>()), EMPTY_SET, "nodeName");
     }
 
     @Test
     public void passingNullContextThrowsException() throws Exception {
         exception.expect(RuntimeException.class);
-        asyncLoopBinding.bindAsyncLoopList(createBasicSyncLoopStatement(), null, EMPTY_SET, "nodeName");
+        parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), null, EMPTY_SET, "nodeName");
     }
 
     @Test
     public void passingNullNodeNameThrowsException() throws Exception {
         exception.expect(RuntimeException.class);
-        asyncLoopBinding.bindAsyncLoopList(createBasicSyncLoopStatement(), new Context(new HashMap<String, Serializable>()), EMPTY_SET, null);
+        parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), new Context(new HashMap<String, Serializable>()), EMPTY_SET, null);
     }
 
     @Test
-    public void testAsyncLoopListIsReturned() throws Exception {
+    public void testParallelLoopListIsReturned() throws Exception {
         Map<String, Serializable> variables = new HashMap<>();
         variables.put("key1", "value1");
         variables.put("key2", "value2");
@@ -64,7 +64,7 @@ public class AsyncLoopBindingTest {
 
         when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET))).thenReturn((Serializable) expectedList);
 
-        List<Serializable> actualList = asyncLoopBinding.bindAsyncLoopList(createBasicSyncLoopStatement(), context, EMPTY_SET, "nodeName");
+        List<Serializable> actualList = parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), context, EMPTY_SET, "nodeName");
 
         verify(scriptEvaluator).evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET));
         assertEquals("returned async loop list not as expected", expectedList, actualList);
@@ -82,7 +82,7 @@ public class AsyncLoopBindingTest {
         exception.expectMessage("expression is empty");
         exception.expect(RuntimeException.class);
 
-        asyncLoopBinding.bindAsyncLoopList(createBasicSyncLoopStatement(), context, EMPTY_SET, "nodeName");
+        parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), context, EMPTY_SET, "nodeName");
     }
 
     @Test
@@ -94,10 +94,10 @@ public class AsyncLoopBindingTest {
         exception.expectMessage("nodeName");
         exception.expect(RuntimeException.class);
 
-        asyncLoopBinding.bindAsyncLoopList(createBasicSyncLoopStatement(), new Context(variables), EMPTY_SET, "nodeName");
+        parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), new Context(variables), EMPTY_SET, "nodeName");
     }
 
-    private AsyncLoopStatement createBasicSyncLoopStatement() {
-        return new AsyncLoopStatement("varName", "expression");
+    private ParallelLoopStatement createBasicSyncLoopStatement() {
+        return new ParallelLoopStatement("varName", "expression");
     }
 }

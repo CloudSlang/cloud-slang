@@ -58,8 +58,8 @@ public interface ScoreLangConstants {
     String STEP_INPUTS_RESULT_CONTEXT = "stepInputsResultContext";
 
     // async loop
-    String ASYNC_LOOP_KEY = "async_loop";
-    String ASYNC_LOOP_STATEMENT_KEY = "asyncLoopStatement";
+    String PARALLEL_LOOP_KEY = "parallel_loop";
+    String PARALLEL_LOOP_STATEMENT_KEY = "parallelLoopStatement";
     String STEP_AGGREGATE_KEY = "stepAggregateValues";
     String BRANCH_BEGIN_STEP_ID_KEY = "branchBeginStep";
 

@@ -5,13 +5,12 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: loops.async_loop
+namespace: io.cloudslang
 
-operation:
-  name: print_list
-  inputs:
-     - words_list
-  python_action:
-    script: |
-      if words_list != None and len(words_list) > 0:
-          print words_list
+flow:
+  name: flow_that_calls_corrupted_flow
+  workflow:
+    - call_to_other_flow:
+        do:
+          flow_input_in_step_same_name_as_dependency_output:
+            - input1

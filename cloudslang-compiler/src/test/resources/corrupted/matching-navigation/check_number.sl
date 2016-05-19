@@ -5,13 +5,20 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: loops.async_loop
+namespace: user.ops
 
 operation:
-  name: print_list
+  name: check_number
   inputs:
-     - words_list
+    - number
   python_action:
     script: |
-      if words_list != None and len(words_list) > 0:
-          print words_list
+      remainder = int(number) % 2
+      isEven = remainder == 0
+      tooBig = int(number) > 512
+  outputs:
+    - preprocessed_number: ${ str(int(number) * 3) }
+  results:
+    - EVEN: ${ isEven and not tooBig }
+    - ODD: ${ not(isEven or tooBig) }
+    - FAILURE # report failure if the number is too big

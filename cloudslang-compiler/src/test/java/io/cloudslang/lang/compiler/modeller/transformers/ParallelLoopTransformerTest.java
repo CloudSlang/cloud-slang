@@ -9,7 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
-import io.cloudslang.lang.entities.AsyncLoopStatement;
+import io.cloudslang.lang.entities.ParallelLoopStatement;
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,30 +20,30 @@ import org.junit.rules.ExpectedException;
  *
  * @author Bonczidai Levente
  */
-public class AsyncLoopTransformerTest {
+public class ParallelLoopTransformerTest {
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    private AsyncLoopForTransformer transformer = new AsyncLoopForTransformer();
+    private ParallelLoopForTransformer transformer = new ParallelLoopForTransformer();
 
     @Test
     public void testValidStatement() throws Exception {
-        AsyncLoopStatement statement = transformer.transform("x in collection");
+        ParallelLoopStatement statement = transformer.transform("x in collection");
         Assert.assertEquals("x", statement.getVarName());
         Assert.assertEquals("collection", statement.getExpression());
     }
 
     @Test
     public void testValidStatementWithSpaces() throws Exception {
-        AsyncLoopStatement statement = transformer.transform("x in range(0, 9)");
+        ParallelLoopStatement statement = transformer.transform("x in range(0, 9)");
         Assert.assertEquals("x", statement.getVarName());
         Assert.assertEquals("range(0, 9)", statement.getExpression());
     }
 
     @Test
     public void testValidStatementAndTrim() throws Exception {
-        AsyncLoopStatement statement = transformer.transform(" min   in  collection  ");
+        ParallelLoopStatement statement = transformer.transform(" min   in  collection  ");
         Assert.assertEquals("min", statement.getVarName());
         Assert.assertEquals("collection", statement.getExpression());
     }
@@ -72,13 +72,13 @@ public class AsyncLoopTransformerTest {
 
     @Test
     public void testMultipleInsAreTrimmed() throws Exception {
-        AsyncLoopStatement statement = transformer.transform(" in   in in ");
+        ParallelLoopStatement statement = transformer.transform(" in   in in ");
         Assert.assertEquals("in", statement.getExpression());
     }
 
     @Test
     public void testEmptyValue() throws Exception {
-        AsyncLoopStatement statement = transformer.transform("");
+        ParallelLoopStatement statement = transformer.transform("");
         Assert.assertNull(statement);
     }
 

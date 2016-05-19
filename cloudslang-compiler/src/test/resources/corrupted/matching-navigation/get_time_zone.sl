@@ -8,10 +8,16 @@
 namespace: user.ops
 
 operation:
-  name: test_op
+  name: get_time_zone
   inputs:
-    - alla
+    - time_zone_as_string
+    - alla: ${get_sp('user.sys.props.alla')}
   python_action:
-    script: 'print "hello world"'
+    script: |
+      time_zone_as_int = int(time_zone_as_string)
+      print 'time zone is: ' + str(time_zone_as_int)
   outputs:
-    - balla: 'some value'
+    - time_zone: ${ time_zone_as_int }
+  results:
+    - NEGATIVE: ${ int(time_zone_as_int) < 0 }
+    - SUCCESS
