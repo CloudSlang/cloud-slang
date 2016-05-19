@@ -90,7 +90,8 @@ public class CompileOperationTest {
     public void testCompileOperationMissingClassName() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_missing_class_name.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage(SlangTextualKeys.JAVA_ACTION_CLASS_NAME_KEY);
+        exception.expectMessage("Action syntax is illegal.\n" +
+                "Following keys are missing: [" + SlangTextualKeys.JAVA_ACTION_CLASS_NAME_KEY);
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 
@@ -98,7 +99,8 @@ public class CompileOperationTest {
     public void testCompileOperationMissingMethodName() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_missing_method_name.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage(SlangTextualKeys.JAVA_ACTION_METHOD_NAME_KEY);
+        exception.expectMessage("Action syntax is illegal.\n" +
+                "Following keys are missing: [" + SlangTextualKeys.JAVA_ACTION_METHOD_NAME_KEY);
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 
@@ -106,7 +108,8 @@ public class CompileOperationTest {
     public void testCompileOperationInvalidActionProperty() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_invalid_action_property.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("IDontBelongHere");
+        exception.expectMessage("Action syntax is illegal.\n" +
+                "Following keys are invalid: [IDontBelongHere]");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 
@@ -114,7 +117,7 @@ public class CompileOperationTest {
     public void testCompileOperationMultipleActionTypes() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_action_multiple_types.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Conflicting keys");
+        exception.expectMessage("Conflicting keys at: operation_action_multiple_types");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 
@@ -122,8 +125,8 @@ public class CompileOperationTest {
     public void testCompileOperationMissingActionProperties() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_missing_action_properties.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("operation_missing_action_properties");
-        exception.expectMessage("no action data");
+        exception.expectMessage("Error compiling operation_missing_action_properties. " +
+                "Operation: operation_missing_action_properties has no action data");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 
@@ -131,8 +134,8 @@ public class CompileOperationTest {
     public void testCompileOperationMissingPythonScript() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_missing_python_script.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("operation_missing_python_script");
-        exception.expectMessage("no action data");
+        exception.expectMessage("Error compiling operation_missing_python_script. " +
+                "Operation: operation_missing_python_script has no action data");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 
@@ -140,7 +143,7 @@ public class CompileOperationTest {
     public void testCompileOperationWithMissingNamespace() throws Exception {
         URL resource = getClass().getResource("/corrupted/op_without_namespace.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("namespace");
+        exception.expectMessage("Operation/Flow op_without_namespace must have a namespace");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 }
