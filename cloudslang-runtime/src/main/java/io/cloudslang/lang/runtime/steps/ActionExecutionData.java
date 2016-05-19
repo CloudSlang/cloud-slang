@@ -44,6 +44,8 @@ import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUT
 public class ActionExecutionData extends AbstractExecutionData {
 
     private static final Logger logger = Logger.getLogger(ActionExecutionData.class);
+    public static final String PACKAGING_TYPE_JAR = "jar";
+    public static final String PACKAGING_TYPE_ZIP = "zip";
 
     @Autowired
     private ScriptExecutor scriptExecutor;
@@ -108,7 +110,7 @@ public class ActionExecutionData extends AbstractExecutionData {
                                                     Map<String, Serializable> currentContext,
                                                     Map<String, Object> nonSerializableExecutionData,
                                                     String gav, String className, String methodName) {
-        Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService.execute(gav, className, methodName,
+        Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService.execute(normalizeJavaGav(gav), className, methodName,
                 new CloudSlangJavaExecutionParameterProvider(serializableSessionData, currentContext, nonSerializableExecutionData));
         if (returnMap == null) {
             throw new RuntimeException("Action method did not return Map<String,String>");
@@ -116,10 +118,32 @@ public class ActionExecutionData extends AbstractExecutionData {
         return returnMap;
     }
 
+    /**
+     * Checks whether need to append packaging type to the gav
+     * @param gav
+     * @param packagingType
+     * @return
+     */
+    private String normalizeGav(String gav, String packagingType) {
+        return gav.split(":").length == 3 ? gav + ":" + packagingType : gav;
+    }
+
+    private String normalizeJavaGav(String gav) {
+        return normalizeGav(gav, PACKAGING_TYPE_JAR);
+    }
+
+    private Set<String> normalizePythonDependencies(Collection<String> dependencies) {
+        Set<String> pythonDependencies = dependencies == null || dependencies.isEmpty() ? Sets.<String>newHashSet() : new HashSet<>(dependencies);
+        Set<String> normalizedDependencies = new HashSet<>(pythonDependencies.size());
+        for (String dependency: pythonDependencies) {
+            normalizedDependencies.add(normalizeGav(dependency, PACKAGING_TYPE_ZIP));
+        }
+        return normalizedDependencies;
+    }
+
     private Map<String, Serializable> prepareAndRunPythonAction(Collection<String> dependencies, String pythonScript, Map<String, Serializable> callArguments) {
         if (StringUtils.isNotBlank(pythonScript)) {
-            Set<String> pythonDependencies = dependencies == null || dependencies.isEmpty() ? Sets.<String>newHashSet() : new HashSet<>(dependencies);
-            return scriptExecutor.executeScript(pythonDependencies, pythonScript, callArguments);
+            return scriptExecutor.executeScript(normalizePythonDependencies(dependencies), pythonScript, callArguments);
         }
 
         throw new RuntimeException("Python script not found in action data");
