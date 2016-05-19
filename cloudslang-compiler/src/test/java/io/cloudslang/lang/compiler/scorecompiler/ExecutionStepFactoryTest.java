@@ -187,7 +187,7 @@ public class ExecutionStepFactoryTest {
     public void testCreateAddBranchesStepPutParallelLoopUnderTheRightKey() throws Exception {
         ParallelLoopStatement statement = new ParallelLoopStatement("value", "values");
         HashMap<String, Serializable> preStepData = new HashMap<>();
-        preStepData.put(ScoreLangConstants.PARALLEL_LOOP_KEY, statement);
+        preStepData.put(SlangTextualKeys.PARALLEL_LOOP_KEY, statement);
         ExecutionStep startStep =  factory.createAddBranchesStep(2L, 5L, 3L, preStepData, "refID", "evenCoolerStep");
         ParallelLoopStatement actualStatement = (ParallelLoopStatement) startStep.getActionData()
                 .get(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY);

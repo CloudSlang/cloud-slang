@@ -148,7 +148,7 @@ public class StepExecutionData extends AbstractExecutionData {
                         @Param(ScoreLangConstants.PREVIOUS_STEP_ID_KEY) Long previousStepId,
                         @Param(ScoreLangConstants.BREAK_LOOP_KEY) List<String> breakOn,
                         @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
-                        @Param(ScoreLangConstants.PARALLEL_LOOP_KEY) boolean parallel_loop) {
+                        @Param(ScoreLangConstants.PARALLEL_LOOP_KEY) boolean parallelLoop) {
 
         try {
             Context flowContext = runEnv.getStack().popContext();
@@ -159,12 +159,12 @@ public class StepExecutionData extends AbstractExecutionData {
                     Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable) stepPublishValues),
                     Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues),
                     Pair.of("executableReturnValues", executableReturnValues),
-                    Pair.of("parallelLoop", parallel_loop)
+                    Pair.of("parallelLoop", parallelLoop)
             );
 
             Map<String, Serializable> argumentsResultContext = removeStepInputsResultContext(flowContext);
             Map<String, Serializable> publishValues;
-            if (parallel_loop) {
+            if (parallelLoop) {
                 publishValues = new HashMap<>(executableReturnValues.getOutputs());
             } else {
                 publishValues =
@@ -202,7 +202,7 @@ public class StepExecutionData extends AbstractExecutionData {
             String executableResult = executableReturnValues.getResult();
             String presetResult = executableResult;
 
-            if (!parallel_loop) {
+            if (!parallelLoop) {
                 // set the position of the next step - for the use of the navigation
                 // find in the navigation values the correct next step position, according to the operation result, and set it
                 ResultNavigation navigation = stepNavigationValues.get(executableResult);

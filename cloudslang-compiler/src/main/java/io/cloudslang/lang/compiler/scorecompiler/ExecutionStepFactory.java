@@ -139,7 +139,7 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.REF_ID, refId);
         actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, nextStepID);
         actionData.put(ScoreLangConstants.BRANCH_BEGIN_STEP_ID_KEY, branchBeginStepID);
-        actionData.put(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY, preStepData.get(ScoreLangConstants.PARALLEL_LOOP_KEY));
+        actionData.put(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY, preStepData.get(SlangTextualKeys.PARALLEL_LOOP_KEY));
         ExecutionStep executionStep = createGeneralStep(currentStepID, PARALLEL_LOOP_STEPS_CLASS, "addBranches", actionData);
         executionStep.setSplitStep(true);
         return executionStep;

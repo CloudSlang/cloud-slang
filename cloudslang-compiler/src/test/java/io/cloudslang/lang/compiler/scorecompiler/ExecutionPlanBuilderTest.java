@@ -9,6 +9,7 @@
 *******************************************************************************/
 package io.cloudslang.lang.compiler.scorecompiler;
 
+import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.*;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
@@ -83,7 +84,7 @@ public class ExecutionPlanBuilderTest {
         Map<String, Serializable> preStepActionData = new HashMap<>();
 
         if (isParallelLoop) {
-            preStepActionData.put(ScoreLangConstants.PARALLEL_LOOP_KEY, "value in values");
+            preStepActionData.put(SlangTextualKeys.PARALLEL_LOOP_KEY, "value in values");
         }
 
         Map<String, Serializable> postStepActionData = new HashMap<>();

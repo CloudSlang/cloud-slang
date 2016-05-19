@@ -302,9 +302,9 @@ public class CompileParallelLoopFlowTest {
     }
 
     private void verifyParallelLoopStatement(Step step) {
-        assertTrue(step.getPreStepActionData().containsKey(ScoreLangConstants.PARALLEL_LOOP_KEY));
+        assertTrue(step.getPreStepActionData().containsKey(SlangTextualKeys.PARALLEL_LOOP_KEY));
         ParallelLoopStatement parallelLoopStatement = (ParallelLoopStatement) step.getPreStepActionData()
-                .get(ScoreLangConstants.PARALLEL_LOOP_KEY);
+                .get(SlangTextualKeys.PARALLEL_LOOP_KEY);
         assertEquals("values", parallelLoopStatement.getExpression());
         assertEquals("value", parallelLoopStatement.getVarName());
     }

@@ -57,7 +57,7 @@ public interface ScoreLangConstants {
     String STEP_INPUTS_RESULT_CONTEXT = "stepInputsResultContext";
 
     // parallel loop
-    String PARALLEL_LOOP_KEY = "parallel_loop";
+    String PARALLEL_LOOP_KEY = "parallelLoop";
     String PARALLEL_LOOP_STATEMENT_KEY = "parallelLoopStatement";
     String BRANCH_BEGIN_STEP_ID_KEY = "branchBeginStep";
 

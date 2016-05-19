@@ -56,7 +56,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
-import static io.cloudslang.lang.entities.ScoreLangConstants.PARALLEL_LOOP_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.PARALLEL_LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER;
 
@@ -448,7 +448,7 @@ public class ExecutableBuilder {
                 arguments,
                 navigationStrings,
                 refId,
-                preStepData.containsKey(ScoreLangConstants.PARALLEL_LOOP_KEY));
+                preStepData.containsKey(SlangTextualKeys.PARALLEL_LOOP_KEY));
         return new StepModellingResult(step, errors);
     }
 
