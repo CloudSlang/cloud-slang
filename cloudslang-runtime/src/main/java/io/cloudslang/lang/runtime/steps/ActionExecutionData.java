@@ -46,6 +46,7 @@ public class ActionExecutionData extends AbstractExecutionData {
     private static final Logger logger = Logger.getLogger(ActionExecutionData.class);
     public static final String PACKAGING_TYPE_JAR = "jar";
     public static final String PACKAGING_TYPE_ZIP = "zip";
+    public static final int GAV_PARTS = 3;
 
     @Autowired
     private ScriptExecutor scriptExecutor;
@@ -125,7 +126,9 @@ public class ActionExecutionData extends AbstractExecutionData {
      * @return
      */
     private String normalizeGav(String gav, String packagingType) {
-        return gav.split(":").length == 3 ? gav + ":" + packagingType : gav;
+        //this is temporary solution until we add mandatory for java
+        //after this we will not check the empty assuming it is always not empty and we have 3 parts
+        return (StringUtils.isEmpty(gav) || (gav.split(":").length > GAV_PARTS)) ? gav : gav + ":" + packagingType;
     }
 
     private String normalizeJavaGav(String gav) {
