@@ -57,7 +57,7 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
 
-        List<String> expectedNameOutputs = verifyPublishValues(branchesData);
+        List<String> expectedNameOutputs = verifyBranchPublishValues(branchesData);
 
         verifyPublishValues(runtimeInformation, expectedNameOutputs);
     }
@@ -95,7 +95,7 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
 
-        List<String> expectedNameOutputs = verifyPublishValues(branchesData);
+        List<String> expectedNameOutputs = verifyBranchPublishValues(branchesData);
 
         verifyPublishValues(runtimeInformation, expectedNameOutputs);
 
@@ -150,7 +150,7 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         return firstList.containsAll(secondList) && secondList.containsAll(firstList);
     }
 
-    private List<String> verifyPublishValues(List<StepData> branchesData) {
+    private List<String> verifyBranchPublishValues(List<StepData> branchesData) {
         // publish
         List<String> actualNameOutputsOfBranches = Lists.newArrayList();
         List<Integer> actualNumberOutputsOfBranches = Lists.newArrayList();
