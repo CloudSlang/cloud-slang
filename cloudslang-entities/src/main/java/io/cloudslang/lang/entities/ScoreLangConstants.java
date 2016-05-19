@@ -60,6 +60,7 @@ public interface ScoreLangConstants {
     String PARALLEL_LOOP_KEY = "parallelLoop";
     String PARALLEL_LOOP_STATEMENT_KEY = "parallelLoopStatement";
     String BRANCH_BEGIN_STEP_ID_KEY = "branchBeginStep";
+    String BRANCH_RESULT_KEY = "branch_result";
 
     // Events types
     String SLANG_EXECUTION_EXCEPTION = "SLANG_EXECUTION_EXCEPTION";

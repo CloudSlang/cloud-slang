@@ -57,7 +57,8 @@ import static org.mockito.Mockito.*;
 @ContextConfiguration(classes = ParallelLoopStepsTest.Config.class)
 public class ParallelLoopStepsTest {
 
-    public static final String BRANCH_EXCEPTION_MESSAGE = "Exception details placeholder";
+    private static final String BRANCH_EXCEPTION_MESSAGE = "Exception details placeholder";
+    private static final String SUCCESS_RESULT = "SUCCESS";
 
     @Autowired
     private ParallelLoopExecutionData parallelLoopSteps;
@@ -200,8 +201,11 @@ public class ParallelLoopStepsTest {
         Map<String, Serializable> runtimeContext2 = new HashMap<>();
         Map<String, Serializable> runtimeContext3 = new HashMap<>();
         runtimeContext1.put("branch1Output", 1);
+        runtimeContext1.put(ScoreLangConstants.BRANCH_RESULT_KEY, SUCCESS_RESULT);
         runtimeContext2.put("branch2Output", 2);
+        runtimeContext2.put(ScoreLangConstants.BRANCH_RESULT_KEY, SUCCESS_RESULT);
         runtimeContext3.put("branch3Output", 3);
+        runtimeContext3.put(ScoreLangConstants.BRANCH_RESULT_KEY, SUCCESS_RESULT);
 
         ExecutionRuntimeServices executionRuntimeServices = createAndConfigureExecutionRuntimeServicesMock(
                 runtimeContext1,

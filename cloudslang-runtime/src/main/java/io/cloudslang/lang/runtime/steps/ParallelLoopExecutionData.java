@@ -130,9 +130,8 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             runEnv.getExecutionPath().up();
             List<Map<String, Serializable>> branchesContext = Lists.newArrayList();
             Context flowContext = runEnv.getStack().popContext();
-            List<String> branchesResult = Lists.newArrayList();
 
-            collectBranchesData(executionRuntimeServices, nodeName, branchesContext, branchesResult);
+            collectBranchesData(executionRuntimeServices, nodeName, branchesContext);
 
             Map<String, Serializable> publishValues =
                     bindPublishValues(
@@ -146,7 +145,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
             flowContext.putVariables(publishValues);
 
-            String parallelLoopResult = getParallelLoopResult(branchesResult);
+            String parallelLoopResult = getParallelLoopResult(branchesContext);
 
             handleNavigationAndReturnValues(runEnv, executionRuntimeServices, stepNavigationValues, nodeName, publishValues, parallelLoopResult);
 
@@ -188,10 +187,11 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         runEnv.putNextStepPosition(nextStepPosition);
     }
 
-    private String getParallelLoopResult(List<String> branchesResult) {
+    private String getParallelLoopResult(List<Map<String, Serializable>> branchesContext) {
         // if one of the branches failed then return with FAILURE, otherwise return with SUCCESS
         String parallelLoopResult = ScoreLangConstants.SUCCESS_RESULT;
-        for (String branchResult : branchesResult) {
+        for (Map<String, Serializable> branchContext : branchesContext) {
+            String branchResult = (String) branchContext.get(ScoreLangConstants.BRANCH_RESULT_KEY);
             if (branchResult.equals(ScoreLangConstants.FAILURE_RESULT)) {
                 parallelLoopResult = ScoreLangConstants.FAILURE_RESULT;
                 break;
@@ -230,33 +230,21 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
     private void collectBranchesData(
             ExecutionRuntimeServices executionRuntimeServices,
             String nodeName,
-            List<Map<String, Serializable>> branchesContext,
-            List<String> branchesResult) {
+            List<Map<String, Serializable>> branchesContext) {
 
         List<EndBranchDataContainer> branches = executionRuntimeServices.getFinishedChildBranchesData();
         for (EndBranchDataContainer branch : branches) {
-
-            //first we check that no exception was thrown during the execution of the branch
-            String branchException = branch.getException();
-            if (StringUtils.isNotEmpty(branchException)) {
-                Map<String, Serializable> systemContextMap = branch.getSystemContext();
-                String branchID = null;
-                if (MapUtils.isNotEmpty(systemContextMap)) {
-                    ExecutionRuntimeServices branchExecutionRuntimeServices = new SystemContext(systemContextMap);
-                    branchID = branchExecutionRuntimeServices.getBranchId();
-                }
-                logger.error("There was an error running branch: " + branchID + " Error is: " + branchException);
-                throw new RuntimeException(BRANCH_EXCEPTION_PREFIX + ": \n" + branchException);
-            }
+            checkExceptionInBranch(branch);
 
             Map<String, Serializable> branchContext = branch.getContexts();
-
             RunEnvironment branchRuntimeEnvironment = (RunEnvironment) branchContext.get(ScoreLangConstants.RUN_ENV);
-
-            branchesContext.add(branchRuntimeEnvironment.getStack().popContext().getImmutableViewOfVariables());
-
+            Map<String, Serializable> branchContextMap = new HashMap<>(
+                    branchRuntimeEnvironment.getStack().popContext().getImmutableViewOfVariables()
+            );
             ReturnValues executableReturnValues = branchRuntimeEnvironment.removeReturnValues();
-            branchesResult.add(executableReturnValues.getResult());
+            String branchResult = executableReturnValues.getResult();
+            branchContextMap.put(ScoreLangConstants.BRANCH_RESULT_KEY, branchResult);
+            branchesContext.add(branchContextMap);
 
             // up branch path
             branchRuntimeEnvironment.getExecutionPath().up();
@@ -265,6 +253,21 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                     "Parallel loop branch ended", LanguageEventData.StepType.STEP, nodeName,
                     Pair.of(RuntimeConstants.BRANCH_RETURN_VALUES_KEY, executableReturnValues)
             );
+        }
+    }
+
+    private void checkExceptionInBranch(EndBranchDataContainer branch) {
+        //first we check that no exception was thrown during the execution of the branch
+        String branchException = branch.getException();
+        if (StringUtils.isNotEmpty(branchException)) {
+            Map<String, Serializable> systemContextMap = branch.getSystemContext();
+            String branchID = null;
+            if (MapUtils.isNotEmpty(systemContextMap)) {
+                ExecutionRuntimeServices branchExecutionRuntimeServices = new SystemContext(systemContextMap);
+                branchID = branchExecutionRuntimeServices.getBranchId();
+            }
+            logger.error("There was an error running branch: " + branchID + " Error is: " + branchException);
+            throw new RuntimeException(BRANCH_EXCEPTION_PREFIX + ": \n" + branchException);
         }
     }
 
