@@ -16,7 +16,7 @@ package io.cloudslang.lang.runtime;
  */
 public interface RuntimeConstants {
 
-    // async loop
+    // parallel loop
     String BRANCHES_CONTEXT_KEY = "branches_context";
     String SPLIT_ITEM_KEY = "splitItem";
     String BRANCH_RETURN_VALUES_KEY = "branchReturnValues";

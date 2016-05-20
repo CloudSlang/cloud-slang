@@ -20,12 +20,12 @@ import java.util.Map;
 public class RuntimeInformation {
     private final Map<String, StepData> steps;
     private final Map<String, List<StepData>> branchesByPath;
-    private final Map<String, StepData> asyncSteps;
+    private final Map<String, StepData> parallelSteps;
 
-    public RuntimeInformation(Map<String, StepData> steps, Map<String, List<StepData>> branchesByPath, Map<String, StepData> asyncSteps) {
+    public RuntimeInformation(Map<String, StepData> steps, Map<String, List<StepData>> branchesByPath, Map<String, StepData> parallelSteps) {
         this.steps = steps;
         this.branchesByPath = branchesByPath;
-        this.asyncSteps = asyncSteps;
+        this.parallelSteps = parallelSteps;
     }
 
     public Map<String, StepData> getSteps() {
@@ -36,7 +36,7 @@ public class RuntimeInformation {
         return branchesByPath;
     }
 
-    public Map<String, StepData> getAsyncSteps() {
-        return asyncSteps;
+    public Map<String, StepData> getParallelSteps() {
+        return parallelSteps;
     }
 }

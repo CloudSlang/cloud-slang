@@ -14,6 +14,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
+import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.bindings.Argument;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Component;
@@ -56,7 +57,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
 
     @Override
     public String keyToTransform() {
-        return null;
+        return SlangTextualKeys.DO_KEY;
     }
 
     private Argument transformListArgument(Object rawArgument) {

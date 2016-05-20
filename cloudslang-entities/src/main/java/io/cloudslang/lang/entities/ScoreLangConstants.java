@@ -56,11 +56,11 @@ public interface ScoreLangConstants {
     String BREAK_LOOP_KEY = "breakOn";
     String STEP_INPUTS_RESULT_CONTEXT = "stepInputsResultContext";
 
-    // async loop
-    String PARALLEL_LOOP_KEY = "parallel_loop";
+    // parallel loop
+    String PARALLEL_LOOP_KEY = "parallelLoop";
     String PARALLEL_LOOP_STATEMENT_KEY = "parallelLoopStatement";
-    String STEP_AGGREGATE_KEY = "stepAggregateValues";
     String BRANCH_BEGIN_STEP_ID_KEY = "branchBeginStep";
+    String BRANCH_RESULT_KEY = "branch_result";
 
     // Events types
     String SLANG_EXECUTION_EXCEPTION = "SLANG_EXECUTION_EXCEPTION";
