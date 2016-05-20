@@ -67,7 +67,7 @@ public class ParallelLoopBindingTest {
         List<Serializable> actualList = parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), context, EMPTY_SET, "nodeName");
 
         verify(scriptEvaluator).evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET));
-        assertEquals("returned async loop list not as expected", expectedList, actualList);
+        assertEquals("returned parallel loop list not as expected", expectedList, actualList);
     }
 
     @Test

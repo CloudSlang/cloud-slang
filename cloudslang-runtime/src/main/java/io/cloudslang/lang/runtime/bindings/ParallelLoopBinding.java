@@ -31,7 +31,7 @@ import java.util.Set;
 @Component
 public class ParallelLoopBinding {
 
-    public static final String PARALLEL_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating async loop expression in step";
+    public static final String PARALLEL_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating parallel loop expression in step";
 
     @Autowired
     private ScriptEvaluator scriptEvaluator;
@@ -45,7 +45,7 @@ public class ParallelLoopBinding {
             Context flowContext,
             Set<SystemProperty> systemProperties,
             String nodeName) {
-        Validate.notNull(parallelLoopStatement, "async loop statement cannot be null");
+        Validate.notNull(parallelLoopStatement, "parallel loop statement cannot be null");
         Validate.notNull(flowContext, "flow context cannot be null");
         Validate.notNull(systemProperties, "system properties cannot be null");
         Validate.notNull(nodeName, "node name cannot be null");

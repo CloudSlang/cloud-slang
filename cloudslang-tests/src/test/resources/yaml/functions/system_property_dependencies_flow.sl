@@ -51,11 +51,11 @@ flow:
           do:
             ops.system_property_dependencies_op:
                 - input1: 'kuku'
-        aggregate:
-            - aggregate_1
-            - aggregate_2: "get_sp('async.aggregate.i_am_no_property')"
-            - aggregate_3: ${get_sp('async.aggregate.prop1')}
-            - aggregate_4: ${get_sp('async.aggregate.prop2', 'default_str')}
+        publish:
+            - publish_1
+            - publish_2: "get_sp('parallel_loop.publish.i_am_no_property')"
+            - publish_3: ${get_sp('parallel_loop.publish.prop1')}
+            - publish_4: ${get_sp('parallel_loop.publish.prop2', 'default_str')}
         navigate:
           - FUNCTIONS_KEY_EXISTS: Step3
           - FUNCTIONS_KEY_EXISTS_PROBLEM: FUNCTIONS_KEY_EXISTS_PROBLEM

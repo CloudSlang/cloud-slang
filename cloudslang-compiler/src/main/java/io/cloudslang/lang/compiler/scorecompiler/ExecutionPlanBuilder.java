@@ -104,11 +104,11 @@ public class ExecutionPlanBuilder {
 
         String stepName = step.getName();
         Long currentId = getCurrentId(stepReferences, steps);
-        boolean isAsync = step.isAsync();
+        boolean parallelLoop = step.isParallelLoop();
 
         //Begin Step
         stepReferences.put(stepName, currentId);
-        if (isAsync) {
+        if (parallelLoop) {
             Long joinStepID = currentId + NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS + 1;
             stepExecutionSteps.add(
                     stepFactory.createAddBranchesStep(currentId++, joinStepID, currentId,
@@ -140,7 +140,7 @@ public class ExecutionPlanBuilder {
                 navigationValues.put(navigationKey, new ResultNavigation(nextStepId, presetResult));
             }
         }
-        if (isAsync) {
+        if (parallelLoop) {
             stepExecutionSteps.add(
                     stepFactory.createFinishStepStep(currentId++, step.getPostStepActionData(),
                             new HashMap<String, ResultNavigation>(), stepName, true)
@@ -172,8 +172,8 @@ public class ExecutionPlanBuilder {
             }
         }
 
-        if (step == null || !step.isAsync()) {
-            // the reference is not a step or is not an async step
+        if (step == null || !step.isParallelLoop()) {
+            // the reference is not a step or is not a parallel loop step
             currentID = max + NUMBER_OF_STEP_EXECUTION_STEPS;
         } else {
             //async step
