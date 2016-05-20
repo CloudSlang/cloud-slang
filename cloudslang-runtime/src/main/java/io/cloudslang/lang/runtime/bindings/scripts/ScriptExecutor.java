@@ -11,42 +11,29 @@
  */
 package io.cloudslang.lang.runtime.bindings.scripts;
 
-import org.python.util.PythonInterpreter;
+import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Bonczidai Levente
  * @since 1/19/2016
  */
 @Component
-public class ScriptExecutor extends AbstractScriptInterpreter {
-
+public class ScriptExecutor {
     @Autowired
-    @Qualifier("execInterpreter")
-    private PythonInterpreter interpreter;
+    private PythonRuntimeService pythonRuntimeService;
 
-    //we need this method to be synchronized so we will not have multiple scripts run in parallel on the same context
-    public synchronized Map<String, Serializable> executeScript(
-            String script,
-            Map<String, Serializable> callArguments) {
-        try {
-            cleanInterpreter(interpreter);
-            prepareInterpreterContext(callArguments);
-            return exec(interpreter, script);
-        } catch (Exception e) {
-            throw new RuntimeException("Error executing python script: " + e, e);
-        }
+    public Map<String, Serializable> executeScript (String script, Map<String, Serializable> callArguments) {
+        return pythonRuntimeService.exec(Collections.<String>emptySet(), script, callArguments);
     }
 
-    private void prepareInterpreterContext(Map<String, Serializable> context) {
-        for (Map.Entry<String, Serializable> entry : context.entrySet()) {
-            interpreter.set(entry.getKey(), entry.getValue());
-        }
+    public Map<String, Serializable> executeScript (Set dependencies, String script, Map<String, Serializable> callArguments) {
+        return pythonRuntimeService.exec(dependencies, script, callArguments);
     }
-
 }

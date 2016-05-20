@@ -9,27 +9,62 @@
  */
 package io.cloudslang.lang.runtime.bindings;
 
+import io.cloudslang.dependency.api.services.DependencyService;
+import io.cloudslang.dependency.api.services.MavenConfig;
+import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
+import io.cloudslang.dependency.impl.services.MavenConfigImpl;
+import io.cloudslang.dependency.impl.services.utils.UnzipUtil;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
+import io.cloudslang.runtime.api.python.PythonRuntimeService;
+import io.cloudslang.runtime.impl.python.*;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.*;
+
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ArgumentsBindingTest.Config.class)
 public class ArgumentsBindingTest {
+    private static boolean shouldRunMaven;
+    static {
+        ClassLoader classLoader = ArgumentsBindingTest.class.getClassLoader();
+
+        String settingsXmlPath = classLoader.getResource("settings.xml").getPath();
+        File rootHome = new File(settingsXmlPath).getParentFile();
+        File mavenHome = new File(rootHome, "maven");
+        File mavenRepo = new File(rootHome, "test-mvn-repo");
+        mavenRepo.mkdirs();
+
+        UnzipUtil.unzipToFolder(mavenHome.getAbsolutePath(), classLoader.getResourceAsStream("maven.zip"));
+
+        System.setProperty(MavenConfigImpl.MAVEN_HOME, mavenHome.getAbsolutePath());
+
+        System.setProperty(MavenConfigImpl.MAVEN_REPO_LOCAL, mavenRepo.getAbsolutePath());
+        System.setProperty("maven.home", classLoader.getResource("maven").getPath());
+
+        shouldRunMaven = System.getProperties().containsKey(MavenConfigImpl.MAVEN_REMOTE_URL) &&
+                System.getProperties().containsKey(MavenConfigImpl.MAVEN_PLUGINS_URL);
+
+        System.setProperty(MavenConfigImpl.MAVEN_SETTINGS_PATH, settingsXmlPath);
+        System.setProperty(MavenConfigImpl.MAVEN_M2_CONF_PATH, classLoader.getResource("m2.conf").getPath());
+
+        String provideralAlreadyConfigured = System.setProperty("python.executor.engine", PythonExecutionNotCachedEngine.class.getSimpleName());
+        assertNull("python.executor.engine was configured before this test!!!!!!!", provideralAlreadyConfigured);
+    }
 
     @SuppressWarnings("unchecked")
     private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
@@ -301,9 +336,23 @@ public class ArgumentsBindingTest {
         }
 
         @Bean
-        public PythonInterpreter evalInterpreter(){
-            return new PythonInterpreter();
+        public DependencyService mavenRepositoryService() {
+            return new DependencyServiceImpl();
         }
 
+        @Bean
+        public MavenConfig mavenConfig() {
+            return new MavenConfigImpl();
+        }
+
+        @Bean
+        public PythonRuntimeService pythonRuntimeService(){
+            return new PythonRuntimeServiceImpl();
+        }
+
+        @Bean
+        public PythonExecutionEngine pythonExecutionEngine(){
+            return new PythonExecutionCachedEngine();
+        }
     }
 }

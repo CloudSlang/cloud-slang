@@ -10,12 +10,15 @@
 
 package io.cloudslang.lang.systemtests;
 
+import io.cloudslang.dependency.impl.services.MavenConfigImpl;
+import io.cloudslang.dependency.impl.services.utils.UnzipUtil;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.runtime.impl.python.PythonExecutionNotCachedEngine;
 import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
@@ -24,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +35,7 @@ import java.util.Set;
 
 import static ch.lambdaj.Lambda.select;
 import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertNull;
 
 /*
  * Created by orius123 on 12/11/14.
@@ -38,6 +43,7 @@ import static org.hamcrest.Matchers.startsWith;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:/META-INF/spring/systemTestContext.xml")
 public abstract class SystemsTestsParent {
+    private static boolean shouldRunMaven;
 
     protected static final String EXEC_START_PATH = "0";
     protected static final String FIRST_STEP_PATH = "0.0";
@@ -49,6 +55,32 @@ public abstract class SystemsTestsParent {
     protected static final String BRANCH_SECOND_STEP_KEY = "0.0.1";
     protected static final String BRANCH_THIRD_STEP_KEY = "0.0.2";
     protected static final String BRANCH_FOURTH_STEP_KEY = "0.0.3";
+
+    static {
+        ClassLoader classLoader = SystemsTestsParent.class.getClassLoader();
+
+        String settingsXmlPath = classLoader.getResource("settings.xml").getPath();
+        File rootHome = new File(settingsXmlPath).getParentFile();
+        File mavenHome = new File(rootHome, "maven");
+        File mavenRepo = new File(rootHome, "test-mvn-repo");
+        mavenRepo.mkdirs();
+
+        UnzipUtil.unzipToFolder(mavenHome.getAbsolutePath(), classLoader.getResourceAsStream("maven.zip"));
+
+        System.setProperty(MavenConfigImpl.MAVEN_HOME, mavenHome.getAbsolutePath());
+
+        System.setProperty(MavenConfigImpl.MAVEN_REPO_LOCAL, mavenRepo.getAbsolutePath());
+        System.setProperty("maven.home", classLoader.getResource("maven").getPath());
+
+        shouldRunMaven = System.getProperties().containsKey(MavenConfigImpl.MAVEN_REMOTE_URL) &&
+                System.getProperties().containsKey(MavenConfigImpl.MAVEN_PLUGINS_URL);
+
+        System.setProperty(MavenConfigImpl.MAVEN_SETTINGS_PATH, settingsXmlPath);
+        System.setProperty(MavenConfigImpl.MAVEN_M2_CONF_PATH, classLoader.getResource("m2.conf").getPath());
+
+        String provideralAlreadyConfigured = System.setProperty("python.executor.engine", PythonExecutionNotCachedEngine.class.getSimpleName());
+        assertNull("python.executor.engine was configured before this test!!!!!!!", provideralAlreadyConfigured);
+    }
 
     @Autowired
     protected Slang slang;

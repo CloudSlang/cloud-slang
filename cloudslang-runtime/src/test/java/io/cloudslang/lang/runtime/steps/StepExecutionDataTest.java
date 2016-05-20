@@ -9,6 +9,10 @@
 *******************************************************************************/
 package io.cloudslang.lang.runtime.steps;
 
+import io.cloudslang.dependency.api.services.DependencyService;
+import io.cloudslang.dependency.api.services.MavenConfig;
+import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
+import io.cloudslang.dependency.impl.services.MavenConfigImpl;
 import io.cloudslang.lang.entities.ListForLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
@@ -21,6 +25,10 @@ import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.*;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
+import io.cloudslang.runtime.api.python.PythonRuntimeService;
+import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
+import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
+import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import org.junit.Assert;
@@ -30,7 +38,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.python.google.common.collect.Lists;
-import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -483,8 +490,23 @@ public class StepExecutionDataTest {
         }
 
         @Bean
-        public PythonInterpreter evalInterpreter(){
-            return mock(PythonInterpreter.class);
+        public DependencyService mavenRepositoryService() {
+            return new DependencyServiceImpl();
+        }
+
+        @Bean
+        public MavenConfig mavenConfig() {
+            return new MavenConfigImpl();
+        }
+
+        @Bean
+        public PythonRuntimeService pythonRuntimeService(){
+            return new PythonRuntimeServiceImpl();
+        }
+
+        @Bean
+        public PythonExecutionEngine pythonExecutionEngine(){
+            return new PythonExecutionCachedEngine();
         }
 
         @Bean
