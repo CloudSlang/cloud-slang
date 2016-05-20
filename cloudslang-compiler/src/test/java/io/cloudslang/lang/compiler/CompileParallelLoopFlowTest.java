@@ -274,7 +274,8 @@ public class CompileParallelLoopFlowTest {
         path.add(SlangSource.fromFile(operation2));
 
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("Property 'publish' under 'parallel_loop' at 'print_values' is illegal");
+        expectedException.expectMessage("Artifact {print_values} has unrecognized tag {publish} under 'parallel_loop'. " +
+                "Please take a look at the supported features per versions link");
 
         compiler.compile(SlangSource.fromFile(flow), path);
     }
@@ -289,7 +290,8 @@ public class CompileParallelLoopFlowTest {
         path.add(SlangSource.fromFile(operation2));
 
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("Property 'aggregate' at 'print_values' is illegal");
+        expectedException.expectMessage("Artifact {print_values} has unrecognized tag {aggregate}. " +
+                "Please take a look at the supported features per versions link");
 
         compiler.compile(SlangSource.fromFile(flow), path);
     }

@@ -323,6 +323,18 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
+    public void testWrongTag() throws Exception {
+        URI resource = getClass().getResource("/corrupted/private_input_without_default_wrong_tag.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Artifact {private_input_without_default} has unrecognized tag {action}. " +
+                "Please take a look at the supported features per versions link");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
     public void testInputWithInvalidKey() throws Exception {
         URI resource = getClass().getResource("/illegal_key_in_input.sl").toURI();
 
