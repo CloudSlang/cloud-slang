@@ -9,9 +9,8 @@
  * <p/>
  * *****************************************************************************
  */
-package io.cloudslang.lang.systemtests.flows;
+package io.cloudslang.lang.systemtests.sensitive;
 
-import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.systemtests.StepData;
@@ -19,25 +18,21 @@ import io.cloudslang.lang.systemtests.ValueSyntaxParent;
 import org.junit.Test;
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
- * Sensitive values in python expressions
+ * Sensitive value test
  *
  * Created by Ifat Gavish on 19/04/2016
  */
-public class SensitiveValuesInPythonExpressionsFlowTest extends ValueSyntaxParent {
+public class SensitiveValueOperationTest extends ValueSyntaxParent {
 
     @Test
     public void testValues() throws Exception {
         // compile
-        URI resource = getClass().getResource("/yaml/formats/sensitive_values_in_python_expressions_flow.sl").toURI();
-        URI op1 = getClass().getResource("/yaml/noop.sl").toURI();
-        URI op2 = getClass().getResource("/yaml/print.sl").toURI();
-
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(op1), SlangSource.fromFile(op2));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        URI resource = getClass().getResource("/yaml/sensitive/sensitive_values_op.sl").toURI();
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), new HashSet<SlangSource>());
 
         // trigger
         Map<String, StepData> steps = prepareAndRun(compilationArtifact);

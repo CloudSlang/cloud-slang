@@ -21,12 +21,14 @@ import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.junit.Assert;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -137,23 +139,47 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
     }
 
     protected void verifyInOutParams(Map<String, Value> params) {
+        List<String> errorsInSensitivity = new ArrayList<>();
+        Map<String, List<String>> errorsInValues = new HashMap<>();
         for (Map.Entry<String, Value> entry : params.entrySet()) {
             String name = entry.getKey();
             Serializable value = entry.getValue() == null ? null : entry.getValue().get();
             boolean sensitive = entry.getValue() != null && entry.getValue().isSensitive();
-            assertTrue(name.contains("sensitive") && sensitive || !name.contains("sensitive") && !sensitive);
+            if (!(name.contains("sensitive") && sensitive || !name.contains("sensitive") && !sensitive)) {
+                errorsInSensitivity.add(name);
+            }
             if (!name.contains("sensitive")) {
                 for (Map.Entry<String, Value> otherEntry : params.entrySet()) {
                     if (otherEntry.getKey().replaceAll("_sensitive", "").equals(name)) {
                         Serializable otherValue = otherEntry.getValue() == null ? null : otherEntry.getValue().get();
-                        if (value == null) {
-                            assertTrue(otherValue == null || otherValue.equals("default_value"));
-                        } else {
-                            assertEquals(value, otherValue);
+                        boolean equal = value == null ?
+                                otherValue == null || otherValue.equals("default_value") :
+                                value.equals(otherValue);
+                        if (!equal) {
+                            String val = "{" +name + ":" + value + "}";
+                            List<String> others = errorsInValues.get(val);
+                            if (others == null) {
+                                errorsInValues.put(val, new ArrayList<String>());
+                                others = errorsInValues.get(val);
+                            }
+                            others.add("{" + otherEntry.getKey() + ":" + otherValue + "}");
                         }
                     }
                 }
             }
         }
+        boolean success = true;
+        if (errorsInSensitivity.size() > 0) {
+            System.out.println("\nSensitivity not set properly for: " + Arrays.toString(errorsInSensitivity.toArray(new String[errorsInSensitivity.size()])));
+            success = false;
+        }
+        if (errorsInValues.size() > 0) {
+            System.out.println("\nValues not equal: ");
+            for (Map.Entry<String, List<String>> entry : errorsInValues.entrySet()) {
+                System.out.println("\t" + entry.getKey() + ": " + Arrays.toString(entry.getValue().toArray(new String[entry.getValue().size()])));
+            }
+            success = false;
+        }
+        assertTrue(success);
     }
 }
