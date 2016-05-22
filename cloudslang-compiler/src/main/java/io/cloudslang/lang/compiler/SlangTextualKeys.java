@@ -43,7 +43,7 @@ public interface SlangTextualKeys {
     String BREAK_KEY = "break";
     String PUBLISH_KEY = "publish";
     String NAVIGATION_KEY = "navigate";
-    String AGGREGATE_KEY = "aggregate";
+    String PARALLEL_LOOP_KEY = "parallel_loop";
 
     //inputs
     String DEFAULT_KEY = "default";

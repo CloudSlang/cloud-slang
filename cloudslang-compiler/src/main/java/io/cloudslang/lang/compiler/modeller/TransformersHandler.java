@@ -1,13 +1,15 @@
 package io.cloudslang.lang.compiler.modeller;
-/*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+/**
+ * ****************************************************************************
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ * <p/>
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * *****************************************************************************
+ */
 
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import org.apache.commons.lang3.StringUtils;
@@ -76,13 +78,31 @@ public class TransformersHandler {
         return transformedData;
     }
 
-    private Class getTransformerFromType(Transformer transformer){
+    private Class getTransformerFromType(Transformer transformer) {
         ResolvableType resolvableType = ResolvableType.forClass(Transformer.class, transformer.getClass());
         return resolvableType.getGeneric(0).resolve();
     }
 
     public List<RuntimeException> checkKeyWords(
             String dataLogicalName,
+            Map<String, Object> rawData,
+            List<Transformer> allRelevantTransformers,
+            List<String> additionalValidKeyWords,
+            List<List<String>> constraintGroups) {
+        return
+                checkKeyWords(
+                        dataLogicalName,
+                        "",
+                        rawData,
+                        allRelevantTransformers,
+                        additionalValidKeyWords,
+                        constraintGroups
+                );
+    }
+
+    public List<RuntimeException> checkKeyWords(
+            String dataLogicalName,
+            String parentProperty,
             Map<String, Object> rawData,
             List<Transformer> allRelevantTransformers,
             List<String> additionalValidKeyWords,
@@ -101,7 +121,11 @@ public class TransformersHandler {
         Set<String> rawDataKeySet = rawData.keySet();
         for (String key : rawDataKeySet) {
             if (!(exists(validKeywords, equalToIgnoringCase(key)))) {
-                errors.add(new RuntimeException("Property: \'" + key + "\' at: \'" + dataLogicalName + "\' is illegal"));
+                String additionalParentPropertyMessage =
+                        StringUtils.isEmpty(parentProperty) ? "" : " under \'" + parentProperty + "\'";
+                errors.add(new RuntimeException("Property \'" + key + "\'" +
+                        additionalParentPropertyMessage +
+                        " at \'" + dataLogicalName + "\' is illegal"));
             }
         }
 

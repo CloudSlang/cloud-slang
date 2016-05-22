@@ -18,7 +18,6 @@ import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
-import org.apache.commons.lang3.StringUtils;
 import io.cloudslang.lang.entities.ResultNavigation;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.Validate;
@@ -41,7 +40,7 @@ public class ExecutionStepFactory {
     private static final String STEP_EXECUTION_DATA_CLASS = STEPS_PACKAGE + ".StepExecutionData";
     private static final String OPERATION_STEPS_CLASS = STEPS_PACKAGE + ".ExecutableExecutionData";
     private static final String ACTION_STEPS_CLASS = STEPS_PACKAGE + ".ActionExecutionData";
-    private static final String ASYNC_LOOP_STEPS_CLASS = STEPS_PACKAGE + ".AsyncLoopExecutionData";
+    private static final String PARALLEL_LOOP_STEPS_CLASS = STEPS_PACKAGE + ".ParallelLoopExecutionData";
     private static final String NAVIGATION_ACTIONS_CLASS = "io.cloudslang.lang.runtime.navigations.Navigations";
     private static final String SIMPLE_NAVIGATION_METHOD = "navigate";
 
@@ -59,16 +58,21 @@ public class ExecutionStepFactory {
     }
 
     public ExecutionStep createFinishStepStep(Long index, Map<String, Serializable> postStepData,
-                                              Map<String, ResultNavigation> navigationValues, String stepName, boolean isAsync) {
+                                              Map<String, ResultNavigation> navigationValues, String stepName, boolean parallelLoop) {
         Validate.notNull(postStepData, "postStepData is null");
         Map<String, Serializable> actionData = new HashMap<>();
-        actionData.put(ScoreLangConstants.STEP_PUBLISH_KEY, postStepData.get(SlangTextualKeys.PUBLISH_KEY));
+
+        if (!parallelLoop) {
+            actionData.put(ScoreLangConstants.STEP_PUBLISH_KEY, postStepData.get(SlangTextualKeys.PUBLISH_KEY));
+        }
+
         actionData.put(ScoreLangConstants.PREVIOUS_STEP_ID_KEY, index - 1);
         actionData.put(ScoreLangConstants.BREAK_LOOP_KEY, postStepData.get(SlangTextualKeys.BREAK_KEY));
         actionData.put(ScoreLangConstants.STEP_NAVIGATION_KEY, new HashMap<>(navigationValues));
         actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
-        actionData.put(ScoreLangConstants.ASYNC_LOOP_KEY, isAsync);
+        actionData.put(ScoreLangConstants.PARALLEL_LOOP_KEY, parallelLoop);
+
         ExecutionStep finishStep = createGeneralStep(index, STEP_EXECUTION_DATA_CLASS, "endStep", actionData);
         finishStep.setNavigationData(null);
         return finishStep;
@@ -135,8 +139,8 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.REF_ID, refId);
         actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, nextStepID);
         actionData.put(ScoreLangConstants.BRANCH_BEGIN_STEP_ID_KEY, branchBeginStepID);
-        actionData.put(ScoreLangConstants.ASYNC_LOOP_STATEMENT_KEY, preStepData.get(ScoreLangConstants.ASYNC_LOOP_KEY));
-        ExecutionStep executionStep = createGeneralStep(currentStepID, ASYNC_LOOP_STEPS_CLASS, "addBranches", actionData);
+        actionData.put(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY, preStepData.get(SlangTextualKeys.PARALLEL_LOOP_KEY));
+        ExecutionStep executionStep = createGeneralStep(currentStepID, PARALLEL_LOOP_STEPS_CLASS, "addBranches", actionData);
         executionStep.setSplitStep(true);
         return executionStep;
     }
@@ -146,11 +150,11 @@ public class ExecutionStepFactory {
         Validate.notNull(postStepData, "postStepData is null");
         Validate.notNull(navigationValues, "navigationValues is null");
         Map<String, Serializable> actionData = new HashMap<>();
-        actionData.put(ScoreLangConstants.STEP_AGGREGATE_KEY, postStepData.get(SlangTextualKeys.AGGREGATE_KEY));
+        actionData.put(ScoreLangConstants.STEP_PUBLISH_KEY, postStepData.get(SlangTextualKeys.PUBLISH_KEY));
         actionData.put(ScoreLangConstants.STEP_NAVIGATION_KEY, new HashMap<>(navigationValues));
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
 
-        return createGeneralStep(index, ASYNC_LOOP_STEPS_CLASS, "joinBranches", actionData);
+        return createGeneralStep(index, PARALLEL_LOOP_STEPS_CLASS, "joinBranches", actionData);
     }
 
     private ExecutionStep createGeneralStep(

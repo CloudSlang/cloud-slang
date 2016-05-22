@@ -150,7 +150,7 @@ public class StepExecutionData extends AbstractExecutionData {
                         @Param(ScoreLangConstants.PREVIOUS_STEP_ID_KEY) Long previousStepId,
                         @Param(ScoreLangConstants.BREAK_LOOP_KEY) List<String> breakOn,
                         @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
-                        @Param(ScoreLangConstants.ASYNC_LOOP_KEY) boolean async_loop) {
+                        @Param(ScoreLangConstants.PARALLEL_LOOP_KEY) boolean parallelLoop) {
 
         try {
             Context flowContext = runEnv.getStack().popContext();
@@ -158,19 +158,25 @@ public class StepExecutionData extends AbstractExecutionData {
             ReturnValues executableReturnValues = runEnv.removeReturnValues();
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
                     LanguageEventData.StepType.STEP, nodeName,
-                    Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable)stepPublishValues),
-                    Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable)stepNavigationValues),
-                    Pair.of("operationReturnValues", executableReturnValues));
+                    Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable) stepPublishValues),
+                    Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues),
+                    Pair.of("executableReturnValues", executableReturnValues),
+                    Pair.of("parallelLoop", parallelLoop)
+            );
 
             Map<String, Value> argumentsResultContext = removeStepInputsResultContext(flowContext);
-            Map<String, Value> publishValues =
-                    outputsBinding.bindOutputs(
-                            argumentsResultContext,
-                            executableReturnValues.getOutputs(),
-                            runEnv.getSystemProperties(),
-                            stepPublishValues
-                    );
-
+            Map<String, Value> publishValues;
+            if (parallelLoop) {
+                publishValues = new HashMap<>(executableReturnValues.getOutputs());
+            } else {
+                publishValues =
+                        outputsBinding.bindOutputs(
+                                argumentsResultContext,
+                                executableReturnValues.getOutputs(),
+                                runEnv.getSystemProperties(),
+                                stepPublishValues
+                        );
+            }
             flowContext.putVariables(publishValues);
 
             //loops
@@ -198,7 +204,7 @@ public class StepExecutionData extends AbstractExecutionData {
             String executableResult = executableReturnValues.getResult();
             String presetResult = executableResult;
 
-            if (!async_loop) {
+            if (!parallelLoop) {
                 // set the position of the next step - for the use of the navigation
                 // find in the navigation values the correct next step position, according to the operation result, and set it
                 ResultNavigation navigation = stepNavigationValues.get(executableResult);

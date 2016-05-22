@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,7 +57,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
-import static io.cloudslang.lang.entities.ScoreLangConstants.ASYNC_LOOP_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.PARALLEL_LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER;
 
@@ -95,6 +96,10 @@ public class ExecutableBuilder {
     private List<Transformer> preStepTransformers;
     private List<Transformer> postStepTransformers;
     private List<String> stepAdditionalKeyWords = Arrays.asList(ScoreLangConstants.LOOP_KEY, SlangTextualKeys.DO_KEY, SlangTextualKeys.NAVIGATION_KEY);
+    private List<String> parallelLoopValidKeywords = Arrays.asList(
+            SlangTextualKeys.DO_KEY,
+            SlangTextualKeys.FOR_KEY
+    );
 
     @PostConstruct
     public void initScopedTransformersAndKeys() {
@@ -130,11 +135,11 @@ public class ExecutableBuilder {
         Map<String, Serializable> postExecutableActionData = new HashMap<>();
 
         errors.addAll(transformersHandler.checkKeyWords(
-                execName,
-                executableRawData,
-                ListUtils.union(preExecTransformers, postExecTransformers),
-                execAdditionalKeywords,
-                actionKeyConstraintGroups)
+                        execName,
+                        executableRawData,
+                        ListUtils.union(preExecTransformers, postExecTransformers),
+                        execAdditionalKeywords,
+                        actionKeyConstraintGroups)
         );
 
         String errorMessagePrefix = "For " + parsedSlang.getType().toString().toLowerCase() + " '" + execName + "' syntax is illegal.\n";
@@ -206,14 +211,14 @@ public class ExecutableBuilder {
         if (executableRawData == null) {
             throw new IllegalArgumentException("Error compiling " + parsedSlang.getName() + ". Executable data is null");
         }
-        if(parsedSlang == null) {
+        if (parsedSlang == null) {
             throw new IllegalArgumentException("Slang source for: \'" + execName + "\' is null");
         }
 
         if (StringUtils.isBlank(execName)) {
             errors.add(new RuntimeException("Executable in source: " + parsedSlang.getName() + " has no name"));
         }
-        if(executableRawData.size() == 0) {
+        if (executableRawData.size() == 0) {
             errors.add(new IllegalArgumentException("Error compiling " + parsedSlang.getName() + ". Executable data for: \'" + execName + "\' is empty"));
         }
     }
@@ -240,15 +245,15 @@ public class ExecutableBuilder {
     private List<Map<String, Map<String, Object>>> getWorkflowRawData(Map<String, Object> executableRawData, List<RuntimeException> errors,
                                                                       ParsedSlang parsedSlang, String execName) {
         Object rawData = executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
-        if(rawData == null){
+        if (rawData == null) {
             rawData = new ArrayList<>();
             errors.add(new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + execName + " has no workflow property"));
         }
         List<Map<String, Map<String, Object>>> workFlowRawData;
-        try{
+        try {
             //noinspection unchecked
             workFlowRawData = (List<Map<String, Map<String, Object>>>) rawData;
-        } catch (ClassCastException ex){
+        } catch (ClassCastException ex) {
             workFlowRawData = new ArrayList<>();
             errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'workflow' property there should be a list of steps and not a map"));
         }
@@ -264,19 +269,19 @@ public class ExecutableBuilder {
         List<Map<String, Map<String, Object>>> onFailureData;
         Iterator<Map<String, Map<String, Object>>> stepsIterator = workFlowRawData.iterator();
         boolean onFailureFound = false;
-        while(stepsIterator.hasNext()){
+        while (stepsIterator.hasNext()) {
             Map<String, Map<String, Object>> stepData = stepsIterator.next();
             String stepName = stepData.keySet().iterator().next();
-            if(stepName.equals(SlangTextualKeys.ON_FAILURE_KEY)){
+            if (stepName.equals(SlangTextualKeys.ON_FAILURE_KEY)) {
                 if (onFailureFound) {
                     errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\n" + MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX));
                 } else {
                     onFailureFound = true;
                 }
-                try{
+                try {
                     //noinspection unchecked
-                    onFailureData = (List<Map<String, Map<String, Object>>>)stepData.values().iterator().next();
-                } catch (ClassCastException ex){
+                    onFailureData = (List<Map<String, Map<String, Object>>>) stepData.values().iterator().next();
+                } catch (ClassCastException ex) {
                     onFailureData = new ArrayList<>();
                     errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a list of steps and not a map"));
                 }
@@ -322,7 +327,7 @@ public class ExecutableBuilder {
         Set<String> stepNames = new HashSet<>();
         Deque<Step> onFailureSteps = !(onFailureSection || onFailureWorkFlow == null) ? onFailureWorkFlow.getSteps() : new LinkedList<Step>();
         List<String> onFailureStepNames = getStepNames(onFailureSteps);
-        boolean onFailureStepFound =  onFailureStepNames.size() > 0;
+        boolean onFailureStepFound = onFailureStepNames.size() > 0;
         String defaultFailure = onFailureStepFound ? onFailureStepNames.get(0) : ScoreLangConstants.FAILURE_RESULT;
 
         PeekingIterator<Map<String, Map<String, Object>>> iterator = new PeekingIterator<>(workFlowRawData.iterator());
@@ -340,20 +345,32 @@ public class ExecutableBuilder {
                 stepRawDataValue = stepRawData.values().iterator().next();
                 if (MapUtils.isNotEmpty(stepRawDataValue)) {
                     boolean loopKeyFound = stepRawDataValue.containsKey(LOOP_KEY);
-                    boolean asyncLoopKeyFound = stepRawDataValue.containsKey(ASYNC_LOOP_KEY);
+                    boolean parallelLoopKeyFound = stepRawDataValue.containsKey(PARALLEL_LOOP_KEY);
                     if (loopKeyFound) {
-                        if (asyncLoopKeyFound) {
+                        if (parallelLoopKeyFound) {
                             errors.add(new RuntimeException("Step: " + stepName + " syntax is illegal.\nBelow step name, there can be either \'loop\' or \'aync_loop\' key."));
                         }
                         message = "Step: " + stepName + " syntax is illegal.\nBelow the 'loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
                         @SuppressWarnings("unchecked") Map<String, Object> loopRawData = (Map<String, Object>) stepRawDataValue.remove(LOOP_KEY);
                         stepRawDataValue.putAll(loopRawData);
                     }
-                    if (asyncLoopKeyFound) {
-                        message = "Step: " + stepName + " syntax is illegal.\nBelow the 'async_loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
-                        @SuppressWarnings("unchecked") Map<String, Object> asyncLoopRawData = (Map<String, Object>) stepRawDataValue.remove(ASYNC_LOOP_KEY);
-                        asyncLoopRawData.put(ASYNC_LOOP_KEY, asyncLoopRawData.remove(FOR_KEY));
-                        stepRawDataValue.putAll(asyncLoopRawData);
+                    if (parallelLoopKeyFound) {
+                        message = "Step: " + stepName + " syntax is illegal.\nBelow the 'parallel_loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
+                        @SuppressWarnings("unchecked") Map<String, Object> parallelLoopRawData = (Map<String, Object>) stepRawDataValue.remove(PARALLEL_LOOP_KEY);
+
+                        errors.addAll(
+                                transformersHandler.checkKeyWords(
+                                        stepName,
+                                        SlangTextualKeys.PARALLEL_LOOP_KEY,
+                                        parallelLoopRawData,
+                                        Collections.<Transformer>emptyList(),
+                                        parallelLoopValidKeywords,
+                                        null
+                                )
+                        );
+
+                        parallelLoopRawData.put(PARALLEL_LOOP_KEY, parallelLoopRawData.remove(FOR_KEY));
+                        stepRawDataValue.putAll(parallelLoopRawData);
                     }
                 }
             } catch (ClassCastException ex) {
@@ -422,7 +439,7 @@ public class ExecutableBuilder {
         replaceOnFailureReference(postStepData, onFailureStepName, stepName);
 
         @SuppressWarnings("unchecked")
-        List<Argument> arguments = (List<Argument>)preStepData.get(SlangTextualKeys.DO_KEY);
+        List<Argument> arguments = (List<Argument>) preStepData.get(SlangTextualKeys.DO_KEY);
 
         String refId = "";
         Map<String, Object> doRawData;
@@ -448,7 +465,7 @@ public class ExecutableBuilder {
                 arguments,
                 navigationStrings,
                 refId,
-                preStepData.containsKey(ScoreLangConstants.ASYNC_LOOP_KEY));
+                preStepData.containsKey(SlangTextualKeys.PARALLEL_LOOP_KEY));
         return new StepModellingResult(step, errors);
     }
 
@@ -525,10 +542,11 @@ public class ExecutableBuilder {
 
     /**
      * Fetch the first level of the dependencies of the executable (non recursively)
+     *
      * @param workflow the workflow of the flow
      * @return a map of dependencies. Key - dependency full name, value - type
      */
-    private Set<String> fetchDirectStepsDependencies(Workflow workflow){
+    private Set<String> fetchDirectStepsDependencies(Workflow workflow) {
         Set<String> dependencies = new HashSet<>();
         Deque<Step> steps = workflow.getSteps();
         for (Step step : steps) {
@@ -538,7 +556,7 @@ public class ExecutableBuilder {
     }
 
     private List<String> getStepNames(Deque<Step> steps) {
-        List<String> stepNames =  new ArrayList<>();
+        List<String> stepNames = new ArrayList<>();
         for (Step step : steps) {
             stepNames.add(step.getName());
         }
@@ -550,11 +568,11 @@ public class ExecutableBuilder {
         for (Result result : results) {
             if (result.getValue() != null) {
                 errors.add(
-                    new RuntimeException(
-                            "Flow: '" + flowName + "' syntax is illegal. Error compiling result: '" +
-                                    result.getName() + "'. " + FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE +
-                                    " '- " + result.getName() + "'."
-                    )
+                        new RuntimeException(
+                                "Flow: '" + flowName + "' syntax is illegal. Error compiling result: '" +
+                                        result.getName() + "'. " + FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE +
+                                        " '- " + result.getName() + "'."
+                        )
                 );
             }
         }

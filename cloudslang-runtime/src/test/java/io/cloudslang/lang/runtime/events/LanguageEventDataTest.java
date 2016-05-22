@@ -184,13 +184,13 @@ public class LanguageEventDataTest {
 
 
     /**
-     * Test method for {@link LanguageEventData#getAsyncLoopBoundExpression()}.
+     * Test method for {@link LanguageEventData#getParallelLoopBoundExpression()}.
      */
     @Test
-    public void testAsyncLoopBoundExpression() {
-        List<Value> asyncLoopBoundExpression = new ArrayList<>(Arrays.asList(ValueFactory.create("a"), ValueFactory.create("b"), ValueFactory.create("c")));
-        eventData.setAsyncLoopBoundExpression(asyncLoopBoundExpression);
-        assertEquals(asyncLoopBoundExpression, eventData.getAsyncLoopBoundExpression());
-        assertEquals(asyncLoopBoundExpression, eventData.get(LanguageEventData.BOUND_ASYNC_LOOP_EXPRESSION));
+    public void testParallelLoopBoundExpression() {
+        List<Serializable> parallelLoopBoundExpression = new ArrayList<>(Arrays.asList(ValueFactory.create("a"), ValueFactory.create("b"), ValueFactory.create("c")));
+        eventData.setParallelLoopBoundExpression(parallelLoopBoundExpression);
+        assertEquals(parallelLoopBoundExpression, eventData.getParallelLoopBoundExpression());
+        assertEquals(parallelLoopBoundExpression, eventData.get(LanguageEventData.BOUND_PARALLEL_LOOP_EXPRESSION));
     }
 }

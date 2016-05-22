@@ -25,7 +25,7 @@ public class Step {
     private final List<Argument> arguments;
     private final List<Map<String, String>> navigationStrings;
     private final String refId;
-    private final boolean async;
+    private final boolean parallelLoop;
 
     public Step(
             String name,
@@ -34,14 +34,14 @@ public class Step {
             List<Argument> arguments,
             List<Map<String, String>> navigationStrings,
             String refId,
-            boolean async) {
+            boolean parallelLoop) {
         this.name = name;
         this.preStepActionData = preStepActionData;
         this.postStepActionData = postStepActionData;
         this.arguments = arguments;
         this.navigationStrings = navigationStrings;
         this.refId = refId;
-        this.async = async;
+        this.parallelLoop = parallelLoop;
     }
 
     public String getName() {
@@ -68,8 +68,8 @@ public class Step {
         return refId;
     }
 
-    public boolean isAsync() {
-        return async;
+    public boolean isParallelLoop() {
+        return parallelLoop;
     }
 
 }

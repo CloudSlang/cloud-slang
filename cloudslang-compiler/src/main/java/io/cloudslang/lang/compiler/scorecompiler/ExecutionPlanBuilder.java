@@ -44,7 +44,7 @@ public class ExecutionPlanBuilder {
 
     private static final String CLOUDSLANG_NAME = "CloudSlang";
     private static final int NUMBER_OF_STEP_EXECUTION_STEPS = 2;
-    private static final int NUMBER_OF_ASYNC_LOOP_EXECUTION_STEPS = 2;
+    private static final int NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS = 2;
     private static final long FLOW_END_STEP_ID = 0L;
     private static final long FLOW_START_STEP_ID = 1L;
 
@@ -104,12 +104,12 @@ public class ExecutionPlanBuilder {
 
         String stepName = step.getName();
         Long currentId = getCurrentId(stepReferences, steps);
-        boolean isAsync = step.isAsync();
+        boolean parallelLoop = step.isParallelLoop();
 
         //Begin Step
         stepReferences.put(stepName, currentId);
-        if (isAsync) {
-            Long joinStepID = currentId + NUMBER_OF_ASYNC_LOOP_EXECUTION_STEPS + 1;
+        if (parallelLoop) {
+            Long joinStepID = currentId + NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS + 1;
             stepExecutionSteps.add(
                     stepFactory.createAddBranchesStep(currentId++, joinStepID, currentId,
                             step.getPreStepActionData(), compiledFlow.getId(), stepName
@@ -140,7 +140,7 @@ public class ExecutionPlanBuilder {
                 navigationValues.put(navigationKey, new ResultNavigation(nextStepId, presetResult));
             }
         }
-        if (isAsync) {
+        if (parallelLoop) {
             stepExecutionSteps.add(
                     stepFactory.createFinishStepStep(currentId++, step.getPostStepActionData(),
                             new HashMap<String, ResultNavigation>(), stepName, true)
@@ -172,12 +172,12 @@ public class ExecutionPlanBuilder {
             }
         }
 
-        if (step == null || !step.isAsync()) {
-            // the reference is not a step or is not an async step
+        if (step == null || !step.isParallelLoop()) {
+            // the reference is not a step or is not a parallel loop step
             currentID = max + NUMBER_OF_STEP_EXECUTION_STEPS;
         } else {
             //async step
-            currentID = max + NUMBER_OF_STEP_EXECUTION_STEPS + NUMBER_OF_ASYNC_LOOP_EXECUTION_STEPS;
+            currentID = max + NUMBER_OF_STEP_EXECUTION_STEPS + NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS;
         }
 
         return currentID;

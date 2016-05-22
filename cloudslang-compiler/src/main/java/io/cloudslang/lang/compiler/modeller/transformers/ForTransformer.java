@@ -9,11 +9,11 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.LoopStatement;
-import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ForTransformer extends AbstractForTransformer implements Transformer<String, LoopStatement> {
@@ -25,12 +25,12 @@ public class ForTransformer extends AbstractForTransformer implements Transforme
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Scope.BEFORE_STEP);
+        return Collections.singletonList(Scope.BEFORE_STEP);
     }
 
     @Override
     public String keyToTransform() {
-        return null;
+        return SlangTextualKeys.FOR_KEY;
     }
 
 }

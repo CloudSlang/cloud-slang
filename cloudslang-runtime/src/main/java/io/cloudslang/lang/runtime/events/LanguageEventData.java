@@ -38,7 +38,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     public static final String ARGUMENTS = "ARGUMENTS";
     public static final String BOUND_INPUTS = "BOUND_INPUTS";
     public static final String BOUND_ARGUMENTS = "BOUND_ARGUMENTS";
-    public static final String BOUND_ASYNC_LOOP_EXPRESSION = "BOUND_ASYNC_LOOP_EXPRESSION";
+    public static final String BOUND_PARALLEL_LOOP_EXPRESSION = "BOUND_PARALLEL_LOOP_EXPRESSION";
     public static final String RETURN_VALUES = "RETURN_VALUES";
     public static final String NEXT_STEP_POSITION = "nextPosition";
     public static final String STEP_TYPE = "STEP_TYPE";
@@ -147,12 +147,12 @@ public class LanguageEventData extends HashMap<String, Serializable> {
         put(OUTPUTS, (Serializable) outputs);
     }
 
-    public List<Value> getAsyncLoopBoundExpression() {
-        return (List<Value>) get(BOUND_ASYNC_LOOP_EXPRESSION);
+    public List<Value> getParallelLoopBoundExpression() {
+        return (List<Value>) get(BOUND_PARALLEL_LOOP_EXPRESSION);
     }
 
-    public void setAsyncLoopBoundExpression(List<Value> asyncLoopBoundExpression) {
-        put(BOUND_ASYNC_LOOP_EXPRESSION, (Serializable)asyncLoopBoundExpression);
+    public void setParallelLoopBoundExpression(List<Value> parallelLoopBoundExpression) {
+        put(BOUND_PARALLEL_LOOP_EXPRESSION, (Serializable) parallelLoopBoundExpression);
     }
 
     public Map<String, Value> getCallArguments() {return (Map<String, Value>) get(CALL_ARGUMENTS);}

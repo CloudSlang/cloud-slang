@@ -88,9 +88,9 @@ public class DeserializeTest {
     }
 
     @Test
-    public void testDeserializeAsyncLoopStatement() throws IOException {
-        AsyncLoopStatement asyncLoopStatement = new AsyncLoopStatement("varName", "expression");
-        testToAndFromJson(asyncLoopStatement, AsyncLoopStatement.class);
+    public void testDeserializeParallelLoopStatement() throws IOException {
+        ParallelLoopStatement parallelLoopStatement = new ParallelLoopStatement("varName", "expression");
+        testToAndFromJson(parallelLoopStatement, ParallelLoopStatement.class);
     }
 
     @Test

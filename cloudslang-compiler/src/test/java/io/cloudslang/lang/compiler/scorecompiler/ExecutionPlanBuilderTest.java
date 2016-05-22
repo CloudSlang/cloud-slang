@@ -9,6 +9,7 @@
 *******************************************************************************/
 package io.cloudslang.lang.compiler.scorecompiler;
 
+import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.*;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
@@ -55,7 +56,7 @@ public class ExecutionPlanBuilderTest {
 
     private Set<String> systemPropertyDependencies = Collections.emptySet();
 
-    private Step createSimpleCompiledAsyncStep(String stepName) {
+    private Step createSimpleCompiledParallelStep(String stepName) {
         return createSimpleCompiledStep(stepName, true);
     }
 
@@ -67,7 +68,7 @@ public class ExecutionPlanBuilderTest {
         return createSimpleCompiledStep(stepName, false, navigationStrings);
     }
 
-    private Step createSimpleCompiledStep(String stepName, boolean isAsync) {
+    private Step createSimpleCompiledStep(String stepName, boolean isParallelLoop) {
         List<Map<String, String>> navigationStrings = new ArrayList<>();
         Map<String, String> successMap = new HashMap<>();
         successMap.put(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.SUCCESS_RESULT);
@@ -76,14 +77,14 @@ public class ExecutionPlanBuilderTest {
         navigationStrings.add(successMap);
         navigationStrings.add(failureMap);
 
-        return createSimpleCompiledStep(stepName, isAsync, navigationStrings);
+        return createSimpleCompiledStep(stepName, isParallelLoop, navigationStrings);
     }
 
-    private Step createSimpleCompiledStep(String stepName, boolean isAsync, List<Map<String, String>> navigationStrings) {
+    private Step createSimpleCompiledStep(String stepName, boolean isParallelLoop, List<Map<String, String>> navigationStrings) {
         Map<String, Serializable> preStepActionData = new HashMap<>();
 
-        if (isAsync) {
-            preStepActionData.put(ScoreLangConstants.ASYNC_LOOP_KEY, "value in values");
+        if (isParallelLoop) {
+            preStepActionData.put(SlangTextualKeys.PARALLEL_LOOP_KEY, "value in values");
         }
 
         Map<String, Serializable> postStepActionData = new HashMap<>();
@@ -95,7 +96,7 @@ public class ExecutionPlanBuilderTest {
                 null,
                 navigationStrings,
                 refId,
-                isAsync);
+                isParallelLoop);
     }
 
     private List<Result> defaultFlowResults() {
@@ -124,14 +125,14 @@ public class ExecutionPlanBuilderTest {
         mockFinishStep(stepId, step, false);
     }
 
-    private void mockFinishAsyncStep(Long stepId, Step step) {
+    private void mockFinishParallelLoopStep(Long stepId, Step step) {
         mockFinishStep(stepId, step, true);
     }
 
-    private void mockFinishStep(Long stepId, Step step, boolean isAsync) {
+    private void mockFinishStep(Long stepId, Step step, boolean isParallelLoop) {
         Map<String, Serializable> postStepActionData = step.getPostStepActionData();
         String stepName = step.getName();
-        when(stepFactory.createFinishStepStep(eq(stepId), eq(postStepActionData), anyMapOf(String.class, ResultNavigation.class), eq(stepName), eq(isAsync))).thenReturn(new ExecutionStep(stepId));
+        when(stepFactory.createFinishStepStep(eq(stepId), eq(postStepActionData), anyMapOf(String.class, ResultNavigation.class), eq(stepName), eq(isParallelLoop))).thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockBeginStep(Long stepId, Step step) {
@@ -211,11 +212,11 @@ public class ExecutionPlanBuilderTest {
     }
 
     @Test
-    public void createSimpleFlowWithAsyncLoop() throws Exception {
+    public void createSimpleFlowWithParallelLoop() throws Exception {
         Map<String, Serializable> preFlowActionData = new HashMap<>();
         Map<String, Serializable> postFlowActionData = new HashMap<>();
         Deque<Step> steps = new LinkedList<>();
-        Step step = createSimpleCompiledAsyncStep("stepName");
+        Step step = createSimpleCompiledParallelStep("stepName");
         steps.add(step);
         Workflow workflow = new Workflow(steps);
         String flowName = "flowName";
@@ -231,7 +232,7 @@ public class ExecutionPlanBuilderTest {
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
         mockAddBranchesStep(2L, 5L, 3L, step, compiledFlow);
         mockBeginStep(3L, step);
-        mockFinishAsyncStep(4L, step);
+        mockFinishParallelLoopStep(4L, step);
         mockJoinBranchesStep(5L, step);
         ExecutionPlan executionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFlow);
 
@@ -243,7 +244,7 @@ public class ExecutionPlanBuilderTest {
                 eq(compiledFlow.getId()),
                 eq(step.getName()));
         verify(stepFactory).createBeginStepStep(eq(3L), anyListOf(Argument.class), eq(step.getPreStepActionData()), eq(step.getRefId()), eq(step.getName()));
-        verify(stepFactory).createFinishStepStep(eq(4L), eq(step.getPostStepActionData()), anyMapOf(String.class, ResultNavigation.class), eq(step.getName()), eq(step.isAsync()));
+        verify(stepFactory).createFinishStepStep(eq(4L), eq(step.getPostStepActionData()), anyMapOf(String.class, ResultNavigation.class), eq(step.getName()), eq(step.isParallelLoop()));
         verify(stepFactory).createJoinBranchesStep(eq(5L), eq(step.getPostStepActionData()), anyMapOf(String.class, ResultNavigation.class), eq(step.getName()));
 
         assertEquals("different number of execution steps than expected", 6, executionPlan.getSteps().size());

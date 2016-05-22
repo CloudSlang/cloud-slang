@@ -42,7 +42,7 @@ public class TriggerFlows {
 
     private final static HashSet<String> BRANCH_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_BRANCH_END);
 
-    private final static HashSet<String> ASYNC_LOOP_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_JOIN_BRANCHES_END);
+    private final static HashSet<String> PARALLEL_LOOP_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_JOIN_BRANCHES_END);
 
     @Autowired
     private Slang slang;
@@ -83,7 +83,7 @@ public class TriggerFlows {
         slang.subscribeOnEvents(branchAggregatorListener, BRANCH_EVENTS);
 
         JoinAggregatorListener joinAggregatorListener = new JoinAggregatorListener();
-        slang.subscribeOnEvents(joinAggregatorListener, ASYNC_LOOP_EVENTS);
+        slang.subscribeOnEvents(joinAggregatorListener, PARALLEL_LOOP_EVENTS);
 
         try {
             Thread.sleep(2000L);      /* TODO : remove this! only to test unstable navigation tests*/
@@ -101,9 +101,9 @@ public class TriggerFlows {
 
         Map<String, StepData> steps = runDataAggregatorListener.aggregate();
         Map<String, List<StepData>> branchesByPath = branchAggregatorListener.aggregate();
-        Map<String, StepData> asyncSteps = joinAggregatorListener.aggregate();
+        Map<String, StepData> parallelSteps = joinAggregatorListener.aggregate();
 
-        RuntimeInformation runtimeInformation = new RuntimeInformation(steps, branchesByPath, asyncSteps);
+        RuntimeInformation runtimeInformation = new RuntimeInformation(steps, branchesByPath, parallelSteps);
 
         slang.unSubscribeOnEvents(joinAggregatorListener);
         slang.unSubscribeOnEvents(branchAggregatorListener);
