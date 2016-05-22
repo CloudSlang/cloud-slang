@@ -19,7 +19,6 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.score.api.ExecutionPlan;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,10 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import static ch.lambdaj.Lambda.convertMap;
 

@@ -17,8 +17,8 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.RuntimeConstants;
-import io.cloudslang.lang.runtime.bindings.ParallelLoopBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
+import io.cloudslang.lang.runtime.bindings.ParallelLoopBinding;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
@@ -240,9 +240,8 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
             Map<String, Serializable> branchContext = branch.getContexts();
             RunEnvironment branchRuntimeEnvironment = (RunEnvironment) branchContext.get(ScoreLangConstants.RUN_ENV);
-            Map<String, Serializable> branchContextMap = new HashMap<>(
-                    branchRuntimeEnvironment.getStack().popContext().getImmutableViewOfVariables()
-            );
+            Map<String, Serializable> branchContextMap =
+                    convert(branchRuntimeEnvironment.getStack().popContext().getImmutableViewOfVariables());
             ReturnValues executableReturnValues = branchRuntimeEnvironment.removeReturnValues();
             String branchResult = executableReturnValues.getResult();
             branchContextMap.put(ScoreLangConstants.BRANCH_RESULT_KEY, branchResult);

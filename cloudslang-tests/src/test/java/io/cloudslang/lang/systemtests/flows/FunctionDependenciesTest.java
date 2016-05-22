@@ -25,11 +25,7 @@ import org.junit.Test;
 
 import java.net.URI;
 import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Bonczidai Levente
@@ -114,7 +110,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedArguments.put("input_9", ValueFactory.create("localhost"));
         expectedArguments.put("input_10", ValueFactory.create("localhost"));
         expectedArguments.put("input_11", ValueFactory.create("default_str"));
-        expectedArguments.put("value_propagate", ValueFactory.create("flowInput_stepArg_"));
+        expectedArguments.put("value_propagate_input", ValueFactory.create("flowInput_stepArg_"));
         expectedArguments.put("input_12", ValueFactory.create("hyphen_value"));
         expectedArguments.put("input_13", ValueFactory.create("hyphen_value"));
         expectedArguments.put("input_14", ValueFactory.create("localhost"));
@@ -144,7 +140,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedFlowInputs.put("input_9", ValueFactory.create("localhost"));
         expectedFlowInputs.put("input_10", ValueFactory.create("localhost"));
         expectedFlowInputs.put("input_11", ValueFactory.create("default_str"));
-        expectedFlowInputs.put("value_propagate", ValueFactory.create("flowInput_"));
+        expectedFlowInputs.put("value_propagate_input", ValueFactory.create("flowInput_"));
         expectedFlowInputs.put("input_12", ValueFactory.create("hyphen_value"));
         expectedFlowInputs.put("input_13", ValueFactory.create("hyphen_value"));
         expectedFlowInputs.put("input_14", ValueFactory.create("localhost"));

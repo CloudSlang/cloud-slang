@@ -16,12 +16,17 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.Serializable;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Date: 3/25/2015
@@ -179,7 +184,7 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
             Set<SystemProperty> systemProperties) {
         CompilationArtifact compilationArtifact = slang.compile(resource, path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Value> userInputs = new HashMap<>();
         return triggerWithData(compilationArtifact, userInputs, systemProperties);
     }
 
@@ -207,11 +212,11 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         List<String> actualNameOutputsOfBranches = Lists.newArrayList();
         List<Integer> actualNumberOutputsOfBranches = Lists.newArrayList();
         for (StepData branchData : branchesData) {
-            Map<String, Serializable> outputs = branchData.getOutputs();
+            Map<String, Value> outputs = branchData.getOutputs();
             Assert.assertTrue(outputs.containsKey("name"));
             Assert.assertTrue(outputs.containsKey("int_output"));
-            actualNameOutputsOfBranches.add((String) outputs.get("name"));
-            actualNumberOutputsOfBranches.add((Integer) outputs.get("int_output"));
+            actualNameOutputsOfBranches.add((String) outputs.get("name").get());
+            actualNumberOutputsOfBranches.add((Integer) outputs.get("int_output").get());
         }
 
         List<String> expectedNameOutputs = Lists.newArrayList();
@@ -236,9 +241,9 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         // publish
         List<String> actualBranchResultOutputs = Lists.newArrayList();
         for (StepData branchData : branchesData) {
-            Map<String, Serializable> outputs = branchData.getOutputs();
+            Map<String, Value> outputs = branchData.getOutputs();
             Assert.assertTrue(outputs.containsKey("branch_result"));
-            actualBranchResultOutputs.add((String) outputs.get("branch_result"));
+            actualBranchResultOutputs.add((String) outputs.get("branch_result").get());
         }
 
         List<String> expectedBranchResultOutputs = Lists.newArrayList(
@@ -255,10 +260,10 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         Map<String, StepData> parallelLoopSteps = runtimeInformation.getParallelSteps();
         StepData parallelLoopStep = parallelLoopSteps.get(FIRST_STEP_PATH);
 
-        Map<String, Serializable> publishValues = parallelLoopStep.getOutputs();
+        Map<String, Value> publishValues = parallelLoopStep.getOutputs();
         Assert.assertTrue("publish name not found in parallel loop outputs", publishValues.containsKey("name_list"));
         @SuppressWarnings("unchecked")
-        List<String> actualPublishNameList = (List<String>) publishValues.get("name_list");
+        List<String> actualPublishNameList = (List<String>) publishValues.get("name_list").get();
 
         Assert.assertTrue(
                 "publish value does not have the expected value",
@@ -268,7 +273,7 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         Assert.assertEquals(
                 "Publish value not bound correctly from system property",
                 "publish_value",
-                publishValues.get("from_sp")
+                publishValues.get("from_sp").get()
         );
     }
 
@@ -278,10 +283,10 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         Map<String, StepData> parallelLoopSteps = runtimeInformation.getParallelSteps();
         StepData parallelLoopStep = parallelLoopSteps.get(FIRST_STEP_PATH);
 
-        Map<String, Serializable> publishValues = parallelLoopStep.getOutputs();
+        Map<String, Value> publishValues = parallelLoopStep.getOutputs();
         Assert.assertTrue(publishValues.containsKey(BRANCH_RESULTS_LIST_PUBLISH_VALUE));
         @SuppressWarnings("unchecked")
-        List<String> actualBranchResultsPublishValue = (List<String>) publishValues.get(BRANCH_RESULTS_LIST_PUBLISH_VALUE);
+        List<String> actualBranchResultsPublishValue = (List<String>) publishValues.get(BRANCH_RESULTS_LIST_PUBLISH_VALUE).get();
 
         Assert.assertEquals(
                 publishValue,

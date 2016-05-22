@@ -48,12 +48,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
 * Date: 4/7/2015
@@ -104,7 +99,7 @@ public class ParallelLoopStepsTest {
 
         // prepare mocks
         ExecutionRuntimeServices executionRuntimeServices = mock(ExecutionRuntimeServices.class);
-        List<Value> expectedSplitData = Lists.newArrayList((Serializable) 1, 2, 3);
+        List<Value> expectedSplitData = Lists.newArrayList(ValueFactory.create(1), ValueFactory.create(2), ValueFactory.create(3));
         when(parallelLoopBinding.bindParallelLoopList(eq(parallelLoopStatement), eq(context), eq(runEnvironment.getSystemProperties()), eq(nodeName))).thenReturn(expectedSplitData);
         Long branchBeginStepID = 3L;
 
@@ -153,7 +148,7 @@ public class ParallelLoopStepsTest {
 
         // prepare mocks
         ExecutionRuntimeServices executionRuntimeServices = mock(ExecutionRuntimeServices.class);
-        List<Value> expectedSplitData = Lists.newArrayList((Serializable) 1, 2, 3);
+        List<Value> expectedSplitData = Lists.newArrayList(ValueFactory.create(1), ValueFactory.create(2), ValueFactory.create(3));
         when(parallelLoopBinding.bindParallelLoopList(eq(parallelLoopStatement), eq(context), eq(runEnvironment.getSystemProperties()), eq(nodeName))).thenReturn(expectedSplitData);
         Long branchBeginStepID = 0L;
 
