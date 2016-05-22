@@ -149,22 +149,22 @@ flow:
 
             - is_int_arguments:                        ${int1_input is int2_input}
             - is_int_argument1_sensitive:              ${int1_input_sensitive is int2_input}
-            - is_int_argument2_sensitive:              ${int1_input is int2_input_sensitive}
+            - is_int_argument2:                        ${int1_input is int2_input_sensitive}
             - is_int_arguments_sensitive:              ${int1_input_sensitive is int2_input_sensitive}
 
             - is_str_arguments:                        ${str1_input is str2_input}
             - is_str_argument1_sensitive:              ${str1_input_sensitive is str2_input}
-            - is_str_argument2_sensitive:              ${str1_input is str2_input_sensitive}
+            - is_str_argument2:                        ${str1_input is str2_input_sensitive}
             - is_str_arguments_sensitive:              ${str1_input_sensitive is str2_input_sensitive}
 
             - is_not_int_arguments:                    ${int1_input is not int2_input}
             - is_not_int_argument1_sensitive:          ${int1_input_sensitive is not int2_input}
-            - is_not_int_argument2_sensitive:          ${int1_input is not int2_input_sensitive}
+            - is_not_int_argument2:                    ${int1_input is not int2_input_sensitive}
             - is_not_int_arguments_sensitive:          ${int1_input_sensitive is not int2_input_sensitive}
 
             - is_not_str_arguments:                    ${str1_input is not str2_input}
             - is_not_str_argument1_sensitive:          ${str1_input_sensitive is not str2_input}
-            - is_not_str_argument2_sensitive:          ${str1_input is not str2_input_sensitive}
+            - is_not_str_argument2:                    ${str1_input is not str2_input_sensitive}
             - is_not_str_arguments_sensitive:          ${str1_input_sensitive is not str2_input_sensitive}
 
             - in_str_argument1:                        ${str1_input in 'abcd'}
@@ -227,10 +227,10 @@ flow:
             - lshift_binary_argument1_sensitive:       ${binary1_input_sensitive << 4}
             - lshift_binary_argument2_sensitive:       ${binary2_input_sensitive << 4}
 
-            - rshift_binary_argument1:                 ${binary1_input << 16}
-            - rshift_binary_argument2:                 ${binary2_input << 16}
-            - rshift_binary_argument1_sensitive:       ${binary1_input_sensitive << 16}
-            - rshift_binary_argument2_sensitive:       ${binary2_input_sensitive << 16}
+            - rshift_binary_argument1:                 ${binary1_input >> 16}
+            - rshift_binary_argument2:                 ${binary2_input >> 16}
+            - rshift_binary_argument1_sensitive:       ${binary1_input_sensitive >> 16}
+            - rshift_binary_argument2_sensitive:       ${binary2_input_sensitive >> 16}
 
             - hex_binary_argument1:                    ${hex(binary1_input)}
             - hex_binary_argument2:                    ${hex(binary2_input)}
@@ -262,7 +262,7 @@ flow:
             - chr_int_argument1_sensitive:             ${chr(int1_input_sensitive)}
             - chr_int_argument2_sensitive:             ${chr(int2_input_sensitive)}
 
-            - unichr_int_argument1:                    ${chr(int1_input)}
+            - unichr_int_argument1:                    ${unichr(int1_input)}
             - unichr_int_argument2:                    ${unichr(int2_input)}
             - unichr_int_argument1_sensitive:          ${unichr(int1_input_sensitive)}
             - unichr_int_argument2_sensitive:          ${unichr(int2_input_sensitive)}
@@ -373,9 +373,9 @@ flow:
             - max_int_arguments_sensitive:             ${max(int1_input_sensitive, int2_input_sensitive)}
 
             - max_float_arguments:                     ${max(float1_input, float2_input)}
-            - max_float_argument1_sensitive:           ${max(float2_input_sensitive, float2_input)}
+            - max_float_argument1_sensitive:           ${max(float1_input_sensitive, float2_input)}
             - max_float_argument2_sensitive:           ${max(float1_input, float2_input_sensitive)}
-            - max_float_arguments_sensitive:           ${max(float2_input_sensitive, float2_input_sensitive)}
+            - max_float_arguments_sensitive:           ${max(float1_input_sensitive, float2_input_sensitive)}
 
             - max_str_arguments:                       ${max(str1_input, str2_input)}
             - max_str_argument1_sensitive:             ${max(str1_input_sensitive, str2_input)}
@@ -388,9 +388,9 @@ flow:
             - min_int_arguments_sensitive:             ${min(int1_input_sensitive, int2_input_sensitive)}
 
             - min_float_arguments:                     ${min(float1_input, float2_input)}
-            - min_float_argument1_sensitive:           ${min(float2_input_sensitive, float2_input)}
+            - min_float_argument1_sensitive:           ${min(float1_input_sensitive, float2_input)}
             - min_float_argument2_sensitive:           ${min(float1_input, float2_input_sensitive)}
-            - min_float_arguments_sensitive:           ${min(float2_input_sensitive, float2_input_sensitive)}
+            - min_float_arguments_sensitive:           ${min(float1_input_sensitive, float2_input_sensitive)}
 
             - min_str_arguments:                       ${min(str1_input, str2_input)}
             - min_str_argument1_sensitive:             ${min(str1_input_sensitive, str2_input)}
@@ -408,9 +408,9 @@ flow:
             - add1_str_arguments_sensitive:            ${str1_input_sensitive + str2_input_sensitive}
 
             - add1_float_arguments:                    ${float1_input + float2_input}
-            - add1_float_argument1_sensitive:          ${float2_input_sensitive + float2_input}
+            - add1_float_argument1_sensitive:          ${float1_input_sensitive + float2_input}
             - add1_float_argument2_sensitive:          ${float1_input + float2_input_sensitive}
-            - add1_float_arguments_sensitive:          ${float2_input_sensitive + float2_input_sensitive}
+            - add1_float_arguments_sensitive:          ${float1_input_sensitive + float2_input_sensitive}
 
             - add2_int_arguments:                      ${int1_input + 5 + int2_input}
             - add2_int_argument1_sensitive:            ${int1_input_sensitive + 5 + int2_input}
@@ -423,9 +423,9 @@ flow:
             - add2_str_arguments_sensitive:            ${str1_input_sensitive + 'c' + str2_input_sensitive}
 
             - add2_float_arguments:                    ${float1_input + 7.0 + float2_input}
-            - add2_float_argument1_sensitive:          ${float2_input_sensitive + 7.0 + float2_input}
+            - add2_float_argument1_sensitive:          ${float1_input_sensitive + 7.0 + float2_input}
             - add2_float_argument2_sensitive:          ${float1_input + 7.0 + float2_input_sensitive}
-            - add2_float_arguments_sensitive:          ${float2_input_sensitive + 7.0 + float2_input_sensitive}
+            - add2_float_arguments_sensitive:          ${float1_input_sensitive + 7.0 + float2_input_sensitive}
 
             - sub_int_arguments:                       ${int1_input - int2_input}
             - sub_int_argument1_sensitive:             ${int1_input_sensitive - int2_input}
@@ -433,9 +433,9 @@ flow:
             - sub_int_arguments_sensitive:             ${int1_input_sensitive - int2_input_sensitive}
 
             - sub_float_arguments:                     ${float1_input - float2_input}
-            - sub_float_argument1_sensitive:           ${float2_input_sensitive - float2_input}
+            - sub_float_argument1_sensitive:           ${float1_input_sensitive - float2_input}
             - sub_float_argument2_sensitive:           ${float1_input - float2_input_sensitive}
-            - sub_float_arguments_sensitive:           ${float2_input_sensitive - float2_input_sensitive}
+            - sub_float_arguments_sensitive:           ${float1_input_sensitive - float2_input_sensitive}
 
             - mul_int_arguments:                       ${int1_input * int2_input}
             - mul_int_argument1_sensitive:             ${int1_input_sensitive * int2_input}
@@ -443,9 +443,9 @@ flow:
             - mul_int_arguments_sensitive:             ${int1_input_sensitive * int2_input_sensitive}
 
             - mul_float_arguments:                     ${float1_input * float2_input}
-            - mul_float_argument1_sensitive:           ${float2_input_sensitive * float2_input}
+            - mul_float_argument1_sensitive:           ${float1_input_sensitive * float2_input}
             - mul_float_argument2_sensitive:           ${float1_input * float2_input_sensitive}
-            - mul_float_arguments_sensitive:           ${float2_input_sensitive * float2_input_sensitive}
+            - mul_float_arguments_sensitive:           ${float1_input_sensitive * float2_input_sensitive}
 
             - div_int_arguments:                       ${int1_input / int2_input}
             - div_int_argument1_sensitive:             ${int1_input_sensitive / int2_input}
@@ -453,9 +453,9 @@ flow:
             - div_int_arguments_sensitive:             ${int1_input_sensitive / int2_input_sensitive}
 
             - div_float_arguments:                     ${float1_input / float2_input}
-            - div_float_argument1_sensitive:           ${float2_input_sensitive / float2_input}
+            - div_float_argument1_sensitive:           ${float1_input_sensitive / float2_input}
             - div_float_argument2_sensitive:           ${float1_input / float2_input_sensitive}
-            - div_float_arguments_sensitive:           ${float2_input_sensitive / float2_input_sensitive}
+            - div_float_arguments_sensitive:           ${float1_input_sensitive / float2_input_sensitive}
 
             - truediv_int_arguments:                   ${int1_input / int2_input}
             - truediv_int_argument1_sensitive:         ${int1_input_sensitive / int2_input}
@@ -463,9 +463,9 @@ flow:
             - truediv_int_arguments_sensitive:         ${int1_input_sensitive / int2_input_sensitive}
 
             - truediv_float_arguments:                 ${float1_input / float2_input}
-            - truediv_float_argument1_sensitive:       ${float2_input_sensitive / float2_input}
+            - truediv_float_argument1_sensitive:       ${float1_input_sensitive / float2_input}
             - truediv_float_argument2_sensitive:       ${float1_input / float2_input_sensitive}
-            - truediv_float_arguments_sensitive:       ${float2_input_sensitive / float2_input_sensitive}
+            - truediv_float_arguments_sensitive:       ${float1_input_sensitive / float2_input_sensitive}
 
             - floordiv_int_arguments:                  ${int1_input // int2_input}
             - floordiv_int_argument1_sensitive:        ${int1_input_sensitive // int2_input}
@@ -473,9 +473,9 @@ flow:
             - floordiv_int_arguments_sensitive:        ${int1_input_sensitive // int2_input_sensitive}
 
             - floordiv_float_arguments:                ${float1_input // float2_input}
-            - floordiv_float_argument1_sensitive:      ${float2_input_sensitive // float2_input}
+            - floordiv_float_argument1_sensitive:      ${float1_input_sensitive // float2_input}
             - floordiv_float_argument2_sensitive:      ${float1_input // float2_input_sensitive}
-            - floordiv_float_arguments_sensitive:      ${float2_input_sensitive // float2_input_sensitive}
+            - floordiv_float_arguments_sensitive:      ${float1_input_sensitive // float2_input_sensitive}
 
             - mod_int_arguments:                       ${int1_input % int2_input}
             - mod_int_argument1_sensitive:             ${int1_input_sensitive % int2_input}
@@ -483,19 +483,19 @@ flow:
             - mod_int_arguments_sensitive:             ${int1_input_sensitive % int2_input_sensitive}
 
             - mod_float_arguments:                     ${float1_input % float2_input}
-            - mod_float_argument1_sensitive:           ${float2_input_sensitive % float2_input}
+            - mod_float_argument1_sensitive:           ${float1_input_sensitive % float2_input}
             - mod_float_argument2_sensitive:           ${float1_input % float2_input_sensitive}
-            - mod_float_arguments_sensitive:           ${float2_input_sensitive % float2_input_sensitive}
+            - mod_float_arguments_sensitive:           ${float1_input_sensitive % float2_input_sensitive}
 
-            - divmod_int_arguments:                    ${divmod(int1_input, 2)}
-            - divmod_int_argument1_sensitive:          ${divmod(int2_input, 2)}
-            - divmod_int_argument2_sensitive:          ${divmod(int1_input_sensitive, 2)}
-            - divmod_int_arguments_sensitive:          ${divmod(int2_input_sensitive, 2)}
+            - divmod_int_argument1:                    ${divmod(int1_input, 2)}
+            - divmod_int_argument2:                    ${divmod(int2_input, 2)}
+            - divmod_int_argument1_sensitive:          ${divmod(int1_input_sensitive, 2)}
+            - divmod_int_argument2_sensitive:          ${divmod(int2_input_sensitive, 2)}
 
-            - divmod_float_arguments:                  ${divmod(float1_input, 2)}
-            - divmod_float_argument1_sensitive:        ${divmod(float2_input, 2)}
-            - divmod_float_argument2_sensitive:        ${divmod(float1_input_sensitive, 2)}
-            - divmod_float_arguments_sensitive:        ${divmod(float2_input_sensitive, 2)}
+            - divmod_float_argument1:                  ${divmod(float1_input, 2)}
+            - divmod_float_argument2:                  ${divmod(float2_input, 2)}
+            - divmod_float_argument1_sensitive:        ${divmod(float1_input_sensitive, 2)}
+            - divmod_float_argument2_sensitive:        ${divmod(float2_input_sensitive, 2)}
 
             - repr_int_argument1:                      ${repr(int1_input)}
             - repr_int_argument2:                      ${repr(int2_input)}
@@ -550,787 +550,787 @@ flow:
             - type_list_argument1:                     ${type(list1_input)}
             - type_list_argument2:                     ${type(list2_input)}
             - type_list_argument1_sensitive:           ${type(list1_input_sensitive)}
-            - type_list_argument2_sensitive:           ${tuple(list2_input_sensitive)}
+            - type_list_argument2_sensitive:           ${type(list2_input_sensitive)}
 
         publish:
-          - cmp_int_arguments:
-          - cmp_int_argument1_sensitive:
-          - cmp_int_argument2_sensitive:
-          - cmp_int_arguments_sensitive:
-          - cmp_str_arguments:
-          - cmp_str_argument1_sensitive:
-          - cmp_str_argument2_sensitive:
-          - cmp_str_arguments_sensitive:
-          - eq_int_arguments:
-          - eq_int_argument1_sensitive:
-          - eq_int_argument2_sensitive:
-          - eq_int_arguments_sensitive:
-          - eq_str_arguments:
-          - eq_str_argument1_sensitive:
-          - eq_str_argument2_sensitive:
-          - eq_str_arguments_sensitive:
-          - ne1_int_arguments:
-          - ne1_int_argument1_sensitive:
-          - ne1_int_argument2_sensitive:
-          - ne1_int_arguments_sensitive:
-          - ne1_str_arguments:
-          - ne1_str_argument1_sensitive:
-          - ne1_str_argument2_sensitive:
-          - ne1_str_arguments_sensitive:
-          - ne2_int_arguments:
-          - ne2_int_argument1_sensitive:
-          - ne2_int_argument2_sensitive:
-          - ne2_int_arguments_sensitive:
-          - ne2_str_arguments:
-          - ne2_str_argument1_sensitive:
-          - ne2_str_argument2_sensitive:
-          - ne2_str_arguments_sensitive:
-          - le_int_arguments:
-          - le_int_argument1_sensitive:
-          - le_int_argument2_sensitive:
-          - le_int_arguments_sensitive:
-          - le_str_arguments:
-          - le_str_argument1_sensitive:
-          - le_str_argument2_sensitive:
-          - le_str_arguments_sensitive:
-          - lt_int_arguments:
-          - lt_int_argument1_sensitive:
-          - lt_int_argument2_sensitive:
-          - lt_int_arguments_sensitive:
-          - lt_str_arguments:
-          - lt_str_argument1_sensitive:
-          - lt_str_argument2_sensitive:
-          - lt_str_arguments_sensitive:
-          - ge_int_arguments:
-          - ge_int_argument1_sensitive:
-          - ge_int_argument2_sensitive:
-          - ge_int_arguments_sensitive:
-          - ge_str_arguments:
-          - ge_str_argument1_sensitive:
-          - ge_str_argument2_sensitive:
-          - ge_str_arguments_sensitive:
-          - gt_int_arguments:
-          - gt_int_argument1_sensitive:
-          - gt_int_argument2_sensitive:
-          - gt_int_arguments_sensitive:
-          - gt_str_arguments:
-          - gt_str_argument1_sensitive:
-          - gt_str_argument2_sensitive:
-          - gt_str_arguments_sensitive:
-          - is_int_arguments:
-          - is_int_argument1_sensitive:
-          - is_int_argument2_sensitive:
-          - is_int_arguments_sensitive:
-          - is_str_arguments:
-          - is_str_argument1_sensitive:
-          - is_str_argument2_sensitive:
-          - is_str_arguments_sensitive:
-          - is_not_int_arguments:
-          - is_not_int_argument1_sensitive:
-          - is_not_int_argument2_sensitive:
-          - is_not_int_arguments_sensitive:
-          - is_not_str_arguments:
-          - is_not_str_argument1_sensitive:
-          - is_not_str_argument2_sensitive:
-          - is_not_str_arguments_sensitive:
-          - in_str_argument1:
-          - in_str_argument2:
-          - in_str_argument1_sensitive:
-          - in_str_argument2_sensitive:
-          - not_in_str_argument1:
-          - not_in_str_argument2:
-          - not_in_str_argument1_sensitive:
-          - not_in_str_argument2_sensitive:
-          - len_str_argument1:
-          - len_str_argument2:
-          - len_str_argument1_sensitive:
-          - len_str_argument2_sensitive:
-          - format1_int_arguments:
-          - format1_int_argument1_sensitive:
-          - format1_int_argument2_sensitive:
-          - format1_int_arguments_sensitive:
-          - format1_str_arguments:
-          - format1_str_argument1_sensitive:
-          - format1_str_argument2_sensitive:
-          - format1_str_arguments_sensitive:
-          - format2_int_arguments:
-          - format2_int_argument1_sensitive:
-          - format2_int_argument2_sensitive:
-          - format2_int_arguments_sensitive:
-          - format2_str_arguments:
-          - format2_str_argument1_sensitive:
-          - format2_str_argument2_sensitive:
-          - format2_str_arguments_sensitive:
-          - and_binary_arguments:
-          - and_binary_argument1_sensitive:
-          - and_binary_argument2_sensitive:
-          - and_binary_arguments_sensitive:
-          - or_binary_arguments:
-          - or_binary_argument1_sensitive:
-          - or_binary_argument2_sensitive:
-          - or_binary_arguments_sensitive:
-          - xor_binary_arguments:
-          - xor_binary_argument1_sensitive:
-          - xor_binary_argument2_sensitive:
-          - xor_binary_arguments_sensitive:
-          - not_binary_argument1:
-          - not_binary_argument2:
-          - not_binary_argument1_sensitive:
-          - not_binary_argument2_sensitive:
-          - lshift_binary_argument1:
-          - lshift_binary_argument2:
-          - lshift_binary_argument1_sensitive:
-          - lshift_binary_argument2_sensitive:
-          - rshift_binary_argument1:
-          - rshift_binary_argument2:
-          - rshift_binary_argument1_sensitive:
-          - rshift_binary_argument2_sensitive:
-          - hex_binary_argument1:
-          - hex_binary_argument2:
-          - hex_binary_argument1_sensitive:
-          - hex_binary_argument2_sensitive:
-          - oct_binary_argument1:
-          - oct_binary_argument2:
-          - oct_binary_argument1_sensitive:
-          - oct_binary_argument2_sensitive:
-          - int_float_argument1:
-          - int_float_argument2:
-          - int_float_argument1_sensitive:
-          - int_float_argument2_sensitive:
-          - long_float_argument1:
-          - long_float_argument2:
-          - long_float_argument1_sensitive:
-          - long_float_argument2_sensitive:
-          - float_int_argument1:
-          - float_int_argument2:
-          - float_int_argument1_sensitive:
-          - float_int_argument2_sensitive:
-          - chr_int_argument1:
-          - chr_int_argument2:
-          - chr_int_argument1_sensitive:
-          - chr_int_argument2_sensitive:
-          - unichr_int_argument1:
-          - unichr_int_argument2:
-          - unichr_int_argument1_sensitive:
-          - unichr_int_argument2_sensitive:
-          - bool_int_argument1:
-          - bool_int_argument2:
-          - bool_int_argument1_sensitive:
-          - bool_int_argument2_sensitive:
-          - str_int_argument1:
-          - str_int_argument2:
-          - str_int_argument1_sensitive:
-          - str_int_argument2_sensitive:
-          - str_float_argument1:
-          - str_float_argument2:
-          - str_float_argument1_sensitive:
-          - str_float_argument2_sensitive:
-          - unicode_int_argument1:
-          - unicode_int_argument2:
-          - unicode_int_argument1_sensitive:
-          - unicode_int_argument2_sensitive:
-          - unicode_float_argument1:
-          - unicode_float_argument2:
-          - unicode_float_argument1_sensitive:
-          - unicode_float_argument2_sensitive:
-          - unicode_str_argument1:
-          - unicode_str_argument2:
-          - unicode_str_argument1_sensitive:
-          - unicode_str_argument2_sensitive:
-          - trunc_float_argument1:
-          - trunc_float_argument2:
-          - trunc_float_argument1_sensitive:
-          - trunc_float_argument2_sensitive:
-          - range_int_argument1:
-          - range_int_argument2:
-          - range_int_argument1_sensitive:
-          - range_int_argument2_sensitive:
-          - pos_int_argument1:
-          - pos_int_argument2:
-          - pos_int_argument1_sensitive:
-          - pos_int_argument2_sensitive:
-          - pos_float_argument1:
-          - pos_float_argument2:
-          - pos_float_argument1_sensitive:
-          - pos_float_argument2_sensitive:
-          - neg_int_argument1:
-          - neg_int_argument2:
-          - neg_int_argument1_sensitive:
-          - neg_int_argument2_sensitive:
-          - neg_float_argument1:
-          - neg_float_argument2:
-          - neg_float_argument1_sensitive:
-          - neg_float_argument2_sensitive:
-          - abs_int_argument1:
-          - abs_int_argument2:
-          - abs_int_argument1_sensitive:
-          - abs_int_argument2_sensitive:
-          - abs_float_argument1:
-          - abs_float_argument2:
-          - abs_float_argument1_sensitive:
-          - abs_float_argument2_sensitive:
-          - round_int_argument1:
-          - round_int_argument2:
-          - round_int_argument1_sensitive:
-          - round_int_argument2_sensitive:
-          - round_float_argument1:
-          - round_float_argument2:
-          - round_float_argument1_sensitive:
-          - round_float_argument2_sensitive:
-          - pow1_int_argument1:
-          - pow1_int_argument2:
-          - pow1_int_argument1_sensitive:
-          - pow1_int_argument2_sensitive:
-          - pow1_float_argument1:
-          - pow1_float_argument2:
-          - pow1_float_argument1_sensitive:
-          - pow1_float_argument2_sensitive:
-          - pow2_int_argument1:
-          - pow2_int_argument2:
-          - pow2_int_argument1_sensitive:
-          - pow2_int_argument2_sensitive:
-          - pow2_float_argument1:
-          - pow2_float_argument2:
-          - pow2_float_argument1_sensitive:
-          - pow2_float_argument2_sensitive:
-          - max_int_arguments:
-          - max_int_argument1_sensitive:
-          - max_int_argument2_sensitive:
-          - max_int_arguments_sensitive:
-          - max_float_arguments:
-          - max_float_argument1_sensitive:
-          - max_float_argument2_sensitive:
-          - max_float_arguments_sensitive:
-          - max_str_arguments:
-          - max_str_argument1_sensitive:
-          - max_str_argument2_sensitive:
-          - max_str_arguments_sensitive:
-          - min_int_arguments:
-          - min_int_argument1_sensitive:
-          - min_int_argument2_sensitive:
-          - min_int_arguments_sensitive:
-          - min_float_arguments:
-          - min_float_argument1_sensitive:
-          - min_float_argument2_sensitive:
-          - min_float_arguments_sensitive:
-          - min_str_arguments:
-          - min_str_argument1_sensitive:
-          - min_str_argument2_sensitive:
-          - min_str_arguments_sensitive:
-          - add1_int_arguments:
-          - add1_int_argument1_sensitive:
-          - add1_int_argument2_sensitive:
-          - add1_int_arguments_sensitive:
-          - add1_str_arguments:
-          - add1_str_argument1_sensitive:
-          - add1_str_argument2_sensitive:
-          - add1_str_arguments_sensitive:
-          - add1_float_arguments:
-          - add1_float_argument1_sensitive:
-          - add1_float_argument2_sensitive:
-          - add1_float_arguments_sensitive:
-          - add2_int_arguments:
-          - add2_int_argument1_sensitive:
-          - add2_int_argument2_sensitive:
-          - add2_int_arguments_sensitive:
-          - add2_str_arguments:
-          - add2_str_argument1_sensitive:
-          - add2_str_argument2_sensitive:
-          - add2_str_arguments_sensitive:
-          - add2_float_arguments:
-          - add2_float_argument1_sensitive:
-          - add2_float_argument2_sensitive:
-          - add2_float_arguments_sensitive:
-          - sub_int_arguments:
-          - sub_int_argument1_sensitive:
-          - sub_int_argument2_sensitive:
-          - sub_int_arguments_sensitive:
-          - sub_float_arguments:
-          - sub_float_argument1_sensitive:
-          - sub_float_argument2_sensitive:
-          - sub_float_arguments_sensitive:
-          - mul_int_arguments:
-          - mul_int_argument1_sensitive:
-          - mul_int_argument2_sensitive:
-          - mul_int_arguments_sensitive:
-          - mul_float_arguments:
-          - mul_float_argument1_sensitive:
-          - mul_float_argument2_sensitive:
-          - mul_float_arguments_sensitive:
-          - div_int_arguments:
-          - div_int_argument1_sensitive:
-          - div_int_argument2_sensitive:
-          - div_int_arguments_sensitive:
-          - div_float_arguments:
-          - div_float_argument1_sensitive:
-          - div_float_argument2_sensitive:
-          - div_float_arguments_sensitive:
-          - truediv_int_arguments:
-          - truediv_int_argument1_sensitive:
-          - truediv_int_argument2_sensitive:
-          - truediv_int_arguments_sensitive:
-          - truediv_float_arguments:
-          - truediv_float_argument1_sensitive:
-          - truediv_float_argument2_sensitive:
-          - truediv_float_arguments_sensitive:
-          - floordiv_int_arguments:
-          - floordiv_int_argument1_sensitive:
-          - floordiv_int_argument2_sensitive:
-          - floordiv_int_arguments_sensitive:
-          - floordiv_float_arguments:
-          - floordiv_float_argument1_sensitive:
-          - floordiv_float_argument2_sensitive:
-          - floordiv_float_arguments_sensitive:
-          - mod_int_arguments:
-          - mod_int_argument1_sensitive:
-          - mod_int_argument2_sensitive:
-          - mod_int_arguments_sensitive:
-          - mod_float_arguments:
-          - mod_float_argument1_sensitive:
-          - mod_float_argument2_sensitive:
-          - mod_float_arguments_sensitive:
-          - divmod_int_arguments:
-          - divmod_int_argument1_sensitive:
-          - divmod_int_argument2_sensitive:
-          - divmod_int_arguments_sensitive:
-          - divmod_float_arguments:
-          - divmod_float_argument1_sensitive:
-          - divmod_float_argument2_sensitive:
-          - divmod_float_arguments_sensitive:
-          - repr_int_argument1:
-          - repr_int_argument2:
-          - repr_int_argument1_sensitive:
-          - repr_int_argument2_sensitive:
-          - repr_float_argument1:
-          - repr_float_argument2:
-          - repr_float_argument1_sensitive:
-          - repr_float_argument2_sensitive:
-          - repr_str_argument1:
-          - repr_str_argument2:
-          - repr_str_argument1_sensitive:
-          - repr_str_argument2_sensitive:
-          - index_list_argument1:
-          - index_list_argument2:
-          - index_list_argument1_sensitive:
-          - index_list_argument2_sensitive:
-          - sorted_list_argument1:
-          - sorted_list_argument2:
-          - sorted_list_argument1_sensitive:
-          - sorted_list_argument2_sensitive:
-          - sum_list_argument1:
-          - sum_list_argument2:
-          - sum_list_argument1_sensitive:
-          - sum_list_argument2_sensitive:
-          - tuple_list_argument1:
-          - tuple_list_argument2:
-          - tuple_list_argument1_sensitive:
-          - tuple_list_argument2_sensitive:
-          - type_int_argument1:
-          - type_int_argument2:
-          - type_int_argument1_sensitive:
-          - type_int_argument2_sensitive:
-          - type_float_argument1:
-          - type_float_argument2:
-          - type_float_argument1_sensitive:
-          - type_float_argument2_sensitive:
-          - type_str_argument1:
-          - type_str_argument2:
-          - type_str_argument1_sensitive:
-          - type_str_argument2_sensitive:
-          - type_list_argument1:
-          - type_list_argument2:
-          - type_list_argument1_sensitive:
-          - type_list_argument2_sensitive:
+          - cmp_int_arguments
+          - cmp_int_argument1_sensitive
+          - cmp_int_argument2_sensitive
+          - cmp_int_arguments_sensitive
+          - cmp_str_arguments
+          - cmp_str_argument1_sensitive
+          - cmp_str_argument2_sensitive
+          - cmp_str_arguments_sensitive
+          - eq_int_arguments
+          - eq_int_argument1_sensitive
+          - eq_int_argument2_sensitive
+          - eq_int_arguments_sensitive
+          - eq_str_arguments
+          - eq_str_argument1_sensitive
+          - eq_str_argument2_sensitive
+          - eq_str_arguments_sensitive
+          - ne1_int_arguments
+          - ne1_int_argument1_sensitive
+          - ne1_int_argument2_sensitive
+          - ne1_int_arguments_sensitive
+          - ne1_str_arguments
+          - ne1_str_argument1_sensitive
+          - ne1_str_argument2_sensitive
+          - ne1_str_arguments_sensitive
+          - ne2_int_arguments
+          - ne2_int_argument1_sensitive
+          - ne2_int_argument2_sensitive
+          - ne2_int_arguments_sensitive
+          - ne2_str_arguments
+          - ne2_str_argument1_sensitive
+          - ne2_str_argument2_sensitive
+          - ne2_str_arguments_sensitive
+          - le_int_arguments
+          - le_int_argument1_sensitive
+          - le_int_argument2_sensitive
+          - le_int_arguments_sensitive
+          - le_str_arguments
+          - le_str_argument1_sensitive
+          - le_str_argument2_sensitive
+          - le_str_arguments_sensitive
+          - lt_int_arguments
+          - lt_int_argument1_sensitive
+          - lt_int_argument2_sensitive
+          - lt_int_arguments_sensitive
+          - lt_str_arguments
+          - lt_str_argument1_sensitive
+          - lt_str_argument2_sensitive
+          - lt_str_arguments_sensitive
+          - ge_int_arguments
+          - ge_int_argument1_sensitive
+          - ge_int_argument2_sensitive
+          - ge_int_arguments_sensitive
+          - ge_str_arguments
+          - ge_str_argument1_sensitive
+          - ge_str_argument2_sensitive
+          - ge_str_arguments_sensitive
+          - gt_int_arguments
+          - gt_int_argument1_sensitive
+          - gt_int_argument2_sensitive
+          - gt_int_arguments_sensitive
+          - gt_str_arguments
+          - gt_str_argument1_sensitive
+          - gt_str_argument2_sensitive
+          - gt_str_arguments_sensitive
+          - is_int_arguments
+          - is_int_argument1_sensitive
+          - is_int_argument2
+          - is_int_arguments_sensitive
+          - is_str_arguments
+          - is_str_argument1_sensitive
+          - is_str_argument2
+          - is_str_arguments_sensitive
+          - is_not_int_arguments
+          - is_not_int_argument1_sensitive
+          - is_not_int_argument2
+          - is_not_int_arguments_sensitive
+          - is_not_str_arguments
+          - is_not_str_argument1_sensitive
+          - is_not_str_argument2
+          - is_not_str_arguments_sensitive
+          - in_str_argument1
+          - in_str_argument2
+          - in_str_argument1_sensitive
+          - in_str_argument2_sensitive
+          - not_in_str_argument1
+          - not_in_str_argument2
+          - not_in_str_argument1_sensitive
+          - not_in_str_argument2_sensitive
+          - len_str_argument1
+          - len_str_argument2
+          - len_str_argument1_sensitive
+          - len_str_argument2_sensitive
+          - format1_int_arguments
+          - format1_int_argument1_sensitive
+          - format1_int_argument2_sensitive
+          - format1_int_arguments_sensitive
+          - format1_str_arguments
+          - format1_str_argument1_sensitive
+          - format1_str_argument2_sensitive
+          - format1_str_arguments_sensitive
+          - format2_int_arguments
+          - format2_int_argument1_sensitive
+          - format2_int_argument2_sensitive
+          - format2_int_arguments_sensitive
+          - format2_str_arguments
+          - format2_str_argument1_sensitive
+          - format2_str_argument2_sensitive
+          - format2_str_arguments_sensitive
+          - and_binary_arguments
+          - and_binary_argument1_sensitive
+          - and_binary_argument2_sensitive
+          - and_binary_arguments_sensitive
+          - or_binary_arguments
+          - or_binary_argument1_sensitive
+          - or_binary_argument2_sensitive
+          - or_binary_arguments_sensitive
+          - xor_binary_arguments
+          - xor_binary_argument1_sensitive
+          - xor_binary_argument2_sensitive
+          - xor_binary_arguments_sensitive
+          - not_binary_argument1
+          - not_binary_argument2
+          - not_binary_argument1_sensitive
+          - not_binary_argument2_sensitive
+          - lshift_binary_argument1
+          - lshift_binary_argument2
+          - lshift_binary_argument1_sensitive
+          - lshift_binary_argument2_sensitive
+          - rshift_binary_argument1
+          - rshift_binary_argument2
+          - rshift_binary_argument1_sensitive
+          - rshift_binary_argument2_sensitive
+          - hex_binary_argument1
+          - hex_binary_argument2
+          - hex_binary_argument1_sensitive
+          - hex_binary_argument2_sensitive
+          - oct_binary_argument1
+          - oct_binary_argument2
+          - oct_binary_argument1_sensitive
+          - oct_binary_argument2_sensitive
+          - int_float_argument1
+          - int_float_argument2
+          - int_float_argument1_sensitive
+          - int_float_argument2_sensitive
+          - long_float_argument1
+          - long_float_argument2
+          - long_float_argument1_sensitive
+          - long_float_argument2_sensitive
+          - float_int_argument1
+          - float_int_argument2
+          - float_int_argument1_sensitive
+          - float_int_argument2_sensitive
+          - chr_int_argument1
+          - chr_int_argument2
+          - chr_int_argument1_sensitive
+          - chr_int_argument2_sensitive
+          - unichr_int_argument1
+          - unichr_int_argument2
+          - unichr_int_argument1_sensitive
+          - unichr_int_argument2_sensitive
+          - bool_int_argument1
+          - bool_int_argument2
+          - bool_int_argument1_sensitive
+          - bool_int_argument2_sensitive
+          - str_int_argument1
+          - str_int_argument2
+          - str_int_argument1_sensitive
+          - str_int_argument2_sensitive
+          - str_float_argument1
+          - str_float_argument2
+          - str_float_argument1_sensitive
+          - str_float_argument2_sensitive
+          - unicode_int_argument1
+          - unicode_int_argument2
+          - unicode_int_argument1_sensitive
+          - unicode_int_argument2_sensitive
+          - unicode_float_argument1
+          - unicode_float_argument2
+          - unicode_float_argument1_sensitive
+          - unicode_float_argument2_sensitive
+          - unicode_str_argument1
+          - unicode_str_argument2
+          - unicode_str_argument1_sensitive
+          - unicode_str_argument2_sensitive
+          - trunc_float_argument1
+          - trunc_float_argument2
+          - trunc_float_argument1_sensitive
+          - trunc_float_argument2_sensitive
+          - range_int_argument1
+          - range_int_argument2
+          - range_int_argument1_sensitive
+          - range_int_argument2_sensitive
+          - pos_int_argument1
+          - pos_int_argument2
+          - pos_int_argument1_sensitive
+          - pos_int_argument2_sensitive
+          - pos_float_argument1
+          - pos_float_argument2
+          - pos_float_argument1_sensitive
+          - pos_float_argument2_sensitive
+          - neg_int_argument1
+          - neg_int_argument2
+          - neg_int_argument1_sensitive
+          - neg_int_argument2_sensitive
+          - neg_float_argument1
+          - neg_float_argument2
+          - neg_float_argument1_sensitive
+          - neg_float_argument2_sensitive
+          - abs_int_argument1
+          - abs_int_argument2
+          - abs_int_argument1_sensitive
+          - abs_int_argument2_sensitive
+          - abs_float_argument1
+          - abs_float_argument2
+          - abs_float_argument1_sensitive
+          - abs_float_argument2_sensitive
+          - round_int_argument1
+          - round_int_argument2
+          - round_int_argument1_sensitive
+          - round_int_argument2_sensitive
+          - round_float_argument1
+          - round_float_argument2
+          - round_float_argument1_sensitive
+          - round_float_argument2_sensitive
+          - pow1_int_argument1
+          - pow1_int_argument2
+          - pow1_int_argument1_sensitive
+          - pow1_int_argument2_sensitive
+          - pow1_float_argument1
+          - pow1_float_argument2
+          - pow1_float_argument1_sensitive
+          - pow1_float_argument2_sensitive
+          - pow2_int_argument1
+          - pow2_int_argument2
+          - pow2_int_argument1_sensitive
+          - pow2_int_argument2_sensitive
+          - pow2_float_argument1
+          - pow2_float_argument2
+          - pow2_float_argument1_sensitive
+          - pow2_float_argument2_sensitive
+          - max_int_arguments
+          - max_int_argument1_sensitive
+          - max_int_argument2_sensitive
+          - max_int_arguments_sensitive
+          - max_float_arguments
+          - max_float_argument1_sensitive
+          - max_float_argument2_sensitive
+          - max_float_arguments_sensitive
+          - max_str_arguments
+          - max_str_argument1_sensitive
+          - max_str_argument2_sensitive
+          - max_str_arguments_sensitive
+          - min_int_arguments
+          - min_int_argument1_sensitive
+          - min_int_argument2_sensitive
+          - min_int_arguments_sensitive
+          - min_float_arguments
+          - min_float_argument1_sensitive
+          - min_float_argument2_sensitive
+          - min_float_arguments_sensitive
+          - min_str_arguments
+          - min_str_argument1_sensitive
+          - min_str_argument2_sensitive
+          - min_str_arguments_sensitive
+          - add1_int_arguments
+          - add1_int_argument1_sensitive
+          - add1_int_argument2_sensitive
+          - add1_int_arguments_sensitive
+          - add1_str_arguments
+          - add1_str_argument1_sensitive
+          - add1_str_argument2_sensitive
+          - add1_str_arguments_sensitive
+          - add1_float_arguments
+          - add1_float_argument1_sensitive
+          - add1_float_argument2_sensitive
+          - add1_float_arguments_sensitive
+          - add2_int_arguments
+          - add2_int_argument1_sensitive
+          - add2_int_argument2_sensitive
+          - add2_int_arguments_sensitive
+          - add2_str_arguments
+          - add2_str_argument1_sensitive
+          - add2_str_argument2_sensitive
+          - add2_str_arguments_sensitive
+          - add2_float_arguments
+          - add2_float_argument1_sensitive
+          - add2_float_argument2_sensitive
+          - add2_float_arguments_sensitive
+          - sub_int_arguments
+          - sub_int_argument1_sensitive
+          - sub_int_argument2_sensitive
+          - sub_int_arguments_sensitive
+          - sub_float_arguments
+          - sub_float_argument1_sensitive
+          - sub_float_argument2_sensitive
+          - sub_float_arguments_sensitive
+          - mul_int_arguments
+          - mul_int_argument1_sensitive
+          - mul_int_argument2_sensitive
+          - mul_int_arguments_sensitive
+          - mul_float_arguments
+          - mul_float_argument1_sensitive
+          - mul_float_argument2_sensitive
+          - mul_float_arguments_sensitive
+          - div_int_arguments
+          - div_int_argument1_sensitive
+          - div_int_argument2_sensitive
+          - div_int_arguments_sensitive
+          - div_float_arguments
+          - div_float_argument1_sensitive
+          - div_float_argument2_sensitive
+          - div_float_arguments_sensitive
+          - truediv_int_arguments
+          - truediv_int_argument1_sensitive
+          - truediv_int_argument2_sensitive
+          - truediv_int_arguments_sensitive
+          - truediv_float_arguments
+          - truediv_float_argument1_sensitive
+          - truediv_float_argument2_sensitive
+          - truediv_float_arguments_sensitive
+          - floordiv_int_arguments
+          - floordiv_int_argument1_sensitive
+          - floordiv_int_argument2_sensitive
+          - floordiv_int_arguments_sensitive
+          - floordiv_float_arguments
+          - floordiv_float_argument1_sensitive
+          - floordiv_float_argument2_sensitive
+          - floordiv_float_arguments_sensitive
+          - mod_int_arguments
+          - mod_int_argument1_sensitive
+          - mod_int_argument2_sensitive
+          - mod_int_arguments_sensitive
+          - mod_float_arguments
+          - mod_float_argument1_sensitive
+          - mod_float_argument2_sensitive
+          - mod_float_arguments_sensitive
+          - divmod_int_argument1
+          - divmod_int_argument2
+          - divmod_int_argument1_sensitive
+          - divmod_int_argument2_sensitive
+          - divmod_float_argument1
+          - divmod_float_argument2
+          - divmod_float_argument1_sensitive
+          - divmod_float_argument2_sensitive
+          - repr_int_argument1
+          - repr_int_argument2
+          - repr_int_argument1_sensitive
+          - repr_int_argument2_sensitive
+          - repr_float_argument1
+          - repr_float_argument2
+          - repr_float_argument1_sensitive
+          - repr_float_argument2_sensitive
+          - repr_str_argument1
+          - repr_str_argument2
+          - repr_str_argument1_sensitive
+          - repr_str_argument2_sensitive
+          - index_list_argument1
+          - index_list_argument2
+          - index_list_argument1_sensitive
+          - index_list_argument2_sensitive
+          - sorted_list_argument1
+          - sorted_list_argument2
+          - sorted_list_argument1_sensitive
+          - sorted_list_argument2_sensitive
+          - sum_list_argument1
+          - sum_list_argument2
+          - sum_list_argument1_sensitive
+          - sum_list_argument2_sensitive
+          - tuple_list_argument1
+          - tuple_list_argument2
+          - tuple_list_argument1_sensitive
+          - tuple_list_argument2_sensitive
+          - type_int_argument1
+          - type_int_argument2
+          - type_int_argument1_sensitive
+          - type_int_argument2_sensitive
+          - type_float_argument1
+          - type_float_argument2
+          - type_float_argument1_sensitive
+          - type_float_argument2_sensitive
+          - type_str_argument1
+          - type_str_argument2
+          - type_str_argument1_sensitive
+          - type_str_argument2_sensitive
+          - type_list_argument1
+          - type_list_argument2
+          - type_list_argument1_sensitive
+          - type_list_argument2_sensitive
 
   outputs:
-    - cmp_int_arguments:
-    - cmp_int_argument1_sensitive:
-    - cmp_int_argument2_sensitive:
-    - cmp_int_arguments_sensitive:
-    - cmp_str_arguments:
-    - cmp_str_argument1_sensitive:
-    - cmp_str_argument2_sensitive:
-    - cmp_str_arguments_sensitive:
-    - eq_int_arguments:
-    - eq_int_argument1_sensitive:
-    - eq_int_argument2_sensitive:
-    - eq_int_arguments_sensitive:
-    - eq_str_arguments:
-    - eq_str_argument1_sensitive:
-    - eq_str_argument2_sensitive:
-    - eq_str_arguments_sensitive:
-    - ne1_int_arguments:
-    - ne1_int_argument1_sensitive:
-    - ne1_int_argument2_sensitive:
-    - ne1_int_arguments_sensitive:
-    - ne1_str_arguments:
-    - ne1_str_argument1_sensitive:
-    - ne1_str_argument2_sensitive:
-    - ne1_str_arguments_sensitive:
-    - ne2_int_arguments:
-    - ne2_int_argument1_sensitive:
-    - ne2_int_argument2_sensitive:
-    - ne2_int_arguments_sensitive:
-    - ne2_str_arguments:
-    - ne2_str_argument1_sensitive:
-    - ne2_str_argument2_sensitive:
-    - ne2_str_arguments_sensitive:
-    - le_int_arguments:
-    - le_int_argument1_sensitive:
-    - le_int_argument2_sensitive:
-    - le_int_arguments_sensitive:
-    - le_str_arguments:
-    - le_str_argument1_sensitive:
-    - le_str_argument2_sensitive:
-    - le_str_arguments_sensitive:
-    - lt_int_arguments:
-    - lt_int_argument1_sensitive:
-    - lt_int_argument2_sensitive:
-    - lt_int_arguments_sensitive:
-    - lt_str_arguments:
-    - lt_str_argument1_sensitive:
-    - lt_str_argument2_sensitive:
-    - lt_str_arguments_sensitive:
-    - ge_int_arguments:
-    - ge_int_argument1_sensitive:
-    - ge_int_argument2_sensitive:
-    - ge_int_arguments_sensitive:
-    - ge_str_arguments:
-    - ge_str_argument1_sensitive:
-    - ge_str_argument2_sensitive:
-    - ge_str_arguments_sensitive:
-    - gt_int_arguments:
-    - gt_int_argument1_sensitive:
-    - gt_int_argument2_sensitive:
-    - gt_int_arguments_sensitive:
-    - gt_str_arguments:
-    - gt_str_argument1_sensitive:
-    - gt_str_argument2_sensitive:
-    - gt_str_arguments_sensitive:
-    - is_int_arguments:
-    - is_int_argument1_sensitive:
-    - is_int_argument2_sensitive:
-    - is_int_arguments_sensitive:
-    - is_str_arguments:
-    - is_str_argument1_sensitive:
-    - is_str_argument2_sensitive:
-    - is_str_arguments_sensitive:
-    - is_not_int_arguments:
-    - is_not_int_argument1_sensitive:
-    - is_not_int_argument2_sensitive:
-    - is_not_int_arguments_sensitive:
-    - is_not_str_arguments:
-    - is_not_str_argument1_sensitive:
-    - is_not_str_argument2_sensitive:
-    - is_not_str_arguments_sensitive:
-    - in_str_argument1:
-    - in_str_argument2:
-    - in_str_argument1_sensitive:
-    - in_str_argument2_sensitive:
-    - not_in_str_argument1:
-    - not_in_str_argument2:
-    - not_in_str_argument1_sensitive:
-    - not_in_str_argument2_sensitive:
-    - len_str_argument1:
-    - len_str_argument2:
-    - len_str_argument1_sensitive:
-    - len_str_argument2_sensitive:
-    - format1_int_arguments:
-    - format1_int_argument1_sensitive:
-    - format1_int_argument2_sensitive:
-    - format1_int_arguments_sensitive:
-    - format1_str_arguments:
-    - format1_str_argument1_sensitive:
-    - format1_str_argument2_sensitive:
-    - format1_str_arguments_sensitive:
-    - format2_int_arguments:
-    - format2_int_argument1_sensitive:
-    - format2_int_argument2_sensitive:
-    - format2_int_arguments_sensitive:
-    - format2_str_arguments:
-    - format2_str_argument1_sensitive:
-    - format2_str_argument2_sensitive:
-    - format2_str_arguments_sensitive:
-    - and_binary_arguments:
-    - and_binary_argument1_sensitive:
-    - and_binary_argument2_sensitive:
-    - and_binary_arguments_sensitive:
-    - or_binary_arguments:
-    - or_binary_argument1_sensitive:
-    - or_binary_argument2_sensitive:
-    - or_binary_arguments_sensitive:
-    - xor_binary_arguments:
-    - xor_binary_argument1_sensitive:
-    - xor_binary_argument2_sensitive:
-    - xor_binary_arguments_sensitive:
-    - not_binary_argument1:
-    - not_binary_argument2:
-    - not_binary_argument1_sensitive:
-    - not_binary_argument2_sensitive:
-    - lshift_binary_argument1:
-    - lshift_binary_argument2:
-    - lshift_binary_argument1_sensitive:
-    - lshift_binary_argument2_sensitive:
-    - rshift_binary_argument1:
-    - rshift_binary_argument2:
-    - rshift_binary_argument1_sensitive:
-    - rshift_binary_argument2_sensitive:
-    - hex_binary_argument1:
-    - hex_binary_argument2:
-    - hex_binary_argument1_sensitive:
-    - hex_binary_argument2_sensitive:
-    - oct_binary_argument1:
-    - oct_binary_argument2:
-    - oct_binary_argument1_sensitive:
-    - oct_binary_argument2_sensitive:
-    - int_float_argument1:
-    - int_float_argument2:
-    - int_float_argument1_sensitive:
-    - int_float_argument2_sensitive:
-    - long_float_argument1:
-    - long_float_argument2:
-    - long_float_argument1_sensitive:
-    - long_float_argument2_sensitive:
-    - float_int_argument1:
-    - float_int_argument2:
-    - float_int_argument1_sensitive:
-    - float_int_argument2_sensitive:
-    - chr_int_argument1:
-    - chr_int_argument2:
-    - chr_int_argument1_sensitive:
-    - chr_int_argument2_sensitive:
-    - unichr_int_argument1:
-    - unichr_int_argument2:
-    - unichr_int_argument1_sensitive:
-    - unichr_int_argument2_sensitive:
-    - bool_int_argument1:
-    - bool_int_argument2:
-    - bool_int_argument1_sensitive:
-    - bool_int_argument2_sensitive:
-    - str_int_argument1:
-    - str_int_argument2:
-    - str_int_argument1_sensitive:
-    - str_int_argument2_sensitive:
-    - str_float_argument1:
-    - str_float_argument2:
-    - str_float_argument1_sensitive:
-    - str_float_argument2_sensitive:
-    - unicode_int_argument1:
-    - unicode_int_argument2:
-    - unicode_int_argument1_sensitive:
-    - unicode_int_argument2_sensitive:
-    - unicode_float_argument1:
-    - unicode_float_argument2:
-    - unicode_float_argument1_sensitive:
-    - unicode_float_argument2_sensitive:
-    - unicode_str_argument1:
-    - unicode_str_argument2:
-    - unicode_str_argument1_sensitive:
-    - unicode_str_argument2_sensitive:
-    - trunc_float_argument1:
-    - trunc_float_argument2:
-    - trunc_float_argument1_sensitive:
-    - trunc_float_argument2_sensitive:
-    - range_int_argument1:
-    - range_int_argument2:
-    - range_int_argument1_sensitive:
-    - range_int_argument2_sensitive:
-    - pos_int_argument1:
-    - pos_int_argument2:
-    - pos_int_argument1_sensitive:
-    - pos_int_argument2_sensitive:
-    - pos_float_argument1:
-    - pos_float_argument2:
-    - pos_float_argument1_sensitive:
-    - pos_float_argument2_sensitive:
-    - neg_int_argument1:
-    - neg_int_argument2:
-    - neg_int_argument1_sensitive:
-    - neg_int_argument2_sensitive:
-    - neg_float_argument1:
-    - neg_float_argument2:
-    - neg_float_argument1_sensitive:
-    - neg_float_argument2_sensitive:
-    - abs_int_argument1:
-    - abs_int_argument2:
-    - abs_int_argument1_sensitive:
-    - abs_int_argument2_sensitive:
-    - abs_float_argument1:
-    - abs_float_argument2:
-    - abs_float_argument1_sensitive:
-    - abs_float_argument2_sensitive:
-    - round_int_argument1:
-    - round_int_argument2:
-    - round_int_argument1_sensitive:
-    - round_int_argument2_sensitive:
-    - round_float_argument1:
-    - round_float_argument2:
-    - round_float_argument1_sensitive:
-    - round_float_argument2_sensitive:
-    - pow1_int_argument1:
-    - pow1_int_argument2:
-    - pow1_int_argument1_sensitive:
-    - pow1_int_argument2_sensitive:
-    - pow1_float_argument1:
-    - pow1_float_argument2:
-    - pow1_float_argument1_sensitive:
-    - pow1_float_argument2_sensitive:
-    - pow2_int_argument1:
-    - pow2_int_argument2:
-    - pow2_int_argument1_sensitive:
-    - pow2_int_argument2_sensitive:
-    - pow2_float_argument1:
-    - pow2_float_argument2:
-    - pow2_float_argument1_sensitive:
-    - pow2_float_argument2_sensitive:
-    - max_int_arguments:
-    - max_int_argument1_sensitive:
-    - max_int_argument2_sensitive:
-    - max_int_arguments_sensitive:
-    - max_float_arguments:
-    - max_float_argument1_sensitive:
-    - max_float_argument2_sensitive:
-    - max_float_arguments_sensitive:
-    - max_str_arguments:
-    - max_str_argument1_sensitive:
-    - max_str_argument2_sensitive:
-    - max_str_arguments_sensitive:
-    - min_int_arguments:
-    - min_int_argument1_sensitive:
-    - min_int_argument2_sensitive:
-    - min_int_arguments_sensitive:
-    - min_float_arguments:
-    - min_float_argument1_sensitive:
-    - min_float_argument2_sensitive:
-    - min_float_arguments_sensitive:
-    - min_str_arguments:
-    - min_str_argument1_sensitive:
-    - min_str_argument2_sensitive:
-    - min_str_arguments_sensitive:
-    - add1_int_arguments:
-    - add1_int_argument1_sensitive:
-    - add1_int_argument2_sensitive:
-    - add1_int_arguments_sensitive:
-    - add1_str_arguments:
-    - add1_str_argument1_sensitive:
-    - add1_str_argument2_sensitive:
-    - add1_str_arguments_sensitive:
-    - add1_float_arguments:
-    - add1_float_argument1_sensitive:
-    - add1_float_argument2_sensitive:
-    - add1_float_arguments_sensitive:
-    - add2_int_arguments:
-    - add2_int_argument1_sensitive:
-    - add2_int_argument2_sensitive:
-    - add2_int_arguments_sensitive:
-    - add2_str_arguments:
-    - add2_str_argument1_sensitive:
-    - add2_str_argument2_sensitive:
-    - add2_str_arguments_sensitive:
-    - add2_float_arguments:
-    - add2_float_argument1_sensitive:
-    - add2_float_argument2_sensitive:
-    - add2_float_arguments_sensitive:
-    - sub_int_arguments:
-    - sub_int_argument1_sensitive:
-    - sub_int_argument2_sensitive:
-    - sub_int_arguments_sensitive:
-    - sub_float_arguments:
-    - sub_float_argument1_sensitive:
-    - sub_float_argument2_sensitive:
-    - sub_float_arguments_sensitive:
-    - mul_int_arguments:
-    - mul_int_argument1_sensitive:
-    - mul_int_argument2_sensitive:
-    - mul_int_arguments_sensitive:
-    - mul_float_arguments:
-    - mul_float_argument1_sensitive:
-    - mul_float_argument2_sensitive:
-    - mul_float_arguments_sensitive:
-    - div_int_arguments:
-    - div_int_argument1_sensitive:
-    - div_int_argument2_sensitive:
-    - div_int_arguments_sensitive:
-    - div_float_arguments:
-    - div_float_argument1_sensitive:
-    - div_float_argument2_sensitive:
-    - div_float_arguments_sensitive:
-    - truediv_int_arguments:
-    - truediv_int_argument1_sensitive:
-    - truediv_int_argument2_sensitive:
-    - truediv_int_arguments_sensitive:
-    - truediv_float_arguments:
-    - truediv_float_argument1_sensitive:
-    - truediv_float_argument2_sensitive:
-    - truediv_float_arguments_sensitive:
-    - floordiv_int_arguments:
-    - floordiv_int_argument1_sensitive:
-    - floordiv_int_argument2_sensitive:
-    - floordiv_int_arguments_sensitive:
-    - floordiv_float_arguments:
-    - floordiv_float_argument1_sensitive:
-    - floordiv_float_argument2_sensitive:
-    - floordiv_float_arguments_sensitive:
-    - mod_int_arguments:
-    - mod_int_argument1_sensitive:
-    - mod_int_argument2_sensitive:
-    - mod_int_arguments_sensitive:
-    - mod_float_arguments:
-    - mod_float_argument1_sensitive:
-    - mod_float_argument2_sensitive:
-    - mod_float_arguments_sensitive:
-    - divmod_int_arguments:
-    - divmod_int_argument1_sensitive:
-    - divmod_int_argument2_sensitive:
-    - divmod_int_arguments_sensitive:
-    - divmod_float_arguments:
-    - divmod_float_argument1_sensitive:
-    - divmod_float_argument2_sensitive:
-    - divmod_float_arguments_sensitive:
-    - repr_int_argument1:
-    - repr_int_argument2:
-    - repr_int_argument1_sensitive:
-    - repr_int_argument2_sensitive:
-    - repr_float_argument1:
-    - repr_float_argument2:
-    - repr_float_argument1_sensitive:
-    - repr_float_argument2_sensitive:
-    - repr_str_argument1:
-    - repr_str_argument2:
-    - repr_str_argument1_sensitive:
-    - repr_str_argument2_sensitive:
-    - index_list_argument1:
-    - index_list_argument2:
-    - index_list_argument1_sensitive:
-    - index_list_argument2_sensitive:
-    - sorted_list_argument1:
-    - sorted_list_argument2:
-    - sorted_list_argument1_sensitive:
-    - sorted_list_argument2_sensitive:
-    - sum_list_argument1:
-    - sum_list_argument2:
-    - sum_list_argument1_sensitive:
-    - sum_list_argument2_sensitive:
-    - tuple_list_argument1:
-    - tuple_list_argument2:
-    - tuple_list_argument1_sensitive:
-    - tuple_list_argument2_sensitive:
-    - type_int_argument1:
-    - type_int_argument2:
-    - type_int_argument1_sensitive:
-    - type_int_argument2_sensitive:
-    - type_float_argument1:
-    - type_float_argument2:
-    - type_float_argument1_sensitive:
-    - type_float_argument2_sensitive:
-    - type_str_argument1:
-    - type_str_argument2:
-    - type_str_argument1_sensitive:
-    - type_str_argument2_sensitive:
-    - type_list_argument1:
-    - type_list_argument2:
-    - type_list_argument1_sensitive:
-    - type_list_argument2_sensitive:
+    - cmp_int_arguments
+    - cmp_int_argument1_sensitive
+    - cmp_int_argument2_sensitive
+    - cmp_int_arguments_sensitive
+    - cmp_str_arguments
+    - cmp_str_argument1_sensitive
+    - cmp_str_argument2_sensitive
+    - cmp_str_arguments_sensitive
+    - eq_int_arguments
+    - eq_int_argument1_sensitive
+    - eq_int_argument2_sensitive
+    - eq_int_arguments_sensitive
+    - eq_str_arguments
+    - eq_str_argument1_sensitive
+    - eq_str_argument2_sensitive
+    - eq_str_arguments_sensitive
+    - ne1_int_arguments
+    - ne1_int_argument1_sensitive
+    - ne1_int_argument2_sensitive
+    - ne1_int_arguments_sensitive
+    - ne1_str_arguments
+    - ne1_str_argument1_sensitive
+    - ne1_str_argument2_sensitive
+    - ne1_str_arguments_sensitive
+    - ne2_int_arguments
+    - ne2_int_argument1_sensitive
+    - ne2_int_argument2_sensitive
+    - ne2_int_arguments_sensitive
+    - ne2_str_arguments
+    - ne2_str_argument1_sensitive
+    - ne2_str_argument2_sensitive
+    - ne2_str_arguments_sensitive
+    - le_int_arguments
+    - le_int_argument1_sensitive
+    - le_int_argument2_sensitive
+    - le_int_arguments_sensitive
+    - le_str_arguments
+    - le_str_argument1_sensitive
+    - le_str_argument2_sensitive
+    - le_str_arguments_sensitive
+    - lt_int_arguments
+    - lt_int_argument1_sensitive
+    - lt_int_argument2_sensitive
+    - lt_int_arguments_sensitive
+    - lt_str_arguments
+    - lt_str_argument1_sensitive
+    - lt_str_argument2_sensitive
+    - lt_str_arguments_sensitive
+    - ge_int_arguments
+    - ge_int_argument1_sensitive
+    - ge_int_argument2_sensitive
+    - ge_int_arguments_sensitive
+    - ge_str_arguments
+    - ge_str_argument1_sensitive
+    - ge_str_argument2_sensitive
+    - ge_str_arguments_sensitive
+    - gt_int_arguments
+    - gt_int_argument1_sensitive
+    - gt_int_argument2_sensitive
+    - gt_int_arguments_sensitive
+    - gt_str_arguments
+    - gt_str_argument1_sensitive
+    - gt_str_argument2_sensitive
+    - gt_str_arguments_sensitive
+    - is_int_arguments
+    - is_int_argument1_sensitive
+    - is_int_argument2
+    - is_int_arguments_sensitive
+    - is_str_arguments
+    - is_str_argument1_sensitive
+    - is_str_argument2
+    - is_str_arguments_sensitive
+    - is_not_int_arguments
+    - is_not_int_argument1_sensitive
+    - is_not_int_argument2
+    - is_not_int_arguments_sensitive
+    - is_not_str_arguments
+    - is_not_str_argument1_sensitive
+    - is_not_str_argument2
+    - is_not_str_arguments_sensitive
+    - in_str_argument1
+    - in_str_argument2
+    - in_str_argument1_sensitive
+    - in_str_argument2_sensitive
+    - not_in_str_argument1
+    - not_in_str_argument2
+    - not_in_str_argument1_sensitive
+    - not_in_str_argument2_sensitive
+    - len_str_argument1
+    - len_str_argument2
+    - len_str_argument1_sensitive
+    - len_str_argument2_sensitive
+    - format1_int_arguments
+    - format1_int_argument1_sensitive
+    - format1_int_argument2_sensitive
+    - format1_int_arguments_sensitive
+    - format1_str_arguments
+    - format1_str_argument1_sensitive
+    - format1_str_argument2_sensitive
+    - format1_str_arguments_sensitive
+    - format2_int_arguments
+    - format2_int_argument1_sensitive
+    - format2_int_argument2_sensitive
+    - format2_int_arguments_sensitive
+    - format2_str_arguments
+    - format2_str_argument1_sensitive
+    - format2_str_argument2_sensitive
+    - format2_str_arguments_sensitive
+    - and_binary_arguments
+    - and_binary_argument1_sensitive
+    - and_binary_argument2_sensitive
+    - and_binary_arguments_sensitive
+    - or_binary_arguments
+    - or_binary_argument1_sensitive
+    - or_binary_argument2_sensitive
+    - or_binary_arguments_sensitive
+    - xor_binary_arguments
+    - xor_binary_argument1_sensitive
+    - xor_binary_argument2_sensitive
+    - xor_binary_arguments_sensitive
+    - not_binary_argument1
+    - not_binary_argument2
+    - not_binary_argument1_sensitive
+    - not_binary_argument2_sensitive
+    - lshift_binary_argument1
+    - lshift_binary_argument2
+    - lshift_binary_argument1_sensitive
+    - lshift_binary_argument2_sensitive
+    - rshift_binary_argument1
+    - rshift_binary_argument2
+    - rshift_binary_argument1_sensitive
+    - rshift_binary_argument2_sensitive
+    - hex_binary_argument1
+    - hex_binary_argument2
+    - hex_binary_argument1_sensitive
+    - hex_binary_argument2_sensitive
+    - oct_binary_argument1
+    - oct_binary_argument2
+    - oct_binary_argument1_sensitive
+    - oct_binary_argument2_sensitive
+    - int_float_argument1
+    - int_float_argument2
+    - int_float_argument1_sensitive
+    - int_float_argument2_sensitive
+    - long_float_argument1
+    - long_float_argument2
+    - long_float_argument1_sensitive
+    - long_float_argument2_sensitive
+    - float_int_argument1
+    - float_int_argument2
+    - float_int_argument1_sensitive
+    - float_int_argument2_sensitive
+    - chr_int_argument1
+    - chr_int_argument2
+    - chr_int_argument1_sensitive
+    - chr_int_argument2_sensitive
+    - unichr_int_argument1
+    - unichr_int_argument2
+    - unichr_int_argument1_sensitive
+    - unichr_int_argument2_sensitive
+    - bool_int_argument1
+    - bool_int_argument2
+    - bool_int_argument1_sensitive
+    - bool_int_argument2_sensitive
+    - str_int_argument1
+    - str_int_argument2
+    - str_int_argument1_sensitive
+    - str_int_argument2_sensitive
+    - str_float_argument1
+    - str_float_argument2
+    - str_float_argument1_sensitive
+    - str_float_argument2_sensitive
+    - unicode_int_argument1
+    - unicode_int_argument2
+    - unicode_int_argument1_sensitive
+    - unicode_int_argument2_sensitive
+    - unicode_float_argument1
+    - unicode_float_argument2
+    - unicode_float_argument1_sensitive
+    - unicode_float_argument2_sensitive
+    - unicode_str_argument1
+    - unicode_str_argument2
+    - unicode_str_argument1_sensitive
+    - unicode_str_argument2_sensitive
+    - trunc_float_argument1
+    - trunc_float_argument2
+    - trunc_float_argument1_sensitive
+    - trunc_float_argument2_sensitive
+    - range_int_argument1
+    - range_int_argument2
+    - range_int_argument1_sensitive
+    - range_int_argument2_sensitive
+    - pos_int_argument1
+    - pos_int_argument2
+    - pos_int_argument1_sensitive
+    - pos_int_argument2_sensitive
+    - pos_float_argument1
+    - pos_float_argument2
+    - pos_float_argument1_sensitive
+    - pos_float_argument2_sensitive
+    - neg_int_argument1
+    - neg_int_argument2
+    - neg_int_argument1_sensitive
+    - neg_int_argument2_sensitive
+    - neg_float_argument1
+    - neg_float_argument2
+    - neg_float_argument1_sensitive
+    - neg_float_argument2_sensitive
+    - abs_int_argument1
+    - abs_int_argument2
+    - abs_int_argument1_sensitive
+    - abs_int_argument2_sensitive
+    - abs_float_argument1
+    - abs_float_argument2
+    - abs_float_argument1_sensitive
+    - abs_float_argument2_sensitive
+    - round_int_argument1
+    - round_int_argument2
+    - round_int_argument1_sensitive
+    - round_int_argument2_sensitive
+    - round_float_argument1
+    - round_float_argument2
+    - round_float_argument1_sensitive
+    - round_float_argument2_sensitive
+    - pow1_int_argument1
+    - pow1_int_argument2
+    - pow1_int_argument1_sensitive
+    - pow1_int_argument2_sensitive
+    - pow1_float_argument1
+    - pow1_float_argument2
+    - pow1_float_argument1_sensitive
+    - pow1_float_argument2_sensitive
+    - pow2_int_argument1
+    - pow2_int_argument2
+    - pow2_int_argument1_sensitive
+    - pow2_int_argument2_sensitive
+    - pow2_float_argument1
+    - pow2_float_argument2
+    - pow2_float_argument1_sensitive
+    - pow2_float_argument2_sensitive
+    - max_int_arguments
+    - max_int_argument1_sensitive
+    - max_int_argument2_sensitive
+    - max_int_arguments_sensitive
+    - max_float_arguments
+    - max_float_argument1_sensitive
+    - max_float_argument2_sensitive
+    - max_float_arguments_sensitive
+    - max_str_arguments
+    - max_str_argument1_sensitive
+    - max_str_argument2_sensitive
+    - max_str_arguments_sensitive
+    - min_int_arguments
+    - min_int_argument1_sensitive
+    - min_int_argument2_sensitive
+    - min_int_arguments_sensitive
+    - min_float_arguments
+    - min_float_argument1_sensitive
+    - min_float_argument2_sensitive
+    - min_float_arguments_sensitive
+    - min_str_arguments
+    - min_str_argument1_sensitive
+    - min_str_argument2_sensitive
+    - min_str_arguments_sensitive
+    - add1_int_arguments
+    - add1_int_argument1_sensitive
+    - add1_int_argument2_sensitive
+    - add1_int_arguments_sensitive
+    - add1_str_arguments
+    - add1_str_argument1_sensitive
+    - add1_str_argument2_sensitive
+    - add1_str_arguments_sensitive
+    - add1_float_arguments
+    - add1_float_argument1_sensitive
+    - add1_float_argument2_sensitive
+    - add1_float_arguments_sensitive
+    - add2_int_arguments
+    - add2_int_argument1_sensitive
+    - add2_int_argument2_sensitive
+    - add2_int_arguments_sensitive
+    - add2_str_arguments
+    - add2_str_argument1_sensitive
+    - add2_str_argument2_sensitive
+    - add2_str_arguments_sensitive
+    - add2_float_arguments
+    - add2_float_argument1_sensitive
+    - add2_float_argument2_sensitive
+    - add2_float_arguments_sensitive
+    - sub_int_arguments
+    - sub_int_argument1_sensitive
+    - sub_int_argument2_sensitive
+    - sub_int_arguments_sensitive
+    - sub_float_arguments
+    - sub_float_argument1_sensitive
+    - sub_float_argument2_sensitive
+    - sub_float_arguments_sensitive
+    - mul_int_arguments
+    - mul_int_argument1_sensitive
+    - mul_int_argument2_sensitive
+    - mul_int_arguments_sensitive
+    - mul_float_arguments
+    - mul_float_argument1_sensitive
+    - mul_float_argument2_sensitive
+    - mul_float_arguments_sensitive
+    - div_int_arguments
+    - div_int_argument1_sensitive
+    - div_int_argument2_sensitive
+    - div_int_arguments_sensitive
+    - div_float_arguments
+    - div_float_argument1_sensitive
+    - div_float_argument2_sensitive
+    - div_float_arguments_sensitive
+    - truediv_int_arguments
+    - truediv_int_argument1_sensitive
+    - truediv_int_argument2_sensitive
+    - truediv_int_arguments_sensitive
+    - truediv_float_arguments
+    - truediv_float_argument1_sensitive
+    - truediv_float_argument2_sensitive
+    - truediv_float_arguments_sensitive
+    - floordiv_int_arguments
+    - floordiv_int_argument1_sensitive
+    - floordiv_int_argument2_sensitive
+    - floordiv_int_arguments_sensitive
+    - floordiv_float_arguments
+    - floordiv_float_argument1_sensitive
+    - floordiv_float_argument2_sensitive
+    - floordiv_float_arguments_sensitive
+    - mod_int_arguments
+    - mod_int_argument1_sensitive
+    - mod_int_argument2_sensitive
+    - mod_int_arguments_sensitive
+    - mod_float_arguments
+    - mod_float_argument1_sensitive
+    - mod_float_argument2_sensitive
+    - mod_float_arguments_sensitive
+    - divmod_int_argument1
+    - divmod_int_argument2
+    - divmod_int_argument1_sensitive
+    - divmod_int_argument2_sensitive
+    - divmod_float_argument1
+    - divmod_float_argument2
+    - divmod_float_argument1_sensitive
+    - divmod_float_argument2_sensitive
+    - repr_int_argument1
+    - repr_int_argument2
+    - repr_int_argument1_sensitive
+    - repr_int_argument2_sensitive
+    - repr_float_argument1
+    - repr_float_argument2
+    - repr_float_argument1_sensitive
+    - repr_float_argument2_sensitive
+    - repr_str_argument1
+    - repr_str_argument2
+    - repr_str_argument1_sensitive
+    - repr_str_argument2_sensitive
+    - index_list_argument1
+    - index_list_argument2
+    - index_list_argument1_sensitive
+    - index_list_argument2_sensitive
+    - sorted_list_argument1
+    - sorted_list_argument2
+    - sorted_list_argument1_sensitive
+    - sorted_list_argument2_sensitive
+    - sum_list_argument1
+    - sum_list_argument2
+    - sum_list_argument1_sensitive
+    - sum_list_argument2_sensitive
+    - tuple_list_argument1
+    - tuple_list_argument2
+    - tuple_list_argument1_sensitive
+    - tuple_list_argument2_sensitive
+    - type_int_argument1
+    - type_int_argument2
+    - type_int_argument1_sensitive
+    - type_int_argument2_sensitive
+    - type_float_argument1
+    - type_float_argument2
+    - type_float_argument1_sensitive
+    - type_float_argument2_sensitive
+    - type_str_argument1
+    - type_str_argument2
+    - type_str_argument1_sensitive
+    - type_str_argument2_sensitive
+    - type_list_argument1
+    - type_list_argument2
+    - type_list_argument1_sensitive
+    - type_list_argument2_sensitive
 
   results:
     - SUCCESS

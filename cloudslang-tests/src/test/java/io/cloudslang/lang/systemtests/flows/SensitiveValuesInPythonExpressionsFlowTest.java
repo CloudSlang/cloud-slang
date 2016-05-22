@@ -16,7 +16,6 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.ValueSyntaxParent;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.URI;
@@ -31,7 +30,6 @@ import java.util.Set;
 public class SensitiveValuesInPythonExpressionsFlowTest extends ValueSyntaxParent {
 
     @Test
-    @Ignore
     public void testValues() throws Exception {
         // compile
         URI resource = getClass().getResource("/yaml/formats/sensitive_values_in_python_expressions_flow.sl").toURI();

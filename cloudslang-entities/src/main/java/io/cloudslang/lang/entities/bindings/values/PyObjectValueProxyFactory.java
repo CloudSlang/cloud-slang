@@ -2,6 +2,7 @@ package io.cloudslang.lang.entities.bindings.values;
 
 import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
+import javassist.util.proxy.Proxy;
 import javassist.util.proxy.ProxyFactory;
 import org.apache.commons.lang.ClassUtils;
 import org.python.core.Py;
@@ -12,6 +13,11 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * PyObjectValue proxy factory
@@ -20,23 +26,74 @@ import java.lang.reflect.Modifier;
  */
 public class PyObjectValueProxyFactory {
 
-    @SuppressWarnings("unchecked")
+    private final static ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private final static Lock writeLock = readWriteLock.writeLock();
+
+    private static ConcurrentMap<String, PyObjectValueProxyClass> proxyClasses = new ConcurrentHashMap<>();
+
     public static PyObjectValue create(Serializable content, boolean sensitive) {
         PyObject pyObject = Py.java2py(content);
         try {
-            ProxyFactory factory = new ProxyFactory();
-            factory.setSuperclass(pyObject.getClass());
-            factory.setInterfaces(new Class[]{PyObjectValue.class});
-            factory.setFilter(new PyObjectValueMethodFilter());
-            PyObjectConstructor constructor = getConstructor(pyObject);
-            MethodHandler methodHandler = new PyObjectValueMethodHandler(content, sensitive, pyObject);
-            return (PyObjectValue) factory.create(constructor.constructor.getParameterTypes(), constructor.params, methodHandler);
+            PyObjectValueProxyClass proxyClass = getProxyClass(pyObject);
+            PyObjectValue pyObjectValue = (PyObjectValue)proxyClass.getConstructor().newInstance(proxyClass.getParams());
+            ((Proxy)pyObjectValue).setHandler(new PyObjectValueMethodHandler(content, sensitive, pyObject));
+            return pyObjectValue;
         } catch (Exception e) {
             // ToDo remove
             System.out.println("\nError in PyObjectValueProxyFactory\n");
             e.printStackTrace();
 
             throw new RuntimeException("Failed to create a proxy to new instance for PyObjectValue and " + pyObject.getClass().getSimpleName(), e);
+        }
+    }
+
+    private static PyObjectValueProxyClass getProxyClass(PyObject pyObject) throws Exception {
+        String proxyClassName = pyObject.getClass() + "Value";
+        PyObjectValueProxyClass proxyClass = proxyClasses.get(proxyClassName);
+        if (proxyClass == null) {
+            writeLock.lock();
+            try {
+                proxyClass = proxyClasses.get(proxyClassName);
+                if (proxyClass == null) {
+                    ProxyFactory factory = new ProxyFactory();
+                    factory.setSuperclass(pyObject.getClass());
+                    factory.setInterfaces(new Class[]{PyObjectValue.class});
+                    factory.setFilter(new PyObjectValueMethodFilter());
+                    proxyClasses.putIfAbsent(proxyClassName, createProxyClass(factory.createClass(), pyObject));
+                    proxyClass = proxyClasses.get(proxyClassName);
+                }
+            } finally {
+                writeLock.unlock();
+            }
+        }
+        return proxyClass;
+    }
+    private static PyObjectValueProxyClass createProxyClass(Class proxyClass, PyObject pyObject) throws Exception {
+        Constructor<?> constructor = proxyClass.getConstructors()[0];
+        for (Constructor<?> con : proxyClass.getConstructors()) {
+            if (con.getParameterCount() < constructor.getParameterCount()) {
+                constructor = con;
+            }
+        }
+        Object[] params = new Object[constructor.getParameterCount()];
+        for (int index = 0; index < constructor.getParameterCount(); index++) {
+            Class<?> parameterType = constructor.getParameterTypes()[index];
+            params[index] = parameterType.equals(PyType.class) ? pyObject.getType() :
+                    !parameterType.isPrimitive() ? null : getPrimitiveTypeDefaultValue(parameterType);
+        }
+        return new PyObjectValueProxyClass(proxyClass, constructor, params);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Object getPrimitiveTypeDefaultValue(Class<?> parameterType) throws Exception {
+        return ClassUtils.primitiveToWrapper(parameterType).getConstructor(String.class).newInstance("0");
+    }
+
+    private static class PyObjectValueMethodFilter implements MethodFilter {
+
+        @Override
+        public boolean isHandled(Method method) {
+            return Modifier.isPublic(method.getModifiers());
         }
     }
 
@@ -70,51 +127,6 @@ public class PyObjectValueProxyFactory {
             } else {
                 throw new RuntimeException("Failed to invoke PyObjectValue method. Implementing class not found");
             }
-        }
-    }
-
-    private static class PyObjectValueMethodFilter implements MethodFilter {
-
-        @Override
-        public boolean isHandled(Method method) {
-            return Modifier.isPublic(method.getModifiers());
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static PyObjectConstructor getConstructor(PyObject pyObject) {
-        try {
-            PyObjectConstructor pyObjectConstructor = new PyObjectConstructor(PyObject.class.getConstructor(), new Object[]{});
-            if (pyObject.getClass().getConstructors().length > 0) {
-                Constructor constructor = pyObject.getClass().getConstructors()[0];
-                for (Constructor<?> con : pyObject.getClass().getConstructors()) {
-                    if (con.getParameterCount() < constructor.getParameterCount()) {
-                        constructor = con;
-                    }
-                }
-                Object[] params = new Object[constructor.getParameterCount()];
-                for (int index = 0; index < constructor.getParameterCount(); index++) {
-                    Class<?> parameterType = constructor.getParameterTypes()[index];
-                    params[index] = parameterType.equals(PyType.class) ? pyObject.getType() :
-                            !parameterType.isPrimitive() ? null : ClassUtils.primitiveToWrapper(parameterType).getConstructor(String.class).newInstance("0");
-                }
-                pyObjectConstructor = new PyObjectConstructor(constructor, params);
-            }
-            return pyObjectConstructor;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get PyObject constructor", e);
-        }
-
-    }
-
-    private static class PyObjectConstructor {
-
-        Constructor<?> constructor;
-        Object[] params;
-
-        public PyObjectConstructor(Constructor<?> constructor, Object[] params) {
-            this.constructor = constructor;
-            this.params = params;
         }
     }
 }
