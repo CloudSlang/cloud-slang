@@ -113,7 +113,7 @@ public class PyObjectValueProxyFactory {
         public Object invoke(Object self, Method thisMethod, Method proceed, Object[] args) throws Throwable {
             if (thisMethod.getName().equals("isAccessed")) {
                 return accessed;
-            } else if (thisMethod.getDeclaringClass().isAssignableFrom(Value.class)) {
+            } else if (Value.class.isAssignableFrom(thisMethod.getDeclaringClass())) {
                 Method valueMethod = value.getClass().getMethod(thisMethod.getName(), thisMethod.getParameterTypes());
                 return valueMethod.invoke(value, args);
             } else if (PyObject.class.isAssignableFrom(thisMethod.getDeclaringClass())) {
