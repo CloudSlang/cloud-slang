@@ -64,7 +64,8 @@ import static org.mockito.Mockito.*;
 @ContextConfiguration(classes = ParallelLoopStepsTest.Config.class)
 public class ParallelLoopStepsTest {
 
-    public static final String BRANCH_EXCEPTION_MESSAGE = "Exception details placeholder";
+    private static final String BRANCH_EXCEPTION_MESSAGE = "Exception details placeholder";
+    private static final String SUCCESS_RESULT = "SUCCESS";
 
     @Autowired
     private ParallelLoopExecutionData parallelLoopSteps;
@@ -184,7 +185,7 @@ public class ParallelLoopStepsTest {
     }
 
     @Test
-    public void testJoinBranchesAggregateContexts() throws Exception {
+    public void testJoinBranchesPublish() throws Exception {
         // prepare arguments
         RunEnvironment runEnvironment = new RunEnvironment();
         runEnvironment.getExecutionPath().down();
@@ -192,7 +193,7 @@ public class ParallelLoopStepsTest {
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
+        List<Output> stepPublishValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
 
         Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, ScoreLangConstants.SUCCESS_RESULT);
@@ -207,8 +208,11 @@ public class ParallelLoopStepsTest {
         Map<String, Serializable> runtimeContext2 = new HashMap<>();
         Map<String, Serializable> runtimeContext3 = new HashMap<>();
         runtimeContext1.put("branch1Output", 1);
+        runtimeContext1.put(ScoreLangConstants.BRANCH_RESULT_KEY, SUCCESS_RESULT);
         runtimeContext2.put("branch2Output", 2);
+        runtimeContext2.put(ScoreLangConstants.BRANCH_RESULT_KEY, SUCCESS_RESULT);
         runtimeContext3.put("branch3Output", 3);
+        runtimeContext3.put(ScoreLangConstants.BRANCH_RESULT_KEY, SUCCESS_RESULT);
 
         ExecutionRuntimeServices executionRuntimeServices = createAndConfigureExecutionRuntimeServicesMock(
                 runtimeContext1,
@@ -220,7 +224,7 @@ public class ParallelLoopStepsTest {
         parallelLoopSteps.joinBranches(
                 runEnvironment,
                 executionRuntimeServices,
-                stepAggregateValues,
+                stepPublishValues,
                 stepNavigationValues,
                 nodeName
         );
@@ -231,7 +235,7 @@ public class ParallelLoopStepsTest {
                 eq(context.getImmutableViewOfVariables()),
                 aggregateContextArgumentCaptor.capture(),
                 eq(runEnvironment.getSystemProperties()),
-                eq(stepAggregateValues)
+                eq(stepPublishValues)
         );
 
         @SuppressWarnings("unchecked")
@@ -254,7 +258,7 @@ public class ParallelLoopStepsTest {
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
+        List<Output> stepPublishValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
 
         Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, "CUSTOM_SUCCESS");
@@ -282,7 +286,7 @@ public class ParallelLoopStepsTest {
         parallelLoopSteps.joinBranches(
                 runEnvironment,
                 executionRuntimeServices,
-                stepAggregateValues,
+                stepPublishValues,
                 stepNavigationValues,
                 nodeName
         );
@@ -304,7 +308,7 @@ public class ParallelLoopStepsTest {
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
+        List<Output> stepPublishValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
 
         Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, "CUSTOM_SUCCESS");
@@ -338,7 +342,7 @@ public class ParallelLoopStepsTest {
         parallelLoopSteps.joinBranches(
                 runEnvironment,
                 executionRuntimeServices,
-                stepAggregateValues,
+                stepPublishValues,
                 stepNavigationValues,
                 nodeName
         );
@@ -360,7 +364,7 @@ public class ParallelLoopStepsTest {
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> stepAggregateValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
+        List<Output> stepPublishValues = Lists.newArrayList(new Output("outputName", "outputExpression"));
 
         Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, ScoreLangConstants.SUCCESS_RESULT);
@@ -388,7 +392,7 @@ public class ParallelLoopStepsTest {
         parallelLoopSteps.joinBranches(
                 runEnvironment,
                 executionRuntimeServices,
-                stepAggregateValues,
+                stepPublishValues,
                 stepNavigationValues,
                 nodeName
         );

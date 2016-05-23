@@ -308,12 +308,12 @@ public class StepExecutionDataTest {
                 createRuntimeServices(), 1L, new ArrayList<String>(), "step1", true);
 
         Assert.assertEquals(
-                "next step position should be null for async endStep method",
+                "next step position should be null for parallel loop endStep method",
                 null,
                 runEnv.removeNextStepPosition()
         );
         Assert.assertEquals(
-                "executable result should be returned in async endStep method",
+                "executable result should be returned in parallel loop endStep method",
                 ScoreLangConstants.SUCCESS_RESULT,
                 runEnv.removeReturnValues().getResult()
         );

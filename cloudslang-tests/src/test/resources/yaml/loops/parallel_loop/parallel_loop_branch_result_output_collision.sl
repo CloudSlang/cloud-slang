@@ -11,7 +11,7 @@ imports:
   ops: loops.parallel_loop
 
 flow:
-  name: parallel_loop_aggregate
+  name: parallel_loop_branch_result_output_collision
   inputs:
     - values: ${ range(1, 4) }
   workflow:
@@ -19,12 +19,10 @@ flow:
         parallel_loop:
           for: value in values
           do:
-            ops.print_branch:
+            ops.print_branch_with_result_output_collision:
               - ID: ${ value }
-          publish:
-            - name
-            - number: ${ int_output }
-        aggregate:
-            - name_list: ${ map(lambda x:str(x['name']), branches_context) }
-            - number_from_last_branch: ${ branches_context[-1]['number'] }
-            - from_sp: ${get_sp('loop.async.prop1')}
+        publish:
+          - branch_results_list: ${ map(lambda x:str(x['branch_result']), branches_context) }
+        navigate:
+          - SUCCESS: SUCCESS
+          - CUSTOM: SUCCESS

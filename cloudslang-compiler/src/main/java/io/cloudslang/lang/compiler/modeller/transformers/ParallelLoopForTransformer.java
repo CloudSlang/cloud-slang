@@ -9,12 +9,11 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.ParallelLoopStatement;
-import io.cloudslang.lang.entities.ScoreLangConstants;
-import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * Date: 3/25/2015
@@ -31,12 +30,12 @@ public class ParallelLoopForTransformer extends AbstractForTransformer implement
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Transformer.Scope.BEFORE_STEP);
+        return Collections.singletonList(Scope.BEFORE_STEP);
     }
 
     @Override
     public String keyToTransform() {
-        return ScoreLangConstants.PARALLEL_LOOP_KEY;
+        return SlangTextualKeys.PARALLEL_LOOP_KEY;
     }
 
 }

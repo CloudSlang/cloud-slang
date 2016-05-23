@@ -28,7 +28,7 @@ public class ParallelLoopStatement extends LoopStatement implements Serializable
     public ParallelLoopStatement(String varName, String expression) {
         super(expression);
 
-        Validate.notBlank(varName, "async loop var name cannot be empty");
+        Validate.notBlank(varName, "parallel loop var name cannot be empty");
         this.varName = varName;
     }
 
