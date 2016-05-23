@@ -33,7 +33,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <score.group>io.cloudslang</score.group>
-        <score.version>0.3.20</score.version>
+        <score.version>0.3.16</score.version>
+        <dependencies.version>0.3.20</dependencies.version>
         <spring.version>4.2.5.RELEASE</spring.version>
     </properties>
 
@@ -210,25 +211,25 @@
             <dependency>
                 <groupId>io.cloudslang</groupId>
                 <artifactId>runtime-management-api</artifactId>
-                <version>${score.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>${score.group}</groupId>
                 <artifactId>runtime-management-impl</artifactId>
-                <version>${score.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>${score.group}</groupId>
                 <artifactId>dependency-management-api</artifactId>
-                <version>${score.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>${score.group}</groupId>
                 <artifactId>dependency-management-impl</artifactId>
-                <version>${score.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <dependency>
