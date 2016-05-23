@@ -18,6 +18,7 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.URI;
@@ -90,6 +91,7 @@ public class OperationSystemTest extends SystemsTestsParent {
     }
 
     @Test
+    @Ignore
     public void testOperationWithJavaActionSensitive() throws Exception {
         URI resource = getClass().getResource("/yaml/java_action_sensitive_input_test.sl").toURI();
 

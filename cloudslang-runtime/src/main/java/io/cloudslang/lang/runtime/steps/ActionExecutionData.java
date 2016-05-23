@@ -98,8 +98,7 @@ public class ActionExecutionData extends AbstractExecutionData {
         ReturnValues returnValues = new ReturnValues(returnValue, null);
         runEnv.putReturnValues(returnValues);
         fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_ACTION_END, "Action performed",
-                runEnv.getExecutionPath().getParentPath(), LanguageEventData.StepType.ACTION, null,
-                Pair.of(LanguageEventData.RETURN_VALUES, (Serializable) returnValue));
+                runEnv.getExecutionPath().getParentPath(), LanguageEventData.StepType.ACTION, null);
 
         runEnv.putNextStepPosition(nextStepId);
     }
@@ -137,21 +136,16 @@ public class ActionExecutionData extends AbstractExecutionData {
         Class actionClass = getActionClass(className);
         Map<String, Value> result;
         try {
-            boolean sensitive = false;
             Object[] params = new Object[parameters.length];
             for (int index = 0; index < parameters.length; index++) {
-                Value param = parameters[index];
-                if (param != null && param.isSensitive()) {
-                    sensitive = true;
-                }
-                params[index] = param == null ? null : param.get();
+                params[index] = parameters[index] == null ? null : parameters[index].get();
             }
             //noinspection unchecked
             Map<String, Serializable> returnObject = (Map<String, Serializable>)actionMethod.invoke(actionClass.newInstance(), params);
 
             result = new HashMap<>(returnObject.size());
             for (Map.Entry<String, Serializable> entry : returnObject.entrySet()) {
-                result.put(entry.getKey(), ValueFactory.create(entry.getValue(), sensitive));
+                result.put(entry.getKey(), ValueFactory.create(entry.getValue(), false));
             }
             return result;
         } catch (Exception e) {

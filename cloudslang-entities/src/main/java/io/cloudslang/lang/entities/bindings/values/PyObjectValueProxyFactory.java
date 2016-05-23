@@ -1,3 +1,14 @@
+/**
+ * ****************************************************************************
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ * <p/>
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * *****************************************************************************
+ */
 package io.cloudslang.lang.entities.bindings.values;
 
 import javassist.util.proxy.MethodFilter;
@@ -26,8 +37,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class PyObjectValueProxyFactory {
 
-    private final static ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-    private final static Lock writeLock = readWriteLock.writeLock();
+    private static final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private static final Lock writeLock = readWriteLock.writeLock();
+
+    public static final String PROXY_CLASS_SUFFIX = "Value";
 
     private static ConcurrentMap<String, PyObjectValueProxyClass> proxyClasses = new ConcurrentHashMap<>();
 
@@ -48,7 +61,7 @@ public class PyObjectValueProxyFactory {
     }
 
     private static PyObjectValueProxyClass getProxyClass(PyObject pyObject) throws Exception {
-        String proxyClassName = pyObject.getClass() + "Value";
+        String proxyClassName = pyObject.getClass() + PROXY_CLASS_SUFFIX;
         PyObjectValueProxyClass proxyClass = proxyClasses.get(proxyClassName);
         if (proxyClass == null) {
             writeLock.lock();
@@ -99,6 +112,8 @@ public class PyObjectValueProxyFactory {
 
     private static class PyObjectValueMethodHandler implements MethodHandler, Serializable {
 
+        private static final String ACCESSED_GETTER_METHOD = "isAccessed";
+
         private Value value;
         private PyObject pyObject;
         private boolean accessed;
@@ -111,7 +126,7 @@ public class PyObjectValueProxyFactory {
 
         @Override
         public Object invoke(Object self, Method thisMethod, Method proceed, Object[] args) throws Throwable {
-            if (thisMethod.getName().equals("isAccessed")) {
+            if (thisMethod.getName().equals(ACCESSED_GETTER_METHOD)) {
                 return accessed;
             } else if (Value.class.isAssignableFrom(thisMethod.getDeclaringClass())) {
                 Method valueMethod = value.getClass().getMethod(thisMethod.getName(), thisMethod.getParameterTypes());
