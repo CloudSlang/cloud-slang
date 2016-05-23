@@ -13,6 +13,7 @@ package io.cloudslang.lang.runtime.bindings;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
@@ -55,7 +56,8 @@ public class OutputsBinding {
                     scriptContext.put(outputKey, scriptContext.get(outputKey));
                     try {
                         //evaluate expression
-                        valueToAssign = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, output.getFunctionDependencies());
+                        Value value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, output.getFunctionDependencies());
+                        valueToAssign = ValueFactory.create(value, rawValue != null && rawValue.isSensitive());
                     } catch (Throwable t) {
                         throw new RuntimeException("Error binding output: '" + output.getName() + "',\n\tError is: " + t.getMessage(), t);
                     }

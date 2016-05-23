@@ -29,16 +29,18 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
             String inputName = (String) rawInput;
             return new Input.InputBuilder(inputName, null, false).build();
         } else if (rawInput instanceof Map) {
+            @SuppressWarnings("unchecked")
             Map.Entry<String, ?> entry = ((Map<String, ?>) rawInput).entrySet().iterator().next();
             Serializable entryValue = (Serializable) entry.getValue();
             if(entryValue == null){
-                throw new RuntimeException("Could not transform Input : " + rawInput + " Since it has a null value.\n\nMake sure a value is specified or that indentation is properly done.");
+                throw new RuntimeException("Could not transform Input : " + rawInput + " since it has a null value.\n\nMake sure a value is specified or that indentation is properly done.");
             }
             if (entryValue instanceof Map) {
                 // - some_inputs:
-                // property1: value1
-                // property2: value2
+                //     property1: value1
+                //     property2: value2
                 // this is the verbose way of defining inputs with all of the properties available
+                //noinspection unchecked
                 return createPropInput((Map.Entry<String, Map<String, Serializable>>) entry);
             }
             // - some_input: some_expression

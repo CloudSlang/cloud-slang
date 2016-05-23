@@ -39,12 +39,8 @@ public class SensitiveValueOperationTest extends ValueSyntaxParent {
 
         // verify
         StepData flowData = steps.get(EXEC_START_PATH);
-        StepData stepData = steps.get(FIRST_STEP_PATH);
 
         verifyInOutParams(flowData.getInputs());
         verifyInOutParams(flowData.getOutputs());
-        verifyInOutParams(stepData.getInputs());
-        verifyInOutParams(stepData.getOutputs());
-        verifySuccessResult(flowData);
     }
 }

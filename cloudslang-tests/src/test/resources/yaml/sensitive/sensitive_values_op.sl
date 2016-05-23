@@ -412,10 +412,6 @@ operation:
       print input_sensitive_expression_characters_sensitive
 
   outputs:
-    - output_no_value
-    - output_no_value:
-        value:
-        sensitive: true
     - output_input_no_value: ${input_no_value}
     - output_sensitive_input_no_value:
         value: ${input_no_value}
@@ -425,19 +421,25 @@ operation:
         value: ${input_no_value_sensitive}
         sensitive: true
 
-    - output_input_get_input_no_value: ${input_get_input_no_value}
+    - output_input_get_input_no_value:
+        value: ${input_get_input_no_value}
     - output_sensitive_input_get_input_no_value:
         value: ${input_get_input_no_value}
         sensitive: true
-    - output_input_get_input_no_value_sensitive: ${input_get_input_no_value_sensitive}
+    - output_input_get_input_no_value_sensitive:
+        value: ${input_get_input_no_value_sensitive}
+        sensitive: false
     - output_sensitive_input_get_input_no_value_sensitive:
         value: ${input_get_input_no_value_sensitive}
         sensitive: true
-    - output_input_get_sensitive_input_no_value: ${input_get_sensitive_input_no_value}
+    - output_input_get_sensitive_input_no_value:
+        value: ${input_get_sensitive_input_no_value}
     - output_sensitive_input_get_sensitive_input_no_value:
         value: ${input_get_sensitive_input_no_value}
         sensitive: true
-    - output_input_get_sensitive_input_no_value_sensitive: ${input_get_sensitive_input_no_value_sensitive}
+    - output_input_get_sensitive_input_no_value_sensitive:
+        value: ${input_get_sensitive_input_no_value_sensitive}
+        sensitive: false
     - output_sensitive_input_get_sensitive_input_no_value_sensitive:
         value: ${input_get_sensitive_input_no_value_sensitive}
         sensitive: true
@@ -672,7 +674,8 @@ operation:
         value: ${input_yaml_list_sensitive}
         sensitive: true
 
-    - output_yaml_map: {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
+    - output_yaml_map:
+        value: {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
     - output_sensitive_yaml_map:
         value: {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
         sensitive: true
@@ -685,7 +688,8 @@ operation:
         value: ${input_yaml_map_sensitive}
         sensitive: true
 
-    - output_properties_yaml_map_folded: {default: medium, required: false}
+    - output_properties_yaml_map_folded:
+        value: {default: medium, required: false}
     - output_sensitive_properties_yaml_map_folded:
         value: {default: medium, required: false}
         sensitive: true

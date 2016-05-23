@@ -61,7 +61,7 @@ public abstract class AbstractScriptInterpreter {
             if (keyIsExcluded(key, value)) {
                 continue;
             }
-            Value javaValue = resolveJythonObjectToJavaExec(value, key, interpreter);
+            Value javaValue = resolveJythonObjectToJavaExec(value, key, null);
             returnValues.put(key, javaValue);
         }
         return returnValues;
@@ -115,7 +115,7 @@ public abstract class AbstractScriptInterpreter {
     }
 
     private boolean getSensitive(PythonInterpreter interpreter) {
-        if (interpreter.getLocals() != null) {
+        if (interpreter != null && interpreter.getLocals() != null) {
             for (PyObject pyObject : interpreter.getLocals().asIterable()) {
                 String key = pyObject.asString();
                 PyObject value = interpreter.get(key);

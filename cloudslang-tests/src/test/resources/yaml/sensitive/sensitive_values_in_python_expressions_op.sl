@@ -1225,7 +1225,7 @@ operation:
         sensitive: true
 
     - add1_str_arguments: ${str1_input + str2_input}
-    - add1_str_arguments:
+    - add1_sensitive_str_arguments:
         value: ${str1_input + str2_input}
         sensitive: true
     - add1_str_argument1_sensitive: ${str1_input_sensitive + str2_input}

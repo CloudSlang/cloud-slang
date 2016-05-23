@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * Created by Ifat Gavish on 19/04/2016
  */
-public class SensitiveValuesInPythonExpressionsOpTest extends ValueSyntaxParent {
+public class SensitiveValuesInPythonExpressionsOperationTest extends ValueSyntaxParent {
 
     @Test
     public void testValues() throws Exception {
@@ -39,12 +39,8 @@ public class SensitiveValuesInPythonExpressionsOpTest extends ValueSyntaxParent 
 
         // verify
         StepData flowData = steps.get(EXEC_START_PATH);
-        StepData stepData = steps.get(FIRST_STEP_PATH);
 
         verifyInOutParams(flowData.getInputs());
         verifyInOutParams(flowData.getOutputs());
-        verifyInOutParams(stepData.getInputs());
-        verifyInOutParams(stepData.getOutputs());
-        verifySuccessResult(flowData);
     }
 }
