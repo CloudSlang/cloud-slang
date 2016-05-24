@@ -10,14 +10,13 @@
 package io.cloudslang.lang.runtime.events;
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
-import io.cloudslang.lang.entities.bindings.values.Value;
-import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -130,13 +129,13 @@ public class LanguageEventDataTest {
 	 */
 	@Test
 	public void testInputs() {
-		HashMap<String, Value> inputs = new HashMap<String, Value>() {
+		HashMap<String, Serializable> inputs = new HashMap<String, Serializable>() {
 
 			private static final long serialVersionUID = 161841000262993977L;
 			{
-				put("input1", ValueFactory.create("str1"));
-				put("input2", ValueFactory.create(123L));
-				put("input3", ValueFactory.create(true));
+				put("input1", "str1");
+				put("input2", 123L);
+				put("input3", true);
 			}
 		};
 		eventData.setInputs(inputs);
@@ -149,13 +148,13 @@ public class LanguageEventDataTest {
 	 */
 	@Test
 	public void testArguments() {
-		HashMap<String, Value> arguments = new HashMap<String, Value>() {
+		HashMap<String, Serializable> arguments = new HashMap<String, Serializable>() {
 
 			private static final long serialVersionUID = 161841000262993977L;
 			{
-				put("argument1", ValueFactory.create("str1"));
-				put("argument2", ValueFactory.create(123L));
-				put("argument3", ValueFactory.create(true));
+				put("argument1", "str1");
+				put("argument2", 123L);
+				put("argument3", true);
 			}
 		};
 		eventData.setArguments(arguments);
@@ -168,13 +167,13 @@ public class LanguageEventDataTest {
 	 */
 	@Test
 	public void testOutputs() {
-		HashMap<String, Value> outputs = new HashMap<String, Value>() {
+		HashMap<String, Serializable> outputs = new HashMap<String, Serializable>() {
 
 			private static final long serialVersionUID = 161841000262993977L;
 			{
-				put("output1", ValueFactory.create("str1"));
-				put("output2", ValueFactory.create(123L));
-				put("output3", ValueFactory.create(false));
+				put("output1", "str1");
+				put("output2", 123L);
+				put("output3", false);
 			}
 		};
 		eventData.setOutputs(outputs);
@@ -182,13 +181,12 @@ public class LanguageEventDataTest {
 		assertEquals(outputs, eventData.get(LanguageEventData.OUTPUTS));
 	}
 
-
-    /**
+	/**
      * Test method for {@link LanguageEventData#getParallelLoopBoundExpression()}.
      */
     @Test
     public void testParallelLoopBoundExpression() {
-        List<Value> parallelLoopBoundExpression = new ArrayList<>(Arrays.asList(ValueFactory.create("a"), ValueFactory.create("b"), ValueFactory.create("c")));
+        List<Serializable> parallelLoopBoundExpression = new ArrayList<>(Arrays.asList((Serializable)"a", "b", "c"));
         eventData.setParallelLoopBoundExpression(parallelLoopBoundExpression);
         assertEquals(parallelLoopBoundExpression, eventData.getParallelLoopBoundExpression());
         assertEquals(parallelLoopBoundExpression, eventData.get(LanguageEventData.BOUND_PARALLEL_LOOP_EXPRESSION));

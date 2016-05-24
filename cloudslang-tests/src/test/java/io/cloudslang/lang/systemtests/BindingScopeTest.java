@@ -20,12 +20,12 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
-import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
@@ -62,10 +62,10 @@ public class BindingScopeTest extends SystemsTestsParent {
     }
 
     private void verifyStepPublishValues(StepData stepData) {
-        Map<String, Value> expectedPublishValues = new LinkedHashMap<>();
-        expectedPublishValues.put("step1_publish_1", ValueFactory.create("op_output_1_value op_input_1_step step_arg_1_value"));
-        expectedPublishValues.put("step1_publish_2_conflict", ValueFactory.create("op_output_2_value"));
-        Map<String, Value> actualPublishValues = stepData.getOutputs();
+        Map<String, Serializable> expectedPublishValues = new LinkedHashMap<>();
+        expectedPublishValues.put("step1_publish_1", "op_output_1_value op_input_1_step step_arg_1_value");
+        expectedPublishValues.put("step1_publish_2_conflict", "op_output_2_value");
+        Map<String, Serializable> actualPublishValues = stepData.getOutputs();
         Assert.assertEquals("step publish values not as expected", expectedPublishValues, actualPublishValues);
     }
 

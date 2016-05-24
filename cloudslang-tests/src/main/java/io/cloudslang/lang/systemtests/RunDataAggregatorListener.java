@@ -14,10 +14,10 @@ package io.cloudslang.lang.systemtests;
 
 import ch.lambdaj.group.Group;
 import io.cloudslang.lang.entities.ScoreLangConstants;
-import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,14 +66,14 @@ public class RunDataAggregatorListener extends AbstractAggregatorListener {
         }
         String path = inputsEvent.getPath();
         String stepName = inputsEvent.getStepName();
-        Map<String, Value> inputs;
+        Map<String, Serializable> inputs;
         if (isStep) {
             inputs = inputsEvent.getArguments();
         } else {
             inputs = inputsEvent.getInputs();
         }
 
-        Map<String, Value> outputs = outputsEvent == null ? null : outputsEvent.getOutputs();
+        Map<String, Serializable> outputs = outputsEvent == null ? null : outputsEvent.getOutputs();
         String result = outputsEvent == null ? null : (String) outputsEvent.get(LanguageEventData.RESULT);
 
         String executableName = executableEvents.get(0).getStepName();

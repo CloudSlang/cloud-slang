@@ -157,7 +157,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Serializable stepsData  = trigger(compilationArtifact, inputs, SYS_PROPS).getData();
-        Map<String, Value> outputs = ((LanguageEventData) stepsData).getOutputs();
+        Map<String, Serializable> outputs = ((LanguageEventData) stepsData).getOutputs();
         Assert.assertEquals(outputs.get("returnResult"), outputs.get("printed_text"));
     }
 

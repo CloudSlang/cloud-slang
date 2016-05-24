@@ -14,6 +14,7 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.events.ScoreEvent;
@@ -86,8 +87,7 @@ public class OperationSystemTest extends SystemsTestsParent {
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
         StepData execStepData = stepsData.get(EXEC_START_PATH);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, execStepData.getResult());
-        Assert.assertEquals("http://localhost:8080", execStepData.getOutputs().get("url").get());
-        Assert.assertFalse(execStepData.getOutputs().get("url").isSensitive());
+        Assert.assertEquals("http://localhost:8080", execStepData.getOutputs().get("url"));
     }
 
     @Test
@@ -103,8 +103,7 @@ public class OperationSystemTest extends SystemsTestsParent {
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
         StepData execStepData = stepsData.get(EXEC_START_PATH);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, execStepData.getResult());
-        Assert.assertEquals("http://localhost:8080", execStepData.getOutputs().get("url").get());
-        Assert.assertTrue(execStepData.getOutputs().get("url").isSensitive());
+        Assert.assertEquals(SensitiveValue.SENSITIVE_VALUE_MASK, execStepData.getOutputs().get("url"));
     }
 
     @Test
@@ -118,7 +117,7 @@ public class OperationSystemTest extends SystemsTestsParent {
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
         StepData execStepData = stepsData.get(EXEC_START_PATH);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, execStepData.getResult());
-        Assert.assertEquals(120, execStepData.getOutputs().get("dur").get());
+        Assert.assertEquals(120, execStepData.getOutputs().get("dur"));
     }
 
     @Test
@@ -129,11 +128,11 @@ public class OperationSystemTest extends SystemsTestsParent {
 
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, null, new HashSet<SystemProperty>()).getSteps();
         StepData execStepData = stepsData.get(EXEC_START_PATH);
-        Assert.assertEquals(true, execStepData.getOutputs().get("condition_1").get());
-        Assert.assertEquals(false, execStepData.getOutputs().get("condition_2").get());
-        Assert.assertEquals(false, execStepData.getOutputs().get("condition_3").get());
-        Assert.assertEquals(true, execStepData.getOutputs().get("condition_4").get());
-        Assert.assertEquals(1, execStepData.getOutputs().get("an_int").get());
+        Assert.assertEquals(true, execStepData.getOutputs().get("condition_1"));
+        Assert.assertEquals(false, execStepData.getOutputs().get("condition_2"));
+        Assert.assertEquals(false, execStepData.getOutputs().get("condition_3"));
+        Assert.assertEquals(true, execStepData.getOutputs().get("condition_4"));
+        Assert.assertEquals(1, execStepData.getOutputs().get("an_int"));
     }
 
 }

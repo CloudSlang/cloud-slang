@@ -19,13 +19,11 @@ package io.cloudslang.lang.tools.build.tester;
 */
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
-import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import org.apache.commons.collections4.MapUtils;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-import io.cloudslang.lang.runtime.env.ReturnValues;
+import org.apache.commons.collections4.MapUtils;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -46,8 +44,15 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
     private AtomicBoolean flowFinished = new AtomicBoolean(false);
     private AtomicReference<String> errorMessage = new AtomicReference<>("");
     private String result;
-    private Map<String, Value> outputs = new HashMap<>();
+    private Map<String, Serializable> outputs = new HashMap<>();
 
+    public String getResult() {
+        return result;
+    }
+
+    public Map<String, Serializable> getOutputs() {
+        return outputs;
+    }
 
     public boolean isFlowFinished() {
         return flowFinished.get();
@@ -76,7 +81,7 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
                 break;
             case ScoreLangConstants.EVENT_OUTPUT_END:
                 eventData = (LanguageEventData) data;
-                Map<String, Value> extractOutputs = extractOutputs(eventData);
+                Map<String, Serializable> extractOutputs = extractOutputs(eventData);
                 if(MapUtils.isNotEmpty(extractOutputs)) {
                     outputs = extractOutputs;
                 }
@@ -84,13 +89,9 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
         }
     }
 
-    public ReturnValues getExecutionReturnValues(){
-        return new ReturnValues(outputs, result);
-    }
+    private static Map<String, Serializable> extractOutputs(LanguageEventData data) {
 
-    private static Map<String, Value> extractOutputs(LanguageEventData data) {
-
-        Map<String, Value> outputsMap = new HashMap<>();
+        Map<String, Serializable> outputsMap = new HashMap<>();
 
         boolean thereAreOutputsForRootPath =
                 data.containsKey(LanguageEventData.OUTPUTS)
@@ -98,7 +99,7 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
                 && data.getPath().equals(EXEC_START_PATH);
 
         if (thereAreOutputsForRootPath) {
-            Map<String, Value> outputs = data.getOutputs();
+            Map<String, Serializable> outputs = data.getOutputs();
             if (MapUtils.isNotEmpty(outputs)) outputsMap.putAll(outputs);
         }
 

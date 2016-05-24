@@ -44,6 +44,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -174,20 +175,20 @@ public class StepExecutionDataTest {
         Assert.assertEquals(LanguageEventData.StepType.STEP,eventData.getStepType());
 
         @SuppressWarnings("unchecked")
-        Map<String, Value> boundInputs = (Map<String,Value>)eventData.get(LanguageEventData.BOUND_ARGUMENTS);
+        Map<String, Serializable> boundInputs = (Map<String,Serializable>)eventData.get(LanguageEventData.BOUND_ARGUMENTS);
         Assert.assertEquals(2, boundInputs.size());
 
         // verify input names are in defined order and have the expected value
-        Set<Map.Entry<String, Value>> inputEntries = boundInputs.entrySet();
-        Iterator<Map.Entry<String, Value>> inputNamesIterator = inputEntries.iterator();
+        Set<Map.Entry<String, Serializable>> inputEntries = boundInputs.entrySet();
+        Iterator<Map.Entry<String, Serializable>> inputNamesIterator = inputEntries.iterator();
 
-        Map.Entry<String, Value> firstInput =  inputNamesIterator.next();
+        Map.Entry<String, Serializable> firstInput =  inputNamesIterator.next();
         Assert.assertEquals("Inputs are not in defined order in end inputs binding event", "input1", firstInput.getKey());
-        Assert.assertEquals(5,firstInput.getValue().get());
+        Assert.assertEquals(5,firstInput.getValue());
 
-        Map.Entry<String, Value> secondInput =  inputNamesIterator.next();
+        Map.Entry<String, Serializable> secondInput =  inputNamesIterator.next();
         Assert.assertEquals("Inputs are not in defined order in end inputs binding event", "input2", secondInput.getKey());
-        Assert.assertEquals(3,secondInput.getValue().get());
+        Assert.assertEquals(3,secondInput.getValue());
     }
 
     @Test

@@ -39,6 +39,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -219,8 +220,11 @@ public class ActionStepsTest {
 
         Assert.assertNotNull(eventActionStart);
         LanguageEventData data = (LanguageEventData)eventActionStart.getData();
-        Map<String, Value> actualCallArguments = data.getCallArguments();
-        Assert.assertEquals("Python action call arguments are not as expected", callArguments, actualCallArguments);
+        Map<String, Serializable> actualCallArguments = data.getCallArguments();
+        Assert.assertEquals(callArguments.size(), actualCallArguments.size());
+        for (Map.Entry<String, Value> entry : callArguments.entrySet()) {
+            Assert.assertEquals("Python action call arguments are not as expected", entry.getValue().get(), actualCallArguments.get(entry.getKey()));
+        }
     }
 
     @Test
@@ -260,8 +264,11 @@ public class ActionStepsTest {
 
         Assert.assertNotNull(eventActionStart);
         LanguageEventData data = (LanguageEventData)eventActionStart.getData();
-        Map<String, Value> actualCallArguments = data.getCallArguments();
-        Assert.assertEquals("Java action call arguments are not as expected", callArguments, actualCallArguments);
+        Map<String, Serializable> actualCallArguments = data.getCallArguments();
+        Assert.assertEquals(callArguments.size(), actualCallArguments.size());
+        for (Map.Entry<String, Value> entry : callArguments.entrySet()) {
+            Assert.assertEquals("Python action call arguments are not as expected", entry.getValue().get(), actualCallArguments.get(entry.getKey()));
+        }
     }
 
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
@@ -403,7 +410,7 @@ public class ActionStepsTest {
         );
 
         //construct expected outputs
-        Map<String, Value> expectedOutputs = new HashMap<>();
+        Map<String, Serializable> expectedOutputs = new HashMap<>();
         expectedOutputs.put("name", ValueFactory.create("nameTest"));
         expectedOutputs.put("role", ValueFactory.create(null));
 
@@ -487,7 +494,7 @@ public class ActionStepsTest {
         );
 
         //construct expected outputs
-        Map<String, Value> expectedOutputs = new HashMap<>();
+        Map<String, Serializable> expectedOutputs = new HashMap<>();
 
         //extract actual outputs
         ReturnValues actualReturnValues = runEnv.removeReturnValues();
@@ -521,7 +528,7 @@ public class ActionStepsTest {
         );
 
         //construct expected outputs
-        Map<String, Value> expectedOutputs = new HashMap<>();
+        Map<String, Serializable> expectedOutputs = new HashMap<>();
 
         //extract actual outputs
         ReturnValues actualReturnValues = runEnv.removeReturnValues();
@@ -743,7 +750,7 @@ public class ActionStepsTest {
         );
 
         //construct expected outputs
-        Map<String, Value> expectedOutputs = new HashMap<>();
+        Map<String, Serializable> expectedOutputs = new HashMap<>();
         expectedOutputs.put("host", ValueFactory.create("localhost"));
         expectedOutputs.put("port", ValueFactory.create(8081));
         expectedOutputs.put("url", ValueFactory.create("http://localhost:8080"));

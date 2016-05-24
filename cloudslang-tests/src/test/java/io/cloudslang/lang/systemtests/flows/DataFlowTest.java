@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
@@ -73,8 +74,8 @@ public class DataFlowTest extends SystemsTestsParent {
 
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, SYSTEM_PROPERTIES).getSteps();
 
-        Map<String, Value> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
-        String final_output = (String) flowOutputs.get("final_output").get();
+        Map<String, Serializable> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
+        String final_output = (String) flowOutputs.get("final_output");
         Assert.assertEquals("some of the inputs or outputs were not bound correctly",
                 13, final_output.length());
         Assert.assertEquals("some of the inputs were not bound correctly",
@@ -99,8 +100,8 @@ public class DataFlowTest extends SystemsTestsParent {
 
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, SYSTEM_PROPERTIES).getSteps();
 
-        Map<String, Value> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
-        int final_output = (int) flowOutputs.get("final_output").get();
+        Map<String, Serializable> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
+        int final_output = (int) flowOutputs.get("final_output");
         Assert.assertEquals("some of the inputs or outputs were not bound correctly",
                 13, final_output);
     }
@@ -119,10 +120,10 @@ public class DataFlowTest extends SystemsTestsParent {
 
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, SYSTEM_PROPERTIES).getSteps();
 
-        Map<String, Value> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
-        String weatherOutput = (String) flowOutputs.get("weather1").get();
-        String weather2Output = (String) flowOutputs.get("weather2").get();
-        String weather3Output = (String) flowOutputs.get("weather3").get();
+        Map<String, Serializable> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
+        String weatherOutput = (String) flowOutputs.get("weather1");
+        String weather2Output = (String) flowOutputs.get("weather2");
+        String weather3Output = (String) flowOutputs.get("weather3");
 
         Assert.assertEquals("weather1 not bound correctly", "New York", weatherOutput);
         Assert.assertEquals("weather2 not bound correctly", "New York", weather2Output);
@@ -130,7 +131,7 @@ public class DataFlowTest extends SystemsTestsParent {
 
         Assert.assertTrue(flowOutputs.containsKey("null_output_no_expression"));
         Assert.assertTrue(flowOutputs.containsKey("null_output_expression"));
-        Assert.assertNull(flowOutputs.get("null_output_no_expression").get());
-        Assert.assertNull(flowOutputs.get("null_output_expression").get());
+        Assert.assertNull(flowOutputs.get("null_output_no_expression"));
+        Assert.assertNull(flowOutputs.get("null_output_expression"));
     }
 }

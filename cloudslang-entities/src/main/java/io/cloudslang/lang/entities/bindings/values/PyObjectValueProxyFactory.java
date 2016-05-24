@@ -84,12 +84,12 @@ public class PyObjectValueProxyFactory {
     private static PyObjectValueProxyClass createProxyClass(Class proxyClass, PyObject pyObject) throws Exception {
         Constructor<?> constructor = proxyClass.getConstructors()[0];
         for (Constructor<?> con : proxyClass.getConstructors()) {
-            if (con.getParameters().length < constructor.getParameters().length) {
+            if (con.getParameterTypes().length < constructor.getParameterTypes().length) {
                 constructor = con;
             }
         }
-        Object[] params = new Object[constructor.getParameters().length];
-        for (int index = 0; index < constructor.getParameters().length; index++) {
+        Object[] params = new Object[constructor.getParameterTypes().length];
+        for (int index = 0; index < constructor.getParameterTypes().length; index++) {
             Class<?> parameterType = constructor.getParameterTypes()[index];
             params[index] = parameterType.equals(PyType.class) ? pyObject.getType() :
                     !parameterType.isPrimitive() ? null : getPrimitiveTypeDefaultValue(parameterType);

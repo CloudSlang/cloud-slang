@@ -14,20 +14,10 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
-import io.cloudslang.lang.entities.bindings.values.Value;
-import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.tools.build.SlangBuildMain;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import io.cloudslang.score.events.EventConstants;
-import java.io.File;
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
@@ -37,6 +27,15 @@ import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by stoneo on 3/15/2015.
@@ -241,8 +240,6 @@ public class SlangTestRunner {
         }
         slang.unSubscribeOnEvents(testsEventListener);
 
-        ReturnValues executionReturnValues = testsEventListener.getExecutionReturnValues();
-
         String errorMessageFlowExecution = testsEventListener.getErrorMessage();
 
         String message;
@@ -264,14 +261,14 @@ public class SlangTestRunner {
             throw new RuntimeException(message);
         }
 
-        String executionResult = executionReturnValues.getResult();
+        String executionResult = testsEventListener.getResult();
         if (result != null && !result.equals(executionResult)){
             message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tExpected result: " + result + "\n\tActual result: " + executionResult;
             log.error(message);
             throw new RuntimeException(message);
         }
 
-        Map<String, Value> executionOutputs = executionReturnValues.getOutputs();
+        Map<String, Serializable> executionOutputs = testsEventListener.getOutputs();
         if (MapUtils.isNotEmpty(outputs)){
             for(Map.Entry<String, Serializable> output: outputs.entrySet()) {
                 String outputName = output.getKey();

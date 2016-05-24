@@ -52,13 +52,13 @@ public class LoopFlowsTest extends SystemsTestsParent{
         StepData secondStep = stepsData.get(SECOND_STEP_KEY);
         StepData thirdStep = stepsData.get(THIRD_STEP_KEY);
 
-        Map<String, Value> expectedInputs = new HashMap<>();
-        expectedInputs.put("text", ValueFactory.create(1));
-        expectedInputs.put("sp_arg", ValueFactory.create("for_value"));
+        Map<String, Serializable> expectedInputs = new HashMap<>();
+        expectedInputs.put("text", 1);
+        expectedInputs.put("sp_arg", "for_value");
         Assert.assertEquals(expectedInputs, firstStep.getInputs());
-        expectedInputs.put("text", ValueFactory.create(2));
+        expectedInputs.put("text", 2);
         Assert.assertEquals(expectedInputs, secondStep.getInputs());
-        expectedInputs.put("text", ValueFactory.create(3));
+        expectedInputs.put("text", 3);
         Assert.assertEquals(expectedInputs, thirdStep.getInputs());
     }
 
@@ -216,23 +216,23 @@ public class LoopFlowsTest extends SystemsTestsParent{
         StepData secondStep = stepsData.get(SECOND_STEP_KEY);
         StepData thirdStep = stepsData.get(THIRD_STEP_KEY);
         @SuppressWarnings("unchecked")
-        Set<Map<String, Value>> actualContextSet = Sets.newHashSet(
+        Set<Map<String, Serializable>> actualContextSet = Sets.newHashSet(
                 firstStep.getInputs(),
                 secondStep.getInputs(),
                 thirdStep.getInputs()
         );
 
-        Map<String, Value> context1 = new HashMap<>();
-        context1.put("text", ValueFactory.create("john"));
-        context1.put("text2", ValueFactory.create(1));
-        Map<String, Value> context2 = new HashMap<>();
-        context2.put("text", ValueFactory.create("jane"));
-        context2.put("text2", ValueFactory.create(2));
-        Map<String, Value> context3 = new HashMap<>();
-        context3.put("text", ValueFactory.create("peter"));
-        context3.put("text2", ValueFactory.create("three"));
+        Map<String, Serializable> context1 = new HashMap<>();
+        context1.put("text", "john");
+        context1.put("text2", 1);
+        Map<String, Serializable> context2 = new HashMap<>();
+        context2.put("text", "jane");
+        context2.put("text2", 2);
+        Map<String, Serializable> context3 = new HashMap<>();
+        context3.put("text", "peter");
+        context3.put("text2", "three");
         @SuppressWarnings("unchecked")
-        Set<Map<String, Value>> expectedContextSet = Sets.newHashSet(
+        Set<Map<String, Serializable>> expectedContextSet = Sets.newHashSet(
                 context1,
                 context2,
                 context3

@@ -10,9 +10,9 @@
 package io.cloudslang.lang.systemtests;
 
 import ch.lambdaj.group.Group;
-import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,12 +44,12 @@ public class JoinAggregatorListener extends AbstractAggregatorListener {
     private StepData buildPublishAggregateData(LanguageEventData data) {
         String path = data.getPath();
         String stepName = data.getStepName();
-        Map<String, Value> outputs = data.getOutputs();
+        Map<String, Serializable> outputs = data.getOutputs();
         String result = (String) data.get(LanguageEventData.RESULT);
         return new StepData(
                 path,
                 stepName,
-                new HashMap<String, Value>(),
+                new HashMap<String, Serializable>(),
                 outputs,
                 null, result
         );

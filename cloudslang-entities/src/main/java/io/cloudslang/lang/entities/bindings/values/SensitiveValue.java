@@ -24,6 +24,8 @@ import java.util.Arrays;
  */
 public class SensitiveValue implements Value {
 
+    public static final String SENSITIVE_VALUE_MASK = "********";
+
     private byte[] content;
 
     @SuppressWarnings("unused")
@@ -68,6 +70,6 @@ public class SensitiveValue implements Value {
 
     @Override
     public String toString() {
-        return "********";
+        return SENSITIVE_VALUE_MASK;
     }
 }

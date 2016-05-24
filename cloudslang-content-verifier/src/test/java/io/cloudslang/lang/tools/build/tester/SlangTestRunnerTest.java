@@ -5,7 +5,6 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.values.Value;
-import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
@@ -13,7 +12,6 @@ import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-import java.util.Set;
 import junit.framework.Assert;
 import org.apache.commons.collections4.SetUtils;
 import org.junit.Before;
@@ -31,6 +29,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +37,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anySetOf;
@@ -233,10 +233,10 @@ public class SlangTestRunnerTest {
     public void runTestCaseWithStringOutputs(){
         Map<String, SlangTestCase> testCases = new HashMap<>();
         ArrayList<Map> outputs = new ArrayList<>();
-        Map<String, Value> output1 = new HashMap<>();
-        output1.put("output1", ValueFactory.create("value1"));
-        Map<String, Value>output2 = new HashMap<>();
-        output2.put("output2", ValueFactory.create("value2"));
+        Map<String, Serializable> output1 = new HashMap<>();
+        output1.put("output1", "value1");
+        Map<String, Serializable>output2 = new HashMap<>();
+        output2.put("output2", "value2");
         outputs.add(output1);
         outputs.add(output2);
 
@@ -244,9 +244,9 @@ public class SlangTestRunnerTest {
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
-        Map<String, Value> convertedOutputs = new HashMap<>();
-        convertedOutputs.put("output1", ValueFactory.create("value1"));
-        convertedOutputs.put("output2", ValueFactory.create("value2"));
+        Map<String, Serializable> convertedOutputs = new HashMap<>();
+        convertedOutputs.put("output1", "value1");
+        convertedOutputs.put("output2", "value2");
         prepareMockForEventListenerWithSuccessResultAndOutputs(convertedOutputs);
         RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, defaultTestSuite);
         Assert.assertEquals("No test cases should fail", 0, runTestsResults.getFailedTests().size());
@@ -263,7 +263,7 @@ public class SlangTestRunnerTest {
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
-        Map<String, Value> convertedOutputs = new HashMap<>();
+        Map<String, Serializable> convertedOutputs = new HashMap<>();
         convertedOutputs.put("output1", null);
         prepareMockForEventListenerWithSuccessResultAndOutputs(convertedOutputs);
         RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, defaultTestSuite);
@@ -274,15 +274,15 @@ public class SlangTestRunnerTest {
     public void runTestCaseWithIntOutput(){
         Map<String, SlangTestCase> testCases = new HashMap<>();
         ArrayList<Map> outputs = new ArrayList<>();
-        Map<String, Value>output1 = new HashMap<>();
-        output1.put("output1", ValueFactory.create(1));
+        Map<String, Serializable>output1 = new HashMap<>();
+        output1.put("output1", 1);
         outputs.add(output1);
         SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, outputs, null, null);
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
-        Map<String, Value> convertedOutputs = new HashMap<>();
-        convertedOutputs.put("output1", ValueFactory.create(1));
+        Map<String, Serializable> convertedOutputs = new HashMap<>();
+        convertedOutputs.put("output1", 1);
         prepareMockForEventListenerWithSuccessResultAndOutputs(convertedOutputs);
         RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, defaultTestSuite);
         Assert.assertEquals("No test cases should fail", 0, runTestsResults.getFailedTests().size());
@@ -292,15 +292,15 @@ public class SlangTestRunnerTest {
     public void runTestCaseWithWrongIntOutput(){
         Map<String, SlangTestCase> testCases = new HashMap<>();
         ArrayList<Map> outputs = new ArrayList<>();
-        Map<String, Value>output1 = new HashMap<>();
-        output1.put("output1", ValueFactory.create(1));
+        Map<String, Serializable>output1 = new HashMap<>();
+        output1.put("output1", 1);
         outputs.add(output1);
         SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, outputs, null, null);
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
-        Map<String, Value> convertedOutputs = new HashMap<>();
-        convertedOutputs.put("output1", ValueFactory.create(2));
+        Map<String, Serializable> convertedOutputs = new HashMap<>();
+        convertedOutputs.put("output1", 2);
         prepareMockForEventListenerWithSuccessResultAndOutputs(convertedOutputs);
         RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, defaultTestSuite);
         Assert.assertEquals("1 test cases should fail", 1, runTestsResults.getFailedTests().size());
@@ -310,15 +310,15 @@ public class SlangTestRunnerTest {
     public void runTestCaseWithBooleanOutput(){
         Map<String, SlangTestCase> testCases = new HashMap<>();
         ArrayList<Map> outputs = new ArrayList<>();
-        Map<String, Value>output1 = new HashMap<>();
-        output1.put("output1", ValueFactory.create(Boolean.TRUE));
+        Map<String, Serializable>output1 = new HashMap<>();
+        output1.put("output1", Boolean.TRUE);
         outputs.add(output1);
         SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, outputs, null, null);
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
-        Map<String, Value> convertedOutputs = new HashMap<>();
-        convertedOutputs.put("output1", ValueFactory.create(Boolean.TRUE));
+        Map<String, Serializable> convertedOutputs = new HashMap<>();
+        convertedOutputs.put("output1", Boolean.TRUE);
         prepareMockForEventListenerWithSuccessResultAndOutputs(convertedOutputs);
         RunTestsResults runTestsResults = slangTestRunner.runAllTests("path", testCases, compiledFlows, defaultTestSuite);
         Assert.assertEquals("No test cases should fail", 0, runTestsResults.getFailedTests().size());
@@ -475,7 +475,7 @@ public class SlangTestRunnerTest {
         }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
     }
 
-    private void prepareMockForEventListenerWithSuccessResultAndOutputs(final Map<String, Value> outputs) {
+    private void prepareMockForEventListenerWithSuccessResultAndOutputs(final Map<String, Serializable> outputs) {
         Mockito.doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
