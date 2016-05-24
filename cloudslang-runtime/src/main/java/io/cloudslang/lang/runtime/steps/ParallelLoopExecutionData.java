@@ -252,8 +252,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
             fireEvent(executionRuntimeServices, branchRuntimeEnvironment, ScoreLangConstants.EVENT_BRANCH_END,
                     "Parallel loop branch ended", LanguageEventData.StepType.STEP, nodeName,
-                    Pair.of(RuntimeConstants.BRANCH_RETURN_VALUES_KEY, executableReturnValues)
-            );
+                    Pair.of(LanguageEventData.RESULT, executableReturnValues.getResult()));
         }
     }
 

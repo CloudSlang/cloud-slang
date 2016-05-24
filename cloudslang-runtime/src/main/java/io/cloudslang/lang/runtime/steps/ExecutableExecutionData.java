@@ -44,8 +44,6 @@ import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUT
 @Component
 public class ExecutableExecutionData extends AbstractExecutionData {
 
-    public static final String ACTION_RETURN_VALUES_KEY = "actionReturnValues";
-
     @Autowired
     private ResultsBinding resultsBinding;
 
@@ -122,8 +120,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
                     LanguageEventData.StepType.EXECUTABLE, nodeName,
                     Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable)executableOutputs),
-                    Pair.of(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable)executableResults),
-                    Pair.of(ACTION_RETURN_VALUES_KEY, actionReturnValues));
+                    Pair.of(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable)executableResults));
 
             // Resolving the result of the operation/flow
             String result = resultsBinding.resolveResult(

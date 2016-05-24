@@ -35,15 +35,37 @@ import java.util.Set;
  */
 public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
-    private static final String BRANCH_MESSAGE = "branch ";
     private static final String BRANCH_RESULTS_LIST_PUBLISH_VALUE = "branch_results_list";
     private static final String CUSTOM_RESULT = "CUSTOM";
     private static final String SUCCESS_RESULT = "SUCCESS";
-    private static final String BRANCH_RESULT_OUTPUT_VALUE = "should_be_overridden";
 
     @Test
     public void testFlowWithParallelLoop() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/parallel_loop/simple_parallel_loop.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+
+        RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path);
+
+        List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
+        Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
+    }
+
+    @Test
+    public void testFlowWithSensitiveInputParallelLoop() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/parallel_loop/sensitive_input_parallel_loop.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+
+        RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path);
+
+        List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
+        Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
+    }
+
+    @Test
+    public void testFlowWithSensitiveOutputParallelLoop() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/parallel_loop/sensitive_output_parallel_loop.sl").toURI();
         URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
 
@@ -67,10 +89,6 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
         List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
-
-        List<String> expectedNameOutputs = verifyBranchPublishValues(branchesData);
-
-        verifyPublishValues(runtimeInformation, expectedNameOutputs);
     }
 
     @Test
@@ -87,8 +105,6 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
         List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
-
-        verifyBranchPublishValues(branchesData);
 
         verifyPublishValuesBranchResultsCase(
                 runtimeInformation,
@@ -110,8 +126,6 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
         List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
-
-        verifyBranchPublishValuesBranchResultsCase(branchesData);
 
         verifyPublishValuesBranchResultsCase(
                 runtimeInformation,
@@ -151,10 +165,6 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
         List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
-
-        List<String> expectedNameOutputs = verifyBranchPublishValues(branchesData);
-
-        verifyPublishValues(runtimeInformation, expectedNameOutputs);
 
         verifyNavigation(runtimeInformation);
     }
@@ -201,80 +211,6 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         }
 
         return stepDataList;
-    }
-
-    private <T> boolean containsSameElementsWithoutOrdering(List<T> firstList, List<T> secondList) {
-        return firstList.containsAll(secondList) && secondList.containsAll(firstList);
-    }
-
-    private List<String> verifyBranchPublishValues(List<StepData> branchesData) {
-        // publish
-        List<String> actualNameOutputsOfBranches = Lists.newArrayList();
-        List<Integer> actualNumberOutputsOfBranches = Lists.newArrayList();
-        for (StepData branchData : branchesData) {
-            Map<String, Value> outputs = branchData.getOutputs();
-            Assert.assertTrue(outputs.containsKey("name"));
-            Assert.assertTrue(outputs.containsKey("int_output"));
-            actualNameOutputsOfBranches.add((String) outputs.get("name").get());
-            actualNumberOutputsOfBranches.add((Integer) outputs.get("int_output").get());
-        }
-
-        List<String> expectedNameOutputs = Lists.newArrayList();
-        List<Integer> expectedNumberOutputs = Lists.newArrayList();
-        for (int i = 1; i < 4; i++) {
-            expectedNameOutputs.add(BRANCH_MESSAGE + i);
-            expectedNumberOutputs.add(i);
-        }
-
-        Assert.assertTrue(
-                "branch publish values not as expected",
-                containsSameElementsWithoutOrdering(expectedNameOutputs, actualNameOutputsOfBranches)
-        );
-        Assert.assertTrue(
-                "branch publish values not as expected",
-                containsSameElementsWithoutOrdering(expectedNumberOutputs, actualNumberOutputsOfBranches)
-        );
-        return expectedNameOutputs;
-    }
-
-    private void verifyBranchPublishValuesBranchResultsCase(List<StepData> branchesData) {
-        // publish
-        List<String> actualBranchResultOutputs = Lists.newArrayList();
-        for (StepData branchData : branchesData) {
-            Map<String, Value> outputs = branchData.getOutputs();
-            Assert.assertTrue(outputs.containsKey("branch_result"));
-            actualBranchResultOutputs.add((String) outputs.get("branch_result").get());
-        }
-
-        List<String> expectedBranchResultOutputs = Lists.newArrayList(
-                BRANCH_RESULT_OUTPUT_VALUE,
-                BRANCH_RESULT_OUTPUT_VALUE,
-                BRANCH_RESULT_OUTPUT_VALUE
-        );
-
-        Assert.assertEquals(expectedBranchResultOutputs, actualBranchResultOutputs);
-    }
-
-    private void verifyPublishValues(RuntimeInformation runtimeInformation, List<String> expectedNameOutputs) {
-        // publish
-        Map<String, StepData> parallelLoopSteps = runtimeInformation.getParallelSteps();
-        StepData parallelLoopStep = parallelLoopSteps.get(FIRST_STEP_PATH);
-
-        Map<String, Value> publishValues = parallelLoopStep.getOutputs();
-        Assert.assertTrue("publish name not found in parallel loop outputs", publishValues.containsKey("name_list"));
-        @SuppressWarnings("unchecked")
-        List<String> actualPublishNameList = (List<String>) publishValues.get("name_list").get();
-
-        Assert.assertTrue(
-                "publish value does not have the expected value",
-                containsSameElementsWithoutOrdering(Lists.newArrayList(actualPublishNameList), expectedNameOutputs)
-        );
-
-        Assert.assertEquals(
-                "Publish value not bound correctly from system property",
-                "publish_value",
-                publishValues.get("from_sp").get()
-        );
     }
 
     private void verifyPublishValuesBranchResultsCase(

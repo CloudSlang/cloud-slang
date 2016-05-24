@@ -12,8 +12,6 @@ package io.cloudslang.lang.systemtests;
 import ch.lambdaj.group.Group;
 import com.google.common.collect.Lists;
 import io.cloudslang.lang.entities.bindings.values.Value;
-import io.cloudslang.lang.runtime.RuntimeConstants;
-import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 
 import java.util.HashMap;
@@ -51,14 +49,13 @@ public class BranchAggregatorListener extends AbstractAggregatorListener {
         for (LanguageEventData branchData : data) {
             String path = branchData.getPath();
             String stepName = branchData.getStepName();
-            ReturnValues returnValues = (ReturnValues) branchData.get(RuntimeConstants.BRANCH_RETURN_VALUES_KEY);
             branches.add(
                     new StepData(
                             path,
                             stepName,
                             new HashMap<String, Value>(),
-                            returnValues.getOutputs(),
-                            null, returnValues.getResult()
+                            new HashMap<String, Value>(),
+                            null, (String)branchData.get(LanguageEventData.RESULT)
                     )
             );
         }
