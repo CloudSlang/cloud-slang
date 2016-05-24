@@ -10,7 +10,7 @@ namespace: user.versioning.ops
 operation:
   name: javaOneAnother31
   java_action:
-    gav: 'hpe.java:one:3.1'
+    gav: 'cloudslang.java:one:3.1'
     class_name: group.artifact.OneClass
     method_name: getVersion
   outputs:

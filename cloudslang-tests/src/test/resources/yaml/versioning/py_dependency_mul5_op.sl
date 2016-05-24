@@ -16,7 +16,7 @@ operation:
         required: true
   python_action:
     dependencies:
-      - 'hpe.release:ver:mul-5.0'
+      - 'cloudslang.release:ver:mul-5.0'
     script: |
       import ver.utils.getver as ver
       ver_label = ver.get_ver(var1,var2)
