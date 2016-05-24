@@ -86,7 +86,7 @@ public class ActionStepsTest {
         nonSerializableExecutionData = new HashMap<>();
     }
 
-    @Test//(timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void doActionJavaTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();

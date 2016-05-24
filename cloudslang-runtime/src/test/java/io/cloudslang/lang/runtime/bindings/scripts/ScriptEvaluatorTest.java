@@ -54,21 +54,22 @@ public class ScriptEvaluatorTest {
     @Autowired
     private ScriptEvaluator scriptEvaluator;
 
-    private static PythonInterpreter evalInterpreter = mock(PythonInterpreter.class);
+    @Autowired
+    private PythonInterpreter pythonInterpreter;
 
     @Test
     public void testEvalExpr() throws Exception {
-        reset(evalInterpreter);
+        reset(pythonInterpreter);
         scriptEvaluator.evalExpr("", new HashMap<String, Serializable>(), new HashSet<SystemProperty>());
-        verify(evalInterpreter).eval(eq(""));
-        verify(evalInterpreter).set("true", Boolean.TRUE);
-        verify(evalInterpreter).set("false", Boolean.FALSE);
+        verify(pythonInterpreter).eval(eq(""));
+        verify(pythonInterpreter).set("true", Boolean.TRUE);
+        verify(pythonInterpreter).set("false", Boolean.FALSE);
     }
 
     @Test
     public void testEvalExprError() throws Exception {
-        reset(evalInterpreter);
-        when(evalInterpreter.eval(anyString())).thenThrow(new RuntimeException("error from interpreter"));
+        reset(pythonInterpreter);
+        when(pythonInterpreter.eval(anyString())).thenThrow(new RuntimeException("error from interpreter"));
         exception.expect(RuntimeException.class);
         exception.expectMessage("input_expression");
         exception.expectMessage("error from interpreter");
@@ -77,7 +78,7 @@ public class ScriptEvaluatorTest {
 
     @Test
     public void testEvalFunctions() throws Exception {
-        reset(evalInterpreter);
+        reset(pythonInterpreter);
         Set<SystemProperty> props = new HashSet<>();
         SystemProperty systemProperty = new SystemProperty("a.b", "c.key", "value");
         props.add(systemProperty);
@@ -90,14 +91,14 @@ public class ScriptEvaluatorTest {
         );
         ArgumentCaptor<String> scriptCaptor = ArgumentCaptor.forClass(String.class);
 
-        when(evalInterpreter.getLocals()).thenReturn(new PyStringMap());
+        when(pythonInterpreter.getLocals()).thenReturn(new PyStringMap());
 
         scriptEvaluator.evalExpr("", new HashMap<String, Serializable>(), props, functionDependencies);
 
-        verify(evalInterpreter).eval(eq(""));
-        verify(evalInterpreter, atLeastOnce()).set("__sys_prop__", propsAsMap);
+        verify(pythonInterpreter).eval(eq(""));
+        verify(pythonInterpreter, atLeastOnce()).set("__sys_prop__", propsAsMap);
 
-        verify(evalInterpreter).exec(scriptCaptor.capture());
+        verify(pythonInterpreter).exec(scriptCaptor.capture());
         String actualScript = scriptCaptor.getValue();
         String[] actualFunctionsArray = actualScript.split(LINE_SEPARATOR + LINE_SEPARATOR);
         Set<String> actualFunctions = new HashSet<>();
@@ -138,12 +139,17 @@ public class ScriptEvaluatorTest {
         }
 
         @Bean
+        public PythonInterpreter pythonInterpreter() {
+            return mock(PythonInterpreter.class);
+        }
+
+        @Bean
         public PythonExecutionEngine pythonExecutionEngine(){
             return new PythonExecutionCachedEngine() {
                 protected PythonExecutor createNewExecutor(Set<String> filePaths) {
                     return new PythonExecutor(filePaths) {
                         protected PythonInterpreter initInterpreter(Set<String> dependencies) {
-                            return evalInterpreter;
+                            return  pythonInterpreter();
                         }
                     };
                 }
