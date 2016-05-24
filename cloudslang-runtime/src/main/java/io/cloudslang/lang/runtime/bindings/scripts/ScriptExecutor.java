@@ -33,7 +33,7 @@ public class ScriptExecutor {
         return pythonRuntimeService.exec(Collections.<String>emptySet(), script, callArguments);
     }
 
-    public Map<String, Serializable> executeScript (Set dependencies, String script, Map<String, Serializable> callArguments) {
+    public Map<String, Serializable> executeScript (Set<String> dependencies, String script, Map<String, Serializable> callArguments) {
         return pythonRuntimeService.exec(dependencies, script, callArguments);
     }
 }
