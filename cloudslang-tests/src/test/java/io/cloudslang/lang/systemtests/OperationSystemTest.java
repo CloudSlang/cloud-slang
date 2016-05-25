@@ -60,6 +60,7 @@ public class OperationSystemTest extends SystemsTestsParent {
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
     @Test
+    @Ignore
     public void testCompileAndRunOperationWithDataMissingInput() throws Exception {
         try {
             URL resource = getClass().getResource("/yaml/test_op_2.sl");
