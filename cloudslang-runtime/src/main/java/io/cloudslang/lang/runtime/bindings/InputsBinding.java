@@ -71,7 +71,14 @@ public class InputsBinding {
             throw new RuntimeException(errorMessage);
         }
 
-        targetContext.put(inputName, value);
+        if (inputValueIsSet(input, context, value)) {
+            targetContext.put(inputName, value);
+        }
+
+    }
+
+    private boolean inputValueIsSet(Input input, Map<String, ? extends Serializable> context, Serializable value) {
+        return !(value == null && !input.isDefaultSpecified() && !context.containsKey(input.getName()));
     }
 
     private Serializable resolveValue(
@@ -94,7 +101,9 @@ public class InputsBinding {
             Serializable rawValue = input.getValue();
             String expressionToEvaluate = ExpressionUtils.extractExpression(rawValue);
             if (expressionToEvaluate != null) {
-                scriptContext.put(inputName, valueFromContext);
+                if (context.containsKey(inputName)) {
+                    scriptContext.put(inputName, valueFromContext);
+                }
                 //so you can resolve previous inputs already bound
                 scriptContext.putAll(targetContext);
                 value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, input.getFunctionDependencies());

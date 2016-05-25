@@ -92,7 +92,7 @@ public class InputsBindingTest {
 
     @Test
     public void testAssignFromInput() {
-        Input input1 = new Input.InputBuilder("input1", "${ input1 }")
+        Input input1 = new Input.InputBuilder("input1", "val1")
                 .withEncrypted(false)
                 .withRequired(false)
                 .withPrivateInput(true)
@@ -106,9 +106,67 @@ public class InputsBindingTest {
         Map<String,Serializable> result = bindInputs(inputs);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(null, result.get("input1"));
+        Assert.assertEquals("val1", result.get("input1"));
         Assert.assertTrue(result.containsKey("input2"));
-        Assert.assertEquals(null, result.get("input2"));
+        Assert.assertEquals("val1", result.get("input2"));
+    }
+
+    @Test
+    public void testPrivateInputMissingInContext() {
+        Input input1 = new Input.InputBuilder("input1", "${ input1 }")
+                .withEncrypted(false)
+                .withRequired(false)
+                .withPrivateInput(true)
+                .build();
+        List<Input> inputs = Collections.singletonList(input1);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Error binding input: 'input1', \n" +
+                "\tError is: Error in running script expression: 'input1',\n" +
+                "\tException is: name 'input1' is not defined");
+        bindInputs(inputs);
+    }
+
+    @Test
+    public void testInputMissingInContext() {
+        Input input1 = new Input.InputBuilder("input1", "${ input1 }")
+                .withEncrypted(false)
+                .withRequired(false)
+                .withPrivateInput(false)
+                .build();
+        List<Input> inputs = Collections.singletonList(input1);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Error binding input: 'input1', \n" +
+                "\tError is: Error in running script expression: 'input1',\n" +
+                "\tException is: name 'input1' is not defined");
+        bindInputs(inputs);
+    }
+
+    @Test
+     public void testInputMissing() {
+        Input input1 = new Input.InputBuilder("input1", null)
+                .withEncrypted(false)
+                .withRequired(false)
+                .withPrivateInput(false)
+                .withDefaultSpecified(false)
+                .build();
+        List<Input> inputs = Collections.singletonList(input1);
+        Map<String,Serializable> result = bindInputs(inputs);
+        Assert.assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testInputWithDefaultValueNull() {
+        Input input1 = new Input.InputBuilder("input1", null)
+                .withEncrypted(false)
+                .withRequired(false)
+                .withPrivateInput(false)
+                .withDefaultSpecified(true)
+                .build();
+        List<Input> inputs = Collections.singletonList(input1);
+        Map<String,Serializable> result = bindInputs(inputs);
+        Assert.assertFalse(result.isEmpty());
+        Assert.assertTrue(result.containsKey("input1"));
+        Assert.assertEquals(null, result.get("input1"));
     }
 
     @Test
@@ -246,7 +304,7 @@ public class InputsBindingTest {
     }
 
     @Test
-    public void testOverrideAssignFrom2(){
+    public void testOverrideAssignFrom2() {
         Map<String,Serializable> context = new HashMap<>();
         context.put("input1", 5);
         Input input = new Input.InputBuilder("input1", 3)
@@ -304,7 +362,7 @@ public class InputsBindingTest {
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
-        List<Input> inputs = Arrays.asList(input);
+        List<Input> inputs = Collections.singletonList(input);
 
         bindInputs(inputs, context);
     }
