@@ -15,6 +15,8 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.systemtests.RuntimeInformation;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.ValueSyntaxParent;
@@ -56,7 +58,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
 
-        Map<String, Serializable> userInputs = prepareUserInputs();
+        Map<String, Value> userInputs = prepareUserInputs();
         Set<SystemProperty> systemProperties = prepareSystemProperties();
 
         // trigger ExecutionPlan
@@ -86,7 +88,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
 
         // trigger ExecutionPlan
-        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Value> userInputs = new HashMap<>();
         RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, EMPTY_SET);
         Map<String, StepData> executionData = runtimeInformation.getSteps();
 
@@ -199,9 +201,9 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         );
     }
 
-    private Map<String, Serializable> prepareUserInputs() {
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("exist", "exist_value");
+    private Map<String, Value> prepareUserInputs() {
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("exist", ValueFactory.create("exist_value"));
         return userInputs;
     }
 

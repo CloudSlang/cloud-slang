@@ -9,7 +9,8 @@
 *******************************************************************************/
 package io.cloudslang.lang.entities.bindings;
 
-import java.io.Serializable;
+import io.cloudslang.lang.entities.bindings.values.Value;
+
 import java.util.Set;
 
 /**
@@ -21,13 +22,13 @@ public class Output extends InOutParam {
 
 	private static final long serialVersionUID = -5390581034091916685L;
 
-	public Output(String name, Serializable value) {
+	public Output(String name, Value value) {
 		super(name, value);
 	}
 
 	public Output(
 			String name,
-			Serializable value,
+			Value value,
 			Set<ScriptFunction> scriptFunctions,
 			Set<String> systemPropertyDependencies) {
 		super(name, value, scriptFunctions, systemPropertyDependencies);

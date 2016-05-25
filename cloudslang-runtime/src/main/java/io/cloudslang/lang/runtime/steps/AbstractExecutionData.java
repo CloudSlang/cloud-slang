@@ -12,10 +12,15 @@ package io.cloudslang.lang.runtime.steps;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
-import io.cloudslang.lang.runtime.env.*;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.runtime.env.Context;
+import io.cloudslang.lang.runtime.env.ContextStack;
+import io.cloudslang.lang.runtime.env.ParentFlowData;
+import io.cloudslang.lang.runtime.env.ParentFlowStack;
+import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import org.apache.commons.lang3.tuple.Pair;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -42,24 +47,20 @@ public abstract class AbstractExecutionData {
     }
 
     public void sendEndBindingInputsEvent(List<Input> inputs,
-                                          final Map<String, Serializable> context,
+                                          final Map<String, Value> context,
                                           RunEnvironment runEnv,
                                           ExecutionRuntimeServices executionRuntimeServices,
                                           String desc,
                                           LanguageEventData.StepType stepType,
                                           String stepName) {
-        Map<String, Serializable> inputsForEvent = new LinkedHashMap<>();
+        Map<String, Value> inputsForEvent = new LinkedHashMap<>();
         for (Input input : inputs) {
             String inputName = input.getName();
-            Serializable inputValue = context.get(inputName);
-            if (input.isEncrypted()) {
-                inputsForEvent.put(inputName, LanguageEventData.ENCRYPTED_VALUE);
-            } else {
-                inputsForEvent.put(inputName, inputValue);
-            }
+            Value inputValue = context.get(inputName);
+            inputsForEvent.put(inputName, inputValue);
         }
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_INPUT_END, desc, stepType, stepName,
-                Pair.of(LanguageEventData.BOUND_INPUTS, (Serializable) inputsForEvent));
+                Pair.of(LanguageEventData.BOUND_INPUTS, (Serializable)inputsForEvent));
     }
 
     public void sendStartBindingArgumentsEvent(
@@ -85,15 +86,15 @@ public abstract class AbstractExecutionData {
 
     public void sendEndBindingArgumentsEvent(
             List<Argument> arguments,
-            final Map<String, Serializable> context,
+            final Map<String, Value> context,
             RunEnvironment runEnv,
             ExecutionRuntimeServices executionRuntimeServices,
             String description,
             String stepName) {
-        Map<String, Serializable> argumentsForEvent = new LinkedHashMap<>();
+        Map<String, Value> argumentsForEvent = new LinkedHashMap<>();
         for (Argument argument : arguments) {
             String argumentName = argument.getName();
-            Serializable argumentValue = context.get(argumentName);
+            Value argumentValue = context.get(argumentName);
             argumentsForEvent.put(argumentName, argumentValue);
         }
         fireEvent(
@@ -135,12 +136,13 @@ public abstract class AbstractExecutionData {
         eventData.setExecutionId(runtimeServices.getExecutionId());
         eventData.setPath(path);
         for (Entry<String, ? extends Serializable> field : fields) {
-            eventData.put(field.getKey(), field.getValue());
+            //noinspection unchecked
+            eventData.put(field.getKey(), LanguageEventData.maskSensitiveValues(field.getValue()));
         }
         runtimeServices.addEvent(type, eventData);
     }
 
-    protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment, Context currentContext, Map<String, Serializable> callArguments) {
+    protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment, Context currentContext, Map<String, Value> callArguments) {
         ContextStack contextStack = runEnvironment.getStack();
         contextStack.pushContext(currentContext);
         //TODO: put a deep clone of the new context
