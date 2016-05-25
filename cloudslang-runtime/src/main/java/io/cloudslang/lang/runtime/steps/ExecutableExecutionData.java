@@ -123,7 +123,10 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     LanguageEventData.StepType.EXECUTABLE, nodeName,
                     Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable)executableOutputs),
                     Pair.of(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable)executableResults),
-                    executableType == ExecutableType.OPERATION ? null : Pair.of(ACTION_RETURN_VALUES_KEY, actionReturnValues));
+                    Pair.of(ACTION_RETURN_VALUES_KEY,
+                            executableType == ExecutableType.OPERATION ?
+                                    new ReturnValues(new HashMap<String, Value>(), actionReturnValues.getResult()) :
+                                    actionReturnValues));
 
             // Resolving the result of the operation/flow
             String result = resultsBinding.resolveResult(

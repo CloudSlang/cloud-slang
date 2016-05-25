@@ -136,10 +136,8 @@ public abstract class AbstractExecutionData {
         eventData.setExecutionId(runtimeServices.getExecutionId());
         eventData.setPath(path);
         for (Entry<String, ? extends Serializable> field : fields) {
-            if (field != null) {
-                //noinspection unchecked
-                eventData.put(field.getKey(), LanguageEventData.maskSensitiveValues(field.getValue()));
-            }
+            //noinspection unchecked
+            eventData.put(field.getKey(), LanguageEventData.maskSensitiveValues(field.getValue()));
         }
         runtimeServices.addEvent(type, eventData);
     }

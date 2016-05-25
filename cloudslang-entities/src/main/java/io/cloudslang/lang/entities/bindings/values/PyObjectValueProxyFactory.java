@@ -52,10 +52,6 @@ public class PyObjectValueProxyFactory {
             ((Proxy)pyObjectValue).setHandler(new PyObjectValueMethodHandler(content, sensitive, pyObject));
             return pyObjectValue;
         } catch (Exception e) {
-            // ToDo remove
-            System.out.println("\nError in PyObjectValueProxyFactory\n");
-            e.printStackTrace();
-
             throw new RuntimeException("Failed to create a proxy to new instance for PyObjectValue and " + pyObject.getClass().getSimpleName(), e);
         }
     }
@@ -134,8 +130,6 @@ public class PyObjectValueProxyFactory {
             } else if (PyObject.class.isAssignableFrom(thisMethod.getDeclaringClass())) {
                 Method pyObjectMethod = pyObject.getClass().getMethod(thisMethod.getName(), thisMethod.getParameterTypes());
                 if (!thisMethod.getName().equals("toString")) {
-                    // ToDo remove
-                    System.out.println("MethodHandler: " + thisMethod.getName() + ". " + thisMethod.toString());
                     accessed = true;
                 }
                 return pyObjectMethod.invoke(pyObject, args);
