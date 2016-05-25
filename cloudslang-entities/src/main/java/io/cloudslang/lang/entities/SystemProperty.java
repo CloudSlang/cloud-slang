@@ -11,6 +11,8 @@
  */
 package io.cloudslang.lang.entities;
 
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -27,9 +29,9 @@ public class SystemProperty implements Serializable {
 
     private final String namespace;
     private final String fullyQualifiedName;
-    private final String value;
+    private final Value value;
 
-    public SystemProperty(String namespace, String key, String value) {
+    public SystemProperty(String namespace, String key, String value, boolean sensitive) {
         Validate.notNull(namespace, "System property namespace cannot be null");
         Validate.notEmpty(key, "System property key cannot be empty");
 
@@ -42,7 +44,11 @@ public class SystemProperty implements Serializable {
 
         this.namespace = namespace;
         this.fullyQualifiedName = fullyQualifiedName;
-        this.value = value;
+        this.value = ValueFactory.create(value, sensitive);
+    }
+
+    public SystemProperty(String namespace, String key, String value) {
+        this(namespace, key, value, false);
     }
 
     public SystemProperty(String key, String value) {
@@ -67,7 +73,7 @@ public class SystemProperty implements Serializable {
         return fullyQualifiedName;
     }
 
-    public String getValue() {
+    public Value getValue() {
         return value;
     }
 

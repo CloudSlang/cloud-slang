@@ -20,7 +20,10 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
-import io.cloudslang.runtime.impl.python.*;
+import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
+import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
+import io.cloudslang.runtime.impl.python.PythonExecutionNotCachedEngine;
+import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,15 +35,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.io.File;
-import java.io.Serializable;
-import java.util.*;
 
 import static org.junit.Assert.assertNull;
 

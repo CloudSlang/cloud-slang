@@ -25,7 +25,6 @@ import io.cloudslang.runtime.api.java.JavaRuntimeService;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.python.google.common.collect.Sets;
@@ -33,7 +32,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
@@ -108,16 +111,34 @@ public class ActionExecutionData extends AbstractExecutionData {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Serializable> runJavaAction(Map<String, SerializableSessionObject> serializableSessionData,
-                                                    Map<String, Serializable> currentContext,
+    private Map<String, Value> runJavaAction(Map<String, SerializableSessionObject> serializableSessionData,
+                                                    Map<String, Value> currentContext,
                                                     Map<String, Object> nonSerializableExecutionData,
                                                     String gav, String className, String methodName) {
         Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService.execute(normalizeJavaGav(gav), className, methodName,
-                new CloudSlangJavaExecutionParameterProvider(serializableSessionData, currentContext, nonSerializableExecutionData));
+                new CloudSlangJavaExecutionParameterProvider(serializableSessionData, createActionContext(currentContext), nonSerializableExecutionData));
         if (returnMap == null) {
             throw new RuntimeException("Action method did not return Map<String,String>");
         }
-        return returnMap;
+        return createActionResult(returnMap, currentContext);
+    }
+
+    protected Map<String, Serializable> createActionContext(Map<String, Value> context) {
+        Map<String, Serializable> result = new HashMap<>();
+        for (Map.Entry<String, Value> entry : context.entrySet()) {
+            result.put(entry.getKey(), entry.getValue() == null ? null : entry.getValue().get());
+        }
+        return result;
+    }
+
+    protected Map<String, Value> createActionResult(Map<String, Serializable> executionResult, Map<String, Value> context) {
+        Map<String, Value> result = new HashMap<>();
+        for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {
+            Value callArgumenet = context.get(entry.getKey());
+            Value value = ValueFactory.create(entry.getValue(), callArgumenet != null && callArgumenet.isSensitive());
+            result.put(entry.getKey(), value);
+        }
+        return result;
     }
 
     /**
@@ -145,7 +166,7 @@ public class ActionExecutionData extends AbstractExecutionData {
         return normalizedDependencies;
     }
 
-    private Map<String, Serializable> prepareAndRunPythonAction(Collection<String> dependencies, String pythonScript, Map<String, Serializable> callArguments) {
+    private Map<String, Value> prepareAndRunPythonAction(Collection<String> dependencies, String pythonScript, Map<String, Value> callArguments) {
         if (StringUtils.isNotBlank(pythonScript)) {
             return scriptExecutor.executeScript(normalizePythonDependencies(dependencies), pythonScript, callArguments);
         }

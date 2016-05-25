@@ -30,12 +30,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
+import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -90,8 +92,6 @@ public class ScriptEvaluatorTest {
         Set<SystemProperty> props = new HashSet<>();
         SystemProperty systemProperty = new SystemProperty("a.b", "c.key", "value");
         props.add(systemProperty);
-        Map<String, String> propsAsMap = new HashMap<>();
-        propsAsMap.put(systemProperty.getFullyQualifiedName(), systemProperty.getValue());
         Set<ScriptFunction> functionDependencies = Sets.newHashSet(
                 ScriptFunction.GET,
                 ScriptFunction.GET_SYSTEM_PROPERTY,
@@ -104,7 +104,7 @@ public class ScriptEvaluatorTest {
         scriptEvaluator.evalExpr("", new HashMap<String, Value>(), props, functionDependencies);
 
         verify(pythonInterpreter).eval(eq(""));
-        verify(pythonInterpreter, atLeastOnce()).set("__sys_prop__", propsAsMap);
+        verify(pythonInterpreter, atLeastOnce()).set(eq("__sys_prop__"), anyMap());
 
         verify(pythonInterpreter).exec(scriptCaptor.capture());
         String actualScript = scriptCaptor.getValue();
