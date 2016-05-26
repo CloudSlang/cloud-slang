@@ -22,5 +22,4 @@
     <score:worker uuid="-1"/>
 
     <bean class="io.cloudslang.lang.systemtests.TriggerFlows"/>
-
 </beans>

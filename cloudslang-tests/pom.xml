@@ -33,6 +33,26 @@
         </dependency>
 
         <dependency>
+            <groupId>${score.group}</groupId>
+            <artifactId>runtime-management-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${score.group}</groupId>
+            <artifactId>runtime-management-impl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${score.group}</groupId>
+            <artifactId>dependency-management-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${score.group}</groupId>
+            <artifactId>dependency-management-impl</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
         </dependency>
