@@ -7,6 +7,7 @@ import io.cloudslang.runtime.api.java.JavaExecutionParametersProvider;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,8 @@ import java.util.Map;
  * Created by Genadi Rabinovich, genadi@hpe.com on 17/05/2016.
  */
 public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionParametersProvider {
+    private static Method PARAM_VALUE_METHOD = null;
+
     private final Map<String, SerializableSessionObject> serializableSessionData;
     private final Map<String, Serializable> currentContext;
     private final Map<String, Object> nonSerializableExecutionData;
@@ -37,13 +40,13 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
         for (Annotation[] annotations : executionMethod.getParameterAnnotations()) {
             index++;
             for (Annotation annotation : annotations) {
-                if (annotation instanceof Param) {
+                String parameterName = getValueIfParamAnnotation(annotation);
+                if (parameterName != null) {
                     if (parameterTypes[index - 1].equals(GlobalSessionObject.class)) {
-                        handleNonSerializableSessionContextArgument(nonSerializableExecutionData, args, (Param) annotation);
+                        handleNonSerializableSessionContextArgument(nonSerializableExecutionData, args, parameterName);
                     } else if (parameterTypes[index - 1].equals(SerializableSessionObject.class)) {
-                        handleSerializableSessionContextArgument(serializableSessionData, args, (Param) annotation);
+                        handleSerializableSessionContextArgument(serializableSessionData, args, parameterName);
                     } else {
-                        String parameterName = ((Param) annotation).value();
                         Serializable value = currentContext.get(parameterName);
                         Class parameterClass = parameterTypes[index - 1];
                         if (parameterClass.isInstance(value) || value == null) {
@@ -70,23 +73,40 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
         return args.toArray(new Object[args.size()]);
     }
 
-    private void handleNonSerializableSessionContextArgument(Map<String, Object> nonSerializableExecutionData, List<Object> args, Param annotation) {
-        String key = annotation.value();
-        Object nonSerializableSessionContextObject = nonSerializableExecutionData.get(key);
+    private String getValueIfParamAnnotation(Annotation annotation) {
+        Class<? extends Annotation> annotationType = annotation.annotationType();
+        if ("com.hp.oo.sdk.content.annotations.Param".equalsIgnoreCase(annotation.annotationType().getCanonicalName())) {
+            if(PARAM_VALUE_METHOD == null) {
+                try {
+                    PARAM_VALUE_METHOD = annotationType.getMethod("value", new Class[0]);
+                } catch (NoSuchMethodException e) {
+                    throw new RuntimeException("com.hp.oo.sdk.content.annotations.Param" + " annotation does not have value method!!!!", e);
+                }
+            }
+            try {
+                return (String) PARAM_VALUE_METHOD.invoke(annotation, new Object[0]);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException("Failed to get value from " + "com.hp.oo.sdk.content.annotations.Param" + " annotation", e);
+            }
+        }
+        return null;
+    }
+
+    private void handleNonSerializableSessionContextArgument(Map<String, Object> nonSerializableExecutionData, List<Object> args, String parameterName) {
+        Object nonSerializableSessionContextObject = nonSerializableExecutionData.get(parameterName);
         if (nonSerializableSessionContextObject == null) {
             nonSerializableSessionContextObject = new GlobalSessionObject<>();
-            nonSerializableExecutionData.put(key, nonSerializableSessionContextObject);
+            nonSerializableExecutionData.put(parameterName, nonSerializableSessionContextObject);
         }
         args.add(nonSerializableSessionContextObject);
     }
 
-    private void handleSerializableSessionContextArgument(Map<String, SerializableSessionObject> serializableSessionData, List<Object> args, Param annotation) {
-        String key = annotation.value();
-        SerializableSessionObject serializableSessionContextObject = serializableSessionData.get(key);
+    private void handleSerializableSessionContextArgument(Map<String, SerializableSessionObject> serializableSessionData, List<Object> args, String parameterName) {
+        SerializableSessionObject serializableSessionContextObject = serializableSessionData.get(parameterName);
         if (serializableSessionContextObject == null) {
             serializableSessionContextObject = new SerializableSessionObject();
             //noinspection unchecked
-            serializableSessionData.put(key, serializableSessionContextObject);
+            serializableSessionData.put(parameterName, serializableSessionContextObject);
         }
         args.add(serializableSessionContextObject);
     }
