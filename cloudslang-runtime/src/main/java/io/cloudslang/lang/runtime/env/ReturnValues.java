@@ -10,22 +10,24 @@
 
 package io.cloudslang.lang.runtime.env;
 
+import io.cloudslang.lang.entities.bindings.values.Value;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ReturnValues implements Serializable{
 
-    private final Map<String, Serializable> outputs;
+    private final Map<String, Value> outputs;
 
     private final String result;
 
-    public ReturnValues(Map<String, Serializable> outputs, String result) {
+    public ReturnValues(Map<String, Value> outputs, String result) {
         this.outputs = new HashMap<>(outputs);
         this.result = result;
     }
 
-    public Map<String, Serializable> getOutputs() {
+    public Map<String, Value> getOutputs() {
         return outputs;
     }
 
@@ -40,5 +42,4 @@ public class ReturnValues implements Serializable{
                 "outputs=" + outputs +
                 '}';
     }
-
 }

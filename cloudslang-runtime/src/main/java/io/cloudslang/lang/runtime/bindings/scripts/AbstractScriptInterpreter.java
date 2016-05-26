@@ -11,13 +11,35 @@
  */
 package io.cloudslang.lang.runtime.bindings.scripts;
 
-import org.python.core.*;
+import io.cloudslang.lang.entities.bindings.values.PyObjectValue;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import org.apache.commons.lang.SerializationUtils;
+import org.python.core.Py;
+import org.python.core.PyArray;
+import org.python.core.PyBoolean;
+import org.python.core.PyDictionary;
+import org.python.core.PyException;
+import org.python.core.PyFile;
+import org.python.core.PyFunction;
+import org.python.core.PyList;
+import org.python.core.PyModule;
+import org.python.core.PyObject;
+import org.python.core.PySet;
+import org.python.core.PyStringMap;
+import org.python.core.PySystemState;
+import org.python.core.PyType;
 import org.python.util.PythonInterpreter;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Bonczidai Levente
@@ -29,65 +51,105 @@ public abstract class AbstractScriptInterpreter {
         interpreter.setLocals(new PyStringMap());
     }
 
-    protected Map<String, Serializable> exec(PythonInterpreter interpreter, String script) {
+    protected Map<String, Value> exec(PythonInterpreter interpreter, String script) {
         interpreter.exec(script);
         Iterator<PyObject> localsIterator = interpreter.getLocals().asIterable().iterator();
-        Map<String, Serializable> returnValue = new HashMap<>();
+        Map<String, Value> returnValues = new HashMap<>();
         while (localsIterator.hasNext()) {
             String key = localsIterator.next().asString();
             PyObject value = interpreter.get(key);
             if (keyIsExcluded(key, value)) {
                 continue;
             }
-            Serializable javaValue = resolveJythonObjectToJavaExec(value, key);
-            returnValue.put(key, javaValue);
+            Value javaValue = resolveJythonObjectToJavaExec(value, key, null);
+            returnValues.put(key, javaValue);
         }
-        return returnValue;
+        return returnValues;
     }
 
-    protected Serializable eval(PythonInterpreter interpreter, String script) {
+    protected Value eval(PythonInterpreter interpreter, String script) {
         PyObject evalResultAsPyObject = interpreter.eval(script);
-        Serializable evalResult;
-        evalResult = resolveJythonObjectToJavaEval(evalResultAsPyObject, script);
-        return evalResult;
+        return resolveJythonObjectToJavaEval(evalResultAsPyObject, script, interpreter);
     }
 
-    private Serializable resolveJythonObjectToJavaExec(PyObject value, String key) {
+    private Value resolveJythonObjectToJavaExec(PyObject value, String key, PythonInterpreter interpreter) {
         String errorMessage =
                 "Non-serializable values are not allowed in the output context of a Python script:\n" +
-                        "\tConversion failed for '" + key + "' (" + String.valueOf(value) + "),\n" +
+                        "\tConversion failed for '" + key + "' (" + getValue(value) + "),\n" +
                         "\tThe error can be solved by removing the variable from the context in the script: e.g. 'del " + key + "'.\n";
-        return resolveJythonObjectToJava(value, errorMessage);
+        return resolveJythonObjectToJava(value, errorMessage, interpreter);
     }
 
-    private Serializable resolveJythonObjectToJavaEval(PyObject value, String expression) {
+    private Value resolveJythonObjectToJavaEval(PyObject value, String expression, PythonInterpreter interpreter) {
         String errorMessage =
                 "Evaluation result for a Python expression should be serializable:\n" +
-                        "\tConversion failed for '" + expression + "' (" + String.valueOf(value) + ").\n";
-        return resolveJythonObjectToJava(value, errorMessage);
+                        "\tConversion failed for '" + expression + "' (" + getValue(value) + ").\n";
+        return resolveJythonObjectToJava(value, errorMessage, interpreter);
     }
 
-    private Serializable resolveJythonObjectToJava(PyObject value, String errorMessage) {
+    private Object getValue(PyObject value) {
+        return value != null && value instanceof Value ? ((Value)value).get() : value;
+    }
+
+    private Value resolveJythonObjectToJava(PyObject value, String errorMessage, PythonInterpreter interpreter) {
         if (value == null) {
             return null;
+        } else if (value instanceof Value) {
+            return ValueFactory.create(value, getSensitive(interpreter));
+        } else {
+            try {
+                Serializable serializable = (Serializable)toJava(value);
+                return ValueFactory.create(serializable, getSensitive(interpreter));
+            } catch (PyException e) {
+                PyObject typeObject = e.type;
+                if (typeObject instanceof PyType) {
+                    PyType type = (PyType) typeObject;
+                    String typeName = type.getName();
+                    if ("TypeError".equals(typeName)) {
+                        throw new RuntimeException(errorMessage, e);
+                    }
+                }
+                throw e;
+            }
         }
-        if (value instanceof PyBoolean) {
-            PyBoolean pyBoolean = (PyBoolean) value;
-            return pyBoolean.getBooleanValue();
-        }
-        try {
-            return Py.tojava(value, Serializable.class);
-        } catch (PyException e) {
-            PyObject typeObject = e.type;
-            if (typeObject instanceof PyType) {
-                PyType type = (PyType) typeObject;
-                String typeName = type.getName();
-                if ("TypeError".equals(typeName)) {
-                    throw new RuntimeException(errorMessage, e);
+    }
+
+    private boolean getSensitive(PythonInterpreter interpreter) {
+        if (interpreter != null && interpreter.getLocals() != null) {
+            for (PyObject pyObject : interpreter.getLocals().asIterable()) {
+                String key = pyObject.asString();
+                PyObject value = interpreter.get(key);
+                if (value != null && value instanceof PyObjectValue) {
+                    PyObjectValue pyObjectValue = (PyObjectValue) value;
+                    if (pyObjectValue.isSensitive() && pyObjectValue.isAccessed()) {
+                        return true;
+                    }
                 }
             }
-            throw e;
         }
+        return false;
+    }
+
+    private Object toJava(PyObject value) {
+        if (value instanceof PyBoolean) {
+            return ((PyBoolean) value).getBooleanValue();
+        }
+        if (value instanceof PyList) {
+            return new ArrayList<>((List<?>)value);
+        }
+        if (value instanceof PyDictionary) {
+            return new ConcurrentHashMap<>((Map<?, ?>)value);
+        }
+        if (value instanceof PySet) {
+            return new HashSet<>((Set<?>)value);
+        }
+        if (value instanceof PyArray) {
+            return SerializationUtils.clone((Serializable)((PyArray) value).getArray());
+        }
+        if (value instanceof PyType) {
+            return ((PyType) value).getName();
+        }
+        return Py.tojava(value, Serializable.class);
     }
 
     private boolean keyIsExcluded(String key, PyObject value) {
@@ -97,5 +159,4 @@ public abstract class AbstractScriptInterpreter {
                 value instanceof PyFunction ||
                 value instanceof PySystemState;
     }
-
 }

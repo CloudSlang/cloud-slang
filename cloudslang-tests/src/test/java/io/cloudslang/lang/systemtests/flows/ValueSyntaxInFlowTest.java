@@ -23,6 +23,7 @@ import org.junit.Test;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -93,7 +94,7 @@ public class ValueSyntaxInFlowTest extends ValueSyntaxParent {
     }
 
     private void verifyStepPublishValues(StepData stepData) {
-        Map<String, Serializable> expectedStepPublishValues = new HashMap<>();
+        Map<String, Serializable> expectedStepPublishValues = new LinkedHashMap<>();
 
         expectedStepPublishValues.put("output_no_expression", "output_no_expression_value");
         expectedStepPublishValues.put("publish_int", 22);

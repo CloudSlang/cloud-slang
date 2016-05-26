@@ -9,9 +9,14 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.events;
 
+import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
+import io.cloudslang.lang.entities.bindings.values.Value;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +25,7 @@ import java.util.Map;
  * @version $Id$
  * @since 03/11/2014
  */
+@SuppressWarnings("unchecked")
 public class LanguageEventData extends HashMap<String, Serializable> {
 
     public static final String TYPE = "TYPE";
@@ -36,9 +42,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     public static final String BOUND_INPUTS = "BOUND_INPUTS";
     public static final String BOUND_ARGUMENTS = "BOUND_ARGUMENTS";
     public static final String BOUND_PARALLEL_LOOP_EXPRESSION = "BOUND_PARALLEL_LOOP_EXPRESSION";
-    public static final String RETURN_VALUES = "RETURN_VALUES";
     public static final String NEXT_STEP_POSITION = "nextPosition";
-    public static final String ENCRYPTED_VALUE = "*****";
     public static final String STEP_TYPE = "STEP_TYPE";
     public static final String STEP_NAME = "STEP_NAME";
 
@@ -126,7 +130,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     }
 
     public void setInputs(Map<String, Serializable> inputs) {
-        put(BOUND_INPUTS, (Serializable) inputs);
+        put(BOUND_INPUTS, (Serializable)inputs);
     }
 
     public Map<String, Serializable> getArguments() {
@@ -134,7 +138,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     }
 
     public void setArguments(Map<String, Serializable> arguments) {
-        put(BOUND_ARGUMENTS, (Serializable) arguments);
+        put(BOUND_ARGUMENTS, (Serializable)arguments);
     }
 
     public Map<String, Serializable> getOutputs() {
@@ -142,7 +146,15 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     }
 
     public void setOutputs(Map<String, Serializable> outputs) {
-        put(OUTPUTS, (Serializable) outputs);
+        put(OUTPUTS, (Serializable)outputs);
+    }
+
+    public Map<String, Serializable> getCallArguments() {
+        return (Map<String, Serializable>) get(CALL_ARGUMENTS);
+    }
+
+    public void setCallArguments(Map<String, Serializable> callArguments) {
+        put(CALL_ARGUMENTS, (Serializable)callArguments);
     }
 
     public List<Serializable> getParallelLoopBoundExpression() {
@@ -153,8 +165,37 @@ public class LanguageEventData extends HashMap<String, Serializable> {
         put(BOUND_PARALLEL_LOOP_EXPRESSION, (Serializable) parallelLoopBoundExpression);
     }
 
-    public Map<String, Serializable> getCallArguments() {return (Map<String, Serializable>) get(CALL_ARGUMENTS);}
+    @SuppressWarnings("unchecked")
+    public static Serializable maskSensitiveValues(Serializable serializable) {
+        if (serializable instanceof Map) {
+            return (Serializable)maskSensitiveValues((Map<String, Serializable>)serializable);
+        } else if (serializable instanceof List) {
+            return (Serializable)maskSensitiveValues((List<Serializable>)serializable);
+        } else {
+            return serializable;
+        }
+    }
 
-    public void setCallArguments(Map<String, Serializable> callArguments) {put(CALL_ARGUMENTS, (Serializable) callArguments);
+    public static Map<String, Serializable> maskSensitiveValues(Map<String, ? extends Serializable> values) {
+        Map<String, Serializable> result = new LinkedHashMap<>();
+        for (Map.Entry<String, ? extends Serializable> entry : values.entrySet()) {
+            result.put(entry.getKey(), getMaskedValue(entry.getValue()));
+        }
+        return result;
+    }
+
+    public static List<Serializable> maskSensitiveValues(List<? extends Serializable> values) {
+        List<Serializable> result = new ArrayList<>();
+        for (Serializable value : values) {
+            result.add(getMaskedValue(value));
+        }
+        return result;
+    }
+
+    private static Serializable getMaskedValue(Serializable value) {
+        if (value != null && value instanceof Value) {
+            return ((Value)value).isSensitive() ? SensitiveValue.SENSITIVE_VALUE_MASK : ((Value)value).get();
+        }
+        return value;
     }
 }

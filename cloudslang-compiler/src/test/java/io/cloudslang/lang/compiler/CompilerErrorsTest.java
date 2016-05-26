@@ -308,9 +308,8 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("For step 'step1' syntax is illegal.\n" +
-                "Step has to many keys under the 'do' keyword,\n" +
-                "May happen due to wrong indentation");
+        exception.expectMessage("step1");
+        exception.expectMessage("too many keys");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 

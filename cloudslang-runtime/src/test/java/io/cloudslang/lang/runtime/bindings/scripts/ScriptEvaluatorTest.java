@@ -2,6 +2,7 @@ package io.cloudslang.lang.runtime.bindings.scripts;
 
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -15,10 +16,17 @@ import org.python.core.PyStringMap;
 import org.python.google.common.collect.Sets;
 import org.python.util.PythonInterpreter;
 
-import java.io.Serializable;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ScriptEvaluatorTest {
@@ -47,7 +55,7 @@ public class ScriptEvaluatorTest {
 
     @Test
     public void testEvalExpr() throws Exception {
-        scriptEvaluator.evalExpr("", new HashMap<String, Serializable>(), new HashSet<SystemProperty>());
+        scriptEvaluator.evalExpr("", new HashMap<String, Value>(), new HashSet<SystemProperty>());
         verify(pythonInterpreter).eval(eq(""));
         verify(pythonInterpreter).set("true", Boolean.TRUE);
         verify(pythonInterpreter).set("false", Boolean.FALSE);
@@ -59,7 +67,7 @@ public class ScriptEvaluatorTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("input_expression");
         exception.expectMessage("error from interpreter");
-        scriptEvaluator.evalExpr("input_expression", new HashMap<String, Serializable>(), new HashSet<SystemProperty>());
+        scriptEvaluator.evalExpr("input_expression", new HashMap<String, Value>(), new HashSet<SystemProperty>());
     }
 
     @Test
@@ -78,7 +86,7 @@ public class ScriptEvaluatorTest {
 
         when(pythonInterpreter.getLocals()).thenReturn(new PyStringMap());
 
-        scriptEvaluator.evalExpr("", new HashMap<String, Serializable>(), props, functionDependencies);
+        scriptEvaluator.evalExpr("", new HashMap<String, Value>(), props, functionDependencies);
 
         verify(pythonInterpreter).eval(eq(""));
         verify(pythonInterpreter, atLeastOnce()).set("__sys_prop__", propsAsMap);

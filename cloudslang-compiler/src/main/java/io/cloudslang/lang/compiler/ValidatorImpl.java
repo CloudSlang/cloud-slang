@@ -5,13 +5,23 @@ import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
-import io.cloudslang.lang.entities.bindings.*;
+import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.InOutParam;
+import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.Result;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * User: bancl
@@ -150,7 +160,7 @@ public class ValidatorImpl implements Validator {
     private List<String> getMandatoryInputNames(Executable executable) {
         List<String> inputNames = new ArrayList<>();
         for (Input input : executable.getInputs()) {
-            if (!input.isPrivateInput() && input.isRequired() && input.getValue() == null) {
+            if (!input.isPrivateInput() && input.isRequired() && (input.getValue() == null || input.getValue().get() == null)) {
                 inputNames.add(input.getName());
             }
         }

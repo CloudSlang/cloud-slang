@@ -2,7 +2,12 @@ package io.cloudslang.lang.entities;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
-import io.cloudslang.lang.entities.bindings.*;
+import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,8 +33,7 @@ public class DeserializeTest {
 
     @Test
     public void testDeserializeInput() throws IOException {
-        Input input = new Input.InputBuilder("new_input", "some_expression")
-                .withEncrypted(true)
+        Input input = new Input.InputBuilder("new_input", "some_expression", true)
                 .withRequired(true)
                 .withPrivateInput(true)
                 .withFunctionDependencies(Sets.newHashSet(ScriptFunction.GET))
@@ -42,7 +46,7 @@ public class DeserializeTest {
     public void testDeserializeArgument() throws IOException {
         Argument argument = new Argument(
                 "new_argument",
-                "some_expression"
+                ValueFactory.create("some_expression")
         );
         testToAndFromJson(argument, Argument.class);
     }
@@ -51,7 +55,7 @@ public class DeserializeTest {
     public void testDeserializeOutput() throws IOException {
         Output output = new Output(
                 "new_output",
-                "some_expression");
+                ValueFactory.create("some_expression"));
         testToAndFromJson(output, Output.class);
     }
 
@@ -59,7 +63,7 @@ public class DeserializeTest {
     public void testDeserializeResult() throws IOException {
         Result result = new Result(
                 "new_result",
-                "some_expression");
+                ValueFactory.create("some_expression"));
         testToAndFromJson(result, Result.class);
     }
 
