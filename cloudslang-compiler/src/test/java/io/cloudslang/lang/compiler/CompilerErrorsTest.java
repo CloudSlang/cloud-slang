@@ -308,8 +308,9 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("step1");
-        exception.expectMessage("too many keys");
+        exception.expectMessage("For step 'step1' syntax is illegal.\n" +
+                "Step has too many keys under the 'do' keyword,\n" +
+                "May happen due to wrong indentation");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -489,7 +490,7 @@ public class CompilerErrorsTest {
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("For flow 'flow_with_null_value_input' syntax is illegal.\n" +
-                "Could not transform Input : {input1=null} Since it has a null value.\n" +
+                "Could not transform Input : {input1=null} since it has a null value.\n" +
                 "\n" +
                 "Make sure a value is specified or that indentation is properly done.");
         compiler.compile(SlangSource.fromFile(resource), path);
