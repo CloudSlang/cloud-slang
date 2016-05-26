@@ -16,8 +16,8 @@ public interface Validator {
 
     void validateInputNamesDifferentFromOutputNames(ExecutableModellingResult result);
 
-    List<RuntimeException> validateModelWithDependencies(
-            Executable executable,
-            Map<String, Executable> filteredDependencies);
+    List<RuntimeException> validateModelWithDependencies(Executable executable, Map<String, Executable> filteredDependencies);
+
+    List<RuntimeException> validateModelWithDirectDependencies(Executable executable, Map<String, Executable> directDependencies);
 
 }
