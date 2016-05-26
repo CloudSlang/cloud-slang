@@ -18,6 +18,7 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.runtime.impl.python.PythonExecutionNotCachedEngine;
 import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Rule;
@@ -28,7 +29,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +43,7 @@ import static org.junit.Assert.assertNull;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:/META-INF/spring/systemTestContext.xml")
 public abstract class SystemsTestsParent {
-    private static boolean shouldRunMaven;
+    protected static boolean shouldRunMaven;
 
     protected static final String EXEC_START_PATH = "0";
     protected static final String FIRST_STEP_PATH = "0.0";
@@ -98,11 +98,11 @@ public abstract class SystemsTestsParent {
         System.setProperty(SlangSystemPropertyConstant.CSLANG_ENCODING.getValue(), "utf-8");
     }
 
-    protected ScoreEvent trigger(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Set<SystemProperty> systemProperties) {
+    protected ScoreEvent trigger(CompilationArtifact compilationArtifact, Map<String, Value> userInputs, Set<SystemProperty> systemProperties) {
         return triggerFlows.runSync(compilationArtifact, userInputs, systemProperties);
     }
 
-	public RuntimeInformation triggerWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Set<SystemProperty> systemProperties) {
+	public RuntimeInformation triggerWithData(CompilationArtifact compilationArtifact, Map<String, Value> userInputs, Set<SystemProperty> systemProperties) {
 		return triggerFlows.runWithData(compilationArtifact, userInputs, systemProperties);
 	}
 

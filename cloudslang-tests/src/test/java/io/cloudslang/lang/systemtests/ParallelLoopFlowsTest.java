@@ -16,12 +16,18 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Date: 3/25/2015
@@ -46,6 +52,38 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
         List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
+    }
+
+    @Test
+    public void testFlowWithSensitiveInputParallelLoop() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/parallel_loop/sensitive_input_parallel_loop.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+
+        RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path, getSystemProperties());
+
+        List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
+        Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
+
+        List<String> expectedNameOutputs = verifyBranchPublishValues(branchesData);
+
+        verifyPublishValues(runtimeInformation, expectedNameOutputs);
+    }
+
+    @Test
+    public void testFlowWithSensitiveOutputParallelLoop() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/parallel_loop/sensitive_output_parallel_loop.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+
+        RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path, getSystemProperties());
+
+        List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
+        Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
+
+        List<String> expectedNameOutputs = verifyBranchPublishValues(branchesData);
+
+        verifyPublishValues(runtimeInformation, expectedNameOutputs);
     }
 
     @Test
@@ -179,7 +217,7 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
             Set<SystemProperty> systemProperties) {
         CompilationArtifact compilationArtifact = slang.compile(resource, path);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Value> userInputs = new HashMap<>();
         return triggerWithData(compilationArtifact, userInputs, systemProperties);
     }
 

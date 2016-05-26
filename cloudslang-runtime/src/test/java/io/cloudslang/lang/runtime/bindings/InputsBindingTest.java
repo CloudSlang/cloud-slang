@@ -15,6 +15,8 @@ import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
 import io.cloudslang.dependency.impl.services.MavenConfigImpl;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
@@ -31,8 +33,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.Serializable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -48,26 +54,26 @@ public class InputsBindingTest {
     @Test
     public void testEmptyBindInputs() throws Exception {
         List<Input> inputs = Collections.emptyList();
-        Map<String,Serializable> result = bindInputs(inputs);
+        Map<String,Value> result = bindInputs(inputs);
         Assert.assertTrue(result.isEmpty());
     }
 
     @Test
     public void testDefaultValue() {
 		List<Input> inputs = Collections.singletonList(new Input.InputBuilder("input1", "value").build());
-        Map<String,Serializable> result = bindInputs(inputs);
+        Map<String,Value> result = bindInputs(inputs);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals("value", result.get("input1"));
+        Assert.assertEquals("value", result.get("input1").get());
     }
 
     @Test
     public void testDefaultValueInt(){
         List<Input> inputs = Collections.singletonList(new Input.InputBuilder("input1", 2).build());
-        Map<String,Serializable> result = bindInputs(inputs);
+        Map<String,Value> result = bindInputs(inputs);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(2, result.get("input1"));
+        Assert.assertEquals(2, result.get("input1").get());
     }
 
 	@Test
@@ -77,10 +83,10 @@ public class InputsBindingTest {
                 new Input.InputBuilder("input2", false).build(),
                 new Input.InputBuilder("input3", "${ str('phrase containing true and false') }").build()
         );
-		Map<String, Serializable> result = bindInputs(inputs);
-		Assert.assertTrue((boolean) result.get("input1"));
-		Assert.assertFalse((boolean) result.get("input2"));
-		Assert.assertEquals("phrase containing true and false", result.get("input3"));
+		Map<String, Value> result = bindInputs(inputs);
+		Assert.assertTrue((boolean) result.get("input1").get());
+		Assert.assertFalse((boolean) result.get("input2").get());
+		Assert.assertEquals("phrase containing true and false", result.get("input3").get());
 	}
 
     @Test
@@ -89,164 +95,161 @@ public class InputsBindingTest {
                 new Input.InputBuilder("input2", "yyy").build(),
                 new Input.InputBuilder("input1", "zzz").build()
         );
-        Map<String,Serializable> result = bindInputs(inputs);
+        Map<String,Value> result = bindInputs(inputs);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals("zzz", result.get("input1"));
+        Assert.assertEquals("zzz", result.get("input1").get());
         Assert.assertTrue(result.containsKey("input2"));
-        Assert.assertEquals("yyy", result.get("input2"));
+        Assert.assertEquals("yyy", result.get("input2").get());
     }
 
     @Test
     public void testAssignFromInput() {
-        Input input1 = new Input.InputBuilder("input1", "${ input1 }")
-                .withEncrypted(false)
+        Input input1 = new Input.InputBuilder("input1", "${ input1 }", false)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
-        Input input2 = new Input.InputBuilder("input2", "${ input1 }")
-                .withEncrypted(false)
+        Input input2 = new Input.InputBuilder("input2", "${ input1 }", false)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
         List<Input> inputs = Arrays.asList(input1, input2);
-        Map<String,Serializable> result = bindInputs(inputs);
+        Map<String,Value> result = bindInputs(inputs);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(null, result.get("input1"));
+        Assert.assertEquals(null, result.get("input1").get());
         Assert.assertTrue(result.containsKey("input2"));
-        Assert.assertEquals(null, result.get("input2"));
+        Assert.assertEquals(null, result.get("input2").get());
     }
 
     @Test
     public void testInputRef() {
-        Map<String,Serializable> context = new HashMap<>();
-        context.put("inputX","xxx");
+        Map<String,Value> context = new HashMap<>();
+        context.put("inputX",ValueFactory.create("xxx"));
         List<Input> inputs = Collections.singletonList(new Input.InputBuilder("input1", "${ str(inputX) }").build());
-        Map<String,Serializable> result = bindInputs(inputs, context);
+        Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals("xxx", result.get("input1"));
+        Assert.assertEquals("xxx", result.get("input1").get());
 
         Assert.assertEquals(1,context.size());
     }
 
     @Test
     public void testInputScriptEval() {
-        Map<String,Serializable> context = new HashMap<>();
-        context.put("valX",5);
+        Map<String,Value> context = new HashMap<>();
+        context.put("valX",ValueFactory.create(5));
         Input scriptInput = new Input.InputBuilder("input1","${ 3 + valX }").build();
         List<Input> inputs = Collections.singletonList(scriptInput);
-        Map<String,Serializable> result = bindInputs(inputs, context);
+        Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(8, result.get("input1"));
+        Assert.assertEquals(8, result.get("input1").get());
 
         Assert.assertEquals(1,context.size());
     }
 
     @Test
     public void testInputScriptEval2() {
-        Map<String,Serializable> context = new HashMap<>();
-        context.put("valB","b");
-        context.put("valC","c");
+        Map<String,Value> context = new HashMap<>();
+        context.put("valB",ValueFactory.create("b"));
+        context.put("valC",ValueFactory.create("c"));
         Input scriptInput = new Input.InputBuilder("input1","${ 'a' + valB + valC }").build();
         List<Input> inputs = Collections.singletonList(scriptInput);
-        Map<String,Serializable> result = bindInputs(inputs, context);
+        Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals("abc", result.get("input1"));
+        Assert.assertEquals("abc", result.get("input1").get());
     }
 
     @Test
     public void testDefaultValueVsEmptyRef() {
-        Map<String,Serializable> context = new HashMap<>();
+        Map<String,Value> context = new HashMap<>();
 
 		Input refInput = new Input.InputBuilder("input1", "${ str('val') }").build();
         List<Input> inputs = Collections.singletonList(refInput);
 
-        Map<String,Serializable> result = bindInputs(inputs, context);
+        Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals("val", result.get("input1"));
+        Assert.assertEquals("val", result.get("input1").get());
 
         Assert.assertTrue(context.isEmpty());
     }
 
     @Test
     public void testAssignFromAndExpr() {
-        Map<String,Serializable> context = new HashMap<>();
-        context.put("input1",3);
+        Map<String,Value> context = new HashMap<>();
+        context.put("input1",ValueFactory.create(3));
 		Input input = new Input.InputBuilder("input1", "${ 5+7 }").build();
         List<Input> inputs = Collections.singletonList(input);
 
-        Map<String,Serializable> result = bindInputs(inputs, context);
+        Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(3, result.get("input1"));
+        Assert.assertEquals(3, result.get("input1").get());
 
         Assert.assertEquals(1,context.size());
-        Assert.assertEquals(3,context.get("input1"));
+        Assert.assertEquals(3,context.get("input1").get());
     }
 
     @Test
     public void testAssignFromAndConst() {
-        Map<String,Serializable> context = new HashMap<>();
-        context.put("input1",3);
+        Map<String,Value> context = new HashMap<>();
+        context.put("input1",ValueFactory.create(3));
 		Input input = new Input.InputBuilder("input1", 5).build();
         List<Input> inputs = Collections.singletonList(input);
 
-        Map<String,Serializable> result = bindInputs(inputs, context);
+        Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(3, result.get("input1"));
+        Assert.assertEquals(3, result.get("input1").get());
     }
 
     @Test
     public void testComplexExpr(){
-        Map<String,Serializable> context = new HashMap<>();
-        context.put("input1",3);
+        Map<String,Value> context = new HashMap<>();
+        context.put("input1",ValueFactory.create(3));
 		Input input = new Input.InputBuilder("input2", "${ input1 + 3 * 2 }").build();
         List<Input> inputs = Collections.singletonList(input);
 
-        Map<String,Serializable> result = bindInputs(inputs, context);
+        Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input2"));
-        Assert.assertEquals(9, result.get("input2"));
+        Assert.assertEquals(9, result.get("input2").get());
         Assert.assertEquals(1, result.size());
     }
 
     @Test
     public void testAssignFromVsRef(){
-        Map<String,Serializable> context = new HashMap<>();
-        context.put("input2",3);
-        context.put("input1",5);
+        Map<String,Value> context = new HashMap<>();
+        context.put("input2",ValueFactory.create(3));
+        context.put("input1",ValueFactory.create(5));
 		Input input = new Input.InputBuilder("input1", "${ input2 }").build();
         List<Input> inputs = Collections.singletonList(input);
 
-        Map<String,Serializable> result = bindInputs(inputs, context);
+        Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(5, result.get("input1"));
+        Assert.assertEquals(5, result.get("input1").get());
         Assert.assertEquals(1, result.size());
     }
 
     @Test
     public void testOverrideAssignFrom(){
-        Map<String,Serializable> context = new HashMap<>();
-        context.put("input2",3);
-        context.put("input1",5);
-        Input input = new Input.InputBuilder("input1", "${ input2 }")
-                .withEncrypted(false)
+        Map<String,Value> context = new HashMap<>();
+        context.put("input2",ValueFactory.create(3));
+        context.put("input1",ValueFactory.create(5));
+        Input input = new Input.InputBuilder("input1", "${ input2 }", false)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
         List<Input> inputs = Collections.singletonList(input);
 
-        Map<String,Serializable> result = bindInputs(inputs, context);
+        Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(3, result.get("input1"));
+        Assert.assertEquals(3, result.get("input1").get());
         Assert.assertEquals(1, result.size());
 
         Assert.assertEquals(2, context.size());
@@ -254,82 +257,79 @@ public class InputsBindingTest {
 
     @Test
     public void testOverrideAssignFrom2(){
-        Map<String,Serializable> context = new HashMap<>();
-        context.put("input1", 5);
-        Input input = new Input.InputBuilder("input1", 3)
-                .withEncrypted(false)
+        Map<String,Value> context = new HashMap<>();
+        context.put("input1", ValueFactory.create(5));
+        Input input = new Input.InputBuilder("input1", 3, false)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
         List<Input> inputs = Collections.singletonList(input);
 
-        Map<String,Serializable> result = bindInputs(inputs, context);
+        Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(3, result.get("input1"));
+        Assert.assertEquals(3, result.get("input1").get());
         Assert.assertEquals(1, result.size());
     }
 
     @Test
     public void testOverrideAssignFrom3() {
-        Map<String,Serializable> context = new HashMap<>();
-        context.put("input1",5);
-        Input input = new Input.InputBuilder("input1", null)
-                .withEncrypted(false)
+        Map<String,Value> context = new HashMap<>();
+        context.put("input1",ValueFactory.create(5));
+        Input input = new Input.InputBuilder("input1", null, false)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
         List<Input> inputs = Collections.singletonList(input);
 
-        Map<String,Serializable> result = bindInputs(inputs, context);
+        Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals("'not private' disables the assignFrom func...",null, result.get("input1"));
+        Assert.assertEquals("'not private' disables the assignFrom func...",null, result.get("input1").get());
         Assert.assertEquals(1, result.size());
     }
 
     @Test
     public void testOverrideFalse() {
-        Map<String,Serializable> context = new HashMap<>();
-        context.put("input1",5);
+        Map<String,Value> context = new HashMap<>();
+        context.put("input1",ValueFactory.create(5));
 		Input input = new Input.InputBuilder("input1", 6).build();
         List<Input> inputs = Collections.singletonList(input);
 
-        Map<String,Serializable> result = bindInputs(inputs, context);
+        Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(5, result.get("input1"));
+        Assert.assertEquals(5, result.get("input1").get());
         Assert.assertEquals(1, result.size());
     }
 
     @Test(expected = RuntimeException.class)
     public void testExpressionWithWrongRef() {
-        Map<String,Serializable> context = new HashMap<>();
+        Map<String,Value> context = new HashMap<>();
 
-        Input input = new Input.InputBuilder("input1", "${ input2 }")
-                .withEncrypted(false)
+        Input input = new Input.InputBuilder("input1", "${ input2 }", false)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
-        List<Input> inputs = Arrays.asList(input);
+        List<Input> inputs = Collections.singletonList(input);
 
         bindInputs(inputs, context);
     }
 
     @Test
     public void testInputAssignFromAnotherInput() {
-        Map<String,Serializable> context = new HashMap<>();
+        Map<String,Value> context = new HashMap<>();
 
 		Input input1 = new Input.InputBuilder("input1", 5).build();
         Input input2 = new Input.InputBuilder("input2","${ input1 }").build();
         List<Input> inputs = Arrays.asList(input1,input2);
 
-        Map<String,Serializable> result = bindInputs(inputs, context);
+        Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(5, result.get("input1"));
+        Assert.assertEquals(5, result.get("input1").get());
         Assert.assertTrue(result.containsKey("input2"));
-        Assert.assertEquals(5, result.get("input2"));
+        Assert.assertEquals(5, result.get("input2").get());
         Assert.assertEquals(2, result.size());
 
         Assert.assertTrue("orig context should not change",context.isEmpty());
@@ -337,19 +337,19 @@ public class InputsBindingTest {
 
     @Test
     public void testComplexExpressionInput() {
-        Map<String,Serializable> context = new HashMap<>();
-        context.put("varX",5);
+        Map<String,Value> context = new HashMap<>();
+        context.put("varX",ValueFactory.create(5));
 
 		Input input1 = new Input.InputBuilder("input1", 5).build();
         Input input2 = new Input.InputBuilder("input2","${ input1 + 5 + varX }").build();
         List<Input> inputs = Arrays.asList(input1,input2);
 
-        Map<String,Serializable> result = bindInputs(inputs, context);
+        Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(5, result.get("input1"));
+        Assert.assertEquals(5, result.get("input1").get());
         Assert.assertTrue(result.containsKey("input2"));
-        Assert.assertEquals(15, result.get("input2"));
+        Assert.assertEquals(15, result.get("input2").get());
         Assert.assertEquals(2, result.size());
 
         Assert.assertEquals("orig context should not change",1,context.size());
@@ -357,31 +357,31 @@ public class InputsBindingTest {
 
     @Test
     public void testComplexExpression2Input() {
-        Map<String,Serializable> context = new HashMap<>();
-        context.put("varX","roles");
+        Map<String,Value> context = new HashMap<>();
+        context.put("varX", ValueFactory.create("roles"));
 
         Input input1 = new Input.InputBuilder("input1", "${ 'mighty' + ' max '   + varX }").build();
         List<Input> inputs = Collections.singletonList(input1);
 
-        Map<String,Serializable> result = bindInputs(inputs, context);
+        Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals("mighty max roles", result.get("input1"));
+        Assert.assertEquals("mighty max roles", result.get("input1").get());
         Assert.assertEquals(1, result.size());
 
         Assert.assertEquals("orig context should not change",1,context.size());
     }
 
-	private Map<String, Serializable> bindInputs(List<Input> inputs, Map<String, ? extends Serializable> context, Set<SystemProperty> systemProperties) {
+	private Map<String, Value> bindInputs(List<Input> inputs, Map<String, Value> context, Set<SystemProperty> systemProperties) {
 		return inputsBinding.bindInputs(inputs, context, systemProperties);
 	}
 
-	private Map<String, Serializable> bindInputs(List<Input> inputs, Map<String, ? extends Serializable> context) {
+	private Map<String, Value> bindInputs(List<Input> inputs, Map<String, Value> context) {
 		return bindInputs(inputs, context, null);
 	}
 
-	private Map<String, Serializable> bindInputs(List<Input> inputs) {
-		return bindInputs(inputs, new HashMap<String, Serializable>());
+	private Map<String, Value> bindInputs(List<Input> inputs) {
+		return bindInputs(inputs, new HashMap<String, Value>());
 	}
 
     @Configuration

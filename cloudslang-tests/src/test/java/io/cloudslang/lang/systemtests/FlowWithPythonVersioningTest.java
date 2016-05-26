@@ -9,11 +9,12 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Test;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -21,7 +22,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class FlowWithPythonVersioningTest extends SystemsTestsParent {
     @Test
@@ -36,9 +37,9 @@ public class FlowWithPythonVersioningTest extends SystemsTestsParent {
                 SlangSource.fromFile(operation_mul3), SlangSource.fromFile(operation_mul5));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), dependencies);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("var1", 6);
-        userInputs.put("var2", 7);
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("var1", ValueFactory.create(6));
+        userInputs.put("var2", ValueFactory.create(7));
         ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
         assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
         LanguageEventData languageEventData = (LanguageEventData) event.getData();
@@ -80,9 +81,9 @@ public class FlowWithPythonVersioningTest extends SystemsTestsParent {
         URI operationSum3 = getClass().getResource(operationPath).toURI();
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(operationSum3), null);
 
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("var1", 6);
-        userInputs.put("var2", 7);
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("var1", ValueFactory.create(6));
+        userInputs.put("var2", ValueFactory.create(7));
         ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
         assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
         LanguageEventData languageEventData = (LanguageEventData) event.getData();

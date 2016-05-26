@@ -16,12 +16,21 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.junit.Assert;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Bonczidai Levente
@@ -35,7 +44,7 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
     }
 
     protected Map<String, StepData> prepareAndRunDefault(CompilationArtifact compilationArtifact) {
-        Map<String, Serializable> userInputs = getUserInputs();
+        Map<String, Value> userInputs = getUserInputs();
         userInputs.put("enable_option_for_action", null);
 
         return triggerWithData(compilationArtifact, userInputs, getSystemProperties()).getSteps();
@@ -47,11 +56,11 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         );
     }
 
-    private Map<String, Serializable> getUserInputs() {
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("input_no_expression", "input_no_expression_value");
-        userInputs.put("input_private", "i_should_not_be_assigned");
-        userInputs.put("enable_option_for_action", "enable_option_for_action_value");
+    private Map<String, Value> getUserInputs() {
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("input_no_expression", ValueFactory.create("input_no_expression_value"));
+        userInputs.put("input_private", ValueFactory.create("i_should_not_be_assigned"));
+        userInputs.put("enable_option_for_action", ValueFactory.create("enable_option_for_action_value"));
         return userInputs;
     }
 
@@ -85,7 +94,7 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         expectedInputs.put("input_str_double", "Hi");
         expectedInputs.put("input_yaml_list", Lists.newArrayList(1, 2, 3));
         expectedInputs.put("input_properties_yaml_map_folded", "medium");
-        HashMap<String, Serializable> expectedInputMap = new HashMap<>();
+        HashMap<String, Serializable> expectedInputMap = new LinkedHashMap<>();
         expectedInputMap.put("key1", "value1");
         expectedInputMap.put("key2", "value2");
         expectedInputMap.put("key3", "value3");
@@ -93,7 +102,7 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
 
         // evaluated via Python
         expectedInputs.put("input_python_null", null);
-        expectedInputs.put("input_python_list",  Lists.newArrayList(1, 2, 3));
+        expectedInputs.put("input_python_list", Lists.newArrayList(1, 2, 3));
         expectedInputs.put("input_python_map", expectedInputMap);
         expectedInputs.put("b", "b");
         expectedInputs.put("b_copy", "b");
@@ -130,4 +139,20 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         return accumulator.equals(map1);
     }
 
+    protected void verifyInOutParams(Map<String, Serializable> params) {
+        List<String> errorsInSensitivity = new ArrayList<>();
+        for (Map.Entry<String, Serializable> entry : params.entrySet()) {
+            String name = entry.getKey();
+            boolean sensitive = entry.getValue() != null && entry.getValue().equals(SensitiveValue.SENSITIVE_VALUE_MASK);
+            if (!(name.contains("sensitive") && sensitive || !name.contains("sensitive") && !sensitive)) {
+                errorsInSensitivity.add(name);
+            }
+            boolean success = true;
+            if (errorsInSensitivity.size() > 0) {
+                System.out.println("\nSensitivity not set properly for: " + Arrays.toString(errorsInSensitivity.toArray(new String[errorsInSensitivity.size()])));
+                success = false;
+            }
+            assertTrue(success);
+        }
+    }
 }

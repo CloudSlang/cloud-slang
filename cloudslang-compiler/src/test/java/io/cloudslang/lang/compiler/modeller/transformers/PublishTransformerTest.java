@@ -81,7 +81,7 @@ public class PublishTransformerTest {
         @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap);
         Output publish = publishValues.get(0);
         Assert.assertEquals("weather", publish.getName());
-        Assert.assertEquals("${weather}", publish.getValue());
+        Assert.assertEquals("${weather}", publish.getValue().get());
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
@@ -89,7 +89,7 @@ public class PublishTransformerTest {
         @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap);
         Output publish = publishValues.get(1);
         Assert.assertEquals("temp", publish.getName());
-        Assert.assertEquals("${temperature}", publish.getValue());
+        Assert.assertEquals("${temperature}", publish.getValue().get());
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
@@ -97,7 +97,7 @@ public class PublishTransformerTest {
         @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap);
         Output publish = publishValues.get(2);
         Assert.assertEquals("publish_str", publish.getName());
-        Assert.assertEquals("publish_str_value", publish.getValue());
+        Assert.assertEquals("publish_str_value", publish.getValue().get());
     }
 
     @Configuration

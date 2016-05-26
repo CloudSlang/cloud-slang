@@ -4,6 +4,7 @@ import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
@@ -11,7 +12,6 @@ import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-import java.util.Set;
 import junit.framework.Assert;
 import org.apache.commons.collections4.SetUtils;
 import org.junit.Before;
@@ -33,9 +33,11 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anySetOf;
@@ -62,9 +64,9 @@ public class SlangTestRunnerTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    private List<String> specialTestSuite = Arrays.asList("special");
+    private List<String> specialTestSuite = Collections.singletonList("special");
     private List<String> specialRuntimeTestSuite = Arrays.asList("special","default");
-    private List<String> defaultTestSuite = Arrays.asList("default");
+    private List<String> defaultTestSuite = Collections.singletonList("default");
     private Set<String> allAvailableExecutables = SetUtils.emptySet();
 
 
@@ -231,9 +233,9 @@ public class SlangTestRunnerTest {
     public void runTestCaseWithStringOutputs(){
         Map<String, SlangTestCase> testCases = new HashMap<>();
         ArrayList<Map> outputs = new ArrayList<>();
-        Map output1 = new HashMap();
+        Map<String, Serializable> output1 = new HashMap<>();
         output1.put("output1", "value1");
-        Map output2 = new HashMap();
+        Map<String, Serializable>output2 = new HashMap<>();
         output2.put("output2", "value2");
         outputs.add(output1);
         outputs.add(output2);
@@ -254,7 +256,7 @@ public class SlangTestRunnerTest {
     public void runTestCaseWithNullValueOutput(){
         Map<String, SlangTestCase> testCases = new HashMap<>();
         ArrayList<Map> outputs = new ArrayList<>();
-        Map output1 = new HashMap();
+        Map<String, Value>output1 = new HashMap<>();
         output1.put("output1", null);
         outputs.add(output1);
         SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, outputs, null, null);
@@ -272,7 +274,7 @@ public class SlangTestRunnerTest {
     public void runTestCaseWithIntOutput(){
         Map<String, SlangTestCase> testCases = new HashMap<>();
         ArrayList<Map> outputs = new ArrayList<>();
-        Map output1 = new HashMap();
+        Map<String, Serializable>output1 = new HashMap<>();
         output1.put("output1", 1);
         outputs.add(output1);
         SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, outputs, null, null);
@@ -290,7 +292,7 @@ public class SlangTestRunnerTest {
     public void runTestCaseWithWrongIntOutput(){
         Map<String, SlangTestCase> testCases = new HashMap<>();
         ArrayList<Map> outputs = new ArrayList<>();
-        Map output1 = new HashMap();
+        Map<String, Serializable>output1 = new HashMap<>();
         output1.put("output1", 1);
         outputs.add(output1);
         SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, outputs, null, null);
@@ -308,7 +310,7 @@ public class SlangTestRunnerTest {
     public void runTestCaseWithBooleanOutput(){
         Map<String, SlangTestCase> testCases = new HashMap<>();
         ArrayList<Map> outputs = new ArrayList<>();
-        Map output1 = new HashMap();
+        Map<String, Serializable>output1 = new HashMap<>();
         output1.put("output1", Boolean.TRUE);
         outputs.add(output1);
         SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, outputs, null, null);

@@ -17,6 +17,8 @@ import io.cloudslang.dependency.impl.services.MavenConfigImpl;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
@@ -32,7 +34,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 /**
  * User: stoneo
@@ -52,121 +58,121 @@ public class ResultBindingTest {
     @Test
     public void testPrimitiveBooleanFirstResult() throws Exception {
         List<Result> results = Arrays.asList(
-                createResult(ScoreLangConstants.SUCCESS_RESULT, true),
-                createResult(ScoreLangConstants.FAILURE_RESULT, "${ True and (not False) }")
+                createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create(true)),
+                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create("${ True and (not False) }"))
         );
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), EMPTY_SET, results, null);
+        String result = resultsBinding.resolveResult(new HashMap<String, Value>(), new HashMap<String, Value>(), EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result);
     }
 
     @Test
     public void testPrimitiveBooleanSecondResult() throws Exception {
         List<Result> results = Arrays.asList(
-                createResult(ScoreLangConstants.SUCCESS_RESULT, false),
-                createResult(ScoreLangConstants.FAILURE_RESULT, true)
+                createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create(false)),
+                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create(true))
         );
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), EMPTY_SET, results, null);
+        String result = resultsBinding.resolveResult(new HashMap<String, Value>(), new HashMap<String, Value>(), EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
     @Test
     public void testObjectBooleanFirstResult() throws Exception {
         List<Result> results = Arrays.asList(
-                createResult(ScoreLangConstants.SUCCESS_RESULT, Boolean.TRUE),
-                createResult(ScoreLangConstants.FAILURE_RESULT, "${ True and (not False) }")
+                createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create(Boolean.TRUE)),
+                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create("${ True and (not False) }"))
         );
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), EMPTY_SET, results, null);
+        String result = resultsBinding.resolveResult(new HashMap<String, Value>(), new HashMap<String, Value>(), EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result);
     }
 
     @Test
     public void testObjectBooleanSecondResult() throws Exception {
         List<Result> results = Arrays.asList(
-                createResult(ScoreLangConstants.SUCCESS_RESULT, Boolean.FALSE),
-                createResult(ScoreLangConstants.FAILURE_RESULT, Boolean.TRUE)
+                createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create(Boolean.FALSE)),
+                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create(Boolean.TRUE))
         );
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), EMPTY_SET, results, null);
+        String result = resultsBinding.resolveResult(new HashMap<String, Value>(), new HashMap<String, Value>(), EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
     @Test
     public void testConstExprChooseFirstResult() throws Exception {
-        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, "${ 1==1 }"),
-                createResult(ScoreLangConstants.FAILURE_RESULT, "${ True and (not False) }"));
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), EMPTY_SET, results, null);
+        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create("${ 1==1 }")),
+                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create("${ True and (not False) }")));
+        String result = resultsBinding.resolveResult(new HashMap<String, Value>(), new HashMap<String, Value>(), EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result);
     }
 
     @Test
     public void testConstExprChooseSecondAResult() throws Exception {
-        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, "${ 1==2 }"),
-                                                createResult(ScoreLangConstants.FAILURE_RESULT, "${ 1==1 }"));
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), new HashMap<String, Serializable>(), EMPTY_SET, results, null);
+        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create("${ 1==2 }")),
+                                                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create("${ 1==1 }")));
+        String result = resultsBinding.resolveResult(new HashMap<String, Value>(), new HashMap<String, Value>(), EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
     @Test
     public void testBindInputFirstResult() throws Exception {
-        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, "${ int(status) == 1 }"),
-                                                createResult(ScoreLangConstants.FAILURE_RESULT, "${ int(status) == -1 }"));
-        HashMap<String, Serializable> context = new HashMap<>();
-        context.put("status", "1");
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, EMPTY_SET, results, null);
+        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create("${ int(status) == 1 }")),
+                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create("${ int(status) == -1 }")));
+        HashMap<String, Value> context = new HashMap<>();
+        context.put("status", ValueFactory.create("1"));
+        String result = resultsBinding.resolveResult(new HashMap<String, Value>(), context, EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result);
     }
 
     @Test
     public void testBindInputSecondResult() throws Exception {
-        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, "${ int(status) == 1 }"),
-                                                createResult(ScoreLangConstants.FAILURE_RESULT, "${ int(status) == -1 }"));
-        HashMap<String, Serializable> context = new HashMap<>();
-        context.put("status", "-1");
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, EMPTY_SET, results, null);
+        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create("${ int(status) == 1 }")),
+                                                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create("${ int(status) == -1 }")));
+        HashMap<String, Value> context = new HashMap<>();
+        context.put("status", ValueFactory.create("-1"));
+        String result = resultsBinding.resolveResult(new HashMap<String, Value>(), context, EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
     @Test(expected = RuntimeException.class)
     public void testIllegalResultExpressionThrowsException() throws Exception {
-        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, "${ str(status) }"),
-                                                createResult(ScoreLangConstants.FAILURE_RESULT, "${ int(status) == -1 }"));
-        HashMap<String, Serializable> context = new HashMap<>();
-        context.put("status", "-1");
-        resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, EMPTY_SET, results, null);
+        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create("${ str(status) }")),
+                                                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create("${ int(status) == -1 }")));
+        HashMap<String, Value> context = new HashMap<>();
+        context.put("status", ValueFactory.create("-1"));
+        resultsBinding.resolveResult(new HashMap<String, Value>(), context, EMPTY_SET, results, null);
     }
 
     @Test
     public void testBindInputNullResult() throws Exception {
-        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, "${ int(status) == 1 }"),
+        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create("${ int(status) == 1 }")),
                                                 createResult(ScoreLangConstants.FAILURE_RESULT, null));
-        HashMap<String, Serializable> context = new HashMap<>();
-        context.put("status", "-1");
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, EMPTY_SET, results, null);
+        HashMap<String, Value> context = new HashMap<>();
+        context.put("status", ValueFactory.create("-1"));
+        String result = resultsBinding.resolveResult(new HashMap<String, Value>(), context, EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
     @Test(expected = RuntimeException.class)
     public void testNoResults() throws Exception {
-        List<Result> results = Arrays.asList();
-        HashMap<String, Serializable> context = new HashMap<>();
-        context.put("status", "-1");
-        resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, EMPTY_SET, results, null);
+        List<Result> results = Collections.emptyList();
+        HashMap<String, Value> context = new HashMap<>();
+        context.put("status", ValueFactory.create("-1"));
+        resultsBinding.resolveResult(new HashMap<String, Value>(), context, EMPTY_SET, results, null);
     }
 
     @Test(expected = RuntimeException.class)
     public void testNoValidResultExpression() throws Exception {
-        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, "${ int(status) == 1 }"),
-                createResult(ScoreLangConstants.FAILURE_RESULT, "${ int(status) == 0 }"));
-        HashMap<String, Serializable> context = new HashMap<>();
-        context.put("status", "-1");
-        resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, EMPTY_SET, results, null);
+        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create("${ int(status) == 1 }")),
+                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create("${ int(status) == 0 }")));
+        HashMap<String, Value> context = new HashMap<>();
+        context.put("status", ValueFactory.create("-1"));
+        resultsBinding.resolveResult(new HashMap<String, Value>(), context, EMPTY_SET, results, null);
     }
 
     @Test
     public void testPresetResult() throws Exception {
         List<Result> results = Arrays.asList(createEmptyResult(ScoreLangConstants.SUCCESS_RESULT),
                 createEmptyResult(ScoreLangConstants.FAILURE_RESULT));
-        HashMap<String, Serializable> context = new HashMap<>();
-        String result = resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, EMPTY_SET, results, ScoreLangConstants.FAILURE_RESULT);
+        HashMap<String, Value> context = new HashMap<>();
+        String result = resultsBinding.resolveResult(new HashMap<String, Value>(), context, EMPTY_SET, results, ScoreLangConstants.FAILURE_RESULT);
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
@@ -174,20 +180,21 @@ public class ResultBindingTest {
     public void testIllegalPresetResult() throws Exception {
         List<Result> results = Arrays.asList(createEmptyResult(ScoreLangConstants.SUCCESS_RESULT),
                 createEmptyResult(ScoreLangConstants.FAILURE_RESULT));
-        HashMap<String, Serializable> context = new HashMap<>();
-        resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, EMPTY_SET, results, "IllegalResult");
+        HashMap<String, Value> context = new HashMap<>();
+        resultsBinding.resolveResult(new HashMap<String, Value>(), context, EMPTY_SET, results, "IllegalResult");
     }
 
     @Test(expected = RuntimeException.class)
     public void testIllegalResultExpression() throws Exception {
-        List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, "${ status }"),
-                createResult(ScoreLangConstants.FAILURE_RESULT, null));
-        HashMap<String, Serializable> context = new HashMap<>();
-        context.put("status", "-1");
-        resultsBinding.resolveResult(new HashMap<String, Serializable>(), context, EMPTY_SET, results, null);
+        List<Result> results = Arrays.asList(
+                createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create("${ status }")),
+                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create((Serializable)null)));
+        HashMap<String, Value> context = new HashMap<>();
+        context.put("status", ValueFactory.create("-1"));
+        resultsBinding.resolveResult(new HashMap<String, Value>(), context, EMPTY_SET, results, null);
     }
 
-    private Result createResult(String name, Serializable expression){
+    private Result createResult(String name, Value expression){
         return new Result(name, expression);
     }
 

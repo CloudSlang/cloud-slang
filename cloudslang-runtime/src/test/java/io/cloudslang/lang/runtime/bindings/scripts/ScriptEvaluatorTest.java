@@ -6,6 +6,7 @@ import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
 import io.cloudslang.dependency.impl.services.MavenConfigImpl;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
@@ -26,10 +27,19 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.Serializable;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ScriptEvaluatorTest.Config.class)
@@ -60,7 +70,7 @@ public class ScriptEvaluatorTest {
     @Test
     public void testEvalExpr() throws Exception {
         reset(pythonInterpreter);
-        scriptEvaluator.evalExpr("", new HashMap<String, Serializable>(), new HashSet<SystemProperty>());
+        scriptEvaluator.evalExpr("", new HashMap<String, Value>(), new HashSet<SystemProperty>());
         verify(pythonInterpreter).eval(eq(""));
         verify(pythonInterpreter).set("true", Boolean.TRUE);
         verify(pythonInterpreter).set("false", Boolean.FALSE);
@@ -73,7 +83,7 @@ public class ScriptEvaluatorTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("input_expression");
         exception.expectMessage("error from interpreter");
-        scriptEvaluator.evalExpr("input_expression", new HashMap<String, Serializable>(), new HashSet<SystemProperty>());
+        scriptEvaluator.evalExpr("input_expression", new HashMap<String, Value>(), new HashSet<SystemProperty>());
     }
 
     @Test
@@ -82,8 +92,6 @@ public class ScriptEvaluatorTest {
         Set<SystemProperty> props = new HashSet<>();
         SystemProperty systemProperty = new SystemProperty("a.b", "c.key", "value");
         props.add(systemProperty);
-        Map<String, String> propsAsMap = new HashMap<>();
-        propsAsMap.put(systemProperty.getFullyQualifiedName(), systemProperty.getValue());
         Set<ScriptFunction> functionDependencies = Sets.newHashSet(
                 ScriptFunction.GET,
                 ScriptFunction.GET_SYSTEM_PROPERTY,
@@ -93,10 +101,10 @@ public class ScriptEvaluatorTest {
 
         when(pythonInterpreter.getLocals()).thenReturn(new PyStringMap());
 
-        scriptEvaluator.evalExpr("", new HashMap<String, Serializable>(), props, functionDependencies);
+        scriptEvaluator.evalExpr("", new HashMap<String, Value>(), props, functionDependencies);
 
         verify(pythonInterpreter).eval(eq(""));
-        verify(pythonInterpreter, atLeastOnce()).set("__sys_prop__", propsAsMap);
+        verify(pythonInterpreter, atLeastOnce()).set(eq("__sys_prop__"), anyMap());
 
         verify(pythonInterpreter).exec(scriptCaptor.capture());
         String actualScript = scriptCaptor.getValue();

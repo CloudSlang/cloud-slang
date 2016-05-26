@@ -4,6 +4,7 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.score.api.ExecutionStep;
 import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Test;
@@ -27,7 +28,7 @@ public class OperationWithDependenciesSystemTest extends SystemsTestsParent {
         assertNull(step.getActionData().get(ScoreLangConstants.JAVA_ACTION_GAV_KEY));
 
         //Trigger ExecutionPlan
-        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Value> userInputs = new HashMap<>();
         ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
         assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
@@ -51,7 +52,7 @@ public class OperationWithDependenciesSystemTest extends SystemsTestsParent {
         assertNull(step.getActionData().get(ScoreLangConstants.ACTION_DEPENDENCIES));
 
         //Trigger ExecutionPlan
-        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Value> userInputs = new HashMap<>();
         ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
         assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }

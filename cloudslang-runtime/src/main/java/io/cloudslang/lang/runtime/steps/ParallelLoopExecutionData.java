@@ -14,9 +14,11 @@ import io.cloudslang.lang.entities.ParallelLoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.RuntimeConstants;
-import io.cloudslang.lang.runtime.bindings.ParallelLoopBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
+import io.cloudslang.lang.runtime.bindings.ParallelLoopBinding;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
@@ -72,7 +74,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         try {
             Context flowContext = runEnv.getStack().popContext();
 
-            List<Serializable> splitData = parallelLoopBinding.bindParallelLoopList(parallelLoopStatement, flowContext, runEnv.getSystemProperties(), nodeName);
+            List<Value> splitData = parallelLoopBinding.bindParallelLoopList(parallelLoopStatement, flowContext, runEnv.getSystemProperties(), nodeName);
 
             fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_SPLIT_BRANCHES,
                     "parallel loop expression bound", runEnv.getExecutionPath().getCurrentPath(),
@@ -82,7 +84,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             runEnv.putNextStepPosition(nextStepId);
             runEnv.getExecutionPath().down();
 
-            for (Serializable splitItem : splitData) {
+            for (Value splitItem : splitData) {
 
                 // first fire event
                 fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_BRANCH_START,
@@ -98,7 +100,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 Context branchContext = (Context) SerializationUtils.clone(flowContext);
                 branchContext.putVariable(parallelLoopStatement.getVarName(), splitItem);
                 updateCallArgumentsAndPushContextToStack(branchRuntimeEnvironment,
-                        branchContext, new HashMap<String, Serializable>());
+                        branchContext, new HashMap<String, Value>());
 
                 createBranch(
                         branchRuntimeEnvironment,
@@ -113,7 +115,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 runEnv.getExecutionPath().forward();
             }
 
-            updateCallArgumentsAndPushContextToStack(runEnv, flowContext, new HashMap<String, Serializable>());
+            updateCallArgumentsAndPushContextToStack(runEnv, flowContext, new HashMap<String, Value>());
         } catch (RuntimeException e) {
             logger.error("There was an error running the add branches execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
@@ -133,7 +135,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
             collectBranchesData(executionRuntimeServices, nodeName, branchesContext);
 
-            Map<String, Serializable> publishValues =
+            Map<String, Value> publishValues =
                     bindPublishValues(
                             runEnv,
                             executionRuntimeServices,
@@ -162,7 +164,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             ExecutionRuntimeServices executionRuntimeServices,
             Map<String, ResultNavigation> stepNavigationValues,
             String nodeName,
-            Map<String, Serializable> publishValues,
+            Map<String, Value> publishValues,
             String parallelLoopResult) {
         // set the position of the next step - for the use of the navigation
         // find in the navigation values the correct next step position, according to the parallel loop result, and set it
@@ -174,7 +176,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         Long nextStepPosition = navigation.getNextStepId();
         String presetResult = navigation.getPresetResult();
 
-        HashMap<String, Serializable> outputs = new HashMap<>(publishValues);
+        HashMap<String, Value> outputs = new HashMap<>(publishValues);
         ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : parallelLoopResult);
 
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_JOIN_BRANCHES_END,
@@ -200,7 +202,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         return parallelLoopResult;
     }
 
-    private Map<String, Serializable> bindPublishValues(
+    private Map<String, Value> bindPublishValues(
             RunEnvironment runEnv,
             ExecutionRuntimeServices executionRuntimeServices,
             List<Output> stepPublishValues,
@@ -208,8 +210,8 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             String nodeName,
             List<Map<String, Serializable>> branchesContext) {
 
-        Map<String, Serializable> publishContext = new HashMap<>();
-        publishContext.put(RuntimeConstants.BRANCHES_CONTEXT_KEY, (Serializable) branchesContext);
+        Map<String, Value> publishContext = new HashMap<>();
+        publishContext.put(RuntimeConstants.BRANCHES_CONTEXT_KEY, ValueFactory.create((Serializable) branchesContext));
 
         fireEvent(
                 executionRuntimeServices,
@@ -220,7 +222,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues));
 
         return outputsBinding.bindOutputs(
-                Collections.<String, Serializable>emptyMap(),
+                Collections.<String, Value>emptyMap(),
                 publishContext,
                 runEnv.getSystemProperties(),
                 stepPublishValues
@@ -238,9 +240,8 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
             Map<String, Serializable> branchContext = branch.getContexts();
             RunEnvironment branchRuntimeEnvironment = (RunEnvironment) branchContext.get(ScoreLangConstants.RUN_ENV);
-            Map<String, Serializable> branchContextMap = new HashMap<>(
-                    branchRuntimeEnvironment.getStack().popContext().getImmutableViewOfVariables()
-            );
+            Map<String, Serializable> branchContextMap =
+                    convert(branchRuntimeEnvironment.getStack().popContext().getImmutableViewOfVariables());
             ReturnValues executableReturnValues = branchRuntimeEnvironment.removeReturnValues();
             String branchResult = executableReturnValues.getResult();
             branchContextMap.put(ScoreLangConstants.BRANCH_RESULT_KEY, branchResult);
@@ -278,5 +279,13 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         Map<String, Serializable> branchContext = new HashMap<>();
         branchContext.put(ScoreLangConstants.RUN_ENV, runEnv);
         executionRuntimeServices.addBranch(branchBeginStep, refId, branchContext);
+    }
+
+    private Map<String, Serializable> convert(Map<String, Value> map) {
+        Map<String, Serializable> result = new HashMap<>(map.size());
+        for (Map.Entry<String, Value> entry : map.entrySet()) {
+            result.put(entry.getKey(), entry.getValue() == null ? null : entry.getValue().get());
+        }
+        return result;
     }
 }

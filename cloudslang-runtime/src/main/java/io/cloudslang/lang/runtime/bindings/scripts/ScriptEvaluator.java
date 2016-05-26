@@ -1,5 +1,3 @@
-package io.cloudslang.lang.runtime.bindings.scripts;
-
 /*******************************************************************************
  * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
@@ -10,8 +8,14 @@ package io.cloudslang.lang.runtime.bindings.scripts;
  *
  *******************************************************************************/
 
+package io.cloudslang.lang.runtime.bindings.scripts;
+
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import io.cloudslang.lang.entities.bindings.values.PyObjectValue;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.runtime.api.python.PythonEvaluationResult;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +33,7 @@ import java.util.Set;
  * @since 06/11/2014
  */
 @Component
-public class ScriptEvaluator {
+public class ScriptEvaluator extends ScriptProcessor {
     private static String LINE_SEPARATOR = System.lineSeparator();
     private static final String SYSTEM_PROPERTIES_MAP = "__sys_prop__";
     private static final String GET_FUNCTION_DEFINITION =
@@ -47,28 +51,22 @@ public class ScriptEvaluator {
     @Autowired
     private PythonRuntimeService pythonRuntimeService;
 
-    public Serializable evalExpr(
-            String expr,
-            Map<String, Serializable> context,
-            Set<SystemProperty> systemProperties){
+    public Value evalExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties){
         return evalExpr(expr, context, systemProperties, new HashSet<ScriptFunction>());
     }
 
-    public Serializable evalExpr(
-            String expr,
-            Map<String, Serializable> context,
-            Set<SystemProperty> systemProperties,
-            Set<ScriptFunction> functionDependencies) {
+    public Value evalExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties, Set<ScriptFunction> functionDependencies) {
         try {
+            Map<String, Serializable> pythonContext = createPythonContext(context);
             if(functionDependencies.contains(ScriptFunction.GET_SYSTEM_PROPERTY)) {
-                context.put(SYSTEM_PROPERTIES_MAP, (Serializable) prepareSystemProperties(systemProperties));
+                pythonContext.put(SYSTEM_PROPERTIES_MAP, (Serializable) prepareSystemProperties(systemProperties));
             }
-            Serializable result = pythonRuntimeService.eval(buildAddFunctionsScript(functionDependencies), expr, context);
+            PythonEvaluationResult result = pythonRuntimeService.eval(buildAddFunctionsScript(functionDependencies), expr, pythonContext);
             if(functionDependencies.contains(ScriptFunction.GET_SYSTEM_PROPERTY)) {
                 context.remove(SYSTEM_PROPERTIES_MAP);
             }
 
-            return result;
+            return ValueFactory.create(result.getEvalResult(), getSensitive(result.getResultContext()));
         } catch (Exception exception) {
             throw new RuntimeException(
                     "Error in running script expression: '"
@@ -103,10 +101,10 @@ public class ScriptEvaluator {
         return text + LINE_SEPARATOR + LINE_SEPARATOR;
     }
 
-    private Map<String, String> prepareSystemProperties(Set<SystemProperty> properties) {
-        Map<String, String> processedSystemProperties = new HashMap<>();
+    private Map<String, Serializable> prepareSystemProperties(Set<SystemProperty> properties) {
+        Map<String, Serializable> processedSystemProperties = new HashMap<>();
         for (SystemProperty property : properties) {
-            processedSystemProperties.put(property.getFullyQualifiedName(), property.getValue());
+            processedSystemProperties.put(property.getFullyQualifiedName(), ValueFactory.createPyObjectValue(property.getValue()));
         }
         return processedSystemProperties;
     }
@@ -119,4 +117,15 @@ public class ScriptEvaluator {
         return processedMessage;
     }
 
+    private boolean getSensitive(Map<String, Serializable> executionResultContext) {
+        for (Serializable value : executionResultContext.values()) {
+            if (value != null && value instanceof PyObjectValue) {
+                PyObjectValue pyObjectValue = (PyObjectValue) value;
+                if (pyObjectValue.isSensitive() && pyObjectValue.isAccessed()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

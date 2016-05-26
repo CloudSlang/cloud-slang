@@ -14,12 +14,12 @@ import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +49,7 @@ public class TriggerFlows {
 
     public ScoreEvent runSync(
             CompilationArtifact compilationArtifact,
-            Map<String, ? extends Serializable> userInputs,
+            Map<String, Value> userInputs,
             Set<SystemProperty> systemProperties) {
         final BlockingQueue<ScoreEvent> finishEvent = new LinkedBlockingQueue<>();
         ScoreEventListener finishListener = new ScoreEventListener() {
@@ -75,7 +75,7 @@ public class TriggerFlows {
         }
     }
 
-    public RuntimeInformation runWithData(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> userInputs, Set<SystemProperty> systemProperties) {
+    public RuntimeInformation runWithData(CompilationArtifact compilationArtifact, Map<String, Value> userInputs, Set<SystemProperty> systemProperties) {
         RunDataAggregatorListener runDataAggregatorListener = new RunDataAggregatorListener();
         slang.subscribeOnEvents(runDataAggregatorListener, STEP_EVENTS);
 

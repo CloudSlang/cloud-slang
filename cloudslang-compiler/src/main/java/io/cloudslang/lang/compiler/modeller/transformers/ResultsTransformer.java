@@ -16,12 +16,13 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +54,7 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Scope.AFTER_EXECUTABLE);
+        return Collections.singletonList(Scope.AFTER_EXECUTABLE);
     }
 
     @Override
@@ -69,7 +70,7 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
         Accumulator accumulator = extractFunctionData(resultValue);
         return new Result(
                 resultName,
-                resultValue,
+                ValueFactory.create(resultValue),
                 accumulator.getFunctionDependencies(),
                 accumulator.getSystemPropertyDependencies()
         );

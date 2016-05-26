@@ -20,11 +20,10 @@ package io.cloudslang.lang.tools.build.tester;
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import org.apache.commons.collections4.MapUtils;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-import io.cloudslang.lang.runtime.env.ReturnValues;
+import org.apache.commons.collections4.MapUtils;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -47,6 +46,13 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
     private String result;
     private Map<String, Serializable> outputs = new HashMap<>();
 
+    public String getResult() {
+        return result;
+    }
+
+    public Map<String, Serializable> getOutputs() {
+        return outputs;
+    }
 
     public boolean isFlowFinished() {
         return flowFinished.get();
@@ -81,10 +87,6 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
                 }
                 break;
         }
-    }
-
-    public ReturnValues getExecutionReturnValues(){
-        return new ReturnValues(outputs, result);
     }
 
     private static Map<String, Serializable> extractOutputs(LanguageEventData data) {
