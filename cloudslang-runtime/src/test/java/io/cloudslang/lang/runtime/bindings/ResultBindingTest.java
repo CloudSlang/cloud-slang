@@ -10,16 +10,23 @@ package io.cloudslang.lang.runtime.bindings;
 *******************************************************************************/
 
 
+import io.cloudslang.dependency.api.services.DependencyService;
+import io.cloudslang.dependency.api.services.MavenConfig;
+import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
+import io.cloudslang.dependency.impl.services.MavenConfigImpl;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
+import io.cloudslang.runtime.api.python.PythonRuntimeService;
+import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
+import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
+import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -209,10 +216,23 @@ public class ResultBindingTest {
         }
 
         @Bean
-        public PythonInterpreter evalInterpreter(){
-            return new PythonInterpreter();
+        public DependencyService mavenRepositoryService() {
+            return new DependencyServiceImpl();
         }
 
-    }
+        @Bean
+        public MavenConfig mavenConfig() {
+            return new MavenConfigImpl();
+        }
 
+        @Bean
+        public PythonRuntimeService pythonRuntimeService(){
+            return new PythonRuntimeServiceImpl();
+        }
+
+        @Bean
+        public PythonExecutionEngine pythonExecutionEngine(){
+            return new PythonExecutionCachedEngine();
+        }
+    }
 }

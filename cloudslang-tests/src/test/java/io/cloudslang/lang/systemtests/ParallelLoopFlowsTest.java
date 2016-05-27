@@ -60,10 +60,14 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
 
-        RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path);
+        RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path, getSystemProperties());
 
         List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
+
+        List<String> expectedNameOutputs = verifyBranchPublishValues(branchesData);
+
+        verifyPublishValues(runtimeInformation, expectedNameOutputs);
     }
 
     @Test
@@ -72,10 +76,14 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
 
-        RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path);
+        RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path, getSystemProperties());
 
         List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
+
+        List<String> expectedNameOutputs = verifyBranchPublishValues(branchesData);
+
+        verifyPublishValues(runtimeInformation, expectedNameOutputs);
     }
 
     @Test

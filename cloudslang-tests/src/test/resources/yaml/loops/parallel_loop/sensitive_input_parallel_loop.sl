@@ -23,6 +23,10 @@ flow:
           do:
             ops.print_branch:
               - ID: ${ value }
+        publish:
+          - name_list: ${ map(lambda x:str(x['name']), branches_context) }
+          - number_from_last_branch: ${ branches_context[-1]['int_output'] }
+          - from_sp: ${get_sp('loop.parallel.prop1')}
   outputs:
     - value1: ${values[0]}
     - value2:
