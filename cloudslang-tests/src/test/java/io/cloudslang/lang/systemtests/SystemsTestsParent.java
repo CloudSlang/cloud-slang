@@ -29,6 +29,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -61,6 +62,9 @@ public abstract class SystemsTestsParent {
 
         String settingsXmlPath = classLoader.getResource("settings.xml").getPath();
         File rootHome = new File(settingsXmlPath).getParentFile();
+
+        System.setProperty("app.home", rootHome.getAbsolutePath());
+
         File mavenHome = new File(rootHome, "maven");
         File mavenRepo = new File(rootHome, "test-mvn-repo");
         mavenRepo.mkdirs();
