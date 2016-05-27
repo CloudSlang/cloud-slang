@@ -7,7 +7,6 @@ import io.cloudslang.runtime.api.java.JavaExecutionParametersProvider;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +16,9 @@ import java.util.Map;
  * Created by Genadi Rabinovich, genadi@hpe.com on 17/05/2016.
  */
 public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionParametersProvider {
-    private static Method PARAM_VALUE_METHOD = null;
-
+    private static final String PARAM_CLASS_NAME = Param.class.getCanonicalName();
+    private static final String GLOBAL_SESSION_OBJECT_CLASS_NAME = GlobalSessionObject.class.getCanonicalName();
+    private static final String SERIALIZABLE_SESSION_OBJECT = SerializableSessionObject.class.getCanonicalName();
     private final Map<String, SerializableSessionObject> serializableSessionData;
     private final Map<String, Serializable> currentContext;
     private final Map<String, Object> nonSerializableExecutionData;
@@ -42,10 +42,13 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
             for (Annotation annotation : annotations) {
                 String parameterName = getValueIfParamAnnotation(annotation);
                 if (parameterName != null) {
-                    if (parameterTypes[index - 1].equals(GlobalSessionObject.class)) {
-                        handleNonSerializableSessionContextArgument(nonSerializableExecutionData, args, parameterName);
-                    } else if (parameterTypes[index - 1].equals(SerializableSessionObject.class)) {
-                        handleSerializableSessionContextArgument(serializableSessionData, args, parameterName);
+                    String paramClassName = parameterTypes[index - 1].getCanonicalName();
+                    if (paramClassName.equals(GLOBAL_SESSION_OBJECT_CLASS_NAME)) {
+                        handleNonSerializableSessionContextArgument(nonSerializableExecutionData, args, parameterName,
+                                annotation.getClass().getClassLoader());
+                    } else if (paramClassName.equals(SERIALIZABLE_SESSION_OBJECT)) {
+                        handleSerializableSessionContextArgument(serializableSessionData, args, parameterName,
+                                annotation.getClass().getClassLoader());
                     } else {
                         Serializable value = currentContext.get(parameterName);
                         Class parameterClass = parameterTypes[index - 1];
@@ -75,36 +78,39 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
 
     private String getValueIfParamAnnotation(Annotation annotation) {
         Class<? extends Annotation> annotationType = annotation.annotationType();
-        if ("com.hp.oo.sdk.content.annotations.Param".equalsIgnoreCase(annotation.annotationType().getCanonicalName())) {
-            if(PARAM_VALUE_METHOD == null) {
-                try {
-                    PARAM_VALUE_METHOD = annotationType.getMethod("value", new Class[0]);
-                } catch (NoSuchMethodException e) {
-                    throw new RuntimeException("com.hp.oo.sdk.content.annotations.Param" + " annotation does not have value method!!!!", e);
-                }
-            }
+        if (PARAM_CLASS_NAME.equalsIgnoreCase(annotation.annotationType().getCanonicalName())) {
             try {
-                return (String) PARAM_VALUE_METHOD.invoke(annotation, new Object[0]);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException("Failed to get value from " + "com.hp.oo.sdk.content.annotations.Param" + " annotation", e);
+                return (String) annotationType.getMethod("value", new Class[0]).invoke(annotation, new Object[0]);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to get value from " + Param.class.getCanonicalName() + " annotation", e);
             }
         }
         return null;
     }
 
-    private void handleNonSerializableSessionContextArgument(Map<String, Object> nonSerializableExecutionData, List<Object> args, String parameterName) {
+    private void handleNonSerializableSessionContextArgument(Map<String, Object> nonSerializableExecutionData, List<Object> args, String parameterName,
+                                                             ClassLoader classLoader) {
         Object nonSerializableSessionContextObject = nonSerializableExecutionData.get(parameterName);
         if (nonSerializableSessionContextObject == null) {
-            nonSerializableSessionContextObject = new GlobalSessionObject<>();
+            try {
+                nonSerializableSessionContextObject = Class.forName(GLOBAL_SESSION_OBJECT_CLASS_NAME, true, classLoader).newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to create instance of [" + GLOBAL_SESSION_OBJECT_CLASS_NAME + "] class", e);
+            }
             nonSerializableExecutionData.put(parameterName, nonSerializableSessionContextObject);
         }
         args.add(nonSerializableSessionContextObject);
     }
 
-    private void handleSerializableSessionContextArgument(Map<String, SerializableSessionObject> serializableSessionData, List<Object> args, String parameterName) {
+    private void handleSerializableSessionContextArgument(Map<String, SerializableSessionObject> serializableSessionData, List<Object> args, String parameterName,
+                                                          ClassLoader classLoader) {
         SerializableSessionObject serializableSessionContextObject = serializableSessionData.get(parameterName);
         if (serializableSessionContextObject == null) {
-            serializableSessionContextObject = new SerializableSessionObject();
+            try {
+                serializableSessionContextObject = (SerializableSessionObject) Class.forName(SERIALIZABLE_SESSION_OBJECT, true, classLoader).newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to create instance of [" + SERIALIZABLE_SESSION_OBJECT + "] class", e);
+            }
             //noinspection unchecked
             serializableSessionData.put(parameterName, serializableSessionContextObject);
         }
