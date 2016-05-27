@@ -168,11 +168,11 @@ public class SlangBuildMain {
         log.info("------------------------------------------------------------");
         log.info("Found " + buildResults.getNumberOfCompiledSources()
                 + " slang files under directory: \"" + contentPath + "\" and all are valid.");
-        printNumberOfPassedSkippedTests(runTestsResults);
+        printNumberOfPassedAndSkippedTests(runTestsResults);
         log.info("");
     }
 
-    private static void printNumberOfPassedSkippedTests(RunTestsResults runTestsResults) {
+    private static void printNumberOfPassedAndSkippedTests(RunTestsResults runTestsResults) {
         log.info(runTestsResults.getPassedTests().size() + " test cases passed");
         Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
         if(skippedTests.size() > 0) {
@@ -192,7 +192,7 @@ public class SlangBuildMain {
     }
 
     private static void printBuildFailureSummary(String projectPath, RunTestsResults runTestsResults) {
-        printNumberOfPassedSkippedTests(runTestsResults);
+        printNumberOfPassedAndSkippedTests(runTestsResults);
         Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
         log.error("");
         log.error("------------------------------------------------------------");
