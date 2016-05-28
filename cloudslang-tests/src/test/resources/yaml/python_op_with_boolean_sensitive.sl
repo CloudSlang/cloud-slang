@@ -8,23 +8,23 @@
 namespace: user.ops
 
 operation:
-  name: java_action_sensitive_input_test
-  inputs:
-    - host:
-        sensitive: true
-    - port
-  java_action:
-    class_name: io.cloudslang.lang.systemtests.actions.LangTestActions
-    method_name: parseUrl
+  name: python_op_with_boolean_sensitive
+  python_action:
+    script: |
+      condition_1 = True
+      condition_2 = 1!=1
+      condition_3 = 1==1 and False
+      condition_4 = 1<>1 or bool(1)
+      an_int = 1
   outputs:
-    - url
-    - url1: ${url}
-    - url2_not_sensitive:
-        value: ${url}
+    - condition_1
+    - condition_2: ${condition_2}
+    - condition_3:
+        value: ${condition_3}
         sensitive: false
-    - url3_sensitive:
-        value: ${url}
+    - condition_4:
+        value: ${condition_4}
         sensitive: true
+    - an_int
   results:
-    - SUCCESS: ${ url is not None }
-    - FAILURE
+    - SUCCESS: ${ condition_4 == True }

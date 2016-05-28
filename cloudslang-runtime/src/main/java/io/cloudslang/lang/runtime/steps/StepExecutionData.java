@@ -160,7 +160,6 @@ public class StepExecutionData extends AbstractExecutionData {
                     LanguageEventData.StepType.STEP, nodeName,
                     Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable) stepPublishValues),
                     Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues),
-                    Pair.of("executableReturnValues", executableReturnValues),
                     Pair.of("parallelLoop", parallelLoop)
             );
 
