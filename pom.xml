@@ -10,7 +10,7 @@
     -->
     <groupId>io.cloudslang.lang</groupId>
     <artifactId>cloudslang</artifactId>
-    <version>0.9.59-SNAPSHOT</version>
+    <version>0.9.60-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A DSL for writing flows</description>
@@ -33,7 +33,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <score.group>io.cloudslang</score.group>
-        <score.version>0.3.16</score.version>
+        <score.version>0.3.23</score.version>
         <spring.version>4.2.5.RELEASE</spring.version>
     </properties>
 
@@ -206,6 +206,30 @@
                 <version>0.0.2</version>
             </dependency>
             <!--end of score content dependencies-->
+
+            <dependency>
+                <groupId>io.cloudslang</groupId>
+                <artifactId>runtime-management-api</artifactId>
+                <version>${score.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${score.group}</groupId>
+                <artifactId>runtime-management-impl</artifactId>
+                <version>${score.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${score.group}</groupId>
+                <artifactId>dependency-management-api</artifactId>
+                <version>${score.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${score.group}</groupId>
+                <artifactId>dependency-management-impl</artifactId>
+                <version>${score.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>log4j</groupId>

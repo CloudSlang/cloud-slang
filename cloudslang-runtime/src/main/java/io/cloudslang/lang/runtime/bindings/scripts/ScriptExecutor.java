@@ -13,39 +13,37 @@ package io.cloudslang.lang.runtime.bindings.scripts;
 
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import org.python.util.PythonInterpreter;
+import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Bonczidai Levente
  * @since 1/19/2016
  */
 @Component
-public class ScriptExecutor extends AbstractScriptInterpreter {
-
+public class ScriptExecutor extends ScriptProcessor {
     @Autowired
-    @Qualifier("execInterpreter")
-    private PythonInterpreter interpreter;
+    private PythonRuntimeService pythonRuntimeService;
 
-    //we need this method to be synchronized so we will not have multiple scripts run in parallel on the same context
-    public synchronized Map<String, Value> executeScript(String script, Map<String, Value> callArguments) {
-        try {
-            cleanInterpreter(interpreter);
-            prepareInterpreterContext(callArguments);
-            return exec(interpreter, script);
-        } catch (Exception e) {
-            throw new RuntimeException("Error executing python script: " + e, e);
-        }
+    public Map<String, Value> executeScript (String script, Map<String, Value> callArguments) {
+        return executeScript(Collections.<String>emptySet(), script, callArguments);
     }
 
-    private void prepareInterpreterContext(Map<String, Value> context) {
-        for (Map.Entry<String, Value> entry : context.entrySet()) {
-            interpreter.set(entry.getKey(), ValueFactory.createPyObjectValue(entry.getValue()));
+    public Map<String, Value> executeScript (Set<String> dependencies, String script, Map<String, Value> callArguments) {
+        Map<String, Serializable> executionResult = pythonRuntimeService.exec(dependencies, script, createPythonContext(callArguments)).getExecutionResult();
+        Map<String, Value> result = new HashMap<>();
+        for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {
+            Value callArgumenet = callArguments.get(entry.getKey());
+            Value value = ValueFactory.create(entry.getValue(), callArgumenet != null && callArgumenet.isSensitive());
+            result.put(entry.getKey(), value);
         }
+        return result;
     }
-
 }
