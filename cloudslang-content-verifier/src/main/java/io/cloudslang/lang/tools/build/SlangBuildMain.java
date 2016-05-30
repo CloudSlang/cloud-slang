@@ -98,15 +98,16 @@ public class SlangBuildMain {
             if(MapUtils.isNotEmpty(skippedTests)){
                 printSkippedTestsSummary(skippedTests);
             }
+            printPassedTests(runTestsResults);
             if(shouldPrintCoverageData) {
                 printTestCoverageData(runTestsResults);
             }
-            Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
-            if(MapUtils.isNotEmpty(failedTests)){
-                printBuildFailureSummary(projectPath, failedTests);
+
+            if(MapUtils.isNotEmpty(runTestsResults.getFailedTests())) {
+                printBuildFailureSummary(projectPath, runTestsResults);
                 System.exit(1);
             } else {
-                printBuildSuccessSummary(contentPath, buildResults, runTestsResults, skippedTests);
+                printBuildSuccessSummary(contentPath, buildResults, runTestsResults);
                 System.exit(0);
             }
         } catch (Throwable e) {
@@ -160,28 +161,46 @@ public class SlangBuildMain {
         return shouldOutputCoverageData;
     }
 
-    private static void printBuildSuccessSummary(String contentPath, SlangBuildResults buildResults, RunTestsResults runTestsResults, Map<String, TestRun> skippedTests) {
+    private static void printBuildSuccessSummary(String contentPath, SlangBuildResults buildResults, RunTestsResults runTestsResults) {
         log.info("");
         log.info("------------------------------------------------------------");
         log.info("BUILD SUCCESS");
         log.info("------------------------------------------------------------");
         log.info("Found " + buildResults.getNumberOfCompiledSources()
                 + " slang files under directory: \"" + contentPath + "\" and all are valid.");
-        log.info(runTestsResults.getPassedTests().size() + " test cases passed");
-        if(skippedTests.size() > 0){
-            log.info(skippedTests.size() + " test cases skipped");
-        }
+        printNumberOfPassedAndSkippedTests(runTestsResults);
         log.info("");
     }
 
-    private static void printBuildFailureSummary(String projectPath, Map<String, TestRun> failedTests) {
+    private static void printNumberOfPassedAndSkippedTests(RunTestsResults runTestsResults) {
+        log.info(runTestsResults.getPassedTests().size() + " test cases passed");
+        Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
+        if(skippedTests.size() > 0) {
+            log.info(skippedTests.size() + " test cases skipped");
+        }
+    }
+
+    private static void printPassedTests(RunTestsResults runTestsResults) {
+        if (runTestsResults.getPassedTests().size() > 0) {
+            log.info("------------------------------------------------------------");
+            log.info("Following " + runTestsResults.getPassedTests().size() + " test cases passed:");
+            for(Map.Entry<String, TestRun> passedTest : runTestsResults.getPassedTests().entrySet()) {
+                String testCaseName = passedTest.getValue().getTestCase().getName();
+                log.info("- " + testCaseName.replaceAll("\n", "\n\t"));
+            }
+        }
+    }
+
+    private static void printBuildFailureSummary(String projectPath, RunTestsResults runTestsResults) {
+        printNumberOfPassedAndSkippedTests(runTestsResults);
+        Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
         log.error("");
         log.error("------------------------------------------------------------");
         log.error("BUILD FAILURE");
         log.error("------------------------------------------------------------");
         log.error("CloudSlang build for repository: \"" + projectPath + "\" failed due to failed tests.");
         log.error("Following " + failedTests.size() + " tests failed:");
-        for(Map.Entry<String, TestRun> failedTest : failedTests.entrySet()){
+        for(Map.Entry<String, TestRun> failedTest : failedTests.entrySet()) {
             String failureMessage = failedTest.getValue().getMessage();
             log.error("- " + failureMessage.replaceAll("\n", "\n\t"));
         }
