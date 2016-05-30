@@ -14,8 +14,8 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.runtime.steps.AbstractExecutionData;
-import org.apache.commons.lang3.tuple.Pair;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import org.apache.commons.lang3.tuple.Pair;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 

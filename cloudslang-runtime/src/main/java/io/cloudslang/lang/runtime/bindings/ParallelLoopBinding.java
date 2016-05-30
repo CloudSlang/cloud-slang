@@ -11,6 +11,8 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.ParallelLoopStatement;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
 import org.apache.commons.collections4.CollectionUtils;
@@ -19,8 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -40,7 +42,7 @@ public class ParallelLoopBinding {
         return PARALLEL_LOOP_EXPRESSION_ERROR_MESSAGE + " '" + nodeName + "', error is: \n" + message;
     }
 
-    public List<Serializable> bindParallelLoopList(
+    public List<Value> bindParallelLoopList(
             ParallelLoopStatement parallelLoopStatement,
             Context flowContext,
             Set<SystemProperty> systemProperties,
@@ -50,18 +52,22 @@ public class ParallelLoopBinding {
         Validate.notNull(systemProperties, "system properties cannot be null");
         Validate.notNull(nodeName, "node name cannot be null");
 
-        List<Serializable> evalResult;
+        List<Value> result = new ArrayList<>();
         try {
-            evalResult = (List<Serializable>) scriptEvaluator.evalExpr(
-                    parallelLoopStatement.getExpression(),
-                    flowContext.getImmutableViewOfVariables(),
-                    systemProperties);
+            Value evalResult = scriptEvaluator.evalExpr(parallelLoopStatement.getExpression(), flowContext.getImmutableViewOfVariables(), systemProperties);
+            if (evalResult != null && evalResult.get() != null) {
+                //noinspection unchecked
+                for (Serializable serializable : ((List<Serializable>)evalResult.get())) {
+                    Value value = ValueFactory.create(serializable, evalResult.isSensitive());
+                    result.add(value);
+                }
+            }
         } catch (Throwable t) {
             throw new RuntimeException(generateParallelLoopExpressionMessage(nodeName, t.getMessage()), t);
         }
-        if (CollectionUtils.isEmpty(evalResult)) {
+        if (CollectionUtils.isEmpty(result)) {
             throw new RuntimeException(generateParallelLoopExpressionMessage(nodeName, "expression is empty"));
         }
-        return evalResult;
+        return result;
     }
 }

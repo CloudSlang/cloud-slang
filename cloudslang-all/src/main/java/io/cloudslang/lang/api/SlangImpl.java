@@ -15,6 +15,8 @@ import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.score.api.Score;
 import io.cloudslang.score.api.TriggeringProperties;
@@ -83,10 +85,16 @@ public class SlangImpl implements Slang {
 		if(runInputs == null) {
 			runInputs = new HashMap<>();
 		}
+
 		Map<String, Serializable> executionContext = new HashMap<>();
 		RunEnvironment runEnv = new RunEnvironment(systemProperties);
 		executionContext.put(ScoreLangConstants.RUN_ENV, runEnv);
-	        Map<String, ? extends Serializable> clonedRunInputs = new HashMap<>(runInputs);
+
+        Map<String, Value> clonedRunInputs = new HashMap<>(runInputs.size());
+        for (Map.Entry<String, ? extends Serializable> entry : runInputs.entrySet()) {
+            clonedRunInputs.put(entry.getKey(), ValueFactory.create(entry.getValue(), false));
+        }
+
 		executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable) clonedRunInputs);
 		TriggeringProperties triggeringProperties = TriggeringProperties.create(compilationArtifact.getExecutionPlan()).setDependencies(compilationArtifact.getDependencies())
 			.setContext(executionContext);

@@ -12,6 +12,7 @@ package io.cloudslang.lang.runtime.env;
 
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import org.apache.commons.lang3.Validate;
 
 import java.io.Serializable;
@@ -25,10 +26,10 @@ import java.util.Set;
  * Date: 20/10/2014
  * Time: 10:28
  */
-public class RunEnvironment implements Serializable{
+public class RunEnvironment implements Serializable {
 
     // Call arguments for the current step
-    private Map<String, Serializable> callArguments;
+    private Map<String, Value> callArguments;
 
     // Return values from the current step
     private ReturnValues returnValues;
@@ -73,13 +74,13 @@ public class RunEnvironment implements Serializable{
         return parentFlowStack;
     }
 
-    public Map<String, Serializable> removeCallArguments() {
-        Map<String, Serializable> callArgumentsValues = callArguments;
+    public Map<String, Value> removeCallArguments() {
+        Map<String, Value> callArgumentsValues = callArguments;
         callArguments = new HashMap<>();
         return callArgumentsValues;
     }
 
-    public void putCallArguments(Map<String, Serializable> callArguments) {
+    public void putCallArguments(Map<String, Value> callArguments) {
         this.callArguments.putAll(callArguments);
     }
 

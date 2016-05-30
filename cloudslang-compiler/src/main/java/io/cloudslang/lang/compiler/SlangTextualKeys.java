@@ -46,9 +46,10 @@ public interface SlangTextualKeys {
     String PARALLEL_LOOP_KEY = "parallel_loop";
 
     //inputs
+    String VALUE_KEY = "value";
     String DEFAULT_KEY = "default";
     String REQUIRED_KEY = "required";
-    String ENCRYPTED_KEY = "encrypted";
+    String SENSITIVE_KEY = "sensitive";
     String PRIVATE_INPUT_KEY = "private";
 
     // system properties

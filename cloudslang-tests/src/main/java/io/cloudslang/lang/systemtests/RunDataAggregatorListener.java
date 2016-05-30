@@ -22,7 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static ch.lambdaj.Lambda.*;
+import static ch.lambdaj.Lambda.by;
+import static ch.lambdaj.Lambda.group;
+import static ch.lambdaj.Lambda.having;
+import static ch.lambdaj.Lambda.on;
+import static ch.lambdaj.Lambda.select;
+import static ch.lambdaj.Lambda.selectFirst;
 import static org.hamcrest.Matchers.equalTo;
 
 /*

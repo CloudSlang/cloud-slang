@@ -11,7 +11,8 @@
  */
 package io.cloudslang.lang.entities.utils;
 
-import java.io.Serializable;
+import io.cloudslang.lang.entities.bindings.values.Value;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,18 +25,18 @@ public final class MapUtils {
     private MapUtils() {
     }
 
-    public static Map<String, Serializable> mergeMaps(
-            Map<String, Serializable> map1,
-            Map<String, Serializable> map2) {
-        Map<String, Serializable> result = new HashMap<>();
+    public static Map<String, Value> mergeMaps(
+            Map<String, Value> map1,
+            Map<String, Value> map2) {
+        Map<String, Value> result = new HashMap<>();
         putAllIfNotEmpty(result, map1);
         putAllIfNotEmpty(result, map2);
         return result;
     }
 
     private static void putAllIfNotEmpty(
-            Map<String, Serializable> target,
-            Map<String, Serializable> source) {
+            Map<String, Value> target,
+            Map<String, Value> source) {
         if (org.apache.commons.collections4.MapUtils.isNotEmpty(source)) {
             target.putAll(source);
         }

@@ -16,7 +16,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import static ch.lambdaj.Lambda.*;
+import static ch.lambdaj.Lambda.by;
+import static ch.lambdaj.Lambda.group;
+import static ch.lambdaj.Lambda.on;
 
 /**
  * Date: 4/8/2015

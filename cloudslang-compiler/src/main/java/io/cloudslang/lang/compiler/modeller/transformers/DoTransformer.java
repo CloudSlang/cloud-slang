@@ -16,11 +16,15 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class DoTransformer extends InOutTransformer implements Transformer<Map<String, Object>, List<Argument>> {
@@ -31,7 +35,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
         if (MapUtils.isEmpty(rawData)) {
             return result;
         } else if (rawData.size() > 1) {
-            throw new RuntimeException("Step has to many keys under the 'do' keyword,\n" +
+            throw new RuntimeException("Step has too many keys under the 'do' keyword,\n" +
                     "May happen due to wrong indentation");
         }
         Map.Entry<String, Object> argumentsEntry = rawData.entrySet().iterator().next();
@@ -74,7 +78,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
             Accumulator accumulator = extractFunctionData(entryValue);
             return new Argument(
                     entry.getKey(),
-                    entryValue,
+                    ValueFactory.create(entryValue),
                     accumulator.getFunctionDependencies(),
                     accumulator.getSystemPropertyDependencies()
             );

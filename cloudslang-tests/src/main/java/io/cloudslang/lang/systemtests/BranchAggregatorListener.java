@@ -20,7 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static ch.lambdaj.Lambda.*;
+import static ch.lambdaj.Lambda.by;
+import static ch.lambdaj.Lambda.group;
+import static ch.lambdaj.Lambda.on;
 
 /**
  * Date: 4/8/2015
@@ -55,7 +57,7 @@ public class BranchAggregatorListener extends AbstractAggregatorListener {
                             path,
                             stepName,
                             new HashMap<String, Serializable>(),
-                            returnValues.getOutputs(),
+                            LanguageEventData.maskSensitiveValues(returnValues.getOutputs()),
                             null, returnValues.getResult()
                     )
             );

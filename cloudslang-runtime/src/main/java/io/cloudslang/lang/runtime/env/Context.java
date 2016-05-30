@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.env;
 
+import io.cloudslang.lang.entities.bindings.values.Value;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -19,35 +20,43 @@ import java.util.Map;
 
 public class Context implements Serializable{
 
-    private final Map<String, Serializable> variables;
-    private final Map<String, Serializable> langVariables;
+    private final Map<String, Value> variables;
+    private final Map<String, Value> langVariables;
 
-    public Context(Map<String, Serializable> variables) {
+    public Context(Map<String, Value> variables) {
         this.variables = variables;
         langVariables = new HashMap<>();
     }
 
-    public void putVariable(String name, Serializable value) {
+    public Value getVariable(String name) {
+        return variables.get(name);
+    }
+
+    public void putVariable(String name, Value value) {
         variables.put(name, value);
     }
 
-    public void putVariables(Map<String, ? extends Serializable> newVariables) {
+    public void putVariables(Map<String, ? extends Value> newVariables) {
         variables.putAll(newVariables);
     }
 
-    public Map<String, Serializable> getImmutableViewOfLanguageVariables() {
+    public Map<String, Value> getImmutableViewOfLanguageVariables() {
         return Collections.unmodifiableMap(langVariables);
     }
 
-    public void putLanguageVariable(String name, Serializable value) {
+    public Value getLanguageVariable(String name) {
+        return langVariables.get(name);
+    }
+
+    public void putLanguageVariable(String name, Value value) {
         langVariables.put(name, value);
     }
 
-    public Map<String, Serializable> getImmutableViewOfVariables() {
+    public Map<String, Value> getImmutableViewOfVariables() {
         return Collections.unmodifiableMap(variables);
     }
 
-    public Serializable removeLanguageVariable(String key) {
+    public Value removeLanguageVariable(String key) {
         return langVariables.remove(key);
     }
 
