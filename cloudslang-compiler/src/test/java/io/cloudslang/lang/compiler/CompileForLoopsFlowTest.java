@@ -25,6 +25,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -67,8 +68,8 @@ public class CompileForLoopsFlowTest {
         assertEquals("value", listForLoopStatement.getVarName());
         @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) step.getPostStepActionData()
                                   .get(SlangTextualKeys.PUBLISH_KEY);
-        assertEquals("a", outputs.get(0).getValue());
-        assertEquals(Arrays.asList(ScoreLangConstants.FAILURE_RESULT),
+        assertEquals("a", outputs.get(0).getValue().get());
+        assertEquals(Collections.singletonList(ScoreLangConstants.FAILURE_RESULT),
                 step.getPostStepActionData().get(SlangTextualKeys.BREAK_KEY));
     }
 
@@ -161,8 +162,8 @@ public class CompileForLoopsFlowTest {
         assertEquals("v", mapForLoopStatement.getValueName());
         @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) step.getPostStepActionData()
                 .get(SlangTextualKeys.PUBLISH_KEY);
-        assertEquals("a", outputs.get(0).getValue());
-        assertEquals(Arrays.asList(ScoreLangConstants.FAILURE_RESULT),
+        assertEquals("a", outputs.get(0).getValue().get());
+        assertEquals(Collections.singletonList(ScoreLangConstants.FAILURE_RESULT),
                 step.getPostStepActionData().get(SlangTextualKeys.BREAK_KEY));
     }
 

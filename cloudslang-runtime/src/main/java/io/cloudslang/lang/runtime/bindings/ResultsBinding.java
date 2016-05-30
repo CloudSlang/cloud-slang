@@ -13,6 +13,7 @@ package io.cloudslang.lang.runtime.bindings;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
@@ -52,8 +53,8 @@ public class ResultsBinding {
      * @param presetResult a given result name. Will be not null only in the case of resolving a result of a flow
      * @return the resolved result name
      */
-    public String resolveResult(Map<String, Serializable> inputs,
-                                Map<String, Serializable> context,
+    public String resolveResult(Map<String, Value> inputs,
+                                Map<String, Value> context,
                                 Set<SystemProperty> systemProperties,
                                 List<Result> possibleResults,
                                 String presetResult) {
@@ -79,7 +80,7 @@ public class ResultsBinding {
         // In the case of operation, we resolve the result by searching for the first result with a true expression
         // An empty expression passes as true
         for(Result result : possibleResults){
-            Serializable rawValue = result.getValue();
+            Serializable rawValue = result.getValue() == null ? null : result.getValue().get();
             String resultName = result.getName();
 
             // If the answer has no expression, we treat it as a true expression, and choose it
@@ -103,15 +104,15 @@ public class ResultsBinding {
                                     " expression " + ScoreLangConstants.EXPRESSION_END_DELIMITER);
                 }
 
-                Map<String, Serializable> scriptContext = MapUtils.mergeMaps(inputs, context);
+                Map<String, Value> scriptContext = MapUtils.mergeMaps(inputs, context);
 
                 try {
-                    Serializable expressionResult = scriptEvaluator.evalExpr(expression, scriptContext, systemProperties, result.getFunctionDependencies());
+                    Value expressionResult = scriptEvaluator.evalExpr(expression, scriptContext, systemProperties, result.getFunctionDependencies());
                     Boolean evaluatedResult;
-                    if (expressionResult instanceof Integer) {
-                        evaluatedResult = (Integer) expressionResult != 0;
+                    if (expressionResult.get() instanceof Integer) {
+                        evaluatedResult = (Integer) expressionResult.get() != 0;
                     } else {
-                        evaluatedResult = (Boolean) expressionResult;
+                        evaluatedResult = (Boolean) expressionResult.get();
                     }
                     if (evaluatedResult == null) {
                         throw new RuntimeException("Expression of the operation result: " + expression + " cannot be evaluated correctly to true or false value");

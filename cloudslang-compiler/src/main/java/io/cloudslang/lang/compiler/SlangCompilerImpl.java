@@ -90,8 +90,8 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     @Override
-    public List<RuntimeException> validateSlangModelWithDependencies(Executable slangModel, Set<Executable> dependenciesModels) {
-        return scoreCompiler.validateSlangModelWithDependencies(slangModel,dependenciesModels);
+    public List<RuntimeException> validateSlangModelWithDirectDependencies(Executable slangModel, Set<Executable> directDependenciesModels) {
+        return scoreCompiler.validateSlangModelWithDirectDependencies(slangModel,directDependenciesModels);
     }
 
     @Override

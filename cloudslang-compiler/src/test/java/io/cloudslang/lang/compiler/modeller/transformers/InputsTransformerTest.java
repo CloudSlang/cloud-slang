@@ -77,7 +77,7 @@ public class InputsTransformerTest {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(0);
         Assert.assertEquals("input1", input.getName());
-        Assert.assertNull(null, input.getValue());
+        Assert.assertNull(null, input.getValue().get());
     }
 
     @Test
@@ -85,7 +85,7 @@ public class InputsTransformerTest {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(1);
         Assert.assertEquals("input2", input.getName());
-        Assert.assertEquals("${ input2 }", input.getValue());
+        Assert.assertEquals("${ input2 }", input.getValue().get());
     }
 
     @Test
@@ -93,7 +93,7 @@ public class InputsTransformerTest {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(2);
         Assert.assertEquals("input3", input.getName());
-        Assert.assertEquals("value3", input.getValue());
+        Assert.assertEquals("value3", input.getValue().get());
     }
 
     @Test
@@ -101,7 +101,7 @@ public class InputsTransformerTest {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(3);
         Assert.assertEquals("input4", input.getName());
-        Assert.assertEquals("${ 'value4' if input3 == value3 else None }", input.getValue());
+        Assert.assertEquals("${ 'value4' if input3 == value3 else None }", input.getValue().get());
     }
 
     @Test
@@ -109,8 +109,8 @@ public class InputsTransformerTest {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(4);
         Assert.assertEquals("input5", input.getName());
-        Assert.assertEquals(null, input.getValue());
-        Assert.assertEquals(true, input.isEncrypted());
+        Assert.assertEquals(null, input.getValue().get());
+        Assert.assertEquals(true, input.isSensitive());
         Assert.assertEquals(true, input.isRequired());
     }
 
@@ -119,8 +119,8 @@ public class InputsTransformerTest {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(5);
         Assert.assertEquals("input6", input.getName());
-        Assert.assertEquals("${ 1 + 5 }", input.getValue());
-        Assert.assertEquals(false, input.isEncrypted());
+        Assert.assertEquals("${ 1 + 5 }", input.getValue().get());
+        Assert.assertEquals(false, input.isSensitive());
         Assert.assertEquals(false, input.isRequired());
     }
 
@@ -129,8 +129,8 @@ public class InputsTransformerTest {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(6);
         Assert.assertEquals("input7", input.getName());
-        Assert.assertEquals(77, input.getValue());
-        Assert.assertEquals(false, input.isEncrypted());
+        Assert.assertEquals(77, input.getValue().get());
+        Assert.assertEquals(false, input.isSensitive());
         Assert.assertEquals(true, input.isRequired());
     }
 
@@ -139,8 +139,8 @@ public class InputsTransformerTest {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(7);
         Assert.assertEquals("input8", input.getName());
-        Assert.assertEquals("${ input6 }", input.getValue());
-        Assert.assertEquals(false, input.isEncrypted());
+        Assert.assertEquals("${ input6 }", input.getValue().get());
+        Assert.assertEquals(false, input.isSensitive());
         Assert.assertEquals(true, input.isRequired());
     }
 
@@ -149,9 +149,9 @@ public class InputsTransformerTest {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(8);
         Assert.assertEquals("input9", input.getName());
-        Assert.assertEquals("${ input6 }", input.getValue());
+        Assert.assertEquals("${ input6 }", input.getValue().get());
         Assert.assertFalse(!input.isPrivateInput());
-        Assert.assertFalse(input.isEncrypted());
+        Assert.assertFalse(input.isSensitive());
         Assert.assertTrue(input.isRequired());
     }
 
@@ -180,7 +180,7 @@ public class InputsTransformerTest {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(9);
         Assert.assertEquals("input10", input.getName());
-        Assert.assertEquals("${ input5 }", input.getValue());
+        Assert.assertEquals("${ input5 }", input.getValue().get());
     }
 
     @Test
@@ -188,7 +188,7 @@ public class InputsTransformerTest {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(10);
         Assert.assertEquals("input11", input.getName());
-        Assert.assertEquals("${ 5 + 6 }", input.getValue());
+        Assert.assertEquals("${ 5 + 6 }", input.getValue().get());
     }
 
     @Test
@@ -196,7 +196,7 @@ public class InputsTransformerTest {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
         Input input = inputs.get(11);
         Assert.assertEquals("input12", input.getName());
-        Assert.assertEquals("${ \"mighty\" + \" max\"   + varX }", input.getValue());
+        Assert.assertEquals("${ \"mighty\" + \" max\"   + varX }", input.getValue().get());
     }
 
     @Test

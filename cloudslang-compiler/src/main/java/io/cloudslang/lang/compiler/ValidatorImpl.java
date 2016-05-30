@@ -5,13 +5,23 @@ import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
-import io.cloudslang.lang.entities.bindings.*;
+import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.InOutParam;
+import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.Result;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * User: bancl
@@ -71,6 +81,18 @@ public class ValidatorImpl implements Validator {
         return false;
     }
 
+    @Override
+    public List<RuntimeException> validateModelWithDirectDependencies(Executable executable, Map<String, Executable> directDependencies) {
+        List<RuntimeException> errors = new ArrayList<>();
+        Flow flow = (Flow) executable;
+        Collection<Step> steps = flow.getWorkflow().getSteps();
+
+        for (Step step : steps) {
+            errors.addAll(validateStepAgainstItsDependency(flow, step, directDependencies));
+        }
+        return errors;
+    }
+
     private List<RuntimeException> validateModelWithDependencies(
             Executable executable,
             Map<String, Executable> dependencies,
@@ -87,17 +109,8 @@ public class ValidatorImpl implements Validator {
         Set<Executable> flowReferences = new HashSet<>();
 
         for (Step step : steps) {
-            String refId = step.getRefId();
-            Executable reference = dependencies.get(refId);
-
-            try {
-                validateMandatoryInputsAreWired(flow, step, reference);
-                validateStepInputNamesDifferentFromDependencyOutputNames(flow, step, reference);
-                validateDependenciesResultsHaveMatchingNavigations(executable, refId, step, reference);
-            } catch (RuntimeException e) {
-                errors.add(e);
-            }
-
+            Executable reference = dependencies.get(step.getRefId());
+            errors.addAll(validateStepAgainstItsDependency(flow, step, dependencies));
             flowReferences.add(reference);
         }
 
@@ -107,34 +120,55 @@ public class ValidatorImpl implements Validator {
         return errors;
     }
 
-    private void validateDependenciesResultsHaveMatchingNavigations(Executable executable, String refId, Step step, Executable reference) {
-        if (!StringUtils.equals(refId, executable.getId())) {
+    private List<RuntimeException> validateStepAgainstItsDependency(Flow flow, Step step, Map<String, Executable> dependencies) {
+        List<RuntimeException> errors = new ArrayList<>();
+        String refId = step.getRefId();
+        Executable reference = dependencies.get(refId);
+        if (reference == null) {
+            throw new RuntimeException("Dependency " + step.getRefId() + " used by step: " + step.getName() + " must be supplied for validation");
+        }
+        errors.addAll(validateMandatoryInputsAreWired(flow, step, reference));
+        errors.addAll(validateStepInputNamesDifferentFromDependencyOutputNames(flow, step, reference));
+        errors.addAll(validateDependenciesResultsHaveMatchingNavigations(flow, refId, step, reference));
+        return errors;
+    }
+
+    private List<RuntimeException> validateDependenciesResultsHaveMatchingNavigations(Flow flow, String refId, Step step, Executable reference) {
+        List<RuntimeException> errors = new ArrayList<>();
+        if (!StringUtils.equals(refId, flow.getId())) {
             List<Map<String, String>> stepNavigationStrings = step.getNavigationStrings();
             if (reference == null) {
-                throw new IllegalArgumentException("Cannot compile flow: \'" + executable.getName() + "\' since for step: \'" + step.getName()
-                        + "\', the dependency: \'" + refId + "\' is missing.");
+                errors.add(new IllegalArgumentException("Cannot compile flow: \'" + flow.getName() + "\' since for step: \'" + step.getName()
+                        + "\', the dependency: \'" + refId + "\' is missing."));
             } else {
                 List<Result> refResults = reference.getResults();
                 for(Result result : refResults){
                     String resultName = result.getName();
                     if (!navigationListContainsKey(stepNavigationStrings, resultName)){
-                        throw new IllegalArgumentException("Cannot compile flow: \'" + executable.getName() +
+                        errors.add(new IllegalArgumentException("Cannot compile flow: \'" + flow.getName() +
                                 "\' since for step: '" + step.getName() + "\', the result \'" + resultName+
-                                "\' of its dependency: \'"+ refId + "\' has no matching navigation");
+                                "\' of its dependency: \'"+ refId + "\' has no matching navigation"));
                     }
                 }
             }
         }
+        return errors;
     }
 
-    private void validateStepInputNamesDifferentFromDependencyOutputNames(Flow flow, Step step, Executable reference) {
+    private List<RuntimeException> validateStepInputNamesDifferentFromDependencyOutputNames(Flow flow, Step step, Executable reference) {
+        List<RuntimeException> errors = new ArrayList<>();
         List<Argument> stepArguments = step.getArguments();
         List<Output> outputs = reference.getOutputs();
         String errorMessage = "Cannot compile flow '" + flow.getId() +
                 "'. Step '" + step.getName() +
                 "' has input '" + NAME_PLACEHOLDER +
                 "' with the same name as the one of the outputs of '" + reference.getId() + "'.";
-        validateListsHaveMutuallyExclusiveNames(stepArguments, outputs, errorMessage);
+        try {
+            validateListsHaveMutuallyExclusiveNames(stepArguments, outputs, errorMessage);
+        } catch (RuntimeException e) {
+            errors.add(e);
+        }
+        return errors;
     }
 
     private void validateListsHaveMutuallyExclusiveNames(List<? extends InOutParam> inOutParams, List<Output> outputs, String errorMessage) {
@@ -150,7 +184,7 @@ public class ValidatorImpl implements Validator {
     private List<String> getMandatoryInputNames(Executable executable) {
         List<String> inputNames = new ArrayList<>();
         for (Input input : executable.getInputs()) {
-            if (!input.isPrivateInput() && input.isRequired() && input.getValue() == null) {
+            if (!input.isPrivateInput() && input.isRequired() && (input.getValue() == null || input.getValue().get() == null)) {
                 inputNames.add(input.getName());
             }
         }
@@ -171,14 +205,15 @@ public class ValidatorImpl implements Validator {
         return inputsNotWired;
     }
 
-    private void validateMandatoryInputsAreWired(Flow flow, Step step, Executable reference) {
+    private List<RuntimeException> validateMandatoryInputsAreWired(Flow flow, Step step, Executable reference) {
+        List<RuntimeException> errors = new ArrayList<>();
         List<String> mandatoryInputNames = getMandatoryInputNames(reference);
         List<String> stepInputNames = getStepInputNames(step);
         List<String> inputsNotWired = getInputsNotWired(mandatoryInputNames, stepInputNames);
-        Validate.isTrue(
-                CollectionUtils.isEmpty(inputsNotWired),
-                prepareErrorMessageValidateInputNamesEmpty(inputsNotWired, flow, step, reference)
-        );
+        if (!CollectionUtils.isEmpty(inputsNotWired)) {
+            errors.add(new IllegalArgumentException(prepareErrorMessageValidateInputNamesEmpty(inputsNotWired, flow, step, reference)));
+        }
+        return errors;
     }
 
     private String prepareErrorMessageValidateInputNamesEmpty(List<String> inputsNotWired, Flow flow, Step step, Executable reference) {

@@ -9,6 +9,8 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.env;
 
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -32,8 +34,9 @@ public class ForLoopCondition implements LoopCondition {
         return iterator;
     }
 
-    public Serializable next() {
-        Serializable next = loopToCurrentObject().next();
+    public Value next() {
+        Serializable serializable = loopToCurrentObject().next();
+        Value next = serializable instanceof Value ? (Value)serializable : ValueFactory.create(serializable);
         index++;
         return next;
     }

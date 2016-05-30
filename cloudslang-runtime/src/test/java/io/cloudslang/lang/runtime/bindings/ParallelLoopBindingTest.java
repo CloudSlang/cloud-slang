@@ -2,6 +2,8 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.ParallelLoopStatement;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
 import org.junit.Rule;
@@ -39,7 +41,7 @@ public class ParallelLoopBindingTest {
     @Test
     public void passingNullParallelLoopStatementThrowsException() throws Exception {
         exception.expect(RuntimeException.class);
-        parallelLoopBinding.bindParallelLoopList(null, new Context(new HashMap<String, Serializable>()), EMPTY_SET, "nodeName");
+        parallelLoopBinding.bindParallelLoopList(null, new Context(new HashMap<String, Value>()), EMPTY_SET, "nodeName");
     }
 
     @Test
@@ -51,20 +53,20 @@ public class ParallelLoopBindingTest {
     @Test
     public void passingNullNodeNameThrowsException() throws Exception {
         exception.expect(RuntimeException.class);
-        parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), new Context(new HashMap<String, Serializable>()), EMPTY_SET, null);
+        parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), new Context(new HashMap<String, Value>()), EMPTY_SET, null);
     }
 
     @Test
     public void testParallelLoopListIsReturned() throws Exception {
-        Map<String, Serializable> variables = new HashMap<>();
-        variables.put("key1", "value1");
-        variables.put("key2", "value2");
+        Map<String, Value> variables = new HashMap<>();
+        variables.put("key1", ValueFactory.create("value1"));
+        variables.put("key2", ValueFactory.create("value2"));
         Context context = new Context(variables);
-        List<Serializable> expectedList = Lists.newArrayList((Serializable) 1, 2, 3);
+        List<Value> expectedList = Lists.newArrayList(ValueFactory.create(1), ValueFactory.create(2), ValueFactory.create(3));
 
-        when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET))).thenReturn((Serializable) expectedList);
+        when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET))).thenReturn(ValueFactory.create((Serializable) expectedList));
 
-        List<Serializable> actualList = parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), context, EMPTY_SET, "nodeName");
+        List<Value> actualList = parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), context, EMPTY_SET, "nodeName");
 
         verify(scriptEvaluator).evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET));
         assertEquals("returned parallel loop list not as expected", expectedList, actualList);
@@ -72,12 +74,12 @@ public class ParallelLoopBindingTest {
 
     @Test
     public void testEmptyExpressionThrowsException() throws Exception {
-        Map<String, Serializable> variables = new HashMap<>();
-        variables.put("key1", "value1");
-        variables.put("key2", "value2");
+        Map<String, Value> variables = new HashMap<>();
+        variables.put("key1", ValueFactory.create("value1"));
+        variables.put("key2", ValueFactory.create("value2"));
         Context context = new Context(variables);
 
-        when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET))).thenReturn(Lists.newArrayList());
+        when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET))).thenReturn(ValueFactory.create(Lists.newArrayList()));
 
         exception.expectMessage("expression is empty");
         exception.expect(RuntimeException.class);
@@ -87,7 +89,7 @@ public class ParallelLoopBindingTest {
 
     @Test
     public void testExceptionIsPropagated() throws Exception {
-        Map<String, Serializable> variables = new HashMap<>();
+        Map<String, Value> variables = new HashMap<>();
 
         when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET))).thenThrow(new RuntimeException("evaluation exception"));
         exception.expectMessage("evaluation exception");

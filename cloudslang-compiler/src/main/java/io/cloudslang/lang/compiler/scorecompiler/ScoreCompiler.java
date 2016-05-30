@@ -43,9 +43,9 @@ public interface ScoreCompiler {
      *      - Validates that required inputs of the dependency have a matching input in the step
      *      - Validate that every result of teh dependency has a matching navigation in the step
      * @param slangModel the CloudSlang model to validate
-     * @param dependenciesModels the CloudSlang models of the direct dependencies
+     * @param directDependenciesModels the CloudSlang models of the direct dependencies
      * @return a list of the exceptions that were found (if any)
      */
-    List<RuntimeException> validateSlangModelWithDependencies(Executable slangModel, Set<Executable> dependenciesModels);
+    List<RuntimeException> validateSlangModelWithDirectDependencies(Executable slangModel, Set<Executable> directDependenciesModels);
 
 }

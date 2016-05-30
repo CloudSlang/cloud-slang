@@ -19,6 +19,7 @@ import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
@@ -27,7 +28,11 @@ import org.junit.Test;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Bonczidai Levente
@@ -42,7 +47,7 @@ public class BindingScopeTest extends SystemsTestsParent {
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
 
-        Map<String, Serializable> userInputs = Collections.emptyMap();
+        Map<String, Value> userInputs = Collections.emptyMap();
         Set<SystemProperty> systemProperties = Collections.emptySet();
 
         // trigger ExecutionPlan
@@ -89,12 +94,12 @@ public class BindingScopeTest extends SystemsTestsParent {
         Assert.assertEquals(
                 "Step expression should contain: " + flowVarName,
                 flowVarName,
-                StringUtils.trim(ExpressionUtils.extractExpression(stepPublishValues.get(0).getValue()))
+                StringUtils.trim(ExpressionUtils.extractExpression(stepPublishValues.get(0).getValue().get()))
         );
 
         CompilationArtifact compilationArtifact = slang.compile(flowSource, path);
 
-        Map<String, Serializable> userInputs = Collections.emptyMap();
+        Map<String, Value> userInputs = Collections.emptyMap();
         Set<SystemProperty> systemProperties = Collections.emptySet();
 
         exception.expect(RuntimeException.class);

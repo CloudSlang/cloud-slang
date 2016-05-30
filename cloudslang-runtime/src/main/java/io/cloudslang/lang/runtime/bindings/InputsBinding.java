@@ -12,13 +12,14 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,12 +38,12 @@ public class InputsBinding {
      * @param context : initial context
      * @return : a new map with all inputs resolved (does not include initial context)
      */
-    public Map<String, Serializable> bindInputs(List<Input> inputs, Map<String, ? extends Serializable> context,
-                                                Set<SystemProperty> systemProperties) {
-        Map<String, Serializable> resultContext = new HashMap<>();
+    public Map<String, Value> bindInputs(List<Input> inputs, Map<String, ? extends Value> context,
+                                         Set<SystemProperty> systemProperties) {
+        Map<String, Value> resultContext = new HashMap<>();
 
         //we do not want to change original context map
-        Map<String, Serializable> srcContext = new HashMap<>(context);
+        Map<String, Value> srcContext = new HashMap<>(context);
 
         for (Input input : inputs) {
             bindInput(input, srcContext, resultContext, systemProperties);
@@ -51,11 +52,9 @@ public class InputsBinding {
         return resultContext;
     }
 
-    private void bindInput(Input input, Map<String, ? extends Serializable> context,
-                           Map<String, Serializable> targetContext,
+    private void bindInput(Input input, Map<String, ? extends Value> context, Map<String, Value> targetContext,
                            Set<SystemProperty> systemProperties) {
-
-        Serializable value;
+        Value value;
 
         String inputName = input.getName();
         Validate.notEmpty(inputName);
@@ -66,7 +65,7 @@ public class InputsBinding {
             throw new RuntimeException("Error binding input: '" + inputName + "', \n\tError is: " + t.getMessage(), t);
         }
 
-        if (input.isRequired() && value == null) {
+        if (input.isRequired() && (value == null || value.get() == null)) {
             String errorMessage = "Input with name: \'" + inputName + "\' is Required, but value is empty";
             throw new RuntimeException(errorMessage);
         }
@@ -81,25 +80,23 @@ public class InputsBinding {
         return !(value == null && !input.isDefaultSpecified() && !context.containsKey(input.getName()));
     }
 
-    private Serializable resolveValue(
-            Input input,
-            Map<String, ? extends Serializable> context,
-            Map<String, ? extends Serializable> targetContext,
-            Set<SystemProperty> systemProperties) {
-        Serializable value = null;
+    private Value resolveValue(Input input, Map<String, ? extends Value> context, Map<String, ? extends Value> targetContext,
+                               Set<SystemProperty> systemProperties) {
+        Value value = null;
 
         //we do not want to change original context map
-        Map<String, Serializable> scriptContext = new HashMap<>(context);
+        Map<String, Value> scriptContext = new HashMap<>(context);
 
         String inputName = input.getName();
-        Serializable valueFromContext = context.get(inputName);
+        Value valueFromContext = context.get(inputName);
+        boolean sensitive = input.getValue() != null && input.getValue().isSensitive() || valueFromContext != null && valueFromContext.isSensitive();
         if (!input.isPrivateInput()) {
-            value = valueFromContext;
+            value = ValueFactory.create(valueFromContext, sensitive);
         }
 
-        if (value == null) {
-            Serializable rawValue = input.getValue();
-            String expressionToEvaluate = ExpressionUtils.extractExpression(rawValue);
+        if (value == null || value.get() == null) {
+            Value rawValue = input.getValue();
+            String expressionToEvaluate = ExpressionUtils.extractExpression(rawValue == null ? null : rawValue.get());
             if (expressionToEvaluate != null) {
                 if (context.containsKey(inputName)) {
                     scriptContext.put(inputName, valueFromContext);
@@ -107,6 +104,7 @@ public class InputsBinding {
                 //so you can resolve previous inputs already bound
                 scriptContext.putAll(targetContext);
                 value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, input.getFunctionDependencies());
+                value = ValueFactory.create(value, sensitive);
             } else {
                 value = rawValue;
             }
