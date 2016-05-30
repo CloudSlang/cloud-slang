@@ -155,7 +155,6 @@ public class InputsBindingTest {
         Input input1 = new Input.InputBuilder("input1", null)
                 .withRequired(true)
                 .withPrivateInput(false)
-                .withDefaultSpecified(false)
                 .build();
         List<Input> inputs = Collections.singletonList(input1);
         exception.expect(RuntimeException.class);
@@ -168,7 +167,6 @@ public class InputsBindingTest {
         Input input1 = new Input.InputBuilder("input1", null)
                 .withRequired(false)
                 .withPrivateInput(false)
-                .withDefaultSpecified(true)
                 .build();
         List<Input> inputs = Collections.singletonList(input1);
         Map<String, Value> result = bindInputs(inputs);

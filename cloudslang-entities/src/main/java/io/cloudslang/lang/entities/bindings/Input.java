@@ -29,7 +29,6 @@ public class Input extends InOutParam {
 
 	private boolean required;
 	private boolean privateInput;
-    private boolean defaultSpecified;
 
 	private Input(InputBuilder inputBuilder) {
 		super(inputBuilder.name,
@@ -39,7 +38,6 @@ public class Input extends InOutParam {
 		);
 		this.required = inputBuilder.required;
 		this.privateInput = inputBuilder.privateInput;
-        this.defaultSpecified = inputBuilder.defaultSpecified;
 	}
 
 	/**
@@ -55,10 +53,6 @@ public class Input extends InOutParam {
 	public boolean isPrivateInput() {
 		return privateInput;
 	}
-
-    public boolean isDefaultSpecified() {
-        return defaultSpecified;
-    }
 
 	@Override
 	public String toString() {
@@ -98,7 +92,6 @@ public class Input extends InOutParam {
 		private Value value;
 		private boolean required;
 		private boolean privateInput;
-		private boolean defaultSpecified;
 		private Set<ScriptFunction> functionDependencies;
 		private Set<String> systemPropertyDependencies;
 
@@ -111,14 +104,8 @@ public class Input extends InOutParam {
 			this.value = ValueFactory.create(serializable, sensitive);
 			this.required = true;
 			this.privateInput = false;
-			this.defaultSpecified = false;
 			this.functionDependencies = new HashSet<>();
 			this.systemPropertyDependencies = new HashSet<>();
-		}
-
-		public InputBuilder withDefaultSpecified(boolean defaultSpecified) {
-			this.defaultSpecified = defaultSpecified;
-			return this;
 		}
 
 		public InputBuilder withRequired(boolean required) {

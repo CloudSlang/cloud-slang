@@ -78,13 +78,13 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
                     "input: " + inputName + " is private but no default value was specified");
         }
 
-        return createInput(inputName, value, sensitive, required, privateInput, defaultSpecified);
+        return createInput(inputName, value, sensitive, required, privateInput);
     }
 
     private Input createInput(
             String name,
             Serializable value) {
-        return createInput(name, value, false, true, false, false);
+        return createInput(name, value, false, true, false);
     }
 
     private Input createInput(
@@ -92,13 +92,11 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
             Serializable value,
             boolean sensitive,
             boolean required,
-            boolean privateInput,
-            boolean defaultSpecified) {
+            boolean privateInput) {
         Accumulator dependencyAccumulator = extractFunctionData(value);
         return new Input.InputBuilder(name, value, sensitive)
                 .withRequired(required)
                 .withPrivateInput(privateInput)
-                .withDefaultSpecified(defaultSpecified)
                 .withFunctionDependencies(dependencyAccumulator.getFunctionDependencies())
                 .withSystemPropertyDependencies(dependencyAccumulator.getSystemPropertyDependencies())
                 .build();
