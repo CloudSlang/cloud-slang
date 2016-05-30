@@ -70,14 +70,7 @@ public class InputsBinding {
             throw new RuntimeException(errorMessage);
         }
 
-        if (inputValueIsSet(input, context, value)) {
-            targetContext.put(inputName, value);
-        }
-
-    }
-
-    private boolean inputValueIsSet(Input input, Map<String, ? extends Serializable> context, Serializable value) {
-        return !(value == null && !input.isDefaultSpecified() && !context.containsKey(input.getName()));
+        targetContext.put(inputName, value);
     }
 
     private Value resolveValue(Input input, Map<String, ? extends Value> context, Map<String, ? extends Value> targetContext,

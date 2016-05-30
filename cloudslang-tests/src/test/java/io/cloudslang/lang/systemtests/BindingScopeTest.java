@@ -23,22 +23,23 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Bonczidai Levente
  * @since 3/18/2016
  */
 public class BindingScopeTest extends SystemsTestsParent {
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testStepPublishValues() throws Exception {
@@ -59,6 +60,22 @@ public class BindingScopeTest extends SystemsTestsParent {
         Assert.assertNotNull("step data is null", stepData);
 
         verifyStepPublishValues(stepData);
+    }
+
+    @Test
+    public void testInputMissing() throws Exception {
+        URL resource = getClass().getResource("/yaml/check_weather_missing_input.sl");
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), new HashSet<SlangSource>());
+
+        Map<String, Value> userInputs = Collections.emptyMap();
+        Set<SystemProperty> systemProperties = Collections.emptySet();
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Error running: 'check_weather_missing_input'.\n" +
+                "\t Error binding input: 'input_get_missing_input', \n" +
+                "\tError is: Error in running script expression: 'missing_input',\n" +
+                "\tException is: name 'missing_input' is not defined");
+        triggerWithData(compilationArtifact, userInputs, systemProperties);
     }
 
     private void verifyStepPublishValues(StepData stepData) {

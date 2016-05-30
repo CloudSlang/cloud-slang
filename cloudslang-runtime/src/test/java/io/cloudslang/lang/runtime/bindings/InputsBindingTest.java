@@ -125,7 +125,6 @@ public class InputsBindingTest {
     @Test
     public void testPrivateInputMissingInContext() {
         Input input1 = new Input.InputBuilder("input1", "${ input1 }")
-                .withEncrypted(false)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
@@ -140,7 +139,6 @@ public class InputsBindingTest {
     @Test
     public void testInputMissingInContext() {
         Input input1 = new Input.InputBuilder("input1", "${ input1 }")
-                .withEncrypted(false)
                 .withRequired(false)
                 .withPrivateInput(false)
                 .build();
@@ -155,29 +153,28 @@ public class InputsBindingTest {
     @Test
      public void testInputMissing() {
         Input input1 = new Input.InputBuilder("input1", null)
-                .withEncrypted(false)
-                .withRequired(false)
+                .withRequired(true)
                 .withPrivateInput(false)
                 .withDefaultSpecified(false)
                 .build();
         List<Input> inputs = Collections.singletonList(input1);
-        Map<String,Serializable> result = bindInputs(inputs);
-        Assert.assertTrue(result.isEmpty());
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Input with name: 'input1' is Required, but value is empty");
+        bindInputs(inputs);
     }
 
     @Test
     public void testInputWithDefaultValueNull() {
         Input input1 = new Input.InputBuilder("input1", null)
-                .withEncrypted(false)
                 .withRequired(false)
                 .withPrivateInput(false)
                 .withDefaultSpecified(true)
                 .build();
         List<Input> inputs = Collections.singletonList(input1);
-        Map<String,Serializable> result = bindInputs(inputs);
+        Map<String, Value> result = bindInputs(inputs);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(null, result.get("input1"));
+        Assert.assertEquals(null, result.get("input1").get());
     }
 
     @Test
