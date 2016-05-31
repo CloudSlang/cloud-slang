@@ -507,15 +507,10 @@ public class CompilerErrorsTest {
         dependencies.add(operationModel);
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("step1");
-        exception.expectMessage("FAILURE");
-        exception.expectMessage("user.ops.java_op");
-        exception.expectMessage("navigation");
-        List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         exception.expectMessage("Cannot compile flow: 'step_with_missing_navigation_from_operation_result_flow' " +
                 "since for step: 'step1', the result 'FAILURE' of its dependency: 'user.ops.java_op' " +
                 "has no matching navigation");
-        List<RuntimeException> errors = compiler.validateSlangModelWithDependencies(flowModel, dependencies);
+        List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         Assert.assertEquals(1, errors.size());
         throw errors.get(0);
     }
@@ -534,16 +529,10 @@ public class CompilerErrorsTest {
         dependencies.add(operation2Model);
 
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("explicit_alias");
-        exception.expectMessage("user.ops.test_op");
-        exception.expectMessage("mandatory");
-        exception.expectMessage("inputs");
-        exception.expectMessage("alla");
-        List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         exception.expectMessage("Cannot compile flow 'io.cloudslang.flow_missing_dependency_required_input_in_step'. " +
                 "Step 'explicit_alias' does not declare all the mandatory inputs of its reference. " +
                 "The following inputs of 'user.ops.test_op' are not private, required and with no default value: alla.");
-        List<RuntimeException> errors = compiler.validateSlangModelWithDependencies(flowModel, dependencies);
+        List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         Assert.assertEquals(1, errors.size());
         throw errors.get(0);
     }
@@ -564,7 +553,7 @@ public class CompilerErrorsTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("Cannot compile flow 'io.cloudslang.flow_input_in_step_same_name_as_dependency_output'. " +
                 "Step 'explicit_alias' has input 'balla' with the same name as the one of the outputs of 'user.ops.test_op'.");
-        List<RuntimeException> errors = compiler.validateSlangModelWithDependencies(flowModel, dependencies);
+        List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         Assert.assertEquals(1, errors.size());
         throw errors.get(0);
     }
@@ -572,31 +561,25 @@ public class CompilerErrorsTest {
     @Test
     public void testValidationOfFlowThatCallsCorruptedFlow()throws Exception {
         URI flowUri = getClass().getResource("/corrupted/flow_that_calls_corrupted_flow.sl").toURI();
-        Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
 
         URI operation1Uri = getClass().getResource("/test_op.sl").toURI();
-        Executable operation1Model = compiler.preCompile(SlangSource.fromFile(operation1Uri));
         URI operation2Uri = getClass().getResource("/check_op.sl").toURI();
-        Executable operation2Model = compiler.preCompile(SlangSource.fromFile(operation2Uri));
         URI operation3Uri = getClass().getResource("/corrupted/flow_input_in_step_same_name_as_dependency_output.sl").toURI();
-        Executable operation3Model = compiler.preCompile(SlangSource.fromFile(operation3Uri));
-        Set<Executable> dependencies = new HashSet<>();
-        dependencies.add(operation1Model);
-        dependencies.add(operation2Model);
-        dependencies.add(operation3Model);
+
+        Set<SlangSource> dependencies = new HashSet<>();
+        dependencies.add(SlangSource.fromFile(operation1Uri));
+        dependencies.add(SlangSource.fromFile(operation2Uri));
+        dependencies.add(SlangSource.fromFile(operation3Uri));
 
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("Cannot compile flow 'io.cloudslang.flow_input_in_step_same_name_as_dependency_output'. " +
                 "Step 'explicit_alias' has input 'balla' with the same name as the one of the outputs of 'user.ops.test_op'.");
-        List<RuntimeException> errors = compiler.validateSlangModelWithDependencies(flowModel, dependencies);
-        Assert.assertEquals(1, errors.size());
-        throw errors.get(0);
+        compiler.compile(SlangSource.fromFile(flowUri), dependencies);
     }
 
     @Test
     public void testValidationMatchingNavigation() throws Exception {
         URI resource = getClass().getResource("/corrupted/matching-navigation/parent_flow.sl").toURI();
-        Executable flowModel = compiler.preCompile(SlangSource.fromFile(resource));
 
         URI subFlow = getClass().getResource("/corrupted/matching-navigation/child_flow.sl").toURI();
         URI operation1 = getClass().getResource("/corrupted/matching-navigation/test_op.sl").toURI();
@@ -604,24 +587,16 @@ public class CompilerErrorsTest {
         URI operation3 = getClass().getResource("/corrupted/matching-navigation/get_time_zone.sl").toURI();
         URI operation4 = getClass().getResource("/corrupted/matching-navigation/check_number.sl").toURI();
 
-        Executable subFlowExecutable = compiler.preCompile(SlangSource.fromFile(subFlow));
-        Executable operation1Model = compiler.preCompile(SlangSource.fromFile(operation1));
-        Executable operation2Model = compiler.preCompile(SlangSource.fromFile(operation2));
-        Executable operation3Model = compiler.preCompile(SlangSource.fromFile(operation3));
-        Executable operation4Model = compiler.preCompile(SlangSource.fromFile(operation4));
-
-        Set<Executable> dependencies = new HashSet<>();
-        dependencies.add(subFlowExecutable);
-        dependencies.add(operation1Model);
-        dependencies.add(operation2Model);
-        dependencies.add(operation3Model);
-        dependencies.add(operation4Model);
+        Set<SlangSource> dependencies = new HashSet<>();
+        dependencies.add(SlangSource.fromFile(subFlow));
+        dependencies.add(SlangSource.fromFile(operation1));
+        dependencies.add(SlangSource.fromFile(operation2));
+        dependencies.add(SlangSource.fromFile(operation3));
+        dependencies.add(SlangSource.fromFile(operation4));
 
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("Cannot compile flow: 'child_flow' since for step: 'step01', the result 'NEGATIVE' " +
                 "of its dependency: 'user.ops.get_time_zone' has no matching navigation");
-        List<RuntimeException> errors = compiler.validateSlangModelWithDependencies(flowModel, dependencies);
-        Assert.assertEquals(1, errors.size());
-        throw errors.get(0);
+        compiler.compile(SlangSource.fromFile(resource), dependencies);
     }
 }
