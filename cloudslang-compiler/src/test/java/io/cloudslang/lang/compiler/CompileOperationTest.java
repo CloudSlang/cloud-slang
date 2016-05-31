@@ -91,7 +91,7 @@ public class CompileOperationTest {
         URL resource = getClass().getResource("/corrupted/operation_missing_class_name.sl");
         exception.expect(RuntimeException.class);
         exception.expectMessage("Action syntax is illegal.\n" +
-                "Following keys are missing: [" + SlangTextualKeys.JAVA_ACTION_CLASS_NAME_KEY);
+                "Following tags are missing: [" + SlangTextualKeys.JAVA_ACTION_CLASS_NAME_KEY);
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 
@@ -100,7 +100,7 @@ public class CompileOperationTest {
         URL resource = getClass().getResource("/corrupted/operation_missing_method_name.sl");
         exception.expect(RuntimeException.class);
         exception.expectMessage("Action syntax is illegal.\n" +
-                "Following keys are missing: [" + SlangTextualKeys.JAVA_ACTION_METHOD_NAME_KEY);
+                "Following tags are missing: [" + SlangTextualKeys.JAVA_ACTION_METHOD_NAME_KEY);
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 
@@ -109,7 +109,7 @@ public class CompileOperationTest {
         URL resource = getClass().getResource("/corrupted/operation_invalid_action_property.sl");
         exception.expect(RuntimeException.class);
         exception.expectMessage("Action syntax is illegal.\n" +
-                "Following keys are invalid: [IDontBelongHere]");
+                "Following tags are invalid: [IDontBelongHere]. Please take a look at the supported features per versions link");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 
