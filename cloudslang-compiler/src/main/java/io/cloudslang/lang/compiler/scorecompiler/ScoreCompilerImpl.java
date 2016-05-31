@@ -90,12 +90,12 @@ public class ScoreCompilerImpl implements ScoreCompiler {
     }
 
     @Override
-    public List<RuntimeException> validateSlangModelWithDependencies(Executable slangModel, Set<Executable> dependenciesModels) {
+    public List<RuntimeException> validateSlangModelWithDirectDependencies(Executable slangModel, Set<Executable> directDependenciesModels) {
         Map<String, Executable> dependenciesMap = new HashMap<>();
-        for (Executable dependency : dependenciesModels) {
+        for (Executable dependency : directDependenciesModels) {
             dependenciesMap.put(dependency.getId(), dependency);
         }
-        return validator.validateModelWithDependencies(slangModel, dependenciesMap);
+        return validator.validateModelWithDirectDependencies(slangModel, dependenciesMap);
     }
 
     /**

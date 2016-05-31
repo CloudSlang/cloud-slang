@@ -507,6 +507,11 @@ public class CompilerErrorsTest {
         dependencies.add(operationModel);
 
         exception.expect(RuntimeException.class);
+        exception.expectMessage("step1");
+        exception.expectMessage("FAILURE");
+        exception.expectMessage("user.ops.java_op");
+        exception.expectMessage("navigation");
+        List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         exception.expectMessage("Cannot compile flow: 'step_with_missing_navigation_from_operation_result_flow' " +
                 "since for step: 'step1', the result 'FAILURE' of its dependency: 'user.ops.java_op' " +
                 "has no matching navigation");
@@ -529,6 +534,12 @@ public class CompilerErrorsTest {
         dependencies.add(operation2Model);
 
         exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("explicit_alias");
+        exception.expectMessage("user.ops.test_op");
+        exception.expectMessage("mandatory");
+        exception.expectMessage("inputs");
+        exception.expectMessage("alla");
+        List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         exception.expectMessage("Cannot compile flow 'io.cloudslang.flow_missing_dependency_required_input_in_step'. " +
                 "Step 'explicit_alias' does not declare all the mandatory inputs of its reference. " +
                 "The following inputs of 'user.ops.test_op' are not private, required and with no default value: alla.");
