@@ -15,6 +15,7 @@ import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.Proxy;
 import javassist.util.proxy.ProxyFactory;
+import javassist.util.proxy.ProxyObject;
 import org.apache.commons.lang.ClassUtils;
 import org.python.core.Py;
 import org.python.core.PyObject;
@@ -110,9 +111,9 @@ public class PyObjectValueProxyFactory {
 
         private static final String ACCESSED_GETTER_METHOD = "isAccessed";
 
-        private Value value;
-        private PyObject pyObject;
-        private boolean accessed;
+        protected Value value;
+        protected PyObject pyObject;
+        protected boolean accessed;
 
         public PyObjectValueMethodHandler(Serializable content, boolean sensitive, PyObject pyObject) {
             this.value = ValueFactory.create(content, sensitive);
@@ -132,10 +133,24 @@ public class PyObjectValueProxyFactory {
                 if (!thisMethod.getName().equals("toString")) {
                     accessed = true;
                 }
-                return pyObjectMethod.invoke(pyObject, args);
+                return pyObjectMethod.invoke(pyObject, getPyObjectArgs(args));
             } else {
                 throw new RuntimeException("Failed to invoke PyObjectValue method. Implementing class not found");
             }
+        }
+
+        private Object[] getPyObjectArgs(Object[] args) {
+            Object[] pyObjectArgs = new Object[args.length];
+            for (int index = 0; index < args.length; index++) {
+                if (args[index] instanceof PyObjectValue) {
+                    PyObjectValueMethodHandler handler = (PyObjectValueMethodHandler)((ProxyObject)args[index]).getHandler();
+                    handler.accessed = true;
+                    pyObjectArgs[index] = handler.pyObject;
+                } else {
+                    pyObjectArgs[index] = args[index];
+                }
+            }
+            return pyObjectArgs;
         }
     }
 }

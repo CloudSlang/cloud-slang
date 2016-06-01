@@ -66,6 +66,6 @@ public class SimpleValue implements Value {
 
     @Override
     public String toString() {
-        return content == null ? "null" : content.toString();
+        return content == null ? null : content.toString();
     }
 }

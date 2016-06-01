@@ -160,7 +160,6 @@ public class StepExecutionData extends AbstractExecutionData {
                     LanguageEventData.StepType.STEP, nodeName,
                     Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable) stepPublishValues),
                     Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues),
-                    Pair.of("executableReturnValues", executableReturnValues),
                     Pair.of("parallelLoop", parallelLoop)
             );
 
@@ -186,8 +185,7 @@ public class StepExecutionData extends AbstractExecutionData {
                 if (!shouldBreakLoop(breakOn, executableReturnValues) && loopCondition.hasMore()) {
                     runEnv.putNextStepPosition(previousStepId);
                     runEnv.getStack().pushContext(flowContext);
-                    throwEventOutputEnd(runEnv, executionRuntimeServices, nodeName,
-                            publishValues, previousStepId,
+                    throwEventOutputEnd(runEnv, executionRuntimeServices, nodeName, previousStepId,
                             new ReturnValues(publishValues, executableReturnValues.getResult()));
                     runEnv.getExecutionPath().forward();
                     return;
@@ -224,7 +222,7 @@ public class StepExecutionData extends AbstractExecutionData {
 
             ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : executableResult);
             runEnv.putReturnValues(returnValues);
-            throwEventOutputEnd(runEnv, executionRuntimeServices, nodeName, publishValues, nextPosition, returnValues);
+            throwEventOutputEnd(runEnv, executionRuntimeServices, nodeName, nextPosition, returnValues);
 
             runEnv.getStack().pushContext(flowContext);
             runEnv.getExecutionPath().forward();
@@ -237,12 +235,10 @@ public class StepExecutionData extends AbstractExecutionData {
     private void throwEventOutputEnd(RunEnvironment runEnv,
                                      ExecutionRuntimeServices executionRuntimeServices,
                                      String nodeName,
-                                     Map<String, Value> publishValues,
                                      Long nextPosition,
                                      ReturnValues returnValues) {
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
                 LanguageEventData.StepType.STEP, nodeName,
-                Pair.of(LanguageEventData.OUTPUTS, (Serializable)publishValues),
                 Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
                 Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition));
     }

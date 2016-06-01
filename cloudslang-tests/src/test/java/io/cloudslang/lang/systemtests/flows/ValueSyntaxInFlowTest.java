@@ -23,7 +23,6 @@ import org.junit.Test;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,7 +54,6 @@ public class ValueSyntaxInFlowTest extends ValueSyntaxParent {
         verifyExecutableInputs(flowData);
         verifyExecutableOutputs(flowData);
         verifyStepInputs(stepData);
-        verifyStepPublishValues(stepData);
         verifySuccessResult(flowData);
     }
 
@@ -91,17 +89,5 @@ public class ValueSyntaxInFlowTest extends ValueSyntaxParent {
         expectedStepArguments.put("step_argument_null", null);
 
         Assert.assertTrue("Step arguments not bound correctly", includeAllPairs(stepData.getInputs(), expectedStepArguments));
-    }
-
-    private void verifyStepPublishValues(StepData stepData) {
-        Map<String, Serializable> expectedStepPublishValues = new LinkedHashMap<>();
-
-        expectedStepPublishValues.put("output_no_expression", "output_no_expression_value");
-        expectedStepPublishValues.put("publish_int", 22);
-        expectedStepPublishValues.put("publish_str", "publish_str_value");
-        expectedStepPublishValues.put("publish_expression", "publish_str_value_suffix");
-        expectedStepPublishValues.put("output_step_argument_null", "step_argument_null_value");
-
-        Assert.assertEquals("Step publish values not bound correctly", expectedStepPublishValues, stepData.getOutputs());
     }
 }
