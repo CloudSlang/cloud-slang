@@ -100,7 +100,7 @@ public class PyObjectValueProxyFactory {
             return pyObject.getType();
         } else if (parameterType.isPrimitive()) {
             return ClassUtils.primitiveToWrapper(parameterType).getConstructor(String.class).newInstance("0");
-        } else if (Number.class.isAssignableFrom(parameterType)) {
+        } else if (Number.class.isAssignableFrom(parameterType) || String.class.isAssignableFrom(parameterType)) {
             return parameterType.getConstructor(String.class).newInstance("0");
         } else {
             return null;
