@@ -454,6 +454,7 @@
                     <version>2.15</version>
                     <configuration>
                         <runOrder>alphabetical</runOrder>
+                        <argLine>-Xmx512m -XX:MaxPermSize=512m</argLine>
                     </configuration>
                 </plugin>
 
