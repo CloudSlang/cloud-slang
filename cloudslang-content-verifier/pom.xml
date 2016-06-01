@@ -104,6 +104,11 @@
             <artifactId>score-xml</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>io.cloudslang.content</groupId>
+            <artifactId>cs-date-time</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
     </dependencies>
 
