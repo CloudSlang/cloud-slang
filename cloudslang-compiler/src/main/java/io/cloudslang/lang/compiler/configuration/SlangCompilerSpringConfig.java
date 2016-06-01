@@ -14,6 +14,8 @@ package io.cloudslang.lang.compiler.configuration;
  * Created by orius123 on 05/11/14.
  */
 
+import io.cloudslang.lang.entities.encryption.DummyEncryptor;
+import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -29,5 +31,15 @@ public class SlangCompilerSpringConfig {
         Yaml yaml = new Yaml();
         yaml.setBeanAccess(BeanAccess.FIELD);
         return yaml;
+    }
+
+    @Bean
+    public ApplicationContextProvider applicationContextProvider() {
+        return new ApplicationContextProvider();
+    }
+
+    @Bean
+    public DummyEncryptor dummyEncryptor() {
+        return new DummyEncryptor();
     }
 }

@@ -17,6 +17,8 @@ import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import io.cloudslang.lang.entities.encryption.DummyEncryptor;
+import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -268,5 +270,14 @@ public class InputsTransformerTest {
             return new InputsTransformer();
         }
 
+        @Bean
+        public ApplicationContextProvider applicationContextProvider() {
+            return new ApplicationContextProvider();
+        }
+
+        @Bean
+        public DummyEncryptor dummyEncryptor() {
+            return new DummyEncryptor();
+        }
     }
 }

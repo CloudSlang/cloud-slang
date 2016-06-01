@@ -12,6 +12,7 @@
 package io.cloudslang.lang.entities.bindings.values;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.cloudslang.lang.entities.encryption.EncryptionProvider;
 import javassist.util.proxy.ProxyObjectInputStream;
 import javassist.util.proxy.ProxyObjectOutputStream;
 import org.python.apache.commons.compress.utils.IOUtils;
@@ -39,8 +40,9 @@ public class SensitiveValue implements Value {
     }
 
     protected SensitiveValue(Serializable content) {
-        byte[] bytes = serialize(content);
-        this.content = Base64.encode(bytes);
+        byte[] serialized = serialize(content);
+        String encoded = Base64.encode(serialized);
+        this.content = EncryptionProvider.get().encrypt(encoded.toCharArray());
     }
 
     public String getContent() {
@@ -53,8 +55,9 @@ public class SensitiveValue implements Value {
 
     @Override
     public Serializable get() {
-        byte[] bytes = Base64.decode(content);
-        return deserialize(bytes);
+        char[] decrypted = EncryptionProvider.get().decrypt(content);
+        byte[] decoded = Base64.decode(new String(decrypted));
+        return deserialize(decoded);
     }
 
     @JsonIgnore
