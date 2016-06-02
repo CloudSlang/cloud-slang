@@ -25,9 +25,11 @@ import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,6 +57,16 @@ public class BindingScopeTest extends SystemsTestsParent {
 
         StepData stepData = executionData.get(FIRST_STEP_PATH);
         Assert.assertNotNull("step data is null", stepData);
+
+        verifyStepPublishValues(stepData);
+    }
+
+    private void verifyStepPublishValues(StepData stepData) {
+        Map<String, Serializable> expectedPublishValues = new LinkedHashMap<>();
+        expectedPublishValues.put("step1_publish_1", "op_output_1_value op_input_1_step step_arg_1_value");
+        expectedPublishValues.put("step1_publish_2_conflict", "op_output_2_value");
+        Map<String, Serializable> actualPublishValues = stepData.getOutputs();
+        Assert.assertEquals("step publish values not as expected", expectedPublishValues, actualPublishValues);
     }
 
     @Test
