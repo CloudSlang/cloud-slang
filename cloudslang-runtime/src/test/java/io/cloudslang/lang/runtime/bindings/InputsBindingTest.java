@@ -105,7 +105,7 @@ public class InputsBindingTest {
 
     @Test
     public void testAssignFromInput() {
-        Input input1 = new Input.InputBuilder("input1", "${ input1 }", false)
+        Input input1 = new Input.InputBuilder("input1", "val1", false)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
@@ -117,9 +117,62 @@ public class InputsBindingTest {
         Map<String,Value> result = bindInputs(inputs);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(null, result.get("input1").get());
+        Assert.assertEquals("val1", result.get("input1").get());
         Assert.assertTrue(result.containsKey("input2"));
-        Assert.assertEquals(null, result.get("input2").get());
+        Assert.assertEquals("val1", result.get("input2").get());
+    }
+
+    @Test
+    public void testPrivateInputMissingInContext() {
+        Input input1 = new Input.InputBuilder("input1", "${ input1 }")
+                .withRequired(false)
+                .withPrivateInput(true)
+                .build();
+        List<Input> inputs = Collections.singletonList(input1);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Error binding input: 'input1', \n" +
+                "\tError is: Error in running script expression: 'input1',\n" +
+                "\tException is: name 'input1' is not defined");
+        bindInputs(inputs);
+    }
+
+    @Test
+    public void testInputMissingInContext() {
+        Input input1 = new Input.InputBuilder("input1", "${ input1 }")
+                .withRequired(false)
+                .withPrivateInput(false)
+                .build();
+        List<Input> inputs = Collections.singletonList(input1);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Error binding input: 'input1', \n" +
+                "\tError is: Error in running script expression: 'input1',\n" +
+                "\tException is: name 'input1' is not defined");
+        bindInputs(inputs);
+    }
+
+    @Test
+     public void testInputMissing() {
+        Input input1 = new Input.InputBuilder("input1", null)
+                .withRequired(true)
+                .withPrivateInput(false)
+                .build();
+        List<Input> inputs = Collections.singletonList(input1);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Input with name: 'input1' is Required, but value is empty");
+        bindInputs(inputs);
+    }
+
+    @Test
+    public void testInputWithDefaultValueNull() {
+        Input input1 = new Input.InputBuilder("input1", null)
+                .withRequired(false)
+                .withPrivateInput(false)
+                .build();
+        List<Input> inputs = Collections.singletonList(input1);
+        Map<String, Value> result = bindInputs(inputs);
+        Assert.assertFalse(result.isEmpty());
+        Assert.assertTrue(result.containsKey("input1"));
+        Assert.assertEquals(null, result.get("input1").get());
     }
 
     @Test
