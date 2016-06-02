@@ -69,6 +69,7 @@ public class PyObjectValueProxyFactory {
                     factory.setSuperclass(pyObject.getClass());
                     factory.setInterfaces(new Class[]{PyObjectValue.class});
                     factory.setFilter(new PyObjectValueMethodFilter());
+                    factory.setUseWriteReplace(false);
                     proxyClasses.putIfAbsent(proxyClassName, createProxyClass(factory.createClass(), pyObject));
                     proxyClass = proxyClasses.get(proxyClassName);
                 }
@@ -88,15 +89,22 @@ public class PyObjectValueProxyFactory {
         Object[] params = new Object[constructor.getParameterTypes().length];
         for (int index = 0; index < constructor.getParameterTypes().length; index++) {
             Class<?> parameterType = constructor.getParameterTypes()[index];
-            params[index] = parameterType.equals(PyType.class) ? pyObject.getType() :
-                    !parameterType.isPrimitive() ? null : getPrimitiveTypeDefaultValue(parameterType);
+            params[index] = getParamDefaultValue(pyObject, parameterType);
         }
         return new PyObjectValueProxyClass(proxyClass, constructor, params);
     }
 
     @SuppressWarnings("unchecked")
-    private static Object getPrimitiveTypeDefaultValue(Class<?> parameterType) throws Exception {
-        return ClassUtils.primitiveToWrapper(parameterType).getConstructor(String.class).newInstance("0");
+    private static Object getParamDefaultValue(PyObject pyObject, Class<?> parameterType) throws Exception {
+        if (parameterType.equals(PyType.class)) {
+            return pyObject.getType();
+        } else if (parameterType.isPrimitive()) {
+            return ClassUtils.primitiveToWrapper(parameterType).getConstructor(String.class).newInstance("0");
+        } else if (Number.class.isAssignableFrom(parameterType) || String.class.isAssignableFrom(parameterType)) {
+            return parameterType.getConstructor(String.class).newInstance("0");
+        } else {
+            return null;
+        }
     }
 
     private static class PyObjectValueMethodFilter implements MethodFilter {

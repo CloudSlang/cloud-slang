@@ -123,9 +123,8 @@ public class TransformersHandler {
             if (!(exists(validKeywords, equalToIgnoringCase(key)))) {
                 String additionalParentPropertyMessage =
                         StringUtils.isEmpty(parentProperty) ? "" : " under \'" + parentProperty + "\'";
-                errors.add(new RuntimeException("Property \'" + key + "\'" +
-                        additionalParentPropertyMessage +
-                        " at \'" + dataLogicalName + "\' is illegal"));
+                errors.add(new RuntimeException("Artifact {" + dataLogicalName + "} has unrecognized tag {" + key + "}" +
+                        additionalParentPropertyMessage + ". Please take a look at the supported features per versions link"));
             }
         }
 

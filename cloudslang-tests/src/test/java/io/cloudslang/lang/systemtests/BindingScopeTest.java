@@ -21,13 +21,11 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
-import java.io.Serializable;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
@@ -35,7 +33,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 
 /**
  * @author Bonczidai Levente

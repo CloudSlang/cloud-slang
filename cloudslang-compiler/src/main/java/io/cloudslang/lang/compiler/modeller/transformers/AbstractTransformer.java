@@ -22,8 +22,9 @@ import org.apache.commons.lang.Validate;
  */
 public abstract class AbstractTransformer {
 
-    public static final String MISSING_KEYS_ERROR_MESSAGE_PREFIX = "Following keys are missing: ";
-    public static final String INVALID_KEYS_ERROR_MESSAGE_PREFIX = "Following keys are invalid: ";
+    public static final String MISSING_KEYS_ERROR_MESSAGE_PREFIX = "Following tags are missing: ";
+    public static final String INVALID_KEYS_ERROR_MESSAGE_PREFIX = "Following tags are invalid: ";
+    public static final String INVALID_KEYS_ERROR_MESSAGE_SUFFIX = ". Please take a look at the supported features per versions link";
 
     protected void validateKeySet(
             Set<String> keySet,
@@ -46,7 +47,8 @@ public abstract class AbstractTransformer {
         invalidKeys.removeAll(optionalKeys);
         if (CollectionUtils.isNotEmpty(invalidKeys)) {
             throw new RuntimeException(
-                    INVALID_KEYS_ERROR_MESSAGE_PREFIX + invalidKeys.toString()
+                    INVALID_KEYS_ERROR_MESSAGE_PREFIX + invalidKeys.toString() +
+                            INVALID_KEYS_ERROR_MESSAGE_SUFFIX
             );
         }
     }

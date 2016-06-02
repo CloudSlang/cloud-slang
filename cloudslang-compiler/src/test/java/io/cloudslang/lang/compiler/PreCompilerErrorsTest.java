@@ -45,7 +45,8 @@ public class PreCompilerErrorsTest {
         URI resource = getClass().getResource("/corrupted/no_op_flow_file.sl").toURI();
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("flow/operation");
+        exception.expectMessage("Error transforming source: no_op_flow_file to a Slang model. " +
+                "Source no_op_flow_file has no content associated with flow/operation/properties property.");
         compiler.preCompileSource(SlangSource.fromFile(resource));
     }
 
@@ -56,7 +57,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("must have a namespace");
+        exception.expectMessage("Operation/Flow op_without_namespace must have a namespace");
         throw result.getErrors().get(0);
     }
 
@@ -67,7 +68,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("name");
+        exception.expectMessage("Executable in source: missing_name_flow has no name");
         throw result.getErrors().get(0);
     }
 
@@ -169,9 +170,9 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("inputs");
-        exception.expectMessage("list");
-        exception.expectMessage("string");
+        exception.expectMessage("For flow 'inputs_type_string_flow' syntax is illegal.\n" +
+                "Under property: 'inputs' there should be a list of values, " +
+                "but instead there is a string.");
         throw result.getErrors().get(0);
     }
 
@@ -182,9 +183,9 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("inputs");
-        exception.expectMessage("list");
-        exception.expectMessage("map");
+        exception.expectMessage("For flow 'inputs_type_string_flow' syntax is illegal.\n" +
+                "Under property: 'inputs' there should be a list of values, but instead there is a map.\n" +
+                "By the Yaml spec lists properties are marked with a '- ' (dash followed by a space)");
         throw result.getErrors().get(0);
     }
 
@@ -195,8 +196,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Input");
-        exception.expectMessage("3");
+        exception.expectMessage("For flow 'flow_with_wrong_type_input' syntax is illegal.\n" +
+                "Could not transform Input : 3");
         throw result.getErrors().get(0);
     }
 
@@ -207,9 +208,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("no_workflow");
-        exception.expectMessage("workflow");
-        exception.expectMessage("property");
+        exception.expectMessage("Error compiling no_workflow_flow. Flow: no_workflow has no workflow property");
         throw result.getErrors().get(0);
     }
 
@@ -220,9 +219,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("no_workflow");
-        exception.expectMessage("workflow");
-        exception.expectMessage("data");
+        exception.expectMessage("Error compiling no_workflow_data_flow. Flow: no_workflow_data has " +
+                "no workflow property");
         throw result.getErrors().get(0);
     }
 
@@ -233,8 +231,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("step1");
-        exception.expectMessage("data");
+        exception.expectMessage("Step: step1 has no data");
         throw result.getErrors().get(0);
     }
 
@@ -245,8 +242,9 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("step1");
-        exception.expectMessage("too many keys");
+        exception.expectMessage("For step 'step1' syntax is illegal.\n" +
+                "Step has too many keys under the 'do' keyword,\n" +
+                "May happen due to wrong indentation");
         throw result.getErrors().get(0);
     }
 
@@ -257,9 +255,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("workflow_with_step_map");
-        exception.expectMessage("map");
-        exception.expectMessage("list");
+        exception.expectMessage("Flow: 'workflow_with_step_map' syntax is illegal.\n" +
+                "Below 'workflow' property there should be a list of steps and not a map");
         throw result.getErrors().get(0);
     }
 
@@ -270,9 +267,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("on_failure_with_step_map");
-        exception.expectMessage("map");
-        exception.expectMessage("list");
+        exception.expectMessage("Flow: 'on_failure_with_step_map' syntax is illegal.\n" +
+                "Below 'on_failure' property there should be a list of steps and not a map");
         throw result.getErrors().get(0);
     }
 
@@ -283,8 +279,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("step1");
-        exception.expectMessage("reference");
+        exception.expectMessage("Step: 'step1' has no reference information");
         throw result.getErrors().get(0);
     }
 
@@ -295,10 +290,9 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("step1");
-        exception.expectMessage("map");
-        exception.expectMessage("list");
-        exception.expectMessage("-");
+        exception.expectMessage("For step 'step1' syntax is illegal.\n" +
+                "Under property: 'do' there should be a map of values, but instead there is a list.\n" +
+                "By the Yaml spec maps properties are NOT marked with a '- ' (dash followed by a space)");
         throw result.getErrors().get(0);
     }
 
@@ -309,9 +303,10 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("step1");
-        exception.expectMessage("map");
-        exception.expectMessage("do:");
+        exception.expectMessage("Step: step1 syntax is illegal.\n" +
+                "Below step name, there should be a map of values in the format:\n" +
+                "do:\n" +
+                "\top_name:");
         throw result.getErrors().get(0);
     }
 
@@ -322,9 +317,20 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("private");
-        exception.expectMessage("default");
-        exception.expectMessage("input_without_default");
+        exception.expectMessage("For operation 'private_input_without_default' syntax is illegal.\n" +
+                "input: input_without_default is private but no default value was specified");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testWrongTag() throws Exception {
+        URI resource = getClass().getResource("/corrupted/private_input_without_default_wrong_tag.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Artifact {private_input_without_default} has unrecognized tag {action}. " +
+                "Please take a look at the supported features per versions link");
         throw result.getErrors().get(0);
     }
 
@@ -335,9 +341,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("known property");
-        exception.expectMessage("input_with_illegal_key");
-        exception.expectMessage("karambula");
+        exception.expectMessage("For operation 'illegal_key_in_input' syntax is illegal.\n" +
+                "key: karambula in input: input_with_illegal_key is not a known property");
         throw result.getErrors().get(0);
     }
 
@@ -348,9 +353,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("operation_with_no_action_data");
-        exception.expectMessage("action");
-        exception.expectMessage("data");
+        exception.expectMessage("Error compiling operation_with_no_action_data. " +
+                "Operation: operation_with_no_action_data has no action data");
         throw result.getErrors().get(0);
     }
 
@@ -361,8 +365,9 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("'python_action'");
-        exception.expectMessage("there should be a map of values, but instead there is a list");
+        exception.expectMessage("Action syntax is illegal.\n" +
+                "Under property: 'python_action' there should be a map of values, but instead there is a list.\n" +
+                "By the Yaml spec maps properties are NOT marked with a '- ' (dash followed by a space)");
         throw result.getErrors().get(0);
     }
 
@@ -373,7 +378,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(subFlow));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("step1");
+        exception.expectMessage("Step: step1 has no data");
         throw result.getErrors().get(0);
     }
 
@@ -384,9 +389,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("'navigate'");
-        exception.expectMessage("list");
-        exception.expectMessage("string");
+        exception.expectMessage("For step 'step1' syntax is illegal.\n" +
+                "Under property: 'navigate' there should be a list of values, but instead there is a string.");
         throw result.getErrors().get(0);
     }
 
@@ -397,9 +401,9 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("step1");
-        exception.expectMessage("navigate");
-        exception.expectMessage("3");
+        exception.expectMessage("For step 'step1' syntax is illegal.\n" +
+                "Data for property: navigate -> 3 is illegal.\n" +
+                " Transformer is: NavigateTransformer");
         throw result.getErrors().get(0);
     }
 
@@ -410,8 +414,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Step1");
-        exception.expectMessage("unique");
+        exception.expectMessage("Step name: 'Step1' appears more than once in the workflow. " +
+                "Each step name in the workflow must be unique");
         throw result.getErrors().get(0);
     }
 
@@ -422,9 +426,10 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Input");
-        exception.expectMessage("input1");
-        exception.expectMessage("null");
+        exception.expectMessage("For flow 'flow_with_null_value_input' syntax is illegal.\n" +
+                "Could not transform Input : {input1=null} since it has a null value.\n" +
+                "\n" +
+                "Make sure a value is specified or that indentation is properly done.");
         throw result.getErrors().get(0);
     }
 
@@ -439,13 +444,15 @@ public class PreCompilerErrorsTest {
 
         validateExceptionMessage(
                 errors.get(0),
-                "flow_with_result_expressions",
+                "Flow: 'flow_with_result_expressions' syntax is illegal. Error compiling result: 'SUCCESS'. " +
+                        "Explicit values are not allowed for flow results. Correct format is: '- SUCCESS'.",
                 "SUCCESS",
                 ExecutableBuilder.FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE
         );
         validateExceptionMessage(
                 errors.get(1),
-                "flow_with_result_expressions",
+                "Flow: 'flow_with_result_expressions' syntax is illegal. Error compiling result: 'CUSTOM'. " +
+                        "Explicit values are not allowed for flow results. Correct format is: '- CUSTOM'.",
                 "CUSTOM",
                 ExecutableBuilder.FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE
         );
@@ -470,9 +477,9 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Step1");
-        exception.expectMessage("navigate");
-        exception.expectMessage("instead there is a map");
+        exception.expectMessage("For step 'Step1' syntax is illegal.\n" +
+                "Under property: 'navigate' there should be a list of values, but instead there is a map.\n" +
+                "By the Yaml spec lists properties are marked with a '- ' (dash followed by a space)");
         throw result.getErrors().get(0);
     }
 
@@ -483,9 +490,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Step1");
-        exception.expectMessage("navigate");
-        exception.expectMessage("exactly one key:value pair");
+        exception.expectMessage("For step 'Step1' syntax is illegal.\n" +
+                "Each list item in the navigate section should contain exactly one key:value pair.");
         throw result.getErrors().get(0);
     }
 
@@ -496,10 +502,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Step1");
-        exception.expectMessage("navigate");
-        exception.expectMessage("key");
-        exception.expectMessage("string");
+        exception.expectMessage("For step 'Step1' syntax is illegal.\n" +
+                "Each key in the navigate section should be a string.");
         throw result.getErrors().get(0);
     }
 
@@ -510,10 +514,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Step1");
-        exception.expectMessage("navigate");
-        exception.expectMessage("value");
-        exception.expectMessage("string");
+        exception.expectMessage("For step 'Step1' syntax is illegal.\n" +
+                "Each value in the navigate section should be a string.");
         throw result.getErrors().get(0);
     }
 
@@ -524,9 +526,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Step");
-        exception.expectMessage("print_message2");
-        exception.expectMessage("unreachable");
+        exception.expectMessage("Step: print_message2 is unreachable");
         throw result.getErrors().get(0);
     }
 
@@ -553,9 +553,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Step");
-        exception.expectMessage("print_message2");
-        exception.expectMessage("unreachable");
+        exception.expectMessage("Step: print_message2 is unreachable");
         throw result.getErrors().get(0);
     }
 }

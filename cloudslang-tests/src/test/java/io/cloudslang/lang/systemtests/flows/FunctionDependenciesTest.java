@@ -26,11 +26,7 @@ import org.junit.Test;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Bonczidai Levente
@@ -77,6 +73,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
 
         verifyFlowInputs(flowData);
         verifyStepArguments(stepData);
+        verifyStepPublishValues(stepData);
         verifyFlowOutputs(flowData);
 
         // verify 'get' function worked in result expressions
@@ -163,6 +160,32 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         Assert.assertEquals("flow output values not as expected", expectedFlowOutputs, actualFlowOutputs);
     }
 
+    private void verifyStepPublishValues(StepData stepData) {
+        // verify `get`, `get_sp()` and mixed mode works
+        Map<String, Serializable> expectedPublishValues = new LinkedHashMap<>();
+        expectedPublishValues.put("output1_safe", "CloudSlang");
+        expectedPublishValues.put("output2_safe", "output2_default");
+        expectedPublishValues.put("output_same_name", "output_same_name_default");
+        expectedPublishValues.put("output_1", null);
+        expectedPublishValues.put("output_2", "default_str");
+        expectedPublishValues.put("output_3", "localhost");
+        expectedPublishValues.put("output_4", "localhost");
+        expectedPublishValues.put("output_5", "localhost");
+        expectedPublishValues.put("output_6", "exist_value");
+        expectedPublishValues.put("output_7", "localhost");
+        expectedPublishValues.put("output_8", "localhost");
+        expectedPublishValues.put("output_9", "default_str");
+        expectedPublishValues.put("output_10", "hyphen_value");
+        expectedPublishValues.put("output_11", "hyphen_value");
+        expectedPublishValues.put("output_12", "localhost");
+        expectedPublishValues.put("output_13", "localhost");
+        expectedPublishValues.put("output_14", null);
+        expectedPublishValues.put("output_15", "default_str");
+        expectedPublishValues.put("value_propagate", "flowInput_stepArg_opInput_opOutput_stepPublish_");
+        Map<String, Serializable> actualPublishValues = stepData.getOutputs();
+        Assert.assertEquals("operation publish values not as expected", expectedPublishValues, actualPublishValues);
+    }
+
     private Set<SystemProperty> prepareSystemProperties() {
         return Sets.newHashSet(
                 new SystemProperty("a.b", "c.host", "localhost"),
@@ -213,7 +236,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
                 "for.input.prop2",
                 "for.publish.prop1",
                 "for.publish.prop2"
-                );
+        );
     }
-    
+
 }
