@@ -4,8 +4,13 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-namespace: io.cloudslang
+
+namespace: user.ops
 
 operation:
-  name: operation_with_no_action_data
-  python_action:
+  name: private_input_without_default
+  inputs:
+    - input_without_default:
+        private: true
+  action:
+    python_script: print "hi"

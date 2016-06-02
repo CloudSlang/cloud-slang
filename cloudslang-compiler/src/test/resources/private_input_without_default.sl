@@ -12,5 +12,5 @@ operation:
   inputs:
     - input_without_default:
         private: true
-  action:
-    python_script: print "hi"
+  python_action:
+    script: print "hi"

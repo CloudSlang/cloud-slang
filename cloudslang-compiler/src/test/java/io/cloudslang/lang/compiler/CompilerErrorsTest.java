@@ -46,8 +46,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Source");
-        exception.expectMessage("empty");
+        exception.expectMessage("Source empty_file cannot be empty");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -57,8 +56,8 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Source");
-        exception.expectMessage("YAML");
+        exception.expectMessage("There was a problem parsing the YAML source: not_yaml_file.\n" +
+                "Source not_yaml_file does not contain YAML content");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -67,7 +66,8 @@ public class CompilerErrorsTest {
         URI resource = getClass().getResource("/corrupted/no_op_flow_file.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("flow/operation");
+        exception.expectMessage("Error transforming source: no_op_flow_file to a Slang model. " +
+                "Source no_op_flow_file has no content associated with flow/operation/properties property.");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -75,8 +75,9 @@ public class CompilerErrorsTest {
 	public void testSystemProperties() throws Exception {
 		URI systemProperties = getClass().getResource("/corrupted/system_properties.yaml").toURI();
 		Set<SlangSource> path = new HashSet<>();
-		exception.expect(RuntimeException.class);
-		exception.expectMessage("problem parsing");
+        exception.expect(RuntimeException.class);
+		exception.expectMessage("There was a problem parsing the YAML source: system_properties.\n" +
+                "Cannot create property=user.sys.props.host for JavaBean=io.cloudslang.lang.compiler.parser.model.ParsedSlang");
 		compiler.compile(SlangSource.fromFile(systemProperties), path);
 	}
 
@@ -88,8 +89,9 @@ public class CompilerErrorsTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
         path.add(SlangSource.fromFile(systemProperties));
-		exception.expect(RuntimeException.class);
-		exception.expectMessage("problem parsing");
+        exception.expect(RuntimeException.class);
+		exception.expectMessage("There was a problem parsing the YAML source: system_properties.\n" +
+                "Cannot create property=user.sys.props.host for JavaBean=io.cloudslang.lang.compiler.parser.model.ParsedSlang");
         compiler.compile(SlangSource.fromFile(flow), path);
     }
 
@@ -101,9 +103,8 @@ public class CompilerErrorsTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Step1");
-        exception.expectMessage("Step2");
-        exception.expectMessage("navigation");
+        exception.expectMessage("Failed to compile step: Step1. The step/result name: " +
+                "Step2 of navigation: SUCCESS -> Step2 is missing");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -141,7 +142,8 @@ public class CompilerErrorsTest {
         path.add(SlangSource.fromFile(checkWeather));
         exception.expect(RuntimeException.class);
         exception.expectMessage(ParserExceptionHandler.CANNOT_CREATE_PROPERTY_ERROR);
-        exception.expectMessage("not supported by CloudSlang");
+        exception.expectMessage("Unable to find property");
+        exception.expectMessage("is not supported by CloudSlang");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -189,9 +191,8 @@ public class CompilerErrorsTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Step1");
-        exception.expectMessage("SUCCESS");
-        exception.expectMessage("navigation");
+        exception.expectMessage("Failed to compile step: Step1. " +
+                "The step/result name: SUCCESS of navigation: SUCCESS -> SUCCESS is missing");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -203,10 +204,8 @@ public class CompilerErrorsTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("step1");
-        exception.expectMessage("FAILURE");
-        exception.expectMessage("user.ops.java_op");
-        exception.expectMessage("navigation");
+        exception.expectMessage("Cannot compile flow: 'step_with_missing_navigation_from_operation_result_flow' " +
+                "since for step: 'step1', the result 'FAILURE' of its dependency: 'user.ops.java_op' has no matching navigation");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -216,7 +215,8 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("imports");
+        exception.expectMessage("Source missing_dependencies_imports_flow has " +
+                "dependencies but no path was given to the compiler");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -226,7 +226,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("must have a namespace");
+        exception.expectMessage("Operation/Flow op_without_namespace must have a namespace");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -236,7 +236,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("name");
+        exception.expectMessage("Executable in source: missing_name_flow has no name");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -246,9 +246,8 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("inputs");
-        exception.expectMessage("list");
-        exception.expectMessage("string");
+        exception.expectMessage("For flow 'inputs_type_string_flow' syntax is illegal.\n" +
+                "Under property: 'inputs' there should be a list of values, but instead there is a string.");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -258,9 +257,9 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("inputs");
-        exception.expectMessage("list");
-        exception.expectMessage("map");
+        exception.expectMessage("For flow 'inputs_type_string_flow' syntax is illegal.\n" +
+                "Under property: 'inputs' there should be a list of values, but instead there is a map.\n" +
+                "By the Yaml spec lists properties are marked with a '- ' (dash followed by a space)");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -270,8 +269,8 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Input");
-        exception.expectMessage("3");
+        exception.expectMessage("For flow 'flow_with_wrong_type_input' syntax is illegal.\n" +
+                "Could not transform Input : 3");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -281,9 +280,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("no_workflow");
-        exception.expectMessage("workflow");
-        exception.expectMessage("property");
+        exception.expectMessage("Error compiling no_workflow_flow. Flow: no_workflow has no workflow property");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -293,9 +290,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("no_workflow");
-        exception.expectMessage("workflow");
-        exception.expectMessage("data");
+        exception.expectMessage("Error compiling no_workflow_data_flow. Flow: no_workflow_data has no workflow property");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -305,8 +300,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("step1");
-        exception.expectMessage("data");
+        exception.expectMessage("Step: step1 has no data");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -316,8 +310,9 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("step1");
-        exception.expectMessage("too many keys");
+        exception.expectMessage("For step 'step1' syntax is illegal.\n" +
+                "Step has too many keys under the 'do' keyword,\n" +
+                "May happen due to wrong indentation");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -327,9 +322,8 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("workflow_with_step_map");
-        exception.expectMessage("map");
-        exception.expectMessage("list");
+        exception.expectMessage("Flow: 'workflow_with_step_map' syntax is illegal.\n" +
+                "Below 'workflow' property there should be a list of steps and not a map");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -339,9 +333,8 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("on_failure_with_step_map");
-        exception.expectMessage("map");
-        exception.expectMessage("list");
+        exception.expectMessage("Flow: 'on_failure_with_step_map' syntax is illegal.\n" +
+                "Below 'on_failure' property there should be a list of steps and not a map");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -351,8 +344,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("step1");
-        exception.expectMessage("reference");
+        exception.expectMessage("Step: 'step1' has no reference information");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -362,10 +354,9 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("step1");
-        exception.expectMessage("map");
-        exception.expectMessage("list");
-        exception.expectMessage("-");
+        exception.expectMessage("For step 'step1' syntax is illegal.\n" +
+                "Under property: 'do' there should be a map of values, but instead there is a list.\n" +
+                "By the Yaml spec maps properties are NOT marked with a '- ' (dash followed by a space)");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -375,9 +366,10 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("step1");
-        exception.expectMessage("map");
-        exception.expectMessage("do:");
+        exception.expectMessage("Step: step1 syntax is illegal.\n" +
+                "Below step name, there should be a map of values in the format:\n" +
+                "do:\n" +
+                "\top_name:");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -389,9 +381,7 @@ public class CompilerErrorsTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(op));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Reference");
-        exception.expectMessage("test_op");
-        exception.expectMessage("basic_flow");
+        exception.expectMessage("Reference: 'user.ops.test_op' in executable: 'basic_flow', wasn't found in path");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -400,9 +390,8 @@ public class CompilerErrorsTest {
         URI resource = getClass().getResource("/private_input_without_default.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("private");
-        exception.expectMessage("default");
-        exception.expectMessage("input_without_default");
+        exception.expectMessage("For operation 'private_input_without_default' syntax is illegal.\n" +
+                "input: input_without_default is private but no default value was specified");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -411,9 +400,8 @@ public class CompilerErrorsTest {
         URI resource = getClass().getResource("/illegal_key_in_input.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("known property");
-        exception.expectMessage("input_with_illegal_key");
-        exception.expectMessage("karambula");
+        exception.expectMessage("For operation 'illegal_key_in_input' syntax is illegal.\n" +
+                "key: karambula in input: input_with_illegal_key is not a known property");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -423,9 +411,8 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("operation_with_no_action_data");
-        exception.expectMessage("action");
-        exception.expectMessage("data");
+        exception.expectMessage("Error compiling operation_with_no_action_data. " +
+                "Operation: operation_with_no_action_data has no action data");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -435,8 +422,8 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("operation_with_list_of_actions");
-        exception.expectMessage("map");
+        exception.expectMessage("There was a problem parsing the YAML source: operation_with_list_of_actions.\n" +
+                "while parsing a block mapping");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -446,8 +433,9 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("'python_action'");
-        exception.expectMessage("there should be a map of values, but instead there is a list");
+        exception.expectMessage("Action syntax is illegal.\n" +
+                "Under property: 'python_action' there should be a map of values, but instead there is a list.\n" +
+                "By the Yaml spec maps properties are NOT marked with a '- ' (dash followed by a space)");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -459,7 +447,7 @@ public class CompilerErrorsTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(subFlow));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("step1");
+        exception.expectMessage("Step: step1 has no data");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -469,9 +457,8 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("'navigate'");
-        exception.expectMessage("list");
-        exception.expectMessage("string");
+        exception.expectMessage("For step 'step1' syntax is illegal.\n" +
+                "Under property: 'navigate' there should be a list of values, but instead there is a string.");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -481,9 +468,9 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("step1");
-        exception.expectMessage("navigate");
-        exception.expectMessage("3");
+        exception.expectMessage("For step 'step1' syntax is illegal.\n" +
+                "Data for property: navigate -> 3 is illegal.\n" +
+                " Transformer is: NavigateTransformer");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -493,8 +480,8 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Step1");
-        exception.expectMessage("unique");
+        exception.expectMessage("Step name: 'Step1' appears more than once in the workflow. " +
+                "Each step name in the workflow must be unique");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -504,9 +491,10 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Input");
-        exception.expectMessage("input1");
-        exception.expectMessage("null");
+        exception.expectMessage("For flow 'flow_with_null_value_input' syntax is illegal.\n" +
+                "Could not transform Input : {input1=null} since it has a null value.\n" +
+                "\n" +
+                "Make sure a value is specified or that indentation is properly done.");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -521,10 +509,9 @@ public class CompilerErrorsTest {
         dependencies.add(operationModel);
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("step1");
-        exception.expectMessage("FAILURE");
-        exception.expectMessage("user.ops.java_op");
-        exception.expectMessage("navigation");
+        exception.expectMessage("Cannot compile flow: 'step_with_missing_navigation_from_operation_result_flow' " +
+                "since for step: 'step1', the result 'FAILURE' of its dependency: 'user.ops.java_op' " +
+                "has no matching navigation");
         List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         Assert.assertEquals(1, errors.size());
         throw errors.get(0);
@@ -544,11 +531,9 @@ public class CompilerErrorsTest {
         dependencies.add(operation2Model);
 
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("explicit_alias");
-        exception.expectMessage("user.ops.test_op");
-        exception.expectMessage("mandatory");
-        exception.expectMessage("inputs");
-        exception.expectMessage("alla");
+        exception.expectMessage("Cannot compile flow 'io.cloudslang.flow_missing_dependency_required_input_in_step'. " +
+                "Step 'explicit_alias' does not declare all the mandatory inputs of its reference. " +
+                "The following inputs of 'user.ops.test_op' are not private, required and with no default value: alla.");
         List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         Assert.assertEquals(1, errors.size());
         throw errors.get(0);
@@ -573,5 +558,47 @@ public class CompilerErrorsTest {
         List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         Assert.assertEquals(1, errors.size());
         throw errors.get(0);
+    }
+
+    @Test
+    public void testValidationOfFlowThatCallsCorruptedFlow()throws Exception {
+        URI flowUri = getClass().getResource("/corrupted/flow_that_calls_corrupted_flow.sl").toURI();
+
+        URI operation1Uri = getClass().getResource("/test_op.sl").toURI();
+        URI operation2Uri = getClass().getResource("/check_op.sl").toURI();
+        URI operation3Uri = getClass().getResource("/corrupted/flow_input_in_step_same_name_as_dependency_output.sl").toURI();
+
+        Set<SlangSource> dependencies = new HashSet<>();
+        dependencies.add(SlangSource.fromFile(operation1Uri));
+        dependencies.add(SlangSource.fromFile(operation2Uri));
+        dependencies.add(SlangSource.fromFile(operation3Uri));
+
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Cannot compile flow 'io.cloudslang.flow_input_in_step_same_name_as_dependency_output'. " +
+                "Step 'explicit_alias' has input 'balla' with the same name as the one of the outputs of 'user.ops.test_op'.");
+        compiler.compile(SlangSource.fromFile(flowUri), dependencies);
+    }
+
+    @Test
+    public void testValidationMatchingNavigation() throws Exception {
+        URI resource = getClass().getResource("/corrupted/matching-navigation/parent_flow.sl").toURI();
+
+        URI subFlow = getClass().getResource("/corrupted/matching-navigation/child_flow.sl").toURI();
+        URI operation1 = getClass().getResource("/corrupted/matching-navigation/test_op.sl").toURI();
+        URI operation2 = getClass().getResource("/corrupted/matching-navigation/check_weather.sl").toURI();
+        URI operation3 = getClass().getResource("/corrupted/matching-navigation/get_time_zone.sl").toURI();
+        URI operation4 = getClass().getResource("/corrupted/matching-navigation/check_number.sl").toURI();
+
+        Set<SlangSource> dependencies = new HashSet<>();
+        dependencies.add(SlangSource.fromFile(subFlow));
+        dependencies.add(SlangSource.fromFile(operation1));
+        dependencies.add(SlangSource.fromFile(operation2));
+        dependencies.add(SlangSource.fromFile(operation3));
+        dependencies.add(SlangSource.fromFile(operation4));
+
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Cannot compile flow: 'child_flow' since for step: 'step01', the result 'NEGATIVE' " +
+                "of its dependency: 'user.ops.get_time_zone' has no matching navigation");
+        compiler.compile(SlangSource.fromFile(resource), dependencies);
     }
 }
