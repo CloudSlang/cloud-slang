@@ -139,22 +139,4 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         return accumulator.equals(map1);
     }
 
-    protected void verifyInOutParams(Map<String, Serializable> params) {
-        if (params != null) {
-            List<String> errorsInSensitivity = new ArrayList<>();
-            for (Map.Entry<String, Serializable> entry : params.entrySet()) {
-                String name = entry.getKey();
-                boolean sensitive = entry.getValue() != null && entry.getValue().equals(SensitiveValue.SENSITIVE_VALUE_MASK);
-                if (!(name.contains("sensitive") && sensitive || !name.contains("sensitive") && !sensitive)) {
-                    errorsInSensitivity.add(name);
-                }
-                boolean success = true;
-                if (errorsInSensitivity.size() > 0) {
-                    System.out.println("\nSensitivity not set properly for: " + Arrays.toString(errorsInSensitivity.toArray(new String[errorsInSensitivity.size()])));
-                    success = false;
-                }
-                assertTrue(success);
-            }
-        }
-    }
 }
