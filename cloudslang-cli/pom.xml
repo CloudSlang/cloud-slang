@@ -211,7 +211,7 @@
 							<resources>
 								<resource>
 									<directory>src/main/resources/maven/conf</directory>
-									<filtering>true</filtering>
+									<filtering>false</filtering>
 								</resource>
 							</resources>
 						</configuration>
