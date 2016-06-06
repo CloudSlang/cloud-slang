@@ -18,9 +18,17 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.runtime.impl.python.PythonExecutionNotCachedEngine;
 import io.cloudslang.score.events.ScoreEvent;
+import java.io.File;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
@@ -28,15 +36,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import static ch.lambdaj.Lambda.select;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /*
  * Created by orius123 on 12/11/14.
@@ -116,6 +119,26 @@ public abstract class SystemsTestsParent {
 
     protected Set<SystemProperty> loadSystemProperties(SlangSource source) {
         return slang.loadSystemProperties(source);
+    }
+
+    protected void verifyInOutParams(Map<String, Serializable> params) {
+        if (params != null) {
+            List<String> errorsInSensitivity = new ArrayList<>();
+            for (Map.Entry<String, Serializable> entry : params.entrySet()) {
+                String name = entry.getKey();
+                boolean sensitive = entry.getValue() != null && entry.getValue().equals(SensitiveValue.SENSITIVE_VALUE_MASK);
+                if (!(name.contains("sensitive") && sensitive || !name.contains("sensitive") && !sensitive)) {
+                    errorsInSensitivity.add(name);
+                }
+                boolean success = true;
+                String errorMessage = "\nSensitivity not set properly for: " + Arrays.toString(errorsInSensitivity.toArray(new String[errorsInSensitivity.size()]));
+                if (errorsInSensitivity.size() > 0) {
+                    System.out.println(errorMessage);
+                    success = false;
+                }
+                assertTrue(errorMessage, success);
+            }
+        }
     }
 
 }
