@@ -16,7 +16,9 @@ import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +28,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -133,11 +138,7 @@ public class SlangCompilerImpl implements SlangCompiler {
             }
 
             Object propertyValue = propertyAsEntry.getValue();
-            SystemProperty property = new SystemProperty(
-                    namespace == null ? "" : namespace,
-                    propertyKey,
-                    propertyValue == null ? null : propertyValue.toString()
-            );
+            SystemProperty property = transformSystemProperty(namespace, propertyKey, propertyValue);
             modelledSystemProperties.add(property);
         }
 
@@ -190,6 +191,61 @@ public class SlangCompilerImpl implements SlangCompiler {
             );
         }
         return convertedProperties;
+    }
+
+    private SystemProperty transformSystemProperty(
+            String rawNamespace,
+            String key,
+            Object rawValue) {
+        String namespace = rawNamespace == null ? "" : rawNamespace;
+        if (rawValue == null) {
+            return new SystemProperty(namespace, key, "null");
+        }
+        if (rawValue instanceof Map) {
+            Map rawModifiers = (Map) rawValue;
+            Map<String, Serializable> modifiers = convertRawMap(rawModifiers, key);
+
+            List<String> knownModifierKeys = Arrays.asList(SENSITIVE_KEY, VALUE_KEY);
+            for (String modifierKey : modifiers.keySet()) {
+                if (!knownModifierKeys.contains(modifierKey)) {
+                    throw new RuntimeException(
+                            "Artifact {" + key + "} has unrecognized tag {" + modifierKey + "}" +
+                            ". Please take a look at the supported features per versions link");
+                }
+            }
+
+            Serializable valueAsSerializable = modifiers.get(VALUE_KEY);
+            String value = valueAsSerializable == null ? null : valueAsSerializable.toString();
+            boolean sensitive = modifiers.containsKey(SENSITIVE_KEY) && (boolean) modifiers.get(SENSITIVE_KEY);
+
+            return new SystemProperty(namespace, key, value, sensitive);
+        } else {
+            return new SystemProperty(namespace, key, rawValue.toString());
+        }
+    }
+
+    private Map<String, Serializable> convertRawMap(Map rawMap, String artifact) {
+        Map<String, Serializable> convertedMap = new HashMap<>();
+        @SuppressWarnings("unchecked")
+        Set<Map.Entry> entrySet = rawMap.entrySet();
+        for (Map.Entry entry : entrySet) {
+            Object rawKey = entry.getKey();
+            if (!(rawKey instanceof String)) {
+                throw new RuntimeException(
+                        "Artifact {" + artifact + "} has invalid tag {" + rawKey + "}:" +
+                                " Value cannot be cast to String"
+                );
+            }
+            Object rawValue = entry.getValue();
+            if (!(rawValue instanceof Serializable)) {
+                throw new RuntimeException(
+                        "Artifact {" + artifact + "} has invalid value {" + rawValue + "}:" +
+                                " Value cannot be cast to Serializable"
+                );
+            }
+            convertedMap.put((String) rawKey, (Serializable) rawValue);
+        }
+        return convertedMap;
     }
 
 }
