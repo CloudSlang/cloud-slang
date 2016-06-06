@@ -12,10 +12,17 @@
 package io.cloudslang.lang.entities.bindings.values;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.lang.SerializationUtils;
+import io.cloudslang.lang.entities.encryption.EncryptionProvider;
+import javassist.util.proxy.ProxyObjectInputStream;
+import javassist.util.proxy.ProxyObjectOutputStream;
+import org.python.apache.commons.compress.utils.IOUtils;
+import org.python.apache.xerces.impl.dv.util.Base64;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Arrays;
 
 /**
  * Sensitive InOutParam value
@@ -26,27 +33,31 @@ public class SensitiveValue implements Value {
 
     public static final String SENSITIVE_VALUE_MASK = "********";
 
-    private byte[] content;
+    private String content;
 
     @SuppressWarnings("unused")
     protected SensitiveValue() {
     }
 
     protected SensitiveValue(Serializable content) {
-        this.content = SerializationUtils.serialize(content);
+        byte[] serialized = serialize(content);
+        String encoded = Base64.encode(serialized);
+        this.content = EncryptionProvider.get().encrypt(encoded.toCharArray());
     }
 
-    public byte[] getContent() {
+    public String getContent() {
         return content;
     }
 
-    public void setContent(byte[] content) {
+    protected void setContent(String content) {
         this.content = content;
     }
 
     @Override
     public Serializable get() {
-        return (Serializable)SerializationUtils.deserialize(content);
+        char[] decrypted = EncryptionProvider.get().decrypt(content);
+        byte[] decoded = Base64.decode(new String(decrypted));
+        return deserialize(decoded);
     }
 
     @JsonIgnore
@@ -60,16 +71,47 @@ public class SensitiveValue implements Value {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SensitiveValue that = (SensitiveValue) o;
-        return Arrays.equals(content, that.content);
+        return content != null ? content.equals(that.content) : that.content == null;
     }
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(content);
+        return content != null ? content.hashCode() : 0;
     }
 
     @Override
     public String toString() {
         return SENSITIVE_VALUE_MASK;
+    }
+
+    private byte[] serialize(Serializable data) {
+        ObjectOutputStream oos = null;
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            oos = new ProxyObjectOutputStream(baos);
+            oos.writeObject(data);
+            return baos.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize object", e);
+        } finally {
+            if (oos != null) {
+                IOUtils.closeQuietly(oos);
+            }
+        }
+    }
+
+    private Serializable deserialize(byte[] data) {
+        ObjectInputStream ois = null;
+        try {
+            ByteArrayInputStream bais = new ByteArrayInputStream(data);
+            ois = new ProxyObjectInputStream(bais);
+            return (Serializable)ois.readObject();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to deserialize object", e);
+        } finally {
+            if (ois != null) {
+                IOUtils.closeQuietly(ois);
+            }
+        }
     }
 }

@@ -3,7 +3,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.9.60-SNAPSHOT</version>
+        <version>0.9.59.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -102,6 +102,11 @@
         <dependency>
             <groupId>io.cloudslang.content</groupId>
             <artifactId>score-xml</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cloudslang.content</groupId>
+            <artifactId>cs-date-time</artifactId>
             <scope>runtime</scope>
         </dependency>
 

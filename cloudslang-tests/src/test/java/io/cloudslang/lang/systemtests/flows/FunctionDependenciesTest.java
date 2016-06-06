@@ -236,7 +236,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
                 "for.input.prop2",
                 "for.publish.prop1",
                 "for.publish.prop2"
-                );
+        );
     }
-    
+
 }

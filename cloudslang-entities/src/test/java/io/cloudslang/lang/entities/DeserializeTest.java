@@ -10,11 +10,20 @@ import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = DeserializeTest.Config.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class DeserializeTest {
 
     private ObjectMapper mapper;
@@ -99,4 +108,7 @@ public class DeserializeTest {
         testToAndFromJson(systemProperty, SystemProperty.class);
     }
 
+    @Configuration
+    @ComponentScan("io.cloudslang.lang.entities")
+    static class Config {}
 }

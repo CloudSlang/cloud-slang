@@ -8,9 +8,18 @@
 namespace: user.ops
 
 operation:
-  name: private_input_without_default
+  name: check_weather_missing_input
   inputs:
-    - input_without_default:
-        private: true
+    - city: "city"
+    - input_get_missing_input:
+            default: ${missing_input}
+            required: false
+            private: true
   python_action:
-    script: print "hi"
+    script: |
+      weather = "weather thing"
+      print city
+  outputs:
+    - weather: ${ weather }
+  results:
+    - SUCCESS: ${ weather == "weather thing" }

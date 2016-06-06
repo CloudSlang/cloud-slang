@@ -149,22 +149,22 @@ flow:
 
             - is_int_arguments:                        ${int1_input is int2_input}
             - is_int_argument1_sensitive:              ${int1_input_sensitive is int2_input}
-            - is_int_argument2:                        ${int1_input is int2_input_sensitive}
+            - is_int_argument2_sensitive:              ${int1_input is int2_input_sensitive}
             - is_int_arguments_sensitive:              ${int1_input_sensitive is int2_input_sensitive}
 
             - is_str_arguments:                        ${str1_input is str2_input}
             - is_str_argument1_sensitive:              ${str1_input_sensitive is str2_input}
-            - is_str_argument2:                        ${str1_input is str2_input_sensitive}
+            - is_str_argument2_sensitive:              ${str1_input is str2_input_sensitive}
             - is_str_arguments_sensitive:              ${str1_input_sensitive is str2_input_sensitive}
 
             - is_not_int_arguments:                    ${int1_input is not int2_input}
             - is_not_int_argument1_sensitive:          ${int1_input_sensitive is not int2_input}
-            - is_not_int_argument2:                    ${int1_input is not int2_input_sensitive}
+            - is_not_int_argument2_sensitive:          ${int1_input is not int2_input_sensitive}
             - is_not_int_arguments_sensitive:          ${int1_input_sensitive is not int2_input_sensitive}
 
             - is_not_str_arguments:                    ${str1_input is not str2_input}
             - is_not_str_argument1_sensitive:          ${str1_input_sensitive is not str2_input}
-            - is_not_str_argument2:                    ${str1_input is not str2_input_sensitive}
+            - is_not_str_argument2_sensitive:          ${str1_input is not str2_input_sensitive}
             - is_not_str_arguments_sensitive:          ${str1_input_sensitive is not str2_input_sensitive}
 
             - in_str_argument1:                        ${str1_input in 'abcd'}

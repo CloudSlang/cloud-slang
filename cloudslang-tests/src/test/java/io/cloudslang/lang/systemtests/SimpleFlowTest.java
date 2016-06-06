@@ -125,7 +125,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Step arguments");
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
-        ScoreEvent event = trigger(compilationArtifact, inputs, systemProperties);
+        trigger(compilationArtifact, inputs, systemProperties);
     }
 
     @Test
@@ -196,4 +196,25 @@ public class SimpleFlowTest extends SystemsTestsParent {
         triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
     }
 
+    @Test
+    public void testFlowGetValue() throws Exception {
+        URI resource = getClass().getResource("/yaml/check_get_value.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/get_value.sl").toURI();
+        URI operation2 = getClass().getResource("/yaml/check_equal_types.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Map<String, Value> userInputs = new HashMap<>();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
+
+        List<String> actualSteps = getStepsOnly(stepsData);
+        Assert.assertEquals(2, actualSteps.size());
+        StepData firstStep = stepsData.get(FIRST_STEP_PATH);
+        StepData secondStep = stepsData.get(SECOND_STEP_KEY);
+        Assert.assertEquals("get_value", firstStep.getName());
+        Assert.assertEquals("SUCCESS", firstStep.getResult());
+        Assert.assertEquals("test_equality", secondStep.getName());
+        Assert.assertEquals("SUCCESS", secondStep.getResult());
+    }
 }

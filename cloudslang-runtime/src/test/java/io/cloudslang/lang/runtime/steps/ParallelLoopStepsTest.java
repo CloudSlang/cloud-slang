@@ -19,6 +19,8 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.lang.entities.encryption.DummyEncryptor;
+import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.lang.runtime.bindings.ParallelLoopBinding;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
@@ -560,6 +562,16 @@ public class ParallelLoopStepsTest {
         @Bean
         public PythonExecutionEngine pythonExecutionEngine(){
             return new PythonExecutionCachedEngine();
+        }
+
+        @Bean
+        public ApplicationContextProvider applicationContextProvider() {
+            return new ApplicationContextProvider();
+        }
+
+        @Bean
+        public DummyEncryptor dummyEncryptor() {
+            return new DummyEncryptor();
         }
     }
 }

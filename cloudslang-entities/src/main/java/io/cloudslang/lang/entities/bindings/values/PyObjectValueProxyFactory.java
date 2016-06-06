@@ -15,6 +15,7 @@ import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.Proxy;
 import javassist.util.proxy.ProxyFactory;
+import javassist.util.proxy.ProxyObject;
 import org.apache.commons.lang.ClassUtils;
 import org.python.core.Py;
 import org.python.core.PyObject;
@@ -68,6 +69,7 @@ public class PyObjectValueProxyFactory {
                     factory.setSuperclass(pyObject.getClass());
                     factory.setInterfaces(new Class[]{PyObjectValue.class});
                     factory.setFilter(new PyObjectValueMethodFilter());
+                    factory.setUseWriteReplace(false);
                     proxyClasses.putIfAbsent(proxyClassName, createProxyClass(factory.createClass(), pyObject));
                     proxyClass = proxyClasses.get(proxyClassName);
                 }
@@ -87,15 +89,22 @@ public class PyObjectValueProxyFactory {
         Object[] params = new Object[constructor.getParameterTypes().length];
         for (int index = 0; index < constructor.getParameterTypes().length; index++) {
             Class<?> parameterType = constructor.getParameterTypes()[index];
-            params[index] = parameterType.equals(PyType.class) ? pyObject.getType() :
-                    !parameterType.isPrimitive() ? null : getPrimitiveTypeDefaultValue(parameterType);
+            params[index] = getParamDefaultValue(pyObject, parameterType);
         }
         return new PyObjectValueProxyClass(proxyClass, constructor, params);
     }
 
     @SuppressWarnings("unchecked")
-    private static Object getPrimitiveTypeDefaultValue(Class<?> parameterType) throws Exception {
-        return ClassUtils.primitiveToWrapper(parameterType).getConstructor(String.class).newInstance("0");
+    private static Object getParamDefaultValue(PyObject pyObject, Class<?> parameterType) throws Exception {
+        if (parameterType.equals(PyType.class)) {
+            return pyObject.getType();
+        } else if (parameterType.isPrimitive()) {
+            return ClassUtils.primitiveToWrapper(parameterType).getConstructor(String.class).newInstance("0");
+        } else if (Number.class.isAssignableFrom(parameterType) || String.class.isAssignableFrom(parameterType)) {
+            return parameterType.getConstructor(String.class).newInstance("0");
+        } else {
+            return null;
+        }
     }
 
     private static class PyObjectValueMethodFilter implements MethodFilter {
@@ -110,9 +119,9 @@ public class PyObjectValueProxyFactory {
 
         private static final String ACCESSED_GETTER_METHOD = "isAccessed";
 
-        private Value value;
-        private PyObject pyObject;
-        private boolean accessed;
+        protected Value value;
+        protected PyObject pyObject;
+        protected boolean accessed;
 
         public PyObjectValueMethodHandler(Serializable content, boolean sensitive, PyObject pyObject) {
             this.value = ValueFactory.create(content, sensitive);
@@ -132,10 +141,24 @@ public class PyObjectValueProxyFactory {
                 if (!thisMethod.getName().equals("toString")) {
                     accessed = true;
                 }
-                return pyObjectMethod.invoke(pyObject, args);
+                return pyObjectMethod.invoke(pyObject, getPyObjectArgs(args));
             } else {
                 throw new RuntimeException("Failed to invoke PyObjectValue method. Implementing class not found");
             }
+        }
+
+        private Object[] getPyObjectArgs(Object[] args) {
+            Object[] pyObjectArgs = new Object[args.length];
+            for (int index = 0; index < args.length; index++) {
+                if (args[index] instanceof PyObjectValue) {
+                    PyObjectValueMethodHandler handler = (PyObjectValueMethodHandler)((ProxyObject)args[index]).getHandler();
+                    handler.accessed = true;
+                    pyObjectArgs[index] = handler.pyObject;
+                } else {
+                    pyObjectArgs[index] = args[index];
+                }
+            }
+            return pyObjectArgs;
         }
     }
 }

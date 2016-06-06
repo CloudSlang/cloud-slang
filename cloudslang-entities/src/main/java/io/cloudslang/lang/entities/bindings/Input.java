@@ -98,7 +98,7 @@ public class Input extends InOutParam {
 		public InputBuilder(String name, Serializable serializable) {
 			this(name, serializable, false);
 		}
-
+        
 		public InputBuilder(String name, Serializable serializable, boolean sensitive) {
 			this.name = name;
 			this.value = ValueFactory.create(serializable, sensitive);

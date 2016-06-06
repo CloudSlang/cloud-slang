@@ -55,7 +55,7 @@ public class StepExecutionData extends AbstractExecutionData {
 
     @Autowired
     private LoopsBinding loopsBinding;
-    
+
     private static final Logger logger = Logger.getLogger(StepExecutionData.class);
 
     @SuppressWarnings("unused")
