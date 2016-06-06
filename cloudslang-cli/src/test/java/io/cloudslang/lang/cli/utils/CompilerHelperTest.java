@@ -225,12 +225,13 @@ public class CompilerHelperTest {
     @Test
     public void testLoadInputsFromFileBadValueKey() throws Exception {
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("'password' input should contain 'value' property.");
+        expectedException.expectMessage("Artifact {C:\\CloudSlang\\cloud-slang-original\\cloudslang-cli\\target\\test-classes" +
+                "\\inputs\\inputs_value_missing.yaml} " +
+                "has unrecognized tag {bad_value_key}. Please take a look at the supported features per versions link");
 
         URI inputsFromFile = getClass().getResource("/inputs/inputs_value_missing.yaml").toURI();
         compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath()));
     }
-
 
     @Test
     public void testLoadInputsFromCommentedFile() throws Exception {

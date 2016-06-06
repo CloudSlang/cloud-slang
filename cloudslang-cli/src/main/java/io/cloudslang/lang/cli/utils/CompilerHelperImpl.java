@@ -126,7 +126,7 @@ public class CompilerHelperImpl implements CompilerHelper{
                             (Map<String, ? extends Serializable>) yaml.load(inputsFileContent);
                     if (MapUtils.isNotEmpty(inputFileYamlContent)) {
                         emptyContent = false;
-                        populateResultMap(result, inputFileYamlContent);
+                        populateResultMap(result, inputFileYamlContent, inputFile);
                     }
                 }
                 if (emptyContent) {
@@ -140,21 +140,32 @@ public class CompilerHelperImpl implements CompilerHelper{
         return result;
     }
 
-    private void populateResultMap(Map<String, Value> result, Map<String, ? extends Serializable> inputFileYamlContent) {
+    private void populateResultMap(Map<String, Value> result, Map<String, ? extends Serializable> inputFileYamlContent,
+                                   File inputFile) {
         for (Map.Entry<String, ? extends Serializable> property : inputFileYamlContent.entrySet()) {
             if (property.getValue() instanceof Map) {
                 @SuppressWarnings("unchecked") Map<String, ? extends Serializable> valueMap = (Map) property.getValue();
-                if (valueMap.containsKey(SlangTextualKeys.VALUE_KEY)) {
-                    result.put(property.getKey(),
-                            ValueFactory.create(valueMap.get(SlangTextualKeys.VALUE_KEY), isSensitiveValue(valueMap)));
-                } else {
-                    throw new RuntimeException("'" + property.getKey() + "' input should contain '" + SlangTextualKeys.VALUE_KEY + "' property.");
-                }
+                validateKeys(inputFile, valueMap);
+                result.put(property.getKey(),
+                        ValueFactory.create(valueMap.get(SlangTextualKeys.VALUE_KEY), isSensitiveValue(valueMap)));
+
             } else {
                 result.put(property.getKey(), ValueFactory.create(property.getValue(), false));
             }
         }
     }
+
+    private void validateKeys(File inputFile, Map<String, ? extends Serializable> valueMap) {
+        List<String> knownModifierKeys = Arrays.asList(SlangTextualKeys.SENSITIVE_KEY, SlangTextualKeys.VALUE_KEY);
+        for (String modifierKey : valueMap.keySet()) {
+            if (!knownModifierKeys.contains(modifierKey)) {
+                throw new RuntimeException(
+                        "Artifact {" + inputFile + "} has unrecognized tag {" + modifierKey + "}" +
+                                ". Please take a look at the supported features per versions link");
+            }
+        }
+    }
+
 
     private Boolean isSensitiveValue(Map<String, ? extends Serializable> valueMap) {
         Boolean isSensitive = false;
