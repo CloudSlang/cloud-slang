@@ -91,7 +91,9 @@ public class InputsBinding {
             Value rawValue = input.getValue();
             String expressionToEvaluate = ExpressionUtils.extractExpression(rawValue == null ? null : rawValue.get());
             if (expressionToEvaluate != null) {
-                scriptContext.put(inputName, valueFromContext);
+                if (context.containsKey(inputName)) {
+                    scriptContext.put(inputName, valueFromContext);
+                }
                 //so you can resolve previous inputs already bound
                 scriptContext.putAll(targetContext);
                 value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, input.getFunctionDependencies());

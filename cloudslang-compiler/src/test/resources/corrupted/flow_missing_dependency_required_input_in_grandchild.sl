@@ -4,8 +4,19 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
+
 namespace: io.cloudslang
 
-operation:
-  name: operation_with_no_action_data
-  python_action:
+imports:
+  ops: user.ops
+
+flow:
+  name: flow_missing_dependency_required_input_in_grandchild
+  workflow:
+    - explicit_alias:
+        do:
+          flow_implicit_alias_for_current_namespace:
+    - implicit_alias:
+        do:
+          check_op:
+
