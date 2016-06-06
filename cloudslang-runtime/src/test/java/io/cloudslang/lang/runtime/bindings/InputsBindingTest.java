@@ -22,6 +22,9 @@ import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -130,9 +133,15 @@ public class InputsBindingTest {
                 .build();
         List<Input> inputs = Collections.singletonList(input1);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error binding input: 'input1', \n" +
-                "\tError is: Error in running script expression: 'input1',\n" +
-                "\tException is: name 'input1' is not defined");
+        exception.expectMessage(new BaseMatcher<String>() {
+            public void describeTo(Description description) {}
+            public boolean matches(Object o) {
+                String message = o.toString();
+                return message.contains("Error binding input: 'input1'") &&
+                        message.contains("Error is: Error in running script expression: 'input1'") &&
+                        message.contains("Exception is: name 'input1' is not defined");
+            }
+        });
         bindInputs(inputs);
     }
 
@@ -144,9 +153,15 @@ public class InputsBindingTest {
                 .build();
         List<Input> inputs = Collections.singletonList(input1);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error binding input: 'input1', \n" +
-                "\tError is: Error in running script expression: 'input1',\n" +
-                "\tException is: name 'input1' is not defined");
+        exception.expectMessage(new BaseMatcher<String>() {
+            public void describeTo(Description description) {}
+            public boolean matches(Object o) {
+                String message = o.toString();
+                return message.contains("Error binding input: 'input1'") &&
+                        message.contains("Error is: Error in running script expression: 'input1'") &&
+                        message.contains("Exception is: name 'input1' is not defined");
+            }
+        });
         bindInputs(inputs);
     }
 
