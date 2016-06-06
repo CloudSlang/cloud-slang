@@ -556,4 +556,16 @@ public class PreCompilerErrorsTest {
         exception.expectMessage("Step: print_message2 is unreachable");
         throw result.getErrors().get(0);
     }
+
+    @Test
+    public void testNullPublishValue() throws Exception {
+        URI resource = getClass().getResource("/corrupted/null_publish_value.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("For step 'CheckWeather' syntax is illegal.");
+        exception.expectMessage("Could not transform Output : {var_with_null_value=null} since it has a null value.");
+        throw result.getErrors().get(0);
+    }
 }
