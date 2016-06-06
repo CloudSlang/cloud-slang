@@ -14,6 +14,10 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.lang.entities.encryption.DummyEncryptor;
+import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import org.junit.Assert;
@@ -68,12 +72,11 @@ public class TestCasesYamlParserTest {
         Map<String, SlangTestCase> testCases = parser.parseTestCases(SlangSource.fromFile(fileUri));
         SlangTestCase testPrintFinishesWithSuccess = testCases.get("testPrintFinishesWithSuccess");
         Assert.assertEquals("Tests that print_text operation finishes with SUCCESS", testPrintFinishesWithSuccess.getDescription());
-        List<Map> expectedInputsList = new ArrayList<>();
-        Map<String, Serializable> expectedInputs = new HashMap<>();
-        expectedInputs.put("text", "text to print");
-        expectedInputsList.add(expectedInputs);
-        Assert.assertEquals(expectedInputsList, testPrintFinishesWithSuccess.getInputs());
-    }
+        Assert.assertEquals("text", testPrintFinishesWithSuccess.getInputs().get(0).getName());
+        Assert.assertEquals(ValueFactory.create("text to print", false), testPrintFinishesWithSuccess.getInputs().get(0).getValue());
+        Assert.assertEquals("password", testPrintFinishesWithSuccess.getInputs().get(1).getName());
+        Assert.assertEquals(ValueFactory.create("password1", true), testPrintFinishesWithSuccess.getInputs().get(1).getValue());
+}
 
     @Test
     public void testCaseFileParsingForNonTestCasesFile() throws Exception{
@@ -149,5 +152,16 @@ public class TestCasesYamlParserTest {
             yaml.setBeanAccess(BeanAccess.FIELD);
             return yaml;
         }
+
+        @Bean
+        public ApplicationContextProvider applicationContextProvider() {
+            return new ApplicationContextProvider();
+        }
+
+        @Bean
+        public DummyEncryptor dummyEncryptor() {
+            return new DummyEncryptor();
+        }
+
     }
 }

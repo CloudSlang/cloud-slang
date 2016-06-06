@@ -19,7 +19,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -30,10 +33,8 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.io.Serializable;
+import java.util.*;
 
 import static ch.lambdaj.Lambda.convertMap;
 
@@ -78,10 +79,58 @@ public class TestCasesYamlParser {
     private SlangTestCase parseTestCase(Map map) {
         try {
             String content = objectMapper.writeValueAsString(map);
-            return objectMapper.readValue(content, SlangTestCase.class);
+            SlangTestCase slangTestCase = objectMapper.readValue(content, SlangTestCase.class);
+            setInputs(slangTestCase, map);
+
+            return slangTestCase;
         } catch (IOException e) {
             throw new RuntimeException("Error parsing slang test case", e);
         }
+    }
+
+    private void setInputs(SlangTestCase slangTestCase, Map map) {
+        Object object = map.get(SlangTextualKeys.INPUTS_KEY);
+        if (object instanceof List) {
+            List<Input> inputs = getInputs((List<Map<String, Serializable>>) object);
+            slangTestCase.setInputs(inputs);
+        }
+    }
+
+    private List<Input> getInputs(List<Map<String, Serializable>> inputsList) {
+        List<Input> inputs = new ArrayList<>();
+        for (Map<String, Serializable> singleElementInputMap : inputsList) {
+            Map.Entry<String, Serializable> entry = singleElementInputMap.entrySet().iterator().next();
+
+            if (entry.getValue() instanceof Map) {
+                @SuppressWarnings("unchecked") Map<String, ? extends Serializable> valueMap = (Map) entry.getValue();
+                validateKeys(valueMap);
+                inputs.add(new Input.InputBuilder(entry.getKey(), valueMap.get(SlangTextualKeys.VALUE_KEY),
+                        isSensitiveValue(valueMap)).build());
+            } else {
+                inputs.add(new Input.InputBuilder(entry.getKey(), entry.getValue(), false).build());
+            }
+        }
+        return inputs;
+    }
+
+    private void validateKeys(Map<String, ? extends Serializable> valueMap) {
+        List<String> knownModifierKeys = Arrays.asList(SlangTextualKeys.SENSITIVE_KEY, SlangTextualKeys.VALUE_KEY);
+        for (String modifierKey : valueMap.keySet()) {
+            if (!knownModifierKeys.contains(modifierKey)) {
+                throw new RuntimeException(
+                        "Artifact has unrecognized tag {" + modifierKey + "}" +
+                                ". Please take a look at the supported features per versions link");
+            }
+        }
+    }
+
+
+    private Boolean isSensitiveValue(Map<String, ? extends Serializable> valueMap) {
+        Boolean isSensitive = false;
+        if (valueMap.get(SlangTextualKeys.SENSITIVE_KEY) instanceof Boolean) {
+            isSensitive = (Boolean) valueMap.get(SlangTextualKeys.SENSITIVE_KEY);
+        }
+        return isSensitive;
     }
 
     public Set<SystemProperty> parseProperties(String fileName) {
