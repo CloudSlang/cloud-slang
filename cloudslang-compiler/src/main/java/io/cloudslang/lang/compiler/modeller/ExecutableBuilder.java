@@ -153,7 +153,7 @@ public class ExecutableBuilder {
         String namespace = parsedSlang.getNamespace();
         Map<String, String> imports = parsedSlang.getImports();
         Set<String> executableDependencies;
-        Set<String> systemPropertyDependencies;
+        Set<String> systemPropertyDependencies = null;
         switch (parsedSlang.getType()) {
             case FLOW:
                 List<Map<String, Map<String, Object>>> workFlowRawData = getWorkflowRawData(executableRawData, errors, parsedSlang, execName);
@@ -167,7 +167,11 @@ public class ExecutableBuilder {
                 errors.addAll(validateFlowResultsHaveNoExpression(results, execName));
 
                 executableDependencies = fetchDirectStepsDependencies(workflow);
-                systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForFlow(inputs, outputs, results, workflow.getSteps());
+                try {
+                    systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForFlow(inputs, outputs, results, workflow.getSteps());
+                } catch (RuntimeException ex) {
+                    errors.add(ex);
+                }
                 Flow flow = new Flow(
                         preExecutableActionData,
                         postExecutableActionData,
@@ -188,7 +192,11 @@ public class ExecutableBuilder {
                 errors.addAll(actionModellingResult.getErrors());
                 Action action = actionModellingResult.getAction();
                 executableDependencies = new HashSet<>();
-                systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForOperation(inputs, outputs, results);
+                try {
+                    systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForOperation(inputs, outputs, results);
+                } catch (RuntimeException ex) {
+                    errors.add(ex);
+                }
                 Operation operation = new Operation(
                         preExecutableActionData,
                         postExecutableActionData,
