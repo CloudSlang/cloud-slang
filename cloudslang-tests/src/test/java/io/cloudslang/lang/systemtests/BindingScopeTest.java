@@ -23,6 +23,8 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import java.util.HashSet;
 import org.apache.commons.lang.StringUtils;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,10 +78,17 @@ public class BindingScopeTest extends SystemsTestsParent {
         Set<SystemProperty> systemProperties = Collections.emptySet();
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error running: 'check_weather_missing_input'.\n" +
-                "\t Error binding input: 'input_get_missing_input', \n" +
-                "\tError is: Error in running script expression: 'missing_input',\n" +
-                "\tException is: name 'missing_input' is not defined");
+
+        exception.expectMessage(new BaseMatcher<String>() {
+            public void describeTo(Description description) {}
+            public boolean matches(Object o) {
+                String message = o.toString();
+                return message.contains("Error running: 'check_weather_missing_input'") &&
+                        message.contains("Error binding input: 'input_get_missing_input'") &&
+                        message.contains("Error is: Error in running script expression: 'missing_input'") &&
+                        message.contains("Exception is: name 'missing_input' is not defined");
+            }
+        });
         triggerWithData(compilationArtifact, userInputs, systemProperties);
     }
 

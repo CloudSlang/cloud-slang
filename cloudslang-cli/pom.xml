@@ -173,6 +173,71 @@
                     <extraJvmArguments>-Dpython.path=@BASEDIR@/python-lib</extraJvmArguments>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.10</version>
+				<executions>
+					<execution>
+						<id>unpack</id>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.apache.maven</groupId>
+									<artifactId>apache-maven</artifactId>
+									<classifier>bin</classifier>
+									<type>zip</type>
+									<version>3.3.9</version>
+									<overWrite>false</overWrite>
+									<outputDirectory>${basedir}/target/cslang/maven</outputDirectory>
+									<destFileName>maven</destFileName>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<id>copy-maven-conf</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/cslang/maven/conf</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/resources/maven/conf</directory>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-cslang-configuration</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/cslang/configuration</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/resources/configuration</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 </project>
