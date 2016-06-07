@@ -1,5 +1,74 @@
 #CHANGE LOG
 
+##Version 1.0.0
+
++ DSL Changes
+	+ New keywords and functions
+		+ Added `sensitive` keyword to mark inputs and outputs as sensitive. Sensitive data is not exposed in the CLI, Builder and logs.  
+		+ Added `gav` keyword to indicate the Maven project group:artifact:version where the code for the `java_action` resides. Upon execution, the Maven project and all its required resources specified in its pom's `dependencies` will be resolved and downloaded (if necessary).
+		+ Added `branch_result` to the `branches_context` to retrieve results from branches in a parallel step.  
+		+ Added `extensions` keyword that is ignored by the compiler.
+		+ Added form of `get()` function that does not take a `default` parameter.
+		+ Added `check_empty(expr1, expr2)` function that returns the value of an expression if it is not empty, or the value of a second expression if the first was empty.
+	+ Restructuring/Renaming - Several sections of flows, operations and system properties files have been restructured or renamed:
+		+ Changed `async_loop` to `parallel_loop`.
+		+ Changed `navigation` section from a map to a list.
+		+ Changed `properties` section from a map to a list.
+		+ Changed `overridable` to  `private` with inverted value. That is, `overridable: false` is now `private: true`.
+		+ Changed operation hierarchy:
+			+ Python based actions:
+    		```
+    		python_action:
+    		  script
+    		```
+			+ Java based actions:
+    		```
+    		java_action:
+    		  class_name:
+    		  method_name:
+    		```
+		+ Removed`aggregate` section from parallel steps. Aggregation for a `parallel_loop` is now accomplished in the `publish` section.
+	+ New Validations
+		+ Flow and operation input names must be different than their output names.
+		+ Step arguments and called subflow/operation output names must be different.
+		+ Flow results can no longer contain expressions.
+		+ Step must declares all subflow/operation inputs that are required, not private and don't have a default value.
+		+ All steps must be reachable.
+		+ The `on_failure` section may contain only one step.
+	+ Other Changes
+		+ Context visibility was changed to make the `self` keyword unnecessary. Therefore, it has been removed from the language.
+		+ Support `null` syntax in step argument list.
+		+ Support navigation to `on_failure` by using `on_failure` keyword.
++ CLI / Builder Improvements
+	+ Added configuration file for builder.
+	+ Directory paths are displayed in error messages.
++ Terminology Changes
+	+ "Tasks" are now referred to as "steps". Appropriate changes were made in the content and events.
++ Content
+	+ Updates - All code updated to reflect changes in the DSL. Additional updates include:
+		+ HTTP: added `response_headers` output.
+	+ Additions - Content has been added in the following areas:
+        + Base
+	        + Date and time
+	        + HTTP
+	        + JSON
+	        + Lists
+	        + Maps
+	        + Math
+	        + Strings
+	        + Utils
+	        + XML
+        + Chef
+        + CI
+	        + CircleCI
+        + Cloud
+	        + Amazon AWS
+		        + Images
+		        + Instances
+		        + Regions
+	+ Removals - Content has been removed in the following areas:
+		+ Powershell
+
 ##Version 0.9.50
 
 + DSL Improvements
