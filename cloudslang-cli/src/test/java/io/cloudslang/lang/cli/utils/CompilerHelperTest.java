@@ -15,6 +15,11 @@ import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.SystemProperty;
 import java.io.File;
+
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.lang.entities.encryption.DummyEncryptor;
+import io.cloudslang.lang.entities.encryption.Encryption;
+import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -23,8 +28,10 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
@@ -205,12 +212,24 @@ public class CompilerHelperTest {
     @Test
     public void testLoadInputsFromFile() throws Exception {
         Map<String, Serializable> expected = new HashMap<>();
-        expected.put("host", "localhost");
-        expected.put("port", "22");
+        expected.put("host", ValueFactory.create("localhost", false));
+        expected.put("port", ValueFactory.create("22", false));
+        expected.put("username", ValueFactory.create("myusername", false));
+        expected.put("password", ValueFactory.create("mypassword", true));
         URI inputsFromFile = getClass().getResource("/inputs/inputs.yaml").toURI();
         Map<String, ? extends Serializable> result = compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath()));
         Assert.assertNotNull(result);
         Assert.assertEquals(expected, result);
+    }
+
+    @Test
+    public void testLoadInputsFromFileBadValueKey() throws Exception {
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("inputs_value_missing.yaml} " +
+                "has unrecognized tag {bad_value_key}. Please take a look at the supported features per versions link");
+
+        URI inputsFromFile = getClass().getResource("/inputs/inputs_value_missing.yaml").toURI();
+        compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath()));
     }
 
     @Test
@@ -251,6 +270,16 @@ public class CompilerHelperTest {
         @Bean
         public CompilerHelper compilerHelper() {
             return new CompilerHelperImpl();
+        }
+
+        @Bean
+        public ApplicationContextProvider applicationContextProvider() {
+            return new ApplicationContextProvider();
+        }
+
+        @Bean
+        public DummyEncryptor dummyEncryptor() {
+            return new DummyEncryptor();
         }
 
         @Bean

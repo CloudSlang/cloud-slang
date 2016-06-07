@@ -9,6 +9,8 @@
  */
 package io.cloudslang.lang.tools.build.tester.parse;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.cloudslang.lang.entities.bindings.Input;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -32,7 +34,8 @@ public class SlangTestCase {
 
     private String systemPropertiesFile;
 
-    private List<Map> inputs;
+    @JsonIgnore
+    private List<Input> inputs;
 
     private List<Map> outputs;
 
@@ -45,7 +48,7 @@ public class SlangTestCase {
     private SlangTestCase() {}
 
     public SlangTestCase(String name, String testFlowPath, String description, List<String> testSuites,
-                         String systemPropertiesFile, List<Map> inputs, List<Map> outputs,
+                         String systemPropertiesFile, List<Input> inputs, List<Map> outputs,
                          Boolean throwsException, String result){
         this.name = name;
         this.testFlowPath = testFlowPath;
@@ -85,7 +88,11 @@ public class SlangTestCase {
         return systemPropertiesFile;
     }
 
-    public List<Map> getInputs() {
+    public void setInputs(List<Input> inputs) {
+        this.inputs = inputs;
+    }
+
+    public List<Input> getInputs() {
         return inputs;
     }
 
@@ -112,10 +119,9 @@ public class SlangTestCase {
         return EqualsBuilder.reflectionEquals(this, o);
     }
 
+
     @Override
     public int hashCode() {
         return HashCodeBuilder.reflectionHashCode(this);
     }
-
-
 }
