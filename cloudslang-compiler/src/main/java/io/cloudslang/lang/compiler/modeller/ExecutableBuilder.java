@@ -192,7 +192,11 @@ public class ExecutableBuilder {
                 errors.addAll(actionModellingResult.getErrors());
                 Action action = actionModellingResult.getAction();
                 executableDependencies = new HashSet<>();
-                systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForOperation(inputs, outputs, results);
+                try {
+                    systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForOperation(inputs, outputs, results);
+                } catch (RuntimeException ex) {
+                    errors.add(ex);
+                }
                 Operation operation = new Operation(
                         preExecutableActionData,
                         postExecutableActionData,
