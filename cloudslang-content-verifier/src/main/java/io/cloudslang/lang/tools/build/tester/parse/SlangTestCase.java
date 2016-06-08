@@ -35,7 +35,7 @@ public class SlangTestCase {
     private String systemPropertiesFile;
 
     @JsonIgnore
-    private List<Input> inputs;
+    private List<Map> inputs;
 
     private List<Map> outputs;
 
@@ -48,7 +48,7 @@ public class SlangTestCase {
     private SlangTestCase() {}
 
     public SlangTestCase(String name, String testFlowPath, String description, List<String> testSuites,
-                         String systemPropertiesFile, List<Input> inputs, List<Map> outputs,
+                         String systemPropertiesFile, List<Map> inputs, List<Map> outputs,
                          Boolean throwsException, String result){
         this.name = name;
         this.testFlowPath = testFlowPath;
@@ -88,11 +88,11 @@ public class SlangTestCase {
         return systemPropertiesFile;
     }
 
-    public void setInputs(List<Input> inputs) {
+    public void setInputs(List<Map> inputs) {
         this.inputs = inputs;
     }
 
-    public List<Input> getInputs() {
+    public List<Map> getInputs() {
         return inputs;
     }
 
