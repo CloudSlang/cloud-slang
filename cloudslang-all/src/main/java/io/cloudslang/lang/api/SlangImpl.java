@@ -15,7 +15,6 @@ import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
-import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
