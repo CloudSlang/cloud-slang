@@ -22,6 +22,7 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -91,23 +92,26 @@ public class TestCasesYamlParser {
     private void setInputs(SlangTestCase slangTestCase, Map map) {
         Object object = map.get(SlangTextualKeys.INPUTS_KEY);
         if (object instanceof List) {
-            List<Input> inputs = getInputs((List<Map<String, Serializable>>) object);
+            List<Map> inputs = getInputs((List<Map<String, Serializable>>) object);
             slangTestCase.setInputs(inputs);
         }
     }
 
-    private List<Input> getInputs(List<Map<String, Serializable>> inputsList) {
-        List<Input> inputs = new ArrayList<>();
+    private List<Map> getInputs(List<Map<String, Serializable>> inputsList) {
+        List<Map> inputs = new ArrayList<>();
         for (Map<String, Serializable> singleElementInputMap : inputsList) {
             Map.Entry<String, Serializable> entry = singleElementInputMap.entrySet().iterator().next();
 
             if (entry.getValue() instanceof Map) {
                 @SuppressWarnings("unchecked") Map<String, ? extends Serializable> valueMap = (Map) entry.getValue();
                 validateKeys(valueMap);
-                inputs.add(new Input.InputBuilder(entry.getKey(), valueMap.get(SlangTextualKeys.VALUE_KEY),
-                        isSensitiveValue(valueMap)).build());
+                Map<String, Value> map = new HashMap<>();
+                map.put(entry.getKey(), ValueFactory.create(valueMap.get(SlangTextualKeys.VALUE_KEY), isSensitiveValue(valueMap)));
+                inputs.add(map);
             } else {
-                inputs.add(new Input.InputBuilder(entry.getKey(), entry.getValue(), false).build());
+                Map<String, Value> map = new HashMap<>();
+                map.put(entry.getKey(), ValueFactory.create(entry.getValue(), false));
+                inputs.add(map);
             }
         }
         return inputs;
