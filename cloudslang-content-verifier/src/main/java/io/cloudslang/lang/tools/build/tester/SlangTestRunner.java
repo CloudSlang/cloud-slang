@@ -14,6 +14,7 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.tools.build.SlangBuildMain;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
@@ -190,9 +191,20 @@ public class SlangTestRunner {
     }
 
     private Map<String, Serializable> getTestCaseInputsMap(SlangTestCase testCase) {
-        List<Map> inputs = testCase.getInputs();
+        List<Input> inputs = testCase.getInputs();
         Map<String, Serializable> convertedInputs = new HashMap<>();
-        return convertMapParams(inputs, convertedInputs);
+        return convertInputParams(inputs, convertedInputs);
+    }
+
+    private Map<String, Serializable> convertInputParams(List<Input> params, Map<String, Serializable> convertedInputs) {
+        if (CollectionUtils.isNotEmpty(params)) {
+            for (Input param : params) {
+                convertedInputs.put(
+                        param.getName(),
+                        param);
+            }
+        }
+        return convertedInputs;
     }
 
     private Map<String, Serializable> convertMapParams(List<Map> params, Map<String, Serializable> convertedInputs) {
