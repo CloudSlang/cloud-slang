@@ -13,6 +13,8 @@ package io.cloudslang.lang.systemtests.flows;
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.ResultNavigation;
+import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
@@ -29,6 +31,8 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.rules.ExpectedException;
 
+import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
+
 /**
  * Date: 12/4/2014
  *
@@ -36,6 +40,7 @@ import org.junit.rules.ExpectedException;
  */
 public class NavigationTest extends SystemsTestsParent {
 
+    public static final long FLOW_END_STEP_ID = 0L;
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
 
@@ -215,16 +220,17 @@ public class NavigationTest extends SystemsTestsParent {
 
     @Test
     public void testNavigationOnFailureNotDefined() throws Exception {
-        expectedEx.expect(RuntimeException.class);
-        expectedEx.expectMessage("navigation");
-        expectedEx.expectMessage("on_failure");
-        expectedEx.expectMessage("section is not defined");
-
         URI resource = getClass().getResource("/yaml/on_failure_not_defined.sl").toURI();
         URI operationPython = getClass().getResource("/yaml/produce_default_navigation.sl").toURI();
 
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operationPython));
-        slang.compile(SlangSource.fromFile(resource), path);
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        Map stepNavigationValues = (Map) compilationArtifact.getExecutionPlan()
+                .getSteps().get(3L).getActionData().get(ScoreLangConstants.STEP_NAVIGATION_KEY);
+        ResultNavigation resultNavigation = (ResultNavigation) stepNavigationValues.get(ScoreLangConstants.FAILURE_RESULT);
+        Assert.assertEquals(ON_FAILURE_KEY, resultNavigation.getPresetResult());
+        Assert.assertEquals(FLOW_END_STEP_ID, resultNavigation.getNextStepId());
+
     }
 
 }

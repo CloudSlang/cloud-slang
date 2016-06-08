@@ -492,11 +492,7 @@ public class ExecutableBuilder {
                 Map<String, String> transformedNavigation = new HashMap<>(navigation);
                 if (navigationEntry.getValue().equals(ON_FAILURE_KEY)) {
                     if (StringUtils.isEmpty(onFailureStepName)) {
-                        throw new RuntimeException(
-                                "Failed to compile step: '" + stepName +
-                                        "'. Navigation: '" + navigationEntry.getKey() + " -> " + navigationEntry.getValue()
-                                        + "' is illegal. 'on_failure' section is not defined."
-                        );
+                        transformedNavigation.put(navigationEntry.getKey(), ON_FAILURE_KEY);
                     } else {
                         transformedNavigation.put(navigationEntry.getKey(), onFailureStepName);
                     }
