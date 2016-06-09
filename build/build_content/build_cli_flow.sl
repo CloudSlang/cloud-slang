@@ -37,7 +37,7 @@ flow:
     - include_content: false
     - target_dir: ${language_codebase + '/build/target'}
     - target_cli:
-        default: ${target_dir + "/cloudslang-cli/cslang"}
+        default: ${target_dir + "/cslang-cli"}
         overridable: false
     - target_builder:
         default: ${target_dir + "/cslang-builder"}
@@ -50,7 +50,7 @@ flow:
     - copy_cloudslang_cli:
         do:
           files.copy:
-            - source: ${language_codebase + '/cloudslang-cli/target/cslang'}
+            - source: ${language_codebase + '/cloudslang-cli/target/cslang-cli'}
             - destination: ${target_cli}
         navigate:
           SUCCESS: copy_verifier
