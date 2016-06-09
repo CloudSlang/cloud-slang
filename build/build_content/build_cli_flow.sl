@@ -37,10 +37,10 @@ flow:
     - include_content: false
     - target_dir: ${language_codebase + '/build/target'}
     - target_cli:
-        default: ${target_dir + "/cslang-cli"}
+        default: ${target_dir + "/cli/cslang-cli"}
         overridable: false
     - target_builder:
-        default: ${target_dir + "/cslang-builder"}
+        default: ${target_dir + "/builder/cslang-builder"}
         overridable: false
     - cloudslang_content_repo:
         default: 'https://github.com/CloudSlang/cloud-slang-content.git'
@@ -127,7 +127,7 @@ flow:
         do:
           files.zip_folder:
             - archive_name: 'cslang-cli'
-            - folder_path: ${target_dir + "/cslang-cli"}
+            - folder_path: ${target_dir + "/cli"}
         navigate:
           SUCCESS: create_cli_tar_gz
           FAILURE: CREATE_CLI_ZIP_PROBLEM
@@ -135,7 +135,7 @@ flow:
     - create_cli_tar_gz:
         do:
           cmd.run_command:
-            - command: ${"cd " + target_dir + "/cslang-cli && tar -cvzf cslang-cli.tar.gz cslang"}
+            - command: ${"cd " + target_dir + "/cli && tar -cvzf cslang-cli.tar.gz cslang-cli"}
         navigate:
           SUCCESS: should_create_builder_zip
           FAILURE: CREATE_CLI_TAR_GZ_PROBLEM
@@ -153,7 +153,7 @@ flow:
         do:
           files.zip_folder:
             - archive_name: 'cslang-builder'
-            - folder_path: ${target_builder}
+            - folder_path: ${target_dir + "/builder"}
         navigate:
           SUCCESS: SUCCESS
           FAILURE: CREATE_BUILDER_ZIP_PROBLEM
