@@ -444,7 +444,7 @@ public class ExecutableBuilder {
         preStepData.putAll(transformersHandler.runTransformers(stepRawData, preStepTransformers, errors, errorMessagePrefix));
         postStepData.putAll(transformersHandler.runTransformers(stepRawData, postStepTransformers, errors, errorMessagePrefix));
 
-        replaceOnFailureReference(postStepData, onFailureStepName, stepName);
+        replaceOnFailureReference(postStepData, onFailureStepName);
 
         @SuppressWarnings("unchecked")
         List<Argument> arguments = (List<Argument>) preStepData.get(SlangTextualKeys.DO_KEY);
@@ -479,8 +479,7 @@ public class ExecutableBuilder {
 
     private void replaceOnFailureReference(
             Map<String, Serializable> postStepData,
-            String onFailureStepName,
-            String stepName) {
+            String onFailureStepName) {
         Serializable navigationData = postStepData.get(NAVIGATION_KEY);
         if (navigationData != null) {
             @SuppressWarnings("unchecked") // from NavigateTransformer
@@ -492,7 +491,7 @@ public class ExecutableBuilder {
                 Map<String, String> transformedNavigation = new HashMap<>(navigation);
                 if (navigationEntry.getValue().equals(ON_FAILURE_KEY)) {
                     if (StringUtils.isEmpty(onFailureStepName)) {
-                        transformedNavigation.put(navigationEntry.getKey(), ON_FAILURE_KEY);
+                        transformedNavigation.put(navigationEntry.getKey(), ScoreLangConstants.FAILURE_RESULT);
                     } else {
                         transformedNavigation.put(navigationEntry.getKey(), onFailureStepName);
                     }

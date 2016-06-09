@@ -31,7 +31,6 @@ import java.util.Map;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
-import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 import static org.hamcrest.Matchers.equalTo;
 
 /*
@@ -98,7 +97,6 @@ public class ExecutionPlanBuilder {
         for (Result result : compiledFlow.getResults()) {
             stepReferences.put(result.getName(), FLOW_END_STEP_ID);
         }
-        stepReferences.put(ON_FAILURE_KEY, FLOW_END_STEP_ID);
         return stepReferences;
     }
 

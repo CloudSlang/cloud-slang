@@ -228,9 +228,8 @@ public class NavigationTest extends SystemsTestsParent {
         Map stepNavigationValues = (Map) compilationArtifact.getExecutionPlan()
                 .getSteps().get(3L).getActionData().get(ScoreLangConstants.STEP_NAVIGATION_KEY);
         ResultNavigation resultNavigation = (ResultNavigation) stepNavigationValues.get(ScoreLangConstants.FAILURE_RESULT);
-        Assert.assertEquals(ON_FAILURE_KEY, resultNavigation.getPresetResult());
+        Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, resultNavigation.getPresetResult());
         Assert.assertEquals(FLOW_END_STEP_ID, resultNavigation.getNextStepId());
-
     }
 
 }
