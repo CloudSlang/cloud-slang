@@ -303,7 +303,7 @@ public class SlangBuildTest {
                 "",
                 Collections.<String>emptyList(),
                 "",
-                Collections.<Input>emptyList(),
+                Collections.<Map>emptyList(),
                 Collections.<Map>emptyList(),
                 false,
                 ""
