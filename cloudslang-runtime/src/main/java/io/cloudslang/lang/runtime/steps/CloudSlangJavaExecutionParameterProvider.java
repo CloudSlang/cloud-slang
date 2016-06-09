@@ -64,6 +64,8 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
                             exceptionMessageBuilder.append(parameterName);
                             exceptionMessageBuilder.append(" expects type ");
                             exceptionMessageBuilder.append(parameterClass.getName());
+                            exceptionMessageBuilder.append(". Actual type is ");
+                            exceptionMessageBuilder.append(value.getClass().getName());
                             throw new RuntimeException(exceptionMessageBuilder.toString());
                         }
                     }
