@@ -229,6 +229,25 @@ public class NavigationTest extends SystemsTestsParent {
         ResultNavigation resultNavigation = (ResultNavigation) stepNavigationValues.get(ScoreLangConstants.FAILURE_RESULT);
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, resultNavigation.getPresetResult());
         Assert.assertEquals(FLOW_END_STEP_ID, resultNavigation.getNextStepId());
+
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("navigationType", ValueFactory.create("failure"));
+        userInputs.put("userNumber", ValueFactory.create("1024"));
+        userInputs.put("emailHost", ValueFactory.create("emailHost"));
+        userInputs.put("emailPort", ValueFactory.create("25"));
+        userInputs.put("emailSender", ValueFactory.create("user@host.com"));
+        userInputs.put("emailRecipient", ValueFactory.create("user@host.com"));
+
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
+
+        // verify
+        StepData flowData = steps.get(EXEC_START_PATH);
+        StepData stepData = steps.get(FIRST_STEP_PATH);
+
+        Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, flowData.getResult());
+        Assert.assertEquals("default_output_value", flowData.getOutputs().get("default_output"));
+        Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, stepData.getResult());
+        Assert.assertEquals("default_output_value", stepData.getOutputs().get("default_output"));
     }
 
 }
