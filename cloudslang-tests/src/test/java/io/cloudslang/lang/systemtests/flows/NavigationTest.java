@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.rules.ExpectedException;
 
-import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 
 /**
  * Date: 12/4/2014
