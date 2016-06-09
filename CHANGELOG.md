@@ -4,7 +4,7 @@
 
 + DSL Changes
 	+ New keywords and functions
-		+ Added `sensitive` keyword to mark inputs and outputs as sensitive. Sensitive data is not exposed in the CLI, Builder and logs.  
+		+ Added `sensitive` keyword to mark inputs and outputs and system properties as sensitive. Sensitive data is not exposed in the CLI, Builder and logs.  
 		+ Added `gav` keyword to indicate the Maven project group:artifact:version where the code for the `java_action` resides. Upon execution, the Maven project and all its required resources specified in its pom's `dependencies` will be resolved and downloaded (if necessary).
 		+ Added `branch_result` to the `branches_context` to retrieve results from branches in a parallel step.  
 		+ Added `extensions` keyword that is ignored by the compiler.
@@ -24,6 +24,7 @@
 			+ Java based actions:
     		```
     		java_action:
+				  gav:
     		  class_name:
     		  method_name:
     		```
