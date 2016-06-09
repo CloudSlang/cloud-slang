@@ -127,7 +127,7 @@ flow:
         do:
           files.zip_folder:
             - archive_name: 'cslang-cli'
-            - folder_path: ${target_dir + "/cloudslang-cli"}
+            - folder_path: ${target_dir + "/cslang-cli"}
         navigate:
           SUCCESS: create_cli_tar_gz
           FAILURE: CREATE_CLI_ZIP_PROBLEM
@@ -135,7 +135,7 @@ flow:
     - create_cli_tar_gz:
         do:
           cmd.run_command:
-            - command: ${"cd " + target_dir + "/cloudslang-cli && tar -cvzf cslang-cli.tar.gz cslang"}
+            - command: ${"cd " + target_dir + "/cslang-cli && tar -cvzf cslang-cli.tar.gz cslang"}
         navigate:
           SUCCESS: should_create_builder_zip
           FAILURE: CREATE_CLI_TAR_GZ_PROBLEM
