@@ -280,7 +280,7 @@ public class ExecutableBuilder {
         while (stepsIterator.hasNext()) {
             Map<String, Map<String, Object>> stepData = stepsIterator.next();
             String stepName = stepData.keySet().iterator().next();
-            if (stepName.equals(SlangTextualKeys.ON_FAILURE_KEY)) {
+            if (stepName.equals(ON_FAILURE_KEY)) {
                 if (onFailureFound) {
                     errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\n" + MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX));
                 } else {
@@ -297,6 +297,8 @@ public class ExecutableBuilder {
                     if (onFailureData.size() > 1) {
                         errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be only one step"));
                     }
+                    handleOnFailureStepNavigationSection(onFailureData, execName, errors);
+
                     WorkflowModellingResult workflowModellingResult = compileWorkFlow(onFailureData, imports, null, true, namespace, execName);
                     errors.addAll(workflowModellingResult.getErrors());
                     onFailureWorkFlow = workflowModellingResult.getWorkflow();
@@ -305,6 +307,31 @@ public class ExecutableBuilder {
             }
         }
         return onFailureWorkFlow;
+    }
+
+    private void handleOnFailureStepNavigationSection(List<Map<String, Map<String, Object>>> onFailureData, String execName, List<RuntimeException> errors) {
+        Map.Entry<String, Map<String, Object>> onFailureStep = getFirstOnFailureStep(onFailureData);
+        if (onFailureStep.getValue().containsKey(NAVIGATION_KEY)) {
+            errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nThe step below 'on_failure' property should not contain a \"navigate\" section."));
+        }
+        List<Map<String, String>> failureNavigationSection = getFailureNavigationSection();
+        onFailureStep.getValue().put(NAVIGATION_KEY, failureNavigationSection);
+    }
+
+    private List<Map<String, String>> getFailureNavigationSection() {
+        List<Map<String, String>> failureNavigationSection = new ArrayList<>();
+        Map<String, String> success = new HashMap<>();
+        success.put(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.SUCCESS_RESULT);
+        Map<String, String> failure = new HashMap<>();
+        failure.put(ScoreLangConstants.FAILURE_RESULT, ScoreLangConstants.FAILURE_RESULT);
+        failureNavigationSection.add(success);
+        failureNavigationSection.add(failure);
+        return failureNavigationSection;
+    }
+
+    private Map.Entry<String, Map<String, Object>> getFirstOnFailureStep(List<Map<String, Map<String, Object>>> onFailureData) {
+        Map<String, Map<String, Object>> onFailureStepMap = onFailureData.iterator().next();
+        return onFailureStepMap.entrySet().iterator().next();
     }
 
     private ActionModellingResult compileAction(Map<String, Object> actionRawData) {

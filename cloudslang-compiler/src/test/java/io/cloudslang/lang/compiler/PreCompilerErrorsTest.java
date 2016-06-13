@@ -539,16 +539,8 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
-    public void testFlowWithUnreachableStepReachableFromOnFailureStep() throws Exception {
-        URI resource = getClass().getResource("/corrupted/unreachable_step_reachable_from_on_failure.sl").toURI();
-
-        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
-        assertTrue(result.getErrors().size() == 0);
-    }
-
-    @Test
-    public void testFlowWithUnreachableTasksOneReachableFromOnFailureTask() throws Exception {
-        URI resource = getClass().getResource("/corrupted/unreachable_tasks_one_reachable_from_on_failure.sl").toURI();
+    public void testFlowWithUnreachableTasksOneReachableFromUnreachableTask() throws Exception {
+        URI resource = getClass().getResource("/corrupted/unreachable_tasks_one_reachable_from_unreachable_task.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
