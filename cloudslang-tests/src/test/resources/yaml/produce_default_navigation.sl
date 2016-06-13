@@ -14,6 +14,8 @@ operation:
   python_action:
     script:
       print 'Producing default navigation based on input'
+  outputs:
+    - default_output: "default_output_value"
   results:
     - SUCCESS: ${ navigationType == 'success' }
     - FAILURE: ${ 1 == 1 }
