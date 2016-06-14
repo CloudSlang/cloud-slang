@@ -83,6 +83,16 @@ public class TestCasesYamlParserTest {
     }
 
     @Test
+    public void testSimpleTestCasesParsingInvalidKey() throws URISyntaxException {
+        String filePath = "/test/base/test_print_text-unrecognized_tag.inputs.yaml";
+        URI fileUri = getClass().getResource(filePath).toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Artifact has unrecognized tag {invalid_key}. Supported tags are {value} and {sensitive}. " +
+                "Please take a look at the supported features per versions link.");
+        parser.parseTestCases(SlangSource.fromFile(fileUri));
+    }
+
+    @Test
     public void testCaseFileParsingForNonTestCasesFile() throws Exception{
         String filePath = "/content/base/properties.prop.sl";
         URI fileUri = getClass().getResource(filePath).toURI();
