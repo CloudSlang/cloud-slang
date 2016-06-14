@@ -321,7 +321,7 @@ public class ExecutableBuilder {
     private List<Map<String, String>> getFailureNavigationSection() {
         List<Map<String, String>> failureNavigationSection = new ArrayList<>();
         Map<String, String> success = new HashMap<>();
-        success.put(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.SUCCESS_RESULT);
+        success.put(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.FAILURE_RESULT);
         Map<String, String> failure = new HashMap<>();
         failure.put(ScoreLangConstants.FAILURE_RESULT, ScoreLangConstants.FAILURE_RESULT);
         failureNavigationSection.add(success);
