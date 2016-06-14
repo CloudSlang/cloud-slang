@@ -49,28 +49,6 @@
             <version>1.35</version>
         </dependency>
 
-        <!-- content dep -->
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-ssh</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-mail</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-http-client</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-rft</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
         <!-- test -->
         <dependency>
             <groupId>org.mockito</groupId>
@@ -87,29 +65,6 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-jClouds</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-vmware</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-xml</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>cs-date-time</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
     </dependencies>
 
     <build>
