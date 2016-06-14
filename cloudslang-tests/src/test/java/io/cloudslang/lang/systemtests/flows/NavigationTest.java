@@ -72,6 +72,29 @@ public class NavigationTest extends SystemsTestsParent {
     }
 
     @Test
+    public void testNavigationOnFailureContainsStepWithCustomResult() throws Exception {
+        URI resource = getClass().getResource("/yaml/on_failure_contains_step_with_custom_result.sl").toURI();
+        URI flow1 = getClass().getResource("/yaml/flow_with_custom_result.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/test_op.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(flow1), SlangSource.fromFile(operation1));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Map<String, Value> userInputs = new HashMap<>();
+
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
+
+        Assert.assertEquals("on_failure_contains_step_with_custom_result", steps.get(EXEC_START_PATH).getName());
+        Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, steps.get(EXEC_START_PATH).getResult());
+        Assert.assertEquals("print_message1", steps.get(FIRST_STEP_PATH).getName());
+        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, steps.get(FIRST_STEP_PATH).getResult());
+        Assert.assertEquals("print_on_failure_1", steps.get(SECOND_STEP_KEY).getName());
+        Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, steps.get(SECOND_STEP_KEY).getResult());
+        Assert.assertEquals("print_message1_flow_with_custom_result", steps.get("0.1.0").getName());
+        Assert.assertEquals("CUSTOM_SUCCESS", steps.get("0.1.0").getResult());
+    }
+
+    @Test
     public void testComplexNavigationOddNumber() throws Exception {
 
         URI resource = getClass().getResource("/yaml/flow_complex_navigation.yaml").toURI();

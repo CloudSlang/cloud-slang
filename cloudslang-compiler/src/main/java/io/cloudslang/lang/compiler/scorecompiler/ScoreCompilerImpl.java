@@ -15,22 +15,20 @@ import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
+import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ExecutionPlan;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static ch.lambdaj.Lambda.convertMap;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 
 /*
  * Created by stoneo on 2/2/2015.
@@ -65,6 +63,8 @@ public class ScoreCompilerImpl implements ScoreCompiler {
             //than we match the references to the actual dependencies
             filteredDependencies = dependenciesHelper.matchReferences(executable, availableExecutables);
 
+            handleOnFailureStepCustomResults((Flow) executable, filteredDependencies);
+
             List<RuntimeException> errors = validator.validateModelWithDependencies(executable, filteredDependencies);
             if (errors.size() > 0) {
                 throw errors.get(0);
@@ -87,6 +87,28 @@ public class ScoreCompilerImpl implements ScoreCompiler {
 
         executionPlan.setSubflowsUUIDs(new HashSet<>(dependencies.keySet()));
         return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemPropertiesFromExecutables(executables));
+    }
+
+    private void handleOnFailureStepCustomResults(Flow executable, Map<String, Executable> filteredDependencies) {
+        Step onFailureStep = getOnFailureStep(executable);
+        if (onFailureStep != null) {
+            Executable onFailureDependency = filteredDependencies.get(onFailureStep.getRefId());
+            for (Result result : onFailureDependency.getResults()) {
+                Map<String, String> navigationString = new HashMap<>();
+                navigationString.put(result.getName(), ScoreLangConstants.FAILURE_RESULT);
+                onFailureStep.getNavigationStrings().add(navigationString);
+            }
+        }
+    }
+
+    private Step getOnFailureStep(Flow flow) {
+        Deque<Step> stepDeque = flow.getWorkflow().getSteps();
+        for (Step step : stepDeque) {
+            if (step.isOnFailureStep()) {
+                return step;
+            }
+        }
+        return null;
     }
 
     @Override

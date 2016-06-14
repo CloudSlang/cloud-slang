@@ -314,11 +314,11 @@ public class ExecutableBuilder {
         if (onFailureStep.getValue().containsKey(NAVIGATION_KEY)) {
             errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nThe step below 'on_failure' property should not contain a \"navigate\" section."));
         }
-        List<Map<String, String>> failureNavigationSection = getFailureNavigationSection();
+        List<Map<String, String>> failureNavigationSection = getOnFailureNavigationSection();
         onFailureStep.getValue().put(NAVIGATION_KEY, failureNavigationSection);
     }
 
-    private List<Map<String, String>> getFailureNavigationSection() {
+    private List<Map<String, String>> getOnFailureNavigationSection() {
         List<Map<String, String>> failureNavigationSection = new ArrayList<>();
         Map<String, String> success = new HashMap<>();
         success.put(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.FAILURE_RESULT);
@@ -428,7 +428,8 @@ public class ExecutableBuilder {
                     imports,
                     defaultFailure,
                     namespace,
-                    onFailureStepName
+                    onFailureStepName,
+                    onFailureSection
             );
 
             errors.addAll(stepModellingResult.getErrors());
@@ -454,7 +455,8 @@ public class ExecutableBuilder {
             Map<String, String> imports,
             String defaultFailure,
             String namespace,
-            String onFailureStepName) {
+            String onFailureStepName,
+            boolean onFailureSection) {
 
         List<RuntimeException> errors = new ArrayList<>();
         if (MapUtils.isEmpty(stepRawData)) {
@@ -500,7 +502,8 @@ public class ExecutableBuilder {
                 arguments,
                 navigationStrings,
                 refId,
-                preStepData.containsKey(SlangTextualKeys.PARALLEL_LOOP_KEY));
+                preStepData.containsKey(SlangTextualKeys.PARALLEL_LOOP_KEY),
+                onFailureSection);
         return new StepModellingResult(step, errors);
     }
 

@@ -26,6 +26,7 @@ public class Step {
     private final List<Map<String, String>> navigationStrings;
     private final String refId;
     private final boolean parallelLoop;
+    private final boolean onFailureStep;
 
     public Step(
             String name,
@@ -34,7 +35,8 @@ public class Step {
             List<Argument> arguments,
             List<Map<String, String>> navigationStrings,
             String refId,
-            boolean parallelLoop) {
+            boolean parallelLoop,
+            boolean onFailureStep) {
         this.name = name;
         this.preStepActionData = preStepActionData;
         this.postStepActionData = postStepActionData;
@@ -42,6 +44,7 @@ public class Step {
         this.navigationStrings = navigationStrings;
         this.refId = refId;
         this.parallelLoop = parallelLoop;
+        this.onFailureStep = onFailureStep;
     }
 
     public String getName() {
@@ -70,6 +73,10 @@ public class Step {
 
     public boolean isParallelLoop() {
         return parallelLoop;
+    }
+
+    public boolean isOnFailureStep() {
+        return onFailureStep;
     }
 
 }

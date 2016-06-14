@@ -96,7 +96,8 @@ public class ExecutionPlanBuilderTest {
                 null,
                 navigationStrings,
                 refId,
-                isParallelLoop);
+                isParallelLoop,
+                false);
     }
 
     private List<Result> defaultFlowResults() {
