@@ -28,9 +28,10 @@ public class JavaActionTransformer extends AbstractTransformer implements Transf
 
     private static Set<String> mandatoryKeySet = Sets.newHashSet(
             SlangTextualKeys.JAVA_ACTION_CLASS_NAME_KEY,
-            SlangTextualKeys.JAVA_ACTION_METHOD_NAME_KEY
+            SlangTextualKeys.JAVA_ACTION_METHOD_NAME_KEY,
+            SlangTextualKeys.JAVA_ACTION_GAV_KEY
     );
-    private static Set<String> optionalKeySet = Sets.newHashSet(SlangTextualKeys.JAVA_ACTION_GAV_KEY);
+    private static Set<String> optionalKeySet = Collections.emptySet();
 
     @Override
     public Map<String, String> transform(Map<String, String> rawData) {
