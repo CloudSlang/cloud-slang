@@ -5,7 +5,7 @@ GHUSERTOKEN=$GH_TOKEN
 BRANCH=$GIT_BRANCH
 BUILD_DIR=$WORKSPACE
 
-CLI_DIR=build/target/cloudslang-cli
+CLI_DIR=build/target/cli
 CLI_ZIP_PATH=${CLI_DIR}/cslang-cli.zip
 CLI_GZIP_PATH=${CLI_DIR}/cslang-cli.tar.gz
 
@@ -13,7 +13,7 @@ cd ${BUILD_DIR}
 
 echo -e "\nTesting a simple flow"
 
-bash ${CLI_DIR}/cslang/bin/cslang run --f ${CLI_DIR}/cslang/content/io/cloudslang/base/print/print_text.sl --i text=hi
+bash ${CLI_DIR}/cslang-cli/bin/cslang run --f ${CLI_DIR}/cslang-cli/content/io/cloudslang/base/print/print_text.sl --i text=hi
 
 RELEASES_URL="https://api.github.com/repos/${REPO}/releases"
 

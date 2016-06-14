@@ -14,7 +14,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.9.59.4-SNAPSHOT</version>
+        <version>0.9.59.5-SNAPSHOT</version>
     </parent>
 
 	<dependencies>
@@ -162,7 +162,7 @@
 				<configuration>
 					<repositoryLayout>flat</repositoryLayout>
 					<repositoryName>lib</repositoryName>
-                    <assembleDirectory>target/cslang</assembleDirectory>
+                    <assembleDirectory>target/cslang-cli</assembleDirectory>
 					<useWildcardClassPath>true</useWildcardClassPath>
 					<programs>
 						<program>
@@ -192,7 +192,7 @@
 									<type>zip</type>
 									<version>3.3.9</version>
 									<overWrite>false</overWrite>
-									<outputDirectory>${basedir}/target/cslang/maven</outputDirectory>
+									<outputDirectory>${basedir}/target/cslang-cli/maven</outputDirectory>
 									<destFileName>maven</destFileName>
 								</artifactItem>
 							</artifactItems>
@@ -211,7 +211,7 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/target/cslang/maven/conf</outputDirectory>
+							<outputDirectory>${basedir}/target/cslang-cli/maven/conf</outputDirectory>
 							<resources>
 								<resource>
 									<directory>src/main/resources/maven/conf</directory>
@@ -227,7 +227,7 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/target/cslang/configuration</outputDirectory>
+							<outputDirectory>${basedir}/target/cslang-cli/configuration</outputDirectory>
 							<resources>
 								<resource>
 									<directory>src/main/resources/configuration</directory>
