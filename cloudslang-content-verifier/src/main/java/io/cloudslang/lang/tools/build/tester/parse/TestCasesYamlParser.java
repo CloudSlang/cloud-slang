@@ -125,7 +125,7 @@ public class TestCasesYamlParser {
                 throw new RuntimeException(
                         "Artifact has unrecognized tag {" + modifierKey + "}" +
                                 ". Supported tags are {" + SlangTextualKeys.VALUE_KEY + "} and {" + SlangTextualKeys.SENSITIVE_KEY +"}. " +
-                                "Please take a look at the supported features per versions link");
+                                "Please take a look at the supported features per versions link.");
             }
         }
     }
