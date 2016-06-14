@@ -25,10 +25,16 @@ import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Deque;
 
 import static ch.lambdaj.Lambda.convertMap;
-import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 
 /*
  * Created by stoneo on 2/2/2015.
@@ -63,7 +69,7 @@ public class ScoreCompilerImpl implements ScoreCompiler {
             //than we match the references to the actual dependencies
             filteredDependencies = dependenciesHelper.matchReferences(executable, availableExecutables);
 
-            handleOnFailureStepCustomResults((Flow) executable, filteredDependencies);
+            handleOnFailureCustomResults(availableExecutables);
 
             List<RuntimeException> errors = validator.validateModelWithDependencies(executable, filteredDependencies);
             if (errors.size() > 0) {
@@ -87,6 +93,15 @@ public class ScoreCompilerImpl implements ScoreCompiler {
 
         executionPlan.setSubflowsUUIDs(new HashSet<>(dependencies.keySet()));
         return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemPropertiesFromExecutables(executables));
+    }
+
+    private void handleOnFailureCustomResults(List<Executable> availableExecutables) {
+        for (Executable availableExecutable : availableExecutables) {
+            if (availableExecutable.getType().equals(SlangTextualKeys.FLOW_TYPE)) {
+                Map<String, Executable> filteredDependencies = dependenciesHelper.matchReferences(availableExecutable, availableExecutables);
+                handleOnFailureStepCustomResults((Flow) availableExecutable, filteredDependencies);
+            }
+        }
     }
 
     private void handleOnFailureStepCustomResults(Flow executable, Map<String, Executable> filteredDependencies) {

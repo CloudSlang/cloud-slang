@@ -11,20 +11,18 @@ imports:
   ops: user.ops
 
 flow:
-  name: on_failure_contains_step_with_custom_result
-  inputs:
-    - alla
+  name: flow_that_uses_on_failure_contains_step_with_custom_result
   workflow:
-    - print_message1:
+    - print_message1_first_level:
         do:
-          ops.test_op:
-            - alla
+          on_failure_contains_step_with_custom_result:
+            - alla: 'on_failure 1'
         navigate:
-          - SUCCESS: print_on_failure_1
-          - FAILURE: print_on_failure_1
+          - SUCCESS: print_on_failure_first_level
+          - FAILURE: print_on_failure_first_level
 
     - on_failure:
-        - print_on_failure_1:
+        - print_on_failure_first_level:
             do:
               flow_with_custom_result:
-                - alla: 'on_failure 1'
+                - alla: 'on_failure first level'
