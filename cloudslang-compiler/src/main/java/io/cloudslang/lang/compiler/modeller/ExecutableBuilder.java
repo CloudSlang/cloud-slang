@@ -280,7 +280,7 @@ public class ExecutableBuilder {
         while (stepsIterator.hasNext()) {
             Map<String, Map<String, Object>> stepData = stepsIterator.next();
             String stepName = stepData.keySet().iterator().next();
-            if (stepName.equals(SlangTextualKeys.ON_FAILURE_KEY)) {
+            if (stepName.equals(ON_FAILURE_KEY)) {
                 if (onFailureFound) {
                     errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\n" + MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX));
                 } else {
@@ -297,6 +297,8 @@ public class ExecutableBuilder {
                     if (onFailureData.size() > 1) {
                         errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be only one step"));
                     }
+                    handleOnFailureStepNavigationSection(onFailureData, execName, errors);
+
                     WorkflowModellingResult workflowModellingResult = compileWorkFlow(onFailureData, imports, null, true, namespace, execName);
                     errors.addAll(workflowModellingResult.getErrors());
                     onFailureWorkFlow = workflowModellingResult.getWorkflow();
@@ -305,6 +307,18 @@ public class ExecutableBuilder {
             }
         }
         return onFailureWorkFlow;
+    }
+
+    private void handleOnFailureStepNavigationSection(List<Map<String, Map<String, Object>>> onFailureData, String execName, List<RuntimeException> errors) {
+        Map.Entry<String, Map<String, Object>> onFailureStep = getFirstOnFailureStep(onFailureData);
+        if (onFailureStep.getValue().containsKey(NAVIGATION_KEY)) {
+            errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nThe step below 'on_failure' property should not contain a \"navigate\" section."));
+        }
+    }
+
+    private Map.Entry<String, Map<String, Object>> getFirstOnFailureStep(List<Map<String, Map<String, Object>>> onFailureData) {
+        Map<String, Map<String, Object>> onFailureStepMap = onFailureData.iterator().next();
+        return onFailureStepMap.entrySet().iterator().next();
     }
 
     private ActionModellingResult compileAction(Map<String, Object> actionRawData) {
@@ -401,7 +415,8 @@ public class ExecutableBuilder {
                     imports,
                     defaultFailure,
                     namespace,
-                    onFailureStepName
+                    onFailureStepName,
+                    onFailureSection
             );
 
             errors.addAll(stepModellingResult.getErrors());
@@ -427,7 +442,8 @@ public class ExecutableBuilder {
             Map<String, String> imports,
             String defaultFailure,
             String namespace,
-            String onFailureStepName) {
+            String onFailureStepName,
+            boolean onFailureSection) {
 
         List<RuntimeException> errors = new ArrayList<>();
         if (MapUtils.isEmpty(stepRawData)) {
@@ -473,7 +489,8 @@ public class ExecutableBuilder {
                 arguments,
                 navigationStrings,
                 refId,
-                preStepData.containsKey(SlangTextualKeys.PARALLEL_LOOP_KEY));
+                preStepData.containsKey(SlangTextualKeys.PARALLEL_LOOP_KEY),
+                onFailureSection);
         return new StepModellingResult(step, errors);
     }
 
