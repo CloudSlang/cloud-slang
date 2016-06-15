@@ -314,19 +314,6 @@ public class ExecutableBuilder {
         if (onFailureStep.getValue().containsKey(NAVIGATION_KEY)) {
             errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nThe step below 'on_failure' property should not contain a \"navigate\" section."));
         }
-        List<Map<String, String>> failureNavigationSection = getOnFailureNavigationSection();
-        onFailureStep.getValue().put(NAVIGATION_KEY, failureNavigationSection);
-    }
-
-    private List<Map<String, String>> getOnFailureNavigationSection() {
-        List<Map<String, String>> failureNavigationSection = new ArrayList<>();
-        Map<String, String> success = new HashMap<>();
-        success.put(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.FAILURE_RESULT);
-        Map<String, String> failure = new HashMap<>();
-        failure.put(ScoreLangConstants.FAILURE_RESULT, ScoreLangConstants.FAILURE_RESULT);
-        failureNavigationSection.add(success);
-        failureNavigationSection.add(failure);
-        return failureNavigationSection;
     }
 
     private Map.Entry<String, Map<String, Object>> getFirstOnFailureStep(List<Map<String, Map<String, Object>>> onFailureData) {
