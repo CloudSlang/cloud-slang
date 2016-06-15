@@ -73,7 +73,8 @@ public class TestCasesYamlParser {
                 }
             });
         } catch (Throwable e) {
-            throw new RuntimeException("There was a problem parsing the YAML source: " + source.getFileName() + ".\n" + e.getMessage(), e);
+            throw new RuntimeException("There was a problem parsing the YAML source: " + source.getFileName() +
+                    source.getFileExtension().getValue() + ".\n" + e.getMessage(), e);
         }
     }
 
@@ -123,7 +124,8 @@ public class TestCasesYamlParser {
             if (!knownModifierKeys.contains(modifierKey)) {
                 throw new RuntimeException(
                         "Artifact has unrecognized tag {" + modifierKey + "}" +
-                                ". Please take a look at the supported features per versions link");
+                                ". Supported tags are {" + SlangTextualKeys.VALUE_KEY + "} and {" + SlangTextualKeys.SENSITIVE_KEY +"}. " +
+                                "Please take a look at the supported features per versions link.");
             }
         }
     }
