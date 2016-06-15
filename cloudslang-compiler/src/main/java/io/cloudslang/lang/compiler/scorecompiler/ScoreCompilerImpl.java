@@ -69,7 +69,7 @@ public class ScoreCompilerImpl implements ScoreCompiler {
             //than we match the references to the actual dependencies
             filteredDependencies = dependenciesHelper.matchReferences(executable, availableExecutables);
 
-            handleOnFailureCustomResults(availableExecutables);
+            handleOnFailureCustomResults(executable, filteredDependencies);
 
             List<RuntimeException> errors = validator.validateModelWithDependencies(executable, filteredDependencies);
             if (errors.size() > 0) {
@@ -95,11 +95,11 @@ public class ScoreCompilerImpl implements ScoreCompiler {
         return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemPropertiesFromExecutables(executables));
     }
 
-    private void handleOnFailureCustomResults(List<Executable> availableExecutables) {
-        for (Executable availableExecutable : availableExecutables) {
-            if (availableExecutable.getType().equals(SlangTextualKeys.FLOW_TYPE)) {
-                Map<String, Executable> filteredDependencies = dependenciesHelper.matchReferences(availableExecutable, availableExecutables);
-                handleOnFailureStepCustomResults((Flow) availableExecutable, filteredDependencies);
+    private void handleOnFailureCustomResults(Executable executable, Map<String, Executable> filteredDependencies) {
+        handleOnFailureStepCustomResults((Flow) executable, filteredDependencies);
+        for (Executable dependency : filteredDependencies.values()) {
+            if (dependency.getType().equals(SlangTextualKeys.FLOW_TYPE)) {
+                handleOnFailureStepCustomResults((Flow) dependency, filteredDependencies);
             }
         }
     }
