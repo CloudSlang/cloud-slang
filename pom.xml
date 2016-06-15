@@ -157,61 +157,6 @@
             </dependency>
             <!--end of score dependencies-->
 
-            <!--score content dependencies-->
-            <dependency>
-                <groupId>io.cloudslang.content</groupId>
-                <artifactId>score-ssh</artifactId>
-                <version>0.0.32</version>
-            </dependency>
-            <dependency>
-                <groupId>io.cloudslang.content</groupId>
-                <artifactId>score-mail</artifactId>
-                <version>0.0.25</version>
-            </dependency>
-            <dependency>
-                <groupId>io.cloudslang.content</groupId>
-                <artifactId>score-http-client</artifactId>
-                <version>0.1.65</version>
-            </dependency>
-            <dependency>
-                <groupId>io.cloudslang.content</groupId>
-                <artifactId>score-rft</artifactId>
-                <version>0.0.2</version>
-            </dependency>
-            <dependency>
-                <groupId>io.cloudslang.content</groupId>
-                <artifactId>score-jClouds</artifactId>
-                <version>0.0.4</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-classic</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>io.cloudslang.content</groupId>
-                <artifactId>score-vmware</artifactId>
-                <version>0.0.4</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.vmware</groupId>
-                        <artifactId>vim25</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>io.cloudslang.content</groupId>
-                <artifactId>score-xml</artifactId>
-                <version>0.0.2</version>
-            </dependency>
-            <dependency>
-                <groupId>io.cloudslang.content</groupId>
-                <artifactId>cs-date-time</artifactId>
-                <version>0.0.2</version>
-            </dependency>
-            <!--end of score content dependencies-->
-
             <dependency>
                 <groupId>io.cloudslang</groupId>
                 <artifactId>runtime-management-api</artifactId>
