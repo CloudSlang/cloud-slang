@@ -42,6 +42,14 @@ public class LoadSystemPropertiesTest extends SystemsTestsParent {
     }
 
     @Test
+    public void testValidNullValue() throws Exception {
+        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/valid_null_value.prop.sl").toURI();
+        Set<SystemProperty> expectedSystemProperties = getSystemPropertiesValidNullValue();
+        Set<SystemProperty> actualSystemProperties = loadSystemProperties(SlangSource.fromFile(propertiesURI));
+        Assert.assertEquals(expectedSystemProperties, actualSystemProperties);
+    }
+
+    @Test
     public void testValidEmptyNamespace() throws Exception {
         URI propertiesURI = getClass().getResource("/yaml/properties/a/b/valid_empty_namespace.prop.sl").toURI();
         Set<SystemProperty> expectedSystemProperties = getSystemPropertiesValidEmptyNamespace();
@@ -139,6 +147,12 @@ public class LoadSystemPropertiesTest extends SystemsTestsParent {
 
     private Set<SystemProperty> getSystemPropertiesValid() {
         return getSystemPropertiesBasic("a.b");
+    }
+
+    private Set<SystemProperty> getSystemPropertiesValidNullValue() {
+        return Sets.newHashSet(
+                new SystemProperty("a.b", "host", null)
+        );
     }
 
     private Set<SystemProperty> getSystemPropertiesValidEmptyNamespace() {
