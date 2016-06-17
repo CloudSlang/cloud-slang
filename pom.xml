@@ -540,6 +540,7 @@
         <module>cloudslang-tests</module>
         <module>cloudslang-all</module>
         <module>cloudslang-content-verifier</module>
+        <module>cloudslang-action-dependencies</module>
     </modules>
 
 </project>
