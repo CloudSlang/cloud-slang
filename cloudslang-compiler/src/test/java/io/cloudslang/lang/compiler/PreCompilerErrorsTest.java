@@ -540,15 +540,19 @@ public class PreCompilerErrorsTest {
 
     @Test
     public void testFlowWithUnreachableStepReachableFromOnFailureStep() throws Exception {
-        URI resource = getClass().getResource("/corrupted/unreachable_step_reachable_from_on_failure.sl").toURI();
+        URI resource = getClass().getResource("/corrupted/on_failure_contains_navigate_section.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
-        assertTrue(result.getErrors().size() == 0);
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Flow: 'on_failure_contains_navigate_section' syntax is illegal.\n" +
+                "The step below 'on_failure' property should not contain a \"navigate\" section.");
+        throw result.getErrors().get(0);
     }
 
     @Test
-    public void testFlowWithUnreachableTasksOneReachableFromOnFailureTask() throws Exception {
-        URI resource = getClass().getResource("/corrupted/unreachable_tasks_one_reachable_from_on_failure.sl").toURI();
+    public void testFlowWithUnreachableTasksOneReachableFromUnreachableTask() throws Exception {
+        URI resource = getClass().getResource("/corrupted/unreachable_tasks_one_reachable_from_unreachable_task.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);

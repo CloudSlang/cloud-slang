@@ -11,15 +11,15 @@ imports:
   ops: user.ops
 
 flow:
-  name: unreachable_step_reachable_from_on_failure
+  name: on_failure_contains_navigate_section
   workflow:
     - print_message1:
         do:
           ops.test_op:
             - alla: 'message 1'
         navigate:
-          - SUCCESS: print_message3
-          - FAILURE: print_message3
+          - SUCCESS: print_message4
+          - FAILURE: print_message4
 
     - print_message2:
         do:
@@ -30,6 +30,14 @@ flow:
         do:
           ops.test_op:
             - alla: 'message 3'
+        navigate:
+          - SUCCESS: print_message3
+          - FAILURE: FAILURE
+
+    - print_message4:
+        do:
+          ops.test_op:
+            - alla: 'message 4'
 
     - on_failure:
         - print_on_failure_1:
@@ -37,5 +45,5 @@ flow:
               ops.test_op:
                 - alla: 'on_failure 1'
             navigate:
-              - SUCCESS: print_message2
+              - SUCCESS: print_message3
               - FAILURE: FAILURE

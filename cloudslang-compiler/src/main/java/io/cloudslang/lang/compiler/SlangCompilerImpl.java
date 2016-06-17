@@ -199,7 +199,7 @@ public class SlangCompilerImpl implements SlangCompiler {
             Object rawValue) {
         String namespace = rawNamespace == null ? "" : rawNamespace;
         if (rawValue == null) {
-            return new SystemProperty(namespace, key, "null");
+            return new SystemProperty(namespace, key, null);
         }
         if (rawValue instanceof Map) {
             Map rawModifiers = (Map) rawValue;

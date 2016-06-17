@@ -11,7 +11,7 @@ imports:
   ops: user.ops
 
 flow:
-  name: unreachable_tasks_one_reachable_from_on_failure
+  name: unreachable_tasks_one_reachable_from_unreachable_task
   workflow:
     - print_message1:
         do:
@@ -30,6 +30,9 @@ flow:
         do:
           ops.test_op:
             - alla: 'message 3'
+        navigate:
+          - SUCCESS: print_message3
+          - FAILURE: FAILURE
 
     - print_message4:
         do:
@@ -41,6 +44,3 @@ flow:
             do:
               ops.test_op:
                 - alla: 'on_failure 1'
-            navigate:
-              - SUCCESS: print_message3
-              - FAILURE: FAILURE

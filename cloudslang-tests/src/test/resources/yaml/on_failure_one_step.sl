@@ -57,7 +57,4 @@ flow:
                 - subject: 'Flow failure'
                 - body: >
                     ${ 'Wrong number: ' + str(userNumber) }
-            navigate:
-              - SUCCESS: FAILURE # end flow with failure result
-              - FAILURE: FAILURE
 
