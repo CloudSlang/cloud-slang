@@ -62,6 +62,7 @@ public class JavaActionTransformerTest {
         initialJavaActionInvalidKey = loadJavaActionData("/corrupted/java_action_invalid_key.sl");
 
         expectedJavaActionSimple = new HashMap<>();
+        expectedJavaActionSimple.put(ScoreLangConstants.JAVA_ACTION_GAV_KEY, "some.group:some.artifact:some.version");
         expectedJavaActionSimple.put(ScoreLangConstants.JAVA_ACTION_CLASS_KEY, "com.hp.thing");
         expectedJavaActionSimple.put(ScoreLangConstants.JAVA_ACTION_METHOD_KEY, "someMethod");
         expectedJavaActionWithDependencies = new HashMap<>(expectedJavaActionSimple);

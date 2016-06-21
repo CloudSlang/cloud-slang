@@ -13,7 +13,6 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
-import org.junit.Assume;
 import org.junit.Test;
 
 import java.net.URI;
@@ -28,7 +27,6 @@ import static org.junit.Assert.assertEquals;
 public class FlowWithPythonVersioningTest extends SystemsTestsParent {
     @Test
     public void testFlowWithOperationIfDifferentVersions() throws Exception {
-        Assume.assumeTrue(shouldRunMaven);
         URI flow = getClass().getResource("/yaml/versioning/py_flow.yaml").toURI();
         URI operation_sum3 = getClass().getResource("/yaml/versioning/py_dependency_sum3_op.sl").toURI();
         URI operation_sum5 = getClass().getResource("/yaml/versioning/py_dependency_sum5_op.sl").toURI();
@@ -61,25 +59,21 @@ public class FlowWithPythonVersioningTest extends SystemsTestsParent {
 
     @Test
     public void testOperationSum3() throws Exception {
-        Assume.assumeTrue(shouldRunMaven);
         testOperation("/yaml/versioning/py_dependency_sum3_op.sl", "version_sum3", "build(13):version(3)");
     }
 
     @Test
     public void testOperationSum5() throws Exception {
-        Assume.assumeTrue(shouldRunMaven);
         testOperation("/yaml/versioning/py_dependency_sum5_op.sl", "version_sum5", "build(13):version(5)");
     }
 
     @Test
     public void testOperationMul3() throws Exception {
-        Assume.assumeTrue(shouldRunMaven);
         testOperation("/yaml/versioning/py_dependency_mul3_op.sl", "version_mul3", "build(42):version(3)");
     }
 
     @Test
     public void testOperationMul5() throws Exception {
-        Assume.assumeTrue(shouldRunMaven);
         testOperation("/yaml/versioning/py_dependency_mul5_op.sl", "version_mul5", "build(42):version(5)");
     }
 

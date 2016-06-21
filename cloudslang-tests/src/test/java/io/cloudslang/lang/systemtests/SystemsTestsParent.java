@@ -47,8 +47,6 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:/META-INF/spring/systemTestContext.xml")
 public abstract class SystemsTestsParent {
-    protected static boolean shouldRunMaven;
-
     protected static final String EXEC_START_PATH = "0";
     protected static final String FIRST_STEP_PATH = "0.0";
     protected static final String SECOND_STEP_KEY = "0.1";
@@ -78,9 +76,6 @@ public abstract class SystemsTestsParent {
 
         System.setProperty(MavenConfigImpl.MAVEN_REPO_LOCAL, mavenRepo.getAbsolutePath());
         System.setProperty("maven.home", classLoader.getResource("maven").getPath());
-
-        shouldRunMaven = System.getProperties().containsKey(MavenConfigImpl.MAVEN_REMOTE_URL) &&
-                System.getProperties().containsKey(MavenConfigImpl.MAVEN_PLUGINS_URL);
 
         System.setProperty(MavenConfigImpl.MAVEN_SETTINGS_PATH, settingsXmlPath);
         System.setProperty(MavenConfigImpl.MAVEN_M2_CONF_PATH, classLoader.getResource("m2.conf").getPath());

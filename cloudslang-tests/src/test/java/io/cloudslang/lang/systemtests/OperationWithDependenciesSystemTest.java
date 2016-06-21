@@ -9,7 +9,6 @@ import io.cloudslang.score.api.ExecutionStep;
 import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Test;
 
-import java.io.Serializable;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,18 +18,10 @@ import java.util.Map;
 import static org.junit.Assert.*;
 
 public class OperationWithDependenciesSystemTest extends SystemsTestsParent {
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testCompileJavaActionWithoutDependencies() throws Exception {
         URL resource = getClass().getResource("/yaml/action_wo_dependencies_java_test.sl");
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), null);
-
-        ExecutionStep step = compilationArtifact.getExecutionPlan().getStep(2L);
-        assertNull(step.getActionData().get(ScoreLangConstants.JAVA_ACTION_GAV_KEY));
-
-        //Trigger ExecutionPlan
-        Map<String, Value> userInputs = new HashMap<>();
-        ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
-        assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
+        slang.compile(SlangSource.fromFile(resource.toURI()), null);
     }
     @Test
     public void testCompileJavaActionWithDependencies() throws Exception {
