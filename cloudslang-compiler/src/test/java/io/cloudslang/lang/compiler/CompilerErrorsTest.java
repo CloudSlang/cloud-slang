@@ -51,6 +51,38 @@ public class CompilerErrorsTest {
     }
 
     @Test
+    public void testNavigateOnSameLevelAsSteps() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_navigate_same_level_as_step.sl").toURI();
+        URI operation = getClass().getResource("/test_op.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("There was a problem parsing the YAML source: flow_navigate_same_level_as_step.\n" +
+                "while parsing a block collection\n" +
+                " in 'string', line 14, column 4:\n" +
+                "       - Step1:\n" +
+                "       ^\n" +
+                "expected <block end>, but found Key\n" +
+                " in 'string', line 18, column 4:\n" +
+                "       navigate:");
+        compiler.compile(SlangSource.fromFile(resource), path);
+    }
+
+    @Test
+     public void testNavigateToNonExistingStep() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_navigate_to_non_existing_step.sl").toURI();
+        URI operation = getClass().getResource("/test_op.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Failed to compile step: Step1. The step/result name: non_existing_step of navigation: " +
+                "SUCCESS -> non_existing_step is missing");
+        compiler.compile(SlangSource.fromFile(resource), path);
+    }
+
+    @Test
     public void testNotYamlFile() throws Exception {
         URI resource = getClass().getResource("/corrupted/not_yaml_file.sl").toURI();
 

@@ -21,6 +21,7 @@ import io.cloudslang.lang.compiler.modeller.result.StepModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.WorkflowModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
@@ -81,6 +82,9 @@ public class ExecutableBuilder {
     @Autowired
     private DependenciesHelper dependenciesHelper;
 
+    @Autowired
+    private PreCompileValidator preCompileValidator;
+
     private List<Transformer> preExecTransformers;
     private List<Transformer> postExecTransformers;
     private List<String> execAdditionalKeywords = Arrays.asList(
@@ -125,22 +129,21 @@ public class ExecutableBuilder {
         return filter(having(on(Transformer.class).getScopes().contains(scope)), transformers);
     }
 
-    public ExecutableModellingResult transformToExecutable(ParsedSlang parsedSlang, String execName, Map<String, Object> executableRawData) {
-
-        execName = execName == null ? "" : execName;
+    public ExecutableModellingResult transformToExecutable(ParsedSlang parsedSlang, Map<String, Object> executableRawData) {
         List<RuntimeException> errors = new ArrayList<>();
-        validate(executableRawData, errors, parsedSlang, execName);
+        String execName = preCompileValidator.validateExecutableRawData(parsedSlang, executableRawData, errors);
 
-        Map<String, Serializable> preExecutableActionData = new HashMap<>();
-        Map<String, Serializable> postExecutableActionData = new HashMap<>();
-
-        errors.addAll(transformersHandler.checkKeyWords(
+        errors.addAll(preCompileValidator.checkKeyWords(
                         execName,
+                        "",
                         executableRawData,
                         ListUtils.union(preExecTransformers, postExecTransformers),
                         execAdditionalKeywords,
                         actionKeyConstraintGroups)
         );
+
+        Map<String, Serializable> preExecutableActionData = new HashMap<>();
+        Map<String, Serializable> postExecutableActionData = new HashMap<>();
 
         String errorMessagePrefix = "For " + parsedSlang.getType().toString().toLowerCase() + " '" + execName + "' syntax is illegal.\n";
         preExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, preExecTransformers, errors, errorMessagePrefix));
@@ -160,7 +163,7 @@ public class ExecutableBuilder {
 
                 Workflow onFailureWorkFlow = getOnFailureWorkflow(workFlowRawData, imports, errors, namespace, execName);
 
-                WorkflowModellingResult workflowModellingResult = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false, namespace, execName);
+                WorkflowModellingResult workflowModellingResult = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false, namespace);
                 errors.addAll(workflowModellingResult.getErrors());
                 Workflow workflow = workflowModellingResult.getWorkflow();
 
@@ -184,7 +187,8 @@ public class ExecutableBuilder {
                         executableDependencies,
                         systemPropertyDependencies
                 );
-                return new ExecutableModellingResult(flow, errors);
+                return preCompileValidator.validateResult(parsedSlang, executableRawData,
+                        new ExecutableModellingResult(flow, errors));
 
             case OPERATION:
                 Map<String, Object> actionRawData = getActionRawData(executableRawData, errors, parsedSlang, execName);
@@ -209,25 +213,11 @@ public class ExecutableBuilder {
                         executableDependencies,
                         systemPropertyDependencies
                 );
-                return new ExecutableModellingResult(operation, errors);
+
+                return preCompileValidator.validateResult(parsedSlang, executableRawData,
+                        new ExecutableModellingResult(operation, errors));
             default:
                 throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". It is not of flow or operations type");
-        }
-    }
-
-    private void validate(Map<String, Object> executableRawData, List<RuntimeException> errors, ParsedSlang parsedSlang, String execName) {
-        if (executableRawData == null) {
-            throw new IllegalArgumentException("Error compiling " + parsedSlang.getName() + ". Executable data is null");
-        }
-        if (parsedSlang == null) {
-            throw new IllegalArgumentException("Slang source for: \'" + execName + "\' is null");
-        }
-
-        if (StringUtils.isBlank(execName)) {
-            errors.add(new RuntimeException("Executable in source: " + parsedSlang.getName() + " has no name"));
-        }
-        if (executableRawData.size() == 0) {
-            errors.add(new IllegalArgumentException("Error compiling " + parsedSlang.getName() + ". Executable data for: \'" + execName + "\' is empty"));
         }
     }
 
@@ -299,7 +289,7 @@ public class ExecutableBuilder {
                     }
                     handleOnFailureStepNavigationSection(onFailureData, execName, errors);
 
-                    WorkflowModellingResult workflowModellingResult = compileWorkFlow(onFailureData, imports, null, true, namespace, execName);
+                    WorkflowModellingResult workflowModellingResult = compileWorkFlow(onFailureData, imports, null, true, namespace);
                     errors.addAll(workflowModellingResult.getErrors());
                     onFailureWorkFlow = workflowModellingResult.getWorkflow();
                 }
@@ -324,7 +314,7 @@ public class ExecutableBuilder {
     private ActionModellingResult compileAction(Map<String, Object> actionRawData) {
         Map<String, Serializable> actionData = new HashMap<>();
 
-        List<RuntimeException> errors = transformersHandler.checkKeyWords("action data", actionRawData, actionTransformers, null, null);
+        List<RuntimeException> errors = preCompileValidator.checkKeyWords("action data", "", actionRawData, actionTransformers, null, null);
 
         String errorMessagePrefix = "Action syntax is illegal.\n";
         actionData.putAll(transformersHandler.runTransformers(actionRawData, actionTransformers, errors, errorMessagePrefix));
@@ -337,13 +327,9 @@ public class ExecutableBuilder {
                                                     Map<String, String> imports,
                                                     Workflow onFailureWorkFlow,
                                                     boolean onFailureSection,
-                                                    String namespace,
-                                                    String execName) {
+                                                    String namespace) {
 
         List<RuntimeException> errors = new ArrayList<>();
-        if (workFlowRawData.isEmpty()) {
-            errors.add(new IllegalArgumentException("For flow '" + execName + "' syntax is illegal. Flow must have steps in its workflow."));
-        }
 
         Deque<Step> steps = new LinkedList<>();
         Set<String> stepNames = new HashSet<>();
@@ -381,7 +367,7 @@ public class ExecutableBuilder {
                         @SuppressWarnings("unchecked") Map<String, Object> parallelLoopRawData = (Map<String, Object>) stepRawDataValue.remove(PARALLEL_LOOP_KEY);
 
                         errors.addAll(
-                                transformersHandler.checkKeyWords(
+                                preCompileValidator.checkKeyWords(
                                         stepName,
                                         SlangTextualKeys.PARALLEL_LOOP_KEY,
                                         parallelLoopRawData,
@@ -454,7 +440,7 @@ public class ExecutableBuilder {
         Map<String, Serializable> preStepData = new HashMap<>();
         Map<String, Serializable> postStepData = new HashMap<>();
 
-        errors.addAll(transformersHandler.checkKeyWords(stepName, stepRawData, ListUtils.union(preStepTransformers, postStepTransformers), stepAdditionalKeyWords, null));
+        errors.addAll(preCompileValidator.checkKeyWords(stepName, "", stepRawData, ListUtils.union(preStepTransformers, postStepTransformers), stepAdditionalKeyWords, null));
 
         String errorMessagePrefix = "For step '" + stepName + "' syntax is illegal.\n";
         preStepData.putAll(transformersHandler.runTransformers(stepRawData, preStepTransformers, errors, errorMessagePrefix));

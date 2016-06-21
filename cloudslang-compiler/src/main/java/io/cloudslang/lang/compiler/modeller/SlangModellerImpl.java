@@ -8,8 +8,6 @@
  */
 package io.cloudslang.lang.compiler.modeller;
 
-import io.cloudslang.lang.compiler.SlangTextualKeys;
-import io.cloudslang.lang.compiler.Validator;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import org.apache.commons.lang.Validate;
@@ -27,9 +25,6 @@ public class SlangModellerImpl implements SlangModeller{
 
     @Autowired
     private ExecutableBuilder executableBuilder;
-
-    @Autowired
-    private Validator validator;
 
     @Override
     public ExecutableModellingResult createModel(ParsedSlang parsedSlang) {
@@ -57,10 +52,6 @@ public class SlangModellerImpl implements SlangModeller{
      * @return {@link ExecutableModellingResult} representing the operation or flow in the source
      */
     private ExecutableModellingResult transformToExecutable(ParsedSlang parsedSlang, Map<String, Object> rawData) {
-        String executableName = (String) rawData.get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
-        ExecutableModellingResult result = executableBuilder.transformToExecutable(parsedSlang, executableName, rawData);
-        validator.validateInputNamesDifferentFromOutputNames(result);
-        validator.validateFileName(executableName, parsedSlang, result);
-        return result;
+        return executableBuilder.transformToExecutable(parsedSlang, rawData);
     }
 }
