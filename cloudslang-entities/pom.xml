@@ -23,6 +23,12 @@
 			<artifactId>score-api</artifactId>
 		</dependency>
 
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cloudslang-spi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
