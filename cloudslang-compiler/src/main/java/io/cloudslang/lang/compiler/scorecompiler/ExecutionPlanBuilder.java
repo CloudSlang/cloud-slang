@@ -133,9 +133,6 @@ public class ExecutionPlanBuilder {
             String nextStepName = entry.getValue();
             if (stepReferences.get(nextStepName) == null) {
                 Step nextStepToCompile = Lambda.selectFirst(steps, having(on(Step.class).getName(), equalTo(nextStepName)));
-                if (nextStepToCompile == null) {
-                    throw new RuntimeException("Failed to compile step: " + stepName + ". The step/result name: " + entry.getValue() + " of navigation: " + entry.getKey() + " -> " + entry.getValue() + " is missing");
-                }
                 stepExecutionSteps.addAll(buildStepExecutionSteps(nextStepToCompile, stepReferences, steps, compiledFlow));
             }
             long nextStepId = stepReferences.get(nextStepName);

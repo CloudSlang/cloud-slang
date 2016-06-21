@@ -10,15 +10,11 @@ package io.cloudslang.lang.cli.utils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.SystemProperty;
-import java.io.File;
-
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
-import io.cloudslang.lang.entities.encryption.Encryption;
 import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,10 +24,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
