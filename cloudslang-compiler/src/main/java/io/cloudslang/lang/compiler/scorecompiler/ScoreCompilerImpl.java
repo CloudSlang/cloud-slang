@@ -10,7 +10,7 @@ package io.cloudslang.lang.compiler.scorecompiler;
 
 import ch.lambdaj.function.convert.Converter;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
-import io.cloudslang.lang.compiler.Validator;
+import io.cloudslang.lang.compiler.validator.CompileValidator;
 import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
@@ -49,7 +49,7 @@ public class ScoreCompilerImpl implements ScoreCompiler {
     private DependenciesHelper dependenciesHelper;
 
     @Autowired
-    private Validator validator;
+    private CompileValidator compileValidator;
 
     @Override
     public CompilationArtifact compile(Executable executable, Set<Executable> path) {
@@ -71,7 +71,7 @@ public class ScoreCompilerImpl implements ScoreCompiler {
 
             handleOnFailureCustomResults(executable, filteredDependencies);
 
-            List<RuntimeException> errors = validator.validateModelWithDependencies(executable, filteredDependencies);
+            List<RuntimeException> errors = compileValidator.validateModelWithDependencies(executable, filteredDependencies);
             if (errors.size() > 0) {
                 throw errors.get(0);
             }
@@ -132,7 +132,7 @@ public class ScoreCompilerImpl implements ScoreCompiler {
         for (Executable dependency : directDependenciesModels) {
             dependenciesMap.put(dependency.getId(), dependency);
         }
-        return validator.validateModelWithDirectDependencies(slangModel, dependenciesMap);
+        return compileValidator.validateModelWithDirectDependencies(slangModel, dependenciesMap);
     }
 
     /**

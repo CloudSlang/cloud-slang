@@ -21,11 +21,6 @@ flow:
           - SUCCESS: print_message4
           - FAILURE: print_message4
 
-    - print_message2:
-        do:
-          ops.test_op:
-            - alla: 'message 2'
-
     - print_message3:
         do:
           ops.test_op:

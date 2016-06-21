@@ -10,7 +10,7 @@
 namespace: io.cloudslang.base.json
 
 operation:
-  name: get_value
+  name: same_input_and_output_name
   inputs:
     - json_input
     - json_path
