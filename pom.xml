@@ -588,6 +588,7 @@
     </profiles>
 
     <modules>
+        <module>cloudslang-spi</module>
         <module>cloudslang-runtime</module>
         <module>cloudslang-compiler</module>
         <module>cloudslang-entities</module>

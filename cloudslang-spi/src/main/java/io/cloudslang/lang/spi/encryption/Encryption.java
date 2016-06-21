@@ -7,26 +7,28 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-package io.cloudslang.lang.entities.encryption;
-
-import io.cloudslang.lang.spi.encryption.Encryption;
-import org.springframework.stereotype.Component;
+package io.cloudslang.lang.spi.encryption;
 
 /**
- * Dummy encryptor
+ * Encryption support
  *
  * Created by Ifat Gavish on 29/05/2016
  */
-@Component
-public class DummyEncryptor implements Encryption {
+public interface Encryption {
 
-    @Override
-    public String encrypt(char[] clearText) {
-        return new String(clearText);
-    }
+    /**
+     * Encrypts a clear text char array
+     *
+     * @param clearText The char array
+     * @return The encrypted string
+     */
+    String encrypt(char[] clearText);
 
-    @Override
-    public char[] decrypt(String cypherText) {
-        return cypherText.toCharArray();
-    }
+    /**
+     * Decrypts an encrypted string to a clear text char array
+     *
+     * @param cypherText The encrypted string
+     * @return The clear text char array
+     */
+    char[] decrypt(String cypherText);
 }
