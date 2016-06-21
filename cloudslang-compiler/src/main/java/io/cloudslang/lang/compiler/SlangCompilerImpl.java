@@ -87,11 +87,7 @@ public class SlangCompilerImpl implements SlangCompiler {
         ParsedSlang parsedSlang = yamlParser.parse(source);
 
         // Then we transform the parsed Slang source to a Slang model
-        ExecutableModellingResult result = slangModeller.createModel(parsedSlang);
-        if (result.getExecutable().getNamespace() == null || result.getExecutable().getNamespace().length() == 0) {
-            result.getErrors().add(new IllegalArgumentException("Operation/Flow " + result.getExecutable().getName() + " must have a namespace"));
-        }
-        return result;
+        return slangModeller.createModel(parsedSlang);
     }
 
     @Override

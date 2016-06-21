@@ -1,17 +1,14 @@
-package io.cloudslang.lang.compiler;
+package io.cloudslang.lang.compiler.validator;
 
+import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Step;
-import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
-import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.entities.bindings.Argument;
-import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -28,41 +25,7 @@ import java.util.Set;
  * Date: 5/12/2016
  */
 @Component
-public class ValidatorImpl implements Validator {
-
-    public static final String NAME_PLACEHOLDER = "name_placeholder01";
-
-    @Override
-    public void validateFileName(String executableName, ParsedSlang parsedSlang, ExecutableModellingResult result) {
-        String fileName = parsedSlang.getName();
-        Extension fileExtension = parsedSlang.getFileExtension();
-        if (StringUtils.isNotEmpty(executableName) && !executableName.equals(fileName)) {
-            if (fileExtension == null) {
-                result.getErrors().add(new IllegalArgumentException("Operation/Flow " + executableName +
-                        " is declared in a file named \"" + fileName + "\"," +
-                        " it should be declared in a file named \"" + executableName + "\" plus a valid " +
-                        "extension(" + Extension.getExtensionValuesAsString() + ") separated by \".\""));
-            } else {
-                result.getErrors().add(new IllegalArgumentException("Operation/Flow " + executableName +
-                        " is declared in a file named \"" + fileName + "." + fileExtension.getValue() + "\"" +
-                        ", it should be declared in a file named \"" + executableName + "." + fileExtension.getValue() + "\""));
-            }
-        }
-    }
-
-    @Override
-    public void validateInputNamesDifferentFromOutputNames(ExecutableModellingResult result) {
-        List<Input> inputs = result.getExecutable().getInputs();
-        List<Output> outputs = result.getExecutable().getOutputs();
-        String errorMessage = "Inputs and outputs names should be different for \"" +
-                result.getExecutable().getId() + "\". " +
-                "Please rename input/output \"" + NAME_PLACEHOLDER + "\"";
-        try {
-            validateListsHaveMutuallyExclusiveNames(inputs, outputs, errorMessage);
-        } catch (RuntimeException e) {
-            result.getErrors().add(e);
-        }
-    }
+public class CompileValidatorImpl extends AbstractValidator implements CompileValidator {
 
     @Override
     public List<RuntimeException> validateModelWithDependencies(
@@ -169,16 +132,6 @@ public class ValidatorImpl implements Validator {
             errors.add(e);
         }
         return errors;
-    }
-
-    private void validateListsHaveMutuallyExclusiveNames(List<? extends InOutParam> inOutParams, List<Output> outputs, String errorMessage) {
-        for (InOutParam inOutParam : CollectionUtils.emptyIfNull(inOutParams)) {
-            for (Output output : CollectionUtils.emptyIfNull(outputs)) {
-                if (StringUtils.equalsIgnoreCase(inOutParam.getName(), output.getName())) {
-                    throw new IllegalArgumentException(errorMessage.replace(NAME_PLACEHOLDER, inOutParam.getName()));
-                }
-            }
-        }
     }
 
     private List<String> getMandatoryInputNames(Executable executable) {

@@ -1,6 +1,7 @@
 package io.cloudslang.lang.entities.encryption;
 
 import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
+import io.cloudslang.lang.spi.encryption.Encryption;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,7 +40,7 @@ public class EncryptorConfigTest {
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    public void testEncrytionWithEncryptorImplementation() {
+    public void testEncryptionWithEncryptorImplementation() {
         String text = "Str1";
         Encryption encryptor = EncryptionProvider.get();
         assertFalse(encryptor instanceof DummyEncryptor);
@@ -49,7 +50,7 @@ public class EncryptorConfigTest {
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    public void testEncrytionWithoutEncryptorImplementation() {
+    public void testEncryptionWithoutEncryptorImplementation() {
         String text = "Str1";
         ((BeanDefinitionRegistry) ApplicationContextProvider.getApplicationContext().
                 getAutowireCapableBeanFactory()).removeBeanDefinition("getEncryption");
