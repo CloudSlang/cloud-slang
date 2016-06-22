@@ -17,7 +17,6 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -33,9 +32,11 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
     public List<Result> transform(List rawData) {
         List<Result> results = new ArrayList<>();
         // If there are no results specified, add the default SUCCESS & FAILURE results
-        if(CollectionUtils.isEmpty(rawData)){
+        if(rawData == null){
             results.add(createNoExpressionResult(ScoreLangConstants.SUCCESS_RESULT));
             results.add(createNoExpressionResult(ScoreLangConstants.FAILURE_RESULT));
+            return results;
+        } else if (rawData.isEmpty()) {
             return results;
         }
         for (Object rawResult : rawData) {
