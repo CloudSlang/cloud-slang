@@ -72,8 +72,8 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         if (CollectionUtils.isEmpty(workFlowRawData)) {
             errors.add(new RuntimeException("Error compiling source '" + parsedSlang.getName() + "'. Flow: '" + executableName + "' has no workflow data"));
         }
-        for (Map<String, Map<String, Object>> stringMapMap : workFlowRawData) {
-            if (stringMapMap.size() > 1) {
+        for (Map<String, Map<String, Object>> step : workFlowRawData) {
+            if (step.size() > 1) {
                 errors.add(new RuntimeException("Error compiling source '" + parsedSlang.getName() + "'. Flow: '" + executableName +
                         "' has steps with keyword on the same indentation as the step name."));
             }
