@@ -10,7 +10,7 @@
     -->
     <groupId>io.cloudslang.lang</groupId>
     <artifactId>cloudslang</artifactId>
-    <version>0.9.59.5-SNAPSHOT</version>
+    <version>0.9.59.7-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A DSL for writing flows</description>
@@ -588,6 +588,7 @@
     </profiles>
 
     <modules>
+        <module>cloudslang-spi</module>
         <module>cloudslang-runtime</module>
         <module>cloudslang-compiler</module>
         <module>cloudslang-entities</module>
