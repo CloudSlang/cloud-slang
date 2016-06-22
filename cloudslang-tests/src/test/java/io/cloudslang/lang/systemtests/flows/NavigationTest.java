@@ -134,11 +134,23 @@ public class NavigationTest extends SystemsTestsParent {
         Assert.assertEquals(true, ((ArrayList)compilationArtifact
                 .getExecutionPlan().getSteps().get(3L).getActionData().get("executableResults")).isEmpty());
         Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("input1", ValueFactory.create("value1", false));
 
         expectedEx.expect(RuntimeException.class);
         expectedEx.expectMessage("Error running: 'operation_results_empty_list'.\n" +
                 "\tNo results were found");
-        triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
+        triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
+    }
+
+    @Test
+    public void testFlowNavigationResultsEmptyList() throws Exception {
+        URI resource = getClass().getResource("/yaml/flow_results_empty_list.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet();
+
+        expectedEx.expect(RuntimeException.class);
+        expectedEx.expectMessage("Failed to compile step: print1. The step/result name: SUCCESS of navigation: SUCCESS -> SUCCESS is missing");
+        slang.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test

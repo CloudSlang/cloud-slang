@@ -6,11 +6,11 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 
 namespace: io.cloudslang
-
-operation:
-  name: operation_results_empty_list
-  inputs:
-    - input1
-  python_action:
-    script: 'print "hello world"'
+flow:
+  name: flow_results_empty_list
+  workflow:
+    - print1:
+        do:
+          operation_results_empty_list:
+            - input1: "input_value"
   results: []
