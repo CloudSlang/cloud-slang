@@ -15,6 +15,9 @@ public interface PreCompileValidator {
 
     String validateExecutableRawData(ParsedSlang parsedSlang, Map<String, Object> executableRawData, List<RuntimeException> errors);
 
+    List<Map<String, Map<String, Object>>> validateWorkflowRawData(ParsedSlang parsedSlang, Map<String, Object> executableRawData,
+                                                                   List<RuntimeException> errors);
+
     ExecutableModellingResult validateResult(ParsedSlang parsedSlang, Map<String, Object> executableRawData, ExecutableModellingResult result);
 
     List<RuntimeException> checkKeyWords(
