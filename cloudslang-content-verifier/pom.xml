@@ -49,28 +49,6 @@
             <version>1.35</version>
         </dependency>
 
-        <!-- content dep -->
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-ssh</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-mail</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-http-client</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-rft</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
         <!-- test -->
         <dependency>
             <groupId>org.mockito</groupId>
@@ -86,28 +64,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-jClouds</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-vmware</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-xml</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>cs-date-time</artifactId>
-            <scope>runtime</scope>
         </dependency>
 
     </dependencies>
@@ -201,6 +157,25 @@
                                 </resource>
                             </resources>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <target>
+                                <unzip src="${basedir}/../cloudslang-cli/src/main/resources/dependency-base.zip"
+                                       dest="${basedir}/target/cslang-builder/maven/repo" />
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

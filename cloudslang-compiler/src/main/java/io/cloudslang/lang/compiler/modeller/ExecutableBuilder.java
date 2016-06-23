@@ -160,7 +160,8 @@ public class ExecutableBuilder {
             case FLOW:
                 Map<String, String> imports = parsedSlang.getImports();
 
-                List<Map<String, Map<String, Object>>> workFlowRawData = getWorkflowRawData(executableRawData, errors, parsedSlang, execName);
+                List<Map<String, Map<String, Object>>> workFlowRawData = preCompileValidator.validateWorkflowRawData(parsedSlang,
+                        executableRawData, errors);
 
                 Workflow onFailureWorkFlow = getOnFailureWorkflow(workFlowRawData, imports, errors, namespace, execName);
 
@@ -297,7 +298,7 @@ public class ExecutableBuilder {
                     errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nThere is no space between step name and the hyphen below 'on_failure' property" +
                             " or there is no step below the 'on_failure' property."));
                 }
-                    stepsIterator.remove();
+                stepsIterator.remove();
             }
         }
         return onFailureWorkFlow;

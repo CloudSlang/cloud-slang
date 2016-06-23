@@ -62,50 +62,6 @@
 			<scope>runtime</scope>
 		</dependency>
 
-
-        <!-- content dep -->
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-ssh</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-mail</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-http-client</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-rft</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-		<dependency>
-			<groupId>io.cloudslang.content</groupId>
-			<artifactId>score-jClouds</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>io.cloudslang.content</groupId>
-			<artifactId>score-vmware</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.cloudslang.content</groupId>
-			<artifactId>score-xml</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.cloudslang.content</groupId>
-			<artifactId>cs-date-time</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-
 		<!-- test -->
 		<dependency>
 			<groupId>org.mockito</groupId>
@@ -235,6 +191,24 @@
 								</resource>
 							</resources>
 						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<phase>generate-resources</phase>
+						<configuration>
+							<target>
+								<unzip src="${basedir}/src/main/resources/dependency-base.zip" dest="${basedir}/target/cslang-cli/maven/repo" />
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>
