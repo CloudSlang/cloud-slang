@@ -242,27 +242,6 @@ public class ExecutableBuilder {
         return actionRawData;
     }
 
-    private List<Map<String, Map<String, Object>>> getWorkflowRawData(Map<String, Object> executableRawData, List<RuntimeException> errors,
-                                                                      ParsedSlang parsedSlang, String execName) {
-        Object rawData = executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
-        if (rawData == null) {
-            rawData = new ArrayList<>();
-            errors.add(new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + execName + " has no workflow property"));
-        }
-        List<Map<String, Map<String, Object>>> workFlowRawData;
-        try {
-            //noinspection unchecked
-            workFlowRawData = (List<Map<String, Map<String, Object>>>) rawData;
-        } catch (ClassCastException ex) {
-            workFlowRawData = new ArrayList<>();
-            errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'workflow' property there should be a list of steps and not a map"));
-        }
-        if (CollectionUtils.isEmpty(workFlowRawData)) {
-            errors.add(new RuntimeException("Error compiling source '" + parsedSlang.getName() + "'. Flow: '" + execName + "' has no workflow data"));
-        }
-        return workFlowRawData;
-    }
-
     private Workflow getOnFailureWorkflow(List<Map<String, Map<String, Object>>> workFlowRawData, Map<String, String> imports, List<RuntimeException> errors,
                                           String namespace, String execName) {
         Workflow onFailureWorkFlow = null;
@@ -295,8 +274,7 @@ public class ExecutableBuilder {
                     errors.addAll(workflowModellingResult.getErrors());
                     onFailureWorkFlow = workflowModellingResult.getWorkflow();
                 } else if (onFailureData == null) {
-                    errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nThere is no space between step name and the hyphen below 'on_failure' property" +
-                            " or there is no step below the 'on_failure' property."));
+                    errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nThere is no step below the 'on_failure' property."));
                 }
                 stepsIterator.remove();
             }

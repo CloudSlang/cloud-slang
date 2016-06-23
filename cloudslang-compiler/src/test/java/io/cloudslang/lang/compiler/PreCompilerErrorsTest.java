@@ -490,9 +490,21 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Flow: 'flow_on_failure_skipped' syntax is illegal.\n" +
-                "There is no space between step name and the hyphen below 'on_failure' property " +
-                "or there is no step below the 'on_failure' property.");
+        exception.expectMessage("Error compiling source 'flow_on_failure_skipped'.\n" +
+                "Flow: 'flow_on_failure_skipped' has steps with keyword on the same indentation as the step name or " +
+                "there is no space between step name and hyphen.");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testFlowOnFailureMissingStep() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_on_failure_missing_step.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Flow: 'flow_on_failure_missing_step' syntax is illegal.\n" +
+                "There is no step below the 'on_failure' property.");
         throw result.getErrors().get(0);
     }
 

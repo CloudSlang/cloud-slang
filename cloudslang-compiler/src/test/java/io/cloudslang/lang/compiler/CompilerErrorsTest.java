@@ -58,8 +58,9 @@ public class CompilerErrorsTest {
         path.add(SlangSource.fromFile(operation));
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error compiling source 'flow_navigate_same_level_as_step'. Flow: " +
-                "'flow_navigate_same_level_as_step' has steps with keyword on the same indentation as the step name.");
+        exception.expectMessage("Error compiling source 'flow_navigate_same_level_as_step'.\n" +
+                "Flow: 'flow_navigate_same_level_as_step' has steps with keyword on the same indentation as the step name " +
+                "or there is no space between step name and hyphen.");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
