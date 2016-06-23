@@ -484,6 +484,19 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
+    public void testFlowOnFailureSkipped() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_on_failure_skipped.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Flow: 'flow_on_failure_skipped' syntax is illegal.\n" +
+                "There is no space between step name and the hyphen below 'on_failure' property " +
+                "or there is no step below the 'on_failure' property.");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
     public void testFlowNavigateMultipleElementsForRule() throws Exception {
         URI resource = getClass().getResource("/corrupted/flow_navigate_multiple_elements_for_rule.sl").toURI();
 

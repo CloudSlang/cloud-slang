@@ -292,8 +292,11 @@ public class ExecutableBuilder {
                     WorkflowModellingResult workflowModellingResult = compileWorkFlow(onFailureData, imports, null, true, namespace);
                     errors.addAll(workflowModellingResult.getErrors());
                     onFailureWorkFlow = workflowModellingResult.getWorkflow();
+                } else if (onFailureData == null) {
+                    errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nThere is no space between step name and the hyphen below 'on_failure' property" +
+                            " or there is no step below the 'on_failure' property."));
                 }
-                stepsIterator.remove();
+                    stepsIterator.remove();
             }
         }
         return onFailureWorkFlow;
