@@ -54,6 +54,35 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     }
 
     @Override
+    public List<Map<String, Map<String, Object>>> validateWorkflowRawData(ParsedSlang parsedSlang, Map<String, Object> executableRawData, List<RuntimeException> errors) {
+        String executableName = getExecutableName(executableRawData);
+        Object rawData = executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
+        if (rawData == null) {
+            rawData = new ArrayList<>();
+            errors.add(new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + executableName + " has no workflow property"));
+        }
+        List<Map<String, Map<String, Object>>> workFlowRawData;
+        try {
+            //noinspection unchecked
+            workFlowRawData = (List<Map<String, Map<String, Object>>>) rawData;
+        } catch (ClassCastException ex) {
+            workFlowRawData = new ArrayList<>();
+            errors.add(new RuntimeException("Flow: '" + executableName + "' syntax is illegal.\nBelow 'workflow' property there should be a list of steps and not a map"));
+        }
+        if (CollectionUtils.isEmpty(workFlowRawData)) {
+            errors.add(new RuntimeException("Error compiling source '" + parsedSlang.getName() + "'. Flow: '" + executableName + "' has no workflow data"));
+        }
+        for (Map<String, Map<String, Object>> step : workFlowRawData) {
+            if (step.size() > 1) {
+                errors.add(new RuntimeException("Error compiling source '" + parsedSlang.getName() + "'. Flow: '" + executableName +
+                        "' has steps with keyword on the same indentation as the step name."));
+            }
+        }
+
+        return workFlowRawData;
+    }
+
+    @Override
     public ExecutableModellingResult validateResult(ParsedSlang parsedSlang, Map<String, Object> executableRawData, ExecutableModellingResult result) {
         String executableName = getExecutableName(executableRawData);
         validateFileName(executableName, parsedSlang, result);
