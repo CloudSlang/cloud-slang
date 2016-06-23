@@ -58,14 +58,8 @@ public class CompilerErrorsTest {
         path.add(SlangSource.fromFile(operation));
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("There was a problem parsing the YAML source: flow_navigate_same_level_as_step.\n" +
-                "while parsing a block collection\n" +
-                " in 'string', line 14, column 4:\n" +
-                "       - Step1:\n" +
-                "       ^\n" +
-                "expected <block end>, but found Key\n" +
-                " in 'string', line 18, column 4:\n" +
-                "       navigate:");
+        exception.expectMessage("Error compiling source 'flow_navigate_same_level_as_step'. Flow: " +
+                "'flow_navigate_same_level_as_step' has steps with keyword on the same indentation as the step name.");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 

@@ -159,7 +159,8 @@ public class ExecutableBuilder {
         Set<String> systemPropertyDependencies = null;
         switch (parsedSlang.getType()) {
             case FLOW:
-                List<Map<String, Map<String, Object>>> workFlowRawData = getWorkflowRawData(executableRawData, errors, parsedSlang, execName);
+                List<Map<String, Map<String, Object>>> workFlowRawData = preCompileValidator.validateWorkflowRawData(parsedSlang,
+                        executableRawData, errors);
 
                 Workflow onFailureWorkFlow = getOnFailureWorkflow(workFlowRawData, imports, errors, namespace, execName);
 
@@ -238,27 +239,6 @@ public class ExecutableBuilder {
             errors.add(new RuntimeException("Error compiling " + parsedSlang.getName() + ". Operation: " + execName + " has no action data"));
         }
         return actionRawData;
-    }
-
-    private List<Map<String, Map<String, Object>>> getWorkflowRawData(Map<String, Object> executableRawData, List<RuntimeException> errors,
-                                                                      ParsedSlang parsedSlang, String execName) {
-        Object rawData = executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
-        if (rawData == null) {
-            rawData = new ArrayList<>();
-            errors.add(new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + execName + " has no workflow property"));
-        }
-        List<Map<String, Map<String, Object>>> workFlowRawData;
-        try {
-            //noinspection unchecked
-            workFlowRawData = (List<Map<String, Map<String, Object>>>) rawData;
-        } catch (ClassCastException ex) {
-            workFlowRawData = new ArrayList<>();
-            errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'workflow' property there should be a list of steps and not a map"));
-        }
-        if (CollectionUtils.isEmpty(workFlowRawData)) {
-            errors.add(new RuntimeException("Error compiling source '" + parsedSlang.getName() + "'. Flow: '" + execName + "' has no workflow data"));
-        }
-        return workFlowRawData;
     }
 
     private Workflow getOnFailureWorkflow(List<Map<String, Map<String, Object>>> workFlowRawData, Map<String, String> imports, List<RuntimeException> errors,
