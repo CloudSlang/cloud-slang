@@ -17,15 +17,13 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.Set;
-import org.springframework.stereotype.Component;
+import java.util.*;
 
-import java.util.Map;
-import java.util.List;
+import org.springframework.stereotype.Component;
 
 @Component
 public class PythonActionTransformer extends AbstractTransformer implements Transformer<Map<String, Serializable>, Map<String, Serializable>> {
+    private static DependencyFormatValidator dependencyFormatValidator = new DependencyFormatValidator();
 
     private static Set<String> mandatoryKeySet = Sets.newHashSet(SlangTextualKeys.PYTHON_ACTION_SCRIPT_KEY);
     private static Set<String> optionalKeySet = Sets.newHashSet(SlangTextualKeys.PYTHON_ACTION_DEPENDENCIES_KEY);
@@ -34,6 +32,13 @@ public class PythonActionTransformer extends AbstractTransformer implements Tran
     public Map<String, Serializable> transform(Map<String, Serializable> rawData) {
         if (rawData != null) {
             validateKeySet(rawData.keySet(), mandatoryKeySet, optionalKeySet);
+            Collection<String> dependencies = (List<String>) rawData.get(SlangTextualKeys.PYTHON_ACTION_DEPENDENCIES_KEY);
+            if(dependencies != null) {
+                for (String dependency: dependencies) {
+                    dependencyFormatValidator.validateDependency(dependency);
+                }
+            }
+            System.out.println(dependencies);
         }
         return rawData;
     }

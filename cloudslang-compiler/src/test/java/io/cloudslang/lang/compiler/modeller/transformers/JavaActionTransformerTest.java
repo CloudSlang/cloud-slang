@@ -96,35 +96,35 @@ public class JavaActionTransformerTest {
     @Test
     public void testTransformWithEmptyOneEmptyPart() throws Exception {
         exception.expect(RuntimeException.class);
-        exception.expectMessage(JavaActionTransformer.INVALID_GAV);
+        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
         javaActionTransformer.transform(loadJavaActionData("/java_action_with_dependencies_1_empty_part.sl"));
     }
 
     @Test
     public void testTransformWithEmptyDependencies() throws Exception {
         exception.expect(RuntimeException.class);
-        exception.expectMessage(JavaActionTransformer.INVALID_GAV);
+        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
         javaActionTransformer.transform(loadJavaActionData("/java_action_with_dependencies_empty.sl"));
     }
 
     @Test
     public void testTransformWithAllEmptyParts() throws Exception {
         exception.expect(RuntimeException.class);
-        exception.expectMessage(JavaActionTransformer.INVALID_GAV);
+        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
         javaActionTransformer.transform(loadJavaActionData("/java_action_with_dependencies_all_empty_parts.sl"));
     }
 
     @Test
     public void testTransformWithOnePart() throws Exception {
         exception.expect(RuntimeException.class);
-        exception.expectMessage(JavaActionTransformer.INVALID_GAV);
+        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
         javaActionTransformer.transform(loadJavaActionData("/java_action_with_dependencies_1_part.sl"));
     }
 
     @Test
     public void testTransformWithTwoEmptyParts() throws Exception {
         exception.expect(RuntimeException.class);
-        exception.expectMessage(JavaActionTransformer.INVALID_GAV);
+        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
         javaActionTransformer.transform(loadJavaActionData("/java_action_with_dependencies_2_parts.sl"));
     }
 

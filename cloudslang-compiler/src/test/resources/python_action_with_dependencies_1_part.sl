@@ -8,11 +8,10 @@
 namespace: user.ops
 
 operation:
-  name: python_action_with_dependencies
+  name: python_action_with_dependencies_1_part
   python_action:
     dependencies:
-      - 'g:a:v1'
-      - 'g:a:v2'
+      - ':a:'
     script: 'pass'
   results:
     - SUCCESS
