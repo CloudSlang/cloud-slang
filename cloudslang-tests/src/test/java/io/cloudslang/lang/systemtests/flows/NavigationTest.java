@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.ArrayList;
 import org.junit.rules.ExpectedException;
 
 
@@ -121,6 +122,35 @@ public class NavigationTest extends SystemsTestsParent {
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, steps.get(SECOND_STEP_KEY).getResult());
         Assert.assertEquals("print_message1_flow_with_custom_result", steps.get("0.1.0").getName());
         Assert.assertEquals("CUSTOM_SUCCESS", steps.get("0.1.0").getResult());
+    }
+
+    @Test
+    public void testNavigationResultsEmptyList() throws Exception {
+        URI resource = getClass().getResource("/yaml/operation_results_empty_list.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet();
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Assert.assertEquals(true, ((ArrayList)compilationArtifact
+                .getExecutionPlan().getSteps().get(3L).getActionData().get("executableResults")).isEmpty());
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("input1", ValueFactory.create("value1", false));
+
+        expectedEx.expect(RuntimeException.class);
+        expectedEx.expectMessage("Error running: 'operation_results_empty_list'.\n" +
+                "\tNo results were found");
+        triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
+    }
+
+    @Test
+    public void testFlowNavigationResultsEmptyList() throws Exception {
+        URI resource = getClass().getResource("/yaml/flow_results_empty_list.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet();
+
+        expectedEx.expect(RuntimeException.class);
+        expectedEx.expectMessage("Failed to compile step: print1. The step/result name: SUCCESS of navigation: SUCCESS -> SUCCESS is missing");
+        slang.compile(SlangSource.fromFile(resource), path);
     }
 
     @Test
