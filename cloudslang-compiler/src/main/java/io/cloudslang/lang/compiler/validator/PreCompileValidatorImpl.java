@@ -74,8 +74,8 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         }
         for (Map<String, Map<String, Object>> step : workFlowRawData) {
             if (step.size() > 1) {
-                errors.add(new RuntimeException("Error compiling source '" + parsedSlang.getName() + "'. Flow: '" + executableName +
-                        "' has steps with keyword on the same indentation as the step name."));
+                errors.add(new RuntimeException("Error compiling source '" + parsedSlang.getName() + "'.\nFlow: '" + executableName +
+                        "' has steps with keyword on the same indentation as the step name or there is no space between step name and hyphen."));
             }
         }
 

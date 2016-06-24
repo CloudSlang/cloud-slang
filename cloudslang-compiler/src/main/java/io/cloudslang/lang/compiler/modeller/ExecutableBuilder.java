@@ -154,11 +154,12 @@ public class ExecutableBuilder {
         @SuppressWarnings("unchecked") List<Result> results = (List<Result>) postExecutableActionData.remove(SlangTextualKeys.RESULTS_KEY);
 
         String namespace = parsedSlang.getNamespace();
-        Map<String, String> imports = parsedSlang.getImports();
         Set<String> executableDependencies;
         Set<String> systemPropertyDependencies = null;
         switch (parsedSlang.getType()) {
             case FLOW:
+                Map<String, String> imports = parsedSlang.getImports();
+
                 List<Map<String, Map<String, Object>>> workFlowRawData = preCompileValidator.validateWorkflowRawData(parsedSlang,
                         executableRawData, errors);
 
@@ -272,6 +273,8 @@ public class ExecutableBuilder {
                     WorkflowModellingResult workflowModellingResult = compileWorkFlow(onFailureData, imports, null, true, namespace);
                     errors.addAll(workflowModellingResult.getErrors());
                     onFailureWorkFlow = workflowModellingResult.getWorkflow();
+                } else if (onFailureData == null) {
+                    errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nThere is no step below the 'on_failure' property."));
                 }
                 stepsIterator.remove();
             }
