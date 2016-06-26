@@ -33,25 +33,14 @@ public class SlangModellerImpl implements SlangModeller{
         try {
             switch (parsedSlang.getType()) {
                 case OPERATION:
-                    return transformToExecutable(parsedSlang, parsedSlang.getOperation());
+                    return executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getOperation());
                 case FLOW:
-                    return transformToExecutable(parsedSlang, parsedSlang.getFlow());
+                    return executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getFlow());
                 default:
                     throw new RuntimeException("Source: " + parsedSlang.getName() + " is not of flow type or operations");
             }
         } catch (Throwable ex){
             throw new RuntimeException("Error transforming source: " + parsedSlang.getName() + " to a Slang model. " + ex.getMessage(), ex);
         }
-    }
-
-    /**
-     * transform a parsed slang source {@link io.cloudslang.lang.compiler.parser.model.ParsedSlang} to
-     * an {@link ExecutableModellingResult}
-     *
-     * @param parsedSlang the source to transform the operations from
-     * @return {@link ExecutableModellingResult} representing the operation or flow in the source
-     */
-    private ExecutableModellingResult transformToExecutable(ParsedSlang parsedSlang, Map<String, Object> rawData) {
-        return executableBuilder.transformToExecutable(parsedSlang, rawData);
     }
 }
