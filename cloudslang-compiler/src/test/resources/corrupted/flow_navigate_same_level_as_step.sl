@@ -12,12 +12,26 @@ flow:
 
  workflow:
    - Step1:
+       navigate:
+         - SUCCESS: Step2
+         - FAILURE: FAILURE
        do:
          user.ops.test_op:
             - alla: ${"temp"}
-   navigate:
-     - SUCCESS: SUCCESS
-     - FAILURE: FAILURE
+     navigate:
+       - SUCCESS: Step2
+       - FAILURE: FAILURE
+
+   - Step2:
+       navigate:
+         - SUCCESS: SUCCESS
+         - FAILURE: FAILURE
+       do:
+         user.ops.test_op:
+            - alla: ${"temp"}
+     navigate:
+       - SUCCESS: SUCCESS
+       - FAILURE: FAILURE
  results:
   - SUCCESS
   - FAILURE
