@@ -55,12 +55,11 @@ public class SlangSource {
     }
 
     private static Charset getCharset() {
-        Charset charset = Charset.defaultCharset();
         String cslangEncoding = System.getProperty(SlangSystemPropertyConstant.CSLANG_ENCODING.getValue());
-        if (!StringUtils.isEmpty(cslangEncoding)) {
-            charset = Charset.forName(cslangEncoding);
+        if (StringUtils.isEmpty(cslangEncoding)) {
+            cslangEncoding = "UTF-8";
         }
-        return charset;
+        return Charset.forName(cslangEncoding);
     }
 
     public static SlangSource fromFile(URI uri) {

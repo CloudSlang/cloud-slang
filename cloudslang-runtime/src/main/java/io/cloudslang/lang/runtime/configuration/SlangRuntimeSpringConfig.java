@@ -32,7 +32,9 @@ public class SlangRuntimeSpringConfig {
 
     private static void setPythonIOEncoding() {
         String encodingValue = System.getProperty(SlangSystemPropertyConstant.CSLANG_ENCODING.getValue());
-        if (!StringUtils.isEmpty(encodingValue))
-            System.getProperties().setProperty(PySystemState.PYTHON_IO_ENCODING, encodingValue);
+        if (StringUtils.isEmpty(encodingValue)) {
+            encodingValue = "UTF-8";
+        }
+        System.getProperties().setProperty(PySystemState.PYTHON_IO_ENCODING, encodingValue);
     }
 }
