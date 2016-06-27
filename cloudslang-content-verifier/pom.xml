@@ -3,7 +3,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.9.59.8-SNAPSHOT</version>
+        <version>0.9.59.8</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -171,7 +171,7 @@
                             <target>
                                 <unzip src="${basedir}/../cloudslang-cli/src/main/resources/dependency-base.zip" dest="${basedir}/target/cslang-builder/maven/repo">
                                     <patternset>
-                                        <exclude name="**/*.path"/>
+                                        <exclude name="**/*.path" />
                                     </patternset>
                                 </unzip>
                             </target>

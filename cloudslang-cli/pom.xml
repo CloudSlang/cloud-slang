@@ -14,7 +14,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.9.59.8-SNAPSHOT</version>
+        <version>0.9.59.8</version>
     </parent>
 
 	<dependencies>
@@ -205,7 +205,7 @@
 							<target>
 								<unzip src="${basedir}/src/main/resources/dependency-base.zip" dest="${basedir}/target/cslang-cli/maven/repo">
 									<patternset>
-										<exclude name="**/*.path"/>
+										<exclude name="**/*.path" />
 									</patternset>
 								</unzip>
 							</target>
