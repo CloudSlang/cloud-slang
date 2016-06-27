@@ -169,7 +169,11 @@
                         <phase>generate-resources</phase>
                         <configuration>
                             <target>
-                                <unzip src="${basedir}/../cloudslang-cli/src/main/resources/dependency-base.zip" dest="${basedir}/target/cslang-builder/maven/repo" />
+                                <unzip src="${basedir}/../cloudslang-cli/src/main/resources/dependency-base.zip" dest="${basedir}/target/cslang-builder/maven/repo">
+                                    <patternset>
+                                        <exclude name="**/*.path"/>
+                                    </patternset>
+                                </unzip>
                             </target>
                         </configuration>
                         <goals>
