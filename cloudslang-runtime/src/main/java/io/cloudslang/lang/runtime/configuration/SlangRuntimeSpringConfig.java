@@ -20,6 +20,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import java.nio.charset.StandardCharsets;
+
 @Configuration
 @Import({RuntimeManagementConfiguration.class})
 @ComponentScan("io.cloudslang.lang.runtime")
@@ -33,7 +35,7 @@ public class SlangRuntimeSpringConfig {
     private static void setPythonIOEncoding() {
         String encodingValue = System.getProperty(SlangSystemPropertyConstant.CSLANG_ENCODING.getValue());
         if (StringUtils.isEmpty(encodingValue)) {
-            encodingValue = "UTF-8";
+            encodingValue = StandardCharsets.UTF_8.name();
         }
         System.getProperties().setProperty(PySystemState.PYTHON_IO_ENCODING, encodingValue);
     }
