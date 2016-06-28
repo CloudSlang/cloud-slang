@@ -70,7 +70,7 @@
 		        + Images
 		        + Instances
 		        + Regions
-			+ Volumes
+		        + Volumes
 	+ Removals - Content has been removed in the following areas:
 		+ Powershell
 
