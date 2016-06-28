@@ -3,7 +3,7 @@
 ##Version 0.9.60
 
 + DSL Changes
-	+ New or changed keywords and functions
+	+ New or changed keywords and functions:
 		+ Added `sensitive` keyword to mark inputs and outputs and system properties as sensitive. Sensitive data is not exposed in the CLI, Builder and logs.  
 		+ Added `gav` keyword to indicate the Maven project group:artifact:version where the code for the `java_action` resides. Upon execution, the Maven project and all its required resources specified in its pom's `dependencies` will be resolved and downloaded (if necessary).
 		+ Added `branch_result` to the `branches_context` to retrieve results from branches in a parallel step.  
@@ -29,15 +29,15 @@
     		  method_name:
     		```
 		+ Removed`aggregate` section from parallel steps. Aggregation for a `parallel_loop` is now accomplished in the `publish` section.
-	+ New Validations
+	+ New Validations:
 		+ Flow and operation input names must be different than their output names.
 		+ Step arguments and called subflow/operation output names must be different.
 		+ Flow results can no longer contain expressions.
 		+ Step must declares all subflow/operation inputs that are required, not private and don't have a default value.
 		+ All steps must be reachable.
 		+ The `on_failure` section may contain only one step.
-	+ Other Changes
-		+ Changes related to `on_failure`
+	+ Other Changes:
+		+ Changes related to `on_failure`:
 			+ Support navigation to `on_failure` by using `on_failure` keyword.
 			+ Navigation to `on_failure` is allowed even if no `on_failure` section exists. In such a case the flow navigates to the `FAILURE` result.
 			+	An `on_failure` step cannot contain a `navigate` section. It always navigates to `FAILURE`.
