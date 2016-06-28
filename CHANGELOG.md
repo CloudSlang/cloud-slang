@@ -24,7 +24,7 @@
 			+ Java based actions:
     		```
     		  java_action:
-                    gav:
+    		    gav:
     		    class_name:
     		    method_name:
     		```
