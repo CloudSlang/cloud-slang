@@ -31,9 +31,9 @@
 		+ Removed`aggregate` section from parallel steps. Aggregation for a `parallel_loop` is now accomplished in the `publish` section.
 	+ New Validations:
 		+ Flow and operation input names must be different than their output names.
-		+ Step arguments and called subflow/operation output names must be different.
+		+ Step inputs and called subflow/operation output names must be different.
 		+ Flow results can no longer contain expressions.
-		+ Step must declares all subflow/operation inputs that are required, not private and don't have a default value.
+		+ Step must declare all subflow/operation inputs that are required, not private and don't have a default value.
 		+ All steps must be reachable.
 		+ The `on_failure` section may contain only one step.
 	+ Other Changes:
