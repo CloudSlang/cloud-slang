@@ -12,6 +12,7 @@ import io.cloudslang.lang.entities.bindings.Input;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -30,8 +31,15 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
             return new Input.InputBuilder(inputName, null, false).build();
         } else if (rawInput instanceof Map) {
             @SuppressWarnings("unchecked")
-            Map.Entry<String, ?> entry = ((Map<String, ?>) rawInput).entrySet().iterator().next();
+            Map<String, ?> map = (Map<String, ?>) rawInput;
+            Iterator<? extends Map.Entry<String, ?>> iterator = map.entrySet().iterator();
+            Map.Entry<String, ?> entry = iterator.next();
             Serializable entryValue = (Serializable) entry.getValue();
+            if (map.size() > 1) {
+                throw new RuntimeException("Invalid syntax after input \"" + entry.getKey() + "\". " +
+                        "Please check all inputs are provided as a list and each input is preceded by a hyphen. " +
+                        "Input \"" + iterator.next().getKey() + "\" is missing the hyphen.");
+            }
             if(entryValue == null){
                 throw new RuntimeException("Could not transform Input : " + rawInput + " since it has a null value.\n\nMake sure a value is specified or that indentation is properly done.");
             }

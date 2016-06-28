@@ -1,0 +1,21 @@
+testPrintFinishesWithSuccess:
+  inputs:
+    - text: text to print
+    - password: {invalid_key: password1, sensitive: true}
+  description: Tests that print_text operation finishes with SUCCESS
+  testFlowPath: base.test_print_text-SUCCESS
+  result: SUCCESS
+
+testPrintFinishesWithFailure:
+  inputs:
+    - text: orit
+  description: Tests that print_text operation finishes with FAILURE
+  testFlowPath: base.test_print_text-SUCCESS
+  result: FAILURE
+
+
+testPrintFinishesWithSuccess2:
+  inputs:
+    - text: text to print
+  description: Tests that print_text operation finishes with SUCCESS 2
+  testFlowPath: base.test_print_text-SUCCESS

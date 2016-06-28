@@ -19,9 +19,6 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 import java.util.*;
 
-import static ch.lambdaj.Lambda.exists;
-import static org.hamcrest.Matchers.equalToIgnoringCase;
-
 /*
  * Created by orius123 on 10/12/14.
  */
@@ -81,68 +78,5 @@ public class TransformersHandler {
     private Class getTransformerFromType(Transformer transformer) {
         ResolvableType resolvableType = ResolvableType.forClass(Transformer.class, transformer.getClass());
         return resolvableType.getGeneric(0).resolve();
-    }
-
-    public List<RuntimeException> checkKeyWords(
-            String dataLogicalName,
-            Map<String, Object> rawData,
-            List<Transformer> allRelevantTransformers,
-            List<String> additionalValidKeyWords,
-            List<List<String>> constraintGroups) {
-        return
-                checkKeyWords(
-                        dataLogicalName,
-                        "",
-                        rawData,
-                        allRelevantTransformers,
-                        additionalValidKeyWords,
-                        constraintGroups
-                );
-    }
-
-    public List<RuntimeException> checkKeyWords(
-            String dataLogicalName,
-            String parentProperty,
-            Map<String, Object> rawData,
-            List<Transformer> allRelevantTransformers,
-            List<String> additionalValidKeyWords,
-            List<List<String>> constraintGroups) {
-        Set<String> validKeywords = new HashSet<>();
-
-        List<RuntimeException> errors = new ArrayList<>();
-        if (additionalValidKeyWords != null) {
-            validKeywords.addAll(additionalValidKeyWords);
-        }
-
-        for (Transformer transformer : allRelevantTransformers) {
-            validKeywords.add(keyToTransform(transformer));
-        }
-
-        Set<String> rawDataKeySet = rawData.keySet();
-        for (String key : rawDataKeySet) {
-            if (!(exists(validKeywords, equalToIgnoringCase(key)))) {
-                String additionalParentPropertyMessage =
-                        StringUtils.isEmpty(parentProperty) ? "" : " under \'" + parentProperty + "\'";
-                errors.add(new RuntimeException("Artifact {" + dataLogicalName + "} has unrecognized tag {" + key + "}" +
-                        additionalParentPropertyMessage + ". Please take a look at the supported features per versions link"));
-            }
-        }
-
-        if (constraintGroups != null) {
-            for (List<String> group : constraintGroups) {
-                boolean found = false;
-                for (String key : group) {
-                    if (rawDataKeySet.contains(key)) {
-                        if (found) {
-                            // one key from this group was already found in action data
-                            errors.add(new RuntimeException("Conflicting keys at: " + dataLogicalName));
-                        } else {
-                            found = true;
-                        }
-                    }
-                }
-            }
-        }
-        return errors;
     }
 }

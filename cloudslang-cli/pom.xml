@@ -14,7 +14,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.9.59.3-SNAPSHOT</version>
+        <version>0.9.59.10-SNAPSHOT</version>
     </parent>
 
 	<dependencies>
@@ -59,50 +59,6 @@
 		<dependency>
 			<groupId>org.python</groupId>
 			<artifactId>jython-standalone</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-
-
-        <!-- content dep -->
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-ssh</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-mail</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-http-client</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cloudslang.content</groupId>
-            <artifactId>score-rft</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-		<dependency>
-			<groupId>io.cloudslang.content</groupId>
-			<artifactId>score-jClouds</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>io.cloudslang.content</groupId>
-			<artifactId>score-vmware</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.cloudslang.content</groupId>
-			<artifactId>score-xml</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.cloudslang.content</groupId>
-			<artifactId>cs-date-time</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 
@@ -162,7 +118,7 @@
 				<configuration>
 					<repositoryLayout>flat</repositoryLayout>
 					<repositoryName>lib</repositoryName>
-                    <assembleDirectory>target/cslang</assembleDirectory>
+                    <assembleDirectory>target/cslang-cli</assembleDirectory>
 					<useWildcardClassPath>true</useWildcardClassPath>
 					<programs>
 						<program>
@@ -192,7 +148,7 @@
 									<type>zip</type>
 									<version>3.3.9</version>
 									<overWrite>false</overWrite>
-									<outputDirectory>${basedir}/target/cslang/maven</outputDirectory>
+									<outputDirectory>${basedir}/target/cslang-cli/maven</outputDirectory>
 									<destFileName>maven</destFileName>
 								</artifactItem>
 							</artifactItems>
@@ -211,7 +167,7 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/target/cslang/maven/conf</outputDirectory>
+							<outputDirectory>${basedir}/target/cslang-cli/maven/conf</outputDirectory>
 							<resources>
 								<resource>
 									<directory>src/main/resources/maven/conf</directory>
@@ -227,7 +183,7 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/target/cslang/configuration</outputDirectory>
+							<outputDirectory>${basedir}/target/cslang-cli/configuration</outputDirectory>
 							<resources>
 								<resource>
 									<directory>src/main/resources/configuration</directory>
@@ -235,6 +191,28 @@
 								</resource>
 							</resources>
 						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<phase>generate-resources</phase>
+						<configuration>
+							<target>
+								<unzip src="${basedir}/src/main/resources/dependency-base.zip" dest="${basedir}/target/cslang-cli/maven/repo">
+									<patternset>
+										<exclude name="**/*.path" />
+									</patternset>
+								</unzip>
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>

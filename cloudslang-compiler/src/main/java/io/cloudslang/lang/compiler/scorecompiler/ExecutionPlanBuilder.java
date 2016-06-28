@@ -78,10 +78,7 @@ public class ExecutionPlanBuilder {
         executionPlan.addStep(stepFactory.createEndStep(FLOW_END_STEP_ID, compiledFlow.getPostExecActionData(),
                 compiledFlow.getOutputs(), compiledFlow.getResults(), compiledFlow.getName(), ExecutableType.FLOW));
 
-        Map<String, Long> stepReferences = new HashMap<>();
-        for (Result result : compiledFlow.getResults()) {
-            stepReferences.put(result.getName(), FLOW_END_STEP_ID);
-        }
+        Map<String, Long> stepReferences = getStepReferences(compiledFlow);
 
         Deque<Step> steps = compiledFlow.getWorkflow().getSteps();
 
@@ -93,6 +90,14 @@ public class ExecutionPlanBuilder {
         executionPlan.addSteps(stepExecutionSteps);
 
         return executionPlan;
+    }
+
+    private Map<String, Long> getStepReferences(Flow compiledFlow) {
+        Map<String, Long> stepReferences = new HashMap<>();
+        for (Result result : compiledFlow.getResults()) {
+            stepReferences.put(result.getName(), FLOW_END_STEP_ID);
+        }
+        return stepReferences;
     }
 
     private List<ExecutionStep> buildStepExecutionSteps(
@@ -128,9 +133,6 @@ public class ExecutionPlanBuilder {
             String nextStepName = entry.getValue();
             if (stepReferences.get(nextStepName) == null) {
                 Step nextStepToCompile = Lambda.selectFirst(steps, having(on(Step.class).getName(), equalTo(nextStepName)));
-                if (nextStepToCompile == null) {
-                    throw new RuntimeException("Failed to compile step: " + stepName + ". The step/result name: " + entry.getValue() + " of navigation: " + entry.getKey() + " -> " + entry.getValue() + " is missing");
-                }
                 stepExecutionSteps.addAll(buildStepExecutionSteps(nextStepToCompile, stepReferences, steps, compiledFlow));
             }
             long nextStepId = stepReferences.get(nextStepName);
