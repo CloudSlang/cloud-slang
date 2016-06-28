@@ -14,6 +14,10 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.lang.entities.encryption.DummyEncryptor;
+import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import org.junit.Assert;
@@ -69,10 +73,23 @@ public class TestCasesYamlParserTest {
         SlangTestCase testPrintFinishesWithSuccess = testCases.get("testPrintFinishesWithSuccess");
         Assert.assertEquals("Tests that print_text operation finishes with SUCCESS", testPrintFinishesWithSuccess.getDescription());
         List<Map> expectedInputsList = new ArrayList<>();
-        Map<String, Serializable> expectedInputs = new HashMap<>();
-        expectedInputs.put("text", "text to print");
-        expectedInputsList.add(expectedInputs);
+        Map<String, Serializable> expectedInput1 = new HashMap<>();
+        expectedInput1.put("text", ValueFactory.create("text to print", false));
+        Map<String, Serializable> expectedInput2 = new HashMap<>();
+        expectedInput2.put("password", ValueFactory.create("password1", true));
+        expectedInputsList.add(expectedInput1);
+        expectedInputsList.add(expectedInput2);
         Assert.assertEquals(expectedInputsList, testPrintFinishesWithSuccess.getInputs());
+    }
+
+    @Test
+    public void testSimpleTestCasesParsingInvalidKey() throws URISyntaxException {
+        String filePath = "/test/base/test_print_text-unrecognized_tag.inputs.yaml";
+        URI fileUri = getClass().getResource(filePath).toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Artifact has unrecognized tag {invalid_key}. Supported tags are {value} and {sensitive}. " +
+                "Please take a look at the supported features per versions link.");
+        parser.parseTestCases(SlangSource.fromFile(fileUri));
     }
 
     @Test
@@ -149,5 +166,16 @@ public class TestCasesYamlParserTest {
             yaml.setBeanAccess(BeanAccess.FIELD);
             return yaml;
         }
+
+        @Bean
+        public ApplicationContextProvider applicationContextProvider() {
+            return new ApplicationContextProvider();
+        }
+
+        @Bean
+        public DummyEncryptor dummyEncryptor() {
+            return new DummyEncryptor();
+        }
+
     }
 }

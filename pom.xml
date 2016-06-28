@@ -10,7 +10,7 @@
     -->
     <groupId>io.cloudslang.lang</groupId>
     <artifactId>cloudslang</artifactId>
-    <version>0.9.59.2-SNAPSHOT</version>
+    <version>0.9.59.9-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A DSL for writing flows</description>
@@ -33,7 +33,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <score.group>io.cloudslang</score.group>
-        <score.version>0.3.25</score.version>
+        <score.version>0.3.28</score.version>
         <spring.version>4.2.5.RELEASE</spring.version>
     </properties>
 
@@ -156,61 +156,6 @@
                 <version>1.10.6</version>
             </dependency>
             <!--end of score dependencies-->
-
-            <!--score content dependencies-->
-            <dependency>
-                <groupId>io.cloudslang.content</groupId>
-                <artifactId>score-ssh</artifactId>
-                <version>0.0.32</version>
-            </dependency>
-            <dependency>
-                <groupId>io.cloudslang.content</groupId>
-                <artifactId>score-mail</artifactId>
-                <version>0.0.25</version>
-            </dependency>
-            <dependency>
-                <groupId>io.cloudslang.content</groupId>
-                <artifactId>score-http-client</artifactId>
-                <version>0.1.65</version>
-            </dependency>
-            <dependency>
-                <groupId>io.cloudslang.content</groupId>
-                <artifactId>score-rft</artifactId>
-                <version>0.0.2</version>
-            </dependency>
-            <dependency>
-                <groupId>io.cloudslang.content</groupId>
-                <artifactId>score-jClouds</artifactId>
-                <version>0.0.4</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-classic</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>io.cloudslang.content</groupId>
-                <artifactId>score-vmware</artifactId>
-                <version>0.0.4</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.vmware</groupId>
-                        <artifactId>vim25</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>io.cloudslang.content</groupId>
-                <artifactId>score-xml</artifactId>
-                <version>0.0.2</version>
-            </dependency>
-            <dependency>
-                <groupId>io.cloudslang.content</groupId>
-                <artifactId>cs-date-time</artifactId>
-                <version>0.0.2</version>
-            </dependency>
-            <!--end of score content dependencies-->
 
             <dependency>
                 <groupId>io.cloudslang</groupId>
@@ -588,6 +533,7 @@
     </profiles>
 
     <modules>
+        <module>cloudslang-spi</module>
         <module>cloudslang-runtime</module>
         <module>cloudslang-compiler</module>
         <module>cloudslang-entities</module>

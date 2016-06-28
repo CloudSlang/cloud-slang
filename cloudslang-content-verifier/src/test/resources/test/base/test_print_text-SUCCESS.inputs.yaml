@@ -1,6 +1,9 @@
 testPrintFinishesWithSuccess:
   inputs:
     - text: text to print
+    - password:
+        value: password1
+        sensitive: true
   description: Tests that print_text operation finishes with SUCCESS
   testFlowPath: base.test_print_text-SUCCESS
   result: SUCCESS

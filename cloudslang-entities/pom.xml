@@ -14,7 +14,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.9.59.2-SNAPSHOT</version>
+        <version>0.9.59.9-SNAPSHOT</version>
     </parent>
 
 	<dependencies>
@@ -22,6 +22,12 @@
 			<groupId>${score.group}</groupId>
 			<artifactId>score-api</artifactId>
 		</dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cloudslang-spi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>

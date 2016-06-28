@@ -158,7 +158,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Inputs and outputs names should be different for \"io.cloudslang.base.json.get_value\". " +
+        exception.expectMessage("Inputs and outputs names should be different for \"io.cloudslang.base.json.same_input_and_output_name\". " +
                 "Please rename input/output \"json_path\"");
         throw result.getErrors().get(0);
     }
@@ -484,6 +484,31 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
+    public void testFlowOnFailureSkipped() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_on_failure_skipped.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Error compiling source 'flow_on_failure_skipped'.\n" +
+                "Flow: 'flow_on_failure_skipped' has steps with keyword on the same indentation as the step name or " +
+                "there is no space between step name and hyphen.");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testFlowOnFailureMissingStep() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_on_failure_missing_step.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Flow: 'flow_on_failure_missing_step' syntax is illegal.\n" +
+                "There is no step below the 'on_failure' property.");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
     public void testFlowNavigateMultipleElementsForRule() throws Exception {
         URI resource = getClass().getResource("/corrupted/flow_navigate_multiple_elements_for_rule.sl").toURI();
 
@@ -540,20 +565,61 @@ public class PreCompilerErrorsTest {
 
     @Test
     public void testFlowWithUnreachableStepReachableFromOnFailureStep() throws Exception {
-        URI resource = getClass().getResource("/corrupted/unreachable_step_reachable_from_on_failure.sl").toURI();
+        URI resource = getClass().getResource("/corrupted/on_failure_contains_navigate_section.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
-        assertTrue(result.getErrors().size() == 0);
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Flow: 'on_failure_contains_navigate_section' syntax is illegal.\n" +
+                "The step below 'on_failure' property should not contain a \"navigate\" section.");
+        throw result.getErrors().get(0);
     }
 
     @Test
-    public void testFlowWithUnreachableTasksOneReachableFromOnFailureTask() throws Exception {
-        URI resource = getClass().getResource("/corrupted/unreachable_tasks_one_reachable_from_on_failure.sl").toURI();
+    public void testNavigateToNonExistingStep() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_navigate_to_non_existing_step.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Failed to compile step: Step1. The step/result name: non_existing_step of navigation: " +
+                "SUCCESS -> non_existing_step is missing");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testFlowWithInvalidInputs() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_with_invalid_inputs.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("For flow 'flow_with_invalid_inputs' syntax is illegal.\n" +
+                "Invalid syntax after input \"input1\". Please check all inputs are provided as a list " +
+                "and each input is preceded by a hyphen. Input \"input2\" is missing the hyphen.");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testFlowWithUnreachableTasksOneReachableFromUnreachableTask() throws Exception {
+        URI resource = getClass().getResource("/corrupted/unreachable_tasks_one_reachable_from_unreachable_task.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("Step: print_message2 is unreachable");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testNullPublishValue() throws Exception {
+        URI resource = getClass().getResource("/corrupted/null_publish_value.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("For step 'CheckWeather' syntax is illegal.");
+        exception.expectMessage("Could not transform Output : {var_with_null_value=null} since it has a null value.");
         throw result.getErrors().get(0);
     }
 }

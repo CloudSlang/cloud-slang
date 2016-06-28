@@ -10,12 +10,15 @@ package io.cloudslang.lang.compiler.scorecompiler;
 
 import ch.lambdaj.function.convert.Converter;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
-import io.cloudslang.lang.compiler.Validator;
+import io.cloudslang.lang.compiler.validator.CompileValidator;
 import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
+import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ExecutionPlan;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
@@ -29,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Deque;
 
 import static ch.lambdaj.Lambda.convertMap;
 
@@ -45,7 +49,7 @@ public class ScoreCompilerImpl implements ScoreCompiler {
     private DependenciesHelper dependenciesHelper;
 
     @Autowired
-    private Validator validator;
+    private CompileValidator compileValidator;
 
     @Override
     public CompilationArtifact compile(Executable executable, Set<Executable> path) {
@@ -65,7 +69,9 @@ public class ScoreCompilerImpl implements ScoreCompiler {
             //than we match the references to the actual dependencies
             filteredDependencies = dependenciesHelper.matchReferences(executable, availableExecutables);
 
-            List<RuntimeException> errors = validator.validateModelWithDependencies(executable, filteredDependencies);
+            handleOnFailureCustomResults(executable, filteredDependencies);
+
+            List<RuntimeException> errors = compileValidator.validateModelWithDependencies(executable, filteredDependencies);
             if (errors.size() > 0) {
                 throw errors.get(0);
             }
@@ -89,13 +95,44 @@ public class ScoreCompilerImpl implements ScoreCompiler {
         return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemPropertiesFromExecutables(executables));
     }
 
+    private void handleOnFailureCustomResults(Executable executable, Map<String, Executable> filteredDependencies) {
+        handleOnFailureStepCustomResults((Flow) executable, filteredDependencies);
+        for (Executable dependency : filteredDependencies.values()) {
+            if (dependency.getType().equals(SlangTextualKeys.FLOW_TYPE)) {
+                handleOnFailureStepCustomResults((Flow) dependency, filteredDependencies);
+            }
+        }
+    }
+
+    private void handleOnFailureStepCustomResults(Flow executable, Map<String, Executable> filteredDependencies) {
+        Step onFailureStep = getOnFailureStep(executable);
+        if (onFailureStep != null) {
+            Executable onFailureDependency = filteredDependencies.get(onFailureStep.getRefId());
+            for (Result result : onFailureDependency.getResults()) {
+                Map<String, String> navigationString = new HashMap<>();
+                navigationString.put(result.getName(), ScoreLangConstants.FAILURE_RESULT);
+                onFailureStep.getNavigationStrings().add(navigationString);
+            }
+        }
+    }
+
+    private Step getOnFailureStep(Flow flow) {
+        Deque<Step> stepDeque = flow.getWorkflow().getSteps();
+        for (Step step : stepDeque) {
+            if (step.isOnFailureStep()) {
+                return step;
+            }
+        }
+        return null;
+    }
+
     @Override
     public List<RuntimeException> validateSlangModelWithDirectDependencies(Executable slangModel, Set<Executable> directDependenciesModels) {
         Map<String, Executable> dependenciesMap = new HashMap<>();
         for (Executable dependency : directDependenciesModels) {
             dependenciesMap.put(dependency.getId(), dependency);
         }
-        return validator.validateModelWithDirectDependencies(slangModel, dependenciesMap);
+        return compileValidator.validateModelWithDirectDependencies(slangModel, dependenciesMap);
     }
 
     /**

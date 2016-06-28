@@ -60,10 +60,16 @@ public class TriggerFlows {
         };
         slang.subscribeOnEvents(finishListener, FINISHED_EVENTS);
 
-        slang.run(compilationArtifact, userInputs, systemProperties);
+        long executionID = slang.run(compilationArtifact, userInputs, systemProperties);
 
         try {
-            ScoreEvent event = finishEvent.take();
+            ScoreEvent event = null;
+            boolean finishEventReceived = false;
+            while (!finishEventReceived) {
+                event = finishEvent.take();
+                long executionIDFromEvent = (long) ((Map) event.getData()).get(LanguageEventData.EXECUTION_ID);
+                finishEventReceived = executionID == executionIDFromEvent;
+            }
             if (event.getEventType().equals(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION)){
                 LanguageEventData languageEvent = (LanguageEventData) event.getData();
                 throw new RuntimeException(languageEvent.getException());
@@ -85,19 +91,7 @@ public class TriggerFlows {
         JoinAggregatorListener joinAggregatorListener = new JoinAggregatorListener();
         slang.subscribeOnEvents(joinAggregatorListener, PARALLEL_LOOP_EVENTS);
 
-        try {
-            Thread.sleep(2000L);      /* TODO : remove this! only to test unstable navigation tests*/
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         runSync(compilationArtifact, userInputs, systemProperties);
-
-        try {
-            Thread.sleep(2000L);     /* TODO : remove this! only to test unstable navigation tests*/
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         Map<String, StepData> steps = runDataAggregatorListener.aggregate();
         Map<String, List<StepData>> branchesByPath = branchAggregatorListener.aggregate();
