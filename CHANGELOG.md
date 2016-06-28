@@ -17,17 +17,17 @@
 		+ Changed `overridable` to  `private` with inverted value. That is, `overridable: false` is now `private: true`.
 		+ Changed operation hierarchy:
 			+ Python based actions:
-	    		```
-	    		python_action:
-	    		  script
-	    		```
+    		```
+    		python_action:
+    		  script
+    		```
 			+ Java based actions:
-	    		```
-	    		java_action:
-	          gav:
-	    		  class_name:
-	    		  method_name:
-	    		```
+    		```
+    		java_action:
+          gav:
+    		  class_name:
+    		  method_name:
+    		```
 		+ Removed`aggregate` section from parallel steps. Aggregation for a `parallel_loop` is now accomplished in the `publish` section.
 	+ New Validations:
 		+ Flow and operation input names must be different than their output names.
