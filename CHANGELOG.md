@@ -18,15 +18,15 @@
 		+ Changed operation hierarchy:
 			+ Python based actions:
     		```
-    		python_action:
-    		  script
+    		  python_action:
+    		    script
     		```
 			+ Java based actions:
     		```
-    		java_action:
-          gav:
-    		  class_name:
-    		  method_name:
+    		  java_action:
+    		    gav:
+    		    class_name:
+    		    method_name:
     		```
 		+ Removed`aggregate` section from parallel steps. Aggregation for a `parallel_loop` is now accomplished in the `publish` section.
 	+ New Validations:
@@ -40,7 +40,7 @@
 		+ Changes related to `on_failure`:
 			+ Support navigation to `on_failure` by using `on_failure` keyword.
 			+ Navigation to `on_failure` is allowed even if no `on_failure` section exists. In such a case the flow navigates to the `FAILURE` result.
-			+	An `on_failure` step cannot contain a `navigate` section. It always navigates to `FAILURE`.
+			+ An `on_failure` step cannot contain a `navigate` section. It always navigates to `FAILURE`.
 		+ Context visibility was changed to make the `self` keyword unnecessary. Therefore, it has been removed from the language.
 		+ Support `null` syntax in step argument list.
 + CLI / Builder Improvements
