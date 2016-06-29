@@ -20,11 +20,8 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
 
 import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 public class FlowWithJavaVersioningTest extends SystemsTestsParent {
@@ -188,38 +185,22 @@ public class FlowWithJavaVersioningTest extends SystemsTestsParent {
         Set<SlangSource> dependencies = Sets.newHashSet(SlangSource.fromFile(py_dependency_mul_op));
         final CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), dependencies);
 
-        final List<AssertionError> errors = new ArrayList<>();
-        int threadsNumber = 2;
-        ForkJoinPool pool = new ForkJoinPool(threadsNumber);
-        for (int iteration = 0; iteration < 10; iteration++) {
-            final int addedValueInt = iteration;
-            pool.invoke(new ForkJoinTask<Integer>() {
-                public Integer getRawResult() {return null;}
-                protected void setRawResult(Integer value) {}
-                protected boolean exec() {
-                    String addedValue = String.valueOf(addedValueInt);
-                    Integer sum_of_mul_sum = 0;
-                    for(int i = 0; i < 20; i++) {
-                        sum_of_mul_sum += (i + addedValueInt) * (i + addedValueInt);
-                    }
-                    try {
-                        Map<String, Value> userInputs = new HashMap<>();
-                        userInputs.put("addedValue", ValueFactory.create(addedValue));
-                        ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
-                        assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
-                        LanguageEventData languageEventData = (LanguageEventData) event.getData();
+        for (int iteration = 0; iteration < 20; iteration++) {
+            String addedValue = String.valueOf(iteration);
+            Integer sum_of_mul_sum = 0;
+            for (int i = 0; i < 20; i++) {
+                sum_of_mul_sum += (i + iteration) * (i + iteration);
+            }
+            Map<String, Value> userInputs = new HashMap<>();
+            userInputs.put("addedValue", ValueFactory.create(addedValue));
+            ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
+            assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
+            LanguageEventData languageEventData = (LanguageEventData) event.getData();
 
-                        Integer actualResult = (Integer) languageEventData.getOutputs().get("sums_result");
-                        System.out.println("Expected [" + actualResult + "] for addedValue [" + addedValue + "]");
-                        assertNotNull("expected result 'muls_result' was not found", actualResult);
-                        assertEquals(sum_of_mul_sum, actualResult);
-                    } catch (AssertionError error) {
-                        errors.add(error);
-                    }
-                    return true;
-                }
-            });
+            Integer actualResult = (Integer) languageEventData.getOutputs().get("sums_result");
+            System.out.println("Expected [" + actualResult + "] for addedValue [" + addedValue + "]");
+            assertNotNull("expected result 'muls_result' was not found", actualResult);
+            assertEquals(sum_of_mul_sum, actualResult);
         }
-        assertTrue("There are CS errors: " + errors.toString(), errors.isEmpty());
     }
 }
