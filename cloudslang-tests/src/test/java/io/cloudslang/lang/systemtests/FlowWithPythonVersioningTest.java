@@ -17,11 +17,12 @@ import org.junit.Test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
 
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 public class FlowWithPythonVersioningTest extends SystemsTestsParent {
@@ -89,6 +90,63 @@ public class FlowWithPythonVersioningTest extends SystemsTestsParent {
         LanguageEventData languageEventData = (LanguageEventData) event.getData();
         String result = (String) languageEventData.getOutputs().get(expectedResultName);
         assertEquals(expectedResultValue, result);
+    }
+
+    @Test
+    public void testOperationWithParallelLoop() throws Exception {
+        URI flow = getClass().getResource("/yaml/versioning/py_flow_with_loop.sl").toURI();
+        URI py_dependency_mul_op = getClass().getResource("/yaml/versioning/py_dependency_mul_op.sl").toURI();
+
+        Set<SlangSource> dependencies = Sets.newHashSet(SlangSource.fromFile(py_dependency_mul_op));
+        final CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), dependencies);
+
+        final List<AssertionError> errors = new ArrayList<>();
+        int threadsNumber = 2;
+        ForkJoinPool pool = new ForkJoinPool(threadsNumber);
+        for (int iteration = 0; iteration < 300; iteration++) {
+            final int addedValue = iteration;
+            pool.invoke(new ForkJoinTask<Integer>() {
+                public Integer getRawResult() {return null;}
+                protected void setRawResult(Integer value) {}
+                protected boolean exec() {
+                    try {
+                        Map<String, Value> userInputs = new HashMap<>();
+                        userInputs.put("addedValue", ValueFactory.create(addedValue));
+                        ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
+                        assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
+                        LanguageEventData languageEventData = (LanguageEventData) event.getData();
+
+                        String actualResult = (String) languageEventData.getOutputs().get("muls_result");
+                        System.out.println("For addedValue [" + addedValue + "] got result[" + actualResult + "]");
+                        assertNotNull("expected result 'muls_result' was not found", actualResult);
+                        assertTrue("Not found 'build([0*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([0*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([1*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([1*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([2*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([2*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([3*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([3*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([4*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([4*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([5*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([5*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([6*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([6*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([7*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([7*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([8*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([8*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([9*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([9*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([10*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([10*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([11*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([11*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([12*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([12*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([13*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([13*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([14*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([14*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([15*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([15*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([16*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([16*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([17*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([17*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([18*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([18*" + addedValue + "]):version(7.5-extream)"));
+                        assertTrue("Not found 'build([19*" + addedValue + "]):version(7.5-extream)'", actualResult.contains("build([19*" + addedValue + "]):version(7.5-extream)"));
+                    } catch (AssertionError error) {
+                        errors.add(error);
+                    }
+                    return true;
+                }
+            });
+        }
+        assertTrue("There are CS errors: " + errors.toString(), errors.isEmpty());
     }
 }
 
