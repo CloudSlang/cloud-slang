@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class SlangSource {
 
@@ -55,12 +56,10 @@ public class SlangSource {
     }
 
     private static Charset getCharset() {
-        Charset charset = Charset.defaultCharset();
         String cslangEncoding = System.getProperty(SlangSystemPropertyConstant.CSLANG_ENCODING.getValue());
-        if (!StringUtils.isEmpty(cslangEncoding)) {
-            charset = Charset.forName(cslangEncoding);
-        }
-        return charset;
+        return StringUtils.isEmpty(cslangEncoding) ?
+                StandardCharsets.UTF_8 :
+                Charset.forName(cslangEncoding);
     }
 
     public static SlangSource fromFile(URI uri) {

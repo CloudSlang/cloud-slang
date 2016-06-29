@@ -3,7 +3,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.9.59.8-SNAPSHOT</version>
+        <version>0.9.59.10-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -169,7 +169,11 @@
                         <phase>generate-resources</phase>
                         <configuration>
                             <target>
-                                <unzip src="${basedir}/../cloudslang-cli/src/main/resources/dependency-base.zip" dest="${basedir}/target/cslang-builder/maven/repo" />
+                                <unzip src="${basedir}/../cloudslang-cli/src/main/resources/dependency-base.zip" dest="${basedir}/target/cslang-builder/maven/repo">
+                                    <patternset>
+                                        <exclude name="**/*.path" />
+                                    </patternset>
+                                </unzip>
                             </target>
                         </configuration>
                         <goals>
