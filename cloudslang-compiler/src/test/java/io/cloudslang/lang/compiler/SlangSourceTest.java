@@ -171,7 +171,7 @@ public class SlangSourceTest {
         when(file.getName()).thenReturn(sourceName);
         when(file.isFile()).thenReturn(true);
 
-        when(file.getPath()).thenThrow(IOException.class);
+        when(file.getPath()).thenThrow((Class) IOException.class);
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("reading");
@@ -182,12 +182,11 @@ public class SlangSourceTest {
 
     @Test
     public void testWhenPassingNullFileThrowException() throws Exception {
-        File file = null;
 
         exception.expect(NullPointerException.class);
         exception.expectMessage("null");
 
-        assertSourceEquals(SlangSource.fromFile(file));
+        assertSourceEquals(SlangSource.fromFile((File) null));
     }
 
     @Test
@@ -200,8 +199,68 @@ public class SlangSourceTest {
     }
 
     @Test
+    public void testFromFileUnicode() throws Exception {
+        // In this scenario, the source file is encoded using the default encoding (UTF-8)
+        final String sourceString = "ÈûÜ噂閏없다哱嘰ЕеЖ lœuvre àît André Citroën";
+        final String filename = sourceName + "_utf8";
+        File file = folder.newFile(filename);
+        FileUtils.writeStringToFile(file, sourceString, "UTF-8");
+
+        // Make sure UTF-8 is the default encoding for reading Slang sources
+        SlangSource result = SlangSource.fromFile(file);
+
+        Assert.assertEquals(sourceString, result.getSource());
+        Assert.assertEquals(filename, result.getFileName());
+    }
+
+    @Test
+    public void testFromFileOverrideEncoding() throws Exception {
+        // In this scenario, the source file is encoded using a single-byte Western European encoding (instead of UTF-8)
+        final String sourceString = "André Citroën";
+        final String filename = sourceName + "_fr";
+        File file = folder.newFile(filename);
+        FileUtils.writeStringToFile(file, sourceString, "ISO-8859-1");
+
+        // Make sure we can override the default encoding (UTF-8) with a system property
+        System.setProperty("cslang.encoding", "ISO-8859-1");
+        SlangSource result = SlangSource.fromFile(file);
+        System.clearProperty("cslang.encoding");
+
+        Assert.assertEquals(sourceString, result.getSource());
+        Assert.assertEquals(filename, result.getFileName());
+    }
+
+    @Test
     public void testFromBytes() throws Exception {
         assertSourceEquals(SlangSource.fromBytes(sourceString.getBytes(), sourceName));
+    }
+
+    @Test
+    public void testFromBytesUnicode() throws Exception {
+        // In this scenario, the source file is encoded using the default encoding (UTF-8)
+        final String sourceString = "ÈûÜ噂閏없다哱嘰ЕеЖ lœuvre àît André Citroën";
+        final byte[] sourceFile = sourceString.getBytes("UTF-8");
+
+        // Make sure UTF-8 is the default encoding for reading Slang sources
+        SlangSource result = SlangSource.fromBytes(sourceFile, sourceName);
+
+        Assert.assertEquals(sourceString, result.getSource());
+        Assert.assertEquals(sourceName, result.getFileName());
+    }
+
+    @Test
+    public void testFromBytesOverrideEncoding() throws Exception {
+        // In this scenario, the source file is encoded using a single-byte Western European encoding (instead of UTF-8)
+        final String sourceString = "André Citroën";
+        final byte[] sourceFile = sourceString.getBytes("ISO-8859-1");
+
+        // Make sure we can override the default encoding (UTF-8) with a system property
+        System.setProperty("cslang.encoding", "ISO-8859-1");
+        SlangSource result = SlangSource.fromBytes(sourceFile, sourceName);
+        System.clearProperty("cslang.encoding");
+
+        Assert.assertEquals(sourceString, result.getSource());
+        Assert.assertEquals(sourceName, result.getFileName());
     }
 
     @Test
