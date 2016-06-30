@@ -101,7 +101,7 @@ public class FlowWithPythonVersioningTest extends SystemsTestsParent {
         Set<SlangSource> dependencies = Sets.newHashSet(SlangSource.fromFile(py_dependency_mul_op));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), dependencies);
 
-        for (int addedValue = 0; addedValue < 1; addedValue++) {
+        for (int addedValue = 0; addedValue < 20; addedValue++) {
             Map<String, Value> userInputs = new HashMap<>();
             userInputs.put("addedValue", ValueFactory.create(addedValue));
             ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
