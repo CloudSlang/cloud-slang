@@ -55,8 +55,8 @@ public class SlangTestRunner {
     public static final String TEST_CASE_PASSED = "Test case passed: ";
     public static final String TEST_CASE_FAILED = "Test case failed: ";
 
-    private final static Logger log = Logger.getLogger(SlangTestRunner.class);
-    private final String UNAVAILABLE_NAME = "N/A";
+    private static final Logger log = Logger.getLogger(SlangTestRunner.class);
+    private static final String UNAVAILABLE_NAME = "N/A";
 
     public Map<String, SlangTestCase> createTestCases(String testPath, Set<String> allAvailableExecutables) {
         Validate.notEmpty(testPath, "You must specify a path for tests");
