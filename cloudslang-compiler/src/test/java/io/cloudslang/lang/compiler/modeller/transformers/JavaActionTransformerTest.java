@@ -94,6 +94,13 @@ public class JavaActionTransformerTest {
     }
 
     @Test
+    public void testTransformWithoutGAV() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Following tags are missing: [gav]");
+        javaActionTransformer.transform(loadJavaActionData("/java_action_wo_dependencies.sl"));
+    }
+
+    @Test
     public void testTransformWithEmptyOneEmptyPart() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
