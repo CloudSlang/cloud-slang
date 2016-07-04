@@ -38,7 +38,6 @@ public class PythonActionTransformer extends AbstractTransformer implements Tran
                     dependencyFormatValidator.validateDependency(dependency);
                 }
             }
-            System.out.println(dependencies);
         }
         return rawData;
     }
