@@ -17,6 +17,7 @@ public class SlangBannerTest {
             " \\______  /____/\\____/|____/\\____ /_______  /|____(____  /___|  /\\___  /" + System.lineSeparator() +
             "        \\/                       \\/       \\/           \\/     \\//_____/" + System.lineSeparator() +
             "null";
+    public static final String CLOUDSLANG = "CloudSlang";
     private SlangBanner slangBanner;
 
     @Before
@@ -27,5 +28,10 @@ public class SlangBannerTest {
     @Test
     public void testGetBanner() throws Exception {
         Assert.assertEquals(BANNER, slangBanner.getBanner());
+    }
+
+    @Test
+    public void testGetProviderName() {
+        Assert.assertEquals(CLOUDSLANG, slangBanner.getProviderName());
     }
 }

@@ -25,6 +25,10 @@ public class MetadataExtractorTest {
 
     public static final String NEWLINE = System.lineSeparator();
 
+    private static final String DESCRIPTION_AND_PREREQUISITES = "description: " + System.lineSeparator() +
+            "  Parses the given JSON input to retrieve the" + System.lineSeparator() +
+            "  corresponding value addressed by the json_path input." + System.lineSeparator() +
+            "prerequisites: jenkinsapi Python module";
     public static final String OPERATION_DESCRIPTION = "Parses the given JSON input to retrieve the" + NEWLINE +
                                                        "corresponding value addressed by the json_path input.";
     public static final String FIRST_INPUT_VALUE = "JSON data input" + NEWLINE +
@@ -60,6 +64,18 @@ public class MetadataExtractorTest {
         Assert.assertEquals("different input name", "json_path", entry2.getKey());
         Assert.assertEquals("different input value", SECOND_OUTPUT_VALUE, entry2.getValue());
         Assert.assertEquals("different result value", "", metadata.getResults().get(SOME_OTHER_RESULT));
+    }
+
+    @Test
+    public void testMetadataPrettyPrint() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata.sl").toURI();
+        Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+        String metadataToPrint = metadata.prettyPrint();
+        Assert.assertNotNull(metadataToPrint);
+        Assert.assertFalse(metadataToPrint.contains("io.cloudslang.lang.compiler.modeller.model.Metadata"));
+        Assert.assertTrue(metadataToPrint.contains(DESCRIPTION_AND_PREREQUISITES));
+        Assert.assertTrue(metadataToPrint.contains(SOME_OTHER_RESULT));
+        Assert.assertFalse(metadataToPrint.contains(SOME_OTHER_RESULT + ":"));
     }
 
     @Test
