@@ -33,16 +33,26 @@ public class SensitiveValue implements Value {
 
     public static final String SENSITIVE_VALUE_MASK = "********";
 
-    private String content;
+    private String content = null;
+    private Serializable originalContent = null;
 
     @SuppressWarnings("unused")
     protected SensitiveValue() {
     }
 
     protected SensitiveValue(Serializable content) {
-        byte[] serialized = serialize(content);
-        String encoded = Base64.encode(serialized);
-        this.content = EncryptionProvider.get().encrypt(encoded.toCharArray());
+        originalContent = content;
+        encrypt();
+    }
+
+    public void encrypt() {
+        content = encrypt(originalContent);
+        originalContent = null;
+    }
+
+    public void decrypt() {
+        originalContent = decrypt(content);
+        content = null;
     }
 
     public String getContent() {
@@ -55,9 +65,7 @@ public class SensitiveValue implements Value {
 
     @Override
     public Serializable get() {
-        char[] decrypted = EncryptionProvider.get().decrypt(content);
-        byte[] decoded = Base64.decode(new String(decrypted));
-        return deserialize(decoded);
+        return decrypt(content);
     }
 
     @JsonIgnore
@@ -82,6 +90,24 @@ public class SensitiveValue implements Value {
     @Override
     public String toString() {
         return SENSITIVE_VALUE_MASK;
+    }
+
+    private String encrypt(Serializable originalContent) {
+        if(originalContent != null) {
+            byte[] serialized = serialize(originalContent);
+            String encoded = Base64.encode(serialized);
+            return EncryptionProvider.get().encrypt(encoded.toCharArray());
+        }
+        return null;
+    }
+
+    private Serializable decrypt(String content) {
+        if(content != null) {
+            char[] decrypted = EncryptionProvider.get().decrypt(content);
+            byte[] decoded = Base64.decode(new String(decrypted));
+            return deserialize(decoded);
+        }
+        return null;
     }
 
     private byte[] serialize(Serializable data) {
