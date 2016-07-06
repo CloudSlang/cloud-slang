@@ -148,14 +148,20 @@ public class RunEnvironment implements Serializable {
 
     private List<Value> prepareValuesToCheck() {
         List<Value> valuesToCheck = new LinkedList<>();
-        valuesToCheck.addAll(callArguments.values());
-        valuesToCheck.addAll(returnValues.getOutputs().values());
-        valuesToCheck.addAll(Collections2.transform(this.systemProperties, new Function<SystemProperty, Value>() {
-            @Override
-            public Value apply(SystemProperty systemProperty) {
-                return systemProperty.getValue();
-            }
-        }));
+        if(callArguments != null) {
+            valuesToCheck.addAll(callArguments.values());
+        }
+        if((returnValues != null) && (returnValues.getOutputs() != null)) {
+            valuesToCheck.addAll(returnValues.getOutputs().values());
+        }
+        if(systemProperties != null) {
+            valuesToCheck.addAll(Collections2.transform(systemProperties, new Function<SystemProperty, Value>() {
+                @Override
+                public Value apply(SystemProperty systemProperty) {
+                    return systemProperty.getValue();
+                }
+            }));
+        }
         ContextStack tempStack = new ContextStack();
         Context context;
         while ((context = contextStack.popContext()) != null) {
