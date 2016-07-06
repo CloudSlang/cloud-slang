@@ -12,14 +12,14 @@ package io.cloudslang.lang.runtime.env;
 
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import org.apache.commons.lang3.Validate;
+import org.python.google.common.base.Function;
+import org.python.google.common.collect.Collections2;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * User: stoneo
@@ -119,6 +119,55 @@ public class RunEnvironment implements Serializable {
     public void resetStacks() {
         contextStack = new ContextStack();
         parentFlowStack = new ParentFlowStack();
+    }
+
+    public boolean containsSensitiveData() {
+        for (Value value: prepareValuesToCheck()) {
+            if(value.isSensitive()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void decryptSensitiveData() {
+        for (Value value: prepareValuesToCheck()) {
+            if(value.isSensitive()) {
+                ((SensitiveValue)value).decrypt();
+            }
+        }
+    }
+
+    public void encryptSensitiveData() {
+        for (Value value: prepareValuesToCheck()) {
+            if(value.isSensitive()) {
+                ((SensitiveValue)value).encrypt();
+            }
+        }
+    }
+
+    private List<Value> prepareValuesToCheck() {
+        List<Value> valuesToCheck = new LinkedList<>();
+        valuesToCheck.addAll(callArguments.values());
+        valuesToCheck.addAll(returnValues.getOutputs().values());
+        valuesToCheck.addAll(Collections2.transform(this.systemProperties, new Function<SystemProperty, Value>() {
+            @Override
+            public Value apply(SystemProperty systemProperty) {
+                return systemProperty.getValue();
+            }
+        }));
+        ContextStack tempStack = new ContextStack();
+        Context context;
+        while ((context = contextStack.popContext()) != null) {
+            valuesToCheck.addAll(context.getImmutableViewOfLanguageVariables().values());
+            valuesToCheck.addAll(context.getImmutableViewOfVariables().values());
+            tempStack.pushContext(context);
+        }
+        while ((context = tempStack.popContext()) != null) {
+            contextStack.pushContext(context);
+        }
+
+        return valuesToCheck;
     }
 
 }
