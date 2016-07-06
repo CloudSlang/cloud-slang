@@ -8,6 +8,6 @@
 namespace: user.SYS
 
 properties:
-  props.host: localhost
-  props.port: 22
-  props.alla: balla
+  - props.host: localhost
+  - props.port: 22
+  - props.alla: balla
