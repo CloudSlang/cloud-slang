@@ -28,4 +28,9 @@ public interface PreCompileValidator {
             List<String> additionalValidKeyWords,
             List<List<String>> constraintGroups);
 
+    Map<String, Map<String, Object>> validateOnFailurePosition(
+            List<Map<String, Map<String, Object>>> workFlowRawData,
+            String execName,
+            List<RuntimeException> errors);
+
 }
