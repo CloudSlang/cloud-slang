@@ -1,6 +1,5 @@
 package io.cloudslang.lang.compiler.modeller.model;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;

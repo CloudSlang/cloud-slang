@@ -62,6 +62,7 @@ public class JavaActionTransformerTest {
         initialJavaActionInvalidKey = loadJavaActionData("/corrupted/java_action_invalid_key.sl");
 
         expectedJavaActionSimple = new HashMap<>();
+        expectedJavaActionSimple.put(ScoreLangConstants.JAVA_ACTION_GAV_KEY, "some.group:some.artifact:some.version");
         expectedJavaActionSimple.put(ScoreLangConstants.JAVA_ACTION_CLASS_KEY, "com.hp.thing");
         expectedJavaActionSimple.put(ScoreLangConstants.JAVA_ACTION_METHOD_KEY, "someMethod");
         expectedJavaActionWithDependencies = new HashMap<>(expectedJavaActionSimple);
@@ -91,11 +92,54 @@ public class JavaActionTransformerTest {
         javaActionTransformer.transform(initialJavaActionInvalidKey);
     }
 
-    private Map loadJavaActionData(String filePath) throws URISyntaxException {
+    @Test
+    public void testTransformWithoutGAV() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Following tags are missing: [gav]");
+        javaActionTransformer.transform(loadJavaActionData("/java_action_wo_dependencies.sl"));
+    }
+
+    @Test
+    public void testTransformWithEmptyOneEmptyPart() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
+        javaActionTransformer.transform(loadJavaActionData("/java_action_with_dependencies_1_empty_part.sl"));
+    }
+
+    @Test
+    public void testTransformWithEmptyDependencies() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
+        javaActionTransformer.transform(loadJavaActionData("/java_action_with_dependencies_empty.sl"));
+    }
+
+    @Test
+    public void testTransformWithAllEmptyParts() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
+        javaActionTransformer.transform(loadJavaActionData("/java_action_with_dependencies_all_empty_parts.sl"));
+    }
+
+    @Test
+    public void testTransformWithOnePart() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
+        javaActionTransformer.transform(loadJavaActionData("/java_action_with_dependencies_1_part.sl"));
+    }
+
+    @Test
+    public void testTransformWithTwoEmptyParts() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
+        javaActionTransformer.transform(loadJavaActionData("/java_action_with_dependencies_2_parts.sl"));
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, String> loadJavaActionData(String filePath) throws URISyntaxException {
         URL resource = getClass().getResource(filePath);
         ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
         Map op = file.getOperation();
-        return (Map) op.get(SlangTextualKeys.JAVA_ACTION_KEY);
+        return (Map<String, String>) op.get(SlangTextualKeys.JAVA_ACTION_KEY);
     }
 
     public static class Config {
@@ -119,6 +163,11 @@ public class JavaActionTransformerTest {
         @Bean
         public JavaActionTransformer javaActionTransformer() {
             return new JavaActionTransformer();
+        }
+
+        @Bean
+        public DependencyFormatValidator dependencyFormatValidator() {
+            return new DependencyFormatValidator();
         }
     }
 }

@@ -10,6 +10,7 @@ namespace: user.ops
 operation:
   name: operation_invalid_action_property
   java_action:
+    gav: 'some.group:some.artifact:some.version'
     class_name: com.hp.thing
     method_name: someMethod
     IDontBelongHere: blah

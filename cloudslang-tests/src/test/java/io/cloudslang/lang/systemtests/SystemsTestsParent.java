@@ -19,7 +19,7 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
-import io.cloudslang.runtime.impl.python.PythonExecutionNotCachedEngine;
+import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
@@ -30,11 +30,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static ch.lambdaj.Lambda.select;
 import static org.hamcrest.Matchers.startsWith;
@@ -47,8 +43,6 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:/META-INF/spring/systemTestContext.xml")
 public abstract class SystemsTestsParent {
-    protected static boolean shouldRunMaven;
-
     protected static final String EXEC_START_PATH = "0";
     protected static final String FIRST_STEP_PATH = "0.0";
     protected static final String SECOND_STEP_KEY = "0.1";
@@ -79,13 +73,10 @@ public abstract class SystemsTestsParent {
         System.setProperty(MavenConfigImpl.MAVEN_REPO_LOCAL, mavenRepo.getAbsolutePath());
         System.setProperty("maven.home", classLoader.getResource("maven").getPath());
 
-        shouldRunMaven = System.getProperties().containsKey(MavenConfigImpl.MAVEN_REMOTE_URL) &&
-                System.getProperties().containsKey(MavenConfigImpl.MAVEN_PLUGINS_URL);
-
         System.setProperty(MavenConfigImpl.MAVEN_SETTINGS_PATH, settingsXmlPath);
         System.setProperty(MavenConfigImpl.MAVEN_M2_CONF_PATH, classLoader.getResource("m2.conf").getPath());
 
-        String provideralAlreadyConfigured = System.setProperty("python.executor.engine", PythonExecutionNotCachedEngine.class.getSimpleName());
+        String provideralAlreadyConfigured = System.setProperty("python.executor.engine", PythonExecutionCachedEngine.class.getSimpleName());
         assertNull("python.executor.engine was configured before this test!!!!!!!", provideralAlreadyConfigured);
     }
 

@@ -14,8 +14,6 @@ import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 /*
  * Created by stoneo on 2/2/2015.
  */

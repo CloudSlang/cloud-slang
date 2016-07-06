@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.hp.oo.platformactions</groupId>
+    <artifactId>platform-actions</artifactId>
+    <version>10.70.00-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <distributionManagement>
+        <repository>
+            <id>nexus-repository</id>
+            <name>nexus repository</name>
+            <url>http://mydphdb0166.hpswlabs.adapps.hp.com:8081/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus-snapshot-repository</id>
+            <name>nexus snapshots repository</name>
+            <url>http://mydphdb0166.hpswlabs.adapps.hp.com:8081/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+
+    <modules>
+        <module>java-actions</module>
+        <module>python-actions</module>
+    </modules>
+</project>

@@ -17,55 +17,48 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.springframework.stereotype.Component;
 
 @Component
 public class JavaActionTransformer extends AbstractTransformer implements Transformer<Map<String, String>, Map<String, String>> {
+    @Autowired
+    private DependencyFormatValidator dependencyFormatValidator;
 
     private static Set<String> mandatoryKeySet = Sets.newHashSet(
             SlangTextualKeys.JAVA_ACTION_CLASS_NAME_KEY,
-            SlangTextualKeys.JAVA_ACTION_METHOD_NAME_KEY
+            SlangTextualKeys.JAVA_ACTION_METHOD_NAME_KEY,
+            SlangTextualKeys.JAVA_ACTION_GAV_KEY
     );
-    private static Set<String> optionalKeySet = Sets.newHashSet(SlangTextualKeys.JAVA_ACTION_GAV_KEY);
+    private static Set<String> optionalKeySet = Sets.newHashSet();
 
     @Override
     public Map<String, String> transform(Map<String, String> rawData) {
         if (rawData != null) {
-            validateKeySet(
-                    rawData.keySet(),
-                    mandatoryKeySet,
-                    optionalKeySet
-            );
+            validateKeySet(rawData.keySet(), mandatoryKeySet, optionalKeySet);
             transformKeys(rawData);
         }
-
         return rawData;
     }
 
     @Override
-    public List<Scope> getScopes() {
-        return Collections.singletonList(Scope.ACTION);
-    }
+    public List<Scope> getScopes() {return Collections.singletonList(Scope.ACTION);}
 
     @Override
-    public String keyToTransform() {
-        return SlangTextualKeys.JAVA_ACTION_KEY;
-    }
+    public String keyToTransform() {return SlangTextualKeys.JAVA_ACTION_KEY;}
 
     private void transformKeys(Map<String, String> rawData) {
         // snake_case -> camelCase
-        rawData.put(
-                ScoreLangConstants.JAVA_ACTION_CLASS_KEY,
-                rawData.remove(SlangTextualKeys.JAVA_ACTION_CLASS_NAME_KEY)
-        );
-        rawData.put(
-                ScoreLangConstants.JAVA_ACTION_METHOD_KEY,
-                rawData.remove(SlangTextualKeys.JAVA_ACTION_METHOD_NAME_KEY)
-        );
+        rawData.put(ScoreLangConstants.JAVA_ACTION_CLASS_KEY, rawData.remove(SlangTextualKeys.JAVA_ACTION_CLASS_NAME_KEY));
+        rawData.put(ScoreLangConstants.JAVA_ACTION_METHOD_KEY, rawData.remove(SlangTextualKeys.JAVA_ACTION_METHOD_NAME_KEY));
+        String gav = rawData.remove(SlangTextualKeys.JAVA_ACTION_GAV_KEY);
+        dependencyFormatValidator.validateDependency(gav);
+        rawData.put(ScoreLangConstants.JAVA_ACTION_GAV_KEY, gav);
     }
 
 }

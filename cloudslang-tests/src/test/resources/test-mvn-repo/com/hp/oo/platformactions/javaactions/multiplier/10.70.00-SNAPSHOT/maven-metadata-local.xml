@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>com.hp.oo.platformactions.javaactions</groupId>
+  <artifactId>multiplier</artifactId>
+  <version>10.70.00-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <localCopy>true</localCopy>
+    </snapshot>
+    <lastUpdated>20160629194247</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>10.70.00-SNAPSHOT</value>
+        <updated>20160629194247</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>10.70.00-SNAPSHOT</value>
+        <updated>20160629194247</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>

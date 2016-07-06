@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.hp.oo.platformactions.javaactions</groupId>
+  <artifactId>sum</artifactId>
+  <versioning>
+    <versions>
+      <version>10.70.00-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20160629194247</lastUpdated>
+  </versioning>
+</metadata>

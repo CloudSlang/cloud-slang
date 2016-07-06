@@ -11,8 +11,8 @@ operation:
   name: python_action_with_dependencies
   python_action:
     dependencies:
-      - dep1
-      - dep2
+      - 'g:a:v1'
+      - 'g:a:v2'
     script: 'pass'
   results:
     - SUCCESS

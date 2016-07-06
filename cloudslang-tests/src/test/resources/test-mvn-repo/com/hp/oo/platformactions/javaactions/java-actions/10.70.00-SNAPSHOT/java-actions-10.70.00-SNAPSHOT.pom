@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.hp.oo.platformactions</groupId>
+        <artifactId>platform-actions</artifactId>
+        <version>10.70.00-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>com.hp.oo.platformactions.javaactions</groupId>
+    <artifactId>java-actions</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+		<module>multiplier</module>
+		<module>sum</module>
+        <module>mul_of_sum</module>
+        <module>sum_of_mul</module>
+        <module>global_context</module>
+		<module>java_utils</module>
+    </modules>
+</project>

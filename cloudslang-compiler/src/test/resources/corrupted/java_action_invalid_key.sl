@@ -10,6 +10,7 @@ namespace: user.ops
 operation:
   name: java_action_invalid_key
   java_action:
+    gav: 'g:a:v'
     invalid_key: 'data'
     class_name: com.hp.thing
     method_name: someMethod

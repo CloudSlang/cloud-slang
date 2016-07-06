@@ -66,7 +66,7 @@ public class PythonActionTransformerTest {
         expectedPythonActionSimple = new HashMap<>();
         expectedPythonActionSimple.put(SlangTextualKeys.PYTHON_ACTION_SCRIPT_KEY, "pass");
         expectedPythonActionWithDependencies = new HashMap<>(expectedPythonActionSimple);
-        ArrayList<String> dependencies = Lists.newArrayList("dep1", "dep2");
+        ArrayList<String> dependencies = Lists.newArrayList("g:a:v1", "g:a:v2");
         expectedPythonActionWithDependencies.put(SlangTextualKeys.PYTHON_ACTION_DEPENDENCIES_KEY, dependencies);
     }
 
@@ -82,6 +82,41 @@ public class PythonActionTransformerTest {
         @SuppressWarnings("unchecked")
         Map<String, Serializable> actualPythonActionSimple = pythonActionTransformer.transform(initialPythonActionWithDependencies);
         Assert.assertEquals(expectedPythonActionWithDependencies, actualPythonActionSimple);
+    }
+
+    @Test
+    public void testTransformWithEmptyOneEmptyPart() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
+        pythonActionTransformer.transform(loadPythonActionData("/python_action_with_dependencies_1_empty_part.sl"));
+    }
+
+    @Test
+    public void testTransformWithEmptyDependencies() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
+        pythonActionTransformer.transform(loadPythonActionData("/python_action_with_dependencies_1_part.sl"));
+    }
+
+    @Test
+    public void testTransformWithAllEmptyParts() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
+        pythonActionTransformer.transform(loadPythonActionData("/python_action_with_dependencies_2_parts.sl"));
+    }
+
+    @Test
+    public void testTransformWithOnePart() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
+        pythonActionTransformer.transform(loadPythonActionData("/python_action_with_dependencies_all_empty_parts.sl"));
+    }
+
+    @Test
+    public void testTransformWithTwoEmptyParts() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
+        pythonActionTransformer.transform(loadPythonActionData("/python_action_with_dependencies_empty.sl"));
     }
 
     @Test
@@ -121,6 +156,11 @@ public class PythonActionTransformerTest {
         @Bean
         public PythonActionTransformer pythonActionTransformer() {
             return new PythonActionTransformer();
+        }
+
+        @Bean
+        public DependencyFormatValidator dependencyFormatValidator() {
+            return new DependencyFormatValidator();
         }
     }
 }

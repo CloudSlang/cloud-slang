@@ -11,8 +11,6 @@ package io.cloudslang.lang.tools.build;
 
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 
-import java.util.Map;
-
 /**
  * Created by stoneo on 4/1/2015.
  **/
