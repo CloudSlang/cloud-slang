@@ -145,6 +145,26 @@ public class LoadSystemPropertiesTest extends SystemsTestsParent {
         loadSystemProperties(SlangSource.fromFile(propertiesURI));
     }
 
+    @Test
+    public void testDuplicateIgnoringCaseSimpleKey() throws Exception {
+        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/duplicate_ignoring_case_simple_key.prop.sl").toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
+        exception.expectMessage(SlangCompilerImpl.DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX);
+        exception.expectMessage("Host");
+        loadSystemProperties(SlangSource.fromFile(propertiesURI));
+    }
+
+    @Test
+    public void testDuplicateIgnoringCaseComplexKey() throws Exception {
+        URI propertiesURI = getClass().getResource("/yaml/properties/a/b/duplicate_ignoring_case_complex_key.prop.sl").toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
+        exception.expectMessage(SlangCompilerImpl.DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX);
+        exception.expectMessage("restrict.OUT.port");
+        loadSystemProperties(SlangSource.fromFile(propertiesURI));
+    }
+
     private Set<SystemProperty> getSystemPropertiesValid() {
         return getSystemPropertiesBasic("a.b");
     }

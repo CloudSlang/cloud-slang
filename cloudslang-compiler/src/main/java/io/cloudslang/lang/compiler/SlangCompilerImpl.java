@@ -16,6 +16,7 @@ import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.utils.SetUtils;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -125,7 +126,7 @@ public class SlangCompilerImpl implements SlangCompiler {
         for (Map<String, Object> propertyAsMap : parsedSystemProperties) {
             Map.Entry<String, Object> propertyAsEntry = propertyAsMap.entrySet().iterator().next();
             String propertyKey = propertyAsEntry.getKey();
-            if (modelledSystemPropertyKeys.contains(propertyKey)) {
+            if (SetUtils.containsIgnoreCase(modelledSystemPropertyKeys, propertyKey)) {
                 throw new RuntimeException(
                         DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX + propertyKey + "'."
                 );

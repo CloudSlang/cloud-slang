@@ -17,6 +17,7 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.lang.entities.utils.SetUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
@@ -47,6 +48,7 @@ public class CompilerHelperImpl implements CompilerHelper{
     private static final String SP_DIR = "properties"; //TODO reconsider it after closing CloudSlang file extensions & some real usecases
     private static final String INPUT_DIR = "inputs";
     private static final String CONFIG_DIR = "configuration";
+    private static final String DUPLICATE_SYSTEM_PROPERTY_ERROR_MESSAGE_PREFIX = "Duplicate system property: '";
 
     @Autowired
     private Slang slang;
@@ -182,20 +184,38 @@ public class CompilerHelperImpl implements CompilerHelper{
                 Extension.validatePropertiesFileExtension(propertyFileCandidate.getName());
             }
         }
-        Set<SystemProperty> result = new HashSet<>();
+        Map<File, Set<SystemProperty>> loadedProperties = new HashMap<>();
         for(File propFile : fileCollection) {
             try {
                 SlangSource source = SlangSource.fromFile(propFile);
                 logger.info("Loading file: " + propFile);
                 Set<SystemProperty> propsFromFile = slang.loadSystemProperties(source);
-                result.addAll(propsFromFile);
+                mergeSystemProperties(loadedProperties, propsFromFile, propFile);
             } catch(Throwable ex) {
                 String errorMessage = "Error loading file: " + propFile + " nested exception is " + ex.getMessage();
                 logger.error(errorMessage, ex);
                 throw new RuntimeException(errorMessage, ex);
             }
         }
-        return result;
+        return SetUtils.mergeSets(loadedProperties.values());
+    }
+
+    private void mergeSystemProperties(
+            Map<File, Set<SystemProperty>> target,
+            Set<SystemProperty> propertiesFromFile,
+            File sourceFile) {
+        for (Map.Entry<File, Set<SystemProperty>> entry : target.entrySet()) {
+            for (SystemProperty propertyFromFile : propertiesFromFile) {
+                if (SetUtils.containsIgnoreCaseBasedOnFQN(entry.getValue(), propertyFromFile)) {
+                    throw new RuntimeException(
+                            DUPLICATE_SYSTEM_PROPERTY_ERROR_MESSAGE_PREFIX + propertyFromFile.getFullyQualifiedName() +
+                                    "' in the following files: " + entry.getKey().getPath() + ", " + sourceFile.getPath()
+
+                    );
+                }
+            }
+        }
+        target.put(sourceFile, propertiesFromFile);
     }
 
     private Collection<File> loadDefaultFiles(String[] extensions, String directory, boolean recursive) {
