@@ -19,11 +19,13 @@ import io.cloudslang.lang.compiler.SlangTextualKeys;
 import java.io.Serializable;
 import java.util.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PythonActionTransformer extends AbstractTransformer implements Transformer<Map<String, Serializable>, Map<String, Serializable>> {
-    private static DependencyFormatValidator dependencyFormatValidator = new DependencyFormatValidator();
+    @Autowired
+    private DependencyFormatValidator dependencyFormatValidator;
 
     private static Set<String> mandatoryKeySet = Sets.newHashSet(SlangTextualKeys.PYTHON_ACTION_SCRIPT_KEY);
     private static Set<String> optionalKeySet = Sets.newHashSet(SlangTextualKeys.PYTHON_ACTION_DEPENDENCIES_KEY);

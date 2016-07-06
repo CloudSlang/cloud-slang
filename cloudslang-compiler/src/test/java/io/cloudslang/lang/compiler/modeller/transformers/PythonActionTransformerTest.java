@@ -157,5 +157,10 @@ public class PythonActionTransformerTest {
         public PythonActionTransformer pythonActionTransformer() {
             return new PythonActionTransformer();
         }
+
+        @Bean
+        public DependencyFormatValidator dependencyFormatValidator() {
+            return new DependencyFormatValidator();
+        }
     }
 }

@@ -17,6 +17,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -26,7 +27,9 @@ import java.util.Set;
 
 @Component
 public class JavaActionTransformer extends AbstractTransformer implements Transformer<Map<String, String>, Map<String, String>> {
-    private static DependencyFormatValidator dependencyFormatValidator = new DependencyFormatValidator();
+    @Autowired
+    private DependencyFormatValidator dependencyFormatValidator;
+
     private static Set<String> mandatoryKeySet = Sets.newHashSet(
             SlangTextualKeys.JAVA_ACTION_CLASS_NAME_KEY,
             SlangTextualKeys.JAVA_ACTION_METHOD_NAME_KEY,

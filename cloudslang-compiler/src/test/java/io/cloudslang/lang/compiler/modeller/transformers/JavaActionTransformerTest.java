@@ -39,7 +39,6 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
  *
  * @author Bonczidai Levente
  */
-@SuppressWarnings("ALL")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes=JavaActionTransformerTest.Config.class)
 public class JavaActionTransformerTest {
@@ -135,11 +134,12 @@ public class JavaActionTransformerTest {
         javaActionTransformer.transform(loadJavaActionData("/java_action_with_dependencies_2_parts.sl"));
     }
 
-    private Map loadJavaActionData(String filePath) throws URISyntaxException {
+    @SuppressWarnings("unchecked")
+    private Map<String, String> loadJavaActionData(String filePath) throws URISyntaxException {
         URL resource = getClass().getResource(filePath);
         ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
         Map op = file.getOperation();
-        return (Map) op.get(SlangTextualKeys.JAVA_ACTION_KEY);
+        return (Map<String, String>) op.get(SlangTextualKeys.JAVA_ACTION_KEY);
     }
 
     public static class Config {
@@ -163,6 +163,11 @@ public class JavaActionTransformerTest {
         @Bean
         public JavaActionTransformer javaActionTransformer() {
             return new JavaActionTransformer();
+        }
+
+        @Bean
+        public DependencyFormatValidator dependencyFormatValidator() {
+            return new DependencyFormatValidator();
         }
     }
 }
