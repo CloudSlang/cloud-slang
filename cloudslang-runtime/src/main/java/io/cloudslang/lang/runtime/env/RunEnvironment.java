@@ -122,16 +122,14 @@ public class RunEnvironment implements Serializable {
     }
 
     public boolean containsSensitiveData() {
-        for (Value value: prepareValuesToCheck()) {
-            if(value.isSensitive()) {
-                return true;
-            }
-        }
-        return false;
+        return containsSensitiveCallArgument() ||
+                containsSensitiveReturnValues() ||
+                containsSensitiveSystemProperties() ||
+                containsSensitiveContexts();
     }
 
     public void decryptSensitiveData() {
-        for (Value value: prepareValuesToCheck()) {
+        for (Value value: prepareValuesForEncryptDecrypt()) {
             if(value.isSensitive()) {
                 ((SensitiveValue)value).decrypt();
             }
@@ -139,14 +137,60 @@ public class RunEnvironment implements Serializable {
     }
 
     public void encryptSensitiveData() {
-        for (Value value: prepareValuesToCheck()) {
+        for (Value value: prepareValuesForEncryptDecrypt()) {
             if(value.isSensitive()) {
                 ((SensitiveValue)value).encrypt();
             }
         }
     }
 
-    private List<Value> prepareValuesToCheck() {
+    private boolean containsSensitiveCallArgument() {
+        return callArguments != null && containsSensitiveData(callArguments.values());
+    }
+
+    private boolean containsSensitiveReturnValues() {
+        return (returnValues != null) && (returnValues.getOutputs() != null) &&
+                containsSensitiveData(returnValues.getOutputs().values());
+    }
+
+    private boolean containsSensitiveSystemProperties() {
+        return (systemProperties != null) &&
+                containsSensitiveData(Collections2.transform(systemProperties, new Function<SystemProperty, Value>() {
+                    @Override
+                    public Value apply(SystemProperty systemProperty) {
+                        return systemProperty.getValue();
+                    }
+                }));
+    }
+
+    private boolean containsSensitiveContexts() {
+        boolean hasSensitive = false;
+        ContextStack tempStack = new ContextStack();
+        Context context;
+        while (!hasSensitive && (context = contextStack.popContext()) != null) {
+            hasSensitive = containsSensitiveData(context.getImmutableViewOfLanguageVariables().values());
+            hasSensitive = hasSensitive || containsSensitiveData(context.getImmutableViewOfVariables().values());
+            tempStack.pushContext(context);
+        }
+        while ((context = tempStack.popContext()) != null) {
+            contextStack.pushContext(context);
+        }
+
+        return hasSensitive;
+    }
+
+    private boolean containsSensitiveData(Collection<Value> data) {
+        if(data != null) {
+            for (Value value: data) {
+                if(value.isSensitive()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private List<Value> prepareValuesForEncryptDecrypt() {
         List<Value> valuesToCheck = new LinkedList<>();
         if(callArguments != null) {
             valuesToCheck.addAll(callArguments.values());
