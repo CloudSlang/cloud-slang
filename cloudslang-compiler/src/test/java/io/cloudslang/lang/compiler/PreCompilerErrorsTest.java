@@ -46,7 +46,7 @@ public class PreCompilerErrorsTest {
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("Error transforming source: no_op_flow_file to a Slang model. " +
-                "Source no_op_flow_file has no content associated with flow/operation/properties property.");
+                "Source no_op_flow_file has no content associated with flow/operation/decision/properties property.");
         compiler.preCompileSource(SlangSource.fromFile(resource));
     }
 

@@ -127,14 +127,14 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
 
         if (constraintGroups != null) {
             for (List<String> group : constraintGroups) {
-                boolean found = false;
+                String lastKeyFound = null;
                 for (String key : group) {
                     if (rawDataKeySet.contains(key)) {
-                        if (found) {
+                        if (lastKeyFound != null) {
                             // one key from this group was already found in action data
-                            errors.add(new RuntimeException("Conflicting keys at: " + dataLogicalName));
+                            errors.add(new RuntimeException("Conflicting keys[" + lastKeyFound + ", " + key + "] at: " + dataLogicalName));
                         } else {
-                            found = true;
+                            lastKeyFound = key;
                         }
                     }
                 }

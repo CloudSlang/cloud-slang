@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler.modeller;
 import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Action;
+import io.cloudslang.lang.compiler.modeller.model.Decision;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Step;
@@ -87,15 +88,15 @@ public class ExecutableBuilder {
 
     private List<Transformer> preExecTransformers;
     private List<Transformer> postExecTransformers;
-    private List<String> execAdditionalKeywords = Arrays.asList(
-            SlangTextualKeys.JAVA_ACTION_KEY,
-            SlangTextualKeys.PYTHON_ACTION_KEY,
-            SlangTextualKeys.WORKFLOW_KEY,
-            SlangTextualKeys.EXECUTABLE_NAME_KEY
-    );
+
+    private List<String> executableAdditionalKeywords = Collections.singletonList(SlangTextualKeys.EXECUTABLE_NAME_KEY);
+    private List<String> operationAdditionalKeywords =
+            Arrays.asList(SlangTextualKeys.JAVA_ACTION_KEY, SlangTextualKeys.PYTHON_ACTION_KEY);
+    private List<String> flowAdditionalKeywords = Collections.singletonList(SlangTextualKeys.WORKFLOW_KEY);
+    private List<String> allExecutableAdditionalKeywords;
 
     private List<Transformer> actionTransformers;
-    private List<List<String>> actionKeyConstraintGroups;
+    private List<List<String>> executableConstraintGroups;
 
     private List<Transformer> preStepTransformers;
     private List<Transformer> postStepTransformers;
@@ -113,12 +114,17 @@ public class ExecutableBuilder {
 
         //action transformers and keys
         actionTransformers = filterTransformers(Transformer.Scope.ACTION);
-        //action keys (Java / Python) excluding each other
-        actionKeyConstraintGroups = Collections.singletonList(
-                Arrays.asList(
-                        SlangTextualKeys.PYTHON_ACTION_KEY,
-                        SlangTextualKeys.JAVA_ACTION_KEY)
+
+        allExecutableAdditionalKeywords = new ArrayList<>(
+                executableAdditionalKeywords.size() + operationAdditionalKeywords.size() + flowAdditionalKeywords.size()
         );
+        allExecutableAdditionalKeywords.addAll(executableAdditionalKeywords);
+        allExecutableAdditionalKeywords.addAll(operationAdditionalKeywords);
+        allExecutableAdditionalKeywords.addAll(flowAdditionalKeywords);
+
+        // keys excluding each other
+        executableConstraintGroups = new ArrayList<>();
+        executableConstraintGroups.add(ListUtils.union(flowAdditionalKeywords, operationAdditionalKeywords));
 
         //step transformers
         preStepTransformers = filterTransformers(Transformer.Scope.BEFORE_STEP);
@@ -138,8 +144,9 @@ public class ExecutableBuilder {
                         "",
                         executableRawData,
                         ListUtils.union(preExecTransformers, postExecTransformers),
-                        execAdditionalKeywords,
-                        actionKeyConstraintGroups)
+                        allExecutableAdditionalKeywords,
+                        executableConstraintGroups
+                )
         );
 
         Map<String, Serializable> preExecutableActionData = new HashMap<>();
@@ -218,8 +225,30 @@ public class ExecutableBuilder {
 
                 return preCompileValidator.validateResult(parsedSlang, executableRawData,
                         new ExecutableModellingResult(operation, errors));
+            case DECISION:
+                try {
+                    systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForDecision(inputs, outputs, results);
+                } catch (RuntimeException ex) {
+                    errors.add(ex);
+                }
+                Decision decision = new Decision(
+                    preExecutableActionData,
+                    postExecutableActionData,
+                    namespace,
+                    execName,
+                    inputs,
+                    outputs,
+                    results,
+                    Collections.<String>emptySet(),
+                    systemPropertyDependencies
+                );
+                return preCompileValidator.validateResult(
+                        parsedSlang,
+                        executableRawData,
+                        new ExecutableModellingResult(decision, errors)
+                );
             default:
-                throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". It is not of flow or operations type");
+                throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". It is not of flow, operations or decision type");
         }
     }
 
