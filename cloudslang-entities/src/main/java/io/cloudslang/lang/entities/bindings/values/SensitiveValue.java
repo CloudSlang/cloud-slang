@@ -34,6 +34,13 @@ public class SensitiveValue implements Value {
     public static final String SENSITIVE_VALUE_MASK = "********";
 
     private String content = null;
+
+    /**
+     * This variable only used when passing sensitive data between application components which use
+     * different encryption key
+     * Json serialization in database should not deal with it
+     */
+    @JsonIgnore
     private Serializable originalContent = null;
 
     @SuppressWarnings("unused")
@@ -46,26 +53,30 @@ public class SensitiveValue implements Value {
     }
 
     public void encrypt() {
-        content = encrypt(originalContent);
-        originalContent = null;
+        if(originalContent != null) {
+            content = encrypt(originalContent);
+            originalContent = null;
+        }
     }
 
     public void decrypt() {
-        originalContent = decrypt(content);
-        content = null;
+        if(content != null) {
+            originalContent = decrypt(content);
+            content = null;
+        }
     }
 
     public String getContent() {
         return content;
     }
 
-    protected void setContent(String content) {
+    public void setContent(String content) {
         this.content = content;
     }
 
     @Override
     public Serializable get() {
-        return decrypt(content);
+        return (originalContent != null) ? originalContent : ((content == null) ? null : decrypt(content));
     }
 
     @JsonIgnore
@@ -76,15 +87,27 @@ public class SensitiveValue implements Value {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
         SensitiveValue that = (SensitiveValue) o;
-        return content != null ? content.equals(that.content) : that.content == null;
+
+        if (content != null ? !content.equals(that.content) : that.content != null) {
+            return false;
+        }
+        return originalContent != null ? originalContent.equals(that.originalContent) : that.originalContent == null;
+
     }
 
     @Override
     public int hashCode() {
-        return content != null ? content.hashCode() : 0;
+        int result = content != null ? content.hashCode() : 0;
+        result = 31 * result + (originalContent != null ? originalContent.hashCode() : 0);
+        return result;
     }
 
     @Override
@@ -93,21 +116,15 @@ public class SensitiveValue implements Value {
     }
 
     private String encrypt(Serializable originalContent) {
-        if(originalContent != null) {
-            byte[] serialized = serialize(originalContent);
-            String encoded = Base64.encode(serialized);
-            return EncryptionProvider.get().encrypt(encoded.toCharArray());
-        }
-        return null;
+        byte[] serialized = serialize(originalContent);
+        String encoded = Base64.encode(serialized);
+        return EncryptionProvider.get().encrypt(encoded.toCharArray());
     }
 
     private Serializable decrypt(String content) {
-        if(content != null) {
-            char[] decrypted = EncryptionProvider.get().decrypt(content);
-            byte[] decoded = Base64.decode(new String(decrypted));
-            return deserialize(decoded);
-        }
-        return null;
+        char[] decrypted = EncryptionProvider.get().decrypt(content);
+        byte[] decoded = Base64.decode(new String(decrypted));
+        return deserialize(decoded);
     }
 
     private byte[] serialize(Serializable data) {
