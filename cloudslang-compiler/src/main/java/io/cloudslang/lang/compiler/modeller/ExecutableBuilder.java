@@ -44,7 +44,6 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,7 +67,6 @@ import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER
 @Component
 public class ExecutableBuilder {
 
-    public static final String MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX = "Multiple 'on_failure' properties found";
     public static final String UNIQUE_STEP_NAME_MESSAGE_SUFFIX = "Each step name in the workflow must be unique";
     public static final String FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE =
             "Explicit values are not allowed for flow results. Correct format is:";
@@ -244,39 +242,34 @@ public class ExecutableBuilder {
 
     private Workflow getOnFailureWorkflow(List<Map<String, Map<String, Object>>> workFlowRawData, Map<String, String> imports, List<RuntimeException> errors,
                                           String namespace, String execName) {
-        Workflow onFailureWorkFlow = null;
-        List<Map<String, Map<String, Object>>> onFailureData;
-        Iterator<Map<String, Map<String, Object>>> stepsIterator = workFlowRawData.iterator();
-        boolean onFailureFound = false;
-        while (stepsIterator.hasNext()) {
-            Map<String, Map<String, Object>> stepData = stepsIterator.next();
-            String stepName = stepData.keySet().iterator().next();
-            if (stepName.equals(ON_FAILURE_KEY)) {
-                if (onFailureFound) {
-                    errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\n" + MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX));
-                } else {
-                    onFailureFound = true;
-                }
-                try {
-                    //noinspection unchecked
-                    onFailureData = (List<Map<String, Map<String, Object>>>) stepData.values().iterator().next();
-                } catch (ClassCastException ex) {
-                    onFailureData = new ArrayList<>();
-                    errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a list of steps and not a map"));
-                }
-                if (CollectionUtils.isNotEmpty(onFailureData)) {
-                    if (onFailureData.size() > 1) {
-                        errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be only one step"));
-                    }
-                    handleOnFailureStepNavigationSection(onFailureData, execName, errors);
 
-                    WorkflowModellingResult workflowModellingResult = compileWorkFlow(onFailureData, imports, null, true, namespace);
-                    errors.addAll(workflowModellingResult.getErrors());
-                    onFailureWorkFlow = workflowModellingResult.getWorkflow();
-                } else if (onFailureData == null) {
-                    errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nThere is no step below the 'on_failure' property."));
+        Map<String, Map<String, Object>> onFailureStepData = preCompileValidator.validateOnFailurePosition(
+                workFlowRawData,
+                execName,
+                errors
+        );
+
+        Workflow onFailureWorkFlow = null;
+        if (MapUtils.isNotEmpty(onFailureStepData)) {
+            List<Map<String, Map<String, Object>>> onFailureData;
+            try {
+                //noinspection unchecked
+                onFailureData = (List<Map<String, Map<String, Object>>>) onFailureStepData.values().iterator().next();
+            } catch (ClassCastException ex) {
+                onFailureData = new ArrayList<>();
+                errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a list of steps and not a map"));
+            }
+            if (CollectionUtils.isNotEmpty(onFailureData)) {
+                if (onFailureData.size() > 1) {
+                    errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be only one step"));
                 }
-                stepsIterator.remove();
+                handleOnFailureStepNavigationSection(onFailureData, execName, errors);
+
+                WorkflowModellingResult workflowModellingResult = compileWorkFlow(onFailureData, imports, null, true, namespace);
+                errors.addAll(workflowModellingResult.getErrors());
+                onFailureWorkFlow = workflowModellingResult.getWorkflow();
+            } else if (onFailureData == null) {
+                errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nThere is no step below the 'on_failure' property."));
             }
         }
         return onFailureWorkFlow;
