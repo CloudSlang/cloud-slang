@@ -10,6 +10,7 @@ package io.cloudslang.lang.compiler.scorecompiler;
 
 import ch.lambdaj.function.convert.Converter;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.modeller.model.Decision;
 import io.cloudslang.lang.compiler.validator.CompileValidator;
 import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
@@ -149,8 +150,10 @@ public class ScoreCompilerImpl implements ScoreCompiler {
                 return executionPlanBuilder.createOperationExecutionPlan((Operation) executable);
             case SlangTextualKeys.FLOW_TYPE:
                 return executionPlanBuilder.createFlowExecutionPlan((Flow) executable);
+            case SlangTextualKeys.DECISION_TYPE:
+                return executionPlanBuilder.createDecisionExecutionPlan((Decision) executable);
             default:
-                throw new RuntimeException("Executable: " + executable.getName() + " cannot be compiled to an ExecutionPlan since it is not a flow and not an operation");
+                throw new RuntimeException("Executable: " + executable.getName() + " cannot be compiled to an ExecutionPlan since it is not of type flow, operation or decision");
         }
     }
 

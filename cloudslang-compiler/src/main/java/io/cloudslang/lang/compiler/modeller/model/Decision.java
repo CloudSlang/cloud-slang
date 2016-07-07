@@ -41,7 +41,7 @@ public class Decision extends Executable {
 
     @Override
     public String getType() {
-        return SlangTextualKeys.DECISION;
+        return SlangTextualKeys.DECISION_TYPE;
     }
 
 }
