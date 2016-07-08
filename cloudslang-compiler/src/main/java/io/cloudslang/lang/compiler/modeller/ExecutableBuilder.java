@@ -144,7 +144,7 @@ public class ExecutableBuilder {
                         "",
                         executableRawData,
                         ListUtils.union(preExecTransformers, postExecTransformers),
-                        allExecutableAdditionalKeywords,
+                        ParsedSlang.Type.DECISION.equals(parsedSlang.getType()) ? executableAdditionalKeywords : allExecutableAdditionalKeywords,
                         executableConstraintGroups
                 )
         );

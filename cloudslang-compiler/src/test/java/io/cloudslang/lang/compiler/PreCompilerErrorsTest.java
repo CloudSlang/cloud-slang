@@ -62,6 +62,17 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
+    public void testOpWithActionAndWorkflow() throws Exception {
+        URI resource = getClass().getResource("/corrupted/op_with_action_and_workflow.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Conflicting keys[workflow, python_action] at: op_with_action_and_workflow");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
     public void testFlowWithMissingName() throws Exception {
         URI resource = getClass().getResource("/corrupted/missing_name_flow.sl").toURI();
 
