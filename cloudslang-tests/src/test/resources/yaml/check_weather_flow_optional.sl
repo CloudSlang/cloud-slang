@@ -5,21 +5,22 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: user.ops
+namespace: user.flows
 
-operation:
-  name: check_weather_optional_input_with_default
+imports:
+  ops: user.ops
+  flows: user.flows
+
+flow:
+  name: check_weather_flow_optional
   inputs:
-    - city: "city"
     - input_with_default_value:
-            default: "default_value"
+            default: ""
             required: false
-  python_action:
-    script: |
-      weather = "weather thing " + input_with_default_value
-      print city
-  outputs:
-    - weather: ${ weather }
-  results:
-    - SUCCESS: ${ weather == "weather thing default_value" }
-    - FAILURE
+  workflow:
+    - step1:
+        do:
+          ops.check_weather_optional_input_with_default:
+            - input_with_default_value
+        publish:
+          - kuku: ${ weather }

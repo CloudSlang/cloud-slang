@@ -16,9 +16,10 @@ operation:
             required: true
   python_action:
     script: |
-      weather = "weather thing"
+      weather = "weather thing " + input_with_default_value
       print city
   outputs:
     - weather: ${ weather }
   results:
-    - SUCCESS: ${ weather == "weather thing" }
+    - SUCCESS: ${ weather == "weather thing default_value" }
+    - FAILURE

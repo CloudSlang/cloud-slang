@@ -187,6 +187,38 @@ public class BindingScopeTest extends SystemsTestsParent {
         Assert.assertEquals("default_value", steps.get(EXEC_START_PATH).getInputs().get("input_with_default_value"));
     }
 
+    @Test
+    public void testStepInputRequiredWithEmptyValue() throws Exception {
+        URL resource = getClass().getResource("/yaml/check_weather_flow.sl");
+        URI operation1 = getClass().getResource("/yaml/check_weather_required_input_with_default.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
+
+        Map<String, Value> userInputs = new HashMap<>();
+        Set<SystemProperty> systemProperties = Collections.emptySet();
+
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
+
+        Assert.assertEquals("weather thing default_value", steps.get(FIRST_STEP_PATH).getOutputs().get("kuku"));
+    }
+
+    @Test
+    public void testStepInputOptionalWithEmptyValue() throws Exception {
+        URL resource = getClass().getResource("/yaml/check_weather_flow_optional.sl");
+        URI operation1 = getClass().getResource("/yaml/check_weather_optional_input_with_default.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
+
+        Map<String, Value> userInputs = new HashMap<>();
+        Set<SystemProperty> systemProperties = Collections.emptySet();
+
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
+
+        Assert.assertEquals("weather thing default_value", steps.get(FIRST_STEP_PATH).getOutputs().get("kuku"));
+    }
+
     private void verifyStepPublishValues(StepData stepData) {
         Map<String, Serializable> expectedPublishValues = new LinkedHashMap<>();
         expectedPublishValues.put("step1_publish_1", "op_output_1_value op_input_1_step step_arg_1_value");
