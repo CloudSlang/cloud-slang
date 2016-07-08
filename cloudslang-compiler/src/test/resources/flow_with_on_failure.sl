@@ -15,13 +15,6 @@ flow:
   inputs:
     - input1
   workflow:
-    - on_failure:
-        - check_something:
-            do:
-              ops.test_op:
-                - city: 'a'
-                - alla: 'a'
-
     - first_step:
         do:
           ops.test_op:
@@ -38,3 +31,10 @@ flow:
         navigate:
           - SUCCESS: SUCCESS
           - FAILURE: FAILURE
+
+    - on_failure:
+        - check_something:
+            do:
+              ops.test_op:
+                - city: 'a'
+                - alla: 'a'

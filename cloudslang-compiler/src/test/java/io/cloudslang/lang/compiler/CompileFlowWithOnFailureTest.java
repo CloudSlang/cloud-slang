@@ -46,7 +46,7 @@ public class CompileFlowWithOnFailureTest {
 
     @Test
     public void testCompileOnFailureBasic() throws Exception {
-        URI flow = getClass().getResource("/flow_with_on_failure.yaml").toURI();
+        URI flow = getClass().getResource("/flow_with_on_failure.sl").toURI();
         URI operation = getClass().getResource("/test_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
@@ -79,7 +79,7 @@ public class CompileFlowWithOnFailureTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
 
-        expectedException.expectMessage(ExecutableBuilder.MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX);
+        expectedException.expectMessage("Multiple 'on_failure' steps found");
         expectedException.expect(RuntimeException.class);
 
         compiler.compile(SlangSource.fromFile(flow), path);
@@ -96,6 +96,20 @@ public class CompileFlowWithOnFailureTest {
         expectedException.expectMessage(ExecutableBuilder.UNIQUE_STEP_NAME_MESSAGE_SUFFIX);
         expectedException.expectMessage("step_same_name");
         expectedException.expect(RuntimeException.class);
+
+        compiler.compile(SlangSource.fromFile(flow), path);
+    }
+
+    @Test
+    public void testCompileOnFailureSecondStep() throws Exception {
+        URI flow = getClass().getResource("/corrupted/flow_with_on_failure_second_step.sl").toURI();
+        URI operation = getClass().getResource("/test_op.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("'on_failure' should be last step in the workflow");
 
         compiler.compile(SlangSource.fromFile(flow), path);
     }
