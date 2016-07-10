@@ -67,7 +67,7 @@ public class SensitiveValue implements Value {
     }
 
     public String getContent() {
-        return content;
+        return (content != null) ? content : ((originalContent != null) ? originalContent.toString() : null);
     }
 
     public void setContent(String content) {
