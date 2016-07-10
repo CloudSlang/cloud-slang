@@ -29,4 +29,9 @@ public class DummyEncryptor implements Encryption {
     public char[] decrypt(String cypherText) {
         return cypherText.toCharArray();
     }
+
+    @Override
+    public boolean isTextEncrypted(String text) {
+        return false;
+    }
 }
