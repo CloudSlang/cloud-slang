@@ -21,6 +21,7 @@ import java.util.*;
 import static ch.lambdaj.Lambda.exists;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 
@@ -30,6 +31,9 @@ import static org.hamcrest.Matchers.equalToIgnoringCase;
  */
 @Component
 public class PreCompileValidatorImpl extends AbstractValidator implements PreCompileValidator {
+
+    public static final String MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX = "Multiple 'on_failure' steps found";
+    public static final String ON_FAILURE_LAST_STEP_MESSAGE_SUFFIX = "'on_failure' should be last step in the workflow";
 
     @Override
     public String validateExecutableRawData(ParsedSlang parsedSlang, Map<String, Object> executableRawData, List<RuntimeException> errors) {
@@ -141,6 +145,44 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
             }
         }
         return errors;
+    }
+
+    @Override
+    public Map<String, Map<String, Object>> validateOnFailurePosition(
+            List<Map<String, Map<String, Object>>> workFlowRawData,
+            String execName,
+            List<RuntimeException> errors) {
+        Iterator<Map<String, Map<String, Object>>> stepsIterator = workFlowRawData.iterator();
+        int onFailureCount = 0;
+        String latestStepName = null;
+        List<RuntimeException> onFailureErrors = new ArrayList<>();
+        Map<String, Map<String, Object>> onFailureData = null;
+
+        while (stepsIterator.hasNext()) {
+            Map<String, Map<String, Object>> stepData = stepsIterator.next();
+            latestStepName = stepData.keySet().iterator().next();
+            if (latestStepName.equals(ON_FAILURE_KEY)) {
+                if (onFailureCount == 1) {
+                    onFailureErrors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\n" + MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX));
+                }
+                ++onFailureCount;
+                onFailureData = stepData;
+                stepsIterator.remove();
+            }
+        }
+        // exactly one on_failure -> need to be last step
+        if (onFailureCount == 1) {
+            if (!ON_FAILURE_KEY.equals(latestStepName)) {
+                onFailureErrors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\n" + ON_FAILURE_LAST_STEP_MESSAGE_SUFFIX));
+            }
+        }
+
+        if (CollectionUtils.isEmpty(onFailureErrors)) {
+            return onFailureData;
+        } else {
+            errors.addAll(onFailureErrors);
+            return null;
+        }
     }
 
     @Override
