@@ -6,7 +6,7 @@
         <groupId>com.hp.oo.platformactions</groupId>
         <artifactId>platform-actions</artifactId>
         <version>10.70.00-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <relativePath>../..</relativePath>
     </parent>
 
     <groupId>com.hp.oo.platformactions.javaactions</groupId>
