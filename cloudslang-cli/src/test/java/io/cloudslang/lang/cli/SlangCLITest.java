@@ -10,6 +10,7 @@ package io.cloudslang.lang.cli;
 
 import com.google.common.collect.Lists;
 
+import com.google.common.collect.Sets;
 import io.cloudslang.lang.entities.SystemProperty;
 import org.apache.commons.lang3.StringUtils;
 import io.cloudslang.lang.cli.services.ScoreServices;
@@ -264,7 +265,7 @@ public class SlangCLITest {
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
         when(ScoreServicesMock.
-                triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Serializable.class),anySetOf(SystemProperty.class), eq(false), eq(false))).
+                triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Serializable.class), anySetOf(SystemProperty.class), eq(false), eq(false))).
                 thenThrow(exception);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT);
@@ -300,6 +301,7 @@ public class SlangCLITest {
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
+
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunSyncWithInputFiles() throws Exception {
         long executionID = 1;
@@ -399,6 +401,23 @@ public class SlangCLITest {
         CommandResult cr = shell.executeCommand("cslang --version");
 
         Assert.assertEquals("method result mismatch", slangCLI.version(), cr.getResult());
+        Assert.assertEquals("method threw exception", null, cr.getException());
+        Assert.assertEquals("success should be true", true, cr.isSuccess());
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void testListSystemProperties() throws Exception {
+        when(compilerHelperMock.loadSystemProperties(Lists.newArrayList("system_properties.prop.sl")))
+                .thenReturn(Sets.newLinkedHashSet(Lists.newArrayList(new SystemProperty("namespace1", "key1", "value1"),
+                        new SystemProperty("namespace2", "key2", "value2"),
+                        new SystemProperty("namespace3", "key3", "value3"))));
+
+        CommandResult cr = shell.executeCommand("list --f system_properties.prop.sl");
+
+        Assert.assertEquals("Following system properties were loaded:\n" +
+                "\tnamespace1.key1: value1\n" +
+                "\tnamespace2.key2: value2\n" +
+                "\tnamespace3.key3: value3", cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
