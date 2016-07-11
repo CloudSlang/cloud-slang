@@ -28,4 +28,7 @@ public interface PreCompileValidator {
             List<String> additionalValidKeyWords,
             List<List<String>> constraintGroups);
 
+
+    void validateResultsSection(Map<String, Object> executableRawData, String artifact, List<RuntimeException> errors);
+
 }

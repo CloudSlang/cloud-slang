@@ -186,6 +186,18 @@ public class CompileDecisionTest {
         compiler.compile(SlangSource.fromFile(decision.toURI()), emptySetSlangSource);
     }
 
+    @Test
+    public void testDecisionMissingResults() throws Exception {
+        URL decision = getClass().getResource("/decision/decision_wo_results.sl");
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(
+                "Artifact {decision_wo_results} syntax is invalid:" +
+                        " 'results' section cannot be empty for executable type 'decision'"
+        );
+        compiler.compile(SlangSource.fromFile(decision.toURI()), emptySetSlangSource);
+    }
+
     private void validateCompilationArtifact(
             CompilationArtifact compilationArtifact,
             List<Input> expectedInputs,

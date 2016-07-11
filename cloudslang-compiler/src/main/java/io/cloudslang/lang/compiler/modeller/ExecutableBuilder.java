@@ -226,6 +226,7 @@ public class ExecutableBuilder {
                 return preCompileValidator.validateResult(parsedSlang, executableRawData,
                         new ExecutableModellingResult(operation, errors));
             case DECISION:
+                preCompileValidator.validateResultsSection(executableRawData, execName, errors);
                 try {
                     systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForDecision(inputs, outputs, results);
                 } catch (RuntimeException ex) {

@@ -143,6 +143,24 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         return errors;
     }
 
+    @Override
+    public void validateResultsSection(
+            Map<String, Object> executableRawData,
+            String artifact,
+            List<RuntimeException> errors) {
+        Object resultsValue = executableRawData.get(SlangTextualKeys.RESULTS_KEY);
+        if (resultsValue == null || (resultsValue instanceof List && ((List) resultsValue).isEmpty())) {
+            errors.add(
+                    new RuntimeException(
+                            "Artifact {" + artifact + "} syntax is invalid: " +
+                                    "'" + SlangTextualKeys.RESULTS_KEY +
+                                    "' section cannot be empty for executable type '" +
+                                    ParsedSlang.Type.DECISION.key() + "'"
+                    )
+            );
+        }
+    }
+
     public String getExecutableName(Map<String, Object> executableRawData) {
         String execName = (String) executableRawData.get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
         return execName == null ? "" : execName;
