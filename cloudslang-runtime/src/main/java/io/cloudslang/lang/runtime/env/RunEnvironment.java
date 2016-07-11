@@ -10,13 +10,13 @@
 
 package io.cloudslang.lang.runtime.env;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import org.apache.commons.lang3.Validate;
-import org.python.google.common.base.Function;
-import org.python.google.common.collect.Collections2;
 
 import java.io.Serializable;
 import java.util.*;

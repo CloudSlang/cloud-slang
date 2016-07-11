@@ -46,6 +46,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.python</groupId>
             <artifactId>jython-standalone</artifactId>
         </dependency>
