@@ -76,6 +76,11 @@ public class EncryptorConfigTest {
                 public char[] decrypt(String cypherText) {
                     return "Decrypted".toCharArray();
                 }
+
+                @Override
+                public boolean isTextEncrypted(String text) {
+                    return false;
+                }
             };
         }
     }
