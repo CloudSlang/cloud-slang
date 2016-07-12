@@ -60,7 +60,6 @@ public class EncryptorConfigTest {
         assertTrue(Arrays.equals(encryptor.decrypt(text), text.toCharArray()));
     }
 
-    @Configuration
     @ComponentScan("io.cloudslang.lang.entities")
     static class Config {
 
@@ -75,6 +74,11 @@ public class EncryptorConfigTest {
                 @Override
                 public char[] decrypt(String cypherText) {
                     return "Decrypted".toCharArray();
+                }
+
+                @Override
+                public boolean isTextEncrypted(String text) {
+                    return false;
                 }
             };
         }
