@@ -15,6 +15,8 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+import io.cloudslang.lang.compiler.validator.PreCompileValidator;
+import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
@@ -279,5 +281,11 @@ public class InputsTransformerTest {
         public DummyEncryptor dummyEncryptor() {
             return new DummyEncryptor();
         }
+
+        @Bean
+        public PreCompileValidator preCompileValidator() {
+            return new PreCompileValidatorImpl();
+        }
+
     }
 }

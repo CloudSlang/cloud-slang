@@ -255,7 +255,7 @@ flow:
         default: ${input_x + input_y}
         sensitive: true
     - input_concat_x_sensitive_y: ${input_x_sensitive + input_y}
-    - input_concat_x_sensitive_y_sensitive:
+    - input_1_concat_x_sensitive_y_sensitive:
         default: ${input_x_sensitive + input_y}
         sensitive: true
     - input_concat_x_y_sensitive: ${input_x + input_y_sensitive}
@@ -287,7 +287,7 @@ flow:
         input_concat_x_sensitive +
         '_suffix'
         }
-    - input_sensitive_concat_x_folded_sensitive: 
+    - input_1_sensitive_concat_x_folded_sensitive:
         default: > 
           ${
           'prefix_' +
@@ -449,12 +449,12 @@ flow:
             - argument_input_concat_xy_sensitive:                                   ${input_concat_xy_sensitive}
             - argument_concat_x_sensitive_y:                                        ${input_x_sensitive + input_y}
             - argument_input_concat_x_sensitive_y:                                  ${input_concat_x_sensitive_y}
-            - argument_input_concat_x_sensitive_y_sensitive:                        ${input_concat_x_sensitive_y_sensitive}
+            - argument_1_input_concat_x_sensitive_y_sensitive:                      ${input_concat_x_sensitive_y_sensitive}
             - argument_concat_x_y_sensitive:                                        ${input_x_sensitive + input_y}
             - argument_input_concat_x_y_sensitive:                                  ${input_concat_x_y_sensitive}
             - argument_input_concat_x_y_sensitive_sensitive:                        ${input_concat_x_y_sensitive_sensitive}
             - argument_concat_x_sensitive_y_sensitive:                              ${input_x_sensitive + input_y_sensitive}
-            - argument_input_concat_x_sensitive_y_sensitive:                        ${input_concat_x_sensitive_y_sensitive}
+            - argument_input_concat_x_sensitive_y_sensitive:                      ${input_concat_x_sensitive_y_sensitive}
             - argument_input_concat_x_sensitive_y_sensitive_sensitive:              ${input_concat_x_sensitive_y_sensitive_sensitive}
 
             - argument_concat_x_folded:                                             ${'prefix_' + input_concat_x + '_suffix'}
@@ -465,8 +465,6 @@ flow:
             - argument_input_concat_x_folded_copy:                                  ${input_concat_x_folded_copy} 
             - argument_input_concat_x_folded_copy_sensitive:                        ${input_concat_x_folded_copy_sensitive} 
             - argument_input_sensitive_concat_x_folded_copy:                        ${input_sensitive_concat_x_folded_copy} 
-            - argument_input_sensitive_concat_x_folded_sensitive:                   ${input_sensitive_concat_x_folded_sensitive} 
-            
             - argument_expression_characters:                                       ${'docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ' + input_authorized_keys_path + '} -p ' + input_scp_host_port + ':22 --name test1 -v /data:'}
             - argument_input_expression_characters:                                 ${input_expression_characters}
             - argument_input_expression_characters_sensitive:                       ${input_expression_characters_sensitive}
@@ -581,7 +579,6 @@ flow:
           - argument_input_concat_x_y_sensitive
           - argument_input_concat_x_y_sensitive_sensitive
           - argument_concat_x_sensitive_y_sensitive
-          - argument_input_concat_x_sensitive_y_sensitive
           - argument_input_concat_x_sensitive_y_sensitive_sensitive
           - argument_concat_x_folded
           - argument_input_concat_x_folded
@@ -591,7 +588,6 @@ flow:
           - argument_input_concat_x_folded_copy
           - argument_input_concat_x_folded_copy_sensitive
           - argument_input_sensitive_concat_x_folded_copy
-          - argument_input_sensitive_concat_x_folded_sensitive
           - argument_expression_characters
           - argument_input_expression_characters
           - argument_input_expression_characters_sensitive
@@ -747,7 +743,6 @@ flow:
     - argument_input_concat_xy_sensitive
     - argument_concat_x_sensitive_y
     - argument_input_concat_x_sensitive_y
-    - argument_input_concat_x_sensitive_y_sensitive
     - argument_concat_x_y_sensitive
     - argument_input_concat_x_y_sensitive
     - argument_input_concat_x_y_sensitive_sensitive
@@ -758,7 +753,6 @@ flow:
     - argument_input_concat_x_folded
     - argument_input_concat_x_folded_sensitive
     - argument_input_sensitive_concat_x_folded
-    - argument_input_sensitive_concat_x_folded_sensitive
     - argument_input_concat_x_folded_copy
     - argument_input_concat_x_folded_copy_sensitive
     - argument_input_sensitive_concat_x_folded_copy
