@@ -628,4 +628,26 @@ public class CompilerErrorsTest {
                 "of its dependency: 'user.ops.get_time_zone' has no matching navigation");
         compiler.compile(SlangSource.fromFile(resource), dependencies);
     }
+
+    @Test
+    public void testValidationDuplicateFQNIgnoreCase() throws Exception {
+        URI resource = getClass().getResource("/corrupted/duplicate/duplicate_fqn_1.sl").toURI();
+        URI dependency1 = getClass().getResource("/noop.sl").toURI();
+        URI dependency2 = getClass().getResource("/corrupted/duplicate/duplicate_fqn_2.sl").toURI();
+        URI dependency3 = getClass().getResource("/basic_flow.yaml").toURI();
+
+        SlangSource duplicateFQNInitialSource = SlangSource.fromFile(dependency2);
+
+        Set<SlangSource> dependencies = new HashSet<>();
+        dependencies.add(SlangSource.fromFile(dependency1));
+        // change file name from source
+        dependencies.add(new SlangSource(duplicateFQNInitialSource.getSource(), "duplicate_fqn_1.sl"));
+        dependencies.add(SlangSource.fromFile(dependency3));
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Duplicate executable found: 'io.CloudSlang.duplicate_fqn_1' (duplicate_fqn_1.sl, duplicate_fqn_1.sl)");
+
+        compiler.compile(SlangSource.fromFile(resource), dependencies);
+    }
+
 }

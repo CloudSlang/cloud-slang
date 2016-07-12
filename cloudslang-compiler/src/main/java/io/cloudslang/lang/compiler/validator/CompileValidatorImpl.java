@@ -1,5 +1,6 @@
 package io.cloudslang.lang.compiler.validator;
 
+import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
@@ -54,6 +55,23 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
             errors.addAll(validateStepAgainstItsDependency(flow, step, directDependencies));
         }
         return errors;
+    }
+
+    @Override
+    public void validateNoDuplicateExecutablesBasedOnFQN(
+            Executable newElement,
+            SlangSource newElementSource,
+            Map<SlangSource, Executable> executablePairs) {
+        for (Map.Entry<SlangSource, Executable> entry : executablePairs.entrySet()) {
+            if (newElement.getId().equalsIgnoreCase(entry.getValue().getId())) {
+                throw new RuntimeException(
+                        "Duplicate executable found: '" + newElement.getId() +
+                                "' (" + newElementSource.getPath() + ", " +
+                                entry.getKey().getPath() + ")"
+                );
+            }
+        }
+
     }
 
     private List<RuntimeException> validateModelWithDependencies(

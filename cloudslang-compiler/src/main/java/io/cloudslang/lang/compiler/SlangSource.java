@@ -82,6 +82,10 @@ public class SlangSource {
         return fileExtension;
     }
 
+    public String getPath() {
+        return fileName + "." + fileExtension.getValue();
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
