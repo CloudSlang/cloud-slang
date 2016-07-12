@@ -2,12 +2,14 @@ package io.cloudslang.lang.cli;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * User: bancl
  * Date: 7/4/2016
  */
+@Ignore
 public class SlangBannerTest {
 
     public static final String BANNER = "_________ .__                   .____________.__" + System.lineSeparator() +
