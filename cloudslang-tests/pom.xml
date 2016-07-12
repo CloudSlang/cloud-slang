@@ -13,7 +13,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.9.62-SNAPSHOT</version>
+        <version>0.9.62</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -83,7 +83,7 @@
                         <phase>test-compile</phase>
                         <configuration>
                             <tasks>
-                                <unzip src="${project.build.testOutputDirectory}/dependencies-base.zip" dest="${project.build.testOutputDirectory}/test-mvn-repo"/>
+                                <unzip src="${project.build.testOutputDirectory}/dependencies-base.zip" dest="${project.build.testOutputDirectory}/test-mvn-repo" />
                             </tasks>
                         </configuration>
                         <goals>
