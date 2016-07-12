@@ -12,6 +12,7 @@
 package io.cloudslang.lang.entities.utils;
 
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.InOutParam;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -49,6 +50,15 @@ public final class SetUtils {
             result.addAll(set);
         }
         return result;
+    }
+
+    public static boolean containsIgnoreCaseBasedOnName(Collection<InOutParam> inOutParams, InOutParam element) {
+        for (InOutParam current : inOutParams) {
+            if (current.getName().equalsIgnoreCase(element.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

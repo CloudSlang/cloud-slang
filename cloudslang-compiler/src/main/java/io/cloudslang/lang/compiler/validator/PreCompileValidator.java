@@ -4,6 +4,10 @@ import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 
+import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.Result;
 import java.util.List;
 import java.util.Map;
 
@@ -32,5 +36,10 @@ public interface PreCompileValidator {
             List<Map<String, Map<String, Object>>> workFlowRawData,
             String execName,
             List<RuntimeException> errors);
+
+    void validateNoDuplicateInputs(List<Input> inputs, Input element);
+    void validateNoDuplicateStepInputs(List<Argument> inputs, Argument element);
+    void validateNoDuplicateOutputs(List<Output> outputs, Output element);
+    void validateNoDuplicateResults(List<Result> results, Result element);
 
 }

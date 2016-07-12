@@ -9,9 +9,12 @@ import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.utils.SetUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -185,6 +188,38 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         }
     }
 
+    @Override
+    public void validateNoDuplicateInputs(List<Input> inputs, Input element) {
+        Collection<InOutParam> inOutParams = new ArrayList<>();
+        inOutParams.addAll(inputs);
+        String message = "Duplicate input found: " + element.getName();
+        validateNotDuplicateInOutParam(inOutParams, element, message);
+    }
+
+    @Override
+    public void validateNoDuplicateStepInputs(List<Argument> inputs, Argument element) {
+        Collection<InOutParam> inOutParams = new ArrayList<>();
+        inOutParams.addAll(inputs);
+        String message = "Duplicate step input found: " + element.getName();
+        validateNotDuplicateInOutParam(inOutParams, element, message);
+    }
+
+    @Override
+    public void validateNoDuplicateOutputs(List<Output> outputs, Output element) {
+        Collection<InOutParam> inOutParams = new ArrayList<>();
+        inOutParams.addAll(outputs);
+        String message = "Duplicate output / publish value found: " + element.getName();
+        validateNotDuplicateInOutParam(inOutParams, element, message);
+    }
+
+    @Override
+    public void validateNoDuplicateResults(List<Result> results, Result element) {
+        Collection<InOutParam> inOutParams = new ArrayList<>();
+        inOutParams.addAll(results);
+        String message = "Duplicate result found: " + element.getName();
+        validateNotDuplicateInOutParam(inOutParams, element, message);
+    }
+
     public String getExecutableName(Map<String, Object> executableRawData) {
         String execName = (String) executableRawData.get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
         return execName == null ? "" : execName;
@@ -260,6 +295,12 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
             validateListsHaveMutuallyExclusiveNames(inputs, outputs, errorMessage);
         } catch (RuntimeException e) {
             result.getErrors().add(e);
+        }
+    }
+
+    private void validateNotDuplicateInOutParam(Collection<InOutParam> inOutParams, InOutParam element, String message) {
+        if (SetUtils.containsIgnoreCaseBasedOnName(inOutParams, element)) {
+            throw new RuntimeException(message);
         }
     }
 

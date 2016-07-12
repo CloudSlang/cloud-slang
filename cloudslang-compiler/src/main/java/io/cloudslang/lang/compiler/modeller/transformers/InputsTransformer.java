@@ -14,8 +14,10 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
+import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.Input;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -25,6 +27,9 @@ import java.util.List;
 
 @Component
 public class InputsTransformer extends AbstractInputsTransformer implements Transformer<List<Object>, List<Input>> {
+
+    @Autowired
+    private PreCompileValidator preCompileValidator;
 
     /**
      * Transforms a list of inputs in (raw data form) to Input objects.
@@ -39,6 +44,7 @@ public class InputsTransformer extends AbstractInputsTransformer implements Tran
         }
         for (Object rawInput : rawData) {
             Input input = transformSingleInput(rawInput);
+            preCompileValidator.validateNoDuplicateInputs(result, input);
             result.add(input);
         }
         return result;

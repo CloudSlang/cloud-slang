@@ -15,9 +15,11 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  */
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.collections4.MapUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -28,6 +30,9 @@ import java.util.Map;
 
 @Component
 public class DoTransformer extends InOutTransformer implements Transformer<Map<String, Object>, List<Argument>> {
+
+    @Autowired
+    private PreCompileValidator preCompileValidator;
 
     @Override
     public List<Argument> transform(Map<String, Object> rawData) {
@@ -45,6 +50,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
             List rawArgumentsList = (List) rawArguments;
             for (Object rawArgument : rawArgumentsList) {
                 Argument argument = transformListArgument(rawArgument);
+                preCompileValidator.validateNoDuplicateStepInputs(result, argument);
                 result.add(argument);
             }
         } else if (rawArguments != null) {
