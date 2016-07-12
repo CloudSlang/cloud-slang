@@ -58,13 +58,19 @@ public abstract class SystemsTestsParent {
         ClassLoader classLoader = SystemsTestsParent.class.getClassLoader();
 
         String settingsXmlPath = classLoader.getResource("settings.xml").getPath();
+        System.out.println("setting.xml path is [" + settingsXmlPath + "]");
         File rootHome = new File(settingsXmlPath).getParentFile();
 
         System.setProperty("app.home", rootHome.getAbsolutePath());
 
+        System.out.println("app.home path is [" + rootHome.getAbsolutePath() + "]");
+
         File mavenHome = new File(rootHome, "maven");
         File mavenRepo = new File(rootHome, "test-mvn-repo");
         mavenRepo.mkdirs();
+
+        System.out.println("Maven home [" + mavenHome.getAbsolutePath() + "]");
+        System.out.println("Maven repo [" + mavenRepo.getAbsolutePath() + "]");
 
         UnzipUtil.unzipToFolder(mavenHome.getAbsolutePath(), classLoader.getResourceAsStream("maven.zip"));
 
@@ -74,7 +80,9 @@ public abstract class SystemsTestsParent {
         System.setProperty("maven.home", classLoader.getResource("maven").getPath());
 
         System.setProperty(MavenConfigImpl.MAVEN_SETTINGS_PATH, settingsXmlPath);
-        System.setProperty(MavenConfigImpl.MAVEN_M2_CONF_PATH, classLoader.getResource("m2.conf").getPath());
+        String m2_conf_path = classLoader.getResource("m2.conf").getPath();
+        System.out.println("m2.conf path [" + m2_conf_path + "]");
+        System.setProperty(MavenConfigImpl.MAVEN_M2_CONF_PATH, m2_conf_path);
 
         String provideralAlreadyConfigured = System.setProperty("python.executor.engine", PythonExecutionCachedEngine.class.getSimpleName());
         assertNull("python.executor.engine was configured before this test!!!!!!!", provideralAlreadyConfigured);
