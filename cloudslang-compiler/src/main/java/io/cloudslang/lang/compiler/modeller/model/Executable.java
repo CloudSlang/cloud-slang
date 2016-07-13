@@ -16,6 +16,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -94,4 +96,39 @@ public abstract class Executable {
 
     public abstract String getType();
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Executable that = (Executable) o;
+
+        return new EqualsBuilder()
+                .append(preExecActionData, that.preExecActionData)
+                .append(postExecActionData, that.postExecActionData)
+                .append(namespace, that.namespace)
+                .append(name, that.name)
+                .append(inputs, that.inputs)
+                .append(outputs, that.outputs)
+                .append(results, that.results)
+                .append(executableDependencies, that.executableDependencies)
+                .append(systemPropertyDependencies, that.systemPropertyDependencies)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(preExecActionData)
+                .append(postExecActionData)
+                .append(namespace)
+                .append(name)
+                .append(inputs)
+                .append(outputs)
+                .append(results)
+                .append(executableDependencies)
+                .append(systemPropertyDependencies)
+                .toHashCode();
+    }
 }

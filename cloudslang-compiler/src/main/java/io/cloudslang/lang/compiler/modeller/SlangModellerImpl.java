@@ -34,8 +34,10 @@ public class SlangModellerImpl implements SlangModeller{
                     return executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getOperation());
                 case FLOW:
                     return executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getFlow());
+                case DECISION:
+                    return executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getDecision());
                 default:
-                    throw new RuntimeException("Source: " + parsedSlang.getName() + " is not of flow type or operations");
+                    throw new RuntimeException("Source: " + parsedSlang.getName() + " is not of flow, operations or decision type");
             }
         } catch (Throwable ex){
             throw new RuntimeException("Error transforming source: " + parsedSlang.getName() + " to a Slang model. " + ex.getMessage(), ex);

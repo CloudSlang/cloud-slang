@@ -7,5 +7,6 @@ package io.cloudslang.lang.entities;
 public enum ExecutableType {
 
     OPERATION,
-    FLOW
+    FLOW,
+    DECISION
 }
