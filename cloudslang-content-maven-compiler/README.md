@@ -1,9 +1,9 @@
 CloudSlang Maven Compiler
 =========================
 
-To use the Cloud Slang maven compiler, you need to make the artifact available in the classpath when the Compiler Plugin runs.
+To use the CloudSlang maven compiler, you need to make the artifact available in the classpath when the Compiler Plugin runs.
 This is possible by adding the dependency when declaring the plugin in your project's pom.xml.
-The example below shows how to use the Cloud Slang compiler:
+The example below shows how to use the CloudSlang compiler:
 
 
 ```shell
