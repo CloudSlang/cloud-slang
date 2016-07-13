@@ -8,8 +8,8 @@ The example below shows how to use the CloudSlang compiler:
 
 ```shell
 <project>
-  [...]
-  <build>
+   [...]
+   <build>
     [...]
     <plugins>
       [...]
@@ -27,6 +27,10 @@ The example below shows how to use the CloudSlang compiler:
           </dependency>
         </dependencies>
       </plugin>
-  [...]
+      [...]
+    <plugins>
+    [...]
+   <build>
+   [...]
 </project>
 ```
