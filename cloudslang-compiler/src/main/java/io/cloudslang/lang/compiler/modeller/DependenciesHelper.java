@@ -95,6 +95,13 @@ public class DependenciesHelper {
         return getSystemPropertiesFromExecutable(inputs, outputs, results);
     }
 
+    public Set<String> getSystemPropertiesForDecision(
+            List<Input> inputs,
+            List<Output> outputs,
+            List<Result> results) {
+        return getSystemPropertiesFromExecutable(inputs, outputs, results);
+    }
+
     private Set<String> getSystemPropertiesFromExecutable(
             List<Input> inputs,
             List<Output> outputs,

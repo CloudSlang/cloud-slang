@@ -33,4 +33,7 @@ public interface PreCompileValidator {
             String execName,
             List<RuntimeException> errors);
 
+
+    void validateResultsSection(Map<String, Object> executableRawData, String artifact, List<RuntimeException> errors);
+
 }

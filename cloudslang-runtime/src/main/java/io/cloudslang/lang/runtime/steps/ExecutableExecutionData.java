@@ -24,6 +24,7 @@ import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import java.util.Collections;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,15 +119,16 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             runEnv.getExecutionPath().up();
             Context operationContext = runEnv.getStack().popContext();
             Map<String, Value> operationVariables = operationContext == null ? null : operationContext.getImmutableViewOfVariables();
-            ReturnValues actionReturnValues = runEnv.removeReturnValues();
+            ReturnValues actionReturnValues = buildReturnValues(runEnv, executableType);
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
                     LanguageEventData.StepType.EXECUTABLE, nodeName,
-                    Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable)executableOutputs),
-                    Pair.of(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable)executableResults),
+                    Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable) executableOutputs),
+                    Pair.of(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable) executableResults),
                     Pair.of(ACTION_RETURN_VALUES_KEY,
                             executableType == ExecutableType.OPERATION ?
                                     new ReturnValues(new HashMap<String, Value>(), actionReturnValues.getResult()) :
-                                    actionReturnValues));
+                                    actionReturnValues)
+            );
 
             // Resolving the result of the operation/flow
             String result = resultsBinding.resolveResult(
@@ -151,7 +153,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             runEnv.putReturnValues(returnValues);
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
                     LanguageEventData.StepType.EXECUTABLE, nodeName,
-                    Pair.of(LanguageEventData.OUTPUTS, (Serializable)operationReturnOutputs),
+                    Pair.of(LanguageEventData.OUTPUTS, (Serializable) operationReturnOutputs),
                     Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
                     Pair.of(ScoreLangConstants.EXECUTABLE_TYPE, executableType));
 
@@ -177,4 +179,21 @@ public class ExecutableExecutionData extends AbstractExecutionData {
         executionRuntimeServices.requestToChangeExecutionPlan(parentFlowData.getRunningExecutionPlanId());
         runEnv.putNextStepPosition(parentFlowData.getPosition());
     }
+
+    private ReturnValues buildReturnValues(RunEnvironment runEnvironment, ExecutableType executableType) {
+        ReturnValues returnValues = runEnvironment.removeReturnValues();
+        switch (executableType) {
+            case DECISION:
+                returnValues = new ReturnValues(Collections.<String, Value>emptyMap(), null);
+                break;
+            case FLOW:
+                break;
+            case OPERATION:
+                break;
+            default:
+                throw new RuntimeException("Unrecognized type: " + executableType);
+        }
+        return returnValues;
+    }
+
 }
