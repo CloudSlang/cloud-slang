@@ -10,16 +10,16 @@
 
 package io.cloudslang.lang.runtime.env;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import org.apache.commons.lang3.Validate;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * User: stoneo
@@ -119,6 +119,105 @@ public class RunEnvironment implements Serializable {
     public void resetStacks() {
         contextStack = new ContextStack();
         parentFlowStack = new ParentFlowStack();
+    }
+
+    public boolean containsSensitiveData() {
+        return containsSensitiveCallArgument() ||
+                containsSensitiveReturnValues() ||
+                containsSensitiveSystemProperties() ||
+                containsSensitiveContexts();
+    }
+
+    public void decryptSensitiveData() {
+        for (Value value: prepareValuesForEncryptDecrypt()) {
+            if(value.isSensitive()) {
+                ((SensitiveValue)value).decrypt();
+            }
+        }
+    }
+
+    public void encryptSensitiveData() {
+        for (Value value: prepareValuesForEncryptDecrypt()) {
+            if(value.isSensitive()) {
+                ((SensitiveValue)value).encrypt();
+            }
+        }
+    }
+
+    private boolean containsSensitiveCallArgument() {
+        return callArguments != null && containsSensitiveData(callArguments.values());
+    }
+
+    private boolean containsSensitiveReturnValues() {
+        return (returnValues != null) && (returnValues.getOutputs() != null) &&
+                containsSensitiveData(returnValues.getOutputs().values());
+    }
+
+    private boolean containsSensitiveSystemProperties() {
+        return (systemProperties != null) &&
+                containsSensitiveData(Collections2.transform(systemProperties, new Function<SystemProperty, Value>() {
+                    @Override
+                    public Value apply(SystemProperty systemProperty) {
+                        return systemProperty.getValue();
+                    }
+                }));
+    }
+
+    private boolean containsSensitiveContexts() {
+        boolean hasSensitive = false;
+        ContextStack tempStack = new ContextStack();
+        Context context;
+        while (!hasSensitive && (context = contextStack.popContext()) != null) {
+            hasSensitive = containsSensitiveData(context.getImmutableViewOfLanguageVariables().values());
+            hasSensitive = hasSensitive || containsSensitiveData(context.getImmutableViewOfVariables().values());
+            tempStack.pushContext(context);
+        }
+        while ((context = tempStack.popContext()) != null) {
+            contextStack.pushContext(context);
+        }
+
+        return hasSensitive;
+    }
+
+    private boolean containsSensitiveData(Collection<Value> data) {
+        if(data != null) {
+            for (Value value: data) {
+                if(value.isSensitive()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private List<Value> prepareValuesForEncryptDecrypt() {
+        List<Value> valuesToCheck = new LinkedList<>();
+        if(callArguments != null) {
+            valuesToCheck.addAll(callArguments.values());
+        }
+        if((returnValues != null) && (returnValues.getOutputs() != null)) {
+            valuesToCheck.addAll(returnValues.getOutputs().values());
+        }
+        if(systemProperties != null) {
+            valuesToCheck.addAll(Collections2.transform(systemProperties, new Function<SystemProperty, Value>() {
+                @Override
+                public Value apply(SystemProperty systemProperty) {
+                    return systemProperty.getValue();
+                }
+            }));
+        }
+        ContextStack tempStack = new ContextStack();
+        Context context;
+        while ((context = contextStack.popContext()) != null) {
+            valuesToCheck.addAll(context.getImmutableViewOfLanguageVariables().values());
+            valuesToCheck.addAll(context.getImmutableViewOfVariables().values());
+            tempStack.pushContext(context);
+        }
+        while ((context = tempStack.popContext()) != null) {
+            contextStack.pushContext(context);
+        }
+
+        return valuesToCheck;
     }
 
 }
