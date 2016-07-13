@@ -134,14 +134,14 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
 
         if (constraintGroups != null) {
             for (List<String> group : constraintGroups) {
-                boolean found = false;
+                String lastKeyFound = null;
                 for (String key : group) {
                     if (rawDataKeySet.contains(key)) {
-                        if (found) {
+                        if (lastKeyFound != null) {
                             // one key from this group was already found in action data
-                            errors.add(new RuntimeException("Conflicting keys at: " + dataLogicalName));
+                            errors.add(new RuntimeException("Conflicting keys[" + lastKeyFound + ", " + key + "] at: " + dataLogicalName));
                         } else {
-                            found = true;
+                            lastKeyFound = key;
                         }
                     }
                 }
@@ -185,6 +185,24 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         } else {
             errors.addAll(onFailureErrors);
             return null;
+        }
+    }
+
+    @Override
+    public void validateResultsSection(
+            Map<String, Object> executableRawData,
+            String artifact,
+            List<RuntimeException> errors) {
+        Object resultsValue = executableRawData.get(SlangTextualKeys.RESULTS_KEY);
+        if (resultsValue == null || (resultsValue instanceof List && ((List) resultsValue).isEmpty())) {
+            errors.add(
+                    new RuntimeException(
+                            "Artifact {" + artifact + "} syntax is invalid: " +
+                                    "'" + SlangTextualKeys.RESULTS_KEY +
+                                    "' section cannot be empty for executable type '" +
+                                    ParsedSlang.Type.DECISION.key() + "'"
+                    )
+            );
         }
     }
 

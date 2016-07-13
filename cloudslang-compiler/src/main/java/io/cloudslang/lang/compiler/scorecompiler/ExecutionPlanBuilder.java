@@ -11,6 +11,7 @@
 package io.cloudslang.lang.compiler.scorecompiler;
 
 import ch.lambdaj.Lambda;
+import io.cloudslang.lang.compiler.modeller.model.Decision;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Step;
@@ -61,6 +62,28 @@ public class ExecutionPlanBuilder {
         executionPlan.addStep(stepFactory.createActionStep(2L, compiledOp.getAction().getActionData()));
         executionPlan.addStep(stepFactory.createEndStep(3L, compiledOp.getPostExecActionData(), compiledOp.getOutputs(),
                 compiledOp.getResults(), compiledOp.getName(), ExecutableType.OPERATION));
+        return executionPlan;
+    }
+
+    public ExecutionPlan createDecisionExecutionPlan(Decision compiledDecision) {
+        ExecutionPlan executionPlan = new ExecutionPlan();
+        executionPlan.setName(compiledDecision.getName());
+        executionPlan.setLanguage(CLOUDSLANG_NAME);
+        executionPlan.setFlowUuid(compiledDecision.getId());
+
+        executionPlan.setBeginStep(1L);
+
+        executionPlan.addStep(
+                stepFactory.createStartStep(
+                        1L, compiledDecision.getPreExecActionData(), compiledDecision.getInputs(), compiledDecision.getName()
+                )
+        );
+        executionPlan.addStep(
+                stepFactory.createEndStep(
+                        2L, compiledDecision.getPostExecActionData(), compiledDecision.getOutputs(),
+                        compiledDecision.getResults(), compiledDecision.getName(), ExecutableType.DECISION
+                )
+        );
         return executionPlan;
     }
 

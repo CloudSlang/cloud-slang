@@ -46,7 +46,7 @@ public class PreCompilerErrorsTest {
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("Error transforming source: no_op_flow_file to a Slang model. " +
-                "Source no_op_flow_file has no content associated with flow/operation/properties property.");
+                "Source no_op_flow_file has no content associated with flow/operation/decision/properties property.");
         compiler.preCompileSource(SlangSource.fromFile(resource));
     }
 
@@ -58,6 +58,17 @@ public class PreCompilerErrorsTest {
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("Operation/Flow op_without_namespace must have a namespace");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testOpWithActionAndWorkflow() throws Exception {
+        URI resource = getClass().getResource("/corrupted/op_with_action_and_workflow.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Conflicting keys[workflow, python_action] at: op_with_action_and_workflow");
         throw result.getErrors().get(0);
     }
 

@@ -37,6 +37,8 @@ public interface PreCompileValidator {
             String execName,
             List<RuntimeException> errors);
 
+    void validateResultsSection(Map<String, Object> executableRawData, String artifact, List<RuntimeException> errors);
+    
     void validateNoDuplicateInputs(List<Input> inputs, Input element);
     void validateNoDuplicateStepInputs(List<Argument> inputs, Argument element);
     void validateNoDuplicateOutputs(List<Output> outputs, Output element);
