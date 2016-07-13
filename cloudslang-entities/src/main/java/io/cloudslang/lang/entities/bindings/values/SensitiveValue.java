@@ -33,31 +33,50 @@ public class SensitiveValue implements Value {
 
     public static final String SENSITIVE_VALUE_MASK = "********";
 
-    private String content;
+    private String content = null;
+
+    /**
+     * This variable only used when passing sensitive data between application components which use
+     * different encryption key
+     * Json serialization in database should not deal with it
+     */
+    @JsonIgnore
+    private Serializable originalContent = null;
 
     @SuppressWarnings("unused")
     protected SensitiveValue() {
     }
 
     protected SensitiveValue(Serializable content) {
-        byte[] serialized = serialize(content);
-        String encoded = Base64.encode(serialized);
-        this.content = EncryptionProvider.get().encrypt(encoded.toCharArray());
+        originalContent = content;
+        encrypt();
+    }
+
+    public void encrypt() {
+        if(originalContent != null) {
+            content = encrypt(originalContent);
+            originalContent = null;
+        }
+    }
+
+    public void decrypt() {
+        if(content != null) {
+            originalContent = decrypt(content);
+            content = null;
+        }
     }
 
     public String getContent() {
-        return content;
+        return (content != null) ? content : ((originalContent != null) ? originalContent.toString() : null);
     }
 
-    protected void setContent(String content) {
+    public void setContent(String content) {
         this.content = content;
     }
 
     @Override
     public Serializable get() {
-        char[] decrypted = EncryptionProvider.get().decrypt(content);
-        byte[] decoded = Base64.decode(new String(decrypted));
-        return deserialize(decoded);
+        return (originalContent != null) ? originalContent : ((content == null) ? null : decrypt(content));
     }
 
     @JsonIgnore
@@ -68,20 +87,48 @@ public class SensitiveValue implements Value {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
         SensitiveValue that = (SensitiveValue) o;
-        return content != null ? content.equals(that.content) : that.content == null;
+
+        if (content != null ? !content.equals(that.content) : that.content != null) {
+            return false;
+        }
+        return originalContent != null ? originalContent.equals(that.originalContent) : that.originalContent == null;
+
     }
 
     @Override
     public int hashCode() {
-        return content != null ? content.hashCode() : 0;
+        int result = content != null ? content.hashCode() : 0;
+        result = 31 * result + (originalContent != null ? originalContent.hashCode() : 0);
+        return result;
     }
 
     @Override
     public String toString() {
         return SENSITIVE_VALUE_MASK;
+    }
+
+    private String encrypt(Serializable originalContent) {
+        if(EncryptionProvider.get().isTextEncrypted(originalContent.toString())) {
+            return originalContent.toString();
+        } else {
+            byte[] serialized = serialize(originalContent);
+            String encoded = Base64.encode(serialized);
+            return EncryptionProvider.get().encrypt(encoded.toCharArray());
+        }
+    }
+
+    private Serializable decrypt(String content) {
+        char[] decrypted = EncryptionProvider.get().decrypt(content);
+        byte[] decoded = Base64.decode(new String(decrypted));
+        return deserialize(decoded);
     }
 
     private byte[] serialize(Serializable data) {

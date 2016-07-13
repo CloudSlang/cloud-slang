@@ -31,4 +31,11 @@ public interface Encryption {
      * @return The clear text char array
      */
     char[] decrypt(String cypherText);
+
+    /**
+     * Checks whether provided text char array is already encrypted
+     * @param text text to check whether it encrypted or not
+     * @return true if text is already encrypted
+     */
+    boolean isTextEncrypted(String text);
 }
