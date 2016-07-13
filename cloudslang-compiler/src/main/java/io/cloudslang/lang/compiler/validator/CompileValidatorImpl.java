@@ -59,19 +59,14 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
 
     @Override
     public void validateNoDuplicateExecutablesBasedOnFQN(
-            Executable newElement,
-            SlangSource newElementSource,
-            Map<SlangSource, Executable> executablePairs) {
-        for (Map.Entry<SlangSource, Executable> entry : executablePairs.entrySet()) {
-            if (newElement.getId().equalsIgnoreCase(entry.getValue().getId())) {
-                throw new RuntimeException(
-                        "Duplicate executable found: '" + newElement.getId() +
-                                "' (" + newElementSource.getPath() + ", " +
-                                entry.getKey().getPath() + ")"
-                );
+            Executable newExecutable,
+            SlangSource newExecutableSource,
+            Set<Executable> allAvailableExecutables) {
+        for (Executable executable : allAvailableExecutables) {
+            if (newExecutable.getId().equalsIgnoreCase(executable.getId())) {
+                throw new RuntimeException("Duplicate executable found: '" + newExecutable.getId() + "'" );
             }
         }
-
     }
 
     private List<RuntimeException> validateModelWithDependencies(

@@ -60,28 +60,27 @@ public class SlangCompilerImpl implements SlangCompiler {
     private CompileValidator compileValidator;
 
     @Override
-    public CompilationArtifact compile(SlangSource source, Set<SlangSource> path) {
+    public CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencySources) {
 
         Executable executable = preCompile(source);
 
-        //we transform also all of the files in the given path to model objects
-        Set<Executable> pathExecutables = new HashSet<>();
+        // we transform also all of the files in the given dependency sources to model objects
+        Set<Executable> allExecutables = new HashSet<>();
+        allExecutables.add(executable);
 
-        Map<SlangSource, Executable> executablePairs = new HashMap<>();
-        executablePairs.put(source, executable);
+        if (CollectionUtils.isNotEmpty(dependencySources)) {
+            for (SlangSource currentSource : dependencySources) {
+                Executable preCompiledCurrentSource = preCompile(currentSource);
 
-        if (CollectionUtils.isNotEmpty(path)) {
-            for (SlangSource pathSource : path) {
-                Executable preCompiledPathSource = preCompile(pathSource);
+                compileValidator.validateNoDuplicateExecutablesBasedOnFQN(preCompiledCurrentSource, currentSource, allExecutables);
 
-                compileValidator.validateNoDuplicateExecutablesBasedOnFQN(preCompiledPathSource, pathSource, executablePairs);
-
-                pathExecutables.add(preCompiledPathSource);
-                executablePairs.put(pathSource, preCompiledPathSource);
+                allExecutables.add(preCompiledCurrentSource);
             }
         }
 
-        return scoreCompiler.compile(executable, pathExecutables);
+        Set<Executable> dependencies = new HashSet<>(allExecutables);
+        dependencies.remove(executable);
+        return scoreCompiler.compile(executable, dependencies);
     }
 
     @Override

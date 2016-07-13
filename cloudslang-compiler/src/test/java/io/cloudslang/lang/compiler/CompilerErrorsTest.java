@@ -645,7 +645,7 @@ public class CompilerErrorsTest {
         dependencies.add(SlangSource.fromFile(dependency3));
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Duplicate executable found: 'io.CloudSlang.duplicate_fqn_1' (duplicate_fqn_1.sl, duplicate_fqn_1.sl)");
+        exception.expectMessage("Duplicate executable found: 'io.CloudSlang.duplicate_fqn_1'");
 
         compiler.compile(SlangSource.fromFile(resource), dependencies);
     }
