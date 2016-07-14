@@ -238,7 +238,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         validateNotDuplicateInOutParam(inOutParams, element, message);
     }
 
-    public String getExecutableName(Map<String, Object> executableRawData) {
+    private String getExecutableName(Map<String, Object> executableRawData) {
         String execName = (String) executableRawData.get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
         return execName == null ? "" : execName;
     }

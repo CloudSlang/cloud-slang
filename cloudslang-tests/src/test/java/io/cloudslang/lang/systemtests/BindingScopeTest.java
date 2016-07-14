@@ -20,8 +20,8 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
-import java.util.HashSet;
 import org.apache.commons.lang.StringUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -33,6 +33,8 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,7 +82,9 @@ public class BindingScopeTest extends SystemsTestsParent {
         exception.expect(RuntimeException.class);
 
         exception.expectMessage(new BaseMatcher<String>() {
-            public void describeTo(Description description) {}
+            public void describeTo(Description description) {
+            }
+
             public boolean matches(Object o) {
                 String message = o.toString();
                 return message.contains("Error running: 'check_weather_missing_input'") &&
@@ -90,6 +94,129 @@ public class BindingScopeTest extends SystemsTestsParent {
             }
         });
         triggerWithData(compilationArtifact, userInputs, systemProperties);
+    }
+
+    @Test
+    public void testInputWithDefaultValue() throws Exception {
+        URL resource = getClass().getResource("/yaml/check_weather_required_input_with_default.sl");
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), new HashSet<SlangSource>());
+
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("city", ValueFactory.create("city1"));
+        userInputs.put("input_with_default_value", ValueFactory.create(""));
+        Set<SystemProperty> systemProperties = Collections.emptySet();
+
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
+
+        Assert.assertEquals("default_value", steps.get(EXEC_START_PATH).getInputs().get("input_with_default_value"));
+    }
+
+    @Test
+    public void testInputRequiredWithEmptyValue() throws Exception {
+        URL resource = getClass().getResource("/yaml/check_weather_input_required.sl");
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), new HashSet<SlangSource>());
+
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("city", ValueFactory.create(""));
+        Set<SystemProperty> systemProperties = Collections.emptySet();
+
+        exception.expect(RuntimeException.class);
+
+        exception.expectMessage(new BaseMatcher<String>() {
+            public void describeTo(Description description) {
+            }
+
+            public boolean matches(Object o) {
+                String message = o.toString();
+                return message.contains("Error running: 'check_weather_input_required'.") &&
+                        message.contains("Input with name: 'city' is Required, but value is empty");
+            }
+        });
+        triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
+    }
+
+    @Test
+    public void testInputRequiredWithNullValue() throws Exception {
+        URL resource = getClass().getResource("/yaml/check_weather_input_required.sl");
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), new HashSet<SlangSource>());
+
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("city", ValueFactory.create(null));
+        Set<SystemProperty> systemProperties = Collections.emptySet();
+
+        exception.expect(RuntimeException.class);
+
+        exception.expectMessage(new BaseMatcher<String>() {
+            public void describeTo(Description description) {
+            }
+
+            public boolean matches(Object o) {
+                String message = o.toString();
+                return message.contains("Error running: 'check_weather_input_required'.") &&
+                        message.contains("Input with name: 'city' is Required, but value is empty");
+            }
+        });
+        triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
+    }
+
+    @Test
+    public void testInputOptionalWithEmptyValue() throws Exception {
+        URL resource = getClass().getResource("/yaml/check_weather_optional_input_with_default.sl");
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), new HashSet<SlangSource>());
+
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("input_with_default_value", ValueFactory.create(""));
+        Set<SystemProperty> systemProperties = Collections.emptySet();
+
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
+
+        Assert.assertEquals("default_value", steps.get(EXEC_START_PATH).getInputs().get("input_with_default_value"));
+    }
+
+    @Test
+    public void testInputOptionalWithNullValue() throws Exception {
+        URL resource = getClass().getResource("/yaml/check_weather_optional_input_with_default.sl");
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), new HashSet<SlangSource>());
+
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("input_with_default_value", ValueFactory.create(null));
+        Set<SystemProperty> systemProperties = Collections.emptySet();
+
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
+
+        Assert.assertEquals("default_value", steps.get(EXEC_START_PATH).getInputs().get("input_with_default_value"));
+    }
+
+    @Test
+    public void testStepInputRequiredWithEmptyValue() throws Exception {
+        URL resource = getClass().getResource("/yaml/check_weather_flow.sl");
+        URI operation1 = getClass().getResource("/yaml/check_weather_required_input_with_default.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
+
+        Map<String, Value> userInputs = new HashMap<>();
+        Set<SystemProperty> systemProperties = Collections.emptySet();
+
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
+
+        Assert.assertEquals("weather thing default_value", steps.get(FIRST_STEP_PATH).getOutputs().get("kuku"));
+    }
+
+    @Test
+    public void testStepInputOptionalWithEmptyValue() throws Exception {
+        URL resource = getClass().getResource("/yaml/check_weather_flow_optional.sl");
+        URI operation1 = getClass().getResource("/yaml/check_weather_optional_input_with_default.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
+
+        Map<String, Value> userInputs = new HashMap<>();
+        Set<SystemProperty> systemProperties = Collections.emptySet();
+
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
+
+        Assert.assertEquals("weather thing default_value", steps.get(FIRST_STEP_PATH).getOutputs().get("kuku"));
     }
 
     private void verifyStepPublishValues(StepData stepData) {
