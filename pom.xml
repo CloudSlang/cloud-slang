@@ -250,6 +250,14 @@
             </dependency>
 
             <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-compiler-test</artifactId>
+                <version>2.4</version>
+                <scope>test</scope>
+            </dependency>
+
+
+            <dependency>
                 <groupId>org.eclipse.sisu</groupId>
                 <artifactId>org.eclipse.sisu.plexus</artifactId>
                 <version>0.3.1</version>

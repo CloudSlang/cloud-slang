@@ -124,13 +124,15 @@ public class CloudSlangMavenCompiler extends AbstractCompiler{
             String[] inclStrs = includes.toArray(new String[includes.size()]);
             scanner.setIncludes(inclStrs);
         } else {
-            scanner.setIncludes(new String[]{"**/*.yaml","**/*.sl","**/*.yml"});
+            scanner.setIncludes(new String[]{"**/*.sl.yaml","**/*.sl","**/*.sl.yml"});
         }
 
         Set<String> configExcludes = config.getExcludes();
         if(configExcludes != null && !configExcludes.isEmpty()) {
             String[] exclStrs = configExcludes.toArray(new String[configExcludes.size()]);
             scanner.setExcludes(exclStrs);
+        } else {
+            scanner.setExcludes(new String[]{"**/*prop.sl"});
         }
 
         scanner.scan();

@@ -24,6 +24,11 @@
         </dependency>
 
         <dependency>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-compiler-test</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.eclipse.sisu</groupId>
             <artifactId>org.eclipse.sisu.plexus</artifactId>
         </dependency>
