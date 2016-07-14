@@ -65,22 +65,21 @@ public class SlangCompilerImpl implements SlangCompiler {
         Executable executable = preCompile(source);
 
         // we transform also all of the files in the given dependency sources to model objects
-        Set<Executable> allExecutables = new HashSet<>();
-        allExecutables.add(executable);
+        Set<Executable> executables = new HashSet<>();
+        executables.add(executable);
 
         if (CollectionUtils.isNotEmpty(dependencySources)) {
             for (SlangSource currentSource : dependencySources) {
                 Executable preCompiledCurrentSource = preCompile(currentSource);
 
-                compileValidator.validateNoDuplicateExecutablesBasedOnFQN(preCompiledCurrentSource, currentSource, allExecutables);
+                compileValidator.validateNoDuplicateExecutablesBasedOnFQN(preCompiledCurrentSource, executables);
 
-                allExecutables.add(preCompiledCurrentSource);
+                executables.add(preCompiledCurrentSource);
             }
         }
 
-        Set<Executable> dependencies = new HashSet<>(allExecutables);
-        dependencies.remove(executable);
-        return scoreCompiler.compile(executable, dependencies);
+        executables.remove(executable);
+        return scoreCompiler.compile(executable, executables);
     }
 
     @Override

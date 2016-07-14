@@ -60,7 +60,6 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
     @Override
     public void validateNoDuplicateExecutablesBasedOnFQN(
             Executable newExecutable,
-            SlangSource newExecutableSource,
             Set<Executable> allAvailableExecutables) {
         for (Executable executable : allAvailableExecutables) {
             if (newExecutable.getId().equalsIgnoreCase(executable.getId())) {
