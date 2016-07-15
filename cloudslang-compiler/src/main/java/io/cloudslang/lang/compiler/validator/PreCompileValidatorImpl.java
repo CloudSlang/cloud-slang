@@ -9,9 +9,12 @@ import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.utils.SetUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -203,6 +206,29 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         }
     }
 
+    @Override
+    public void validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element) {
+        Collection<InOutParam> inOutParams = new ArrayList<>();
+        inOutParams.addAll(inputs);
+
+        String message = "Duplicate " + getMessagePart(element) + " found: " + element.getName();
+        validateNotDuplicateInOutParam(inOutParams, element, message);
+    }
+
+    private String getMessagePart(InOutParam element) {
+        String messagePart = "";
+        if (element instanceof Input) {
+            messagePart = "input";
+        } else if (element instanceof Argument) {
+            messagePart = "step input";
+        } else if (element instanceof Output) {
+            messagePart = "output / publish value";
+        } else if (element instanceof Result) {
+            messagePart = "result";
+        }
+        return messagePart;
+    }
+
     private String getExecutableName(Map<String, Object> executableRawData) {
         String execName = (String) executableRawData.get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
         return execName == null ? "" : execName;
@@ -278,6 +304,12 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
             validateListsHaveMutuallyExclusiveNames(inputs, outputs, errorMessage);
         } catch (RuntimeException e) {
             result.getErrors().add(e);
+        }
+    }
+
+    private void validateNotDuplicateInOutParam(Collection<InOutParam> inOutParams, InOutParam element, String message) {
+        if (SetUtils.containsIgnoreCaseBasedOnName(inOutParams, element)) {
+            throw new RuntimeException(message);
         }
     }
 

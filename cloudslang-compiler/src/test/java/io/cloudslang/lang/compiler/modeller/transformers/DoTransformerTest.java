@@ -5,6 +5,8 @@ import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+import io.cloudslang.lang.compiler.validator.PreCompileValidator;
+import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
 import io.cloudslang.lang.entities.bindings.Argument;
 import junit.framework.Assert;
 import org.junit.Rule;
@@ -159,6 +161,11 @@ public class DoTransformerTest {
         @Bean
         public DoTransformer inputTransformer() {
             return new DoTransformer();
+        }
+
+        @Bean
+        public PreCompileValidator preCompileValidator() {
+            return new PreCompileValidatorImpl();
         }
 
     }

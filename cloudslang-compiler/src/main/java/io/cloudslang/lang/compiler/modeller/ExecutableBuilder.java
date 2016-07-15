@@ -156,7 +156,9 @@ public class ExecutableBuilder {
 
         @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) preExecutableActionData.remove(SlangTextualKeys.INPUTS_KEY);
         @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) postExecutableActionData.remove(SlangTextualKeys.OUTPUTS_KEY);
+
         @SuppressWarnings("unchecked") List<Result> results = (List<Result>) postExecutableActionData.remove(SlangTextualKeys.RESULTS_KEY);
+        results = results == null ? new ArrayList<Result>() : results;
 
         String namespace = parsedSlang.getNamespace();
         Set<String> executableDependencies;
