@@ -44,7 +44,7 @@ public class InputsTransformer extends AbstractInputsTransformer implements Tran
         }
         for (Object rawInput : rawData) {
             Input input = transformSingleInput(rawInput);
-            preCompileValidator.validateNoDuplicateInputs(result, input);
+            preCompileValidator.validateNoDuplicateInOutParams(result, input);
             result.add(input);
         }
         return result;

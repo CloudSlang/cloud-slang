@@ -59,7 +59,7 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
     }
 
     private void addResult(List<Result> results, Result element) {
-        preCompileValidator.validateNoDuplicateResults(results, element);
+        preCompileValidator.validateNoDuplicateInOutParams(results, element);
         results.add(element);
     }
 

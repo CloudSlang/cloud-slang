@@ -72,7 +72,7 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
     }
 
     private void addOutput(List<Output> outputs, Output element) {
-        preCompileValidator.validateNoDuplicateOutputs(outputs, element);
+        preCompileValidator.validateNoDuplicateInOutParams(outputs, element);
         outputs.add(element);
     }
 

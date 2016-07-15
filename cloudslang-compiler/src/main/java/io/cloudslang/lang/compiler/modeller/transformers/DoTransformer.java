@@ -50,7 +50,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
             List rawArgumentsList = (List) rawArguments;
             for (Object rawArgument : rawArgumentsList) {
                 Argument argument = transformListArgument(rawArgument);
-                preCompileValidator.validateNoDuplicateStepInputs(result, argument);
+                preCompileValidator.validateNoDuplicateInOutParams(result, argument);
                 result.add(argument);
             }
         } else if (rawArguments != null) {

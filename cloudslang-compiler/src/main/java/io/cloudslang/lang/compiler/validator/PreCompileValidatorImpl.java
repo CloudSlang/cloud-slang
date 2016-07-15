@@ -207,35 +207,26 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     }
 
     @Override
-    public void validateNoDuplicateInputs(List<Input> inputs, Input element) {
+    public void validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element) {
         Collection<InOutParam> inOutParams = new ArrayList<>();
         inOutParams.addAll(inputs);
-        String message = "Duplicate input found: " + element.getName();
+
+        String message = "Duplicate " + getMessagePart(element) + " found: " + element.getName();
         validateNotDuplicateInOutParam(inOutParams, element, message);
     }
 
-    @Override
-    public void validateNoDuplicateStepInputs(List<Argument> inputs, Argument element) {
-        Collection<InOutParam> inOutParams = new ArrayList<>();
-        inOutParams.addAll(inputs);
-        String message = "Duplicate step input found: " + element.getName();
-        validateNotDuplicateInOutParam(inOutParams, element, message);
-    }
-
-    @Override
-    public void validateNoDuplicateOutputs(List<Output> outputs, Output element) {
-        Collection<InOutParam> inOutParams = new ArrayList<>();
-        inOutParams.addAll(outputs);
-        String message = "Duplicate output / publish value found: " + element.getName();
-        validateNotDuplicateInOutParam(inOutParams, element, message);
-    }
-
-    @Override
-    public void validateNoDuplicateResults(List<Result> results, Result element) {
-        Collection<InOutParam> inOutParams = new ArrayList<>();
-        inOutParams.addAll(results);
-        String message = "Duplicate result found: " + element.getName();
-        validateNotDuplicateInOutParam(inOutParams, element, message);
+    private String getMessagePart(InOutParam element) {
+        String messagePart = "";
+        if (element instanceof Input) {
+            messagePart = "input";
+        } else if (element instanceof Argument) {
+            messagePart = "step input";
+        } else if (element instanceof Output) {
+            messagePart = "output / publish value";
+        } else if (element instanceof Result) {
+            messagePart = "result";
+        }
+        return messagePart;
     }
 
     private String getExecutableName(Map<String, Object> executableRawData) {
