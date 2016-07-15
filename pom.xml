@@ -243,6 +243,26 @@
                 <version>3.20.0-GA</version>
             </dependency>
 
+            <dependency>
+              <groupId>org.codehaus.plexus</groupId>
+              <artifactId>plexus-compiler-api</artifactId>
+              <version>2.4</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-compiler-test</artifactId>
+                <version>2.4</version>
+                <scope>test</scope>
+            </dependency>
+
+
+            <dependency>
+                <groupId>org.eclipse.sisu</groupId>
+                <artifactId>org.eclipse.sisu.plexus</artifactId>
+                <version>0.3.1</version>
+            </dependency>
+
             <!-- spring artifacts -->
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -555,6 +575,7 @@
         <module>cloudslang-tests</module>
         <module>cloudslang-all</module>
         <module>cloudslang-content-verifier</module>
+        <module>cloudslang-content-maven-compiler</module>
     </modules>
 
 </project>
