@@ -4,6 +4,8 @@ import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 
+import io.cloudslang.lang.entities.bindings.InOutParam;
+
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +35,8 @@ public interface PreCompileValidator {
             String execName,
             List<RuntimeException> errors);
 
-
     void validateResultsSection(Map<String, Object> executableRawData, String artifact, List<RuntimeException> errors);
+    
+    void validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element);
 
 }

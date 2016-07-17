@@ -253,14 +253,10 @@ decision:
         default: ${input_x + input_y}
         sensitive: true
     - input_concat_x_sensitive_y: ${input_x_sensitive + input_y}
-    - input_concat_x_sensitive_y_sensitive:
-        default: ${input_x_sensitive + input_y}
-        sensitive: true
     - input_concat_x_y_sensitive: ${input_x + input_y_sensitive}
     - input_concat_x_y_sensitive_sensitive:
         default: ${input_x + input_y_sensitive}
         sensitive: true
-    - input_concat_x_sensitive_y_sensitive: ${input_x_sensitive + input_y_sensitive}
     - input_concat_x_sensitive_y_sensitive_sensitive:
         default: ${input_x_sensitive + input_y_sensitive}
         sensitive: true
@@ -285,15 +281,6 @@ decision:
         input_concat_x_sensitive +
         '_suffix'
         }
-    - input_sensitive_concat_x_folded_sensitive:
-        default: >
-          ${
-          'prefix_' +
-          input_concat_x_sensitive +
-          '_suffix'
-          }
-        sensitive: true
-
     - input_concat_x_folded_copy:
         default: ${ input_concat_x_folded }
     - input_concat_x_folded_copy_sensitive:
@@ -754,10 +741,6 @@ decision:
     - output_sensitive_input_concat_x_sensitive_y:
         value: ${input_concat_x_sensitive_y}
         sensitive: true
-    - output_input_concat_x_sensitive_y_sensitive: ${input_concat_x_sensitive_y_sensitive}
-    - output_sensitive_input_concat_x_sensitive_y_sensitive:
-        value: ${input_concat_x_sensitive_y_sensitive}
-        sensitive: true
     - output_concat_x_y_sensitive: ${input_x_sensitive + input_y}
     - output_sensitive_concat_x_y_sensitive:
         value:  ${input_x_sensitive + input_y}
@@ -773,10 +756,6 @@ decision:
     - output_concat_x_sensitive_y_sensitive: ${input_x_sensitive + input_y_sensitive}
     - output_sensitive_concat_x_sensitive_y_sensitive:
         value: ${input_x_sensitive + input_y_sensitive}
-        sensitive: true
-    - output_input_concat_x_sensitive_y_sensitive: ${input_concat_x_sensitive_y_sensitive}
-    - output_sensitive_input_concat_x_sensitive_y_sensitive:
-        value: ${input_concat_x_sensitive_y_sensitive}
         sensitive: true
     - output_input_concat_x_sensitive_y_sensitive_sensitive: ${input_concat_x_sensitive_y_sensitive_sensitive}
     - output_sensitive_input_concat_x_sensitive_y_sensitive_sensitive:
@@ -798,10 +777,6 @@ decision:
     - output_input_sensitive_concat_x_folded: ${input_sensitive_concat_x_folded}
     - output_sensitive_input_sensitive_concat_x_folded:
         value: ${input_sensitive_concat_x_folded}
-        sensitive: true
-    - output_input_sensitive_concat_x_folded_sensitive: ${input_sensitive_concat_x_folded_sensitive}
-    - output_sensitive_input_sensitive_concat_x_folded_sensitive:
-        value: ${input_sensitive_concat_x_folded_sensitive}
         sensitive: true
     - output_input_concat_x_folded_copy: ${input_concat_x_folded_copy}
     - output_sensitive_input_concat_x_folded_copy:

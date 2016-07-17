@@ -14,8 +14,10 @@ import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
+import io.cloudslang.lang.compiler.validator.CompileValidator;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.utils.SetUtils;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,20 +56,30 @@ public class SlangCompilerImpl implements SlangCompiler {
     @Autowired
     private ScoreCompiler scoreCompiler;
 
+    @Autowired
+    private CompileValidator compileValidator;
+
     @Override
-    public CompilationArtifact compile(SlangSource source, Set<SlangSource> path) {
+    public CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencySources) {
 
         Executable executable = preCompile(source);
 
-        //we transform also all of the files in the given path to model objects
-        Set<Executable> pathExecutables = new HashSet<>();
-        if (CollectionUtils.isNotEmpty(path)) {
-            for (SlangSource pathSource : path) {
-                pathExecutables.add(preCompile(pathSource));
+        // we transform also all of the files in the given dependency sources to model objects
+        Set<Executable> executables = new HashSet<>();
+        executables.add(executable);
+
+        if (CollectionUtils.isNotEmpty(dependencySources)) {
+            for (SlangSource currentSource : dependencySources) {
+                Executable preCompiledCurrentSource = preCompile(currentSource);
+
+                compileValidator.validateNoDuplicateExecutablesBasedOnFQN(preCompiledCurrentSource, executables);
+
+                executables.add(preCompiledCurrentSource);
             }
         }
 
-        return scoreCompiler.compile(executable, pathExecutables);
+        executables.remove(executable);
+        return scoreCompiler.compile(executable, executables);
     }
 
     @Override
@@ -125,7 +137,7 @@ public class SlangCompilerImpl implements SlangCompiler {
         for (Map<String, Object> propertyAsMap : parsedSystemProperties) {
             Map.Entry<String, Object> propertyAsEntry = propertyAsMap.entrySet().iterator().next();
             String propertyKey = propertyAsEntry.getKey();
-            if (modelledSystemPropertyKeys.contains(propertyKey)) {
+            if (SetUtils.containsIgnoreCase(modelledSystemPropertyKeys, propertyKey)) {
                 throw new RuntimeException(
                         DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX + propertyKey + "'."
                 );

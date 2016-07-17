@@ -16,6 +16,10 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
 import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
+import java.io.File;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -172,14 +176,23 @@ public class CompilerHelperTest {
 
     @Test
     public void testLoadSystemPropertiesInvalidExtension() throws Exception {
-        URI systemPropertyURI = getClass().getResource("/flow.sl").toURI();
+        URI props1 = getClass().getResource("/properties/duplicate/props1.prop.sl").toURI();
+        URI props2 = getClass().getResource("/properties/duplicate/props2.prop.sl").toURI();
+        Set<SystemProperty> systemProperties1 = Sets.newHashSet(
+                new SystemProperty("user.sys", "props.host", "localhost")
+        );
+        Set<SystemProperty> systemProperties2 = Sets.newHashSet(
+                new SystemProperty("user.SYS", "props.host", "localhost")
+        );
+        when(slang.loadSystemProperties(eq(SlangSource.fromFile(props1)))).thenReturn(systemProperties1);
+        when(slang.loadSystemProperties(eq(SlangSource.fromFile(props2)))).thenReturn(systemProperties2);
 
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("flow.sl");
-        expectedException.expectMessage("extension");
-        expectedException.expectMessage("prop.sl");
+        expectedException.expectMessage(containsIgnoreCase("user.SYS.props.host"));
+        expectedException.expectMessage("properties" + File.separator + "duplicate" + File.separator + "props1.prop.sl");
+        expectedException.expectMessage("properties" + File.separator + "duplicate" + File.separator + "props1.prop.sl");
 
-        compilerHelper.loadSystemProperties(Collections.singletonList(systemPropertyURI.getPath()));
+        compilerHelper.loadSystemProperties(Lists.newArrayList(props1.getPath(), props2.getPath()));
     }
 
     @Test
@@ -283,6 +296,21 @@ public class CompilerHelperTest {
             return yaml;
         }
 
+    }
+
+    private Matcher<String> containsIgnoreCase(final String element) {
+        return new BaseMatcher<String>() {
+            @Override
+            public boolean matches(Object item) {
+                String itemAsString = (String) item;
+                return itemAsString.toLowerCase().contains(element.toLowerCase());
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("should contain (ignoring case) " + element);
+            }
+        };
     }
 
 }

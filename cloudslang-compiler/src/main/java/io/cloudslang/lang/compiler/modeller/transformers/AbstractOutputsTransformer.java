@@ -10,6 +10,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 *******************************************************************************/
 
 
+import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
@@ -30,6 +32,9 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
  * Time: 11:33
  */
 public class AbstractOutputsTransformer  extends InOutTransformer {
+
+    @Autowired
+    private PreCompileValidator preCompileValidator;
 
     public List<Output> transform(List<Object> rawData) {
 
@@ -52,18 +57,23 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
                     //     property2: value2
                     // this is the verbose way of defining outputs with all of the properties available
                     //noinspection unchecked
-                    outputs.add(createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry));
+                    addOutput(outputs, createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry));
                 } else {
                     // - some_output: some_expression
-                    outputs.add(createOutput(entry.getKey(), entryValue, false));
+                    addOutput(outputs, createOutput(entry.getKey(), entryValue, false));
                 }
             } else {
                 //- some_output
                 //this is our default behavior that if the user specifies only a key, the key is also the ref we look for
-                outputs.add(createRefOutput((String) rawOutput));
+                addOutput(outputs, createRefOutput((String) rawOutput));
             }
         }
         return outputs;
+    }
+
+    private void addOutput(List<Output> outputs, Output element) {
+        preCompileValidator.validateNoDuplicateInOutParams(outputs, element);
+        outputs.add(element);
     }
 
     private Output createPropOutput(Map.Entry<String, Map<String, Serializable>> entry) {
