@@ -90,10 +90,10 @@ public class SlangImpl implements Slang {
 		RunEnvironment runEnv = new RunEnvironment(systemProperties);
 		executionContext.put(ScoreLangConstants.RUN_ENV, runEnv);
 
-        Map<String, Value> clonedRunInputs = new HashMap<>(runInputs.size());
-        for (Map.Entry<String, ? extends Serializable> entry : runInputs.entrySet()) {
+		Map<String, Value> clonedRunInputs = new HashMap<>(runInputs.size());
+		for (Map.Entry<String, ? extends Serializable> entry : runInputs.entrySet()) {
             clonedRunInputs.put(entry.getKey(), ValueFactory.create(entry.getValue(), false));
-        }
+		}
 
 		executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable) clonedRunInputs);
 		TriggeringProperties triggeringProperties = TriggeringProperties.create(compilationArtifact.getExecutionPlan()).setDependencies(compilationArtifact.getDependencies())
