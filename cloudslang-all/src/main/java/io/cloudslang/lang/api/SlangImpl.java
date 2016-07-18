@@ -80,7 +80,7 @@ public class SlangImpl implements Slang {
     }
 
 	@Override
-	public Long run(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> runInputs, Set<SystemProperty> systemProperties) {
+	public Long run(CompilationArtifact compilationArtifact, Map<String, Value> runInputs, Set<SystemProperty> systemProperties) {
 		Validate.notNull(compilationArtifact, "Compilation artifact can not be null");
 		if(runInputs == null) {
 			runInputs = new HashMap<>();
@@ -90,12 +90,7 @@ public class SlangImpl implements Slang {
 		RunEnvironment runEnv = new RunEnvironment(systemProperties);
 		executionContext.put(ScoreLangConstants.RUN_ENV, runEnv);
 
-		Map<String, Value> clonedRunInputs = new HashMap<>(runInputs.size());
-		for (Map.Entry<String, ? extends Serializable> entry : runInputs.entrySet()) {
-			clonedRunInputs.put(entry.getKey(), ValueFactory.create(entry.getValue(), false));
-		}
-
-		executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable) clonedRunInputs);
+		executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable) runInputs);
 		TriggeringProperties triggeringProperties = TriggeringProperties.create(compilationArtifact.getExecutionPlan()).setDependencies(compilationArtifact.getDependencies())
 			.setContext(executionContext);
 		return score.trigger(triggeringProperties);
@@ -105,7 +100,7 @@ public class SlangImpl implements Slang {
 	public Long compileAndRun(
             SlangSource source,
             Set<SlangSource> dependencies,
-            Map<String, ? extends Serializable> runInputs,
+            Map<String, Value> runInputs,
             Set<SystemProperty> systemProperties) {
 		CompilationArtifact compilationArtifact = compile(source, dependencies);
 		return run(compilationArtifact, runInputs, systemProperties);

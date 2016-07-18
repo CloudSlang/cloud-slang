@@ -15,6 +15,8 @@ import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
@@ -70,7 +72,7 @@ public class ScoreServicesImplTest {
         when(
                 slang.run(
                         any(CompilationArtifact.class),
-                        anyMapOf(String.class, Serializable.class),
+                        anyMapOf(String.class, Value.class),
                         anySetOf(SystemProperty.class)))
                 .thenReturn(DEFAULT_EXECUTION_ID);
     }
@@ -88,8 +90,8 @@ public class ScoreServicesImplTest {
     @Test (timeout = DEFAULT_TIMEOUT)
      public void testTrigger() throws Exception {
         CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
-        Map<String, Serializable > inputs = new HashMap<>();
-        inputs.put("a", 1);
+        Map<String, Value > inputs = new HashMap<>();
+        inputs.put("a", ValueFactory.create(1));
         Set<SystemProperty> systemProperties  = Sets.newHashSet(
             new SystemProperty("ns", "b", "c")
         );
@@ -104,8 +106,8 @@ public class ScoreServicesImplTest {
     public void testTriggerSyncSuccess() throws Exception {
         //prepare method args
         CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
-        Map<String, Serializable > inputs = new HashMap<>();
-        inputs.put("a", 1);
+        Map<String, Value > inputs = new HashMap<>();
+        inputs.put("a", ValueFactory.create(1));
         Set<SystemProperty> systemProperties  = Sets.newHashSet(
                 new SystemProperty("ns", "b", "c")
         );
@@ -147,8 +149,8 @@ public class ScoreServicesImplTest {
     public void testTriggerSyncException() throws Exception {
         //prepare method args
         CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
-        Map<String, Serializable > inputs = new HashMap<>();
-        inputs.put("a", 1);
+        Map<String, Value > inputs = new HashMap<>();
+        inputs.put("a", ValueFactory.create(1));
         Set<SystemProperty> systemProperties  = Sets.newHashSet(
                 new SystemProperty("ns", "b", "c")
         );
@@ -194,8 +196,8 @@ public class ScoreServicesImplTest {
     public void testTriggerSyncSpException() throws Exception {
         //prepare method args
         CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
-        Map<String, Serializable > inputs = new HashMap<>();
-        inputs.put("a", 1);
+        Map<String, Value > inputs = new HashMap<>();
+        ValueFactory.create(1);
         Set<SystemProperty> systemProperties  = Sets.newHashSet(
                 new SystemProperty("ns", "b", "c")
         );
