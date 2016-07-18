@@ -13,6 +13,8 @@ package io.cloudslang.lang.entities.utils;
 
 import io.cloudslang.lang.entities.bindings.values.Value;
 
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +34,14 @@ public final class MapUtils {
         putAllIfNotEmpty(result, map1);
         putAllIfNotEmpty(result, map2);
         return result;
+    }
+
+    public static Map<String, Value> convertMapNonSensitiveValues(Map<String, ? extends Serializable> source) {
+        Map<String, Value> target = new HashMap<>(source.size());
+        for (Map.Entry<String, ? extends Serializable> entry : source.entrySet()) {
+            target.put(entry.getKey(), ValueFactory.create(entry.getValue()));
+        }
+        return target;
     }
 
     private static void putAllIfNotEmpty(

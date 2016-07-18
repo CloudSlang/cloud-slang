@@ -10,9 +10,9 @@ package io.cloudslang.lang.cli.services;
 
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.score.events.ScoreEventListener;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,6 +23,6 @@ import java.util.Set;
  */
 public interface ScoreServices {
     void subscribe(ScoreEventListener eventHandler, Set<String> eventTypes);
-    Long trigger(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Set<SystemProperty> systemProperties);
-    Long triggerSync(CompilationArtifact compilationArtifact, Map<String, ? extends Serializable> inputs, Set<SystemProperty> systemProperties, boolean quiet, boolean debug);
+    Long trigger(CompilationArtifact compilationArtifact, Map<String, Value> inputs, Set<SystemProperty> systemProperties);
+    Long triggerSync(CompilationArtifact compilationArtifact, Map<String, Value> inputs, Set<SystemProperty> systemProperties, boolean quiet, boolean debug);
 }

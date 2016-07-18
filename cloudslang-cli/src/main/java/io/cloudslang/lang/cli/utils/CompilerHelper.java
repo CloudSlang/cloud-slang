@@ -11,8 +11,8 @@ package io.cloudslang.lang.cli.utils;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 
+import io.cloudslang.lang.entities.bindings.values.Value;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +33,6 @@ public interface CompilerHelper {
      * @param inputFiles paths to the files containing the inputs
      * @return map containing all of the inputs with fully qualified keys
      */
-    Map<String, ? extends Serializable> loadInputsFromFile(List<String> inputFiles) throws IOException;
+    Map<String, Value> loadInputsFromFile(List<String> inputFiles) throws IOException;
 
 }

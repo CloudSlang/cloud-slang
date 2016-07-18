@@ -155,4 +155,19 @@ public class CompileDependenciesTest {
         Assert.assertNotNull(executionPlan);
         Assert.assertEquals(3, compilationArtifact.getDependencies().size());
     }
+
+    @Test
+    public void sameSourceAsDependencyWorks() throws Exception {
+        URI flow = getClass().getResource("/basic_flow.yaml").toURI();
+        URI importedOperation = getClass().getResource("/test_op.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(importedOperation));
+        SlangSource flowSource = SlangSource.fromFile(flow);
+        path.add(flowSource);
+
+        Assert.assertTrue(path.contains(flowSource));
+        CompilationArtifact compilationArtifact = compiler.compile(flowSource, path);
+        Assert.assertNotNull(compilationArtifact);
+    }
+
 }
