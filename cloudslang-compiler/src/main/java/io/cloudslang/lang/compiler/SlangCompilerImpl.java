@@ -72,7 +72,7 @@ public class SlangCompilerImpl implements SlangCompiler {
             for (SlangSource currentSource : dependencySources) {
                 Executable preCompiledCurrentSource = preCompile(currentSource);
 
-                compileValidator.validateNoDuplicateExecutablesBasedOnFQN(preCompiledCurrentSource, currentSource, executablePairs);
+                compileValidator.validateNoDuplicateExecutables(preCompiledCurrentSource, currentSource, executablePairs);
 
                 executablePairs.put(preCompiledCurrentSource, currentSource);
             }

@@ -16,6 +16,6 @@ public interface CompileValidator {
 
     List<RuntimeException> validateModelWithDirectDependencies(Executable executable, Map<String, Executable> directDependencies);
 
-    void validateNoDuplicateExecutablesBasedOnFQN(Executable currentExecutable, SlangSource currentSource, Map<Executable, SlangSource> allAvailableExecutables);
+    void validateNoDuplicateExecutables(Executable currentExecutable, SlangSource currentSource, Map<Executable, SlangSource> allAvailableExecutables);
 
 }

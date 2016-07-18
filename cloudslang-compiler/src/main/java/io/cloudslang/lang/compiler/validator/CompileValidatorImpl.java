@@ -58,7 +58,7 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
     }
 
     @Override
-    public void validateNoDuplicateExecutablesBasedOnFQN(
+    public void validateNoDuplicateExecutables(
             Executable currentExecutable,
             SlangSource currentSource,
             Map<Executable, SlangSource> allAvailableExecutables) {
