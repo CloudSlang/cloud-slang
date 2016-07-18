@@ -65,7 +65,7 @@ public class InputsBinding {
             throw new RuntimeException("Error binding input: '" + inputName + "', \n\tError is: " + t.getMessage(), t);
         }
 
-        if (input.isRequired() && (isDefined(value))) {
+        if (input.isRequired() && isEmpty(value)) {
             String errorMessage = "Input with name: \'" + inputName + "\' is Required, but value is empty";
             throw new RuntimeException(errorMessage);
         }
@@ -87,7 +87,7 @@ public class InputsBinding {
             value = ValueFactory.create(valueFromContext, sensitive);
         }
 
-        if (isDefined(value)) {
+        if (isEmpty(value)) {
             Value rawValue = input.getValue();
             String expressionToEvaluate = ExpressionUtils.extractExpression(rawValue == null ? null : rawValue.get());
             if (expressionToEvaluate != null) {
@@ -106,7 +106,7 @@ public class InputsBinding {
         return value;
     }
 
-    private boolean isDefined(Value value) {
+    private boolean isEmpty(Value value) {
         return value == null || value.get() == null || value.get().equals("");
     }
 
