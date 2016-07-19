@@ -51,8 +51,8 @@ public class InputsTransformerTest extends TransformersTestParent {
     @Autowired
     private YamlParser yamlParser;
 
-    private List inputsMap;
-    private List inputsMapWithFunctions;
+    private List<Object> inputsMap;
+    private List<Object> inputsMapWithFunctions;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();

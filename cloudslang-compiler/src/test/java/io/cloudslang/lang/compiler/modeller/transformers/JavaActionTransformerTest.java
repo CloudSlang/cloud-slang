@@ -49,9 +49,9 @@ public class JavaActionTransformerTest extends TransformersTestParent {
     private YamlParser yamlParser;
     @Rule
     public ExpectedException exception = ExpectedException.none();
-    private Map initialJavaActionSimple;
-    private Map initialJavaActionWithDependencies;
-    private Map initialJavaActionInvalidKey;
+    private Map<String, String> initialJavaActionSimple;
+    private Map<String, String> initialJavaActionWithDependencies;
+    private Map<String, String> initialJavaActionInvalidKey;
     private Map<String, String> expectedJavaActionSimple;
     private Map<String, String> expectedJavaActionWithDependencies;
 

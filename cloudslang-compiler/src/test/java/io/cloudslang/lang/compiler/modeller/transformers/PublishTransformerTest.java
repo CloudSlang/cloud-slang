@@ -57,7 +57,7 @@ public class PublishTransformerTest extends TransformersTestParent {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    private List publishMap;
+    private List<Object> publishMap;
 
     @Before
     public void init() throws URISyntaxException {

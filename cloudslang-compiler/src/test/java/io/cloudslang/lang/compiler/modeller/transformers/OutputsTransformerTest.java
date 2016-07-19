@@ -58,13 +58,13 @@ public class OutputsTransformerTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    private List outputsMap;
+    private List<Object> outputsMap;
 
     @Before
     public void init() throws URISyntaxException {
         URL resource = getClass().getResource("/operation_with_data.sl");
         ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
-        Map op = file.getOperation();
+        Map<String, Object> op = file.getOperation();
         outputsMap = (List) op.get(SlangTextualKeys.OUTPUTS_KEY);
     }
 

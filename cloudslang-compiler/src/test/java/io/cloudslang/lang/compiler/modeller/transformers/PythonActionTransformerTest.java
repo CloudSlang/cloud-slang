@@ -51,9 +51,9 @@ public class PythonActionTransformerTest extends TransformersTestParent {
     private YamlParser yamlParser;
     @Rule
     public ExpectedException exception = ExpectedException.none();
-    private Map initialPythonActionSimple;
-    private Map initialPythonActionWithDependencies;
-    private Map initialPythonActionInvalidKey;
+    private Map<String, Serializable> initialPythonActionSimple;
+    private Map<String, Serializable> initialPythonActionWithDependencies;
+    private Map<String, Serializable> initialPythonActionInvalidKey;
     private Map<String, Serializable> expectedPythonActionSimple;
     private Map<String, Serializable> expectedPythonActionWithDependencies;
 

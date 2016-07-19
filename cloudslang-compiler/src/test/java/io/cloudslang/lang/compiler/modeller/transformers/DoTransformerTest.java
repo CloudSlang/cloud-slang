@@ -54,7 +54,8 @@ public class DoTransformerTest extends TransformersTestParent {
 
     @Test
     public void testTransformExpression() throws Exception {
-        Map doArgumentsMap = loadFirstStepFromFile("/flow_with_data.yaml");
+        @SuppressWarnings("unchecked")
+        Map<String, Object> doArgumentsMap = loadFirstStepFromFile("/flow_with_data.yaml");
         @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap).getTransformedData();
         Assert.assertFalse(arguments.isEmpty());
         Assert.assertEquals(3, arguments.size());
@@ -66,7 +67,8 @@ public class DoTransformerTest extends TransformersTestParent {
 
     @Test
     public void testTransformNoValue() throws Exception {
-        Map doArgumentsMap = loadFirstStepFromFile("/basic_flow.yaml");
+        @SuppressWarnings("unchecked")
+        Map<String, Object> doArgumentsMap = loadFirstStepFromFile("/basic_flow.yaml");
         @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap).getTransformedData();
         Assert.assertFalse(arguments.isEmpty());
         Assert.assertEquals(3, arguments.size());
@@ -77,7 +79,8 @@ public class DoTransformerTest extends TransformersTestParent {
 
     @Test
     public void testTransformConst() throws Exception {
-        Map doArgumentsMap = loadFirstStepFromFile("/flow_with_data.yaml");
+        @SuppressWarnings("unchecked")
+        Map<String, Object> doArgumentsMap = loadFirstStepFromFile("/flow_with_data.yaml");
         @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap).getTransformedData();
         Assert.assertFalse(arguments.isEmpty());
         Assert.assertEquals(3, arguments.size());
