@@ -98,12 +98,22 @@ public class InputsBinding {
                 scriptContext.putAll(targetContext);
                 value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, input.getFunctionDependencies());
                 value = ValueFactory.create(value, sensitive);
-            } else if (!isEmpty(rawValue)) {
+            } else if ((value == null && rawValue != null) || (containsEmptyStringOrNull(value) && doesNotContainNull(rawValue))) {
                 value = rawValue;
             }
         }
 
         return value;
+    }
+
+    private boolean containsEmptyStringOrNull(Value value) {
+        return value != null &&
+                ((value.get() != null && value.get().equals("")) ||
+                        value.get() == null);
+    }
+
+    private boolean doesNotContainNull(Value value) {
+        return value != null && value.get() != null;
     }
 
     private boolean isEmpty(Value value) {
