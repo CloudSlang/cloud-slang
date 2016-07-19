@@ -5,7 +5,6 @@ import io.cloudslang.lang.compiler.modeller.model.Executable;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * User: bancl
@@ -17,6 +16,6 @@ public interface CompileValidator {
 
     List<RuntimeException> validateModelWithDirectDependencies(Executable executable, Map<String, Executable> directDependencies);
 
-    void validateNoDuplicateExecutablesBasedOnFQN(Executable newExecutable, Set<Executable> allAvailableExecutables);
+    void validateNoDuplicateExecutables(Executable currentExecutable, SlangSource currentSource, Map<Executable, SlangSource> allAvailableExecutables);
 
 }

@@ -14,6 +14,7 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.tools.build.SlangBuildMain;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
@@ -174,7 +175,7 @@ public class SlangTestRunner {
 
     private void runTest(SlangTestCase testCase, CompilationArtifact compiledTestFlow, String projectPath) {
 
-        Map<String, Serializable> convertedInputs = getTestCaseInputsMap(testCase);
+        Map<String, Value> convertedInputs = getTestCaseInputsMap(testCase);
         Set<SystemProperty> systemProperties = getTestSystemProperties(testCase, projectPath);
 
         trigger(testCase, compiledTestFlow, convertedInputs, systemProperties);
@@ -189,10 +190,11 @@ public class SlangTestRunner {
         return parser.parseProperties(systemPropertiesFile);
     }
 
-    private Map<String, Serializable> getTestCaseInputsMap(SlangTestCase testCase) {
+    private Map<String, Value> getTestCaseInputsMap(SlangTestCase testCase) {
         List<Map> inputs = testCase.getInputs();
         Map<String, Serializable> convertedInputs = new HashMap<>();
-        return convertMapParams(inputs, convertedInputs);
+        convertedInputs = convertMapParams(inputs, convertedInputs);
+        return io.cloudslang.lang.entities.utils.MapUtils.convertMapNonSensitiveValues(convertedInputs);
     }
 
     private Map<String, Serializable> convertMapParams(List<Map> params, Map<String, Serializable> convertedInputs) {
@@ -220,7 +222,7 @@ public class SlangTestRunner {
      * @return executionId
      */
     public Long trigger(SlangTestCase testCase, CompilationArtifact compilationArtifact,
-                        Map<String, ? extends Serializable> inputs,
+                        Map<String, Value> inputs,
                         Set<SystemProperty> systemProperties) {
 
         String testCaseName = testCase.getName();

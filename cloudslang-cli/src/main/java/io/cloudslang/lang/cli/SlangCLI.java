@@ -16,6 +16,7 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
@@ -26,7 +27,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
@@ -80,7 +80,7 @@ public class SlangCLI implements CommandMarker {
     @Autowired
     private MetadataHelper metadataHelper;
 
-    @Value("${slang.version}")
+    @org.springframework.beans.factory.annotation.Value("${slang.version}")
     private String slangVersion;
 
     /**
@@ -92,7 +92,7 @@ public class SlangCLI implements CommandMarker {
     public String run(
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = FILE_HELP) final File file,
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP) final List<String> classPath,
-            @CliOption(key = {"i", "inputs"}, mandatory = false, help = INPUTS_HELP) final Map<String,? extends Serializable> inputs,
+            @CliOption(key = {"i", "inputs"}, mandatory = false, help = INPUTS_HELP) final Map<String, ? extends Serializable> inputs,
             @CliOption(key = {"if", "input-file"}, mandatory = false, help = INPUT_FILE_HELP) final List<String> inputFiles,
             @CliOption(key = {"v", "verbose"}, mandatory = false, help = "default, quiet, debug(print each step outputs). e.g. run --f c:/.../your_flow.sl --v quiet", specifiedDefaultValue = "debug", unspecifiedDefaultValue = "default") final String verbose,
             @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = SYSTEM_PROPERTY_FILE_HELP) final List<String> systemPropertyFiles) throws IOException {
@@ -101,14 +101,14 @@ public class SlangCLI implements CommandMarker {
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
         Set<SystemProperty> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
-        Map<String, ? extends Serializable> inputsFromFile = compilerHelper.loadInputsFromFile(inputFiles);
-        Map<String, Serializable> mergedInputs = new HashMap<>();
+        Map<String, Value> inputsFromFile = compilerHelper.loadInputsFromFile(inputFiles);
+        Map<String, Value> mergedInputs = new HashMap<>();
 
         if(MapUtils.isNotEmpty(inputsFromFile)){
             mergedInputs.putAll(inputsFromFile);
         }
         if(MapUtils.isNotEmpty(inputs)) {
-            mergedInputs.putAll(inputs);
+            mergedInputs.putAll(io.cloudslang.lang.entities.utils.MapUtils.convertMapNonSensitiveValues(inputs));
         }
         boolean quiet = QUIET.equalsIgnoreCase(verbose);
         boolean debug = DEBUG.equalsIgnoreCase(verbose);
