@@ -71,14 +71,14 @@ public class ResultsTransformerTest {
 
     @Test
     public void testTransform() throws Exception {
-        List<Result> results = resultsTransformer.transform(resultsMapOpWithData);
+        List<Result> results = resultsTransformer.transform(resultsMapOpWithData).getTransformedData();
         Assert.assertTrue(CollectionUtils.isNotEmpty(results));
         Assert.assertEquals(3, results.size());
     }
 
     @Test
     public void testSimpleExpressionResult() throws Exception {
-        List<Result> results = resultsTransformer.transform(resultsMapOpWithData);
+        List<Result> results = resultsTransformer.transform(resultsMapOpWithData).getTransformedData();
         Result result = results.get(0);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result.getName());
         Assert.assertEquals("${ 1 != 123456 }", result.getValue().get());
@@ -86,7 +86,7 @@ public class ResultsTransformerTest {
 
     @Test
     public void testBooleanExpressionResult() throws Exception {
-        List<Result> results = resultsTransformer.transform(resultsMapOpWithData);
+        List<Result> results = resultsTransformer.transform(resultsMapOpWithData).getTransformedData();
         Result result = results.get(1);
         Assert.assertEquals("NO_ACTION", result.getName());
         Assert.assertEquals("${ true }", result.getValue().get());
@@ -94,7 +94,7 @@ public class ResultsTransformerTest {
 
     @Test
     public void testNoExpressionResult() throws Exception {
-        List<Result> results = resultsTransformer.transform(resultsMapOpWithData);
+        List<Result> results = resultsTransformer.transform(resultsMapOpWithData).getTransformedData();
         Result result = results.get(2);
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result.getName());
         Assert.assertNull(result.getValue());
@@ -102,11 +102,10 @@ public class ResultsTransformerTest {
 
     @Test
     public void testFillDefaultResultsWhenNoResultsGiven() throws Exception {
-        List<Result> results = resultsTransformer.transform(resultsMapOpNoData);
+        List<Result> results = resultsTransformer.transform(resultsMapOpNoData).getTransformedData();
         Assert.assertTrue(CollectionUtils.isNotEmpty(results));
         Assert.assertEquals(2, results.size());
     }
-
 
     @Configuration
     static class Config {

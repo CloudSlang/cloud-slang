@@ -10,7 +10,8 @@
 package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
-import io.cloudslang.lang.entities.ParallelLoopStatement;
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.entities.LoopStatement;
 import java.util.Collections;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -21,11 +22,11 @@ import org.springframework.stereotype.Component;
  * @author Bonczidai Levente
  */
 @Component
-public class ParallelLoopForTransformer extends AbstractForTransformer implements Transformer<String, ParallelLoopStatement> {
+public class ParallelLoopForTransformer extends AbstractForTransformer implements Transformer<String, LoopStatement> {
 
     @Override
-    public ParallelLoopStatement transform(String rawData) {
-        return (ParallelLoopStatement) transformToLoopStatement(rawData, true);
+    public TransformModellingResult<LoopStatement> transform(String rawData) {
+        return transformToLoopStatement(rawData, true);
     }
 
     @Override

@@ -41,7 +41,7 @@ import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DoTransformerTest.Config.class)
-public class DoTransformerTest {
+public class DoTransformerTest extends TransformersTestParent {
 
     @Autowired
     private DoTransformer doTransformer;
@@ -55,7 +55,7 @@ public class DoTransformerTest {
     @Test
     public void testTransformExpression() throws Exception {
         Map doArgumentsMap = loadFirstStepFromFile("/flow_with_data.yaml");
-        @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap);
+        @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap).getTransformedData();
         Assert.assertFalse(arguments.isEmpty());
         Assert.assertEquals(3, arguments.size());
         Argument argument = arguments.iterator().next();
@@ -67,7 +67,7 @@ public class DoTransformerTest {
     @Test
     public void testTransformNoValue() throws Exception {
         Map doArgumentsMap = loadFirstStepFromFile("/basic_flow.yaml");
-        @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap);
+        @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap).getTransformedData();
         Assert.assertFalse(arguments.isEmpty());
         Assert.assertEquals(3, arguments.size());
         Argument argument = arguments.get(1);
@@ -78,7 +78,7 @@ public class DoTransformerTest {
     @Test
     public void testTransformConst() throws Exception {
         Map doArgumentsMap = loadFirstStepFromFile("/flow_with_data.yaml");
-        @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap);
+        @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap).getTransformedData();
         Assert.assertFalse(arguments.isEmpty());
         Assert.assertEquals(3, arguments.size());
         Argument argument = arguments.get(1);
@@ -90,7 +90,7 @@ public class DoTransformerTest {
     public void testTransformEmptyArgumentExpression() throws Exception {
         @SuppressWarnings("unchecked")
         Map<String, Object> doArgumentsMap = loadFirstStepFromFile("/corrupted/flow_with_empty_argument_expression.yaml");
-        @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap);
+        @SuppressWarnings("unchecked") List<Argument> arguments = doTransformer.transform(doArgumentsMap).getTransformedData();
         Assert.assertFalse(arguments.isEmpty());
         Assert.assertEquals(2, arguments.size());
         Argument argument = arguments.get(1);
@@ -107,7 +107,7 @@ public class DoTransformerTest {
         @SuppressWarnings("unchecked")
         Map<String, Object> doArgumentsMap = loadFirstStepFromFile("/corrupted/flow_with_invalid_argument.yaml");
 
-        doTransformer.transform(doArgumentsMap);
+        transformAndThrowFirstException(doTransformer, doArgumentsMap);
     }
 
     @Test
@@ -118,8 +118,7 @@ public class DoTransformerTest {
         @SuppressWarnings("unchecked")
         Map<String, Object> doArgumentsMap = loadFirstStepFromFile("/step-args-in-list/flow_arguments_one_liner.yaml");
 
-        doTransformer.transform(doArgumentsMap);
-
+        transformAndThrowFirstException(doTransformer, doArgumentsMap);
     }
 
     private Map loadFirstStepFromFile(String path) throws URISyntaxException {

@@ -10,6 +10,7 @@
 package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.LoopStatement;
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component;
 public class ForTransformer extends AbstractForTransformer implements Transformer<String, LoopStatement> {
 
     @Override
-    public LoopStatement transform(String rawData) {
+    public TransformModellingResult<LoopStatement> transform(String rawData) {
         return transformToLoopStatement(rawData, false);
     }
 

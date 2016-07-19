@@ -43,7 +43,7 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes=PythonActionTransformerTest.Config.class)
-public class PythonActionTransformerTest {
+public class PythonActionTransformerTest extends TransformersTestParent {
 
     @Autowired
     private PythonActionTransformer pythonActionTransformer;
@@ -73,14 +73,14 @@ public class PythonActionTransformerTest {
     @Test
     public void testTransformSimple() throws Exception {
         @SuppressWarnings("unchecked")
-        Map<String, Serializable> actualPythonActionSimple = pythonActionTransformer.transform(initialPythonActionSimple);
+        Map<String, Serializable> actualPythonActionSimple = pythonActionTransformer.transform(initialPythonActionSimple).getTransformedData();
         Assert.assertEquals(expectedPythonActionSimple, actualPythonActionSimple);
     }
 
     @Test
     public void testTransformWithDependencies() throws Exception {
         @SuppressWarnings("unchecked")
-        Map<String, Serializable> actualPythonActionSimple = pythonActionTransformer.transform(initialPythonActionWithDependencies);
+        Map<String, Serializable> actualPythonActionSimple = pythonActionTransformer.transform(initialPythonActionWithDependencies).getTransformedData();
         Assert.assertEquals(expectedPythonActionWithDependencies, actualPythonActionSimple);
     }
 
@@ -88,35 +88,35 @@ public class PythonActionTransformerTest {
     public void testTransformWithEmptyOneEmptyPart() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        pythonActionTransformer.transform(loadPythonActionData("/python_action_with_dependencies_1_empty_part.sl"));
+        transformAndThrowFirstException(pythonActionTransformer, loadPythonActionData("/python_action_with_dependencies_1_empty_part.sl"));
     }
 
     @Test
     public void testTransformWithEmptyDependencies() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        pythonActionTransformer.transform(loadPythonActionData("/python_action_with_dependencies_1_part.sl"));
+        transformAndThrowFirstException(pythonActionTransformer, loadPythonActionData("/python_action_with_dependencies_1_part.sl"));
     }
 
     @Test
     public void testTransformWithAllEmptyParts() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        pythonActionTransformer.transform(loadPythonActionData("/python_action_with_dependencies_2_parts.sl"));
+        transformAndThrowFirstException(pythonActionTransformer, loadPythonActionData("/python_action_with_dependencies_2_parts.sl"));
     }
 
     @Test
     public void testTransformWithOnePart() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        pythonActionTransformer.transform(loadPythonActionData("/python_action_with_dependencies_all_empty_parts.sl"));
+        transformAndThrowFirstException(pythonActionTransformer, loadPythonActionData("/python_action_with_dependencies_all_empty_parts.sl"));
     }
 
     @Test
     public void testTransformWithTwoEmptyParts() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        pythonActionTransformer.transform(loadPythonActionData("/python_action_with_dependencies_empty.sl"));
+        transformAndThrowFirstException(pythonActionTransformer, loadPythonActionData("/python_action_with_dependencies_empty.sl"));
     }
 
     @Test
@@ -125,14 +125,16 @@ public class PythonActionTransformerTest {
         exception.expectMessage(AbstractTransformer.INVALID_KEYS_ERROR_MESSAGE_PREFIX);
         exception.expectMessage("invalid_key");
         //noinspection unchecked
-        pythonActionTransformer.transform(initialPythonActionInvalidKey);
+        transformAndThrowFirstException(pythonActionTransformer, initialPythonActionInvalidKey);
     }
 
-    private Map loadPythonActionData(String filePath) throws URISyntaxException {
+    private Map<String, Serializable> loadPythonActionData(String filePath) throws URISyntaxException {
         URL resource = getClass().getResource(filePath);
         ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
         Map op = file.getOperation();
-        return (Map) op.get(SlangTextualKeys.PYTHON_ACTION_KEY);
+        @SuppressWarnings("unchecked")
+        Map<String, Serializable> returnMap = (Map) op.get(SlangTextualKeys.PYTHON_ACTION_KEY);
+        return returnMap;
     }
 
     public static class Config {

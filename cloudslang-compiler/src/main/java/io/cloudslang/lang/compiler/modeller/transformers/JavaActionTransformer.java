@@ -16,7 +16,10 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -38,12 +41,21 @@ public class JavaActionTransformer extends AbstractTransformer implements Transf
     private static Set<String> optionalKeySet = Sets.newHashSet();
 
     @Override
-    public Map<String, String> transform(Map<String, String> rawData) {
-        if (rawData != null) {
-            validateKeySet(rawData.keySet(), mandatoryKeySet, optionalKeySet);
-            transformKeys(rawData);
+    public TransformModellingResult<Map<String, String>> transform(Map<String, String> rawData) {
+        Map<String, String> transformedData = null;
+        List<RuntimeException> errors = new ArrayList<>();
+
+        try {
+            if (rawData != null) {
+                validateKeySet(rawData.keySet(), mandatoryKeySet, optionalKeySet);
+                transformKeys(rawData);
+                transformedData = rawData;
+            }
+        } catch (RuntimeException rex) {
+            errors.add(rex);
         }
-        return rawData;
+
+        return new BasicTransformModellingResult<>(transformedData, errors);
     }
 
     @Override

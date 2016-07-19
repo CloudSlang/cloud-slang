@@ -70,13 +70,13 @@ public class OutputsTransformerTest {
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testTransform() throws Exception {
-        @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
+        @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap).getTransformedData();
         Assert.assertFalse(outputs.isEmpty());
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testNoExpression() throws Exception {
-        @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
+        @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap).getTransformedData();
         Output output = outputs.get(2);
         Assert.assertEquals("output3", output.getName());
         Assert.assertEquals("${output3}", output.getValue().get());
@@ -84,7 +84,7 @@ public class OutputsTransformerTest {
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testExpressionKeyFromActionReturnValues() throws Exception {
-        @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
+        @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap).getTransformedData();
         Output output = outputs.get(0);
         Assert.assertEquals("output1", output.getName());
         Assert.assertEquals("${ input1 }", output.getValue().get());
