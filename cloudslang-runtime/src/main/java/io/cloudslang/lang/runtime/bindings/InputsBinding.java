@@ -98,7 +98,7 @@ public class InputsBinding {
                 scriptContext.putAll(targetContext);
                 value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, input.getFunctionDependencies());
                 value = ValueFactory.create(value, sensitive);
-            } else {
+            } else if (!isEmpty(rawValue)) {
                 value = rawValue;
             }
         }
