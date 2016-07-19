@@ -353,7 +353,7 @@ public class InputsBindingTest {
         Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals("'not private' disables the assignFrom func...",null, result.get("input1").get());
+        Assert.assertEquals("'not private' disables the assignFrom func...",null, result.get("input1"));
         Assert.assertEquals(1, result.size());
     }
 
