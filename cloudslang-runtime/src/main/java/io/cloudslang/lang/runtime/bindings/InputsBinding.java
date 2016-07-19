@@ -108,8 +108,7 @@ public class InputsBinding {
 
     private boolean containsEmptyStringOrNull(Value value) {
         return value != null &&
-                ((value.get() != null && value.get().equals("")) ||
-                        value.get() == null);
+                (value.get() == null || value.get().equals(""));
     }
 
     private boolean doesNotContainNull(Value value) {
