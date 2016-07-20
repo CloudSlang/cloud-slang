@@ -10,7 +10,8 @@ namespace: user.ops
 operation:
   name: check_weather_required_input_with_default
   inputs:
-    - city: "city"
+    - city:
+       required: false
     - input_with_default_value:
             default: "default_value"
             required: true

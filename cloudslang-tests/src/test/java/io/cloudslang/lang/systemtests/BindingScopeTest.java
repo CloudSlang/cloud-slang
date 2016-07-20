@@ -102,13 +102,30 @@ public class BindingScopeTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), new HashSet<SlangSource>());
 
         Map<String, Value> userInputs = new HashMap<>();
-        userInputs.put("city", ValueFactory.create("city1"));
+        userInputs.put("city", ValueFactory.create(""));
         userInputs.put("input_with_default_value", ValueFactory.create(""));
         Set<SystemProperty> systemProperties = Collections.emptySet();
 
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
 
         Assert.assertEquals("default_value", steps.get(EXEC_START_PATH).getInputs().get("input_with_default_value"));
+        Assert.assertEquals("", steps.get(EXEC_START_PATH).getInputs().get("city"));
+    }
+
+    @Test
+    public void testInputNotRequiredNull() throws Exception {
+        URL resource = getClass().getResource("/yaml/check_weather_required_input_with_default.sl");
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), new HashSet<SlangSource>());
+
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("city", ValueFactory.create(null));
+        userInputs.put("input_with_default_value", ValueFactory.create(""));
+        Set<SystemProperty> systemProperties = Collections.emptySet();
+
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
+
+        Assert.assertEquals("default_value", steps.get(EXEC_START_PATH).getInputs().get("input_with_default_value"));
+        Assert.assertEquals(null, steps.get(EXEC_START_PATH).getInputs().get("city"));
     }
 
     @Test
