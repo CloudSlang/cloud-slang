@@ -21,6 +21,7 @@ import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.score.events.ScoreEvent;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
@@ -72,6 +73,11 @@ public abstract class SystemsTestsParent {
 
         System.setProperty(MavenConfigImpl.MAVEN_REPO_LOCAL, mavenRepo.getAbsolutePath());
         System.setProperty("maven.home", classLoader.getResource("maven").getPath());
+
+        String localRepository = System.getProperty(MavenConfigImpl.MAVEN_REPO_LOCAL);
+        if (StringUtils.isNotEmpty(localRepository)) {
+            System.setProperty("maven.repo.local", localRepository);
+        }
 
         System.setProperty(MavenConfigImpl.MAVEN_SETTINGS_PATH, settingsXmlPath);
         System.setProperty(MavenConfigImpl.MAVEN_M2_CONF_PATH, classLoader.getResource("m2.conf").getPath());
