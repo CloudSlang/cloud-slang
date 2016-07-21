@@ -238,13 +238,11 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         if (CollectionUtils.isEmpty(compiledFlow.getWorkflow().getSteps())) {
             result.getErrors().add(new RuntimeException("Flow: " + compiledFlow.getName() + " has no steps"));
         } else {
-            List<RuntimeException> navigationErrors = new ArrayList<>();
+            List<RuntimeException> errors = result.getErrors();
             Set<String> reachableStepNames = new HashSet<>();
             Set<String> reachableResultNames = new HashSet<>();
             Set<String> resultNames = getResultNames(compiledFlow);
             Deque<Step> steps = compiledFlow.getWorkflow().getSteps();
-            List<RuntimeException> stepErrors = new ArrayList<>();
-            List<RuntimeException> resultsErrors = new ArrayList<>();
 
             validateNavigation(
                     compiledFlow.getWorkflow().getSteps().getFirst(),
@@ -252,15 +250,10 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
                     resultNames,
                     reachableStepNames,
                     reachableResultNames,
-                    navigationErrors
+                    errors
             );
-            result.getErrors().addAll(navigationErrors);
-
-            validateStepsAreReachable(reachableStepNames, steps, stepErrors);
-            result.getErrors().addAll(stepErrors);
-
-            validateResultsAreReachable(reachableResultNames, resultNames, resultsErrors);
-            result.getErrors().addAll(resultsErrors);
+            validateStepsAreReachable(reachableStepNames, steps, errors);
+            validateResultsAreReachable(reachableResultNames, resultNames, errors);
         }
     }
 
