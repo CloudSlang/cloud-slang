@@ -26,3 +26,5 @@ flow:
             do:
               flow_with_custom_result:
                 - alla: 'on_failure first level'
+  results:
+    - FAILURE

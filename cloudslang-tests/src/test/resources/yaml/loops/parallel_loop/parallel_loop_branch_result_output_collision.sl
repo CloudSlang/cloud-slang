@@ -26,3 +26,5 @@ flow:
         navigate:
           - SUCCESS: SUCCESS
           - CUSTOM: SUCCESS
+  results:
+    - SUCCESS
