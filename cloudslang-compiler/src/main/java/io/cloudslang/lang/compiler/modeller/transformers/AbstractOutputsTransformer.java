@@ -10,6 +10,8 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 *******************************************************************************/
 
 
+import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
@@ -36,39 +38,45 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
     @Autowired
     private PreCompileValidator preCompileValidator;
 
-    public List<Output> transform(List<Object> rawData) {
+    public TransformModellingResult<List<Output>> transform(List<Object> rawData) {
+        List<Output> transformedData = new ArrayList<>();
+        List<RuntimeException> errors = new ArrayList<>();
 
-        List<Output> outputs = new ArrayList<>();
         if (CollectionUtils.isEmpty(rawData)){
-            return outputs;
+            return new BasicTransformModellingResult<>(transformedData, errors);
         }
-        for (Object rawOutput : rawData) {
-            if (rawOutput instanceof Map) {
 
-                @SuppressWarnings("unchecked")
-                Map.Entry<String, ?> entry = ((Map<String, ?>) rawOutput).entrySet().iterator().next();
-                Serializable entryValue = (Serializable) entry.getValue();
-                if(entryValue == null){
-                    throw new RuntimeException("Could not transform Output : " + rawOutput + " since it has a null value.\n\nMake sure a value is specified or that indentation is properly done.");
-                }
-                if (entryValue instanceof Map) {
-                    // - some_output:
-                    //     property1: value1
-                    //     property2: value2
-                    // this is the verbose way of defining outputs with all of the properties available
-                    //noinspection unchecked
-                    addOutput(outputs, createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry));
+        for (Object rawOutput : rawData) {
+            try {
+                if (rawOutput instanceof Map) {
+
+                    @SuppressWarnings("unchecked")
+                    Map.Entry<String, ?> entry = ((Map<String, ?>) rawOutput).entrySet().iterator().next();
+                    Serializable entryValue = (Serializable) entry.getValue();
+                    if (entryValue == null) {
+                        throw new RuntimeException("Could not transform Output : " + rawOutput + " since it has a null value.\n\nMake sure a value is specified or that indentation is properly done.");
+                    }
+                    if (entryValue instanceof Map) {
+                        // - some_output:
+                        //     property1: value1
+                        //     property2: value2
+                        // this is the verbose way of defining outputs with all of the properties available
+                        //noinspection unchecked
+                        addOutput(transformedData, createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry));
+                    } else {
+                        // - some_output: some_expression
+                        addOutput(transformedData, createOutput(entry.getKey(), entryValue, false));
+                    }
                 } else {
-                    // - some_output: some_expression
-                    addOutput(outputs, createOutput(entry.getKey(), entryValue, false));
+                    //- some_output
+                    //this is our default behavior that if the user specifies only a key, the key is also the ref we look for
+                    addOutput(transformedData, createRefOutput((String) rawOutput));
                 }
-            } else {
-                //- some_output
-                //this is our default behavior that if the user specifies only a key, the key is also the ref we look for
-                addOutput(outputs, createRefOutput((String) rawOutput));
+            } catch (RuntimeException rex) {
+                errors.add(rex);
             }
         }
-        return outputs;
+        return new BasicTransformModellingResult<>(transformedData, errors);
     }
 
     private void addOutput(List<Output> outputs, Output element) {
@@ -82,7 +90,7 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
 
         for (String key : props.keySet()) {
             if (!knownKeys.contains(key)) {
-                throw new RuntimeException("key: " + key + " in output: " + entry.getKey() + " is not a known property");
+                throw new RuntimeException("Key: " + key + " in output: " + entry.getKey() + " is not a known property");
             }
         }
 

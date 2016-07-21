@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler.modeller;
  * *****************************************************************************
  */
 
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.ResolvableType;
@@ -47,9 +48,13 @@ public class TransformersHandler {
             String key = keyToTransform(transformer);
             Object value = rawData.get(key);
             try {
-                @SuppressWarnings("unchecked") Object transformedValue = transformer.transform(value);
-                if (transformedValue != null) {
-                    transformedData.put(key, (Serializable) transformedValue);
+                @SuppressWarnings("unchecked") TransformModellingResult transformModellingResult = transformer.transform(value);
+                Object data = transformModellingResult.getTransformedData();
+                if (data != null) {
+                    transformedData.put(key, (Serializable) data);
+                }
+                for (RuntimeException rex : transformModellingResult.getErrors()) {
+                    errors.add(wrapErrorMessage(rex, errorMessagePrefix));
                 }
             } catch (ClassCastException e) {
                 Class transformerType = getTransformerFromType(transformer);
@@ -69,7 +74,7 @@ public class TransformersHandler {
                     errors.add(new RuntimeException(errorMessagePrefix + message, e));
                 }
             } catch (RuntimeException e) {
-                errors.add(new RuntimeException(errorMessagePrefix + e.getMessage(), e));
+                errors.add(wrapErrorMessage(e, errorMessagePrefix));
             }
         }
         return transformedData;
@@ -79,4 +84,9 @@ public class TransformersHandler {
         ResolvableType resolvableType = ResolvableType.forClass(Transformer.class, transformer.getClass());
         return resolvableType.getGeneric(0).resolve();
     }
+
+    private RuntimeException wrapErrorMessage(RuntimeException rex, String errorMessagePrefix) {
+        return new RuntimeException(errorMessagePrefix + rex.getMessage(), rex);
+    }
+
 }

@@ -43,7 +43,7 @@ import java.util.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = InputsTransformerTest.Config.class)
-public class InputsTransformerTest {
+public class InputsTransformerTest extends TransformersTestParent {
 
     @Autowired
     private InputsTransformer inputTransformer;
@@ -51,8 +51,8 @@ public class InputsTransformerTest {
     @Autowired
     private YamlParser yamlParser;
 
-    private List inputsMap;
-    private List inputsMapWithFunctions;
+    private List<Object> inputsMap;
+    private List<Object> inputsMapWithFunctions;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -72,13 +72,13 @@ public class InputsTransformerTest {
 
     @Test
     public void testTransform() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Assert.assertFalse(inputs.isEmpty());
     }
 
     @Test
     public void testSimpleRefInput() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(0);
         Assert.assertEquals("input1", input.getName());
         Assert.assertNull(null, input.getValue().get());
@@ -86,7 +86,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testExplicitRefInput() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(1);
         Assert.assertEquals("input2", input.getName());
         Assert.assertEquals("${ input2 }", input.getValue().get());
@@ -94,7 +94,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testDefaultValueInput() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(2);
         Assert.assertEquals("input3", input.getName());
         Assert.assertEquals("value3", input.getValue().get());
@@ -102,7 +102,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testInlineExprInput() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(3);
         Assert.assertEquals("input4", input.getName());
         Assert.assertEquals("${ 'value4' if input3 == value3 else None }", input.getValue().get());
@@ -110,7 +110,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testReqEncInput() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(4);
         Assert.assertEquals("input5", input.getName());
         Assert.assertEquals(null, input.getValue().get());
@@ -120,7 +120,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testDefaultExprReqInput() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(5);
         Assert.assertEquals("input6", input.getName());
         Assert.assertEquals("${ 1 + 5 }", input.getValue().get());
@@ -130,7 +130,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testInlineConstInput() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(6);
         Assert.assertEquals("input7", input.getName());
         Assert.assertEquals(77, input.getValue().get());
@@ -140,7 +140,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testDefaultExprRefInput() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(7);
         Assert.assertEquals("input8", input.getName());
         Assert.assertEquals("${ input6 }", input.getValue().get());
@@ -150,7 +150,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testOverrideInput() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(8);
         Assert.assertEquals("input9", input.getName());
         Assert.assertEquals("${ input6 }", input.getValue().get());
@@ -166,7 +166,7 @@ public class InputsTransformerTest {
         exception.expectMessage("default");
         exception.expectMessage("input_without_default");
         List inputs = getInputsFormSl("/private_input_without_default.sl");
-        inputTransformer.transform(inputs);
+        transformAndThrowFirstException(inputTransformer, inputs);
     }
 
     @Test
@@ -176,12 +176,12 @@ public class InputsTransformerTest {
         exception.expectMessage("input_with_illegal_key");
         exception.expectMessage("karambula");
         List inputs = getInputsFormSl("/illegal_key_in_input.sl");
-        inputTransformer.transform(inputs);
+        transformAndThrowFirstException(inputTransformer, inputs);
     }
 
     @Test
     public void testLeadingSpaces() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(9);
         Assert.assertEquals("input10", input.getName());
         Assert.assertEquals("${ input5 }", input.getValue().get());
@@ -189,7 +189,7 @@ public class InputsTransformerTest {
 
     @Test
      public void testLeadingAndTrailingSpaces() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(10);
         Assert.assertEquals("input11", input.getName());
         Assert.assertEquals("${ 5 + 6 }", input.getValue().get());
@@ -197,7 +197,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testLeadingAndTrailingSpacesComplex() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(11);
         Assert.assertEquals("input12", input.getName());
         Assert.assertEquals("${ \"mighty\" + \" max\"   + varX }", input.getValue().get());
@@ -205,7 +205,7 @@ public class InputsTransformerTest {
 
     @Test
     public void testFunctionsAndSPDependencies() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMapWithFunctions);
+        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMapWithFunctions).getTransformedData();
 
         // prepare parameters
         Set<ScriptFunction> setGet = Sets.newHashSet(ScriptFunction.GET);

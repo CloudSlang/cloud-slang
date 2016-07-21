@@ -14,14 +14,16 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
+import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.Input;
+import java.util.Collections;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -37,22 +39,27 @@ public class InputsTransformer extends AbstractInputsTransformer implements Tran
      * @return : list of inputs after transformation.
      */
     @Override
-    public List<Input> transform(List<Object> rawData) {
-        List<Input> result = new ArrayList<>();
+    public TransformModellingResult<List<Input>> transform(List<Object> rawData) {
+        List<Input> transformedData = new ArrayList<>();
+        List<RuntimeException> errors = new ArrayList<>();
         if (CollectionUtils.isEmpty(rawData)){
-            return result;
+            return new BasicTransformModellingResult<>(transformedData, errors);
         }
         for (Object rawInput : rawData) {
-            Input input = transformSingleInput(rawInput);
-            preCompileValidator.validateNoDuplicateInOutParams(result, input);
-            result.add(input);
+            try {
+                Input input = transformSingleInput(rawInput);
+                preCompileValidator.validateNoDuplicateInOutParams(transformedData, input);
+                transformedData.add(input);
+            } catch (RuntimeException rex) {
+                errors.add(rex);
+            }
         }
-        return result;
+        return new BasicTransformModellingResult<>(transformedData, errors);
     }
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Scope.BEFORE_EXECUTABLE);
+        return Collections.singletonList(Scope.BEFORE_EXECUTABLE);
     }
 
     @Override

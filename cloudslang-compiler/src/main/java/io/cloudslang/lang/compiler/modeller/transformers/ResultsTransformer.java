@@ -14,6 +14,8 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
+import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Result;
@@ -34,28 +36,34 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
     private PreCompileValidator preCompileValidator;
 
     @Override
-    public List<Result> transform(List rawData) {
-        List<Result> results = new ArrayList<>();
+    public TransformModellingResult<List<Result>> transform(List rawData) {
+        List<Result> transformedData = new ArrayList<>();
+        List<RuntimeException> errors = new ArrayList<>();
+
         // If there are no results specified, add the default SUCCESS & FAILURE results
         if(rawData == null){
-            addResult(results, createNoExpressionResult(ScoreLangConstants.SUCCESS_RESULT));
-            addResult(results, createNoExpressionResult(ScoreLangConstants.FAILURE_RESULT));
-            return results;
+            addResult(transformedData, createNoExpressionResult(ScoreLangConstants.SUCCESS_RESULT));
+            addResult(transformedData, createNoExpressionResult(ScoreLangConstants.FAILURE_RESULT));
+            return new BasicTransformModellingResult<>(transformedData, errors);
         } else if (rawData.isEmpty()) {
-            return results;
+            return new BasicTransformModellingResult<>(transformedData, errors);
         }
         for (Object rawResult : rawData) {
-            if (rawResult instanceof String) {
-                //- some_result
-                addResult(results, createNoExpressionResult((String) rawResult));
-            } else if (rawResult instanceof Map) {
-                // - some_result: some_expression
-                // the value of the result is an expression we need to evaluate at runtime
-                @SuppressWarnings("unchecked") Map.Entry<String, Serializable> entry = (Map.Entry<String, Serializable>) (((Map) rawResult).entrySet()).iterator().next();
-                addResult(results, createExpressionResult(entry.getKey(), entry.getValue()));
+            try {
+                if (rawResult instanceof String) {
+                    //- some_result
+                    addResult(transformedData, createNoExpressionResult((String) rawResult));
+                } else if (rawResult instanceof Map) {
+                    // - some_result: some_expression
+                    // the value of the result is an expression we need to evaluate at runtime
+                    @SuppressWarnings("unchecked") Map.Entry<String, Serializable> entry = (Map.Entry<String, Serializable>) (((Map) rawResult).entrySet()).iterator().next();
+                    addResult(transformedData, createExpressionResult(entry.getKey(), entry.getValue()));
+                }
+            } catch (RuntimeException rex) {
+                errors.add(rex);
             }
         }
-        return results;
+        return new BasicTransformModellingResult<>(transformedData, errors);
     }
 
     private void addResult(List<Result> results, Result element) {

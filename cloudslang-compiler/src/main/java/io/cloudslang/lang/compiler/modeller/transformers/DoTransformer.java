@@ -15,6 +15,8 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  */
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
@@ -35,13 +37,18 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
     private PreCompileValidator preCompileValidator;
 
     @Override
-    public List<Argument> transform(Map<String, Object> rawData) {
-        List<Argument> result = new ArrayList<>();
+    public TransformModellingResult<List<Argument>> transform(Map<String, Object> rawData) {
+        List<Argument> transformedData = new ArrayList<>();
+        List<RuntimeException> errors = new ArrayList<>();
         if (MapUtils.isEmpty(rawData)) {
-            return result;
+            return new BasicTransformModellingResult<>(transformedData, errors);
         } else if (rawData.size() > 1) {
-            throw new RuntimeException("Step has too many keys under the 'do' keyword,\n" +
-                    "May happen due to wrong indentation");
+            errors.add(
+                    new RuntimeException("Step has too many keys under the 'do' keyword,\n" +
+                            "May happen due to wrong indentation"
+                    )
+            );
+            return new BasicTransformModellingResult<>(transformedData, errors);
         }
         Map.Entry<String, Object> argumentsEntry = rawData.entrySet().iterator().next();
         Object rawArguments = argumentsEntry.getValue();
@@ -49,15 +56,19 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
             // list syntax
             List rawArgumentsList = (List) rawArguments;
             for (Object rawArgument : rawArgumentsList) {
-                Argument argument = transformListArgument(rawArgument);
-                preCompileValidator.validateNoDuplicateInOutParams(result, argument);
-                result.add(argument);
+                try {
+                    Argument argument = transformListArgument(rawArgument);
+                    preCompileValidator.validateNoDuplicateInOutParams(transformedData, argument);
+                    transformedData.add(argument);
+                } catch (RuntimeException rex) {
+                    errors.add(rex);
+                }
             }
         } else if (rawArguments != null) {
-            throw new RuntimeException("Step arguments should be defined using a standard YAML list.");
+            errors.add(new RuntimeException("Step arguments should be defined using a standard YAML list."));
         }
 
-        return result;
+        return new BasicTransformModellingResult<>(transformedData, errors);
     }
 
     @Override

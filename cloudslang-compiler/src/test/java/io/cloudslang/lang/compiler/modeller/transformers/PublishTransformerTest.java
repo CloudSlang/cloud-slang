@@ -44,7 +44,7 @@ import java.util.Map;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes=PublishTransformerTest.Config.class)
-public class PublishTransformerTest {
+public class PublishTransformerTest extends TransformersTestParent {
 
     private static final long DEFAULT_TIMEOUT = 10000;
 
@@ -57,7 +57,7 @@ public class PublishTransformerTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    private List publishMap;
+    private List<Object> publishMap;
 
     @Before
     public void init() throws URISyntaxException {
@@ -74,13 +74,13 @@ public class PublishTransformerTest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testTransform() throws Exception {
-        @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap);
+        @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap).getTransformedData();
         Assert.assertFalse(publishValues.isEmpty());
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testNoValue() throws Exception {
-        @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap);
+        @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap).getTransformedData();
         Output publish = publishValues.get(0);
         Assert.assertEquals("weather", publish.getName());
         Assert.assertEquals("${weather}", publish.getValue().get());
@@ -88,7 +88,7 @@ public class PublishTransformerTest {
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testExpressionValue() throws Exception {
-        @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap);
+        @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap).getTransformedData();
         Output publish = publishValues.get(1);
         Assert.assertEquals("temp", publish.getName());
         Assert.assertEquals("${temperature}", publish.getValue().get());
@@ -96,7 +96,7 @@ public class PublishTransformerTest {
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testStringValue() throws Exception {
-        @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap);
+        @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap).getTransformedData();
         Output publish = publishValues.get(2);
         Assert.assertEquals("publish_str", publish.getName());
         Assert.assertEquals("publish_str_value", publish.getValue().get());

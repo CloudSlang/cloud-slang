@@ -41,7 +41,7 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes=JavaActionTransformerTest.Config.class)
-public class JavaActionTransformerTest {
+public class JavaActionTransformerTest extends TransformersTestParent {
 
     @Autowired
     private JavaActionTransformer javaActionTransformer;
@@ -49,9 +49,9 @@ public class JavaActionTransformerTest {
     private YamlParser yamlParser;
     @Rule
     public ExpectedException exception = ExpectedException.none();
-    private Map initialJavaActionSimple;
-    private Map initialJavaActionWithDependencies;
-    private Map initialJavaActionInvalidKey;
+    private Map<String, String> initialJavaActionSimple;
+    private Map<String, String> initialJavaActionWithDependencies;
+    private Map<String, String> initialJavaActionInvalidKey;
     private Map<String, String> expectedJavaActionSimple;
     private Map<String, String> expectedJavaActionWithDependencies;
 
@@ -72,14 +72,14 @@ public class JavaActionTransformerTest {
     @Test
     public void testTransformSimple() throws Exception {
         @SuppressWarnings("unchecked")
-        Map<String, String> actualJavaActionSimple = javaActionTransformer.transform(initialJavaActionSimple);
+        Map<String, String> actualJavaActionSimple = javaActionTransformer.transform(initialJavaActionSimple).getTransformedData();
         Assert.assertEquals(expectedJavaActionSimple, actualJavaActionSimple);
     }
 
     @Test
     public void testTransformWithDependencies() throws Exception {
         @SuppressWarnings("unchecked")
-        Map<String, String> actualJavaActionSimple = javaActionTransformer.transform(initialJavaActionWithDependencies);
+        Map<String, String> actualJavaActionSimple = javaActionTransformer.transform(initialJavaActionWithDependencies).getTransformedData();
         Assert.assertEquals(expectedJavaActionWithDependencies, actualJavaActionSimple);
     }
 
@@ -89,49 +89,49 @@ public class JavaActionTransformerTest {
         exception.expectMessage(AbstractTransformer.INVALID_KEYS_ERROR_MESSAGE_PREFIX);
         exception.expectMessage("invalid_key");
         //noinspection unchecked
-        javaActionTransformer.transform(initialJavaActionInvalidKey);
+        transformAndThrowFirstException(javaActionTransformer, initialJavaActionInvalidKey);
     }
 
     @Test
     public void testTransformWithoutGAV() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Following tags are missing: [gav]");
-        javaActionTransformer.transform(loadJavaActionData("/java_action_wo_dependencies.sl"));
+        transformAndThrowFirstException(javaActionTransformer, loadJavaActionData("/java_action_wo_dependencies.sl"));
     }
 
     @Test
     public void testTransformWithEmptyOneEmptyPart() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        javaActionTransformer.transform(loadJavaActionData("/java_action_with_dependencies_1_empty_part.sl"));
+        transformAndThrowFirstException(javaActionTransformer, loadJavaActionData("/java_action_with_dependencies_1_empty_part.sl"));
     }
 
     @Test
     public void testTransformWithEmptyDependencies() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        javaActionTransformer.transform(loadJavaActionData("/java_action_with_dependencies_empty.sl"));
+        transformAndThrowFirstException(javaActionTransformer, loadJavaActionData("/java_action_with_dependencies_empty.sl"));
     }
 
     @Test
     public void testTransformWithAllEmptyParts() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        javaActionTransformer.transform(loadJavaActionData("/java_action_with_dependencies_all_empty_parts.sl"));
+        transformAndThrowFirstException(javaActionTransformer, loadJavaActionData("/java_action_with_dependencies_all_empty_parts.sl"));
     }
 
     @Test
     public void testTransformWithOnePart() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        javaActionTransformer.transform(loadJavaActionData("/java_action_with_dependencies_1_part.sl"));
+        transformAndThrowFirstException(javaActionTransformer, loadJavaActionData("/java_action_with_dependencies_1_part.sl"));
     }
 
     @Test
     public void testTransformWithTwoEmptyParts() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        javaActionTransformer.transform(loadJavaActionData("/java_action_with_dependencies_2_parts.sl"));
+        transformAndThrowFirstException(javaActionTransformer, loadJavaActionData("/java_action_with_dependencies_2_parts.sl"));
     }
 
     @SuppressWarnings("unchecked")

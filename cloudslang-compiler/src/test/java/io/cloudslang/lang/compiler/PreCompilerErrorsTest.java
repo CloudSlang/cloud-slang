@@ -329,7 +329,7 @@ public class PreCompilerErrorsTest {
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'private_input_without_default' syntax is illegal.\n" +
-                "input: input_without_default is private but no default value was specified");
+                "Input: input_without_default is private but no default value was specified");
         throw result.getErrors().get(0);
     }
 
@@ -595,6 +595,18 @@ public class PreCompilerErrorsTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Failed to compile step: Step1. The step/result name: non_existing_step of navigation: " +
                 "SUCCESS -> non_existing_step is missing");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testNavigationRuleIncorrectType() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_navigation_rule_incorrect_type.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("For step 'Step1' syntax is illegal.");
+        exception.expectMessage("Navigation rule should be a Map. Actual type is java.util.ArrayList: [SUCCESS, SUCCESS]");
         throw result.getErrors().get(0);
     }
 

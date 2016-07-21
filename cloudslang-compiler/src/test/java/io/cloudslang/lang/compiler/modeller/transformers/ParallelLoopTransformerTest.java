@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.ParallelLoopStatement;
 import junit.framework.Assert;
 import org.junit.Rule;
@@ -20,7 +21,7 @@ import org.junit.rules.ExpectedException;
  *
  * @author Bonczidai Levente
  */
-public class ParallelLoopTransformerTest {
+public class ParallelLoopTransformerTest extends TransformersTestParent {
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -29,21 +30,21 @@ public class ParallelLoopTransformerTest {
 
     @Test
     public void testValidStatement() throws Exception {
-        ParallelLoopStatement statement = transformer.transform("x in collection");
+        ParallelLoopStatement statement = (ParallelLoopStatement) transformer.transform("x in collection").getTransformedData();
         Assert.assertEquals("x", statement.getVarName());
         Assert.assertEquals("collection", statement.getExpression());
     }
 
     @Test
     public void testValidStatementWithSpaces() throws Exception {
-        ParallelLoopStatement statement = transformer.transform("x in range(0, 9)");
+        ParallelLoopStatement statement = (ParallelLoopStatement) transformer.transform("x in range(0, 9)").getTransformedData();
         Assert.assertEquals("x", statement.getVarName());
         Assert.assertEquals("range(0, 9)", statement.getExpression());
     }
 
     @Test
     public void testValidStatementAndTrim() throws Exception {
-        ParallelLoopStatement statement = transformer.transform(" min   in  collection  ");
+        ParallelLoopStatement statement = (ParallelLoopStatement) transformer.transform(" min   in  collection  ").getTransformedData();
         Assert.assertEquals("min", statement.getVarName());
         Assert.assertEquals("collection", statement.getExpression());
     }
@@ -52,7 +53,7 @@ public class ParallelLoopTransformerTest {
     public void testNoVarName() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage("var name");
-        transformer.transform("  in  collection");
+        transformAndThrowFirstException(transformer, "  in  collection");
     }
 
     @Test
@@ -60,25 +61,25 @@ public class ParallelLoopTransformerTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("var name");
         exception.expectMessage("invalid");
-        transformer.transform("x a  in  collection");
+        transformAndThrowFirstException(transformer, "x a  in  collection");
     }
 
     @Test
     public void testNoCollectionExpression() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage("expression");
-        transformer.transform("x in  ");
+        transformAndThrowFirstException(transformer, "x in  ");
     }
 
     @Test
     public void testMultipleInsAreTrimmed() throws Exception {
-        ParallelLoopStatement statement = transformer.transform(" in   in in ");
+        LoopStatement statement = transformer.transform(" in   in in ").getTransformedData();
         Assert.assertEquals("in", statement.getExpression());
     }
 
     @Test
     public void testEmptyValue() throws Exception {
-        ParallelLoopStatement statement = transformer.transform("");
+        LoopStatement statement = transformer.transform("").getTransformedData();
         Assert.assertNull(statement);
     }
 

@@ -9,27 +9,35 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import java.util.ArrayList;
+import java.util.Collections;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Component
 public class BreakTransformer implements Transformer<List<String>, List<String>>{
 
     @Override
-    public List<String> transform(List<String> rawData) {
+    public TransformModellingResult<List<String>> transform(List<String> rawData) {
+        List<String> transformedData = new ArrayList<>();
+        List<RuntimeException> errors = new ArrayList<>();
+
         if (rawData == null) {
-            return Arrays.asList(ScoreLangConstants.FAILURE_RESULT);
+            transformedData.add(ScoreLangConstants.FAILURE_RESULT);
+        } else {
+            transformedData = rawData;
         }
 
-        return rawData;
+        return new BasicTransformModellingResult<>(transformedData, errors);
     }
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Scope.AFTER_STEP);
+        return Collections.singletonList(Scope.AFTER_STEP);
     }
 
     @Override

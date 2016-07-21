@@ -16,6 +16,8 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import java.io.Serializable;
 import java.util.*;
 
@@ -31,17 +33,24 @@ public class PythonActionTransformer extends AbstractTransformer implements Tran
     private static Set<String> optionalKeySet = Sets.newHashSet(SlangTextualKeys.PYTHON_ACTION_DEPENDENCIES_KEY);
 
     @Override
-    public Map<String, Serializable> transform(Map<String, Serializable> rawData) {
-        if (rawData != null) {
-            validateKeySet(rawData.keySet(), mandatoryKeySet, optionalKeySet);
-            Collection<String> dependencies = (List<String>) rawData.get(SlangTextualKeys.PYTHON_ACTION_DEPENDENCIES_KEY);
-            if(dependencies != null) {
-                for (String dependency: dependencies) {
-                    dependencyFormatValidator.validateDependency(dependency);
+    public TransformModellingResult<Map<String, Serializable>> transform(Map<String, Serializable> rawData) {
+        List<RuntimeException> errors = new ArrayList<>();
+
+        try {
+            if (rawData != null) {
+                validateKeySet(rawData.keySet(), mandatoryKeySet, optionalKeySet);
+                Collection<String> dependencies = (List<String>) rawData.get(SlangTextualKeys.PYTHON_ACTION_DEPENDENCIES_KEY);
+                if (dependencies != null) {
+                    for (String dependency : dependencies) {
+                        dependencyFormatValidator.validateDependency(dependency);
+                    }
                 }
             }
+        } catch (RuntimeException rex) {
+            errors.add(rex);
         }
-        return rawData;
+
+        return new BasicTransformModellingResult<>(rawData, errors);
     }
 
     @Override

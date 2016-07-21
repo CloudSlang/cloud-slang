@@ -58,25 +58,25 @@ public class OutputsTransformerTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    private List outputsMap;
+    private List<Object> outputsMap;
 
     @Before
     public void init() throws URISyntaxException {
         URL resource = getClass().getResource("/operation_with_data.sl");
         ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
-        Map op = file.getOperation();
+        Map<String, Object> op = file.getOperation();
         outputsMap = (List) op.get(SlangTextualKeys.OUTPUTS_KEY);
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testTransform() throws Exception {
-        @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
+        @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap).getTransformedData();
         Assert.assertFalse(outputs.isEmpty());
     }
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testNoExpression() throws Exception {
-        @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
+        @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap).getTransformedData();
         Output output = outputs.get(2);
         Assert.assertEquals("output3", output.getName());
         Assert.assertEquals("${output3}", output.getValue().get());
@@ -84,7 +84,7 @@ public class OutputsTransformerTest {
 
     @Test (timeout = DEFAULT_TIMEOUT)
     public void testExpressionKeyFromActionReturnValues() throws Exception {
-        @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap);
+        @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap).getTransformedData();
         Output output = outputs.get(0);
         Assert.assertEquals("output1", output.getName());
         Assert.assertEquals("${ input1 }", output.getValue().get());
