@@ -11,9 +11,17 @@ imports:
   ops: user.ops
 
 flow:
-  name: unreachable_on_failure_step
+  name: flow_both_result_and_step_name
   workflow:
     - print_message1:
+        do:
+          ops.test_op:
+            - alla: 'message 1'
+        navigate:
+          - SUCCESS: SUCCESS
+          - FAILURE: BOTH_RESULT_AND_STEP_NAME
+
+    - BOTH_RESULT_AND_STEP_NAME:
         do:
           ops.test_op:
             - alla: 'message 1'
@@ -24,16 +32,10 @@ flow:
     - print_message2:
         do:
           ops.test_op:
-            - alla: 'message 3'
+            - alla: 'message 1'
         navigate:
           - SUCCESS: SUCCESS
           - FAILURE: SUCCESS
-
-    - on_failure:
-        - print_on_failure_1:
-            do:
-              ops.test_op:
-                - alla: 'on_failure 1'
-
   results:
     - SUCCESS
+    - BOTH_RESULT_AND_STEP_NAME

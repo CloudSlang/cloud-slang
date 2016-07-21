@@ -238,37 +238,101 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         if (CollectionUtils.isEmpty(compiledFlow.getWorkflow().getSteps())) {
             result.getErrors().add(new RuntimeException("Flow: " + compiledFlow.getName() + " has no steps"));
         } else {
-            RuntimeException exception = validateNavigation(compiledFlow.getWorkflow().getSteps().getFirst(), compiledFlow.getWorkflow().getSteps(),
-                    getStepNames(compiledFlow));
-            if (exception != null) {
-                result.getErrors().add(exception);
-            }
+            List<RuntimeException> errors = result.getErrors();
+            Set<String> reachableStepNames = new HashSet<>();
+            Set<String> reachableResultNames = new HashSet<>();
+            Set<String> resultNames = getResultNames(compiledFlow);
+            Deque<Step> steps = compiledFlow.getWorkflow().getSteps();
+
+            validateNavigation(
+                    compiledFlow.getWorkflow().getSteps().getFirst(),
+                    steps,
+                    resultNames,
+                    reachableStepNames,
+                    reachableResultNames,
+                    errors
+            );
+            validateStepsAreReachable(reachableStepNames, steps, errors);
+            validateResultsAreReachable(reachableResultNames, resultNames, errors);
         }
     }
 
-    private Set<String> getStepNames(Flow compiledFlow) {
-        Set<String> stepNames = new HashSet<>();
+    private Set<String> getResultNames(Flow compiledFlow) {
+        Set<String> resultNames = new HashSet<>();
         for (Result result : compiledFlow.getResults()) {
-            stepNames.add(result.getName());
+            resultNames.add(result.getName());
         }
-        return stepNames;
+        return resultNames;
     }
 
-    private RuntimeException validateNavigation(Step step, Deque<Step> steps, Set<String> stepNames) {
-        String stepName = step.getName();
-        stepNames.add(stepName);
-        for (Map<String, String> map : step.getNavigationStrings()) {
+    private void validateNavigation(
+            Step currentStep,
+            Deque<Step> steps,
+            Set<String> resultNames,
+            Set<String> reachableStepNames,
+            Set<String> reachableResultNames,
+            List<RuntimeException> errors) {
+        String currentStepName = currentStep.getName();
+        reachableStepNames.add(currentStepName);
+        for (Map<String, String> map : currentStep.getNavigationStrings()) {
             Map.Entry<String, String> entry = map.entrySet().iterator().next();
-            String nextStepName = entry.getValue();
-            if (!stepNames.contains(nextStepName)) {
-                Step nextStepToCompile = Lambda.selectFirst(steps, having(on(Step.class).getName(), equalTo(nextStepName)));
-                if (nextStepToCompile == null) {
-                    return new RuntimeException("Failed to compile step: " + stepName + ". The step/result name: " + entry.getValue() + " of navigation: " + entry.getKey() + " -> " + entry.getValue() + " is missing");
+            String navigationTarget = entry.getValue();
+            if (!isProcessed(navigationTarget, reachableStepNames, reachableResultNames)) {
+                boolean isResult = resultNames.contains(navigationTarget);
+                Step nextStepToCompile = Lambda.selectFirst(steps, having(on(Step.class).getName(), equalTo(navigationTarget)));
+                boolean isStep = nextStepToCompile != null;
+
+                if (isStep && isResult) {
+                    errors.add(
+                            new RuntimeException(
+                                "Navigation target: '" + navigationTarget + "' is declared both as step name and flow result."
+                            )
+                    );
                 }
-                return validateNavigation(nextStepToCompile, steps, stepNames);
+                if (isResult) {
+                    reachableResultNames.add(navigationTarget);
+                } else {
+                    if (isStep) {
+                        validateNavigation(nextStepToCompile, steps, resultNames, reachableStepNames, reachableResultNames, errors);
+                    } else {
+                        errors.add(
+                                new RuntimeException(
+                                        "Failed to compile step: " + currentStepName + ". The step/result name: " + entry.getValue() +
+                                                " of navigation: " + entry.getKey() + " -> " + entry.getValue() + " is missing"
+                                )
+                        );
+                    }
+                }
             }
         }
-        return null;
+    }
+
+    private boolean isProcessed(String navigationTarget, Set<String> reachableStepNames, Set<String> reachableResultNames) {
+        return reachableStepNames.contains(navigationTarget) || reachableResultNames.contains(navigationTarget);
+    }
+
+    private void validateStepsAreReachable(
+            Set<String> reachableStepNames,
+            Deque<Step> steps,
+            List<RuntimeException> errors) {
+        for (Step step : steps) {
+            String stepName = step.getName();
+            String messagePrefix = step.isOnFailureStep() ? "on_failure step '" : "Step '";
+            if (!reachableStepNames.contains(stepName)) {
+                errors.add(new RuntimeException(messagePrefix + stepName + "' is unreachable."));
+            }
+        }
+    }
+
+    private void validateResultsAreReachable(
+            Set<String> reachableResultNames,
+            Set<String> resultNames,
+            List<RuntimeException> errors) {
+        Set<String> unreachableResultNames = new HashSet<>(resultNames);
+        unreachableResultNames.removeAll(reachableResultNames);
+        if (!unreachableResultNames.isEmpty()) {
+            errors.add(new RuntimeException("The following results are not wired: " + unreachableResultNames + "."));
+        }
     }
 
     private void validateFileName(String executableName, ParsedSlang parsedSlang, ExecutableModellingResult result) {
