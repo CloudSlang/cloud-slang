@@ -56,7 +56,10 @@ public class NavigateTransformer implements Transformer<List<Object>, List<Map<S
                     Map<String, String> elementAsStringMap = elementAsMap;
                     transformedData.add(elementAsStringMap);
                 } else {
-                    throw new RuntimeException();
+                    throw new RuntimeException(
+                            "Navigation rule should be a Map. Actual type is " +
+                                    elementAsObject.getClass().getName() + ": " + elementAsObject
+                    );
                 }
             } catch (RuntimeException rex) {
                 errors.add(rex);

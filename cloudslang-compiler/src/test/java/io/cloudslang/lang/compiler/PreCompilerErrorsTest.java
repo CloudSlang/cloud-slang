@@ -599,6 +599,18 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
+    public void testNavigationRuleIncorrectType() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_navigation_rule_incorrect_type.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("For step 'Step1' syntax is illegal.");
+        exception.expectMessage("Navigation rule should be a Map. Actual type is java.util.ArrayList: [SUCCESS, SUCCESS]");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
     public void testFlowWithInvalidInputs() throws Exception {
         URI resource = getClass().getResource("/corrupted/flow_with_invalid_inputs.sl").toURI();
 
