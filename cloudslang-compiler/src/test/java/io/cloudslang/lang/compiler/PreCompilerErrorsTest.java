@@ -687,6 +687,17 @@ public class PreCompilerErrorsTest {
         throw result.getErrors().get(0);
     }
 
+    @Test
+    public void testDefaultNavigationMissingResult() throws Exception {
+        URI resource = getClass().getResource("/corrupted/default_navigation_missing_result.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Failed to compile step: jedi_training_1. The step/result name: FAILURE of navigation: FAILURE -> FAILURE is missing");
+        throw result.getErrors().get(0);
+    }
+
     private void assertContains(List<RuntimeException> errors, int index, String message) {
         @SuppressWarnings("all")
         RuntimeException rex1 = errors.get(index);

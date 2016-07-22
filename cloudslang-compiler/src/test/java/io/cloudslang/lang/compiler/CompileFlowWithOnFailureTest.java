@@ -118,6 +118,23 @@ public class CompileFlowWithOnFailureTest {
     }
 
     @Test
+    public void testDefaultNavigationMissingResultOnFailure() throws Exception {
+        URI flow = getClass().getResource("/corrupted/default_navigation_missing_result_on_failure.sl").toURI();
+        URI operation = getClass().getResource("/test_op.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage(
+                "Failed to compile step: jedi_training_3." +
+                        " The step/result name: FAILURE of navigation: SUCCESS -> FAILURE is missing"
+        );
+
+        compiler.compile(SlangSource.fromFile(flow), path);
+    }
+
+    @Test
     public void testFlowOnFailureStepFailureResultIsReachable() throws Exception {
         URI resource = getClass().getResource("/on_failure_reachable_result.sl").toURI();
 
