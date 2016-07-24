@@ -14,12 +14,12 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import java.util.List;
 
-//TODO: Eliya - add Java Doc
 public interface Transformer<F, T> {
 
-    T transform(F rawData);
+    TransformModellingResult<T> transform(F rawData);
 
     List<Scope> getScopes();
 

@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class BreakTransformerTest {
+public class BreakTransformerTest extends TransformersTestParent {
 
     @Test
     public void testTransformWithData() throws Exception {
         BreakTransformer breakTransformer = new BreakTransformer();
         List<String> list = Arrays.asList("1", "2");
-        List<String> returnValue = breakTransformer.transform(list);
+        List<String> returnValue = breakTransformer.transform(list).getTransformedData();
         Assert.assertEquals(list, returnValue);
     }
 
@@ -22,14 +22,14 @@ public class BreakTransformerTest {
     public void testTransformWithNullReturnDefault() throws Exception {
         BreakTransformer breakTransformer = new BreakTransformer();
         List<String> list = Arrays.asList(ScoreLangConstants.FAILURE_RESULT);
-        List<String> returnValue = breakTransformer.transform(null);
+        List<String> returnValue = breakTransformer.transform(null).getTransformedData();
         Assert.assertEquals(list, returnValue);
     }
 
     @Test
     public void testTransformWithEmptyListReturnEmptyList() throws Exception {
         BreakTransformer breakTransformer = new BreakTransformer();
-        List<String> returnValue = breakTransformer.transform(new ArrayList<String>());
+        List<String> returnValue = breakTransformer.transform(new ArrayList<String>()).getTransformedData();
         List<String> expected = new ArrayList<>();
         Assert.assertEquals(expected, returnValue);
     }

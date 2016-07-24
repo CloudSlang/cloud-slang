@@ -11,22 +11,16 @@ imports:
   ops: user.ops
 
 flow:
-  name: on_failure_contains_step_with_custom_result
-  inputs:
-    - alla
+  name: unreachable_flow_results_explicit_nav
   workflow:
     - print_message1:
         do:
           ops.test_op:
-            - alla
+            - alla: 'message 1'
         navigate:
-          - SUCCESS: print_on_failure_1
-          - FAILURE: print_on_failure_1
-
-    - on_failure:
-        - print_on_failure_1:
-            do:
-              flow_with_custom_result:
-                - alla: 'on_failure 1'
+          - SUCCESS: SUCCESS
+          - FAILURE: CUSTOM
   results:
-    - FAILURE
+    - SUCCESS
+    - UNREACHABLE_RESULT
+    - CUSTOM

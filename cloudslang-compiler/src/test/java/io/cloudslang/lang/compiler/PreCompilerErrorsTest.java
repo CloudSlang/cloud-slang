@@ -13,6 +13,7 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.ExecutableBuilder;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
+import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -329,7 +330,7 @@ public class PreCompilerErrorsTest {
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'private_input_without_default' syntax is illegal.\n" +
-                "input: input_without_default is private but no default value was specified");
+                "Input: input_without_default is private but no default value was specified");
         throw result.getErrors().get(0);
     }
 
@@ -562,8 +563,32 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Step: print_message2 is unreachable");
+        exception.expectMessage("Step 'print_message2' is unreachable.");
         throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testFlowWithUnreachableFlowResult() throws Exception {
+        URI resource = getClass().getResource("/corrupted/unreachable_flow_results_explicit_nav.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("The following results are not wired: [UNREACHABLE_RESULT].");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testFlowWithUnreachableFlowResultMissingNavigation() throws Exception {
+        URI resource = getClass().getResource("/corrupted/unreachable_flow_results_missing_nav.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+
+        List<RuntimeException> errors = result.getErrors();
+        assertTrue(errors.size() == 2);
+
+        assertContains(errors, 0, "Failed to compile step: print_message1. The step/result name: CUSTOM of navigation: FAILURE -> CUSTOM is missing");
+        assertContains(errors, 1, "The following results are not wired: [UNREACHABLE_RESULT].");
     }
 
     @Test
@@ -571,7 +596,23 @@ public class PreCompilerErrorsTest {
         URI resource = getClass().getResource("/corrupted/unreachable_on_failure_step.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
-        assertTrue(result.getErrors().size() == 0);
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("on_failure step 'print_on_failure_1' is unreachable.");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testFlowBothResultAndStepName() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_both_result_and_step_name.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(
+                "Navigation target: 'BOTH_RESULT_AND_STEP_NAME' is declared both as step name and flow result."
+        );
+        throw result.getErrors().get(0);
     }
 
     @Test
@@ -599,6 +640,18 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
+    public void testNavigationRuleIncorrectType() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_navigation_rule_incorrect_type.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("For step 'Step1' syntax is illegal.");
+        exception.expectMessage("Navigation rule should be a Map. Actual type is java.util.ArrayList: [SUCCESS, SUCCESS]");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
     public void testFlowWithInvalidInputs() throws Exception {
         URI resource = getClass().getResource("/corrupted/flow_with_invalid_inputs.sl").toURI();
 
@@ -618,7 +671,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Step: print_message2 is unreachable");
+        exception.expectMessage("Step 'print_message2' is unreachable.");
         throw result.getErrors().get(0);
     }
 
@@ -633,4 +686,22 @@ public class PreCompilerErrorsTest {
         exception.expectMessage("Could not transform Output : {var_with_null_value=null} since it has a null value.");
         throw result.getErrors().get(0);
     }
+
+    @Test
+    public void testDefaultNavigationMissingResult() throws Exception {
+        URI resource = getClass().getResource("/corrupted/default_navigation_missing_result.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Failed to compile step: jedi_training_1. The step/result name: FAILURE of navigation: FAILURE -> FAILURE is missing");
+        throw result.getErrors().get(0);
+    }
+
+    private void assertContains(List<RuntimeException> errors, int index, String message) {
+        @SuppressWarnings("all")
+        RuntimeException rex1 = errors.get(index);
+        Assert.assertTrue(rex1.getMessage().contains(message));
+    }
+
 }

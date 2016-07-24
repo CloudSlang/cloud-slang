@@ -21,7 +21,7 @@ import org.junit.rules.ExpectedException;
  * @author Bonczidai Levente
  * @since 5/5/2016
  */
-public class AbstractTransformerTest {
+public class AbstractTransformerTest extends TransformersTestParent {
 
     @Rule
     public ExpectedException exception = ExpectedException.none();;

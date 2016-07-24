@@ -14,9 +14,12 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
+import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import java.util.ArrayList;
+import java.util.Collections;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -24,13 +27,13 @@ import java.util.Map;
 public class WorkFlowTransformer implements Transformer<Map<String, Object>, Map<String, Object>> {
 
     @Override
-    public Map<String, Object> transform(Map<String, Object> rawData) {
-        return rawData;
+    public TransformModellingResult<Map<String, Object>> transform(Map<String, Object> rawData) {
+        return new BasicTransformModellingResult<>(rawData, new ArrayList<RuntimeException>());
     }
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList();
+        return Collections.emptyList();
     }
 
     @Override

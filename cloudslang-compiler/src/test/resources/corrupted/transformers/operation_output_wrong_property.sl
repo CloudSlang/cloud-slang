@@ -4,18 +4,18 @@
 #
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
-namespace: io.cloudslang
 
-imports:
-  ops: user.ops
+namespace: user.ops
 
-flow:
-  name: step_with_missing_navigation_from_operation_result_flow
-  workflow:
-    - step1:
-        do:
-          ops.java_op:
-        navigate:
-          - SUCCESS: SUCCESS
+operation:
+  name: operation_output_wrong_property
+  python_action:
+    script: pass
+  outputs:
+    - output_1: 'abc'
+    - output_wrong_key:
+        wrong_key: 'abc'
+    - output_2: 'abc'
   results:
-    - SUCCESS
+    - SUCCESS: ${ 1 == 1 }
+    - FAILURE

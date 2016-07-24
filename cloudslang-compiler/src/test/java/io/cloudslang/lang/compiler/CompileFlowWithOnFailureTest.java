@@ -12,6 +12,7 @@ package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.ExecutableBuilder;
+import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
@@ -30,6 +31,8 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static org.junit.Assert.assertTrue;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -112,6 +115,31 @@ public class CompileFlowWithOnFailureTest {
         expectedException.expectMessage("'on_failure' should be last step in the workflow");
 
         compiler.compile(SlangSource.fromFile(flow), path);
+    }
+
+    @Test
+    public void testDefaultNavigationMissingResultOnFailure() throws Exception {
+        URI flow = getClass().getResource("/corrupted/default_navigation_missing_result_on_failure.sl").toURI();
+        URI operation = getClass().getResource("/test_op.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage(
+                "Failed to compile step: jedi_training_3." +
+                        " The step/result name: FAILURE of navigation: SUCCESS -> FAILURE is missing"
+        );
+
+        compiler.compile(SlangSource.fromFile(flow), path);
+    }
+
+    @Test
+    public void testFlowOnFailureStepFailureResultIsReachable() throws Exception {
+        URI resource = getClass().getResource("/on_failure_reachable_result.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() == 0);
     }
 
 	private long getFailureNavigationStepId(ExecutionStep firstStep) {

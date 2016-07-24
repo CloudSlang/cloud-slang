@@ -10,6 +10,7 @@
 
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.bindings.Output;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,7 @@ import java.util.List;
 public class OutputsTransformer extends AbstractOutputsTransformer implements Transformer<List<Object>, List<Output>> {
 
     @Override
-    public List<Output> transform(List<Object> rawData) {
+    public TransformModellingResult<List<Output>> transform(List<Object> rawData) {
         return super.transform(rawData);
     }
 

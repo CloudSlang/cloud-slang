@@ -5,28 +5,29 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: io.cloudslang
+namespace: user.ops
 
 imports:
   ops: user.ops
 
 flow:
-  name: on_failure_contains_step_with_custom_result
-  inputs:
-    - alla
+  name: default_navigation_missing_result_on_failure
   workflow:
-    - print_message1:
+    - jedi_training_1:
         do:
-          ops.test_op:
-            - alla
+          ops.test_op: []
+
+    - jedi_training_2:
+        do:
+          ops.test_op: []
         navigate:
-          - SUCCESS: print_on_failure_1
-          - FAILURE: print_on_failure_1
+          - SUCCESS: EQUAL
+          - FAILURE: LESS_THAN
 
     - on_failure:
-        - print_on_failure_1:
+        - jedi_training_3:
             do:
-              flow_with_custom_result:
-                - alla: 'on_failure 1'
+              ops.test_op: []
   results:
-    - FAILURE
+    - EQUAL
+    - LESS_THAN

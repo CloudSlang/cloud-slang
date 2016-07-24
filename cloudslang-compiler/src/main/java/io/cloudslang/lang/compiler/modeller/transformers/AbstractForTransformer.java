@@ -9,10 +9,14 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.ParallelLoopStatement;
 import io.cloudslang.lang.entities.ListForLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.MapForLoopStatement;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Matcher;
@@ -31,58 +35,64 @@ public abstract class AbstractForTransformer {
     private final static String KEY_VALUE_PAIR_REGEX = "^(\\s+)?(\\w+)(\\s+)?(,)(\\s+)?(\\w+)(\\s+)?$";
     private final static String FOR_IN_KEYWORD= " in ";
 
-    public LoopStatement transformToLoopStatement(String rawData, boolean isParallelLoop) {
+    public TransformModellingResult<LoopStatement> transformToLoopStatement(String rawData, boolean isParallelLoop) {
+        List<RuntimeException> errors = new ArrayList<>();
+
         if (StringUtils.isEmpty(rawData)) {
-            return null;
+            return new BasicTransformModellingResult<>(null, errors);
         }
 
-        LoopStatement loopStatement;
+        LoopStatement loopStatement = null;
         String varName;
         String collectionExpression;
 
         Pattern regexSimpleFor = Pattern.compile(FOR_REGEX);
         Matcher matcherSimpleFor = regexSimpleFor.matcher(rawData);
 
-        if (matcherSimpleFor.find()) {
-            // case: value in variable_name
-            varName = matcherSimpleFor.group(2);
-            collectionExpression = matcherSimpleFor.group(4);
-            if (isParallelLoop) {
-                loopStatement = new ParallelLoopStatement(varName, collectionExpression);
-            } else {
-                loopStatement = new ListForLoopStatement(varName, collectionExpression);
-            }
-        } else {
-            String beforeInKeyword = StringUtils.substringBefore(rawData, FOR_IN_KEYWORD);
-            collectionExpression = StringUtils.substringAfter(rawData, FOR_IN_KEYWORD).trim();
-
-            Pattern regexKeyValueFor = Pattern.compile(KEY_VALUE_PAIR_REGEX);
-            Matcher matcherKeyValueFor = regexKeyValueFor.matcher(beforeInKeyword);
-
-            if (matcherKeyValueFor.find()) {
-                // case: key, value
-                String keyName = matcherKeyValueFor.group(2);
-                String valueName = matcherKeyValueFor.group(6);
-
-                loopStatement = new MapForLoopStatement(
-                        keyName,
-                        valueName,
-                        collectionExpression);
-            } else {
-                // case: value in expression_other_than_variable_name
-                varName = beforeInKeyword.trim();
-                if (isContainInvalidChars(varName)) {
-                    throw new RuntimeException("for loop var name cannot contain invalid chars");
-                }
+        try {
+            if (matcherSimpleFor.find()) {
+                // case: value in variable_name
+                varName = matcherSimpleFor.group(2);
+                collectionExpression = matcherSimpleFor.group(4);
                 if (isParallelLoop) {
                     loopStatement = new ParallelLoopStatement(varName, collectionExpression);
                 } else {
                     loopStatement = new ListForLoopStatement(varName, collectionExpression);
                 }
+            } else {
+                String beforeInKeyword = StringUtils.substringBefore(rawData, FOR_IN_KEYWORD);
+                collectionExpression = StringUtils.substringAfter(rawData, FOR_IN_KEYWORD).trim();
+
+                Pattern regexKeyValueFor = Pattern.compile(KEY_VALUE_PAIR_REGEX);
+                Matcher matcherKeyValueFor = regexKeyValueFor.matcher(beforeInKeyword);
+
+                if (matcherKeyValueFor.find()) {
+                    // case: key, value
+                    String keyName = matcherKeyValueFor.group(2);
+                    String valueName = matcherKeyValueFor.group(6);
+
+                    loopStatement = new MapForLoopStatement(
+                            keyName,
+                            valueName,
+                            collectionExpression);
+                } else {
+                    // case: value in expression_other_than_variable_name
+                    varName = beforeInKeyword.trim();
+                    if (isContainInvalidChars(varName)) {
+                        throw new RuntimeException("for loop var name cannot contain invalid chars");
+                    }
+                    if (isParallelLoop) {
+                        loopStatement = new ParallelLoopStatement(varName, collectionExpression);
+                    } else {
+                        loopStatement = new ListForLoopStatement(varName, collectionExpression);
+                    }
+                }
             }
+        } catch (RuntimeException rex) {
+            errors.add(rex);
         }
 
-        return loopStatement;
+        return new BasicTransformModellingResult<>(loopStatement, errors);
     }
 
     private boolean isContainInvalidChars(String varName) {
