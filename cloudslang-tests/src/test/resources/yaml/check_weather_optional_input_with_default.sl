@@ -12,8 +12,8 @@ operation:
   inputs:
     - city: "city"
     - input_with_default_value:
-            default: "default_value"
-            required: false
+       default: "default_value"
+       required: false
   python_action:
     script: |
       weather = "weather thing " + input_with_default_value

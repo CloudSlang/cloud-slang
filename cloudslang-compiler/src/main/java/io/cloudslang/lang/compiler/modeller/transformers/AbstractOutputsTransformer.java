@@ -62,15 +62,7 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
                         //     property2: value2
                         // this is the verbose way of defining outputs with all of the properties available
                         //noinspection unchecked
-                        Map.Entry<String, Map<String, Serializable>> mapEntry = (Map.Entry<String, Map<String, Serializable>>) entry;
-                        Map<String, Serializable> props = mapEntry.getValue();
-                        validateKeys(mapEntry, props);
-                        Serializable value = props.get(VALUE_KEY);
-                        if (value == null) {
-                            addOutput(transformedData, createRefOutput(entry.getKey()));
-                        } else {
-                            addOutput(transformedData, createPropOutput(mapEntry));
-                        }
+                        addOutput(transformedData, createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry));
                     } else {
                         // - some_output: some_expression
                         addOutput(transformedData, createOutput(entry.getKey(), entryValue, false));
@@ -78,7 +70,7 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
                 } else {
                     //- some_output
                     //this is our default behavior that if the user specifies only a key, the key is also the ref we look for
-                    addOutput(transformedData, createRefOutput((String) rawOutput));
+                    addOutput(transformedData, createRefOutput((String) rawOutput, false));
                 }
             } catch (RuntimeException rex) {
                 errors.add(rex);
@@ -94,11 +86,14 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
 
     private Output createPropOutput(Map.Entry<String, Map<String, Serializable>> entry) {
         Map<String, Serializable> props = entry.getValue();
-
+        validateKeys(entry, props);
         // default is sensitive=false
         String outputName = entry.getKey();
         boolean sensitive = props.containsKey(SENSITIVE_KEY) && (boolean) props.get(SENSITIVE_KEY);
         Serializable value = props.get(VALUE_KEY);
+        if (value == null) {
+            return createRefOutput(outputName, sensitive);
+        }
 
         return createOutput(outputName, value, sensitive);
     }
@@ -123,8 +118,8 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
         );
     }
 
-    private Output createRefOutput(String rawOutput) {
-        return new Output(rawOutput, ValueFactory.create(transformNameToExpression(rawOutput)));
+    private Output createRefOutput(String rawOutput, boolean sensitive) {
+        return new Output(rawOutput, ValueFactory.create(transformNameToExpression(rawOutput), sensitive));
     }
 
     private String transformNameToExpression(String name) {

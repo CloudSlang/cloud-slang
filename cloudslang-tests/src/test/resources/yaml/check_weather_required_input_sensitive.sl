@@ -13,10 +13,10 @@ operation:
     - city:
        required: false
     - input_with_default_value:
-            default: "default_value"
-            required: true
+       default: "default_value"
+       required: true
     - input_with_sensitive_no_default:
-            sensitive: true
+       sensitive: true
   python_action:
     script: |
       weather = "weather thing " + input_with_default_value + " " + input_with_sensitive_no_default
