@@ -62,11 +62,14 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
                         //     property2: value2
                         // this is the verbose way of defining outputs with all of the properties available
                         //noinspection unchecked
-                        Serializable value = ((Map<String, Serializable>) entryValue).get(VALUE_KEY);
+                        Map.Entry<String, Map<String, Serializable>> mapEntry = (Map.Entry<String, Map<String, Serializable>>) entry;
+                        Map<String, Serializable> props = mapEntry.getValue();
+                        validateKeys(mapEntry, props);
+                        Serializable value = props.get(VALUE_KEY);
                         if (value == null) {
                             addOutput(transformedData, createRefOutput(entry.getKey()));
                         } else {
-                            addOutput(transformedData, createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry));
+                            addOutput(transformedData, createPropOutput(mapEntry));
                         }
                     } else {
                         // - some_output: some_expression
@@ -91,13 +94,6 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
 
     private Output createPropOutput(Map.Entry<String, Map<String, Serializable>> entry) {
         Map<String, Serializable> props = entry.getValue();
-        List<String> knownKeys = Arrays.asList(SENSITIVE_KEY, VALUE_KEY);
-
-        for (String key : props.keySet()) {
-            if (!knownKeys.contains(key)) {
-                throw new RuntimeException("Key: " + key + " in output: " + entry.getKey() + " is not a known property");
-            }
-        }
 
         // default is sensitive=false
         String outputName = entry.getKey();
@@ -105,6 +101,16 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
         Serializable value = props.get(VALUE_KEY);
 
         return createOutput(outputName, value, sensitive);
+    }
+
+    private void validateKeys(Map.Entry<String, Map<String, Serializable>> entry, Map<String, Serializable> props) {
+        List<String> knownKeys = Arrays.asList(SENSITIVE_KEY, VALUE_KEY);
+
+        for (String key : props.keySet()) {
+            if (!knownKeys.contains(key)) {
+                throw new RuntimeException("Key: " + key + " in output: " + entry.getKey() + " is not a known property");
+            }
+        }
     }
 
     private Output createOutput(String outputName, Serializable outputExpression, boolean sensitive){
