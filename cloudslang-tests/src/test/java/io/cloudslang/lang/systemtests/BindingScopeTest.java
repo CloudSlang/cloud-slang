@@ -239,6 +239,24 @@ public class BindingScopeTest extends SystemsTestsParent {
     }
 
     @Test
+    public void testSensitiveStepOutputs() throws Exception {
+        URL resource = getClass().getResource("/yaml/check_weather_flow_sensitive_outputs.sl");
+        URI operation1 = getClass().getResource("/yaml/check_weather_required_input_sensitive.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
+
+        Map<String, Value> userInputs = new HashMap<>();
+        Set<SystemProperty> systemProperties = Collections.emptySet();
+
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
+
+        Assert.assertEquals("********", steps.get(EXEC_START_PATH).getOutputs().get("flow_output_0"));
+        Assert.assertEquals("********", steps.get(EXEC_START_PATH).getOutputs().get("flow_output_1"));
+        Assert.assertEquals("sensitive", steps.get(FIRST_STEP_PATH).getInputs().get("input_with_sensitive_no_default"));
+    }
+
+    @Test
     public void testStepInputOptionalWithEmptyValue() throws Exception {
         URL resource = getClass().getResource("/yaml/check_weather_flow_optional.sl");
         URI operation1 = getClass().getResource("/yaml/check_weather_optional_input_with_default.sl").toURI();
