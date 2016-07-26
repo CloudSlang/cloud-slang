@@ -62,7 +62,12 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
                         //     property2: value2
                         // this is the verbose way of defining outputs with all of the properties available
                         //noinspection unchecked
-                        addOutput(transformedData, createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry));
+                        Serializable value = ((Map<String, Serializable>) entryValue).get(VALUE_KEY);
+                        if (value == null) {
+                            addOutput(transformedData, createRefOutput(entry.getKey()));
+                        } else {
+                            addOutput(transformedData, createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry));
+                        }
                     } else {
                         // - some_output: some_expression
                         addOutput(transformedData, createOutput(entry.getKey(), entryValue, false));
@@ -98,9 +103,6 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
         String outputName = entry.getKey();
         boolean sensitive = props.containsKey(SENSITIVE_KEY) && (boolean) props.get(SENSITIVE_KEY);
         Serializable value = props.get(VALUE_KEY);
-        if (value == null) {
-            throw new RuntimeException("Output: " + outputName + " was not specified");
-        }
 
         return createOutput(outputName, value, sensitive);
     }
