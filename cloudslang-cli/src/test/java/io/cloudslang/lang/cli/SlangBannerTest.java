@@ -27,7 +27,14 @@ public class SlangBannerTest {
 
     @Test
     public void testGetBanner() throws Exception {
-        Assert.assertEquals(BANNER, slangBanner.getBanner());
+
+        Assert.assertNotNull(slangBanner.getBanner());
+
+        // Remove \r (carriage return) to ignore differences in line break styles
+        String expected = BANNER.replace("\r", "");
+        String actual = slangBanner.getBanner().replace("\r", "");
+
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
