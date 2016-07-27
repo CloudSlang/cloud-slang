@@ -31,7 +31,7 @@ public class SystemProperty implements Serializable {
     private final String fullyQualifiedName;
     private final Value value;
 
-    public SystemProperty(String namespace, String key, String value, boolean sensitive) {
+    public SystemProperty(String namespace, String key, Value value) {
         Validate.notNull(namespace, "System property namespace cannot be null");
         Validate.notEmpty(key, "System property key cannot be empty");
 
@@ -42,9 +42,17 @@ public class SystemProperty implements Serializable {
             fullyQualifiedName = key;
         }
 
+        if (value == null) {
+            value = ValueFactory.create(null);
+        }
+
         this.namespace = namespace;
         this.fullyQualifiedName = fullyQualifiedName;
-        this.value = ValueFactory.create(value, sensitive);
+        this.value = value;
+    }
+
+    public SystemProperty(String namespace, String key, String value, boolean sensitive) {
+        this(namespace, key, ValueFactory.create(value, sensitive));
     }
 
     public SystemProperty(String namespace, String key, String value) {
@@ -109,5 +117,4 @@ public class SystemProperty implements Serializable {
                 .append(value)
                 .toHashCode();
     }
-
 }
