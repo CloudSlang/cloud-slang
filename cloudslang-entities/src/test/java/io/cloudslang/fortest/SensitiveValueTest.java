@@ -12,57 +12,108 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.junit.Assert.*;
+import java.io.Serializable;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
+ *
  * Created by Genadi Rabinovich, genadi@hpe.com on 10/07/2016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SensitiveValueTest.SensitiveValueTestConfig.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class SensitiveValueTest {
-    private static final String ENCYPTED = "{Encrypted}";
+    private static final String ENCRYPTED = "{Encrypted}";
 
     @Test
     public void testSensitiveValueEncryptDecrypt() {
-        String originalValue = "OriginalSensitiveValue";
+        final String originalValue = "OriginalSensitiveValue";
+        final String expectedEncryptedString = "{Encrypted}rO0ABXQAFk9yaWdpbmFsU2Vuc2l0aXZlVmFsdWU=";
+
         SensitiveValue value = (SensitiveValue) ValueFactory.create(originalValue, true);
-        assertEquals("{Encrypted}rO0ABXQAFk9yaWdpbmFsU2Vuc2l0aXZlVmFsdWU=", value.getContent());
-        assertEquals(originalValue, value.get());
-        value = (SensitiveValue) ValueFactory.create(value.getContent(), true);
-        assertEquals("{Encrypted}rO0ABXQAFk9yaWdpbmFsU2Vuc2l0aXZlVmFsdWU=", value.getContent());
-        assertEquals(originalValue, value.get());
-        assertTrue(value.isSensitive());
-
+        verifyEncrypted(value, originalValue, expectedEncryptedString);
 
         value.encrypt();
-        assertEquals("{Encrypted}rO0ABXQAFk9yaWdpbmFsU2Vuc2l0aXZlVmFsdWU=", value.getContent());
-        assertEquals(originalValue, value.get());
-        assertTrue(value.isSensitive());
+        verifyEncrypted(value, originalValue, expectedEncryptedString);
 
         value.decrypt();
-        assertEquals(originalValue, value.getContent());
-        assertEquals(originalValue, value.get());
-
-        assertTrue(value.isSensitive());
+        verifyDecrypted(value, originalValue);
 
         value.decrypt();
-        assertEquals(originalValue, value.getContent());
-        assertEquals(originalValue, value.get());
-
-        assertTrue(value.isSensitive());
+        verifyDecrypted(value, originalValue);
 
         value.encrypt();
-        assertEquals("{Encrypted}rO0ABXQAFk9yaWdpbmFsU2Vuc2l0aXZlVmFsdWU=", value.getContent());
-        assertEquals(originalValue, value.get());
-
-        assertTrue(value.isSensitive());
+        verifyEncrypted(value, originalValue, expectedEncryptedString);
 
         value.encrypt();
-        assertEquals("{Encrypted}rO0ABXQAFk9yaWdpbmFsU2Vuc2l0aXZlVmFsdWU=", value.getContent());
-        assertEquals(originalValue, value.get());
-        assertTrue(value.isSensitive());
+        verifyEncrypted(value, originalValue, expectedEncryptedString);
+    }
 
+    @Test
+    public void testEncryptedStringSensitiveValue() {
+        final String originalValue = "foo";
+        final String encryptedString = "{Encrypted}foo";
+
+        SensitiveValue value = (SensitiveValue) ValueFactory.createEncryptedString(originalValue, false);
+        verifyEncrypted(value, originalValue, encryptedString);
+
+        value.encrypt();
+        verifyEncrypted(value, originalValue, encryptedString);
+
+        value.decrypt();
+        verifyDecrypted(value, originalValue);
+
+        value.decrypt();
+        verifyDecrypted(value, originalValue);
+
+        value.encrypt();
+        verifyEncrypted(value, originalValue, encryptedString);
+
+        value.encrypt();
+        verifyEncrypted(value, originalValue, encryptedString);
+    }
+
+    @Test
+    public void testEncryptedStringSensitiveValuePreEncrypted() {
+        final String encryptedString = "{Encrypted}bar";
+        final String expectedDecryptedValue = "bar";
+
+        SensitiveValue value = (SensitiveValue) ValueFactory.createEncryptedString(encryptedString, true);
+        verifyEncrypted(value, expectedDecryptedValue, encryptedString);
+
+        value.encrypt();
+        verifyEncrypted(value, expectedDecryptedValue, encryptedString);
+
+        value.decrypt();
+        verifyDecrypted(value, expectedDecryptedValue);
+
+        value.decrypt();
+        verifyDecrypted(value, expectedDecryptedValue);
+
+        value.encrypt();
+        verifyEncrypted(value, expectedDecryptedValue, encryptedString);
+
+        value.encrypt();
+        verifyEncrypted(value, expectedDecryptedValue, encryptedString);
+    }
+
+    private void verifyEncrypted(SensitiveValue value, Serializable expectedOriginalValue, String expectedEncryptedString) {
+        verifySensitiveValue(value, expectedOriginalValue, expectedEncryptedString);
+    }
+
+    private void verifyDecrypted(SensitiveValue value, Serializable expectedOriginalValue) {
+        // When the value is decrypted, the inner content should be the toString() result of the original value
+        String expectedContent = expectedOriginalValue.toString();
+        verifySensitiveValue(value, expectedOriginalValue, expectedContent);
+    }
+
+    private void verifySensitiveValue(SensitiveValue value, Serializable expectedOriginalValue, String expectedContent) {
+        assertEquals(expectedContent, value.getContent());
+        assertEquals(expectedOriginalValue, value.get());
+        assertEquals(SensitiveValue.SENSITIVE_VALUE_MASK, value.toString());
+        assertTrue(value.isSensitive());
     }
 
     @Configuration
@@ -74,17 +125,17 @@ public class SensitiveValueTest {
 
                 @Override
                 public String encrypt(char[] clearText) {
-                    return ENCYPTED + new String(clearText);
+                    return ENCRYPTED + new String(clearText);
                 }
 
                 @Override
                 public char[] decrypt(String cypherText) {
-                    return cypherText.substring(ENCYPTED.length()).toCharArray();
+                    return cypherText.substring(ENCRYPTED.length()).toCharArray();
                 }
 
                 @Override
                 public boolean isTextEncrypted(String text) {
-                    return text.startsWith(ENCYPTED);
+                    return text.startsWith(ENCRYPTED);
                 }
             };
         }

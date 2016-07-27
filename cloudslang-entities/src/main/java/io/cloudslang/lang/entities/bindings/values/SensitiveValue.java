@@ -52,6 +52,15 @@ public class SensitiveValue implements Value {
         encrypt();
     }
 
+    protected SensitiveValue(String content, boolean preEncrypted) {
+        if (preEncrypted) {
+            this.content = content;
+        } else {
+            originalContent = content;
+            encrypt();
+        }
+    }
+
     public void encrypt() {
         if(originalContent != null) {
             content = encrypt(originalContent);
@@ -115,20 +124,17 @@ public class SensitiveValue implements Value {
         return SENSITIVE_VALUE_MASK;
     }
 
-    private String encrypt(Serializable originalContent) {
-        if(EncryptionProvider.get().isTextEncrypted(originalContent.toString())) {
-            return originalContent.toString();
-        } else {
-            byte[] serialized = serialize(originalContent);
-            String encoded = Base64.encode(serialized);
-            return EncryptionProvider.get().encrypt(encoded.toCharArray());
-        }
+    protected String encrypt(Serializable originalContent) {
+        byte[] serialized = serialize(originalContent);
+        String serializedAsString = Base64.encode(serialized);
+        return EncryptionProvider.get().encrypt(serializedAsString.toCharArray());
     }
 
-    private Serializable decrypt(String content) {
+    protected Serializable decrypt(String content) {
         char[] decrypted = EncryptionProvider.get().decrypt(content);
-        byte[] decoded = Base64.decode(new String(decrypted));
-        return deserialize(decoded);
+        String serializedAsString = new String(decrypted);
+        byte[] serialized = Base64.decode(serializedAsString);
+        return deserialize(serialized);
     }
 
     private byte[] serialize(Serializable data) {

@@ -18,6 +18,11 @@ import io.cloudslang.lang.compiler.validator.CompileValidator;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.utils.SetUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.Validate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,10 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
@@ -207,7 +208,7 @@ public class SlangCompilerImpl implements SlangCompiler {
             Object rawValue) {
         String namespace = rawNamespace == null ? "" : rawNamespace;
         if (rawValue == null) {
-            return new SystemProperty(namespace, key, null);
+            return new SystemProperty(namespace, key, (String) null);
         }
         if (rawValue instanceof Map) {
             Map rawModifiers = (Map) rawValue;
