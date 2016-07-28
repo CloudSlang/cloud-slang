@@ -30,7 +30,11 @@ public abstract class ValueFactory implements Serializable {
                 ValueFactory.createValue(serializable, sensitive);
     }
 
-    public static Value createEncryptedString(String value, boolean preEncrypted) {
+    public static SensitiveStringValue createEncryptedString(String value) {
+        return new SensitiveStringValue(value, false);
+    }
+
+    public static SensitiveStringValue createEncryptedString(String value, boolean preEncrypted) {
         return new SensitiveStringValue(value, preEncrypted);
     }
 

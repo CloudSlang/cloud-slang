@@ -17,6 +17,7 @@ import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.compiler.validator.CompileValidator;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.SetUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
@@ -227,7 +228,11 @@ public class SlangCompilerImpl implements SlangCompiler {
             String value = valueAsSerializable == null ? null : valueAsSerializable.toString();
             boolean sensitive = modifiers.containsKey(SENSITIVE_KEY) && (boolean) modifiers.get(SENSITIVE_KEY);
 
-            return new SystemProperty(namespace, key, value, sensitive);
+            if (sensitive) {
+                return new SystemProperty(namespace, key, ValueFactory.createEncryptedString(value));
+            } else {
+                return new SystemProperty(namespace, key, value);
+            }
         } else {
             return new SystemProperty(namespace, key, rawValue.toString());
         }

@@ -2,7 +2,6 @@ package io.cloudslang.lang.runtime.env;
 
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
-import io.cloudslang.lang.entities.bindings.values.SimpleValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.spi.encryption.Encryption;
@@ -17,12 +16,15 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.junit.Assert.*;
-
 import java.util.Map;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
+ *
  * Created by Genadi Rabinovich, genadi@hpe.com on 10/07/2016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -55,7 +57,7 @@ public class RunEnvironmentSensitiveTest {
     public void testRunEnvironmentOnlySpSensitive() {
         //everything is empty
         Set<SystemProperty> sp = Sets.newHashSet();
-        sp.add(new SystemProperty("a.b", "key", "value", true));
+        sp.add(new SystemProperty("a.b", "key", ValueFactory.createEncryptedString("value")));
 
         RunEnvironment runEnvironment = new RunEnvironment(sp);
         assertTrue(runEnvironment.containsSensitiveData());
@@ -77,7 +79,7 @@ public class RunEnvironmentSensitiveTest {
     public void testRunEnvironmentOnlyCallArgsSensitive() {
         //everything is empty
         Set<SystemProperty> sp = Sets.newHashSet();
-        sp.add(new SystemProperty("a.b", "key", "value", false));
+        sp.add(new SystemProperty("a.b", "key", "value"));
 
         RunEnvironment runEnvironment = new RunEnvironment(sp);
         assertFalse(runEnvironment.containsSensitiveData());
@@ -101,7 +103,7 @@ public class RunEnvironmentSensitiveTest {
     public void testRunEnvironmentOnlyReturnValueSensitive() {
         //everything is empty
         Set<SystemProperty> sp = Sets.newHashSet();
-        sp.add(new SystemProperty("a.b", "key", "value", false));
+        sp.add(new SystemProperty("a.b", "key", "value"));
 
         RunEnvironment runEnvironment = new RunEnvironment(sp);
         assertFalse(runEnvironment.containsSensitiveData());
@@ -124,9 +126,9 @@ public class RunEnvironmentSensitiveTest {
     public void testRunEnvironmentAllSensitive() {
         //everything is empty
         Set<SystemProperty> sp = Sets.newHashSet();
-        SystemProperty systemProperty1 = new SystemProperty("a.b", "sp1", "systemProperty1", true);
+        SystemProperty systemProperty1 = new SystemProperty("a.b", "sp1", ValueFactory.createEncryptedString("systemProperty1"));
         sp.add(systemProperty1);
-        SystemProperty systemProperty2 = new SystemProperty("a.b", "sp2", "systemProperty2", true);
+        SystemProperty systemProperty2 = new SystemProperty("a.b", "sp2", ValueFactory.createEncryptedString("systemProperty2"));
         sp.add(systemProperty2);
 
         RunEnvironment runEnvironment = new RunEnvironment(sp);
@@ -150,27 +152,22 @@ public class RunEnvironmentSensitiveTest {
         ReturnValues returnValues = new ReturnValues(outputs, "result");
         runEnvironment.putReturnValues(returnValues);
         assertTrue(runEnvironment.containsSensitiveData());
-
         testEncrypted(systemProperty1, systemProperty2, callValue1, callValue2, output1, output2, true);
 
         runEnvironment.encryptSensitiveData();
         assertTrue(runEnvironment.containsSensitiveData());
-
         testEncrypted(systemProperty1, systemProperty2, callValue1, callValue2, output1, output2, true);
 
         runEnvironment.decryptSensitiveData();
         assertTrue(runEnvironment.containsSensitiveData());
-
         testEncrypted(systemProperty1, systemProperty2, callValue1, callValue2, output1, output2, false);
 
         runEnvironment.decryptSensitiveData();
         assertTrue(runEnvironment.containsSensitiveData());
-
         testEncrypted(systemProperty1, systemProperty2, callValue1, callValue2, output1, output2, false);
 
         runEnvironment.encryptSensitiveData();
         assertTrue(runEnvironment.containsSensitiveData());
-
         testEncrypted(systemProperty1, systemProperty2, callValue1, callValue2, output1, output2, true);
     }
 
@@ -185,8 +182,9 @@ public class RunEnvironmentSensitiveTest {
         String sp2 = systemProperty2.getValue().get().toString();
         assertEquals("systemProperty2", sp2);
 
-        assertEquals(encrypted ? "{Encrypted}rO0ABXQAD3N5c3RlbVByb3BlcnR5MQ==" : sp1, systemPropertyContent1);
-        assertEquals(encrypted ? "{Encrypted}rO0ABXQAD3N5c3RlbVByb3BlcnR5Mg==" : sp2, systemPropertyContent2);
+        // Sensitive system property values are encrypted directly (without Base64 encoding), since they are simple strings
+        assertEquals(encrypted ? "{Encrypted}" + sp1 : sp1, systemPropertyContent1);
+        assertEquals(encrypted ? "{Encrypted}" + sp2 : sp2, systemPropertyContent2);
 
         String callValue1Content = ((SensitiveValue) callValue1).getContent();
         String callValue2Content = ((SensitiveValue) callValue2).getContent();
