@@ -190,7 +190,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         return Sets.newHashSet(
                 new SystemProperty("a.b", "c.host", "localhost"),
                 new SystemProperty("cloudslang", "lang.key", "language"),
-                new SystemProperty("", "a.b.c.null_value", null),
+                new SystemProperty("", "a.b.c.null_value", (String) null),
                 new SystemProperty("propagate", "flow.input", "flowInput_"),
                 new SystemProperty("propagate", "step.argument", "stepArg_"),
                 new SystemProperty("propagate", "op.input", "opInput_"),

@@ -171,7 +171,7 @@ public class LoadSystemPropertiesTest extends SystemsTestsParent {
 
     private Set<SystemProperty> getSystemPropertiesValidNullValue() {
         return Sets.newHashSet(
-                new SystemProperty("a.b", "host", null)
+                new SystemProperty("a.b", "host", (String) null)
         );
     }
 
