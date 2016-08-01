@@ -35,6 +35,8 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
  */
 public class AbstractOutputsTransformer  extends InOutTransformer {
 
+    public static final List<String> KNOWN_KEYS = Arrays.asList(SENSITIVE_KEY, VALUE_KEY);
+
     @Autowired
     private PreCompileValidator preCompileValidator;
 
@@ -99,10 +101,8 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
     }
 
     private void validateKeys(Map.Entry<String, Map<String, Serializable>> entry, Map<String, Serializable> props) {
-        List<String> knownKeys = Arrays.asList(SENSITIVE_KEY, VALUE_KEY);
-
         for (String key : props.keySet()) {
-            if (!knownKeys.contains(key)) {
+            if (!KNOWN_KEYS.contains(key)) {
                 throw new RuntimeException("Key: " + key + " in output: " + entry.getKey() + " is not a known property");
             }
         }
