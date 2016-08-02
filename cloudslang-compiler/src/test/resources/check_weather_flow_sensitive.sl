@@ -18,14 +18,11 @@ flow:
         default: "defaultValue"
     - flow_input_0:
         default: '${flow_input_1}'
-        sensitive: true
-    - flow_input_sensitive:
-        sensitive: true
   workflow:
     - bootstrap_node:
         do:
           ops.check_weather_required_input_sensitive:
-            - input_with_sensitive_no_default: "sensitiveValue"
+            - input_with_sensitive_no_default: "sensitive"
         navigate:
           - FAILURE: on_failure
           - SUCCESS: SUCCESS
@@ -36,7 +33,7 @@ flow:
         value: '${flow_input_1}'
         sensitive: true
     - flow_output_1:
-        sensitive: false
+        sensitive: true
   results:
     - FAILURE
     - SUCCESS
