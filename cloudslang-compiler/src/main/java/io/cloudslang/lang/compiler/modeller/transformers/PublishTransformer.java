@@ -18,8 +18,9 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.bindings.Output;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class PublishTransformer extends AbstractOutputsTransformer implements Transformer<List<Object>, List<Output>> {
@@ -31,12 +32,18 @@ public class PublishTransformer extends AbstractOutputsTransformer implements Tr
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Scope.AFTER_STEP);
+        return Collections.singletonList(Scope.AFTER_STEP);
     }
 
     @Override
     public String keyToTransform() {
         return null;
+    }
+
+    @Override
+    void handleOutputProperties(List<Output> transformedData, Map.Entry<String, ?> entry) {
+        throw new RuntimeException("It is illegal to specify properties for step publish outputs. " +
+                "Please remove the properties for " + entry.getKey() + ".");
     }
 
 }

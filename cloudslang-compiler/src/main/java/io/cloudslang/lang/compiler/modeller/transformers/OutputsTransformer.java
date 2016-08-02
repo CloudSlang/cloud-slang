@@ -14,8 +14,10 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.bindings.Output;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Date: 11/7/2014
@@ -32,12 +34,18 @@ public class OutputsTransformer extends AbstractOutputsTransformer implements Tr
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Scope.AFTER_EXECUTABLE);
+        return Collections.singletonList(Scope.AFTER_EXECUTABLE);
     }
 
     @Override
     public String keyToTransform() {
         return null;
+    }
+
+    @Override
+    void handleOutputProperties(List<Output> transformedData, Map.Entry<String, ?> entry) {
+        //noinspection unchecked
+        addOutput(transformedData, createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry));
     }
 
 }

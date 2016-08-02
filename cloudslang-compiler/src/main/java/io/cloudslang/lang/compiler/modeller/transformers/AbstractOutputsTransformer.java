@@ -33,7 +33,7 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
  * Date: 12/11/2014
  * Time: 11:33
  */
-public class AbstractOutputsTransformer  extends InOutTransformer {
+public abstract class AbstractOutputsTransformer  extends InOutTransformer {
 
     public static final List<String> KNOWN_KEYS = Arrays.asList(SENSITIVE_KEY, VALUE_KEY);
 
@@ -63,12 +63,7 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
                         //     property1: value1
                         //     property2: value2
                         // this is the verbose way of defining outputs with all of the properties available
-                        //noinspection unchecked
-                        if (this instanceof PublishTransformer) {
-                            throw new RuntimeException("It is illegal to specify properties for step publish outputs. " +
-                                    "Please remove the properties for " + entry.getKey() + ".");
-                        }
-                        addOutput(transformedData, createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry));
+                        handleOutputProperties(transformedData, entry);
                     } else {
                         // - some_output: some_expression
                         addOutput(transformedData, createOutput(entry.getKey(), entryValue, false));
@@ -85,12 +80,14 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
         return new BasicTransformModellingResult<>(transformedData, errors);
     }
 
-    private void addOutput(List<Output> outputs, Output element) {
+    abstract void handleOutputProperties(List<Output> transformedData, Map.Entry<String, ?> entry);
+
+    void addOutput(List<Output> outputs, Output element) {
         preCompileValidator.validateNoDuplicateInOutParams(outputs, element);
         outputs.add(element);
     }
 
-    private Output createPropOutput(Map.Entry<String, Map<String, Serializable>> entry) {
+    Output createPropOutput(Map.Entry<String, Map<String, Serializable>> entry) {
         Map<String, Serializable> props = entry.getValue();
         validateKeys(entry, props);
         // default is sensitive=false
