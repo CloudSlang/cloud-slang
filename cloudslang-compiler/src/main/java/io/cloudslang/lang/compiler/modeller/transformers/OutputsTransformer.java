@@ -19,6 +19,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
+
 /**
  * Date: 11/7/2014
  *
@@ -46,6 +49,28 @@ public class OutputsTransformer extends AbstractOutputsTransformer implements Tr
     void handleOutputProperties(List<Output> transformedData, Map.Entry<String, ?> entry) {
         //noinspection unchecked
         addOutput(transformedData, createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry));
+    }
+
+    private Output createPropOutput(Map.Entry<String, Map<String, Serializable>> entry) {
+        Map<String, Serializable> props = entry.getValue();
+        validateKeys(entry, props);
+        // default is sensitive=false
+        String outputName = entry.getKey();
+        boolean sensitive = props.containsKey(SENSITIVE_KEY) && (boolean) props.get(SENSITIVE_KEY);
+        Serializable value = props.get(VALUE_KEY);
+        if (value == null) {
+            return createRefOutput(outputName, sensitive);
+        }
+
+        return createOutput(outputName, value, sensitive);
+    }
+
+    private void validateKeys(Map.Entry<String, Map<String, Serializable>> entry, Map<String, Serializable> props) {
+        for (String key : props.keySet()) {
+            if (!KNOWN_KEYS.contains(key)) {
+                throw new RuntimeException("Key: " + key + " in output: " + entry.getKey() + " is not a known property");
+            }
+        }
     }
 
 }
