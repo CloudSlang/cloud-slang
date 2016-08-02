@@ -30,6 +30,14 @@ public abstract class ValueFactory implements Serializable {
                 ValueFactory.createValue(serializable, sensitive);
     }
 
+    public static SensitiveStringValue createEncryptedString(String value) {
+        return new SensitiveStringValue(value, false);
+    }
+
+    public static SensitiveStringValue createEncryptedString(String value, boolean preEncrypted) {
+        return new SensitiveStringValue(value, preEncrypted);
+    }
+
     public static PyObjectValue createPyObjectValue(Serializable content, boolean sensitive) {
         return PyObjectValueProxyFactory.create(content, sensitive);
     }

@@ -10,7 +10,7 @@
     -->
     <groupId>io.cloudslang.lang</groupId>
     <artifactId>cloudslang</artifactId>
-    <version>0.9.65-SNAPSHOT</version>
+    <version>0.9.69-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A DSL for writing flows</description>
@@ -33,7 +33,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <score.group>io.cloudslang</score.group>
-        <score.version>0.3.32</score.version>
+        <score.version>0.3.35</score.version>
         <spring.version>4.2.5.RELEASE</spring.version>
     </properties>
 
@@ -565,7 +565,6 @@
             </build>
         </profile>
     </profiles>
-
     <modules>
         <module>cloudslang-spi</module>
         <module>cloudslang-runtime</module>
@@ -577,5 +576,4 @@
         <module>cloudslang-content-verifier</module>
         <module>cloudslang-content-maven-compiler</module>
     </modules>
-
 </project>

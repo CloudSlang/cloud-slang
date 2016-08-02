@@ -18,6 +18,7 @@ import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.events.ScoreEvent;
+import java.io.Serializable;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -151,4 +152,18 @@ public class OperationSystemTest extends SystemsTestsParent {
         Assert.assertEquals(SensitiveValue.SENSITIVE_VALUE_MASK, execStepData.getOutputs().get("condition_4"));
         Assert.assertEquals(1, execStepData.getOutputs().get("an_int"));
     }
+
+    @Test
+    public void testOperationPyClassInScript() throws Exception {
+        URI resource = getClass().getResource("/yaml/op_python_pyclass.sl").toURI();
+
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), null);
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, null, new HashSet<SystemProperty>()).getSteps();
+
+        StepData execStepData = stepsData.get(EXEC_START_PATH);
+        Map<String, Serializable> expectedOutputs = new HashMap<>();
+        expectedOutputs.put("x", "abc");
+        Assert.assertEquals(expectedOutputs, execStepData.getOutputs());
+    }
+
 }

@@ -1,5 +1,6 @@
 package io.cloudslang.lang.cli;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,14 +10,6 @@ import org.junit.Test;
  * Date: 7/4/2016
  */
 public class SlangBannerTest {
-
-    public static final String BANNER = "_________ .__                   .____________.__" + System.lineSeparator() +
-            "\\_   ___ \\|  |   ____  __ __  __| _/   _____/|  | _____    ____    ____" + System.lineSeparator() +
-            "/    \\  \\/|  |  /  _ \\|  |  \\/ __ |\\_____  \\ |  | \\__  \\  /    \\  / ___\\" + System.lineSeparator() +
-            "\\     \\___|  |_(  <_> )  |  / /_/ |/        \\|  |__/ __ \\|   |  \\/ /_/  >" + System.lineSeparator() +
-            " \\______  /____/\\____/|____/\\____ /_______  /|____(____  /___|  /\\___  /" + System.lineSeparator() +
-            "        \\/                       \\/       \\/           \\/     \\//_____/" + System.lineSeparator() +
-            "null";
     public static final String CLOUDSLANG = "CloudSlang";
     private SlangBanner slangBanner;
 
@@ -27,7 +20,8 @@ public class SlangBannerTest {
 
     @Test
     public void testGetBanner() throws Exception {
-        Assert.assertEquals(BANNER, slangBanner.getBanner());
+        String banner = IOUtils.toString(getClass().getResource("/slangBanner1.txt").toURI());
+        Assert.assertTrue(slangBanner.getBanner().contains(banner));
     }
 
     @Test
