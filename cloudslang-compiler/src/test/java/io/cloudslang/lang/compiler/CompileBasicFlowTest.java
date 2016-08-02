@@ -28,7 +28,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -57,26 +56,6 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());
         Assert.assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
         Assert.assertEquals("the inputs size is not as expected", 3, compilationArtifact.getInputs().size());
-    }
-
-    @Test
-    public void testCompileSensitiveOutputsWithAndWithoutDefault() throws Exception {
-        URI flow = getClass().getResource("/check_weather_flow_sensitive.sl").toURI();
-        URI operation = getClass().getResource("/check_weather_required_input_sensitive.sl").toURI();
-        Set<SlangSource> path = new HashSet<>();
-        path.add(SlangSource.fromFile(operation));
-        CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
-        ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
-        Assert.assertNotNull("execution plan is null", executionPlan);
-        Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
-        Assert.assertEquals("output is different than expected", "${flow_input_1}",
-                ((Output) ((ArrayList) executionPlan.getStep(0l).getActionData().get("executableOutputs")).get(0)).getValue().get());
-        Assert.assertEquals("output is different than expected", true,
-                ((Output) ((ArrayList) executionPlan.getStep(0l).getActionData().get("executableOutputs")).get(0)).getValue().isSensitive());
-        Assert.assertEquals("output is different than expected", "${flow_output_1}",
-                ((Output)((ArrayList)executionPlan.getStep(0l).getActionData().get("executableOutputs")).get(1)).getValue().get());
-        Assert.assertEquals("output is different than expected", true,
-                ((Output)((ArrayList)executionPlan.getStep(0l).getActionData().get("executableOutputs")).get(1)).getValue().isSensitive());
     }
 
     @Test
@@ -158,7 +137,7 @@ public class CompileBasicFlowTest {
         URI operationUri = getClass().getResource("/test_op.sl").toURI();
         Executable op = compiler.preCompile(SlangSource.fromFile(operationUri));
 
-        Set<Executable> dependencies = new HashSet();
+        Set<Executable> dependencies = new HashSet<>();
         dependencies.add(op);
         List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flow, dependencies);
 

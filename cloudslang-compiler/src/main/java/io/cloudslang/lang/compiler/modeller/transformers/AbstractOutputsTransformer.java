@@ -64,6 +64,10 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
                         //     property2: value2
                         // this is the verbose way of defining outputs with all of the properties available
                         //noinspection unchecked
+                        if (this instanceof PublishTransformer) {
+                            throw new RuntimeException("It is illegal to specify properties for step publish outputs. " +
+                                    "Please remove the properties for " + entry.getKey() + ".");
+                        }
                         addOutput(transformedData, createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry));
                     } else {
                         // - some_output: some_expression

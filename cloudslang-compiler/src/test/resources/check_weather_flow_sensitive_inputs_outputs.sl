@@ -12,24 +12,25 @@ imports:
   flows: user.flows
 
 flow:
-  name: check_weather_flow_sensitive
+  name: check_weather_flow_sensitive_inputs_outputs
   inputs:
     - flow_input_1:
         default: "defaultValue"
     - flow_input_0:
         default: '${flow_input_1}'
+        sensitive: true
+    - flow_input_sensitive:
+        sensitive: true
   workflow:
     - bootstrap_node:
         do:
           ops.check_weather_required_input_sensitive:
-            - input_with_sensitive_no_default: "sensitive"
+            - input_with_sensitive_no_default: "sensitiveValue"
         navigate:
           - FAILURE: on_failure
           - SUCCESS: SUCCESS
         publish:
-          - flow_output_1:
-              value: '${weather}'
-              sensitive: false
+          - flow_output_1: '${weather}'
   outputs:
     - flow_output_0:
         value: '${flow_input_1}'
