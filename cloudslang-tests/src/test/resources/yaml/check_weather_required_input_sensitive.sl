@@ -8,16 +8,18 @@
 namespace: user.ops
 
 operation:
-  name: check_weather_required_input_with_default
+  name: check_weather_required_input_sensitive
   inputs:
     - city:
        required: false
     - input_with_default_value:
        default: "default_value"
        required: true
+    - input_with_sensitive_no_default:
+       sensitive: true
   python_action:
     script: |
-      weather = "weather thing " + input_with_default_value
+      weather = "weather thing " + input_with_default_value + " " + input_with_sensitive_no_default
       print city
   outputs:
     - weather: ${ weather }
