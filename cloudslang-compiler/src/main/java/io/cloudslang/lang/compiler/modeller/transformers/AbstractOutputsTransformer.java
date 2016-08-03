@@ -35,8 +35,6 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
  */
 public abstract class AbstractOutputsTransformer  extends InOutTransformer {
 
-    public static final List<String> KNOWN_KEYS = Arrays.asList(SENSITIVE_KEY, VALUE_KEY);
-
     @Autowired
     private PreCompileValidator preCompileValidator;
 
