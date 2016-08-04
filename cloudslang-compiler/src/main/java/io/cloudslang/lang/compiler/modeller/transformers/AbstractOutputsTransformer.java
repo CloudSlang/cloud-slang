@@ -14,19 +14,16 @@ import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
-import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 
 /**
  * User: stoneo
@@ -78,6 +75,11 @@ public abstract class AbstractOutputsTransformer  extends InOutTransformer {
         return new BasicTransformModellingResult<>(transformedData, errors);
     }
 
+    @Override
+    public Class<? extends InOutParam> getTransformedObjectsClass() {
+        return Output.class;
+    }
+
     abstract void handleOutputProperties(List<Output> transformedData, Map.Entry<String, ?> entry);
 
     void addOutput(List<Output> outputs, Output element) {
@@ -86,6 +88,7 @@ public abstract class AbstractOutputsTransformer  extends InOutTransformer {
     }
 
     Output createOutput(String outputName, Serializable outputExpression, boolean sensitive){
+        preCompileValidator.validateStringValue(outputName, outputExpression, this);
         Accumulator accumulator = extractFunctionData(outputExpression);
         return new Output(
                 outputName,

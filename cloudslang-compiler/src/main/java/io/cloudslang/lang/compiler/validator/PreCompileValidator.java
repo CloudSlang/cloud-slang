@@ -1,11 +1,13 @@
 package io.cloudslang.lang.compiler.validator;
 
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
+import io.cloudslang.lang.compiler.modeller.transformers.InOutTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 
 import io.cloudslang.lang.entities.bindings.InOutParam;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -39,4 +41,5 @@ public interface PreCompileValidator {
     
     void validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element);
 
+    void validateStringValue(String name, Serializable value, InOutTransformer transformer);
 }

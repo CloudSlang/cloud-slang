@@ -11,6 +11,7 @@
  */
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import org.apache.commons.collections4.CollectionUtils;
@@ -65,5 +66,7 @@ public abstract class InOutTransformer {
         }
 
     }
+
+    public abstract Class<? extends InOutParam> getTransformedObjectsClass();
 
 }

@@ -7,6 +7,7 @@ import io.cloudslang.lang.compiler.modeller.TransformersHandler;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
+import io.cloudslang.lang.compiler.modeller.transformers.InOutTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.entities.bindings.Argument;
@@ -19,6 +20,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.*;
 
 import static ch.lambdaj.Lambda.exists;
@@ -211,19 +213,27 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         Collection<InOutParam> inOutParams = new ArrayList<>();
         inOutParams.addAll(inputs);
 
-        String message = "Duplicate " + getMessagePart(element) + " found: " + element.getName();
+        String message = "Duplicate " + getMessagePart(element.getClass()) + " found: " + element.getName();
         validateNotDuplicateInOutParam(inOutParams, element, message);
     }
 
-    private String getMessagePart(InOutParam element) {
+    @Override
+    public void validateStringValue(String name, Serializable value, InOutTransformer transformer) {
+        if (value != null && !(value instanceof String)) {
+            throw new RuntimeException(StringUtils.capitalize(getMessagePart(transformer.getTransformedObjectsClass())) + ": '" + name
+                    + "' should have a String value.");
+        }
+    }
+
+    private String getMessagePart(Class aClass) {
         String messagePart = "";
-        if (element instanceof Input) {
+        if (aClass.equals(Input.class)) {
             messagePart = "input";
-        } else if (element instanceof Argument) {
+        } else if (aClass.equals(Argument.class)) {
             messagePart = "step input";
-        } else if (element instanceof Output) {
+        } else if (aClass.equals(Output.class)) {
             messagePart = "output / publish value";
-        } else if (element instanceof Result) {
+        } else if (aClass.equals(Result.class)) {
             messagePart = "result";
         }
         return messagePart;
@@ -376,5 +386,4 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
             throw new RuntimeException(message);
         }
     }
-
 }

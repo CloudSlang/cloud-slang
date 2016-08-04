@@ -19,6 +19,7 @@ import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +82,11 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
         return SlangTextualKeys.DO_KEY;
     }
 
+    @Override
+    public Class<? extends InOutParam> getTransformedObjectsClass() {
+        return Argument.class;
+    }
+
     private Argument transformListArgument(Object rawArgument) {
         // - some_arg
         // this is our default behaviour that if the user specifies only a key, the key is also the ref we look for
@@ -92,14 +98,19 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
             Map.Entry<String, Serializable> entry = ((Map<String, Serializable>) rawArgument).entrySet().iterator().next();
             Serializable entryValue = entry.getValue();
             // - some_input: some_expression
-            Accumulator accumulator = extractFunctionData(entryValue);
-            return new Argument(
-                    entry.getKey(),
-                    ValueFactory.create(entryValue),
-                    accumulator.getFunctionDependencies(),
-                    accumulator.getSystemPropertyDependencies()
-            );
+            return createArgument(entry, entryValue);
         }
         throw new RuntimeException("Could not transform step argument: " + rawArgument);
+    }
+
+    private Argument createArgument(Map.Entry<String, Serializable> entry, Serializable entryValue) {
+        preCompileValidator.validateStringValue(entry.getKey(), entryValue, this);
+        Accumulator accumulator = extractFunctionData(entryValue);
+        return new Argument(
+                entry.getKey(),
+                ValueFactory.create(entryValue),
+                accumulator.getFunctionDependencies(),
+                accumulator.getSystemPropertyDependencies()
+        );
     }
 }
