@@ -15,9 +15,9 @@ flow:
   workflow:
     - step_same_name:
         do:
-          ops.fail_on_input_op: [nr: 1]
+          ops.fail_on_input_op: [nr: '1']
 
     - on_failure:
         - step_same_name:
             do:
-              ops.fail_on_input_op: [nr: 0]
+              ops.fail_on_input_op: [nr: '0']

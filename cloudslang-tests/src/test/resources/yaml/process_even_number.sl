@@ -11,8 +11,8 @@ operation:
   name: process_even_number
   inputs:
     - even_number
-    - offset: 32
+    - offset: '32'
   python_action:
     script: |
-      processing_result = int(even_number) + offset
+      processing_result = int(even_number) + int(offset)
       print 'Even number processed. Result= ' + str(processing_result)
