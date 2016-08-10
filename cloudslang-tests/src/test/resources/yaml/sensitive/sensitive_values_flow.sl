@@ -124,11 +124,11 @@ flow:
         sensitive: true
         
     - input_not_overridable:
-        default: 10
+        default: '10'
         private: true
         sensitive: false
     - input_not_overridable_sensitive:
-        default: 10
+        default: '10'
         private: true
         sensitive: true
 
@@ -160,21 +160,21 @@ flow:
         sensitive: true
     
     - input_yaml_list:
-        default: [1, 2, 3]
+        default: '[1, 2, 3]'
     - input_yaml_list_sensitive:
-        default: [1, 2, 3]
+        default: '[1, 2, 3]'
         sensitive: true
 
     - input_yaml_map:
-        default: {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
+        default: "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}"
     - input_yaml_map_sensitive:
-        default: {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
+        default: "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}"
         sensitive: true
 
     - input_properties_yaml_map_folded:
-        default: {default: medium, required: false}
+        default: "{default: medium, required: false}"
     - input_properties_yaml_map_folded_sensitive:
-        default: {default: medium, required: false}
+        default: "{default: medium, required: false}"
         sensitive: true
 
     - input_python_null:
@@ -395,15 +395,15 @@ flow:
             - argument_input_overridable_hi3:                                       ${input_overridable_hi3}
             - argument_input_overridable_hi3_sensitive:                             ${input_overridable_hi3_sensitive}
 
-            - argument_yaml_list:                                                   [1, 2, 3]
+            - argument_yaml_list:                                                   '[1, 2, 3]'
             - argument_input_yaml_list:                                             ${input_yaml_list}
             - argument_input_yaml_list_sensitive:                                   ${input_yaml_list_sensitive}
             
-            - argument_yaml_map:                                                    {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
+            - argument_yaml_map:                                                    "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}"
             - argument_input_yaml_map:                                              ${input_yaml_map}
             - argument_input_yaml_map_sensitive:                                    ${input_yaml_map_sensitive}
             
-            - argument_properties_yaml_map_folded:                                  {default: medium, required: false}
+            - argument_properties_yaml_map_folded:                                  "{default: medium, required: false}"
             - argument_input_properties_yaml_map_folded:                            ${input_properties_yaml_map_folded}
             - argument_input_properties_yaml_map_folded_sensitive:                  ${input_properties_yaml_map_folded_sensitive}
             

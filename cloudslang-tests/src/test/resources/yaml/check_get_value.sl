@@ -23,9 +23,9 @@ flow:
           'outer_key2': {'inner_key1': 'inner_value1', 'inner_key2': ['list_item1', 'list_item2']}
           }}
     - map_key:
-        default: [outer_key2]
+        default: "outer_key2"
     - found_value:
-        default: {"inner_key1": "inner_value1", "inner_key2": ['list_item1', 'list_item2']}
+        default: "{'inner_key1': 'inner_value1', 'inner_key2': ['list_item1', 'list_item2']}"
 
   workflow:
     - get_value:
@@ -38,12 +38,12 @@ flow:
         navigate:
           - SUCCESS: test_equality
           - FAILURE: CREATEFAILURE
+
     - test_equality:
         do:
           ops.check_equal_types:
             - first: ${ value }
             - second: ${ found_value }
-
         navigate:
           - EQUALS: SUCCESS
           - NOT_EQUALS: EQUALITY_FAILURE

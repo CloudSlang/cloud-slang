@@ -28,4 +28,4 @@ flow:
     - print_list:
         do:
             ops.print_list:
-                - words_list: []
+                - words_list: "empty"

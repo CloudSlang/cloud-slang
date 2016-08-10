@@ -13,7 +13,7 @@ imports:
 flow:
   name: loop_with_empty_break
   inputs:
-    - values: [1,2,3]
+    - values: "1,2,3"
   workflow:
     - print_values:
         loop:

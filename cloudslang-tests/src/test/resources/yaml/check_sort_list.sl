@@ -19,14 +19,15 @@ namespace: io.cloudslang
 operation:
   name: check_sort_list
   inputs:
-    - input_list: ['element5', 'element3', 'element4', 'element2', 'element7', 'element1', 'element6']
+    - input_list: "element5,element3,element4,element2,element7,element1,element6"
 
   python_action:
     script: |
-      if all(isinstance(item, int) for item in input_list):
-        result = sorted(input_list)
-      elif all(isinstance(item, basestring) for item in input_list):
-        sorted_list = sorted(input_list)
+      in_list = input_list.split(",")
+      if all(isinstance(item, int) for item in in_list):
+        result = sorted(in_list)
+      elif all(isinstance(item, basestring) for item in in_list):
+        sorted_list = sorted(in_list)
         string_list = []
         for item in sorted_list:
           string_list.append(str(item))

@@ -13,11 +13,11 @@ imports:
 flow:
   name: simple_loop
   inputs:
-    - values: [1,2,3]
+    - values: "1,2,3"
   workflow:
     - print_values:
         loop:
-          for: value in values
+          for: value in values.split(",")
           do:
             ops.print:
               - text: ${ value }

@@ -13,11 +13,11 @@ imports:
 flow:
   name: loop_with_custom_navigation
   inputs:
-    - values: [1,2]
+    - values: "1,2"
   workflow:
     - print_values:
         loop:
-          for: value in values
+          for: value in values.split(",")
           do:
             ops.print:
               - text: ${ value }

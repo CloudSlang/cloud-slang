@@ -122,11 +122,11 @@ operation:
         sensitive: true
 
     - input_not_overridable:
-        default: 10
+        default: '10'
         private: true
         sensitive: false
     - input_not_overridable_sensitive:
-        default: 10
+        default: '10'
         private: true
         sensitive: true
 
@@ -158,21 +158,21 @@ operation:
         sensitive: true
 
     - input_yaml_list:
-        default: [1, 2, 3]
+        default: '[1, 2, 3]'
     - input_yaml_list_sensitive:
-        default: [1, 2, 3]
+        default: '[1, 2, 3]'
         sensitive: true
 
     - input_yaml_map:
-        default: {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
+        default: "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}"
     - input_yaml_map_sensitive:
-        default: {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
+        default: "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}"
         sensitive: true
 
     - input_properties_yaml_map_folded:
-        default: {default: medium, required: false}
+        default: "{default: medium, required: false}"
     - input_properties_yaml_map_folded_sensitive:
-        default: {default: medium, required: false}
+        default: "{default: medium, required: false}"
         sensitive: true
 
     - input_python_null:
@@ -661,9 +661,9 @@ operation:
         value: ${input_overridable_hi3_sensitive}
         sensitive: true
 
-    - output_yaml_list: [1, 2, 3]
+    - output_yaml_list: '[1, 2, 3]'
     - output_sensitive_yaml_list:
-        value: [1, 2, 3]
+        value: '[1, 2, 3]'
         sensitive: true
     - output_input_yaml_list: ${input_yaml_list}
     - output_sensitive_input_yaml_list:
@@ -675,9 +675,9 @@ operation:
         sensitive: true
 
     - output_yaml_map:
-        value: {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
+        value: "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}"
     - output_sensitive_yaml_map:
-        value: {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
+        value: "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}"
         sensitive: true
     - output_input_yaml_map: ${input_yaml_map}
     - output_sensitive_input_yaml_map:
@@ -689,9 +689,9 @@ operation:
         sensitive: true
 
     - output_properties_yaml_map_folded:
-        value: {default: medium, required: false}
+        value: "{default: medium, required: false}"
     - output_sensitive_properties_yaml_map_folded:
-        value: {default: medium, required: false}
+        value: "{default: medium, required: false}"
         sensitive: true
     - output_input_properties_yaml_map_folded: ${input_properties_yaml_map_folded}
     - output_sensitive_input_properties_yaml_map_folded:

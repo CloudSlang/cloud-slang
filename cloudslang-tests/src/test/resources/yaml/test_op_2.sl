@@ -21,14 +21,14 @@ operation:
     - input6:
         default: ${ 1 + 5 }
         required: False
-    - input7: 77
+    - input7: '77'
     - input8:
         default: ${ input6 }
     - input9:
         default: ${ input6 }
         private: true
     - input10:
-        default: true
+        default: 'true'
         required: False
 
   python_action:
