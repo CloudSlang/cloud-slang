@@ -14,7 +14,9 @@ import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.utils.ResultUtils;
 import io.cloudslang.lang.entities.utils.SetUtils;
+import java.io.Serializable;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -189,7 +191,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     }
 
     @Override
-    public void validateResultsSection(
+    public void validateDecisionResultsSection(
             Map<String, Object> executableRawData,
             String artifact,
             List<RuntimeException> errors) {
@@ -207,12 +209,42 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     }
 
     @Override
-    public void validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element) {
+    public void validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element, List<RuntimeException> errors) {
         Collection<InOutParam> inOutParams = new ArrayList<>();
         inOutParams.addAll(inputs);
 
         String message = "Duplicate " + getMessagePart(element) + " found: " + element.getName();
-        validateNotDuplicateInOutParam(inOutParams, element, message);
+        validateNotDuplicateInOutParam(inOutParams, element, message, errors);
+    }
+
+    @Override
+    public void validateTransformResultType(Result result, List<RuntimeException> errors) {
+        if (result.getValue() == null || result.getValue().get() == null) {
+            return;
+        }
+        Serializable value = result.getValue().get();
+        if (!(value instanceof String || Boolean.TRUE.equals(value))) {
+            errors.add(new RuntimeException("Result with name '" + result.getName() + "' is not valid." +
+                    "Value supports only expression or boolean true values."));
+        }
+    }
+
+    @Override
+    public void validateDefaultResult(List<Result> results, List<RuntimeException> errors) {
+        for (int i = 0; i < results.size()-1; i++) {
+            Result currentResult = results.get(i);
+            if (ResultUtils.isDefaultResult(currentResult)) {
+                errors.add(new RuntimeException(
+                        "Default result with name '" + currentResult.getName() + "should be on last position."
+                ));
+            }
+        }
+        Result lastResult = results.get(results.size()-1);
+        if (!ResultUtils.isDefaultResult(lastResult)) {
+            errors.add(new RuntimeException(
+                    "Last result with name '" + lastResult.getName() + "' should be default result."
+            ));
+        }
     }
 
     private String getMessagePart(InOutParam element) {
@@ -371,9 +403,9 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         }
     }
 
-    private void validateNotDuplicateInOutParam(Collection<InOutParam> inOutParams, InOutParam element, String message) {
+    private void validateNotDuplicateInOutParam(Collection<InOutParam> inOutParams, InOutParam element, String message, List<RuntimeException> errors) {
         if (SetUtils.containsIgnoreCaseBasedOnName(inOutParams, element)) {
-            throw new RuntimeException(message);
+            errors.add(new RuntimeException(message));
         }
     }
 

@@ -8,7 +8,6 @@
  */
 package io.cloudslang.lang.compiler.modeller;
 
-import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Action;
 import io.cloudslang.lang.compiler.modeller.model.Decision;
@@ -45,7 +44,6 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +52,6 @@ import java.util.Set;
 import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
-import static org.hamcrest.Matchers.equalTo;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
@@ -226,7 +223,7 @@ public class ExecutableBuilder {
                 return preCompileValidator.validateResult(parsedSlang, executableRawData,
                         new ExecutableModellingResult(operation, errors));
             case DECISION:
-                preCompileValidator.validateResultsSection(executableRawData, execName, errors);
+                preCompileValidator.validateDecisionResultsSection(executableRawData, execName, errors);
                 try {
                     systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForDecision(inputs, outputs, results);
                 } catch (RuntimeException ex) {

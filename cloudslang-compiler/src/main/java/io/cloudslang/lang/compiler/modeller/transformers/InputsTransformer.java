@@ -48,7 +48,7 @@ public class InputsTransformer extends AbstractInputsTransformer implements Tran
         for (Object rawInput : rawData) {
             try {
                 Input input = transformSingleInput(rawInput);
-                preCompileValidator.validateNoDuplicateInOutParams(transformedData, input);
+                preCompileValidator.validateNoDuplicateInOutParams(transformedData, input, errors);
                 transformedData.add(input);
             } catch (RuntimeException rex) {
                 errors.add(rex);

@@ -42,33 +42,41 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
 
         // If there are no results specified, add the default SUCCESS & FAILURE results
         if(rawData == null){
-            addResult(transformedData, createNoExpressionResult(ScoreLangConstants.SUCCESS_RESULT));
-            addResult(transformedData, createNoExpressionResult(ScoreLangConstants.FAILURE_RESULT));
-            return new BasicTransformModellingResult<>(transformedData, errors);
+            addResult(transformedData, createNoExpressionResult(ScoreLangConstants.SUCCESS_RESULT), errors);
+            addResult(transformedData, createNoExpressionResult(ScoreLangConstants.FAILURE_RESULT), errors);
+            return postProcessResults(transformedData, errors);
         } else if (rawData.isEmpty()) {
-            return new BasicTransformModellingResult<>(transformedData, errors);
+            return postProcessResults(transformedData, errors);
         }
         for (Object rawResult : rawData) {
             try {
                 if (rawResult instanceof String) {
                     //- some_result
-                    addResult(transformedData, createNoExpressionResult((String) rawResult));
+                    addResult(transformedData, createNoExpressionResult((String) rawResult), errors);
                 } else if (rawResult instanceof Map) {
                     // - some_result: some_expression
                     // the value of the result is an expression we need to evaluate at runtime
                     @SuppressWarnings("unchecked") Map.Entry<String, Serializable> entry = (Map.Entry<String, Serializable>) (((Map) rawResult).entrySet()).iterator().next();
-                    addResult(transformedData, createExpressionResult(entry.getKey(), entry.getValue()));
+                    addResult(transformedData, createExpressionResult(entry.getKey(), entry.getValue()), errors);
                 }
             } catch (RuntimeException rex) {
                 errors.add(rex);
             }
         }
-        return new BasicTransformModellingResult<>(transformedData, errors);
+        return postProcessResults(transformedData, errors);
     }
 
-    private void addResult(List<Result> results, Result element) {
-        preCompileValidator.validateNoDuplicateInOutParams(results, element);
+    private void addResult(List<Result> results, Result element, List<RuntimeException> errors) {
+        preCompileValidator.validateNoDuplicateInOutParams(results, element, errors);
+        preCompileValidator.validateTransformResultType(element, errors);
         results.add(element);
+    }
+
+    private TransformModellingResult<List<Result>> postProcessResults(
+            List<Result> transformedData,
+            List<RuntimeException> errors) {
+        preCompileValidator.validateDefaultResult(transformedData, errors);
+        return new BasicTransformModellingResult<>(transformedData, errors);
     }
 
     @Override
