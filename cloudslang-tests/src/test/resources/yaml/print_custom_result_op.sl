@@ -13,3 +13,4 @@ operation:
     script: 'print "hello world"'
   results:
     - CUSTOM: ${ 1==1 }
+    - FAILURE

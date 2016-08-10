@@ -76,8 +76,12 @@ public abstract class AbstractOutputsTransformer  extends InOutTransformer {
     abstract void handleOutputProperties(List<Output> transformedData, Map.Entry<String, ?> entry, List<RuntimeException> errors);
 
     void addOutput(List<Output> outputs, Output element, List<RuntimeException> errors) {
-        preCompileValidator.validateNoDuplicateInOutParams(outputs, element, errors);
-        outputs.add(element);
+        List<RuntimeException> validationErrors = preCompileValidator.validateNoDuplicateInOutParams(outputs, element);
+        if (CollectionUtils.isEmpty(validationErrors)) {
+            outputs.add(element);
+        } else {
+            errors.addAll(validationErrors);
+        }
     }
 
     Output createOutput(String outputName, Serializable outputExpression, boolean sensitive){

@@ -37,11 +37,9 @@ public interface PreCompileValidator {
             List<RuntimeException> errors);
 
     void validateDecisionResultsSection(Map<String, Object> executableRawData, String artifact, List<RuntimeException> errors);
-    
-    void validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element, List<RuntimeException> errors);
-
-    void validateTransformResultType(Result result, List<RuntimeException> errors);
-
-    void validateDefaultResult(List<Result> results, List<RuntimeException> errors);
+    List<RuntimeException> validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element);
+    void validateResultsHaveNoExpression(List<Result> results, String flowName, List<RuntimeException> errors);
+    void validateResultTypes(List<Result> results, String flowName, List<RuntimeException> errors);
+    void validateDefaultResult(List<Result> results, String flowName, List<RuntimeException> errors);
 
 }

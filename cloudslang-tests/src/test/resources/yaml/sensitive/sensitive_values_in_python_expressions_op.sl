@@ -1735,5 +1735,5 @@ operation:
         sensitive: true
 
   results:
-    - SUCCESS
+    - SUCCESS: ${True}
     - FAILURE

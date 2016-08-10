@@ -30,6 +30,7 @@ flow:
             - city: 'AwesomeCity'
         navigate:
           - SUCCESS: SUCCESS # end flow with success result
+          - FAILURE: FAILURE
 
     - on_failure: # default navigation: go to this step on failure
         - send_error_mail:

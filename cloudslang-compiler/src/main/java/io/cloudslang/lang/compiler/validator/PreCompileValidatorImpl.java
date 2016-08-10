@@ -39,6 +39,8 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
 
     public static final String MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX = "Multiple 'on_failure' steps found";
     public static final String ON_FAILURE_LAST_STEP_MESSAGE_SUFFIX = "'on_failure' should be last step in the workflow";
+    public static final String FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE =
+            "Explicit values are not allowed for flow results. Correct format is:";
 
     @Override
     public String validateExecutableRawData(ParsedSlang parsedSlang, Map<String, Object> executableRawData, List<RuntimeException> errors) {
@@ -209,41 +211,66 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     }
 
     @Override
-    public void validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element, List<RuntimeException> errors) {
+    public  List<RuntimeException> validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element) {
+        List<RuntimeException> errors = new ArrayList<>();
         Collection<InOutParam> inOutParams = new ArrayList<>();
         inOutParams.addAll(inputs);
 
         String message = "Duplicate " + getMessagePart(element) + " found: " + element.getName();
         validateNotDuplicateInOutParam(inOutParams, element, message, errors);
+        return errors;
     }
 
     @Override
-    public void validateTransformResultType(Result result, List<RuntimeException> errors) {
-        if (result.getValue() == null || result.getValue().get() == null) {
-            return;
-        }
-        Serializable value = result.getValue().get();
-        if (!(value instanceof String || Boolean.TRUE.equals(value))) {
-            errors.add(new RuntimeException("Result with name '" + result.getName() + "' is not valid." +
-                    "Value supports only expression or boolean true values."));
+    public void validateResultsHaveNoExpression(List<Result> results, String flowName, List<RuntimeException> errors) {
+        for (Result result : results) {
+            if (result.getValue() != null) {
+                errors.add(
+                        new RuntimeException(
+                                "Flow: '" + flowName + "' syntax is illegal. Error compiling result: '" +
+                                        result.getName() + "'. " + FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE +
+                                        " '- " + result.getName() + "'."
+                        )
+                );
+            }
         }
     }
 
     @Override
-    public void validateDefaultResult(List<Result> results, List<RuntimeException> errors) {
+    public void validateResultTypes(List<Result> results, String flowName, List<RuntimeException> errors) {
+        for (Result result : results) {
+            if (!(result.getValue() == null) && !(result.getValue().get() == null)) {
+                Serializable value = result.getValue().get();
+                if (!(value instanceof String || Boolean.TRUE.equals(value))) {
+                    errors.add(
+                            new RuntimeException("Flow: '" + flowName + "' syntax is illegal. Error compiling result: '" +
+                                    result.getName() + "'. Value supports only expression or boolean true values."
+                            )
+                    );
+                }
+            }
+        }
+    }
+
+    @Override
+    public void validateDefaultResult(List<Result> results, String flowName, List<RuntimeException> errors) {
         for (int i = 0; i < results.size()-1; i++) {
             Result currentResult = results.get(i);
             if (ResultUtils.isDefaultResult(currentResult)) {
                 errors.add(new RuntimeException(
-                        "Default result with name '" + currentResult.getName() + "should be on last position."
+                        "Flow: '" + flowName + "' syntax is illegal. Error compiling result: '" +
+                                currentResult.getName() + "'. Default result should be on last position."
                 ));
             }
         }
-        Result lastResult = results.get(results.size()-1);
-        if (!ResultUtils.isDefaultResult(lastResult)) {
-            errors.add(new RuntimeException(
-                    "Last result with name '" + lastResult.getName() + "' should be default result."
-            ));
+        if (results.size() > 0) {
+            Result lastResult = results.get(results.size() - 1);
+            if (!ResultUtils.isDefaultResult(lastResult)) {
+                errors.add(new RuntimeException(
+                        "Flow: '" + flowName + "' syntax is illegal. Error compiling result: '" +
+                                lastResult.getName() + "'. Last result should be default result."
+                ));
+            }
         }
     }
 
@@ -406,6 +433,8 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     private void validateNotDuplicateInOutParam(Collection<InOutParam> inOutParams, InOutParam element, String message, List<RuntimeException> errors) {
         if (SetUtils.containsIgnoreCaseBasedOnName(inOutParams, element)) {
             errors.add(new RuntimeException(message));
+        } else {
+            inOutParams.add(element);
         }
     }
 

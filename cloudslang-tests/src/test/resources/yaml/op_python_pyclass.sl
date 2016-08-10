@@ -17,3 +17,4 @@ operation:
     - x
   results:
     - SUCCESS: ${1 == 1}
+    - FAILURE

@@ -17,9 +17,11 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
+import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,11 +43,7 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
         List<RuntimeException> errors = new ArrayList<>();
 
         // If there are no results specified, add the default SUCCESS & FAILURE results
-        if(rawData == null){
-            addResult(transformedData, createNoExpressionResult(ScoreLangConstants.SUCCESS_RESULT), errors);
-            addResult(transformedData, createNoExpressionResult(ScoreLangConstants.FAILURE_RESULT), errors);
-            return postProcessResults(transformedData, errors);
-        } else if (rawData.isEmpty()) {
+        if(CollectionUtils.isEmpty(rawData)){
             return postProcessResults(transformedData, errors);
         }
         for (Object rawResult : rawData) {
@@ -66,16 +64,36 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
         return postProcessResults(transformedData, errors);
     }
 
+    public void addDefaultResultsIfNeeded(List rawResults, ExecutableType executableType, List<Result> resolvedResults, List<RuntimeException> errors) {
+        if(rawResults == null && CollectionUtils.isEmpty(resolvedResults)) {
+            switch (executableType) {
+                case FLOW:
+                    addResult(resolvedResults, createNoExpressionResult(ScoreLangConstants.SUCCESS_RESULT), errors);
+                    addResult(resolvedResults, createNoExpressionResult(ScoreLangConstants.FAILURE_RESULT), errors);
+                    break;
+                case OPERATION:
+                    addResult(resolvedResults, createNoExpressionResult(ScoreLangConstants.SUCCESS_RESULT), errors);
+                    break;
+                case DECISION:
+                    break;
+                default:
+                    throw new RuntimeException("Not implemented for executable type: " + executableType);
+            }
+        }
+    }
+
     private void addResult(List<Result> results, Result element, List<RuntimeException> errors) {
-        preCompileValidator.validateNoDuplicateInOutParams(results, element, errors);
-        preCompileValidator.validateTransformResultType(element, errors);
-        results.add(element);
+        List<RuntimeException> validationErrors = preCompileValidator.validateNoDuplicateInOutParams(results, element);
+        if (CollectionUtils.isEmpty(validationErrors)) {
+            results.add(element);
+        } else {
+            errors.addAll(validationErrors);
+        }
     }
 
     private TransformModellingResult<List<Result>> postProcessResults(
             List<Result> transformedData,
             List<RuntimeException> errors) {
-        preCompileValidator.validateDefaultResult(transformedData, errors);
         return new BasicTransformModellingResult<>(transformedData, errors);
     }
 

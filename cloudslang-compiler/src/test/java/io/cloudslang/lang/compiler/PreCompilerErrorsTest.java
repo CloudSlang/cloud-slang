@@ -13,6 +13,7 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.ExecutableBuilder;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
+import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -459,14 +460,14 @@ public class PreCompilerErrorsTest {
                 "Flow: 'flow_with_result_expressions' syntax is illegal. Error compiling result: 'SUCCESS'. " +
                         "Explicit values are not allowed for flow results. Correct format is: '- SUCCESS'.",
                 "SUCCESS",
-                ExecutableBuilder.FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE
+                PreCompileValidatorImpl.FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE
         );
         validateExceptionMessage(
                 errors.get(1),
                 "Flow: 'flow_with_result_expressions' syntax is illegal. Error compiling result: 'CUSTOM'. " +
                         "Explicit values are not allowed for flow results. Correct format is: '- CUSTOM'.",
                 "CUSTOM",
-                ExecutableBuilder.FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE
+                PreCompileValidatorImpl.FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE
         );
     }
 
