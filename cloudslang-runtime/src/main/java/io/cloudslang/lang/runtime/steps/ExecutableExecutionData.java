@@ -63,15 +63,17 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                                 @Param(ScoreLangConstants.USER_INPUTS_KEY) Map<String, ? extends Value> userInputs,
                                 @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                                 @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
-                                @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId) {
+                                @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
+                                @Param(ScoreLangConstants.EXECUTABLE_TYPE) ExecutableType executableType) {
         try {
             Map<String, Value> callArguments = runEnv.removeCallArguments();
 
             if (userInputs != null) {
                 callArguments.putAll(userInputs);
             }
+            LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             sendStartBindingInputsEvent(executableInputs, runEnv, executionRuntimeServices,
-                    "Pre Input binding for operation/flow", LanguageEventData.StepType.EXECUTABLE, nodeName);
+                    "Pre Input binding for " + stepType, stepType, nodeName);
 
             Map<String, Value> executableContext = inputsBinding.bindInputs(executableInputs, callArguments, runEnv.getSystemProperties());
 
@@ -90,7 +92,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             updateCallArgumentsAndPushContextToStack(runEnv, new Context(executableContext), actionArguments);
 
             sendEndBindingInputsEvent(executableInputs, executableContext, runEnv, executionRuntimeServices,
-                    "Post Input binding for operation/flow", LanguageEventData.StepType.EXECUTABLE, nodeName);
+                    "Post Input binding for " + stepType, stepType, nodeName);
 
             // put the next step position for the navigation
             runEnv.putNextStepPosition(nextStepId);
@@ -120,8 +122,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             Context operationContext = runEnv.getStack().popContext();
             Map<String, Value> operationVariables = operationContext == null ? null : operationContext.getImmutableViewOfVariables();
             ReturnValues actionReturnValues = buildReturnValues(runEnv, executableType);
+            LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
-                    LanguageEventData.StepType.EXECUTABLE, nodeName,
+                    stepType, nodeName,
                     Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable) executableOutputs),
                     Pair.of(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable) executableResults),
                     Pair.of(ACTION_RETURN_VALUES_KEY,
@@ -152,10 +155,10 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             ReturnValues returnValues = new ReturnValues(operationReturnOutputs, result);
             runEnv.putReturnValues(returnValues);
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
-                    LanguageEventData.StepType.EXECUTABLE, nodeName,
+                    stepType, nodeName,
                     Pair.of(LanguageEventData.OUTPUTS, (Serializable) operationReturnOutputs),
-                    Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
-                    Pair.of(ScoreLangConstants.EXECUTABLE_TYPE, executableType));
+                    Pair.of(LanguageEventData.RESULT, returnValues.getResult())
+            );
 
             // If we have parent flow data on the stack, we pop it and request the score engine to switch to the parent
             // execution plan id once it can, and we set the next position that was stored there for the use of the navigation
@@ -163,10 +166,10 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 handleNavigationToParent(runEnv, executionRuntimeServices);
             } else {
                 fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_EXECUTION_FINISHED,
-                        "Execution finished running", LanguageEventData.StepType.EXECUTABLE, nodeName,
+                        "Execution finished running", stepType, nodeName,
                         Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
-                        Pair.of(LanguageEventData.OUTPUTS, (Serializable)operationReturnOutputs),
-                        Pair.of(ScoreLangConstants.EXECUTABLE_TYPE, executableType));
+                        Pair.of(LanguageEventData.OUTPUTS, (Serializable)operationReturnOutputs)
+                );
             }
         } catch (RuntimeException e){
             logger.error("There was an error running the finish executable execution step of: \'" + nodeName + "\'.\n\tError is: " + e.getMessage());

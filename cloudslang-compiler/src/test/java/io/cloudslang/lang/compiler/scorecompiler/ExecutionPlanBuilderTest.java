@@ -111,7 +111,8 @@ public class ExecutionPlanBuilderTest {
         Map<String, Serializable> preExecActionData = executable.getPreExecActionData();
         String execName = executable.getName();
         List<Input> inputs = executable.getInputs();
-        when(stepFactory.createStartStep(eq(1L), same(preExecActionData), same(inputs), same(execName))).thenReturn(new ExecutionStep(1L));
+        when(stepFactory.createStartStep(eq(1L), same(preExecActionData), same(inputs), same(execName), eq(ExecutableType.FLOW))).thenReturn(new ExecutionStep(1L));
+        when(stepFactory.createStartStep(eq(1L), same(preExecActionData), same(inputs), same(execName), eq(ExecutableType.OPERATION))).thenReturn(new ExecutionStep(1L));
     }
 
     private void mockEndStep(Long stepId, Executable executable, ExecutableType executableType) {

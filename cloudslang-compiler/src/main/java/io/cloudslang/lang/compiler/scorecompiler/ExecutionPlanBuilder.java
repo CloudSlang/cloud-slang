@@ -58,7 +58,7 @@ public class ExecutionPlanBuilder {
         executionPlan.setBeginStep(1L);
 
         executionPlan.addStep(stepFactory.createStartStep(1L, compiledOp.getPreExecActionData(), compiledOp.getInputs(),
-                compiledOp.getName()));
+                compiledOp.getName(), ExecutableType.OPERATION));
         executionPlan.addStep(stepFactory.createActionStep(2L, compiledOp.getAction().getActionData()));
         executionPlan.addStep(stepFactory.createEndStep(3L, compiledOp.getPostExecActionData(), compiledOp.getOutputs(),
                 compiledOp.getResults(), compiledOp.getName(), ExecutableType.OPERATION));
@@ -75,7 +75,7 @@ public class ExecutionPlanBuilder {
 
         executionPlan.addStep(
                 stepFactory.createStartStep(
-                        1L, compiledDecision.getPreExecActionData(), compiledDecision.getInputs(), compiledDecision.getName()
+                        1L, compiledDecision.getPreExecActionData(), compiledDecision.getInputs(), compiledDecision.getName(), ExecutableType.DECISION
                 )
         );
         executionPlan.addStep(
@@ -96,7 +96,7 @@ public class ExecutionPlanBuilder {
         executionPlan.setBeginStep(FLOW_START_STEP_ID);
         //flow start step
         executionPlan.addStep(stepFactory.createStartStep(FLOW_START_STEP_ID, compiledFlow.getPreExecActionData(),
-                compiledFlow.getInputs(), compiledFlow.getName()));
+                compiledFlow.getInputs(), compiledFlow.getName(), ExecutableType.FLOW));
         //flow end step
         executionPlan.addStep(stepFactory.createEndStep(FLOW_END_STEP_ID, compiledFlow.getPostExecActionData(),
                 compiledFlow.getOutputs(), compiledFlow.getResults(), compiledFlow.getName(), ExecutableType.FLOW));
