@@ -5,18 +5,13 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: user.ops
+namespace: io.cloudslang
 
 operation:
-  name: check_weather
-  inputs:
-    - city
+  name: op_2
   python_action:
-    script: |
-      weather = "weather thing"
-      print city
-  outputs:
-    - weather: ${ weather }
+    script: pass
   results:
-    - SUCCESS: ${ weather == "weather thing" }
-    - FAILURE
+    - CUSTOM_1: ${True}
+    - CUSTOM_2
+    - CUSTOM_3: ${True}

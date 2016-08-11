@@ -44,12 +44,12 @@ public class SyncTriggerEventListenerTest {
     public static final String LONG_RESULT = "result that is too long will be abbreviated so that it does not affect CLI readability result that is too long will be abbreviated so that it does not affect CLI readability";
     public static final String ABBREVIATED_RESULT = "result that is too long will be abbreviated so that it does not affect CLI readability result tha...";
 
-    Map<String, Serializable> data;
+    LanguageEventData data;
     Map<String, Serializable> outputs, expectedFilteredOutputs, actualFilteredOutputs;
 
     @Before
     public void before() throws Exception {
-        data = new HashMap<>();
+        data = new LanguageEventData();
         outputs = new HashMap<>();
     }
 

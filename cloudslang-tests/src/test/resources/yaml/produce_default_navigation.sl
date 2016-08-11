@@ -18,4 +18,4 @@ operation:
     - default_output: "default_output_value"
   results:
     - SUCCESS: ${ navigationType == 'success' }
-    - FAILURE: ${ 1 == 1 }
+    - FAILURE

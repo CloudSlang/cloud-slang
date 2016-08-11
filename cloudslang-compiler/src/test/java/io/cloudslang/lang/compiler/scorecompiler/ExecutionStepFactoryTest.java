@@ -34,7 +34,7 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateStartStep() throws Exception {
-        ExecutionStep startStep = factory.createStartStep(1L, new HashMap<String, Serializable>(), new ArrayList<Input>(),"coolStep");
+        ExecutionStep startStep = factory.createStartStep(1L, new HashMap<String, Serializable>(), new ArrayList<Input>(),"coolStep", ExecutableType.FLOW);
         Assert.assertNotNull("step should not be null", startStep);
         Assert.assertEquals("coolStep",startStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
     }
@@ -42,7 +42,7 @@ public class ExecutionStepFactoryTest {
     @Test
     public void testCreateStartStepPutInputsUnderTheRightKey() throws Exception {
         ArrayList<Input> execInputs = new ArrayList<>();
-        ExecutionStep startStep = factory.createStartStep(1L, new HashMap<String, Serializable>(), execInputs,"");
+        ExecutionStep startStep = factory.createStartStep(1L, new HashMap<String, Serializable>(), execInputs,"", ExecutableType.FLOW);
         Assert.assertNotNull("inputs key is null", startStep.getActionData().get(ScoreLangConstants.EXECUTABLE_INPUTS_KEY));
         Assert.assertSame("inputs are not set under their key", execInputs, startStep.getActionData().get(ScoreLangConstants.EXECUTABLE_INPUTS_KEY));
     }
@@ -74,12 +74,12 @@ public class ExecutionStepFactoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateStartStepWithNullData() throws Exception {
-        factory.createStartStep(1L, null, new ArrayList<Input>(), "");
+        factory.createStartStep(1L, null, new ArrayList<Input>(), "", ExecutableType.FLOW);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateStartStepWithNullInputs() throws Exception {
-        factory.createStartStep(1L, new HashMap<String, Serializable>(), null,"");
+        factory.createStartStep(1L, new HashMap<String, Serializable>(), null,"", ExecutableType.FLOW);
     }
 
     @Test (expected = RuntimeException.class)

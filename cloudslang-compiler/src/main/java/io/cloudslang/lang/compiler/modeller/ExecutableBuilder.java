@@ -8,7 +8,6 @@
  */
 package io.cloudslang.lang.compiler.modeller;
 
-import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Action;
 import io.cloudslang.lang.compiler.modeller.model.Decision;
@@ -20,9 +19,11 @@ import io.cloudslang.lang.compiler.modeller.result.ActionModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.StepModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.WorkflowModellingResult;
+import io.cloudslang.lang.compiler.modeller.transformers.ResultsTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
+import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
@@ -45,7 +46,6 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +54,6 @@ import java.util.Set;
 import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
-import static org.hamcrest.Matchers.equalTo;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
@@ -69,8 +68,6 @@ import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER
 public class ExecutableBuilder {
 
     public static final String UNIQUE_STEP_NAME_MESSAGE_SUFFIX = "Each step name in the workflow must be unique";
-    public static final String FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE =
-            "Explicit values are not allowed for flow results. Correct format is:";
 
     @Autowired
     private List<Transformer> transformers;
@@ -83,6 +80,9 @@ public class ExecutableBuilder {
 
     @Autowired
     private PreCompileValidator preCompileValidator;
+
+    @Autowired
+    private ResultsTransformer resultsTransformer;
 
     private List<Transformer> preExecTransformers;
     private List<Transformer> postExecTransformers;
@@ -165,6 +165,8 @@ public class ExecutableBuilder {
         Set<String> systemPropertyDependencies = null;
         switch (parsedSlang.getType()) {
             case FLOW:
+                resultsTransformer.addDefaultResultsIfNeeded((List) executableRawData.get(SlangTextualKeys.RESULTS_KEY), ExecutableType.FLOW, results, errors);
+
                 Map<String, String> imports = parsedSlang.getImports();
 
                 List<Map<String, Map<String, Object>>> workFlowRawData = preCompileValidator.validateWorkflowRawData(parsedSlang,
@@ -176,7 +178,7 @@ public class ExecutableBuilder {
                 errors.addAll(workflowModellingResult.getErrors());
                 Workflow workflow = workflowModellingResult.getWorkflow();
 
-                errors.addAll(validateFlowResultsHaveNoExpression(results, execName));
+                preCompileValidator.validateResultsHaveNoExpression(results, execName, errors);
 
                 executableDependencies = fetchDirectStepsDependencies(workflow);
                 try {
@@ -200,11 +202,17 @@ public class ExecutableBuilder {
                         new ExecutableModellingResult(flow, errors));
 
             case OPERATION:
+                resultsTransformer.addDefaultResultsIfNeeded((List) executableRawData.get(SlangTextualKeys.RESULTS_KEY), ExecutableType.OPERATION, results, errors);
+
                 Map<String, Object> actionRawData = getActionRawData(executableRawData, errors, parsedSlang, execName);
                 ActionModellingResult actionModellingResult = compileAction(actionRawData);
                 errors.addAll(actionModellingResult.getErrors());
                 Action action = actionModellingResult.getAction();
                 executableDependencies = new HashSet<>();
+
+                preCompileValidator.validateResultTypes(results, execName, errors);
+                preCompileValidator.validateDefaultResult(results, execName, errors);
+
                 try {
                     systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForOperation(inputs, outputs, results);
                 } catch (RuntimeException ex) {
@@ -226,7 +234,12 @@ public class ExecutableBuilder {
                 return preCompileValidator.validateResult(parsedSlang, executableRawData,
                         new ExecutableModellingResult(operation, errors));
             case DECISION:
-                preCompileValidator.validateResultsSection(executableRawData, execName, errors);
+                resultsTransformer.addDefaultResultsIfNeeded((List) executableRawData.get(SlangTextualKeys.RESULTS_KEY), ExecutableType.DECISION, results, errors);
+
+                preCompileValidator.validateResultTypes(results, execName, errors);
+                preCompileValidator.validateDecisionResultsSection(executableRawData, execName, errors);
+                preCompileValidator.validateDefaultResult(results, execName, errors);
+
                 try {
                     systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForDecision(inputs, outputs, results);
                 } catch (RuntimeException ex) {
@@ -570,22 +583,6 @@ public class ExecutableBuilder {
             stepNames.add(step.getName());
         }
         return stepNames;
-    }
-
-    private List<RuntimeException> validateFlowResultsHaveNoExpression(List<Result> results, String flowName) {
-        List<RuntimeException> errors = new ArrayList<>();
-        for (Result result : results) {
-            if (result.getValue() != null) {
-                errors.add(
-                        new RuntimeException(
-                                "Flow: '" + flowName + "' syntax is illegal. Error compiling result: '" +
-                                        result.getName() + "'. " + FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE +
-                                        " '- " + result.getName() + "'."
-                        )
-                );
-            }
-        }
-        return errors;
     }
 
 }

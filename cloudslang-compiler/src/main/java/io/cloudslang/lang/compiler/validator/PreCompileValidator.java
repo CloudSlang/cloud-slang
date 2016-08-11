@@ -7,6 +7,7 @@ import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 
 import io.cloudslang.lang.entities.bindings.InOutParam;
 
+import io.cloudslang.lang.entities.bindings.Result;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -37,9 +38,11 @@ public interface PreCompileValidator {
             String execName,
             List<RuntimeException> errors);
 
-    void validateResultsSection(Map<String, Object> executableRawData, String artifact, List<RuntimeException> errors);
-    
-    void validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element);
+    void validateDecisionResultsSection(Map<String, Object> executableRawData, String artifact, List<RuntimeException> errors);
+    List<RuntimeException> validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element);
+    void validateResultsHaveNoExpression(List<Result> results, String artifactName, List<RuntimeException> errors);
+    void validateResultTypes(List<Result> results, String artifactName, List<RuntimeException> errors);
+    void validateDefaultResult(List<Result> results, String artifactName, List<RuntimeException> errors);
 
     void validateStringValue(String name, Serializable value, InOutTransformer transformer);
 }

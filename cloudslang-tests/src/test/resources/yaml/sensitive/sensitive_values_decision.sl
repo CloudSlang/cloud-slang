@@ -817,5 +817,5 @@ decision:
         sensitive: true
 
   results:
-    - SUCCESS
+    - SUCCESS: ${True}
     - FAILURE

@@ -103,8 +103,7 @@ public class ResultsTransformerTest {
     @Test
     public void testFillDefaultResultsWhenNoResultsGiven() throws Exception {
         List<Result> results = resultsTransformer.transform(resultsMapOpNoData).getTransformedData();
-        Assert.assertTrue(CollectionUtils.isNotEmpty(results));
-        Assert.assertEquals(2, results.size());
+        Assert.assertTrue(CollectionUtils.isEmpty(results));
     }
 
     @Configuration

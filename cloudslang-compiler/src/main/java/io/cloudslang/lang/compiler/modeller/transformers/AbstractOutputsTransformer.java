@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -58,15 +59,15 @@ public abstract class AbstractOutputsTransformer  extends InOutTransformer {
                         //     property1: value1
                         //     property2: value2
                         // this is the verbose way of defining outputs with all of the properties available
-                        handleOutputProperties(transformedData, entry);
+                        handleOutputProperties(transformedData, entry, errors);
                     } else {
                         // - some_output: some_expression
-                        addOutput(transformedData, createOutput(entry.getKey(), entryValue, false));
+                        addOutput(transformedData, createOutput(entry.getKey(), entryValue, false), errors);
                     }
                 } else {
                     //- some_output
                     //this is our default behavior that if the user specifies only a key, the key is also the ref we look for
-                    addOutput(transformedData, createRefOutput((String) rawOutput, false));
+                    addOutput(transformedData, createRefOutput((String) rawOutput, false), errors);
                 }
             } catch (RuntimeException rex) {
                 errors.add(rex);
@@ -80,11 +81,15 @@ public abstract class AbstractOutputsTransformer  extends InOutTransformer {
         return Output.class;
     }
 
-    abstract void handleOutputProperties(List<Output> transformedData, Map.Entry<String, ?> entry);
+    abstract void handleOutputProperties(List<Output> transformedData, Map.Entry<String, ?> entry, List<RuntimeException> errors);
 
-    void addOutput(List<Output> outputs, Output element) {
-        preCompileValidator.validateNoDuplicateInOutParams(outputs, element);
-        outputs.add(element);
+    void addOutput(List<Output> outputs, Output element, List<RuntimeException> errors) {
+        List<RuntimeException> validationErrors = preCompileValidator.validateNoDuplicateInOutParams(outputs, element);
+        if (CollectionUtils.isEmpty(validationErrors)) {
+            outputs.add(element);
+        } else {
+            errors.addAll(validationErrors);
+        }
     }
 
     Output createOutput(String outputName, Serializable outputExpression, boolean sensitive){

@@ -28,3 +28,4 @@ operation:
     - an_int
   results:
     - SUCCESS: ${ condition_4 == True }
+    - FAILURE

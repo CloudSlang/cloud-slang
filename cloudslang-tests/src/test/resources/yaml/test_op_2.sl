@@ -52,5 +52,5 @@ operation:
     - output4
   results:
     - SUCCESS: ${ 1 != 123456 }
-    - NO_ACTION: true
+    - NO_ACTION: ${True}
     - FAILURE

@@ -9,11 +9,12 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.events;
 
+import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
-
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -47,10 +48,44 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     public static final String STEP_NAME = "STEP_NAME";
 
     public enum StepType {
-        STEP,
-        EXECUTABLE,
-        ACTION,
-        NAVIGATION
+        FLOW("flow"),
+        OPERATION("operation"),
+        DECISION("decision"),
+        STEP("step"),
+        ACTION("action"),
+        NAVIGATION("navigation");
+
+        private final String value;
+        private static final StepType[] EXECUTABLE_TYPES;
+
+        static {
+            EXECUTABLE_TYPES = new StepType[3];
+            EXECUTABLE_TYPES[0] = FLOW;
+            EXECUTABLE_TYPES[1] = OPERATION;
+            EXECUTABLE_TYPES[2] = DECISION;
+        }
+
+        StepType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public static StepType[] getExecutableTypes() {
+            return Arrays.copyOf(EXECUTABLE_TYPES, EXECUTABLE_TYPES.length);
+        }
+    }
+
+    public static StepType convertExecutableType(ExecutableType executableType) {
+        switch (executableType) {
+            case FLOW: return StepType.FLOW;
+            case OPERATION: return StepType.OPERATION;
+            case DECISION: return StepType.DECISION;
+            default:
+                throw new RuntimeException("Not implemented for executable type: " + executableType);
+        }
     }
 
     public String getStepName() {
