@@ -18,6 +18,7 @@ import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.compiler.validator.CompileValidator;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.entities.SystemProperty;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -141,6 +142,11 @@ public class SlangCompilerImplTest {
         @Bean
         public CompileValidator compileValidator() {
             return mock(CompileValidator.class);
+        }
+
+        @Bean
+        public SystemPropertyValidator systemPropertyValidator() {
+            return mock(SystemPropertyValidator.class);
         }
 
     }
