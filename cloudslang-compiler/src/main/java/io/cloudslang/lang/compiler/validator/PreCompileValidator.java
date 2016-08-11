@@ -38,8 +38,8 @@ public interface PreCompileValidator {
 
     void validateDecisionResultsSection(Map<String, Object> executableRawData, String artifact, List<RuntimeException> errors);
     List<RuntimeException> validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element);
-    void validateResultsHaveNoExpression(List<Result> results, String flowName, List<RuntimeException> errors);
-    void validateResultTypes(List<Result> results, String flowName, List<RuntimeException> errors);
-    void validateDefaultResult(List<Result> results, String flowName, List<RuntimeException> errors);
+    void validateResultsHaveNoExpression(List<Result> results, String artifactName, List<RuntimeException> errors);
+    void validateResultTypes(List<Result> results, String artifactName, List<RuntimeException> errors);
+    void validateDefaultResult(List<Result> results, String artifactName, List<RuntimeException> errors);
 
 }

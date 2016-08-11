@@ -222,12 +222,12 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     }
 
     @Override
-    public void validateResultsHaveNoExpression(List<Result> results, String flowName, List<RuntimeException> errors) {
+    public void validateResultsHaveNoExpression(List<Result> results, String artifactName, List<RuntimeException> errors) {
         for (Result result : results) {
             if (result.getValue() != null) {
                 errors.add(
                         new RuntimeException(
-                                "Flow: '" + flowName + "' syntax is illegal. Error compiling result: '" +
+                                "Flow: '" + artifactName + "' syntax is illegal. Error compiling result: '" +
                                         result.getName() + "'. " + FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE +
                                         " '- " + result.getName() + "'."
                         )
@@ -237,13 +237,13 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     }
 
     @Override
-    public void validateResultTypes(List<Result> results, String flowName, List<RuntimeException> errors) {
+    public void validateResultTypes(List<Result> results, String artifactName, List<RuntimeException> errors) {
         for (Result result : results) {
             if (!(result.getValue() == null) && !(result.getValue().get() == null)) {
                 Serializable value = result.getValue().get();
                 if (!(value instanceof String || Boolean.TRUE.equals(value))) {
                     errors.add(
-                            new RuntimeException("Flow: '" + flowName + "' syntax is illegal. Error compiling result: '" +
+                            new RuntimeException("Flow: '" + artifactName + "' syntax is illegal. Error compiling result: '" +
                                     result.getName() + "'. Value supports only expression or boolean true values."
                             )
                     );
@@ -253,12 +253,12 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     }
 
     @Override
-    public void validateDefaultResult(List<Result> results, String flowName, List<RuntimeException> errors) {
+    public void validateDefaultResult(List<Result> results, String artifactName, List<RuntimeException> errors) {
         for (int i = 0; i < results.size()-1; i++) {
             Result currentResult = results.get(i);
             if (ResultUtils.isDefaultResult(currentResult)) {
                 errors.add(new RuntimeException(
-                        "Flow: '" + flowName + "' syntax is illegal. Error compiling result: '" +
+                        "Flow: '" + artifactName + "' syntax is illegal. Error compiling result: '" +
                                 currentResult.getName() + "'. Default result should be on last position."
                 ));
             }
@@ -267,7 +267,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
             Result lastResult = results.get(results.size() - 1);
             if (!ResultUtils.isDefaultResult(lastResult)) {
                 errors.add(new RuntimeException(
-                        "Flow: '" + flowName + "' syntax is illegal. Error compiling result: '" +
+                        "Flow: '" + artifactName + "' syntax is illegal. Error compiling result: '" +
                                 lastResult.getName() + "'. Last result should be default result."
                 ));
             }
