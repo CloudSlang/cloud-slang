@@ -41,9 +41,9 @@ public class PublishTransformer extends AbstractOutputsTransformer implements Tr
     }
 
     @Override
-    void handleOutputProperties(List<Output> transformedData, Map.Entry<String, ?> entry) {
-        throw new RuntimeException("It is illegal to specify properties for step publish outputs. " +
-                "Please remove the properties for " + entry.getKey() + ".");
+    void handleOutputProperties(List<Output> transformedData, Map.Entry<String, ?> entry, List<RuntimeException> errors) {
+        errors.add(new RuntimeException("It is illegal to specify properties for step publish outputs. " +
+                "Please remove the properties for " + entry.getKey() + "."));
     }
 
 }

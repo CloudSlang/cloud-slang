@@ -66,16 +66,6 @@ public class ResultBindingTest {
     }
 
     @Test
-    public void testPrimitiveBooleanSecondResult() throws Exception {
-        List<Result> results = Arrays.asList(
-                createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create(false)),
-                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create(true))
-        );
-        String result = resultsBinding.resolveResult(new HashMap<String, Value>(), new HashMap<String, Value>(), EMPTY_SET, results, null);
-        Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
-    }
-
-    @Test
     public void testObjectBooleanFirstResult() throws Exception {
         List<Result> results = Arrays.asList(
                 createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create(Boolean.TRUE)),
@@ -83,16 +73,6 @@ public class ResultBindingTest {
         );
         String result = resultsBinding.resolveResult(new HashMap<String, Value>(), new HashMap<String, Value>(), EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result);
-    }
-
-    @Test
-    public void testObjectBooleanSecondResult() throws Exception {
-        List<Result> results = Arrays.asList(
-                createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create(Boolean.FALSE)),
-                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create(Boolean.TRUE))
-        );
-        String result = resultsBinding.resolveResult(new HashMap<String, Value>(), new HashMap<String, Value>(), EMPTY_SET, results, null);
-        Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
 
     @Test

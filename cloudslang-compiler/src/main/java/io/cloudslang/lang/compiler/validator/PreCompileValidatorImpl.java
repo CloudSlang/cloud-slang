@@ -14,7 +14,9 @@ import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.utils.ResultUtils;
 import io.cloudslang.lang.entities.utils.SetUtils;
+import java.io.Serializable;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -37,6 +39,8 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
 
     public static final String MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX = "Multiple 'on_failure' steps found";
     public static final String ON_FAILURE_LAST_STEP_MESSAGE_SUFFIX = "'on_failure' should be last step in the workflow";
+    public static final String FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE =
+            "Explicit values are not allowed for flow results. Correct format is:";
 
     @Override
     public String validateExecutableRawData(ParsedSlang parsedSlang, Map<String, Object> executableRawData, List<RuntimeException> errors) {
@@ -189,7 +193,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     }
 
     @Override
-    public void validateResultsSection(
+    public void validateDecisionResultsSection(
             Map<String, Object> executableRawData,
             String artifact,
             List<RuntimeException> errors) {
@@ -207,12 +211,67 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     }
 
     @Override
-    public void validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element) {
+    public  List<RuntimeException> validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element) {
+        List<RuntimeException> errors = new ArrayList<>();
         Collection<InOutParam> inOutParams = new ArrayList<>();
         inOutParams.addAll(inputs);
 
         String message = "Duplicate " + getMessagePart(element) + " found: " + element.getName();
-        validateNotDuplicateInOutParam(inOutParams, element, message);
+        validateNotDuplicateInOutParam(inOutParams, element, message, errors);
+        return errors;
+    }
+
+    @Override
+    public void validateResultsHaveNoExpression(List<Result> results, String artifactName, List<RuntimeException> errors) {
+        for (Result result : results) {
+            if (result.getValue() != null) {
+                errors.add(
+                        new RuntimeException(
+                                "Flow: '" + artifactName + "' syntax is illegal. Error compiling result: '" +
+                                        result.getName() + "'. " + FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE +
+                                        " '- " + result.getName() + "'."
+                        )
+                );
+            }
+        }
+    }
+
+    @Override
+    public void validateResultTypes(List<Result> results, String artifactName, List<RuntimeException> errors) {
+        for (Result result : results) {
+            if (!(result.getValue() == null) && !(result.getValue().get() == null)) {
+                Serializable value = result.getValue().get();
+                if (!(value instanceof String || Boolean.TRUE.equals(value))) {
+                    errors.add(
+                            new RuntimeException("Flow: '" + artifactName + "' syntax is illegal. Error compiling result: '" +
+                                    result.getName() + "'. Value supports only expression or boolean true values."
+                            )
+                    );
+                }
+            }
+        }
+    }
+
+    @Override
+    public void validateDefaultResult(List<Result> results, String artifactName, List<RuntimeException> errors) {
+        for (int i = 0; i < results.size()-1; i++) {
+            Result currentResult = results.get(i);
+            if (ResultUtils.isDefaultResult(currentResult)) {
+                errors.add(new RuntimeException(
+                        "Flow: '" + artifactName + "' syntax is illegal. Error compiling result: '" +
+                                currentResult.getName() + "'. Default result should be on last position."
+                ));
+            }
+        }
+        if (results.size() > 0) {
+            Result lastResult = results.get(results.size() - 1);
+            if (!ResultUtils.isDefaultResult(lastResult)) {
+                errors.add(new RuntimeException(
+                        "Flow: '" + artifactName + "' syntax is illegal. Error compiling result: '" +
+                                lastResult.getName() + "'. Last result should be default result."
+                ));
+            }
+        }
     }
 
     private String getMessagePart(InOutParam element) {
@@ -371,9 +430,11 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         }
     }
 
-    private void validateNotDuplicateInOutParam(Collection<InOutParam> inOutParams, InOutParam element, String message) {
+    private void validateNotDuplicateInOutParam(Collection<InOutParam> inOutParams, InOutParam element, String message, List<RuntimeException> errors) {
         if (SetUtils.containsIgnoreCaseBasedOnName(inOutParams, element)) {
-            throw new RuntimeException(message);
+            errors.add(new RuntimeException(message));
+        } else {
+            inOutParams.add(element);
         }
     }
 

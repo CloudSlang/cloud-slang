@@ -19,3 +19,4 @@ operation:
     - daylight_time_zone: ${ daylight_time_zone }
   results:
     - SUCCESS: ${ 1 == 1 }
+    - FAILURE

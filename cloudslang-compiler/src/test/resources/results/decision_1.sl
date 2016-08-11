@@ -5,18 +5,16 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: user.ops
+namespace: user.decisions
 
-operation:
-  name: check_weather
+decision:
+  name: decision_1
   inputs:
-    - city
-  python_action:
-    script: |
-      weather = "weather thing"
-      print city
+    - x
+    - y
   outputs:
-    - weather: ${ weather }
+    - sum: ${x+y}
   results:
-    - SUCCESS: ${ weather == "weather thing" }
-    - FAILURE
+    - EQUAL: ${x == y}
+    - LESS_THAN: 123
+    - GREATER_THAN

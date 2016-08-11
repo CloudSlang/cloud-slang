@@ -49,9 +49,9 @@ public class OutputsTransformer extends AbstractOutputsTransformer implements Tr
     }
 
     @Override
-    void handleOutputProperties(List<Output> transformedData, Map.Entry<String, ?> entry) {
+    void handleOutputProperties(List<Output> transformedData, Map.Entry<String, ?> entry, List<RuntimeException> errors) {
         //noinspection unchecked
-        addOutput(transformedData, createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry));
+        addOutput(transformedData, createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry), errors);
     }
 
     private Output createPropOutput(Map.Entry<String, Map<String, Serializable>> entry) {
