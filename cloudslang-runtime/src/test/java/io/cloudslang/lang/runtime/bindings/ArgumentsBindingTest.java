@@ -171,13 +171,13 @@ public class ArgumentsBindingTest {
     @Test
     public void testArgumentScriptEval() {
         Map<String,Value> context = new HashMap<>();
-        context.put("valX",ValueFactory.create(5));
-        Argument scriptArgument = new Argument("argument1",ValueFactory.create("${ 3 + valX }"));
+        context.put("valX",ValueFactory.create("5"));
+        Argument scriptArgument = new Argument("argument1",ValueFactory.create("${ \"3\" + valX }"));
         List<Argument> arguments = Collections.singletonList(scriptArgument);
         Map<String,Value> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
-        Assert.assertEquals(8, result.get("argument1").get());
+        Assert.assertEquals("35", result.get("argument1").get());
 
         Assert.assertEquals(1, context.size());
     }
@@ -213,45 +213,45 @@ public class ArgumentsBindingTest {
     @Test
     public void testOverridableFalseBehaviour() {
         Map<String,Value> context = new HashMap<>();
-        context.put("argument1",ValueFactory.create(3));
-		Argument argument = new Argument("argument1", ValueFactory.create("${ 5+7 }"));
+        context.put("argument1",ValueFactory.create("3"));
+		Argument argument = new Argument("argument1", ValueFactory.create("${ \"5+7\" }"));
         List<Argument> arguments = Collections.singletonList(argument);
 
         Map<String,Value> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
-        Assert.assertEquals(12, result.get("argument1").get());
+        Assert.assertEquals("5+7", result.get("argument1").get());
 
         Assert.assertEquals(1, context.size());
-        Assert.assertEquals(3, context.get("argument1").get());
+        Assert.assertEquals("3", context.get("argument1").get());
     }
 
     @Test
     public void testComplexExpr(){
         Map<String,Value> context = new HashMap<>();
-        context.put("argument1", ValueFactory.create(3));
-		Argument argument = new Argument("argument2", ValueFactory.create("${ argument1 + 3 * 2 }"));
+        context.put("argument1", ValueFactory.create("3"));
+		Argument argument = new Argument("argument2", ValueFactory.create("${ argument1 + \"3 * 2\" }"));
         List<Argument> arguments = Collections.singletonList(argument);
 
         Map<String,Value> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument2"));
-        Assert.assertEquals(9, result.get("argument2").get());
+        Assert.assertEquals("33 * 2", result.get("argument2").get());
         Assert.assertEquals(1, result.size());
     }
 
     @Test
     public void testOverrideAssignFromVar() {
         Map<String, Value> context = new HashMap<>();
-        context.put("argument2", ValueFactory.create(3));
-        context.put("argument1", ValueFactory.create(5));
+        context.put("argument2", ValueFactory.create("3"));
+        context.put("argument1", ValueFactory.create("5"));
         Argument argument = new Argument("argument1", ValueFactory.create("${ argument2 }"));
         List<Argument> arguments = Collections.singletonList(argument);
 
         Map<String, Value> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
-        Assert.assertEquals(3, result.get("argument1").get());
+        Assert.assertEquals("3", result.get("argument1").get());
         Assert.assertEquals(1, result.size());
     }
 
@@ -269,16 +269,16 @@ public class ArgumentsBindingTest {
     public void testArgumentAssignFromAnotherArgument() {
         Map<String,Value> context = new HashMap<>();
 
-		Argument argument1 = new Argument("argument1",ValueFactory.create(5));
-        Argument argument2 = new Argument("argument2",ValueFactory.create("${ argument1 }"));
+		Argument argument1 = new Argument("argument1", ValueFactory.create("5"));
+        Argument argument2 = new Argument("argument2", ValueFactory.create("${ argument1 }"));
         List<Argument> arguments = Arrays.asList(argument1,argument2);
 
         Map<String,Value> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
-        Assert.assertEquals(5, result.get("argument1").get());
+        Assert.assertEquals("5", result.get("argument1").get());
         Assert.assertTrue(result.containsKey("argument2"));
-        Assert.assertEquals(5, result.get("argument2").get());
+        Assert.assertEquals("5", result.get("argument2").get());
         Assert.assertEquals(2, result.size());
 
         Assert.assertTrue("orig context should not change", context.isEmpty());
@@ -287,18 +287,18 @@ public class ArgumentsBindingTest {
     @Test
     public void testComplexExpressionArgument() {
         Map<String,Value> context = new HashMap<>();
-        context.put("varX",ValueFactory.create(5));
+        context.put("varX",ValueFactory.create("5"));
 
-		Argument argument1 = new Argument("argument1", ValueFactory.create(5));
-        Argument argument2 = new Argument("argument2",ValueFactory.create("${ argument1 + 5 + varX }"));
+		Argument argument1 = new Argument("argument1", ValueFactory.create("5"));
+        Argument argument2 = new Argument("argument2",ValueFactory.create("${ argument1 + \"5\" + varX }"));
         List<Argument> arguments = Arrays.asList(argument1,argument2);
 
         Map<String,Value> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
-        Assert.assertEquals(5, result.get("argument1").get());
+        Assert.assertEquals("5", result.get("argument1").get());
         Assert.assertTrue(result.containsKey("argument2"));
-        Assert.assertEquals(15, result.get("argument2").get());
+        Assert.assertEquals("555", result.get("argument2").get());
         Assert.assertEquals(2, result.size());
 
         Assert.assertEquals("orig context should not change",1,context.size());

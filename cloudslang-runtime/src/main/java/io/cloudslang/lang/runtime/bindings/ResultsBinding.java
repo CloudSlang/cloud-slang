@@ -19,6 +19,7 @@ import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.entities.utils.ResultUtils;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -102,12 +103,13 @@ public class ResultsBinding {
                 try {
                     Value expressionResult = scriptEvaluator.evalExpr(expression, scriptContext, systemProperties, result.getFunctionDependencies());
                     Boolean evaluatedResult;
-                    if (expressionResult.get() instanceof Integer) {
-                        evaluatedResult = (Integer) expressionResult.get() != 0;
+                    String expressionResultValue = (String) expressionResult.get();
+                    if (NumberUtils.isNumber(expressionResultValue)) {
+                        evaluatedResult = Integer.parseInt(expressionResultValue) != 0;
                     } else {
-                        evaluatedResult = (Boolean) expressionResult.get();
+                        evaluatedResult = Boolean.parseBoolean(expressionResultValue);
                     }
-                    if (evaluatedResult == null) {
+                    if (!evaluatedResult && !Boolean.FALSE.toString().equalsIgnoreCase(expressionResultValue)) {
                         throw new RuntimeException("Expression of the operation result: " + expression + " cannot be evaluated correctly to true or false value");
                     }
                     if (evaluatedResult) {

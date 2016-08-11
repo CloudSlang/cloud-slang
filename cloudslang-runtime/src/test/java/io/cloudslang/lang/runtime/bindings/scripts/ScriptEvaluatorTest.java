@@ -84,6 +84,17 @@ public class ScriptEvaluatorTest {
     }
 
     @Test
+    public void testEvalExprDoesNotReturnString() throws Exception {
+        reset(pythonRuntimeService);
+        when(pythonRuntimeService.eval(anyString(), anyString(), isA(Map.class)))
+                .thenReturn(new PythonEvaluationResult(1, new HashMap<String, Serializable>()));
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Error in running script expression: ''");
+        exception.expectMessage("Exception is: Expression result should be String.");
+        scriptEvaluator.evalExpr("", new HashMap<String, Value>(), new HashSet<SystemProperty>(), new HashSet<ScriptFunction>());
+    }
+
+    @Test
     public void testEvalExprError() throws Exception {
         reset(pythonRuntimeService);
         when(pythonRuntimeService.eval(anyString(), anyString(), anyMap())).thenThrow(new RuntimeException("error from interpreter"));

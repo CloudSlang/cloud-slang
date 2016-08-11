@@ -66,12 +66,19 @@ public class ScriptEvaluator extends ScriptProcessor {
                 context.remove(SYSTEM_PROPERTIES_MAP);
             }
 
-            return ValueFactory.create(result.getEvalResult(), getSensitive(result.getResultContext(), systemPropertiesDefined));
+            return ValueFactory.create(validateEvalResult(result.getEvalResult()), getSensitive(result.getResultContext(), systemPropertiesDefined));
         } catch (Exception exception) {
             throw new RuntimeException(
                     "Error in running script expression: '"
                             + expr + "',\n\tException is: " + handleExceptionSpecialCases(exception.getMessage()), exception);
         }
+    }
+
+    private Serializable validateEvalResult(Serializable evalResult) {
+        if (evalResult != null && !(evalResult instanceof String)) {
+            throw new RuntimeException("Expression result should be String.");
+        }
+        return evalResult;
     }
 
     private String buildAddFunctionsScript(Set<ScriptFunction> functionDependencies) {
