@@ -54,10 +54,6 @@ public class ScriptEvaluator extends ScriptProcessor {
     @Autowired
     private PythonRuntimeService pythonRuntimeService;
 
-    public Value evalExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties){
-        return evalExpr(expr, context, systemProperties, new HashSet<ScriptFunction>());
-    }
-
     public Value evalExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties, Set<ScriptFunction> functionDependencies) {
         try {
             Map<String, Serializable> pythonContext = createPythonContext(context);

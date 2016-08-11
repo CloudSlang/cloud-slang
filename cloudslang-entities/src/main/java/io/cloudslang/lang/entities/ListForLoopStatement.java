@@ -9,12 +9,14 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities;
 
+import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * Date: 2/3/2015
@@ -27,8 +29,8 @@ public class ListForLoopStatement extends LoopStatement implements Serializable 
 
     private final String varName;
 
-    public ListForLoopStatement(String varName, String collectionExpression) {
-        super(collectionExpression);
+    public ListForLoopStatement(String varName, String collectionExpression, Set<ScriptFunction> functionDependencies) {
+        super(collectionExpression, functionDependencies);
         Validate.notBlank(varName, "for loop var name cannot be empty");
 
         this.varName = varName;

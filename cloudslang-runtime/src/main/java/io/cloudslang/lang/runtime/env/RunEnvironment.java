@@ -169,7 +169,7 @@ public class RunEnvironment implements Serializable {
         Context context;
         while (!hasSensitive && (context = contextStack.popContext()) != null) {
             hasSensitive = containsSensitiveData(context.getImmutableViewOfLanguageVariables().values());
-            hasSensitive = hasSensitive || containsSensitiveData(context.getImmutableViewOfVariables().values());
+            hasSensitive = hasSensitive || containsSensitiveData(context.getVariables().values());
             tempStack.pushContext(context);
         }
         while ((context = tempStack.popContext()) != null) {
@@ -210,7 +210,7 @@ public class RunEnvironment implements Serializable {
         Context context;
         while ((context = contextStack.popContext()) != null) {
             valuesToCheck.addAll(context.getImmutableViewOfLanguageVariables().values());
-            valuesToCheck.addAll(context.getImmutableViewOfVariables().values());
+            valuesToCheck.addAll(context.getVariables().values());
             tempStack.pushContext(context);
         }
         while ((context = tempStack.popContext()) != null) {

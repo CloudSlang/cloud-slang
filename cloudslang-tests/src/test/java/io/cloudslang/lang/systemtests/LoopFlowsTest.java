@@ -24,7 +24,6 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -74,6 +73,26 @@ public class LoopFlowsTest extends SystemsTestsParent{
 
         Map<String, Value> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
+        StepData thirdStep = stepsData.get(THIRD_STEP_KEY);
+        Assert.assertEquals("print_other_values", thirdStep.getName());
+    }
+
+    @Test
+    public void testFlowWithLoopsFromPropertyFile() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/loop_from_property_with_custom_navigation.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/print.sl").toURI();
+        URI propertiesURI = getClass().getResource("/yaml/loops/loop_property.prop.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Set<SystemProperty> systemProperties = loadSystemProperties(SlangSource.fromFile(propertiesURI));
+
+        Map<String, Value> userInputs = new HashMap<>();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
+        StepData secondStep = stepsData.get(SECOND_STEP_KEY);
+        Assert.assertEquals("print_values", secondStep.getName());
+        Assert.assertEquals("SUCCESS", secondStep.getResult());
         StepData thirdStep = stepsData.get(THIRD_STEP_KEY);
         Assert.assertEquals("print_other_values", thirdStep.getName());
     }

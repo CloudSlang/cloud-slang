@@ -19,6 +19,7 @@ import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
@@ -54,15 +55,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
@@ -99,7 +92,7 @@ public class StepExecutionDataTest {
     }
 
     private LoopStatement createBasicForStatement(String varName, String collectionExpression) {
-        return new ListForLoopStatement(varName, collectionExpression);
+        return new ListForLoopStatement(varName, collectionExpression, new HashSet<ScriptFunction>());
     }
 
     @Before
@@ -261,7 +254,7 @@ public class StepExecutionDataTest {
         stepExecutionData.endStep(runEnv, possiblePublishValues, stepNavigationValues,
                 createRuntimeServices(), 1L, new ArrayList<String>(), "step1", false);
 
-        Map<String,Value> flowVars = runEnv.getStack().popContext().getImmutableViewOfVariables();
+        Map<String,Value> flowVars = runEnv.getStack().popContext().getVariables();
         Assert.assertTrue(flowVars.containsKey("name"));
         Assert.assertEquals("John" ,flowVars.get("name").get());
     }

@@ -103,7 +103,7 @@ public class StepExecutionData extends AbstractExecutionData {
                 }
             }
 
-            Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
+            Map<String, Value> flowVariables = flowContext.getVariables();
 
             sendStartBindingArgumentsEvent(
                     stepInputs,
@@ -219,7 +219,7 @@ public class StepExecutionData extends AbstractExecutionData {
 
             runEnv.putNextStepPosition(nextPosition);
 
-            Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
+            Map<String, Value> flowVariables = flowContext.getVariables();
             HashMap<String, Value> outputs = new HashMap<>(flowVariables);
 
             ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : executableResult);

@@ -18,6 +18,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
 
@@ -86,19 +87,19 @@ public class DeserializeTest {
 
     @Test
     public void testDeserializeListForLoopStatement() throws IOException {
-        LoopStatement listForLoopStatement = new ListForLoopStatement("varName", "expression");
+        LoopStatement listForLoopStatement = new ListForLoopStatement("varName", "expression", new HashSet<ScriptFunction>());
         testToAndFromJson(listForLoopStatement, ListForLoopStatement.class);
     }
 
     @Test
     public void testDeserializeMapForLoopStatement() throws IOException {
-        MapForLoopStatement mapForLoopStatement = new MapForLoopStatement("keyName", "valueName", "expression");
+        MapForLoopStatement mapForLoopStatement = new MapForLoopStatement("keyName", "valueName", "expression", new HashSet<ScriptFunction>());
         testToAndFromJson(mapForLoopStatement, MapForLoopStatement.class);
     }
 
     @Test
     public void testDeserializeParallelLoopStatement() throws IOException {
-        ParallelLoopStatement parallelLoopStatement = new ParallelLoopStatement("varName", "expression");
+        ParallelLoopStatement parallelLoopStatement = new ParallelLoopStatement("varName", "expression", new HashSet<ScriptFunction>());
         testToAndFromJson(parallelLoopStatement, ParallelLoopStatement.class);
     }
 

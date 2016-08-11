@@ -52,8 +52,8 @@ public class Context implements Serializable{
         langVariables.put(name, value);
     }
 
-    public Map<String, Value> getImmutableViewOfVariables() {
-        return Collections.unmodifiableMap(variables);
+    public Map<String, Value> getVariables() {
+        return variables;
     }
 
     public Value removeLanguageVariable(String key) {

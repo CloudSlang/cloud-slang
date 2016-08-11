@@ -241,7 +241,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             Map<String, Serializable> branchContext = branch.getContexts();
             RunEnvironment branchRuntimeEnvironment = (RunEnvironment) branchContext.get(ScoreLangConstants.RUN_ENV);
             Map<String, Serializable> branchContextMap =
-                    convert(branchRuntimeEnvironment.getStack().popContext().getImmutableViewOfVariables());
+                    convert(branchRuntimeEnvironment.getStack().popContext().getVariables());
             ReturnValues executableReturnValues = branchRuntimeEnvironment.removeReturnValues();
             String branchResult = executableReturnValues.getResult();
             branchContextMap.put(ScoreLangConstants.BRANCH_RESULT_KEY, branchResult);

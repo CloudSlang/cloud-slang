@@ -98,7 +98,7 @@ public class ExecutableStepsTest {
         when(inputsBinding.bindInputs(eq(inputs), anyMap(), anySet())).thenReturn(resultMap);
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(), new ExecutionRuntimeServices(),"", 2L);
 
-        Map<String, Value> opVars = runEnv.getStack().popContext().getImmutableViewOfVariables();
+        Map<String, Value> opVars = runEnv.getStack().popContext().getVariables();
         Assert.assertTrue(opVars.containsKey("input1"));
         Assert.assertEquals(5, opVars.get("input1").get());
 

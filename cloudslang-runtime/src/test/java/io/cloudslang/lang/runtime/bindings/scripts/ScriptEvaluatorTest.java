@@ -79,7 +79,7 @@ public class ScriptEvaluatorTest {
         reset(pythonRuntimeService);
         when(pythonRuntimeService.eval(anyString(), anyString(), isA(Map.class)))
                 .thenReturn(new PythonEvaluationResult("result", new HashMap<String, Serializable>()));
-        scriptEvaluator.evalExpr("", new HashMap<String, Value>(), new HashSet<SystemProperty>());
+        scriptEvaluator.evalExpr("", new HashMap<String, Value>(), new HashSet<SystemProperty>(), new HashSet<ScriptFunction>());
         verify(pythonRuntimeService).eval(eq(""), anyString(), anyMap());
     }
 
@@ -90,7 +90,8 @@ public class ScriptEvaluatorTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("input_expression");
         exception.expectMessage("error from interpreter");
-        scriptEvaluator.evalExpr("input_expression", new HashMap<String, Value>(), new HashSet<SystemProperty>());
+        scriptEvaluator.evalExpr("input_expression", new HashMap<String, Value>(), new HashSet<SystemProperty>(),
+                new HashSet<ScriptFunction>());
     }
 
     @Test

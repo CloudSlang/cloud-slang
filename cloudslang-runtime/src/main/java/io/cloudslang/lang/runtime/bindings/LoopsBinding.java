@@ -95,11 +95,12 @@ public class LoopsBinding {
             Context flowContext,
             Set<SystemProperty> systemProperties,
             String nodeName) {
-        Map<String, Value> variables = flowContext.getImmutableViewOfVariables();
+        Map<String, Value> variables = flowContext.getVariables();
         Value evalResult;
         String collectionExpression = forLoopStatement.getExpression();
         try {
-            evalResult = scriptEvaluator.evalExpr(collectionExpression, variables, systemProperties);
+            evalResult = scriptEvaluator.evalExpr(collectionExpression, variables, systemProperties,
+                    forLoopStatement.getFunctionDependencies());
         } catch (Throwable t) {
             throw new RuntimeException(FOR_LOOP_EXPRESSION_ERROR_MESSAGE + " '" + nodeName + "',\n\tError is: " + t.getMessage(), t);
         }
