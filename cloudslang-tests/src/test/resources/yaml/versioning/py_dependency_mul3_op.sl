@@ -19,9 +19,9 @@ operation:
       - 'cloudslang.release:ver:mul-3.0'
     script: |
       import ver.utils.getver as ver
-      ver_label = ver.get_ver(var1,var2)
+      ver_label = ver.get_ver(int(var1),int(var2))
   outputs:
-    - version_mul3: ${ver_label}
+    - version_mul3: ${ str(ver_label) }
   results:
     - SUCCESS
 

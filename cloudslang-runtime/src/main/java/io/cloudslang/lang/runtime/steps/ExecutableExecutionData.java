@@ -120,7 +120,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 		try {
             runEnv.getExecutionPath().up();
             Context operationContext = runEnv.getStack().popContext();
-            Map<String, Value> operationVariables = operationContext == null ? null : operationContext.getVariables();
+            Map<String, Value> operationVariables = operationContext == null ? null : operationContext.getImmutableViewOfVariables();
             ReturnValues actionReturnValues = buildReturnValues(runEnv, executableType);
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",

@@ -55,7 +55,7 @@ public class ParallelLoopBinding {
         List<Value> result = new ArrayList<>();
         try {
             Value evalResult = scriptEvaluator.evalExpr(parallelLoopStatement.getExpression(),
-                    flowContext.getVariables(), systemProperties, parallelLoopStatement.getFunctionDependencies());
+                    flowContext.getImmutableViewOfVariables(), systemProperties, parallelLoopStatement.getFunctionDependencies());
             if (evalResult != null && evalResult.get() != null) {
                 //noinspection unchecked
                 for (Serializable serializable : ((List<Serializable>)evalResult.get())) {

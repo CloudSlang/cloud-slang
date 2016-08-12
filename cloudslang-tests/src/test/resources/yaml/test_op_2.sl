@@ -19,7 +19,7 @@ operation:
         required: yes
         sensitive: true
     - input6:
-        default: ${ 1 + 5 }
+        default: ${ str(1 + 5) }
         required: False
     - input7: '77'
     - input8:
@@ -48,7 +48,7 @@ operation:
       print input6
   outputs:
     - output1: ${ input1 }
-    - output2: ${ processId }
+    - output2: ${ str(processId) }
     - output4
   results:
     - SUCCESS: ${ 1 != 123456 }

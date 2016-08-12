@@ -37,12 +37,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ScriptEvaluatorTest.Config.class)
@@ -84,17 +79,6 @@ public class ScriptEvaluatorTest {
     }
 
     @Test
-    public void testEvalExprDoesNotReturnString() throws Exception {
-        reset(pythonRuntimeService);
-        when(pythonRuntimeService.eval(anyString(), anyString(), isA(Map.class)))
-                .thenReturn(new PythonEvaluationResult(1, new HashMap<String, Serializable>()));
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Error in running script expression: ''");
-        exception.expectMessage("Exception is: Expression result should be String.");
-        scriptEvaluator.evalExpr("", new HashMap<String, Value>(), new HashSet<SystemProperty>(), new HashSet<ScriptFunction>());
-    }
-
-    @Test
     public void testEvalExprError() throws Exception {
         reset(pythonRuntimeService);
         when(pythonRuntimeService.eval(anyString(), anyString(), anyMap())).thenThrow(new RuntimeException("error from interpreter"));
@@ -130,7 +114,6 @@ public class ScriptEvaluatorTest {
         Map<String, Serializable> expectedContext = new HashMap<>();
         Map<String, Value> properties = new HashMap<>();
         properties.put("a.b.c.key", ValueFactory.createPyObjectValue("value", false));
-        expectedContext.put(SYSTEM_PROPERTIES_MAP, (Serializable) properties);
 
         verify(pythonRuntimeService).eval(scriptCaptor.capture(), eq(expr), eq(expectedContext));
 

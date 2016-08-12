@@ -25,6 +25,7 @@ import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionNotCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -109,6 +110,7 @@ public class ArgumentsBindingTest {
         Assert.assertEquals("value", result.get("argument1").get());
     }
 
+    @Ignore("Remove when types are supported")
     @Test
     public void testDefaultValueInt() {
         List<Argument> arguments = Collections.singletonList(new Argument("argument1", ValueFactory.create(2)));
@@ -118,6 +120,7 @@ public class ArgumentsBindingTest {
         Assert.assertEquals(2, result.get("argument1").get());
     }
 
+    @Ignore("Remove when types are supported")
 	@Test
 	public void testDefaultValueBoolean() {
 		List<Argument> arguments = Arrays.asList(

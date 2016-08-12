@@ -14,17 +14,17 @@ flow:
   name: sensitive_input_parallel_loop
   inputs:
     - values:
-        default: ${ range(1, 4) }
+        default: "1,2,3"
         sensitive: true
   workflow:
     - print_values:
         parallel_loop:
-          for: value in values
+          for: value in values.split(",")
           do:
             ops.print_branch:
               - ID: ${ value }
         publish:
-          - name_list: ${ map(lambda x:str(x['name']), branches_context) }
+          - name_list: ${ str(map(lambda x:str(x['name']), branches_context)) }
           - number_from_last_branch: ${ branches_context[-1]['int_output'] }
           - from_sp: ${get_sp('loop.parallel.prop1')}
   outputs:

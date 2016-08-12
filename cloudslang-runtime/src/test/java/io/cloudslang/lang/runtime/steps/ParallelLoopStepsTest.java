@@ -132,7 +132,7 @@ public class ParallelLoopStepsTest {
         for (Map branchContext : branchContexts) {
             Assert.assertTrue("runtime environment not found in branch context", branchContext.containsKey(ScoreLangConstants.RUN_ENV));
             RunEnvironment branchRunEnvironment = (RunEnvironment) branchContext.get(ScoreLangConstants.RUN_ENV);
-            Map<String, Value> branchVariables = branchRunEnvironment.getStack().popContext().getVariables();
+            Map<String, Value> branchVariables = branchRunEnvironment.getStack().popContext().getImmutableViewOfVariables();
             actualSplitData.add(branchVariables.get("varName"));
         }
         Assert.assertEquals(expectedSplitData, actualSplitData);
@@ -236,7 +236,7 @@ public class ParallelLoopStepsTest {
         ArgumentCaptor<Map> aggregateContextArgumentCaptor = ArgumentCaptor.forClass(Map.class);
         //noinspection unchecked
         verify(outputsBinding).bindOutputs(
-                eq(context.getVariables()),
+                eq(context.getImmutableViewOfVariables()),
                 aggregateContextArgumentCaptor.capture(),
                 eq(runEnvironment.getSystemProperties()),
                 eq(stepPublishValues)

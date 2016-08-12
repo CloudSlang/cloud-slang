@@ -95,7 +95,7 @@ public class LoopsBinding {
             Context flowContext,
             Set<SystemProperty> systemProperties,
             String nodeName) {
-        Map<String, Value> variables = flowContext.getVariables();
+        Map<String, Value> variables = flowContext.getImmutableViewOfVariables();
         Value evalResult;
         String collectionExpression = forLoopStatement.getExpression();
         try {

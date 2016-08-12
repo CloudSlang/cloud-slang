@@ -26,6 +26,7 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -70,6 +71,7 @@ public class InputsBindingTest {
         Assert.assertEquals("value", result.get("input1").get());
     }
 
+    @Ignore("Remove when types are supported")
     @Test
     public void testDefaultValueInt(){
         List<Input> inputs = Collections.singletonList(new Input.InputBuilder("input1", 2).build());
@@ -79,6 +81,7 @@ public class InputsBindingTest {
         Assert.assertEquals(2, result.get("input1").get());
     }
 
+    @Ignore("Remove when types are supported")
 	@Test
 	public void testDefaultValueBoolean() {
 		List<Input> inputs = Arrays.asList(
@@ -248,30 +251,30 @@ public class InputsBindingTest {
     @Test
     public void testAssignFromAndExpr() {
         Map<String,Value> context = new HashMap<>();
-        context.put("input1",ValueFactory.create(3));
+        context.put("input1",ValueFactory.create("3"));
 		Input input = new Input.InputBuilder("input1", "${ 5+7 }").build();
         List<Input> inputs = Collections.singletonList(input);
 
         Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(3, result.get("input1").get());
+        Assert.assertEquals("3", result.get("input1").get());
 
         Assert.assertEquals(1,context.size());
-        Assert.assertEquals(3,context.get("input1").get());
+        Assert.assertEquals("3",context.get("input1").get());
     }
 
     @Test
     public void testAssignFromAndConst() {
         Map<String,Value> context = new HashMap<>();
-        context.put("input1",ValueFactory.create(3));
+        context.put("input1",ValueFactory.create("3"));
 		Input input = new Input.InputBuilder("input1", 5).build();
         List<Input> inputs = Collections.singletonList(input);
 
         Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(3, result.get("input1").get());
+        Assert.assertEquals("3", result.get("input1").get());
     }
 
     @Test
@@ -292,14 +295,14 @@ public class InputsBindingTest {
     public void testAssignFromVsRef(){
         Map<String,Value> context = new HashMap<>();
         context.put("input2",ValueFactory.create(3));
-        context.put("input1",ValueFactory.create(5));
+        context.put("input1",ValueFactory.create("5"));
 		Input input = new Input.InputBuilder("input1", "${ input2 }").build();
         List<Input> inputs = Collections.singletonList(input);
 
         Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(5, result.get("input1").get());
+        Assert.assertEquals("5", result.get("input1").get());
         Assert.assertEquals(1, result.size());
     }
 
@@ -327,7 +330,7 @@ public class InputsBindingTest {
     public void testOverrideAssignFrom2(){
         Map<String,Value> context = new HashMap<>();
         context.put("input1", ValueFactory.create(5));
-        Input input = new Input.InputBuilder("input1", 3, false)
+        Input input = new Input.InputBuilder("input1", "3", false)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
@@ -336,7 +339,7 @@ public class InputsBindingTest {
         Map<String,Value> result = bindInputs(inputs, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("input1"));
-        Assert.assertEquals(3, result.get("input1").get());
+        Assert.assertEquals("3", result.get("input1").get());
         Assert.assertEquals(1, result.size());
     }
 
@@ -357,6 +360,7 @@ public class InputsBindingTest {
         Assert.assertEquals(1, result.size());
     }
 
+    @Ignore("Remove when types are supported")
     @Test
     public void testOverrideFalse() {
         Map<String,Value> context = new HashMap<>();

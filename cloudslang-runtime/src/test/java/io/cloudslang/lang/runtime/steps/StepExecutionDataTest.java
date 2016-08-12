@@ -254,7 +254,7 @@ public class StepExecutionDataTest {
         stepExecutionData.endStep(runEnv, possiblePublishValues, stepNavigationValues,
                 createRuntimeServices(), 1L, new ArrayList<String>(), "step1", false);
 
-        Map<String,Value> flowVars = runEnv.getStack().popContext().getVariables();
+        Map<String,Value> flowVars = runEnv.getStack().popContext().getImmutableViewOfVariables();
         Assert.assertTrue(flowVars.containsKey("name"));
         Assert.assertEquals("John" ,flowVars.get("name").get());
     }

@@ -142,6 +142,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Assert.assertEquals("print_other_values", thirdStep.getName());
     }
 
+    @Ignore("Remove when support for maps in loops is added")
     @Test
     public void testFlowWithMapLoops() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/simple_loop_with_map.sl").toURI();
@@ -155,6 +156,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         verifyPersonMap(stepsData);
     }
 
+    @Ignore("Remove when support for maps in loops is added")
     @Test
     public void testFlowWithHashMap() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/simple_loop_with_hashmap.sl").toURI();
@@ -173,7 +175,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         verifyPersonMap(stepsData);
     }
 
-    @Ignore
+    @Ignore("Remove when support for maps in loops is added")
     @Test
     public void testFlowWithMapLoopsWithCustomNavigation() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/loop_with_custom_navigation_with_map.sl").toURI();
@@ -188,7 +190,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Assert.assertEquals("print_other_values", fourthStep.getName());
     }
 
-    @Ignore
+    @Ignore("Remove when support for maps in loops is added")
     @Test
     public void testFlowWithMapLoopsWithDefaultBreak() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/loop_with_default_break_with_map.sl").toURI();
@@ -203,6 +205,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Assert.assertEquals(1, actualSteps.size());
     }
 
+    @Ignore("Remove when support for maps in loops is added")
     @Test
     public void testFlowWithMapLoopsWithEmptyBreak() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/loop_with_empty_break_with_map.sl").toURI();
@@ -217,7 +220,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Assert.assertEquals(3, actualSteps.size());
     }
 
-    @Ignore
+    @Ignore("Remove when support for maps in loops is added")
     @Test
     public void testFlowWithMapLoopsWithBreak() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/loop_with_break_with_map.sl").toURI();

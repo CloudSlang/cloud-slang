@@ -48,13 +48,14 @@ flow:
     - input_python_null:
         default: ${ None }
         required: false
-    - input_python_list: ${[1, 2, 3]}
-    - input_python_map: >
-        ${{
-        'key1': 'value1',
-        'key2': 'value2',
-        'key3': 'value3'
-        }}
+# uncomment when types will be supported
+#    - input_python_list: ${[1, 2, 3]}
+#    - input_python_map: >
+#        ${{
+#        'key1': 'value1',
+#        'key2': 'value2',
+#        'key3': 'value3'
+#        }}
     - b: b
     - b_copy: ${ b }
     - input_concat_1: ${'a' + b}
@@ -85,13 +86,13 @@ flow:
 
             # evalauted via Python
             - input_python_null: ${ None }
-            - input_python_list: ${[1, 2, 3]}
-            - input_python_map: >
-                ${{
-                'key1': 'value1',
-                'key2': 'value2',
-                'key3': 'value3'
-                }}
+#            - input_python_list: ${[1, 2, 3]}
+#            - input_python_map: >
+#                ${{
+#                'key1': 'value1',
+#                'key2': 'value2',
+#                'key3': 'value3'
+#                }}
             - b: b
             - b_copy: ${ b }
             - input_concat_1: ${'a' + b}

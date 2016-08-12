@@ -105,29 +105,29 @@ public class DecisionsTest extends SystemsTestsParent {
 
     private Map<String, Value> getUserInputs() {
         Map<String, Value> userInputs = new HashMap<>();
-        userInputs.put("x", ValueFactory.create(2));
-        userInputs.put("y", ValueFactory.create(3));
+        userInputs.put("x", ValueFactory.create("2"));
+        userInputs.put("y", ValueFactory.create("3"));
         return userInputs;
     }
 
     private void verifyInputs1(StepData data) {
         Map<String, Serializable> expectedInputs = new LinkedHashMap<>();
-        expectedInputs.put("x", 2);
-        expectedInputs.put("y", 3);
+        expectedInputs.put("x", "2");
+        expectedInputs.put("y", "3");
         Assert.assertEquals("decision input values not as expected", expectedInputs, data.getInputs());
     }
 
     private void verifyInputs2(StepData data) {
         Map<String, Serializable> expectedInputs = new LinkedHashMap<>();
-        expectedInputs.put("x", 2);
-        expectedInputs.put("y", 3);
+        expectedInputs.put("x", "2");
+        expectedInputs.put("y", "3");
         expectedInputs.put("z", "default_value");
         Assert.assertEquals("decision input values not as expected", expectedInputs, data.getInputs());
     }
 
     private void verifyOutputs1(StepData data) {
         Map<String, Serializable> expectedOutputs = new LinkedHashMap<>();
-        expectedOutputs.put("sum", 5);
+        expectedOutputs.put("sum", "5");
         Assert.assertEquals("decision output values not as expected", expectedOutputs, data.getOutputs());
     }
 

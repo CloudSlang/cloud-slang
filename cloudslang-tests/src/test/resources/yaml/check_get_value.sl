@@ -18,10 +18,10 @@ flow:
   inputs:
     - map_before:
         default: >
-          ${{
+          ${"{
           'outer_key1': 'outer_value1',
           'outer_key2': {'inner_key1': 'inner_value1', 'inner_key2': ['list_item1', 'list_item2']}
-          }}
+          }"}
     - map_key:
         default: "outer_key2"
     - found_value:

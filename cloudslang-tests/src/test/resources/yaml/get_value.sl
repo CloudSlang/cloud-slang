@@ -29,9 +29,11 @@ operation:
     - map_key
   python_action:
     script: |
+      import ast
+      map1 = ast.literal_eval(map_input)
       try:
         for key in map_key.split(","):
-          decoded = map_input[key]
+          decoded = map1[key]
         return_code = '0'
         return_result = 'Parsing successful.'
       except Exception as ex:

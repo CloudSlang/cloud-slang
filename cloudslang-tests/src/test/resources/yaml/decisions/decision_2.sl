@@ -16,6 +16,6 @@ decision:
         default: 'default_value'
         required: false
   results:
-    - EQUAL: ${x == y}
-    - LESS_THAN: ${x < y}
+    - EQUAL: ${int(x) == int(y)}
+    - LESS_THAN: ${int(x) < int(y)}
     - GREATER_THAN

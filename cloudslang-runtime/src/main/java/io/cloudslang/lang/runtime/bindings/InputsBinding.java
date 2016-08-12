@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Component
-public class InputsBinding {
+public class InputsBinding extends AbstractBinding {
 
     @Autowired
     private ScriptEvaluator scriptEvaluator;
@@ -58,18 +58,19 @@ public class InputsBinding {
 
         String inputName = input.getName();
         Validate.notEmpty(inputName);
+        String errorMessagePrefix = "Error binding input: '" + inputName;
 
         try {
             value = resolveValue(input, context, targetContext, systemProperties);
         } catch (Throwable t) {
-            throw new RuntimeException("Error binding input: '" + inputName + "', \n\tError is: " + t.getMessage(), t);
+            throw new RuntimeException(errorMessagePrefix + "', \n\tError is: " + t.getMessage(), t);
         }
 
         if (input.isRequired() && isEmpty(value)) {
-            String errorMessage = "Input with name: \'" + inputName + "\' is Required, but value is empty";
-            throw new RuntimeException(errorMessage);
+            throw new RuntimeException("Input with name: \'" + inputName + "\' is Required, but value is empty");
         }
 
+        validateStringValue(errorMessagePrefix, value);
         targetContext.put(inputName, value);
     }
 

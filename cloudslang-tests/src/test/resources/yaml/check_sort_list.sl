@@ -31,7 +31,7 @@ operation:
         string_list = []
         for item in sorted_list:
           string_list.append(str(item))
-          result = string_list
+          result = str(string_list)
 
   outputs:
     - result

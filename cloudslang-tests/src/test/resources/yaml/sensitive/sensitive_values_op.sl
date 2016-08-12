@@ -156,54 +156,54 @@ operation:
         default: "Hi"
         private: false
         sensitive: true
-
-    - input_yaml_list:
-        default: '[1, 2, 3]'
-    - input_yaml_list_sensitive:
-        default: '[1, 2, 3]'
-        sensitive: true
-
-    - input_yaml_map:
-        default: "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}"
-    - input_yaml_map_sensitive:
-        default: "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}"
-        sensitive: true
-
-    - input_properties_yaml_map_folded:
-        default: "{default: medium, required: false}"
-    - input_properties_yaml_map_folded_sensitive:
-        default: "{default: medium, required: false}"
-        sensitive: true
-
-    - input_python_null:
-        default: ${ None }
-        required: false
-    - input_python_null_sensitive:
-        default: ${ None }
-        required: false
-        sensitive: true
-
-    - input_python_list:
-        default: ${[1, 2, 3]}
-    - input_python_list_sensitive:
-        default: ${[1, 2, 3]}
-        sensitive: true
-
-    - input_python_map:
-        default: >
-          ${{
-          'key1': 'value1',
-          'key2': 'value2',
-          'key3': 'value3'
-          }}
-    - input_python_map_sensitive:
-        default: >
-          ${{
-          'key1': 'value1',
-          'key2': 'value2',
-          'key3': 'value3'
-          }}
-        sensitive: true
+# uncomment when types will be supported
+#    - input_yaml_list:
+#        default: '[1, 2, 3]'
+#    - input_yaml_list_sensitive:
+#        default: '[1, 2, 3]'
+#        sensitive: true
+#
+#    - input_yaml_map:
+#        default: "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}"
+#    - input_yaml_map_sensitive:
+#        default: "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}"
+#        sensitive: true
+#
+#    - input_properties_yaml_map_folded:
+#        default: "{default: medium, required: false}"
+#    - input_properties_yaml_map_folded_sensitive:
+#        default: "{default: medium, required: false}"
+#        sensitive: true
+#
+#    - input_python_null:
+#        default: ${ None }
+#        required: false
+#    - input_python_null_sensitive:
+#        default: ${ None }
+#        required: false
+#        sensitive: true
+#
+#    - input_python_list:
+#        default: ${[1, 2, 3]}
+#    - input_python_list_sensitive:
+#        default: ${[1, 2, 3]}
+#        sensitive: true
+#
+#    - input_python_map:
+#        default: >
+#          ${{
+#          'key1': 'value1',
+#          'key2': 'value2',
+#          'key3': 'value3'
+#          }}
+#    - input_python_map_sensitive:
+#        default: >
+#          ${{
+#          'key1': 'value1',
+#          'key2': 'value2',
+#          'key3': 'value3'
+#          }}
+#        sensitive: true
 
     - input_x: x
     - input_x_sensitive:
@@ -360,18 +360,18 @@ operation:
       print input_overridable_hi2_sensitive
       print input_overridable_hi3
       print input_overridable_hi3_sensitive
-      print input_yaml_list
-      print input_yaml_list_sensitive
-      print input_yaml_map
-      print input_yaml_map_sensitive
-      print input_properties_yaml_map_folded
-      print input_properties_yaml_map_folded_sensitive
-      print input_python_null
-      print input_python_null_sensitive
-      print input_python_list
-      print input_python_list_sensitive
-      print input_python_map
-      print input_python_map_sensitive
+      #      print input_yaml_list
+      #      print input_yaml_list_sensitive
+      #      print input_yaml_map
+      #      print input_yaml_map_sensitive
+      #      print input_properties_yaml_map_folded
+      #      print input_properties_yaml_map_folded_sensitive
+      #      print input_python_null
+      #      print input_python_null_sensitive
+      #      print input_python_list
+      #      print input_python_list_sensitive
+      #      print input_python_map
+      #      print input_python_map_sensitive
       print input_x
       print input_x_sensitive
       print input_x_copy
@@ -665,81 +665,81 @@ operation:
     - output_sensitive_yaml_list:
         value: '[1, 2, 3]'
         sensitive: true
-    - output_input_yaml_list: ${input_yaml_list}
-    - output_sensitive_input_yaml_list:
-        value: ${input_yaml_list}
-        sensitive: true
-    - output_input_yaml_list_sensitive: ${input_yaml_list_sensitive}
-    - output_sensitive_input_yaml_list_sensitive:
-        value: ${input_yaml_list_sensitive}
-        sensitive: true
-
-    - output_yaml_map:
-        value: "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}"
-    - output_sensitive_yaml_map:
-        value: "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}"
-        sensitive: true
-    - output_input_yaml_map: ${input_yaml_map}
-    - output_sensitive_input_yaml_map:
-        value: ${input_yaml_map}
-        sensitive: true
-    - output_input_yaml_map_sensitive: ${input_yaml_map_sensitive}
-    - output_sensitive_input_yaml_map_sensitive:
-        value: ${input_yaml_map_sensitive}
-        sensitive: true
-
-    - output_properties_yaml_map_folded:
-        value: "{default: medium, required: false}"
-    - output_sensitive_properties_yaml_map_folded:
-        value: "{default: medium, required: false}"
-        sensitive: true
-    - output_input_properties_yaml_map_folded: ${input_properties_yaml_map_folded}
-    - output_sensitive_input_properties_yaml_map_folded:
-        value: ${input_properties_yaml_map_folded}
-        sensitive: true
-    - output_input_properties_yaml_map_folded_sensitive: ${input_properties_yaml_map_folded_sensitive}
-    - output_sensitive_input_properties_yaml_map_folded_sensitive:
-        value: ${input_properties_yaml_map_folded_sensitive}
-        sensitive: true
-
-    - output_python_null: ${ None }
-    - output_sensitive_python_null:
-        value: ${ None }
-        sensitive: true
-    - output_input_python_null: ${input_python_null}
-    - output_sensitive_input_python_null:
-        value: ${input_python_null}
-        sensitive: true
-    - output_input_python_null_sensitive: ${input_python_null_sensitive}
-    - output_sensitive_input_python_null_sensitive:
-        value: ${input_python_null_sensitive}
-        sensitive: true
-
-    - output_python_list: ${[1, 2, 3]}
-    - output_sensitive_python_list:
-        value: ${[1, 2, 3]}
-        sensitive: true
-    - output_input_python_list: ${input_python_list}
-    - output_sensitive_input_python_list:
-        value: ${input_python_list}
-        sensitive: true
-    - output_input_python_list_sensitive: ${input_python_list_sensitive}
-    - output_sensitive_input_python_list_sensitive:
-        value: ${input_python_list_sensitive}
-        sensitive: true
-
-    - output_python_map: ${{'key1':'value1', 'key2':'value2', 'key3':'value3'}}
-    - output_sensitive_python_map:
-        value: ${{'key1':'value1', 'key2':'value2', 'key3':'value3'}}
-        sensitive: true
-    - output_input_python_map: ${input_python_map}
-    - output_sensitive_input_python_map:
-        value: ${input_python_map}
-        sensitive: true
-    - output_input_python_map_sensitive: ${input_python_map_sensitive}
-    - output_sensitive_input_python_map_sensitive:
-        value: ${input_python_map_sensitive}
-        sensitive: true
+#    - output_input_yaml_list: ${input_yaml_list}
+#    - output_sensitive_input_yaml_list:
+#        value: ${input_yaml_list}
+#        sensitive: true
+#    - output_input_yaml_list_sensitive: ${input_yaml_list_sensitive}
+#    - output_sensitive_input_yaml_list_sensitive:
+#        value: ${input_yaml_list_sensitive}
+#        sensitive: true
+#
+#    - output_yaml_map:
+#        value: "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}"
+#    - output_sensitive_yaml_map:
+#        value: "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}"
+#        sensitive: true
+#    - output_input_yaml_map: ${input_yaml_map}
+#    - output_sensitive_input_yaml_map:
+#        value: ${input_yaml_map}
+#        sensitive: true
+#    - output_input_yaml_map_sensitive: ${input_yaml_map_sensitive}
+#    - output_sensitive_input_yaml_map_sensitive:
+#        value: ${input_yaml_map_sensitive}
+#        sensitive: true
+#
+#    - output_properties_yaml_map_folded:
+#        value: "{default: medium, required: false}"
+#    - output_sensitive_properties_yaml_map_folded:
+#        value: "{default: medium, required: false}"
+#        sensitive: true
+#    - output_input_properties_yaml_map_folded: ${input_properties_yaml_map_folded}
+#    - output_sensitive_input_properties_yaml_map_folded:
+#        value: ${input_properties_yaml_map_folded}
+#        sensitive: true
+#    - output_input_properties_yaml_map_folded_sensitive: ${input_properties_yaml_map_folded_sensitive}
+#    - output_sensitive_input_properties_yaml_map_folded_sensitive:
+#        value: ${input_properties_yaml_map_folded_sensitive}
+#        sensitive: true
+#
+#    - output_python_null: ${ None }
+#    - output_sensitive_python_null:
+#        value: ${ None }
+#        sensitive: true
+#    - output_input_python_null: ${input_python_null}
+#    - output_sensitive_input_python_null:
+#        value: ${input_python_null}
+#        sensitive: true
+#    - output_input_python_null_sensitive: ${input_python_null_sensitive}
+#    - output_sensitive_input_python_null_sensitive:
+#        value: ${input_python_null_sensitive}
+#        sensitive: true
+#
+#    - output_python_list: ${[1, 2, 3]}
+#    - output_sensitive_python_list:
+#        value: ${[1, 2, 3]}
+#        sensitive: true
+#    - output_input_python_list: ${input_python_list}
+#    - output_sensitive_input_python_list:
+#        value: ${input_python_list}
+#        sensitive: true
+#    - output_input_python_list_sensitive: ${input_python_list_sensitive}
+#    - output_sensitive_input_python_list_sensitive:
+#        value: ${input_python_list_sensitive}
+#        sensitive: true
+#
+#    - output_python_map: ${{'key1':'value1', 'key2':'value2', 'key3':'value3'}}
+#    - output_sensitive_python_map:
+#        value: ${{'key1':'value1', 'key2':'value2', 'key3':'value3'}}
+#        sensitive: true
+#    - output_input_python_map: ${input_python_map}
+#    - output_sensitive_input_python_map:
+#        value: ${input_python_map}
+#        sensitive: true
+#    - output_input_python_map_sensitive: ${input_python_map_sensitive}
+#    - output_sensitive_input_python_map_sensitive:
+#        value: ${input_python_map_sensitive}
+#        sensitive: true
 
     - output_x: x
     - output_sensitive_x:

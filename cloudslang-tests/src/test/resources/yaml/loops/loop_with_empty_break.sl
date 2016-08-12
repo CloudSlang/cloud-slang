@@ -20,5 +20,5 @@ flow:
           for: value in range(0, 3)
           do:
             ops.operation_that_fails_when_value_is_2:
-              - text: ${ value }
+              - text: ${ str(value) }
           break: []

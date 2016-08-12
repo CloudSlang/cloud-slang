@@ -243,20 +243,20 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
     private List<String> verifyBranchPublishValues(List<StepData> branchesData) {
         // publish
         List<String> actualNameOutputsOfBranches = Lists.newArrayList();
-        List<Integer> actualNumberOutputsOfBranches = Lists.newArrayList();
+        List<String> actualNumberOutputsOfBranches = Lists.newArrayList();
         for (StepData branchData : branchesData) {
             Map<String, Serializable> outputs = branchData.getOutputs();
             Assert.assertTrue(outputs.containsKey("name"));
             Assert.assertTrue(outputs.containsKey("int_output"));
             actualNameOutputsOfBranches.add((String) outputs.get("name"));
-            actualNumberOutputsOfBranches.add((Integer) outputs.get("int_output"));
+            actualNumberOutputsOfBranches.add((String) outputs.get("int_output"));
         }
 
         List<String> expectedNameOutputs = Lists.newArrayList();
-        List<Integer> expectedNumberOutputs = Lists.newArrayList();
+        List<String> expectedNumberOutputs = Lists.newArrayList();
         for (int i = 1; i < 4; i++) {
             expectedNameOutputs.add(BRANCH_MESSAGE + i);
-            expectedNumberOutputs.add(i);
+            expectedNumberOutputs.add(Integer.toString(i));
         }
 
         Assert.assertTrue(
@@ -296,8 +296,9 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         Map<String, Serializable> publishValues = parallelLoopStep.getOutputs();
         Assert.assertTrue("publish name not found in parallel loop outputs", publishValues.containsKey("name_list"));
         @SuppressWarnings("unchecked")
-        List<String> actualPublishNameList = (List<String>) publishValues.get("name_list");
+        String actualPublishNames = (String) publishValues.get("name_list");
 
+        ArrayList<String> actualPublishNameList = getArrayListFromString(actualPublishNames);
         Assert.assertTrue(
                 "publish value does not have the expected value",
                 containsSameElementsWithoutOrdering(Lists.newArrayList(actualPublishNameList), expectedNameOutputs)
@@ -310,6 +311,16 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         );
     }
 
+    private ArrayList<String> getArrayListFromString(String actualPublishNames) {
+        String[] actualArray = actualPublishNames.replaceAll("'", "")
+                .replaceAll("\\[", "").replaceAll("]", "").split(",");
+        ArrayList<String> actualPublishNameList = new ArrayList<>();
+        for (String s : actualArray) {
+            actualPublishNameList.add(s.trim());
+        }
+        return actualPublishNameList;
+    }
+
     private void verifyPublishValuesBranchResultsCase(
             RuntimeInformation runtimeInformation,
             List<String> publishValue) {
@@ -319,11 +330,11 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         Map<String, Serializable> publishValues = parallelLoopStep.getOutputs();
         Assert.assertTrue(publishValues.containsKey(BRANCH_RESULTS_LIST_PUBLISH_VALUE));
         @SuppressWarnings("unchecked")
-        List<String> actualBranchResultsPublishValue = (List<String>) publishValues.get(BRANCH_RESULTS_LIST_PUBLISH_VALUE);
+        String actualBranchResultsPublishValue = (String) publishValues.get(BRANCH_RESULTS_LIST_PUBLISH_VALUE);
 
         Assert.assertEquals(
                 publishValue,
-                actualBranchResultsPublishValue
+                getArrayListFromString(actualBranchResultsPublishValue)
         );
     }
 

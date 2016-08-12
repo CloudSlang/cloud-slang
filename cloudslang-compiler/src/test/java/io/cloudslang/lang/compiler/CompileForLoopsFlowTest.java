@@ -180,7 +180,7 @@ public class CompileForLoopsFlowTest {
                 step.getPostStepActionData().get(SlangTextualKeys.BREAK_KEY));
     }
 
-    @Ignore
+    @Ignore("Remove when support for maps in loops is added")
     @Test
     public void testPreCompileLoopWithMapWithCustomNavigationFlow() throws Exception {
         URI flow = getClass().getResource("/loops/loop_with_custom_navigation_with_map.sl").toURI();
