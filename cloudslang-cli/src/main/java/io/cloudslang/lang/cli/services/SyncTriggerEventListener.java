@@ -153,7 +153,7 @@ public class SyncTriggerEventListener implements ScoreEventListener{
     }
 
     private void printForOperationOrFlow(Map<String, Serializable> data, Ansi.Color color, String operationMessage, String flowMessage) {
-        if (ExecutableType.OPERATION.equals(data.get(ScoreLangConstants.EXECUTABLE_TYPE))) {
+        if (LanguageEventData.StepType.OPERATION.equals(data.get(LanguageEventData.STEP_TYPE))) {
             printWithColor(color, operationMessage);
         } else {
             printWithColor(color, flowMessage);

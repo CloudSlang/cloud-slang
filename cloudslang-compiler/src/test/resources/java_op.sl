@@ -13,3 +13,6 @@ operation:
     gav: 'some.group:some.artifact:some.version'
     class_name: com.hp.thing
     method_name: someMethod
+  results:
+    - SUCCESS: ${1 == 2}
+    - FAILURE

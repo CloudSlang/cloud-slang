@@ -20,6 +20,7 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -58,8 +59,12 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
             for (Object rawArgument : rawArgumentsList) {
                 try {
                     Argument argument = transformListArgument(rawArgument);
-                    preCompileValidator.validateNoDuplicateInOutParams(transformedData, argument);
-                    transformedData.add(argument);
+                    List<RuntimeException> validationErrors = preCompileValidator.validateNoDuplicateInOutParams(transformedData, argument);
+                    if (CollectionUtils.isEmpty(validationErrors)) {
+                        transformedData.add(argument);
+                    } else {
+                        errors.addAll(validationErrors);
+                    }
                 } catch (RuntimeException rex) {
                     errors.add(rex);
                 }

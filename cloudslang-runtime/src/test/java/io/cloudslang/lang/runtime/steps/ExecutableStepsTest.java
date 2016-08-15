@@ -84,7 +84,7 @@ public class ExecutableStepsTest {
 
     @Test
     public void testStart() throws Exception {
-        executableSteps.startExecutable(new ArrayList<Input>(), new RunEnvironment(), new HashMap<String, Value>(), new ExecutionRuntimeServices(),"", 2L);
+        executableSteps.startExecutable(new ArrayList<Input>(), new RunEnvironment(), new HashMap<String, Value>(), new ExecutionRuntimeServices(),"", 2L, ExecutableType.FLOW);
     }
 
     @Test
@@ -96,7 +96,7 @@ public class ExecutableStepsTest {
         resultMap.put("input1", ValueFactory.create(5));
 
         when(inputsBinding.bindInputs(eq(inputs), anyMap(), anySet())).thenReturn(resultMap);
-        executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(), new ExecutionRuntimeServices(),"", 2L);
+        executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(), new ExecutionRuntimeServices(),"", 2L, ExecutableType.FLOW);
 
         Map<String, Value> opVars = runEnv.getStack().popContext().getImmutableViewOfVariables();
         Assert.assertTrue(opVars.containsKey("input1"));
@@ -124,7 +124,7 @@ public class ExecutableStepsTest {
         resultMap.put("input2", ValueFactory.create(inputs.get(1).getValue()));
 
         when(inputsBinding.bindInputs(eq(inputs), anyMap(), anySet())).thenReturn(resultMap);
-        executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(), runtimeServices, "dockerizeStep", 2L);
+        executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(), runtimeServices, "dockerizeStep", 2L, ExecutableType.FLOW);
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 
         Assert.assertFalse(events.isEmpty());
@@ -140,7 +140,7 @@ public class ExecutableStepsTest {
         @SuppressWarnings("unchecked") Map<String, Serializable> inputsBounded = (Map<String, Serializable>)eventData.get(LanguageEventData.BOUND_INPUTS);
 
         Assert.assertNotNull(eventData.getStepName());
-        Assert.assertEquals(LanguageEventData.StepType.EXECUTABLE, eventData.getStepType());
+        Assert.assertEquals(LanguageEventData.StepType.FLOW, eventData.getStepType());
         Assert.assertEquals("dockerizeStep", eventData.getStepName());
 
         // verify input names are in defined order and have the expected value
@@ -162,7 +162,7 @@ public class ExecutableStepsTest {
         RunEnvironment runEnv = new RunEnvironment();
 
         Long nextStepPosition = 2L;
-        executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(), new ExecutionRuntimeServices(), "", nextStepPosition);
+        executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(), new ExecutionRuntimeServices(), "", nextStepPosition, ExecutableType.FLOW);
 
         Assert.assertEquals(nextStepPosition, runEnv.removeNextStepPosition());
     }
@@ -295,7 +295,7 @@ public class ExecutableStepsTest {
         Map<String, Serializable> returnOutputs= eventData.getOutputs();
         String returnResult= (String)eventData.get(LanguageEventData.RESULT);
         Assert.assertEquals("step1",eventData.getStepName());
-        Assert.assertEquals(LanguageEventData.StepType.EXECUTABLE, eventData.getStepType());
+        Assert.assertEquals(LanguageEventData.StepType.FLOW, eventData.getStepType());
         Assert.assertEquals(1, returnOutputs.size());
         Assert.assertEquals("John", returnOutputs.get("name"));
         Assert.assertTrue(returnResult.equals(ScoreLangConstants.SUCCESS_RESULT));

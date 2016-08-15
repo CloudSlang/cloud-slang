@@ -4,6 +4,7 @@ import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
+import io.cloudslang.lang.compiler.modeller.transformers.ResultsTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
@@ -363,6 +364,11 @@ public class ExecutableBuilderTest {
         @Bean
         public PreCompileValidator preCompileValidator() {
             return new PreCompileValidatorImpl();
+        }
+
+        @Bean
+        public ResultsTransformer resultsTransformer() {
+            return Mockito.mock(ResultsTransformer.class);
         }
     }
 }

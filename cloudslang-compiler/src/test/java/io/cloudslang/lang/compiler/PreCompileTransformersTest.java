@@ -19,6 +19,7 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import java.net.URI;
 import java.util.List;
+
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -60,6 +61,52 @@ public class PreCompileTransformersTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'operation_input_private_no_default' syntax is illegal.");
         exception.expectMessage("Input: input_private_no_default is private but no default value was specified");
+        throw errors.get(0);
+    }
+
+    @Test
+    public void testPreCompileSensitiveInputsAndOutputsWithAndWithoutDefault() throws Exception {
+        URI resource = getClass().getResource("/check_weather_flow_sensitive_inputs_outputs.sl").toURI();
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+
+        Assert.assertNotNull(result);
+
+        List<RuntimeException> errors = result.getErrors();
+        Assert.assertNotNull(errors);
+        Assert.assertTrue(errors.size() == 0);
+        Executable executable = result.getExecutable();
+        Assert.assertNotNull(executable);
+        List<Input> inputs = executable.getInputs();
+        Assert.assertEquals(3, inputs.size());
+        Assert.assertEquals("flow_input_1", inputs.get(0).getName());
+        Assert.assertEquals("defaultValue", inputs.get(0).getValue().get());
+        Assert.assertEquals(false, inputs.get(0).getValue().isSensitive());
+        Assert.assertEquals("flow_input_0", inputs.get(1).getName());
+        Assert.assertEquals("${flow_input_1}", inputs.get(1).getValue().get());
+        Assert.assertEquals(true, inputs.get(1).getValue().isSensitive());
+        Assert.assertEquals("flow_input_sensitive", inputs.get(2).getName());
+        Assert.assertEquals(null, inputs.get(2).getValue().get());
+        Assert.assertEquals(true, inputs.get(2).getValue().isSensitive());
+        List<Output> outputs = executable.getOutputs();
+        Assert.assertEquals(2, outputs.size());
+        Assert.assertEquals("flow_output_0", outputs.get(0).getName());
+        Assert.assertEquals("${flow_input_1}", outputs.get(0).getValue().get());
+        Assert.assertEquals(true, outputs.get(0).getValue().isSensitive());
+        Assert.assertEquals("flow_output_1", outputs.get(1).getName());
+        Assert.assertEquals("${flow_output_1}", outputs.get(1).getValue().get());
+        Assert.assertEquals(true, outputs.get(1).getValue().isSensitive());
+    }
+
+    @Test
+    public void testPropertiesOnStepPublishOutput() throws Exception {
+        URI flow = getClass().getResource("/check_weather_flow_sensitive.sl").toURI();
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(flow));
+        List<RuntimeException> errors = result.getErrors();
+        Assert.assertNotNull(errors);
+        Assert.assertTrue(errors.size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("It is illegal to specify properties for step publish outputs.");
+        exception.expectMessage("Please remove the properties for flow_output_1.");
         throw errors.get(0);
     }
 

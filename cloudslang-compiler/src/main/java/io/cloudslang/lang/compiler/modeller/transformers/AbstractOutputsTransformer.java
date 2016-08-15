@@ -16,24 +16,19 @@ import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
-import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 
 /**
  * User: stoneo
  * Date: 12/11/2014
  * Time: 11:33
  */
-public class AbstractOutputsTransformer  extends InOutTransformer {
+public abstract class AbstractOutputsTransformer  extends InOutTransformer {
 
     @Autowired
     private PreCompileValidator preCompileValidator;
@@ -61,16 +56,15 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
                         //     property1: value1
                         //     property2: value2
                         // this is the verbose way of defining outputs with all of the properties available
-                        //noinspection unchecked
-                        addOutput(transformedData, createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry));
+                        handleOutputProperties(transformedData, entry, errors);
                     } else {
                         // - some_output: some_expression
-                        addOutput(transformedData, createOutput(entry.getKey(), entryValue, false));
+                        addOutput(transformedData, createOutput(entry.getKey(), entryValue, false), errors);
                     }
                 } else {
                     //- some_output
                     //this is our default behavior that if the user specifies only a key, the key is also the ref we look for
-                    addOutput(transformedData, createRefOutput((String) rawOutput));
+                    addOutput(transformedData, createRefOutput((String) rawOutput, false), errors);
                 }
             } catch (RuntimeException rex) {
                 errors.add(rex);
@@ -79,33 +73,18 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
         return new BasicTransformModellingResult<>(transformedData, errors);
     }
 
-    private void addOutput(List<Output> outputs, Output element) {
-        preCompileValidator.validateNoDuplicateInOutParams(outputs, element);
-        outputs.add(element);
+    abstract void handleOutputProperties(List<Output> transformedData, Map.Entry<String, ?> entry, List<RuntimeException> errors);
+
+    void addOutput(List<Output> outputs, Output element, List<RuntimeException> errors) {
+        List<RuntimeException> validationErrors = preCompileValidator.validateNoDuplicateInOutParams(outputs, element);
+        if (CollectionUtils.isEmpty(validationErrors)) {
+            outputs.add(element);
+        } else {
+            errors.addAll(validationErrors);
+        }
     }
 
-    private Output createPropOutput(Map.Entry<String, Map<String, Serializable>> entry) {
-        Map<String, Serializable> props = entry.getValue();
-        List<String> knownKeys = Arrays.asList(SENSITIVE_KEY, VALUE_KEY);
-
-        for (String key : props.keySet()) {
-            if (!knownKeys.contains(key)) {
-                throw new RuntimeException("Key: " + key + " in output: " + entry.getKey() + " is not a known property");
-            }
-        }
-
-        // default is sensitive=false
-        String outputName = entry.getKey();
-        boolean sensitive = props.containsKey(SENSITIVE_KEY) && (boolean) props.get(SENSITIVE_KEY);
-        Serializable value = props.get(VALUE_KEY);
-        if (value == null) {
-            throw new RuntimeException("Output: " + outputName + " was not specified");
-        }
-
-        return createOutput(outputName, value, sensitive);
-    }
-
-    private Output createOutput(String outputName, Serializable outputExpression, boolean sensitive){
+    Output createOutput(String outputName, Serializable outputExpression, boolean sensitive){
         Accumulator accumulator = extractFunctionData(outputExpression);
         return new Output(
                 outputName,
@@ -115,8 +94,8 @@ public class AbstractOutputsTransformer  extends InOutTransformer {
         );
     }
 
-    private Output createRefOutput(String rawOutput) {
-        return new Output(rawOutput, ValueFactory.create(transformNameToExpression(rawOutput)));
+    Output createRefOutput(String rawOutput, boolean sensitive) {
+        return new Output(rawOutput, ValueFactory.create(transformNameToExpression(rawOutput), sensitive));
     }
 
     private String transformNameToExpression(String name) {

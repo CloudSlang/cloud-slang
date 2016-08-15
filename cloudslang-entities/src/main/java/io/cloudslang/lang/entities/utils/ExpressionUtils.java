@@ -11,7 +11,7 @@
  */
 package io.cloudslang.lang.entities.utils;
 
-import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.constants.RegexConstants;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -28,34 +28,14 @@ public final class ExpressionUtils {
     private ExpressionUtils() {
     }
 
-    // match ${ expression } pattern
-    private final static String EXPRESSION_REGEX =
-            "^\\s*" +
-                    ScoreLangConstants.EXPRESSION_START_DELIMITER_ESCAPED +
-                    "\\s*" +
-                    "(.+?)" +
-                    "\\s*" +
-                    ScoreLangConstants.EXPRESSION_END_DELIMITER_ESCAPED +
-                    "\\s*$";
-    // match get_sp(key) function
-    private final static String SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE = "get_sp\\(\\s*'([\\w\\-.]+)'\\s*\\)";
-    private final static String SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE = "get_sp\\(\\s*\"([\\w\\-.]+)\"\\s*\\)";
-    // match get_sp(key, default) function
-    private final static String SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE = "get_sp\\(\\s*'([\\w\\-.]+)'\\s*,\\s*(.+?)\\)";
-    private final static String SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE = "get_sp\\(\\s*\"([\\w\\-.]+)\"\\s*,\\s*(.+?)\\)";
-    // match get() function
-    private final static String GET_REGEX = "get\\((.+)\\)";
-    private final static String GET_REGEX_WITH_DEFAULT = "get\\((.+?),(.+?)\\)";
-    private final static String CHECK_EMPTY_REGEX = "check_empty\\((.+?),(.+?)\\)";
-
-    private final static Pattern EXPRESSION_PATTERN = Pattern.compile(EXPRESSION_REGEX, Pattern.DOTALL);
-    private final static Pattern SYSTEM_PROPERTY_PATTERN_SINGLE_QUOTE = Pattern.compile(SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE);
-    private final static Pattern SYSTEM_PROPERTY_PATTERN_DOUBLE_QUOTE = Pattern.compile(SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE);
-    private final static Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_SINGLE_QUOTE = Pattern.compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE);
-    private final static Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_DOUBLE_QUOTE = Pattern.compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE);
-    private final static Pattern GET_PATTERN = Pattern.compile(GET_REGEX);
-    private final static Pattern GET_PATTERN_WITH_DEFAULT = Pattern.compile(GET_REGEX_WITH_DEFAULT);
-    private final static Pattern CHECK_EMPTY_PATTERN = Pattern.compile(CHECK_EMPTY_REGEX);
+    private final static Pattern EXPRESSION_PATTERN = Pattern.compile(RegexConstants.EXPRESSION_REGEX, Pattern.DOTALL);
+    private final static Pattern SYSTEM_PROPERTY_PATTERN_SINGLE_QUOTE = Pattern.compile(RegexConstants.SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE);
+    private final static Pattern SYSTEM_PROPERTY_PATTERN_DOUBLE_QUOTE = Pattern.compile(RegexConstants.SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE);
+    private final static Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_SINGLE_QUOTE = Pattern.compile(RegexConstants.SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE);
+    private final static Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_DOUBLE_QUOTE = Pattern.compile(RegexConstants.SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE);
+    private final static Pattern GET_PATTERN = Pattern.compile(RegexConstants.GET_REGEX);
+    private final static Pattern GET_PATTERN_WITH_DEFAULT = Pattern.compile(RegexConstants.GET_REGEX_WITH_DEFAULT);
+    private final static Pattern CHECK_EMPTY_PATTERN = Pattern.compile(RegexConstants.CHECK_EMPTY_REGEX);
 
     public static String extractExpression(Serializable value) {
         String expression = null;

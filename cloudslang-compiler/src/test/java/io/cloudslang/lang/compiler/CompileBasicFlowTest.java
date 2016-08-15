@@ -137,7 +137,7 @@ public class CompileBasicFlowTest {
         URI operationUri = getClass().getResource("/test_op.sl").toURI();
         Executable op = compiler.preCompile(SlangSource.fromFile(operationUri));
 
-        Set<Executable> dependencies = new HashSet();
+        Set<Executable> dependencies = new HashSet<>();
         dependencies.add(op);
         List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flow, dependencies);
 

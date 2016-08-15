@@ -19,3 +19,4 @@ operation:
     - weather: ${ weather }
   results:
     - SUCCESS: ${ weather == "weather thing" }
+    - FAILURE
