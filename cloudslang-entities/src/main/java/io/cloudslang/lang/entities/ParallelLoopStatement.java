@@ -27,8 +27,9 @@ public class ParallelLoopStatement extends LoopStatement implements Serializable
 
     private final String varName;
 
-    public ParallelLoopStatement(String varName, String expression, Set<ScriptFunction> functionDependencies) {
-        super(expression, functionDependencies);
+    public ParallelLoopStatement(String varName, String expression, Set<ScriptFunction> functionDependencies,
+                                 Set<String> systemPropertyDependencies) {
+        super(expression, functionDependencies, systemPropertyDependencies);
 
         Validate.notBlank(varName, "parallel loop var name cannot be empty");
         this.varName = varName;
