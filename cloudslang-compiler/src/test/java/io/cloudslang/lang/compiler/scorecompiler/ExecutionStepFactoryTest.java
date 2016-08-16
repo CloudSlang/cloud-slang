@@ -49,7 +49,7 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateStartStepPutForUnderTheRightKey() throws Exception {
-        LoopStatement statement = new ListForLoopStatement("1", "2", new HashSet<ScriptFunction>());
+        LoopStatement statement = new ListForLoopStatement("1", "2", new HashSet<ScriptFunction>(), new HashSet<String>());
         HashMap<String, Serializable> preStepData = new HashMap<>();
         preStepData.put(SlangTextualKeys.FOR_KEY, statement);
         ExecutionStep startStep = factory.createBeginStepStep(1L, new ArrayList<Argument>(), preStepData, "", "");
@@ -183,7 +183,7 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateAddBranchesStepPutParallelLoopUnderTheRightKey() throws Exception {
-        ParallelLoopStatement statement = new ParallelLoopStatement("value", "values", new HashSet<ScriptFunction>());
+        ParallelLoopStatement statement = new ParallelLoopStatement("value", "values", new HashSet<ScriptFunction>(), new HashSet<String>());
         HashMap<String, Serializable> preStepData = new HashMap<>();
         preStepData.put(SlangTextualKeys.PARALLEL_LOOP_KEY, statement);
         ExecutionStep startStep =  factory.createAddBranchesStep(2L, 5L, 3L, preStepData, "refID", "evenCoolerStep");

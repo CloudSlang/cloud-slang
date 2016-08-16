@@ -31,6 +31,8 @@ public class ParallelLoopBindingTest {
     private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
     @SuppressWarnings("unchecked")
     private static final Set<ScriptFunction> EMPTY_FUNCTION_SET = Collections.EMPTY_SET;
+    @SuppressWarnings("unchecked")
+    private static final Set<String> EMPTY_PROPERTY_SET = Collections.EMPTY_SET;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -103,6 +105,6 @@ public class ParallelLoopBindingTest {
     }
 
     private ParallelLoopStatement createBasicSyncLoopStatement() {
-        return new ParallelLoopStatement("varName", "expression", EMPTY_FUNCTION_SET);
+        return new ParallelLoopStatement("varName", "expression", EMPTY_FUNCTION_SET, EMPTY_PROPERTY_SET);
     }
 }

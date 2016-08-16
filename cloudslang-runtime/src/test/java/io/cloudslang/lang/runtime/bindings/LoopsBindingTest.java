@@ -46,7 +46,7 @@ public class LoopsBindingTest {
     private ScriptEvaluator scriptEvaluator;
 
     private LoopStatement createBasicForStatement() {
-        return new ListForLoopStatement("x", "[1]", new HashSet<ScriptFunction>());
+        return new ListForLoopStatement("x", "[1]", new HashSet<ScriptFunction>(), new HashSet<String>());
     }
 
     @Test

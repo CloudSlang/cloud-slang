@@ -87,19 +87,19 @@ public class DeserializeTest {
 
     @Test
     public void testDeserializeListForLoopStatement() throws IOException {
-        LoopStatement listForLoopStatement = new ListForLoopStatement("varName", "expression", new HashSet<ScriptFunction>());
+        LoopStatement listForLoopStatement = new ListForLoopStatement("varName", "expression", new HashSet<ScriptFunction>(), new HashSet<String>());
         testToAndFromJson(listForLoopStatement, ListForLoopStatement.class);
     }
 
     @Test
     public void testDeserializeMapForLoopStatement() throws IOException {
-        MapForLoopStatement mapForLoopStatement = new MapForLoopStatement("keyName", "valueName", "expression", new HashSet<ScriptFunction>());
+        MapForLoopStatement mapForLoopStatement = new MapForLoopStatement("keyName", "valueName", "expression", new HashSet<ScriptFunction>(), new HashSet<String>());
         testToAndFromJson(mapForLoopStatement, MapForLoopStatement.class);
     }
 
     @Test
     public void testDeserializeParallelLoopStatement() throws IOException {
-        ParallelLoopStatement parallelLoopStatement = new ParallelLoopStatement("varName", "expression", new HashSet<ScriptFunction>());
+        ParallelLoopStatement parallelLoopStatement = new ParallelLoopStatement("varName", "expression", new HashSet<ScriptFunction>(), new HashSet<String>());
         testToAndFromJson(parallelLoopStatement, ParallelLoopStatement.class);
     }
 

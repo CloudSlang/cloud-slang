@@ -92,7 +92,7 @@ public class StepExecutionDataTest {
     }
 
     private LoopStatement createBasicForStatement(String varName, String collectionExpression) {
-        return new ListForLoopStatement(varName, collectionExpression, new HashSet<ScriptFunction>());
+        return new ListForLoopStatement(varName, collectionExpression, new HashSet<ScriptFunction>(), new HashSet<String>());
     }
 
     @Before

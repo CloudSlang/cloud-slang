@@ -94,7 +94,7 @@ public class ParallelLoopStepsTest {
     @Test
     public void testBranchesAreCreated() throws Exception {
         // prepare arguments
-        ParallelLoopStatement parallelLoopStatement = new ParallelLoopStatement("varName", "expression", new HashSet<ScriptFunction>());
+        ParallelLoopStatement parallelLoopStatement = new ParallelLoopStatement("varName", "expression", new HashSet<ScriptFunction>(), new HashSet<String>());
 
         RunEnvironment runEnvironment = new RunEnvironment();
         Map<String, Value> variables = new HashMap<>();
@@ -143,7 +143,7 @@ public class ParallelLoopStepsTest {
     @Test
     public void testAddBranchesEventsAreFired() throws Exception {
         // prepare arguments
-        ParallelLoopStatement parallelLoopStatement = new ParallelLoopStatement("varName", "expression", new HashSet<ScriptFunction>());
+        ParallelLoopStatement parallelLoopStatement = new ParallelLoopStatement("varName", "expression", new HashSet<ScriptFunction>(), new HashSet<String>());
 
         RunEnvironment runEnvironment = new RunEnvironment();
         Map<String, Value> variables = new HashMap<>();
