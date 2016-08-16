@@ -31,8 +31,8 @@ public class MapForLoopStatement extends LoopStatement implements Serializable{
     private final String valueName;
 
     public MapForLoopStatement(String keyName, String valueName, String collectionExpression,
-                               Set<ScriptFunction> functionDependencies) {
-        super(collectionExpression, functionDependencies);
+                               Set<ScriptFunction> functionDependencies, Set<String> systemPropertyDependencies) {
+        super(collectionExpression, functionDependencies, systemPropertyDependencies);
         Validate.notBlank(keyName, "key name cannot be empty");
         Validate.notBlank(valueName, "value name cannot be empty");
 

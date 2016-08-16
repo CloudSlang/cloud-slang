@@ -56,10 +56,12 @@ public abstract class AbstractForTransformer extends AbstractInOutForTransformer
                 collectionExpression = matcherSimpleFor.group(4);
                 if (isParallelLoop) {
                     loopStatement = new ParallelLoopStatement(varName, collectionExpression,
-                            dependencyAccumulator.getFunctionDependencies());
+                            dependencyAccumulator.getFunctionDependencies(),
+                            dependencyAccumulator.getSystemPropertyDependencies());
                 } else {
                     loopStatement = new ListForLoopStatement(varName, collectionExpression,
-                            dependencyAccumulator.getFunctionDependencies());
+                            dependencyAccumulator.getFunctionDependencies(),
+                            dependencyAccumulator.getSystemPropertyDependencies());
                 }
             } else {
                 String beforeInKeyword = StringUtils.substringBefore(rawData, FOR_IN_KEYWORD);
@@ -77,7 +79,8 @@ public abstract class AbstractForTransformer extends AbstractInOutForTransformer
                             keyName,
                             valueName,
                             collectionExpression,
-                            dependencyAccumulator.getFunctionDependencies());
+                            dependencyAccumulator.getFunctionDependencies(),
+                            dependencyAccumulator.getSystemPropertyDependencies());
                 } else {
                     // case: value in expression_other_than_variable_name
                     varName = beforeInKeyword.trim();
@@ -86,10 +89,12 @@ public abstract class AbstractForTransformer extends AbstractInOutForTransformer
                     }
                     if (isParallelLoop) {
                         loopStatement = new ParallelLoopStatement(varName, collectionExpression,
-                                dependencyAccumulator.getFunctionDependencies());
+                                dependencyAccumulator.getFunctionDependencies(),
+                                dependencyAccumulator.getSystemPropertyDependencies());
                     } else {
                         loopStatement = new ListForLoopStatement(varName, collectionExpression,
-                                dependencyAccumulator.getFunctionDependencies());
+                                dependencyAccumulator.getFunctionDependencies(),
+                                dependencyAccumulator.getSystemPropertyDependencies());
                     }
                 }
             }

@@ -26,12 +26,14 @@ import java.util.Set;
 public abstract class LoopStatement implements Serializable {
     private final String expression;
     private Set<ScriptFunction> functionDependencies;
+    private Set<String> systemPropertyDependencies;
 
-    public LoopStatement(String expression, Set<ScriptFunction> functionDependencies) {
+    public LoopStatement(String expression, Set<ScriptFunction> functionDependencies, Set<String> systemPropertyDependencies) {
         Validate.notBlank(expression, "loop expression cannot be empty");
 
         this.expression = expression;
         this.functionDependencies = functionDependencies;
+        this.systemPropertyDependencies = systemPropertyDependencies;
     }
 
     /**
@@ -48,6 +50,10 @@ public abstract class LoopStatement implements Serializable {
 
     public Set<ScriptFunction> getFunctionDependencies() {
         return functionDependencies;
+    }
+
+    public Set<String> getSystemPropertyDependencies() {
+        return systemPropertyDependencies;
     }
 
     @Override

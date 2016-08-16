@@ -29,8 +29,9 @@ public class ListForLoopStatement extends LoopStatement implements Serializable 
 
     private final String varName;
 
-    public ListForLoopStatement(String varName, String collectionExpression, Set<ScriptFunction> functionDependencies) {
-        super(collectionExpression, functionDependencies);
+    public ListForLoopStatement(String varName, String collectionExpression, Set<ScriptFunction> functionDependencies,
+                                Set<String> systemPropertyDependencies) {
+        super(collectionExpression, functionDependencies, systemPropertyDependencies);
         Validate.notBlank(varName, "for loop var name cannot be empty");
 
         this.varName = varName;
