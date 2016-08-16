@@ -316,14 +316,6 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         }
     }
 
-    private Set<String> getResultNames(Flow compiledFlow) {
-        Set<String> resultNames = new HashSet<>();
-        for (Result result : compiledFlow.getResults()) {
-            resultNames.add(result.getName());
-        }
-        return resultNames;
-    }
-
     private void validateNavigation(
             Step currentStep,
             Deque<Step> steps,

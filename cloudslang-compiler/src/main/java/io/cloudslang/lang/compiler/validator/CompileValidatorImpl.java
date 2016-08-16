@@ -9,6 +9,7 @@ import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import java.io.Serializable;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -107,7 +108,33 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
         errors.addAll(validateMandatoryInputsAreWired(flow, step, reference));
         errors.addAll(validateStepInputNamesDifferentFromDependencyOutputNames(flow, step, reference));
         errors.addAll(validateDependenciesResultsHaveMatchingNavigations(flow, refId, step, reference));
+        errors.addAll(validateBreakSection(flow, step, reference));
         return errors;
+    }
+
+    private List<RuntimeException> validateBreakSection(Flow parentFlow, Step step, Executable reference) {
+        List<RuntimeException> errors = new ArrayList<>();
+        @SuppressWarnings("unchecked") // from BreakTransformer
+        List<String> breakValues = (List<String>) step.getPostStepActionData().get(SlangTextualKeys.BREAK_KEY);
+
+        if (isForLoop(step, breakValues)) {
+            Set<String> referenceResultNames = getResultNames(reference);
+            Collection<String> nonExistingResults = CollectionUtils.subtract(breakValues, referenceResultNames);
+
+            if (CollectionUtils.isNotEmpty(nonExistingResults)) {
+                errors.add(new IllegalArgumentException("Cannot compile flow '" + parentFlow.getId() +
+                        "' since in step '" + step.getName() + "' the results " +
+                        nonExistingResults + " declared in '" + SlangTextualKeys.BREAK_KEY +
+                        "' section are not declared in the dependency '" + reference.getId() + "' result section."));
+            }
+        }
+
+        return errors;
+    }
+
+    private boolean isForLoop(Step step, List<String> breakValuesList) {
+        Serializable forData = step.getPreStepActionData().get(SlangTextualKeys.FOR_KEY);
+        return (forData != null) && CollectionUtils.isNotEmpty(breakValuesList);
     }
 
     private List<RuntimeException> validateDependenciesResultsHaveMatchingNavigations(Flow flow, String refId, Step step, Executable reference) {

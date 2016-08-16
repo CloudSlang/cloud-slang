@@ -639,6 +639,7 @@ flow:
           do:
             ops.print:
               - text: ${ value }
+          break: []
 
   outputs:
     - argument_no_value
