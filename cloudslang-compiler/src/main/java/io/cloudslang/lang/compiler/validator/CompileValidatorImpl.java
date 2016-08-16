@@ -9,6 +9,7 @@ import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.utils.ListUtils;
 import java.io.Serializable;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -118,8 +119,8 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
         List<String> breakValues = (List<String>) step.getPostStepActionData().get(SlangTextualKeys.BREAK_KEY);
 
         if (isForLoop(step, breakValues)) {
-            Set<String> referenceResultNames = getResultNames(reference);
-            Collection<String> nonExistingResults = CollectionUtils.subtract(breakValues, referenceResultNames);
+            List<String> referenceResultNames = getResultNames(reference);
+            Collection<String> nonExistingResults = ListUtils.subtract(breakValues, referenceResultNames);
 
             if (CollectionUtils.isNotEmpty(nonExistingResults)) {
                 errors.add(new IllegalArgumentException("Cannot compile flow '" + parentFlow.getId() +

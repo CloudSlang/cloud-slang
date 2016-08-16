@@ -4,8 +4,7 @@ import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -28,8 +27,8 @@ public class AbstractValidator {
         }
     }
 
-    protected Set<String> getResultNames(Executable executable) {
-        Set<String> resultNames = new HashSet<>();
+    protected List<String> getResultNames(Executable executable) {
+        List<String> resultNames = new ArrayList<>();
         for (Result result : executable.getResults()) {
             resultNames.add(result.getName());
         }

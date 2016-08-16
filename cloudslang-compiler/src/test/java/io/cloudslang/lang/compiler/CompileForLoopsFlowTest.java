@@ -254,7 +254,7 @@ public class CompileForLoopsFlowTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage(
                 "Cannot compile flow 'loops.loop_with_break_on_non_existing_result' since in step" +
-                        " 'print_values' the results [CUSTOM_2, CUSTOM_1] declared in 'break' section " +
+                        " 'print_values' the results [CUSTOM_1, CUSTOM_2] declared in 'break' section " +
                         "are not declared in the dependency 'loops.print' result section."
         );
         compiler.compile(SlangSource.fromFile(flow), path);

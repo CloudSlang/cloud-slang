@@ -300,7 +300,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
             List<RuntimeException> errors = result.getErrors();
             Set<String> reachableStepNames = new HashSet<>();
             Set<String> reachableResultNames = new HashSet<>();
-            Set<String> resultNames = getResultNames(compiledFlow);
+            List<String> resultNames = getResultNames(compiledFlow);
             Deque<Step> steps = compiledFlow.getWorkflow().getSteps();
 
             validateNavigation(
@@ -319,7 +319,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     private void validateNavigation(
             Step currentStep,
             Deque<Step> steps,
-            Set<String> resultNames,
+            List<String> resultNames,
             Set<String> reachableStepNames,
             Set<String> reachableResultNames,
             List<RuntimeException> errors) {
@@ -377,7 +377,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
 
     private void validateResultsAreReachable(
             Set<String> reachableResultNames,
-            Set<String> resultNames,
+            List<String> resultNames,
             List<RuntimeException> errors) {
         Set<String> unreachableResultNames = new HashSet<>(resultNames);
         unreachableResultNames.removeAll(reachableResultNames);
