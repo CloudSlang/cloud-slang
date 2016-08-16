@@ -15,6 +15,7 @@ import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.compiler.validator.CompileValidator;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
@@ -60,6 +61,9 @@ public class SlangCompilerImpl implements SlangCompiler {
 
     @Autowired
     private CompileValidator compileValidator;
+
+    @Autowired
+    private SystemPropertyValidator systemPropertyValidator;
 
     @Override
     public CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencySources) {
@@ -131,14 +135,14 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     private Set<SystemProperty> extractProperties(ParsedSlang parsedSlang) {
-        String namespace = parsedSlang.getNamespace();
+        String namespace = getNameSpace(parsedSlang);
         List<Map<String, Object>> parsedSystemProperties = convertRawProperties(parsedSlang.getProperties());
         Set<SystemProperty> modelledSystemProperties = new HashSet<>();
         Set<String> modelledSystemPropertyKeys = new HashSet<>();
 
         for (Map<String, Object> propertyAsMap : parsedSystemProperties) {
             Map.Entry<String, Object> propertyAsEntry = propertyAsMap.entrySet().iterator().next();
-            String propertyKey = propertyAsEntry.getKey();
+            String propertyKey = getPropertyKey(propertyAsEntry);
             if (SetUtils.containsIgnoreCase(modelledSystemPropertyKeys, propertyKey)) {
                 throw new RuntimeException(
                         DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX + propertyKey + "'."
@@ -153,6 +157,18 @@ public class SlangCompilerImpl implements SlangCompiler {
         }
 
         return modelledSystemProperties;
+    }
+
+    private String getNameSpace(ParsedSlang parsedSlang) {
+        String namespace = parsedSlang.getNamespace();
+        systemPropertyValidator.validateNamespace(namespace);
+        return namespace;
+    }
+
+    private String getPropertyKey(Map.Entry<String, Object> propertyAsEntry) {
+        String propertyKey = propertyAsEntry.getKey();
+        systemPropertyValidator.validateKey(propertyKey);
+        return propertyKey;
     }
 
     // casting and validations
