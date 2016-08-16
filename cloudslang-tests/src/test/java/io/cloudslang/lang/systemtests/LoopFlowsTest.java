@@ -86,7 +86,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Set<SystemProperty> systemProperties = this.loadSystemProperties(SlangSource.fromFile(propertiesURI));
+        Set<SystemProperty> systemProperties = loadSystemProperties(SlangSource.fromFile(propertiesURI));
 
         Map<String, Value> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
