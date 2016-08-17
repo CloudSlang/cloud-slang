@@ -136,6 +136,40 @@ public class CompilerErrorsTest {
     }
 
     @Test
+    public void testNavigationSectionKeysNotInResultsSection() throws Exception {
+        URI resource = getClass().getResource("/corrupted/navigation/flow_1.yaml").toURI();
+        URI dep1 = getClass().getResource("/corrupted/navigation/op_1.sl").toURI();
+
+        Set<SlangSource> dependencies = new HashSet<>();
+        dependencies.add(SlangSource.fromFile(dep1));
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(
+                "Cannot compile flow 'flow_1' since for step 'step_1' the navigation keys " +
+                "[KEY_1, KEY_2] have no matching results in its dependency 'io.cloudslang.op_1'."
+        );
+
+        compiler.compile(SlangSource.fromFile(resource), dependencies);
+    }
+
+    @Test
+    public void testNavigationSectionResultsNotWired() throws Exception {
+        URI resource = getClass().getResource("/corrupted/navigation/flow_2.yaml").toURI();
+        URI dep1 = getClass().getResource("/corrupted/navigation/op_2.sl").toURI();
+
+        Set<SlangSource> dependencies = new HashSet<>();
+        dependencies.add(SlangSource.fromFile(dep1));
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(
+                "Cannot compile flow 'flow_2' since for step 'step_1' the results [CUSTOM_1]" +
+                        " of its dependency 'io.cloudslang.op_2' have no matching navigation."
+        );
+
+        compiler.compile(SlangSource.fromFile(resource), dependencies);
+    }
+
+    @Test
     public void testFlowWithMissingSpaceBeforeFirstImport() throws Exception {
         //covers "mapping values are not allowed here" error
 
