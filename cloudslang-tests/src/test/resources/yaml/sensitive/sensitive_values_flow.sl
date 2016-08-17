@@ -634,8 +634,8 @@ flow:
 #
 #        publish:
 #          - argument_python_all_values_list
-#        navigate:
-#          - SUCCESS: print_values
+        navigate:
+          - SUCCESS: SUCCESS
 #
 #    - print_values:
 #        loop:
