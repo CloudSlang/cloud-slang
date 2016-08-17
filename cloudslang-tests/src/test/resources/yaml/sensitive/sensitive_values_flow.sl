@@ -166,15 +166,15 @@ flow:
 #        sensitive: true
 #
 #    - input_yaml_map:
-#        default: "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}"
+#        default: {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
 #    - input_yaml_map_sensitive:
-#        default: "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}"
+#        default: {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
 #        sensitive: true
 #
 #    - input_properties_yaml_map_folded:
-#        default: "{default: medium, required: false}"
+#        default: {default: medium, required: false}
 #    - input_properties_yaml_map_folded_sensitive:
-#        default: "{default: medium, required: false}"
+#        default: {default: medium, required: false}
 #        sensitive: true
 #
 #    - input_python_null:
@@ -206,48 +206,6 @@ flow:
 #          'key3': 'value3'
 #          }}
 #        sensitive: true
-
-    - input_yaml_map:
-        default: {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
-    - input_yaml_map_sensitive:
-        default: {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
-        sensitive: true
-
-    - input_properties_yaml_map_folded:
-        default: {default: medium, required: false}
-    - input_properties_yaml_map_folded_sensitive:
-        default: {default: medium, required: false}
-        sensitive: true
-
-    - input_python_null:
-        default: ${ None }
-        required: false
-    - input_python_null_sensitive:
-        default: ${ None }
-        required: false
-        sensitive: true
-
-    - input_python_list:
-        default: ${[1, 2, 3]}
-    - input_python_list_sensitive:
-        default: ${[1, 2, 3]}
-        sensitive: true
-
-    - input_python_map:
-        default: >
-          ${{
-          'key1': 'value1',
-          'key2': 'value2',
-          'key3': 'value3'
-          }}
-    - input_python_map_sensitive:
-        default: >
-          ${{
-          'key1': 'value1',
-          'key2': 'value2',
-          'key3': 'value3'
-          }}
-        sensitive: true
 
     - input_x: x
     - input_x_sensitive:
