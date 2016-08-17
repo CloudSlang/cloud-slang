@@ -241,4 +241,16 @@ public class CompileForLoopsFlowTest {
         assertEquals(Arrays.asList(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.FAILURE_RESULT),
                 endStepActionData.get(ScoreLangConstants.BREAK_LOOP_KEY));
     }
+
+    @Test
+    public void testCompileLoopFlowWithSystemProperty() throws Exception {
+        URI flow = getClass().getResource("/loops/loop_from_property_with_custom_navigation.sl").toURI();
+        URI operation = getClass().getResource("/loops/print.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+        CompilationArtifact artifact = compiler.compile(SlangSource.fromFile(flow), path);
+        assertNotNull("artifact is null", artifact);
+        Assert.assertEquals(1, artifact.getSystemProperties().size());
+        Assert.assertEquals("loops.list", artifact.getSystemProperties().iterator().next());
+    }
 }
