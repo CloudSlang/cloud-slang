@@ -7,16 +7,21 @@
 
 namespace: loops
 
-operation:
-  name: print
+imports:
+  ops: loops
+
+flow:
+  name: loop_with_break_on_non_existing_result
   inputs:
-     - text
-     - text2:
-        default: 'text2 default value'
-  python_action:
-    script: |
-        print text
-        print text2
-  results:
-    - SUCCESS: ${ text == '' }
-    - FAILURE
+    - values: [1,2,3]
+  workflow:
+    - print_values:
+        loop:
+          for: value in values
+          do:
+            ops.print:
+              - text: ${ value }
+          break:
+            - CUSTOM_1
+            - FAILURE
+            - CUSTOM_2

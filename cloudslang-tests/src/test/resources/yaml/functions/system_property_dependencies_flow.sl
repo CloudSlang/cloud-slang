@@ -69,6 +69,8 @@ flow:
               - input2: "get_sp('for.input.i_am_no_property')"
               - input3: ${get_sp('for.input.prop1')}
               - input4: ${get_sp('for.input.prop2', 'default_str')}
+          break:
+            - FUNCTIONS_KEY_EXISTS_PROBLEM
           publish:
               - publish_1
               - publish_2: "get_sp('for.publish.i_am_no_property')"
