@@ -14,11 +14,11 @@ flow:
   name: loop_with_custom_navigation_with_map
   inputs:
     - person_map:
-        default: {'john': 1, 'jane': 2, 'peter': 'three'}
+        default: "{'john': 1, 'jane': 2, 'peter': 'three'}"
   workflow:
     - print_values:
         loop:
-          for: k, v in person_map
+          for: import ast k, v in ast.literal_eval(person_map)
           do:
               ops.print:
                 - text: ${ k }

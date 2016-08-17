@@ -128,8 +128,8 @@ public class FlowWithJavaVersioningTest extends SystemsTestsParent {
         ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
         assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
         LanguageEventData languageEventData = (LanguageEventData) event.getData();
-        Integer result = (Integer) languageEventData.getOutputs().get("result");
-        assertEquals(121, result.intValue());
+        String result = (String) languageEventData.getOutputs().get("result");
+        assertEquals("121", result);
     }
 
     @Test
@@ -144,8 +144,8 @@ public class FlowWithJavaVersioningTest extends SystemsTestsParent {
         ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
         assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
         LanguageEventData languageEventData = (LanguageEventData) event.getData();
-        Integer result = (Integer) languageEventData.getOutputs().get("result");
-        assertEquals(24, result.intValue());
+        String result = (String) languageEventData.getOutputs().get("result");
+        assertEquals("24", result);
     }
 
     @Test
@@ -197,10 +197,10 @@ public class FlowWithJavaVersioningTest extends SystemsTestsParent {
             assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
             LanguageEventData languageEventData = (LanguageEventData) event.getData();
 
-            Integer actualResult = (Integer) languageEventData.getOutputs().get("sums_result");
+            String actualResult = (String) languageEventData.getOutputs().get("sums_result");
             System.out.println("Expected [" + actualResult + "] for addedValue [" + addedValue + "]");
             assertNotNull("expected result 'muls_result' was not found", actualResult);
-            assertEquals(sum_of_mul_sum, actualResult);
+            assertEquals(sum_of_mul_sum.toString(), actualResult);
         }
     }
 }

@@ -18,7 +18,9 @@ import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import java.net.URI;
+import java.net.URL;
 import java.util.List;
+
 
 import junit.framework.Assert;
 import org.junit.Rule;
@@ -107,6 +109,65 @@ public class PreCompileTransformersTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("It is illegal to specify properties for step publish outputs.");
         exception.expectMessage("Please remove the properties for flow_output_1.");
+        throw errors.get(0);
+    }
+
+    @Test
+    public void testInputBoolean() throws Exception {
+        URL resource = getClass().getResource("/corrupted/transformers/check_weather_optional_input_boolean.sl");
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource.toURI()));
+
+        List<RuntimeException> errors = result.getErrors();
+        Assert.assertNotNull(errors);
+        Assert.assertTrue(errors.size() > 0);
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("For operation 'check_weather_optional_input_boolean' syntax is illegal.");
+        exception.expectMessage("Input: 'city' should have a String value.");
+        throw errors.get(0);
+    }
+
+    @Test
+    public void testInputDefaultInteger() throws Exception {
+        URL resource = getClass().getResource("/corrupted/transformers/check_weather_optional_input_default_integer.sl");
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource.toURI()));
+
+        List<RuntimeException> errors = result.getErrors();
+        Assert.assertNotNull(errors);
+        Assert.assertTrue(errors.size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("For operation 'check_weather_optional_input_default_integer' syntax is illegal.");
+        exception.expectMessage("Input: 'input_with_default_value' should have a String value.");
+        throw errors.get(0);
+    }
+
+    @Test
+    public void testStepInputDefaultDouble() throws Exception {
+        URL resource = getClass().getResource("/corrupted/transformers/check_weather_flow_step_input_double.sl");
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource.toURI()));
+
+        List<RuntimeException> errors = result.getErrors();
+        Assert.assertNotNull(errors);
+        Assert.assertTrue(errors.size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("For step 'bootstrap_node' syntax is illegal.");
+        exception.expectMessage("Step input: 'input_with_sensitive_no_default' should have a String value.");
+        throw errors.get(0);
+    }
+
+    @Test
+    public void testOutputDefaultDouble() throws Exception {
+        URL resource = getClass().getResource("/corrupted/transformers/check_weather_flow_output_default_double.sl");
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource.toURI()));
+
+        List<RuntimeException> errors = result.getErrors();
+        Assert.assertNotNull(errors);
+        Assert.assertTrue(errors.size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("For flow 'check_weather_flow_output_default_double' syntax is illegal.");
+        exception.expectMessage("Output / publish value: 'flow_output_0' should have a String value.");
         throw errors.get(0);
     }
 

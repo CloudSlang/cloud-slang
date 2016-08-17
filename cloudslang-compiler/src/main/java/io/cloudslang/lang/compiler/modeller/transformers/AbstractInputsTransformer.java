@@ -8,7 +8,10 @@
  */
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.compiler.validator.PreCompileValidator;
+import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -22,6 +25,14 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.REQUIRED_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 
 public abstract class AbstractInputsTransformer extends InOutTransformer {
+
+    @Autowired
+    protected PreCompileValidator preCompileValidator;
+
+    @Override
+    public Class<? extends InOutParam> getTransformedObjectsClass() {
+        return Input.class;
+    }
 
     protected Input transformSingleInput(Object rawInput) {
         // - some_input
@@ -101,6 +112,7 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
             boolean sensitive,
             boolean required,
             boolean privateInput) {
+        preCompileValidator.validateStringValue(name, value, this);
         Accumulator dependencyAccumulator = extractFunctionData(value);
         return new Input.InputBuilder(name, value, sensitive)
                 .withRequired(required)
@@ -109,5 +121,4 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
                 .withSystemPropertyDependencies(dependencyAccumulator.getSystemPropertyDependencies())
                 .build();
     }
-
 }

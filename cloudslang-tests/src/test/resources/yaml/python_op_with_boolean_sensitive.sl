@@ -17,15 +17,15 @@ operation:
       condition_4 = 1<>1 or bool(1)
       an_int = 1
   outputs:
-    - condition_1
-    - condition_2: ${condition_2}
+    - condition_1: ${ str(condition_1) }
+    - condition_2: ${ str(condition_2) }
     - condition_3:
-        value: ${condition_3}
+        value: ${ str(condition_3) }
         sensitive: false
     - condition_4:
-        value: ${condition_4}
+        value: ${ str(condition_4) }
         sensitive: true
-    - an_int
+    - an_int: ${ str(an_int) }
   results:
     - SUCCESS: ${ condition_4 == True }
     - FAILURE

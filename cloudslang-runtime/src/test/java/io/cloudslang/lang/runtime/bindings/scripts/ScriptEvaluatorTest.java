@@ -37,12 +37,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ScriptEvaluatorTest.Config.class)
@@ -79,7 +74,7 @@ public class ScriptEvaluatorTest {
         reset(pythonRuntimeService);
         when(pythonRuntimeService.eval(anyString(), anyString(), isA(Map.class)))
                 .thenReturn(new PythonEvaluationResult("result", new HashMap<String, Serializable>()));
-        scriptEvaluator.evalExpr("", new HashMap<String, Value>(), new HashSet<SystemProperty>());
+        scriptEvaluator.evalExpr("", new HashMap<String, Value>(), new HashSet<SystemProperty>(), new HashSet<ScriptFunction>());
         verify(pythonRuntimeService).eval(eq(""), anyString(), anyMap());
     }
 
@@ -90,7 +85,8 @@ public class ScriptEvaluatorTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("input_expression");
         exception.expectMessage("error from interpreter");
-        scriptEvaluator.evalExpr("input_expression", new HashMap<String, Value>(), new HashSet<SystemProperty>());
+        scriptEvaluator.evalExpr("input_expression", new HashMap<String, Value>(), new HashSet<SystemProperty>(),
+                new HashSet<ScriptFunction>());
     }
 
     @Test
@@ -118,7 +114,6 @@ public class ScriptEvaluatorTest {
         Map<String, Serializable> expectedContext = new HashMap<>();
         Map<String, Value> properties = new HashMap<>();
         properties.put("a.b.c.key", ValueFactory.createPyObjectValue("value", false));
-        expectedContext.put(SYSTEM_PROPERTIES_MAP, (Serializable) properties);
 
         verify(pythonRuntimeService).eval(scriptCaptor.capture(), eq(expr), eq(expectedContext));
 

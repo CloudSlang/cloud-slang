@@ -9,12 +9,14 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities;
 
+import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * Date: 3/25/2015
@@ -25,8 +27,9 @@ public class ParallelLoopStatement extends LoopStatement implements Serializable
 
     private final String varName;
 
-    public ParallelLoopStatement(String varName, String expression) {
-        super(expression);
+    public ParallelLoopStatement(String varName, String expression, Set<ScriptFunction> functionDependencies,
+                                 Set<String> systemPropertyDependencies) {
+        super(expression, functionDependencies, systemPropertyDependencies);
 
         Validate.notBlank(varName, "parallel loop var name cannot be empty");
         this.varName = varName;

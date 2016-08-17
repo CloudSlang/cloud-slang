@@ -28,9 +28,9 @@ operation:
       o2 = str(type(second))
       eq = first == second
   outputs:
-    - eq
+    - eq: ${ str(eq) }
     - o1
     - o2
   results:
-    - EQUALS: ${ eq }
+    - EQUALS: ${ bool(eq) }
     - NOT_EQUALS

@@ -2,6 +2,7 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.ParallelLoopStatement;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
@@ -28,6 +29,10 @@ public class ParallelLoopBindingTest {
 
     @SuppressWarnings("unchecked")
     private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
+    @SuppressWarnings("unchecked")
+    private static final Set<ScriptFunction> EMPTY_FUNCTION_SET = Collections.EMPTY_SET;
+    @SuppressWarnings("unchecked")
+    private static final Set<String> EMPTY_PROPERTY_SET = Collections.EMPTY_SET;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -64,11 +69,11 @@ public class ParallelLoopBindingTest {
         Context context = new Context(variables);
         List<Value> expectedList = Lists.newArrayList(ValueFactory.create(1), ValueFactory.create(2), ValueFactory.create(3));
 
-        when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET))).thenReturn(ValueFactory.create((Serializable) expectedList));
+        when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET))).thenReturn(ValueFactory.create((Serializable) expectedList));
 
         List<Value> actualList = parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), context, EMPTY_SET, "nodeName");
 
-        verify(scriptEvaluator).evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET));
+        verify(scriptEvaluator).evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET));
         assertEquals("returned parallel loop list not as expected", expectedList, actualList);
     }
 
@@ -79,7 +84,7 @@ public class ParallelLoopBindingTest {
         variables.put("key2", ValueFactory.create("value2"));
         Context context = new Context(variables);
 
-        when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET))).thenReturn(ValueFactory.create(Lists.newArrayList()));
+        when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET))).thenReturn(ValueFactory.create(Lists.newArrayList()));
 
         exception.expectMessage("expression is empty");
         exception.expect(RuntimeException.class);
@@ -91,7 +96,7 @@ public class ParallelLoopBindingTest {
     public void testExceptionIsPropagated() throws Exception {
         Map<String, Value> variables = new HashMap<>();
 
-        when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET))).thenThrow(new RuntimeException("evaluation exception"));
+        when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET))).thenThrow(new RuntimeException("evaluation exception"));
         exception.expectMessage("evaluation exception");
         exception.expectMessage("nodeName");
         exception.expect(RuntimeException.class);
@@ -100,6 +105,6 @@ public class ParallelLoopBindingTest {
     }
 
     private ParallelLoopStatement createBasicSyncLoopStatement() {
-        return new ParallelLoopStatement("varName", "expression");
+        return new ParallelLoopStatement("varName", "expression", EMPTY_FUNCTION_SET, EMPTY_PROPERTY_SET);
     }
 }

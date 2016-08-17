@@ -19,6 +19,7 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.collections4.CollectionUtils;
@@ -105,6 +106,11 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
     @Override
     public String keyToTransform() {
         return null;
+    }
+
+    @Override
+    public Class<? extends InOutParam> getTransformedObjectsClass() {
+        return Result.class;
     }
 
     private Result createNoExpressionResult(String rawResult) {

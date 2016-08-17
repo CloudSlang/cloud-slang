@@ -16,7 +16,7 @@ operation:
     class_name: io.cloudslang.lang.systemtests.actions.LangTestActions
     method_name: printAndReturnDur
   outputs:
-    - dur
+    - dur: ${ str(dur) }
   results:
     - SUCCESS: ${ dur == 120 }
     - FAILURE

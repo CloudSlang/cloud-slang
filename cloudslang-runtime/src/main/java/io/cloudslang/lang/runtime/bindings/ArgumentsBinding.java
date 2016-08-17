@@ -19,6 +19,7 @@ import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ import java.util.Set;
  * @since 8/17/2015
  */
 @Component
-public class ArgumentsBinding {
+public class ArgumentsBinding extends AbstractBinding {
 
     @Autowired
     private ScriptEvaluator scriptEvaluator;
@@ -57,6 +58,7 @@ public class ArgumentsBinding {
             Map<String, Value> targetContext) {
         Value inputValue;
         String inputName = argument.getName();
+        String errorMessagePrefix = "Error binding step input: '" + inputName;
 
         try {
             inputValue = srcContext.get(inputName);
@@ -75,8 +77,9 @@ public class ArgumentsBinding {
                 }
             }
         } catch (Throwable t) {
-            throw new RuntimeException("Error binding step input: '" + inputName + "', \n\tError is: " + t.getMessage(), t);
+            throw new RuntimeException(errorMessagePrefix + "', \n\tError is: " + t.getMessage(), t);
         }
+        validateStringValue(errorMessagePrefix, inputValue);
         targetContext.put(inputName, inputValue);
     }
 

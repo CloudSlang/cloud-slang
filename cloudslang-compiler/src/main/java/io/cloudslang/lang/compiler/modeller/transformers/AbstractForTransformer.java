@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
  *
  * @author Bonczidai Levente
  */
-public abstract class AbstractForTransformer {
+public abstract class AbstractForTransformer extends AbstractInOutForTransformer {
 
     // case: value in variable_name
     private final static String FOR_REGEX = "^(\\s+)?(\\w+)\\s+(in)\\s+(\\w+)(\\s+)?$";
@@ -37,7 +37,7 @@ public abstract class AbstractForTransformer {
 
     public TransformModellingResult<LoopStatement> transformToLoopStatement(String rawData, boolean isParallelLoop) {
         List<RuntimeException> errors = new ArrayList<>();
-
+        Accumulator dependencyAccumulator = extractFunctionData("${" + rawData + "}");
         if (StringUtils.isEmpty(rawData)) {
             return new BasicTransformModellingResult<>(null, errors);
         }
@@ -55,9 +55,13 @@ public abstract class AbstractForTransformer {
                 varName = matcherSimpleFor.group(2);
                 collectionExpression = matcherSimpleFor.group(4);
                 if (isParallelLoop) {
-                    loopStatement = new ParallelLoopStatement(varName, collectionExpression);
+                    loopStatement = new ParallelLoopStatement(varName, collectionExpression,
+                            dependencyAccumulator.getFunctionDependencies(),
+                            dependencyAccumulator.getSystemPropertyDependencies());
                 } else {
-                    loopStatement = new ListForLoopStatement(varName, collectionExpression);
+                    loopStatement = new ListForLoopStatement(varName, collectionExpression,
+                            dependencyAccumulator.getFunctionDependencies(),
+                            dependencyAccumulator.getSystemPropertyDependencies());
                 }
             } else {
                 String beforeInKeyword = StringUtils.substringBefore(rawData, FOR_IN_KEYWORD);
@@ -74,7 +78,9 @@ public abstract class AbstractForTransformer {
                     loopStatement = new MapForLoopStatement(
                             keyName,
                             valueName,
-                            collectionExpression);
+                            collectionExpression,
+                            dependencyAccumulator.getFunctionDependencies(),
+                            dependencyAccumulator.getSystemPropertyDependencies());
                 } else {
                     // case: value in expression_other_than_variable_name
                     varName = beforeInKeyword.trim();
@@ -82,9 +88,13 @@ public abstract class AbstractForTransformer {
                         throw new RuntimeException("for loop var name cannot contain invalid chars");
                     }
                     if (isParallelLoop) {
-                        loopStatement = new ParallelLoopStatement(varName, collectionExpression);
+                        loopStatement = new ParallelLoopStatement(varName, collectionExpression,
+                                dependencyAccumulator.getFunctionDependencies(),
+                                dependencyAccumulator.getSystemPropertyDependencies());
                     } else {
-                        loopStatement = new ListForLoopStatement(varName, collectionExpression);
+                        loopStatement = new ListForLoopStatement(varName, collectionExpression,
+                                dependencyAccumulator.getFunctionDependencies(),
+                                dependencyAccumulator.getSystemPropertyDependencies());
                     }
                 }
             }

@@ -21,6 +21,7 @@ import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.SystemsTestsParent;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.Serializable;
@@ -86,6 +87,7 @@ public class DataFlowTest extends SystemsTestsParent {
                 2, StringUtils.countMatches(final_output, "|"));
     }
 
+    @Ignore("Remove when types are supported")
     @Test
     public void testBindingsFlowIntegers() throws Exception {
         URI resource = getClass().getResource("/yaml/system-flows/bindings_flow_int.sl").toURI();

@@ -127,9 +127,9 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         Map<String, Serializable> expectedFlowInputs = new LinkedHashMap<>();
         expectedFlowInputs.put("input1", null);
         expectedFlowInputs.put("input1_safe", "input1_default");
-        expectedFlowInputs.put("input2", 22);
-        expectedFlowInputs.put("input2_safe", 22);
-        expectedFlowInputs.put("input_locals_found", 22);
+        expectedFlowInputs.put("input2", "22");
+        expectedFlowInputs.put("input2_safe", "22");
+        expectedFlowInputs.put("input_locals_found", "22");
         expectedFlowInputs.put("input_locals_not_found", "input_locals_not_found_default");
         expectedFlowInputs.put("exist", "exist_value");
         expectedFlowInputs.put("input_3", null);
