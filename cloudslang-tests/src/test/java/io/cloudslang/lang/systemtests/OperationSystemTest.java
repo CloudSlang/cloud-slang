@@ -120,7 +120,7 @@ public class OperationSystemTest extends SystemsTestsParent {
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
         StepData execStepData = stepsData.get(EXEC_START_PATH);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, execStepData.getResult());
-        Assert.assertEquals(120, execStepData.getOutputs().get("dur"));
+        Assert.assertEquals("120", execStepData.getOutputs().get("dur"));
     }
 
     @Test
@@ -131,11 +131,11 @@ public class OperationSystemTest extends SystemsTestsParent {
 
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, null, new HashSet<SystemProperty>()).getSteps();
         StepData execStepData = stepsData.get(EXEC_START_PATH);
-        Assert.assertEquals(true, execStepData.getOutputs().get("condition_1"));
-        Assert.assertEquals(false, execStepData.getOutputs().get("condition_2"));
-        Assert.assertEquals(false, execStepData.getOutputs().get("condition_3"));
-        Assert.assertEquals(true, execStepData.getOutputs().get("condition_4"));
-        Assert.assertEquals(1, execStepData.getOutputs().get("an_int"));
+        Assert.assertEquals("True", execStepData.getOutputs().get("condition_1"));
+        Assert.assertEquals("False", execStepData.getOutputs().get("condition_2"));
+        Assert.assertEquals("False", execStepData.getOutputs().get("condition_3"));
+        Assert.assertEquals("True", execStepData.getOutputs().get("condition_4"));
+        Assert.assertEquals("1", execStepData.getOutputs().get("an_int"));
     }
 
     @Test
@@ -146,11 +146,11 @@ public class OperationSystemTest extends SystemsTestsParent {
 
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, null, new HashSet<SystemProperty>()).getSteps();
         StepData execStepData = stepsData.get(EXEC_START_PATH);
-        Assert.assertEquals(true, execStepData.getOutputs().get("condition_1"));
-        Assert.assertEquals(false, execStepData.getOutputs().get("condition_2"));
-        Assert.assertEquals(false, execStepData.getOutputs().get("condition_3"));
+        Assert.assertEquals("True", execStepData.getOutputs().get("condition_1"));
+        Assert.assertEquals("False", execStepData.getOutputs().get("condition_2"));
+        Assert.assertEquals("False", execStepData.getOutputs().get("condition_3"));
         Assert.assertEquals(SensitiveValue.SENSITIVE_VALUE_MASK, execStepData.getOutputs().get("condition_4"));
-        Assert.assertEquals(1, execStepData.getOutputs().get("an_int"));
+        Assert.assertEquals("1", execStepData.getOutputs().get("an_int"));
     }
 
     @Test

@@ -13,11 +13,11 @@ imports:
 flow:
   name: loop_with_break_on_non_existing_result
   inputs:
-    - values: [1,2,3]
+    - values: "1,2,3"
   workflow:
     - print_values:
         loop:
-          for: value in values
+          for: value in values.split()
           do:
             ops.print:
               - text: ${ value }

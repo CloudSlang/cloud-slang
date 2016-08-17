@@ -11,10 +11,7 @@ package io.cloudslang.lang.compiler.scorecompiler;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.*;
-import io.cloudslang.lang.entities.bindings.Argument;
-import io.cloudslang.lang.entities.bindings.Result;
-import io.cloudslang.lang.entities.bindings.Input;
-import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.*;
 import junit.framework.Assert;
 import io.cloudslang.score.api.ExecutionStep;
 import org.junit.Before;
@@ -23,6 +20,7 @@ import org.junit.Test;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class ExecutionStepFactoryTest {
@@ -51,7 +49,7 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateStartStepPutForUnderTheRightKey() throws Exception {
-        LoopStatement statement = new ListForLoopStatement("1", "2");
+        LoopStatement statement = new ListForLoopStatement("1", "2", new HashSet<ScriptFunction>(), new HashSet<String>());
         HashMap<String, Serializable> preStepData = new HashMap<>();
         preStepData.put(SlangTextualKeys.FOR_KEY, statement);
         ExecutionStep startStep = factory.createBeginStepStep(1L, new ArrayList<Argument>(), preStepData, "", "");
@@ -185,7 +183,7 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateAddBranchesStepPutParallelLoopUnderTheRightKey() throws Exception {
-        ParallelLoopStatement statement = new ParallelLoopStatement("value", "values");
+        ParallelLoopStatement statement = new ParallelLoopStatement("value", "values", new HashSet<ScriptFunction>(), new HashSet<String>());
         HashMap<String, Serializable> preStepData = new HashMap<>();
         preStepData.put(SlangTextualKeys.PARALLEL_LOOP_KEY, statement);
         ExecutionStep startStep =  factory.createAddBranchesStep(2L, 5L, 3L, preStepData, "refID", "evenCoolerStep");

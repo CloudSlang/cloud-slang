@@ -3,6 +3,7 @@ package io.cloudslang.lang.runtime.bindings;
 import io.cloudslang.lang.entities.ListForLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
@@ -32,6 +33,8 @@ public class LoopsBindingTest {
 
     @SuppressWarnings("unchecked")
     private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
+    @SuppressWarnings("unchecked")
+    private static final Set<ScriptFunction> EMPTY_FUNCTION_SET = Collections.EMPTY_SET;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -43,7 +46,7 @@ public class LoopsBindingTest {
     private ScriptEvaluator scriptEvaluator;
 
     private LoopStatement createBasicForStatement() {
-        return new ListForLoopStatement("x", "[1]");
+        return new ListForLoopStatement("x", "[1]", new HashSet<ScriptFunction>(), new HashSet<String>());
     }
 
     @Test
@@ -53,7 +56,8 @@ public class LoopsBindingTest {
         when(scriptEvaluator.evalExpr(
                         anyString(),
                         anyMapOf(String.class, Value.class),
-                        anySetOf(SystemProperty.class))
+                        anySetOf(SystemProperty.class),
+                        anySetOf(ScriptFunction.class))
         ).thenReturn(ValueFactory.create(result));
         Value loopCondition = ValueFactory.create(new ForLoopCondition(result));
         when(context.getLanguageVariable(LoopCondition.LOOP_CONDITION_KEY)).thenReturn(null);
@@ -66,7 +70,7 @@ public class LoopsBindingTest {
     @Test
     public void whenExpressionIsEmptyThrowsException() throws Exception {
         Context context = mock(Context.class);
-        when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Value.class), eq(EMPTY_SET)))
+        when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Value.class), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET)))
                 .thenReturn(ValueFactory.create(Lists.newArrayList()));
         Map<String, Value> langVars = Collections.emptyMap();
         when(context.getImmutableViewOfLanguageVariables()).thenReturn(langVars);
@@ -95,7 +99,7 @@ public class LoopsBindingTest {
     public void whenValueIsThereItWillBeReturned() throws Exception {
         Context context = mock(Context.class);
         ArrayList<Value> result = Lists.newArrayList(ValueFactory.create(1));
-        when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Value.class), eq(EMPTY_SET)))
+        when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Value.class), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET)))
                 .thenReturn(ValueFactory.create(result));
         Map<String, Value> langVars = new HashMap<>();
         ForLoopCondition forLoopCondition = new ForLoopCondition(result);

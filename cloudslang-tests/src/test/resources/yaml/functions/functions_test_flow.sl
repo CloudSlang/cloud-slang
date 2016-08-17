@@ -22,7 +22,7 @@ flow:
         private: true
         required: false
     - input2:
-        default: 22
+        default: '22'
         private: true
     - input2_safe:
         default: ${ get('input2', 'input2_default') }

@@ -25,12 +25,12 @@ flow:
               - var1: ${n}
               - var2: ${addedValue}
         publish:
-          - result_mul_of_sum: ${sum(map(lambda x:x['result'], branches_context))}
+          - result_mul_of_sum: ${str(sum(map(lambda x:int(x['result']), branches_context)))}
         navigate:
           - SUCCESS: SUCCESS
           - FAILURE: FAILURE
   outputs:
-    - sums_result: ${result_mul_of_sum}
+    - sums_result: ${str(result_mul_of_sum)}
   results:
     - SUCCESS
     - FAILURE

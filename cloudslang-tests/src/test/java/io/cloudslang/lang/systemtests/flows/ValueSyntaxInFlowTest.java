@@ -66,24 +66,22 @@ public class ValueSyntaxInFlowTest extends ValueSyntaxParent {
         expectedStepArguments.put("input_no_expression", "input_no_expression_value");
 
         // loaded by Yaml
-        expectedStepArguments.put("input_int", 22);
+        expectedStepArguments.put("input_int", "22");
         expectedStepArguments.put("input_str_no_quotes", "Hi");
         expectedStepArguments.put("input_str_single", "Hi");
         expectedStepArguments.put("input_str_double", "Hi");
-        expectedStepArguments.put("input_yaml_list", Lists.newArrayList(1, 2, 3));
-        HashMap<String, Serializable> expectedYamlMapFolded = new HashMap<>();
-        expectedYamlMapFolded.put("key1", "medium");
-        expectedYamlMapFolded.put("key2", false);
-        expectedStepArguments.put("input_yaml_map_folded", expectedYamlMapFolded);
+        expectedStepArguments.put("input_yaml_list", "[1, 2, 3]");
+        expectedStepArguments.put("input_yaml_map_folded", "{key1: medium, key2: false}");
 
         // evaluated via Python
         expectedStepArguments.put("input_python_null", null);
-        expectedStepArguments.put("input_python_list", Lists.newArrayList(1, 2, 3));
-        HashMap<String, Serializable> expectedInputPythonMap = new HashMap<>();
-        expectedInputPythonMap.put("key1", "value1");
-        expectedInputPythonMap.put("key2", "value2");
-        expectedInputPythonMap.put("key3", "value3");
-        expectedStepArguments.put("input_python_map", expectedInputPythonMap);
+//      uncomment when types will be supported
+//        expectedStepArguments.put("input_python_list", Lists.newArrayList(1, 2, 3));
+//        HashMap<String, Serializable> expectedInputPythonMap = new HashMap<>();
+//        expectedInputPythonMap.put("key1", "value1");
+//        expectedInputPythonMap.put("key2", "value2");
+//        expectedInputPythonMap.put("key3", "value3");
+//        expectedStepArguments.put("input_python_map", expectedInputPythonMap);
         expectedStepArguments.put("b", "b");
         expectedStepArguments.put("b_copy", "b");
         expectedStepArguments.put("input_concat_1", "ab");
@@ -97,7 +95,7 @@ public class ValueSyntaxInFlowTest extends ValueSyntaxParent {
         Map<String, Serializable> expectedStepPublishValues = new LinkedHashMap<>();
 
         expectedStepPublishValues.put("output_no_expression", "output_no_expression_value");
-        expectedStepPublishValues.put("publish_int", 22);
+        expectedStepPublishValues.put("publish_int", "22");
         expectedStepPublishValues.put("publish_str", "publish_str_value");
         expectedStepPublishValues.put("publish_expression", "publish_str_value_suffix");
         expectedStepPublishValues.put("output_step_argument_null", "step_argument_null_value");

@@ -13,13 +13,13 @@ imports:
 flow:
   name: parallel_loop_branch_result_output_collision
   inputs:
-    - values: ${ range(1, 4) }
+    - values: "1,2,3"
   workflow:
     - print_values:
         parallel_loop:
-          for: value in values
+          for: value in values.split(",")
           do:
             ops.print_branch_with_result_output_collision:
               - ID: ${ value }
         publish:
-          - branch_results_list: ${ map(lambda x:str(x['branch_result']), branches_context) }
+          - branch_results_list: ${ str(map(lambda x:str(x['branch_result']), branches_context)) }

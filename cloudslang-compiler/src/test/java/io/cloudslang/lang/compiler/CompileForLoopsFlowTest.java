@@ -13,6 +13,7 @@ import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.entities.*;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -69,7 +70,7 @@ public class CompileForLoopsFlowTest {
         LoopStatement forStatement = (LoopStatement) step.getPreStepActionData()
                                 .get(SlangTextualKeys.FOR_KEY);
         ListForLoopStatement listForLoopStatement  = validateListForLoopStatement(forStatement);
-        assertEquals("values", listForLoopStatement.getExpression());
+        assertEquals("values.split(\",\")", listForLoopStatement.getExpression());
         assertEquals("value", listForLoopStatement.getVarName());
         @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) step.getPostStepActionData()
                                   .get(SlangTextualKeys.PUBLISH_KEY);
@@ -103,7 +104,7 @@ public class CompileForLoopsFlowTest {
         LoopStatement forStatement = (LoopStatement) step.getPreStepActionData()
                                                          .get(SlangTextualKeys.FOR_KEY);
         ListForLoopStatement listForLoopStatement  = validateListForLoopStatement(forStatement);
-        assertEquals("values", listForLoopStatement.getExpression());
+        assertEquals("values.split(\",\")", listForLoopStatement.getExpression());
         assertEquals("value", listForLoopStatement.getVarName());
         @SuppressWarnings("unchecked") List<Map<String, String>> actual = (List<Map<String, String>>) step.getPostStepActionData()
                                                                                 .get(SlangTextualKeys.NAVIGATION_KEY);
@@ -125,7 +126,7 @@ public class CompileForLoopsFlowTest {
         assertTrue(startStepActionData.containsKey(ScoreLangConstants.LOOP_KEY));
         LoopStatement forStatement = (LoopStatement) startStepActionData.get(ScoreLangConstants.LOOP_KEY);
         ListForLoopStatement listForLoopStatement  = validateListForLoopStatement(forStatement);
-        assertEquals("values", listForLoopStatement.getExpression());
+        assertEquals("values.split(\",\")", listForLoopStatement.getExpression());
         assertEquals("value", listForLoopStatement.getVarName());
 
         Map<String, ?> endStepActionData = executionPlan.getStep(3L)
@@ -184,6 +185,7 @@ public class CompileForLoopsFlowTest {
                 step.getPostStepActionData().get(SlangTextualKeys.BREAK_KEY));
     }
 
+    @Ignore("Remove when support for maps in loops is added")
     @Test
     public void testPreCompileLoopWithMapWithCustomNavigationFlow() throws Exception {
         URI flow = getClass().getResource("/loops/loop_with_custom_navigation_with_map.sl").toURI();
@@ -243,6 +245,18 @@ public class CompileForLoopsFlowTest {
                 .getActionData();
         assertEquals(Arrays.asList(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.FAILURE_RESULT),
                 endStepActionData.get(ScoreLangConstants.BREAK_LOOP_KEY));
+    }
+
+    @Test
+    public void testCompileLoopFlowWithSystemProperty() throws Exception {
+        URI flow = getClass().getResource("/loops/loop_from_property_with_custom_navigation.sl").toURI();
+        URI operation = getClass().getResource("/loops/print.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+        CompilationArtifact artifact = compiler.compile(SlangSource.fromFile(flow), path);
+        assertNotNull("artifact is null", artifact);
+        Assert.assertEquals(1, artifact.getSystemProperties().size());
+        Assert.assertEquals("loops.list", artifact.getSystemProperties().iterator().next());
     }
 
     @Test

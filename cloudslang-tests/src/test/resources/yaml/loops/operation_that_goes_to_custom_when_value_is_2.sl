@@ -13,5 +13,5 @@ operation:
   python_action:
     script: print text
   results:
-    - CUSTOM: ${ text == 2 }
+    - CUSTOM: ${ text == "2" }
     - SUCCESS

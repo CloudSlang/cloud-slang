@@ -19,16 +19,16 @@ operation:
         required: yes
         sensitive: true
     - input6:
-        default: ${ 1 + 5 }
+        default: ${ str(1 + 5) }
         required: False
-    - input7: 77
+    - input7: '77'
     - input8:
         default: ${ input6 }
     - input9:
         default: ${ input6 }
         private: true
     - input10:
-        default: true
+        default: 'true'
         required: False
 
   python_action:
@@ -48,7 +48,7 @@ operation:
       print input6
   outputs:
     - output1: ${ input1 }
-    - output2: ${ processId }
+    - output2: ${ str(processId) }
     - output4
   results:
     - SUCCESS: ${ 1 != 123456 }

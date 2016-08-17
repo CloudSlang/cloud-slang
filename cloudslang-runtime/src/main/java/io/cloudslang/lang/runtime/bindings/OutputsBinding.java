@@ -31,7 +31,7 @@ import java.util.Set;
  * @author Bonczidai Levente
  */
 @Component
-public class OutputsBinding {
+public class OutputsBinding extends AbstractBinding {
 
     @Autowired
     ScriptEvaluator scriptEvaluator;
@@ -48,6 +48,7 @@ public class OutputsBinding {
         if (possibleOutputs != null) {
             for (Output output : possibleOutputs) {
                 String outputKey = output.getName();
+                String errorMessagePrefix = "Error binding output: '" + output.getName();
                 Value rawValue = output.getValue();
                 Value valueToAssign = rawValue;
                 String expressionToEvaluate = ExpressionUtils.extractExpression(rawValue == null ? null : rawValue.get());
@@ -59,15 +60,12 @@ public class OutputsBinding {
                         Value value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, output.getFunctionDependencies());
                         valueToAssign = ValueFactory.create(value, rawValue != null && rawValue.isSensitive());
                     } catch (Throwable t) {
-                        throw new RuntimeException("Error binding output: '" + output.getName() + "',\n\tError is: " + t.getMessage(), t);
+                        throw new RuntimeException(errorMessagePrefix + "',\n\tError is: " + t.getMessage(), t);
                     }
                 }
-                try {
-                    outputs.put(outputKey, valueToAssign);
-                    scriptContext.put(outputKey, valueToAssign);
-                } catch (ClassCastException ex) {
-                    throw new RuntimeException("The output value: " + rawValue + " is not a proper output", ex);
-                }
+                validateStringValue(errorMessagePrefix, valueToAssign);
+                outputs.put(outputKey, valueToAssign);
+                scriptContext.put(outputKey, valueToAssign);
             }
         }
         return outputs;

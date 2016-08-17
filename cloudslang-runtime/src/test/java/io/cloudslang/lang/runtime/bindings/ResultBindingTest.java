@@ -168,7 +168,7 @@ public class ResultBindingTest {
     public void testIllegalResultExpression() throws Exception {
         List<Result> results = Arrays.asList(
                 createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create("${ status }")),
-                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create((Serializable)null)));
+                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create(null)));
         HashMap<String, Value> context = new HashMap<>();
         context.put("status", ValueFactory.create("-1"));
         resultsBinding.resolveResult(new HashMap<String, Value>(), context, EMPTY_SET, results, null);
