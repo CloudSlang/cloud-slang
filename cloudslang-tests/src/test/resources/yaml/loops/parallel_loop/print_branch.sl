@@ -19,3 +19,6 @@ operation:
   outputs:
     - name
     - int_output
+  results:
+    - SUCCESS: ${1==1}
+    - FAILURE

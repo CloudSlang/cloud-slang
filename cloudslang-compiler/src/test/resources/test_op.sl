@@ -15,3 +15,6 @@ operation:
     script: 'print "hello world"'
   outputs:
     - balla: 'some value'
+  results:
+    - SUCCESS: ${1 == 1}
+    - FAILURE

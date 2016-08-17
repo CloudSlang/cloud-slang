@@ -231,8 +231,9 @@ public class CompilerErrorsTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Cannot compile flow: 'step_with_missing_navigation_from_operation_result_flow' " +
-                "since for step: 'step1', the result 'FAILURE' of its dependency: 'user.ops.java_op' has no matching navigation");
+        exception.expectMessage("Cannot compile flow 'step_with_missing_navigation_from_operation_result_flow' " +
+                "since for step 'step1' the results [FAILURE] of its dependency 'user.ops.java_op' " +
+                "have no matching navigation.");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -536,9 +537,9 @@ public class CompilerErrorsTest {
         dependencies.add(operationModel);
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Cannot compile flow: 'step_with_missing_navigation_from_operation_result_flow' " +
-                "since for step: 'step1', the result 'FAILURE' of its dependency: 'user.ops.java_op' " +
-                "has no matching navigation");
+        exception.expectMessage("Cannot compile flow 'step_with_missing_navigation_from_operation_result_flow' " +
+                "since for step 'step1' the results [FAILURE] of its dependency 'user.ops.java_op' " +
+                "have no matching navigation.");
         List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         Assert.assertEquals(1, errors.size());
         throw errors.get(0);
@@ -624,8 +625,8 @@ public class CompilerErrorsTest {
         dependencies.add(SlangSource.fromFile(operation4));
 
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Cannot compile flow: 'child_flow' since for step: 'step01', the result 'NEGATIVE' " +
-                "of its dependency: 'user.ops.get_time_zone' has no matching navigation");
+        exception.expectMessage("Cannot compile flow 'child_flow' since for step 'step01' the results [NEGATIVE]" +
+                " of its dependency 'user.ops.get_time_zone' have no matching navigation.");
         compiler.compile(SlangSource.fromFile(resource), dependencies);
     }
 

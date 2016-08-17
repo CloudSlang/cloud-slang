@@ -942,6 +942,9 @@ flow:
           - type_list_argument1_sensitive
           - type_list_argument2_sensitive
 
+        navigate:
+          - SUCCESS: SUCCESS
+
   outputs:
     - cmp_int_arguments
     - cmp_int_argument1_sensitive
@@ -1334,4 +1337,3 @@ flow:
 
   results:
     - SUCCESS
-    - FAILURE

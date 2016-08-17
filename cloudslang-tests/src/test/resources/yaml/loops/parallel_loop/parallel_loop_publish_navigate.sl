@@ -33,3 +33,8 @@ flow:
         do:
             ops.print_list:
                 - words_list: []
+        navigate:
+            - SUCCESS: SUCCESS
+  results:
+    - SUCCESS
+    - FAILURE

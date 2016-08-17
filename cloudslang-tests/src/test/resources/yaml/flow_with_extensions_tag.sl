@@ -16,6 +16,10 @@ flow:
     - noop_step:
         do:
           ops.noop: []
+        navigate:
+          - SUCCESS: SUCCESS
+  results:
+    - SUCCESS
 
 extensions:
   - visual:
