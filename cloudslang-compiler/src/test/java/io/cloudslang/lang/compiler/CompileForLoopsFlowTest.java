@@ -13,7 +13,9 @@ import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.entities.*;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
@@ -41,6 +43,9 @@ public class CompileForLoopsFlowTest {
 
     @Autowired
     private SlangCompiler compiler;
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     public static ListForLoopStatement validateListForLoopStatement(LoopStatement statement) {
         Assert.assertEquals(true, statement instanceof ListForLoopStatement);
@@ -239,4 +244,20 @@ public class CompileForLoopsFlowTest {
         assertEquals(Arrays.asList(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.FAILURE_RESULT),
                 endStepActionData.get(ScoreLangConstants.BREAK_LOOP_KEY));
     }
+
+    @Test
+    public void testCompileLoopFlowWithBreakOnNonExistingResult() throws Exception {
+        URI flow = getClass().getResource("/loops/loop_with_break_on_non_existing_result.sl").toURI();
+        URI operation = getClass().getResource("/loops/print.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage(
+                "Cannot compile flow 'loops.loop_with_break_on_non_existing_result' since in step" +
+                        " 'print_values' the results [CUSTOM_1, CUSTOM_2] declared in 'break' section " +
+                        "are not declared in the dependency 'loops.print' result section."
+        );
+        compiler.compile(SlangSource.fromFile(flow), path);
+    }
+
 }
