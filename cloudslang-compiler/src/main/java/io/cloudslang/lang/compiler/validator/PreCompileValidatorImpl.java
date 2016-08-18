@@ -283,6 +283,17 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         }
     }
 
+    @Override
+    public void validateResultName(String resultName) {
+        validateKeywords(resultName);
+    }
+
+    private void validateKeywords(String resultName) {
+        if (SlangTextualKeys.ON_FAILURE_KEY.equalsIgnoreCase(resultName)) {
+            throw new RuntimeException("Result cannot be called '" + SlangTextualKeys.ON_FAILURE_KEY + "'.");
+        }
+    }
+
     private String getMessagePart(Class aClass) {
         String messagePart = "";
         if (aClass.equals(Input.class)) {
