@@ -7,6 +7,7 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.score.api.ExecutionStep;
 import io.cloudslang.score.events.ScoreEvent;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.URL;
@@ -47,6 +48,7 @@ public class OperationWithDependenciesSystemTest extends SystemsTestsParent {
         ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
         assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
+    @Ignore("Enable when `dependencies` tag will be added")
     @Test
     public void testCompilePythonActionWithDependencies() throws Exception {
         URL resource = getClass().getResource("/yaml/action_w_dependencies_python_test.sl");

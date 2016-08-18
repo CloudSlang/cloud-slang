@@ -30,27 +30,34 @@ public class PythonActionTransformer extends AbstractTransformer implements Tran
     private DependencyFormatValidator dependencyFormatValidator;
 
     private static Set<String> mandatoryKeySet = Sets.newHashSet(SlangTextualKeys.PYTHON_ACTION_SCRIPT_KEY);
-    private static Set<String> optionalKeySet = Sets.newHashSet(SlangTextualKeys.PYTHON_ACTION_DEPENDENCIES_KEY);
+    private static Set<String> optionalKeySet = Collections.emptySet();
+
+    @SuppressWarnings("FieldCanBeLocal") // remove when `dependencies` will be enabled
+    private boolean dependenciesEnabled = false;
 
     @Override
     public TransformModellingResult<Map<String, Serializable>> transform(Map<String, Serializable> rawData) {
         List<RuntimeException> errors = new ArrayList<>();
+        Map<String, Serializable> transformedData = null;
 
         try {
             if (rawData != null) {
                 validateKeySet(rawData.keySet(), mandatoryKeySet, optionalKeySet);
-                Collection<String> dependencies = (List<String>) rawData.get(SlangTextualKeys.PYTHON_ACTION_DEPENDENCIES_KEY);
-                if (dependencies != null) {
-                    for (String dependency : dependencies) {
-                        dependencyFormatValidator.validateDependency(dependency);
+                if (dependenciesEnabled) {
+                    Collection<String> dependencies = (List<String>) rawData.get(SlangTextualKeys.PYTHON_ACTION_DEPENDENCIES_KEY);
+                    if (dependencies != null) {
+                        for (String dependency : dependencies) {
+                            dependencyFormatValidator.validateDependency(dependency);
+                        }
                     }
                 }
+                transformedData = rawData;
             }
         } catch (RuntimeException rex) {
             errors.add(rex);
         }
 
-        return new BasicTransformModellingResult<>(rawData, errors);
+        return new BasicTransformModellingResult<>(transformedData, errors);
     }
 
     @Override
