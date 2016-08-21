@@ -13,6 +13,7 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.URI;
@@ -26,6 +27,7 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+@Ignore("Enable when `dependencies` tag will be added")
 public class FlowWithPythonVersioningTest extends SystemsTestsParent {
     @Test
     public void testFlowWithOperationIfDifferentVersions() throws Exception {
