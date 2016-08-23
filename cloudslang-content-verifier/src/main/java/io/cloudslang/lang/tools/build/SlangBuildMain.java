@@ -13,6 +13,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.tools.build.commands.ApplicationArgs;
+import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.TestRun;
 import io.cloudslang.score.events.ScoreEvent;
@@ -97,7 +98,7 @@ public class SlangBuildMain {
 
         try {
             SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites, false);
-            RunTestsResults runTestsResults = buildResults.getRunTestsResults();
+            IRunTestResults runTestsResults = buildResults.getRunTestsResults();
             Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
 
             if (MapUtils.isNotEmpty(skippedTests)) {
@@ -175,7 +176,7 @@ public class SlangBuildMain {
         return runTestsInParallel;
     }
 
-    private static void printBuildSuccessSummary(String contentPath, SlangBuildResults buildResults, RunTestsResults runTestsResults) {
+    private static void printBuildSuccessSummary(String contentPath, SlangBuildResults buildResults, IRunTestResults runTestsResults) {
         log.info("");
         log.info("------------------------------------------------------------");
         log.info("BUILD SUCCESS");
@@ -186,7 +187,7 @@ public class SlangBuildMain {
         log.info("");
     }
 
-    private static void printNumberOfPassedAndSkippedTests(RunTestsResults runTestsResults) {
+    private static void printNumberOfPassedAndSkippedTests(IRunTestResults runTestsResults) {
         log.info(runTestsResults.getPassedTests().size() + " test cases passed");
         Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
         if(skippedTests.size() > 0) {
@@ -194,7 +195,7 @@ public class SlangBuildMain {
         }
     }
 
-    private static void printPassedTests(RunTestsResults runTestsResults) {
+    private static void printPassedTests(IRunTestResults runTestsResults) {
         if (runTestsResults.getPassedTests().size() > 0) {
             log.info("------------------------------------------------------------");
             log.info("Following " + runTestsResults.getPassedTests().size() + " test cases passed:");
@@ -205,7 +206,7 @@ public class SlangBuildMain {
         }
     }
 
-    private static void printBuildFailureSummary(String projectPath, RunTestsResults runTestsResults) {
+    private static void printBuildFailureSummary(String projectPath, IRunTestResults runTestsResults) {
         printNumberOfPassedAndSkippedTests(runTestsResults);
         Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
         log.error("");
@@ -231,7 +232,7 @@ public class SlangBuildMain {
         }
     }
 
-    private static void printTestCoverageData(RunTestsResults runTestsResults){
+    private static void printTestCoverageData(IRunTestResults runTestsResults){
         printCoveredExecutables(runTestsResults.getCoveredExecutables());
         printUncoveredExecutables(runTestsResults.getUncoveredExecutables());
         int coveredExecutablesSize = runTestsResults.getCoveredExecutables().size();
