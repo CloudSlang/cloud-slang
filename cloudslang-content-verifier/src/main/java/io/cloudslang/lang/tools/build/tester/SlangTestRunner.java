@@ -242,7 +242,7 @@ public class SlangTestRunner {
         Map<String, Value> convertedInputs = getTestCaseInputsMap(testCase);
         Set<SystemProperty> systemProperties = getTestSystemProperties(testCase, projectPath);
 
-        trigger(testCase, compiledTestFlow, convertedInputs, systemProperties);
+        runTestCaseSequentiallyToCompletion(testCase, compiledTestFlow, convertedInputs, systemProperties);
     }
 
     public void runTestParallel(SlangTestCase testCase, CompilationArtifact compiledTestFlow, String projectPath, MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener) {
@@ -250,7 +250,7 @@ public class SlangTestRunner {
         Map<String, Value> convertedInputs = getTestCaseInputsMap(testCase);
         Set<SystemProperty> systemProperties = getTestSystemProperties(testCase, projectPath);
 
-        triggerParallel(testCase, compiledTestFlow, convertedInputs, systemProperties, multiTriggerTestCaseEventListener);
+        runTestCaseInParallelToCompletion(testCase, compiledTestFlow, convertedInputs, systemProperties, multiTriggerTestCaseEventListener);
     }
 
     private Set<SystemProperty> getTestSystemProperties(SlangTestCase testCase, String projectPath) {
@@ -293,9 +293,9 @@ public class SlangTestRunner {
      * @param inputs              : flow inputs
      * @return executionId
      */
-    public Long trigger(SlangTestCase testCase, CompilationArtifact compilationArtifact,
-                        Map<String, Value> inputs,
-                        Set<SystemProperty> systemProperties) {
+    public Long runTestCaseSequentiallyToCompletion(SlangTestCase testCase, CompilationArtifact compilationArtifact,
+                                                    Map<String, Value> inputs,
+                                                    Set<SystemProperty> systemProperties) {
 
         String testCaseName = testCase.getName();
         String result = testCase.getResult();
@@ -362,9 +362,9 @@ public class SlangTestRunner {
         return executionId;
     }
 
-    public Long triggerParallel(SlangTestCase testCase, CompilationArtifact compilationArtifact,
-                                Map<String, Value> inputs,
-                                Set<SystemProperty> systemProperties, MultiTriggerTestCaseEventListener globalListener) {
+    public Long runTestCaseInParallelToCompletion(SlangTestCase testCase, CompilationArtifact compilationArtifact,
+                                                  Map<String, Value> inputs,
+                                                  Set<SystemProperty> systemProperties, MultiTriggerTestCaseEventListener globalListener) {
 
         String testCaseName = testCase.getName();
         String result = testCase.getResult();
