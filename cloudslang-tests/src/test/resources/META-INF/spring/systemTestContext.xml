@@ -15,7 +15,7 @@
                         http://www.cloudslang.io/schema/score
                         http://www.cloudslang.io/schema/score.xsd">
 
-    <bean class="io.cloudslang.lang.api.configuration.SlangSpringConfiguration"/>
+    <bean class="io.cloudslang.lang.commons.configuration.SlangCommonsSpringConfig"/>
 
     <score:engine />
 

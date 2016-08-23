@@ -10,13 +10,12 @@ package io.cloudslang.lang.cli.utils;
 
 import ch.lambdaj.function.convert.Converter;
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangSource;
-import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
-import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.SetUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -54,6 +53,8 @@ public class CompilerHelperImpl implements CompilerHelper{
     private Slang slang;
     @Autowired
     private Yaml yaml;
+    @Autowired
+    private SlangSourceService slangSourceService;
 
     @Override
 	public CompilationArtifact compile(String filePath, List<String> dependencies) throws IOException {
@@ -124,7 +125,7 @@ public class CompilerHelperImpl implements CompilerHelper{
                             (Map<String, ? extends Serializable>) yaml.load(inputsFileContent);
                     if (MapUtils.isNotEmpty(inputFileYamlContent)) {
                         emptyContent = false;
-                        populateResultMap(result, inputFileYamlContent, inputFile);
+                        result.putAll(slangSourceService.convertFromRawMap(inputFileYamlContent, inputFile.getName()));
                     }
                 }
                 if (emptyContent) {
@@ -136,41 +137,6 @@ public class CompilerHelperImpl implements CompilerHelper{
 			}
 		}
         return result;
-    }
-
-    private void populateResultMap(Map<String, Value> result, Map<String, ? extends Serializable> inputFileYamlContent,
-                                   File inputFile) {
-        for (Map.Entry<String, ? extends Serializable> property : inputFileYamlContent.entrySet()) {
-            if (property.getValue() instanceof Map) {
-                @SuppressWarnings("unchecked") Map<String, ? extends Serializable> valueMap = (Map) property.getValue();
-                validateKeys(inputFile, valueMap);
-                result.put(property.getKey(),
-                        ValueFactory.create(valueMap.get(SlangTextualKeys.VALUE_KEY), isSensitiveValue(valueMap)));
-
-            } else {
-                result.put(property.getKey(), ValueFactory.create(property.getValue(), false));
-            }
-        }
-    }
-
-    private void validateKeys(File inputFile, Map<String, ? extends Serializable> valueMap) {
-        List<String> knownModifierKeys = Arrays.asList(SlangTextualKeys.SENSITIVE_KEY, SlangTextualKeys.VALUE_KEY);
-        for (String modifierKey : valueMap.keySet()) {
-            if (!knownModifierKeys.contains(modifierKey)) {
-                throw new RuntimeException(
-                        "Artifact {" + inputFile + "} has unrecognized tag {" + modifierKey + "}" +
-                                ". Please take a look at the supported features per versions link");
-            }
-        }
-    }
-
-
-    private Boolean isSensitiveValue(Map<String, ? extends Serializable> valueMap) {
-        Boolean isSensitive = false;
-        if (valueMap.get(SlangTextualKeys.SENSITIVE_KEY) instanceof Boolean) {
-            isSensitive = (Boolean) valueMap.get(SlangTextualKeys.SENSITIVE_KEY);
-        }
-        return isSensitive;
     }
 
     private Set<SystemProperty> loadPropertiesFromFiles(List<File> files, String[] extensions, String directory) {

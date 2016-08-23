@@ -9,6 +9,7 @@
 package io.cloudslang.lang.tools.build;
 
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
@@ -359,6 +360,11 @@ public class SlangBuildTest {
         @Bean
         public Slang slang() {
             return mock(Slang.class);
+        }
+
+        @Bean
+        public SlangSourceService slangSourceService() {
+            return mock(SlangSourceService.class);
         }
     }
 }
