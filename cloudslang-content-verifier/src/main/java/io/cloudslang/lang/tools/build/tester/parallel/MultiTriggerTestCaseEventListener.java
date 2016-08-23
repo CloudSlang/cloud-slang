@@ -15,6 +15,8 @@ import java.util.Map;
 
 public class MultiTriggerTestCaseEventListener implements ScoreEventListener {
 
+    public static final String SYSTEM_CONTEXT = "systemContext";
+    public static final String EXECUTION_ID_CONTEXT = "executionIdContext";
     private Map<Long, Boolean> flowFinishedMap;
     private Map<Long, String> errorMessageMap;
     private Map<Long, String> resultMap;
@@ -48,7 +50,8 @@ public class MultiTriggerTestCaseEventListener implements ScoreEventListener {
     public synchronized void onEvent(ScoreEvent scoreEvent) throws InterruptedException {
         @SuppressWarnings("unchecked") Map<String, Serializable> data = (Map<String, Serializable>) scoreEvent.getData();
         LanguageEventData eventData;
-        Long executionId = 1L;
+        Long executionId =  (data instanceof LanguageEventData) ? (((LanguageEventData) data).getExecutionId()) :
+                (Long) ((Map)data.get(SYSTEM_CONTEXT)).get(EXECUTION_ID_CONTEXT);
 
         switch (scoreEvent.getEventType()) {
             case EventConstants.SCORE_FINISHED_EVENT:
