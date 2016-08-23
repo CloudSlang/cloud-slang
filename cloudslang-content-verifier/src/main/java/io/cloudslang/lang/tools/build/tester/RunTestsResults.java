@@ -14,9 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-/**
- * Created by stoneo on 4/27/2015.
- **/
 
 /**
  * Holds the results of running the content test cases
