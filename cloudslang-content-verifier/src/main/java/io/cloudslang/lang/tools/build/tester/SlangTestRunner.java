@@ -17,7 +17,7 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.tools.build.SlangBuildMain;
 import io.cloudslang.lang.tools.build.tester.parallel.MultiTriggerTestCaseEventListener;
-import io.cloudslang.lang.tools.build.tester.parallel.collect.ThreadSafeRunTestResults;
+import io.cloudslang.lang.tools.build.tester.parallel.report.ThreadSafeRunTestResults;
 import io.cloudslang.lang.tools.build.tester.parallel.report.LoggingSlangTestCaseEventListener;
 import io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService;
 import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDispatchService;
@@ -167,8 +167,8 @@ public class SlangTestRunner {
         }
 
         testCaseEventDispatchService.unregisterAllListeners();
-        testCaseEventDispatchService.registerListener(runTestsResults);
-        testCaseEventDispatchService.registerListener(new LoggingSlangTestCaseEventListener());
+        testCaseEventDispatchService.registerListener(runTestsResults); // for gathering of report data
+        testCaseEventDispatchService.registerListener(new LoggingSlangTestCaseEventListener()); // for logging purpose
 
         MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener = new MultiTriggerTestCaseEventListener();
         slang.subscribeOnEvents(multiTriggerTestCaseEventListener, createListenerEventTypesSet());

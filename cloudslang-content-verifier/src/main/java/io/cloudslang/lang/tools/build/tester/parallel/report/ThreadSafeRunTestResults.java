@@ -1,4 +1,4 @@
-package io.cloudslang.lang.tools.build.tester.parallel.collect;
+package io.cloudslang.lang.tools.build.tester.parallel.report;
 
 
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
