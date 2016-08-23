@@ -2,7 +2,13 @@ package io.cloudslang.lang.tools.build.tester.parallel.collect;
 
 
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
+import io.cloudslang.lang.tools.build.tester.ISlangTestCaseEventListener;
 import io.cloudslang.lang.tools.build.tester.TestRun;
+import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.FailedSlangTestCaseEvent;
+import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.PassedSlangTestCaseEvent;
+import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.SkippedSlangTestCaseEvent;
+import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.SlangTestCaseEvent;
+import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -13,7 +19,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class ThreadSafeRunTestResults implements IRunTestResults {
+public class ThreadSafeRunTestResults implements IRunTestResults, ISlangTestCaseEventListener {
 
     private ConcurrentMap<String, TestRun> passedTests;
     private ConcurrentMap<String, TestRun> failedTests;
@@ -106,6 +112,19 @@ public class ThreadSafeRunTestResults implements IRunTestResults {
     }
 
     @Override
+    public void onEvent(SlangTestCaseEvent event) {
+        SlangTestCase slangTestCase = event.getSlangTestCase();
+        if (event instanceof FailedSlangTestCaseEvent) {
+            addFailedTest(slangTestCase.getName(), new TestRun(slangTestCase, ((FailedSlangTestCaseEvent) event).getFailureReason()));
+        } else if (event instanceof PassedSlangTestCaseEvent) {
+            addPassedTest(slangTestCase.getName(), new TestRun(slangTestCase, null));
+        } else if (event instanceof SkippedSlangTestCaseEvent) {
+            addSkippedTest(slangTestCase.getName(), new TestRun(slangTestCase, "Skipping test: " + slangTestCase.getName() + " because it is not in active test suites"));
+        }
+
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
@@ -146,4 +165,5 @@ public class ThreadSafeRunTestResults implements IRunTestResults {
                 .append(lockUncoveredExecutables)
                 .toHashCode();
     }
+
 }

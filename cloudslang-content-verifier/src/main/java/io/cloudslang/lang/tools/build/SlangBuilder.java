@@ -11,6 +11,7 @@ package io.cloudslang.lang.tools.build;
 
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
@@ -56,7 +57,7 @@ public class SlangBuilder {
 
         Map<String, CompilationArtifact> compiledSources = compileModels(slangModels);
 
-        RunTestsResults runTestsResults = new RunTestsResults();
+        IRunTestResults runTestsResults = new RunTestsResults();
         if (StringUtils.isNotBlank(testsPath) && new File(testsPath).isDirectory()) {
             runTestsResults = runTests(slangModels, projectPath, testsPath, testSuits, false);
         }
@@ -82,7 +83,7 @@ public class SlangBuilder {
         return compiledSlangFiles;
     }
 
-    private RunTestsResults runTests(Map<String, Executable> contentSlangModels,
+    private IRunTestResults runTests(Map<String, Executable> contentSlangModels,
                                      String projectPath, String testsPath, List<String> testSuites, boolean runTestsInParallel){
         log.info("");
         log.info("--- compiling tests sources ---");
@@ -100,7 +101,7 @@ public class SlangBuilder {
         log.info("");
         log.info("--- running tests ---");
         log.info("Found " + testCases.size() + " tests");
-        RunTestsResults runTestsResults;
+        IRunTestResults runTestsResults;
         if (!runTestsInParallel) {
             runTestsResults = slangTestRunner.runAllTestsSequential(projectPath, testCases, compiledFlows, testSuites);
         } else {
@@ -119,7 +120,7 @@ public class SlangBuilder {
     }
 
     private void addCoverageDataToRunTestsResults(Map<String, Executable> contentSlangModels, Map<String, Executable> testFlowModels,
-                                                  Map<String, SlangTestCase> testCases, RunTestsResults runTestsResults) {
+                                                  Map<String, SlangTestCase> testCases, IRunTestResults runTestsResults) {
         Set<String> coveredContent = new HashSet<>();
         Set<String> uncoveredContent = new HashSet<>();
         // Add to the covered content set all the dependencies of the test flows
