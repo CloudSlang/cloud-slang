@@ -9,6 +9,7 @@ import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import org.apache.log4j.Logger;
 
 public class LoggingSlangTestCaseEventListener implements ISlangTestCaseEventListener {
+
     private static Logger log = Logger.getLogger(LoggingSlangTestCaseEventListener.class);
 
     @Override

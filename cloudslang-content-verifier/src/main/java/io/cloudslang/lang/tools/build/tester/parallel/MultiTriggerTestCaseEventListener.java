@@ -39,7 +39,7 @@ public class MultiTriggerTestCaseEventListener implements ScoreEventListener {
     }
 
     public String getErrorMessageByExecutionId(Long executionId) {
-        return errorMessageMap.get(executionId); // TODO see why special treatment of empty is required
+        return errorMessageMap.get(executionId);
     }
 
     public Map<String, Serializable> getOutputsByExecutionId(Long executionId) {
