@@ -16,6 +16,7 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.tools.build.SlangBuildMain;
+import io.cloudslang.lang.tools.build.tester.parallel.MultiTriggerTestCaseEventListener;
 import io.cloudslang.lang.tools.build.tester.parallel.collect.ThreadSafeRunTestResults;
 import io.cloudslang.lang.tools.build.tester.parallel.report.LoggingSlangTestCaseEventListener;
 import io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService;
@@ -245,7 +246,8 @@ public class SlangTestRunner {
         Map<String, Value> convertedInputs = getTestCaseInputsMap(testCase);
         Set<SystemProperty> systemProperties = getTestSystemProperties(testCase, projectPath);
 
-        trigger(testCase, compiledTestFlow, convertedInputs, systemProperties);
+        MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener = new MultiTriggerTestCaseEventListener();
+        triggerParallel(testCase, compiledTestFlow, convertedInputs, systemProperties, multiTriggerTestCaseEventListener);
     }
 
     private Set<SystemProperty> getTestSystemProperties(SlangTestCase testCase, String projectPath) {
@@ -359,7 +361,7 @@ public class SlangTestRunner {
 
     public Long triggerParallel(SlangTestCase testCase, CompilationArtifact compilationArtifact,
                                 Map<String, Value> inputs,
-                                Set<SystemProperty> systemProperties, TriggerTestCaseEventListener globalListener) {
+                                Set<SystemProperty> systemProperties, MultiTriggerTestCaseEventListener globalListener) {
 
         String testCaseName = testCase.getName();
         String result = testCase.getResult();
@@ -368,14 +370,14 @@ public class SlangTestRunner {
 
         Long executionId = slang.run(compilationArtifact, inputs, systemProperties);
 
-        while (!globalListener.isFlowFinished()) {
+        while (!globalListener.isFlowFinishedByExecutionId(executionId)) {
             try {
                 Thread.sleep(200);
             } catch (InterruptedException ignore) {
             }
         }
 
-        String errorMessageFlowExecution = globalListener.getErrorMessage();
+        String errorMessageFlowExecution = globalListener.getErrorMessageByExecutionId(executionId);
 
         String message;
         if (BooleanUtils.isTrue(testCase.getThrowsException())) {
@@ -397,14 +399,14 @@ public class SlangTestRunner {
             throw new RuntimeException(message);
         }
 
-        String executionResult = globalListener.getResult();
+        String executionResult = globalListener.getResultByExecutionId(executionId);
         if (result != null && !result.equals(executionResult)) {
             message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tExpected result: " + result + "\n\tActual result: " + executionResult;
             log.error(message);
             throw new RuntimeException(message);
         }
 
-        Map<String, Serializable> executionOutputs = globalListener.getOutputs();
+        Map<String, Serializable> executionOutputs = globalListener.getOutputsByExecutionId(executionId);
         if (MapUtils.isNotEmpty(outputs)) {
             for (Map.Entry<String, Serializable> output : outputs.entrySet()) {
                 String outputName = output.getKey();
