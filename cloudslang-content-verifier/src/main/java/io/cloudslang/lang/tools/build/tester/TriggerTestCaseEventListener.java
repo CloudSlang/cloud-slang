@@ -89,7 +89,7 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
         }
     }
 
-    private static Map<String, Serializable> extractOutputs(LanguageEventData data) {
+    public static Map<String, Serializable> extractOutputs(LanguageEventData data) {
 
         Map<String, Serializable> outputsMap = new HashMap<>();
 

@@ -12,7 +12,7 @@ public class LoggingSlangTestCaseEventListener implements ISlangTestCaseEventLis
     private static Logger log = Logger.getLogger(LoggingSlangTestCaseEventListener.class);
 
     @Override
-    public void onEvent(SlangTestCaseEvent event) {
+    public synchronized void onEvent(SlangTestCaseEvent event) {
         SlangTestCase slangTestCase = event.getSlangTestCase();
         if (event instanceof BeginSlangTestCaseEvent) {
             log.info("Running test: " + slangTestCase.getName() + " - " + slangTestCase.getDescription());

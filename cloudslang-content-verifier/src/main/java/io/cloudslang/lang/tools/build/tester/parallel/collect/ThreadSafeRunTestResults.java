@@ -112,7 +112,7 @@ public class ThreadSafeRunTestResults implements IRunTestResults, ISlangTestCase
     }
 
     @Override
-    public void onEvent(SlangTestCaseEvent event) {
+    public synchronized void onEvent(SlangTestCaseEvent event) {
         SlangTestCase slangTestCase = event.getSlangTestCase();
         if (event instanceof FailedSlangTestCaseEvent) {
             addFailedTest(slangTestCase.getName(), new TestRun(slangTestCase, ((FailedSlangTestCaseEvent) event).getFailureReason()));
