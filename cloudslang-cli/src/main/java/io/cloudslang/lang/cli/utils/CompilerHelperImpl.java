@@ -125,7 +125,7 @@ public class CompilerHelperImpl implements CompilerHelper{
                             (Map<String, ? extends Serializable>) yaml.load(inputsFileContent);
                     if (MapUtils.isNotEmpty(inputFileYamlContent)) {
                         emptyContent = false;
-                        result.putAll(slangSourceService.convertFromRawMap(inputFileYamlContent, inputFile.getName()));
+                        result.putAll(slangSourceService.convertInputFromRawMap(inputFileYamlContent, inputFile.getName()));
                     }
                 }
                 if (emptyContent) {

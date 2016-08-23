@@ -18,5 +18,5 @@ import java.util.Map;
  * @since 8/23/2016
  */
 public interface SlangSourceService {
-    Map<String, Value> convertFromRawMap(Map<String, ? extends Serializable> rawMap, String artifact);
+    Map<String, Value> convertInputFromRawMap(Map<String, ? extends Serializable> rawMap, String artifact);
 }

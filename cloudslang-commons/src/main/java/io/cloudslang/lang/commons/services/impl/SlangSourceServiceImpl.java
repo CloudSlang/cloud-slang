@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SlangSourceServiceImpl implements SlangSourceService{
     @Override
-    public Map<String, Value> convertFromRawMap(Map<String, ? extends Serializable> rawMap, String artifact) {
+    public Map<String, Value> convertInputFromRawMap(Map<String, ? extends Serializable> rawMap, String artifact) {
         Map<String, Value> result = new HashMap<>();
         for (Map.Entry<String, ? extends Serializable> property : rawMap.entrySet()) {
             if (property.getValue() instanceof Map) {
