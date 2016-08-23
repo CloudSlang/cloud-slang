@@ -44,6 +44,10 @@ public class ApplicationArgs {
             description = "Whether or not test coverage data should be outputted")
     public boolean coverage = false;
 
+    @Parameter(names = {"--parallel", "-par"},
+            description = "Whether or not parallel test execution should be used")
+    public boolean parallel = false;
+
     @Parameter(names = {"--help", "-h"}, help = true,
             description = "Display help information")
     private boolean help;
@@ -81,5 +85,9 @@ public class ApplicationArgs {
 
     public Map<String, String> getDynamicParams() {
         return dynamicParams;
+    }
+
+    public Boolean isParallel() {
+        return parallel;
     }
 }

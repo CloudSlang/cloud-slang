@@ -28,6 +28,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
@@ -73,6 +74,7 @@ public class SlangBuildMain {
         String testsPath = StringUtils.defaultIfEmpty(appArgs.getTestRoot(), projectPath + TEST_DIR);
         List<String> testSuites = parseTestSuites(appArgs);
         Boolean shouldPrintCoverageData = parseCoverageArg(appArgs);
+        Boolean runTestsInParallel = parseParallelTestsArg(appArgs);
 
         log.info("");
         log.info("------------------------------------------------------------");
@@ -80,6 +82,7 @@ public class SlangBuildMain {
         log.info("Content root is at: " + contentPath);
         log.info("Test root is at: " + testsPath);
         log.info("Active test suites are: " + Arrays.toString(testSuites.toArray()));
+        log.info("Parallel: " + Arrays.toString(testSuites.toArray()));
 
         log.info("");
         log.info("Loading...");
@@ -152,13 +155,22 @@ public class SlangBuildMain {
         return testSuites;
     }
 
-    private static Boolean parseCoverageArg(ApplicationArgs appArgs){
-        Boolean shouldOutputCoverageData = false;
+    private static boolean parseCoverageArg(ApplicationArgs appArgs) {
+        boolean shouldOutputCoverageData = false;
 
         if (appArgs.shouldOutputCoverage() != null) {
             shouldOutputCoverageData = appArgs.shouldOutputCoverage();
         }
         return shouldOutputCoverageData;
+    }
+
+    private static boolean parseParallelTestsArg(ApplicationArgs appArgs) {
+        boolean runTestsInParallel = false;
+
+        if (appArgs.isParallel() != null) {
+            runTestsInParallel = appArgs.isParallel();
+        }
+        return runTestsInParallel;
     }
 
     private static void printBuildSuccessSummary(String contentPath, SlangBuildResults buildResults, RunTestsResults runTestsResults) {

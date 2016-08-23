@@ -100,7 +100,7 @@ public class SlangBuilder {
         log.info("");
         log.info("--- running tests ---");
         log.info("Found " + testCases.size() + " tests");
-        RunTestsResults runTestsResults = slangTestRunner.runAllTests(projectPath, testCases, compiledFlows, testSuites);
+        RunTestsResults runTestsResults = slangTestRunner.runAllTestsSequential(projectPath, testCases, compiledFlows, testSuites);
         addCoverageDataToRunTestsResults(contentSlangModels, testFlowModels, testCases, runTestsResults);
         return runTestsResults;
     }

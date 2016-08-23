@@ -271,7 +271,7 @@ public class SlangBuildTest {
         Mockito.when(scoreCompiler.compile(emptyExecutable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
         RunTestsResults runTestsResults = new RunTestsResults();
         runTestsResults.addFailedTest("test1", new TestRun(new SlangTestCase("test1", "", null, null, null, null, null, null, null), "message"));
-        Mockito.when(slangTestRunner.runAllTests(any(String.class), anyMap(), anyMap(), anyList())).thenReturn(runTestsResults);
+        Mockito.when(slangTestRunner.runAllTestsSequential(any(String.class), anyMap(), anyMap(), anyList())).thenReturn(runTestsResults);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(contentResource.getPath(), contentResource.getPath(), testResource.getPath(), null);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
         RunTestsResults actualRunTestsResults = buildResults.getRunTestsResults();
@@ -288,7 +288,7 @@ public class SlangBuildTest {
         RunTestsResults runTestsResults = new RunTestsResults();
         runTestsResults.addFailedTest("test1", new TestRun(new SlangTestCase("test1", "", null, null, null, null, null, null, null), "message"));
         Mockito.when(
-                slangTestRunner.runAllTests(
+                slangTestRunner.runAllTestsSequential(
                         any(String.class),
                         anyMapOf(String.class, SlangTestCase.class),
                         anyMapOf(String.class, CompilationArtifact.class),

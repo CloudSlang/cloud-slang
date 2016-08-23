@@ -16,6 +16,9 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.tools.build.SlangBuildMain;
+import io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService;
+import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDispatchService;
+import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.FailedSlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import io.cloudslang.score.events.EventConstants;
@@ -37,20 +40,29 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 
-/**
- * Created by stoneo on 3/15/2015.
- */
+import static java.util.concurrent.TimeUnit.MINUTES;
+
+
 @Component
 public class SlangTestRunner {
 
     private final static String PROJECT_PATH_TOKEN = "${project_path}";
+    public static final int MAX_TIME_PER_TESTCASE_IN_MINUTES = 10;
 
     @Autowired
     private TestCasesYamlParser parser;
 
     @Autowired
     private Slang slang;
+
+    @Autowired
+    private ParallelTestCaseExecutorService parallelTestCaseExecutorService;
+
+    @Autowired
+    private TestCaseEventDispatchService testCaseEventDispatchService;
 
     private String[] TEST_CASE_FILE_EXTENSIONS = {"yaml", "yml"};
     public static final String TEST_CASE_PASSED = "Test case passed: ";
@@ -113,8 +125,8 @@ public class SlangTestRunner {
      * @param testSuites
      * @return RunTestsResults containing maps of passed, failed & skipped tests
      */
-    public RunTestsResults runAllTests(String projectPath, Map<String, SlangTestCase> testCases,
-                            Map<String, CompilationArtifact> compiledFlows, List<String> testSuites) {
+    public RunTestsResults runAllTestsSequential(String projectPath, Map<String, SlangTestCase> testCases,
+                                                 Map<String, CompilationArtifact> compiledFlows, List<String> testSuites) {
 
         RunTestsResults runTestsResults = new RunTestsResults();
         if(MapUtils.isEmpty(testCases)){
@@ -126,8 +138,7 @@ public class SlangTestRunner {
                 runTestsResults.addFailedTest(UNAVAILABLE_NAME, new TestRun(testCase, "Test case cannot be null"));
                 continue;
             }
-            if ((CollectionUtils.isEmpty(testCase.getTestSuites()) && testSuites.contains(SlangBuildMain.DEFAULT_TESTS)) ||
-                    CollectionUtils.containsAny(testSuites, testCase.getTestSuites())) {
+            if (isTestCaseInActiveSuite(testCase, testSuites)) {
                 log.info("Running test: " + testCaseEntry.getKey() + " - " + testCase.getDescription());
                 try {
                     CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
@@ -145,6 +156,46 @@ public class SlangTestRunner {
         return runTestsResults;
     }
 
+    public RunTestsResults runAllTestsParallel(String projectPath, Map<String, SlangTestCase> testCases,
+                                                 Map<String, CompilationArtifact> compiledFlows, List<String> testSuites) {
+
+        RunTestsResults runTestsResults = new RunTestsResults();
+        if (MapUtils.isEmpty(testCases)) {
+            return runTestsResults;
+        }
+
+        Map<SlangTestCase, Future<?>> testCaseFutures = new HashMap<>();
+        for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
+            SlangTestCase testCase = testCaseEntry.getValue();
+            if (testCase == null) {
+                testCaseEventDispatchService.notifyListeners(new FailedSlangTestCaseEvent(testCase, "Test case cannot be null", null));
+                continue;
+            }
+            SlangTestCaseRunnable slangTestCaseRunnable = new SlangTestCaseRunnable(testCase, compiledFlows, projectPath, testSuites, this, testCaseEventDispatchService);
+            testCaseFutures.put(testCase, parallelTestCaseExecutorService.submitTestCase(slangTestCaseRunnable));
+        }
+
+        for (Map.Entry<SlangTestCase, Future<?>> slangTestCaseFutureEntry : testCaseFutures.entrySet()) {
+            SlangTestCase testCase = slangTestCaseFutureEntry.getKey();
+            Future<?> testCaseFuture = slangTestCaseFutureEntry.getValue();
+            try {
+                testCaseFuture.get(MAX_TIME_PER_TESTCASE_IN_MINUTES, MINUTES);
+            } catch (InterruptedException e) {
+                log.error("Interrupted while waiting for result: ", e);
+            } catch (TimeoutException e) {
+                    testCaseEventDispatchService.notifyListeners(new FailedSlangTestCaseEvent(testCase, "Timeout reached for test case " + testCase.getName(), e));
+            } catch (Exception e) {
+                testCaseEventDispatchService.notifyListeners(new FailedSlangTestCaseEvent(testCase, e.getMessage(), e));
+            }
+        }
+        return runTestsResults;
+    }
+
+    public boolean isTestCaseInActiveSuite(SlangTestCase testCase, List<String> testSuites) {
+        return (CollectionUtils.isEmpty(testCase.getTestSuites()) && testSuites.contains(SlangBuildMain.DEFAULT_TESTS)) ||
+                CollectionUtils.containsAny(testSuites, testCase.getTestSuites());
+    }
+
     private void printTestCasesWithMissingReference(Set<SlangTestCase> testCasesWithMissingReference) {
         int testCasesWithMissingReferenceSize = testCasesWithMissingReference.size();
         if (testCasesWithMissingReferenceSize > 0) {
@@ -160,7 +211,7 @@ public class SlangTestRunner {
         }
     }
 
-    private static CompilationArtifact getCompiledTestFlow(Map<String, CompilationArtifact> compiledFlows, SlangTestCase testCase) {
+    public CompilationArtifact getCompiledTestFlow(Map<String, CompilationArtifact> compiledFlows, SlangTestCase testCase) {
         String testFlowPath = testCase.getTestFlowPath();
         if(StringUtils.isEmpty(testFlowPath)){
             throw new RuntimeException("For test case: " + testCase.getName() + " testFlowPath property is mandatory");
@@ -173,7 +224,15 @@ public class SlangTestRunner {
         return compiledTestFlow;
     }
 
-    private void runTest(SlangTestCase testCase, CompilationArtifact compiledTestFlow, String projectPath) {
+    public void runTest(SlangTestCase testCase, CompilationArtifact compiledTestFlow, String projectPath) {
+
+        Map<String, Value> convertedInputs = getTestCaseInputsMap(testCase);
+        Set<SystemProperty> systemProperties = getTestSystemProperties(testCase, projectPath);
+
+        trigger(testCase, compiledTestFlow, convertedInputs, systemProperties);
+    }
+
+    public void runTestParallel(SlangTestCase testCase, CompilationArtifact compiledTestFlow, String projectPath) {
 
         Map<String, Value> convertedInputs = getTestCaseInputsMap(testCase);
         Set<SystemProperty> systemProperties = getTestSystemProperties(testCase, projectPath);
@@ -279,6 +338,72 @@ public class SlangTestRunner {
                 if(!executionOutputs.containsKey(outputName) ||
                         !outputsAreEqual(outputValue, executionOutputValue)){
                     message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tFor output: " + outputName+ "\n\tExpected value: " + outputValue + "\n\tActual value: " + executionOutputValue;
+                    log.error(message);
+                    throw new RuntimeException(message);
+                }
+            }
+        }
+
+        log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with result: " + executionResult);
+        return executionId;
+    }
+
+    public Long triggerParallel(SlangTestCase testCase, CompilationArtifact compilationArtifact,
+                                Map<String, Value> inputs,
+                                Set<SystemProperty> systemProperties, TriggerTestCaseEventListener globalListener) {
+
+        String testCaseName = testCase.getName();
+        String result = testCase.getResult();
+        Map<String, Serializable> outputs = getTestCaseOutputsMap(testCase);
+        String flowName = testCase.getTestFlowPath();
+
+        Long executionId = slang.run(compilationArtifact, inputs, systemProperties);
+
+        while (!globalListener.isFlowFinished()) {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException ignore) {
+            }
+        }
+
+        String errorMessageFlowExecution = globalListener.getErrorMessage();
+
+        String message;
+        if (BooleanUtils.isTrue(testCase.getThrowsException())) {
+            if (StringUtils.isBlank(errorMessageFlowExecution)) {
+
+                message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tFlow " +
+                        compilationArtifact.getExecutionPlan().getName() + " did not throw an exception as expected";
+                log.info(message);
+                throw new RuntimeException(message);
+            }
+            log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with exception as expected");
+            return executionId;
+        }
+
+        if (StringUtils.isNotBlank(errorMessageFlowExecution)) {
+            // unexpected exception occurred during flow execution
+            message = "Error occurred while running test: " + testCaseName + " - " + testCase.getDescription() + "\n\t" + errorMessageFlowExecution;
+            log.info(message);
+            throw new RuntimeException(message);
+        }
+
+        String executionResult = globalListener.getResult();
+        if (result != null && !result.equals(executionResult)) {
+            message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tExpected result: " + result + "\n\tActual result: " + executionResult;
+            log.error(message);
+            throw new RuntimeException(message);
+        }
+
+        Map<String, Serializable> executionOutputs = globalListener.getOutputs();
+        if (MapUtils.isNotEmpty(outputs)) {
+            for (Map.Entry<String, Serializable> output : outputs.entrySet()) {
+                String outputName = output.getKey();
+                Serializable outputValue = output.getValue();
+                Serializable executionOutputValue = executionOutputs.get(outputName);
+                if (!executionOutputs.containsKey(outputName) ||
+                        !outputsAreEqual(outputValue, executionOutputValue)) {
+                    message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tFor output: " + outputName + "\n\tExpected value: " + outputValue + "\n\tActual value: " + executionOutputValue;
                     log.error(message);
                     throw new RuntimeException(message);
                 }
