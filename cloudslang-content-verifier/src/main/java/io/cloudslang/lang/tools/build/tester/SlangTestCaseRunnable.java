@@ -40,7 +40,7 @@ public class SlangTestCaseRunnable implements Runnable {
                 testCaseEventDispatchService.notifyListeners(new BeginSlangTestCaseEvent(testCase));
 
                 CompilationArtifact compiledTestFlow = slangTestRunService.getCompiledTestFlow(compiledFlows, testCase);
-                slangTestRunService.runTestParallel(testCase, compiledTestFlow, projectPath, multiTriggerTestCaseEventListener);
+                slangTestRunService.runTestCaseParallel(testCase, compiledTestFlow, projectPath, multiTriggerTestCaseEventListener);
                 testCaseEventDispatchService.notifyListeners(new PassedSlangTestCaseEvent(testCase));
             } else {
                 testCaseEventDispatchService.notifyListeners(new SkippedSlangTestCaseEvent(testCase));
