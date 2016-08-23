@@ -14,17 +14,9 @@ import com.beust.jcommander.ParameterException;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.tools.build.commands.ApplicationArgs;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
-import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.TestRun;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -35,11 +27,18 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.lang.String.valueOf;
 
@@ -48,7 +47,7 @@ import static java.lang.String.valueOf;
  */
 public class SlangBuildMain {
 
-    private static final String CONTENT_DIR =  File.separator + "content";
+    private static final String CONTENT_DIR = File.separator + "content";
     private static final String TEST_DIR = File.separator + "test";
     public static final String DEFAULT_TESTS = "default";
 
@@ -145,14 +144,14 @@ public class SlangBuildMain {
         List<String> testSuites = new ArrayList<>();
         boolean runDefaultTests = true;
         List<String> testSuitesArg = ListUtils.defaultIfNull(appArgs.getTestSuites(), new ArrayList<String>());
-        for(String testSuite : testSuitesArg){
-            if(!testSuite.startsWith(NOT_TS)){
+        for (String testSuite : testSuitesArg) {
+            if (!testSuite.startsWith(NOT_TS)) {
                 testSuites.add(testSuite);
-            } else if(testSuite.equalsIgnoreCase(NOT_TS + DEFAULT_TESTS)){
+            } else if (testSuite.equalsIgnoreCase(NOT_TS + DEFAULT_TESTS)) {
                 runDefaultTests = false;
             }
         }
-        if(runDefaultTests && !testSuitesArg.contains(DEFAULT_TESTS)){
+        if (runDefaultTests && !testSuitesArg.contains(DEFAULT_TESTS)) {
             testSuites.add(DEFAULT_TESTS);
         }
         return testSuites;
@@ -190,7 +189,7 @@ public class SlangBuildMain {
     private static void printNumberOfPassedAndSkippedTests(IRunTestResults runTestsResults) {
         log.info(runTestsResults.getPassedTests().size() + " test cases passed");
         Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
-        if(skippedTests.size() > 0) {
+        if (skippedTests.size() > 0) {
             log.info(skippedTests.size() + " test cases skipped");
         }
     }
@@ -199,7 +198,7 @@ public class SlangBuildMain {
         if (runTestsResults.getPassedTests().size() > 0) {
             log.info("------------------------------------------------------------");
             log.info("Following " + runTestsResults.getPassedTests().size() + " test cases passed:");
-            for(Map.Entry<String, TestRun> passedTest : runTestsResults.getPassedTests().entrySet()) {
+            for (Map.Entry<String, TestRun> passedTest : runTestsResults.getPassedTests().entrySet()) {
                 String testCaseName = passedTest.getValue().getTestCase().getName();
                 log.info("- " + testCaseName.replaceAll("\n", "\n\t"));
             }
@@ -215,7 +214,7 @@ public class SlangBuildMain {
         log.error("------------------------------------------------------------");
         log.error("CloudSlang build for repository: \"" + projectPath + "\" failed due to failed tests.");
         log.error("Following " + failedTests.size() + " tests failed:");
-        for(Map.Entry<String, TestRun> failedTest : failedTests.entrySet()) {
+        for (Map.Entry<String, TestRun> failedTest : failedTests.entrySet()) {
             String failureMessage = failedTest.getValue().getMessage();
             log.error("- " + failureMessage.replaceAll("\n", "\n\t"));
         }
@@ -226,19 +225,19 @@ public class SlangBuildMain {
         log.info("");
         log.info("------------------------------------------------------------");
         log.info("Following " + skippedTests.size() + " tests were skipped:");
-        for(Map.Entry<String, TestRun> skippedTest : skippedTests.entrySet()){
+        for (Map.Entry<String, TestRun> skippedTest : skippedTests.entrySet()) {
             String message = skippedTest.getValue().getMessage();
             log.info("- " + message.replaceAll("\n", "\n\t"));
         }
     }
 
-    private static void printTestCoverageData(IRunTestResults runTestsResults){
+    private static void printTestCoverageData(IRunTestResults runTestsResults) {
         printCoveredExecutables(runTestsResults.getCoveredExecutables());
         printUncoveredExecutables(runTestsResults.getUncoveredExecutables());
         int coveredExecutablesSize = runTestsResults.getCoveredExecutables().size();
         int uncoveredExecutablesSize = runTestsResults.getUncoveredExecutables().size();
         int totalNumberOfExecutables = coveredExecutablesSize + uncoveredExecutablesSize;
-        Double coveragePercentage = new Double(coveredExecutablesSize)/new Double(totalNumberOfExecutables)*100;
+        Double coveragePercentage = new Double(coveredExecutablesSize) / new Double(totalNumberOfExecutables) * 100;
         log.info("");
         log.info("------------------------------------------------------------");
         log.info(coveragePercentage.intValue() + "% of the content has tests");
@@ -249,7 +248,7 @@ public class SlangBuildMain {
         log.info("");
         log.info("------------------------------------------------------------");
         log.info("Following " + coveredExecutables.size() + " executables have tests:");
-        for(String executable : coveredExecutables){
+        for (String executable : coveredExecutables) {
             log.info("- " + executable);
         }
     }
@@ -258,7 +257,7 @@ public class SlangBuildMain {
         log.info("");
         log.info("------------------------------------------------------------");
         log.info("Following " + uncoveredExecutables.size() + " executables do not have tests:");
-        for(String executable : uncoveredExecutables){
+        for (String executable : uncoveredExecutables) {
             log.info("- " + executable);
         }
     }
@@ -268,8 +267,8 @@ public class SlangBuildMain {
 
         if (args.getProjectRoot() != null) {
             repositoryPath = args.getProjectRoot();
-        // if only one parameter was passed, we treat it as the project root
-        // i.e. './cslang-builder some/path/to/project'
+            // if only one parameter was passed, we treat it as the project root
+            // i.e. './cslang-builder some/path/to/project'
         } else if (args.getParameters().size() == 1) {
             repositoryPath = args.getParameters().get(0);
         } else {
