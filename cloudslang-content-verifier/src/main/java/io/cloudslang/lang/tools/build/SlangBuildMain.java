@@ -28,7 +28,6 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
@@ -40,6 +39,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static java.lang.String.valueOf;
 
 /*
  * Created by stoneo on 1/11/2015.
@@ -73,8 +74,8 @@ public class SlangBuildMain {
         String contentPath = StringUtils.defaultIfEmpty(appArgs.getContentRoot(), projectPath + CONTENT_DIR);
         String testsPath = StringUtils.defaultIfEmpty(appArgs.getTestRoot(), projectPath + TEST_DIR);
         List<String> testSuites = parseTestSuites(appArgs);
-        Boolean shouldPrintCoverageData = parseCoverageArg(appArgs);
-        Boolean runTestsInParallel = parseParallelTestsArg(appArgs);
+        boolean shouldPrintCoverageData = parseCoverageArg(appArgs);
+        boolean runTestsInParallel = parseParallelTestsArg(appArgs);
 
         log.info("");
         log.info("------------------------------------------------------------");
@@ -82,7 +83,8 @@ public class SlangBuildMain {
         log.info("Content root is at: " + contentPath);
         log.info("Test root is at: " + testsPath);
         log.info("Active test suites are: " + Arrays.toString(testSuites.toArray()));
-        log.info("Parallel: " + Arrays.toString(testSuites.toArray()));
+        log.info("Print coverage data: " + valueOf(shouldPrintCoverageData));
+        log.info("Parallel: " + valueOf(runTestsInParallel));
 
         log.info("");
         log.info("Loading...");
@@ -94,19 +96,19 @@ public class SlangBuildMain {
         registerEventHandlers(slang);
 
         try {
-            SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites);
+            SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites, false);
             RunTestsResults runTestsResults = buildResults.getRunTestsResults();
             Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
 
-            if(MapUtils.isNotEmpty(skippedTests)){
+            if (MapUtils.isNotEmpty(skippedTests)) {
                 printSkippedTestsSummary(skippedTests);
             }
             printPassedTests(runTestsResults);
-            if(shouldPrintCoverageData) {
+            if (shouldPrintCoverageData) {
                 printTestCoverageData(runTestsResults);
             }
 
-            if(MapUtils.isNotEmpty(runTestsResults.getFailedTests())) {
+            if (MapUtils.isNotEmpty(runTestsResults.getFailedTests())) {
                 printBuildFailureSummary(projectPath, runTestsResults);
                 System.exit(1);
             } else {

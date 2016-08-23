@@ -41,7 +41,7 @@ public class SlangBuilder {
 
     private final static Logger log = Logger.getLogger(SlangBuilder.class);
 
-    public SlangBuildResults buildSlangContent(String projectPath, String contentPath, String testsPath, List<String> testSuits){
+    public SlangBuildResults buildSlangContent(String projectPath, String contentPath, String testsPath, List<String> testSuits, boolean runTestsInParallel){
 
         String projectName = FilenameUtils.getName(projectPath);
         log.info("");
@@ -58,7 +58,7 @@ public class SlangBuilder {
 
         RunTestsResults runTestsResults = new RunTestsResults();
         if (StringUtils.isNotBlank(testsPath) && new File(testsPath).isDirectory()) {
-            runTestsResults = runTests(slangModels, projectPath, testsPath, testSuits);
+            runTestsResults = runTests(slangModels, projectPath, testsPath, testSuits, false);
         }
 
         return new SlangBuildResults(compiledSources.size(), runTestsResults);
@@ -83,7 +83,7 @@ public class SlangBuilder {
     }
 
     private RunTestsResults runTests(Map<String, Executable> contentSlangModels,
-                          String projectPath, String testsPath, List<String> testSuites){
+                                     String projectPath, String testsPath, List<String> testSuites, boolean runTestsInParallel){
         log.info("");
         log.info("--- compiling tests sources ---");
         // Compile all slang test flows under the test directory
@@ -100,7 +100,12 @@ public class SlangBuilder {
         log.info("");
         log.info("--- running tests ---");
         log.info("Found " + testCases.size() + " tests");
-        RunTestsResults runTestsResults = slangTestRunner.runAllTestsSequential(projectPath, testCases, compiledFlows, testSuites);
+        RunTestsResults runTestsResults;
+        if (!runTestsInParallel) {
+            runTestsResults = slangTestRunner.runAllTestsSequential(projectPath, testCases, compiledFlows, testSuites);
+        } else {
+            runTestsResults = slangTestRunner.runAllTestsParallel(projectPath, testCases, compiledFlows, testSuites);
+        }
         addCoverageDataToRunTestsResults(contentSlangModels, testFlowModels, testCases, runTestsResults);
         return runTestsResults;
     }
