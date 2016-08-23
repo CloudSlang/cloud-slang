@@ -1,9 +1,7 @@
 package io.cloudslang.lang.tools.build.tester.parallel;
 
-import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.tools.build.tester.TriggerTestCaseEventListener;
-import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
 import org.apache.commons.collections4.MapUtils;
@@ -11,6 +9,14 @@ import org.apache.commons.collections4.MapUtils;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
+import static io.cloudslang.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
+import static io.cloudslang.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
+import static io.cloudslang.score.events.EventConstants.SCORE_ERROR_EVENT;
+import static io.cloudslang.score.events.EventConstants.SCORE_ERROR_LOG_MSG;
+import static io.cloudslang.score.events.EventConstants.SCORE_ERROR_MSG;
+import static io.cloudslang.score.events.EventConstants.SCORE_FAILURE_EVENT;
+import static io.cloudslang.score.events.EventConstants.SCORE_FINISHED_EVENT;
 
 
 public class MultiTriggerTestCaseEventListener implements ScoreEventListener {
@@ -54,22 +60,22 @@ public class MultiTriggerTestCaseEventListener implements ScoreEventListener {
                 (Long) ((Map)data.get(SYSTEM_CONTEXT)).get(EXECUTION_ID_CONTEXT);
 
         switch (scoreEvent.getEventType()) {
-            case EventConstants.SCORE_FINISHED_EVENT:
+            case SCORE_FINISHED_EVENT:
                 break;
-            case EventConstants.SCORE_ERROR_EVENT:
-            case EventConstants.SCORE_FAILURE_EVENT:
-                String errorMessage = data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " + data.get(EventConstants.SCORE_ERROR_MSG);
+            case SCORE_ERROR_EVENT:
+            case SCORE_FAILURE_EVENT:
+                String errorMessage = data.get(SCORE_ERROR_LOG_MSG) + " , " + data.get(SCORE_ERROR_MSG);
                 errorMessageMap.put(executionId, errorMessage);
                 flowFinishedMap.put(executionId, true);
                 break;
 
-            case ScoreLangConstants.EVENT_EXECUTION_FINISHED:
+            case EVENT_EXECUTION_FINISHED:
                 eventData = (LanguageEventData) data;
                 resultMap.put(executionId, eventData.getResult());
                 flowFinishedMap.put(executionId, true);
                 break;
 
-            case ScoreLangConstants.EVENT_OUTPUT_END:
+            case EVENT_OUTPUT_END:
                 eventData = (LanguageEventData) data;
                 Map<String, Serializable> extractOutputs = TriggerTestCaseEventListener.extractOutputs(eventData);
                 if (MapUtils.isNotEmpty(extractOutputs)) {
