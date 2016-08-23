@@ -16,6 +16,7 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.tools.build.SlangBuildMain;
+import io.cloudslang.lang.tools.build.tester.parallel.collect.ThreadSafeRunTestResults;
 import io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService;
 import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDispatchService;
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.FailedSlangTestCaseEvent;
@@ -125,10 +126,10 @@ public class SlangTestRunner {
      * @param testSuites
      * @return RunTestsResults containing maps of passed, failed & skipped tests
      */
-    public RunTestsResults runAllTestsSequential(String projectPath, Map<String, SlangTestCase> testCases,
+    public IRunTestResults runAllTestsSequential(String projectPath, Map<String, SlangTestCase> testCases,
                                                  Map<String, CompilationArtifact> compiledFlows, List<String> testSuites) {
 
-        RunTestsResults runTestsResults = new RunTestsResults();
+        IRunTestResults runTestsResults = new RunTestsResults();
         if(MapUtils.isEmpty(testCases)){
             return runTestsResults;
         }
@@ -156,12 +157,12 @@ public class SlangTestRunner {
         return runTestsResults;
     }
 
-    public RunTestsResults runAllTestsParallel(String projectPath, Map<String, SlangTestCase> testCases,
+    public IRunTestResults runAllTestsParallel(String projectPath, Map<String, SlangTestCase> testCases,
                                                  Map<String, CompilationArtifact> compiledFlows, List<String> testSuites) {
 
-        RunTestsResults runTestsResults = new RunTestsResults();
+        IRunTestResults runTestsResults = new ThreadSafeRunTestResults();
         if (MapUtils.isEmpty(testCases)) {
-            return runTestsResults;
+            return new ThreadSafeRunTestResults();
         }
 
         Map<SlangTestCase, Future<?>> testCaseFutures = new HashMap<>();
