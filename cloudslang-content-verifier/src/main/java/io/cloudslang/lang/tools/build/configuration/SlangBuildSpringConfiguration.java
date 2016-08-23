@@ -10,6 +10,8 @@
 package io.cloudslang.lang.tools.build.configuration;
 
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
+import io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService;
+import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDispatchService;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
 import io.cloudslang.lang.api.configuration.SlangSpringConfiguration;
 import io.cloudslang.lang.tools.build.SlangBuilder;
@@ -44,4 +46,15 @@ public class SlangBuildSpringConfiguration {
     public TestCasesYamlParser parser(){
         return new TestCasesYamlParser();
     }
+
+    @Bean
+    public ParallelTestCaseExecutorService parallelTestCaseExecutorService() {
+        return new ParallelTestCaseExecutorService();
+    }
+
+    @Bean
+    public TestCaseEventDispatchService testCaseEventDispatchService() {
+        return new TestCaseEventDispatchService();
+    }
+
 }

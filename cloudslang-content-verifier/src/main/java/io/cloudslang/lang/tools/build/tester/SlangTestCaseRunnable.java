@@ -2,6 +2,7 @@ package io.cloudslang.lang.tools.build.tester;
 
 
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.tools.build.tester.parallel.MultiTriggerTestCaseEventListener;
 import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDispatchService;
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.BeginSlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.FailedSlangTestCaseEvent;
@@ -20,14 +21,16 @@ public class SlangTestCaseRunnable implements Runnable {
     private final List<String> testSuites;
     private final TestCaseEventDispatchService testCaseEventDispatchService;
     private final SlangTestRunner slangTestRunService;
+    private final MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener;
 
-    public SlangTestCaseRunnable(SlangTestCase testCase, Map<String, CompilationArtifact> compiledFlows, String projectPath, List<String> testSuites, SlangTestRunner slangTestRunService, TestCaseEventDispatchService testCaseEventDispatchService) {
+    public SlangTestCaseRunnable(SlangTestCase testCase, Map<String, CompilationArtifact> compiledFlows, String projectPath, List<String> testSuites, SlangTestRunner slangTestRunService, TestCaseEventDispatchService testCaseEventDispatchService, MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener) {
         this.testCase = testCase;
         this.compiledFlows = compiledFlows;
         this.projectPath = projectPath;
         this.testSuites = testSuites;
         this.testCaseEventDispatchService = testCaseEventDispatchService;
         this.slangTestRunService = slangTestRunService;
+        this.multiTriggerTestCaseEventListener = multiTriggerTestCaseEventListener;
     }
 
     @Override
@@ -37,7 +40,7 @@ public class SlangTestCaseRunnable implements Runnable {
                 testCaseEventDispatchService.notifyListeners(new BeginSlangTestCaseEvent(testCase));
 
                 CompilationArtifact compiledTestFlow = slangTestRunService.getCompiledTestFlow(compiledFlows, testCase);
-                slangTestRunService.runTestParallel(testCase, compiledTestFlow, projectPath);
+                slangTestRunService.runTestParallel(testCase, compiledTestFlow, projectPath, multiTriggerTestCaseEventListener);
                 testCaseEventDispatchService.notifyListeners(new PassedSlangTestCaseEvent(testCase));
             } else {
                 testCaseEventDispatchService.notifyListeners(new SkippedSlangTestCaseEvent(testCase));

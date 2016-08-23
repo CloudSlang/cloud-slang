@@ -3,9 +3,7 @@ package io.cloudslang.lang.tools.build.tester.parallel.services;
 import io.cloudslang.lang.tools.build.tester.ISlangTestCaseEventListener;
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.SlangTestCaseEvent;
 import org.apache.commons.lang3.event.EventListenerSupport;
-import org.springframework.stereotype.Component;
 
-@Component
 public class TestCaseEventDispatchService {
 
     private EventListenerSupport<ISlangTestCaseEventListener> listenerList;

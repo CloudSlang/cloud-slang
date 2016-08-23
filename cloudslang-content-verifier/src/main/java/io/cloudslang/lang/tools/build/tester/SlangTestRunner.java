@@ -169,6 +169,9 @@ public class SlangTestRunner {
         testCaseEventDispatchService.unregisterAllListeners();
         testCaseEventDispatchService.registerListener(runTestsResults);
         testCaseEventDispatchService.registerListener(new LoggingSlangTestCaseEventListener());
+
+        MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener = new MultiTriggerTestCaseEventListener();
+        slang.subscribeOnEvents(multiTriggerTestCaseEventListener, createListenerEventTypesSet());
         try {
             Map<SlangTestCase, Future<?>> testCaseFutures = new HashMap<>();
             for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
@@ -177,7 +180,7 @@ public class SlangTestRunner {
                     testCaseEventDispatchService.notifyListeners(new FailedSlangTestCaseEvent(null, "Test case cannot be null", null));
                     continue;
                 }
-                SlangTestCaseRunnable slangTestCaseRunnable = new SlangTestCaseRunnable(testCase, compiledFlows, projectPath, testSuites, this, testCaseEventDispatchService);
+                SlangTestCaseRunnable slangTestCaseRunnable = new SlangTestCaseRunnable(testCase, compiledFlows, projectPath, testSuites, this, testCaseEventDispatchService, multiTriggerTestCaseEventListener);
                 testCaseFutures.put(testCase, parallelTestCaseExecutorService.submitTestCase(slangTestCaseRunnable));
             }
 
@@ -196,6 +199,7 @@ public class SlangTestRunner {
             }
         } finally {
             testCaseEventDispatchService.unregisterAllListeners();
+            slang.unSubscribeOnEvents(multiTriggerTestCaseEventListener);
         }
         return runTestsResults;
     }
@@ -241,12 +245,11 @@ public class SlangTestRunner {
         trigger(testCase, compiledTestFlow, convertedInputs, systemProperties);
     }
 
-    public void runTestParallel(SlangTestCase testCase, CompilationArtifact compiledTestFlow, String projectPath) {
+    public void runTestParallel(SlangTestCase testCase, CompilationArtifact compiledTestFlow, String projectPath, MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener) {
 
         Map<String, Value> convertedInputs = getTestCaseInputsMap(testCase);
         Set<SystemProperty> systemProperties = getTestSystemProperties(testCase, projectPath);
 
-        MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener = new MultiTriggerTestCaseEventListener();
         triggerParallel(testCase, compiledTestFlow, convertedInputs, systemProperties, multiTriggerTestCaseEventListener);
     }
 

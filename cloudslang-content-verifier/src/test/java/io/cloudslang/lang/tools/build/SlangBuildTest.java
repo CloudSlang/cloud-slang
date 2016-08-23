@@ -16,6 +16,7 @@ import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
 import io.cloudslang.lang.tools.build.tester.TestRun;
@@ -274,7 +275,7 @@ public class SlangBuildTest {
         Mockito.when(slangTestRunner.runAllTestsSequential(any(String.class), anyMap(), anyMap(), anyList())).thenReturn(runTestsResults);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(contentResource.getPath(), contentResource.getPath(), testResource.getPath(), null, false);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
-        RunTestsResults actualRunTestsResults = buildResults.getRunTestsResults();
+        IRunTestResults actualRunTestsResults = buildResults.getRunTestsResults();
         Assert.assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
         Assert.assertEquals("1 test case should fail", 1, actualRunTestsResults.getFailedTests().size());
     }

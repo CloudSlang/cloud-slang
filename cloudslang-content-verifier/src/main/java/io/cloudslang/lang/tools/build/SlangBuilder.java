@@ -59,7 +59,7 @@ public class SlangBuilder {
 
         IRunTestResults runTestsResults = new RunTestsResults();
         if (StringUtils.isNotBlank(testsPath) && new File(testsPath).isDirectory()) {
-            runTestsResults = runTests(slangModels, projectPath, testsPath, testSuits, false);
+            runTestsResults = runTests(slangModels, projectPath, testsPath, testSuits, runTestsInParallel);
         }
 
         return new SlangBuildResults(compiledSources.size(), runTestsResults);
