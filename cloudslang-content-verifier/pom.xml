@@ -13,7 +13,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>cloudslang-all</artifactId>
+            <artifactId>cloudslang-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
 

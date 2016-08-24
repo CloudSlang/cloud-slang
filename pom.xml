@@ -575,5 +575,6 @@
         <module>cloudslang-all</module>
         <module>cloudslang-content-verifier</module>
         <module>cloudslang-content-maven-compiler</module>
+        <module>cloudslang-commons</module>
     </modules>
 </project>

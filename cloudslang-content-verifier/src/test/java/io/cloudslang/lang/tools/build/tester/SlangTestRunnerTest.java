@@ -1,6 +1,7 @@
 package io.cloudslang.lang.tools.build.tester;
 
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
@@ -528,4 +529,10 @@ public class SlangTestRunnerTest {
         public Slang slang(){
             return mock(Slang.class);
         }
-    }}
+
+        @Bean
+        public SlangSourceService slangSourceService() {
+            return mock(SlangSourceService.class);
+        }
+    }
+}
