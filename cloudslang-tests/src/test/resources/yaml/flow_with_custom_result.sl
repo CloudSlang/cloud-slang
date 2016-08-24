@@ -21,7 +21,5 @@ flow:
             - alla: alla
         navigate:
           - SUCCESS: CUSTOM_SUCCESS
-          - FAILURE: CUSTOM_FAILURE
   results:
     - CUSTOM_SUCCESS
-    - CUSTOM_FAILURE

@@ -19,6 +19,8 @@ flow:
         do:
           ops.set_global_session_object_dependencies:
             - value: ${ object_value }
+        navigate:
+          - SUCCESS: get_session_object
 
     - get_session_object:
         do:

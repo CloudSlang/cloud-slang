@@ -5,20 +5,12 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: loops.parallel_loop
+namespace: io.cloudslang
 
 operation:
-  name: print_branch
-  inputs:
-     - ID
+  name: op_1
   python_action:
-    script: |
-        name = 'branch ' + str(ID)
-        int_output = len(name) + int(ID)
-        print 'Hello from ' + name
-  outputs:
-    - name
-    - int_output
+    script: pass
   results:
-    - SUCCESS: ${1==1}
+    - SUCCESS: ${1 == 1}
     - FAILURE

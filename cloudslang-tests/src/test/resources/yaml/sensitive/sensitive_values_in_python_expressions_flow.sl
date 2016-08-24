@@ -1331,7 +1331,8 @@ flow:
 #    - type_list_argument2
 #    - type_list_argument1_sensitive
 #    - type_list_argument2_sensitive
+        navigate:
+          - SUCCESS: SUCCESS
 
   results:
     - SUCCESS
-    - FAILURE

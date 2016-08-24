@@ -23,8 +23,3 @@ flow:
               - ID: ${ value }
         publish:
           - branch_results_list: ${ str(map(lambda x:str(x['branch_result']), branches_context)) }
-        navigate:
-          - SUCCESS: SUCCESS
-          - CUSTOM: SUCCESS
-  results:
-    - SUCCESS

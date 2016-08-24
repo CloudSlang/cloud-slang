@@ -25,9 +25,3 @@ flow:
             - alla: 'walla'
         publish:
           - weather
-        navigate:
-          - SUCCESS: SUCCESS
-          - FAILURE: FAILURE
-  results:
-    - SUCCESS
-    - FAILURE

@@ -15,3 +15,6 @@ operation:
     script: |
       if words_list != None and len(words_list) > 0:
           print words_list
+  results:
+    - SUCCESS: ${1==1}
+    - FAILURE

@@ -26,5 +26,11 @@ flow:
               - var2: ${addedValue}
         publish:
           - mul_concat: ${'+++'.join(map(lambda x:x['result_version_mul'], branches_context))}
+        navigate:
+          - SUCCESS: SUCCESS
+          - FAILURE: FAILURE
   outputs:
     - muls_result: ${mul_concat}
+  results:
+    - SUCCESS
+    - FAILURE

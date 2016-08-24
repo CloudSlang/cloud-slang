@@ -18,7 +18,6 @@ flow:
           on_failure_contains_step_with_custom_result:
             - alla: 'on_failure 1'
         navigate:
-          - SUCCESS: print_on_failure_first_level
           - FAILURE: print_on_failure_first_level
 
     - on_failure:
