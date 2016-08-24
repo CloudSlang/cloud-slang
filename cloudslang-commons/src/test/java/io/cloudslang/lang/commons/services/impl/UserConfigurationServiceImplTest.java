@@ -18,6 +18,7 @@ public class UserConfigurationServiceImplTest {
 
     private static final String APP_HOME_1 = "/app_home";
     private static final String APP_HOME_2 = "/app_home2";
+    private static final String APP_HOME_3 = "/app_home3";
 
     private UserConfigurationService userConfigurationService;
 
@@ -40,6 +41,12 @@ public class UserConfigurationServiceImplTest {
         userConfigurationService.loadUserProperties();
         assertEquals("root/maven/apache-maven-3.3.9", System.getProperty(SP_MAVEN_HOME));
         assertEquals("http://repo1.maven.org/maven2", System.getProperty(SP_REMOTE_URL));
+    }
+
+    @Test
+    public void loadUserPropertiesMissingFolderValid() throws Exception {
+        System.setProperty(SP_APP_HOME, getPathForResource(APP_HOME_3));
+        userConfigurationService.loadUserProperties();
     }
 
     private String getPathForResource(String resourceRelativePath) {
