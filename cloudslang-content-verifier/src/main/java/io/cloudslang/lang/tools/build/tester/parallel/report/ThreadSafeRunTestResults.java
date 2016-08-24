@@ -27,9 +27,6 @@ public class ThreadSafeRunTestResults implements IRunTestResults, ISlangTestCase
     private TreeSet<String> coveredExecutables;
     private TreeSet<String> uncoveredExecutables;
 
-    private final Object lockPassedTests;
-    private final Object lockFailedTests;
-    private final Object lockSkippedTests;
     private final Object lockCoveredExecutables;
     private final Object lockUncoveredExecutables;
 
@@ -37,35 +34,26 @@ public class ThreadSafeRunTestResults implements IRunTestResults, ISlangTestCase
         this.passedTests = new ConcurrentHashMap<>();
         this.failedTests = new ConcurrentHashMap<>();
         this.skippedTests = new ConcurrentHashMap<>();
-        coveredExecutables = new TreeSet<>();
-        uncoveredExecutables = new TreeSet<>();
+        this.coveredExecutables = new TreeSet<>();
+        this.uncoveredExecutables = new TreeSet<>();
 
-        lockPassedTests = new Object();
-        lockFailedTests = new Object();
-        lockSkippedTests = new Object();
-        lockCoveredExecutables = new Object();
-        lockUncoveredExecutables = new Object();
+        this.lockCoveredExecutables = new Object();
+        this.lockUncoveredExecutables = new Object();
     }
 
     @Override
     public Map<String, TestRun> getPassedTests() {
-        synchronized (lockPassedTests) {
-            return new HashMap<>(passedTests);
-        }
+        return new HashMap<>(passedTests);
     }
 
     @Override
     public Map<String, TestRun> getFailedTests() {
-        synchronized (lockFailedTests) {
-            return new HashMap<>(failedTests);
-        }
+        return new HashMap<>(failedTests);
     }
 
     @Override
     public Map<String, TestRun> getSkippedTests() {
-        synchronized (lockSkippedTests) {
-            return new HashMap<>(skippedTests);
-        }
+        return new HashMap<>(skippedTests);
     }
 
     @Override
@@ -121,7 +109,6 @@ public class ThreadSafeRunTestResults implements IRunTestResults, ISlangTestCase
         } else if (event instanceof SkippedSlangTestCaseEvent) {
             addSkippedTest(slangTestCase.getName(), new TestRun(slangTestCase, "Skipping test: " + slangTestCase.getName() + " because it is not in active test suites"));
         }
-
     }
 
     @Override
@@ -142,11 +129,6 @@ public class ThreadSafeRunTestResults implements IRunTestResults, ISlangTestCase
                 .append(this.skippedTests, rhs.skippedTests)
                 .append(this.coveredExecutables, rhs.coveredExecutables)
                 .append(this.uncoveredExecutables, rhs.uncoveredExecutables)
-                .append(this.lockPassedTests, rhs.lockPassedTests)
-                .append(this.lockFailedTests, rhs.lockFailedTests)
-                .append(this.lockSkippedTests, rhs.lockSkippedTests)
-                .append(this.lockCoveredExecutables, rhs.lockCoveredExecutables)
-                .append(this.lockUncoveredExecutables, rhs.lockUncoveredExecutables)
                 .isEquals();
     }
 
@@ -158,11 +140,6 @@ public class ThreadSafeRunTestResults implements IRunTestResults, ISlangTestCase
                 .append(skippedTests)
                 .append(coveredExecutables)
                 .append(uncoveredExecutables)
-                .append(lockPassedTests)
-                .append(lockFailedTests)
-                .append(lockSkippedTests)
-                .append(lockCoveredExecutables)
-                .append(lockUncoveredExecutables)
                 .toHashCode();
     }
 
