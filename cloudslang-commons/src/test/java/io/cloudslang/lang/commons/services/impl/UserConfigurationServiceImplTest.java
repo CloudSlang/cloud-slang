@@ -1,0 +1,49 @@
+package io.cloudslang.lang.commons.services.impl;
+
+import io.cloudslang.lang.commons.services.api.UserConfigurationService;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
+/**
+ * @author Bonczidai Levente
+ * @since 8/24/2016
+ */
+public class UserConfigurationServiceImplTest {
+    private static final String SP_APP_HOME = "app.home";
+    private static final String SP_SINGLE_KEY = "single_key";
+    private static final String SP_MAVEN_HOME = "maven.home";
+    private static final String SP_REMOTE_URL = "cloudslang.maven.plugins.remote.url";
+
+    private static final String APP_HOME_1 = "/app_home";
+    private static final String APP_HOME_2 = "/app_home2";
+
+    private UserConfigurationService userConfigurationService;
+
+    @Before
+    public void setUp() throws Exception {
+        userConfigurationService = new UserConfigurationServiceImpl();
+    }
+
+    @Test
+    public void loadUserPropertiesSimple() throws Exception {
+        System.setProperty(SP_APP_HOME, getPathForResource(APP_HOME_1));
+        userConfigurationService.loadUserProperties();
+        assertEquals("single_value", System.getProperty(SP_SINGLE_KEY));
+    }
+
+    @Test
+    public void loadUserPropertiesSubstitution() throws Exception {
+        System.setProperty(SP_APP_HOME, getPathForResource(APP_HOME_2));
+        System.setProperty("custom.home", "root");
+        userConfigurationService.loadUserProperties();
+        assertEquals("root/maven/apache-maven-3.3.9", System.getProperty(SP_MAVEN_HOME));
+        assertEquals("http://repo1.maven.org/maven2", System.getProperty(SP_REMOTE_URL));
+    }
+
+    private String getPathForResource(String resourceRelativePath) {
+        return getClass().getResource(resourceRelativePath).getPath();
+    }
+
+}
