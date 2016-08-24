@@ -102,7 +102,7 @@ public class TestCasesYamlParser {
     private List<Map> getInputs(List<Map<String, Serializable>> inputsList, String artifact) {
         List<Map> inputs = new ArrayList<>();
         for (Map<String, Serializable> singleElementInputMap : inputsList) {
-            inputs.add(slangSourceService.convertInputFromRawMap(singleElementInputMap, artifact));
+            inputs.add(slangSourceService.convertInputFromMap(singleElementInputMap, artifact));
         }
         return inputs;
     }
