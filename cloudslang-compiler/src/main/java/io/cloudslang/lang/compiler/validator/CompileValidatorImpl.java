@@ -149,7 +149,7 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
     }
 
     private void validateResultNamesAndNavigationSection(Flow flow, Step step, String refId, Executable reference, List<RuntimeException> errors) {
-        List<String> stepNavigationKeys = mapMapToKey(step.getNavigationStrings());
+        List<String> stepNavigationKeys = getMapKeyList(step.getNavigationStrings());
         List<String> refResults = getReferenceResultNames(step, reference.getResults());
 
         List<String> stepNavigationKeysWithoutMatchingResult = ListUtils.subtract(stepNavigationKeys, refResults);
@@ -175,7 +175,7 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
                 "' since for step '" + step.getName() + "'";
     }
 
-    private List<String> mapMapToKey(List<Map<String, String>> collection) {
+    private List<String> getMapKeyList(List<Map<String, String>> collection) {
         List<String> result = new ArrayList<>();
         for (Map<String, String> element : collection) {
             result.add(element.keySet().iterator().next());
