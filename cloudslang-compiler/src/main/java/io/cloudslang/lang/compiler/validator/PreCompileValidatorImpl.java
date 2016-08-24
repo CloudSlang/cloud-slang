@@ -18,11 +18,18 @@ import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.utils.ResultUtils;
 import io.cloudslang.lang.entities.utils.SetUtils;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.*;
 
 import static ch.lambdaj.Lambda.exists;
 import static ch.lambdaj.Lambda.having;
@@ -38,6 +45,9 @@ import static org.hamcrest.Matchers.equalToIgnoringCase;
 @Component
 public class PreCompileValidatorImpl extends AbstractValidator implements PreCompileValidator {
 
+    @Autowired
+    private ExecutableValidator executableValidator;
+
     public static final String MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX = "Multiple 'on_failure' steps found";
     public static final String ON_FAILURE_LAST_STEP_MESSAGE_SUFFIX = "'on_failure' should be last step in the workflow";
     public static final String FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE =
@@ -49,13 +59,10 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
             errors.add(new IllegalArgumentException("Error compiling " + parsedSlang.getName() + ". Executable data is null"));
             return "";
         } else {
-            String executableName = getExecutableName(executableRawData);
+            String executableName = getExecutableName(executableRawData, parsedSlang.getName(), errors);
             if (parsedSlang == null) {
                 errors.add(new IllegalArgumentException("Slang source for: \'" + executableName + "\' is null"));
             } else {
-                if (StringUtils.isBlank(executableName)) {
-                    errors.add(new RuntimeException("Executable in source: " + parsedSlang.getName() + " has no name"));
-                }
                 if (executableRawData.size() == 0) {
                     errors.add(new IllegalArgumentException("Error compiling " + parsedSlang.getName() + ". Executable data for: \'" + executableName + "\' is empty"));
                 }
@@ -66,17 +73,15 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     }
 
     @Override
-    public List<Map<String, Map<String, Object>>> validateWorkflowRawData(ParsedSlang parsedSlang, Map<String, Object> executableRawData, List<RuntimeException> errors) {
-        String executableName = getExecutableName(executableRawData);
-        Object rawData = executableRawData.get(SlangTextualKeys.WORKFLOW_KEY);
-        if (rawData == null) {
-            rawData = new ArrayList<>();
+    public List<Map<String, Map<String, Object>>> validateWorkflowRawData(ParsedSlang parsedSlang, Object workflowRawData, String executableName, List<RuntimeException> errors) {
+        if (workflowRawData == null) {
+            workflowRawData = new ArrayList<>();
             errors.add(new RuntimeException("Error compiling " + parsedSlang.getName() + ". Flow: " + executableName + " has no workflow property"));
         }
         List<Map<String, Map<String, Object>>> workFlowRawData;
         try {
             //noinspection unchecked
-            workFlowRawData = (List<Map<String, Map<String, Object>>>) rawData;
+            workFlowRawData = (List<Map<String, Map<String, Object>>>) workflowRawData;
         } catch (ClassCastException ex) {
             workFlowRawData = new ArrayList<>();
             errors.add(new RuntimeException("Flow: '" + executableName + "' syntax is illegal.\nBelow 'workflow' property there should be a list of steps and not a map"));
@@ -95,8 +100,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     }
 
     @Override
-    public ExecutableModellingResult validateResult(ParsedSlang parsedSlang, Map<String, Object> executableRawData, ExecutableModellingResult result) {
-        String executableName = getExecutableName(executableRawData);
+    public ExecutableModellingResult validateResult(ParsedSlang parsedSlang, String executableName, ExecutableModellingResult result) {
         validateFileName(executableName, parsedSlang, result);
         validateNamespace(result);
         validateInputNamesDifferentFromOutputNames(result);
@@ -283,17 +287,6 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         }
     }
 
-    @Override
-    public void validateResultName(String resultName) {
-        validateKeywords(resultName);
-    }
-
-    private void validateKeywords(String resultName) {
-        if (SlangTextualKeys.ON_FAILURE_KEY.equalsIgnoreCase(resultName)) {
-            throw new RuntimeException("Result cannot be called '" + SlangTextualKeys.ON_FAILURE_KEY + "'.");
-        }
-    }
-
     private String getMessagePart(Class aClass) {
         String messagePart = "";
         if (aClass.equals(Input.class)) {
@@ -308,9 +301,17 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         return messagePart;
     }
 
-    private String getExecutableName(Map<String, Object> executableRawData) {
+    private String getExecutableName(Map<String, Object> executableRawData, String sourceName, List<RuntimeException> errors) {
         String execName = (String) executableRawData.get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
-        return execName == null ? "" : execName;
+        if (StringUtils.isBlank(execName)) {
+            errors.add(new RuntimeException("Executable in source: " + sourceName + " has no name"));
+        }
+        try {
+            executableValidator.validateExecutableName(execName);
+        } catch (RuntimeException rex) {
+            errors.add(rex);
+        }
+        return execName;
     }
 
     private void validateFlow(Flow compiledFlow, ExecutableModellingResult result) {

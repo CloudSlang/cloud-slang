@@ -17,6 +17,7 @@ package io.cloudslang.lang.compiler.parser;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,8 @@ public class YamlParser {
     private Yaml yaml;
     @Autowired
     private ParserExceptionHandler parserExceptionHandler;
+    @Autowired
+    private ExecutableValidator executableValidator;
 
     public ParsedSlang parse(SlangSource source) {
 
@@ -41,6 +44,11 @@ public class YamlParser {
             }
             parsedSlang.setName(source.getFileName());
             parsedSlang.setFileExtension(source.getFileExtension());
+
+            executableValidator.validateNamespace(parsedSlang);
+            executableValidator.validateImportsSectionAliases(parsedSlang);
+            executableValidator.validateImportsSectionValues(parsedSlang);
+
             return parsedSlang;
         } catch (Throwable e) {
             throw new RuntimeException("There was a problem parsing the YAML source: " +

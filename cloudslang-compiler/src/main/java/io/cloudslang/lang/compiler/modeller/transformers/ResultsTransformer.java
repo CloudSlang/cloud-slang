@@ -16,27 +16,29 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ResultsTransformer extends InOutTransformer implements Transformer<List, List<Result>> {
     
     @Autowired
     private PreCompileValidator preCompileValidator;
+    @Autowired
+    private ExecutableValidator executableValidator;
 
     @Override
     public TransformModellingResult<List<Result>> transform(List rawData) {
@@ -118,7 +120,7 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
     }
 
     private Result createExpressionResult(String resultName, Serializable resultValue) {
-        preCompileValidator.validateResultName(resultName);
+        executableValidator.validateResultName(resultName);
         if (resultValue == null) {
             return new Result(resultName, null);
         } else {
@@ -132,4 +134,3 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
         }
     }
 }
-

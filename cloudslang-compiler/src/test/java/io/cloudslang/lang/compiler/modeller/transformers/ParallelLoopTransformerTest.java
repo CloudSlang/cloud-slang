@@ -9,24 +9,36 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
+import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.ParallelLoopStatement;
 import junit.framework.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Date: 4/1/2015
  *
  * @author Bonczidai Levente
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = ParallelLoopTransformerTest.Config.class)
 public class ParallelLoopTransformerTest extends TransformersTestParent {
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    private ParallelLoopForTransformer transformer = new ParallelLoopForTransformer();
+    @Autowired
+    private ParallelLoopForTransformer transformer;
 
     @Test
     public void testValidStatement() throws Exception {
@@ -56,6 +68,7 @@ public class ParallelLoopTransformerTest extends TransformersTestParent {
         transformAndThrowFirstException(transformer, "  in  collection");
     }
 
+    @Ignore("unignore when implemented")
     @Test
     public void testVarNameContainInvalidChars() throws Exception {
         exception.expect(RuntimeException.class);
@@ -83,4 +96,15 @@ public class ParallelLoopTransformerTest extends TransformersTestParent {
         Assert.assertNull(statement);
     }
 
+    @Configuration
+    public static class Config {
+        @Bean
+        public ParallelLoopForTransformer parallelLoopForTransformer() {
+            return new ParallelLoopForTransformer();
+        }
+        @Bean
+        public ExecutableValidator executableValidator() {
+            return new ExecutableValidatorImpl();
+        }
+    }
 }

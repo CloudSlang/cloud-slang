@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
  * @since 8/11/2016
  */
 @Component
-public class SystemPropertyValidatorImpl implements SystemPropertyValidator {
+public class SystemPropertyValidatorImpl extends AbstractValidator implements SystemPropertyValidator {
     private Pattern namingPattern;
 
     public SystemPropertyValidatorImpl() {

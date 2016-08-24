@@ -4,9 +4,7 @@ import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.InOutTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
-
 import io.cloudslang.lang.entities.bindings.InOutParam;
-
 import io.cloudslang.lang.entities.bindings.Result;
 import java.io.Serializable;
 import java.util.List;
@@ -20,10 +18,9 @@ public interface PreCompileValidator {
 
     String validateExecutableRawData(ParsedSlang parsedSlang, Map<String, Object> executableRawData, List<RuntimeException> errors);
 
-    List<Map<String, Map<String, Object>>> validateWorkflowRawData(ParsedSlang parsedSlang, Map<String, Object> executableRawData,
-                                                                   List<RuntimeException> errors);
+    public List<Map<String, Map<String, Object>>> validateWorkflowRawData(ParsedSlang parsedSlang, Object workflowRawData, String executableName, List<RuntimeException> errors);
 
-    ExecutableModellingResult validateResult(ParsedSlang parsedSlang, Map<String, Object> executableRawData, ExecutableModellingResult result);
+    ExecutableModellingResult validateResult(ParsedSlang parsedSlang, String executableName, ExecutableModellingResult result);
 
     List<RuntimeException> checkKeyWords(
             String dataLogicalName,
@@ -43,7 +40,6 @@ public interface PreCompileValidator {
     void validateResultsHaveNoExpression(List<Result> results, String artifactName, List<RuntimeException> errors);
     void validateResultTypes(List<Result> results, String artifactName, List<RuntimeException> errors);
     void validateDefaultResult(List<Result> results, String artifactName, List<RuntimeException> errors);
-    void validateResultName(String resultName);
 
     void validateStringValue(String name, Serializable value, InOutTransformer transformer);
 }

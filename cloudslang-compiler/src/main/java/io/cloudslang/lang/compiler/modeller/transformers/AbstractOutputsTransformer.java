@@ -12,13 +12,12 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +34,8 @@ public abstract class AbstractOutputsTransformer  extends InOutTransformer {
 
     @Autowired
     private PreCompileValidator preCompileValidator;
+    @Autowired
+    private ExecutableValidator executableValidator;
 
     public TransformModellingResult<List<Output>> transform(List<Object> rawData) {
         List<Output> transformedData = new ArrayList<>();
@@ -93,6 +94,7 @@ public abstract class AbstractOutputsTransformer  extends InOutTransformer {
     }
 
     Output createOutput(String outputName, Serializable outputExpression, boolean sensitive){
+        executableValidator.validateOutputName(outputName);
         preCompileValidator.validateStringValue(outputName, outputExpression, this);
         Accumulator accumulator = extractFunctionData(outputExpression);
         return new Output(
@@ -104,7 +106,7 @@ public abstract class AbstractOutputsTransformer  extends InOutTransformer {
     }
 
     Output createRefOutput(String rawOutput, boolean sensitive) {
-        return new Output(rawOutput, ValueFactory.create(transformNameToExpression(rawOutput), sensitive));
+        return createOutput(rawOutput, transformNameToExpression(rawOutput), sensitive);
     }
 
     private String transformNameToExpression(String name) {

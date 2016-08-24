@@ -8,16 +8,16 @@
  */
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.DEFAULT_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PRIVATE_INPUT_KEY;
@@ -29,6 +29,9 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
     @Autowired
     protected PreCompileValidator preCompileValidator;
 
+    @Autowired
+    private ExecutableValidator executableValidator;
+
     @Override
     public Class<? extends InOutParam> getTransformedObjectsClass() {
         return Input.class;
@@ -39,7 +42,7 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
         // this is our default behaviour that if the user specifies only a key, the key is also the ref we look for
         if (rawInput instanceof String) {
             String inputName = (String) rawInput;
-            return new Input.InputBuilder(inputName, null, false).build();
+            return createInput(inputName, null);
         } else if (rawInput instanceof Map) {
             @SuppressWarnings("unchecked")
             Map<String, ?> map = (Map<String, ?>) rawInput;
@@ -112,6 +115,7 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
             boolean sensitive,
             boolean required,
             boolean privateInput) {
+        executableValidator.validateInputName(name);
         preCompileValidator.validateStringValue(name, value, this);
         Accumulator dependencyAccumulator = extractFunctionData(value);
         return new Input.InputBuilder(name, value, sensitive)
