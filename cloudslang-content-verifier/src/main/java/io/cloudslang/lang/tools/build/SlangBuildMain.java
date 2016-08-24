@@ -95,8 +95,9 @@ public class SlangBuildMain {
         Slang slang = context.getBean(Slang.class);
         registerEventHandlers(slang);
 
+//        long time = System.currentTimeMillis();
         try {
-            SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites, false);
+            SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites, runTestsInParallel);
             IRunTestResults runTestsResults = buildResults.getRunTestsResults();
             Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
 
@@ -107,6 +108,7 @@ public class SlangBuildMain {
             if (shouldPrintCoverageData) {
                 printTestCoverageData(runTestsResults);
             }
+//            System.out.println("Took " + (System.currentTimeMillis() - time) / 1000f + " s.");
 
             if (MapUtils.isNotEmpty(runTestsResults.getFailedTests())) {
                 printBuildFailureSummary(projectPath, runTestsResults);
