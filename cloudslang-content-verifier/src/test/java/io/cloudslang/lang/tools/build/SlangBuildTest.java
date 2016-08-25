@@ -8,6 +8,8 @@
  */
 package io.cloudslang.lang.tools.build;
 
+import com.beust.jcommander.internal.Maps;
+import com.google.common.collect.Lists;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
@@ -20,22 +22,15 @@ import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
 import io.cloudslang.lang.tools.build.tester.TestRun;
+import io.cloudslang.lang.tools.build.tester.parallel.report.ThreadSafeRunTestResults;
 import io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService;
 import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDispatchService;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
 import io.cloudslang.score.api.ExecutionPlan;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import junit.framework.Assert;
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -49,14 +44,30 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 /*
  * Created by stoneo on 2/11/2015.
@@ -115,6 +126,30 @@ public class SlangBuildTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("path");
         slangBuilder.buildSlangContent("", "content", null, null, false);
+    }
+
+    @Test
+    public void testParallelFlag() throws Exception {
+        Path testPath = null;
+        try {
+            String projectPath = "aaa/bb/cc";
+            List<String> suites = Lists.newArrayList("suite1", "suite2");
+            testPath = Files.createTempDirectory("testPath");
+            String testPathString = testPath.toString();
+
+            doReturn(new ThreadSafeRunTestResults()).when(slangTestRunner).runAllTestsParallel(eq(projectPath), anyMap(), anyMap(), eq(suites));
+            doReturn(Maps.newHashMap()).when(slangTestRunner).createTestCases(anyString(), anySet());
+            doReturn(new ThreadSafeRunTestResults()).when(slangTestRunner).runAllTestsParallel(anyString(), anyMap(), anyMap(), anyList());
+
+            slangBuilder.runTests(Maps.<String, Executable>newHashMap(), projectPath, testPathString, suites, true);
+            verify(slangTestRunner).runAllTestsParallel(eq(projectPath), anyMap(), anyMap(), eq(suites));
+            verify(slangTestRunner, never()).runAllTestsSequential(anyString(), anyMap(), anyMap(), anyList());
+
+        } finally {
+            if (testPath != null) {
+                FileUtils.deleteQuietly(testPath.toFile());
+            }
+        }
     }
 
     @Test
