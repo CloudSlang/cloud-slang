@@ -1,6 +1,6 @@
 package io.cloudslang.lang.tools.build.tester;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.compiler.SlangSource;

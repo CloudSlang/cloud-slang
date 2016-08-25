@@ -8,8 +8,8 @@
  */
 package io.cloudslang.lang.tools.build;
 
-import com.beust.jcommander.internal.Maps;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.compiler.SlangCompiler;
