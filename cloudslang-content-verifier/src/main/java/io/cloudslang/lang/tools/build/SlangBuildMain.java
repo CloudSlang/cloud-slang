@@ -12,6 +12,8 @@ package io.cloudslang.lang.tools.build;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.commons.services.api.UserConfigurationService;
+import io.cloudslang.lang.commons.services.impl.UserConfigurationServiceImpl;
 import io.cloudslang.lang.tools.build.commands.ApplicationArgs;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.TestRun;
@@ -57,20 +59,8 @@ public class SlangBuildMain {
     private final static Logger log = Logger.getLogger(SlangBuildMain.class);
     private final static String NOT_TS = "!";
 
-    private static final String USER_CONFIG_DIR = "configuration";
-    private static final String USER_CONFIG_FILENAME = "cslang.properties";
-    private static final String USER_CONFIG_FILEPATH = USER_CONFIG_DIR + File.separator + USER_CONFIG_FILENAME;
-    private static final String SUBSTITUTION_REGEX = "\\$\\{([^${}]+)\\}"; // ${system.property.name}
-    private static final Pattern SUBSTITUTION_PATTERN = Pattern.compile(SUBSTITUTION_REGEX);
-    public static final int MAX_THREADS_TEST_RUNNER = 16;
-
     public static void main(String[] args) {
-        try {
-            loadUserProperties();
-        } catch (Exception ex) {
-            System.out.println("Error occurred while loading user configuration: " + ex.getMessage());
-            ex.printStackTrace();
-        }
+        loadUserProperties();
 
         ApplicationArgs appArgs = new ApplicationArgs();
         parseArgs(args, appArgs);
@@ -132,6 +122,17 @@ public class SlangBuildMain {
             log.error("------------------------------------------------------------");
             log.error("");
             System.exit(1);
+        }
+    }
+
+    @SuppressWarnings("Duplicates")
+    private static void loadUserProperties() {
+        try {
+            UserConfigurationService userConfigurationService = new UserConfigurationServiceImpl();
+            userConfigurationService.loadUserProperties();
+        } catch (Exception ex) {
+            System.out.println("Error occurred while loading user configuration: " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 
@@ -327,49 +328,6 @@ public class SlangBuildMain {
 
     private static void logEvent(ScoreEvent event) {
         log.debug(("Event received: " + event.getEventType() + " Data is: " + event.getData()));
-    }
-
-    private static void loadUserProperties() throws IOException {
-        String appHome = System.getProperty("app.home");
-        String propertyFilePath = appHome + File.separator + USER_CONFIG_FILEPATH;
-        File propertyFile = new File(propertyFilePath);
-        Properties rawProperties = new Properties();
-        if (propertyFile.isFile()) {
-            try (InputStream propertiesStream = new FileInputStream(propertyFilePath)) {
-                rawProperties.load(propertiesStream);
-            }
-        }
-        Set<Map.Entry<Object, Object>> propertyEntries = rawProperties.entrySet();
-        for (Map.Entry<Object, Object> property : propertyEntries) {
-            String key = (String) property.getKey();
-            String value = (String) property.getValue();
-            value = substitutePropertyReferences(value);
-            setProperty(key, value);
-        }
-    }
-
-    private static String substitutePropertyReferences(String value) {
-        Set<String> variableNames = findPropertyReferences(value);
-        return replacePropertyReferences(value, variableNames);
-    }
-
-    private static Set<String> findPropertyReferences(String value) {
-        Matcher mather = SUBSTITUTION_PATTERN.matcher(value);
-        Set<String> variableNames = new HashSet<>();
-        while (mather.find()) {
-            variableNames.add(mather.group(1));
-        }
-        return variableNames;
-    }
-
-    private static String replacePropertyReferences(String value, Set<String> variableNames) {
-        for (String variableName : variableNames) {
-            String variableValue = System.getProperty(variableName);
-            if (StringUtils.isNotEmpty(variableValue)) {
-                value = value.replace("${" + variableName + "}", variableValue);
-            }
-        }
-        return value;
     }
 
 }

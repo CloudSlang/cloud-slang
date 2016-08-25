@@ -18,46 +18,64 @@ flow:
           ops.javaOneAnother11:
         publish:
           - result11: ${version}
+        navigate:
+          - SUCCESS: step_12
     - step_12:
         do:
           ops.javaOneAnother12:
         publish:
           - result12: ${version}
+        navigate:
+          - SUCCESS: step_13
     - step_13:
         do:
           ops.javaOneAnother13:
         publish:
           - result13: ${version}
+        navigate:
+          - SUCCESS: step_21
     - step_21:
         do:
           ops.javaOneAnother21:
         publish:
           - result21: ${version}
+        navigate:
+          - SUCCESS: step_22
     - step_22:
         do:
           ops.javaOneAnother22:
         publish:
           - result22: ${version}
+        navigate:
+          - SUCCESS: step_23
     - step_23:
         do:
           ops.javaOneAnother23:
         publish:
           - result23: ${version}
+        navigate:
+          - SUCCESS: step_31
     - step_31:
         do:
           ops.javaOneAnother31:
         publish:
           - result31: ${version}
+        navigate:
+          - SUCCESS: step_32
     - step_32:
         do:
           ops.javaOneAnother32:
         publish:
           - result32: ${version}
+        navigate:
+          - SUCCESS: step_33
     - step_33:
         do:
           ops.javaOneAnother33:
         publish:
           - result33: ${version}
+        navigate:
+          - SUCCESS: SUCCESS
   outputs:
     - result11
     - result12
@@ -70,4 +88,3 @@ flow:
     - result33
   results:
     - SUCCESS
-    - FAILURE

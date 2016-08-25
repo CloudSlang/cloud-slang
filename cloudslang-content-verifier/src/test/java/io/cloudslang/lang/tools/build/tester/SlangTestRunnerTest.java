@@ -2,6 +2,7 @@ package io.cloudslang.lang.tools.build.tester;
 
 import com.beust.jcommander.internal.Lists;
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
@@ -623,6 +624,11 @@ public class SlangTestRunnerTest {
         }
 
         @Bean
+        public SlangSourceService slangSourceService() {
+            return mock(SlangSourceService.class);
+        }
+
+        @Bean
         public TestCaseEventDispatchService testCaseEventDispatchService() {
             return mock(TestCaseEventDispatchService.class);
         }
@@ -657,4 +663,5 @@ public class SlangTestRunnerTest {
             this.eventTypes = eventTypes;
         }
     }
+    
 }

@@ -10,11 +10,12 @@
 package io.cloudslang.lang.tools.build.tester.parser;
 
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.commons.services.api.SlangSourceService;
+import io.cloudslang.lang.commons.services.impl.SlangSourceServiceImpl;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.entities.SystemProperty;
-import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
 import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
@@ -87,8 +88,7 @@ public class TestCasesYamlParserTest {
         String filePath = "/test/base/test_print_text-unrecognized_tag.inputs.yaml";
         URI fileUri = getClass().getResource(filePath).toURI();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Artifact has unrecognized tag {invalid_key}. Supported tags are {value} and {sensitive}. " +
-                "Please take a look at the supported features per versions link.");
+        exception.expectMessage("Artifact {testPrintFinishesWithSuccess} has unrecognized tag {invalid_key}. Please take a look at the supported features per versions link");
         parser.parseTestCases(SlangSource.fromFile(fileUri));
     }
 
@@ -177,5 +177,9 @@ public class TestCasesYamlParserTest {
             return new DummyEncryptor();
         }
 
+        @Bean
+        public SlangSourceService slangSourceService() {
+            return new SlangSourceServiceImpl();
+        }
     }
 }

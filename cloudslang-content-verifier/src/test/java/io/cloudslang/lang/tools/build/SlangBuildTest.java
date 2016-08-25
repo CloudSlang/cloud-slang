@@ -11,6 +11,7 @@ package io.cloudslang.lang.tools.build;
 import com.beust.jcommander.internal.Maps;
 import com.google.common.collect.Lists;
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
@@ -415,6 +416,11 @@ public class SlangBuildTest {
         @Bean
         public TestCaseEventDispatchService testCaseEventDispatchService() {
             return mock(TestCaseEventDispatchService.class);
+        }
+
+        @Bean
+        public SlangSourceService slangSourceService() {
+            return mock(SlangSourceService.class);
         }
     }
 }

@@ -1,0 +1,26 @@
+#   (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+#   All rights reserved. This program and the accompanying materials
+#   are made available under the terms of the Apache License v2.0 which accompany this distribution.
+#
+#   The Apache License is available at
+#   http://www.apache.org/licenses/LICENSE-2.0
+
+namespace: io.cloudslang
+
+imports:
+  ops: io.cloudslang
+
+flow:
+  name: flow_1
+  workflow:
+    - step_1:
+        do:
+          ops.op_1: []
+        navigate:
+          - SUCCESS: SUCCESS
+          - FAILURE: FAILURE
+          - KEY_1: SUCCESS
+          - KEY_2: FAILURE
+  results:
+    - SUCCESS
+    - FAILURE
