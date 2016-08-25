@@ -48,6 +48,10 @@ public class ApplicationArgs {
             description = "Whether or not parallel test execution should be used")
     public boolean parallel = false;
 
+    @Parameter(names = {"--thread-count", "-th"},
+            description = "Number of threads to be used in case of parallel test execution. Has no effect for sequential execution. By default, it is set to the number of number of processors available to the SlangBuilder.")
+    public String threadCount;
+
     @Parameter(names = {"--help", "-h"}, help = true,
             description = "Display help information")
     private boolean help;
@@ -89,5 +93,9 @@ public class ApplicationArgs {
 
     public Boolean isParallel() {
         return parallel;
+    }
+
+    public String getThreadCount() {
+        return threadCount;
     }
 }

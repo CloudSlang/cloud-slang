@@ -40,7 +40,10 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService.SLANG_TEST_RUNNER_THREAD_COUNT;
+import static java.lang.String.format;
 import static java.lang.String.valueOf;
+import static java.lang.System.setProperty;
 
 /*
  * Created by stoneo on 1/11/2015.
@@ -59,6 +62,7 @@ public class SlangBuildMain {
     private static final String USER_CONFIG_FILEPATH = USER_CONFIG_DIR + File.separator + USER_CONFIG_FILENAME;
     private static final String SUBSTITUTION_REGEX = "\\$\\{([^${}]+)\\}"; // ${system.property.name}
     private static final Pattern SUBSTITUTION_PATTERN = Pattern.compile(SUBSTITUTION_REGEX);
+    public static final int MAX_THREADS_TEST_RUNNER = 16;
 
     public static void main(String[] args) {
         try {
@@ -76,6 +80,8 @@ public class SlangBuildMain {
         List<String> testSuites = parseTestSuites(appArgs);
         boolean shouldPrintCoverageData = parseCoverageArg(appArgs);
         boolean runTestsInParallel = parseParallelTestsArg(appArgs);
+        int threadCount = parseThreadCountArg(appArgs, runTestsInParallel);
+        setProperty(SLANG_TEST_RUNNER_THREAD_COUNT, valueOf(threadCount));
 
         log.info("");
         log.info("------------------------------------------------------------");
@@ -175,6 +181,30 @@ public class SlangBuildMain {
             runTestsInParallel = appArgs.isParallel();
         }
         return runTestsInParallel;
+    }
+
+
+    private static int parseThreadCountArg(ApplicationArgs appArgs, boolean isParallel) {
+        if (!isParallel) {
+            return 1;
+        } else {
+            int defaultThreadCount = Runtime.getRuntime().availableProcessors();
+            String threadCountErrorMessage = format("Thread count is misconfigured. The thread count value must be a positive integer less than or equal to %d. Using %d threads.", MAX_THREADS_TEST_RUNNER, defaultThreadCount);
+            try {
+                String sThreadCount = appArgs.getThreadCount();
+                if (sThreadCount != null) {
+                    Integer threadCount = Integer.parseInt(sThreadCount);
+                    if ((threadCount > 0) || (threadCount <= MAX_THREADS_TEST_RUNNER)) {
+                        return threadCount;
+                    } else {
+                        log.warn(threadCountErrorMessage);
+                    }
+                }
+            } catch (NumberFormatException nfEx) {
+                log.warn(threadCountErrorMessage);
+            }
+            return defaultThreadCount;
+        }
     }
 
     private static void printBuildSuccessSummary(String contentPath, SlangBuildResults buildResults, IRunTestResults runTestsResults) {
@@ -313,7 +343,7 @@ public class SlangBuildMain {
             String key = (String) property.getKey();
             String value = (String) property.getValue();
             value = substitutePropertyReferences(value);
-            System.setProperty(key, value);
+            setProperty(key, value);
         }
     }
 
