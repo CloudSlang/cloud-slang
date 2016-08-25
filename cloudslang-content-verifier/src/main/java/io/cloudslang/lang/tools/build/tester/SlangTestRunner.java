@@ -53,7 +53,7 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 public class SlangTestRunner {
 
     private final static String PROJECT_PATH_TOKEN = "${project_path}";
-    public static final int MAX_TIME_PER_TESTCASE_IN_MINUTES = 10;
+    public static final long MAX_TIME_PER_TESTCASE_IN_MINUTES = 10;
 
     @Autowired
     private TestCasesYamlParser parser;

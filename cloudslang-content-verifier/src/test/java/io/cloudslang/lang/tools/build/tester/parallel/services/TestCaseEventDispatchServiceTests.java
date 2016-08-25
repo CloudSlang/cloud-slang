@@ -58,6 +58,7 @@ public class TestCaseEventDispatchServiceTests {
         InOrder inOrder = inOrder(listenerList);
         inOrder.verify(listenerList).removeListener(eq(loggingListener));
         inOrder.verify(listenerList).removeListener(eq(collector));
+        inOrder.verifyNoMoreInteractions();
     }
 
     @Test

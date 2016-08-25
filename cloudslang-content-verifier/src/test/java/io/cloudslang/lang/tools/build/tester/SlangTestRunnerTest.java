@@ -1,11 +1,19 @@
 package io.cloudslang.lang.tools.build.tester;
 
+import com.beust.jcommander.internal.Lists;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
+import io.cloudslang.lang.tools.build.tester.parallel.MultiTriggerTestCaseEventListener;
+import io.cloudslang.lang.tools.build.tester.parallel.report.LoggingSlangTestCaseEventListener;
+import io.cloudslang.lang.tools.build.tester.parallel.report.ThreadSafeRunTestResults;
+import io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService;
+import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDispatchService;
+import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.FailedSlangTestCaseEvent;
+import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.SlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import io.cloudslang.score.api.ExecutionPlan;
@@ -19,6 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -38,15 +47,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
+import static io.cloudslang.lang.tools.build.tester.SlangTestRunner.MAX_TIME_PER_TESTCASE_IN_MINUTES;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anySetOf;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * Created by stoneo on 4/15/2015.
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangTestRunnerTest.Config.class)
 public class SlangTestRunnerTest {
@@ -61,6 +82,12 @@ public class SlangTestRunnerTest {
     @Autowired
     private Slang slang;
 
+    @Autowired
+    private TestCaseEventDispatchService testCaseEventDispatchService;
+
+    @Autowired
+    private ParallelTestCaseExecutorService parallelTestCaseExecutorService;
+
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
@@ -69,11 +96,10 @@ public class SlangTestRunnerTest {
     private List<String> defaultTestSuite = Collections.singletonList("default");
     private Set<String> allAvailableExecutables = SetUtils.emptySet();
 
-
     @Before
     public void resetMocks() {
-        Mockito.reset(parser);
-        Mockito.reset(slang);
+        reset(parser);
+        reset(slang);
     }
 
     @Test
@@ -214,6 +240,73 @@ public class SlangTestRunnerTest {
         prepareMockForEventListenerWithSuccessResult();
         IRunTestResults runTestsResults = slangTestRunner.runAllTestsSequential("path", testCases, compiledFlows, defaultTestSuite);
         Assert.assertEquals("No test cases should fail", 0, runTestsResults.getFailedTests().size());
+    }
+
+    @Test
+    public void runTestCaseParallel() throws InterruptedException, ExecutionException, TimeoutException {
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        SlangTestCase testCase1 = new SlangTestCase("test1", "testFlowPath1", null, null, null, null, null, null, null);
+        SlangTestCase testCase2 = new SlangTestCase("test2", "testFlowPath2", null, null, null, null, null, null, null);
+        testCases.put("test1", testCase1);
+        testCases.put("test2", testCase2);
+        HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        compiledFlows.put("testFlowPath1", new CompilationArtifact(new ExecutionPlan(), null, null, null));
+        compiledFlows.put("testFlowPath2", new CompilationArtifact(new ExecutionPlan(), null, null, null));
+
+        doNothing().when(testCaseEventDispatchService).unregisterAllListeners();
+        doNothing().when(testCaseEventDispatchService).registerListener(any(ISlangTestCaseEventListener.class));
+
+        final SubscribeArgumentsHolder subscribeArgumentsHolder = new SubscribeArgumentsHolder();
+        // Get the global event listener that was created
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Object[] arguments = invocationOnMock.getArguments();
+                subscribeArgumentsHolder.setMultiTriggerTestCaseEventListener((MultiTriggerTestCaseEventListener) arguments[0]);
+                subscribeArgumentsHolder.setEventTypes((Set<String>) arguments[1]);
+                return null;
+            }
+        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), any(Set.class));
+
+        final Future futureTestCase1 = mock(Future.class);
+        final Future futureTestCase2 = mock(Future.class);
+        final List<Runnable> runnableList = Lists.newArrayList();
+        // Collect the Runnable objects created inside, so that later we can verify them
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                int size = runnableList.size();
+                Object[] arguments = invocationOnMock.getArguments();
+                runnableList.add((Runnable) arguments[0]);
+                return size == 0 ? futureTestCase1 : futureTestCase2;
+            }
+        }).when(parallelTestCaseExecutorService).submitTestCase(any(Runnable.class));
+
+
+        doThrow(new TimeoutException("timeout")).when(futureTestCase1).get(anyLong(), any(TimeUnit.class));
+        doThrow(new RuntimeException("unknown exception")).when(futureTestCase2).get(anyLong(), any(TimeUnit.class));
+
+        doNothing().when(slang).unSubscribeOnEvents(any(ScoreEventListener.class));
+        doNothing().when(testCaseEventDispatchService).notifyListeners(any(SlangTestCaseEvent.class));
+
+        slangTestRunner.runAllTestsParallel("path", testCases, compiledFlows, defaultTestSuite);
+
+        verify(testCaseEventDispatchService, times(2)).unregisterAllListeners();
+        verify(testCaseEventDispatchService).registerListener(isA(ThreadSafeRunTestResults.class));
+        verify(testCaseEventDispatchService).registerListener(isA(LoggingSlangTestCaseEventListener.class));
+
+        verify(slang).subscribeOnEvents(eq(subscribeArgumentsHolder.getMultiTriggerTestCaseEventListener()), eq(subscribeArgumentsHolder.getEventTypes()));
+
+        InOrder inOrderTestCases = inOrder(parallelTestCaseExecutorService);
+        inOrderTestCases.verify(parallelTestCaseExecutorService).submitTestCase(eq(runnableList.get(0)));
+        inOrderTestCases.verify(parallelTestCaseExecutorService).submitTestCase(eq(runnableList.get(1)));
+        inOrderTestCases.verifyNoMoreInteractions();
+
+        verify(futureTestCase1).get(eq(MAX_TIME_PER_TESTCASE_IN_MINUTES), eq(TimeUnit.MINUTES));
+        verify(futureTestCase2).get(eq(MAX_TIME_PER_TESTCASE_IN_MINUTES), eq(TimeUnit.MINUTES));
+        verify(testCaseEventDispatchService, times(2)).notifyListeners(isA(FailedSlangTestCaseEvent.class));
+
+        verify(slang).unSubscribeOnEvents(eq(subscribeArgumentsHolder.getMultiTriggerTestCaseEventListener()));
     }
 
     @Test
@@ -527,6 +620,41 @@ public class SlangTestRunnerTest {
         @Bean
         public Slang slang() {
             return mock(Slang.class);
+        }
+
+        @Bean
+        public TestCaseEventDispatchService testCaseEventDispatchService() {
+            return mock(TestCaseEventDispatchService.class);
+        }
+
+        @Bean
+        public ParallelTestCaseExecutorService parallelTestCaseExecutorService() {
+            return mock(ParallelTestCaseExecutorService.class);
+        }
+    }
+
+    private static class SubscribeArgumentsHolder {
+
+        private MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener;
+        private Set<String> eventTypes;
+
+        public SubscribeArgumentsHolder() {
+        }
+
+        public MultiTriggerTestCaseEventListener getMultiTriggerTestCaseEventListener() {
+            return multiTriggerTestCaseEventListener;
+        }
+
+        public Set<String> getEventTypes() {
+            return eventTypes;
+        }
+
+        public void setMultiTriggerTestCaseEventListener(MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener) {
+            this.multiTriggerTestCaseEventListener = multiTriggerTestCaseEventListener;
+        }
+
+        public void setEventTypes(Set<String> eventTypes) {
+            this.eventTypes = eventTypes;
         }
     }
 }

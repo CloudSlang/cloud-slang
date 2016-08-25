@@ -20,10 +20,13 @@ import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
 import io.cloudslang.lang.tools.build.tester.TestRun;
+import io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService;
+import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDispatchService;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
 import io.cloudslang.score.api.ExecutionPlan;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,6 +34,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -82,6 +86,12 @@ public class SlangBuildTest {
 
     @Autowired
     private SlangTestRunner slangTestRunner;
+
+    @Autowired
+    public ParallelTestCaseExecutorService parallelTestCaseExecutorService;
+
+    @Autowired
+    public TestCaseEventDispatchService testCaseEventDispatchService;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -360,6 +370,16 @@ public class SlangBuildTest {
         @Bean
         public Slang slang() {
             return mock(Slang.class);
+        }
+
+        @Bean
+        public ParallelTestCaseExecutorService parallelTestCaseExecutorService() {
+            return mock(ParallelTestCaseExecutorService.class);
+        }
+
+        @Bean
+        public TestCaseEventDispatchService testCaseEventDispatchService() {
+            return mock(TestCaseEventDispatchService.class);
         }
     }
 }
