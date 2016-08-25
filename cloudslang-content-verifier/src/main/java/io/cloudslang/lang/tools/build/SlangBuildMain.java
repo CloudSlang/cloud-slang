@@ -91,6 +91,7 @@ public class SlangBuildMain {
         log.info("Active test suites are: " + Arrays.toString(testSuites.toArray()));
         log.info("Print coverage data: " + valueOf(shouldPrintCoverageData));
         log.info("Parallel: " + valueOf(runTestsInParallel));
+        log.info("Thread count: " + threadCount);
 
         log.info("");
         log.info("Loading...");

@@ -11,7 +11,7 @@ public class TestCaseEventDispatchService {
     private EventListenerSupport<ISlangTestCaseEventListener> listenerList;
 
     @PostConstruct
-    private void initializeListeners() {
+    void initializeListeners() {
         this.listenerList = EventListenerSupport.create(ISlangTestCaseEventListener.class);
     }
 
