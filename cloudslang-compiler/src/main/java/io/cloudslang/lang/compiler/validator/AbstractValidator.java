@@ -4,11 +4,12 @@ import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.constants.RegexConstants;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.List;
 
 /**
  * User: bancl
@@ -16,6 +17,17 @@ import java.util.List;
  */
 public class AbstractValidator {
     public static final String NAME_PLACEHOLDER = "name_placeholder01";
+
+    protected Pattern namespacePattern;
+
+    public AbstractValidator() {
+        namespacePattern = Pattern.compile(RegexConstants.NAMESPACE_CHARS);
+    }
+
+    protected void validateNamespaceRules(String input) {
+        validateChars(input);
+        validateDelimiter(input);
+    }
 
     protected void validateListsHaveMutuallyExclusiveNames(List<? extends InOutParam> inOutParams, List<Output> outputs, String errorMessage) {
         for (InOutParam inOutParam : CollectionUtils.emptyIfNull(inOutParams)) {
@@ -33,5 +45,33 @@ public class AbstractValidator {
             resultNames.add(result.getName());
         }
         return resultNames;
+    }
+
+    private void validateChars(String input) {
+        if (!namespacePattern.matcher(input).matches()) {
+            throw new RuntimeException("Argument[" + input +"] contains invalid characters.");
+        }
+    }
+
+    private void validateDelimiter(String input) {
+        if (input.startsWith(RegexConstants.NAMESPACE_PROPERTY_DELIMITER)) {
+            throw new RuntimeException(
+                    "Argument[" + input +"] cannot start with delimiter[" + RegexConstants.NAMESPACE_PROPERTY_DELIMITER + "]."
+            );
+        }
+        if (input.endsWith(RegexConstants.NAMESPACE_PROPERTY_DELIMITER)) {
+            throw new RuntimeException(
+                    "Argument[" + input +"] cannot end with delimiter[" + RegexConstants.NAMESPACE_PROPERTY_DELIMITER + "]."
+            );
+        }
+        String[] parts = input.split(RegexConstants.NAMESPACE_DELIMITER_ESCAPED);
+        for (String part : parts) {
+            if ("".equals(part)) {
+                throw new RuntimeException(
+                        "Argument[" + input + "] cannot contain multiple delimiters["
+                                + RegexConstants.NAMESPACE_PROPERTY_DELIMITER + "] without content."
+                );
+            }
+        }
     }
 }

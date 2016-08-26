@@ -20,6 +20,8 @@ import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
@@ -294,6 +296,11 @@ public class InputsTransformerTest extends TransformersTestParent {
         @Bean
         public ExecutableValidator executableValidator() {
             return new ExecutableValidatorImpl();
+        }
+
+        @Bean
+        public SystemPropertyValidator systemPropertyValidator() {
+            return new SystemPropertyValidatorImpl();
         }
 
     }

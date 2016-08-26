@@ -15,9 +15,12 @@ package io.cloudslang.lang.compiler.parser;
  */
 
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.modeller.result.ParseModellingResult;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,6 +36,31 @@ public class YamlParser {
     @Autowired
     private ExecutableValidator executableValidator;
 
+    public ParsedSlang parseAndValidateAndThrowFirstError(SlangSource source) {
+        ParseModellingResult parseModellingResult = parseAndValidate(source);
+        if (!parseModellingResult.getErrors().isEmpty()) {
+            throw parseModellingResult.getErrors().get(0);
+        } else {
+            return parseModellingResult.getParsedSlang();
+        }
+    }
+
+    public ParseModellingResult parseAndValidate(SlangSource source) {
+        ParsedSlang parsedSlang = parse(source);
+        List<RuntimeException> errors = new ArrayList<>();
+        try {
+            executableValidator.validateNamespace(parsedSlang);
+        } catch (RuntimeException rex) {
+            errors.add(rex);
+        }
+        try {
+            executableValidator.validateImportsSection(parsedSlang);
+        } catch (RuntimeException rex) {
+            errors.add(rex);
+        }
+        return new ParseModellingResult(parsedSlang, errors);
+    }
+
     public ParsedSlang parse(SlangSource source) {
 
         Validate.notEmpty(source.getSource(), "Source " + source.getFileName() + " cannot be empty");
@@ -44,10 +72,6 @@ public class YamlParser {
             }
             parsedSlang.setName(source.getFileName());
             parsedSlang.setFileExtension(source.getFileExtension());
-
-            executableValidator.validateNamespace(parsedSlang);
-            executableValidator.validateImportsSectionAliases(parsedSlang);
-            executableValidator.validateImportsSectionValues(parsedSlang);
 
             return parsedSlang;
         } catch (Throwable e) {

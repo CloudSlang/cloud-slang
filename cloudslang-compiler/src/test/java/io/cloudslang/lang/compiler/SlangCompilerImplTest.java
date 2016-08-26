@@ -67,7 +67,7 @@ public class SlangCompilerImplTest {
     @Test
     public void testInvalidParsedSlangType() throws Exception {
         ParsedSlang parsedSlangInvalidTypeMock = mock(ParsedSlang.class);
-        when(yamlParserMock.parse(eq(slangSource))).thenReturn(parsedSlangInvalidTypeMock);
+        when(yamlParserMock.parseAndValidateAndThrowFirstError(eq(slangSource))).thenReturn(parsedSlangInvalidTypeMock);
         when(parsedSlangInvalidTypeMock.getType()).thenReturn(ParsedSlang.Type.FLOW);
         when(parsedSlangInvalidTypeMock.getName()).thenReturn("flow_name");
 
@@ -81,7 +81,7 @@ public class SlangCompilerImplTest {
     @Test
     public void testLoadSystemProperties() throws Exception {
         ParsedSlang parsedSlangMock = mock(ParsedSlang.class);
-        when(yamlParserMock.parse(eq(slangSource))).thenReturn(parsedSlangMock);
+        when(yamlParserMock.parseAndValidateAndThrowFirstError(eq(slangSource))).thenReturn(parsedSlangMock);
         when(parsedSlangMock.getType()).thenReturn(ParsedSlang.Type.SYSTEM_PROPERTY_FILE);
 
         String namespace = "a.b";

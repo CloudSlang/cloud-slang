@@ -8,23 +8,22 @@
  */
 package io.cloudslang.lang.compiler;
 
+import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.score.api.ExecutionPlan;
+import io.cloudslang.score.api.ExecutionStep;
+import java.net.URL;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import io.cloudslang.score.api.ExecutionPlan;
-import io.cloudslang.score.api.ExecutionStep;
-import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
-import io.cloudslang.lang.entities.bindings.Input;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.net.URL;
-import java.util.List;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -143,7 +142,7 @@ public class CompileOperationTest {
     public void testCompileOperationWithMissingNamespace() throws Exception {
         URL resource = getClass().getResource("/corrupted/op_without_namespace.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Operation/Flow op_without_namespace must have a namespace");
+        exception.expectMessage("For source[op_without_namespace] namespace cannot be empty.");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 }

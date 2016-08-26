@@ -17,6 +17,8 @@ import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
@@ -190,9 +192,14 @@ public class TestCasesYamlParserTest {
             return new SlangSourceServiceImpl();
         }
 
-       @Bean
-       public ExecutableValidator executableValidator() {
+        @Bean
+        public ExecutableValidator executableValidator() {
            return new ExecutableValidatorImpl();
+       }
+
+       @Bean
+        public SystemPropertyValidator systemPropertyValidator() {
+           return new SystemPropertyValidatorImpl();
        }
     }
 }

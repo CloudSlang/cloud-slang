@@ -176,7 +176,8 @@ public class LoadSystemPropertiesTest {
         URI propertiesURI = getClass().getResource("/properties/a/b/invalid_1.prop.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage(
-                "Error loading properties source: 'invalid_1'. Nested exception is: Namespace[a.!.b] contains invalid characters."
+                "Error loading properties source: 'invalid_1'. Nested exception is: Error validating system property namespace." +
+                        " Nested exception is: Argument[a.!.b] contains invalid characters."
         );
         loadSystemProperties(SlangSource.fromFile(propertiesURI));
     }
@@ -186,7 +187,9 @@ public class LoadSystemPropertiesTest {
         URI propertiesURI = getClass().getResource("/properties/a/b/invalid_2.prop.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage(
-                "Error loading properties source: 'invalid_2'. Nested exception is: Key[c.?.name] contains invalid characters."
+                "Error loading properties source: 'invalid_2'. Nested exception is:" +
+                        " Error validating system property key. Nested exception is:" +
+                        " Argument[c.?.name] contains invalid characters."
         );
         loadSystemProperties(SlangSource.fromFile(propertiesURI));
     }

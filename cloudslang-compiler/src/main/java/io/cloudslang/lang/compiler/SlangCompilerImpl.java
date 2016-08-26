@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.modeller.SlangModeller;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.ParseModellingResult;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
@@ -20,11 +21,6 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.SetUtils;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +29,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.Validate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
@@ -102,10 +102,14 @@ public class SlangCompilerImpl implements SlangCompiler {
         Validate.notNull(source, "You must supply a source to compile");
 
         //first thing we parse the yaml file into java maps
-        ParsedSlang parsedSlang = yamlParser.parse(source);
+        ParseModellingResult parseModellingResult = yamlParser.parseAndValidate(source);
 
         // Then we transform the parsed Slang source to a Slang model
-        return slangModeller.createModel(parsedSlang);
+        ExecutableModellingResult executableModellingResult =
+                slangModeller.createModel(parseModellingResult.getParsedSlang());
+
+        executableModellingResult.getErrors().addAll(parseModellingResult.getErrors());
+        return executableModellingResult;
     }
 
     @Override
@@ -127,7 +131,7 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     private ParsedSlang parseSystemPropertiesFile(SlangSource source) {
-        ParsedSlang parsedSlang = yamlParser.parse(source);
+        ParsedSlang parsedSlang = yamlParser.parseAndValidateAndThrowFirstError(source);
         if (!ParsedSlang.Type.SYSTEM_PROPERTY_FILE.equals(parsedSlang.getType())) {
             throw new RuntimeException("Source: " + parsedSlang.getName() + " " + NOT_A_VALID_SYSTEM_PROPERTY_FILE_ERROR_MESSAGE_SUFFIX);
         }
@@ -160,9 +164,7 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     private String getNameSpace(ParsedSlang parsedSlang) {
-        String namespace = parsedSlang.getNamespace();
-        systemPropertyValidator.validateNamespace(namespace);
-        return namespace;
+        return parsedSlang.getNamespace();
     }
 
     private String getPropertyKey(Map.Entry<String, Object> propertyAsEntry) {

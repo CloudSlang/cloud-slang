@@ -59,7 +59,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
             errors.add(new IllegalArgumentException("Error compiling " + parsedSlang.getName() + ". Executable data is null"));
             return "";
         } else {
-            String executableName = getExecutableName(executableRawData, parsedSlang.getName(), errors);
+            String executableName = getExecutableName(executableRawData, errors);
             if (parsedSlang == null) {
                 errors.add(new IllegalArgumentException("Slang source for: \'" + executableName + "\' is null"));
             } else {
@@ -102,7 +102,6 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     @Override
     public ExecutableModellingResult validateResult(ParsedSlang parsedSlang, String executableName, ExecutableModellingResult result) {
         validateFileName(executableName, parsedSlang, result);
-        validateNamespace(result);
         validateInputNamesDifferentFromOutputNames(result);
 
         if (SlangTextualKeys.FLOW_TYPE.equals(result.getExecutable().getType())) {
@@ -301,10 +300,10 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         return messagePart;
     }
 
-    private String getExecutableName(Map<String, Object> executableRawData, String sourceName, List<RuntimeException> errors) {
+    private String getExecutableName(Map<String, Object> executableRawData, List<RuntimeException> errors) {
         String execName = (String) executableRawData.get(SlangTextualKeys.EXECUTABLE_NAME_KEY);
         if (StringUtils.isBlank(execName)) {
-            errors.add(new RuntimeException("Executable in source: " + sourceName + " has no name"));
+            errors.add(new RuntimeException("Executable has no name"));
         }
         try {
             executableValidator.validateExecutableName(execName);
@@ -421,12 +420,6 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
                         " is declared in a file named \"" + fileName + "." + fileExtension.getValue() + "\"" +
                         ", it should be declared in a file named \"" + executableName + "." + fileExtension.getValue() + "\""));
             }
-        }
-    }
-
-    private void validateNamespace(ExecutableModellingResult result) {
-        if (result.getExecutable().getNamespace() == null || result.getExecutable().getNamespace().length() == 0) {
-            result.getErrors().add(new IllegalArgumentException("Operation/Flow " + result.getExecutable().getName() + " must have a namespace"));
         }
     }
 

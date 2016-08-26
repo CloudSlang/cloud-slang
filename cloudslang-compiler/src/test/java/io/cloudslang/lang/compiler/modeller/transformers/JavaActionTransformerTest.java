@@ -17,6 +17,8 @@ import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import java.io.File;
 import java.net.URISyntaxException;
@@ -176,5 +178,11 @@ public class JavaActionTransformerTest extends TransformersTestParent {
         public ExecutableValidator executableValidator() {
             return new ExecutableValidatorImpl();
         }
+
+        @Bean
+        public SystemPropertyValidator systemPropertyValidator() {
+            return new SystemPropertyValidatorImpl();
+        }
+
     }
 }

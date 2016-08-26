@@ -18,8 +18,7 @@ import java.util.Map;
  */
 public interface ExecutableValidator {
     void validateNamespace(ParsedSlang parsedSlang);
-    void validateImportsSectionAliases(ParsedSlang parsedSlang);
-    void validateImportsSectionValues(ParsedSlang parsedSlang);
+    void validateImportsSection(ParsedSlang parsedSlang);
     void validateStepReferenceId(String referenceId);
     void validateExecutableName(String executableName);
     void validateStepName(String stepName);

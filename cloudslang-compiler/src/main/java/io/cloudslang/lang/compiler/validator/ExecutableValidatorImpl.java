@@ -12,6 +12,10 @@ import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,24 +25,65 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExecutableValidatorImpl extends AbstractValidator implements ExecutableValidator {
 
+    @Autowired
+    private SystemPropertyValidator systemPropertyValidator;
+
     @Override
     public void validateNamespace(ParsedSlang parsedSlang) {
-
+        String namespace = parsedSlang.getNamespace();
+        ParsedSlang.Type executableType = parsedSlang.getType();
+        switch (executableType) {
+            case SYSTEM_PROPERTY_FILE:
+                systemPropertyValidator.validateNamespace(namespace);
+                break;
+            case FLOW:
+            case OPERATION:
+            case DECISION:
+                // namespace cannot be empty
+                if (org.apache.commons.lang3.StringUtils.isEmpty(namespace)) {
+                    throw new RuntimeException("For source[" + parsedSlang.getName() + "] namespace cannot be empty.");
+                } else {
+                    validateNamespaceRules(namespace);
+                }
+                break;
+            default:
+                throw new RuntimeException("Not yet implemented");
+        }
     }
 
     @Override
-    public void validateImportsSectionAliases(ParsedSlang parsedSlang) {
-
-    }
-
-    @Override
-    public void validateImportsSectionValues(ParsedSlang parsedSlang) {
-
+    public void validateImportsSection(ParsedSlang parsedSlang) {
+        Map<String, String> imports = parsedSlang.getImports();
+        ParsedSlang.Type executableType = parsedSlang.getType();
+        switch(executableType) {
+            case FLOW: break;
+            case OPERATION:
+            case DECISION:
+            case SYSTEM_PROPERTY_FILE:
+                if (MapUtils.isNotEmpty(imports)) {
+                    throw new RuntimeException("Type[" + executableType.name() + "] cannot have imports section");
+                }
+                break;
+            default:
+                throw new RuntimeException("Not yet implemented");
+        }
+        if (MapUtils.isNotEmpty(imports)) {
+            Set<Map.Entry<String, String>> entrySet = imports.entrySet();
+            for (Map.Entry<String, String> entry : entrySet) {
+                String alias = entry.getKey();
+                String namespace = entry.getValue();
+                validateNamespaceRules(namespace);
+                // TODO [Bonczidai] alias
+            }
+        }
     }
 
     @Override
     public void validateStepReferenceId(String referenceId) {
-
+        if (StringUtils.isEmpty(referenceId)) {
+            throw new RuntimeException("Reference ID cannot be empty");
+        }
+        validateNamespaceRules(referenceId);
     }
 
     @Override

@@ -18,6 +18,8 @@ import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.bindings.Output;
 import java.io.File;
 import java.net.URISyntaxException;
@@ -26,9 +28,7 @@ import java.util.List;
 import java.util.Map;
 import junit.framework.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -54,9 +54,6 @@ public class PublishTransformerTest extends TransformersTestParent {
 
     @Autowired
     private YamlParser yamlParser;
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     private List<Object> publishMap;
 
@@ -136,6 +133,11 @@ public class PublishTransformerTest extends TransformersTestParent {
         @Bean
         public ExecutableValidator executableValidator() {
             return new ExecutableValidatorImpl();
+        }
+
+        @Bean
+        public SystemPropertyValidator systemPropertyValidator() {
+            return new SystemPropertyValidatorImpl();
         }
 
     }

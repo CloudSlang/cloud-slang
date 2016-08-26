@@ -490,8 +490,12 @@ public class ExecutableBuilder {
         if (MapUtils.isEmpty(doRawData)) {
             errors.add(new RuntimeException("Step: \'" + stepName + "\' has no reference information"));
         } else {
-            String refString = doRawData.keySet().iterator().next();
-            refId = resolveReferenceID(refString, imports, namespace);
+            try {
+                String refString = doRawData.keySet().iterator().next();
+                refId = resolveReferenceID(refString, imports, namespace);
+            } catch (RuntimeException rex) {
+                errors.add(rex);
+            }
         }
 
         List<Map<String, String>> navigationStrings = getNavigationStrings(postStepData, defaultSuccess, defaultFailure, errors);
