@@ -54,6 +54,16 @@ public class CharValidationsPreCompileErrorsTest {
         runAndValidateError("/corrupted/chars/flow_3.sl", "Argument[op$] contains invalid characters.");
     }
 
+    @Test
+    public void testExecutableName() throws Exception {
+        runAndValidateError("/corrupted/chars/flow-4.sl", "Argument[flow-4] contains invalid characters.");
+    }
+
+    @Test
+    public void testStepName() throws Exception {
+        runAndValidateError("/corrupted/chars/flow_5.sl", "Argument[*CheckWeather*] contains invalid characters.");
+    }
+
     public void runAndValidateError(String sourcePath, String... messages) throws Exception {
         URI resource = getClass().getResource(sourcePath).toURI();
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));

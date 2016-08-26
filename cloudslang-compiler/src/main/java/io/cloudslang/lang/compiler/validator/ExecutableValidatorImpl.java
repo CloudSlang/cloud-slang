@@ -88,12 +88,12 @@ public class ExecutableValidatorImpl extends AbstractValidator implements Execut
 
     @Override
     public void validateExecutableName(String executableName) {
-
+        validateSimpleNameRules(executableName);
     }
 
     @Override
     public void validateStepName(String stepName) {
-
+        validateSimpleNameRules(stepName);
     }
 
     @Override
