@@ -8,7 +8,7 @@
 namespace: user.decisions
 
 decision:
-  name: decision_4_py_action_key.sl
+  name: decision_4_py_action_key
   inputs:
     - x
     - y

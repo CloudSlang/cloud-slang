@@ -30,8 +30,8 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Map;
+import java.util.Set;
 import junit.framework.Assert;
 import org.apache.commons.collections4.MapUtils;
 import org.junit.Rule;
@@ -168,7 +168,7 @@ public class CompileDecisionTest {
 
         exception.expect(RuntimeException.class);
         exception.expectMessage(
-                "Artifact {decision_4_py_action_key.sl} has unrecognized tag {wrong_key}." +
+                "Artifact {decision_4_py_action_key} has unrecognized tag {wrong_key}." +
                         " Please take a look at the supported features per versions link"
         );
         compiler.compile(SlangSource.fromFile(decision.toURI()), emptySetSlangSource);
