@@ -17,10 +17,10 @@ import io.cloudslang.lang.commons.services.impl.UserConfigurationServiceImpl;
 import io.cloudslang.lang.tools.build.commands.ApplicationArgs;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.TestRun;
+import io.cloudslang.lang.tools.build.tester.parallel.report.SlangTestCaseRunReportGeneratorService;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
 import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +39,7 @@ import static io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTe
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.lang.System.setProperty;
+import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 
 /*
  * Created by stoneo on 1/11/2015.
@@ -84,6 +85,7 @@ public class SlangBuildMain {
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/testRunnerContext.xml");
         SlangBuilder slangBuilder = context.getBean(SlangBuilder.class);
         Slang slang = context.getBean(Slang.class);
+        SlangTestCaseRunReportGeneratorService reportGeneratorService = context.getBean(SlangTestCaseRunReportGeneratorService.class);
         registerEventHandlers(slang);
 
 //        long time = System.currentTimeMillis();
@@ -92,7 +94,7 @@ public class SlangBuildMain {
             IRunTestResults runTestsResults = buildResults.getRunTestsResults();
             Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
 
-            if (MapUtils.isNotEmpty(skippedTests)) {
+            if (isNotEmpty(skippedTests)) {
                 printSkippedTestsSummary(skippedTests);
             }
             printPassedTests(runTestsResults);
@@ -101,13 +103,15 @@ public class SlangBuildMain {
             }
 //            System.out.println("Took " + (System.currentTimeMillis() - time) / 1000f + " s.");
 
-            if (MapUtils.isNotEmpty(runTestsResults.getFailedTests())) {
+            if (isNotEmpty(runTestsResults.getFailedTests())) {
                 printBuildFailureSummary(projectPath, runTestsResults);
-                System.exit(1);
             } else {
                 printBuildSuccessSummary(contentPath, buildResults, runTestsResults);
-                System.exit(0);
             }
+
+            reportGeneratorService.generateReport(runTestsResults, testsPath);
+            System.exit(isNotEmpty(runTestsResults.getFailedTests()) ? 1 : 0);
+
         } catch (Throwable e) {
             log.error("");
             log.error("------------------------------------------------------------");

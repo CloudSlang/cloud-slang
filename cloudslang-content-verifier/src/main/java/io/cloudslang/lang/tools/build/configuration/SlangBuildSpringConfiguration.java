@@ -11,6 +11,7 @@ package io.cloudslang.lang.tools.build.configuration;
 
 import io.cloudslang.lang.commons.configuration.SlangCommonsSpringConfig;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
+import io.cloudslang.lang.tools.build.tester.parallel.report.SlangTestCaseRunReportGeneratorService;
 import io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService;
 import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDispatchService;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
@@ -55,6 +56,11 @@ public class SlangBuildSpringConfiguration {
     @Bean
     public TestCaseEventDispatchService testCaseEventDispatchService() {
         return new TestCaseEventDispatchService();
+    }
+
+    @Bean
+    public SlangTestCaseRunReportGeneratorService reportGeneratorService() {
+        return new SlangTestCaseRunReportGeneratorService();
     }
 
 }
