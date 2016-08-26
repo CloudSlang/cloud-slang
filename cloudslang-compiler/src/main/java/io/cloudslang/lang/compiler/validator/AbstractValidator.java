@@ -19,14 +19,20 @@ public class AbstractValidator {
     public static final String NAME_PLACEHOLDER = "name_placeholder01";
 
     protected Pattern namespacePattern;
+    protected Pattern simpleNamePattern;
 
     public AbstractValidator() {
         namespacePattern = Pattern.compile(RegexConstants.NAMESPACE_CHARS);
+        simpleNamePattern = Pattern.compile(RegexConstants.SIMPLE_NAME_CHARS);
     }
 
     protected void validateNamespaceRules(String input) {
-        validateChars(input);
+        validateChars(namespacePattern, input);
         validateDelimiter(input);
+    }
+
+    protected void validateSimpleNameRules(String input) {
+        validateChars(simpleNamePattern, input);
     }
 
     protected void validateListsHaveMutuallyExclusiveNames(List<? extends InOutParam> inOutParams, List<Output> outputs, String errorMessage) {
@@ -47,8 +53,8 @@ public class AbstractValidator {
         return resultNames;
     }
 
-    private void validateChars(String input) {
-        if (!namespacePattern.matcher(input).matches()) {
+    private void validateChars(Pattern pattern, String input) {
+        if (!pattern.matcher(input).matches()) {
             throw new RuntimeException("Argument[" + input +"] contains invalid characters.");
         }
     }

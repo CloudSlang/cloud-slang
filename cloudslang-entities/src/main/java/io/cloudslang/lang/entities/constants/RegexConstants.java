@@ -28,6 +28,7 @@ public class RegexConstants {
     public static final String NAMESPACE_PROPERTY_DELIMITER = ".";
     public static final String NAMESPACE_DELIMITER_ESCAPED = "\\" + NAMESPACE_PROPERTY_DELIMITER;
     public static final String NAMESPACE_CHARS = "([\\w\\-" + NAMESPACE_PROPERTY_DELIMITER + "]+)";
+    public static final String SIMPLE_NAME_CHARS = "([\\w]+)";
     // match get_sp(key) function
     public final static String SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE = "get_sp\\(\\s*'" + NAMESPACE_CHARS + "'\\s*\\)";
     public final static String SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE = "get_sp\\(\\s*\"" + NAMESPACE_CHARS + "\"\\s*\\)";

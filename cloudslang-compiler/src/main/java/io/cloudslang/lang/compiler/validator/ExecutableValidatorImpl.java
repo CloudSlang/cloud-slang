@@ -73,7 +73,7 @@ public class ExecutableValidatorImpl extends AbstractValidator implements Execut
                 String alias = entry.getKey();
                 String namespace = entry.getValue();
                 validateNamespaceRules(namespace);
-                // TODO [Bonczidai] alias
+                validateSimpleNameRules(alias);
             }
         }
     }
