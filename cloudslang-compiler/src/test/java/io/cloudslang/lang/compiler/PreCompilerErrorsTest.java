@@ -80,7 +80,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Executable in source: missing_name_flow has no name");
+        exception.expectMessage("Executable has no name");
         throw result.getErrors().get(0);
     }
 
