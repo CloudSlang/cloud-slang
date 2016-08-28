@@ -23,7 +23,8 @@ public class SlangTestCaseRunnable implements Runnable {
     private final SlangTestRunner slangTestRunService;
     private final MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener;
 
-    public SlangTestCaseRunnable(SlangTestCase testCase, Map<String, CompilationArtifact> compiledFlows, String projectPath, List<String> testSuites, SlangTestRunner slangTestRunService, TestCaseEventDispatchService testCaseEventDispatchService, MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener) {
+    public SlangTestCaseRunnable(SlangTestCase testCase, Map<String, CompilationArtifact> compiledFlows, String projectPath, List<String> testSuites,
+                                 SlangTestRunner slangTestRunService, TestCaseEventDispatchService testCaseEventDispatchService, MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener) {
         this.testCase = testCase;
         this.compiledFlows = compiledFlows;
         this.projectPath = projectPath;

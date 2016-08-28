@@ -102,10 +102,10 @@ public class SlangBuilder {
         log.info("--- running tests ---");
         log.info("Found " + testCases.size() + " tests");
         IRunTestResults runTestsResults;
-        if (!runTestsInParallel) {
-            runTestsResults = slangTestRunner.runAllTestsSequential(projectPath, testCases, compiledFlows, testSuites);
-        } else {
+        if (runTestsInParallel) {
             runTestsResults = slangTestRunner.runAllTestsParallel(projectPath, testCases, compiledFlows, testSuites);
+        } else {
+            runTestsResults = slangTestRunner.runAllTestsSequential(projectPath, testCases, compiledFlows, testSuites);
         }
         addCoverageDataToRunTestsResults(contentSlangModels, testFlowModels, testCases, runTestsResults);
         return runTestsResults;

@@ -52,7 +52,6 @@
         <dependency>
             <groupId>org.rendersnake</groupId>
             <artifactId>rendersnake</artifactId>
-            <version>1.9.0</version>
         </dependency>
 
         <!-- test -->

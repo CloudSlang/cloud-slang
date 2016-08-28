@@ -40,6 +40,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -173,7 +174,7 @@ public class SlangTestRunner {
         MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener = new MultiTriggerTestCaseEventListener();
         slang.subscribeOnEvents(multiTriggerTestCaseEventListener, createListenerEventTypesSet());
         try {
-            Map<SlangTestCase, Future<?>> testCaseFutures = new HashMap<>();
+            Map<SlangTestCase, Future<?>> testCaseFutures = new LinkedHashMap<>();
             for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
                 SlangTestCase testCase = testCaseEntry.getValue();
                 if (testCase == null) {
@@ -308,10 +309,7 @@ public class SlangTestRunner {
         Long executionId = slang.run(compilationArtifact, inputs, systemProperties);
 
         while (!testsEventListener.isFlowFinished()) {
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException ignore) {
-            }
+            poll();
         }
         slang.unSubscribeOnEvents(testsEventListener);
 
@@ -344,19 +342,7 @@ public class SlangTestRunner {
         }
 
         Map<String, Serializable> executionOutputs = testsEventListener.getOutputs();
-        if (MapUtils.isNotEmpty(outputs)) {
-            for (Map.Entry<String, Serializable> output : outputs.entrySet()) {
-                String outputName = output.getKey();
-                Serializable outputValue = output.getValue();
-                Serializable executionOutputValue = executionOutputs.get(outputName);
-                if (!executionOutputs.containsKey(outputName) ||
-                        !outputsAreEqual(outputValue, executionOutputValue)) {
-                    message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tFor output: " + outputName + "\n\tExpected value: " + outputValue + "\n\tActual value: " + executionOutputValue;
-                    log.error(message);
-                    throw new RuntimeException(message);
-                }
-            }
-        }
+        handleTestCaseFailuresFromOutputs(testCase, testCaseName, outputs, executionOutputs);
 
         log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with result: " + executionResult);
         return executionId;
@@ -374,10 +360,7 @@ public class SlangTestRunner {
         Long executionId = slang.run(compilationArtifact, inputs, systemProperties);
 
         while (!globalListener.isFlowFinishedByExecutionId(executionId)) {
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException ignore) {
-            }
+            poll();
         }
 
         String errorMessageFlowExecution = globalListener.getErrorMessageByExecutionId(executionId);
@@ -410,6 +393,21 @@ public class SlangTestRunner {
         }
 
         Map<String, Serializable> executionOutputs = globalListener.getOutputsByExecutionId(executionId);
+        handleTestCaseFailuresFromOutputs(testCase, testCaseName, outputs, executionOutputs);
+
+        log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with result: " + executionResult);
+        return executionId;
+    }
+
+    private void poll() {
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException ignore) {
+        }
+    }
+
+    private void handleTestCaseFailuresFromOutputs(SlangTestCase testCase, String testCaseName, Map<String, Serializable> outputs, Map<String, Serializable> executionOutputs) {
+        String message;
         if (MapUtils.isNotEmpty(outputs)) {
             for (Map.Entry<String, Serializable> output : outputs.entrySet()) {
                 String outputName = output.getKey();
@@ -423,9 +421,6 @@ public class SlangTestRunner {
                 }
             }
         }
-
-        log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with result: " + executionResult);
-        return executionId;
     }
 
     private boolean outputsAreEqual(Serializable outputValue, Serializable executionOutputValue) {
