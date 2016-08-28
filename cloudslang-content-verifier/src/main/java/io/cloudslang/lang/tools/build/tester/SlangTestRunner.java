@@ -47,6 +47,9 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 
+import static java.lang.Long.parseLong;
+import static java.lang.String.valueOf;
+import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
 
@@ -55,6 +58,7 @@ public class SlangTestRunner {
 
     private final static String PROJECT_PATH_TOKEN = "${project_path}";
     public static final long MAX_TIME_PER_TESTCASE_IN_MINUTES = 10;
+    public static final String TEST_CASE_TIMEOUT_IN_MINUTES_KEY = "test.case.timeout.in.minutes";
 
     @Autowired
     private TestCasesYamlParser parser;
@@ -185,11 +189,12 @@ public class SlangTestRunner {
                 testCaseFutures.put(testCase, parallelTestCaseExecutorService.submitTestCase(slangTestCaseRunnable));
             }
 
+            final long testCaseTimeoutMinutes = getTestCaseTimeoutInMinutes();
             for (Map.Entry<SlangTestCase, Future<?>> slangTestCaseFutureEntry : testCaseFutures.entrySet()) {
                 SlangTestCase testCase = slangTestCaseFutureEntry.getKey();
                 Future<?> testCaseFuture = slangTestCaseFutureEntry.getValue();
                 try {
-                    testCaseFuture.get(MAX_TIME_PER_TESTCASE_IN_MINUTES, MINUTES);
+                    testCaseFuture.get(testCaseTimeoutMinutes, MINUTES);
                 } catch (InterruptedException e) {
                     log.error("Interrupted while waiting for result: ", e);
                 } catch (TimeoutException e) {
@@ -203,6 +208,15 @@ public class SlangTestRunner {
             slang.unSubscribeOnEvents(multiTriggerTestCaseEventListener);
         }
         return runTestsResults;
+    }
+
+    private long getTestCaseTimeoutInMinutes() {
+        try {
+            return parseLong(getProperty(TEST_CASE_TIMEOUT_IN_MINUTES_KEY, valueOf(MAX_TIME_PER_TESTCASE_IN_MINUTES)));
+        } catch (NumberFormatException nfEx) {
+            log.warn(String.format("Misconfigured test case timeout '%s'. Using default timeout %d.", getProperty(TEST_CASE_TIMEOUT_IN_MINUTES_KEY), MAX_TIME_PER_TESTCASE_IN_MINUTES));
+            return MAX_TIME_PER_TESTCASE_IN_MINUTES;
+        }
     }
 
     public boolean isTestCaseInActiveSuite(SlangTestCase testCase, List<String> testSuites) {

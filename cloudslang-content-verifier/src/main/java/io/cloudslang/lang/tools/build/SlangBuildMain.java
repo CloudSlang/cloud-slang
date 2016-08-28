@@ -29,15 +29,22 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.cloudslang.lang.tools.build.tester.SlangTestRunner.MAX_TIME_PER_TESTCASE_IN_MINUTES;
+import static io.cloudslang.lang.tools.build.tester.SlangTestRunner.TEST_CASE_TIMEOUT_IN_MINUTES_KEY;
 import static io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService.SLANG_TEST_RUNNER_THREAD_COUNT;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
+import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 
@@ -46,6 +53,7 @@ import static org.apache.commons.collections4.MapUtils.isNotEmpty;
  */
 public class SlangBuildMain {
 
+    private static final String TEST_CASE_REPORT_LOCATION = "cloudslang.test.case.report.location";
     private static final String CONTENT_DIR = File.separator + "content";
     private static final String TEST_DIR = File.separator + "test";
     public static final String DEFAULT_TESTS = "default";
@@ -66,7 +74,9 @@ public class SlangBuildMain {
         boolean shouldPrintCoverageData = parseCoverageArg(appArgs);
         boolean runTestsInParallel = parseParallelTestsArg(appArgs);
         int threadCount = parseThreadCountArg(appArgs, runTestsInParallel);
+        String testCaseTimeout = parseTestTimeout(appArgs);
         setProperty(SLANG_TEST_RUNNER_THREAD_COUNT, valueOf(threadCount));
+        setProperty(TEST_CASE_TIMEOUT_IN_MINUTES_KEY, valueOf(testCaseTimeout));
 
         log.info("");
         log.info("------------------------------------------------------------");
@@ -77,6 +87,7 @@ public class SlangBuildMain {
         log.info("Print coverage data: " + valueOf(shouldPrintCoverageData));
         log.info("Parallel: " + valueOf(runTestsInParallel));
         log.info("Thread count: " + threadCount);
+        log.info("Test case timeout: " + (StringUtils.isEmpty(testCaseTimeout) ? valueOf(MAX_TIME_PER_TESTCASE_IN_MINUTES) : testCaseTimeout));
 
         log.info("");
         log.info("Loading...");
@@ -109,7 +120,7 @@ public class SlangBuildMain {
                 printBuildSuccessSummary(contentPath, buildResults, runTestsResults);
             }
 
-            reportGeneratorService.generateReport(runTestsResults, testsPath);
+            generateTestCaseReport(reportGeneratorService, runTestsResults);
             System.exit(isNotEmpty(runTestsResults.getFailedTests()) ? 1 : 0);
 
         } catch (Throwable e) {
@@ -121,6 +132,14 @@ public class SlangBuildMain {
             log.error("");
             System.exit(1);
         }
+    }
+
+    private static void generateTestCaseReport(SlangTestCaseRunReportGeneratorService reportGeneratorService, IRunTestResults runTestsResults) throws IOException {
+        Path reportDirectoryPath = Paths.get(getProperty(TEST_CASE_REPORT_LOCATION));
+        if (!Files.exists(reportDirectoryPath)) {
+            Files.createDirectories(reportDirectoryPath);
+        }
+        reportGeneratorService.generateReport(runTestsResults, reportDirectoryPath.toString());
     }
 
     @SuppressWarnings("Duplicates")
@@ -183,6 +202,10 @@ public class SlangBuildMain {
         return runTestsInParallel;
     }
 
+    private static String parseTestTimeout(ApplicationArgs appArgs) {
+        Map<String, String> dynamicArgs = appArgs.getDynamicParams();
+        return dynamicArgs.get(TEST_CASE_TIMEOUT_IN_MINUTES_KEY);
+    }
 
     private static int parseThreadCountArg(ApplicationArgs appArgs, boolean isParallel) {
         if (!isParallel) {
