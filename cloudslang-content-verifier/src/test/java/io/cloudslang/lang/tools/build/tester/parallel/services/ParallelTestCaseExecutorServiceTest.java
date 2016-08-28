@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -57,6 +58,13 @@ public class ParallelTestCaseExecutorServiceTest {
             assertEquals(mockException.getMessage(), ex.getMessage());
         }
         verify(threadPoolExecutor).submit(eq(mockRunnable));
+    }
+
+    @Test
+    public void testDestroySuccess() throws Exception {
+        doNothing().when(threadPoolExecutor).shutdown();
+        parallelTestCaseExecutorService.destroy();
+        verify(threadPoolExecutor).shutdown();
     }
 
 }

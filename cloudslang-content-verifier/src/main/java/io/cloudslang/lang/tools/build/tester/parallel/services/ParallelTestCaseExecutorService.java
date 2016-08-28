@@ -29,10 +29,6 @@ public class ParallelTestCaseExecutorService implements DisposableBean {
         return threadPoolExecutor.submit(runnable);
     }
 
-    public <T> Future<T> submitTestCase(Callable<T> callable) {
-        return threadPoolExecutor.submit(callable);
-    }
-
     @Override
     public void destroy() throws Exception {
         threadPoolExecutor.shutdown();
