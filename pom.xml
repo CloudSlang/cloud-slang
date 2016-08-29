@@ -464,26 +464,22 @@
                         </execution>
                     </executions>
                 </plugin>
-
                 <plugin>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>2.2.1</version>
                     <executions>
                         <execution>
-                            <id>release-internal-profile</id>
-                            <phase>verify</phase>
+                            <id>attach-sources-no-fork</id>
+							<inherited>true</inherited>
+                            <phase>generate-sources</phase>
                             <goals>
                                 <goal>jar-no-fork</goal>
                             </goals>
                         </execution>
                     </executions>
-                    <configuration>
-                        <attach>true</attach>
-                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
-
         <plugins>
             <plugin>
                 <artifactId>maven-enforcer-plugin</artifactId>
