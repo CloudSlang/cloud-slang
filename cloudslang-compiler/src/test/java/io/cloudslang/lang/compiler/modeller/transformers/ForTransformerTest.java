@@ -66,7 +66,7 @@ public class ForTransformerTest extends TransformersTestParent {
     @Test
     public void testNoVarName() throws Exception {
         exception.expect(RuntimeException.class);
-        exception.expectMessage("var name");
+        exception.expectMessage("Argument[] violates character rules");
         transformAndThrowFirstException(transformer, "  in  collection" );
     }
 

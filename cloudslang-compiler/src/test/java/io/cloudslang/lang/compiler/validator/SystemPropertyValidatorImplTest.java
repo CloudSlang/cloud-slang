@@ -99,7 +99,7 @@ public class SystemPropertyValidatorImplTest {
     public void testNamespaceNoMatch5() throws Exception {
         String input = "a.b.?";
         expectException("Error validating system property namespace." +
-                " Nested exception is: Argument[a.b.?] contains invalid characters.");
+                " Nested exception is: Argument[a.b.?] violates character rules.");
         systemPropertyValidator.validateNamespace(input);
     }
 
@@ -176,7 +176,7 @@ public class SystemPropertyValidatorImplTest {
     public void testKeyNoMatch5() throws Exception {
         String input = "a.b.?";
         expectException("Error validating system property key. Nested exception is:" +
-                " Argument[a.b.?] contains invalid characters.");
+                " Argument[a.b.?] violates character rules.");
         systemPropertyValidator.validateKey(input);
     }
     

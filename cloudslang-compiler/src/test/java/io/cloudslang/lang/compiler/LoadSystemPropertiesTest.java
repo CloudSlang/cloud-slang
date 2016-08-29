@@ -177,7 +177,7 @@ public class LoadSystemPropertiesTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage(
                 "Error loading properties source: 'invalid_1'. Nested exception is: Error validating system property namespace." +
-                        " Nested exception is: Argument[a.!.b] contains invalid characters."
+                        " Nested exception is: Argument[a.!.b] violates character rules."
         );
         loadSystemProperties(SlangSource.fromFile(propertiesURI));
     }
@@ -189,7 +189,7 @@ public class LoadSystemPropertiesTest {
         exception.expectMessage(
                 "Error loading properties source: 'invalid_2'. Nested exception is:" +
                         " Error validating system property key. Nested exception is:" +
-                        " Argument[c.?.name] contains invalid characters."
+                        " Argument[c.?.name] violates character rules."
         );
         loadSystemProperties(SlangSource.fromFile(propertiesURI));
     }
