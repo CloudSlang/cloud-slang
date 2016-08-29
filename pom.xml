@@ -470,7 +470,7 @@
                     <version>2.2.1</version>
                     <executions>
                         <execution>
-                            <id>attach-sources</id>
+                            <id>release-internal-profile</id>
                             <phase>verify</phase>
                             <goals>
                                 <goal>jar-no-fork</goal>
