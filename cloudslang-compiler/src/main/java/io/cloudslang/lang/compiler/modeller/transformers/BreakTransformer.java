@@ -34,7 +34,7 @@ public class BreakTransformer implements Transformer<List<String>, List<String>>
             transformedData.add(ScoreLangConstants.FAILURE_RESULT);
         } else {
             try {
-                executableValidator.validateBreakKeys();
+                executableValidator.validateBreakKeys(rawData);
                 transformedData = rawData;
             } catch (RuntimeException rex) {
                 errors.add(rex);

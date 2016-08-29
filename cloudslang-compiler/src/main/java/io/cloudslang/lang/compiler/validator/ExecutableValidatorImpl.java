@@ -8,7 +8,6 @@
  */
 package io.cloudslang.lang.compiler.validator;
 
-import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import java.util.List;
 import java.util.Map;
@@ -98,17 +97,26 @@ public class ExecutableValidatorImpl extends AbstractValidator implements Execut
 
     @Override
     public void validateResultName(String resultName) {
-        validateKeywords(resultName);
+        validateResultNameRules(resultName);
     }
 
     @Override
     public void validateNavigationStrings(List<Map<String, String>> navigationStrings) {
+        for (Map<String, String> element : navigationStrings) {
+            Map.Entry<String, String> navigation = element.entrySet().iterator().next();
+            String navigationKey = navigation.getKey();
+            String navigationValue = navigation.getValue();
+            validateNavigationKey(navigationKey);
+            validateNavigationValue(navigationValue);
+        }
 
     }
 
     @Override
-    public void validateBreakKeys() {
-
+    public void validateBreakKeys(List<String> breakKeys) {
+        for (String breakOn : breakKeys) {
+            validateResultNameRules(breakOn);
+        }
     }
 
     @Override
@@ -126,9 +134,16 @@ public class ExecutableValidatorImpl extends AbstractValidator implements Execut
 
     }
 
-    private void validateKeywords(String resultName) {
-        if (SlangTextualKeys.ON_FAILURE_KEY.equalsIgnoreCase(resultName)) {
-            throw new RuntimeException("Result cannot be called '" + SlangTextualKeys.ON_FAILURE_KEY + "'.");
+    private void validateNavigationKey(String navigationKey) {
+        validateResultNameRules(navigationKey);
+    }
+
+    private void validateNavigationValue(String navigationValue) {
+        try {
+            validateStepName(navigationValue);
+        } catch (RuntimeException rex) {
+            validateResultName(navigationValue);
         }
     }
+
 }

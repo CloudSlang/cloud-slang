@@ -64,6 +64,34 @@ public class CharValidationsPreCompileErrorsTest {
         runAndValidateError("/corrupted/chars/flow_5.sl", "Argument[*CheckWeather*] contains invalid characters.");
     }
 
+    @Test
+    public void testResultName() throws Exception {
+        runAndValidateError(
+                "/corrupted/chars/op_2.sl",
+                "For operation 'op_1' syntax is illegal.",
+                "Argument[CUSTOM_RE$ULT] contains invalid characters."
+        );
+    }
+
+    @Test
+    public void testNavigationKey() throws Exception {
+        runAndValidateError("/corrupted/chars/flow_6.sl", "Argument[SUCCE$$] contains invalid characters.");
+    }
+
+    @Test
+    public void testBreakKeys() throws Exception {
+        runAndValidateError(
+                "/corrupted/chars/flow_7.sl",
+                "For step 'CheckWeather' syntax is illegal.",
+                "Argument[INV#LID] contains invalid characters."
+        );
+    }
+
+    @Test
+    public void testNavigationValue() throws Exception {
+        runAndValidateError("/corrupted/chars/flow_8.sl", "Argument[%SUCCESS%] contains invalid characters.");
+    }
+
     public void runAndValidateError(String sourcePath, String... messages) throws Exception {
         URI resource = getClass().getResource(sourcePath).toURI();
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));

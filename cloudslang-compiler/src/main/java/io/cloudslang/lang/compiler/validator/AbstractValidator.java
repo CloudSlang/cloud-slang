@@ -1,5 +1,6 @@
 package io.cloudslang.lang.compiler.validator;
 
+import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Output;
@@ -20,10 +21,12 @@ public class AbstractValidator {
 
     protected Pattern namespacePattern;
     protected Pattern simpleNamePattern;
+    protected Pattern resultNamePattern;
 
     public AbstractValidator() {
         namespacePattern = Pattern.compile(RegexConstants.NAMESPACE_CHARS);
         simpleNamePattern = Pattern.compile(RegexConstants.SIMPLE_NAME_CHARS);
+        resultNamePattern = Pattern.compile(RegexConstants.RESULT_NAME_CHARS);
     }
 
     protected void validateNamespaceRules(String input) {
@@ -33,6 +36,11 @@ public class AbstractValidator {
 
     protected void validateSimpleNameRules(String input) {
         validateChars(simpleNamePattern, input);
+    }
+
+    protected void validateResultNameRules(String input) {
+        validateChars(resultNamePattern, input);
+        validateKeywords(input);
     }
 
     protected void validateListsHaveMutuallyExclusiveNames(List<? extends InOutParam> inOutParams, List<Output> outputs, String errorMessage) {
@@ -51,6 +59,12 @@ public class AbstractValidator {
             resultNames.add(result.getName());
         }
         return resultNames;
+    }
+
+    private void validateKeywords(String resultName) {
+        if (SlangTextualKeys.ON_FAILURE_KEY.equalsIgnoreCase(resultName)) {
+            throw new RuntimeException("Result cannot be called '" + SlangTextualKeys.ON_FAILURE_KEY + "'.");
+        }
     }
 
     private void validateChars(Pattern pattern, String input) {

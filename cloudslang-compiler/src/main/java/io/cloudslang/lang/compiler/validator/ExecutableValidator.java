@@ -24,7 +24,7 @@ public interface ExecutableValidator {
     void validateStepName(String stepName);
     void validateResultName(String resultName);
     void validateNavigationStrings(List<Map<String, String>> navigationStrings);
-    void validateBreakKeys();
+    void validateBreakKeys(List<String> breakKeys);
     void validateInputName(String name);
     void validateOutputName(String name);
     void validateLoopStatementVariable(String name);
