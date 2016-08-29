@@ -508,7 +508,7 @@
                         <version>2.8.1</version>
                         <executions>
                           <execution>
-                            <phase>package</phase>
+                            <phase>deploy</phase>
                             <goals>
                               <goal>jar-no-fork</goal>
                             </goals>
@@ -528,7 +528,7 @@
                         <version>2.8.1</version>
                         <executions>
                           <execution>
-                            <phase>package</phase>
+                            <phase>deploy</phase>
                             <goals>
                               <goal>jar-no-fork</goal>
                             </goals>
@@ -553,7 +553,7 @@
                         <version>2.8.1</version>
                         <executions>
                           <execution>
-                            <phase>package</phase>
+                            <phase>deploy</phase>
                             <goals>
                               <goal>jar-no-fork</goal>
                             </goals>
