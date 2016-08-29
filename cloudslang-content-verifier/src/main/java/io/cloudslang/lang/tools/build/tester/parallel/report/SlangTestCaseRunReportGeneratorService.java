@@ -33,13 +33,13 @@ import static java.util.Locale.ENGLISH;
 public class SlangTestCaseRunReportGeneratorService {
 
     // Test case table column name
-    private static final String TEST_NAME = "Test Case Name";
-    private static final String TEST_SUITE = "Test Case Suites";
-    private static final String TEST_STATUS = "Test Case Status";
-    private static final String TEST_FLOW_PATH = "Test Case Flow Path";
-    private static final String TEST_DESCRIPTION = "Test Case Description";
-    private static final String OUTPUTS = "Test Case Outputs";
-    private static final String EXCEPTION_MESSAGE = "Test Case Exception Message";
+    static final String TEST_NAME = "Test Case Name";
+    static final String TEST_SUITE = "Test Case Suites";
+    static final String TEST_STATUS = "Test Case Status";
+    static final String TEST_FLOW_PATH = "Test Case Flow Path";
+    static final String TEST_DESCRIPTION = "Test Case Description";
+    static final String OUTPUTS = "Test Case Outputs";
+    static final String EXCEPTION_OR_MESSAGE = "Test Case Exception/Message";
 
     private static final String SEPARATOR = ",";
     private static final String SLASH = "/";
@@ -52,21 +52,21 @@ public class SlangTestCaseRunReportGeneratorService {
     private static final String RES = "res";
     private static final String REPORT = "report";
     private static final String IMAGES = "imgs";
-    private static final String BASIC_REPORT_CSS = "basic_report.css";
     private static final String CLOUD_SLANG_LOGO_PNG = "CloudSlang_logo.png";
-    private static final String PIECHART_JS = "piechart.js";
+    static final String BASIC_REPORT_CSS = "basic_report.css";
+    static final String PIECHART_JS = "piechart.js";
     private static final String REPORT_EXTENSION = ".html";
 
     // Links or script href
     private static final String HTTP_CLOUD_SLANG_IO = "http://cloudslang.io/";
-    private static final String GOOGLE_CHARTS_URL = "https://www.gstatic.com/charts/loader.js";
+    static final String GOOGLE_CHARTS_URL = "https://www.gstatic.com/charts/loader.js";
 
     // Css classes and element ids
     private static final String PIECHART_ID = "piechart";
     public static final String HEADER_BAR_ID = "header-bar";
     private static final String HIDDEN_CLASS = "hidden";
     private static final String TEST_SUMMARY_CLASS = "test-summary";
-    private static final String TEST_CASE_REPORT = "Test Case Report";
+    static final String TEST_CASE_REPORT = "Test Case Report";
     private static final String STATUS_CSS_CLASS = "status";
     private static final String TEST_SUITES_CSS_CLASS = "test-suite";
     private static final String TABLE_CLASS = "table";
@@ -78,9 +78,9 @@ public class SlangTestCaseRunReportGeneratorService {
     public static final String PASSED_TESTS = "%d passed test cases";
     public static final String FAILED_TESTS = "%d failed test cases";
     public static final String SKIPPED_TESTS = "%d skipped test cases";
-    private static final String PASSED = "Passed";
-    private static final String FAILED = "Failed";
-    private static final String SKIPPED = "Skipped";
+    static final String PASSED = "Passed";
+    static final String FAILED = "Failed";
+    static final String SKIPPED = "Skipped";
 
 
     public void generateReport(IRunTestResults iRunTestResults, String reportDirectory) throws IOException {
@@ -103,7 +103,7 @@ public class SlangTestCaseRunReportGeneratorService {
         }
     }
 
-    private void appendReportPageHead(HtmlCanvas reportPageHtml) throws IOException {
+    void appendReportPageHead(HtmlCanvas reportPageHtml) throws IOException {
         HtmlCanvas reportPageHead = reportPageHtml.head();
         reportPageHead.macros().javascript(GOOGLE_CHARTS_URL);
         reportPageHead.macros().javascript(CURRENT_DIRECTORY + RES + SLASH + PIECHART_JS);
@@ -152,7 +152,7 @@ public class SlangTestCaseRunReportGeneratorService {
         FileUtils.copyInputStreamToFile(sourceStream, destination);
     }
 
-    private void generateHeader(HtmlCanvas reportPageBody, String cloudSlangImage) throws IOException {
+    void generateHeader(HtmlCanvas reportPageBody, String cloudSlangImage) throws IOException {
         HtmlCanvas headerDiv = reportPageBody.div(new HtmlAttributes().id(HEADER_BAR_ID));
         HtmlCanvas anchor = headerDiv.a(new HtmlAttributes().href(HTTP_CLOUD_SLANG_IO).target(BLANK));
         HtmlCanvas img = new HtmlCanvas().img(new HtmlAttributes().src(cloudSlangImage).alt(CLOUD_SLANG_LOGO_ALT));
@@ -170,7 +170,7 @@ public class SlangTestCaseRunReportGeneratorService {
                 .th().content(TEST_FLOW_PATH)
                 .th().content(TEST_DESCRIPTION)
                 .th().content(OUTPUTS)
-                .th().content(EXCEPTION_MESSAGE)
+                .th().content(EXCEPTION_OR_MESSAGE)
                 ._tr();
 
         appendTestRuns(table, iRunTestResults.getPassedTests(), PASSED);
@@ -178,7 +178,7 @@ public class SlangTestCaseRunReportGeneratorService {
         appendTestRuns(table, iRunTestResults.getSkippedTests(), SKIPPED);
     }
 
-    private void appendTestRuns(HtmlCanvas table, Map<String, TestRun> tests, String result) throws IOException {
+    void appendTestRuns(HtmlCanvas table, Map<String, TestRun> tests, String result) throws IOException {
         for (Map.Entry<String, TestRun> stringTestRunEntry : tests.entrySet()) {
             TestRun testRun = stringTestRunEntry.getValue();
             SlangTestCase testCase = testRun.getTestCase();

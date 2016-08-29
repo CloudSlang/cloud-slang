@@ -4,7 +4,6 @@ package io.cloudslang.lang.tools.build.tester.parallel.services;
 import org.springframework.beans.factory.DisposableBean;
 
 import javax.annotation.PostConstruct;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
