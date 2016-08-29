@@ -121,17 +121,17 @@ public class ExecutableValidatorImpl extends AbstractValidator implements Execut
 
     @Override
     public void validateInputName(String name) {
-
+        validateVariableNameRules(name);
     }
 
     @Override
     public void validateOutputName(String name) {
-
+        validateVariableNameRules(name);
     }
 
     @Override
     public void validateLoopStatementVariable(String name) {
-
+        validateVariableNameRules(name);
     }
 
     private void validateNavigationKey(String navigationKey) {

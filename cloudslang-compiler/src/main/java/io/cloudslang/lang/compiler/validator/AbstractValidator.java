@@ -16,17 +16,19 @@ import org.apache.commons.lang3.StringUtils;
  * User: bancl
  * Date: 6/17/2016
  */
-public class AbstractValidator {
+public abstract class AbstractValidator {
     public static final String NAME_PLACEHOLDER = "name_placeholder01";
 
     protected Pattern namespacePattern;
     protected Pattern simpleNamePattern;
     protected Pattern resultNamePattern;
+    protected Pattern variableNamePattern;
 
     public AbstractValidator() {
         namespacePattern = Pattern.compile(RegexConstants.NAMESPACE_CHARS);
         simpleNamePattern = Pattern.compile(RegexConstants.SIMPLE_NAME_CHARS);
         resultNamePattern = Pattern.compile(RegexConstants.RESULT_NAME_CHARS);
+        variableNamePattern = Pattern.compile(RegexConstants.VARIABLE_NAME_CHARS);
     }
 
     protected void validateNamespaceRules(String input) {
@@ -41,6 +43,10 @@ public class AbstractValidator {
     protected void validateResultNameRules(String input) {
         validateChars(resultNamePattern, input);
         validateKeywords(input);
+    }
+
+    protected void validateVariableNameRules(String input) {
+        validateChars(variableNamePattern, input);
     }
 
     protected void validateListsHaveMutuallyExclusiveNames(List<? extends InOutParam> inOutParams, List<Output> outputs, String errorMessage) {
@@ -69,7 +75,7 @@ public class AbstractValidator {
 
     private void validateChars(Pattern pattern, String input) {
         if (!pattern.matcher(input).matches()) {
-            throw new RuntimeException("Argument[" + input +"] contains invalid characters.");
+            throw new RuntimeException("Argument[" + input +"] violates character rules.");
         }
     }
 

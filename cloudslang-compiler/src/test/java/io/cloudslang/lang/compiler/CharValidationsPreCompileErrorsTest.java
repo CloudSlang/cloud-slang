@@ -36,32 +36,32 @@ public class CharValidationsPreCompileErrorsTest {
 
     @Test
     public void testNamespace() throws Exception {
-        runAndValidateError("/corrupted/chars/op_1.sl", "Argument[bo$$.ops] contains invalid characters.");
+        runAndValidateError("/corrupted/chars/op_1.sl", "Argument[bo$$.ops] violates character rules.");
     }
 
     @Test
     public void testImportValue() throws Exception {
-        runAndValidateError("/corrupted/chars/flow_1.sl", "Argument[bo$$.ops] contains invalid characters.");
+        runAndValidateError("/corrupted/chars/flow_1.sl", "Argument[bo$$.ops] violates character rules.");
     }
 
     @Test
     public void testReferenceID() throws Exception {
-        runAndValidateError("/corrupted/chars/flow_2.sl", "Argument[bo$$.ops.check_Weather] contains invalid characters.");
+        runAndValidateError("/corrupted/chars/flow_2.sl", "Argument[bo$$.ops.check_Weather] violates character rules.");
     }
 
     @Test
     public void testAlias() throws Exception {
-        runAndValidateError("/corrupted/chars/flow_3.sl", "Argument[op$] contains invalid characters.");
+        runAndValidateError("/corrupted/chars/flow_3.sl", "Argument[op$] violates character rules.");
     }
 
     @Test
     public void testExecutableName() throws Exception {
-        runAndValidateError("/corrupted/chars/flow-4.sl", "Argument[flow-4] contains invalid characters.");
+        runAndValidateError("/corrupted/chars/flow-4.sl", "Argument[flow-4] violates character rules.");
     }
 
     @Test
     public void testStepName() throws Exception {
-        runAndValidateError("/corrupted/chars/flow_5.sl", "Argument[*CheckWeather*] contains invalid characters.");
+        runAndValidateError("/corrupted/chars/flow_5.sl", "Argument[*CheckWeather*] violates character rules.");
     }
 
     @Test
@@ -69,13 +69,13 @@ public class CharValidationsPreCompileErrorsTest {
         runAndValidateError(
                 "/corrupted/chars/op_2.sl",
                 "For operation 'op_1' syntax is illegal.",
-                "Argument[CUSTOM_RE$ULT] contains invalid characters."
+                "Argument[CUSTOM_RE$ULT] violates character rules."
         );
     }
 
     @Test
     public void testNavigationKey() throws Exception {
-        runAndValidateError("/corrupted/chars/flow_6.sl", "Argument[SUCCE$$] contains invalid characters.");
+        runAndValidateError("/corrupted/chars/flow_6.sl", "Argument[SUCCE$$] violates character rules.");
     }
 
     @Test
@@ -83,13 +83,48 @@ public class CharValidationsPreCompileErrorsTest {
         runAndValidateError(
                 "/corrupted/chars/flow_7.sl",
                 "For step 'CheckWeather' syntax is illegal.",
-                "Argument[INV#LID] contains invalid characters."
+                "Argument[INV#LID] violates character rules."
         );
     }
 
     @Test
     public void testNavigationValue() throws Exception {
-        runAndValidateError("/corrupted/chars/flow_8.sl", "Argument[%SUCCESS%] contains invalid characters.");
+        runAndValidateError("/corrupted/chars/flow_8.sl", "Argument[%SUCCESS%] violates character rules.");
+    }
+
+    @Test
+    public void testInputKey() throws Exception {
+        runAndValidateError(
+                "/corrupted/chars/op_3.sl",
+                "For operation 'op_3' syntax is illegal.",
+                "Argument[9_var_name] violates character rules."
+        );
+    }
+
+    @Test
+    public void testOutputKey() throws Exception {
+        runAndValidateError(
+                "/corrupted/chars/op_4.sl",
+                "For operation 'op_4' syntax is illegal.",
+                "Argument[0name] violates character rules."
+        );
+    }
+
+    @Test
+    public void testPublishKey() throws Exception {
+        runAndValidateError(
+                "/corrupted/chars/flow_9.sl",
+                "Argument[00invalid_key] violates character rules."
+        );
+    }
+
+    @Test
+    public void testLoopStatementVariable() throws Exception {
+        runAndValidateError(
+                "/corrupted/chars/flow_10.sl",
+                "For step 'CheckWeather' syntax is illegal.",
+                "Argument[${var}] violates character rules."
+        );
     }
 
     public void runAndValidateError(String sourcePath, String... messages) throws Exception {

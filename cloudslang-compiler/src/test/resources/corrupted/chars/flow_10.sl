@@ -11,14 +11,15 @@ imports:
   op$: user.ops
 
 flow:
-  name: flow_7
+  name: flow_10
   inputs:
     - city_name
 
   workflow:
     - CheckWeather:
         loop:
-          for: var in "1,2,3".split(",")
+          for: >
+            ${var} in "1,2,3".split(",")
           do:
             ops.check_Weather:
               - city: city_name
@@ -26,8 +27,6 @@ flow:
               - alla: 'walla'
           publish:
             - weather
-          break:
-            - INV#LID
           navigate:
             - SUCCESS: SUCCESS
             - FAILURE: FAILURE
