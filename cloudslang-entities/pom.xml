@@ -14,7 +14,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.9.73-SNAPSHOT</version>
+        <version>0.9.73</version>
     </parent>
 
 	<dependencies>
