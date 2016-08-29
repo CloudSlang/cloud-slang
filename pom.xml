@@ -488,9 +488,6 @@
             <plugin>
                 <artifactId>maven-enforcer-plugin</artifactId>
             </plugin>
-            <plugin>
-                <artifactId>maven-source-plugin</artifactId>
-            </plugin>
         </plugins>
     </build>
 
