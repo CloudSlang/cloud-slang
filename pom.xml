@@ -509,9 +509,6 @@
                         <executions>
                           <execution>
                             <phase>deploy</phase>
-                            <goals>
-                              <goal>jar-no-fork</goal>
-                            </goals>
                           </execution>
                         </executions>
                     </plugin>
@@ -529,9 +526,6 @@
                         <executions>
                           <execution>
                             <phase>deploy</phase>
-                            <goals>
-                              <goal>jar-no-fork</goal>
-                            </goals>
                           </execution>
                         </executions>
                     </plugin>
@@ -554,9 +548,6 @@
                         <executions>
                           <execution>
                             <phase>deploy</phase>
-                            <goals>
-                              <goal>jar-no-fork</goal>
-                            </goals>
                           </execution>
                         </executions>
                     </plugin>
