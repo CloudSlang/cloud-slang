@@ -87,7 +87,7 @@ public class SlangBuildMain {
         log.info("Print coverage data: " + valueOf(shouldPrintCoverageData));
         log.info("Parallel: " + valueOf(runTestsInParallel));
         log.info("Thread count: " + threadCount);
-        log.info("Test case timeout: " + (StringUtils.isEmpty(testCaseTimeout) ? valueOf(MAX_TIME_PER_TESTCASE_IN_MINUTES) : testCaseTimeout));
+        log.info("Test case timeout in minutes: " + (StringUtils.isEmpty(testCaseTimeout) ? valueOf(MAX_TIME_PER_TESTCASE_IN_MINUTES) : testCaseTimeout));
 
         log.info("");
         log.info("Loading...");
