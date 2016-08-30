@@ -1,10 +1,9 @@
 package io.cloudslang.lang.tools.build.tester.parallel.testcaseevents;
 
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
+import java.util.EventObject;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import java.util.EventObject;
 
 public class SlangTestCaseEvent extends EventObject {
 
