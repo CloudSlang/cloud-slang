@@ -16,7 +16,6 @@ import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.ParallelLoopStatement;
 import junit.framework.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -70,12 +69,10 @@ public class ParallelLoopTransformerTest extends TransformersTestParent {
         transformAndThrowFirstException(transformer, "  in  collection");
     }
 
-    @Ignore("unignore when implemented")
     @Test
     public void testVarNameContainInvalidChars() throws Exception {
         exception.expect(RuntimeException.class);
-        exception.expectMessage("var name");
-        exception.expectMessage("invalid");
+        exception.expectMessage("Argument[x a] violates character rules.");
         transformAndThrowFirstException(transformer, "x a  in  collection");
     }
 

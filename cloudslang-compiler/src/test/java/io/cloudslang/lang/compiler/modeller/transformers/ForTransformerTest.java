@@ -8,7 +8,6 @@ import io.cloudslang.lang.entities.ListForLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.MapForLoopStatement;
 import junit.framework.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -70,12 +69,10 @@ public class ForTransformerTest extends TransformersTestParent {
         transformAndThrowFirstException(transformer, "  in  collection" );
     }
 
-    @Ignore("unignore when implemented")
     @Test
     public void testVarNameContainInvalidChars() throws Exception {
         exception.expect(RuntimeException.class);
-        exception.expectMessage("var name");
-        exception.expectMessage("invalid");
+        exception.expectMessage("Argument[x a] violates character rules.");
         transformAndThrowFirstException(transformer, "x a  in  collection");
     }
 
@@ -144,12 +141,10 @@ public class ForTransformerTest extends TransformersTestParent {
         Assert.assertEquals("collection", statement.getExpression());
     }
 
-    @Ignore("unignore when implemented")
     @Test
     public void testMapVarNameContainInvalidChars() throws Exception {
         exception.expect(RuntimeException.class);
-        exception.expectMessage("var name");
-        exception.expectMessage("invalid");
+        exception.expectMessage("Argument[(k v m)] violates character rules.");
         transformAndThrowFirstException(transformer, "(k v m)  in  collection" );
     }
 
