@@ -10,11 +10,14 @@
 package io.cloudslang.lang.tools.build.verifier;
 
 import io.cloudslang.lang.compiler.Extension;
+import io.cloudslang.lang.compiler.MetadataExtractor;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
+import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.tools.build.validation.StaticValidator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
@@ -23,8 +26,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by stoneo on 3/15/2015.
@@ -36,6 +37,12 @@ public class SlangContentVerifier {
 
     @Autowired
     private SlangCompiler slangCompiler;
+
+    @Autowired
+    private MetadataExtractor metadataExtractor;
+
+    @Autowired
+    private StaticValidator staticValidator;
 
     @Autowired
     private ScoreCompiler scoreCompiler;
@@ -51,16 +58,11 @@ public class SlangContentVerifier {
         int ignoredExecutables = 0;
         for(File slangFile: slangFiles){
             Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() + "\' must lead to a file");
-            Executable sourceModel;
-            try {
-                sourceModel = slangCompiler.preCompile(SlangSource.fromFile(slangFile));
-            } catch (Exception e) {
-                String errorMessage = "Failed creating Slang models for file: \'" + slangFile.getAbsoluteFile() + "\'.\n" + e.getMessage();
-                log.error(errorMessage);
-                throw new RuntimeException(errorMessage, e);
-            }
+            SlangSource slangSource = SlangSource.fromFile(slangFile);
+            Executable sourceModel = getSourceModel(slangFile, slangSource);
+            Metadata sourceMetadata = getSourceMetadata(slangFile, slangSource);
             if (sourceModel != null) {
-                staticSlangFileValidation(slangFile, sourceModel);
+                staticValidator.validateSlangFile(slangFile, sourceModel, sourceMetadata);
                 slangModels.put(getUniqueName(sourceModel), sourceModel);
             }
         }
@@ -70,6 +72,30 @@ public class SlangContentVerifier {
                     " executable files in path: \'" + directoryPath + "\' But managed to create slang models for only: " + slangModels.size());
         }
         return slangModels;
+    }
+
+    private Metadata getSourceMetadata(File slangFile, SlangSource slangSource) {
+        Metadata sourceMetadata;
+        try {
+            sourceMetadata = metadataExtractor.extractMetadata(slangSource);
+        } catch (Exception e) {
+            String errorMessage = "Failed to extract metadata for file: \'" + slangFile.getAbsoluteFile() + "\'.\n" + e.getMessage();
+            log.error(errorMessage);
+            throw new RuntimeException(errorMessage, e);
+        }
+        return sourceMetadata;
+    }
+
+    private Executable getSourceModel(File slangFile, SlangSource slangSource) {
+        Executable sourceModel;
+        try {
+            sourceModel = slangCompiler.preCompile(slangSource);
+        } catch (Exception e) {
+            String errorMessage = "Failed creating Slang models for file: \'" + slangFile.getAbsoluteFile() + "\'.\n" + e.getMessage();
+            log.error(errorMessage);
+            throw new RuntimeException(errorMessage, e);
+        }
+        return sourceModel;
     }
 
     public Map<String, CompilationArtifact> compileSlangModels(Map<String, Executable> slangModels) {
@@ -111,44 +137,8 @@ public class SlangContentVerifier {
         return dependenciesModels;
     }
 
-    private void staticSlangFileValidation(File slangFile, Executable executable){
-        validateNamespace(slangFile, executable);
-
-        validateExecutableName(slangFile, executable);
-    }
-
-    private void validateNamespace(File slangFile, Executable executable) {
-        // Validate that the namespace is not empty
-        String namespace = executable.getNamespace();
-        Validate.notEmpty(namespace, "Error validating Slang file: \'" + slangFile.getAbsoluteFile() +
-                "\'. Namespace of slang source: \'" + executable.getName() + "\' cannot be empty.");
-
-        // Validate that the namespace matches the path of the file
-        String executableNamespacePath = namespace.replace('.', File.separatorChar);
-        String namespaceErrorMessage = "Error validating Slang file: \'" + slangFile.getAbsoluteFile() +
-                "\'. Namespace of slang source: " + executable.getName() + " is wrong.\nIt is currently \'" +
-                namespace + "\', but it should match the file path: \'" + slangFile.getPath() + "\'";
-        int indexOfLastFileSeparator = slangFile.getAbsolutePath().lastIndexOf(File.separatorChar);
-        String filePathWithoutFileName = slangFile.getAbsolutePath().substring(0, indexOfLastFileSeparator);
-        Validate.isTrue(filePathWithoutFileName.toLowerCase().endsWith(executableNamespacePath.toLowerCase()), namespaceErrorMessage);
-
-        // Validate that the namespace is composed only of abc letters, _ or -
-        Pattern pattern = Pattern.compile("^[\\w-\\.]+$");
-        Matcher matcher = pattern.matcher(namespace);
-        Validate.isTrue(matcher.matches(), "Namespace: " + namespace + " is invalid. It can contain only alphanumeric characters, underscore or hyphen");
-    }
-
     private String getUniqueName(Executable sourceModel) {
         return sourceModel.getNamespace() + "." + sourceModel.getName();
-    }
-
-    private void validateExecutableName(File slangFile, Executable executable) {
-        // Validate executable name is the same as the file name
-        String fileNameNoExtension = Extension.removeExtension(slangFile.getName());
-        String executableNameErrorMessage = "Error validating Slang file: \'" + slangFile.getAbsoluteFile() +
-                "\'. Name of flow or operation: \'" + executable.getName() +
-                "\' is invalid.\nIt should be identical to the file name: \'" + fileNameNoExtension + "\'";
-        Validate.isTrue(fileNameNoExtension.equals(executable.getName()), executableNameErrorMessage);
     }
 
     // e.g. exclude .prop.sl from .sl set
