@@ -8,22 +8,23 @@
  */
 package io.cloudslang.lang.cli.services;
 
-import io.cloudslang.lang.entities.SystemProperty;
-import io.cloudslang.lang.entities.bindings.values.Value;
-import org.apache.commons.lang.StringUtils;
-import io.cloudslang.score.events.EventConstants;
-import io.cloudslang.score.events.ScoreEventListener;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.entities.CompilationArtifact;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.io.Serializable;
+import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.score.events.EventConstants;
+import io.cloudslang.score.events.ScoreEventListener;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import static io.cloudslang.lang.entities.ScoreLangConstants.*;
+import static io.cloudslang.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
+import static io.cloudslang.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
+import static io.cloudslang.lang.entities.ScoreLangConstants.EVENT_STEP_START;
+import static io.cloudslang.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
 
 /**
  * @author Bonczidai Levente

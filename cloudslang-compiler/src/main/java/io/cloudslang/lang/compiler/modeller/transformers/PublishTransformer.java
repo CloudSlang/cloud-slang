@@ -16,11 +16,10 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.bindings.Output;
-import org.springframework.stereotype.Component;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.springframework.stereotype.Component;
 
 @Component
 public class PublishTransformer extends AbstractOutputsTransformer implements Transformer<List<Object>, List<Output>> {

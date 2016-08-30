@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 *******************************************************************************/
 
 
+import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
@@ -21,13 +22,19 @@ import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
 import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,11 +42,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
-
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = InputsTransformerTest.Config.class)

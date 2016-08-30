@@ -19,6 +19,13 @@ import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
 import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import java.io.File;
+import java.io.Serializable;
+import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -39,12 +46,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
-import java.io.Serializable;
-import java.net.URI;
-import java.util.*;
-
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = CompilerHelperTest.Config.class)

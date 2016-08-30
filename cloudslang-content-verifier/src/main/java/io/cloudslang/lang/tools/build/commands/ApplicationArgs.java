@@ -12,7 +12,6 @@ package io.cloudslang.lang.tools.build.commands;
 import com.beust.jcommander.DynamicParameter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.CommaParameterSplitter;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -9,17 +9,23 @@
 package io.cloudslang.lang.cli;
 
 import com.google.common.collect.Lists;
-
 import com.google.common.collect.Sets;
-import io.cloudslang.lang.entities.SystemProperty;
-import io.cloudslang.lang.entities.bindings.values.Value;
-import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import org.apache.commons.lang3.StringUtils;
 import io.cloudslang.lang.cli.services.ScoreServices;
 import io.cloudslang.lang.cli.utils.CompilerHelper;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.api.ExecutionPlan;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,10 +33,13 @@ import org.springframework.shell.Bootstrap;
 import org.springframework.shell.core.CommandResult;
 import org.springframework.shell.core.JLineShellComponent;
 
-import java.io.IOException;
-import java.util.*;
-
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.Matchers.anySetOf;
+import static org.mockito.Matchers.contains;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

@@ -10,18 +10,17 @@
 package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 public class SlangSource {
 

@@ -9,15 +9,14 @@
  *******************************************************************************/
 package io.cloudslang.lang.cli.converters;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.shell.core.Completion;
 import org.springframework.shell.core.Converter;
 import org.springframework.shell.core.MethodTarget;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Date: 11/11/2014

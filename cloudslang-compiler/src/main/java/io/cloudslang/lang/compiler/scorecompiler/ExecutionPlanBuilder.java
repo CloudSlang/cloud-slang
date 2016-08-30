@@ -20,15 +20,14 @@ import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;

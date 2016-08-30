@@ -1,10 +1,9 @@
 package io.cloudslang.maven.compiler;
 
+import java.util.ArrayList;
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
 import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
-
-import java.util.ArrayList;
 
 /**
  * Created by hanael on 10/07/2016.

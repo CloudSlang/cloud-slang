@@ -9,7 +9,6 @@
 package io.cloudslang.lang.compiler.parser.model;
 
 import io.cloudslang.lang.compiler.Extension;
-
 import java.util.Map;
 
 /*

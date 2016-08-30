@@ -24,16 +24,15 @@ import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 

@@ -9,7 +9,6 @@ import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.FailedSlang
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.PassedSlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.SkippedSlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
-
 import java.util.List;
 import java.util.Map;
 

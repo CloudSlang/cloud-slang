@@ -22,23 +22,22 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
+import java.io.Serializable;
+import java.net.URI;
+import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-
-import java.io.Serializable;
-import java.net.URI;
-import java.net.URL;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.junit.rules.ExpectedException;
 
 /**

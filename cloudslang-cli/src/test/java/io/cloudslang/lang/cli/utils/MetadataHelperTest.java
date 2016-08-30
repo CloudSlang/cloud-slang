@@ -11,6 +11,8 @@ import io.cloudslang.lang.compiler.parser.MetadataParser;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.score.api.Score;
 import io.cloudslang.score.events.EventBus;
+import java.io.File;
+import java.net.URI;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,9 +22,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
-
-import java.io.File;
-import java.net.URI;
 
 import static org.mockito.Mockito.mock;
 

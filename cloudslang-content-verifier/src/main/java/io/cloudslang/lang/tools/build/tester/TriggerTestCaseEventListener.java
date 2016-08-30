@@ -23,13 +23,12 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-import org.apache.commons.collections4.MapUtils;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import org.apache.commons.collections4.MapUtils;
 
 /**
  * User: stoneo

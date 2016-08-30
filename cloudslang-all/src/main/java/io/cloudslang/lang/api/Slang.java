@@ -14,7 +14,6 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.score.events.ScoreEventListener;
-
 import java.util.Map;
 import java.util.Set;
 

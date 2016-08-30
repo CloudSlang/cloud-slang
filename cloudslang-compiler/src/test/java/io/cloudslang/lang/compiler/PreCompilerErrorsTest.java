@@ -11,9 +11,10 @@
 package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
-import io.cloudslang.lang.compiler.modeller.ExecutableBuilder;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
+import java.net.URI;
+import java.util.List;
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,9 +23,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.net.URI;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

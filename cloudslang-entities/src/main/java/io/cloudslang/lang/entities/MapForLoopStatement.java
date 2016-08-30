@@ -10,13 +10,12 @@
 package io.cloudslang.lang.entities;
 
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import java.io.Serializable;
+import java.util.Set;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-
-import java.io.Serializable;
-import java.util.Set;
 
 /**
  * Date: 2/3/2015

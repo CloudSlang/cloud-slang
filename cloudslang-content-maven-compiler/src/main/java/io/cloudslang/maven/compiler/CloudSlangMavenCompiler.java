@@ -4,6 +4,15 @@ import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
@@ -15,16 +24,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Created by hanael on 10/07/2016.

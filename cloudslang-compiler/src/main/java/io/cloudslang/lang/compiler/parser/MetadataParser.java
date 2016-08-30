@@ -12,12 +12,6 @@ package io.cloudslang.lang.compiler.parser;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.utils.DescriptionTag;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.text.StrBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -27,6 +21,11 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.text.StrBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * User: bancl

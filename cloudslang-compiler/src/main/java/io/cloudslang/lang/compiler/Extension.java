@@ -1,9 +1,8 @@
 package io.cloudslang.lang.compiler;
 
+import java.util.Arrays;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.Arrays;
 
 /**
  * User: bancl

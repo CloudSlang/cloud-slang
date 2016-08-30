@@ -17,9 +17,6 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
@@ -28,6 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Date: 3/25/2015

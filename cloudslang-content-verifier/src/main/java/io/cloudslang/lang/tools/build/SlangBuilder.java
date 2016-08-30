@@ -16,14 +16,18 @@ import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
+import java.io.File;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.File;
-import java.util.*;
 
 /*
  * Created by stoneo on 2/9/2015.

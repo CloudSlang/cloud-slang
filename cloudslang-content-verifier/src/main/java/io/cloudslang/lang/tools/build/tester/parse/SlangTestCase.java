@@ -10,13 +10,12 @@
 package io.cloudslang.lang.tools.build.tester.parse;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * Created by stoneo on 3/15/2015.

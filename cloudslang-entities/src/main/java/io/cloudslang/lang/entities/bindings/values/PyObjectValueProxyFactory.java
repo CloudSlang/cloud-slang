@@ -11,16 +11,6 @@
  */
 package io.cloudslang.lang.entities.bindings.values;
 
-import javassist.util.proxy.MethodFilter;
-import javassist.util.proxy.MethodHandler;
-import javassist.util.proxy.Proxy;
-import javassist.util.proxy.ProxyFactory;
-import javassist.util.proxy.ProxyObject;
-import org.apache.commons.lang.ClassUtils;
-import org.python.core.Py;
-import org.python.core.PyObject;
-import org.python.core.PyType;
-
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -30,6 +20,15 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import javassist.util.proxy.MethodFilter;
+import javassist.util.proxy.MethodHandler;
+import javassist.util.proxy.Proxy;
+import javassist.util.proxy.ProxyFactory;
+import javassist.util.proxy.ProxyObject;
+import org.apache.commons.lang.ClassUtils;
+import org.python.core.Py;
+import org.python.core.PyObject;
+import org.python.core.PyType;
 
 /**
  * PyObjectValue proxy factory

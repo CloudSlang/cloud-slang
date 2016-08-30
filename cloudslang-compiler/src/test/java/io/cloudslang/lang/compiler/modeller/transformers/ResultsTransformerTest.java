@@ -18,6 +18,11 @@ import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Result;
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
 import junit.framework.Assert;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Before;
@@ -30,12 +35,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
-
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
 /**
  * User: stoneo

@@ -12,7 +12,6 @@
 package io.cloudslang.lang.entities.utils;
 
 import io.cloudslang.lang.entities.bindings.values.Value;
-
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import java.io.Serializable;
 import java.util.HashMap;

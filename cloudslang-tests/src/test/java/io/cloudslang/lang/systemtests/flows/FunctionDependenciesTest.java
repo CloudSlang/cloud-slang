@@ -20,13 +20,16 @@ import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.systemtests.RuntimeInformation;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.ValueSyntaxParent;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Bonczidai Levente

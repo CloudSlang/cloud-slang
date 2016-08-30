@@ -1,11 +1,10 @@
 package io.cloudslang.lang.entities.utils;
 
 import com.google.common.collect.Sets;
-import junit.framework.Assert;
-import org.junit.Test;
-
 import java.util.Collections;
 import java.util.Set;
+import junit.framework.Assert;
+import org.junit.Test;
 
 import static io.cloudslang.lang.entities.utils.ExpressionUtils.extractExpression;
 import static io.cloudslang.lang.entities.utils.ExpressionUtils.extractSystemProperties;

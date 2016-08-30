@@ -15,16 +15,20 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.File;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by stoneo on 3/15/2015.

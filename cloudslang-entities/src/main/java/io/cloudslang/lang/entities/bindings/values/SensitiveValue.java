@@ -13,16 +13,15 @@ package io.cloudslang.lang.entities.bindings.values;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.cloudslang.lang.entities.encryption.EncryptionProvider;
-import javassist.util.proxy.ProxyObjectInputStream;
-import javassist.util.proxy.ProxyObjectOutputStream;
-import org.python.apache.commons.compress.utils.IOUtils;
-import org.python.apache.xerces.impl.dv.util.Base64;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import javassist.util.proxy.ProxyObjectInputStream;
+import javassist.util.proxy.ProxyObjectOutputStream;
+import org.python.apache.commons.compress.utils.IOUtils;
+import org.python.apache.xerces.impl.dv.util.Base64;
 
 /**
  * Sensitive InOutParam value
