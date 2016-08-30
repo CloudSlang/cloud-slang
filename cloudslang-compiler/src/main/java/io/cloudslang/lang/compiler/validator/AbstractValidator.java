@@ -2,13 +2,17 @@ package io.cloudslang.lang.compiler.validator;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
+import io.cloudslang.lang.compiler.validator.matcher.NamespacePatternMatcher;
+import io.cloudslang.lang.compiler.validator.matcher.PatternMatcher;
+import io.cloudslang.lang.compiler.validator.matcher.ResultNamePatternMatcher;
+import io.cloudslang.lang.compiler.validator.matcher.SimpleNamePatternMatcher;
+import io.cloudslang.lang.compiler.validator.matcher.VariableNamePatternMatcher;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.constants.RegexConstants;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -19,34 +23,34 @@ import org.apache.commons.lang3.StringUtils;
 public abstract class AbstractValidator {
     public static final String NAME_PLACEHOLDER = "name_placeholder01";
 
-    protected Pattern namespacePattern;
-    protected Pattern simpleNamePattern;
-    protected Pattern resultNamePattern;
-    protected Pattern variableNamePattern;
+    protected PatternMatcher namespacePatternMatcher;
+    protected PatternMatcher simpleNamePatternMatcher;
+    protected PatternMatcher resultNamePatternMatcher;
+    protected PatternMatcher variableNamePatternMatcher;
 
     public AbstractValidator() {
-        namespacePattern = Pattern.compile(RegexConstants.NAMESPACE_CHARS);
-        simpleNamePattern = Pattern.compile(RegexConstants.SIMPLE_NAME_CHARS);
-        resultNamePattern = Pattern.compile(RegexConstants.RESULT_NAME_CHARS);
-        variableNamePattern = Pattern.compile(RegexConstants.VARIABLE_NAME_CHARS);
+        namespacePatternMatcher = new NamespacePatternMatcher();
+        simpleNamePatternMatcher = new SimpleNamePatternMatcher();
+        resultNamePatternMatcher = new ResultNamePatternMatcher();
+        variableNamePatternMatcher = new VariableNamePatternMatcher();
     }
 
     protected void validateNamespaceRules(String input) {
-        validateChars(namespacePattern, input);
+        validateChars(namespacePatternMatcher, input);
         validateDelimiter(input);
     }
 
     protected void validateSimpleNameRules(String input) {
-        validateChars(simpleNamePattern, input);
+        validateChars(simpleNamePatternMatcher, input);
     }
 
     protected void validateResultNameRules(String input) {
-        validateChars(resultNamePattern, input);
+        validateChars(resultNamePatternMatcher, input);
         validateKeywords(input);
     }
 
     protected void validateVariableNameRules(String input) {
-        validateChars(variableNamePattern, input);
+        validateChars(variableNamePatternMatcher, input);
     }
 
     protected void validateListsHaveMutuallyExclusiveNames(List<? extends InOutParam> inOutParams, List<Output> outputs, String errorMessage) {
@@ -73,8 +77,8 @@ public abstract class AbstractValidator {
         }
     }
 
-    private void validateChars(Pattern pattern, String input) {
-        if (!pattern.matcher(input).matches()) {
+    private void validateChars(PatternMatcher patternMatcher, String input) {
+        if (!patternMatcher.matchesEndToEnd(input)) {
             throw new RuntimeException("Argument[" + input +"] violates character rules.");
         }
     }
