@@ -44,6 +44,14 @@ public class ApplicationArgs {
             description = "Whether or not test coverage data should be outputted")
     public boolean coverage = false;
 
+    @Parameter(names = {"--parallel", "-par"},
+            description = "Whether or not parallel test execution should be used")
+    public boolean parallel = false;
+
+    @Parameter(names = {"--thread-count", "-th"},
+            description = "Number of threads to be used in case of parallel test execution. Has no effect for sequential execution. By default, it is set to the number of processors.")
+    public String threadCount;
+
     @Parameter(names = {"--help", "-h"}, help = true,
             description = "Display help information")
     private boolean help;
@@ -81,5 +89,13 @@ public class ApplicationArgs {
 
     public Map<String, String> getDynamicParams() {
         return dynamicParams;
+    }
+
+    public Boolean isParallel() {
+        return parallel;
+    }
+
+    public String getThreadCount() {
+        return threadCount;
     }
 }

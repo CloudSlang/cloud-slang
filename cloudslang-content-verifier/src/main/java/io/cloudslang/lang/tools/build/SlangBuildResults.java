@@ -9,7 +9,7 @@
  */
 package io.cloudslang.lang.tools.build;
 
-import io.cloudslang.lang.tools.build.tester.RunTestsResults;
+import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 
 /**
  * Created by stoneo on 4/1/2015.
@@ -21,9 +21,9 @@ import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 public class SlangBuildResults {
 
     private final int numberOfCompiledSources;
-    private final RunTestsResults runTestsResults;
+    private final IRunTestResults runTestsResults;
 
-    public SlangBuildResults(int numberOfCompiledSources, RunTestsResults runTestsResults) {
+    public SlangBuildResults(int numberOfCompiledSources, IRunTestResults runTestsResults) {
         this.numberOfCompiledSources = numberOfCompiledSources;
         this.runTestsResults = runTestsResults;
     }
@@ -32,7 +32,7 @@ public class SlangBuildResults {
         return numberOfCompiledSources;
     }
 
-    public RunTestsResults getRunTestsResults() {
+    public IRunTestResults getRunTestsResults() {
         return runTestsResults;
     }
 

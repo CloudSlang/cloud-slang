@@ -77,9 +77,9 @@ public class SlangContentVerifier {
         for(Map.Entry<String, Executable> slangModelEntry : slangModels.entrySet()) {
             Executable slangModel = slangModelEntry.getValue();
             try {
-                Set<Executable> dependenciesModels = getModelDependenciesRecursively(slangModels, slangModel);
                 CompilationArtifact compiledSource = compiledArtifacts.get(getUniqueName(slangModel));
                 if (compiledSource == null) {
+                    Set<Executable> dependenciesModels = getModelDependenciesRecursively(slangModels, slangModel);
                     compiledSource = scoreCompiler.compile(slangModel, dependenciesModels);
                     if(compiledSource != null) {
                         log.info("Compiled: \'" + slangModel.getNamespace() + "." + slangModel.getName() + "\' successfully");
