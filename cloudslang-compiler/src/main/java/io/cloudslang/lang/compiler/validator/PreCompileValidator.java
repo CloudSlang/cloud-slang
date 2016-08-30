@@ -43,6 +43,7 @@ public interface PreCompileValidator {
     void validateResultsHaveNoExpression(List<Result> results, String artifactName, List<RuntimeException> errors);
     void validateResultTypes(List<Result> results, String artifactName, List<RuntimeException> errors);
     void validateDefaultResult(List<Result> results, String artifactName, List<RuntimeException> errors);
+    void validateResultName(String resultName);
 
     void validateStringValue(String name, Serializable value, InOutTransformer transformer);
 }

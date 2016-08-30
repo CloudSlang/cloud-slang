@@ -285,6 +285,43 @@ public class PreCompilerErrorsTest {
         throw result.getErrors().get(0);
     }
 
+
+    @Test
+    public void testOpResultNamedOnFailure() throws Exception {
+        URI resource = getClass().getResource("/corrupted/on_failure/op_1.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("For operation 'op_1' syntax is illegal.");
+        exception.expectMessage("Result cannot be called 'on_failure'.");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testFlowResultNamedOnFailure() throws Exception {
+        URI resource = getClass().getResource("/corrupted/on_failure/flow_1.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("For flow 'flow_1' syntax is illegal.");
+        exception.expectMessage("Result cannot be called 'on_failure'.");
+        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testDecisionResultNamedOnFailure() throws Exception {
+        URI resource = getClass().getResource("/corrupted/on_failure/decision_1.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertTrue(result.getErrors().size() > 0);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("For decision 'decision_1' syntax is illegal.");
+        exception.expectMessage("Result cannot be called 'on_failure'.");
+        throw result.getErrors().get(0);
+    }
+
     @Test
     public void testFlowWithNoRefStep() throws Exception {
         URI resource = getClass().getResource("/corrupted/step_with_no_ref_flow.sl").toURI();

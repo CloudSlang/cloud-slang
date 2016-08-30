@@ -10,9 +10,10 @@
 
 package io.cloudslang.lang.compiler.modeller.transformers;
 
-import com.google.common.collect.Lists;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
@@ -20,11 +21,13 @@ import java.io.File;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import junit.framework.Assert;
+import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -55,7 +58,6 @@ public class PythonActionTransformerTest extends TransformersTestParent {
     private Map<String, Serializable> initialPythonActionWithDependencies;
     private Map<String, Serializable> initialPythonActionInvalidKey;
     private Map<String, Serializable> expectedPythonActionSimple;
-    private Map<String, Serializable> expectedPythonActionWithDependencies;
 
     @Before
     public void init() throws URISyntaxException {
@@ -65,25 +67,23 @@ public class PythonActionTransformerTest extends TransformersTestParent {
 
         expectedPythonActionSimple = new HashMap<>();
         expectedPythonActionSimple.put(SlangTextualKeys.PYTHON_ACTION_SCRIPT_KEY, "pass");
-        expectedPythonActionWithDependencies = new HashMap<>(expectedPythonActionSimple);
-        ArrayList<String> dependencies = Lists.newArrayList("g:a:v1", "g:a:v2");
-        expectedPythonActionWithDependencies.put(SlangTextualKeys.PYTHON_ACTION_DEPENDENCIES_KEY, dependencies);
     }
 
     @Test
     public void testTransformSimple() throws Exception {
         @SuppressWarnings("unchecked")
-        Map<String, Serializable> actualPythonActionSimple = pythonActionTransformer.transform(initialPythonActionSimple).getTransformedData();
+        Map<String, Serializable> actualPythonActionSimple = transformAndThrowErrorIfExists(pythonActionTransformer, initialPythonActionSimple);
         Assert.assertEquals(expectedPythonActionSimple, actualPythonActionSimple);
     }
 
     @Test
     public void testTransformWithDependencies() throws Exception {
-        @SuppressWarnings("unchecked")
-        Map<String, Serializable> actualPythonActionSimple = pythonActionTransformer.transform(initialPythonActionWithDependencies).getTransformedData();
-        Assert.assertEquals(expectedPythonActionWithDependencies, actualPythonActionSimple);
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Following tags are invalid: [dependencies]. Please take a look at the supported features per versions link");
+        transformAndThrowErrorIfExists(pythonActionTransformer, initialPythonActionWithDependencies);
     }
 
+    @Ignore("Enable when `dependencies` tag will be added")
     @Test
     public void testTransformWithEmptyOneEmptyPart() throws Exception {
         exception.expect(RuntimeException.class);
@@ -91,6 +91,7 @@ public class PythonActionTransformerTest extends TransformersTestParent {
         transformAndThrowFirstException(pythonActionTransformer, loadPythonActionData("/python_action_with_dependencies_1_empty_part.sl"));
     }
 
+    @Ignore("Enable when `dependencies` tag will be added")
     @Test
     public void testTransformWithEmptyDependencies() throws Exception {
         exception.expect(RuntimeException.class);
@@ -98,6 +99,7 @@ public class PythonActionTransformerTest extends TransformersTestParent {
         transformAndThrowFirstException(pythonActionTransformer, loadPythonActionData("/python_action_with_dependencies_1_part.sl"));
     }
 
+    @Ignore("Enable when `dependencies` tag will be added")
     @Test
     public void testTransformWithAllEmptyParts() throws Exception {
         exception.expect(RuntimeException.class);
@@ -105,6 +107,7 @@ public class PythonActionTransformerTest extends TransformersTestParent {
         transformAndThrowFirstException(pythonActionTransformer, loadPythonActionData("/python_action_with_dependencies_2_parts.sl"));
     }
 
+    @Ignore("Enable when `dependencies` tag will be added")
     @Test
     public void testTransformWithOnePart() throws Exception {
         exception.expect(RuntimeException.class);
@@ -112,6 +115,7 @@ public class PythonActionTransformerTest extends TransformersTestParent {
         transformAndThrowFirstException(pythonActionTransformer, loadPythonActionData("/python_action_with_dependencies_all_empty_parts.sl"));
     }
 
+    @Ignore("Enable when `dependencies` tag will be added")
     @Test
     public void testTransformWithTwoEmptyParts() throws Exception {
         exception.expect(RuntimeException.class);
@@ -135,6 +139,18 @@ public class PythonActionTransformerTest extends TransformersTestParent {
         @SuppressWarnings("unchecked")
         Map<String, Serializable> returnMap = (Map) op.get(SlangTextualKeys.PYTHON_ACTION_KEY);
         return returnMap;
+    }
+
+    private Map<String, Serializable> transformAndThrowErrorIfExists(PythonActionTransformer pythonActionTransformer, Map<String, Serializable> rawData) {
+        TransformModellingResult<Map<String, Serializable>> transformModellingResult = pythonActionTransformer.transform(rawData);
+        BasicTransformModellingResult<Map<String, Serializable>> basicTransformModellingResult =
+                (BasicTransformModellingResult<Map<String, Serializable>>) transformModellingResult;
+        List<RuntimeException> errors = basicTransformModellingResult.getErrors();
+        if (CollectionUtils.isNotEmpty(errors)) {
+            throw errors.get(0);
+        } else {
+            return basicTransformModellingResult.getTransformedData();
+        }
     }
 
     public static class Config {
