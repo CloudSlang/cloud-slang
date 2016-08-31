@@ -76,7 +76,6 @@ public class SlangBuildMain {
         String testCaseTimeout = parseTestTimeout(appArgs);
         setProperty(SLANG_TEST_RUNNER_THREAD_COUNT, valueOf(threadCount));
         setProperty(TEST_CASE_TIMEOUT_IN_MINUTES_KEY, valueOf(testCaseTimeout));
-        Boolean shouldPrintCoverageData = parseCoverageArg(appArgs);
         Boolean shouldValidateDescription = parseValidateDescriptionArg(appArgs);
 
         log.info("");
