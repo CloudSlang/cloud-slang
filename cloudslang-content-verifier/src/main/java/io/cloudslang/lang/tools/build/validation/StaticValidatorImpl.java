@@ -4,6 +4,7 @@ import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.entities.bindings.InOutParam;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang.Validate;
 
 import java.io.File;
@@ -33,7 +34,7 @@ public class StaticValidatorImpl implements StaticValidator {
     }
 
     private void validateInputs(Map<String, String> metadataInputs, List<? extends InOutParam> inOutParams, String errorMessagePrefix) {
-        for (InOutParam inOutParam : inOutParams) {
+        for (InOutParam inOutParam : ListUtils.emptyIfNull(inOutParams)) {
             if (metadataInputs.get(inOutParam.getName()) == null) {
                 throw new RuntimeException(errorMessagePrefix + inOutParam.getName() + "' is missing description.");
             }
