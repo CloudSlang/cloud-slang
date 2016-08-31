@@ -18,10 +18,9 @@ import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import java.util.ArrayList;
 import java.util.Collections;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Map;
+import org.springframework.stereotype.Component;
 
 @Component
 public class WorkFlowTransformer implements Transformer<Map<String, Object>, Map<String, Object>> {

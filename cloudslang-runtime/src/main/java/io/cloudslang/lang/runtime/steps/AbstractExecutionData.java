@@ -20,8 +20,6 @@ import io.cloudslang.lang.runtime.env.ParentFlowStack;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.apache.commons.lang3.tuple.Pair;
 
 public abstract class AbstractExecutionData {
 

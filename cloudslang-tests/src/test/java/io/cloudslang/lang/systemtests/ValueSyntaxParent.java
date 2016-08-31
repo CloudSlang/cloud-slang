@@ -11,26 +11,17 @@
  */
 package io.cloudslang.lang.systemtests;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
-import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import org.junit.Assert;
-
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static org.junit.Assert.assertTrue;
+import org.junit.Assert;
 
 /**
  * @author Bonczidai Levente

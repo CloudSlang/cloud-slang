@@ -13,22 +13,21 @@ package io.cloudslang.lang.compiler.scorecompiler;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.ActionType;
 import io.cloudslang.lang.entities.ExecutableType;
+import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
-import io.cloudslang.lang.entities.ResultNavigation;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.Validate;
 import io.cloudslang.score.api.ControlActionMetadata;
 import io.cloudslang.score.api.ExecutionStep;
-import org.springframework.stereotype.Component;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.Validate;
+import org.springframework.stereotype.Component;
 
 /*
  * Created by orius123 on 05/11/14.

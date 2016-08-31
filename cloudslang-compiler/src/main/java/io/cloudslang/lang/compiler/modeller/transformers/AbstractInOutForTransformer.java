@@ -2,11 +2,10 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * User: bancl

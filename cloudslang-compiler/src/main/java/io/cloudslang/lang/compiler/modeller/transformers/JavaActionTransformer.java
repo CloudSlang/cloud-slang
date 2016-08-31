@@ -20,13 +20,12 @@ import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import java.util.ArrayList;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public class JavaActionTransformer extends AbstractTransformer implements Transformer<Map<String, String>, Map<String, String>> {

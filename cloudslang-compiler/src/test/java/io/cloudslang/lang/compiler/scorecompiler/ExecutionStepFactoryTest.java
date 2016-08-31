@@ -10,18 +10,26 @@
 package io.cloudslang.lang.compiler.scorecompiler;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
-import io.cloudslang.lang.entities.*;
-import io.cloudslang.lang.entities.bindings.*;
-import junit.framework.Assert;
+import io.cloudslang.lang.entities.ExecutableType;
+import io.cloudslang.lang.entities.ListForLoopStatement;
+import io.cloudslang.lang.entities.LoopStatement;
+import io.cloudslang.lang.entities.ParallelLoopStatement;
+import io.cloudslang.lang.entities.ResultNavigation;
+import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.score.api.ExecutionStep;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import junit.framework.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ExecutionStepFactoryTest {
 

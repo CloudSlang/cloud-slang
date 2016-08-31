@@ -10,13 +10,12 @@
 package io.cloudslang.lang.runtime.env;
 
 import io.cloudslang.lang.entities.bindings.values.Value;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Context implements Serializable{
 

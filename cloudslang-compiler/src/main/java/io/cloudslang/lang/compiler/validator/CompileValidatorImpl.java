@@ -12,11 +12,6 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.utils.ListUtils;
 import java.io.Serializable;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.python.google.common.collect.Lists;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,6 +19,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.python.google.common.collect.Lists;
+import org.springframework.stereotype.Component;
 
 /**
  * User: bancl
@@ -149,7 +148,7 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
     }
 
     private void validateResultNamesAndNavigationSection(Flow flow, Step step, String refId, Executable reference, List<RuntimeException> errors) {
-        List<String> stepNavigationKeys = mapMapToKey(step.getNavigationStrings());
+        List<String> stepNavigationKeys = getMapKeyList(step.getNavigationStrings());
         List<String> refResults = getReferenceResultNames(step, reference.getResults());
 
         List<String> stepNavigationKeysWithoutMatchingResult = ListUtils.subtract(stepNavigationKeys, refResults);
@@ -175,7 +174,7 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
                 "' since for step '" + step.getName() + "'";
     }
 
-    private List<String> mapMapToKey(List<Map<String, String>> collection) {
+    private List<String> getMapKeyList(List<Map<String, String>> collection) {
         List<String> result = new ArrayList<>();
         for (Map<String, String> element : collection) {
             result.add(element.keySet().iterator().next());

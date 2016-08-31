@@ -10,7 +10,6 @@
 package io.cloudslang.lang.entities.bindings;
 
 import io.cloudslang.lang.entities.bindings.values.Value;
-
 import java.util.Set;
 
 /**

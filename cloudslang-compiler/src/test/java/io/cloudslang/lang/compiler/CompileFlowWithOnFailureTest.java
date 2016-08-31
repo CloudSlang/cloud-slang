@@ -16,21 +16,20 @@ import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.score.api.ExecutionPlan;
+import io.cloudslang.score.api.ExecutionStep;
+import java.net.URI;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import io.cloudslang.score.api.ExecutionPlan;
-import io.cloudslang.score.api.ExecutionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.net.URI;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 

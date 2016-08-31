@@ -9,14 +9,13 @@
  *******************************************************************************/
 package io.cloudslang.lang.cli.converters;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.shell.core.Completion;
 import org.springframework.shell.core.Converter;
 import org.springframework.shell.core.MethodTarget;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by lesant on 12/16/2014.

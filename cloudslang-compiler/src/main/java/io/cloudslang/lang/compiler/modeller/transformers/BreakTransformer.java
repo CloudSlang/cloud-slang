@@ -14,9 +14,8 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import java.util.ArrayList;
 import java.util.Collections;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
+import org.springframework.stereotype.Component;
 
 @Component
 public class BreakTransformer implements Transformer<List<String>, List<String>>{

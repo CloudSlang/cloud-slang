@@ -9,7 +9,6 @@
 package io.cloudslang.lang.compiler.modeller;
 
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
-
 import java.util.Map;
 
 /**

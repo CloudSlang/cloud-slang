@@ -4,7 +4,6 @@ import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import io.cloudslang.runtime.api.java.JavaExecutionParametersProvider;
-
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

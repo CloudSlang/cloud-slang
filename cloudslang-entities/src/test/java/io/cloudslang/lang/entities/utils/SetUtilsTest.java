@@ -9,9 +9,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import junit.framework.Assert;
 
 /**
  * @author Bonczidai Levente

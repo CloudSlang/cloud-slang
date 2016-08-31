@@ -1,12 +1,12 @@
 package io.cloudslang.lang.compiler.modeller.transformers;
 
-import junit.framework.Assert;
 import io.cloudslang.lang.entities.ListForLoopStatement;
+import io.cloudslang.lang.entities.LoopStatement;
+import io.cloudslang.lang.entities.MapForLoopStatement;
+import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import io.cloudslang.lang.entities.LoopStatement;
-import io.cloudslang.lang.entities.MapForLoopStatement;
 
 public class ForTransformerTest extends TransformersTestParent {
 

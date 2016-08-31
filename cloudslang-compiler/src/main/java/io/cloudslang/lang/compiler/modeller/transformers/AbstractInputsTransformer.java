@@ -11,13 +11,12 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.DEFAULT_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PRIVATE_INPUT_KEY;

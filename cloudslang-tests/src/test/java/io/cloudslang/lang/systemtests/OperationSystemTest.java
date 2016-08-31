@@ -19,14 +19,13 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.events.ScoreEvent;
 import java.io.Serializable;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * User: stoneo

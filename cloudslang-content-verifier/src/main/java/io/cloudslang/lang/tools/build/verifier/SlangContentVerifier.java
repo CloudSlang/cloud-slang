@@ -18,14 +18,20 @@ import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.tools.build.validation.StaticValidator;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.File;
-import java.util.*;
 
 /**
  * Created by stoneo on 3/15/2015.
@@ -103,9 +109,9 @@ public class SlangContentVerifier {
         for(Map.Entry<String, Executable> slangModelEntry : slangModels.entrySet()) {
             Executable slangModel = slangModelEntry.getValue();
             try {
-                Set<Executable> dependenciesModels = getModelDependenciesRecursively(slangModels, slangModel);
                 CompilationArtifact compiledSource = compiledArtifacts.get(getUniqueName(slangModel));
                 if (compiledSource == null) {
+                    Set<Executable> dependenciesModels = getModelDependenciesRecursively(slangModels, slangModel);
                     compiledSource = scoreCompiler.compile(slangModel, dependenciesModels);
                     if(compiledSource != null) {
                         log.info("Compiled: \'" + slangModel.getNamespace() + "." + slangModel.getName() + "\' successfully");

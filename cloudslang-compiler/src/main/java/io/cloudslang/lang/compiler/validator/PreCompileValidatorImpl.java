@@ -18,11 +18,17 @@ import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.utils.ResultUtils;
 import io.cloudslang.lang.entities.utils.SetUtils;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-
-import java.util.*;
 
 import static ch.lambdaj.Lambda.exists;
 import static ch.lambdaj.Lambda.having;

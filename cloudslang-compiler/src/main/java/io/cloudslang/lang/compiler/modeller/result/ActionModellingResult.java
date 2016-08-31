@@ -1,7 +1,6 @@
 package io.cloudslang.lang.compiler.modeller.result;
 
 import io.cloudslang.lang.compiler.modeller.model.Action;
-
 import java.util.List;
 
 /**

@@ -10,13 +10,12 @@
 
 package io.cloudslang.lang.cli;
 
+import io.cloudslang.lang.cli.converters.MapConverter;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import io.cloudslang.lang.cli.converters.MapConverter;
-
-import java.util.Map;
 
 /**
  * Date: 2/16/2015

@@ -4,7 +4,7 @@ import io.cloudslang.lang.commons.services.api.UserConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Bonczidai Levente

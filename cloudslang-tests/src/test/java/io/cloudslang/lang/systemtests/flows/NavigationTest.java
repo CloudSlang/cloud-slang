@@ -20,16 +20,15 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.SystemsTestsParent;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.ArrayList;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 

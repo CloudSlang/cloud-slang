@@ -4,9 +4,7 @@ import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.InOutTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
-
 import io.cloudslang.lang.entities.bindings.InOutParam;
-
 import io.cloudslang.lang.entities.bindings.Result;
 import java.io.Serializable;
 import java.util.List;
