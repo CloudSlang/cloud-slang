@@ -28,15 +28,17 @@ public class StaticValidatorImpl implements StaticValidator {
     }
 
     private void validateExecutableAgainstMetadata(Executable executable, Metadata metadata) {
-        validateInputs(metadata.getInputs(), executable.getInputs(), "Input '");
-        validateInputs(metadata.getOutputs(), executable.getOutputs(), "Output '");
-        validateInputs(metadata.getResults(), executable.getResults(), "Result '");
+        validateInOutParams(metadata.getInputs(), executable.getInputs(), "Input");
+        validateInOutParams(metadata.getOutputs(), executable.getOutputs(), "Output");
+        validateInOutParams(metadata.getResults(), executable.getResults(), "Result");
     }
 
-    private void validateInputs(Map<String, String> metadataInputs, List<? extends InOutParam> inOutParams, String errorMessagePrefix) {
+    private void validateInOutParams(Map<String, String> metadataInOutParams, List<? extends InOutParam> inOutParams, String errorMessagePrefix) {
         for (InOutParam inOutParam : ListUtils.emptyIfNull(inOutParams)) {
-            if (metadataInputs.get(inOutParam.getName()) == null) {
-                throw new RuntimeException(errorMessagePrefix + inOutParam.getName() + "' is missing description.");
+            if (metadataInOutParams == null) {
+                throw new RuntimeException(errorMessagePrefix + "s are missing description entirely.");
+            } else if (metadataInOutParams.get(inOutParam.getName()) == null) {
+                throw new RuntimeException(errorMessagePrefix + " '" + inOutParam.getName() + "' is missing description.");
             }
         }
     }
