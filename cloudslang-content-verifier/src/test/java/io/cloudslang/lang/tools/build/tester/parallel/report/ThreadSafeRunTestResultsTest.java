@@ -6,12 +6,11 @@ import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.FailedSlang
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.PassedSlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.SkippedSlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
+import java.util.HashSet;
+import java.util.Iterator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.HashSet;
-import java.util.Iterator;
 
 import static org.junit.Assert.assertEquals;
 

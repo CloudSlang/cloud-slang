@@ -1,15 +1,14 @@
 package io.cloudslang.lang.tools.build.tester.parallel.services;
 
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

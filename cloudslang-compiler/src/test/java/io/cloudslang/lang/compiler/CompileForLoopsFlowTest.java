@@ -9,23 +9,17 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler;
 
-import io.cloudslang.lang.compiler.modeller.model.Executable;
-import io.cloudslang.lang.compiler.modeller.model.Step;
-import io.cloudslang.lang.entities.*;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
+import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
+import io.cloudslang.lang.compiler.modeller.model.Step;
+import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.ListForLoopStatement;
+import io.cloudslang.lang.entities.LoopStatement;
+import io.cloudslang.lang.entities.MapForLoopStatement;
+import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
+import io.cloudslang.score.api.ExecutionPlan;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,6 +27,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

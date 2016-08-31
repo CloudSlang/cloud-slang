@@ -10,30 +10,29 @@ package io.cloudslang.lang.compiler.scorecompiler;
 
 import ch.lambdaj.function.convert.Converter;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
-import io.cloudslang.lang.compiler.modeller.model.Decision;
-import io.cloudslang.lang.compiler.validator.CompileValidator;
 import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
+import io.cloudslang.lang.compiler.modeller.model.Decision;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Step;
+import io.cloudslang.lang.compiler.validator.CompileValidator;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ExecutionPlan;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Deque;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.Validate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import static ch.lambdaj.Lambda.convertMap;
 

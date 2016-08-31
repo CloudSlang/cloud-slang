@@ -20,8 +20,6 @@ import io.cloudslang.lang.entities.bindings.Result;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
-
-
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;

@@ -7,16 +7,18 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.score.api.ExecutionStep;
 import io.cloudslang.score.events.ScoreEvent;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import org.junit.Ignore;
+import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class OperationWithDependenciesSystemTest extends SystemsTestsParent {
     @Test(expected = RuntimeException.class)

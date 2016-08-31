@@ -4,11 +4,10 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.tools.build.tester.TriggerTestCaseEventListener;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-import org.apache.commons.collections4.MapUtils;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.collections4.MapUtils;
 
 import static io.cloudslang.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
 import static io.cloudslang.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;

@@ -4,11 +4,6 @@ package io.cloudslang.lang.tools.build.tester.parallel.report;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.TestRun;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
-import org.apache.commons.io.FileUtils;
-import org.rendersnake.HtmlAttributes;
-import org.rendersnake.HtmlCanvas;
-import org.springframework.core.io.DefaultResourceLoader;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,6 +15,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.io.FileUtils;
+import org.rendersnake.HtmlAttributes;
+import org.rendersnake.HtmlCanvas;
+import org.springframework.core.io.DefaultResourceLoader;
 
 import static com.google.common.base.Joiner.on;
 import static java.lang.String.format;

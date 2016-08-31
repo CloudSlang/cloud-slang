@@ -13,14 +13,13 @@ package io.cloudslang.lang.runtime.configuration;
 
 import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
 import io.cloudslang.runtime.impl.RuntimeManagementConfiguration;
+import java.nio.charset.StandardCharsets;
 import org.apache.commons.lang3.StringUtils;
 import org.python.core.Options;
 import org.python.core.PySystemState;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-
-import java.nio.charset.StandardCharsets;
 
 @Configuration
 @Import({RuntimeManagementConfiguration.class})

@@ -13,6 +13,10 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+import java.net.URI;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,11 +25,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.net.URI;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Created by stoneo on 1/22/2015.

@@ -17,8 +17,6 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

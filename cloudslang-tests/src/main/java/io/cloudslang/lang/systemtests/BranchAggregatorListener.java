@@ -14,7 +14,6 @@ import com.google.common.collect.Lists;
 import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;

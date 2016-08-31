@@ -11,7 +11,6 @@ package io.cloudslang.lang.systemtests;
 
 import ch.lambdaj.group.Group;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;

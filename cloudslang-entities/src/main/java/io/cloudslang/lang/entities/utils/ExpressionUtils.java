@@ -12,7 +12,6 @@
 package io.cloudslang.lang.entities.utils;
 
 import io.cloudslang.lang.entities.constants.RegexConstants;
-
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;

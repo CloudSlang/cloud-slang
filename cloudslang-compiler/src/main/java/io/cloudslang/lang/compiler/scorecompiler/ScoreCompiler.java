@@ -10,7 +10,6 @@ package io.cloudslang.lang.compiler.scorecompiler;
 
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
-
 import java.util.List;
 import java.util.Set;
 

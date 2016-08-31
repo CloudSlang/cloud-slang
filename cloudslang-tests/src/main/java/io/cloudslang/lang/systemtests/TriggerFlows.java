@@ -18,14 +18,13 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class TriggerFlows {
 

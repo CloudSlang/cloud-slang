@@ -10,7 +10,6 @@ package io.cloudslang.lang.cli.utils;
 
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
-
 import io.cloudslang.lang.entities.bindings.values.Value;
 import java.io.IOException;
 import java.util.List;

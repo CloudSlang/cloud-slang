@@ -16,14 +16,12 @@ import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Bonczidai Levente

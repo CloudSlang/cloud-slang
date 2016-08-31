@@ -1,11 +1,11 @@
 package io.cloudslang.lang.tools.build.tester.parallel.services;
 
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import org.springframework.beans.factory.DisposableBean;
 
 import javax.annotation.PostConstruct;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 import static java.lang.Integer.parseInt;
 import static java.lang.String.valueOf;
