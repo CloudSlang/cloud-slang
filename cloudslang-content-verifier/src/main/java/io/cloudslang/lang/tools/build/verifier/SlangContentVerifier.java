@@ -47,7 +47,7 @@ public class SlangContentVerifier {
     @Autowired
     private ScoreCompiler scoreCompiler;
 
-    public Map<String, Executable> createModelsAndValidate(String directoryPath) {
+    public Map<String, Executable> createModelsAndValidate(String directoryPath, Boolean shouldValidateDescription) {
         Validate.notEmpty(directoryPath, "You must specify a path");
         Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" + directoryPath + "\' does not lead to a directory");
         Map<String, Executable> slangModels = new HashMap<>();
@@ -62,7 +62,7 @@ public class SlangContentVerifier {
             Executable sourceModel = getSourceModel(slangFile, slangSource);
             Metadata sourceMetadata = getSourceMetadata(slangFile, slangSource);
             if (sourceModel != null) {
-                staticValidator.validateSlangFile(slangFile, sourceModel, sourceMetadata);
+                staticValidator.validateSlangFile(slangFile, sourceModel, sourceMetadata, shouldValidateDescription);
                 slangModels.put(getUniqueName(sourceModel), sourceModel);
             }
         }

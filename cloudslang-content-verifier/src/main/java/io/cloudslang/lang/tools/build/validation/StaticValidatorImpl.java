@@ -19,12 +19,14 @@ import java.util.regex.Pattern;
 public class StaticValidatorImpl implements StaticValidator {
 
     @Override
-    public void validateSlangFile(File slangFile, Executable executable, Metadata metadata){
+    public void validateSlangFile(File slangFile, Executable executable, Metadata metadata, Boolean shouldValidateDescription){
         validateNamespace(slangFile, executable);
 
         validateExecutableName(slangFile, executable);
 
-        validateExecutableAgainstMetadata(executable, metadata);
+        if (shouldValidateDescription) {
+            validateExecutableAgainstMetadata(executable, metadata);
+        }
     }
 
     private void validateExecutableAgainstMetadata(Executable executable, Metadata metadata) {

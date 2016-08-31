@@ -48,7 +48,7 @@ public class StaticValidatorTest {
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("Input 'input3' is missing description.");
-        staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()), newExecutable, metadata);
+        staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()), newExecutable, metadata, true);
     }
 
     @Test
@@ -68,7 +68,7 @@ public class StaticValidatorTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Output 'output3' is missing description.");
         staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
-                newExecutable, metadata);
+                newExecutable, metadata, true);
     }
 
     @Test
@@ -88,7 +88,7 @@ public class StaticValidatorTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Result 'result3' is missing description.");
         staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
-                newExecutable, metadata);
+                newExecutable, metadata, true);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class StaticValidatorTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Results are missing description entirely.");
         staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
-                newExecutable, metadata);
+                newExecutable, metadata, true);
     }
 
 }

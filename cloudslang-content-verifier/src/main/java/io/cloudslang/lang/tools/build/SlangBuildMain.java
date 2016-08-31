@@ -57,6 +57,7 @@ public class SlangBuildMain {
         String testsPath = StringUtils.defaultIfEmpty(appArgs.getTestRoot(), projectPath + TEST_DIR);
         List<String> testSuites = parseTestSuites(appArgs);
         Boolean shouldPrintCoverageData = parseCoverageArg(appArgs);
+        Boolean shouldValidateDescription = parseValidateDescriptionArg(appArgs);
 
         log.info("");
         log.info("------------------------------------------------------------");
@@ -75,7 +76,8 @@ public class SlangBuildMain {
         registerEventHandlers(slang);
 
         try {
-            SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites);
+            SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath,
+                    testSuites, shouldValidateDescription);
             RunTestsResults runTestsResults = buildResults.getRunTestsResults();
             Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
 
@@ -154,6 +156,15 @@ public class SlangBuildMain {
             shouldOutputCoverageData = appArgs.shouldOutputCoverage();
         }
         return shouldOutputCoverageData;
+    }
+
+    private static Boolean parseValidateDescriptionArg(ApplicationArgs appArgs){
+        Boolean shouldValidateDescription = false;
+
+        if (appArgs.shouldValidateDescription() != null) {
+            shouldValidateDescription = appArgs.shouldValidateDescription();
+        }
+        return shouldValidateDescription;
     }
 
     private static void printBuildSuccessSummary(String contentPath, SlangBuildResults buildResults, RunTestsResults runTestsResults) {

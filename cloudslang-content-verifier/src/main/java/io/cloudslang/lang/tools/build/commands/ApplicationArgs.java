@@ -44,6 +44,10 @@ public class ApplicationArgs {
             description = "Whether or not test coverage data should be outputted")
     public boolean coverage = false;
 
+    @Parameter(names = {"--description", "-cov"},
+            description = "Whether or not to validate the inputs, outputs and results have description")
+    public boolean validateDescription = false;
+
     @Parameter(names = {"--help", "-h"}, help = true,
             description = "Display help information")
     private boolean help;
@@ -73,6 +77,10 @@ public class ApplicationArgs {
 
     public Boolean shouldOutputCoverage() {
         return coverage;
+    }
+
+    public Boolean shouldValidateDescription() {
+        return validateDescription;
     }
 
     public boolean isHelp() {

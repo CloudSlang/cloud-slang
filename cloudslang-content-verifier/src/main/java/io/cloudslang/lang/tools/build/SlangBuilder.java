@@ -41,7 +41,7 @@ public class SlangBuilder {
 
     private final static Logger log = Logger.getLogger(SlangBuilder.class);
 
-    public SlangBuildResults buildSlangContent(String projectPath, String contentPath, String testsPath, List<String> testSuits){
+    public SlangBuildResults buildSlangContent(String projectPath, String contentPath, String testsPath, List<String> testSuits, Boolean shouldValidateDescription){
 
         String projectName = FilenameUtils.getName(projectPath);
         log.info("");
@@ -52,7 +52,7 @@ public class SlangBuilder {
         log.info("");
         log.info("--- compiling sources ---");
         Map<String, Executable> slangModels =
-                slangContentVerifier.createModelsAndValidate(contentPath);
+                slangContentVerifier.createModelsAndValidate(contentPath, shouldValidateDescription);
 
         Map<String, CompilationArtifact> compiledSources = compileModels(slangModels);
 
@@ -87,7 +87,7 @@ public class SlangBuilder {
         log.info("");
         log.info("--- compiling tests sources ---");
         // Compile all slang test flows under the test directory
-        Map<String, Executable> testFlowModels = slangContentVerifier.createModelsAndValidate(testsPath);
+        Map<String, Executable> testFlowModels = slangContentVerifier.createModelsAndValidate(testsPath, false);
         // Add also all of the slang models of the content in order to allow for compilation of the test flows
         Map<String, Executable> allTestedFlowModels = new HashMap<>(testFlowModels);
         allTestedFlowModels.putAll(contentSlangModels);
