@@ -19,9 +19,9 @@ operation:
       - 'com.hp.oo.platformactions.pythonactions:buildversion:10.70.00-SNAPSHOT'
     script: |
       import ver.utils.getver as ver
-      ver_label = ver.get_ver(var1,var2)
+      ver_label = ver.get_ver(int(var1),int(var2))
   outputs:
-    - result_version_mul: ${ver_label}
+    - result_version_mul: ${ str(ver_label) }
   results:
     - SUCCESS
 

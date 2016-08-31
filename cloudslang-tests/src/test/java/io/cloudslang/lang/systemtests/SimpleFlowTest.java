@@ -68,7 +68,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
 	@Test(timeout = DEFAULT_TIMEOUT)
 	public void testSimpleFlowNavigation() throws Exception {
         Map<String, Value> inputs = new HashMap<>();
-        inputs.put("input1", ValueFactory.create(-999));
+        inputs.put("input1", ValueFactory.create("-999"));
 		compileAndRunSimpleFlow(inputs, SYS_PROPS);
 	}
 

@@ -11,6 +11,8 @@ package io.cloudslang.lang.cli.utils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.commons.services.api.SlangSourceService;
+import io.cloudslang.lang.commons.services.impl.SlangSourceServiceImpl;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
@@ -294,6 +296,11 @@ public class CompilerHelperTest {
             Yaml yaml = new Yaml();
             yaml.setBeanAccess(BeanAccess.FIELD);
             return yaml;
+        }
+
+        @Bean
+        public SlangSourceService slangSourceService() {
+            return new SlangSourceServiceImpl();
         }
 
     }

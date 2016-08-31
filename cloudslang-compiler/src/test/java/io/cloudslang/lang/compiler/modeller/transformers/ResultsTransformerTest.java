@@ -59,7 +59,7 @@ public class ResultsTransformerTest {
     @Before
     public void init() throws URISyntaxException {
         resultsMapOpWithData = getResultsFromOperationFile("/operation_with_data.sl");
-        resultsMapOpNoData = getResultsFromOperationFile("/test_op.sl");
+        resultsMapOpNoData = getResultsFromOperationFile("/test_op_1.sl");
     }
 
     private List getResultsFromOperationFile(String fileName) throws URISyntaxException {

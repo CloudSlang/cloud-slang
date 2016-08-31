@@ -24,6 +24,8 @@ flow:
             - base_input: ${ bound_input + 1 }
         publish:
           - bound_input: ${ bound_output + 1 }
+        navigate:
+          - SUCCESS: Step_2
 
     - Step_2:
         do:
@@ -31,6 +33,10 @@ flow:
             - base_input: ${ bound_input + 1 }
         publish:
           - bound_input: ${ bound_output + 1 }
+        navigate:
+          - SUCCESS: SUCCESS
 
   outputs:
     - final_output: ${ bound_input + 1 }
+  results:
+    - SUCCESS

@@ -10,13 +10,13 @@ namespace: user.decisions
 decision:
   name: decision_3_sp
   inputs:
-    - x: ${int(get_sp('user.sys.prop1'))}
+    - x: ${get_sp('user.sys.prop1')}
     - y:
-        default: ${int(get_sp('user.sys.prop2'))}
+        default: ${get_sp('user.sys.prop2')}
         required: false
   outputs:
-    - sum: ${int(get_sp('user.sys.prop3'))}
+    - sum: ${get_sp('user.sys.prop3')}
   results:
-    - EQUAL: ${x == int(get_sp('user.sys.prop4'))}
-    - LESS_THAN: ${x < y}
+    - EQUAL: ${int(x) == int(get_sp('user.sys.prop4'))}
+    - LESS_THAN: ${int(x) < int(y)}
     - GREATER_THAN

@@ -18,4 +18,7 @@ operation:
       print 'Hello from ' + name
   outputs:
     - name
-    - int_output
+    - int_output: ${ str(int_output) }
+  results:
+    - SUCCESS: ${1==1}
+    - FAILURE

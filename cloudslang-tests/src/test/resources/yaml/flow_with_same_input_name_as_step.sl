@@ -28,7 +28,13 @@ flow:
     - StepOnFailure:
         do:
           ops.test_op:
+        navigate:
+          - SUCCESS: SUCCESS
 
     - StepOnSuccess:
         do:
           ops.test_op:
+        navigate:
+          - SUCCESS: SUCCESS
+  results:
+    - SUCCESS

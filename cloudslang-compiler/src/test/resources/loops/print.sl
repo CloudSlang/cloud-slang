@@ -17,3 +17,6 @@ operation:
     script: |
         print text
         print text2
+  results:
+    - SUCCESS: ${ text == '' }
+    - FAILURE

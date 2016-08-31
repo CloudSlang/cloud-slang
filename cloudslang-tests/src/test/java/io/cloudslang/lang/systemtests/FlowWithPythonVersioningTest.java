@@ -13,6 +13,7 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.URI;
@@ -26,6 +27,7 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+@Ignore("Enable when `dependencies` tag will be added")
 public class FlowWithPythonVersioningTest extends SystemsTestsParent {
     @Test
     public void testFlowWithOperationIfDifferentVersions() throws Exception {
@@ -40,8 +42,8 @@ public class FlowWithPythonVersioningTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), dependencies);
 
         Map<String, Value> userInputs = new HashMap<>();
-        userInputs.put("var1", ValueFactory.create(6));
-        userInputs.put("var2", ValueFactory.create(7));
+        userInputs.put("var1", ValueFactory.create("6"));
+        userInputs.put("var2", ValueFactory.create("7"));
         ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
         assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
         LanguageEventData languageEventData = (LanguageEventData) event.getData();
@@ -84,8 +86,8 @@ public class FlowWithPythonVersioningTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(operationSum3), null);
 
         Map<String, Value> userInputs = new HashMap<>();
-        userInputs.put("var1", ValueFactory.create(6));
-        userInputs.put("var2", ValueFactory.create(7));
+        userInputs.put("var1", ValueFactory.create("6"));
+        userInputs.put("var2", ValueFactory.create("7"));
         ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
         assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
         LanguageEventData languageEventData = (LanguageEventData) event.getData();
@@ -103,7 +105,7 @@ public class FlowWithPythonVersioningTest extends SystemsTestsParent {
 
         for (int addedValue = 0; addedValue < 20; addedValue++) {
             Map<String, Value> userInputs = new HashMap<>();
-            userInputs.put("addedValue", ValueFactory.create(addedValue));
+            userInputs.put("addedValue", ValueFactory.create(Integer.toString(addedValue)));
             ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
             assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
             LanguageEventData languageEventData = (LanguageEventData) event.getData();

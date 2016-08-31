@@ -33,7 +33,7 @@ flow:
     - step3:
         do:
           ops.check_number:
-            - number: 4
+            - number: '4'
         navigate:
           - EVEN: SUCCESS
           - ODD: SUCCESS

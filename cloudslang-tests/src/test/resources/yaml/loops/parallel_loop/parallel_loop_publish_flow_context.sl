@@ -13,12 +13,12 @@ imports:
 flow:
   name: parallel_loop_publish_flow_context
   inputs:
-    - values: ${ range(1, 4) }
+    - values: "1,2,3"
     - flow_var: 'FLOW VARIABLE VALUE'
   workflow:
     - print_values:
         parallel_loop:
-          for: value in values
+          for: value in values.split(",")
           do:
             ops.print_branch:
               - ID: ${ value }

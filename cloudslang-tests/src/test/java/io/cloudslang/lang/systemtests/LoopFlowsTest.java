@@ -16,6 +16,7 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.Serializable;
@@ -53,12 +54,12 @@ public class LoopFlowsTest extends SystemsTestsParent{
         StepData thirdStep = stepsData.get(THIRD_STEP_KEY);
 
         Map<String, Serializable> expectedInputs = new HashMap<>();
-        expectedInputs.put("text", 1);
+        expectedInputs.put("text", "1");
         expectedInputs.put("sp_arg", "for_value");
         Assert.assertEquals(expectedInputs, firstStep.getInputs());
-        expectedInputs.put("text", 2);
+        expectedInputs.put("text", "2");
         Assert.assertEquals(expectedInputs, secondStep.getInputs());
-        expectedInputs.put("text", 3);
+        expectedInputs.put("text", "3");
         Assert.assertEquals(expectedInputs, thirdStep.getInputs());
     }
 
@@ -72,6 +73,28 @@ public class LoopFlowsTest extends SystemsTestsParent{
 
         Map<String, Value> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
+        StepData thirdStep = stepsData.get(THIRD_STEP_KEY);
+        Assert.assertEquals("print_other_values", thirdStep.getName());
+    }
+
+    @Test
+    public void testFlowWithLoopsFromPropertyFile() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/loop_from_property_with_custom_navigation.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/print.sl").toURI();
+        URI propertiesURI = getClass().getResource("/yaml/loops/loop_property.prop.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        Assert.assertEquals(1, compilationArtifact.getSystemProperties().size());
+        Assert.assertEquals("loops.list", compilationArtifact.getSystemProperties().iterator().next());
+
+        Set<SystemProperty> systemProperties = loadSystemProperties(SlangSource.fromFile(propertiesURI));
+        Map<String, Value> userInputs = new HashMap<>();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
+        StepData secondStep = stepsData.get(SECOND_STEP_KEY);
+
+        Assert.assertEquals("print_values", secondStep.getName());
+        Assert.assertEquals("SUCCESS", secondStep.getResult());
         StepData thirdStep = stepsData.get(THIRD_STEP_KEY);
         Assert.assertEquals("print_other_values", thirdStep.getName());
     }
@@ -121,6 +144,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Assert.assertEquals("print_other_values", thirdStep.getName());
     }
 
+    @Ignore("Remove when support for maps in loops is added")
     @Test
     public void testFlowWithMapLoops() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/simple_loop_with_map.sl").toURI();
@@ -134,6 +158,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         verifyPersonMap(stepsData);
     }
 
+    @Ignore("Remove when support for maps in loops is added")
     @Test
     public void testFlowWithHashMap() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/simple_loop_with_hashmap.sl").toURI();
@@ -152,6 +177,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         verifyPersonMap(stepsData);
     }
 
+    @Ignore("Remove when support for maps in loops is added")
     @Test
     public void testFlowWithMapLoopsWithCustomNavigation() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/loop_with_custom_navigation_with_map.sl").toURI();
@@ -166,6 +192,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Assert.assertEquals("print_other_values", fourthStep.getName());
     }
 
+    @Ignore("Remove when support for maps in loops is added")
     @Test
     public void testFlowWithMapLoopsWithDefaultBreak() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/loop_with_default_break_with_map.sl").toURI();
@@ -180,6 +207,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Assert.assertEquals(1, actualSteps.size());
     }
 
+    @Ignore("Remove when support for maps in loops is added")
     @Test
     public void testFlowWithMapLoopsWithEmptyBreak() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/loop_with_empty_break_with_map.sl").toURI();
@@ -194,6 +222,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Assert.assertEquals(3, actualSteps.size());
     }
 
+    @Ignore("Remove when support for maps in loops is added")
     @Test
     public void testFlowWithMapLoopsWithBreak() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/loop_with_break_with_map.sl").toURI();

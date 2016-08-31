@@ -36,7 +36,6 @@ flow:
             - even_number: ${ new_number }
         navigate:
           - SUCCESS: SUCCESS # end flow with success result
-          - FAILURE: send_error_mail
 
     - process_odd_number:
         do:
@@ -44,7 +43,6 @@ flow:
             - odd_number: ${ new_number }
         navigate:
           - SUCCESS: SUCCESS # end flow with success result
-          - FAILURE: send_error_mail
 
     - on_failure: # you can also use this step for default navigation in failure case
         - send_error_mail: # or refer it by the step name

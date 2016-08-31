@@ -118,6 +118,10 @@ public abstract class SystemsTestsParent {
         return select(stepsData.keySet(), startsWith("0."));
     }
 
+    protected Set<SystemProperty> loadSystemProperties(SlangSource source) {
+        return slang.loadSystemProperties(source);
+    }
+
     protected void verifyInOutParams(Map<String, Serializable> params) {
         if (params != null) {
             List<String> errorsInSensitivity = new ArrayList<>();

@@ -17,6 +17,7 @@ import io.cloudslang.dependency.impl.services.MavenConfigImpl;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
@@ -51,10 +52,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -96,7 +94,7 @@ public class ParallelLoopStepsTest {
     @Test
     public void testBranchesAreCreated() throws Exception {
         // prepare arguments
-        ParallelLoopStatement parallelLoopStatement = new ParallelLoopStatement("varName", "expression");
+        ParallelLoopStatement parallelLoopStatement = new ParallelLoopStatement("varName", "expression", new HashSet<ScriptFunction>(), new HashSet<String>());
 
         RunEnvironment runEnvironment = new RunEnvironment();
         Map<String, Value> variables = new HashMap<>();
@@ -145,7 +143,7 @@ public class ParallelLoopStepsTest {
     @Test
     public void testAddBranchesEventsAreFired() throws Exception {
         // prepare arguments
-        ParallelLoopStatement parallelLoopStatement = new ParallelLoopStatement("varName", "expression");
+        ParallelLoopStatement parallelLoopStatement = new ParallelLoopStatement("varName", "expression", new HashSet<ScriptFunction>(), new HashSet<String>());
 
         RunEnvironment runEnvironment = new RunEnvironment();
         Map<String, Value> variables = new HashMap<>();

@@ -85,25 +85,26 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         expectedInputs.put("input_no_expression", "input_no_expression_value");
         expectedInputs.put("input_no_expression_not_required", null);
         expectedInputs.put("input_system_property", "localhost");
-        expectedInputs.put("input_private", 25);
+        expectedInputs.put("input_private", "25");
 
         // loaded by Yaml
-        expectedInputs.put("input_int", 22);
+        expectedInputs.put("input_int", "22");
         expectedInputs.put("input_str_no_quotes", "Hi");
         expectedInputs.put("input_str_single", "Hi");
         expectedInputs.put("input_str_double", "Hi");
-        expectedInputs.put("input_yaml_list", Lists.newArrayList(1, 2, 3));
+        expectedInputs.put("input_yaml_list", "[1, 2, 3]");
         expectedInputs.put("input_properties_yaml_map_folded", "medium");
-        HashMap<String, Serializable> expectedInputMap = new LinkedHashMap<>();
-        expectedInputMap.put("key1", "value1");
-        expectedInputMap.put("key2", "value2");
-        expectedInputMap.put("key3", "value3");
-        expectedInputs.put("input_yaml_map", expectedInputMap);
+        expectedInputs.put("input_yaml_map", "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}");
 
         // evaluated via Python
         expectedInputs.put("input_python_null", null);
-        expectedInputs.put("input_python_list", Lists.newArrayList(1, 2, 3));
-        expectedInputs.put("input_python_map", expectedInputMap);
+//      uncomment when types will be supported
+//        expectedInputs.put("input_python_list", Lists.newArrayList(1, 2 ,3));
+//        HashMap<String, Serializable> expectedInputMap = new LinkedHashMap<>();
+//        expectedInputMap.put("key1", "value1");
+//        expectedInputMap.put("key2", "value2");
+//        expectedInputMap.put("key3", "value3");
+//        expectedInputs.put("input_python_map", expectedInputMap);
         expectedInputs.put("b", "b");
         expectedInputs.put("b_copy", "b");
         expectedInputs.put("input_concat_1", "ab");
@@ -121,7 +122,7 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         Map<String, Serializable> expectedOutputs = new HashMap<>();
 
         expectedOutputs.put("output_no_expression", "output_no_expression_value");
-        expectedOutputs.put("output_int", 22);
+        expectedOutputs.put("output_int", "22");
         expectedOutputs.put("output_str", "output_str_value");
         expectedOutputs.put("output_expression", "output_str_value_suffix");
         expectedOutputs.put("output_step_argument_null", "step_argument_null_value");

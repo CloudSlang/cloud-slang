@@ -29,16 +29,18 @@ operation:
     - map_key
   python_action:
     script: |
+      import ast
+      map1 = ast.literal_eval(map_input)
       try:
-        for key in map_key:
-          decoded = map_input[key]
+        for key in map_key.split(","):
+          decoded = map1[key]
         return_code = '0'
         return_result = 'Parsing successful.'
       except Exception as ex:
         return_result = ex
         return_code = '-1'
   outputs:
-    - value: ${ decoded if return_code == '0' else '' }
+    - value: ${ str(decoded) if return_code == '0' else '' }
     - return_result
     - return_code
     - error_message: ${ return_result if return_code == '-1' else '' }

@@ -133,7 +133,7 @@ public class InputsTransformerTest extends TransformersTestParent {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(6);
         Assert.assertEquals("input7", input.getName());
-        Assert.assertEquals(77, input.getValue().get());
+        Assert.assertTrue("77".equals(input.getValue().get()));
         Assert.assertEquals(false, input.isSensitive());
         Assert.assertEquals(true, input.isRequired());
     }

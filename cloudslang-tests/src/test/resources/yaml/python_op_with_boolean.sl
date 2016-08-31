@@ -17,10 +17,10 @@ operation:
       condition_4 = 1<>1 or bool(1)
       an_int = 1
   outputs:
-    - condition_1
-    - condition_2
-    - condition_3
-    - condition_4
-    - an_int
+    - condition_1: ${ str(condition_1) }
+    - condition_2: ${ str(condition_2) }
+    - condition_3: ${ str(condition_3) }
+    - condition_4: ${ str(condition_4) }
+    - an_int: ${ str(an_int) }
   results:
     - SUCCESS

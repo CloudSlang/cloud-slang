@@ -55,9 +55,7 @@ public class SimpleOperationTest extends SystemsTestsParent {
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
 
         StepData data = steps.get(EXEC_START_PATH);
-        List<String> outputs = (List<String>)data.getOutputs().get("result");
-        for (int index = 0; index < outputs.size(); index++) {
-            assertEquals(outputs.get(index), "element" + (index + 1));
-        }
+        String outputs = (String) data.getOutputs().get("result");
+        assertEquals(outputs, "['element1', 'element2', 'element3', 'element4', 'element5', 'element6', 'element7']");
     }
 }

@@ -3,7 +3,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.9.69-SNAPSHOT</version>
+        <version>0.9.71-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +13,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>cloudslang-all</artifactId>
+            <artifactId>cloudslang-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -47,6 +47,11 @@
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <version>1.35</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.rendersnake</groupId>
+            <artifactId>rendersnake</artifactId>
         </dependency>
 
         <!-- test -->

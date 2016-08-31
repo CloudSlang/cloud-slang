@@ -19,6 +19,6 @@ operation:
     class_name: utils.complex.Compute
     method_name: compute
   outputs:
-    - result
+    - result: ${ str(result) }
   results:
     - SUCCESS

@@ -16,4 +16,4 @@ flow:
     - step1:
         do:
           a.b.c.d.print:
-            - cool_input: 25
+            - cool_input: '25'

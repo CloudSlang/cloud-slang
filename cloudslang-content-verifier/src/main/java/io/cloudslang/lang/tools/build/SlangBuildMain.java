@@ -12,20 +12,15 @@ package io.cloudslang.lang.tools.build;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.commons.services.api.UserConfigurationService;
+import io.cloudslang.lang.commons.services.impl.UserConfigurationServiceImpl;
 import io.cloudslang.lang.tools.build.commands.ApplicationArgs;
-import io.cloudslang.lang.tools.build.tester.RunTestsResults;
+import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.TestRun;
+import io.cloudslang.lang.tools.build.tester.parallel.report.SlangTestCaseRunReportGeneratorService;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
@@ -34,37 +29,41 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.cloudslang.lang.tools.build.tester.SlangTestRunner.MAX_TIME_PER_TESTCASE_IN_MINUTES;
+import static io.cloudslang.lang.tools.build.tester.SlangTestRunner.TEST_CASE_TIMEOUT_IN_MINUTES_KEY;
+import static io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService.SLANG_TEST_RUNNER_THREAD_COUNT;
+import static java.lang.String.format;
+import static java.lang.String.valueOf;
+import static java.lang.System.getProperty;
+import static java.lang.System.setProperty;
+import static org.apache.commons.collections4.MapUtils.isNotEmpty;
+
 /*
  * Created by stoneo on 1/11/2015.
  */
 public class SlangBuildMain {
 
-    private static final String CONTENT_DIR =  File.separator + "content";
+    private static final String TEST_CASE_REPORT_LOCATION = "cloudslang.test.case.report.location";
+    private static final String CONTENT_DIR = File.separator + "content";
     private static final String TEST_DIR = File.separator + "test";
     public static final String DEFAULT_TESTS = "default";
 
     private final static Logger log = Logger.getLogger(SlangBuildMain.class);
     private final static String NOT_TS = "!";
-
-    private static final String USER_CONFIG_DIR = "configuration";
-    private static final String USER_CONFIG_FILENAME = "cslang.properties";
-    private static final String USER_CONFIG_FILEPATH = USER_CONFIG_DIR + File.separator + USER_CONFIG_FILENAME;
-    private static final String SUBSTITUTION_REGEX = "\\$\\{([^${}]+)\\}"; // ${system.property.name}
-    private static final Pattern SUBSTITUTION_PATTERN = Pattern.compile(SUBSTITUTION_REGEX);
+    private static final int MAX_THREADS_TEST_RUNNER = 16;
 
     public static void main(String[] args) {
-        try {
-            loadUserProperties();
-        } catch (Exception ex) {
-            System.out.println("Error occurred while loading user configuration: " + ex.getMessage());
-            ex.printStackTrace();
-        }
+        loadUserProperties();
 
         ApplicationArgs appArgs = new ApplicationArgs();
         parseArgs(args, appArgs);
@@ -72,7 +71,12 @@ public class SlangBuildMain {
         String contentPath = StringUtils.defaultIfEmpty(appArgs.getContentRoot(), projectPath + CONTENT_DIR);
         String testsPath = StringUtils.defaultIfEmpty(appArgs.getTestRoot(), projectPath + TEST_DIR);
         List<String> testSuites = parseTestSuites(appArgs);
-        Boolean shouldPrintCoverageData = parseCoverageArg(appArgs);
+        boolean shouldPrintCoverageData = parseCoverageArg(appArgs);
+        boolean runTestsInParallel = parseParallelTestsArg(appArgs);
+        int threadCount = parseThreadCountArg(appArgs, runTestsInParallel);
+        String testCaseTimeout = parseTestTimeout(appArgs);
+        setProperty(SLANG_TEST_RUNNER_THREAD_COUNT, valueOf(threadCount));
+        setProperty(TEST_CASE_TIMEOUT_IN_MINUTES_KEY, valueOf(testCaseTimeout));
 
         log.info("");
         log.info("------------------------------------------------------------");
@@ -80,6 +84,10 @@ public class SlangBuildMain {
         log.info("Content root is at: " + contentPath);
         log.info("Test root is at: " + testsPath);
         log.info("Active test suites are: " + Arrays.toString(testSuites.toArray()));
+        log.info("Print coverage data: " + valueOf(shouldPrintCoverageData));
+        log.info("Parallel: " + valueOf(runTestsInParallel));
+        log.info("Thread count: " + threadCount);
+        log.info("Test case timeout in minutes: " + (StringUtils.isEmpty(testCaseTimeout) ? valueOf(MAX_TIME_PER_TESTCASE_IN_MINUTES) : testCaseTimeout));
 
         log.info("");
         log.info("Loading...");
@@ -88,28 +96,33 @@ public class SlangBuildMain {
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/testRunnerContext.xml");
         SlangBuilder slangBuilder = context.getBean(SlangBuilder.class);
         Slang slang = context.getBean(Slang.class);
+        SlangTestCaseRunReportGeneratorService reportGeneratorService = context.getBean(SlangTestCaseRunReportGeneratorService.class);
         registerEventHandlers(slang);
 
+//        long time = System.currentTimeMillis();
         try {
-            SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites);
-            RunTestsResults runTestsResults = buildResults.getRunTestsResults();
+            SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites, runTestsInParallel);
+            IRunTestResults runTestsResults = buildResults.getRunTestsResults();
             Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
 
-            if(MapUtils.isNotEmpty(skippedTests)){
+            if (isNotEmpty(skippedTests)) {
                 printSkippedTestsSummary(skippedTests);
             }
             printPassedTests(runTestsResults);
-            if(shouldPrintCoverageData) {
+            if (shouldPrintCoverageData) {
                 printTestCoverageData(runTestsResults);
             }
+//            System.out.println("Took " + (System.currentTimeMillis() - time) / 1000f + " s.");
 
-            if(MapUtils.isNotEmpty(runTestsResults.getFailedTests())) {
+            if (isNotEmpty(runTestsResults.getFailedTests())) {
                 printBuildFailureSummary(projectPath, runTestsResults);
-                System.exit(1);
             } else {
                 printBuildSuccessSummary(contentPath, buildResults, runTestsResults);
-                System.exit(0);
             }
+
+            generateTestCaseReport(reportGeneratorService, runTestsResults);
+            System.exit(isNotEmpty(runTestsResults.getFailedTests()) ? 1 : 0);
+
         } catch (Throwable e) {
             log.error("");
             log.error("------------------------------------------------------------");
@@ -118,6 +131,25 @@ public class SlangBuildMain {
             log.error("------------------------------------------------------------");
             log.error("");
             System.exit(1);
+        }
+    }
+
+    private static void generateTestCaseReport(SlangTestCaseRunReportGeneratorService reportGeneratorService, IRunTestResults runTestsResults) throws IOException {
+        Path reportDirectoryPath = Paths.get(getProperty(TEST_CASE_REPORT_LOCATION));
+        if (!Files.exists(reportDirectoryPath)) {
+            Files.createDirectories(reportDirectoryPath);
+        }
+        reportGeneratorService.generateReport(runTestsResults, reportDirectoryPath.toString());
+    }
+
+    @SuppressWarnings("Duplicates")
+    private static void loadUserProperties() {
+        try {
+            UserConfigurationService userConfigurationService = new UserConfigurationServiceImpl();
+            userConfigurationService.loadUserProperties();
+        } catch (Exception ex) {
+            System.out.println("Error occurred while loading user configuration: " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 
@@ -139,21 +171,21 @@ public class SlangBuildMain {
         List<String> testSuites = new ArrayList<>();
         boolean runDefaultTests = true;
         List<String> testSuitesArg = ListUtils.defaultIfNull(appArgs.getTestSuites(), new ArrayList<String>());
-        for(String testSuite : testSuitesArg){
-            if(!testSuite.startsWith(NOT_TS)){
+        for (String testSuite : testSuitesArg) {
+            if (!testSuite.startsWith(NOT_TS)) {
                 testSuites.add(testSuite);
-            } else if(testSuite.equalsIgnoreCase(NOT_TS + DEFAULT_TESTS)){
+            } else if (testSuite.equalsIgnoreCase(NOT_TS + DEFAULT_TESTS)) {
                 runDefaultTests = false;
             }
         }
-        if(runDefaultTests && !testSuitesArg.contains(DEFAULT_TESTS)){
+        if (runDefaultTests && !testSuitesArg.contains(DEFAULT_TESTS)) {
             testSuites.add(DEFAULT_TESTS);
         }
         return testSuites;
     }
 
-    private static Boolean parseCoverageArg(ApplicationArgs appArgs){
-        Boolean shouldOutputCoverageData = false;
+    private static boolean parseCoverageArg(ApplicationArgs appArgs) {
+        boolean shouldOutputCoverageData = false;
 
         if (appArgs.shouldOutputCoverage() != null) {
             shouldOutputCoverageData = appArgs.shouldOutputCoverage();
@@ -161,7 +193,44 @@ public class SlangBuildMain {
         return shouldOutputCoverageData;
     }
 
-    private static void printBuildSuccessSummary(String contentPath, SlangBuildResults buildResults, RunTestsResults runTestsResults) {
+    private static boolean parseParallelTestsArg(ApplicationArgs appArgs) {
+        boolean runTestsInParallel = false;
+
+        if (appArgs.isParallel() != null) {
+            runTestsInParallel = appArgs.isParallel();
+        }
+        return runTestsInParallel;
+    }
+
+    private static String parseTestTimeout(ApplicationArgs appArgs) {
+        Map<String, String> dynamicArgs = appArgs.getDynamicParams();
+        return dynamicArgs.get(TEST_CASE_TIMEOUT_IN_MINUTES_KEY);
+    }
+
+    private static int parseThreadCountArg(ApplicationArgs appArgs, boolean isParallel) {
+        if (!isParallel) {
+            return 1;
+        } else {
+            int defaultThreadCount = Runtime.getRuntime().availableProcessors();
+            String threadCountErrorMessage = format("Thread count is misconfigured. The thread count value must be a positive integer less than or equal to %d. Using %d threads.", MAX_THREADS_TEST_RUNNER, defaultThreadCount);
+            try {
+                String sThreadCount = appArgs.getThreadCount();
+                if (sThreadCount != null) {
+                    Integer threadCount = Integer.parseInt(sThreadCount);
+                    if ((threadCount > 0) || (threadCount <= MAX_THREADS_TEST_RUNNER)) {
+                        return threadCount;
+                    } else {
+                        log.warn(threadCountErrorMessage);
+                    }
+                }
+            } catch (NumberFormatException nfEx) {
+                log.warn(threadCountErrorMessage);
+            }
+            return defaultThreadCount;
+        }
+    }
+
+    private static void printBuildSuccessSummary(String contentPath, SlangBuildResults buildResults, IRunTestResults runTestsResults) {
         log.info("");
         log.info("------------------------------------------------------------");
         log.info("BUILD SUCCESS");
@@ -172,26 +241,26 @@ public class SlangBuildMain {
         log.info("");
     }
 
-    private static void printNumberOfPassedAndSkippedTests(RunTestsResults runTestsResults) {
+    private static void printNumberOfPassedAndSkippedTests(IRunTestResults runTestsResults) {
         log.info(runTestsResults.getPassedTests().size() + " test cases passed");
         Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
-        if(skippedTests.size() > 0) {
+        if (skippedTests.size() > 0) {
             log.info(skippedTests.size() + " test cases skipped");
         }
     }
 
-    private static void printPassedTests(RunTestsResults runTestsResults) {
+    private static void printPassedTests(IRunTestResults runTestsResults) {
         if (runTestsResults.getPassedTests().size() > 0) {
             log.info("------------------------------------------------------------");
             log.info("Following " + runTestsResults.getPassedTests().size() + " test cases passed:");
-            for(Map.Entry<String, TestRun> passedTest : runTestsResults.getPassedTests().entrySet()) {
+            for (Map.Entry<String, TestRun> passedTest : runTestsResults.getPassedTests().entrySet()) {
                 String testCaseName = passedTest.getValue().getTestCase().getName();
                 log.info("- " + testCaseName.replaceAll("\n", "\n\t"));
             }
         }
     }
 
-    private static void printBuildFailureSummary(String projectPath, RunTestsResults runTestsResults) {
+    private static void printBuildFailureSummary(String projectPath, IRunTestResults runTestsResults) {
         printNumberOfPassedAndSkippedTests(runTestsResults);
         Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
         log.error("");
@@ -200,7 +269,7 @@ public class SlangBuildMain {
         log.error("------------------------------------------------------------");
         log.error("CloudSlang build for repository: \"" + projectPath + "\" failed due to failed tests.");
         log.error("Following " + failedTests.size() + " tests failed:");
-        for(Map.Entry<String, TestRun> failedTest : failedTests.entrySet()) {
+        for (Map.Entry<String, TestRun> failedTest : failedTests.entrySet()) {
             String failureMessage = failedTest.getValue().getMessage();
             log.error("- " + failureMessage.replaceAll("\n", "\n\t"));
         }
@@ -211,19 +280,19 @@ public class SlangBuildMain {
         log.info("");
         log.info("------------------------------------------------------------");
         log.info("Following " + skippedTests.size() + " tests were skipped:");
-        for(Map.Entry<String, TestRun> skippedTest : skippedTests.entrySet()){
+        for (Map.Entry<String, TestRun> skippedTest : skippedTests.entrySet()) {
             String message = skippedTest.getValue().getMessage();
             log.info("- " + message.replaceAll("\n", "\n\t"));
         }
     }
 
-    private static void printTestCoverageData(RunTestsResults runTestsResults){
+    private static void printTestCoverageData(IRunTestResults runTestsResults) {
         printCoveredExecutables(runTestsResults.getCoveredExecutables());
         printUncoveredExecutables(runTestsResults.getUncoveredExecutables());
         int coveredExecutablesSize = runTestsResults.getCoveredExecutables().size();
         int uncoveredExecutablesSize = runTestsResults.getUncoveredExecutables().size();
         int totalNumberOfExecutables = coveredExecutablesSize + uncoveredExecutablesSize;
-        Double coveragePercentage = new Double(coveredExecutablesSize)/new Double(totalNumberOfExecutables)*100;
+        Double coveragePercentage = new Double(coveredExecutablesSize) / new Double(totalNumberOfExecutables) * 100;
         log.info("");
         log.info("------------------------------------------------------------");
         log.info(coveragePercentage.intValue() + "% of the content has tests");
@@ -234,7 +303,7 @@ public class SlangBuildMain {
         log.info("");
         log.info("------------------------------------------------------------");
         log.info("Following " + coveredExecutables.size() + " executables have tests:");
-        for(String executable : coveredExecutables){
+        for (String executable : coveredExecutables) {
             log.info("- " + executable);
         }
     }
@@ -243,7 +312,7 @@ public class SlangBuildMain {
         log.info("");
         log.info("------------------------------------------------------------");
         log.info("Following " + uncoveredExecutables.size() + " executables do not have tests:");
-        for(String executable : uncoveredExecutables){
+        for (String executable : uncoveredExecutables) {
             log.info("- " + executable);
         }
     }
@@ -253,8 +322,8 @@ public class SlangBuildMain {
 
         if (args.getProjectRoot() != null) {
             repositoryPath = args.getProjectRoot();
-        // if only one parameter was passed, we treat it as the project root
-        // i.e. './cslang-builder some/path/to/project'
+            // if only one parameter was passed, we treat it as the project root
+            // i.e. './cslang-builder some/path/to/project'
         } else if (args.getParameters().size() == 1) {
             repositoryPath = args.getParameters().get(0);
         } else {
@@ -280,49 +349,6 @@ public class SlangBuildMain {
 
     private static void logEvent(ScoreEvent event) {
         log.debug(("Event received: " + event.getEventType() + " Data is: " + event.getData()));
-    }
-
-    private static void loadUserProperties() throws IOException {
-        String appHome = System.getProperty("app.home");
-        String propertyFilePath = appHome + File.separator + USER_CONFIG_FILEPATH;
-        File propertyFile = new File(propertyFilePath);
-        Properties rawProperties = new Properties();
-        if (propertyFile.isFile()) {
-            try (InputStream propertiesStream = new FileInputStream(propertyFilePath)) {
-                rawProperties.load(propertiesStream);
-            }
-        }
-        Set<Map.Entry<Object, Object>> propertyEntries = rawProperties.entrySet();
-        for (Map.Entry<Object, Object> property : propertyEntries) {
-            String key = (String) property.getKey();
-            String value = (String) property.getValue();
-            value = substitutePropertyReferences(value);
-            System.setProperty(key, value);
-        }
-    }
-
-    private static String substitutePropertyReferences(String value) {
-        Set<String> variableNames = findPropertyReferences(value);
-        return replacePropertyReferences(value, variableNames);
-    }
-
-    private static Set<String> findPropertyReferences(String value) {
-        Matcher mather = SUBSTITUTION_PATTERN.matcher(value);
-        Set<String> variableNames = new HashSet<>();
-        while (mather.find()) {
-            variableNames.add(mather.group(1));
-        }
-        return variableNames;
-    }
-
-    private static String replacePropertyReferences(String value, Set<String> variableNames) {
-        for (String variableName : variableNames) {
-            String variableValue = System.getProperty(variableName);
-            if (StringUtils.isNotEmpty(variableValue)) {
-                value = value.replace("${" + variableName + "}", variableValue);
-            }
-        }
-        return value;
     }
 
 }

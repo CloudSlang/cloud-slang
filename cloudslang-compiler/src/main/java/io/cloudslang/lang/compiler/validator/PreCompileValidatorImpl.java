@@ -7,6 +7,7 @@ import io.cloudslang.lang.compiler.modeller.TransformersHandler;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
+import io.cloudslang.lang.compiler.modeller.transformers.InOutTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.entities.bindings.Argument;
@@ -216,9 +217,17 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         Collection<InOutParam> inOutParams = new ArrayList<>();
         inOutParams.addAll(inputs);
 
-        String message = "Duplicate " + getMessagePart(element) + " found: " + element.getName();
+        String message = "Duplicate " + getMessagePart(element.getClass()) + " found: " + element.getName();
         validateNotDuplicateInOutParam(inOutParams, element, message, errors);
         return errors;
+    }
+
+    @Override
+    public void validateStringValue(String name, Serializable value, InOutTransformer transformer) {
+        if (value != null && !(value instanceof String)) {
+            throw new RuntimeException(StringUtils.capitalize(getMessagePart(transformer.getTransformedObjectsClass())) + ": '" + name
+                    + "' should have a String value.");
+        }
     }
 
     @Override
@@ -274,15 +283,26 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         }
     }
 
-    private String getMessagePart(InOutParam element) {
+    @Override
+    public void validateResultName(String resultName) {
+        validateKeywords(resultName);
+    }
+
+    private void validateKeywords(String resultName) {
+        if (SlangTextualKeys.ON_FAILURE_KEY.equalsIgnoreCase(resultName)) {
+            throw new RuntimeException("Result cannot be called '" + SlangTextualKeys.ON_FAILURE_KEY + "'.");
+        }
+    }
+
+    private String getMessagePart(Class aClass) {
         String messagePart = "";
-        if (element instanceof Input) {
+        if (aClass.equals(Input.class)) {
             messagePart = "input";
-        } else if (element instanceof Argument) {
+        } else if (aClass.equals(Argument.class)) {
             messagePart = "step input";
-        } else if (element instanceof Output) {
+        } else if (aClass.equals(Output.class)) {
             messagePart = "output / publish value";
-        } else if (element instanceof Result) {
+        } else if (aClass.equals(Result.class)) {
             messagePart = "result";
         }
         return messagePart;
@@ -300,7 +320,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
             List<RuntimeException> errors = result.getErrors();
             Set<String> reachableStepNames = new HashSet<>();
             Set<String> reachableResultNames = new HashSet<>();
-            Set<String> resultNames = getResultNames(compiledFlow);
+            List<String> resultNames = getResultNames(compiledFlow);
             Deque<Step> steps = compiledFlow.getWorkflow().getSteps();
 
             validateNavigation(
@@ -316,18 +336,10 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         }
     }
 
-    private Set<String> getResultNames(Flow compiledFlow) {
-        Set<String> resultNames = new HashSet<>();
-        for (Result result : compiledFlow.getResults()) {
-            resultNames.add(result.getName());
-        }
-        return resultNames;
-    }
-
     private void validateNavigation(
             Step currentStep,
             Deque<Step> steps,
-            Set<String> resultNames,
+            List<String> resultNames,
             Set<String> reachableStepNames,
             Set<String> reachableResultNames,
             List<RuntimeException> errors) {
@@ -385,7 +397,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
 
     private void validateResultsAreReachable(
             Set<String> reachableResultNames,
-            Set<String> resultNames,
+            List<String> resultNames,
             List<RuntimeException> errors) {
         Set<String> unreachableResultNames = new HashSet<>(resultNames);
         unreachableResultNames.removeAll(reachableResultNames);
@@ -437,5 +449,4 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
             inOutParams.add(element);
         }
     }
-
 }

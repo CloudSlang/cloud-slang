@@ -10,6 +10,9 @@ namespace: cloud
 operation:
   name: cloud_op
   inputs:
-    - cool_input: 1992
+    - cool_input: '1992'
   python_action:
     script: 'print "hello world"'
+  results:
+    - SUCCESS: ${1==1}
+    - FAILURE

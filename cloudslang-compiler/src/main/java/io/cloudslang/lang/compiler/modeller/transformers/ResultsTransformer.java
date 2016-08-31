@@ -19,6 +19,7 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.collections4.CollectionUtils;
@@ -107,18 +108,28 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
         return null;
     }
 
-    private Result createNoExpressionResult(String rawResult) {
-        return new Result(rawResult, null);
+    @Override
+    public Class<? extends InOutParam> getTransformedObjectsClass() {
+        return Result.class;
+    }
+
+    private Result createNoExpressionResult(String resultName) {
+        return createExpressionResult(resultName, null);
     }
 
     private Result createExpressionResult(String resultName, Serializable resultValue) {
-        Accumulator accumulator = extractFunctionData(resultValue);
-        return new Result(
-                resultName,
-                ValueFactory.create(resultValue),
-                accumulator.getFunctionDependencies(),
-                accumulator.getSystemPropertyDependencies()
-        );
+        preCompileValidator.validateResultName(resultName);
+        if (resultValue == null) {
+            return new Result(resultName, null);
+        } else {
+            Accumulator accumulator = extractFunctionData(resultValue);
+            return new Result(
+                    resultName,
+                    ValueFactory.create(resultValue),
+                    accumulator.getFunctionDependencies(),
+                    accumulator.getSystemPropertyDependencies()
+            );
+        }
     }
 }
 

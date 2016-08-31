@@ -26,5 +26,7 @@ flow:
     - step02:
         do:
           ops.test_op:
+        navigate:
+          - SUCCESS: SUCCESS
   outputs:
     - val_output: ${ input1 }

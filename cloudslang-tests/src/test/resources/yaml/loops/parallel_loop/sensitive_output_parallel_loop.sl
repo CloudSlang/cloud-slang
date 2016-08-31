@@ -13,16 +13,16 @@ imports:
 flow:
   name: sensitive_output_parallel_loop
   inputs:
-    - values: ${ range(1, 4) }
+    - values: "1,2,3"
   workflow:
     - print_values:
         parallel_loop:
-          for: value in values
+          for: value in values.split(",")
           do:
             ops.print_branch:
               - ID: ${ value }
         publish:
-          - name_list: ${ map(lambda x:str(x['name']), branches_context) }
+          - name_list: ${ str(map(lambda x:str(x['name']), branches_context)) }
           - number_from_last_branch: ${ branches_context[-1]['int_output'] }
           - from_sp: ${get_sp('loop.parallel.prop1')}
   outputs:

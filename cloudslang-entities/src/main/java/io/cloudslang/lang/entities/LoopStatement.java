@@ -9,12 +9,14 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities;
 
+import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * Date: 3/25/2015
@@ -23,11 +25,15 @@ import java.io.Serializable;
  */
 public abstract class LoopStatement implements Serializable {
     private final String expression;
+    private Set<ScriptFunction> functionDependencies;
+    private Set<String> systemPropertyDependencies;
 
-    public LoopStatement(String expression) {
+    public LoopStatement(String expression, Set<ScriptFunction> functionDependencies, Set<String> systemPropertyDependencies) {
         Validate.notBlank(expression, "loop expression cannot be empty");
 
         this.expression = expression;
+        this.functionDependencies = functionDependencies;
+        this.systemPropertyDependencies = systemPropertyDependencies;
     }
 
     /**
@@ -35,10 +41,19 @@ public abstract class LoopStatement implements Serializable {
      */
     protected LoopStatement() {
         expression = null;
+        functionDependencies = null;
     }
 
     public String getExpression() {
         return expression;
+    }
+
+    public Set<ScriptFunction> getFunctionDependencies() {
+        return functionDependencies;
+    }
+
+    public Set<String> getSystemPropertyDependencies() {
+        return systemPropertyDependencies;
     }
 
     @Override
