@@ -15,8 +15,7 @@ operation:
         default: 'default value'
   python_action:
     script: |
-      print text
-      print text2
+      pass
   results:
     - SUCCESS: ${ 1 == 1 }
     - FAILURE
