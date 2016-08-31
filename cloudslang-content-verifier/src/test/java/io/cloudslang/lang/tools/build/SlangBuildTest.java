@@ -10,10 +10,12 @@ package io.cloudslang.lang.tools.build;
 
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
+import io.cloudslang.lang.compiler.MetadataExtractor;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
+import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.bindings.Input;
@@ -22,8 +24,12 @@ import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
 import io.cloudslang.lang.tools.build.tester.TestRun;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
+import io.cloudslang.lang.tools.build.validation.StaticValidator;
+import io.cloudslang.lang.tools.build.validation.StaticValidatorImpl;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
 import io.cloudslang.score.api.ExecutionPlan;
+
+import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,13 +51,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.anySetOf;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 
 /*
@@ -61,15 +61,16 @@ import static org.mockito.Mockito.mock;
 @ContextConfiguration(classes = SlangBuildTest.Config.class)
 public class SlangBuildTest {
 
-    private static final Set<String> systemPropertyDependencies = Collections.emptySet();
-    private static final CompilationArtifact emptyCompilationArtifact =
+    private static final Set<String> SYSTEM_PROPERTY_DEPENDENCIES = Collections.emptySet();
+    private static final CompilationArtifact EMPTY_COMPILATION_ARTIFACT =
             new CompilationArtifact(
                     new ExecutionPlan(),
                     new HashMap<String, ExecutionPlan>(),
                     new ArrayList<Input>(),
                     new HashSet<String>()
             );
-    private static final Flow emptyExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, null, new HashSet<String>(), systemPropertyDependencies);
+    private static final Flow EMPTY_EXECUTABLE = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
+    private static final Metadata EMPTY_METADATA = new Metadata();
 
     @Autowired
     private SlangBuilder slangBuilder;
@@ -79,6 +80,12 @@ public class SlangBuildTest {
 
     @Autowired
     private ScoreCompiler scoreCompiler;
+
+    @Autowired
+    private MetadataExtractor metadataExtractor;
+
+    @Autowired
+    private StaticValidator staticValidator;
 
     @Autowired
     private SlangTestRunner slangTestRunner;
@@ -137,8 +144,10 @@ public class SlangBuildTest {
     @Test
     public void testCompileValidSlangFileNoDependencies() throws Exception {
         URI resource = getClass().getResource("/no_dependencies").toURI();
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(emptyExecutable);
-        Mockito.when(scoreCompiler.compile(emptyExecutable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
+        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
+        Mockito.when(metadataExtractor.extractMetadata(any(SlangSource.class))).thenReturn(EMPTY_METADATA);
+        Mockito.doNothing().when(staticValidator).validateSlangFile(any(File.class), eq(EMPTY_EXECUTABLE), eq(EMPTY_METADATA));
+        Mockito.when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
         Assert.assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
@@ -147,8 +156,8 @@ public class SlangBuildTest {
     @Test
     public void testCompileInvalidSlangFile() throws Exception {
         URI resource = getClass().getResource("/no_dependencies").toURI();
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(emptyExecutable);
-        Mockito.when(scoreCompiler.compile(emptyExecutable, new HashSet<Executable>())).thenThrow(new RuntimeException());
+        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
+        Mockito.when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenThrow(new RuntimeException());
         exception.expect(RuntimeException.class);
         slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null);
     }
@@ -156,8 +165,8 @@ public class SlangBuildTest {
     @Test
     public void testNotAllSlangFilesWereCompiled() throws Exception {
         URI resource = getClass().getResource("/no_dependencies").toURI();
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(emptyExecutable);
-        Mockito.when(scoreCompiler.compile(emptyExecutable, new HashSet<Executable>())).thenReturn(null);
+        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
+        Mockito.when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(null);
         exception.expect(RuntimeException.class);
         exception.expectMessage("1");
         exception.expectMessage("0");
@@ -171,9 +180,9 @@ public class SlangBuildTest {
         URI resource = getClass().getResource("/no_dependencies").toURI();
         Set<String> flowDependencies = new HashSet<>();
         flowDependencies.add("dep1");
-        Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, null, flowDependencies, systemPropertyDependencies);
+        Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, null, flowDependencies, SYSTEM_PROPERTY_DEPENDENCIES);
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
-        Mockito.when(scoreCompiler.compile(newExecutable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
+        Mockito.when(scoreCompiler.compile(newExecutable, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
         exception.expect(RuntimeException.class);
         exception.expectMessage("dependency");
         exception.expectMessage("dep1");
@@ -185,14 +194,14 @@ public class SlangBuildTest {
         URI resource = getClass().getResource("/dependencies").toURI();
         Set<String> flowDependencies = new HashSet<>();
         flowDependencies.add("dependencies.dependency");
-        Flow emptyFlowExecutable = new Flow(null, null, null, "dependencies", "empty_flow", null, null, null, flowDependencies, systemPropertyDependencies);
+        Flow emptyFlowExecutable = new Flow(null, null, null, "dependencies", "empty_flow", null, null, null, flowDependencies, SYSTEM_PROPERTY_DEPENDENCIES);
         Mockito.when(slangCompiler.preCompile(new SlangSource("", "empty_flow"))).thenReturn(emptyFlowExecutable);
-        Flow dependencyExecutable = new Flow(null, null, null, "dependencies", "dependency", null, null, null, new HashSet<String>(), systemPropertyDependencies);
+        Flow dependencyExecutable = new Flow(null, null, null, "dependencies", "dependency", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         Mockito.when(slangCompiler.preCompile(new SlangSource("", "dependency"))).thenReturn(dependencyExecutable);
         HashSet<Executable> dependencies = new HashSet<>();
         dependencies.add(dependencyExecutable);
-        Mockito.when(scoreCompiler.compile(emptyFlowExecutable, dependencies)).thenReturn(emptyCompilationArtifact);
-        Mockito.when(scoreCompiler.compile(dependencyExecutable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
+        Mockito.when(scoreCompiler.compile(emptyFlowExecutable, dependencies)).thenReturn(EMPTY_COMPILATION_ARTIFACT);
+        Mockito.when(scoreCompiler.compile(dependencyExecutable, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
         // properties file should be ignored
@@ -202,7 +211,7 @@ public class SlangBuildTest {
     @Test
     public void testInvalidNamespaceFlow() throws Exception {
         URI resource = getClass().getResource("/no_dependencies").toURI();
-        Flow newExecutable = new Flow(null, null, null, "wrong.namespace", "empty_flow", null, null, null, new HashSet<String>(), systemPropertyDependencies);
+        Flow newExecutable = new Flow(null, null, null, "wrong.namespace", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
         exception.expect(RuntimeException.class);
         exception.expectMessage("Namespace");
@@ -213,7 +222,7 @@ public class SlangBuildTest {
     @Test
     public void testInvalidFlowName() throws Exception {
         URI resource = getClass().getResource("/no_dependencies").toURI();
-        Flow newExecutable = new Flow(null, null, null, "no_dependencies", "wrong_name", null, null, null, new HashSet<String>(), systemPropertyDependencies);
+        Flow newExecutable = new Flow(null, null, null, "no_dependencies", "wrong_name", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
         exception.expect(RuntimeException.class);
         exception.expectMessage("Name");
@@ -222,21 +231,11 @@ public class SlangBuildTest {
     }
 
     @Test
-    public void testValidFlowNameAndNamespace() throws Exception {
-        URI resource = getClass().getResource("/no_dependencies").toURI();
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(emptyExecutable);
-        Mockito.when(scoreCompiler.compile(emptyExecutable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
-        SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null);
-        int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
-        Assert.assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
-    }
-
-    @Test
     public void testValidFlowNamespaceWithAllValidCharsTypes() throws Exception {
         URI resource = getClass().getResource("/no_dependencies-0123456789").toURI();
-        Flow executable = new Flow(null, null, null, "no_dependencies-0123456789", "empty_flow", null, null, null, new HashSet<String>(), systemPropertyDependencies);
+        Flow executable = new Flow(null, null, null, "no_dependencies-0123456789", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(executable);
-        Mockito.when(scoreCompiler.compile(executable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
+        Mockito.when(scoreCompiler.compile(executable, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
         Assert.assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
@@ -245,9 +244,9 @@ public class SlangBuildTest {
     @Test
     public void testValidFlowNamespaceCaseInsensitive() throws Exception {
         URI resource = getClass().getResource("/no_dependencies").toURI();
-        Flow executable = new Flow(null, null, null, "No_Dependencies", "empty_flow", null, null, null, new HashSet<String>(), systemPropertyDependencies);
+        Flow executable = new Flow(null, null, null, "No_Dependencies", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(executable);
-        Mockito.when(scoreCompiler.compile(executable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
+        Mockito.when(scoreCompiler.compile(executable, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
         Assert.assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
@@ -256,7 +255,7 @@ public class SlangBuildTest {
     @Test
     public void testNamespaceWithInvalidCharsFlow() throws Exception {
         URI resource = getClass().getResource("/invalid-chars$").toURI();
-        Flow newExecutable = new Flow(null, null, null, "invalid-chars$", "empty_flow", null, null, null, new HashSet<String>(), systemPropertyDependencies);
+        Flow newExecutable = new Flow(null, null, null, "invalid-chars$", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
         exception.expect(RuntimeException.class);
         exception.expectMessage("invalid-chars$");
@@ -268,8 +267,8 @@ public class SlangBuildTest {
     public void testCompileSlangFileAndRunTests() throws Exception {
         URI contentResource = getClass().getResource("/no_dependencies").toURI();
         URI testResource = getClass().getResource("/test/valid").toURI();
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(emptyExecutable);
-        Mockito.when(scoreCompiler.compile(emptyExecutable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
+        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
+        Mockito.when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
         RunTestsResults runTestsResults = new RunTestsResults();
         runTestsResults.addFailedTest("test1", new TestRun(new SlangTestCase("test1", "", null, null, null, null, null, null, null), "message"));
         Mockito.when(slangTestRunner.runAllTests(any(String.class), anyMap(), anyMap(), anyList())).thenReturn(runTestsResults);
@@ -284,8 +283,8 @@ public class SlangBuildTest {
     public void testTestCaseWithIncorrectTestFlowReference() throws Exception {
         URI contentResource = getClass().getResource("/no_dependencies").toURI();
         URI testResource = getClass().getResource("/test/valid").toURI();
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(emptyExecutable);
-        Mockito.when(scoreCompiler.compile(emptyExecutable, new HashSet<Executable>())).thenReturn(emptyCompilationArtifact);
+        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
+        Mockito.when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
         RunTestsResults runTestsResults = new RunTestsResults();
         runTestsResults.addFailedTest("test1", new TestRun(new SlangTestCase("test1", "", null, null, null, null, null, null, null), "message"));
         Mockito.when(
@@ -365,6 +364,16 @@ public class SlangBuildTest {
         @Bean
         public SlangSourceService slangSourceService() {
             return mock(SlangSourceService.class);
+        }
+
+        @Bean
+        public MetadataExtractor metadataExtractor() {
+            return mock(MetadataExtractor.class);
+        }
+
+        @Bean
+        public StaticValidator staticValidator() {
+            return mock(StaticValidatorImpl.class);
         }
     }
 }
