@@ -96,7 +96,7 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
-     public void testOperationWithWrongName() throws Exception {
+    public void testOperationWithWrongName() throws Exception {
         URI resource = getClass().getResource("/corrupted/wrong_name_operation.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
@@ -107,7 +107,7 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
-     public void testOperationWithWrongNameSLYAMLExtension() throws Exception {
+    public void testOperationWithWrongNameSLYAMLExtension() throws Exception {
         URI resource = getClass().getResource("/corrupted/wrong_name_operation.sl.yaml").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));

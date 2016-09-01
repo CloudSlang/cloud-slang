@@ -24,7 +24,8 @@ import org.junit.rules.ExpectedException;
 public class AbstractTransformerTest extends TransformersTestParent {
 
     @Rule
-    public ExpectedException exception = ExpectedException.none();;
+    public ExpectedException exception = ExpectedException.none();
+    ;
     private AbstractTransformer abstractTransformer;
     private Set<String> mandatoryKeys;
     private Set<String> optionalKeys;
@@ -34,8 +35,9 @@ public class AbstractTransformerTest extends TransformersTestParent {
     private String invalidKey1;
 
     @Before
-    public void setUp(){
-        abstractTransformer = new AbstractTransformer() {};
+    public void setUp() {
+        abstractTransformer = new AbstractTransformer() {
+        };
         mandatoryKey1 = "mandatory1";
         mandatoryKey2 = "mandatory2";
         optionalKey1 = "optional1";

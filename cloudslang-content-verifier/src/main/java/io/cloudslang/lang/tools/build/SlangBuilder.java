@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 /*
  * Created by stoneo on 2/9/2015.
  */
+
 /**
  * Verifies all files with extensions: .sl, .sl.yaml or .sl.yml in a given directory are valid
  */
@@ -46,7 +47,7 @@ public class SlangBuilder {
 
     private final static Logger log = Logger.getLogger(SlangBuilder.class);
 
-    public SlangBuildResults buildSlangContent(String projectPath, String contentPath, String testsPath, List<String> testSuits, boolean runTestsInParallel){
+    public SlangBuildResults buildSlangContent(String projectPath, String contentPath, String testsPath, List<String> testSuits, boolean runTestsInParallel) {
 
         String projectName = FilenameUtils.getName(projectPath);
         log.info("");
@@ -71,13 +72,14 @@ public class SlangBuilder {
 
     /**
      * Compiles all CloudSlang models
+     *
      * @return the number of valid CloudSlang files in the given directory
      */
-    private Map<String, CompilationArtifact> compileModels(Map<String, Executable> slangModels){
+    private Map<String, CompilationArtifact> compileModels(Map<String, Executable> slangModels) {
         Map<String, CompilationArtifact> compiledSlangFiles =
                 slangContentVerifier.compileSlangModels(slangModels);
 
-        if(compiledSlangFiles.size() != slangModels.size()){
+        if (compiledSlangFiles.size() != slangModels.size()) {
             throw new RuntimeException("Some Slang files were not compiled.\n" +
                     "Found: " + slangModels.size() + " slang models, but managed to compile only: "
                     + compiledSlangFiles.size());
@@ -88,7 +90,7 @@ public class SlangBuilder {
     }
 
     IRunTestResults runTests(Map<String, Executable> contentSlangModels,
-                                     String projectPath, String testsPath, List<String> testSuites, boolean runTestsInParallel){
+                             String projectPath, String testsPath, List<String> testSuites, boolean runTestsInParallel) {
         log.info("");
         log.info("--- compiling tests sources ---");
         // Compile all slang test flows under the test directory
@@ -124,35 +126,35 @@ public class SlangBuilder {
     }
 
     void addCoverageDataToRunTestsResults(Map<String, Executable> contentSlangModels, Map<String, Executable> testFlowModels,
-                                                  Map<String, SlangTestCase> testCases, IRunTestResults runTestsResults) {
+                                          Map<String, SlangTestCase> testCases, IRunTestResults runTestsResults) {
         Set<String> coveredContent = new HashSet<>();
         Set<String> uncoveredContent = new HashSet<>();
         // Add to the covered content set all the dependencies of the test flows
-        for (SlangTestCase testCase : testCases.values()){
+        for (SlangTestCase testCase : testCases.values()) {
             String testFlowPath = testCase.getTestFlowPath();
             Executable testFlowModel;
-            if(testFlowModels.containsKey(testFlowPath)) {
+            if (testFlowModels.containsKey(testFlowPath)) {
                 testFlowModel = testFlowModels.get(testFlowPath);
             } else {
                 testFlowModel = contentSlangModels.get(testFlowPath);
             }
-            if(testFlowModel == null){
+            if (testFlowModel == null) {
                 continue;
             }
             addAllDependenciesToCoveredContent(coveredContent, testFlowModel.getExecutableDependencies(), contentSlangModels);
         }
         Set<String> contentExecutablesNames = contentSlangModels.keySet();
         // Add to the covered content set also all the direct test case's test flows, which are part of the tested content
-        for(SlangTestCase testCase : testCases.values()){
+        for (SlangTestCase testCase : testCases.values()) {
             String testFlowPath = testCase.getTestFlowPath();
             // Add the test flow only if it part of the content, and not of the test flows
-            if(contentExecutablesNames.contains(testFlowPath)) {
+            if (contentExecutablesNames.contains(testFlowPath)) {
                 coveredContent.add(testFlowPath);
             }
         }
         // Create the uncovered content set from the content which does not appear in the covered set
-        for(String contentModelName : contentExecutablesNames){
-            if(!coveredContent.contains(contentModelName)){
+        for (String contentModelName : contentExecutablesNames) {
+            if (!coveredContent.contains(contentModelName)) {
                 uncoveredContent.add(contentModelName);
             }
         }
@@ -163,6 +165,7 @@ public class SlangBuilder {
 
     /**
      * Collect recursively all the dependencies of an executable
+     *
      * @param allDependencies
      * @param directDependencies
      * @param contentSlangModels
@@ -175,7 +178,7 @@ public class SlangBuilder {
             allDependencies.add(dependency);
             Executable executable = contentSlangModels.get(dependency);
             // Executable will be null in case of a dependecy which is a test flow (and not patr of the content)
-            if(executable != null) {
+            if (executable != null) {
                 addAllDependenciesToCoveredContent(allDependencies, executable.getExecutableDependencies(), contentSlangModels);
             }
         }

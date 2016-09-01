@@ -42,9 +42,9 @@ public class Flow extends Executable {
         return workflow;
     }
 
-	@Override
-	public String getType() {
-		return SlangTextualKeys.FLOW_TYPE;
-	}
+    @Override
+    public String getType() {
+        return SlangTextualKeys.FLOW_TYPE;
+    }
 
 }

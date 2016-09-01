@@ -17,7 +17,7 @@ import org.springframework.context.ApplicationContext;
 
 /**
  * Encryptor factory
- *
+ * <p>
  * Created by Ifat Gavish on 30/05/2016
  */
 public class EncryptionProvider {

@@ -16,7 +16,7 @@ import java.io.Serializable;
 
 /**
  * Simple InOutParam value
- *
+ * <p>
  * Created by Ifat Gavish on 19/04/2016
  */
 public class SimpleValue implements Value {

@@ -22,15 +22,15 @@ public class ApplicationArgs {
     @Parameter
     public List<String> parameters = new ArrayList<>();
 
-    @Parameter(names = { "--project-root", "-pr"},
+    @Parameter(names = {"--project-root", "-pr"},
             description = "Project root directory")
     public String projectRoot;
 
-    @Parameter(names = { "--content-root", "-cr"},
+    @Parameter(names = {"--content-root", "-cr"},
             description = "Content root directory")
     public String contentRoot;
 
-    @Parameter(names = { "--test-root", "-tr"},
+    @Parameter(names = {"--test-root", "-tr"},
             description = "Test root directory")
     public String testRoot;
 

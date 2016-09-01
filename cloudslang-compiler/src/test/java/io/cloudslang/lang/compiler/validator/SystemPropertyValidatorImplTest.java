@@ -169,7 +169,7 @@ public class SystemPropertyValidatorImplTest {
         expectException("Key[a.b.?] contains invalid characters.");
         systemPropertyValidator.validateKey(input);
     }
-    
+
     private void expectException(String message) {
         exception.expect(RuntimeException.class);
         exception.expectMessage(message);

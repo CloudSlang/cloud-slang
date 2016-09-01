@@ -45,14 +45,14 @@
     </activeProfiles>
 
     <!--<proxies>-->
-        <!--<proxy>-->
-            <!--<id>io-cloudslang-proxy</id>-->
-            <!--<active>false</active>-->
-            <!--<protocol>${maven.proxy.protocol}</protocol>-->
-            <!--<host>${maven.proxy.host}</host>-->
-            <!--<port>8080</port>-->
-            <!--<nonProxyHosts>${maven.proxy.non.proxy.hosts}</nonProxyHosts>-->
-        <!--</proxy>-->
+    <!--<proxy>-->
+    <!--<id>io-cloudslang-proxy</id>-->
+    <!--<active>false</active>-->
+    <!--<protocol>${maven.proxy.protocol}</protocol>-->
+    <!--<host>${maven.proxy.host}</host>-->
+    <!--<port>8080</port>-->
+    <!--<nonProxyHosts>${maven.proxy.non.proxy.hosts}</nonProxyHosts>-->
+    <!--</proxy>-->
     <!--</proxies>-->
 
 </settings>

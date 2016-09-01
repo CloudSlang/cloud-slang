@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
  * @since 8/23/2016
  */
 @Service
-public class SlangSourceServiceImpl implements SlangSourceService{
+public class SlangSourceServiceImpl implements SlangSourceService {
     @Override
     public Map<String, Value> convertInputFromMap(Map<String, ? extends Serializable> rawMap, String artifact) {
         Map<String, Value> result = new HashMap<>();

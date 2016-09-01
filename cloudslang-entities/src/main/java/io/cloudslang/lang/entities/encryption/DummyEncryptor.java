@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Dummy encryptor
- *
+ * <p>
  * Created by Ifat Gavish on 29/05/2016
  */
 @Component

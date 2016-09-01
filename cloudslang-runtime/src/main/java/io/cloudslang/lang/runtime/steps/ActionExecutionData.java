@@ -80,7 +80,7 @@ public class ActionExecutionData extends AbstractExecutionData {
         Map<String, SerializableSessionObject> serializableSessionData = runEnv.getSerializableDataMap();
         fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_ACTION_START, "Preparing to run action " + actionType,
                 runEnv.getExecutionPath().getParentPath(), LanguageEventData.StepType.ACTION, null,
-                Pair.of(LanguageEventData.CALL_ARGUMENTS, (Serializable)callArgumentsDeepCopy));
+                Pair.of(LanguageEventData.CALL_ARGUMENTS, (Serializable) callArgumentsDeepCopy));
         try {
             switch (actionType) {
                 case JAVA:
@@ -111,9 +111,9 @@ public class ActionExecutionData extends AbstractExecutionData {
 
     @SuppressWarnings("unchecked")
     private Map<String, Value> runJavaAction(Map<String, SerializableSessionObject> serializableSessionData,
-                                                    Map<String, Value> currentContext,
-                                                    Map<String, Object> nonSerializableExecutionData,
-                                                    String gav, String className, String methodName) {
+                                             Map<String, Value> currentContext,
+                                             Map<String, Object> nonSerializableExecutionData,
+                                             String gav, String className, String methodName) {
         Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService.execute(normalizeJavaGav(gav), className, methodName,
                 new CloudSlangJavaExecutionParameterProvider(serializableSessionData, createActionContext(currentContext), nonSerializableExecutionData));
         if (returnMap == null) {
@@ -142,6 +142,7 @@ public class ActionExecutionData extends AbstractExecutionData {
 
     /**
      * Checks whether need to append packaging type to the gav
+     *
      * @param gav
      * @param packagingType
      * @return
@@ -159,7 +160,7 @@ public class ActionExecutionData extends AbstractExecutionData {
     private Set<String> normalizePythonDependencies(Collection<String> dependencies) {
         Set<String> pythonDependencies = dependencies == null || dependencies.isEmpty() ? Sets.<String>newHashSet() : new HashSet<>(dependencies);
         Set<String> normalizedDependencies = new HashSet<>(pythonDependencies.size());
-        for (String dependency: pythonDependencies) {
+        for (String dependency : pythonDependencies) {
             normalizedDependencies.add(normalizeGav(dependency, PACKAGING_TYPE_ZIP));
         }
         return normalizedDependencies;

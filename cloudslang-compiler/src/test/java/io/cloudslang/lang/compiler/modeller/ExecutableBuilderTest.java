@@ -365,7 +365,7 @@ public class ExecutableBuilderTest {
         }
 
         @Bean
-        public TransformersHandler transformersHandler(){
+        public TransformersHandler transformersHandler() {
             return Mockito.mock(TransformersHandler.class);
         }
 
