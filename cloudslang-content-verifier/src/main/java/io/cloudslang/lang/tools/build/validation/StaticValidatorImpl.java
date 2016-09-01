@@ -6,6 +6,7 @@ import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang.Validate;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.regex.Pattern;
 /**
  * Created by bancl on 8/30/2016.
  */
+@Component
 public class StaticValidatorImpl implements StaticValidator {
 
     @Override

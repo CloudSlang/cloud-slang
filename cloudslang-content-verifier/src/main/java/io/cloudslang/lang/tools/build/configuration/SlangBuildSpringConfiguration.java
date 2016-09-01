@@ -16,6 +16,8 @@ import io.cloudslang.lang.tools.build.tester.parallel.report.SlangTestCaseRunRep
 import io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService;
 import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDispatchService;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
+import io.cloudslang.lang.tools.build.validation.StaticValidator;
+import io.cloudslang.lang.tools.build.validation.StaticValidatorImpl;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,6 +38,11 @@ public class SlangBuildSpringConfiguration {
     @Bean
     public SlangContentVerifier slangContentVerifier(){
         return new SlangContentVerifier();
+    }
+
+    @Bean
+    public StaticValidator staticValidator(){
+        return new StaticValidatorImpl();
     }
 
     @Bean

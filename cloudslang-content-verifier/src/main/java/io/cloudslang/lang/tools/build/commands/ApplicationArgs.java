@@ -51,7 +51,7 @@ public class ApplicationArgs {
             description = "Number of threads to be used in case of parallel test execution. Has no effect for sequential execution. By default, it is set to the number of processors.")
     public String threadCount;
 
-    @Parameter(names = {"--description", "-cov"},
+    @Parameter(names = {"--description", "-des"},
             description = "Whether or not to validate the inputs, outputs and results have description")
     public boolean validateDescription = false;
 
