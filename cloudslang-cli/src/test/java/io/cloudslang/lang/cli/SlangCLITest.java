@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
 public class SlangCLITest {
 
     static final CompilationArtifact emptyCompilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>(), new HashSet<String>());
-    private final static String[] CONTEXT_PATH = { "classpath*:/META-INF/spring/test-spring-shell-plugin.xml" };
+    private final static String[] CONTEXT_PATH = {"classpath*:/META-INF/spring/test-spring-shell-plugin.xml"};
     private final static String FLOW_PATH_BACKSLASH_INPUT = "C:\\\\basic_flow.yaml";
     private final static String FLOW_PATH_BACKSLASH = "C:\\basic_flow.yaml";
     private final static String DEPENDENCIES_PATH_BACKSLASH = "C:\\\\executables.dir1\\\\";
@@ -76,7 +76,7 @@ public class SlangCLITest {
         slangCLI.setEnvVar(false);
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunQuietlyValidFilePathAsync() throws Exception {
         slangCLI.setEnvVar(true);
 
@@ -95,7 +95,7 @@ public class SlangCLITest {
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunQuietlyValidFilePathSync() throws Exception {
         long executionID = 1;
 
@@ -112,7 +112,7 @@ public class SlangCLITest {
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunDebugValidFilePathSync() throws Exception {
         long executionID = 1;
 
@@ -128,7 +128,7 @@ public class SlangCLITest {
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunInvalidVerboseArgumentValidFilePathSync() throws Exception {
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --v invalidArgument");
 
@@ -190,14 +190,14 @@ public class SlangCLITest {
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunSyncWithInputsAndFileInputs() throws Exception {
         long executionID = 1;
         String inputsString = "--i input1=value1,input2=value2";
 
         Map<String, Value> inputsMap = new HashMap<>();
         inputsMap.put("input1", ValueFactory.create("value1"));
-        inputsMap.put("input2",  ValueFactory.create("value2"));
+        inputsMap.put("input2", ValueFactory.create("value2"));
 
         Map fileInputsMap = new HashMap<>();
         fileInputsMap.put("host", "localhost");
@@ -218,7 +218,7 @@ public class SlangCLITest {
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunAsyncWithInputsAndFileInputs() throws Exception {
         slangCLI.setEnvVar(true);
 
@@ -226,8 +226,8 @@ public class SlangCLITest {
         String inputsString = "--i input1=value1,input2=value2";
 
         Map<String, Value> inputsMap = new HashMap<>();
-        inputsMap.put("input1",  ValueFactory.create("value1"));
-        inputsMap.put("input2",  ValueFactory.create("value2"));
+        inputsMap.put("input1", ValueFactory.create("value1"));
+        inputsMap.put("input2", ValueFactory.create("value2"));
 
         Map fileInputsMap = new HashMap<>();
         fileInputsMap.put("host", "localhost");
@@ -269,7 +269,7 @@ public class SlangCLITest {
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunException() throws IOException {
         RuntimeException exception = new RuntimeException("exception message");
 
@@ -288,7 +288,7 @@ public class SlangCLITest {
         Assert.assertEquals("exception not as expected", exception, cr.getException());
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunAsyncWithInputs() throws Exception {
         //set async mode
         slangCLI.setEnvVar(true);
@@ -329,22 +329,22 @@ public class SlangCLITest {
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
 
-	@Test(timeout = DEFAULT_TIMEOUT)
-	public void testRunSyncWithSystemProperties() throws Exception {
-		long executionID = 1;
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void testRunSyncWithSystemProperties() throws Exception {
+        long executionID = 1;
 
-		when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
-		when(ScoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false))).thenReturn(executionID);
+        when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
+        when(ScoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false))).thenReturn(executionID);
 
-		CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --spf " + FLOW_PATH_BACKSLASH_INPUT);
+        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --spf " + FLOW_PATH_BACKSLASH_INPUT);
 
-		verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
-		verify(compilerHelperMock).loadSystemProperties(Collections.singletonList(FLOW_PATH_BACKSLASH));
-		verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false));
+        verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
+        verify(compilerHelperMock).loadSystemProperties(Collections.singletonList(FLOW_PATH_BACKSLASH));
+        verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false));
 
-		Assert.assertEquals("method threw exception", null, cr.getException());
-		Assert.assertEquals("success should be true", true, cr.isSuccess());
-	}
+        Assert.assertEquals("method threw exception", null, cr.getException());
+        Assert.assertEquals("success should be true", true, cr.isSuccess());
+    }
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testSetEnvVarTrue() throws Exception {
@@ -388,9 +388,9 @@ public class SlangCLITest {
         List<Input> inputsList = Lists.newArrayList(
                 new Input.InputBuilder("input1", "expression1").build(),
                 new Input.InputBuilder("input_override", "expression_override", false)
-                .withRequired(true)
-                .withPrivateInput(true)
-                .build(),
+                        .withRequired(true)
+                        .withPrivateInput(true)
+                        .build(),
                 new Input.InputBuilder("input2", "expression2").build()
         );
         CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), inputsList, null);

@@ -1,12 +1,12 @@
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 package io.cloudslang.lang.tools.build.tester.parse;
 
@@ -56,7 +56,7 @@ public class TestCasesYamlParser {
 
     public Map<String, SlangTestCase> parseTestCases(SlangSource source) {
 
-        if(StringUtils.isEmpty(source.getSource())){
+        if (StringUtils.isEmpty(source.getSource())) {
             log.info("No tests cases were found in: " + source.getFileName());
             return new HashMap<>();
         }
@@ -64,7 +64,7 @@ public class TestCasesYamlParser {
 
         try {
             @SuppressWarnings("unchecked") Map<String, Map> parsedTestCases = yaml.loadAs(source.getSource(), Map.class);
-            if (MapUtils.isEmpty(parsedTestCases)){
+            if (MapUtils.isEmpty(parsedTestCases)) {
                 log.info("No tests cases were found in: " + source.getFileName());
                 return new HashMap<>();
             }

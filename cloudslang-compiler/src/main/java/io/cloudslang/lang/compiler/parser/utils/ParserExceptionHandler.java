@@ -31,17 +31,15 @@ public class ParserExceptionHandler {
 
     public String getErrorMessage(Throwable e) {
         String errorMessage = e.getMessage();
-        if (e instanceof ScannerException && (errorMessage.startsWith(MAPPING_VALUES_NOT_ALLOWED_HERE_ERROR) || errorMessage.startsWith(SCANNING_A_SIMPLE_KEY_ERROR))){
+        if (e instanceof ScannerException && (errorMessage.startsWith(MAPPING_VALUES_NOT_ALLOWED_HERE_ERROR) || errorMessage.startsWith(SCANNING_A_SIMPLE_KEY_ERROR))) {
             errorMessage += KEY_VALUE_PAIR_MISSING_OR_INDENTATION_PROBLEM_MSG;
-        }
-        else if (e instanceof ConstructorException && errorMessage.startsWith(CANNOT_CREATE_PROPERTY_ERROR)){
-            if (errorMessage.contains(UNABLE_TO_FIND_PROPERTY_ERROR)){
+        } else if (e instanceof ConstructorException && errorMessage.startsWith(CANNOT_CREATE_PROPERTY_ERROR)) {
+            if (errorMessage.contains(UNABLE_TO_FIND_PROPERTY_ERROR)) {
                 //parse for undefined property name
                 String truncatedErrorMessage = errorMessage.substring(errorMessage.indexOf(TRUNCATION_BEGINNING), errorMessage.indexOf(TRUNCATION_END));
-                String undefinedProperty = truncatedErrorMessage.substring(truncatedErrorMessage.indexOf("\'")+1, truncatedErrorMessage.lastIndexOf("\'"));
+                String undefinedProperty = truncatedErrorMessage.substring(truncatedErrorMessage.indexOf("\'") + 1, truncatedErrorMessage.lastIndexOf("\'"));
                 errorMessage += "Property \'" + undefinedProperty + "\' is not supported by CloudSlang. Check that \'" + undefinedProperty + "\' is indented properly.";
-            }
-            else if (errorMessage.contains(MAP_CONSTRUCTOR_NOT_FOUND_ERROR)){
+            } else if (errorMessage.contains(MAP_CONSTRUCTOR_NOT_FOUND_ERROR)) {
                 errorMessage += KEY_VALUE_PAIR_MISSING_OR_INDENTATION_PROBLEM_MSG;
             }
         }

@@ -61,8 +61,8 @@ public class DependenciesHelper {
     }
 
     private Map<String, Executable> fetchFlowReferences(Executable executable,
-                                                                Collection<Executable> availableDependencies,
-                                                                Map<String, Executable> resolvedDependencies) {
+                                                        Collection<Executable> availableDependencies,
+                                                        Map<String, Executable> resolvedDependencies) {
         for (String refId : executable.getExecutableDependencies()) {
             //if it is already in the references we do nothing
             if (resolvedDependencies.get(refId) == null) {
@@ -152,9 +152,9 @@ public class DependenciesHelper {
     private Set<String> getSystemPropertiesFromInOutParam(List<? extends InOutParam> inOutParams) {
         Set<String> result = new HashSet<>();
         if (inOutParams != null) {
-            for(InOutParam inOutParam : inOutParams) {
+            for (InOutParam inOutParam : inOutParams) {
                 Set<String> systemPropertyDependencies = inOutParam.getSystemPropertyDependencies();
-                if(CollectionUtils.isNotEmpty(systemPropertyDependencies)) {
+                if (CollectionUtils.isNotEmpty(systemPropertyDependencies)) {
                     result.addAll(systemPropertyDependencies);
                 }
             }

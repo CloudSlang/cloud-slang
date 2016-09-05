@@ -20,5 +20,5 @@ public interface RuntimeConstants {
     String BRANCHES_CONTEXT_KEY = "branches_context";
     String SPLIT_ITEM_KEY = "splitItem";
     String BRANCH_RETURN_VALUES_KEY = "branchReturnValues";
-    
+
 }

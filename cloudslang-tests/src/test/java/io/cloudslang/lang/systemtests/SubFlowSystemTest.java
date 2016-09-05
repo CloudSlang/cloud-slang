@@ -44,7 +44,7 @@ public class SubFlowSystemTest extends SystemsTestsParent {
                 SlangSource.fromFile(operation4));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
         Assert.assertEquals("the system properties size is not as expected", 2, compilationArtifact.getSystemProperties().size());
-		Set<SystemProperty> systemProperties = new HashSet<>();
+        Set<SystemProperty> systemProperties = new HashSet<>();
         systemProperties.add(new SystemProperty("user.sys", "props.port", "22"));
         systemProperties.add(new SystemProperty("user.sys", "props.alla", "balla"));
         Map<String, Value> userInputs = new HashMap<>();
@@ -69,7 +69,7 @@ public class SubFlowSystemTest extends SystemsTestsParent {
         try {
             slang.compile(SlangSource.fromFile(resource), path);
             Assert.fail();
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             Assert.assertNotNull(e.getCause());
             Assert.assertTrue("got wrong error type: expected [" + IllegalArgumentException.class + "] got [" + e.getCause().getClass() + "]", e.getCause() instanceof IllegalArgumentException);
             String errorMessage = e.getCause().getMessage();
@@ -98,7 +98,7 @@ public class SubFlowSystemTest extends SystemsTestsParent {
         try {
             slang.compile(SlangSource.fromFile(resource), path);
             Assert.fail();
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             Assert.assertNotNull(e.getCause());
             Assert.assertTrue("got wrong error type: expected [" + IllegalArgumentException.class + "] got [" + e.getCause().getClass() + "]", e.getCause() instanceof IllegalArgumentException);
             String errorMessage = e.getCause().getMessage();

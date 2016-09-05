@@ -29,22 +29,22 @@ import org.springframework.context.annotation.Import;
 public class SlangBuildSpringConfiguration {
 
     @Bean
-    public SlangBuilder slangBuild(){
+    public SlangBuilder slangBuild() {
         return new SlangBuilder();
     }
 
     @Bean
-    public SlangContentVerifier slangContentVerifier(){
+    public SlangContentVerifier slangContentVerifier() {
         return new SlangContentVerifier();
     }
 
     @Bean
-    public SlangTestRunner slangTestRunner(){
+    public SlangTestRunner slangTestRunner() {
         return new SlangTestRunner();
     }
 
     @Bean
-    public TestCasesYamlParser parser(){
+    public TestCasesYamlParser parser() {
         return new TestCasesYamlParser();
     }
 

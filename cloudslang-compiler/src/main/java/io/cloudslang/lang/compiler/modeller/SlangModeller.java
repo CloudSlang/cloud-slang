@@ -23,6 +23,7 @@ public interface SlangModeller {
 
     /**
      * Pre-compile a Slang source into an {@link ExecutableModellingResult}
+     *
      * @param parsedSlang the {@link io.cloudslang.lang.compiler.parser.model.ParsedSlang} source
      * @return an {@link ExecutableModellingResult} object, containing an executable
      * which is either a flow or an operations in the file

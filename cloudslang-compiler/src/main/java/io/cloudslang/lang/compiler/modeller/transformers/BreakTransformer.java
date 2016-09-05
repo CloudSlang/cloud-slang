@@ -18,7 +18,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BreakTransformer implements Transformer<List<String>, List<String>>{
+public class BreakTransformer implements Transformer<List<String>, List<String>> {
 
     @Override
     public TransformModellingResult<List<String>> transform(List<String> rawData) {

@@ -36,8 +36,8 @@ import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * @author stoneo
- * @since 03/12/2014
  * @version $Id$
+ * @since 03/12/2014
  */
 public class SlangImpl implements Slang {
 
@@ -77,32 +77,32 @@ public class SlangImpl implements Slang {
         }
     }
 
-	@Override
-	public Long run(CompilationArtifact compilationArtifact, Map<String, Value> runInputs, Set<SystemProperty> systemProperties) {
-		Validate.notNull(compilationArtifact, "Compilation artifact can not be null");
-		if(runInputs == null) {
-			runInputs = new HashMap<>();
-		}
+    @Override
+    public Long run(CompilationArtifact compilationArtifact, Map<String, Value> runInputs, Set<SystemProperty> systemProperties) {
+        Validate.notNull(compilationArtifact, "Compilation artifact can not be null");
+        if (runInputs == null) {
+            runInputs = new HashMap<>();
+        }
 
-		Map<String, Serializable> executionContext = new HashMap<>();
-		RunEnvironment runEnv = new RunEnvironment(systemProperties);
-		executionContext.put(ScoreLangConstants.RUN_ENV, runEnv);
+        Map<String, Serializable> executionContext = new HashMap<>();
+        RunEnvironment runEnv = new RunEnvironment(systemProperties);
+        executionContext.put(ScoreLangConstants.RUN_ENV, runEnv);
 
-		executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable) runInputs);
-		TriggeringProperties triggeringProperties = TriggeringProperties.create(compilationArtifact.getExecutionPlan()).setDependencies(compilationArtifact.getDependencies())
-			.setContext(executionContext);
-		return score.trigger(triggeringProperties);
-	}
+        executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable) runInputs);
+        TriggeringProperties triggeringProperties = TriggeringProperties.create(compilationArtifact.getExecutionPlan()).setDependencies(compilationArtifact.getDependencies())
+                .setContext(executionContext);
+        return score.trigger(triggeringProperties);
+    }
 
-	@Override
-	public Long compileAndRun(
+    @Override
+    public Long compileAndRun(
             SlangSource source,
             Set<SlangSource> dependencies,
             Map<String, Value> runInputs,
             Set<SystemProperty> systemProperties) {
-		CompilationArtifact compilationArtifact = compile(source, dependencies);
-		return run(compilationArtifact, runInputs, systemProperties);
-	}
+        CompilationArtifact compilationArtifact = compile(source, dependencies);
+        return run(compilationArtifact, runInputs, systemProperties);
+    }
 
     @Override
     public void subscribeOnEvents(ScoreEventListener eventListener, Set<String> eventTypes) {

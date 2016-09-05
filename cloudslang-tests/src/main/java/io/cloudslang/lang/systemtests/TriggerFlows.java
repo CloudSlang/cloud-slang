@@ -69,7 +69,7 @@ public class TriggerFlows {
                 long executionIDFromEvent = (long) ((Map) event.getData()).get(LanguageEventData.EXECUTION_ID);
                 finishEventReceived = executionID == executionIDFromEvent;
             }
-            if (event.getEventType().equals(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION)){
+            if (event.getEventType().equals(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION)) {
                 LanguageEventData languageEvent = (LanguageEventData) event.getData();
                 throw new RuntimeException(languageEvent.getException());
             }

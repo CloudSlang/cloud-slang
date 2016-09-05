@@ -35,7 +35,7 @@ public class ForLoopCondition implements LoopCondition {
 
     public Value next() {
         Serializable serializable = loopToCurrentObject().next();
-        Value next = serializable instanceof Value ? (Value)serializable : ValueFactory.create(serializable);
+        Value next = serializable instanceof Value ? (Value) serializable : ValueFactory.create(serializable);
         index++;
         return next;
     }

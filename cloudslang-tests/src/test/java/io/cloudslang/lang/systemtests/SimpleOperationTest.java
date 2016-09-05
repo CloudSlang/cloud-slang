@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Simple operation test
- *
+ * <p>
  * Created by Ifat Gavish on 30/05/2016
  */
 @Component

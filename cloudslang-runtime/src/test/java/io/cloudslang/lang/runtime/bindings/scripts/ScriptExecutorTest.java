@@ -57,8 +57,8 @@ public class ScriptExecutorTest {
         scriptInputValues.put("input1", value1);
         scriptInputValues.put("input2", value2);
         Map<Object, PyObject> scriptOutputValues = new HashMap<>();
-        PyObject PyObjectValue1 = (PyObject)ValueFactory.createPyObjectValue("value1", false);
-        PyObject PyObjectValue2 = (PyObject)ValueFactory.createPyObjectValue("value2", false);
+        PyObject PyObjectValue1 = (PyObject) ValueFactory.createPyObjectValue("value1", false);
+        PyObject PyObjectValue2 = (PyObject) ValueFactory.createPyObjectValue("value2", false);
         scriptOutputValues.put("output1", PyObjectValue1);
         scriptOutputValues.put("output2", PyObjectValue2);
         when(execInterpreter.getLocals()).thenReturn(new PyStringMap(scriptOutputValues));
@@ -70,8 +70,8 @@ public class ScriptExecutorTest {
 
         Map<String, Value> outputs = scriptExecutor.executeScript(script, scriptInputValues);
 
-        verify(execInterpreter).set(eq("input1"), eq((Value)PyObjectValue1));
-        verify(execInterpreter).set(eq("input2"), eq((Value)PyObjectValue2));
+        verify(execInterpreter).set(eq("input1"), eq((Value) PyObjectValue1));
+        verify(execInterpreter).set(eq("input2"), eq((Value) PyObjectValue2));
         verify(execInterpreter).exec(script);
         Assert.assertEquals(expectedScriptOutputs, outputs);
     }
@@ -117,7 +117,7 @@ public class ScriptExecutorTest {
         }
 
         @Bean
-        public PythonExecutionEngine pythonExecutionEngine(){
+        public PythonExecutionEngine pythonExecutionEngine() {
             return new PythonExecutionCachedEngine() {
                 protected PythonExecutor createNewExecutor(Set<String> filePaths) {
                     return new PythonExecutor(filePaths) {

@@ -42,9 +42,9 @@ public class Operation extends Executable {
         return action;
     }
 
-	@Override
-	public String getType() {
-		return SlangTextualKeys.OPERATION_TYPE;
-	}
+    @Override
+    public String getType() {
+        return SlangTextualKeys.OPERATION_TYPE;
+    }
 
 }

@@ -59,7 +59,7 @@ public class MetadataHelperTest {
     }
 
     @Test
-     public void testPrettyPrint() throws Exception {
+    public void testPrettyPrint() throws Exception {
         URI flowFilePath = getClass().getResource("/metadata/metadata.sl").toURI();
         String metadataToPrint = metadataHelper.extractMetadata(new File(flowFilePath));
         Assert.assertNotNull(metadataToPrint);

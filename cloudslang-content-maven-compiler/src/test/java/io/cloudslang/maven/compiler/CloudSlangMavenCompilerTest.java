@@ -31,7 +31,7 @@ public class CloudSlangMavenCompilerTest extends AbstractCompilerTest {
         ArrayList messages = new ArrayList();
         CompilerConfiguration compilerConfiguration = getCompilerConfiguration();
 
-        Compiler compiler = (Compiler)this.lookup(Compiler.ROLE, this.getRoleHint());
+        Compiler compiler = (Compiler) this.lookup(Compiler.ROLE, this.getRoleHint());
         messages.addAll(compiler.performCompile(compilerConfiguration).getCompilerMessages());
 
         int numCompilerErrors = compilerErrorCount(messages);

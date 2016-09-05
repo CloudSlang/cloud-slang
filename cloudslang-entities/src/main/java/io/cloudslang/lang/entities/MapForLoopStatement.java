@@ -22,7 +22,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  *
  * @author Bonczidai Levente
  */
-public class MapForLoopStatement extends LoopStatement implements Serializable{
+public class MapForLoopStatement extends LoopStatement implements Serializable {
 
     private static final long serialVersionUID = -667210580560286978L;
 

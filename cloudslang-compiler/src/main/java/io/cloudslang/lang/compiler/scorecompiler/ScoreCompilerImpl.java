@@ -144,7 +144,7 @@ public class ScoreCompilerImpl implements ScoreCompiler {
      */
     private ExecutionPlan compileToExecutionPlan(Executable executable) {
 
-        switch (executable.getType()){
+        switch (executable.getType()) {
             case SlangTextualKeys.OPERATION_TYPE:
                 return executionPlanBuilder.createOperationExecutionPlan((Operation) executable);
             case SlangTextualKeys.FLOW_TYPE:
@@ -158,7 +158,7 @@ public class ScoreCompilerImpl implements ScoreCompiler {
 
     private Set<String> getSystemPropertiesFromExecutables(Collection<Executable> executables) {
         Set<String> result = new HashSet<>();
-        for(Executable executable : executables) {
+        for (Executable executable : executables) {
             result.addAll(executable.getSystemPropertyDependencies());
         }
         return result;

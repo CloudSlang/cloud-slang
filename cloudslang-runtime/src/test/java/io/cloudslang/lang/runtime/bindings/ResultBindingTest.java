@@ -1,13 +1,13 @@
 package io.cloudslang.lang.runtime.bindings;
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 
 import io.cloudslang.dependency.api.services.DependencyService;
@@ -49,7 +49,7 @@ public class ResultBindingTest {
 
     @SuppressWarnings("unchecked")
     private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
-    
+
     @Autowired
     private ResultsBinding resultsBinding;
 
@@ -84,7 +84,7 @@ public class ResultBindingTest {
     @Test
     public void testConstExprChooseSecondAResult() throws Exception {
         List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create("${ 1==2 }")),
-                                                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create("${ 1==1 }")));
+                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create("${ 1==1 }")));
         String result = resultsBinding.resolveResult(new HashMap<String, Value>(), new HashMap<String, Value>(), EMPTY_SET, results, null);
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, result);
     }
@@ -102,7 +102,7 @@ public class ResultBindingTest {
     @Test
     public void testBindInputSecondResult() throws Exception {
         List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create("${ int(status) == 1 }")),
-                                                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create("${ int(status) == -1 }")));
+                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create("${ int(status) == -1 }")));
         HashMap<String, Value> context = new HashMap<>();
         context.put("status", ValueFactory.create("-1"));
         String result = resultsBinding.resolveResult(new HashMap<String, Value>(), context, EMPTY_SET, results, null);
@@ -112,7 +112,7 @@ public class ResultBindingTest {
     @Test(expected = RuntimeException.class)
     public void testIllegalResultExpressionThrowsException() throws Exception {
         List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create("${ str(status) }")),
-                                                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create("${ int(status) == -1 }")));
+                createResult(ScoreLangConstants.FAILURE_RESULT, ValueFactory.create("${ int(status) == -1 }")));
         HashMap<String, Value> context = new HashMap<>();
         context.put("status", ValueFactory.create("-1"));
         resultsBinding.resolveResult(new HashMap<String, Value>(), context, EMPTY_SET, results, null);
@@ -121,7 +121,7 @@ public class ResultBindingTest {
     @Test
     public void testBindInputNullResult() throws Exception {
         List<Result> results = Arrays.asList(createResult(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create("${ int(status) == 1 }")),
-                                                createResult(ScoreLangConstants.FAILURE_RESULT, null));
+                createResult(ScoreLangConstants.FAILURE_RESULT, null));
         HashMap<String, Value> context = new HashMap<>();
         context.put("status", ValueFactory.create("-1"));
         String result = resultsBinding.resolveResult(new HashMap<String, Value>(), context, EMPTY_SET, results, null);
@@ -172,24 +172,24 @@ public class ResultBindingTest {
         resultsBinding.resolveResult(new HashMap<String, Value>(), context, EMPTY_SET, results, null);
     }
 
-    private Result createResult(String name, Value expression){
+    private Result createResult(String name, Value expression) {
         return new Result(name, expression);
     }
 
-    private Result createEmptyResult(String name){
+    private Result createEmptyResult(String name) {
         return new Result(name, null);
     }
 
     @Configuration
-    static class Config{
+    static class Config {
 
         @Bean
-        public ResultsBinding resultsBinding(){
+        public ResultsBinding resultsBinding() {
             return new ResultsBinding();
         }
 
         @Bean
-        public ScriptEvaluator scriptEvaluator(){
+        public ScriptEvaluator scriptEvaluator() {
             return new ScriptEvaluator();
         }
 
@@ -204,12 +204,12 @@ public class ResultBindingTest {
         }
 
         @Bean
-        public PythonRuntimeService pythonRuntimeService(){
+        public PythonRuntimeService pythonRuntimeService() {
             return new PythonRuntimeServiceImpl();
         }
 
         @Bean
-        public PythonExecutionEngine pythonExecutionEngine(){
+        public PythonExecutionEngine pythonExecutionEngine() {
             return new PythonExecutionCachedEngine();
         }
     }

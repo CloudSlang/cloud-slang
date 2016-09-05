@@ -46,8 +46,8 @@ import javax.annotation.PostConstruct;
 
 /**
  * @author lesant
- * @since 11/07/2014
  * @version $Id$
+ * @since 11/07/2014
  */
 @Component
 public class SlangCLI implements CommandMarker {
@@ -61,13 +61,13 @@ public class SlangCLI implements CommandMarker {
     public static final String RUN_HELP = "triggers a CloudSlang flow";
     public static final String FILE_HELP = "Path to filename. e.g. run --f c:/.../your_flow.sl";
     public static final String CLASSPATH_HELP = "Classpath, a directory comma separated list to flow dependencies, by default it will take flow file dir. " +
-                                                "e.g. run --f c:/.../your_flow.sl --i input1=root,input2=25 --cp c:/.../yaml";
+            "e.g. run --f c:/.../your_flow.sl --i input1=root,input2=25 --cp c:/.../yaml";
     public static final String INPUTS_HELP = "inputs in a key=value comma separated list. " +
-                                             "e.g. run --f c:/.../your_flow.sl --i input1=root,input2=25";
+            "e.g. run --f c:/.../your_flow.sl --i input1=root,input2=25";
     public static final String INPUT_FILE_HELP = "comma separated list of input file locations. " +
-                                                 "e.g. run --f C:/.../your_flow.sl --if C:/.../inputs.yaml";
+            "e.g. run --f C:/.../your_flow.sl --if C:/.../inputs.yaml";
     public static final String SYSTEM_PROPERTY_FILE_HELP = "comma separated list of system property file locations. " +
-                                                           "e.g. run --f c:/.../your_flow.sl --spf c:/.../yaml";
+            "e.g. run --f c:/.../your_flow.sl --spf c:/.../yaml";
     public static final String ENV_HELP = "Set environment var relevant to the CLI";
     public static final String SET_ASYNC_HELP = "set the async. e.g. env --setAsync true";
     public static final String CSLANG_VERSION_HELP = "Prints the CloudSlang version used";
@@ -110,10 +110,10 @@ public class SlangCLI implements CommandMarker {
         Map<String, Value> inputsFromFile = compilerHelper.loadInputsFromFile(inputFiles);
         Map<String, Value> mergedInputs = new HashMap<>();
 
-        if(MapUtils.isNotEmpty(inputsFromFile)){
+        if (MapUtils.isNotEmpty(inputsFromFile)) {
             mergedInputs.putAll(inputsFromFile);
         }
-        if(MapUtils.isNotEmpty(inputs)) {
+        if (MapUtils.isNotEmpty(inputs)) {
             mergedInputs.putAll(io.cloudslang.lang.entities.utils.MapUtils.convertMapNonSensitiveValues(inputs));
         }
         boolean quiet = QUIET.equalsIgnoreCase(verbose);
@@ -249,12 +249,12 @@ public class SlangCLI implements CommandMarker {
 
     private void logSlangEvent(ScoreEvent event) {
         LanguageEventData eventData = (LanguageEventData) event.getData();
-        logger.info(("[ " + eventData.getPath() + " - " + eventData.getStepName() +  " ] "
+        logger.info(("[ " + eventData.getPath() + " - " + eventData.getStepName() + " ] "
                 + event.getEventType() + " - Inputs: " + eventData.getInputs()
                 + ", Outputs: " + eventData.getOutputs()
                 + ", Result: " + eventData.getResult()
                 + ", Raw Data: " + event.getData()
-         ));
+        ));
     }
 
     private void logScoreEvent(ScoreEvent event) {

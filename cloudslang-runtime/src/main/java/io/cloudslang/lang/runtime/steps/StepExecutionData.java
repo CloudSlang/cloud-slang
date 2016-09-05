@@ -244,7 +244,7 @@ public class StepExecutionData extends AbstractExecutionData {
                                      ReturnValues returnValues) {
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
                 LanguageEventData.StepType.STEP, nodeName,
-                Pair.of(LanguageEventData.OUTPUTS, (Serializable)publishValues),
+                Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
                 Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
                 Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition));
     }
@@ -266,7 +266,7 @@ public class StepExecutionData extends AbstractExecutionData {
     }
 
     private void saveStepInputsResultContext(Context context, Map<String, Value> stepInputsResultContext) {
-        context.putLanguageVariable(ScoreLangConstants.STEP_INPUTS_RESULT_CONTEXT, ValueFactory.create((Serializable)stepInputsResultContext));
+        context.putLanguageVariable(ScoreLangConstants.STEP_INPUTS_RESULT_CONTEXT, ValueFactory.create((Serializable) stepInputsResultContext));
     }
 
     private Map<String, Value> removeStepInputsResultContext(Context context) {

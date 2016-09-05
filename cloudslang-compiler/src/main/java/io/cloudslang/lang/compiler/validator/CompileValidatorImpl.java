@@ -61,7 +61,7 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
         for (Map.Entry<Executable, SlangSource> entry : allAvailableExecutables.entrySet()) {
             Executable executable = entry.getKey();
             if (currentExecutable.getId().equalsIgnoreCase(executable.getId()) && !currentSource.equals(entry.getValue())) {
-                throw new RuntimeException("Duplicate executable found: '" + currentExecutable.getId() + "'" );
+                throw new RuntimeException("Duplicate executable found: '" + currentExecutable.getId() + "'");
             }
         }
     }
@@ -72,7 +72,7 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
             Set<Executable> verifiedExecutables,
             List<RuntimeException> errors) {
         //validate that all required & non private parameters with no default value of a reference are provided
-        if(!SlangTextualKeys.FLOW_TYPE.equals(executable.getType()) || verifiedExecutables.contains(executable)){
+        if (!SlangTextualKeys.FLOW_TYPE.equals(executable.getType()) || verifiedExecutables.contains(executable)) {
             return errors;
         }
         verifiedExecutables.add(executable);
@@ -110,7 +110,7 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
     private List<RuntimeException> validateBreakSection(Flow parentFlow, Step step, Executable reference) {
         List<RuntimeException> errors = new ArrayList<>();
         @SuppressWarnings("unchecked") // from BreakTransformer
-        List<String> breakValues = (List<String>) step.getPostStepActionData().get(SlangTextualKeys.BREAK_KEY);
+                List<String> breakValues = (List<String>) step.getPostStepActionData().get(SlangTextualKeys.BREAK_KEY);
 
         if (isForLoop(step, breakValues)) {
             List<String> referenceResultNames = getResultNames(reference);
@@ -157,14 +157,14 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
         if (CollectionUtils.isNotEmpty(refResultsWithoutMatchingNavigation)) {
             errors.add(new IllegalArgumentException(
                     getErrorMessagePrefix(flow, step) + " the results " + refResultsWithoutMatchingNavigation +
-                    " of its dependency '"+ refId + "' have no matching navigation."
+                            " of its dependency '" + refId + "' have no matching navigation."
             ));
         }
         if (CollectionUtils.isNotEmpty(stepNavigationKeysWithoutMatchingResult)) {
             errors.add(new IllegalArgumentException(
                     getErrorMessagePrefix(flow, step) + " the navigation keys " +
-                    stepNavigationKeysWithoutMatchingResult + " have no matching results in its dependency '" +
-                    refId + "'."
+                            stepNavigationKeysWithoutMatchingResult + " have no matching results in its dependency '" +
+                            refId + "'."
             ));
         }
     }

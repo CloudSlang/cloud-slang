@@ -57,7 +57,7 @@ public class ParallelLoopBinding {
                     flowContext.getImmutableViewOfVariables(), systemProperties, parallelLoopStatement.getFunctionDependencies());
             if (evalResult != null && evalResult.get() != null) {
                 //noinspection unchecked
-                for (Serializable serializable : ((List<Serializable>)evalResult.get())) {
+                for (Serializable serializable : ((List<Serializable>) evalResult.get())) {
                     Value value = ValueFactory.create(serializable, evalResult.isSensitive());
                     result.add(value);
                 }

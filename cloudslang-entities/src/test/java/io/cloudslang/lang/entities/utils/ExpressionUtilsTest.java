@@ -53,7 +53,7 @@ public class ExpressionUtilsTest {
 
     @Test
     public void testExtractExpressionWhitespacesAll() throws Exception {
-        Assert.assertEquals("var + 'abc'", extractExpression("     ${   var + 'abc'      }"              ));
+        Assert.assertEquals("var + 'abc'", extractExpression("     ${   var + 'abc'      }"));
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

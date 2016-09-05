@@ -662,5 +662,5 @@ public class SlangTestRunnerTest {
             this.eventTypes = eventTypes;
         }
     }
-    
+
 }

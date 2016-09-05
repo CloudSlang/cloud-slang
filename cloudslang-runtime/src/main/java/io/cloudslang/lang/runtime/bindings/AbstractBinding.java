@@ -9,7 +9,7 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 public class AbstractBinding {
     protected void validateStringValue(String errorMessagePrefix, Value value) {
         if (value != null && value.get() != null && !(value.get() instanceof String)) {
-            throw new RuntimeException( errorMessagePrefix + "' should have a String value.");
+            throw new RuntimeException(errorMessagePrefix + "' should have a String value.");
         }
     }
 }

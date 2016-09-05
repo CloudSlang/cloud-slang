@@ -48,19 +48,19 @@ public class SystemPropertyValidatorImpl implements SystemPropertyValidator {
 
     private void validateChars(String input, String type) {
         if (!namingPattern.matcher(input).matches()) {
-            throw new RuntimeException(type + "[" + input +"] contains invalid characters.");
+            throw new RuntimeException(type + "[" + input + "] contains invalid characters.");
         }
     }
 
     private void validateDelimiter(String input, String type) {
         if (input.startsWith(RegexConstants.SYSTEM_PROPERTY_DELIMITER)) {
             throw new RuntimeException(
-                    type + "[" + input +"] cannot start with system property delimiter[" + RegexConstants.SYSTEM_PROPERTY_DELIMITER + "]."
+                    type + "[" + input + "] cannot start with system property delimiter[" + RegexConstants.SYSTEM_PROPERTY_DELIMITER + "]."
             );
         }
         if (input.endsWith(RegexConstants.SYSTEM_PROPERTY_DELIMITER)) {
             throw new RuntimeException(
-                    type + "[" + input +"] cannot end with system property delimiter[" + RegexConstants.SYSTEM_PROPERTY_DELIMITER + "]."
+                    type + "[" + input + "] cannot end with system property delimiter[" + RegexConstants.SYSTEM_PROPERTY_DELIMITER + "]."
             );
         }
         String[] parts = input.split(RegexConstants.SYSTEM_PROPERTY_DELIMITER_ESCAPED);

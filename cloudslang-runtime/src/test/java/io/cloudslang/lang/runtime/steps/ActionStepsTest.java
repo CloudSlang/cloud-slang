@@ -1,12 +1,12 @@
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 package io.cloudslang.lang.runtime.steps;
 
@@ -71,9 +71,9 @@ public class ActionStepsTest {
 
     private static final long DEFAULT_TIMEOUT = 10000;
     private static final String NON_SERIALIZABLE_VARIABLE_NAME = "current_time";
-//    private static final String GAV_DEFAULT = "g:a:v";
+    //    private static final String GAV_DEFAULT = "g:a:v";
     private static final String GAV_DEFAULT = "";
-//    private static final ArrayList<String> DEPENDENCIES_DEFAULT = Lists.newArrayList("dep1", "dep2");
+    //    private static final ArrayList<String> DEPENDENCIES_DEFAULT = Lists.newArrayList("dep1", "dep2");
     private static final List<String> DEPENDENCIES_DEFAULT = Collections.emptyList();
     private Map<String, Object> nonSerializableExecutionData;
 
@@ -86,7 +86,7 @@ public class ActionStepsTest {
     @Autowired
     private ActionExecutionData actionSteps;
 
-	ExecutionRuntimeServices executionRuntimeServicesMock = mock(ExecutionRuntimeServices.class);
+    ExecutionRuntimeServices executionRuntimeServicesMock = mock(ExecutionRuntimeServices.class);
 
     @Before
     public void setUp() {
@@ -103,7 +103,7 @@ public class ActionStepsTest {
         runEnv.putCallArguments(initialCallArguments);
 
         //invoke doAction
-		actionSteps.doAction(
+        actionSteps.doAction(
                 executionRuntimeServicesMock,
                 runEnv,
                 nonSerializableExecutionData,
@@ -183,10 +183,10 @@ public class ActionStepsTest {
         Assert.assertFalse(events.isEmpty());
         ScoreEvent actionErrorEvent = null;
         ScoreEvent actionEndEvent = null;
-        for(ScoreEvent event:events){
-            if(event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_ERROR)){
+        for (ScoreEvent event : events) {
+            if (event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_ERROR)) {
                 actionErrorEvent = event;
-            } else if(event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_END)){
+            } else if (event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_END)) {
                 actionEndEvent = event;
             }
         }
@@ -224,15 +224,15 @@ public class ActionStepsTest {
 
         Assert.assertFalse(events.isEmpty());
         ScoreEvent eventActionStart = null;
-        for(ScoreEvent event:events){
-            if(event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_START)){
+        for (ScoreEvent event : events) {
+            if (event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_START)) {
                 eventActionStart = event;
                 break;
             }
         }
 
         Assert.assertNotNull(eventActionStart);
-        LanguageEventData data = (LanguageEventData)eventActionStart.getData();
+        LanguageEventData data = (LanguageEventData) eventActionStart.getData();
         Map<String, Serializable> actualCallArguments = data.getCallArguments();
         Assert.assertEquals(callArguments.size(), actualCallArguments.size());
         for (Map.Entry<String, Value> entry : callArguments.entrySet()) {
@@ -268,15 +268,15 @@ public class ActionStepsTest {
 
         Assert.assertFalse(events.isEmpty());
         ScoreEvent eventActionStart = null;
-        for(ScoreEvent event:events){
-            if(event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_START)){
+        for (ScoreEvent event : events) {
+            if (event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_START)) {
                 eventActionStart = event;
                 break;
             }
         }
 
         Assert.assertNotNull(eventActionStart);
-        LanguageEventData data = (LanguageEventData)eventActionStart.getData();
+        LanguageEventData data = (LanguageEventData) eventActionStart.getData();
         Map<String, Serializable> actualCallArguments = data.getCallArguments();
         Assert.assertEquals(callArguments.size(), actualCallArguments.size());
         for (Map.Entry<String, Value> entry : callArguments.entrySet()) {
@@ -309,10 +309,10 @@ public class ActionStepsTest {
         Assert.assertFalse(events.isEmpty());
         ScoreEvent actionErrorEvent = null;
         ScoreEvent actionEndEvent = null;
-        for(ScoreEvent event:events){
-            if(event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_ERROR)){
+        for (ScoreEvent event : events) {
+            if (event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_ERROR)) {
                 actionErrorEvent = event;
-            } else if(event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_END)){
+            } else if (event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_END)) {
                 actionEndEvent = event;
             }
         }
@@ -341,7 +341,7 @@ public class ActionStepsTest {
                     null,
                     DEPENDENCIES_DEFAULT
             );
-        } catch (RuntimeException ex){
+        } catch (RuntimeException ex) {
             exceptionThrown = true;
         }
 
@@ -352,10 +352,10 @@ public class ActionStepsTest {
         Assert.assertFalse(events.isEmpty());
         ScoreEvent actionErrorEvent = null;
         ScoreEvent actionEndEvent = null;
-        for(ScoreEvent event:events){
-            if(event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_ERROR)){
+        for (ScoreEvent event : events) {
+            if (event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_ERROR)) {
                 actionErrorEvent = event;
-            } else if(event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_END)){
+            } else if (event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_END)) {
                 actionEndEvent = event;
             }
         }
@@ -388,10 +388,10 @@ public class ActionStepsTest {
         Assert.assertFalse(events.isEmpty());
         ScoreEvent actionErrorEvent = null;
         ScoreEvent actionEndEvent = null;
-        for(ScoreEvent event:events){
-            if(event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_ERROR)){
+        for (ScoreEvent event : events) {
+            if (event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_ERROR)) {
                 actionErrorEvent = event;
-            } else if(event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_END)){
+            } else if (event.getEventType().equals(ScoreLangConstants.EVENT_ACTION_END)) {
                 actionEndEvent = event;
             }
         }
@@ -480,7 +480,7 @@ public class ActionStepsTest {
                 DEPENDENCIES_DEFAULT
         );
         ReturnValues returnValues = runEnv.removeReturnValues();
-        Assert.assertEquals(5, returnValues.getOutputs() .get("port").get());
+        Assert.assertEquals(5, returnValues.getOutputs().get("port").get());
     }
 
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
@@ -789,12 +789,12 @@ public class ActionStepsTest {
 
         String userPythonScript =
                 "valid = 1\n" +
-                "with open('" + fileAbsolutePathEscaped + "', 'r') as f:\n" +
-                "  f.close()\n\n" +
-                "import sys\n" +
-                "import io\n" +
-                "def a():\n" +
-                "  print 'a'\n\n";
+                        "with open('" + fileAbsolutePathEscaped + "', 'r') as f:\n" +
+                        "  f.close()\n\n" +
+                        "import sys\n" +
+                        "import io\n" +
+                        "def a():\n" +
+                        "  print 'a'\n\n";
 
         //invoke doAction
         actionSteps.doAction(
@@ -819,7 +819,7 @@ public class ActionStepsTest {
                 1, actualOutputs.size());
     }
 
-    @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
+    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void doActionPythonMissingInputsTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
@@ -860,8 +860,8 @@ public class ActionStepsTest {
 
         String userPythonScript =
                 "import io\n" +
-                "if 'StringIO' not in dir(io):\n" +
-                "  raise Exception('cant find StringIO')";
+                        "if 'StringIO' not in dir(io):\n" +
+                        "  raise Exception('cant find StringIO')";
 
         //invoke doAction
         actionSteps.doAction(
@@ -878,7 +878,7 @@ public class ActionStepsTest {
         );
     }
 
-    @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
+    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void doActionPythonInputTypeMismatchTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
@@ -905,7 +905,7 @@ public class ActionStepsTest {
         );
     }
 
-    @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
+    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void doActionPythonEmptyScript() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
@@ -929,7 +929,7 @@ public class ActionStepsTest {
         );
     }
 
-    @Test (expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
+    @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
     public void doActionPythonMissingScript() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
@@ -959,7 +959,7 @@ public class ActionStepsTest {
         runEnv.putCallArguments(new HashMap<String, Value>());
         String userPythonScript =
                 "from datetime import datetime\n" +
-                NON_SERIALIZABLE_VARIABLE_NAME + " = datetime.utcnow()";
+                        NON_SERIALIZABLE_VARIABLE_NAME + " = datetime.utcnow()";
 
         exception.expect(RuntimeException.class);
         exception.expectMessage(NON_SERIALIZABLE_VARIABLE_NAME);
@@ -993,12 +993,12 @@ public class ActionStepsTest {
         }
 
         @Bean
-        public PythonRuntimeService pythonRuntimeService(){
+        public PythonRuntimeService pythonRuntimeService() {
             return new PythonRuntimeServiceImpl();
         }
 
         @Bean
-        public PythonExecutionEngine pythonExecutionEngine(){
+        public PythonExecutionEngine pythonExecutionEngine() {
             return new PythonExecutionCachedEngine();
         }
 

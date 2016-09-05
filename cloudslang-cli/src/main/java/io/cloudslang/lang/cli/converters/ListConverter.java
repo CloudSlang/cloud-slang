@@ -31,8 +31,8 @@ public class ListConverter implements Converter<List<String>> {
     public List<String> convertFromText(String value, Class<?> targetType, String optionContext) {
         String[] values = StringUtils.commaDelimitedListToStringArray(value);
         List<String> list = new ArrayList<>();
-        for (String v : values){
-             list.add(v);
+        for (String v : values) {
+            list.add(v);
         }
         return list;
     }
@@ -41,7 +41,6 @@ public class ListConverter implements Converter<List<String>> {
     public boolean getAllPossibleValues(List<Completion> completions, Class<?> targetType, String existingData, String optionContext, MethodTarget target) {
         return true;
     }
-
 
 
 }

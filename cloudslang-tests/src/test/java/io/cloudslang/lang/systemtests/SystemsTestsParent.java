@@ -113,9 +113,9 @@ public abstract class SystemsTestsParent {
         return triggerFlows.runSync(compilationArtifact, userInputs, systemProperties);
     }
 
-	public RuntimeInformation triggerWithData(CompilationArtifact compilationArtifact, Map<String, Value> userInputs, Set<SystemProperty> systemProperties) {
-		return triggerFlows.runWithData(compilationArtifact, userInputs, systemProperties);
-	}
+    public RuntimeInformation triggerWithData(CompilationArtifact compilationArtifact, Map<String, Value> userInputs, Set<SystemProperty> systemProperties) {
+        return triggerFlows.runWithData(compilationArtifact, userInputs, systemProperties);
+    }
 
     protected List<String> getStepsOnly(Map<String, StepData> stepsData) {
         return select(stepsData.keySet(), startsWith("0."));

@@ -27,8 +27,8 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class LoopFlowsTest extends SystemsTestsParent{
-    
+public class LoopFlowsTest extends SystemsTestsParent {
+
     @SuppressWarnings("unchecked")
     private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
 
@@ -184,7 +184,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         personMap.put("jane", ValueFactory.create(2));
         personMap.put("peter", ValueFactory.create("three"));
         Map<String, Value> userInputs = new HashMap<>();
-        userInputs.put("person_map", ValueFactory.create((Serializable)personMap));
+        userInputs.put("person_map", ValueFactory.create((Serializable) personMap));
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
         verifyPersonMap(stepsData);
     }
