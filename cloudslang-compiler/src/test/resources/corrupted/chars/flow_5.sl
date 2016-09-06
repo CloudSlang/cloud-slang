@@ -8,7 +8,7 @@
 namespace: slang.sample.flows
 
 imports:
-  op$: user.ops
+  op: user.ops
 
 flow:
   name: flow_5

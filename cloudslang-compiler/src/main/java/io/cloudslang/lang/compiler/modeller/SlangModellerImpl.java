@@ -9,7 +9,10 @@
 package io.cloudslang.lang.compiler.modeller;
 
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.ParseModellingResult;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,22 +28,41 @@ public class SlangModellerImpl implements SlangModeller{
     private ExecutableBuilder executableBuilder;
 
     @Override
-    public ExecutableModellingResult createModel(ParsedSlang parsedSlang) {
+    public ExecutableModellingResult createModel(ParseModellingResult parseModellingResult) {
+        ParsedSlang parsedSlang = parseModellingResult.getParsedSlang();
         Validate.notNull(parsedSlang, "You must supply a parsed Slang source to compile");
 
         try {
             switch (parsedSlang.getType()) {
                 case OPERATION:
-                    return executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getOperation());
+                    return aggregateModellingWithParseResult(
+                            executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getOperation()),
+                            parseModellingResult
+                    );
                 case FLOW:
-                    return executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getFlow());
+                    return aggregateModellingWithParseResult(
+                            executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getFlow()),
+                            parseModellingResult
+                    );
                 case DECISION:
-                    return executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getDecision());
+                    return aggregateModellingWithParseResult(
+                            executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getDecision()),
+                            parseModellingResult
+                    );
                 default:
                     throw new RuntimeException("Source: " + parsedSlang.getName() + " is not of flow, operations or decision type");
             }
         } catch (Throwable ex){
             throw new RuntimeException("Error transforming source: " + parsedSlang.getName() + " to a Slang model. " + ex.getMessage(), ex);
         }
+    }
+
+    private ExecutableModellingResult aggregateModellingWithParseResult(
+            ExecutableModellingResult executableModellingResult,
+            ParseModellingResult parseModellingResult) {
+        List<RuntimeException> aggregatedExceptions = new ArrayList<>();
+        aggregatedExceptions.addAll(parseModellingResult.getErrors());
+        aggregatedExceptions.addAll(executableModellingResult.getErrors());
+        return new ExecutableModellingResult(executableModellingResult.getExecutable(), aggregatedExceptions);
     }
 }

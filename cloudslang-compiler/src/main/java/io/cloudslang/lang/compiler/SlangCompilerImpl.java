@@ -105,11 +105,7 @@ public class SlangCompilerImpl implements SlangCompiler {
         ParseModellingResult parseModellingResult = yamlParser.parseAndValidate(source);
 
         // Then we transform the parsed Slang source to a Slang model
-        ExecutableModellingResult executableModellingResult =
-                slangModeller.createModel(parseModellingResult.getParsedSlang());
-
-        executableModellingResult.getErrors().addAll(parseModellingResult.getErrors());
-        return executableModellingResult;
+        return slangModeller.createModel(parseModellingResult);
     }
 
     @Override
