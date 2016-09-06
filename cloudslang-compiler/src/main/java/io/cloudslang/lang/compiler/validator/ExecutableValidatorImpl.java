@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +39,7 @@ public class ExecutableValidatorImpl extends AbstractValidator implements Execut
             case OPERATION:
             case DECISION:
                 // namespace cannot be empty
-                if (org.apache.commons.lang3.StringUtils.isEmpty(namespace)) {
+                if (StringUtils.isEmpty(namespace)) {
                     throw new RuntimeException("For source[" + parsedSlang.getName() + "] namespace cannot be empty.");
                 } else {
                     validateNamespaceRules(namespace);
