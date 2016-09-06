@@ -1,3 +1,12 @@
+/*
+ * (c) Copyright 2016 Hewlett-Packard Enterprise Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ */
 package io.cloudslang.lang.tools.build.validation;
 
 import io.cloudslang.lang.compiler.modeller.model.Flow;
@@ -47,7 +56,7 @@ public class StaticValidatorTest {
         metadata.setInputs(inputMap);
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Input 'input3' is missing description.");
+        exception.expectMessage("Error for executable no_dependencies.empty_flow: Input 'input3' is missing description.");
         staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()), newExecutable, metadata, true);
     }
 
@@ -66,7 +75,7 @@ public class StaticValidatorTest {
         metadata.setOutputs(outputMap);
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Output 'output3' is missing description.");
+        exception.expectMessage("Error for executable no_dependencies.empty_flow: Output 'output3' is missing description.");
         staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
                 newExecutable, metadata, true);
     }
@@ -86,7 +95,7 @@ public class StaticValidatorTest {
         metadata.setResults(inputMap);
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Result 'result3' is missing description.");
+        exception.expectMessage("Error for executable no_dependencies.empty_flow: Result 'result3' is missing description.");
         staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
                 newExecutable, metadata, true);
     }
@@ -102,7 +111,7 @@ public class StaticValidatorTest {
         Metadata metadata = new Metadata();
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Results are missing description entirely.");
+        exception.expectMessage("Error for executable no_dependencies.empty_flow: Results are missing description entirely.");
         staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
                 newExecutable, metadata, true);
     }

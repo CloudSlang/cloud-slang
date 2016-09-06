@@ -179,7 +179,10 @@ public class SlangBuildTest {
         URI resource = getClass().getResource("/no_dependencies").toURI();
         Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenThrow(new RuntimeException());
         exception.expect(RuntimeException.class);
-        slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        Assert.assertNotNull(slangBuildResults.getCompilationExceptions());
+        Assert.assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
+        throw slangBuildResults.getCompilationExceptions().get(0);
     }
 
     @Test
@@ -190,7 +193,10 @@ public class SlangBuildTest {
         exception.expectMessage("1");
         exception.expectMessage("0");
         exception.expectMessage("compiled");
-        slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        Assert.assertNotNull(slangBuildResults.getCompilationExceptions());
+        Assert.assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
+        throw slangBuildResults.getCompilationExceptions().get(0);
     }
 
     @Test
@@ -270,7 +276,10 @@ public class SlangBuildTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Namespace");
         exception.expectMessage("wrong.namespace");
-        slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        Assert.assertNotNull(slangBuildResults.getCompilationExceptions());
+        Assert.assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
+        throw slangBuildResults.getCompilationExceptions().get(0);
     }
 
     @Test
@@ -283,7 +292,10 @@ public class SlangBuildTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Name");
         exception.expectMessage("wrong_name");
-        slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        Assert.assertNotNull(slangBuildResults.getCompilationExceptions());
+        Assert.assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
+        throw slangBuildResults.getCompilationExceptions().get(0);
     }
 
     @Test
@@ -318,7 +330,10 @@ public class SlangBuildTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("invalid-chars$");
         exception.expectMessage("alphanumeric");
-        slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        Assert.assertNotNull(slangBuildResults.getCompilationExceptions());
+        Assert.assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
+        throw slangBuildResults.getCompilationExceptions().get(0);
     }
 
     @Test

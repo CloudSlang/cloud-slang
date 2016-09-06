@@ -1,3 +1,12 @@
+/*
+ * (c) Copyright 2016 Hewlett-Packard Enterprise Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ */
 package io.cloudslang.lang.tools.build.validation;
 
 import io.cloudslang.lang.compiler.Extension;
@@ -32,9 +41,12 @@ public class StaticValidatorImpl implements StaticValidator {
     }
 
     private void validateExecutableAgainstMetadata(Executable executable, Metadata metadata) {
-        validateInOutParams(metadata.getInputs(), executable.getInputs(), "Input");
-        validateInOutParams(metadata.getOutputs(), executable.getOutputs(), "Output");
-        validateInOutParams(metadata.getResults(), executable.getResults(), "Result");
+        validateInOutParams(metadata.getInputs(), executable.getInputs(), "Error for executable " +
+                executable.getId() + ": Input");
+        validateInOutParams(metadata.getOutputs(), executable.getOutputs(), "Error for executable " +
+                executable.getId() + ": Output");
+        validateInOutParams(metadata.getResults(), executable.getResults(), "Error for executable " +
+                executable.getId() + ": Result");
     }
 
     private void validateInOutParams(Map<String, String> metadataInOutParams, List<? extends InOutParam> inOutParams, String errorMessagePrefix) {

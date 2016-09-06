@@ -101,9 +101,14 @@ public class SlangBuildMain {
         registerEventHandlers(slang);
 
 //        long time = System.currentTimeMillis();
+        List<RuntimeException> exceptions = new ArrayList<>();
         try {
             SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath,
                     testSuites, shouldValidateDescription, runTestsInParallel);
+            exceptions.addAll(ListUtils.emptyIfNull(buildResults.getCompilationExceptions()));
+            if (exceptions.size() > 0) {
+                throw exceptions.get(0);
+            }
             IRunTestResults runTestsResults = buildResults.getRunTestsResults();
             Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
 
@@ -126,14 +131,25 @@ public class SlangBuildMain {
             System.exit(isNotEmpty(runTestsResults.getFailedTests()) ? 1 : 0);
 
         } catch (Throwable e) {
-            log.error("");
-            log.error("------------------------------------------------------------");
-            log.error("Exception: " + e.getMessage() + "\n\nFAILURE: Validation of slang files for project: \""
-                    + projectPath + "\" failed.");
-            log.error("------------------------------------------------------------");
-            log.error("");
+            logErrors(e, exceptions, projectPath);
             System.exit(1);
         }
+    }
+
+    private static void logErrors(Throwable e, List<RuntimeException> exceptions, String projectPath) {
+        log.error("");
+        log.error("------------------------------------------------------------");
+        if (exceptions.size() > 0) {
+            for (RuntimeException runtimeException : exceptions) {
+                log.error("Exception: " + runtimeException.getMessage());
+            }
+        } else {
+            log.error("Exception: " + e.getMessage());
+        }
+        log.error("FAILURE: Validation of slang files for project: \""
+                + projectPath + "\" failed.");
+        log.error("------------------------------------------------------------");
+        log.error("");
     }
 
     private static void generateTestCaseReport(SlangTestCaseRunReportGeneratorService reportGeneratorService, IRunTestResults runTestsResults) throws IOException {

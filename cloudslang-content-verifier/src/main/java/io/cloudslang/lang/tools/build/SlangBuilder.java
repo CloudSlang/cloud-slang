@@ -15,8 +15,10 @@ import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
+import io.cloudslang.lang.tools.build.verifier.CompilationResult;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,8 +58,10 @@ public class SlangBuilder {
 
         log.info("");
         log.info("--- compiling sources ---");
-        Map<String, Executable> slangModels =
+        CompilationResult compilationResult =
                 slangContentVerifier.createModelsAndValidate(contentPath, shouldValidateDescription);
+        Map<String, Executable> slangModels = compilationResult.getResults();
+
 
         Map<String, CompilationArtifact> compiledSources = compileModels(slangModels);
 
@@ -65,8 +69,9 @@ public class SlangBuilder {
         if (StringUtils.isNotBlank(testsPath) && new File(testsPath).isDirectory()) {
             runTestsResults = runTests(slangModels, projectPath, testsPath, testSuits, runTestsInParallel);
         }
-
-        return new SlangBuildResults(compiledSources.size(), runTestsResults);
+        List<RuntimeException> exceptions = new ArrayList<>(runTestsResults.getExceptions());
+        exceptions.addAll(compilationResult.getExceptions());
+        return new SlangBuildResults(compiledSources.size(), runTestsResults, exceptions);
     }
 
     /**
@@ -92,7 +97,8 @@ public class SlangBuilder {
         log.info("");
         log.info("--- compiling tests sources ---");
         // Compile all slang test flows under the test directory
-        Map<String, Executable> testFlowModels = slangContentVerifier.createModelsAndValidate(testsPath, false);
+        CompilationResult compilationResult = slangContentVerifier.createModelsAndValidate(testsPath, false);
+        Map<String, Executable> testFlowModels = compilationResult.getResults();
         // Add also all of the slang models of the content in order to allow for compilation of the test flows
         Map<String, Executable> allTestedFlowModels = new HashMap<>(testFlowModels);
         allTestedFlowModels.putAll(contentSlangModels);
@@ -111,6 +117,7 @@ public class SlangBuilder {
         } else {
             runTestsResults = slangTestRunner.runAllTestsSequential(projectPath, testCases, compiledFlows, testSuites);
         }
+        runTestsResults.addExceptions(compilationResult.getExceptions());
         addCoverageDataToRunTestsResults(contentSlangModels, testFlowModels, testCases, runTestsResults);
         return runTestsResults;
     }

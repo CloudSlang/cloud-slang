@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Queue;
+import java.util.ArrayDeque;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
@@ -53,7 +53,7 @@ public class SlangContentVerifier {
     @Autowired
     private ScoreCompiler scoreCompiler;
 
-    public Map<String, Executable> createModelsAndValidate(String directoryPath, Boolean shouldValidateDescription) {
+    public CompilationResult createModelsAndValidate(String directoryPath, Boolean shouldValidateDescription) {
         Validate.notEmpty(directoryPath, "You must specify a path");
         Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" + directoryPath + "\' does not lead to a directory");
         Map<String, Executable> slangModels = new HashMap<>();
@@ -61,47 +61,28 @@ public class SlangContentVerifier {
         log.info("Start compiling all slang files under: " + directoryPath);
         log.info(slangFiles.size() + " .sl files were found");
         log.info("");
-        int ignoredExecutables = 0;
+        Queue<RuntimeException> exceptions = new ArrayDeque<>();
         for(File slangFile: slangFiles){
-            Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() + "\' must lead to a file");
-            SlangSource slangSource = SlangSource.fromFile(slangFile);
-            Executable sourceModel = getSourceModel(slangFile, slangSource);
-            Metadata sourceMetadata = getSourceMetadata(slangFile, slangSource);
-            if (sourceModel != null) {
-                staticValidator.validateSlangFile(slangFile, sourceModel, sourceMetadata, shouldValidateDescription);
-                slangModels.put(getUniqueName(sourceModel), sourceModel);
+            try {
+                Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() + "\' must lead to a file");
+                SlangSource slangSource = SlangSource.fromFile(slangFile);
+                Executable sourceModel = slangCompiler.preCompile(slangSource);
+                Metadata sourceMetadata = metadataExtractor.extractMetadata(slangSource);
+                if (sourceModel != null) {
+                    staticValidator.validateSlangFile(slangFile, sourceModel, sourceMetadata, shouldValidateDescription);
+                    slangModels.put(getUniqueName(sourceModel), sourceModel);
+                }
+            } catch (Exception e) {
+                String errorMessage = "Failed to extract metadata for file: \'" + slangFile.getAbsoluteFile() + "\'.\n" + e.getMessage();
+                log.error(errorMessage);
+                exceptions.add(new RuntimeException(errorMessage, e));
             }
         }
-        int numberOfExecutables = slangFiles.size() - ignoredExecutables;
-        if(numberOfExecutables != slangModels.size()){
-            throw new RuntimeException("Some Slang files were not pre-compiled.\nFound: " + numberOfExecutables +
-                    " executable files in path: \'" + directoryPath + "\' But managed to create slang models for only: " + slangModels.size());
+        if(slangFiles.size() != slangModels.size()){
+            exceptions.add(new RuntimeException("Some Slang files were not pre-compiled.\nFound: " + slangFiles.size() +
+                    " executable files in path: \'" + directoryPath + "\' But managed to create slang models for only: " + slangModels.size()));
         }
-        return slangModels;
-    }
-
-    private Metadata getSourceMetadata(File slangFile, SlangSource slangSource) {
-        Metadata sourceMetadata;
-        try {
-            sourceMetadata = metadataExtractor.extractMetadata(slangSource);
-        } catch (Exception e) {
-            String errorMessage = "Failed to extract metadata for file: \'" + slangFile.getAbsoluteFile() + "\'.\n" + e.getMessage();
-            log.error(errorMessage);
-            throw new RuntimeException(errorMessage, e);
-        }
-        return sourceMetadata;
-    }
-
-    private Executable getSourceModel(File slangFile, SlangSource slangSource) {
-        Executable sourceModel;
-        try {
-            sourceModel = slangCompiler.preCompile(slangSource);
-        } catch (Exception e) {
-            String errorMessage = "Failed creating Slang models for file: \'" + slangFile.getAbsoluteFile() + "\'.\n" + e.getMessage();
-            log.error(errorMessage);
-            throw new RuntimeException(errorMessage, e);
-        }
-        return sourceModel;
+        return new CompilationResult(slangModels, exceptions);
     }
 
     public Map<String, CompilationArtifact> compileSlangModels(Map<String, Executable> slangModels) {

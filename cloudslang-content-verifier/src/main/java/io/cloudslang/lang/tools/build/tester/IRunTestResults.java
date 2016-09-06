@@ -1,6 +1,7 @@
 package io.cloudslang.lang.tools.build.tester;
 
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 
@@ -11,6 +12,8 @@ public interface IRunTestResults {
     Map<String, TestRun> getFailedTests();
 
     Map<String, TestRun> getSkippedTests();
+
+    Queue<RuntimeException> getExceptions();
 
     Set<String> getCoveredExecutables();
 
@@ -26,4 +29,5 @@ public interface IRunTestResults {
 
     void addUncoveredExecutables(Set<String> uncoveredExecutables);
 
+    void addExceptions(Queue<RuntimeException> exceptions);
 }
