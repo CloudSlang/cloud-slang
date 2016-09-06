@@ -1,12 +1,12 @@
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.entities;
 
 import java.io.Serializable;
@@ -16,13 +16,13 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * @author moradi
- * @since 26/11/2014
  * @version $Id$
+ * @since 26/11/2014
  */
 public class ResultNavigation implements Serializable {
 
-	private long nextStepId;
-	private String presetResult;
+    private long nextStepId;
+    private String presetResult;
 
     public ResultNavigation(long nextStepId, String presetResult) {
         this.nextStepId = nextStepId;
@@ -32,15 +32,16 @@ public class ResultNavigation implements Serializable {
     /**
      * only here to satisfy serialization libraries
      */
-    private ResultNavigation(){}
+    private ResultNavigation() {
+    }
 
     public long getNextStepId() {
-		return this.nextStepId;
-	}
+        return this.nextStepId;
+    }
 
-	public String getPresetResult() {
-		return this.presetResult;
-	}
+    public String getPresetResult() {
+        return this.presetResult;
+    }
 
     @Override
     public String toString() {

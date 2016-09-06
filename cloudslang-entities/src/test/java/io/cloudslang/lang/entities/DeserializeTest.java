@@ -110,5 +110,6 @@ public class DeserializeTest {
 
     @Configuration
     @ComponentScan("io.cloudslang.lang.entities")
-    static class Config {}
+    static class Config {
+    }
 }

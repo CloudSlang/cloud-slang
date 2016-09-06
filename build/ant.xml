@@ -34,7 +34,7 @@
         <mkdir dir="${stable-cli_forward_slash}"/>
         <mkdir dir="${build}"/>
         <get src="https://github.com/CloudSlang/cloud-slang/releases/download/cloudslang-0.8.6/cslang-cli-with-content.zip"
-            dest="${stable-cli_forward_slash}/cslang-cli-with-content.zip" usetimestamp="true" verbose="true"/>
+             dest="${stable-cli_forward_slash}/cslang-cli-with-content.zip" usetimestamp="true" verbose="true"/>
         <unzip src="${stable-cli_forward_slash}/cslang-cli-with-content.zip" dest="${stable-cli_forward_slash}"/>
         <exec executable="/bin/bash" osfamily="unix">
             <arg value="${stable-cli_forward_slash}/cslang/bin/cslang"/>
@@ -59,7 +59,7 @@
         </exec>
     </target>
     <target name="clean"
-        description="clean up" >
+            description="clean up">
         <delete dir="${build}"/>
     </target>
 </project>

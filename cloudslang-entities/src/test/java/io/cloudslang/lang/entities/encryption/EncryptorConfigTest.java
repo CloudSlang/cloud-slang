@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Encryptor configuration test
- *
+ * <p>
  * Created by Ifat Gavish on 30/05/2016
  */
 @RunWith(SpringJUnit4ClassRunner.class)

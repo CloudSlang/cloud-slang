@@ -1,12 +1,12 @@
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.runtime.steps;
 
 import io.cloudslang.dependency.api.services.DependencyService;
@@ -66,10 +66,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
-* Date: 4/7/2015
-*
-* @author Bonczidai Levente
-*/
+ * Date: 4/7/2015
+ *
+ * @author Bonczidai Levente
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ParallelLoopStepsTest.Config.class)
 public class ParallelLoopStepsTest {
@@ -546,7 +546,7 @@ public class ParallelLoopStepsTest {
         }
 
         @Bean
-        public ScriptEvaluator scriptEvaluator(){
+        public ScriptEvaluator scriptEvaluator() {
             return mock(ScriptEvaluator.class);
         }
 
@@ -561,12 +561,12 @@ public class ParallelLoopStepsTest {
         }
 
         @Bean
-        public PythonRuntimeService pythonRuntimeService(){
+        public PythonRuntimeService pythonRuntimeService() {
             return new PythonRuntimeServiceImpl();
         }
 
         @Bean
-        public PythonExecutionEngine pythonExecutionEngine(){
+        public PythonExecutionEngine pythonExecutionEngine() {
             return new PythonExecutionCachedEngine();
         }
 

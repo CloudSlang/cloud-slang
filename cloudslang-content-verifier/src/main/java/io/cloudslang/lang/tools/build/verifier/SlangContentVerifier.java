@@ -78,7 +78,7 @@ public class SlangContentVerifier {
                 exceptions.add(new RuntimeException(errorMessage, e));
             }
         }
-        if(slangFiles.size() != slangModels.size()){
+        if (slangFiles.size() != slangModels.size()) {
             exceptions.add(new RuntimeException("Some Slang files were not pre-compiled.\nFound: " + slangFiles.size() +
                     " executable files in path: \'" + directoryPath + "\' But managed to create slang models for only: " + slangModels.size()));
         }
@@ -87,14 +87,14 @@ public class SlangContentVerifier {
 
     public Map<String, CompilationArtifact> compileSlangModels(Map<String, Executable> slangModels) {
         Map<String, CompilationArtifact> compiledArtifacts = new HashMap<>();
-        for(Map.Entry<String, Executable> slangModelEntry : slangModels.entrySet()) {
+        for (Map.Entry<String, Executable> slangModelEntry : slangModels.entrySet()) {
             Executable slangModel = slangModelEntry.getValue();
             try {
                 CompilationArtifact compiledSource = compiledArtifacts.get(getUniqueName(slangModel));
                 if (compiledSource == null) {
                     Set<Executable> dependenciesModels = getModelDependenciesRecursively(slangModels, slangModel);
                     compiledSource = scoreCompiler.compile(slangModel, dependenciesModels);
-                    if(compiledSource != null) {
+                    if (compiledSource != null) {
                         log.info("Compiled: \'" + slangModel.getNamespace() + "." + slangModel.getName() + "\' successfully");
                         compiledArtifacts.put(getUniqueName(slangModel), compiledSource);
                     } else {
@@ -114,7 +114,7 @@ public class SlangContentVerifier {
         Set<Executable> dependenciesModels = new HashSet<>();
         for (String dependencyName : slangModel.getExecutableDependencies()) {
             Executable dependency = slangModels.get(dependencyName);
-            if(dependency == null){
+            if (dependency == null) {
                 throw new RuntimeException("Failed compiling slang source: " + slangModel.getNamespace() + "." +
                         slangModel.getName() + ". Missing dependency: " + dependencyName);
             }

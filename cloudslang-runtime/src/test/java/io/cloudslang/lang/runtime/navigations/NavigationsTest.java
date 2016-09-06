@@ -1,12 +1,12 @@
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 package io.cloudslang.lang.runtime.navigations;
 
@@ -43,7 +43,7 @@ public class NavigationsTest {
         RunEnvironment runEnv = new RunEnvironment();
         Long nextStepId = 2L;
         runEnv.putNextStepPosition(nextStepId);
-        Long nextPosition = navigations.navigate(runEnv , new ExecutionRuntimeServices());
+        Long nextPosition = navigations.navigate(runEnv, new ExecutionRuntimeServices());
 
         Assert.assertEquals(nextStepId, nextPosition);
     }
@@ -57,15 +57,15 @@ public class NavigationsTest {
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         runtimeServices.setStepErrorKey("Error");
         try {
-            Long nextPosition = navigations.navigate(runEnv , runtimeServices);
+            Long nextPosition = navigations.navigate(runEnv, runtimeServices);
 
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             Collection<ScoreEvent> events = runtimeServices.getEvents();
 
             Assert.assertFalse(events.isEmpty());
             ScoreEvent stepErrorEvent = null;
-            for(ScoreEvent event:events){
-                if(event.getEventType().equals(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION)){
+            for (ScoreEvent event : events) {
+                if (event.getEventType().equals(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION)) {
                     stepErrorEvent = event;
                 }
             }
@@ -75,10 +75,10 @@ public class NavigationsTest {
     }
 
     @Configuration
-    static class Config{
+    static class Config {
 
         @Bean
-        public Navigations navigations(){
+        public Navigations navigations() {
             return new Navigations();
         }
 

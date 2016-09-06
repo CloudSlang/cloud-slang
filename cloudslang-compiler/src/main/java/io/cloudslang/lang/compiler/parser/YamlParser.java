@@ -1,13 +1,13 @@
 package io.cloudslang.lang.compiler.parser;
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 
 /*
@@ -36,7 +36,7 @@ public class YamlParser {
 
         try {
             ParsedSlang parsedSlang = yaml.loadAs(source.getSource(), ParsedSlang.class);
-            if(parsedSlang == null) {
+            if (parsedSlang == null) {
                 throw new RuntimeException("Source " + source.getFileName() + " does not contain YAML content");
             }
             parsedSlang.setName(source.getFileName());

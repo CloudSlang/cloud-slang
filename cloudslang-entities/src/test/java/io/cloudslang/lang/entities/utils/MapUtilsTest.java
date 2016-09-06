@@ -15,7 +15,7 @@ import org.junit.Test;
  */
 public class MapUtilsTest {
 
-    private static Map<String, Value> EMPTY_MAP =  Collections.emptyMap();
+    private static Map<String, Value> EMPTY_MAP = Collections.emptyMap();
     private static Map<String, Value> map1;
     private static Map<String, Value> map2;
     private static Map<String, Value> map_1_2;

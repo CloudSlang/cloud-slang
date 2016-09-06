@@ -57,7 +57,7 @@ public class SyncTriggerEventListenerTest {
     public void testExtractOutputs() throws InterruptedException {
         outputs.put(RETURN_RESULT, RESULT);
         outputs.put(ERROR_MESSAGE, StringUtils.EMPTY);
-        data.put(LanguageEventData.OUTPUTS, (Serializable)outputs);
+        data.put(LanguageEventData.OUTPUTS, (Serializable) outputs);
         data.put(LanguageEventData.PATH, EXEC_START_PATH);
 
         expectedFilteredOutputs = new HashMap<>();
@@ -72,7 +72,7 @@ public class SyncTriggerEventListenerTest {
     public void testExtractStepOutputs() throws InterruptedException {
         outputs.put(RETURN_RESULT, RESULT);
         outputs.put(ERROR_MESSAGE, StringUtils.EMPTY);
-        data.put(LanguageEventData.OUTPUTS, (Serializable)outputs);
+        data.put(LanguageEventData.OUTPUTS, (Serializable) outputs);
         data.put(LanguageEventData.STEP_TYPE, LanguageEventData.StepType.STEP);
 
         expectedFilteredOutputs = new HashMap<>();
@@ -86,7 +86,7 @@ public class SyncTriggerEventListenerTest {
     @Test
     public void testExtractStepOutputsEmpty() throws InterruptedException {
         outputs.put(ERROR_MESSAGE, StringUtils.EMPTY);
-        data.put(LanguageEventData.OUTPUTS, (Serializable)outputs);
+        data.put(LanguageEventData.OUTPUTS, (Serializable) outputs);
         data.put(LanguageEventData.STEP_TYPE, LanguageEventData.StepType.STEP);
 
         actualFilteredOutputs = SyncTriggerEventListener.extractNotEmptyOutputs(data);
@@ -97,7 +97,7 @@ public class SyncTriggerEventListenerTest {
     @Test
     public void testExtractOutputsAbbreviated() throws InterruptedException {
         outputs.put(RETURN_RESULT, LONG_RESULT);
-        data.put(LanguageEventData.OUTPUTS, (Serializable)outputs);
+        data.put(LanguageEventData.OUTPUTS, (Serializable) outputs);
         data.put(LanguageEventData.PATH, EXEC_START_PATH);
 
         expectedFilteredOutputs = new HashMap<>();
@@ -111,7 +111,7 @@ public class SyncTriggerEventListenerTest {
     @Test
     public void testExtractOutputsEmpty() throws InterruptedException {
         outputs.put(ERROR_MESSAGE, StringUtils.EMPTY);
-        data.put(LanguageEventData.OUTPUTS, (Serializable)outputs);
+        data.put(LanguageEventData.OUTPUTS, (Serializable) outputs);
         data.put(LanguageEventData.PATH, EXEC_START_PATH);
 
         actualFilteredOutputs = SyncTriggerEventListener.extractNotEmptyOutputs(data);
@@ -122,7 +122,7 @@ public class SyncTriggerEventListenerTest {
     @Test
     public void testExtractNotEmptyOutputs() throws InterruptedException {
         outputs.put(ERROR_MESSAGE, StringUtils.EMPTY);
-        data.put(LanguageEventData.OUTPUTS, (Serializable)outputs);
+        data.put(LanguageEventData.OUTPUTS, (Serializable) outputs);
         data.put(LanguageEventData.PATH, EXEC_START_PATH);
 
         actualFilteredOutputs = SyncTriggerEventListener.extractNotEmptyOutputs(data);

@@ -166,12 +166,12 @@ public class ScriptEvaluatorTest {
         }
 
         @Bean
-        public PythonExecutionEngine pythonExecutionEngine(){
+        public PythonExecutionEngine pythonExecutionEngine() {
             return new PythonExecutionCachedEngine() {
                 protected PythonExecutor createNewExecutor(Set<String> filePaths) {
                     return new PythonExecutor(filePaths) {
                         protected PythonInterpreter initInterpreter(Set<String> dependencies) {
-                            return  pythonInterpreter();
+                            return pythonInterpreter();
                         }
                     };
                 }

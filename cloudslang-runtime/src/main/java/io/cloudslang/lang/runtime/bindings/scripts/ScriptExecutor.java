@@ -31,11 +31,11 @@ public class ScriptExecutor extends ScriptProcessor {
     @Autowired
     private PythonRuntimeService pythonRuntimeService;
 
-    public Map<String, Value> executeScript (String script, Map<String, Value> callArguments) {
+    public Map<String, Value> executeScript(String script, Map<String, Value> callArguments) {
         return executeScript(Collections.<String>emptySet(), script, callArguments);
     }
 
-    public Map<String, Value> executeScript (Set<String> dependencies, String script, Map<String, Value> callArguments) {
+    public Map<String, Value> executeScript(Set<String> dependencies, String script, Map<String, Value> callArguments) {
         Map<String, Serializable> executionResult = pythonRuntimeService.exec(dependencies, script, createPythonContext(callArguments)).getExecutionResult();
         Map<String, Value> result = new HashMap<>();
         for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {

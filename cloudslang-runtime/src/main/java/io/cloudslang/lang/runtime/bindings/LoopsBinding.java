@@ -113,7 +113,7 @@ public class LoopsBinding {
                             ValueFactory.create(entry.getKey(), evalResult.isSensitive()),
                             ValueFactory.create(entry.getValue(), evalResult.isSensitive())));
                 }
-                evalResult = ValueFactory.create((Serializable)entriesAsValues);
+                evalResult = ValueFactory.create((Serializable) entriesAsValues);
             } else {
                 throw new RuntimeException(INVALID_MAP_EXPRESSION_MESSAGE + ": " + collectionExpression);
             }
@@ -131,7 +131,7 @@ public class LoopsBinding {
         return forLoopCondition;
     }
 
-    private ForLoopCondition createForLoopCondition(Value loopCollection){
+    private ForLoopCondition createForLoopCondition(Value loopCollection) {
         Iterable<Value> iterable;
 
         Serializable loopCollectionContent = loopCollection.get();

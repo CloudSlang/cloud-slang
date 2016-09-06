@@ -62,10 +62,10 @@ public class LoopsBindingTest {
         Context context = mock(Context.class);
         ArrayList<Value> result = Lists.newArrayList(ValueFactory.create(1));
         when(scriptEvaluator.evalExpr(
-                        anyString(),
-                        anyMapOf(String.class, Value.class),
-                        anySetOf(SystemProperty.class),
-                        anySetOf(ScriptFunction.class))
+                anyString(),
+                anyMapOf(String.class, Value.class),
+                anySetOf(SystemProperty.class),
+                anySetOf(ScriptFunction.class))
         ).thenReturn(ValueFactory.create(result));
         Value loopCondition = ValueFactory.create(new ForLoopCondition(result));
         when(context.getLanguageVariable(LoopCondition.LOOP_CONDITION_KEY)).thenReturn(null);
@@ -101,7 +101,8 @@ public class LoopsBindingTest {
 
     @Test(expected = RuntimeException.class)
     public void passingNullNodeNameThrowsException() throws Exception {
-        loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), mock(Context.class), EMPTY_SET, null);    }
+        loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), mock(Context.class), EMPTY_SET, null);
+    }
 
     @Test
     public void whenValueIsThereItWillBeReturned() throws Exception {

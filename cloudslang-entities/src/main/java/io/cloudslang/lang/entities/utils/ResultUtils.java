@@ -19,7 +19,8 @@ import org.apache.commons.lang3.Validate;
  */
 public final class ResultUtils {
 
-    private ResultUtils(){}
+    private ResultUtils() {
+    }
 
     public static boolean isDefaultResult(Result result) {
         Validate.notNull(result);
