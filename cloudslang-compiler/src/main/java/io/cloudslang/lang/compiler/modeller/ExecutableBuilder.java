@@ -364,7 +364,8 @@ public class ExecutableBuilder {
         while (iterator.hasNext()) {
             Map<String, Map<String, Object>> stepRawData = iterator.next();
             Map<String, Map<String, Object>> nextStepData = iterator.peek();
-            String stepName = getStepName(stepRawData, errors);
+            String stepName = getStepName(stepRawData);
+            validateStepName(stepName, errors);
             if (stepNames.contains(stepName) || onFailureStepNames.contains(stepName)) {
                 errors.add(new RuntimeException("Step name: \'" + stepName + "\' appears more than once in the workflow. " + UNIQUE_STEP_NAME_MESSAGE_SUFFIX));
             }
@@ -438,10 +439,12 @@ public class ExecutableBuilder {
         return new WorkflowModellingResult(new Workflow(steps), errors);
     }
 
-    private String getStepName(Map<String, Map<String, Object>> stepRawData, List<RuntimeException> errors) {
-        String stepName = null;
+    private String getStepName(Map<String, Map<String, Object>> stepRawData) {
+        return stepRawData.keySet().iterator().next();
+    }
+
+    private String validateStepName(String stepName, List<RuntimeException> errors) {
         try {
-            stepName = stepRawData.keySet().iterator().next();
             executableValidator.validateStepName(stepName);
         } catch (RuntimeException rex) {
             errors.add(rex);
