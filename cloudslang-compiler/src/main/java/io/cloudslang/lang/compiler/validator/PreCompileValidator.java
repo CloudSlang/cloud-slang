@@ -18,7 +18,7 @@ public interface PreCompileValidator {
 
     String validateExecutableRawData(ParsedSlang parsedSlang, Map<String, Object> executableRawData, List<RuntimeException> errors);
 
-    public List<Map<String, Map<String, Object>>> validateWorkflowRawData(ParsedSlang parsedSlang, Object workflowRawData, String executableName, List<RuntimeException> errors);
+    List<Map<String, Map<String, Object>>> validateWorkflowRawData(ParsedSlang parsedSlang, Object workflowRawData, String executableName, List<RuntimeException> errors);
 
     ExecutableModellingResult validateResult(ParsedSlang parsedSlang, String executableName, ExecutableModellingResult result);
 
@@ -44,8 +44,6 @@ public interface PreCompileValidator {
     void validateResultTypes(List<Result> results, String artifactName, List<RuntimeException> errors);
 
     void validateDefaultResult(List<Result> results, String artifactName, List<RuntimeException> errors);
-
-    void validateResultName(String resultName);
 
     void validateStringValue(String name, Serializable value, InOutTransformer transformer);
 }
