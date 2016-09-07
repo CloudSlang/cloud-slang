@@ -15,16 +15,20 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.File;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by stoneo on 3/15/2015.
@@ -49,7 +53,7 @@ public class SlangContentVerifier {
         log.info(slangFiles.size() + " .sl files were found");
         log.info("");
         int ignoredExecutables = 0;
-        for(File slangFile: slangFiles){
+        for (File slangFile : slangFiles) {
             Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() + "\' must lead to a file");
             Executable sourceModel;
             try {
@@ -65,7 +69,7 @@ public class SlangContentVerifier {
             }
         }
         int numberOfExecutables = slangFiles.size() - ignoredExecutables;
-        if(numberOfExecutables != slangModels.size()){
+        if (numberOfExecutables != slangModels.size()) {
             throw new RuntimeException("Some Slang files were not pre-compiled.\nFound: " + numberOfExecutables +
                     " executable files in path: \'" + directoryPath + "\' But managed to create slang models for only: " + slangModels.size());
         }
@@ -74,14 +78,14 @@ public class SlangContentVerifier {
 
     public Map<String, CompilationArtifact> compileSlangModels(Map<String, Executable> slangModels) {
         Map<String, CompilationArtifact> compiledArtifacts = new HashMap<>();
-        for(Map.Entry<String, Executable> slangModelEntry : slangModels.entrySet()) {
+        for (Map.Entry<String, Executable> slangModelEntry : slangModels.entrySet()) {
             Executable slangModel = slangModelEntry.getValue();
             try {
-                Set<Executable> dependenciesModels = getModelDependenciesRecursively(slangModels, slangModel);
                 CompilationArtifact compiledSource = compiledArtifacts.get(getUniqueName(slangModel));
                 if (compiledSource == null) {
+                    Set<Executable> dependenciesModels = getModelDependenciesRecursively(slangModels, slangModel);
                     compiledSource = scoreCompiler.compile(slangModel, dependenciesModels);
-                    if(compiledSource != null) {
+                    if (compiledSource != null) {
                         log.info("Compiled: \'" + slangModel.getNamespace() + "." + slangModel.getName() + "\' successfully");
                         compiledArtifacts.put(getUniqueName(slangModel), compiledSource);
                     } else {
@@ -101,7 +105,7 @@ public class SlangContentVerifier {
         Set<Executable> dependenciesModels = new HashSet<>();
         for (String dependencyName : slangModel.getExecutableDependencies()) {
             Executable dependency = slangModels.get(dependencyName);
-            if(dependency == null){
+            if (dependency == null) {
                 throw new RuntimeException("Failed compiling slang source: " + slangModel.getNamespace() + "." +
                         slangModel.getName() + ". Missing dependency: " + dependencyName);
             }
@@ -111,7 +115,7 @@ public class SlangContentVerifier {
         return dependenciesModels;
     }
 
-    private void staticSlangFileValidation(File slangFile, Executable executable){
+    private void staticSlangFileValidation(File slangFile, Executable executable) {
         validateNamespace(slangFile, executable);
 
         validateExecutableName(slangFile, executable);

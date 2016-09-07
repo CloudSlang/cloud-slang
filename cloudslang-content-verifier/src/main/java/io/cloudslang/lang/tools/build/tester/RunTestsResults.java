@@ -14,14 +14,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-/**
- * Created by stoneo on 4/27/2015.
- **/
 
 /**
  * Holds the results of running the content test cases
  */
-public class RunTestsResults {
+public class RunTestsResults implements IRunTestResults {
 
     private Map<String, TestRun> passedTests;
 
@@ -33,7 +30,7 @@ public class RunTestsResults {
 
     private TreeSet<String> uncoveredExecutables;
 
-    public RunTestsResults(){
+    public RunTestsResults() {
         this.passedTests = new HashMap<>();
         this.failedTests = new HashMap<>();
         this.skippedTests = new HashMap<>();
@@ -41,43 +38,53 @@ public class RunTestsResults {
         uncoveredExecutables = new TreeSet<>();
     }
 
+    @Override
     public Map<String, TestRun> getPassedTests() {
         return passedTests;
     }
 
+    @Override
     public Map<String, TestRun> getFailedTests() {
         return failedTests;
     }
 
+    @Override
     public Map<String, TestRun> getSkippedTests() {
         return skippedTests;
     }
 
+    @Override
     public Set<String> getCoveredExecutables() {
         return coveredExecutables;
     }
 
+    @Override
     public Set<String> getUncoveredExecutables() {
         return uncoveredExecutables;
     }
 
-    public void addPassedTest(String testCaseName, TestRun testRun){
+    @Override
+    public void addPassedTest(String testCaseName, TestRun testRun) {
         passedTests.put(testCaseName, testRun);
     }
 
-    public void addFailedTest(String testCaseName, TestRun testRun){
+    @Override
+    public void addFailedTest(String testCaseName, TestRun testRun) {
         failedTests.put(testCaseName, testRun);
     }
 
-    public void addSkippedTest(String testCaseName, TestRun testRun){
+    @Override
+    public void addSkippedTest(String testCaseName, TestRun testRun) {
         skippedTests.put(testCaseName, testRun);
     }
 
-    public void addCoveredExecutables(Set<String> coveredExecutables){
+    @Override
+    public void addCoveredExecutables(Set<String> coveredExecutables) {
         this.coveredExecutables.addAll(coveredExecutables);
     }
 
-    public void addUncoveredExecutables(Set<String> uncoveredExecutables){
+    @Override
+    public void addUncoveredExecutables(Set<String> uncoveredExecutables) {
         this.uncoveredExecutables.addAll(uncoveredExecutables);
     }
 

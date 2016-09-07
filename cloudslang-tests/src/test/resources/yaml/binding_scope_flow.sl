@@ -22,3 +22,7 @@ flow:
         publish:
           - step1_publish_1: ${ op_output_1 + ' ' + op_input_1 + ' ' + step_arg_1 }
           - step1_publish_2_conflict: ${ op_output_2 }
+        navigate:
+          - SUCCESS: SUCCESS
+  results:
+    - SUCCESS

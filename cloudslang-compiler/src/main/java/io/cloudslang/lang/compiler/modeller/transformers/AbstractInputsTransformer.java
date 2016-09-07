@@ -54,7 +54,7 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
                         "Please check all inputs are provided as a list and each input is preceded by a hyphen. " +
                         "Input \"" + iterator.next().getKey() + "\" is missing the hyphen.");
             }
-            if(entryValue == null){
+            if (entryValue == null) {
                 throw new RuntimeException("Could not transform Input : " + rawInput + " since it has a null value.\n\nMake sure a value is specified or that indentation is properly done.");
             }
             if (entryValue instanceof Map) {

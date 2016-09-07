@@ -9,29 +9,28 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.bindings;
 
+import io.cloudslang.lang.entities.LoopStatement;
+import io.cloudslang.lang.entities.MapForLoopStatement;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
-import org.apache.commons.lang3.Validate;
-import org.apache.log4j.Logger;
-import io.cloudslang.lang.entities.MapForLoopStatement;
-import io.cloudslang.lang.runtime.env.LoopCondition;
-import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ForLoopCondition;
+import io.cloudslang.lang.runtime.env.LoopCondition;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
 import org.python.core.PyObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.List;
-import java.util.Set;
-import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 import static io.cloudslang.lang.runtime.env.LoopCondition.LOOP_CONDITION_KEY;
 
@@ -114,7 +113,7 @@ public class LoopsBinding {
                             ValueFactory.create(entry.getKey(), evalResult.isSensitive()),
                             ValueFactory.create(entry.getValue(), evalResult.isSensitive())));
                 }
-                evalResult = ValueFactory.create((Serializable)entriesAsValues);
+                evalResult = ValueFactory.create((Serializable) entriesAsValues);
             } else {
                 throw new RuntimeException(INVALID_MAP_EXPRESSION_MESSAGE + ": " + collectionExpression);
             }
@@ -132,7 +131,7 @@ public class LoopsBinding {
         return forLoopCondition;
     }
 
-    private ForLoopCondition createForLoopCondition(Value loopCollection){
+    private ForLoopCondition createForLoopCondition(Value loopCollection) {
         Iterable<Value> iterable;
 
         Serializable loopCollectionContent = loopCollection.get();

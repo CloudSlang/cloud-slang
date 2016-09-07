@@ -2,20 +2,18 @@ package io.cloudslang.lang.entities.encryption;
 
 import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import io.cloudslang.lang.spi.encryption.Encryption;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -23,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Encryptor configuration test
- *
+ * <p>
  * Created by Ifat Gavish on 30/05/2016
  */
 @RunWith(SpringJUnit4ClassRunner.class)

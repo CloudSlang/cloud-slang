@@ -21,6 +21,13 @@ import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.score.events.ScoreEvent;
+import java.io.File;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
@@ -28,10 +35,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.io.File;
-import java.io.Serializable;
-import java.util.*;
 
 import static ch.lambdaj.Lambda.select;
 import static org.hamcrest.Matchers.startsWith;
@@ -110,9 +113,9 @@ public abstract class SystemsTestsParent {
         return triggerFlows.runSync(compilationArtifact, userInputs, systemProperties);
     }
 
-	public RuntimeInformation triggerWithData(CompilationArtifact compilationArtifact, Map<String, Value> userInputs, Set<SystemProperty> systemProperties) {
-		return triggerFlows.runWithData(compilationArtifact, userInputs, systemProperties);
-	}
+    public RuntimeInformation triggerWithData(CompilationArtifact compilationArtifact, Map<String, Value> userInputs, Set<SystemProperty> systemProperties) {
+        return triggerFlows.runWithData(compilationArtifact, userInputs, systemProperties);
+    }
 
     protected List<String> getStepsOnly(Map<String, StepData> stepsData) {
         return select(stepsData.keySet(), startsWith("0."));

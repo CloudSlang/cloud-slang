@@ -10,24 +10,22 @@
 
 package io.cloudslang.lang.cli.services;
 
-import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.ExecutionPath;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.StringUtils;
-import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.AnsiConsole;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.StringUtils;
+import org.fusesource.jansi.Ansi;
+import org.fusesource.jansi.AnsiConsole;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -36,7 +34,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  *
  * @author lesant
  */
-public class SyncTriggerEventListener implements ScoreEventListener{
+public class SyncTriggerEventListener implements ScoreEventListener {
     public static final String SLANG_STEP_ERROR_MSG = "Slang Error: ";
     public static final String SCORE_ERROR_EVENT_MSG = "Score Error Event:";
     public static final String FLOW_FINISHED_WITH_FAILURE_MSG = "Flow finished with failure";
@@ -51,9 +49,10 @@ public class SyncTriggerEventListener implements ScoreEventListener{
     private AtomicReference<String> errorMessage = new AtomicReference<>("");
     private boolean isDebugMode = false;
 
-    public void setIsDebugMode(boolean isDebugMode){
+    public void setIsDebugMode(boolean isDebugMode) {
         this.isDebugMode = isDebugMode;
     }
+
     public boolean isFlowFinished() {
         return flowFinished.get();
     }
@@ -64,17 +63,17 @@ public class SyncTriggerEventListener implements ScoreEventListener{
 
     @Override
     public synchronized void onEvent(ScoreEvent scoreEvent) throws InterruptedException {
-        @SuppressWarnings("unchecked") Map<String,Serializable> data = (Map<String,Serializable>)scoreEvent.getData();
-        switch (scoreEvent.getEventType()){
-            case EventConstants.SCORE_FINISHED_EVENT :
+        @SuppressWarnings("unchecked") Map<String, Serializable> data = (Map<String, Serializable>) scoreEvent.getData();
+        switch (scoreEvent.getEventType()) {
+            case EventConstants.SCORE_FINISHED_EVENT:
                 flowFinished.set(true);
                 break;
-            case EventConstants.SCORE_ERROR_EVENT :
+            case EventConstants.SCORE_ERROR_EVENT:
                 errorMessage.set(SCORE_ERROR_EVENT_MSG + data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " +
                         data.get(EventConstants.SCORE_ERROR_MSG));
                 break;
-            case EventConstants.SCORE_FAILURE_EVENT :
-                printWithColor(Ansi.Color.RED,FLOW_FINISHED_WITH_FAILURE_MSG);
+            case EventConstants.SCORE_FAILURE_EVENT:
+                printWithColor(Ansi.Color.RED, FLOW_FINISHED_WITH_FAILURE_MSG);
                 flowFinished.set(true);
                 break;
             case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
@@ -82,7 +81,7 @@ public class SyncTriggerEventListener implements ScoreEventListener{
                 break;
             case ScoreLangConstants.EVENT_STEP_START:
                 LanguageEventData eventData = (LanguageEventData) data;
-                if(eventData.getStepType() == LanguageEventData.StepType.STEP){
+                if (eventData.getStepType() == LanguageEventData.StepType.STEP) {
                     String stepName = eventData.getStepName();
                     String path = eventData.getPath();
                     int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
@@ -92,7 +91,7 @@ public class SyncTriggerEventListener implements ScoreEventListener{
                 break;
             case ScoreLangConstants.EVENT_OUTPUT_END:
                 // Step end case
-                if((data.get(LanguageEventData.STEP_TYPE)).equals((LanguageEventData.StepType.STEP))) {
+                if ((data.get(LanguageEventData.STEP_TYPE)).equals((LanguageEventData.StepType.STEP))) {
                     if (this.isDebugMode) {
                         Map<String, Serializable> stepOutputs = extractNotEmptyOutputs(data);
                         String path = ((LanguageEventData) data).getPath();
@@ -106,7 +105,7 @@ public class SyncTriggerEventListener implements ScoreEventListener{
                 }
 
                 // Flow end case
-                else if(data.containsKey(LanguageEventData.OUTPUTS)
+                else if (data.containsKey(LanguageEventData.OUTPUTS)
                         && data.containsKey(LanguageEventData.PATH)
                         && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
                     Map<String, Serializable> outputs = extractNotEmptyOutputs(data);
@@ -118,7 +117,7 @@ public class SyncTriggerEventListener implements ScoreEventListener{
                     }
                 }
                 break;
-            case ScoreLangConstants.EVENT_EXECUTION_FINISHED :
+            case ScoreLangConstants.EVENT_EXECUTION_FINISHED:
                 flowFinished.set(true);
                 printFinishEvent(data);
                 break;
@@ -135,7 +134,7 @@ public class SyncTriggerEventListener implements ScoreEventListener{
             while (iterator.hasNext()) {
                 Map.Entry<String, Serializable> output = iterator.next();
 
-                if (output.getValue() != null && !(StringUtils.isEmpty(output.getValue().toString()))){
+                if (output.getValue() != null && !(StringUtils.isEmpty(output.getValue().toString()))) {
                     extractedOutputs.put(output.getKey(), StringUtils.abbreviate(output.getValue().toString(), 0, OUTPUT_VALUE_LIMIT));
                 }
             }
@@ -146,8 +145,8 @@ public class SyncTriggerEventListener implements ScoreEventListener{
 
 
     private void printFinishEvent(Map<String, Serializable> data) {
-        String flowResult = (String)data.get(LanguageEventData.RESULT);
-        String flowName = (String)data.get(LanguageEventData.STEP_NAME);
+        String flowResult = (String) data.get(LanguageEventData.RESULT);
+        String flowName = (String) data.get(LanguageEventData.STEP_NAME);
         printForOperationOrFlow(data, Ansi.Color.CYAN, "Operation: " + flowName + FINISHED_WITH_RESULT + flowResult,
                 "Flow: " + flowName + FINISHED_WITH_RESULT + flowResult);
     }
@@ -160,7 +159,7 @@ public class SyncTriggerEventListener implements ScoreEventListener{
         }
     }
 
-    private void printWithColor(Ansi.Color color, String msg){
+    private void printWithColor(Ansi.Color color, String msg) {
         AnsiConsole.out().print(ansi().fg(color).a(msg).newline());
         AnsiConsole.out().print(ansi().fg(Ansi.Color.WHITE));
 

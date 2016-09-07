@@ -41,7 +41,7 @@ public class ForTransformerTest extends TransformersTestParent {
     @Test
     public void testValidStatement() throws Exception {
         LoopStatement statement = transformer.transform("x in collection").getTransformedData();
-        ListForLoopStatement listForLoopStatement  = validateListForLoopStatement(statement);
+        ListForLoopStatement listForLoopStatement = validateListForLoopStatement(statement);
         Assert.assertEquals("x", listForLoopStatement.getVarName());
         Assert.assertEquals("collection", listForLoopStatement.getExpression());
     }
@@ -49,7 +49,7 @@ public class ForTransformerTest extends TransformersTestParent {
     @Test
     public void testValidStatementWithSpaces() throws Exception {
         LoopStatement statement = transformer.transform("x in range(0, 9)").getTransformedData();
-        ListForLoopStatement listForLoopStatement  = validateListForLoopStatement(statement);
+        ListForLoopStatement listForLoopStatement = validateListForLoopStatement(statement);
         Assert.assertEquals("x", listForLoopStatement.getVarName());
         Assert.assertEquals("range(0, 9)", listForLoopStatement.getExpression());
     }
@@ -57,7 +57,7 @@ public class ForTransformerTest extends TransformersTestParent {
     @Test
     public void testValidStatementAndTrim() throws Exception {
         LoopStatement statement = transformer.transform(" min   in  collection  ").getTransformedData();
-        ListForLoopStatement listForLoopStatement  = validateListForLoopStatement(statement);
+        ListForLoopStatement listForLoopStatement = validateListForLoopStatement(statement);
         Assert.assertEquals("min", listForLoopStatement.getVarName());
         Assert.assertEquals("collection", listForLoopStatement.getExpression());
     }
@@ -66,7 +66,7 @@ public class ForTransformerTest extends TransformersTestParent {
     public void testNoVarName() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Argument[] violates character rules");
-        transformAndThrowFirstException(transformer, "  in  collection" );
+        transformAndThrowFirstException(transformer, "  in  collection");
     }
 
     @Test
@@ -86,7 +86,7 @@ public class ForTransformerTest extends TransformersTestParent {
     @Test
     public void testMultipleInsAreTrimmed() throws Exception {
         LoopStatement statement = transformer.transform(" in   in in ").getTransformedData();
-        ListForLoopStatement listForLoopStatement  = validateListForLoopStatement(statement);
+        ListForLoopStatement listForLoopStatement = validateListForLoopStatement(statement);
         Assert.assertEquals("in", listForLoopStatement.getExpression());
     }
 
@@ -99,7 +99,7 @@ public class ForTransformerTest extends TransformersTestParent {
     @Test
     public void testValidMapStatement() throws Exception {
         LoopStatement statement = transformer.transform("k, v in collection").getTransformedData();
-        MapForLoopStatement mapForLoopStatement  = validateMapForLoopStatement(statement);
+        MapForLoopStatement mapForLoopStatement = validateMapForLoopStatement(statement);
         Assert.assertEquals("k", mapForLoopStatement.getKeyName());
         Assert.assertEquals("v", mapForLoopStatement.getValueName());
         Assert.assertEquals("collection", statement.getExpression());
@@ -108,7 +108,7 @@ public class ForTransformerTest extends TransformersTestParent {
     @Test
     public void testValidMapStatementSpaceBeforeComma() throws Exception {
         LoopStatement statement = transformer.transform("k ,v in collection").getTransformedData();
-        MapForLoopStatement mapForLoopStatement  = validateMapForLoopStatement(statement);
+        MapForLoopStatement mapForLoopStatement = validateMapForLoopStatement(statement);
         Assert.assertEquals("k", mapForLoopStatement.getKeyName());
         Assert.assertEquals("v", mapForLoopStatement.getValueName());
         Assert.assertEquals("collection", statement.getExpression());
@@ -117,7 +117,7 @@ public class ForTransformerTest extends TransformersTestParent {
     @Test
     public void testValidMapStatementWithoutSpaceAfterComma() throws Exception {
         LoopStatement statement = transformer.transform("k,v in collection").getTransformedData();
-        MapForLoopStatement mapForLoopStatement  = validateMapForLoopStatement(statement);
+        MapForLoopStatement mapForLoopStatement = validateMapForLoopStatement(statement);
         Assert.assertEquals("k", mapForLoopStatement.getKeyName());
         Assert.assertEquals("v", mapForLoopStatement.getValueName());
         Assert.assertEquals("collection", statement.getExpression());
@@ -126,7 +126,7 @@ public class ForTransformerTest extends TransformersTestParent {
     @Test
     public void testValidMapStatementAndTrim() throws Exception {
         LoopStatement statement = transformer.transform(" k, v   in  collection  ").getTransformedData();
-        MapForLoopStatement mapForLoopStatement  = validateMapForLoopStatement(statement);
+        MapForLoopStatement mapForLoopStatement = validateMapForLoopStatement(statement);
         Assert.assertEquals("k", mapForLoopStatement.getKeyName());
         Assert.assertEquals("v", mapForLoopStatement.getValueName());
         Assert.assertEquals("collection", statement.getExpression());
@@ -135,7 +135,7 @@ public class ForTransformerTest extends TransformersTestParent {
     @Test
     public void testValidMapStatementAndTrimMultipleWhitSpaces() throws Exception {
         LoopStatement statement = transformer.transform("   k,    v     in  collection  ").getTransformedData();
-        MapForLoopStatement mapForLoopStatement  = validateMapForLoopStatement(statement);
+        MapForLoopStatement mapForLoopStatement = validateMapForLoopStatement(statement);
         Assert.assertEquals("k", mapForLoopStatement.getKeyName());
         Assert.assertEquals("v", mapForLoopStatement.getValueName());
         Assert.assertEquals("collection", statement.getExpression());
@@ -145,7 +145,7 @@ public class ForTransformerTest extends TransformersTestParent {
     public void testMapVarNameContainInvalidChars() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Argument[(k v m)] violates character rules.");
-        transformAndThrowFirstException(transformer, "(k v m)  in  collection" );
+        transformAndThrowFirstException(transformer, "(k v m)  in  collection");
     }
 
     @Test

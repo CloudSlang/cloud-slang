@@ -13,20 +13,19 @@ package io.cloudslang.lang.entities.bindings.values;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.cloudslang.lang.entities.encryption.EncryptionProvider;
-import javassist.util.proxy.ProxyObjectInputStream;
-import javassist.util.proxy.ProxyObjectOutputStream;
-import org.python.apache.commons.compress.utils.IOUtils;
-import org.python.apache.xerces.impl.dv.util.Base64;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import javassist.util.proxy.ProxyObjectInputStream;
+import javassist.util.proxy.ProxyObjectOutputStream;
+import org.python.apache.commons.compress.utils.IOUtils;
+import org.python.apache.xerces.impl.dv.util.Base64;
 
 /**
  * Sensitive InOutParam value
- *
+ * <p>
  * Created by Ifat Gavish on 19/04/2016
  */
 public class SensitiveValue implements Value {
@@ -62,14 +61,14 @@ public class SensitiveValue implements Value {
     }
 
     public void encrypt() {
-        if(originalContent != null) {
+        if (originalContent != null) {
             content = encrypt(originalContent);
             originalContent = null;
         }
     }
 
     public void decrypt() {
-        if(content != null) {
+        if (content != null) {
             originalContent = decrypt(content);
             content = null;
         }
@@ -158,7 +157,7 @@ public class SensitiveValue implements Value {
         try {
             ByteArrayInputStream bais = new ByteArrayInputStream(data);
             ois = new ProxyObjectInputStream(bais);
-            return (Serializable)ois.readObject();
+            return (Serializable) ois.readObject();
         } catch (Exception e) {
             throw new RuntimeException("Failed to deserialize object", e);
         } finally {

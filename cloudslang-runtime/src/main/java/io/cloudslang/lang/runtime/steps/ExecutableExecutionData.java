@@ -24,16 +24,15 @@ import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
@@ -97,7 +96,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             // put the next step position for the navigation
             runEnv.putNextStepPosition(nextStepId);
             runEnv.getExecutionPath().down();
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             logger.error("There was an error running the start executable execution step of: \'" + nodeName + "\'.\n\tError is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t " + e.getMessage(), e);
         }
@@ -106,9 +105,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
     /**
      * This method is executed by the finishExecutable execution step of an operation or flow
      *
-     * @param runEnv the run environment object
-     * @param executableOutputs the operation outputs data
-     * @param executableResults the operation results data
+     * @param runEnv                   the run environment object
+     * @param executableOutputs        the operation outputs data
+     * @param executableResults        the operation results data
      * @param executionRuntimeServices services supplied by score engine for handling the execution
      */
     public void finishExecutable(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
@@ -117,7 +116,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                                  @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                                  @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
                                  @Param(ScoreLangConstants.EXECUTABLE_TYPE) ExecutableType executableType) {
-		try {
+        try {
             runEnv.getExecutionPath().up();
             Context operationContext = runEnv.getStack().popContext();
             Map<String, Value> operationVariables = operationContext == null ? null : operationContext.getImmutableViewOfVariables();
@@ -168,10 +167,10 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_EXECUTION_FINISHED,
                         "Execution finished running", stepType, nodeName,
                         Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
-                        Pair.of(LanguageEventData.OUTPUTS, (Serializable)operationReturnOutputs)
+                        Pair.of(LanguageEventData.OUTPUTS, (Serializable) operationReturnOutputs)
                 );
             }
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             logger.error("There was an error running the finish executable execution step of: \'" + nodeName + "\'.\n\tError is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t" + e.getMessage(), e);
         }

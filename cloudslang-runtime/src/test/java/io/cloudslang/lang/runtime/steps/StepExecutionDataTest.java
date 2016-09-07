@@ -1,12 +1,12 @@
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.runtime.steps;
 
 import io.cloudslang.dependency.api.services.DependencyService;
@@ -41,6 +41,17 @@ import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -53,9 +64,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.io.Serializable;
-import java.util.*;
 
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
@@ -96,7 +104,7 @@ public class StepExecutionDataTest {
     }
 
     @Before
-    public void init(){
+    public void init() {
         reset(loopsBinding);
     }
 
@@ -104,7 +112,7 @@ public class StepExecutionDataTest {
     public void testBeginStepEmptyInputs() throws Exception {
         RunEnvironment runEnv = createRunEnvironment();
         stepExecutionData.beginStep(new ArrayList<Argument>(), null, runEnv, createRuntimeServices(), "step1", 1L, 2L, "2");
-        Map<String,Value> callArgs = runEnv.removeCallArguments();
+        Map<String, Value> callArgs = runEnv.removeCallArguments();
         Assert.assertTrue(callArgs.isEmpty());
     }
 
@@ -133,7 +141,7 @@ public class StepExecutionDataTest {
     public void testBeginStepInputsEvents() throws Exception {
         RunEnvironment runEnv = createRunEnvironment();
         List<Argument> arguments = Arrays.asList(new Argument("input1", ValueFactory.create("input1")), new Argument("input2", ValueFactory.create("input2")));
-        Map<String,Value> resultMap = new HashMap<>();
+        Map<String, Value> resultMap = new HashMap<>();
         resultMap.put("input1", ValueFactory.create(5));
         resultMap.put("input2", ValueFactory.create(3));
 
@@ -145,13 +153,13 @@ public class StepExecutionDataTest {
 
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
         stepExecutionData.beginStep(arguments, null, runEnv, runtimeServices, "step1", 1L, 2L, "2");
-        Map<String,Value> callArgs = runEnv.removeCallArguments();
+        Map<String, Value> callArgs = runEnv.removeCallArguments();
         Assert.assertFalse(callArgs.isEmpty());
         Assert.assertEquals(5, callArgs.get("input1").get());
         Assert.assertEquals(3, callArgs.get("input2").get());
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
-        Assert.assertEquals(3,events.size());
+        Assert.assertEquals(3, events.size());
         Iterator<ScoreEvent> eventsIterator = events.iterator();
         ScoreEvent stepStartEvent = eventsIterator.next();
         Assert.assertEquals(ScoreLangConstants.EVENT_STEP_START, stepStartEvent.getEventType());
@@ -160,37 +168,37 @@ public class StepExecutionDataTest {
         ScoreEvent inputEndEvent = eventsIterator.next();
         Assert.assertEquals(ScoreLangConstants.EVENT_ARGUMENT_END, inputEndEvent.getEventType());
 
-        LanguageEventData startBindingEventData = (LanguageEventData)inputStartEvent.getData();
-        Assert.assertEquals("step1",startBindingEventData.getStepName());
+        LanguageEventData startBindingEventData = (LanguageEventData) inputStartEvent.getData();
+        Assert.assertEquals("step1", startBindingEventData.getStepName());
         Assert.assertEquals(LanguageEventData.StepType.STEP, startBindingEventData.getStepType());
 
         @SuppressWarnings("unchecked")
-        List<String> inputsToBind = (List<String>)startBindingEventData.get(LanguageEventData.ARGUMENTS);
+        List<String> inputsToBind = (List<String>) startBindingEventData.get(LanguageEventData.ARGUMENTS);
         Assert.assertEquals(
                 "Inputs are not in defined order in start binding event",
                 Lists.newArrayList("input1", "input2"),
                 inputsToBind
         );
 
-        LanguageEventData eventData = (LanguageEventData)inputEndEvent.getData();
-        Assert.assertEquals("step1",eventData.getStepName());
-        Assert.assertEquals(LanguageEventData.StepType.STEP,eventData.getStepType());
+        LanguageEventData eventData = (LanguageEventData) inputEndEvent.getData();
+        Assert.assertEquals("step1", eventData.getStepName());
+        Assert.assertEquals(LanguageEventData.StepType.STEP, eventData.getStepType());
 
         @SuppressWarnings("unchecked")
-        Map<String, Serializable> boundInputs = (Map<String,Serializable>)eventData.get(LanguageEventData.BOUND_ARGUMENTS);
+        Map<String, Serializable> boundInputs = (Map<String, Serializable>) eventData.get(LanguageEventData.BOUND_ARGUMENTS);
         Assert.assertEquals(2, boundInputs.size());
 
         // verify input names are in defined order and have the expected value
         Set<Map.Entry<String, Serializable>> inputEntries = boundInputs.entrySet();
         Iterator<Map.Entry<String, Serializable>> inputNamesIterator = inputEntries.iterator();
 
-        Map.Entry<String, Serializable> firstInput =  inputNamesIterator.next();
+        Map.Entry<String, Serializable> firstInput = inputNamesIterator.next();
         Assert.assertEquals("Inputs are not in defined order in end inputs binding event", "input1", firstInput.getKey());
-        Assert.assertEquals(5,firstInput.getValue());
+        Assert.assertEquals(5, firstInput.getValue());
 
-        Map.Entry<String, Serializable> secondInput =  inputNamesIterator.next();
+        Map.Entry<String, Serializable> secondInput = inputNamesIterator.next();
         Assert.assertEquals("Inputs are not in defined order in end inputs binding event", "input2", secondInput.getKey());
-        Assert.assertEquals(3,secondInput.getValue());
+        Assert.assertEquals(3, secondInput.getValue());
     }
 
     @Test
@@ -214,21 +222,21 @@ public class StepExecutionDataTest {
                 runtimeServices, 1L, new ArrayList<String>(), "step1", false);
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
-        Assert.assertEquals(2,events.size());
+        Assert.assertEquals(2, events.size());
         Iterator<ScoreEvent> eventsIter = events.iterator();
         ScoreEvent outputStart = eventsIter.next();
-        Assert.assertEquals(ScoreLangConstants.EVENT_OUTPUT_START,outputStart.getEventType());
+        Assert.assertEquals(ScoreLangConstants.EVENT_OUTPUT_START, outputStart.getEventType());
 
-        LanguageEventData eventData = (LanguageEventData)outputStart.getData();
-        Assert.assertEquals("step1",eventData.getStepName());
-        Assert.assertEquals(LanguageEventData.StepType.STEP,eventData.getStepType());
+        LanguageEventData eventData = (LanguageEventData) outputStart.getData();
+        Assert.assertEquals("step1", eventData.getStepName());
+        Assert.assertEquals(LanguageEventData.StepType.STEP, eventData.getStepType());
 
         ScoreEvent outputEnd = eventsIter.next();
-        Assert.assertEquals(ScoreLangConstants.EVENT_OUTPUT_END,outputEnd.getEventType());
+        Assert.assertEquals(ScoreLangConstants.EVENT_OUTPUT_END, outputEnd.getEventType());
 
-        eventData = (LanguageEventData)outputEnd.getData();
-        Assert.assertEquals("step1",eventData.getStepName());
-        Assert.assertEquals(LanguageEventData.StepType.STEP,eventData.getStepType());
+        eventData = (LanguageEventData) outputEnd.getData();
+        Assert.assertEquals("step1", eventData.getStepName());
+        Assert.assertEquals(LanguageEventData.StepType.STEP, eventData.getStepType());
 
     }
 
@@ -254,9 +262,9 @@ public class StepExecutionDataTest {
         stepExecutionData.endStep(runEnv, possiblePublishValues, stepNavigationValues,
                 createRuntimeServices(), 1L, new ArrayList<String>(), "step1", false);
 
-        Map<String,Value> flowVars = runEnv.getStack().popContext().getImmutableViewOfVariables();
+        Map<String, Value> flowVars = runEnv.getStack().popContext().getImmutableViewOfVariables();
         Assert.assertTrue(flowVars.containsKey("name"));
-        Assert.assertEquals("John" ,flowVars.get("name").get());
+        Assert.assertEquals("John", flowVars.get("name").get());
     }
 
     @Test
@@ -337,7 +345,7 @@ public class StepExecutionDataTest {
     /////////
 
     @Test
-    public void whenLoopKeyProvidedLoopConditionIsRequested(){
+    public void whenLoopKeyProvidedLoopConditionIsRequested() {
         String collectionExpression = "collection";
         LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "step1";
@@ -351,7 +359,7 @@ public class StepExecutionDataTest {
     }
 
     @Test
-    public void whenLoopConditionHasNoMoreNextStepIdSetToEndStep(){
+    public void whenLoopConditionHasNoMoreNextStepIdSetToEndStep() {
         String collectionExpression = "collection";
         LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "step1";
@@ -371,7 +379,7 @@ public class StepExecutionDataTest {
     }
 
     @Test
-    public void whenLoopConditionHasMoreNextStepIdSetToEndStep(){
+    public void whenLoopConditionHasMoreNextStepIdSetToEndStep() {
         String collectionExpression = "collection";
         LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "step1";
@@ -393,7 +401,7 @@ public class StepExecutionDataTest {
     }
 
     @Test
-    public void whenLoopConditionIsOfForTypeStartStepWillIncrementIt(){
+    public void whenLoopConditionIsOfForTypeStartStepWillIncrementIt() {
         String collectionExpression = "collection";
         LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "step1";
@@ -467,7 +475,7 @@ public class StepExecutionDataTest {
         Assert.assertFalse(context.getImmutableViewOfLanguageVariables().containsKey(LoopCondition.LOOP_CONDITION_KEY));
     }
 
-    private ExecutionRuntimeServices createRuntimeServices(){
+    private ExecutionRuntimeServices createRuntimeServices() {
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         runtimeServices.setSubFlowsData(new HashMap<String, Long>(), new HashMap<String, Long>());
         return runtimeServices;
@@ -480,10 +488,10 @@ public class StepExecutionDataTest {
     }
 
     @Configuration
-    static class Config{
+    static class Config {
 
         @Bean
-        public ArgumentsBinding argumentsBinding(){
+        public ArgumentsBinding argumentsBinding() {
             return mock(ArgumentsBinding.class);
         }
 
@@ -498,7 +506,7 @@ public class StepExecutionDataTest {
         }
 
         @Bean
-        public ScriptEvaluator scriptEvaluator(){
+        public ScriptEvaluator scriptEvaluator() {
             return mock(ScriptEvaluator.class);
         }
 
@@ -513,17 +521,17 @@ public class StepExecutionDataTest {
         }
 
         @Bean
-        public PythonRuntimeService pythonRuntimeService(){
+        public PythonRuntimeService pythonRuntimeService() {
             return new PythonRuntimeServiceImpl();
         }
 
         @Bean
-        public PythonExecutionEngine pythonExecutionEngine(){
+        public PythonExecutionEngine pythonExecutionEngine() {
             return new PythonExecutionCachedEngine();
         }
 
         @Bean
-        public StepExecutionData stepSteps(){
+        public StepExecutionData stepSteps() {
             return new StepExecutionData();
         }
 

@@ -12,7 +12,6 @@
 package io.cloudslang.lang.entities.bindings.values;
 
 import io.cloudslang.lang.entities.encryption.EncryptionProvider;
-
 import java.io.Serializable;
 
 /**

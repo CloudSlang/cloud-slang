@@ -110,7 +110,7 @@ public class SlangCompilerImpl implements SlangCompiler {
 
     @Override
     public List<RuntimeException> validateSlangModelWithDirectDependencies(Executable slangModel, Set<Executable> directDependenciesModels) {
-        return scoreCompiler.validateSlangModelWithDirectDependencies(slangModel,directDependenciesModels);
+        return scoreCompiler.validateSlangModelWithDirectDependencies(slangModel, directDependenciesModels);
     }
 
     @Override
@@ -234,7 +234,7 @@ public class SlangCompilerImpl implements SlangCompiler {
                 if (!knownModifierKeys.contains(modifierKey)) {
                     throw new RuntimeException(
                             "Artifact {" + key + "} has unrecognized tag {" + modifierKey + "}" +
-                            ". Please take a look at the supported features per versions link");
+                                    ". Please take a look at the supported features per versions link");
                 }
             }
 

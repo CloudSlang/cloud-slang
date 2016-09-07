@@ -20,9 +20,10 @@ flow:
             - text: ${input}
         publish:
           - printed_text
+        navigate:
+          - SUCCESS: SUCCESS
   outputs:
     - returnResult: ${input}
     - printed_text
   results:
     - SUCCESS
-    - FAILURE

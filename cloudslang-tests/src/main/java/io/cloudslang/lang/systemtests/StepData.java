@@ -8,7 +8,7 @@
  *
  * *****************************************************************************/
 
- package io.cloudslang.lang.systemtests;
+package io.cloudslang.lang.systemtests;
 
 import java.io.Serializable;
 import java.util.Map;

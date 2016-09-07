@@ -10,10 +10,13 @@
 package io.cloudslang.lang.tools.build.configuration;
 
 import io.cloudslang.lang.commons.configuration.SlangCommonsSpringConfig;
-import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
-import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
 import io.cloudslang.lang.tools.build.SlangBuilder;
+import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
+import io.cloudslang.lang.tools.build.tester.parallel.report.SlangTestCaseRunReportGeneratorService;
+import io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService;
+import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDispatchService;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
+import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -26,22 +29,38 @@ import org.springframework.context.annotation.Import;
 public class SlangBuildSpringConfiguration {
 
     @Bean
-    public SlangBuilder slangBuild(){
+    public SlangBuilder slangBuild() {
         return new SlangBuilder();
     }
 
     @Bean
-    public SlangContentVerifier slangContentVerifier(){
+    public SlangContentVerifier slangContentVerifier() {
         return new SlangContentVerifier();
     }
 
     @Bean
-    public SlangTestRunner slangTestRunner(){
+    public SlangTestRunner slangTestRunner() {
         return new SlangTestRunner();
     }
 
     @Bean
-    public TestCasesYamlParser parser(){
+    public TestCasesYamlParser parser() {
         return new TestCasesYamlParser();
     }
+
+    @Bean
+    public ParallelTestCaseExecutorService parallelTestCaseExecutorService() {
+        return new ParallelTestCaseExecutorService();
+    }
+
+    @Bean
+    public TestCaseEventDispatchService testCaseEventDispatchService() {
+        return new TestCaseEventDispatchService();
+    }
+
+    @Bean
+    public SlangTestCaseRunReportGeneratorService reportGeneratorService() {
+        return new SlangTestCaseRunReportGeneratorService();
+    }
+
 }

@@ -64,7 +64,7 @@ public class CompilerErrorsTest {
     }
 
     @Test
-     public void testNavigateToNonExistingStep() throws Exception {
+    public void testNavigateToNonExistingStep() throws Exception {
         URI resource = getClass().getResource("/corrupted/flow_navigate_to_non_existing_step.sl").toURI();
         URI operation = getClass().getResource("/test_op.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
@@ -97,26 +97,26 @@ public class CompilerErrorsTest {
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
-	@Test
-	public void testSystemProperties() throws Exception {
-		URI systemProperties = getClass().getResource("/corrupted/system_properties.yaml").toURI();
-		Set<SlangSource> path = new HashSet<>();
+    @Test
+    public void testSystemProperties() throws Exception {
+        URI systemProperties = getClass().getResource("/corrupted/system_properties.yaml").toURI();
+        Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-		exception.expectMessage("There was a problem parsing the YAML source: system_properties.\n" +
+        exception.expectMessage("There was a problem parsing the YAML source: system_properties.\n" +
                 "Cannot create property=user.sys.props.host for JavaBean=io.cloudslang.lang.compiler.parser.model.ParsedSlang");
-		compiler.compile(SlangSource.fromFile(systemProperties), path);
-	}
+        compiler.compile(SlangSource.fromFile(systemProperties), path);
+    }
 
     @Test
     public void testSystemPropertiesAsDep() throws Exception {
         URI flow = getClass().getResource("/basic_flow.yaml").toURI();
         URI operation = getClass().getResource("/test_op.sl").toURI();
-		URI systemProperties = getClass().getResource("/corrupted/system_properties.yaml").toURI();
+        URI systemProperties = getClass().getResource("/corrupted/system_properties.yaml").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
         path.add(SlangSource.fromFile(systemProperties));
         exception.expect(RuntimeException.class);
-		exception.expectMessage("There was a problem parsing the YAML source: system_properties.\n" +
+        exception.expectMessage("There was a problem parsing the YAML source: system_properties.\n" +
                 "Cannot create property=user.sys.props.host for JavaBean=io.cloudslang.lang.compiler.parser.model.ParsedSlang");
         compiler.compile(SlangSource.fromFile(flow), path);
     }
@@ -132,6 +132,40 @@ public class CompilerErrorsTest {
         exception.expectMessage("Failed to compile step: Step1. The step/result name: " +
                 "Step2 of navigation: SUCCESS -> Step2 is missing");
         compiler.compile(SlangSource.fromFile(resource), path);
+    }
+
+    @Test
+    public void testNavigationSectionKeysNotInResultsSection() throws Exception {
+        URI resource = getClass().getResource("/corrupted/navigation/flow_1.yaml").toURI();
+        URI dep1 = getClass().getResource("/corrupted/navigation/op_1.sl").toURI();
+
+        Set<SlangSource> dependencies = new HashSet<>();
+        dependencies.add(SlangSource.fromFile(dep1));
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(
+                "Cannot compile flow 'flow_1' since for step 'step_1' the navigation keys " +
+                        "[KEY_1, KEY_2] have no matching results in its dependency 'io.cloudslang.op_1'."
+        );
+
+        compiler.compile(SlangSource.fromFile(resource), dependencies);
+    }
+
+    @Test
+    public void testNavigationSectionResultsNotWired() throws Exception {
+        URI resource = getClass().getResource("/corrupted/navigation/flow_2.yaml").toURI();
+        URI dep1 = getClass().getResource("/corrupted/navigation/op_2.sl").toURI();
+
+        Set<SlangSource> dependencies = new HashSet<>();
+        dependencies.add(SlangSource.fromFile(dep1));
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(
+                "Cannot compile flow 'flow_2' since for step 'step_1' the results [CUSTOM_1]" +
+                        " of its dependency 'io.cloudslang.op_2' have no matching navigation."
+        );
+
+        compiler.compile(SlangSource.fromFile(resource), dependencies);
     }
 
     @Test
@@ -230,8 +264,9 @@ public class CompilerErrorsTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Cannot compile flow: 'step_with_missing_navigation_from_operation_result_flow' " +
-                "since for step: 'step1', the result 'FAILURE' of its dependency: 'user.ops.java_op' has no matching navigation");
+        exception.expectMessage("Cannot compile flow 'step_with_missing_navigation_from_operation_result_flow' " +
+                "since for step 'step1' the results [FAILURE] of its dependency 'user.ops.java_op' " +
+                "have no matching navigation.");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -525,7 +560,7 @@ public class CompilerErrorsTest {
     }
 
     @Test
-    public void testValidationOfFlowWithMissingNavigationFromOperationResult()throws Exception {
+    public void testValidationOfFlowWithMissingNavigationFromOperationResult() throws Exception {
         URI flowUri = getClass().getResource("/corrupted/step_with_missing_navigation_from_operation_result_flow.sl").toURI();
         Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
 
@@ -535,16 +570,16 @@ public class CompilerErrorsTest {
         dependencies.add(operationModel);
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Cannot compile flow: 'step_with_missing_navigation_from_operation_result_flow' " +
-                "since for step: 'step1', the result 'FAILURE' of its dependency: 'user.ops.java_op' " +
-                "has no matching navigation");
+        exception.expectMessage("Cannot compile flow 'step_with_missing_navigation_from_operation_result_flow' " +
+                "since for step 'step1' the results [FAILURE] of its dependency 'user.ops.java_op' " +
+                "have no matching navigation.");
         List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         Assert.assertEquals(1, errors.size());
         throw errors.get(0);
     }
 
     @Test
-    public void testValidationOfFlowWithMissingDependencyRequiredInputInStep()throws Exception {
+    public void testValidationOfFlowWithMissingDependencyRequiredInputInStep() throws Exception {
         URI flowUri = getClass().getResource("/corrupted/flow_missing_dependency_required_input_in_step.sl").toURI();
         Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
 
@@ -566,7 +601,7 @@ public class CompilerErrorsTest {
     }
 
     @Test
-    public void testValidationOfFlowInputInStepWithSameNameAsDependencyOutput()throws Exception {
+    public void testValidationOfFlowInputInStepWithSameNameAsDependencyOutput() throws Exception {
         URI flowUri = getClass().getResource("/corrupted/flow_input_in_step_same_name_as_dependency_output.sl").toURI();
         Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
 
@@ -587,7 +622,7 @@ public class CompilerErrorsTest {
     }
 
     @Test
-    public void testValidationOfFlowThatCallsCorruptedFlow()throws Exception {
+    public void testValidationOfFlowThatCallsCorruptedFlow() throws Exception {
         URI flowUri = getClass().getResource("/corrupted/flow_that_calls_corrupted_flow.sl").toURI();
 
         URI operation1Uri = getClass().getResource("/test_op.sl").toURI();
@@ -623,8 +658,8 @@ public class CompilerErrorsTest {
         dependencies.add(SlangSource.fromFile(operation4));
 
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Cannot compile flow: 'child_flow' since for step: 'step01', the result 'NEGATIVE' " +
-                "of its dependency: 'user.ops.get_time_zone' has no matching navigation");
+        exception.expectMessage("Cannot compile flow 'child_flow' since for step 'step01' the results [NEGATIVE]" +
+                " of its dependency 'user.ops.get_time_zone' have no matching navigation.");
         compiler.compile(SlangSource.fromFile(resource), dependencies);
     }
 

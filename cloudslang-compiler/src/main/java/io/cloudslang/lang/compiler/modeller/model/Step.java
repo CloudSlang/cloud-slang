@@ -9,7 +9,6 @@
 package io.cloudslang.lang.compiler.modeller.model;
 
 import io.cloudslang.lang.entities.bindings.Argument;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;

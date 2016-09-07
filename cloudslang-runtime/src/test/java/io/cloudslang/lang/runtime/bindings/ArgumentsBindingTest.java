@@ -24,6 +24,13 @@ import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionNotCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
+import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -36,20 +43,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import static org.junit.Assert.assertNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ArgumentsBindingTest.Config.class)
 public class ArgumentsBindingTest {
     private static boolean shouldRunMaven;
+
     static {
         ClassLoader classLoader = ArgumentsBindingTest.class.getClassLoader();
 
@@ -88,14 +88,14 @@ public class ArgumentsBindingTest {
     @Test
     public void testEmptyBindArguments() throws Exception {
         List<Argument> arguments = Collections.emptyList();
-        Map<String,Value> result = bindArguments(arguments);
+        Map<String, Value> result = bindArguments(arguments);
         Assert.assertTrue(result.isEmpty());
     }
 
     @Test
     public void testDefaultValueNoExpression() {
-		List<Argument> arguments = Collections.singletonList(new Argument("argument1", ValueFactory.create("value")));
-        Map<String,Value> result = bindArguments(arguments);
+        List<Argument> arguments = Collections.singletonList(new Argument("argument1", ValueFactory.create("value")));
+        Map<String, Value> result = bindArguments(arguments);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
         Assert.assertEquals("value", result.get("argument1").get());
@@ -104,7 +104,7 @@ public class ArgumentsBindingTest {
     @Test
     public void testDefaultValueExpression() {
         List<Argument> arguments = Collections.singletonList(new Argument("argument1", ValueFactory.create("${ 'value' }")));
-        Map<String,Value> result = bindArguments(arguments);
+        Map<String, Value> result = bindArguments(arguments);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
         Assert.assertEquals("value", result.get("argument1").get());
@@ -114,30 +114,30 @@ public class ArgumentsBindingTest {
     @Test
     public void testDefaultValueInt() {
         List<Argument> arguments = Collections.singletonList(new Argument("argument1", ValueFactory.create(2)));
-        Map<String,Value> result = bindArguments(arguments);
+        Map<String, Value> result = bindArguments(arguments);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
         Assert.assertEquals(2, result.get("argument1").get());
     }
 
     @Ignore("Remove when types are supported")
-	@Test
-	public void testDefaultValueBoolean() {
-		List<Argument> arguments = Arrays.asList(
+    @Test
+    public void testDefaultValueBoolean() {
+        List<Argument> arguments = Arrays.asList(
                 new Argument("argument1", ValueFactory.create(true)),
                 new Argument("argument2", ValueFactory.create(false)),
                 new Argument("argument3", ValueFactory.create("phrase containing true and false"))
         );
-		Map<String, Value> result = bindArguments(arguments);
-		Assert.assertTrue((boolean) result.get("argument1").get());
-		Assert.assertFalse((boolean) result.get("argument2").get());
-		Assert.assertEquals("phrase containing true and false", result.get("argument3").get());
-	}
+        Map<String, Value> result = bindArguments(arguments);
+        Assert.assertTrue((boolean) result.get("argument1").get());
+        Assert.assertFalse((boolean) result.get("argument2").get());
+        Assert.assertEquals("phrase containing true and false", result.get("argument3").get());
+    }
 
     @Test
     public void testTwoArguments() {
-		List<Argument> arguments = Arrays.asList(new Argument("argument2", ValueFactory.create("yyy")), new Argument("argument1", ValueFactory.create("zzz")));
-        Map<String,Value> result = bindArguments(arguments);
+        List<Argument> arguments = Arrays.asList(new Argument("argument2", ValueFactory.create("yyy")), new Argument("argument1", ValueFactory.create("zzz")));
+        Map<String, Value> result = bindArguments(arguments);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
         Assert.assertEquals("zzz", result.get("argument1").get());
@@ -150,7 +150,7 @@ public class ArgumentsBindingTest {
         Argument argument1 = new Argument("argument1", ValueFactory.create("${ argument1 }"));
         Argument argument2 = new Argument("argument2", ValueFactory.create("${ argument1 }"));
         List<Argument> arguments = Arrays.asList(argument1, argument2);
-        Map<String,Value> result = bindArguments(arguments);
+        Map<String, Value> result = bindArguments(arguments);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
         Assert.assertEquals(null, result.get("argument1").get());
@@ -160,24 +160,24 @@ public class ArgumentsBindingTest {
 
     @Test
     public void testArgumentRef() {
-        Map<String,Value> context = new HashMap<>();
-        context.put("argumentX",ValueFactory.create("xxx"));
+        Map<String, Value> context = new HashMap<>();
+        context.put("argumentX", ValueFactory.create("xxx"));
         List<Argument> arguments = Collections.singletonList(new Argument("argument1", ValueFactory.create("${ str(argumentX) }")));
-        Map<String,Value> result = bindArguments(arguments, context);
+        Map<String, Value> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
         Assert.assertEquals("xxx", result.get("argument1").get());
 
-        Assert.assertEquals(1,context.size());
+        Assert.assertEquals(1, context.size());
     }
 
     @Test
     public void testArgumentScriptEval() {
-        Map<String,Value> context = new HashMap<>();
-        context.put("valX",ValueFactory.create("5"));
-        Argument scriptArgument = new Argument("argument1",ValueFactory.create("${ \"3\" + valX }"));
+        Map<String, Value> context = new HashMap<>();
+        context.put("valX", ValueFactory.create("5"));
+        Argument scriptArgument = new Argument("argument1", ValueFactory.create("${ \"3\" + valX }"));
         List<Argument> arguments = Collections.singletonList(scriptArgument);
-        Map<String,Value> result = bindArguments(arguments, context);
+        Map<String, Value> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
         Assert.assertEquals("35", result.get("argument1").get());
@@ -187,12 +187,12 @@ public class ArgumentsBindingTest {
 
     @Test
     public void testArgumentScriptEval2() {
-        Map<String,Value> context = new HashMap<>();
-        context.put("valB",ValueFactory.create("b"));
-        context.put("valC",ValueFactory.create("c"));
-        Argument scriptArgument = new Argument("argument1",ValueFactory.create("${ 'a' + valB + valC }"));
+        Map<String, Value> context = new HashMap<>();
+        context.put("valB", ValueFactory.create("b"));
+        context.put("valC", ValueFactory.create("c"));
+        Argument scriptArgument = new Argument("argument1", ValueFactory.create("${ 'a' + valB + valC }"));
         List<Argument> arguments = Collections.singletonList(scriptArgument);
-        Map<String,Value> result = bindArguments(arguments, context);
+        Map<String, Value> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
         Assert.assertEquals("abc", result.get("argument1").get());
@@ -200,12 +200,12 @@ public class ArgumentsBindingTest {
 
     @Test
     public void testDefaultValueVsEmptyRef() {
-        Map<String,Value> context = new HashMap<>();
+        Map<String, Value> context = new HashMap<>();
 
-		Argument refArgument = new Argument("argument1", ValueFactory.create("${ str('val') }"));
+        Argument refArgument = new Argument("argument1", ValueFactory.create("${ str('val') }"));
         List<Argument> arguments = Collections.singletonList(refArgument);
 
-        Map<String,Value> result = bindArguments(arguments, context);
+        Map<String, Value> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
         Assert.assertEquals("val", result.get("argument1").get());
@@ -215,12 +215,12 @@ public class ArgumentsBindingTest {
 
     @Test
     public void testOverridableFalseBehaviour() {
-        Map<String,Value> context = new HashMap<>();
-        context.put("argument1",ValueFactory.create("3"));
-		Argument argument = new Argument("argument1", ValueFactory.create("${ \"5+7\" }"));
+        Map<String, Value> context = new HashMap<>();
+        context.put("argument1", ValueFactory.create("3"));
+        Argument argument = new Argument("argument1", ValueFactory.create("${ \"5+7\" }"));
         List<Argument> arguments = Collections.singletonList(argument);
 
-        Map<String,Value> result = bindArguments(arguments, context);
+        Map<String, Value> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
         Assert.assertEquals("5+7", result.get("argument1").get());
@@ -230,13 +230,13 @@ public class ArgumentsBindingTest {
     }
 
     @Test
-    public void testComplexExpr(){
-        Map<String,Value> context = new HashMap<>();
+    public void testComplexExpr() {
+        Map<String, Value> context = new HashMap<>();
         context.put("argument1", ValueFactory.create("3"));
-		Argument argument = new Argument("argument2", ValueFactory.create("${ argument1 + \"3 * 2\" }"));
+        Argument argument = new Argument("argument2", ValueFactory.create("${ argument1 + \"3 * 2\" }"));
         List<Argument> arguments = Collections.singletonList(argument);
 
-        Map<String,Value> result = bindArguments(arguments, context);
+        Map<String, Value> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument2"));
         Assert.assertEquals("33 * 2", result.get("argument2").get());
@@ -260,9 +260,9 @@ public class ArgumentsBindingTest {
 
     @Test(expected = RuntimeException.class)
     public void testExpressionWithWrongRef() {
-        Map<String,Value> context = new HashMap<>();
+        Map<String, Value> context = new HashMap<>();
 
-		Argument argument = new Argument("argument1", ValueFactory.create("${ argument2 }"));
+        Argument argument = new Argument("argument1", ValueFactory.create("${ argument2 }"));
         List<Argument> arguments = Collections.singletonList(argument);
 
         bindArguments(arguments, context);
@@ -270,13 +270,13 @@ public class ArgumentsBindingTest {
 
     @Test
     public void testArgumentAssignFromAnotherArgument() {
-        Map<String,Value> context = new HashMap<>();
+        Map<String, Value> context = new HashMap<>();
 
-		Argument argument1 = new Argument("argument1", ValueFactory.create("5"));
+        Argument argument1 = new Argument("argument1", ValueFactory.create("5"));
         Argument argument2 = new Argument("argument2", ValueFactory.create("${ argument1 }"));
-        List<Argument> arguments = Arrays.asList(argument1,argument2);
+        List<Argument> arguments = Arrays.asList(argument1, argument2);
 
-        Map<String,Value> result = bindArguments(arguments, context);
+        Map<String, Value> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
         Assert.assertEquals("5", result.get("argument1").get());
@@ -289,14 +289,14 @@ public class ArgumentsBindingTest {
 
     @Test
     public void testComplexExpressionArgument() {
-        Map<String,Value> context = new HashMap<>();
-        context.put("varX",ValueFactory.create("5"));
+        Map<String, Value> context = new HashMap<>();
+        context.put("varX", ValueFactory.create("5"));
 
-		Argument argument1 = new Argument("argument1", ValueFactory.create("5"));
-        Argument argument2 = new Argument("argument2",ValueFactory.create("${ argument1 + \"5\" + varX }"));
-        List<Argument> arguments = Arrays.asList(argument1,argument2);
+        Argument argument1 = new Argument("argument1", ValueFactory.create("5"));
+        Argument argument2 = new Argument("argument2", ValueFactory.create("${ argument1 + \"5\" + varX }"));
+        List<Argument> arguments = Arrays.asList(argument1, argument2);
 
-        Map<String,Value> result = bindArguments(arguments, context);
+        Map<String, Value> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
         Assert.assertEquals("5", result.get("argument1").get());
@@ -304,46 +304,46 @@ public class ArgumentsBindingTest {
         Assert.assertEquals("555", result.get("argument2").get());
         Assert.assertEquals(2, result.size());
 
-        Assert.assertEquals("orig context should not change",1,context.size());
+        Assert.assertEquals("orig context should not change", 1, context.size());
     }
 
     @Test
     public void testComplexExpression2Argument() {
-        Map<String,Value> context = new HashMap<>();
-        context.put("varX",ValueFactory.create("roles"));
+        Map<String, Value> context = new HashMap<>();
+        context.put("varX", ValueFactory.create("roles"));
 
-		Argument argument1 = new Argument("argument1", ValueFactory.create("${ 'mighty' + ' max '   + varX }"));
+        Argument argument1 = new Argument("argument1", ValueFactory.create("${ 'mighty' + ' max '   + varX }"));
         List<Argument> arguments = Collections.singletonList(argument1);
 
-        Map<String,Value> result = bindArguments(arguments, context);
+        Map<String, Value> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
         Assert.assertEquals("mighty max roles", result.get("argument1").get());
         Assert.assertEquals(1, result.size());
 
-        Assert.assertEquals("orig context should not change",1,context.size());
+        Assert.assertEquals("orig context should not change", 1, context.size());
     }
 
-	private Map<String, Value> bindArguments(
+    private Map<String, Value> bindArguments(
             List<Argument> arguments,
             Map<String, ? extends Value> context) {
-		return argumentsBinding.bindArguments(arguments, context, EMPTY_SET);
-	}
+        return argumentsBinding.bindArguments(arguments, context, EMPTY_SET);
+    }
 
-	private Map<String, Value> bindArguments(List<Argument> arguments) {
-		return bindArguments(arguments, new HashMap<String, Value>());
-	}
+    private Map<String, Value> bindArguments(List<Argument> arguments) {
+        return bindArguments(arguments, new HashMap<String, Value>());
+    }
 
     @Configuration
-    static class Config{
+    static class Config {
 
         @Bean
-        public ArgumentsBinding argumentsBinding(){
+        public ArgumentsBinding argumentsBinding() {
             return new ArgumentsBinding();
         }
 
         @Bean
-        public ScriptEvaluator scriptEvaluator(){
+        public ScriptEvaluator scriptEvaluator() {
             return new ScriptEvaluator();
         }
 
@@ -358,12 +358,12 @@ public class ArgumentsBindingTest {
         }
 
         @Bean
-        public PythonRuntimeService pythonRuntimeService(){
+        public PythonRuntimeService pythonRuntimeService() {
             return new PythonRuntimeServiceImpl();
         }
 
         @Bean
-        public PythonExecutionEngine pythonExecutionEngine(){
+        public PythonExecutionEngine pythonExecutionEngine() {
             return new PythonExecutionCachedEngine();
         }
     }

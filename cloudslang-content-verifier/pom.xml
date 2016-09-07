@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.9.70-SNAPSHOT</version>
+        <version>0.9.71-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -47,6 +48,11 @@
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <version>1.35</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.rendersnake</groupId>
+            <artifactId>rendersnake</artifactId>
         </dependency>
 
         <!-- test -->
@@ -169,9 +175,10 @@
                         <phase>generate-resources</phase>
                         <configuration>
                             <target>
-                                <unzip src="${basedir}/../cloudslang-cli/src/main/resources/dependency-base.zip" dest="${basedir}/target/cslang-builder/maven/repo">
+                                <unzip src="${basedir}/../cloudslang-cli/src/main/resources/dependency-base.zip"
+                                       dest="${basedir}/target/cslang-builder/maven/repo">
                                     <patternset>
-                                        <exclude name="**/*.path" />
+                                        <exclude name="**/*.path"/>
                                     </patternset>
                                 </unzip>
                             </target>

@@ -15,7 +15,7 @@ import java.io.Serializable;
 
 /**
  * InOutParam value factory
- *
+ * <p>
  * Created by Ifat Gavish on 19/04/2016
  */
 public abstract class ValueFactory implements Serializable {
@@ -26,7 +26,7 @@ public abstract class ValueFactory implements Serializable {
 
     public static Value create(Serializable serializable, boolean sensitive) {
         return serializable != null && serializable instanceof Value ?
-                ValueFactory.createValue(((Value)serializable).get(), ((Value)serializable).isSensitive() || sensitive) :
+                ValueFactory.createValue(((Value) serializable).get(), ((Value) serializable).isSensitive() || sensitive) :
                 ValueFactory.createValue(serializable, sensitive);
     }
 

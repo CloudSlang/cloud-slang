@@ -1,20 +1,19 @@
 package io.cloudslang.lang.runtime.steps;
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import com.hp.oo.sdk.content.plugin.SessionResource;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,11 +52,11 @@ public class ContentTestActions {
     }
 
     @SuppressWarnings("unused")
-    public void doJavaActionWrongReturnType(){
+    public void doJavaActionWrongReturnType() {
     }
 
     @SuppressWarnings("unused")
-    public void doJavaActionExceptionMethod(){
+    public void doJavaActionExceptionMethod() {
         throw new RuntimeException("Error");
     }
 
@@ -70,11 +69,11 @@ public class ContentTestActions {
     }
 
     @SuppressWarnings("unused")
-    public Map<String, String> getNameFromNonSerializableSession(@Param("name") GlobalSessionObject<NonSerializableObject> name){
+    public Map<String, String> getNameFromNonSerializableSession(@Param("name") GlobalSessionObject<NonSerializableObject> name) {
         SessionResource<NonSerializableObject> sessionName = name.getResource();
         Map<String, String> returnMap = new HashMap<>();
         String value = null;
-        if(sessionName != null && sessionName.get() != null){
+        if (sessionName != null && sessionName.get() != null) {
             value = sessionName.get().getName();
         }
         returnMap.put("name", value);
@@ -83,7 +82,7 @@ public class ContentTestActions {
 
     @SuppressWarnings("unused")
     public Map<String, String> setNameOnNonSerializableSession(@Param("name") GlobalSessionObject<NonSerializableObject> name,
-                                                               @Param("value") String value){
+                                                               @Param("value") String value) {
         SessionResource<NonSerializableObject> sessionName = name.getResource();
         Map<String, String> returnMap = new HashMap<>();
         name.setResource(new NonSerializableSessionResource(new NonSerializableObject(value)));
@@ -92,7 +91,7 @@ public class ContentTestActions {
     }
 
     @SuppressWarnings("unused")
-    public Map<String, String> getNameFromSerializableSession(@Param("name") SerializableSessionObject name){
+    public Map<String, String> getNameFromSerializableSession(@Param("name") SerializableSessionObject name) {
         String sessionName = name.getName();
         Map<String, String> returnMap = new HashMap<>();
         returnMap.put("name", sessionName);

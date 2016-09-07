@@ -8,30 +8,29 @@
  */
 package io.cloudslang.lang.compiler;
 
+import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
-import java.util.HashMap;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
-import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
-import io.cloudslang.lang.entities.ResultNavigation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import java.net.URI;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -146,7 +145,7 @@ public class CompileBasicFlowTest {
 
 
     @Test
-    public void testValidFlowWithMissingDependencyRequiredInputInGrandchild()throws Exception {
+    public void testValidFlowWithMissingDependencyRequiredInputInGrandchild() throws Exception {
         URI flowUri = getClass().getResource("/corrupted/flow_missing_dependency_required_input_in_grandchild.sl").toURI();
         Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
 

@@ -7,11 +7,12 @@ are made available under the terms of the Apache License v2.0 which accompany th
 The Apache License is available at
 http://www.apache.org/licenses/LICENSE-2.0
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.9.70-SNAPSHOT</version>
+        <version>0.9.71-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

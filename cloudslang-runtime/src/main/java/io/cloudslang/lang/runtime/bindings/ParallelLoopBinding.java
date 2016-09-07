@@ -15,15 +15,14 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.Validate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Date: 3/25/2015
@@ -58,7 +57,7 @@ public class ParallelLoopBinding {
                     flowContext.getImmutableViewOfVariables(), systemProperties, parallelLoopStatement.getFunctionDependencies());
             if (evalResult != null && evalResult.get() != null) {
                 //noinspection unchecked
-                for (Serializable serializable : ((List<Serializable>)evalResult.get())) {
+                for (Serializable serializable : ((List<Serializable>) evalResult.get())) {
                     Value value = ValueFactory.create(serializable, evalResult.isSensitive());
                     result.add(value);
                 }

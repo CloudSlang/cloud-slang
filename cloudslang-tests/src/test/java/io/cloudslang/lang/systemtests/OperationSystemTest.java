@@ -19,14 +19,13 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.events.ScoreEvent;
 import java.io.Serializable;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * User: stoneo
@@ -49,7 +48,7 @@ public class OperationSystemTest extends SystemsTestsParent {
     @Test
     public void testCompileAndRunOperationWithData() throws Exception {
         URL resource = getClass().getResource("/yaml/test_op_2.sl");
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()),null);
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), null);
         //Trigger ExecutionPlan
         Map<String, Value> userInputs = new HashMap<>();
         userInputs.put("input1", ValueFactory.create("value1"));
@@ -59,6 +58,7 @@ public class OperationSystemTest extends SystemsTestsParent {
         ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
+
     @Test
     public void testCompileAndRunOperationWithDataMissingInput() throws Exception {
         URL resource = getClass().getResource("/yaml/test_op_2.sl");

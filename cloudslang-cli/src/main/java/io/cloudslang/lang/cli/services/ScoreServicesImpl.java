@@ -8,30 +8,31 @@
  */
 package io.cloudslang.lang.cli.services;
 
-import io.cloudslang.lang.entities.SystemProperty;
-import io.cloudslang.lang.entities.bindings.values.Value;
-import org.apache.commons.lang.StringUtils;
-import io.cloudslang.score.events.EventConstants;
-import io.cloudslang.score.events.ScoreEventListener;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.entities.CompilationArtifact;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.io.Serializable;
+import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.score.events.EventConstants;
+import io.cloudslang.score.events.ScoreEventListener;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import static io.cloudslang.lang.entities.ScoreLangConstants.*;
+import static io.cloudslang.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
+import static io.cloudslang.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
+import static io.cloudslang.lang.entities.ScoreLangConstants.EVENT_STEP_START;
+import static io.cloudslang.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
 
 /**
  * @author Bonczidai Levente
- * @since 11/13/2014
  * @version $Id$
+ * @since 11/13/2014
  */
 @Service
-public class ScoreServicesImpl implements ScoreServices{
+public class ScoreServicesImpl implements ScoreServices {
 
     @Autowired
     private Slang slang;
@@ -42,30 +43,31 @@ public class ScoreServicesImpl implements ScoreServices{
 
     /**
      * This method will trigger the flow in an Async matter.
+     *
      * @param compilationArtifact the artifact to trigger
-     * @param inputs : flow inputs
+     * @param inputs              : flow inputs
      * @return executionId
      */
     @Override
-	public Long trigger(CompilationArtifact compilationArtifact, Map<String, Value> inputs, Set<SystemProperty> systemProperties) {
+    public Long trigger(CompilationArtifact compilationArtifact, Map<String, Value> inputs, Set<SystemProperty> systemProperties) {
         return slang.run(compilationArtifact, inputs, systemProperties);
     }
 
     /**
      * This method will trigger the flow in a synchronize matter, meaning only one flow can run at a time.
+     *
      * @param compilationArtifact the artifact to trigger
-     * @param inputs : flow inputs
+     * @param inputs              : flow inputs
      * @return executionId
      */
     @Override
-    public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, Value> inputs, Set<SystemProperty> systemProperties, boolean isQuiet, boolean debug){
+    public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, Value> inputs, Set<SystemProperty> systemProperties, boolean isQuiet, boolean debug) {
         //add start event
         Set<String> handlerTypes = new HashSet<>();
-        if(isQuiet){
+        if (isQuiet) {
             handlerTypes.add(EVENT_EXECUTION_FINISHED);
             handlerTypes.add(EVENT_OUTPUT_END);
-        }
-        else {
+        } else {
             handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
             handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
             handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
@@ -81,10 +83,11 @@ public class ScoreServicesImpl implements ScoreServices{
 
         Long executionId = trigger(compilationArtifact, inputs, systemProperties);
 
-        while(!scoreEventListener.isFlowFinished()){
+        while (!scoreEventListener.isFlowFinished()) {
             try {
                 Thread.sleep(200);
-            } catch (InterruptedException ignore) {}
+            } catch (InterruptedException ignore) {
+            }
         }
         slang.unSubscribeOnEvents(scoreEventListener);
 

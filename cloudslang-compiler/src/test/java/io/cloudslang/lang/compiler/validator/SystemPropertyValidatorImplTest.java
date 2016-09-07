@@ -179,7 +179,7 @@ public class SystemPropertyValidatorImplTest {
                 " Argument[a.b.?] violates character rules.");
         systemPropertyValidator.validateKey(input);
     }
-    
+
     private void expectException(String message) {
         exception.expect(RuntimeException.class);
         exception.expectMessage(message);

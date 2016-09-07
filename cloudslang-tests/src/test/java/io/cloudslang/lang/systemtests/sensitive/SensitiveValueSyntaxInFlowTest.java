@@ -16,15 +16,14 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.ValueSyntaxParent;
-import org.junit.Test;
-
 import java.net.URI;
 import java.util.Map;
 import java.util.Set;
+import org.junit.Test;
 
 /**
  * Sensitive value test
- *
+ * <p>
  * Created by Ifat Gavish on 19/04/2016
  */
 public class SensitiveValueSyntaxInFlowTest extends ValueSyntaxParent {

@@ -1,14 +1,14 @@
 package io.cloudslang.lang.compiler.modeller.transformers;
 
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 
 import com.google.common.collect.Sets;
@@ -194,7 +194,7 @@ public class InputsTransformerTest extends TransformersTestParent {
     }
 
     @Test
-     public void testLeadingAndTrailingSpaces() throws Exception {
+    public void testLeadingAndTrailingSpaces() throws Exception {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(10);
         Assert.assertEquals("input11", input.getName());

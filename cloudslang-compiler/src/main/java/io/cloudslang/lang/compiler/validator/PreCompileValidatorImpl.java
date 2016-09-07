@@ -215,7 +215,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     }
 
     @Override
-    public  List<RuntimeException> validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element) {
+    public List<RuntimeException> validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element) {
         List<RuntimeException> errors = new ArrayList<>();
         Collection<InOutParam> inOutParams = new ArrayList<>();
         inOutParams.addAll(inputs);
@@ -266,7 +266,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
 
     @Override
     public void validateDefaultResult(List<Result> results, String artifactName, List<RuntimeException> errors) {
-        for (int i = 0; i < results.size()-1; i++) {
+        for (int i = 0; i < results.size() - 1; i++) {
             Result currentResult = results.get(i);
             if (ResultUtils.isDefaultResult(currentResult)) {
                 errors.add(new RuntimeException(
@@ -356,7 +356,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
                 if (isStep && isResult) {
                     errors.add(
                             new RuntimeException(
-                                "Navigation target: '" + navigationTarget + "' is declared both as step name and flow result."
+                                    "Navigation target: '" + navigationTarget + "' is declared both as step name and flow result."
                             )
                     );
                 }

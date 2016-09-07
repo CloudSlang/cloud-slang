@@ -1,12 +1,12 @@
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.runtime.steps;
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
@@ -20,8 +20,6 @@ import io.cloudslang.lang.runtime.env.ParentFlowStack;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,15 +27,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.apache.commons.lang3.tuple.Pair;
 
 public abstract class AbstractExecutionData {
 
     public void sendStartBindingInputsEvent(List<Input> inputs,
-                                          RunEnvironment runEnv,
-                                          ExecutionRuntimeServices executionRuntimeServices,
-                                          String desc,
-                                          LanguageEventData.StepType stepType,
-                                          String stepName) {
+                                            RunEnvironment runEnv,
+                                            ExecutionRuntimeServices executionRuntimeServices,
+                                            String desc,
+                                            LanguageEventData.StepType stepType,
+                                            String stepName) {
         ArrayList<String> inputNames = new ArrayList<>();
         for (Input input : inputs) {
             inputNames.add(input.getName());
@@ -60,7 +59,7 @@ public abstract class AbstractExecutionData {
             inputsForEvent.put(inputName, inputValue);
         }
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_INPUT_END, desc, stepType, stepName,
-                Pair.of(LanguageEventData.BOUND_INPUTS, (Serializable)inputsForEvent));
+                Pair.of(LanguageEventData.BOUND_INPUTS, (Serializable) inputsForEvent));
     }
 
     public void sendStartBindingArgumentsEvent(

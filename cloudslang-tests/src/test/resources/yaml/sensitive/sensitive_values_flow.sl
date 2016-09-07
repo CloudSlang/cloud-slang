@@ -593,6 +593,8 @@ flow:
 #          - argument_input_expression_characters_sensitive
 #          - argument_input_sensitive_expression_characters
 #          - argument_input_sensitive_expression_characters_sensitive
+        navigate:
+          - SUCCESS: prepare_for_print
 
     - prepare_for_print:
         do:
@@ -632,6 +634,8 @@ flow:
 #
 #        publish:
 #          - argument_python_all_values_list
+        navigate:
+          - SUCCESS: SUCCESS
 #
 #    - print_values:
 #        loop:
@@ -640,6 +644,8 @@ flow:
 #            ops.print:
 #              - text: ${ value }
 #          break: []
+#          navigate:
+#            - SUCCESS: SUCCESS
 
 #  outputs:
 #    - argument_no_value
@@ -765,6 +771,5 @@ flow:
 #    - argument_input_sensitive_expression_characters_sensitive
 #    - argument_all_values
 #
-#  results:
-#    - SUCCESS
-#    - FAILURE
+  results:
+    - SUCCESS

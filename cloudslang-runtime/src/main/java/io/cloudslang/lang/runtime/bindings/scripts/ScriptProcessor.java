@@ -11,14 +11,13 @@ package io.cloudslang.lang.runtime.bindings.scripts;
 
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Script processor
- *
+ * <p>
  * Created by Ifat Gavish on 25/05/2016
  */
 public abstract class ScriptProcessor {

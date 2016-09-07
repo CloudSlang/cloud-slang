@@ -10,6 +10,13 @@ import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ForLoopCondition;
 import io.cloudslang.lang.runtime.env.LoopCondition;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -21,12 +28,13 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.python.google.common.collect.Lists;
 
-import java.io.Serializable;
-import java.util.*;
-
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anySetOf;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LoopsBindingTest {
@@ -54,10 +62,10 @@ public class LoopsBindingTest {
         Context context = mock(Context.class);
         ArrayList<Value> result = Lists.newArrayList(ValueFactory.create(1));
         when(scriptEvaluator.evalExpr(
-                        anyString(),
-                        anyMapOf(String.class, Value.class),
-                        anySetOf(SystemProperty.class),
-                        anySetOf(ScriptFunction.class))
+                anyString(),
+                anyMapOf(String.class, Value.class),
+                anySetOf(SystemProperty.class),
+                anySetOf(ScriptFunction.class))
         ).thenReturn(ValueFactory.create(result));
         Value loopCondition = ValueFactory.create(new ForLoopCondition(result));
         when(context.getLanguageVariable(LoopCondition.LOOP_CONDITION_KEY)).thenReturn(null);
@@ -93,7 +101,8 @@ public class LoopsBindingTest {
 
     @Test(expected = RuntimeException.class)
     public void passingNullNodeNameThrowsException() throws Exception {
-        loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), mock(Context.class), EMPTY_SET, null);    }
+        loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), mock(Context.class), EMPTY_SET, null);
+    }
 
     @Test
     public void whenValueIsThereItWillBeReturned() throws Exception {

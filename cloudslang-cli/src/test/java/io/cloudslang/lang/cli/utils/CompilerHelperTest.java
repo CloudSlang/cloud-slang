@@ -19,6 +19,13 @@ import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
 import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import java.io.File;
+import java.io.Serializable;
+import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -39,12 +46,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
-import java.io.Serializable;
-import java.net.URI;
-import java.util.*;
-
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = CompilerHelperTest.Config.class)
@@ -84,7 +90,7 @@ public class CompilerHelperTest {
     }
 
     @Test
-	public void testDependenciesFileParentFolder() throws Exception {
+    public void testDependenciesFileParentFolder() throws Exception {
         URI flowPath = getClass().getResource("/executables/dir3/flow.sl").toURI();
         URI opPath = getClass().getResource("/executables/dir3/dir3_1/test_op.sl").toURI();
         compilerHelper.compile(flowPath.getPath(), null);
@@ -95,7 +101,7 @@ public class CompilerHelperTest {
                         SlangSource.fromFile(flowPath)
                 )
         );
-	}
+    }
 
     @Test
     public void testFilePathValidWithOtherPathForDependencies() throws Exception {
@@ -139,7 +145,7 @@ public class CompilerHelperTest {
     @Test
     public void testInvalidDirPathForDependencies() throws Exception {
         String flowFilePath = getClass().getResource("/flow.sl").getPath();
-        String currentDirPath =  getClass().getResource("").getPath();
+        String currentDirPath = getClass().getResource("").getPath();
         String invalidDirPath = currentDirPath.concat("xxx");
 
         expectedException.expect(IllegalArgumentException.class);
@@ -160,21 +166,21 @@ public class CompilerHelperTest {
         compilerHelper.compile(flowFilePath, Lists.newArrayList(flowFilePath));
     }
 
-	@Test
-	public void testLoadSystemProperties() throws Exception {
-		Set<SystemProperty> systemProperties = Sets.newHashSet(
+    @Test
+    public void testLoadSystemProperties() throws Exception {
+        Set<SystemProperty> systemProperties = Sets.newHashSet(
                 new SystemProperty("user.sys", "props.host", "localhost"),
                 new SystemProperty("user.sys", "props.port", "22"),
                 new SystemProperty("user.sys", "props.alla", "balla")
         );
-		URI systemPropertyURI = getClass().getResource("/properties/system_properties.prop.sl").toURI();
+        URI systemPropertyURI = getClass().getResource("/properties/system_properties.prop.sl").toURI();
         SlangSource source = SlangSource.fromFile(systemPropertyURI);
         when(slang.loadSystemProperties(eq(source))).thenReturn(systemProperties);
 
-		compilerHelper.loadSystemProperties(Collections.singletonList(systemPropertyURI.getPath()));
+        compilerHelper.loadSystemProperties(Collections.singletonList(systemPropertyURI.getPath()));
 
         verify(slang).loadSystemProperties(eq(source));
-	}
+    }
 
     @Test
     public void testLoadSystemPropertiesInvalidExtension() throws Exception {
@@ -209,7 +215,7 @@ public class CompilerHelperTest {
         verify(slang, times((2))).loadSystemProperties(sourceCaptor.capture());
 
         Set<SlangSource> capturedSources = new HashSet<>(sourceCaptor.getAllValues());
-        Set<SlangSource> expectedSources =  Sets.newHashSet(
+        Set<SlangSource> expectedSources = Sets.newHashSet(
                 SlangSource.fromFile(getClass().getResource("/mixed_sl_files/configuration/properties/properties/ubuntu.prop.sl").toURI()),
                 SlangSource.fromFile(getClass().getResource("/mixed_sl_files/configuration/properties/properties/windows.prop.sl").toURI())
         );

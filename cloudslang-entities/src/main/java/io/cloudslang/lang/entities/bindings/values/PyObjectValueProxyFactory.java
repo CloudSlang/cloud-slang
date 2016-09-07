@@ -11,6 +11,15 @@
  */
 package io.cloudslang.lang.entities.bindings.values;
 
+import java.io.Serializable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.Proxy;
@@ -21,19 +30,9 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 
-import java.io.Serializable;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 /**
  * PyObjectValue proxy factory
- *
+ * <p>
  * Created by Ifat Gavish on 04/05/2016
  */
 public class PyObjectValueProxyFactory {
@@ -49,8 +48,8 @@ public class PyObjectValueProxyFactory {
         PyObject pyObject = Py.java2py(content);
         try {
             PyObjectValueProxyClass proxyClass = getProxyClass(pyObject);
-            PyObjectValue pyObjectValue = (PyObjectValue)proxyClass.getConstructor().newInstance(proxyClass.getParams());
-            ((Proxy)pyObjectValue).setHandler(new PyObjectValueMethodHandler(content, sensitive, pyObject));
+            PyObjectValue pyObjectValue = (PyObjectValue) proxyClass.getConstructor().newInstance(proxyClass.getParams());
+            ((Proxy) pyObjectValue).setHandler(new PyObjectValueMethodHandler(content, sensitive, pyObject));
             return pyObjectValue;
         } catch (Exception e) {
             throw new RuntimeException("Failed to create a proxy to new instance for PyObjectValue and " + pyObject.getClass().getSimpleName(), e);
@@ -79,6 +78,7 @@ public class PyObjectValueProxyFactory {
         }
         return proxyClass;
     }
+
     private static PyObjectValueProxyClass createProxyClass(Class proxyClass, PyObject pyObject) throws Exception {
         Constructor<?> constructor = proxyClass.getConstructors()[0];
         for (Constructor<?> con : proxyClass.getConstructors()) {
@@ -151,7 +151,7 @@ public class PyObjectValueProxyFactory {
             Object[] pyObjectArgs = new Object[args.length];
             for (int index = 0; index < args.length; index++) {
                 if (args[index] instanceof PyObjectValue) {
-                    PyObjectValueMethodHandler handler = (PyObjectValueMethodHandler)((ProxyObject)args[index]).getHandler();
+                    PyObjectValueMethodHandler handler = (PyObjectValueMethodHandler) ((ProxyObject) args[index]).getHandler();
                     handler.accessed = true;
                     pyObjectArgs[index] = handler.pyObject;
                 } else {

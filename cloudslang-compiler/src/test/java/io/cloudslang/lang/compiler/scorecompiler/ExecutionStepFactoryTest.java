@@ -1,27 +1,35 @@
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.compiler.scorecompiler;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
-import io.cloudslang.lang.entities.*;
-import io.cloudslang.lang.entities.bindings.*;
-import junit.framework.Assert;
+import io.cloudslang.lang.entities.ExecutableType;
+import io.cloudslang.lang.entities.ListForLoopStatement;
+import io.cloudslang.lang.entities.LoopStatement;
+import io.cloudslang.lang.entities.ParallelLoopStatement;
+import io.cloudslang.lang.entities.ResultNavigation;
+import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.score.api.ExecutionStep;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import junit.framework.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ExecutionStepFactoryTest {
 
@@ -34,15 +42,15 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateStartStep() throws Exception {
-        ExecutionStep startStep = factory.createStartStep(1L, new HashMap<String, Serializable>(), new ArrayList<Input>(),"coolStep", ExecutableType.FLOW);
+        ExecutionStep startStep = factory.createStartStep(1L, new HashMap<String, Serializable>(), new ArrayList<Input>(), "coolStep", ExecutableType.FLOW);
         Assert.assertNotNull("step should not be null", startStep);
-        Assert.assertEquals("coolStep",startStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
+        Assert.assertEquals("coolStep", startStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
     }
 
     @Test
     public void testCreateStartStepPutInputsUnderTheRightKey() throws Exception {
         ArrayList<Input> execInputs = new ArrayList<>();
-        ExecutionStep startStep = factory.createStartStep(1L, new HashMap<String, Serializable>(), execInputs,"", ExecutableType.FLOW);
+        ExecutionStep startStep = factory.createStartStep(1L, new HashMap<String, Serializable>(), execInputs, "", ExecutableType.FLOW);
         Assert.assertNotNull("inputs key is null", startStep.getActionData().get(ScoreLangConstants.EXECUTABLE_INPUTS_KEY));
         Assert.assertSame("inputs are not set under their key", execInputs, startStep.getActionData().get(ScoreLangConstants.EXECUTABLE_INPUTS_KEY));
     }
@@ -54,13 +62,13 @@ public class ExecutionStepFactoryTest {
         preStepData.put(SlangTextualKeys.FOR_KEY, statement);
         ExecutionStep startStep = factory.createBeginStepStep(1L, new ArrayList<Argument>(), preStepData, "", "");
         LoopStatement actualStatement = (LoopStatement) startStep.getActionData()
-                                 .get(ScoreLangConstants.LOOP_KEY);
+                .get(ScoreLangConstants.LOOP_KEY);
         Assert.assertNotNull("for key is null", actualStatement);
         Assert.assertSame("inputs are not set under their key", statement, actualStatement);
     }
 
     @Test
-    public void testCreateFinishTakStep(){
+    public void testCreateFinishTakStep() {
         ExecutionStep finishStepStep = factory.createFinishStepStep(
                 1L,
                 new HashMap<String, Serializable>(),
@@ -79,10 +87,10 @@ public class ExecutionStepFactoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateStartStepWithNullInputs() throws Exception {
-        factory.createStartStep(1L, new HashMap<String, Serializable>(), null,"", ExecutableType.FLOW);
+        factory.createStartStep(1L, new HashMap<String, Serializable>(), null, "", ExecutableType.FLOW);
     }
 
-    @Test (expected = RuntimeException.class)
+    @Test(expected = RuntimeException.class)
     public void testCreateActionStepWithEmptyData() throws Exception {
         factory.createActionStep(1L, new HashMap<String, Serializable>());
     }
@@ -116,14 +124,14 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateEndStep() throws Exception {
-        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), new ArrayList<Result>(),"", ExecutableType.FLOW);
+        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), new ArrayList<Result>(), "", ExecutableType.FLOW);
         Assert.assertNotNull("step should not be null", endStep);
     }
 
     @Test
     public void testCreateEndStepPutOutputsUnderTheRightKey() throws Exception {
         ArrayList<Output> outputs = new ArrayList<>();
-        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), outputs, new ArrayList<Result>(),"", ExecutableType.FLOW);
+        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), outputs, new ArrayList<Result>(), "", ExecutableType.FLOW);
         Assert.assertNotNull("outputs key is null", endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY));
         Assert.assertSame("outputs are not set under their key", outputs, endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY));
     }
@@ -131,7 +139,7 @@ public class ExecutionStepFactoryTest {
     @Test
     public void testCreateEndStepPutResultsUnderTheRightKey() throws Exception {
         ArrayList<Result> results = new ArrayList<>();
-        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), results,"", ExecutableType.FLOW);
+        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), results, "", ExecutableType.FLOW);
         Assert.assertNotNull("results key is null", endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_RESULTS_KEY));
         Assert.assertSame("results are not set under their key", results, endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_RESULTS_KEY));
     }
@@ -143,18 +151,18 @@ public class ExecutionStepFactoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateEndStepWithNullOutputs() throws Exception {
-        factory.createEndStep(1L, new HashMap<String, Serializable>(), null, new ArrayList<Result>(),"", ExecutableType.FLOW);
+        factory.createEndStep(1L, new HashMap<String, Serializable>(), null, new ArrayList<Result>(), "", ExecutableType.FLOW);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateEndStepWithNullResults() throws Exception {
-        factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), null,"", ExecutableType.FLOW);
+        factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), null, "", ExecutableType.FLOW);
     }
 
     @Test
     public void testStepName() throws Exception {
         ArrayList<Result> results = new ArrayList<>();
-        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), results,"stepX", ExecutableType.FLOW);
+        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), results, "stepX", ExecutableType.FLOW);
         Assert.assertNotNull("results key is null", endStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
         Assert.assertEquals("stepX", endStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
     }
@@ -162,7 +170,7 @@ public class ExecutionStepFactoryTest {
     @Test
     public void testExecutableType() throws Exception {
         ArrayList<Result> results = new ArrayList<>();
-        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), results,"stepX", ExecutableType.FLOW);
+        ExecutionStep endStep = factory.createEndStep(1L, new HashMap<String, Serializable>(), new ArrayList<Output>(), results, "stepX", ExecutableType.FLOW);
         Assert.assertNotNull("key is null", endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_TYPE));
         Assert.assertEquals(ExecutableType.FLOW, endStep.getActionData().get(ScoreLangConstants.EXECUTABLE_TYPE));
     }
@@ -171,7 +179,7 @@ public class ExecutionStepFactoryTest {
     public void testCreateAddBranchesStep() throws Exception {
         ExecutionStep startStep = factory.createAddBranchesStep(2L, 5L, 3L, new HashMap<String, Serializable>(), "refID", "evenCoolerStep");
         Assert.assertNotNull("step should not be null", startStep);
-        Assert.assertEquals("evenCoolerStep",startStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
+        Assert.assertEquals("evenCoolerStep", startStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
     }
 
     @Test
@@ -186,7 +194,7 @@ public class ExecutionStepFactoryTest {
         ParallelLoopStatement statement = new ParallelLoopStatement("value", "values", new HashSet<ScriptFunction>(), new HashSet<String>());
         HashMap<String, Serializable> preStepData = new HashMap<>();
         preStepData.put(SlangTextualKeys.PARALLEL_LOOP_KEY, statement);
-        ExecutionStep startStep =  factory.createAddBranchesStep(2L, 5L, 3L, preStepData, "refID", "evenCoolerStep");
+        ExecutionStep startStep = factory.createAddBranchesStep(2L, 5L, 3L, preStepData, "refID", "evenCoolerStep");
         ParallelLoopStatement actualStatement = (ParallelLoopStatement) startStep.getActionData()
                 .get(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY);
         Assert.assertNotNull("parallel loop statement not found in action data", actualStatement);

@@ -1,12 +1,12 @@
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 package io.cloudslang.lang.tools.build.tester.parse;
 
@@ -21,6 +21,15 @@ import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.SystemProperty;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -28,11 +37,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.*;
 
 @Component
 public class TestCasesYamlParser {
@@ -52,7 +56,7 @@ public class TestCasesYamlParser {
 
     public Map<String, SlangTestCase> parseTestCases(SlangSource source) {
 
-        if(StringUtils.isEmpty(source.getSource())){
+        if (StringUtils.isEmpty(source.getSource())) {
             log.info("No tests cases were found in: " + source.getFileName());
             return new HashMap<>();
         }
@@ -60,7 +64,7 @@ public class TestCasesYamlParser {
 
         try {
             @SuppressWarnings("unchecked") Map<String, Map> parsedTestCases = yaml.loadAs(source.getSource(), Map.class);
-            if (MapUtils.isEmpty(parsedTestCases)){
+            if (MapUtils.isEmpty(parsedTestCases)) {
                 log.info("No tests cases were found in: " + source.getFileName());
                 return new HashMap<>();
             }

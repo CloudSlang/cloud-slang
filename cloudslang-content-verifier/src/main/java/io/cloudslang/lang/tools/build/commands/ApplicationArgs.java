@@ -12,7 +12,6 @@ package io.cloudslang.lang.tools.build.commands;
 import com.beust.jcommander.DynamicParameter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.CommaParameterSplitter;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,15 +22,15 @@ public class ApplicationArgs {
     @Parameter
     public List<String> parameters = new ArrayList<>();
 
-    @Parameter(names = { "--project-root", "-pr"},
+    @Parameter(names = {"--project-root", "-pr"},
             description = "Project root directory")
     public String projectRoot;
 
-    @Parameter(names = { "--content-root", "-cr"},
+    @Parameter(names = {"--content-root", "-cr"},
             description = "Content root directory")
     public String contentRoot;
 
-    @Parameter(names = { "--test-root", "-tr"},
+    @Parameter(names = {"--test-root", "-tr"},
             description = "Test root directory")
     public String testRoot;
 
@@ -43,6 +42,14 @@ public class ApplicationArgs {
     @Parameter(names = {"--coverage", "-cov"},
             description = "Whether or not test coverage data should be outputted")
     public boolean coverage = false;
+
+    @Parameter(names = {"--parallel", "-par"},
+            description = "Whether or not parallel test execution should be used")
+    public boolean parallel = false;
+
+    @Parameter(names = {"--thread-count", "-th"},
+            description = "Number of threads to be used in case of parallel test execution. Has no effect for sequential execution. By default, it is set to the number of processors.")
+    public String threadCount;
 
     @Parameter(names = {"--help", "-h"}, help = true,
             description = "Display help information")
@@ -81,5 +88,13 @@ public class ApplicationArgs {
 
     public Map<String, String> getDynamicParams() {
         return dynamicParams;
+    }
+
+    public Boolean isParallel() {
+        return parallel;
+    }
+
+    public String getThreadCount() {
+        return threadCount;
     }
 }

@@ -12,20 +12,18 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
-import org.junit.Test;
-import org.springframework.stereotype.Component;
-
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
+import org.junit.Test;
+import org.springframework.stereotype.Component;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  * Simple operation test
- *
+ * <p>
  * Created by Ifat Gavish on 30/05/2016
  */
 @Component

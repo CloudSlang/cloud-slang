@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public class SlangModellerImpl implements SlangModeller{
+public class SlangModellerImpl implements SlangModeller {
 
     @Autowired
     private ExecutableBuilder executableBuilder;
@@ -52,7 +52,7 @@ public class SlangModellerImpl implements SlangModeller{
                 default:
                     throw new RuntimeException("Source: " + parsedSlang.getName() + " is not of flow, operations or decision type");
             }
-        } catch (Throwable ex){
+        } catch (Throwable ex) {
             throw new RuntimeException("Error transforming source: " + parsedSlang.getName() + " to a Slang model. " + ex.getMessage(), ex);
         }
     }

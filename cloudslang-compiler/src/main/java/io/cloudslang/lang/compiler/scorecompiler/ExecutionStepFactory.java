@@ -1,34 +1,33 @@
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 package io.cloudslang.lang.compiler.scorecompiler;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.ActionType;
 import io.cloudslang.lang.entities.ExecutableType;
+import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
-import io.cloudslang.lang.entities.ResultNavigation;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.Validate;
 import io.cloudslang.score.api.ControlActionMetadata;
 import io.cloudslang.score.api.ExecutionStep;
-import org.springframework.stereotype.Component;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.Validate;
+import org.springframework.stereotype.Component;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -106,7 +105,7 @@ public class ExecutionStepFactory {
         if (javaActionFound) {
             actionType = ActionType.JAVA;
             actionData.putAll(javaActionData);
-        } else  if (pythonActionFound) {
+        } else if (pythonActionFound) {
             actionType = ActionType.PYTHON;
             actionData.putAll(pythonActionData);
         } else {

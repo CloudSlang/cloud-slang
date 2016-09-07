@@ -5,16 +5,13 @@ import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Step;
+import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.utils.ListUtils;
 import java.io.Serializable;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,6 +19,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.python.google.common.collect.Lists;
+import org.springframework.stereotype.Component;
 
 /**
  * User: bancl
@@ -38,13 +39,6 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
         dependencies.put(executable.getId(), executable);
         Set<Executable> verifiedExecutables = new HashSet<>();
         return validateModelWithDependencies(executable, dependencies, verifiedExecutables, new ArrayList<RuntimeException>());
-    }
-
-    private boolean navigationListContainsKey(List<Map<String, String>> stepNavigations, String resultName) {
-        for (Map<String, String> map : stepNavigations) {
-            if (map.containsKey(resultName)) return true;
-        }
-        return false;
     }
 
     @Override
@@ -67,7 +61,7 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
         for (Map.Entry<Executable, SlangSource> entry : allAvailableExecutables.entrySet()) {
             Executable executable = entry.getKey();
             if (currentExecutable.getId().equalsIgnoreCase(executable.getId()) && !currentSource.equals(entry.getValue())) {
-                throw new RuntimeException("Duplicate executable found: '" + currentExecutable.getId() + "'" );
+                throw new RuntimeException("Duplicate executable found: '" + currentExecutable.getId() + "'");
             }
         }
     }
@@ -78,7 +72,7 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
             Set<Executable> verifiedExecutables,
             List<RuntimeException> errors) {
         //validate that all required & non private parameters with no default value of a reference are provided
-        if(!SlangTextualKeys.FLOW_TYPE.equals(executable.getType()) || verifiedExecutables.contains(executable)){
+        if (!SlangTextualKeys.FLOW_TYPE.equals(executable.getType()) || verifiedExecutables.contains(executable)) {
             return errors;
         }
         verifiedExecutables.add(executable);
@@ -108,7 +102,7 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
         }
         errors.addAll(validateMandatoryInputsAreWired(flow, step, reference));
         errors.addAll(validateStepInputNamesDifferentFromDependencyOutputNames(flow, step, reference));
-        errors.addAll(validateDependenciesResultsHaveMatchingNavigations(flow, refId, step, reference));
+        errors.addAll(validateNavigationSectionAgainstDependencyResults(flow, step, reference));
         errors.addAll(validateBreakSection(flow, step, reference));
         return errors;
     }
@@ -116,7 +110,7 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
     private List<RuntimeException> validateBreakSection(Flow parentFlow, Step step, Executable reference) {
         List<RuntimeException> errors = new ArrayList<>();
         @SuppressWarnings("unchecked") // from BreakTransformer
-        List<String> breakValues = (List<String>) step.getPostStepActionData().get(SlangTextualKeys.BREAK_KEY);
+                List<String> breakValues = (List<String>) step.getPostStepActionData().get(SlangTextualKeys.BREAK_KEY);
 
         if (isForLoop(step, breakValues)) {
             List<String> referenceResultNames = getResultNames(reference);
@@ -138,26 +132,71 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
         return (forData != null) && CollectionUtils.isNotEmpty(breakValuesList);
     }
 
-    private List<RuntimeException> validateDependenciesResultsHaveMatchingNavigations(Flow flow, String refId, Step step, Executable reference) {
+    private List<RuntimeException> validateNavigationSectionAgainstDependencyResults(Flow flow, Step step, Executable reference) {
         List<RuntimeException> errors = new ArrayList<>();
-        if (!StringUtils.equals(refId, flow.getId())) {
-            List<Map<String, String>> stepNavigationStrings = step.getNavigationStrings();
-            if (reference == null) {
-                errors.add(new IllegalArgumentException("Cannot compile flow: \'" + flow.getName() + "\' since for step: \'" + step.getName()
-                        + "\', the dependency: \'" + refId + "\' is missing."));
-            } else {
-                List<Result> refResults = reference.getResults();
-                for(Result result : refResults){
-                    String resultName = result.getName();
-                    if (!navigationListContainsKey(stepNavigationStrings, resultName)){
-                        errors.add(new IllegalArgumentException("Cannot compile flow: \'" + flow.getName() +
-                                "\' since for step: '" + step.getName() + "\', the result \'" + resultName+
-                                "\' of its dependency: \'"+ refId + "\' has no matching navigation"));
-                    }
-                }
+        String refId = step.getRefId();
+        if (reference == null) {
+            errors.add(new IllegalArgumentException(
+                    getErrorMessagePrefix(flow, step) + " the dependency '" + refId + "' is missing."
+            ));
+        } else {
+            if (!step.isOnFailureStep()) { // on_failure step cannot have navigation section
+                validateResultNamesAndNavigationSection(flow, step, refId, reference, errors);
             }
         }
         return errors;
+    }
+
+    private void validateResultNamesAndNavigationSection(Flow flow, Step step, String refId, Executable reference, List<RuntimeException> errors) {
+        List<String> stepNavigationKeys = getMapKeyList(step.getNavigationStrings());
+        List<String> refResults = getReferenceResultNames(step, reference.getResults());
+
+        List<String> stepNavigationKeysWithoutMatchingResult = ListUtils.subtract(stepNavigationKeys, refResults);
+        List<String> refResultsWithoutMatchingNavigation = ListUtils.subtract(refResults, stepNavigationKeys);
+
+        if (CollectionUtils.isNotEmpty(refResultsWithoutMatchingNavigation)) {
+            errors.add(new IllegalArgumentException(
+                    getErrorMessagePrefix(flow, step) + " the results " + refResultsWithoutMatchingNavigation +
+                            " of its dependency '" + refId + "' have no matching navigation."
+            ));
+        }
+        if (CollectionUtils.isNotEmpty(stepNavigationKeysWithoutMatchingResult)) {
+            errors.add(new IllegalArgumentException(
+                    getErrorMessagePrefix(flow, step) + " the navigation keys " +
+                            stepNavigationKeysWithoutMatchingResult + " have no matching results in its dependency '" +
+                            refId + "'."
+            ));
+        }
+    }
+
+    private String getErrorMessagePrefix(Flow flow, Step step) {
+        return "Cannot compile flow '" + flow.getName() +
+                "' since for step '" + step.getName() + "'";
+    }
+
+    private List<String> getMapKeyList(List<Map<String, String>> collection) {
+        List<String> result = new ArrayList<>();
+        for (Map<String, String> element : collection) {
+            result.add(element.keySet().iterator().next());
+        }
+        return result;
+    }
+
+    private List<String> mapResultsToNames(List<Result> results) {
+        List<String> resultNames = new ArrayList<>();
+        for (Result element : results) {
+            resultNames.add(element.getName());
+        }
+        return resultNames;
+    }
+
+    private List<String> getReferenceResultNames(Step step, List<Result> results) {
+        if (step.isParallelLoop()) {
+            // parallel loop -> may end with SUCCESS or FAILURE
+            return Lists.newArrayList(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.FAILURE_RESULT);
+        } else {
+            return mapResultsToNames(results);
+        }
     }
 
     private List<RuntimeException> validateStepInputNamesDifferentFromDependencyOutputNames(Flow flow, Step step, Executable reference) {

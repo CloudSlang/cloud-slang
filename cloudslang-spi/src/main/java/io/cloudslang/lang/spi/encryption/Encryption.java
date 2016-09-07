@@ -11,7 +11,7 @@ package io.cloudslang.lang.spi.encryption;
 
 /**
  * Encryption support
- *
+ * <p>
  * Created by Ifat Gavish on 29/05/2016
  */
 public interface Encryption {
@@ -34,6 +34,7 @@ public interface Encryption {
 
     /**
      * Checks whether provided text char array is already encrypted
+     *
      * @param text text to check whether it encrypted or not
      * @return true if text is already encrypted
      */

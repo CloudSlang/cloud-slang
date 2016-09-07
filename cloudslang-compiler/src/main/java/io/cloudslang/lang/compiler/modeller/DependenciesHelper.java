@@ -12,6 +12,7 @@ package io.cloudslang.lang.compiler.modeller;
 /*
  * Created by orius123 on 05/11/14.
  */
+
 import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
@@ -23,13 +24,19 @@ import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.Serializable;
-import java.util.*;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
@@ -54,8 +61,8 @@ public class DependenciesHelper {
     }
 
     private Map<String, Executable> fetchFlowReferences(Executable executable,
-                                                                Collection<Executable> availableDependencies,
-                                                                Map<String, Executable> resolvedDependencies) {
+                                                        Collection<Executable> availableDependencies,
+                                                        Map<String, Executable> resolvedDependencies) {
         for (String refId : executable.getExecutableDependencies()) {
             //if it is already in the references we do nothing
             if (resolvedDependencies.get(refId) == null) {
@@ -145,9 +152,9 @@ public class DependenciesHelper {
     private Set<String> getSystemPropertiesFromInOutParam(List<? extends InOutParam> inOutParams) {
         Set<String> result = new HashSet<>();
         if (inOutParams != null) {
-            for(InOutParam inOutParam : inOutParams) {
+            for (InOutParam inOutParam : inOutParams) {
                 Set<String> systemPropertyDependencies = inOutParam.getSystemPropertyDependencies();
-                if(CollectionUtils.isNotEmpty(systemPropertyDependencies)) {
+                if (CollectionUtils.isNotEmpty(systemPropertyDependencies)) {
                     result.addAll(systemPropertyDependencies);
                 }
             }

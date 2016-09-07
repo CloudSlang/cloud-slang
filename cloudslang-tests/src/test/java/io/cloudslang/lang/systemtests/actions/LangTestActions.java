@@ -1,12 +1,12 @@
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 package io.cloudslang.lang.systemtests.actions;
 
@@ -14,7 +14,6 @@ import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import com.hp.oo.sdk.content.plugin.SessionResource;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +26,7 @@ import java.util.Map;
 public class LangTestActions {
 
     @SuppressWarnings("unused")
-    public Map<String, String> parseUrl(@Param("host")String host, @Param("port")String nova_port){
+    public Map<String, String> parseUrl(@Param("host") String host, @Param("port") String nova_port) {
         String url = "http://" + host + ":" + nova_port;
         System.out.println(url);
         Map<String, String> returnValue = new HashMap<>();
@@ -35,13 +34,13 @@ public class LangTestActions {
         return returnValue;
     }
 
-    public Map<String, String> print(@Param("string")String string){
+    public Map<String, String> print(@Param("string") String string) {
         System.out.println(string);
         return new HashMap<>();
     }
 
     @SuppressWarnings("unused")
-    public Map<String, Serializable> printAndReturnDur(@Param("string")String string){
+    public Map<String, Serializable> printAndReturnDur(@Param("string") String string) {
         System.out.println(string);
         HashMap<String, Serializable> outputs = new HashMap<>();
         outputs.put("dur", 120);
@@ -49,11 +48,11 @@ public class LangTestActions {
     }
 
     @SuppressWarnings("unused")
-    public Map<String, String> getConnectionFromNonSerializableSession(@Param("connection") GlobalSessionObject<NonSerializableObject> connection){
+    public Map<String, String> getConnectionFromNonSerializableSession(@Param("connection") GlobalSessionObject<NonSerializableObject> connection) {
         SessionResource<NonSerializableObject> sessionName = connection.getResource();
         Map<String, String> returnMap = new HashMap<>();
         String value = null;
-        if(sessionName != null && sessionName.get() != null){
+        if (sessionName != null && sessionName.get() != null) {
             value = sessionName.get().getName();
         }
         returnMap.put("connection", value);
@@ -62,7 +61,7 @@ public class LangTestActions {
 
     @SuppressWarnings("unused")
     public Map<String, String> setConnectionOnNonSerializableSession(@Param("connection") GlobalSessionObject<NonSerializableObject> connection,
-                                                                     @Param("value") String value){
+                                                                     @Param("value") String value) {
         SessionResource<NonSerializableObject> sessionName = connection.getResource();
         Map<String, String> returnMap = new HashMap<>();
         connection.setResource(new NonSerializableSessionResource(new NonSerializableObject(value)));
@@ -71,7 +70,7 @@ public class LangTestActions {
     }
 
     @SuppressWarnings("unused")
-    public Map<String, String> getNameFromSerializableSession(@Param("name") SerializableSessionObject name){
+    public Map<String, String> getNameFromSerializableSession(@Param("name") SerializableSessionObject name) {
         String sessionName = name.getName();
         Map<String, String> returnMap = new HashMap<>();
         returnMap.put("name", sessionName);

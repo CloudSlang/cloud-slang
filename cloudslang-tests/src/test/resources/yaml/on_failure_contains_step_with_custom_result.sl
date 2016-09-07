@@ -21,7 +21,6 @@ flow:
             - alla
         navigate:
           - SUCCESS: print_on_failure_1
-          - FAILURE: print_on_failure_1
 
     - on_failure:
         - print_on_failure_1:

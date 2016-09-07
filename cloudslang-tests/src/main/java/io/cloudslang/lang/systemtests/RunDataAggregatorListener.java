@@ -15,13 +15,12 @@ package io.cloudslang.lang.systemtests;
 import ch.lambdaj.group.Group;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import java.util.ArrayList;
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections4.CollectionUtils;
 
 import static ch.lambdaj.Lambda.by;
 import static ch.lambdaj.Lambda.group;

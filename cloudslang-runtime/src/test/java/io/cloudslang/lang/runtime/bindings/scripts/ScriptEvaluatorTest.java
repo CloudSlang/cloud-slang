@@ -34,10 +34,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ScriptEvaluatorTest.Config.class)
@@ -162,12 +166,12 @@ public class ScriptEvaluatorTest {
         }
 
         @Bean
-        public PythonExecutionEngine pythonExecutionEngine(){
+        public PythonExecutionEngine pythonExecutionEngine() {
             return new PythonExecutionCachedEngine() {
                 protected PythonExecutor createNewExecutor(Set<String> filePaths) {
                     return new PythonExecutor(filePaths) {
                         protected PythonInterpreter initInterpreter(Set<String> dependencies) {
-                            return  pythonInterpreter();
+                            return pythonInterpreter();
                         }
                     };
                 }

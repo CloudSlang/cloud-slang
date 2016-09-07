@@ -20,6 +20,8 @@ flow:
     - op1:
         do:
           ops.noop: []
+        navigate:
+          - SUCCESS: compare
 
     - compare:
         do:
@@ -38,4 +40,3 @@ flow:
     - EQUAL
     - LESS_THAN
     - GREATER_THAN
-    - FAILURE # fix for default navigation of op1

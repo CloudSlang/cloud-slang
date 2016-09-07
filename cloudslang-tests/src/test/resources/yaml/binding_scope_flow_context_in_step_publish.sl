@@ -23,3 +23,7 @@ flow:
             - op_output_2_step: "op_output_2_step"
         publish:
           - step1_publish_1: ${ flow_var }
+        navigate:
+          - SUCCESS: SUCCESS
+  results:
+    - SUCCESS

@@ -16,9 +16,26 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.tools.build.SlangBuildMain;
+import io.cloudslang.lang.tools.build.tester.parallel.MultiTriggerTestCaseEventListener;
+import io.cloudslang.lang.tools.build.tester.parallel.report.LoggingSlangTestCaseEventListener;
+import io.cloudslang.lang.tools.build.tester.parallel.report.ThreadSafeRunTestResults;
+import io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService;
+import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDispatchService;
+import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.FailedSlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import io.cloudslang.score.events.EventConstants;
+import java.io.File;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
@@ -29,28 +46,30 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import static java.lang.Long.parseLong;
+import static java.lang.String.valueOf;
+import static java.lang.System.getProperty;
+import static java.util.concurrent.TimeUnit.MINUTES;
 
-/**
- * Created by stoneo on 3/15/2015.
- */
+
 @Component
 public class SlangTestRunner {
 
     private final static String PROJECT_PATH_TOKEN = "${project_path}";
+    public static final long MAX_TIME_PER_TESTCASE_IN_MINUTES = 10;
+    public static final String TEST_CASE_TIMEOUT_IN_MINUTES_KEY = "test.case.timeout.in.minutes";
 
     @Autowired
     private TestCasesYamlParser parser;
 
     @Autowired
     private Slang slang;
+
+    @Autowired
+    private ParallelTestCaseExecutorService parallelTestCaseExecutorService;
+
+    @Autowired
+    private TestCaseEventDispatchService testCaseEventDispatchService;
 
     private String[] TEST_CASE_FILE_EXTENSIONS = {"yaml", "yml"};
     public static final String TEST_CASE_PASSED = "Test case passed: ";
@@ -84,14 +103,14 @@ public class SlangTestRunner {
                 String testFlowPath = currentTestCase.getTestFlowPath();
                 //todo: temporary solution
                 currentTestCase.setName(currentTestCaseName);
-                if(StringUtils.isBlank(currentTestCase.getResult())){
+                if (StringUtils.isBlank(currentTestCase.getResult())) {
                     currentTestCase.setResult(getResultFromFileName(testFlowPath));
                 }
-                if(currentTestCase.getThrowsException() == null){
+                if (currentTestCase.getThrowsException() == null) {
                     currentTestCase.setThrowsException(false);
                 }
                 // Make sure the new test cases names are unique
-                if (testCases.containsKey(currentTestCaseName)){
+                if (testCases.containsKey(currentTestCaseName)) {
                     throw new RuntimeException("Test case with the name: " + currentTestCaseName + " already exists. Test case name should be unique across the project"
                     );
                 }
@@ -106,18 +125,17 @@ public class SlangTestRunner {
     }
 
     /**
-     *
      * @param projectPath
      * @param testCases
      * @param compiledFlows
      * @param testSuites
      * @return RunTestsResults containing maps of passed, failed & skipped tests
      */
-    public RunTestsResults runAllTests(String projectPath, Map<String, SlangTestCase> testCases,
-                            Map<String, CompilationArtifact> compiledFlows, List<String> testSuites) {
+    public IRunTestResults runAllTestsSequential(String projectPath, Map<String, SlangTestCase> testCases,
+                                                 Map<String, CompilationArtifact> compiledFlows, List<String> testSuites) {
 
-        RunTestsResults runTestsResults = new RunTestsResults();
-        if(MapUtils.isEmpty(testCases)){
+        IRunTestResults runTestsResults = new RunTestsResults();
+        if (MapUtils.isEmpty(testCases)) {
             return runTestsResults;
         }
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
@@ -126,8 +144,7 @@ public class SlangTestRunner {
                 runTestsResults.addFailedTest(UNAVAILABLE_NAME, new TestRun(testCase, "Test case cannot be null"));
                 continue;
             }
-            if ((CollectionUtils.isEmpty(testCase.getTestSuites()) && testSuites.contains(SlangBuildMain.DEFAULT_TESTS)) ||
-                    CollectionUtils.containsAny(testSuites, testCase.getTestSuites())) {
+            if (isTestCaseInActiveSuite(testCase, testSuites)) {
                 log.info("Running test: " + testCaseEntry.getKey() + " - " + testCase.getDescription());
                 try {
                     CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
@@ -145,6 +162,67 @@ public class SlangTestRunner {
         return runTestsResults;
     }
 
+    public IRunTestResults runAllTestsParallel(String projectPath, Map<String, SlangTestCase> testCases,
+                                               Map<String, CompilationArtifact> compiledFlows, List<String> testSuites) {
+
+        ThreadSafeRunTestResults runTestsResults = new ThreadSafeRunTestResults();
+        if (MapUtils.isEmpty(testCases)) {
+            return runTestsResults;
+        }
+
+        testCaseEventDispatchService.unregisterAllListeners();
+        testCaseEventDispatchService.registerListener(runTestsResults); // for gathering of report data
+        testCaseEventDispatchService.registerListener(new LoggingSlangTestCaseEventListener()); // for logging purpose
+
+        MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener = new MultiTriggerTestCaseEventListener();
+        slang.subscribeOnEvents(multiTriggerTestCaseEventListener, createListenerEventTypesSet());
+        try {
+            Map<SlangTestCase, Future<?>> testCaseFutures = new LinkedHashMap<>();
+            for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
+                SlangTestCase testCase = testCaseEntry.getValue();
+                if (testCase == null) {
+                    testCaseEventDispatchService.notifyListeners(new FailedSlangTestCaseEvent(null, "Test case cannot be null", null));
+                    continue;
+                }
+                SlangTestCaseRunnable slangTestCaseRunnable = new SlangTestCaseRunnable(testCase, compiledFlows, projectPath, testSuites, this, testCaseEventDispatchService, multiTriggerTestCaseEventListener);
+                testCaseFutures.put(testCase, parallelTestCaseExecutorService.submitTestCase(slangTestCaseRunnable));
+            }
+
+            final long testCaseTimeoutMinutes = getTestCaseTimeoutInMinutes();
+            for (Map.Entry<SlangTestCase, Future<?>> slangTestCaseFutureEntry : testCaseFutures.entrySet()) {
+                SlangTestCase testCase = slangTestCaseFutureEntry.getKey();
+                Future<?> testCaseFuture = slangTestCaseFutureEntry.getValue();
+                try {
+                    testCaseFuture.get(testCaseTimeoutMinutes, MINUTES);
+                } catch (InterruptedException e) {
+                    log.error("Interrupted while waiting for result: ", e);
+                } catch (TimeoutException e) {
+                    testCaseEventDispatchService.notifyListeners(new FailedSlangTestCaseEvent(testCase, "Timeout reached for test case " + testCase.getName(), e));
+                } catch (Exception e) {
+                    testCaseEventDispatchService.notifyListeners(new FailedSlangTestCaseEvent(testCase, e.getMessage(), e));
+                }
+            }
+        } finally {
+            testCaseEventDispatchService.unregisterAllListeners();
+            slang.unSubscribeOnEvents(multiTriggerTestCaseEventListener);
+        }
+        return runTestsResults;
+    }
+
+    private long getTestCaseTimeoutInMinutes() {
+        try {
+            return parseLong(getProperty(TEST_CASE_TIMEOUT_IN_MINUTES_KEY, valueOf(MAX_TIME_PER_TESTCASE_IN_MINUTES)));
+        } catch (NumberFormatException nfEx) {
+            log.warn(String.format("Misconfigured test case timeout '%s'. Using default timeout %d.", getProperty(TEST_CASE_TIMEOUT_IN_MINUTES_KEY), MAX_TIME_PER_TESTCASE_IN_MINUTES));
+            return MAX_TIME_PER_TESTCASE_IN_MINUTES;
+        }
+    }
+
+    public boolean isTestCaseInActiveSuite(SlangTestCase testCase, List<String> testSuites) {
+        return (CollectionUtils.isEmpty(testCase.getTestSuites()) && testSuites.contains(SlangBuildMain.DEFAULT_TESTS)) ||
+                CollectionUtils.containsAny(testSuites, testCase.getTestSuites());
+    }
+
     private void printTestCasesWithMissingReference(Set<SlangTestCase> testCasesWithMissingReference) {
         int testCasesWithMissingReferenceSize = testCasesWithMissingReference.size();
         if (testCasesWithMissingReferenceSize > 0) {
@@ -160,30 +238,38 @@ public class SlangTestRunner {
         }
     }
 
-    private static CompilationArtifact getCompiledTestFlow(Map<String, CompilationArtifact> compiledFlows, SlangTestCase testCase) {
+    public CompilationArtifact getCompiledTestFlow(Map<String, CompilationArtifact> compiledFlows, SlangTestCase testCase) {
         String testFlowPath = testCase.getTestFlowPath();
-        if(StringUtils.isEmpty(testFlowPath)){
+        if (StringUtils.isEmpty(testFlowPath)) {
             throw new RuntimeException("For test case: " + testCase.getName() + " testFlowPath property is mandatory");
         }
         String testFlowPathTransformed = testFlowPath.replace(File.separatorChar, '.');
         CompilationArtifact compiledTestFlow = compiledFlows.get(testFlowPathTransformed);
-        if(compiledTestFlow == null) {
+        if (compiledTestFlow == null) {
             throw new RuntimeException("Test flow: " + testFlowPath + " is missing. Referenced in test case: " + testCase.getName());
         }
         return compiledTestFlow;
     }
 
-    private void runTest(SlangTestCase testCase, CompilationArtifact compiledTestFlow, String projectPath) {
+    public void runTest(SlangTestCase testCase, CompilationArtifact compiledTestFlow, String projectPath) {
 
         Map<String, Value> convertedInputs = getTestCaseInputsMap(testCase);
         Set<SystemProperty> systemProperties = getTestSystemProperties(testCase, projectPath);
 
-        trigger(testCase, compiledTestFlow, convertedInputs, systemProperties);
+        runTestCaseSequentiallyToCompletion(testCase, compiledTestFlow, convertedInputs, systemProperties);
+    }
+
+    public void runTestCaseParallel(SlangTestCase testCase, CompilationArtifact compiledTestFlow, String projectPath, MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener) {
+
+        Map<String, Value> convertedInputs = getTestCaseInputsMap(testCase);
+        Set<SystemProperty> systemProperties = getTestSystemProperties(testCase, projectPath);
+
+        runTestCaseInParallelToCompletion(testCase, compiledTestFlow, convertedInputs, systemProperties, multiTriggerTestCaseEventListener);
     }
 
     private Set<SystemProperty> getTestSystemProperties(SlangTestCase testCase, String projectPath) {
         String systemPropertiesFile = testCase.getSystemPropertiesFile();
-        if(StringUtils.isEmpty(systemPropertiesFile)){
+        if (StringUtils.isEmpty(systemPropertiesFile)) {
             return new HashSet<>();
         }
         systemPropertiesFile = StringUtils.replace(systemPropertiesFile, PROJECT_PATH_TOKEN, projectPath);
@@ -221,9 +307,9 @@ public class SlangTestRunner {
      * @param inputs              : flow inputs
      * @return executionId
      */
-    public Long trigger(SlangTestCase testCase, CompilationArtifact compilationArtifact,
-                        Map<String, Value> inputs,
-                        Set<SystemProperty> systemProperties) {
+    public Long runTestCaseSequentiallyToCompletion(SlangTestCase testCase, CompilationArtifact compilationArtifact,
+                                                    Map<String, Value> inputs,
+                                                    Set<SystemProperty> systemProperties) {
 
         String testCaseName = testCase.getName();
         String result = testCase.getResult();
@@ -236,9 +322,7 @@ public class SlangTestRunner {
         Long executionId = slang.run(compilationArtifact, inputs, systemProperties);
 
         while (!testsEventListener.isFlowFinished()) {
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException ignore) {}
+            poll();
         }
         slang.unSubscribeOnEvents(testsEventListener);
 
@@ -246,17 +330,17 @@ public class SlangTestRunner {
 
         String message;
         if (BooleanUtils.isTrue(testCase.getThrowsException())) {
-            if(StringUtils.isBlank(errorMessageFlowExecution)) {
+            if (StringUtils.isBlank(errorMessageFlowExecution)) {
                 message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tFlow " +
-                                compilationArtifact.getExecutionPlan().getName() + " did not throw an exception as expected";
+                        compilationArtifact.getExecutionPlan().getName() + " did not throw an exception as expected";
                 log.info(message);
                 throw new RuntimeException(message);
             }
-            log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with exception as expected" );
+            log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with exception as expected");
             return executionId;
         }
 
-        if (StringUtils.isNotBlank(errorMessageFlowExecution)){
+        if (StringUtils.isNotBlank(errorMessageFlowExecution)) {
             // unexpected exception occurred during flow execution
             message = "Error occurred while running test: " + testCaseName + " - " + testCase.getDescription() + "\n\t" + errorMessageFlowExecution;
             log.info(message);
@@ -264,34 +348,97 @@ public class SlangTestRunner {
         }
 
         String executionResult = testsEventListener.getResult();
-        if (result != null && !result.equals(executionResult)){
+        if (result != null && !result.equals(executionResult)) {
             message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tExpected result: " + result + "\n\tActual result: " + executionResult;
             log.error(message);
             throw new RuntimeException(message);
         }
 
         Map<String, Serializable> executionOutputs = testsEventListener.getOutputs();
-        if (MapUtils.isNotEmpty(outputs)){
-            for(Map.Entry<String, Serializable> output: outputs.entrySet()) {
-                String outputName = output.getKey();
-                Serializable outputValue = output.getValue();
-                Serializable executionOutputValue = executionOutputs.get(outputName);
-                if(!executionOutputs.containsKey(outputName) ||
-                        !outputsAreEqual(outputValue, executionOutputValue)){
-                    message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tFor output: " + outputName+ "\n\tExpected value: " + outputValue + "\n\tActual value: " + executionOutputValue;
-                    log.error(message);
-                    throw new RuntimeException(message);
-                }
-            }
-        }
+        handleTestCaseFailuresFromOutputs(testCase, testCaseName, outputs, executionOutputs);
 
         log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with result: " + executionResult);
         return executionId;
     }
 
+    public Long runTestCaseInParallelToCompletion(SlangTestCase testCase, CompilationArtifact compilationArtifact,
+                                                  Map<String, Value> inputs,
+                                                  Set<SystemProperty> systemProperties, MultiTriggerTestCaseEventListener globalListener) {
+
+        String testCaseName = testCase.getName();
+        String result = testCase.getResult();
+        Map<String, Serializable> outputs = getTestCaseOutputsMap(testCase);
+        String flowName = testCase.getTestFlowPath();
+
+        Long executionId = slang.run(compilationArtifact, inputs, systemProperties);
+
+        while (!globalListener.isFlowFinishedByExecutionId(executionId)) {
+            poll();
+        }
+
+        String errorMessageFlowExecution = globalListener.getErrorMessageByExecutionId(executionId);
+
+        String message;
+        if (BooleanUtils.isTrue(testCase.getThrowsException())) {
+            if (StringUtils.isBlank(errorMessageFlowExecution)) {
+
+                message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tFlow " +
+                        compilationArtifact.getExecutionPlan().getName() + " did not throw an exception as expected";
+                log.info(message);
+                throw new RuntimeException(message);
+            }
+            log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with exception as expected");
+            return executionId;
+        }
+
+        if (StringUtils.isNotBlank(errorMessageFlowExecution)) {
+            // unexpected exception occurred during flow execution
+            message = "Error occurred while running test: " + testCaseName + " - " + testCase.getDescription() + "\n\t" + errorMessageFlowExecution;
+            log.info(message);
+            throw new RuntimeException(message);
+        }
+
+        String executionResult = globalListener.getResultByExecutionId(executionId);
+        if (result != null && !result.equals(executionResult)) {
+            message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tExpected result: " + result + "\n\tActual result: " + executionResult;
+            log.error(message);
+            throw new RuntimeException(message);
+        }
+
+        Map<String, Serializable> executionOutputs = globalListener.getOutputsByExecutionId(executionId);
+        handleTestCaseFailuresFromOutputs(testCase, testCaseName, outputs, executionOutputs);
+
+        log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with result: " + executionResult);
+        return executionId;
+    }
+
+    private void poll() {
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException ignore) {
+        }
+    }
+
+    private void handleTestCaseFailuresFromOutputs(SlangTestCase testCase, String testCaseName, Map<String, Serializable> outputs, Map<String, Serializable> executionOutputs) {
+        String message;
+        if (MapUtils.isNotEmpty(outputs)) {
+            for (Map.Entry<String, Serializable> output : outputs.entrySet()) {
+                String outputName = output.getKey();
+                Serializable outputValue = output.getValue();
+                Serializable executionOutputValue = executionOutputs.get(outputName);
+                if (!executionOutputs.containsKey(outputName) ||
+                        !outputsAreEqual(outputValue, executionOutputValue)) {
+                    message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tFor output: " + outputName + "\n\tExpected value: " + outputValue + "\n\tActual value: " + executionOutputValue;
+                    log.error(message);
+                    throw new RuntimeException(message);
+                }
+            }
+        }
+    }
+
     private boolean outputsAreEqual(Serializable outputValue, Serializable executionOutputValue) {
         return executionOutputValue == outputValue ||
-                    StringUtils.equals(executionOutputValue.toString(), outputValue.toString());
+                StringUtils.equals(executionOutputValue.toString(), outputValue.toString());
     }
 
     private Set<String> createListenerEventTypesSet() {

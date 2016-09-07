@@ -25,6 +25,8 @@ flow:
             - var2
         publish:
           - result_sum3: ${version_sum3}
+        navigate:
+          - SUCCESS: step_sum5
     - step_sum5:
         do:
           ops.py_dependency_sum5_op:
@@ -32,6 +34,8 @@ flow:
             - var2
         publish:
           - result_sum5: ${version_sum5}
+        navigate:
+          - SUCCESS: step_mul3
     - step_mul3:
         do:
           ops.py_dependency_mul3_op:
@@ -39,6 +43,8 @@ flow:
             - var2
         publish:
           - result_mul3: ${version_mul3}
+        navigate:
+          - SUCCESS: step_mul5
     - step_mul5:
         do:
           ops.py_dependency_mul5_op:
@@ -46,6 +52,8 @@ flow:
             - var2
         publish:
           - result_mul5: ${version_mul5}
+        navigate:
+          - SUCCESS: SUCCESS
   outputs:
     - result_sum3
     - result_sum5
@@ -53,4 +61,3 @@ flow:
     - result_mul5
   results:
     - SUCCESS
-    - FAILURE

@@ -23,13 +23,12 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-import org.apache.commons.collections4.MapUtils;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import org.apache.commons.collections4.MapUtils;
 
 /**
  * User: stoneo
@@ -64,17 +63,17 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
 
     @Override
     public synchronized void onEvent(ScoreEvent scoreEvent) throws InterruptedException {
-        @SuppressWarnings("unchecked") Map<String,Serializable> data = (Map<String,Serializable>) scoreEvent.getData();
+        @SuppressWarnings("unchecked") Map<String, Serializable> data = (Map<String, Serializable>) scoreEvent.getData();
         LanguageEventData eventData;
-        switch (scoreEvent.getEventType()){
-            case EventConstants.SCORE_FINISHED_EVENT :
+        switch (scoreEvent.getEventType()) {
+            case EventConstants.SCORE_FINISHED_EVENT:
                 break;
-            case EventConstants.SCORE_ERROR_EVENT :
-            case EventConstants.SCORE_FAILURE_EVENT :
+            case EventConstants.SCORE_ERROR_EVENT:
+            case EventConstants.SCORE_FAILURE_EVENT:
                 errorMessage.set(data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " + data.get(EventConstants.SCORE_ERROR_MSG));
                 flowFinished.set(true);
                 break;
-            case ScoreLangConstants.EVENT_EXECUTION_FINISHED :
+            case ScoreLangConstants.EVENT_EXECUTION_FINISHED:
                 eventData = (LanguageEventData) data;
                 result = eventData.getResult();
                 flowFinished.set(true);
@@ -82,21 +81,21 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
             case ScoreLangConstants.EVENT_OUTPUT_END:
                 eventData = (LanguageEventData) data;
                 Map<String, Serializable> extractOutputs = extractOutputs(eventData);
-                if(MapUtils.isNotEmpty(extractOutputs)) {
+                if (MapUtils.isNotEmpty(extractOutputs)) {
                     outputs = extractOutputs;
                 }
                 break;
         }
     }
 
-    private static Map<String, Serializable> extractOutputs(LanguageEventData data) {
+    public static Map<String, Serializable> extractOutputs(LanguageEventData data) {
 
         Map<String, Serializable> outputsMap = new HashMap<>();
 
         boolean thereAreOutputsForRootPath =
                 data.containsKey(LanguageEventData.OUTPUTS)
-                && data.containsKey(LanguageEventData.PATH)
-                && data.getPath().equals(EXEC_START_PATH);
+                        && data.containsKey(LanguageEventData.PATH)
+                        && data.getPath().equals(EXEC_START_PATH);
 
         if (thereAreOutputsForRootPath) {
             Map<String, Serializable> outputs = data.getOutputs();

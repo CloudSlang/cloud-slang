@@ -1,13 +1,13 @@
 package io.cloudslang.lang.compiler.modeller.transformers;
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Date: 12/11/2014
  * Time: 11:33
  */
-public abstract class AbstractOutputsTransformer  extends InOutTransformer {
+public abstract class AbstractOutputsTransformer extends InOutTransformer {
 
     @Autowired
     private PreCompileValidator preCompileValidator;
@@ -41,7 +41,7 @@ public abstract class AbstractOutputsTransformer  extends InOutTransformer {
         List<Output> transformedData = new ArrayList<>();
         List<RuntimeException> errors = new ArrayList<>();
 
-        if (CollectionUtils.isEmpty(rawData)){
+        if (CollectionUtils.isEmpty(rawData)) {
             return new BasicTransformModellingResult<>(transformedData, errors);
         }
 
@@ -93,7 +93,7 @@ public abstract class AbstractOutputsTransformer  extends InOutTransformer {
         }
     }
 
-    Output createOutput(String outputName, Serializable outputExpression, boolean sensitive){
+    Output createOutput(String outputName, Serializable outputExpression, boolean sensitive) {
         executableValidator.validateOutputName(outputName);
         preCompileValidator.validateStringValue(outputName, outputExpression, this);
         Accumulator accumulator = extractFunctionData(outputExpression);

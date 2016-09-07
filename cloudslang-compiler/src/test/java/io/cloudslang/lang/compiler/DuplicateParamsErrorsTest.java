@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -170,7 +169,7 @@ public class DuplicateParamsErrorsTest {
     }
 
     @Test
-         public void testStepDuplicatePublishValueIgnoreCase() throws Exception {
+    public void testStepDuplicatePublishValueIgnoreCase() throws Exception {
         URI resource = getClass().getResource("/corrupted/duplicate/duplicate_step_publish_value_ignore_case.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));

@@ -1,12 +1,12 @@
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 package io.cloudslang.lang.compiler;
 
@@ -16,21 +16,20 @@ import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.score.api.ExecutionPlan;
+import io.cloudslang.score.api.ExecutionStep;
+import java.net.URI;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import io.cloudslang.score.api.ExecutionPlan;
-import io.cloudslang.score.api.ExecutionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.net.URI;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 
@@ -142,10 +141,10 @@ public class CompileFlowWithOnFailureTest {
         assertTrue(result.getErrors().size() == 0);
     }
 
-	private long getFailureNavigationStepId(ExecutionStep firstStep) {
+    private long getFailureNavigationStepId(ExecutionStep firstStep) {
         Map<String, ResultNavigation> navigationData = getNavigationMap(firstStep);
         return navigationData.get(ScoreLangConstants.FAILURE_RESULT).getNextStepId();
-	}
+    }
 
     private Map<String, ResultNavigation> getNavigationMap(ExecutionStep firstStep) {
         @SuppressWarnings("unchecked") Map<String, ResultNavigation> stringResultNavigationMap =
