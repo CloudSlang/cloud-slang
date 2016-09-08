@@ -36,8 +36,8 @@ public class YamlParser {
     @Autowired
     private ExecutableValidator executableValidator;
 
-    public ParsedSlang parseAndValidateAndThrowFirstError(SlangSource source) {
-        ParseModellingResult parseModellingResult = parseAndValidate(source);
+    public ParsedSlang validateAndThrowFirstError(ParsedSlang parsedSlang) {
+        ParseModellingResult parseModellingResult = validate(parsedSlang);
         if (!parseModellingResult.getErrors().isEmpty()) {
             throw parseModellingResult.getErrors().get(0);
         } else {
@@ -45,8 +45,7 @@ public class YamlParser {
         }
     }
 
-    public ParseModellingResult parseAndValidate(SlangSource source) {
-        ParsedSlang parsedSlang = parse(source);
+    public ParseModellingResult validate(ParsedSlang parsedSlang) {
         List<RuntimeException> errors = new ArrayList<>();
         try {
             executableValidator.validateNamespace(parsedSlang);

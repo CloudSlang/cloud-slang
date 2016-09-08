@@ -102,7 +102,8 @@ public class SlangCompilerImpl implements SlangCompiler {
         Validate.notNull(source, "You must supply a source to compile");
 
         //first thing we parse the yaml file into java maps
-        ParseModellingResult parseModellingResult = yamlParser.parseAndValidate(source);
+        ParsedSlang parsedSlang = yamlParser.parse(source);
+        ParseModellingResult parseModellingResult = yamlParser.validate(parsedSlang);
 
         // Then we transform the parsed Slang source to a Slang model
         return slangModeller.createModel(parseModellingResult);
@@ -127,7 +128,8 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     private ParsedSlang parseSystemPropertiesFile(SlangSource source) {
-        ParsedSlang parsedSlang = yamlParser.parseAndValidateAndThrowFirstError(source);
+        ParsedSlang parsedSlang = yamlParser.parse(source);
+        parsedSlang = yamlParser.validateAndThrowFirstError(parsedSlang);
         if (!ParsedSlang.Type.SYSTEM_PROPERTY_FILE.equals(parsedSlang.getType())) {
             throw new RuntimeException("Source: " + parsedSlang.getName() + " " + NOT_A_VALID_SYSTEM_PROPERTY_FILE_ERROR_MESSAGE_SUFFIX);
         }
