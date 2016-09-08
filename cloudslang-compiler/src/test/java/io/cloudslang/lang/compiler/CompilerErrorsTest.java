@@ -287,7 +287,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Operation/Flow op_without_namespace must have a namespace");
+        exception.expectMessage("For source[op_without_namespace] namespace cannot be empty.");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -297,7 +297,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Executable in source: missing_name_flow has no name");
+        exception.expectMessage("Executable has no name");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 

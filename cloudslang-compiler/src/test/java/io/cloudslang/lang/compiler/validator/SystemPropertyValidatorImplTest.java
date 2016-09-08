@@ -66,35 +66,40 @@ public class SystemPropertyValidatorImplTest {
     @Test
     public void testNamespaceNoMatch1() throws Exception {
         String input = ".c";
-        expectException("Namespace[.c] cannot start with system property delimiter[.].");
+        expectException("Error validating system property namespace. Nested exception is:" +
+                " Argument[.c] cannot start with delimiter[.].");
         systemPropertyValidator.validateNamespace(input);
     }
 
     @Test
     public void testNamespaceNoMatch2() throws Exception {
         String input = "a..c";
-        expectException("Namespace[a..c] cannot contain multiple system property delimiters[.] without content.");
+        expectException("Error validating system property namespace. Nested exception is:" +
+                " Argument[a..c] cannot contain multiple delimiters[.] without content.");
         systemPropertyValidator.validateNamespace(input);
     }
 
     @Test
     public void testNamespaceNoMatch3() throws Exception {
         String input = "a.c.";
-        expectException("Namespace[a.c.] cannot end with system property delimiter[.].");
+        expectException("Error validating system property namespace. Nested exception is:" +
+                " Argument[a.c.] cannot end with delimiter[.].");
         systemPropertyValidator.validateNamespace(input);
     }
 
     @Test
     public void testNamespaceNoMatch4() throws Exception {
         String input = ".";
-        expectException("Namespace[.] cannot start with system property delimiter[.].");
+        expectException("Error validating system property namespace." +
+                " Nested exception is: Argument[.] cannot start with delimiter[.].");
         systemPropertyValidator.validateNamespace(input);
     }
 
     @Test
     public void testNamespaceNoMatch5() throws Exception {
         String input = "a.b.?";
-        expectException("Namespace[a.b.?] contains invalid characters.");
+        expectException("Error validating system property namespace." +
+                " Nested exception is: Argument[a.b.?] violates character rules.");
         systemPropertyValidator.validateNamespace(input);
     }
 
@@ -138,35 +143,40 @@ public class SystemPropertyValidatorImplTest {
     @Test
     public void testKeyNoMatch1() throws Exception {
         String input = ".c";
-        expectException("Key[.c] cannot start with system property delimiter[.].");
+        expectException("Error validating system property key. Nested exception is:" +
+                " Argument[.c] cannot start with delimiter[.].");
         systemPropertyValidator.validateKey(input);
     }
 
     @Test
     public void testKeyNoMatch2() throws Exception {
         String input = "a..c";
-        expectException("Key[a..c] cannot contain multiple system property delimiters[.] without content.");
+        expectException("Error validating system property key. Nested exception is: " +
+                "Argument[a..c] cannot contain multiple delimiters[.] without content.");
         systemPropertyValidator.validateKey(input);
     }
 
     @Test
     public void testKeyNoMatch3() throws Exception {
         String input = "a.c.";
-        expectException("Key[a.c.] cannot end with system property delimiter[.].");
+        expectException("Error validating system property key. Nested exception is:" +
+                " Argument[a.c.] cannot end with delimiter[.].");
         systemPropertyValidator.validateKey(input);
     }
 
     @Test
     public void testKeyNoMatch4() throws Exception {
         String input = ".";
-        expectException("Key[.] cannot start with system property delimiter[.].");
+        expectException("Error validating system property key. Nested exception is:" +
+                " Argument[.] cannot start with delimiter[.].");
         systemPropertyValidator.validateKey(input);
     }
 
     @Test
     public void testKeyNoMatch5() throws Exception {
         String input = "a.b.?";
-        expectException("Key[a.b.?] contains invalid characters.");
+        expectException("Error validating system property key. Nested exception is:" +
+                " Argument[a.b.?] violates character rules.");
         systemPropertyValidator.validateKey(input);
     }
 

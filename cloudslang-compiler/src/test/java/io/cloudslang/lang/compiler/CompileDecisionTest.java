@@ -168,7 +168,7 @@ public class CompileDecisionTest {
 
         exception.expect(RuntimeException.class);
         exception.expectMessage(
-                "Artifact {decision_4_py_action_key.sl} has unrecognized tag {wrong_key}." +
+                "Artifact {decision_4_py_action_key} has unrecognized tag {wrong_key}." +
                         " Please take a look at the supported features per versions link"
         );
         compiler.compile(SlangSource.fromFile(decision.toURI()), emptySetSlangSource);
