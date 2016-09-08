@@ -85,8 +85,8 @@ public abstract class AbstractForTransformer extends AbstractInOutForTransformer
     }
 
     private LoopStatement createMapForLoopStatement(String keyName, String valueName, String collectionExpression, Accumulator dependencyAccumulator) {
-        validateChars(keyName);
-        validateChars(valueName);
+        executableValidator.validateLoopStatementVariable(keyName);
+        executableValidator.validateLoopStatementVariable(valueName);
         return new MapForLoopStatement(
                 keyName,
                 valueName,
@@ -96,7 +96,7 @@ public abstract class AbstractForTransformer extends AbstractInOutForTransformer
     }
 
     private LoopStatement createLoopStatement(String varName, String collectionExpression, Accumulator dependencyAccumulator, boolean isParallelLoop) {
-        validateChars(varName);
+        executableValidator.validateLoopStatementVariable(varName);
         LoopStatement loopStatement;
         if (isParallelLoop) {
             loopStatement = new ParallelLoopStatement(varName, collectionExpression,
@@ -110,7 +110,4 @@ public abstract class AbstractForTransformer extends AbstractInOutForTransformer
         return loopStatement;
     }
 
-    private void validateChars(String name) {
-        executableValidator.validateLoopStatementVariable(name);
-    }
 }
