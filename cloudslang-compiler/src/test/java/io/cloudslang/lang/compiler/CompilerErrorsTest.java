@@ -452,7 +452,7 @@ public class CompilerErrorsTest {
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'private_input_without_default' syntax is illegal.\n" +
-                "Input: input_without_default is private but no default value was specified");
+                "Input: 'input_without_default' is private but no default value was specified");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 

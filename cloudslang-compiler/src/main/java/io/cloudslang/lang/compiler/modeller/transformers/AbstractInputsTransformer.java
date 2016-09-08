@@ -93,7 +93,10 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
 
         if (privateInput && !defaultSpecified) {
             throw new RuntimeException(
-                    "Input: " + inputName + " is private but no default value was specified");
+                    "Input: '" + inputName + "' is private but no default value was specified");
+        } else if (privateInput && required && "".equals(value)) {
+            throw new RuntimeException(
+                    "Input: '" + inputName + "' is private and required and the default value is empty string");
         }
 
         return createInput(inputName, value, sensitive, required, privateInput);
