@@ -10,6 +10,8 @@ import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.utils.ArgumentUtils;
+import io.cloudslang.lang.entities.utils.InputUtils;
 import io.cloudslang.lang.entities.utils.ListUtils;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -216,17 +218,19 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
     private List<String> getMandatoryInputNames(Executable executable) {
         List<String> inputNames = new ArrayList<>();
         for (Input input : executable.getInputs()) {
-            if (!input.isPrivateInput() && input.isRequired() && (input.getValue() == null || input.getValue().get() == null)) {
+            if (InputUtils.isMandatory(input)) {
                 inputNames.add(input.getName());
             }
         }
         return inputNames;
     }
 
-    private List<String> getStepInputNames(Step step) {
+    private List<String> getStepInputNamesWithNonEmptyValue(Step step) {
         List<String> inputNames = new ArrayList<>();
         for (Argument argument : step.getArguments()) {
-            inputNames.add(argument.getName());
+            if (ArgumentUtils.isDefined(argument)) {
+                inputNames.add(argument.getName());
+            }
         }
         return inputNames;
     }
@@ -240,7 +244,7 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
     private List<RuntimeException> validateMandatoryInputsAreWired(Flow flow, Step step, Executable reference) {
         List<RuntimeException> errors = new ArrayList<>();
         List<String> mandatoryInputNames = getMandatoryInputNames(reference);
-        List<String> stepInputNames = getStepInputNames(step);
+        List<String> stepInputNames = getStepInputNamesWithNonEmptyValue(step);
         List<String> inputsNotWired = getInputsNotWired(mandatoryInputNames, stepInputNames);
         if (!CollectionUtils.isEmpty(inputsNotWired)) {
             errors.add(new IllegalArgumentException(prepareErrorMessageValidateInputNamesEmpty(inputsNotWired, flow, step, reference)));
