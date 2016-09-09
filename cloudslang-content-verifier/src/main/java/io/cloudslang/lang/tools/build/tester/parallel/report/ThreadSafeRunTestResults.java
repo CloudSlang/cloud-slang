@@ -58,7 +58,7 @@ public class ThreadSafeRunTestResults implements IRunTestResults, ISlangTestCase
 
     @Override
     public Queue<RuntimeException> getExceptions() {
-        return null;
+        return exceptions;
     }
 
     @Override

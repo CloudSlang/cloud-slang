@@ -46,14 +46,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -61,6 +59,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyListOf;
@@ -71,10 +72,13 @@ import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 
 /*
  * Created by stoneo on 2/11/2015.
@@ -123,9 +127,9 @@ public class SlangBuildTest {
 
     @Before
     public void resetMocks() {
-        Mockito.reset(slangCompiler);
-        Mockito.reset(scoreCompiler);
-        Mockito.reset(slangTestRunner);
+        reset(slangCompiler);
+        reset(scoreCompiler);
+        reset(slangTestRunner);
     }
 
     @Test
@@ -177,43 +181,43 @@ public class SlangBuildTest {
     @Test
     public void testPreCompileIllegalSlangFile() throws Exception {
         URI resource = getClass().getResource("/no_dependencies").toURI();
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenThrow(new RuntimeException());
+        when(slangCompiler.preCompile(any(SlangSource.class))).thenThrow(new RuntimeException());
         exception.expect(RuntimeException.class);
         SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
-        Assert.assertNotNull(slangBuildResults.getCompilationExceptions());
-        Assert.assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
+        assertNotNull(slangBuildResults.getCompilationExceptions());
+        assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
         throw slangBuildResults.getCompilationExceptions().get(0);
     }
 
     @Test
     public void testNotAllSlangFilesWerePreCompiled() throws Exception {
         URI resource = getClass().getResource("/no_dependencies").toURI();
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(null);
+        when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(null);
         exception.expect(RuntimeException.class);
         exception.expectMessage("1");
         exception.expectMessage("0");
         exception.expectMessage("compiled");
         SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
-        Assert.assertNotNull(slangBuildResults.getCompilationExceptions());
-        Assert.assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
+        assertNotNull(slangBuildResults.getCompilationExceptions());
+        assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
         throw slangBuildResults.getCompilationExceptions().get(0);
     }
 
     @Test
     public void testCompileValidSlangFileNoDependencies() throws Exception {
         URI resource = getClass().getResource("/no_dependencies").toURI();
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
-        Mockito.when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
+        when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
+        when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
-        Assert.assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
+        assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
     }
 
     @Test
     public void testCompileInvalidSlangFile() throws Exception {
         URI resource = getClass().getResource("/no_dependencies").toURI();
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
-        Mockito.when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenThrow(new RuntimeException());
+        when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
+        when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenThrow(new RuntimeException());
         exception.expect(RuntimeException.class);
         slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
     }
@@ -221,8 +225,8 @@ public class SlangBuildTest {
     @Test
     public void testNotAllSlangFilesWereCompiled() throws Exception {
         URI resource = getClass().getResource("/no_dependencies").toURI();
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
-        Mockito.when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(null);
+        when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
+        when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(null);
         exception.expect(RuntimeException.class);
         exception.expectMessage("1");
         exception.expectMessage("0");
@@ -237,10 +241,10 @@ public class SlangBuildTest {
         Set<String> flowDependencies = new HashSet<>();
         flowDependencies.add("dep1");
         Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, null, flowDependencies, SYSTEM_PROPERTY_DEPENDENCIES);
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
-        Mockito.when(scoreCompiler.compile(newExecutable, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
-        Mockito.when(metadataExtractor.extractMetadata(any(SlangSource.class))).thenReturn(EMPTY_METADATA);
-        Mockito.doCallRealMethod().when(staticValidator).validateSlangFile(any(File.class), eq(newExecutable), eq(EMPTY_METADATA), eq(false));
+        when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
+        when(scoreCompiler.compile(newExecutable, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
+        when(metadataExtractor.extractMetadata(any(SlangSource.class))).thenReturn(EMPTY_METADATA);
+        doCallRealMethod().when(staticValidator).validateSlangFile(any(File.class), eq(newExecutable), eq(EMPTY_METADATA), eq(false));
         exception.expect(RuntimeException.class);
         exception.expectMessage("dependency");
         exception.expectMessage("dep1");
@@ -253,32 +257,32 @@ public class SlangBuildTest {
         Set<String> flowDependencies = new HashSet<>();
         flowDependencies.add("dependencies.dependency");
         Flow emptyFlowExecutable = new Flow(null, null, null, "dependencies", "empty_flow", null, null, null, flowDependencies, SYSTEM_PROPERTY_DEPENDENCIES);
-        Mockito.when(slangCompiler.preCompile(new SlangSource("", "empty_flow"))).thenReturn(emptyFlowExecutable);
+        when(slangCompiler.preCompile(new SlangSource("", "empty_flow"))).thenReturn(emptyFlowExecutable);
         Flow dependencyExecutable = new Flow(null, null, null, "dependencies", "dependency", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
-        Mockito.when(slangCompiler.preCompile(new SlangSource("", "dependency"))).thenReturn(dependencyExecutable);
+        when(slangCompiler.preCompile(new SlangSource("", "dependency"))).thenReturn(dependencyExecutable);
         HashSet<Executable> dependencies = new HashSet<>();
         dependencies.add(dependencyExecutable);
-        Mockito.when(scoreCompiler.compile(emptyFlowExecutable, dependencies)).thenReturn(EMPTY_COMPILATION_ARTIFACT);
-        Mockito.when(scoreCompiler.compile(dependencyExecutable, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
+        when(scoreCompiler.compile(emptyFlowExecutable, dependencies)).thenReturn(EMPTY_COMPILATION_ARTIFACT);
+        when(scoreCompiler.compile(dependencyExecutable, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
         // properties file should be ignored
-        Assert.assertEquals("Did not compile all Slang files. Expected to compile: 2, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 2);
+        assertEquals("Did not compile all Slang files. Expected to compile: 2, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 2);
     }
 
     @Test
     public void testInvalidNamespaceFlow() throws Exception {
         URI resource = getClass().getResource("/no_dependencies").toURI();
         Flow newExecutable = new Flow(null, null, null, "wrong.namespace", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
-        Mockito.when(metadataExtractor.extractMetadata(any(SlangSource.class))).thenReturn(EMPTY_METADATA);
-        Mockito.doCallRealMethod().when(staticValidator).validateSlangFile(any(File.class), eq(newExecutable), eq(EMPTY_METADATA), eq(false));
+        when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
+        when(metadataExtractor.extractMetadata(any(SlangSource.class))).thenReturn(EMPTY_METADATA);
+        doCallRealMethod().when(staticValidator).validateSlangFile(any(File.class), eq(newExecutable), eq(EMPTY_METADATA), eq(false));
         exception.expect(RuntimeException.class);
         exception.expectMessage("Namespace");
         exception.expectMessage("wrong.namespace");
         SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
-        Assert.assertNotNull(slangBuildResults.getCompilationExceptions());
-        Assert.assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
+        assertNotNull(slangBuildResults.getCompilationExceptions());
+        assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
         throw slangBuildResults.getCompilationExceptions().get(0);
     }
 
@@ -286,15 +290,15 @@ public class SlangBuildTest {
     public void testInvalidFlowName() throws Exception {
         URI resource = getClass().getResource("/no_dependencies").toURI();
         Flow newExecutable = new Flow(null, null, null, "no_dependencies", "wrong_name", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
-        Mockito.when(metadataExtractor.extractMetadata(any(SlangSource.class))).thenReturn(EMPTY_METADATA);
-        Mockito.doCallRealMethod().when(staticValidator).validateSlangFile(any(File.class), eq(newExecutable), eq(EMPTY_METADATA), eq(false));
+        when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
+        when(metadataExtractor.extractMetadata(any(SlangSource.class))).thenReturn(EMPTY_METADATA);
+        doCallRealMethod().when(staticValidator).validateSlangFile(any(File.class), eq(newExecutable), eq(EMPTY_METADATA), eq(false));
         exception.expect(RuntimeException.class);
         exception.expectMessage("Name");
         exception.expectMessage("wrong_name");
         SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
-        Assert.assertNotNull(slangBuildResults.getCompilationExceptions());
-        Assert.assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
+        assertNotNull(slangBuildResults.getCompilationExceptions());
+        assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
         throw slangBuildResults.getCompilationExceptions().get(0);
     }
 
@@ -302,37 +306,37 @@ public class SlangBuildTest {
     public void testValidFlowNamespaceWithAllValidCharsTypes() throws Exception {
         URI resource = getClass().getResource("/no_dependencies-0123456789").toURI();
         Flow executable = new Flow(null, null, null, "no_dependencies-0123456789", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(executable);
-        Mockito.when(scoreCompiler.compile(executable, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
+        when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(executable);
+        when(scoreCompiler.compile(executable, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
-        Assert.assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
+        assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
     }
 
     @Test
     public void testValidFlowNamespaceCaseInsensitive() throws Exception {
         URI resource = getClass().getResource("/no_dependencies").toURI();
         Flow executable = new Flow(null, null, null, "No_Dependencies", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(executable);
-        Mockito.when(scoreCompiler.compile(executable, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
+        when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(executable);
+        when(scoreCompiler.compile(executable, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
-        Assert.assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
+        assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
     }
 
     @Test
     public void testNamespaceWithInvalidCharsFlow() throws Exception {
         URI resource = getClass().getResource("/invalid-chars$").toURI();
         Flow newExecutable = new Flow(null, null, null, "invalid-chars$", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
-        Mockito.when(metadataExtractor.extractMetadata(any(SlangSource.class))).thenReturn(EMPTY_METADATA);
-        Mockito.doCallRealMethod().when(staticValidator).validateSlangFile(any(File.class), eq(newExecutable), eq(EMPTY_METADATA), eq(false));
+        when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
+        when(metadataExtractor.extractMetadata(any(SlangSource.class))).thenReturn(EMPTY_METADATA);
+        doCallRealMethod().when(staticValidator).validateSlangFile(any(File.class), eq(newExecutable), eq(EMPTY_METADATA), eq(false));
         exception.expect(RuntimeException.class);
         exception.expectMessage("invalid-chars$");
         exception.expectMessage("alphanumeric");
         SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
-        Assert.assertNotNull(slangBuildResults.getCompilationExceptions());
-        Assert.assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
+        assertNotNull(slangBuildResults.getCompilationExceptions());
+        assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
         throw slangBuildResults.getCompilationExceptions().get(0);
     }
 
@@ -340,27 +344,27 @@ public class SlangBuildTest {
     public void testCompileSlangFileAndRunTests() throws Exception {
         URI contentResource = getClass().getResource("/no_dependencies").toURI();
         URI testResource = getClass().getResource("/test/valid").toURI();
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
-        Mockito.when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
+        when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
+        when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
         RunTestsResults runTestsResults = new RunTestsResults();
         runTestsResults.addFailedTest("test1", new TestRun(new SlangTestCase("test1", "", null, null, null, null, null, null, null), "message"));
-        Mockito.when(slangTestRunner.runAllTestsSequential((any(String.class)), anyMap(), anyMap(), anyList())).thenReturn(runTestsResults);
+        when(slangTestRunner.runAllTestsSequential((any(String.class)), anyMap(), anyMap(), anyList())).thenReturn(runTestsResults);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(contentResource.getPath(), contentResource.getPath(), testResource.getPath(), null, false, false);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
         IRunTestResults actualRunTestsResults = buildResults.getRunTestsResults();
-        Assert.assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
-        Assert.assertEquals("1 test case should fail", 1, actualRunTestsResults.getFailedTests().size());
+        assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
+        assertEquals("1 test case should fail", 1, actualRunTestsResults.getFailedTests().size());
     }
 
     @Test
     public void testTestCaseWithIncorrectTestFlowReference() throws Exception {
         URI contentResource = getClass().getResource("/no_dependencies").toURI();
         URI testResource = getClass().getResource("/test/valid").toURI();
-        Mockito.when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
-        Mockito.when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
+        when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
+        when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
         RunTestsResults runTestsResults = new RunTestsResults();
         runTestsResults.addFailedTest("test1", new TestRun(new SlangTestCase("test1", "", null, null, null, null, null, null, null), "message"));
-        Mockito.when(
+        when(
                 slangTestRunner.runAllTestsSequential(
                         any(String.class),
                         anyMapOf(String.class, SlangTestCase.class),
@@ -382,13 +386,13 @@ public class SlangBuildTest {
                 ""
         );
         testCases.put("i_don_t_exist", testCaseWithIncorrectFlowPath);
-        Mockito.when(slangTestRunner.createTestCases(anyString(), anySetOf(String.class))).thenReturn(testCases);
+        when(slangTestRunner.createTestCases(anyString(), anySetOf(String.class))).thenReturn(testCases);
 
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(contentResource.getPath(), contentResource.getPath(), testResource.getPath(), null, false, false);
 
         // test case: test flow path points to non existing executable
         // validate execution does not return when detects this situation and coverage data is added to results
-        Assert.assertEquals(1, buildResults.getRunTestsResults().getUncoveredExecutables().size());
+        assertEquals(1, buildResults.getRunTestsResults().getUncoveredExecutables().size());
     }
 
     @Configuration

@@ -11,6 +11,8 @@ package io.cloudslang.lang.tools.build.verifier;
 
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 
+import java.util.ArrayDeque;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 
@@ -22,24 +24,24 @@ public class CompilationResult {
     private Map<String, Executable> results;
     private Queue<RuntimeException> exceptions;
 
-    public CompilationResult(Map<String, Executable> results, Queue<RuntimeException> exceptions) {
-        this.results = results;
-        this.exceptions = exceptions;
+    public CompilationResult() {
+        this.results = new HashMap<>();
+        this.exceptions = new ArrayDeque<>();
     }
 
     public Map<String, Executable> getResults() {
         return results;
     }
 
-    public void setResults(Map<String, Executable> results) {
-        this.results = results;
+    public void addResults(Map<String, Executable> results) {
+        this.results.putAll(results);
     }
 
     public Queue<RuntimeException> getExceptions() {
         return exceptions;
     }
 
-    public void setExceptions(Queue<RuntimeException> exceptions) {
-        this.exceptions = exceptions;
+    public void addExceptions(Queue<RuntimeException> exceptions) {
+        this.exceptions.addAll(exceptions);
     }
 }

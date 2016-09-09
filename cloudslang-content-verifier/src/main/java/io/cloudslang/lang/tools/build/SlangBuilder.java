@@ -49,7 +49,7 @@ public class SlangBuilder {
 
     private final static Logger log = Logger.getLogger(SlangBuilder.class);
 
-    public SlangBuildResults buildSlangContent(String projectPath, String contentPath, String testsPath, List<String> testSuits, Boolean shouldValidateDescription, boolean runTestsInParallel) {
+    public SlangBuildResults buildSlangContent(String projectPath, String contentPath, String testsPath, List<String> testSuits, boolean shouldValidateDescription, boolean runTestsInParallel) {
 
         String projectName = FilenameUtils.getName(projectPath);
         log.info("");

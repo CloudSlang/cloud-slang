@@ -82,11 +82,11 @@ public class ApplicationArgs {
         return testSuites;
     }
 
-    public Boolean shouldOutputCoverage() {
+    public boolean shouldOutputCoverage() {
         return coverage;
     }
 
-    public Boolean shouldValidateDescription() {
+    public boolean shouldValidateDescription() {
         return validateDescription;
     }
 
@@ -98,7 +98,7 @@ public class ApplicationArgs {
         return dynamicParams;
     }
 
-    public Boolean isParallel() {
+    public boolean isParallel() {
         return parallel;
     }
 

@@ -53,7 +53,7 @@ public class SlangContentVerifier {
     @Autowired
     private ScoreCompiler scoreCompiler;
 
-    public CompilationResult createModelsAndValidate(String directoryPath, Boolean shouldValidateDescription) {
+    public CompilationResult createModelsAndValidate(String directoryPath, boolean shouldValidateDescription) {
         Validate.notEmpty(directoryPath, "You must specify a path");
         Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" + directoryPath + "\' does not lead to a directory");
         Map<String, Executable> slangModels = new HashMap<>();
@@ -62,7 +62,7 @@ public class SlangContentVerifier {
         log.info(slangFiles.size() + " .sl files were found");
         log.info("");
         Queue<RuntimeException> exceptions = new ArrayDeque<>();
-        for(File slangFile: slangFiles){
+        for (File slangFile: slangFiles) {
             try {
                 Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() + "\' must lead to a file");
                 SlangSource slangSource = SlangSource.fromFile(slangFile);
@@ -82,7 +82,10 @@ public class SlangContentVerifier {
             exceptions.add(new RuntimeException("Some Slang files were not pre-compiled.\nFound: " + slangFiles.size() +
                     " executable files in path: \'" + directoryPath + "\' But managed to create slang models for only: " + slangModels.size()));
         }
-        return new CompilationResult(slangModels, exceptions);
+        CompilationResult compilationResult = new CompilationResult();
+        compilationResult.addExceptions(exceptions);
+        compilationResult.addResults(slangModels);
+        return compilationResult;
     }
 
     public Map<String, CompilationArtifact> compileSlangModels(Map<String, Executable> slangModels) {

@@ -9,6 +9,7 @@
  */
 package io.cloudslang.lang.tools.build.validation;
 
+import com.google.common.collect.Lists;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.entities.bindings.Input;
@@ -23,7 +24,13 @@ import org.junit.rules.ExpectedException;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by bancl on 8/31/2016.
@@ -44,10 +51,9 @@ public class StaticValidatorTest {
 
     @Test
     public void missingDescriptionForInput() throws URISyntaxException {
-        List<Input> inputList = new ArrayList<>();
-        inputList.add(new Input.InputBuilder("input1", "value1").build());
-        inputList.add(new Input.InputBuilder("input2", "value2").build());
-        inputList.add(new Input.InputBuilder("input3", "value3").build());
+        List<Input> inputList = Lists.newArrayList(new Input.InputBuilder("input1", "value1").build(),
+                new Input.InputBuilder("input2", "value2").build(),
+                new Input.InputBuilder("input3", "value3").build());
         Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", inputList, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         Metadata metadata = new Metadata();
         Map<String, String> inputMap = new HashMap<>();
@@ -62,10 +68,9 @@ public class StaticValidatorTest {
 
     @Test
     public void missingDescriptionForOutput() throws URISyntaxException {
-        List<Output> outputList = new ArrayList<>();
-        outputList.add(new Output("output1", ValueFactory.create("value1"), Collections.<ScriptFunction>emptySet(), Collections.<String>emptySet()));
-        outputList.add(new Output("output2", ValueFactory.create("value2"), Collections.<ScriptFunction>emptySet(), Collections.<String>emptySet()));
-        outputList.add(new Output("output3", ValueFactory.create("value3"), Collections.<ScriptFunction>emptySet(), Collections.<String>emptySet()));
+        List<Output> outputList = Lists.newArrayList(new Output("output1", ValueFactory.create("value1"), Collections.<ScriptFunction>emptySet(), Collections.<String>emptySet()),
+                new Output("output2", ValueFactory.create("value2"), Collections.<ScriptFunction>emptySet(), Collections.<String>emptySet()),
+                new Output("output3", ValueFactory.create("value3"), Collections.<ScriptFunction>emptySet(), Collections.<String>emptySet()));
         Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, outputList, null,
                 new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         Metadata metadata = new Metadata();
@@ -82,10 +87,9 @@ public class StaticValidatorTest {
 
     @Test
     public void missingDescriptionForResult() throws URISyntaxException {
-        List<Result> resultList = new ArrayList<>();
-        resultList.add(new Result("result1", ValueFactory.create("value1")));
-        resultList.add(new Result("result2", ValueFactory.create("value2")));
-        resultList.add(new Result("result3", ValueFactory.create("value3")));
+        List<Result> resultList = Lists.newArrayList(new Result("result1", ValueFactory.create("value1")),
+                new Result("result2", ValueFactory.create("value2")),
+                new Result("result3", ValueFactory.create("value3")));
         Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, resultList,
                 new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         Metadata metadata = new Metadata();
@@ -102,10 +106,9 @@ public class StaticValidatorTest {
 
     @Test
     public void missingDescriptionEntirelyForResult() throws URISyntaxException {
-        List<Result> resultList = new ArrayList<>();
-        resultList.add(new Result("result1", ValueFactory.create("value1")));
-        resultList.add(new Result("result2", ValueFactory.create("value2")));
-        resultList.add(new Result("result3", ValueFactory.create("value3")));
+        List<Result> resultList = Lists.newArrayList(new Result("result1", ValueFactory.create("value1")),
+                new Result("result2", ValueFactory.create("value2")),
+                new Result("result3", ValueFactory.create("value3")));
         Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, resultList,
                 new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         Metadata metadata = new Metadata();

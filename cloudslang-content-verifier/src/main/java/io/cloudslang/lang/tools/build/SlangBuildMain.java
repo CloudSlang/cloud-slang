@@ -70,13 +70,13 @@ public class SlangBuildMain {
         String contentPath = StringUtils.defaultIfEmpty(appArgs.getContentRoot(), projectPath + CONTENT_DIR);
         String testsPath = StringUtils.defaultIfEmpty(appArgs.getTestRoot(), projectPath + TEST_DIR);
         List<String> testSuites = parseTestSuites(appArgs);
-        boolean shouldPrintCoverageData = parseCoverageArg(appArgs);
-        boolean runTestsInParallel = parseParallelTestsArg(appArgs);
+        boolean shouldPrintCoverageData = appArgs.shouldOutputCoverage();
+        boolean runTestsInParallel = appArgs.isParallel();
         int threadCount = parseThreadCountArg(appArgs, runTestsInParallel);
         String testCaseTimeout = parseTestTimeout(appArgs);
         setProperty(SLANG_TEST_RUNNER_THREAD_COUNT, valueOf(threadCount));
         setProperty(TEST_CASE_TIMEOUT_IN_MINUTES_KEY, valueOf(testCaseTimeout));
-        Boolean shouldValidateDescription = parseValidateDescriptionArg(appArgs);
+        boolean shouldValidateDescription = appArgs.shouldValidateDescription();
 
         log.info("");
         log.info("------------------------------------------------------------");
@@ -105,9 +105,9 @@ public class SlangBuildMain {
         try {
             SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath,
                     testSuites, shouldValidateDescription, runTestsInParallel);
-            exceptions.addAll(ListUtils.emptyIfNull(buildResults.getCompilationExceptions()));
+            exceptions.addAll(buildResults.getCompilationExceptions());
             if (exceptions.size() > 0) {
-                throw exceptions.get(0);
+                logErrors(exceptions, projectPath);
             }
             IRunTestResults runTestsResults = buildResults.getRunTestsResults();
             Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
@@ -131,25 +131,32 @@ public class SlangBuildMain {
             System.exit(isNotEmpty(runTestsResults.getFailedTests()) ? 1 : 0);
 
         } catch (Throwable e) {
-            logErrors(e, exceptions, projectPath);
+            logErrorsPrefix();
+            log.error("Exception: " + e.getMessage());
+            logErrorsSuffix(projectPath);
             System.exit(1);
         }
     }
 
-    private static void logErrors(Throwable e, List<RuntimeException> exceptions, String projectPath) {
-        log.error("");
-        log.error("------------------------------------------------------------");
-        if (exceptions.size() > 0) {
-            for (RuntimeException runtimeException : exceptions) {
-                log.error("Exception: " + runtimeException.getMessage());
-            }
-        } else {
-            log.error("Exception: " + e.getMessage());
+    private static void logErrors(List<RuntimeException> exceptions, String projectPath) {
+        logErrorsPrefix();
+        for (RuntimeException runtimeException : exceptions) {
+            log.error("Exception: " + runtimeException.getMessage());
         }
+        logErrorsSuffix(projectPath);
+        System.exit(1);
+    }
+
+    private static void logErrorsSuffix(String projectPath) {
         log.error("FAILURE: Validation of slang files for project: \""
                 + projectPath + "\" failed.");
         log.error("------------------------------------------------------------");
         log.error("");
+    }
+
+    private static void logErrorsPrefix() {
+        log.error("");
+        log.error("------------------------------------------------------------");
     }
 
     private static void generateTestCaseReport(SlangTestCaseRunReportGeneratorService reportGeneratorService, IRunTestResults runTestsResults) throws IOException {
@@ -200,33 +207,6 @@ public class SlangBuildMain {
             testSuites.add(DEFAULT_TESTS);
         }
         return testSuites;
-    }
-
-    private static boolean parseCoverageArg(ApplicationArgs appArgs) {
-        boolean shouldOutputCoverageData = false;
-
-        if (appArgs.shouldOutputCoverage() != null) {
-            shouldOutputCoverageData = appArgs.shouldOutputCoverage();
-        }
-        return shouldOutputCoverageData;
-    }
-
-    private static boolean parseParallelTestsArg(ApplicationArgs appArgs) {
-        boolean runTestsInParallel = false;
-
-        if (appArgs.isParallel() != null) {
-            runTestsInParallel = appArgs.isParallel();
-        }
-        return runTestsInParallel;
-    }
-
-    private static Boolean parseValidateDescriptionArg(ApplicationArgs appArgs){
-        Boolean shouldValidateDescription = false;
-
-        if (appArgs.shouldValidateDescription() != null) {
-            shouldValidateDescription = appArgs.shouldValidateDescription();
-        }
-        return shouldValidateDescription;
     }
 
     private static String parseTestTimeout(ApplicationArgs appArgs) {
@@ -290,8 +270,7 @@ public class SlangBuildMain {
     private static void printBuildFailureSummary(String projectPath, IRunTestResults runTestsResults) {
         printNumberOfPassedAndSkippedTests(runTestsResults);
         Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
-        log.error("");
-        log.error("------------------------------------------------------------");
+        logErrorsPrefix();
         log.error("BUILD FAILURE");
         log.error("------------------------------------------------------------");
         log.error("CloudSlang build for repository: \"" + projectPath + "\" failed due to failed tests.");
