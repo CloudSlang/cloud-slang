@@ -38,19 +38,14 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
         Map<String, Executable> dependencies = new HashMap<>(filteredDependencies);
         dependencies.put(executable.getId(), executable);
         Set<Executable> verifiedExecutables = new HashSet<>();
-        return validateModelWithDependencies(executable, dependencies, verifiedExecutables, new ArrayList<RuntimeException>());
+        return validateModelWithDependencies(executable, dependencies, verifiedExecutables, new ArrayList<RuntimeException>(), true);
     }
 
     @Override
     public List<RuntimeException> validateModelWithDirectDependencies(Executable executable, Map<String, Executable> directDependencies) {
         List<RuntimeException> errors = new ArrayList<>();
-        Flow flow = (Flow) executable;
-        Collection<Step> steps = flow.getWorkflow().getSteps();
-
-        for (Step step : steps) {
-            errors.addAll(validateStepAgainstItsDependency(flow, step, directDependencies));
-        }
-        return errors;
+        Set<Executable> verifiedExecutables = new HashSet<>();
+        return validateModelWithDependencies(executable, directDependencies, verifiedExecutables, errors, true);
     }
 
     @Override
@@ -70,7 +65,8 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
             Executable executable,
             Map<String, Executable> dependencies,
             Set<Executable> verifiedExecutables,
-            List<RuntimeException> errors) {
+            List<RuntimeException> errors,
+            boolean recursive) {
         //validate that all required & non private parameters with no default value of a reference are provided
         if (!SlangTextualKeys.FLOW_TYPE.equals(executable.getType()) || verifiedExecutables.contains(executable)) {
             return errors;
@@ -87,8 +83,10 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
             flowReferences.add(reference);
         }
 
-        for (Executable reference : flowReferences) {
-            validateModelWithDependencies(reference, dependencies, verifiedExecutables, errors);
+        if (recursive) {
+            for (Executable reference : flowReferences) {
+                validateModelWithDependencies(reference, dependencies, verifiedExecutables, errors, true);
+            }
         }
         return errors;
     }
