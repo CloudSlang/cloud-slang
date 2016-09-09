@@ -50,9 +50,10 @@ public interface SlangCompiler {
      * Validate that the given {@Link io.cloudslang.lang.compiler.modeller.model.Executable} is valid regarding
      * its wiring to its dependencies
      * Current validations:
-     * - Validates that required inputs of the dependency have a matching input in the step
-     * - Validate that every result of the dependency has a matching navigation in the step
+     * - Validates that (required, non private, non empty) inputs of the dependency have a matching input in the step
+     * - Validate step navigation section declares the exact set of dependency results
      * - Validate step input names are different from dependency output names
+     * - Validate break section results are declared in dependency
      *
      * @param slangModel               the CloudSlang model to validate
      * @param directDependenciesModels the CloudSlang models of the direct dependencies
