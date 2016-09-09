@@ -17,6 +17,7 @@ import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.tools.build.validation.MetadataMissingException;
 import io.cloudslang.lang.tools.build.validation.StaticValidator;
 import java.io.File;
 import java.util.ArrayList;
@@ -63,10 +64,11 @@ public class SlangContentVerifier {
         log.info("");
         Queue<RuntimeException> exceptions = new ArrayDeque<>();
         for (File slangFile: slangFiles) {
+            Executable sourceModel = null;
             try {
                 Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() + "\' must lead to a file");
                 SlangSource slangSource = SlangSource.fromFile(slangFile);
-                Executable sourceModel = slangCompiler.preCompile(slangSource);
+                sourceModel = slangCompiler.preCompile(slangSource);
                 Metadata sourceMetadata = metadataExtractor.extractMetadata(slangSource);
                 if (sourceModel != null) {
                     staticValidator.validateSlangFile(slangFile, sourceModel, sourceMetadata, shouldValidateDescription);
@@ -76,6 +78,9 @@ public class SlangContentVerifier {
                 String errorMessage = "Failed to extract metadata for file: \'" + slangFile.getAbsoluteFile() + "\'.\n" + e.getMessage();
                 log.error(errorMessage);
                 exceptions.add(new RuntimeException(errorMessage, e));
+                if (e instanceof MetadataMissingException && sourceModel != null) {
+                    slangModels.put(getUniqueName(sourceModel), sourceModel);
+                }
             }
         }
         if (slangFiles.size() != slangModels.size()) {

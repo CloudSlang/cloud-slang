@@ -54,9 +54,9 @@ public class StaticValidatorImpl implements StaticValidator {
     private void validateInOutParams(Map<String, String> metadataInOutParams, List<? extends InOutParam> inOutParams, String errorMessagePrefix) {
         for (InOutParam inOutParam : ListUtils.emptyIfNull(inOutParams)) {
             if (metadataInOutParams == null) {
-                throw new RuntimeException(errorMessagePrefix + "s are missing description entirely.");
+                throw new MetadataMissingException(errorMessagePrefix + "s are missing description entirely.");
             } else if (metadataInOutParams.get(inOutParam.getName()) == null) {
-                throw new RuntimeException(errorMessagePrefix + " '" + inOutParam.getName() + "' is missing description.");
+                throw new MetadataMissingException(errorMessagePrefix + " '" + inOutParam.getName() + "' is missing description.");
             }
         }
     }
