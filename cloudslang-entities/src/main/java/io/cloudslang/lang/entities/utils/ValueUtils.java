@@ -17,6 +17,6 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ValueUtils {
     public static boolean isEmpty(Value value) {
-        return value == null || value.get() == null || value.get() == StringUtils.EMPTY;
+        return value == null || value.get() == null || StringUtils.EMPTY.equals(value.get());
     }
 }
