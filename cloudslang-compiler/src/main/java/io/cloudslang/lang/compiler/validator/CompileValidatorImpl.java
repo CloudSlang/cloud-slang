@@ -45,7 +45,7 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
     public List<RuntimeException> validateModelWithDirectDependencies(Executable executable, Map<String, Executable> directDependencies) {
         List<RuntimeException> errors = new ArrayList<>();
         Set<Executable> verifiedExecutables = new HashSet<>();
-        return validateModelWithDependencies(executable, directDependencies, verifiedExecutables, errors, true);
+        return validateModelWithDependencies(executable, directDependencies, verifiedExecutables, errors, false);
     }
 
     @Override
