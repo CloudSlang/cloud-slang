@@ -11,16 +11,10 @@ imports:
   ops: user.ops
 
 flow:
-  name: flow_missing_dependency_required_input_in_step
+  name: test_inputs_no_default_not_in_step
   workflow:
     - explicit_alias:
         do:
           ops.test_op:
-            - city: 'input_1'
-            - port: '22'
-
-    - implicit_alias:
-        do:
-          check_op:
             - city: 'input_1'
             - port: '22'

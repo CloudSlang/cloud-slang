@@ -129,38 +129,6 @@ public class CompileBasicFlowTest {
     }
 
     @Test
-    public void testValidateSlangModelWithDependenciesBasic() throws Exception {
-        URI flowUri = getClass().getResource("/basic_flow.yaml").toURI();
-        Executable flow = compiler.preCompile(SlangSource.fromFile(flowUri));
-
-        URI operationUri = getClass().getResource("/test_op.sl").toURI();
-        Executable op = compiler.preCompile(SlangSource.fromFile(operationUri));
-
-        Set<Executable> dependencies = new HashSet<>();
-        dependencies.add(op);
-        List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flow, dependencies);
-
-        Assert.assertEquals("", 0, errors.size());
-    }
-
-
-    @Test
-    public void testValidFlowWithMissingDependencyRequiredInputInGrandchild() throws Exception {
-        URI flowUri = getClass().getResource("/corrupted/flow_missing_dependency_required_input_in_grandchild.sl").toURI();
-        Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
-
-        URI operation2Uri = getClass().getResource("/check_op.sl").toURI();
-        Executable operation2Model = compiler.preCompile(SlangSource.fromFile(operation2Uri));
-        URI subFlowUri = getClass().getResource("/flow_implicit_alias_for_current_namespace.sl").toURI();
-        Executable subFlowModel = compiler.preCompile(SlangSource.fromFile(subFlowUri));
-        Set<Executable> dependencies = new HashSet<>();
-        dependencies.add(subFlowModel);
-        dependencies.add(operation2Model);
-        List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
-        Assert.assertEquals(0, errors.size());
-    }
-
-    @Test
     public void testCompileFlowNavigateDuplicateKeysFirstIsTaken() throws Exception {
         URI flow = getClass().getResource("/flow_navigate_duplicate_keys.sl").toURI();
         URI operation = getClass().getResource("/check_Weather.sl").toURI();
