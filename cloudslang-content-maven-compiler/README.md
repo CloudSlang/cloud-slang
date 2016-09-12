@@ -22,7 +22,7 @@ The example below shows how to use the CloudSlang compiler:
         <configuration>
           <compilerId>cloudslang</compilerId>
            <compilerArgs>
-             <!--<arg>ignore-dependencies</arg> if you do not wan to compile with dependnecies-->
+             <!--<arg>ignore-dependencies</arg> if you do not want to compile with dependnecies-->
              <!--<arg>ignore-errors</arg> if you want to get only warnings and not fail the build -->
            </compilerArgs>
         </configuration>
