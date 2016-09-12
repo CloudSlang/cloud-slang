@@ -54,8 +54,10 @@ public class TransformersHandler {
                 if (data != null) {
                     transformedData.put(key, (Serializable) data);
                 }
-                for (RuntimeException rex : transformModellingResult.getErrors()) {
-                    errors.add(wrapErrorMessage(rex, errorMessagePrefix));
+                if (rawData.containsKey(key)) {
+                    for (RuntimeException rex : transformModellingResult.getErrors()) {
+                        errors.add(wrapErrorMessage(rex, errorMessagePrefix));
+                    }
                 }
             } catch (ClassCastException e) {
                 Class transformerType = getTransformerFromType(transformer);
