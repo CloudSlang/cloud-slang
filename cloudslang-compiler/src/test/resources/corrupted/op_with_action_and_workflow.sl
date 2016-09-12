@@ -5,6 +5,8 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
+namespace: user.ops
+
 operation:
   name: op_with_action_and_workflow
   inputs:

@@ -16,6 +16,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
@@ -36,6 +37,8 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
 
     @Autowired
     private PreCompileValidator preCompileValidator;
+    @Autowired
+    private ExecutableValidator executableValidator;
 
     @Override
     public TransformModellingResult<List<Result>> transform(List rawData) {
@@ -117,7 +120,7 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
     }
 
     private Result createExpressionResult(String resultName, Serializable resultValue) {
-        preCompileValidator.validateResultName(resultName);
+        executableValidator.validateResultName(resultName);
         if (resultValue == null) {
             return new Result(resultName, null);
         } else {
@@ -131,4 +134,3 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
         }
     }
 }
-

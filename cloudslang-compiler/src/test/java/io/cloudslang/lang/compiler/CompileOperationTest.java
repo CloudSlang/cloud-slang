@@ -142,7 +142,7 @@ public class CompileOperationTest {
     public void testCompileOperationWithMissingNamespace() throws Exception {
         URL resource = getClass().getResource("/corrupted/op_without_namespace.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Operation/Flow op_without_namespace must have a namespace");
+        exception.expectMessage("For source[op_without_namespace] namespace cannot be empty.");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 }

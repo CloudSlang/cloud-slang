@@ -15,8 +15,12 @@ package io.cloudslang.lang.compiler.parser;
  */
 
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.modeller.result.ParseModellingResult;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,6 +33,32 @@ public class YamlParser {
     private Yaml yaml;
     @Autowired
     private ParserExceptionHandler parserExceptionHandler;
+    @Autowired
+    private ExecutableValidator executableValidator;
+
+    public ParsedSlang validateAndThrowFirstError(ParsedSlang parsedSlang) {
+        ParseModellingResult parseModellingResult = validate(parsedSlang);
+        if (!parseModellingResult.getErrors().isEmpty()) {
+            throw parseModellingResult.getErrors().get(0);
+        } else {
+            return parseModellingResult.getParsedSlang();
+        }
+    }
+
+    public ParseModellingResult validate(ParsedSlang parsedSlang) {
+        List<RuntimeException> errors = new ArrayList<>();
+        try {
+            executableValidator.validateNamespace(parsedSlang);
+        } catch (RuntimeException rex) {
+            errors.add(rex);
+        }
+        try {
+            executableValidator.validateImportsSection(parsedSlang);
+        } catch (RuntimeException rex) {
+            errors.add(rex);
+        }
+        return new ParseModellingResult(parsedSlang, errors);
+    }
 
     public ParsedSlang parse(SlangSource source) {
 
@@ -41,6 +71,7 @@ public class YamlParser {
             }
             parsedSlang.setName(source.getFileName());
             parsedSlang.setFileExtension(source.getFileExtension());
+
             return parsedSlang;
         } catch (Throwable e) {
             throw new RuntimeException("There was a problem parsing the YAML source: " +

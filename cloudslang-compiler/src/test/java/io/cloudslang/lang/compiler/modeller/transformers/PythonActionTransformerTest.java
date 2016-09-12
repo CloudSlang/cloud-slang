@@ -17,6 +17,10 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
+import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import java.io.File;
 import java.io.Serializable;
 import java.net.URISyntaxException;
@@ -179,6 +183,16 @@ public class PythonActionTransformerTest extends TransformersTestParent {
         @Bean
         public DependencyFormatValidator dependencyFormatValidator() {
             return new DependencyFormatValidator();
+        }
+
+        @Bean
+        public ExecutableValidator executableValidator() {
+            return new ExecutableValidatorImpl();
+        }
+
+        @Bean
+        public SystemPropertyValidator systemPropertyValidator() {
+            return new SystemPropertyValidatorImpl();
         }
     }
 }
