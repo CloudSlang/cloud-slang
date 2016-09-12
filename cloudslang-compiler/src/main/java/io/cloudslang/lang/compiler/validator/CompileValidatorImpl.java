@@ -10,6 +10,8 @@ import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.utils.ArgumentUtils;
+import io.cloudslang.lang.entities.utils.InputUtils;
 import io.cloudslang.lang.entities.utils.ListUtils;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -38,19 +40,14 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
         Map<String, Executable> dependencies = new HashMap<>(filteredDependencies);
         dependencies.put(executable.getId(), executable);
         Set<Executable> verifiedExecutables = new HashSet<>();
-        return validateModelWithDependencies(executable, dependencies, verifiedExecutables, new ArrayList<RuntimeException>());
+        return validateModelWithDependencies(executable, dependencies, verifiedExecutables, new ArrayList<RuntimeException>(), true);
     }
 
     @Override
     public List<RuntimeException> validateModelWithDirectDependencies(Executable executable, Map<String, Executable> directDependencies) {
         List<RuntimeException> errors = new ArrayList<>();
-        Flow flow = (Flow) executable;
-        Collection<Step> steps = flow.getWorkflow().getSteps();
-
-        for (Step step : steps) {
-            errors.addAll(validateStepAgainstItsDependency(flow, step, directDependencies));
-        }
-        return errors;
+        Set<Executable> verifiedExecutables = new HashSet<>();
+        return validateModelWithDependencies(executable, directDependencies, verifiedExecutables, errors, false);
     }
 
     @Override
@@ -70,7 +67,8 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
             Executable executable,
             Map<String, Executable> dependencies,
             Set<Executable> verifiedExecutables,
-            List<RuntimeException> errors) {
+            List<RuntimeException> errors,
+            boolean recursive) {
         //validate that all required & non private parameters with no default value of a reference are provided
         if (!SlangTextualKeys.FLOW_TYPE.equals(executable.getType()) || verifiedExecutables.contains(executable)) {
             return errors;
@@ -87,8 +85,10 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
             flowReferences.add(reference);
         }
 
-        for (Executable reference : flowReferences) {
-            validateModelWithDependencies(reference, dependencies, verifiedExecutables, errors);
+        if (recursive) {
+            for (Executable reference : flowReferences) {
+                validateModelWithDependencies(reference, dependencies, verifiedExecutables, errors, true);
+            }
         }
         return errors;
     }
@@ -218,17 +218,19 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
     private List<String> getMandatoryInputNames(Executable executable) {
         List<String> inputNames = new ArrayList<>();
         for (Input input : executable.getInputs()) {
-            if (!input.isPrivateInput() && input.isRequired() && (input.getValue() == null || input.getValue().get() == null)) {
+            if (InputUtils.isMandatory(input)) {
                 inputNames.add(input.getName());
             }
         }
         return inputNames;
     }
 
-    private List<String> getStepInputNames(Step step) {
+    private List<String> getStepInputNamesWithNonEmptyValue(Step step) {
         List<String> inputNames = new ArrayList<>();
         for (Argument argument : step.getArguments()) {
-            inputNames.add(argument.getName());
+            if (ArgumentUtils.isDefined(argument)) {
+                inputNames.add(argument.getName());
+            }
         }
         return inputNames;
     }
@@ -242,7 +244,7 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
     private List<RuntimeException> validateMandatoryInputsAreWired(Flow flow, Step step, Executable reference) {
         List<RuntimeException> errors = new ArrayList<>();
         List<String> mandatoryInputNames = getMandatoryInputNames(reference);
-        List<String> stepInputNames = getStepInputNames(step);
+        List<String> stepInputNames = getStepInputNamesWithNonEmptyValue(step);
         List<String> inputsNotWired = getInputsNotWired(mandatoryInputNames, stepInputNames);
         if (!CollectionUtils.isEmpty(inputsNotWired)) {
             errors.add(new IllegalArgumentException(prepareErrorMessageValidateInputNamesEmpty(inputsNotWired, flow, step, reference)));
