@@ -77,7 +77,7 @@ public class SlangImplTest {
     private EventBus eventBus;
 
     @Before
-    public void init(){
+    public void init() {
         Mockito.reset(score, compiler);
     }
 
@@ -91,7 +91,7 @@ public class SlangImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testExtractMetadataNoFilePath(){
+    public void testExtractMetadataNoFilePath() {
         slang.extractMetadata(null);
     }
 
@@ -105,12 +105,12 @@ public class SlangImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCompileWithNoFilePath(){
+    public void testCompileWithNoFilePath() {
         slang.compile(null, new HashSet<SlangSource>());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCompileWithCorruptedFilePath(){
+    public void testCompileWithCorruptedFilePath() {
         slang.compile(SlangSource.fromFile(new File("/")), new HashSet<SlangSource>());
     }
 
@@ -148,7 +148,7 @@ public class SlangImplTest {
     // tests for run() method
 
     @Test
-    public void testRun(){
+    public void testRun() {
         SystemProperty expectedSystemProperty = new SystemProperty("docker.sys", "props.port", "22");
         Long executionId = slang.run(
                 emptyCompilationArtifact,
@@ -161,20 +161,20 @@ public class SlangImplTest {
         Mockito.verify(score).trigger(argumentCaptor.capture());
 
         TriggeringProperties triggeringProperties = argumentCaptor.getValue();
-        RunEnvironment runEnv = (RunEnvironment)triggeringProperties.getContext().get(ScoreLangConstants.RUN_ENV);
+        RunEnvironment runEnv = (RunEnvironment) triggeringProperties.getContext().get(ScoreLangConstants.RUN_ENV);
         Assert.assertNotNull(runEnv);
         Assert.assertTrue(triggeringProperties.getContext().containsKey(ScoreLangConstants.USER_INPUTS_KEY));
         Assert.assertTrue(runEnv.getSystemProperties().contains(expectedSystemProperty));
     }
 
     @Test
-    public void testRunWithNullInputs(){
+    public void testRunWithNullInputs() {
         Long executionId = slang.run(emptyCompilationArtifact, null, new HashSet<SystemProperty>());
         Assert.assertNotNull(executionId);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testRunWithNullCompilationArtifact(){
+    public void testRunWithNullCompilationArtifact() {
         slang.run(null, new HashMap<String, Value>(), null);
     }
 
@@ -205,7 +205,7 @@ public class SlangImplTest {
     // tests for subscribeOnEvents() method
 
     @Test
-    public void testSubscribeOnEventsWithListener(){
+    public void testSubscribeOnEventsWithListener() {
         ScoreEventListener eventListener = new EventListener();
         Set<String> eventTypes = new HashSet<>();
         eventTypes.add(EventConstants.SCORE_ERROR_EVENT);
@@ -214,7 +214,7 @@ public class SlangImplTest {
     }
 
     @Test
-    public void testUnSubscribeOnEvents(){
+    public void testUnSubscribeOnEvents() {
         ScoreEventListener eventListener = new EventListener();
         slang.unSubscribeOnEvents(eventListener);
         Mockito.verify(eventBus).unsubscribe(eventListener);
@@ -222,7 +222,7 @@ public class SlangImplTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testSubscribeOnAllEventsWithListener(){
+    public void testSubscribeOnAllEventsWithListener() {
         Slang mockSlang = Mockito.mock(SlangImpl.class);
         ScoreEventListener eventListener = new EventListener();
         Mockito.doCallRealMethod().when(mockSlang).subscribeOnAllEvents(any(ScoreEventListener.class));
@@ -237,7 +237,7 @@ public class SlangImplTest {
         Assert.assertEquals("Events size not as expected", ALL_EVENTS_SIZE, allEvents.size());
     }
 
-    private class EventListener implements ScoreEventListener{
+    private class EventListener implements ScoreEventListener {
 
         @Override
         public synchronized void onEvent(ScoreEvent event) throws InterruptedException {
@@ -255,7 +255,7 @@ public class SlangImplTest {
     static class Config {
 
         @Bean
-        public SlangImpl slang(){
+        public SlangImpl slang() {
             return new SlangImpl();
         }
 
@@ -272,12 +272,12 @@ public class SlangImplTest {
         }
 
         @Bean
-        public Score score(){
+        public Score score() {
             return Mockito.mock(Score.class);
         }
 
         @Bean
-        public EventBus eventBus(){
+        public EventBus eventBus() {
             return Mockito.mock(EventBus.class);
         }
     }

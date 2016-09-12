@@ -5,8 +5,12 @@ import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
+import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.bindings.Argument;
 import java.io.File;
 import java.net.URISyntaxException;
@@ -28,14 +32,14 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -59,7 +63,7 @@ public class DoTransformerTest extends TransformersTestParent {
         Assert.assertFalse(arguments.isEmpty());
         Assert.assertEquals(3, arguments.size());
         Argument argument = arguments.iterator().next();
-        Assert.assertEquals("city",argument.getName());
+        Assert.assertEquals("city", argument.getName());
         Assert.assertEquals("city_name", argument.getValue().get());
         Assert.assertEquals(true, argument.isPrivateArgument());
     }
@@ -72,7 +76,7 @@ public class DoTransformerTest extends TransformersTestParent {
         Assert.assertFalse(arguments.isEmpty());
         Assert.assertEquals(3, arguments.size());
         Argument argument = arguments.get(1);
-        Assert.assertEquals("port",argument.getName());
+        Assert.assertEquals("port", argument.getName());
         Assert.assertEquals(false, argument.isPrivateArgument());
     }
 
@@ -130,8 +134,8 @@ public class DoTransformerTest extends TransformersTestParent {
         ParsedSlang parsedSlang = yamlParser.parse(SlangSource.fromFile(file));
         @SuppressWarnings("unchecked")
         List<Map<String, Map>> flow = (List<Map<String, Map>>) parsedSlang.getFlow().get(SlangTextualKeys.WORKFLOW_KEY);
-        for(Map<String, Map> step : flow){
-            if(step.keySet().iterator().next().equals("CheckWeather")){
+        for (Map<String, Map> step : flow) {
+            if (step.keySet().iterator().next().equals("CheckWeather")) {
                 doArgumentsMap = (Map) step.values().iterator().next().get(SlangTextualKeys.DO_KEY);
                 return doArgumentsMap;
             }
@@ -167,6 +171,16 @@ public class DoTransformerTest extends TransformersTestParent {
         @Bean
         public PreCompileValidator preCompileValidator() {
             return new PreCompileValidatorImpl();
+        }
+
+        @Bean
+        public ExecutableValidator executableValidator() {
+            return new ExecutableValidatorImpl();
+        }
+
+        @Bean
+        public SystemPropertyValidator systemPropertyValidator() {
+            return new SystemPropertyValidatorImpl();
         }
 
     }

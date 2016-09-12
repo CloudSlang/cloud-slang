@@ -33,7 +33,7 @@
 
     <context:property-placeholder location="application.properties"/>
 
-    <score:engine />
+    <score:engine/>
 
     <score:worker uuid="-1"/>
 

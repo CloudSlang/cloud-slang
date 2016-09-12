@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 /**
  * Application context provider. This class allows accessing the application
  * context from outside the container
- *
+ * <p>
  * Created by Ifat Gavish on 30/05/2016
  */
 @Component

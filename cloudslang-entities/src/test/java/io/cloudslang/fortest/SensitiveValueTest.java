@@ -17,7 +17,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- *
  * Created by Genadi Rabinovich, genadi@hpe.com on 10/07/2016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)

@@ -15,6 +15,10 @@ import io.cloudslang.lang.commons.services.impl.SlangSourceServiceImpl;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
+import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
@@ -65,11 +69,11 @@ public class TestCasesYamlParserTest {
     public ExpectedException exception = ExpectedException.none();
 
     @Test
-    public void emptyTestCaseFileParsing() throws Exception{
+    public void emptyTestCaseFileParsing() throws Exception {
         String filePath = "/test/invalid/empty_file.inputs.yaml";
         URI fileUri = getClass().getResource(filePath).toURI();
         Map<String, SlangTestCase> testCases = parser.parseTestCases(SlangSource.fromFile(fileUri));
-        Assert.assertEquals("There should have been no test cases in the file", 0 ,testCases.size());
+        Assert.assertEquals("There should have been no test cases in the file", 0, testCases.size());
     }
 
     @Test
@@ -99,7 +103,7 @@ public class TestCasesYamlParserTest {
     }
 
     @Test
-    public void testCaseFileParsingForNonTestCasesFile() throws Exception{
+    public void testCaseFileParsingForNonTestCasesFile() throws Exception {
         String filePath = "/content/base/properties.prop.sl";
         URI fileUri = getClass().getResource(filePath).toURI();
         exception.expect(RuntimeException.class);
@@ -110,7 +114,7 @@ public class TestCasesYamlParserTest {
     }
 
     @Test
-    public void illegalTestCaseFileParsing() throws Exception{
+    public void illegalTestCaseFileParsing() throws Exception {
         String filePath = "/test/invalid/invalid_test_case.yaml";
         URI fileUri = getClass().getResource(filePath).toURI();
         exception.expect(RuntimeException.class);
@@ -121,7 +125,7 @@ public class TestCasesYamlParserTest {
     }
 
     @Test
-    public void parseSystemPropertiesFile() throws Exception{
+    public void parseSystemPropertiesFile() throws Exception {
         URI filePath = getClass().getResource("/content/base/properties.prop.sl").toURI();
         SlangSource source = SlangSource.fromFile(filePath);
         Set<SystemProperty> props = new HashSet<>();
@@ -132,7 +136,7 @@ public class TestCasesYamlParserTest {
     }
 
     @Test
-    public void parseSystemPropertiesFileInvalidExtension() throws Exception{
+    public void parseSystemPropertiesFileInvalidExtension() throws Exception {
         URI filePath = getClass().getResource("/content/base/print_text.sl").toURI();
 
         exception.expect(RuntimeException.class);
@@ -152,7 +156,7 @@ public class TestCasesYamlParserTest {
         }
 
         @Bean
-        public YamlParser yamlParser(){
+        public YamlParser yamlParser() {
             return new YamlParser();
         }
 
@@ -167,7 +171,7 @@ public class TestCasesYamlParserTest {
         }
 
         @Bean
-        public Yaml yaml(){
+        public Yaml yaml() {
             Yaml yaml = new Yaml();
             yaml.setBeanAccess(BeanAccess.FIELD);
             return yaml;
@@ -187,5 +191,15 @@ public class TestCasesYamlParserTest {
         public SlangSourceService slangSourceService() {
             return new SlangSourceServiceImpl();
         }
+
+        @Bean
+        public ExecutableValidator executableValidator() {
+           return new ExecutableValidatorImpl();
+       }
+
+       @Bean
+        public SystemPropertyValidator systemPropertyValidator() {
+           return new SystemPropertyValidatorImpl();
+       }
     }
 }

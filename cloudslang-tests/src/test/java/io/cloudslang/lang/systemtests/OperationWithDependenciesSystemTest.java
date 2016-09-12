@@ -26,6 +26,7 @@ public class OperationWithDependenciesSystemTest extends SystemsTestsParent {
         URL resource = getClass().getResource("/yaml/action_wo_dependencies_java_test.sl");
         slang.compile(SlangSource.fromFile(resource.toURI()), null);
     }
+
     @Test
     public void testCompileJavaActionWithDependencies() throws Exception {
         URL resource = getClass().getResource("/yaml/action_w_dependencies_java_test.sl");
@@ -50,6 +51,7 @@ public class OperationWithDependenciesSystemTest extends SystemsTestsParent {
         ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
         assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
+
     @Ignore("Enable when `dependencies` tag will be added")
     @Test
     public void testCompilePythonActionWithDependencies() throws Exception {

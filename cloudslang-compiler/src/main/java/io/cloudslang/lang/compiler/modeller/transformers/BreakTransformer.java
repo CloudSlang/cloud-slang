@@ -11,14 +11,19 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BreakTransformer implements Transformer<List<String>, List<String>>{
+public class BreakTransformer implements Transformer<List<String>, List<String>> {
+
+    @Autowired
+    private ExecutableValidator executableValidator;
 
     @Override
     public TransformModellingResult<List<String>> transform(List<String> rawData) {
@@ -28,7 +33,12 @@ public class BreakTransformer implements Transformer<List<String>, List<String>>
         if (rawData == null) {
             transformedData.add(ScoreLangConstants.FAILURE_RESULT);
         } else {
-            transformedData = rawData;
+            try {
+                executableValidator.validateBreakKeys(rawData);
+                transformedData = rawData;
+            } catch (RuntimeException rex) {
+                errors.add(rex);
+            }
         }
 
         return new BasicTransformModellingResult<>(transformedData, errors);

@@ -18,13 +18,14 @@ public enum Extension {
 
     private final String value;
     private static final String[] extensionValues = new String[values().length];
+
     static {
         initExtensionValues();
     }
 
     private static void initExtensionValues() {
         Extension[] extensions = values();
-        for(int i = 0; i < extensions.length; i++)
+        for (int i = 0; i < extensions.length; i++)
             extensionValues[i] = extensions[i].getValue();
     }
 
@@ -76,7 +77,7 @@ public enum Extension {
         for (Extension extension : extensions) {
             if (extension.equals(fileExtension)) validFileExtension = true;
         }
-        String extensionsAsString =  Arrays.toString(extensionValues);
+        String extensionsAsString = Arrays.toString(extensionValues);
         Validate.isTrue(validFileExtension,
                 "File: " + fileName + " must have one of the following extensions: " +
                         extensionsAsString.substring(1, extensionsAsString.length() - 1) + "."

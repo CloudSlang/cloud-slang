@@ -64,7 +64,7 @@ public class CompilerErrorsTest {
     }
 
     @Test
-     public void testNavigateToNonExistingStep() throws Exception {
+    public void testNavigateToNonExistingStep() throws Exception {
         URI resource = getClass().getResource("/corrupted/flow_navigate_to_non_existing_step.sl").toURI();
         URI operation = getClass().getResource("/test_op.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
@@ -97,26 +97,26 @@ public class CompilerErrorsTest {
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
-	@Test
-	public void testSystemProperties() throws Exception {
-		URI systemProperties = getClass().getResource("/corrupted/system_properties.yaml").toURI();
-		Set<SlangSource> path = new HashSet<>();
+    @Test
+    public void testSystemProperties() throws Exception {
+        URI systemProperties = getClass().getResource("/corrupted/system_properties.yaml").toURI();
+        Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-		exception.expectMessage("There was a problem parsing the YAML source: system_properties.\n" +
+        exception.expectMessage("There was a problem parsing the YAML source: system_properties.\n" +
                 "Cannot create property=user.sys.props.host for JavaBean=io.cloudslang.lang.compiler.parser.model.ParsedSlang");
-		compiler.compile(SlangSource.fromFile(systemProperties), path);
-	}
+        compiler.compile(SlangSource.fromFile(systemProperties), path);
+    }
 
     @Test
     public void testSystemPropertiesAsDep() throws Exception {
         URI flow = getClass().getResource("/basic_flow.yaml").toURI();
         URI operation = getClass().getResource("/test_op.sl").toURI();
-		URI systemProperties = getClass().getResource("/corrupted/system_properties.yaml").toURI();
+        URI systemProperties = getClass().getResource("/corrupted/system_properties.yaml").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
         path.add(SlangSource.fromFile(systemProperties));
         exception.expect(RuntimeException.class);
-		exception.expectMessage("There was a problem parsing the YAML source: system_properties.\n" +
+        exception.expectMessage("There was a problem parsing the YAML source: system_properties.\n" +
                 "Cannot create property=user.sys.props.host for JavaBean=io.cloudslang.lang.compiler.parser.model.ParsedSlang");
         compiler.compile(SlangSource.fromFile(flow), path);
     }
@@ -145,7 +145,7 @@ public class CompilerErrorsTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage(
                 "Cannot compile flow 'flow_1' since for step 'step_1' the navigation keys " +
-                "[KEY_1, KEY_2] have no matching results in its dependency 'io.cloudslang.op_1'."
+                        "[KEY_1, KEY_2] have no matching results in its dependency 'io.cloudslang.op_1'."
         );
 
         compiler.compile(SlangSource.fromFile(resource), dependencies);
@@ -287,7 +287,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Operation/Flow op_without_namespace must have a namespace");
+        exception.expectMessage("For source[op_without_namespace] namespace cannot be empty.");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -297,7 +297,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Executable in source: missing_name_flow has no name");
+        exception.expectMessage("Executable has no name");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -560,7 +560,7 @@ public class CompilerErrorsTest {
     }
 
     @Test
-    public void testValidationOfFlowWithMissingNavigationFromOperationResult()throws Exception {
+    public void testValidationOfFlowWithMissingNavigationFromOperationResult() throws Exception {
         URI flowUri = getClass().getResource("/corrupted/step_with_missing_navigation_from_operation_result_flow.sl").toURI();
         Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
 
@@ -579,7 +579,7 @@ public class CompilerErrorsTest {
     }
 
     @Test
-    public void testValidationOfFlowWithMissingDependencyRequiredInputInStep()throws Exception {
+    public void testValidationOfFlowWithMissingDependencyRequiredInputInStep() throws Exception {
         URI flowUri = getClass().getResource("/corrupted/flow_missing_dependency_required_input_in_step.sl").toURI();
         Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
 
@@ -601,7 +601,7 @@ public class CompilerErrorsTest {
     }
 
     @Test
-    public void testValidationOfFlowInputInStepWithSameNameAsDependencyOutput()throws Exception {
+    public void testValidationOfFlowInputInStepWithSameNameAsDependencyOutput() throws Exception {
         URI flowUri = getClass().getResource("/corrupted/flow_input_in_step_same_name_as_dependency_output.sl").toURI();
         Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
 
@@ -622,7 +622,7 @@ public class CompilerErrorsTest {
     }
 
     @Test
-    public void testValidationOfFlowThatCallsCorruptedFlow()throws Exception {
+    public void testValidationOfFlowThatCallsCorruptedFlow() throws Exception {
         URI flowUri = getClass().getResource("/corrupted/flow_that_calls_corrupted_flow.sl").toURI();
 
         URI operation1Uri = getClass().getResource("/test_op.sl").toURI();

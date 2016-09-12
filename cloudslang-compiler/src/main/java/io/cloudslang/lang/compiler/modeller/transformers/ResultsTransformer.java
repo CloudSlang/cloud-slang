@@ -1,13 +1,13 @@
 package io.cloudslang.lang.compiler.modeller.transformers;
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 
 /*
@@ -16,6 +16,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
@@ -33,9 +34,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ResultsTransformer extends InOutTransformer implements Transformer<List, List<Result>> {
-    
+
     @Autowired
     private PreCompileValidator preCompileValidator;
+    @Autowired
+    private ExecutableValidator executableValidator;
 
     @Override
     public TransformModellingResult<List<Result>> transform(List rawData) {
@@ -43,7 +46,7 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
         List<RuntimeException> errors = new ArrayList<>();
 
         // If there are no results specified, add the default SUCCESS & FAILURE results
-        if(CollectionUtils.isEmpty(rawData)){
+        if (CollectionUtils.isEmpty(rawData)) {
             return postProcessResults(transformedData, errors);
         }
         for (Object rawResult : rawData) {
@@ -65,7 +68,7 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
     }
 
     public void addDefaultResultsIfNeeded(List rawResults, ExecutableType executableType, List<Result> resolvedResults, List<RuntimeException> errors) {
-        if(rawResults == null && CollectionUtils.isEmpty(resolvedResults)) {
+        if (rawResults == null && CollectionUtils.isEmpty(resolvedResults)) {
             switch (executableType) {
                 case FLOW:
                     addResult(resolvedResults, createNoExpressionResult(ScoreLangConstants.SUCCESS_RESULT), errors);
@@ -117,7 +120,7 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
     }
 
     private Result createExpressionResult(String resultName, Serializable resultValue) {
-        preCompileValidator.validateResultName(resultName);
+        executableValidator.validateResultName(resultName);
         if (resultValue == null) {
             return new Result(resultName, null);
         } else {
@@ -131,4 +134,3 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
         }
     }
 }
-

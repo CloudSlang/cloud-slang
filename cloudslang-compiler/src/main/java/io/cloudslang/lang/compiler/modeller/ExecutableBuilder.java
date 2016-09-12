@@ -22,6 +22,7 @@ import io.cloudslang.lang.compiler.modeller.result.WorkflowModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.ResultsTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
@@ -44,7 +45,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.iterators.PeekingIterator;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -57,6 +58,7 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PARALLEL_LOOP_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.WORKFLOW_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER;
 
@@ -82,6 +84,8 @@ public class ExecutableBuilder {
 
     @Autowired
     private ResultsTransformer resultsTransformer;
+    @Autowired
+    private ExecutableValidator executableValidator;
 
     private List<Transformer> preExecTransformers;
     private List<Transformer> postExecTransformers;
@@ -137,12 +141,12 @@ public class ExecutableBuilder {
         String execName = preCompileValidator.validateExecutableRawData(parsedSlang, executableRawData, errors);
 
         errors.addAll(preCompileValidator.checkKeyWords(
-                        execName,
-                        "",
-                        executableRawData,
-                        ListUtils.union(preExecTransformers, postExecTransformers),
-                        ParsedSlang.Type.DECISION.equals(parsedSlang.getType()) ? executableAdditionalKeywords : allExecutableAdditionalKeywords,
-                        executableConstraintGroups
+                execName,
+                "",
+                executableRawData,
+                ListUtils.union(preExecTransformers, postExecTransformers),
+                ParsedSlang.Type.DECISION.equals(parsedSlang.getType()) ? executableAdditionalKeywords : allExecutableAdditionalKeywords,
+                executableConstraintGroups
                 )
         );
 
@@ -168,8 +172,8 @@ public class ExecutableBuilder {
 
                 Map<String, String> imports = parsedSlang.getImports();
 
-                List<Map<String, Map<String, Object>>> workFlowRawData = preCompileValidator.validateWorkflowRawData(parsedSlang,
-                        executableRawData, errors);
+                List<Map<String, Map<String, Object>>> workFlowRawData =
+                        preCompileValidator.validateWorkflowRawData(parsedSlang, executableRawData.get(WORKFLOW_KEY), execName, errors);
 
                 Workflow onFailureWorkFlow = getOnFailureWorkflow(workFlowRawData, imports, errors, namespace, execName);
 
@@ -197,8 +201,7 @@ public class ExecutableBuilder {
                         executableDependencies,
                         systemPropertyDependencies
                 );
-                return preCompileValidator.validateResult(parsedSlang, executableRawData,
-                        new ExecutableModellingResult(flow, errors));
+                return preCompileValidator.validateResult(parsedSlang, execName, new ExecutableModellingResult(flow, errors));
 
             case OPERATION:
                 resultsTransformer.addDefaultResultsIfNeeded((List) executableRawData.get(SlangTextualKeys.RESULTS_KEY), ExecutableType.OPERATION, results, errors);
@@ -230,8 +233,7 @@ public class ExecutableBuilder {
                         systemPropertyDependencies
                 );
 
-                return preCompileValidator.validateResult(parsedSlang, executableRawData,
-                        new ExecutableModellingResult(operation, errors));
+                return preCompileValidator.validateResult(parsedSlang, execName, new ExecutableModellingResult(operation, errors));
             case DECISION:
                 resultsTransformer.addDefaultResultsIfNeeded((List) executableRawData.get(SlangTextualKeys.RESULTS_KEY), ExecutableType.DECISION, results, errors);
 
@@ -245,19 +247,19 @@ public class ExecutableBuilder {
                     errors.add(ex);
                 }
                 Decision decision = new Decision(
-                    preExecutableActionData,
-                    postExecutableActionData,
-                    namespace,
-                    execName,
-                    inputs,
-                    outputs,
-                    results,
-                    Collections.<String>emptySet(),
-                    systemPropertyDependencies
+                        preExecutableActionData,
+                        postExecutableActionData,
+                        namespace,
+                        execName,
+                        inputs,
+                        outputs,
+                        results,
+                        Collections.<String>emptySet(),
+                        systemPropertyDependencies
                 );
                 return preCompileValidator.validateResult(
                         parsedSlang,
-                        executableRawData,
+                        execName,
                         new ExecutableModellingResult(decision, errors)
                 );
             default:
@@ -362,7 +364,8 @@ public class ExecutableBuilder {
         while (iterator.hasNext()) {
             Map<String, Map<String, Object>> stepRawData = iterator.next();
             Map<String, Map<String, Object>> nextStepData = iterator.peek();
-            String stepName = stepRawData.keySet().iterator().next();
+            String stepName = getStepName(stepRawData);
+            validateStepName(stepName, errors);
             if (stepNames.contains(stepName) || onFailureStepNames.contains(stepName)) {
                 errors.add(new RuntimeException("Step name: \'" + stepName + "\' appears more than once in the workflow. " + UNIQUE_STEP_NAME_MESSAGE_SUFFIX));
             }
@@ -436,9 +439,22 @@ public class ExecutableBuilder {
         return new WorkflowModellingResult(new Workflow(steps), errors);
     }
 
+    private String getStepName(Map<String, Map<String, Object>> stepRawData) {
+        return stepRawData.keySet().iterator().next();
+    }
+
+    private String validateStepName(String stepName, List<RuntimeException> errors) {
+        try {
+            executableValidator.validateStepName(stepName);
+        } catch (RuntimeException rex) {
+            errors.add(rex);
+        }
+        return stepName;
+    }
+
     private StepModellingResult compileStep(
-            String stepName, Map<String,
-            Object> stepRawData,
+            String stepName,
+            Map<String, Object> stepRawData,
             String defaultSuccess,
             Map<String, String> imports,
             String defaultFailure,
@@ -477,11 +493,15 @@ public class ExecutableBuilder {
         if (MapUtils.isEmpty(doRawData)) {
             errors.add(new RuntimeException("Step: \'" + stepName + "\' has no reference information"));
         } else {
-            String refString = doRawData.keySet().iterator().next();
-            refId = resolveReferenceID(refString, imports, namespace);
+            try {
+                String refString = doRawData.keySet().iterator().next();
+                refId = resolveReferenceID(refString, imports, namespace);
+            } catch (RuntimeException rex) {
+                errors.add(rex);
+            }
         }
 
-        List<Map<String, String>> navigationStrings = getNavigationStrings(postStepData, defaultSuccess, defaultFailure);
+        List<Map<String, String>> navigationStrings = getNavigationStrings(postStepData, defaultSuccess, defaultFailure, errors);
 
         Step step = new Step(
                 stepName,
@@ -522,7 +542,11 @@ public class ExecutableBuilder {
         }
     }
 
-    private List<Map<String, String>> getNavigationStrings(Map<String, Serializable> postStepData, String defaultSuccess, String defaultFailure) {
+    private List<Map<String, String>> getNavigationStrings(
+            Map<String, Serializable> postStepData,
+            String defaultSuccess,
+            String defaultFailure,
+            List<RuntimeException> errors) {
         @SuppressWarnings("unchecked") List<Map<String, String>> navigationStrings =
                 (List<Map<String, String>>) postStepData.get(SlangTextualKeys.NAVIGATION_KEY);
 
@@ -535,11 +559,21 @@ public class ExecutableBuilder {
             failureMap.put(ScoreLangConstants.FAILURE_RESULT, defaultFailure);
             navigationStrings.add(successMap);
             navigationStrings.add(failureMap);
+            return navigationStrings;
+        } else {
+            try {
+                executableValidator.validateNavigationStrings(navigationStrings);
+                return navigationStrings;
+            } catch (RuntimeException rex) {
+                errors.add(rex);
+                return new ArrayList<>();
+            }
         }
-        return navigationStrings;
     }
 
-    private static String resolveReferenceID(String rawReferenceID, Map<String, String> imports, String namespace) {
+    private String resolveReferenceID(String rawReferenceID, Map<String, String> imports, String namespace) {
+        executableValidator.validateStepReferenceId(rawReferenceID);
+
         int numberOfDelimiters = StringUtils.countMatches(rawReferenceID, NAMESPACE_DELIMITER);
         String resolvedReferenceID;
 

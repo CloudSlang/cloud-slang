@@ -42,11 +42,11 @@ import static ch.lambdaj.Lambda.convert;
 
 /**
  * @author lesant
- * @since 11/13/2014
  * @version $Id$
+ * @since 11/13/2014
  */
 @Component
-public class CompilerHelperImpl implements CompilerHelper{
+public class CompilerHelperImpl implements CompilerHelper {
 
     public static final String INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX = "' is not a directory";
     private static final Logger logger = Logger.getLogger(CompilerHelperImpl.class);
@@ -63,7 +63,7 @@ public class CompilerHelperImpl implements CompilerHelper{
     private SlangSourceService slangSourceService;
 
     @Override
-	public CompilationArtifact compile(String filePath, List<String> dependencies) throws IOException {
+    public CompilationArtifact compile(String filePath, List<String> dependencies) throws IOException {
         Validate.notNull(filePath, "File path can not be null");
         Set<SlangSource> depsSources = new HashSet<>();
         File file = new File(filePath);
@@ -84,7 +84,7 @@ public class CompilerHelperImpl implements CompilerHelper{
                 dependencies.add(file.getParent());
             }
         }
-        for (String dependency:dependencies) {
+        for (String dependency : dependencies) {
             Collection<File> dependenciesFiles = listSlangFiles(new File(dependency), true);
             for (File dependencyCandidate : dependenciesFiles) {
                 SlangSource source = SlangSource.fromFile(dependencyCandidate);
@@ -94,7 +94,7 @@ public class CompilerHelperImpl implements CompilerHelper{
         try {
             return slang.compile(SlangSource.fromFile(file), depsSources);
         } catch (Exception e) {
-            logger.error("Failed compilation for file : "+file.getName() + " ,Exception is : " + e.getMessage());
+            logger.error("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage());
             throw e;
         }
     }
@@ -114,16 +114,16 @@ public class CompilerHelperImpl implements CompilerHelper{
 
     private Map<String, Value> loadMapsFromFiles(List<File> files, String[] extensions, String directory) {
         Collection<File> fileCollection;
-        if(CollectionUtils.isEmpty(files)) {
+        if (CollectionUtils.isEmpty(files)) {
             fileCollection = loadDefaultFiles(extensions, directory, false);
-            if(CollectionUtils.isEmpty(fileCollection)) return null;
+            if (CollectionUtils.isEmpty(fileCollection)) return null;
         } else {
             fileCollection = files;
         }
         Map<String, Value> result = new HashMap<>();
-		for(File inputFile : fileCollection) {
-			logger.info("Loading file: " + inputFile);
-			try {
+        for (File inputFile : fileCollection) {
+            logger.info("Loading file: " + inputFile);
+            try {
                 String inputsFileContent = SlangSource.fromFile(inputFile).getSource();
                 Boolean emptyContent = true;
                 if (StringUtils.isNotEmpty(inputsFileContent)) {
@@ -137,19 +137,19 @@ public class CompilerHelperImpl implements CompilerHelper{
                 if (emptyContent) {
                     throw new RuntimeException("Inputs file: " + inputFile + " is empty or does not contain valid YAML content.");
                 }
-			} catch(RuntimeException ex) {
+            } catch (RuntimeException ex) {
                 logger.error("Error loading file: " + inputFile + ". Nested exception is: " + ex.getMessage(), ex);
-				throw new RuntimeException(ex);
-			}
-		}
+                throw new RuntimeException(ex);
+            }
+        }
         return result;
     }
 
     private Set<SystemProperty> loadPropertiesFromFiles(List<File> files, String[] extensions, String directory) {
         Collection<File> fileCollection;
-        if(CollectionUtils.isEmpty(files)) {
+        if (CollectionUtils.isEmpty(files)) {
             fileCollection = loadDefaultFiles(extensions, directory, true);
-            if(CollectionUtils.isEmpty(fileCollection)) return new HashSet<>();
+            if (CollectionUtils.isEmpty(fileCollection)) return new HashSet<>();
         } else {
             fileCollection = files;
             for (File propertyFileCandidate : fileCollection) {
@@ -157,13 +157,13 @@ public class CompilerHelperImpl implements CompilerHelper{
             }
         }
         Map<File, Set<SystemProperty>> loadedProperties = new HashMap<>();
-        for(File propFile : fileCollection) {
+        for (File propFile : fileCollection) {
             try {
                 SlangSource source = SlangSource.fromFile(propFile);
                 logger.info("Loading file: " + propFile);
                 Set<SystemProperty> propsFromFile = slang.loadSystemProperties(source);
                 mergeSystemProperties(loadedProperties, propsFromFile, propFile);
-            } catch(Throwable ex) {
+            } catch (Throwable ex) {
                 String errorMessage = "Error loading file: " + propFile + " nested exception is " + ex.getMessage();
                 logger.error(errorMessage, ex);
                 throw new RuntimeException(errorMessage, ex);

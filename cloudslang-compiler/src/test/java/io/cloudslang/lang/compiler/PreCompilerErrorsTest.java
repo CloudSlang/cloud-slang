@@ -45,8 +45,9 @@ public class PreCompilerErrorsTest {
         URI resource = getClass().getResource("/corrupted/no_op_flow_file.sl").toURI();
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error transforming source: no_op_flow_file to a Slang model. " +
-                "Source no_op_flow_file has no content associated with flow/operation/decision/properties property.");
+        exception.expectMessage("Error transforming source: no_op_flow_file to a Slang model." +
+                " Source no_op_flow_file has no content associated with flow/operation/decision/properties property."
+        );
         compiler.preCompileSource(SlangSource.fromFile(resource));
     }
 
@@ -57,7 +58,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Operation/Flow op_without_namespace must have a namespace");
+        exception.expectMessage("For source[op_without_namespace] namespace cannot be empty.");
         throw result.getErrors().get(0);
     }
 
@@ -79,7 +80,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Executable in source: missing_name_flow has no name");
+        exception.expectMessage("Executable has no name");
         throw result.getErrors().get(0);
     }
 
@@ -96,7 +97,7 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
-     public void testOperationWithWrongName() throws Exception {
+    public void testOperationWithWrongName() throws Exception {
         URI resource = getClass().getResource("/corrupted/wrong_name_operation.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
@@ -107,7 +108,7 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
-     public void testOperationWithWrongNameSLYAMLExtension() throws Exception {
+    public void testOperationWithWrongNameSLYAMLExtension() throws Exception {
         URI resource = getClass().getResource("/corrupted/wrong_name_operation.sl.yaml").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));

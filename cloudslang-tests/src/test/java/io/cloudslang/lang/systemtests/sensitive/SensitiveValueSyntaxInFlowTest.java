@@ -23,7 +23,7 @@ import org.junit.Test;
 
 /**
  * Sensitive value test
- *
+ * <p>
  * Created by Ifat Gavish on 19/04/2016
  */
 public class SensitiveValueSyntaxInFlowTest extends ValueSyntaxParent {

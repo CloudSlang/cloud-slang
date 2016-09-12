@@ -17,11 +17,13 @@ import java.util.Set;
 
 /**
  * @author Bonczidai Levente
- * @since 12/09/2014
  * @version $Id$
+ * @since 12/09/2014
  */
 public interface ScoreServices {
     void subscribe(ScoreEventListener eventHandler, Set<String> eventTypes);
+
     Long trigger(CompilationArtifact compilationArtifact, Map<String, Value> inputs, Set<SystemProperty> systemProperties);
+
     Long triggerSync(CompilationArtifact compilationArtifact, Map<String, Value> inputs, Set<SystemProperty> systemProperties, boolean quiet, boolean debug);
 }

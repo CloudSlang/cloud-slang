@@ -46,7 +46,7 @@ public final class SetUtils {
 
     public static <T> Set<T> mergeSets(Collection<Set<T>> collection) {
         Set<T> result = new HashSet<>();
-        for (Set<T> set: collection) {
+        for (Set<T> set : collection) {
             result.addAll(set);
         }
         return result;

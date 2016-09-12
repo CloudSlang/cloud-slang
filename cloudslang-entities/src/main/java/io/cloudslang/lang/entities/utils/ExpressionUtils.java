@@ -72,7 +72,7 @@ public final class ExpressionUtils {
     private static Set<String> matchFunction(Pattern functionPattern, String text, int parameterGroup) {
         Matcher matcher = functionPattern.matcher(text);
         Set<String> parameters = new HashSet<>();
-        while(matcher.find()) {
+        while (matcher.find()) {
             parameters.add(matcher.group(parameterGroup));
         }
         return parameters;

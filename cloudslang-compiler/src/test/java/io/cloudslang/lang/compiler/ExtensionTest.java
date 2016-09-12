@@ -22,7 +22,7 @@ public class ExtensionTest {
     }
 
     @Test
-     public void testValidateSlangFileExtensionSL() {
+    public void testValidateSlangFileExtensionSL() {
         Extension.validateSlangFileExtension("slang.sl");
     }
 

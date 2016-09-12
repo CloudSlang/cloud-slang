@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.modeller.SlangModeller;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.ParseModellingResult;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
@@ -102,14 +103,15 @@ public class SlangCompilerImpl implements SlangCompiler {
 
         //first thing we parse the yaml file into java maps
         ParsedSlang parsedSlang = yamlParser.parse(source);
+        ParseModellingResult parseModellingResult = yamlParser.validate(parsedSlang);
 
         // Then we transform the parsed Slang source to a Slang model
-        return slangModeller.createModel(parsedSlang);
+        return slangModeller.createModel(parseModellingResult);
     }
 
     @Override
     public List<RuntimeException> validateSlangModelWithDirectDependencies(Executable slangModel, Set<Executable> directDependenciesModels) {
-        return scoreCompiler.validateSlangModelWithDirectDependencies(slangModel,directDependenciesModels);
+        return scoreCompiler.validateSlangModelWithDirectDependencies(slangModel, directDependenciesModels);
     }
 
     @Override
@@ -127,6 +129,7 @@ public class SlangCompilerImpl implements SlangCompiler {
 
     private ParsedSlang parseSystemPropertiesFile(SlangSource source) {
         ParsedSlang parsedSlang = yamlParser.parse(source);
+        parsedSlang = yamlParser.validateAndThrowFirstError(parsedSlang);
         if (!ParsedSlang.Type.SYSTEM_PROPERTY_FILE.equals(parsedSlang.getType())) {
             throw new RuntimeException("Source: " + parsedSlang.getName() + " " + NOT_A_VALID_SYSTEM_PROPERTY_FILE_ERROR_MESSAGE_SUFFIX);
         }
@@ -159,9 +162,7 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     private String getNameSpace(ParsedSlang parsedSlang) {
-        String namespace = parsedSlang.getNamespace();
-        systemPropertyValidator.validateNamespace(namespace);
-        return namespace;
+        return parsedSlang.getNamespace();
     }
 
     private String getPropertyKey(Map.Entry<String, Object> propertyAsEntry) {
@@ -235,7 +236,7 @@ public class SlangCompilerImpl implements SlangCompiler {
                 if (!knownModifierKeys.contains(modifierKey)) {
                     throw new RuntimeException(
                             "Artifact {" + key + "} has unrecognized tag {" + modifierKey + "}" +
-                            ". Please take a look at the supported features per versions link");
+                                    ". Please take a look at the supported features per versions link");
                 }
             }
 

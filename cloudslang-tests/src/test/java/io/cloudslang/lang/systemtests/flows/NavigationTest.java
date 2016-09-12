@@ -1,12 +1,12 @@
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 package io.cloudslang.lang.systemtests.flows;
 
@@ -65,7 +65,7 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailSender", ValueFactory.create("user@host.com"));
         userInputs.put("emailRecipient", ValueFactory.create("user@host.com"));
 
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
 
         Assert.assertEquals("check_number", steps.get(FIRST_STEP_PATH).getName());
         Assert.assertEquals("process_even_number", steps.get(SECOND_STEP_KEY).getName());
@@ -83,7 +83,7 @@ public class NavigationTest extends SystemsTestsParent {
         Map<String, Value> userInputs = new HashMap<>();
         userInputs.put("alla", ValueFactory.create("alla message 1"));
 
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
 
         Assert.assertEquals("on_failure_contains_step_with_custom_result", steps.get(EXEC_START_PATH).getName());
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, steps.get(EXEC_START_PATH).getResult());
@@ -109,7 +109,7 @@ public class NavigationTest extends SystemsTestsParent {
         Map<String, Value> userInputs = new HashMap<>();
         userInputs.put("alla", ValueFactory.create("alla message 1"));
 
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
 
         Assert.assertEquals("flow_that_uses_on_failure_contains_step_with_custom_result", steps.get(EXEC_START_PATH).getName());
         Assert.assertEquals(ScoreLangConstants.FAILURE_RESULT, steps.get(EXEC_START_PATH).getResult());
@@ -130,7 +130,7 @@ public class NavigationTest extends SystemsTestsParent {
         Set<SlangSource> path = Sets.newHashSet();
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
-        Assert.assertEquals(true, ((ArrayList)compilationArtifact
+        Assert.assertEquals(true, ((ArrayList) compilationArtifact
                 .getExecutionPlan().getSteps().get(3L).getActionData().get("executableResults")).isEmpty());
         Map<String, Value> userInputs = new HashMap<>();
         userInputs.put("input1", ValueFactory.create("value1", false));
@@ -162,9 +162,9 @@ public class NavigationTest extends SystemsTestsParent {
         URI operation4Python = getClass().getResource("/yaml/send_email_mock.sl").toURI();
 
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1Python),
-                                                SlangSource.fromFile(operation2Python),
-                                                SlangSource.fromFile(operation3Python),
-                                                SlangSource.fromFile(operation4Python));
+                SlangSource.fromFile(operation2Python),
+                SlangSource.fromFile(operation3Python),
+                SlangSource.fromFile(operation4Python));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Value> userInputs = new HashMap<>();
@@ -174,7 +174,7 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailSender", ValueFactory.create("user@host.com"));
         userInputs.put("emailRecipient", ValueFactory.create("user@host.com"));
 
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
 
         Assert.assertEquals("check_number", steps.get(FIRST_STEP_PATH).getName());
         Assert.assertEquals("process_odd_number", steps.get(SECOND_STEP_KEY).getName());
@@ -202,7 +202,7 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailSender", ValueFactory.create("user@host.com"));
         userInputs.put("emailRecipient", ValueFactory.create("user@host.com"));
 
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
 
         Assert.assertEquals("check_number", steps.get(FIRST_STEP_PATH).getName());
         Assert.assertEquals("send_error_mail", steps.get(SECOND_STEP_KEY).getName());
@@ -226,7 +226,7 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailSender", ValueFactory.create("user@host.com"));
         userInputs.put("emailRecipient", ValueFactory.create("user@host.com"));
 
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
 
         Assert.assertEquals("produce_default_navigation", steps.get(FIRST_STEP_PATH).getName());
         Assert.assertEquals("check_weather", steps.get(SECOND_STEP_KEY).getName());
@@ -250,7 +250,7 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailSender", ValueFactory.create("user@host.com"));
         userInputs.put("emailRecipient", ValueFactory.create("user@host.com"));
 
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
 
         Assert.assertEquals("produce_default_navigation", steps.get(FIRST_STEP_PATH).getName());
         Assert.assertEquals("send_error_mail", steps.get(SECOND_STEP_KEY).getName());
@@ -292,7 +292,7 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailSender", ValueFactory.create("user@host.com"));
         userInputs.put("emailRecipient", ValueFactory.create("user@host.com"));
 
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
 
         Assert.assertEquals("check_number", steps.get(FIRST_STEP_PATH).getName());
         Assert.assertEquals("send_error_mail", steps.get(SECOND_STEP_KEY).getName());
@@ -319,7 +319,7 @@ public class NavigationTest extends SystemsTestsParent {
         userInputs.put("emailSender", ValueFactory.create("user@host.com"));
         userInputs.put("emailRecipient", ValueFactory.create("user@host.com"));
 
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs,new HashSet<SystemProperty>()).getSteps();
+        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
 
         // verify
         StepData flowData = steps.get(EXEC_START_PATH);

@@ -15,5 +15,6 @@ package io.cloudslang.lang.compiler.validator;
  */
 public interface SystemPropertyValidator {
     void validateNamespace(String input);
+
     void validateKey(String input);
 }

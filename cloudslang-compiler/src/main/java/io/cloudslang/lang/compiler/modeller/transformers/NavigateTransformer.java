@@ -24,14 +24,14 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 @Component
-public class NavigateTransformer implements Transformer<List<Object>, List<Map<String, String>>>  {
+public class NavigateTransformer implements Transformer<List<Object>, List<Map<String, String>>> {
 
     @Override
     public TransformModellingResult<List<Map<String, String>>> transform(List<Object> rawData) {
         List<Map<String, String>> transformedData = new ArrayList<>();
         List<RuntimeException> errors = new ArrayList<>();
 
-        if (CollectionUtils.isEmpty(rawData)){
+        if (CollectionUtils.isEmpty(rawData)) {
             return new BasicTransformModellingResult<>(transformedData, errors);
         }
 

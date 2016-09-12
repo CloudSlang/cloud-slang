@@ -16,7 +16,7 @@ import java.util.Arrays;
 
 /**
  * PyObject value proxy class
- *
+ * <p>
  * Created by Ifat Gavish on 19/05/2016
  */
 public class PyObjectValueProxyClass {

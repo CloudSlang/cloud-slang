@@ -1,12 +1,12 @@
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 package io.cloudslang.lang.compiler.modeller.transformers;
 
@@ -15,8 +15,12 @@ import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
+import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.bindings.Output;
 import java.io.File;
 import java.net.URISyntaxException;
@@ -25,9 +29,7 @@ import java.util.List;
 import java.util.Map;
 import junit.framework.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -43,7 +45,7 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
  * @author Bonczidai Levente
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes=OutputsTransformerTest.Config.class)
+@ContextConfiguration(classes = OutputsTransformerTest.Config.class)
 public class OutputsTransformerTest {
 
     private static final long DEFAULT_TIMEOUT = 10000;
@@ -53,9 +55,6 @@ public class OutputsTransformerTest {
 
     @Autowired
     private YamlParser yamlParser;
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     private List<Object> outputsMap;
 
@@ -67,13 +66,13 @@ public class OutputsTransformerTest {
         outputsMap = (List) op.get(SlangTextualKeys.OUTPUTS_KEY);
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testTransform() throws Exception {
         @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap).getTransformedData();
         Assert.assertFalse(outputs.isEmpty());
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testNoExpression() throws Exception {
         @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap).getTransformedData();
         Output output = outputs.get(2);
@@ -81,7 +80,7 @@ public class OutputsTransformerTest {
         Assert.assertEquals("${output3}", output.getValue().get());
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testExpressionKeyFromActionReturnValues() throws Exception {
         @SuppressWarnings("unchecked") List<Output> outputs = outputTransformer.transform(outputsMap).getTransformedData();
         Output output = outputs.get(0);
@@ -117,6 +116,16 @@ public class OutputsTransformerTest {
         @Bean
         public PreCompileValidator preCompileValidator() {
             return new PreCompileValidatorImpl();
+        }
+
+        @Bean
+        public ExecutableValidator executableValidator() {
+            return new ExecutableValidatorImpl();
+        }
+
+        @Bean
+        public SystemPropertyValidator systemPropertyValidator() {
+            return new SystemPropertyValidatorImpl();
         }
 
     }

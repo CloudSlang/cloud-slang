@@ -173,7 +173,7 @@ public class FlowWithJavaVersioningTest extends SystemsTestsParent {
         URI operationSum3 = getClass().getResource(operationPath).toURI();
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(operationSum3), null);
 
-        ScoreEvent event = trigger(compilationArtifact,  new HashMap<String, Value>(), new HashSet<SystemProperty>());
+        ScoreEvent event = trigger(compilationArtifact, new HashMap<String, Value>(), new HashSet<SystemProperty>());
         assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
         LanguageEventData languageEventData = (LanguageEventData) event.getData();
         String result = (String) languageEventData.getOutputs().get("version");

@@ -145,7 +145,7 @@ public class CompileBasicFlowTest {
 
 
     @Test
-    public void testValidFlowWithMissingDependencyRequiredInputInGrandchild()throws Exception {
+    public void testValidFlowWithMissingDependencyRequiredInputInGrandchild() throws Exception {
         URI flowUri = getClass().getResource("/corrupted/flow_missing_dependency_required_input_in_grandchild.sl").toURI();
         Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
 
