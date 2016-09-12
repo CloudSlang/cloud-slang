@@ -96,7 +96,7 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
         boolean defaultSpecified = props.containsKey(DEFAULT_KEY);
         String inputName = entry.getKey();
         Serializable value = defaultSpecified ? props.get(DEFAULT_KEY) : null;
-        if (defaultSpecified && ("".equals(value) || value == null)) {
+        if (defaultSpecified && (value == null || StringUtils.EMPTY.equals(value))) {
             defaultSpecified = false;
         }
 
