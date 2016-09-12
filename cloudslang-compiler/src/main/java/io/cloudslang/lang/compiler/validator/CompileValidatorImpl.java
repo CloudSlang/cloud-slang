@@ -218,15 +218,11 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
     private List<String> getMandatoryInputNames(Executable executable) {
         List<String> inputNames = new ArrayList<>();
         for (Input input : executable.getInputs()) {
-            if (!input.isPrivateInput() && input.isRequired() && isNullValue(input)) {
+            if (InputUtils.isMandatory(input)) {
                 inputNames.add(input.getName());
             }
         }
         return inputNames;
-    }
-
-    private boolean isNullValue(Input input) {
-        return input.getValue() == null || input.getValue().get() == null;
     }
 
     private List<String> getStepInputNamesWithNonEmptyValue(Step step) {
