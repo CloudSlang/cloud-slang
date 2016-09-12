@@ -166,6 +166,22 @@ public class InputsTransformerTest extends TransformersTestParent {
     }
 
     @Test
+    public void testPrivateRequiredInputWithEmptyStringDefault() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Input: 'input1' is private but no default value was specified");
+        List inputs = getInputsFormSl("/corrupted/operation_with_data_invalid_input.sl");
+        transformAndThrowFirstException(inputTransformer, inputs);
+    }
+
+    @Test
+    public void testPrivateRequiredInputWithNoneDefault() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Input: 'input1' is private but no default value was specified");
+        List inputs = getInputsFormSl("/corrupted/operation_with_data_invalid_input.sl");
+        transformAndThrowFirstException(inputTransformer, inputs);
+    }
+
+    @Test
     public void testPrivateInputWithoutDefault() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage("private");
