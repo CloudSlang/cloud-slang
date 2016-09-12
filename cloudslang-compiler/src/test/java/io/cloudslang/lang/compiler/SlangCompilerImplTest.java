@@ -18,6 +18,8 @@ import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.compiler.validator.CompileValidator;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
+import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.entities.SystemProperty;
 import java.util.ArrayList;
@@ -66,6 +68,7 @@ public class SlangCompilerImplTest {
     public void testInvalidParsedSlangType() throws Exception {
         ParsedSlang parsedSlangInvalidTypeMock = mock(ParsedSlang.class);
         when(yamlParserMock.parse(eq(slangSource))).thenReturn(parsedSlangInvalidTypeMock);
+        when(yamlParserMock.validateAndThrowFirstError(eq(parsedSlangInvalidTypeMock))).thenReturn(parsedSlangInvalidTypeMock);
         when(parsedSlangInvalidTypeMock.getType()).thenReturn(ParsedSlang.Type.FLOW);
         when(parsedSlangInvalidTypeMock.getName()).thenReturn("flow_name");
 
@@ -80,6 +83,7 @@ public class SlangCompilerImplTest {
     public void testLoadSystemProperties() throws Exception {
         ParsedSlang parsedSlangMock = mock(ParsedSlang.class);
         when(yamlParserMock.parse(eq(slangSource))).thenReturn(parsedSlangMock);
+        when(yamlParserMock.validateAndThrowFirstError(eq(parsedSlangMock))).thenReturn(parsedSlangMock);
         when(parsedSlangMock.getType()).thenReturn(ParsedSlang.Type.SYSTEM_PROPERTY_FILE);
 
         String namespace = "a.b";
@@ -147,6 +151,11 @@ public class SlangCompilerImplTest {
         @Bean
         public SystemPropertyValidator systemPropertyValidator() {
             return mock(SystemPropertyValidator.class);
+        }
+
+        @Bean
+        public ExecutableValidator executableValidator() {
+            return new ExecutableValidatorImpl();
         }
 
     }

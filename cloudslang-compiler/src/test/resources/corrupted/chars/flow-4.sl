@@ -5,22 +5,24 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-namespace: io.cloudslang
+namespace: slang.sample.flows
 
 imports:
-  ops: user.ops
+  op: user.ops
 
 flow:
-  name: flow_missing_dependency_required_input_in_step
-  workflow:
-    - explicit_alias:
-        do:
-          ops.test_op:
-            - city: 'input_1'
-            - port: '22'
+  name: flow-4
+  inputs:
+    - city_name
 
-    - implicit_alias:
+  workflow:
+    - CheckWeather:
         do:
-          check_op:
-            - city: 'input_1'
-            - port: '22'
+          ops.check_Weather:
+            - city: city_name
+            - country: 'Israel'
+            - alla: 'walla'
+        publish:
+          - weather
+  outputs:
+    - weather
