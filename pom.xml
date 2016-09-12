@@ -34,7 +34,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <score.group>io.cloudslang</score.group>
-        <score.version>0.3.35</score.version>
+        <score.version>0.3.39</score.version>
         <spring.version>4.2.5.RELEASE</spring.version>
     </properties>
 
