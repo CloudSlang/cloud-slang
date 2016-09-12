@@ -17,9 +17,5 @@ flow:
             - text
         publish:
           - answer: returnResult
-        navigate:
-          - SUCCESS: SUCCESS
   outputs:
     - returnResult: answer
-  results:
-    - SUCCESS
