@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.DEFAULT_KEY;
@@ -94,13 +96,13 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
         boolean defaultSpecified = props.containsKey(DEFAULT_KEY);
         String inputName = entry.getKey();
         Serializable value = defaultSpecified ? props.get(DEFAULT_KEY) : null;
+        if (defaultSpecified && ("".equals(value) || value == null)) {
+            defaultSpecified = false;
+        }
 
         if (privateInput && !defaultSpecified) {
             throw new RuntimeException(
                     "Input: '" + inputName + "' is private but no default value was specified");
-        } else if (privateInput && required && "".equals(value)) {
-            throw new RuntimeException(
-                    "Input: '" + inputName + "' is private and required and the default value is empty string");
         }
 
         return createInput(inputName, value, sensitive, required, privateInput);
