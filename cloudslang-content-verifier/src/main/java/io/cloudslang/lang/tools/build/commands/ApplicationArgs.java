@@ -51,6 +51,10 @@ public class ApplicationArgs {
             description = "Number of threads to be used in case of parallel test execution. Has no effect for sequential execution. By default, it is set to the number of processors.")
     public String threadCount;
 
+    @Parameter(names = {"--description", "-des"},
+            description = "Whether or not to validate the inputs, outputs and results have description")
+    public boolean validateDescription = false;
+
     @Parameter(names = {"--help", "-h"}, help = true,
             description = "Display help information")
     private boolean help;
@@ -78,8 +82,12 @@ public class ApplicationArgs {
         return testSuites;
     }
 
-    public Boolean shouldOutputCoverage() {
+    public boolean shouldOutputCoverage() {
         return coverage;
+    }
+
+    public boolean shouldValidateDescription() {
+        return validateDescription;
     }
 
     public boolean isHelp() {
@@ -90,7 +98,7 @@ public class ApplicationArgs {
         return dynamicParams;
     }
 
-    public Boolean isParallel() {
+    public boolean isParallel() {
         return parallel;
     }
 
