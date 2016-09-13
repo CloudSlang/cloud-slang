@@ -35,9 +35,9 @@ The example below shows how to use the CloudSlang compiler:
         </dependencies>
       </plugin>
       [...]
-    <plugins>
+    </plugins>
     [...]
-   <build>
+   </build>
    [...]
 </project>
 ```
