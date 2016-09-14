@@ -12,6 +12,7 @@ import io.cloudslang.lang.compiler.modeller.SlangModeller;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.ParseModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.SystemPropertyModellingResult;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
@@ -116,105 +117,130 @@ public class SlangCompilerImpl implements SlangCompiler {
 
     @Override
     public Set<SystemProperty> loadSystemProperties(SlangSource source) {
+        SystemPropertyModellingResult systemPropertyModellingResult = loadSystemPropertiesFromSource(source);
+        if (systemPropertyModellingResult.getErrors().size() > 0) {
+            throw systemPropertyModellingResult.getErrors().get(0);
+        }
+        return systemPropertyModellingResult.getSystemProperties();
+    }
+
+    @Override
+    public SystemPropertyModellingResult loadSystemPropertiesFromSource(SlangSource source) {
+        ParseModellingResult parseModellingResult = parseSystemPropertiesFile(source);
+        SystemPropertyModellingResult systemPropertyModellingResult =
+                extractProperties(parseModellingResult.getParsedSlang(), source);
+        systemPropertyModellingResult.getErrors().addAll(parseModellingResult.getErrors());
+        return systemPropertyModellingResult;
+    }
+
+    private ParseModellingResult parseSystemPropertiesFile(SlangSource source) {
+        List<RuntimeException> exceptions = new ArrayList<>();
+        ParsedSlang parsedSlang = null;
         try {
-            ParsedSlang parsedSlang = parseSystemPropertiesFile(source);
-            return extractProperties(parsedSlang);
+            parsedSlang = yamlParser.parse(source);
+            if (!ParsedSlang.Type.SYSTEM_PROPERTY_FILE.equals(parsedSlang.getType())) {
+                throw new RuntimeException("Source: " + parsedSlang.getName() + " " +
+                        NOT_A_VALID_SYSTEM_PROPERTY_FILE_ERROR_MESSAGE_SUFFIX);
+            }
         } catch (Throwable ex) {
-            throw new RuntimeException(
-                    ERROR_LOADING_PROPERTIES_FILE_MESSAGE + source.getFileName() + "'. Nested exception is: " + ex.getMessage(),
-                    ex
-            );
+            exceptions.add(getException(source, ex));
         }
+        try {
+            parsedSlang = yamlParser.validateAndThrowFirstError(parsedSlang);
+        } catch (RuntimeException ex) {
+            exceptions.add(getException(source, ex));
+        }
+
+        return new ParseModellingResult(parsedSlang, exceptions);
     }
 
-    private ParsedSlang parseSystemPropertiesFile(SlangSource source) {
-        ParsedSlang parsedSlang = yamlParser.parse(source);
-        parsedSlang = yamlParser.validateAndThrowFirstError(parsedSlang);
-        if (!ParsedSlang.Type.SYSTEM_PROPERTY_FILE.equals(parsedSlang.getType())) {
-            throw new RuntimeException("Source: " + parsedSlang.getName() + " " + NOT_A_VALID_SYSTEM_PROPERTY_FILE_ERROR_MESSAGE_SUFFIX);
-        }
-        return parsedSlang;
+    private RuntimeException getException(SlangSource source, Throwable ex) {
+        return new RuntimeException(
+                ERROR_LOADING_PROPERTIES_FILE_MESSAGE + source.getFileName() + "'. Nested exception is: " + ex.getMessage(),
+                ex);
     }
 
-    private Set<SystemProperty> extractProperties(ParsedSlang parsedSlang) {
-        String namespace = getNameSpace(parsedSlang);
-        List<Map<String, Object>> parsedSystemProperties = convertRawProperties(parsedSlang.getProperties());
+    private SystemPropertyModellingResult extractProperties(ParsedSlang parsedSlang, SlangSource source) {
+        List<RuntimeException> exceptions = new ArrayList<>();
         Set<SystemProperty> modelledSystemProperties = new HashSet<>();
         Set<String> modelledSystemPropertyKeys = new HashSet<>();
 
+        List<Map<String, Object>> parsedSystemProperties = convertRawProperties(parsedSlang.getProperties(), source, exceptions);
         for (Map<String, Object> propertyAsMap : parsedSystemProperties) {
             Map.Entry<String, Object> propertyAsEntry = propertyAsMap.entrySet().iterator().next();
-            String propertyKey = getPropertyKey(propertyAsEntry);
+            String propertyKey = getPropertyKey(propertyAsEntry, source, exceptions);
             if (SetUtils.containsIgnoreCase(modelledSystemPropertyKeys, propertyKey)) {
-                throw new RuntimeException(
-                        DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX + propertyKey + "'."
-                );
+                exceptions.add(getException(source, new RuntimeException(
+                        DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX + propertyKey + "'.")));
             } else {
                 modelledSystemPropertyKeys.add(propertyKey);
             }
 
             Object propertyValue = propertyAsEntry.getValue();
-            SystemProperty property = transformSystemProperty(namespace, propertyKey, propertyValue);
+            SystemProperty property = transformSystemProperty(parsedSlang.getNamespace(), propertyKey, propertyValue);
             modelledSystemProperties.add(property);
         }
-
-        return modelledSystemProperties;
+        return new SystemPropertyModellingResult(modelledSystemProperties, exceptions);
     }
 
-    private String getNameSpace(ParsedSlang parsedSlang) {
-        return parsedSlang.getNamespace();
-    }
-
-    private String getPropertyKey(Map.Entry<String, Object> propertyAsEntry) {
+    private String getPropertyKey(Map.Entry<String, Object> propertyAsEntry, SlangSource source,
+                                  List<RuntimeException> exceptions) {
         String propertyKey = propertyAsEntry.getKey();
-        systemPropertyValidator.validateKey(propertyKey);
+        try {
+            systemPropertyValidator.validateKey(propertyKey);
+        } catch (RuntimeException ex) {
+            exceptions.add(getException(source, ex));
+        }
         return propertyKey;
     }
 
     // casting and validations
-    private List<Map<String, Object>> convertRawProperties(Object propertiesAsObject) {
+    private List<Map<String, Object>> convertRawProperties(Object propertiesAsObject, SlangSource source,
+                                                           List<RuntimeException> exceptions) {
         List<Map<String, Object>> convertedProperties = new ArrayList<>();
-        if (propertiesAsObject instanceof List) {
-            List propertiesAsList = (List) propertiesAsObject;
-            for (Object propertyAsObject : propertiesAsList) {
-                if (propertyAsObject instanceof Map) {
-                    Map propertyAsMap = (Map) propertyAsObject;
-                    if (propertyAsMap.size() == 1) {
-                        Map.Entry propertyAsEntry = (Map.Entry) propertyAsMap.entrySet().iterator().next();
-                        Object propertyKeyAsObject = propertyAsEntry.getKey();
-                        if (propertyKeyAsObject instanceof String) {
-                            Map<String, Object> convertedProperty = new HashMap<>();
-                            convertedProperty.put((String) propertyKeyAsObject, propertyAsEntry.getValue());
-                            convertedProperties.add(convertedProperty);
+        if (propertiesAsObject != null) {
+            if (propertiesAsObject instanceof List) {
+                List propertiesAsList = (List) propertiesAsObject;
+                for (Object propertyAsObject : propertiesAsList) {
+                    if (propertyAsObject instanceof Map) {
+                        Map propertyAsMap = (Map) propertyAsObject;
+                        if (propertyAsMap.size() == 1) {
+                            Map.Entry propertyAsEntry = (Map.Entry) propertyAsMap.entrySet().iterator().next();
+                            Object propertyKeyAsObject = propertyAsEntry.getKey();
+                            if (propertyKeyAsObject instanceof String) {
+                                Map<String, Object> convertedProperty = new HashMap<>();
+                                convertedProperty.put((String) propertyKeyAsObject, propertyAsEntry.getValue());
+                                convertedProperties.add(convertedProperty);
+                            } else {
+                                exceptions.add(getException(source, new RuntimeException(
+                                        SYSTEM_PROPERTY_KEY_WRONG_TYPE_ERROR_MESSAGE_PREFIX +
+                                                propertyKeyAsObject + "(" + propertyKeyAsObject.getClass().getName() + ")."
+                                )));
+                            }
                         } else {
-                            throw new RuntimeException(
-                                    SYSTEM_PROPERTY_KEY_WRONG_TYPE_ERROR_MESSAGE_PREFIX +
-                                            propertyKeyAsObject + "(" + propertyKeyAsObject.getClass().getName() + ")."
-                            );
+                            exceptions.add(getException(source, new RuntimeException(
+                                    SIZE_OF_SYSTEM_PROPERTY_ERROR_MESSAGE_PREFIX +
+                                            propertyAsMap + "' size is: " + propertyAsMap.size() + "."
+                            )));
                         }
                     } else {
-                        throw new RuntimeException(
-                                SIZE_OF_SYSTEM_PROPERTY_ERROR_MESSAGE_PREFIX +
-                                        propertyAsMap + "' size is: " + propertyAsMap.size() + "."
-                        );
+                        String errorMessageSuffix;
+                        if (propertyAsObject == null) {
+                            errorMessageSuffix = "null.";
+                        } else {
+                            errorMessageSuffix = propertyAsObject.toString() + "(" + propertyAsObject.getClass().getName() + ").";
+                        }
+                        exceptions.add(getException(source, new RuntimeException(
+                                PROPERTY_LIST_ELEMENT_WRONG_TYPE_ERROR_MESSAGE_PREFIX + errorMessageSuffix
+                        )));
                     }
-                } else {
-                    String errorMessageSuffix;
-                    if (propertyAsObject == null) {
-                        errorMessageSuffix = "null.";
-                    } else {
-                        errorMessageSuffix = propertyAsObject.toString() + "(" + propertyAsObject.getClass().getName() + ").";
-                    }
-                    throw new RuntimeException(
-                            PROPERTY_LIST_ELEMENT_WRONG_TYPE_ERROR_MESSAGE_PREFIX + errorMessageSuffix
-                    );
                 }
+            } else {
+                exceptions.add(getException(source, new RuntimeException(
+                        "Under '" + SlangTextualKeys.SYSTEM_PROPERTY_KEY +
+                                "' key there should be a list. Found: " + propertiesAsObject.getClass().getName() + "."
+                )));
             }
-        } else {
-            throw new RuntimeException(
-                    "Under '" + SlangTextualKeys.SYSTEM_PROPERTY_KEY +
-                            "' key there should be a list. Found: " + propertiesAsObject.getClass().getName() + "."
-            );
         }
         return convertedProperties;
     }

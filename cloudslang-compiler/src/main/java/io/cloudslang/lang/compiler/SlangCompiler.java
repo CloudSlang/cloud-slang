@@ -10,8 +10,10 @@ package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.SystemPropertyModellingResult;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
+
 import java.util.List;
 import java.util.Set;
 
@@ -63,4 +65,5 @@ public interface SlangCompiler {
 
     Set<SystemProperty> loadSystemProperties(SlangSource source);
 
+    SystemPropertyModellingResult loadSystemPropertiesFromSource(SlangSource source);
 }
