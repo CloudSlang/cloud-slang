@@ -127,10 +127,7 @@ public class SlangCompilerImpl implements SlangCompiler {
     @Override
     public SystemPropertyModellingResult loadSystemPropertiesFromSource(SlangSource source) {
         ParseModellingResult parseModellingResult = parseSystemPropertiesFile(source);
-        SystemPropertyModellingResult systemPropertyModellingResult =
-                extractProperties(parseModellingResult.getParsedSlang(), source);
-        systemPropertyModellingResult.getErrors().addAll(parseModellingResult.getErrors());
-        return systemPropertyModellingResult;
+        return extractProperties(parseModellingResult.getParsedSlang(), source, parseModellingResult.getErrors());
     }
 
     private ParseModellingResult parseSystemPropertiesFile(SlangSource source) {
@@ -160,8 +157,8 @@ public class SlangCompilerImpl implements SlangCompiler {
                 ex);
     }
 
-    private SystemPropertyModellingResult extractProperties(ParsedSlang parsedSlang, SlangSource source) {
-        List<RuntimeException> exceptions = new ArrayList<>();
+    private SystemPropertyModellingResult extractProperties(ParsedSlang parsedSlang, SlangSource source,
+                                                            List<RuntimeException> exceptions) {
         Set<SystemProperty> modelledSystemProperties = new HashSet<>();
         Set<String> modelledSystemPropertyKeys = new HashSet<>();
 

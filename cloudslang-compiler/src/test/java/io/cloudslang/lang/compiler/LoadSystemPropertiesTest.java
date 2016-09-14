@@ -199,6 +199,22 @@ public class LoadSystemPropertiesTest {
     }
 
     @Test
+    public void testMultipleExceptionsFromSource() throws Exception {
+        URI propertiesURI = getClass().getResource("/properties/a/b/multiple_invalid.prop.sl").toURI();
+        SystemPropertyModellingResult result = compiler.loadSystemPropertiesFromSource(SlangSource.fromFile(propertiesURI));
+        assertTrue(result.getErrors().size() == 3);
+        assertTrue(result.getErrors().get(0).getMessage().contains("Error loading properties source: 'multiple_invalid'. " +
+                "Nested exception is: Error validating system property namespace." +
+                " Nested exception is: Argument[a.!.b] violates character rules."));
+        assertTrue(result.getErrors().get(1).getMessage().contains("Error loading properties source: 'multiple_invalid'. " +
+                "Nested exception is: Error validating system property key. Nested exception is:" +
+                " Argument[c.?.name] violates character rules."));
+        assertTrue(result.getErrors().get(2).getMessage().contains(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE));
+        assertTrue(result.getErrors().get(2).getMessage().contains(SlangCompilerImpl.DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX));
+        assertTrue(result.getErrors().get(2).getMessage().contains("restrict.OUT.port"));
+    }
+
+    @Test
     public void testInvalidCharsNamespace() throws Exception {
         URI propertiesURI = getClass().getResource("/properties/a/b/invalid_1.prop.sl").toURI();
         exception.expect(RuntimeException.class);
