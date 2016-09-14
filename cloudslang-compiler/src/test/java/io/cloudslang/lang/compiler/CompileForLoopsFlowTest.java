@@ -151,6 +151,18 @@ public class CompileForLoopsFlowTest {
     }
 
     @Test
+    public void testCompileEmptyStringLoopFlow() throws Exception {
+        URI flow = getClass().getResource("/loops/simple_loop_empty_string.sl").toURI();
+        URI operation = getClass().getResource("/loops/print.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("For step 'print_values' syntax is illegal.\n" +
+                "For statement is empty.");
+        compiler.compile(SlangSource.fromFile(flow), path);
+    }
+
+    @Test
     public void testCompileLoopFlowWithBreak() throws Exception {
         URI flow = getClass().getResource("/loops/loop_with_break.sl").toURI();
         URI operation = getClass().getResource("/loops/print.sl").toURI();
