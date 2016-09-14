@@ -28,9 +28,7 @@ flow:
           - result_mul_of_sum: ${str(sum(map(lambda x:int(x['result']), branches_context)))}
         navigate:
           - SUCCESS: SUCCESS
-          - FAILURE: FAILURE
   outputs:
     - sums_result: ${str(result_mul_of_sum)}
   results:
     - SUCCESS
-    - FAILURE

@@ -58,8 +58,7 @@ flow:
             - publish_4: ${get_sp('parallel_loop.publish.prop2', 'default_str')}
         navigate:
           - SUCCESS: Step3
-          - FAILURE: FUNCTIONS_KEY_EXISTS_PROBLEM
-          
+
     - Step3:
         loop:
           for: value in [1,2,3]
