@@ -44,11 +44,8 @@ public class InputsTransformer extends AbstractInputsTransformer implements Tran
             try {
                 Input input = transformSingleInput(rawInput);
                 List<RuntimeException> validationErrors = preCompileValidator.validateNoDuplicateInOutParams(transformedData, input);
-                if (CollectionUtils.isEmpty(validationErrors)) {
-                    transformedData.add(input);
-                } else {
-                    errors.addAll(validationErrors);
-                }
+                transformedData.add(input);
+                errors.addAll(validationErrors);
             } catch (RuntimeException rex) {
                 errors.add(rex);
             }

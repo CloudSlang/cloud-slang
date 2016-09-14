@@ -42,6 +42,10 @@ public class DuplicateParamsErrorsTest {
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
+        assertTrue(result.getExecutable().getInputs().size() == 4);
+        assertTrue(result.getExecutable().getInputs().get(1).getName()
+                .equals(result.getExecutable().getInputs().get(3).getName()));
+        exception.expect(RuntimeException.class);
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'duplicate_op_input_lowercase' syntax is illegal.");
         exception.expectMessage("Duplicate input found: city");
@@ -54,6 +58,9 @@ public class DuplicateParamsErrorsTest {
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
+        assertTrue(result.getExecutable().getInputs().size() == 4);
+        assertTrue(result.getExecutable().getInputs().get(1).getName()
+                .equalsIgnoreCase(result.getExecutable().getInputs().get(3).getName()));
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'duplicate_op_input_ignore_case' syntax is illegal.");
         exception.expectMessage("Duplicate input found: City");
