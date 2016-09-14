@@ -43,6 +43,7 @@ public abstract class AbstractForTransformer extends AbstractInOutForTransformer
         List<RuntimeException> errors = new ArrayList<>();
         Accumulator dependencyAccumulator = extractFunctionData("${" + rawData + "}");
         if (StringUtils.isEmpty(rawData)) {
+            errors.add(new RuntimeException("For statement is empty."));
             return new BasicTransformModellingResult<>(null, errors);
         }
 
