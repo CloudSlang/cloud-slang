@@ -199,23 +199,26 @@ public class CloudSlangMavenCompiler extends AbstractCompiler {
 
     private static Map<String, byte[]> getSourceFilesForDependencies(String dependency) throws IOException {
         Path path = Paths.get(dependency);
-        if (!Files.exists(path) || !path.toString().toLowerCase().endsWith(".jar")) return Collections.EMPTY_MAP;
+        if (!Files.exists(path) || !path.toString().toLowerCase().endsWith(".jar")) {
+            return Collections.emptyMap();
+        }
 
-        Map<String, byte[]> sources = new HashMap();
+        Map<String, byte[]> sources = new HashMap<>();
 
-        JarFile jar = new JarFile(dependency);
-        Enumeration enumEntries = jar.entries();
-        while (enumEntries.hasMoreElements()) {
-            JarEntry file = (JarEntry) enumEntries.nextElement();
-            if (file.isDirectory() || (!file.getName().endsWith(".sl.yaml") && !file.getName().endsWith(".sl") && !file.getName().endsWith(".sl.yml"))) {
-                continue;
-            }
+        try (JarFile jar = new JarFile(dependency)) {
+            Enumeration enumEntries = jar.entries();
+            while (enumEntries.hasMoreElements()) {
+                JarEntry file = (JarEntry) enumEntries.nextElement();
+                if (file.isDirectory() || (!file.getName().endsWith(".sl.yaml") && !file.getName().endsWith(".sl") && !file.getName().endsWith(".sl.yml"))) {
+                    continue;
+                }
 
-            byte[] bytes;
-            try (InputStream is = jar.getInputStream(file)) {
-                bytes = IOUtils.toByteArray(is);
-                Path filePath = Paths.get(file.getName());
-                sources.put(filePath.getFileName().toString(), bytes);
+                byte[] bytes;
+                try (InputStream is = jar.getInputStream(file)) {
+                    bytes = IOUtils.toByteArray(is);
+                    Path filePath = Paths.get(file.getName());
+                    sources.put(filePath.getFileName().toString(), bytes);
+                }
             }
         }
 
