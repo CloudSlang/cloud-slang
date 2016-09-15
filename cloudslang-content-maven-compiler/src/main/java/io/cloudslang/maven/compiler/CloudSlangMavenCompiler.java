@@ -177,7 +177,7 @@ public class CloudSlangMavenCompiler extends AbstractCompiler {
         return sources.toArray(new String[sources.size()]);
     }
 
-    protected static Map<String, byte[]> getDependenciesSourceFiles(CompilerConfiguration config) throws CompilerException {
+    private static Map<String, byte[]> getDependenciesSourceFiles(CompilerConfiguration config) throws CompilerException {
         if (config.getClasspathEntries().isEmpty()) {
             return Collections.emptyMap();
         }
