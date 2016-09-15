@@ -11,19 +11,20 @@ imports:
   ops: loops.parallel_loop
 
 flow:
-  name: parallel_loop_branch_result_output_collision
+  name: parallel_loop_navigate_custom
   inputs:
-    - values: "1,2,3"
+    - values: ${ range(1, 11) }
   workflow:
     - print_values:
         parallel_loop:
-          for: value in values.split(",")
+          for: value in values
           do:
-            ops.print_branch_with_result_output_collision:
+            ops.print_branch_custom_only:
               - ID: ${ value }
-        publish:
-          - branch_results_list: ${ str(map(lambda x:str(x['branch_result']), branches_context)) }
         navigate:
-          - SUCCESS: SUCCESS
-  results:
-    - SUCCESS
+          - SUCCESS: print_list
+
+    - print_list:
+        do:
+            ops.print_list:
+                - words_list: '[]'

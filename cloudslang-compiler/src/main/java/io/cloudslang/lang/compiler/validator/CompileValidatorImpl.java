@@ -149,24 +149,57 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
 
     private void validateResultNamesAndNavigationSection(Flow flow, Step step, String refId, Executable reference, List<RuntimeException> errors) {
         List<String> stepNavigationKeys = getMapKeyList(step.getNavigationStrings());
-        List<String> refResults = getReferenceResultNames(step, reference.getResults());
+        List<String> refResults = mapResultsToNames(reference.getResults());
+        List<String> possibleResults;
 
-        List<String> stepNavigationKeysWithoutMatchingResult = ListUtils.subtract(stepNavigationKeys, refResults);
-        List<String> refResultsWithoutMatchingNavigation = ListUtils.subtract(refResults, stepNavigationKeys);
+        possibleResults = getPossibleResults(step, refResults);
+
+        List<String> stepNavigationKeysWithoutMatchingResult = ListUtils.subtract(stepNavigationKeys, possibleResults);
+        List<String> refResultsWithoutMatchingNavigation = ListUtils.subtract(possibleResults, stepNavigationKeys);
 
         if (CollectionUtils.isNotEmpty(refResultsWithoutMatchingNavigation)) {
-            errors.add(new IllegalArgumentException(
-                    getErrorMessagePrefix(flow, step) + " the results " + refResultsWithoutMatchingNavigation +
-                            " of its dependency '" + refId + "' have no matching navigation."
-            ));
+            if (step.isParallelLoop()) {
+                errors.add(new IllegalArgumentException(
+                        getErrorMessagePrefix(flow, step) + " the parallel loop results " +
+                                refResultsWithoutMatchingNavigation + " have no matching navigation."
+                ));
+            } else {
+                errors.add(new IllegalArgumentException(
+                        getErrorMessagePrefix(flow, step) + " the results " + refResultsWithoutMatchingNavigation +
+                                " of its dependency '" + refId + "' have no matching navigation."
+                ));
+            }
         }
         if (CollectionUtils.isNotEmpty(stepNavigationKeysWithoutMatchingResult)) {
-            errors.add(new IllegalArgumentException(
-                    getErrorMessagePrefix(flow, step) + " the navigation keys " +
-                            stepNavigationKeysWithoutMatchingResult + " have no matching results in its dependency '" +
-                            refId + "'."
-            ));
+            if (step.isParallelLoop()) {
+                errors.add(new IllegalArgumentException(
+                        getErrorMessagePrefix(flow, step) + " the navigation keys " +
+                                stepNavigationKeysWithoutMatchingResult + " have no matching results." +
+                                " The parallel loop depending on '" + refId +
+                                "' can have the following results: " + possibleResults + "."
+                ));
+            } else {
+                errors.add(new IllegalArgumentException(
+                        getErrorMessagePrefix(flow, step) + " the navigation keys " +
+                                stepNavigationKeysWithoutMatchingResult + " have no matching results in its dependency '" +
+                                refId + "'."
+                ));
+            }
         }
+    }
+
+    private List<String> getPossibleResults(Step step, List<String> refResults) {
+        List<String> possibleResults;
+        if (step.isParallelLoop()) {
+            possibleResults = Lists.newArrayList(ScoreLangConstants.SUCCESS_RESULT);
+            if (refResults.contains(ScoreLangConstants.FAILURE_RESULT)) {
+                possibleResults.add(ScoreLangConstants.FAILURE_RESULT);
+            }
+
+        } else {
+            possibleResults = refResults;
+        }
+        return possibleResults;
     }
 
     private String getErrorMessagePrefix(Flow flow, Step step) {
@@ -188,15 +221,6 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
             resultNames.add(element.getName());
         }
         return resultNames;
-    }
-
-    private List<String> getReferenceResultNames(Step step, List<Result> results) {
-        if (step.isParallelLoop()) {
-            // parallel loop -> may end with SUCCESS or FAILURE
-            return Lists.newArrayList(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.FAILURE_RESULT);
-        } else {
-            return mapResultsToNames(results);
-        }
     }
 
     private List<RuntimeException> validateStepInputNamesDifferentFromDependencyOutputNames(Flow flow, Step step, Executable reference) {
