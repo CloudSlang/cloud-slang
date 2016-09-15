@@ -16,9 +16,11 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.bindings.Output;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 @Component

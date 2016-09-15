@@ -23,11 +23,13 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,6 +39,7 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
 
     @Autowired
     private PreCompileValidator preCompileValidator;
+
     @Autowired
     private ExecutableValidator executableValidator;
 
@@ -132,5 +135,13 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
                     accumulator.getSystemPropertyDependencies()
             );
         }
+    }
+
+    public void setPreCompileValidator(PreCompileValidator preCompileValidator) {
+        this.preCompileValidator = preCompileValidator;
+    }
+
+    public void setExecutableValidator(ExecutableValidator executableValidator) {
+        this.executableValidator = executableValidator;
     }
 }

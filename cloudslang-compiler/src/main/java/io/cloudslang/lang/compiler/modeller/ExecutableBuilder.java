@@ -61,10 +61,10 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.PARALLEL_LOOP_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.WORKFLOW_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
-/*
- * Created by orius123 on 09/11/14.
- */
+
 @Component
 public class ExecutableBuilder {
 
@@ -84,16 +84,16 @@ public class ExecutableBuilder {
 
     @Autowired
     private ResultsTransformer resultsTransformer;
+
     @Autowired
     private ExecutableValidator executableValidator;
 
     private List<Transformer> preExecTransformers;
     private List<Transformer> postExecTransformers;
 
-    private List<String> executableAdditionalKeywords = Collections.singletonList(SlangTextualKeys.EXECUTABLE_NAME_KEY);
-    private List<String> operationAdditionalKeywords =
-            Arrays.asList(SlangTextualKeys.JAVA_ACTION_KEY, SlangTextualKeys.PYTHON_ACTION_KEY);
-    private List<String> flowAdditionalKeywords = Collections.singletonList(SlangTextualKeys.WORKFLOW_KEY);
+    private List<String> executableAdditionalKeywords = singletonList(SlangTextualKeys.EXECUTABLE_NAME_KEY);
+    private List<String> operationAdditionalKeywords = asList(SlangTextualKeys.JAVA_ACTION_KEY, SlangTextualKeys.PYTHON_ACTION_KEY);
+    private List<String> flowAdditionalKeywords = singletonList(SlangTextualKeys.WORKFLOW_KEY);
     private List<String> allExecutableAdditionalKeywords;
 
     private List<Transformer> actionTransformers;
@@ -101,11 +101,8 @@ public class ExecutableBuilder {
 
     private List<Transformer> preStepTransformers;
     private List<Transformer> postStepTransformers;
-    private List<String> stepAdditionalKeyWords = Arrays.asList(ScoreLangConstants.LOOP_KEY, SlangTextualKeys.DO_KEY, SlangTextualKeys.NAVIGATION_KEY);
-    private List<String> parallelLoopValidKeywords = Arrays.asList(
-            SlangTextualKeys.DO_KEY,
-            SlangTextualKeys.FOR_KEY
-    );
+    private List<String> stepAdditionalKeyWords = asList(ScoreLangConstants.LOOP_KEY, SlangTextualKeys.DO_KEY, SlangTextualKeys.NAVIGATION_KEY);
+    private List<String> parallelLoopValidKeywords = asList(SlangTextualKeys.DO_KEY, SlangTextualKeys.FOR_KEY);
 
     @PostConstruct
     public void initScopedTransformersAndKeys() {
@@ -618,4 +615,75 @@ public class ExecutableBuilder {
         return stepNames;
     }
 
+    public void setTransformers(List<Transformer> transformers) {
+        this.transformers = transformers;
+    }
+
+    public void setTransformersHandler(TransformersHandler transformersHandler) {
+        this.transformersHandler = transformersHandler;
+    }
+
+    public void setDependenciesHelper(DependenciesHelper dependenciesHelper) {
+        this.dependenciesHelper = dependenciesHelper;
+    }
+
+    public void setPreCompileValidator(PreCompileValidator preCompileValidator) {
+        this.preCompileValidator = preCompileValidator;
+    }
+
+    public void setResultsTransformer(ResultsTransformer resultsTransformer) {
+        this.resultsTransformer = resultsTransformer;
+    }
+
+    public void setExecutableValidator(ExecutableValidator executableValidator) {
+        this.executableValidator = executableValidator;
+    }
+
+    public void setPreExecTransformers(List<Transformer> preExecTransformers) {
+        this.preExecTransformers = preExecTransformers;
+    }
+
+    public void setPostExecTransformers(List<Transformer> postExecTransformers) {
+        this.postExecTransformers = postExecTransformers;
+    }
+
+    public void setExecutableAdditionalKeywords(List<String> executableAdditionalKeywords) {
+        this.executableAdditionalKeywords = executableAdditionalKeywords;
+    }
+
+    public void setOperationAdditionalKeywords(List<String> operationAdditionalKeywords) {
+        this.operationAdditionalKeywords = operationAdditionalKeywords;
+    }
+
+    public void setFlowAdditionalKeywords(List<String> flowAdditionalKeywords) {
+        this.flowAdditionalKeywords = flowAdditionalKeywords;
+    }
+
+    public void setAllExecutableAdditionalKeywords(List<String> allExecutableAdditionalKeywords) {
+        this.allExecutableAdditionalKeywords = allExecutableAdditionalKeywords;
+    }
+
+    public void setActionTransformers(List<Transformer> actionTransformers) {
+        this.actionTransformers = actionTransformers;
+    }
+
+    public void setExecutableConstraintGroups(List<List<String>> executableConstraintGroups) {
+        this.executableConstraintGroups = executableConstraintGroups;
+    }
+
+    public void setPreStepTransformers(List<Transformer> preStepTransformers) {
+        this.preStepTransformers = preStepTransformers;
+    }
+
+    public void setPostStepTransformers(List<Transformer> postStepTransformers) {
+        this.postStepTransformers = postStepTransformers;
+    }
+
+    public void setStepAdditionalKeyWords(List<String> stepAdditionalKeyWords) {
+        this.stepAdditionalKeyWords = stepAdditionalKeyWords;
+    }
+
+    public void setParallelLoopValidKeywords(List<String> parallelLoopValidKeywords) {
+        this.parallelLoopValidKeywords = parallelLoopValidKeywords;
+    }
 }
