@@ -35,6 +35,8 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import static java.util.Collections.emptySet;
+
 /**
  * Created by hanael on 10/07/2016.
  */
@@ -166,26 +168,21 @@ public class CloudSlangMavenCompiler extends AbstractCompiler {
     }
 
     protected static String[] getSourceFiles(CompilerConfiguration config) {
-        Set sources = new HashSet();
+        Set<String> sources = new HashSet<>();
 
         for (String sourceLocation : config.getSourceLocations()) {
             sources.addAll(getSourceFilesForSourceRoot(config, sourceLocation));
         }
 
-        String[] result;
-        if (sources.isEmpty()) {
-            result = new String[0];
-        } else {
-            result = (String[]) sources.toArray(new String[sources.size()]);
-        }
-
-        return result;
+        return sources.toArray(new String[sources.size()]);
     }
 
     protected static Map<String, byte[]> getDependenciesSourceFiles(CompilerConfiguration config) throws CompilerException {
-        Map<String, byte[]> sources = new HashMap();
+        if (config.getClasspathEntries().isEmpty()) {
+            return Collections.emptyMap();
+        }
 
-        if (config.getClasspathEntries().isEmpty()) return Collections.EMPTY_MAP;
+        Map<String, byte[]> sources = new HashMap<>();
         for (String dependency : config.getClasspathEntries()) {
             try {
                 sources.putAll(getSourceFilesForDependencies(dependency));
@@ -228,7 +225,9 @@ public class CloudSlangMavenCompiler extends AbstractCompiler {
     // we need to override this as it is hard coded java file extensions
     protected static Set<String> getSourceFilesForSourceRoot(CompilerConfiguration config, String sourceLocation) {
         Path path = Paths.get(sourceLocation);
-        if (!Files.exists(path)) return Collections.EMPTY_SET;
+        if (!Files.exists(path)) {
+            return emptySet();
+        }
 
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(sourceLocation);
@@ -250,11 +249,10 @@ public class CloudSlangMavenCompiler extends AbstractCompiler {
 
         scanner.scan();
         String[] sourceDirectorySources = scanner.getIncludedFiles();
-        HashSet sources = new HashSet();
+        Set<String> sources = new HashSet<>();
 
         for (String sourceDirectorySource : sourceDirectorySources) {
-            File f = new File(sourceLocation, sourceDirectorySource);
-            sources.add(f.getPath());
+            sources.add(new File(sourceLocation, sourceDirectorySource).getPath());
         }
 
         return sources;
