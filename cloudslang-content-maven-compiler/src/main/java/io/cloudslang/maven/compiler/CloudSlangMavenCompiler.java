@@ -35,6 +35,8 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import static java.util.Collections.emptySet;
+
 /**
  * Created by hanael on 10/07/2016.
  */
@@ -166,26 +168,21 @@ public class CloudSlangMavenCompiler extends AbstractCompiler {
     }
 
     protected static String[] getSourceFiles(CompilerConfiguration config) {
-        Set sources = new HashSet();
+        Set<String> sources = new HashSet<>();
 
         for (String sourceLocation : config.getSourceLocations()) {
             sources.addAll(getSourceFilesForSourceRoot(config, sourceLocation));
         }
 
-        String[] result;
-        if (sources.isEmpty()) {
-            result = new String[0];
-        } else {
-            result = (String[]) sources.toArray(new String[sources.size()]);
-        }
-
-        return result;
+        return sources.toArray(new String[sources.size()]);
     }
 
-    protected static Map<String, byte[]> getDependenciesSourceFiles(CompilerConfiguration config) throws CompilerException {
-        Map<String, byte[]> sources = new HashMap();
+    private static Map<String, byte[]> getDependenciesSourceFiles(CompilerConfiguration config) throws CompilerException {
+        if (config.getClasspathEntries().isEmpty()) {
+            return Collections.emptyMap();
+        }
 
-        if (config.getClasspathEntries().isEmpty()) return Collections.EMPTY_MAP;
+        Map<String, byte[]> sources = new HashMap<>();
         for (String dependency : config.getClasspathEntries()) {
             try {
                 sources.putAll(getSourceFilesForDependencies(dependency));
@@ -199,23 +196,26 @@ public class CloudSlangMavenCompiler extends AbstractCompiler {
 
     private static Map<String, byte[]> getSourceFilesForDependencies(String dependency) throws IOException {
         Path path = Paths.get(dependency);
-        if (!Files.exists(path) || !path.toString().toLowerCase().endsWith(".jar")) return Collections.EMPTY_MAP;
+        if (!Files.exists(path) || !path.toString().toLowerCase().endsWith(".jar")) {
+            return Collections.emptyMap();
+        }
 
-        Map<String, byte[]> sources = new HashMap();
+        Map<String, byte[]> sources = new HashMap<>();
 
-        JarFile jar = new JarFile(dependency);
-        Enumeration enumEntries = jar.entries();
-        while (enumEntries.hasMoreElements()) {
-            JarEntry file = (JarEntry) enumEntries.nextElement();
-            if (file.isDirectory() || (!file.getName().endsWith(".sl.yaml") && !file.getName().endsWith(".sl") && !file.getName().endsWith(".sl.yml"))) {
-                continue;
-            }
+        try (JarFile jar = new JarFile(dependency)) {
+            Enumeration enumEntries = jar.entries();
+            while (enumEntries.hasMoreElements()) {
+                JarEntry file = (JarEntry) enumEntries.nextElement();
+                if (file.isDirectory() || (!file.getName().endsWith(".sl.yaml") && !file.getName().endsWith(".sl") && !file.getName().endsWith(".sl.yml"))) {
+                    continue;
+                }
 
-            byte[] bytes;
-            try (InputStream is = jar.getInputStream(file)) {
-                bytes = IOUtils.toByteArray(is);
-                Path filePath = Paths.get(file.getName());
-                sources.put(filePath.getFileName().toString(), bytes);
+                byte[] bytes;
+                try (InputStream is = jar.getInputStream(file)) {
+                    bytes = IOUtils.toByteArray(is);
+                    Path filePath = Paths.get(file.getName());
+                    sources.put(filePath.getFileName().toString(), bytes);
+                }
             }
         }
 
@@ -225,7 +225,9 @@ public class CloudSlangMavenCompiler extends AbstractCompiler {
     // we need to override this as it is hard coded java file extensions
     protected static Set<String> getSourceFilesForSourceRoot(CompilerConfiguration config, String sourceLocation) {
         Path path = Paths.get(sourceLocation);
-        if (!Files.exists(path)) return Collections.EMPTY_SET;
+        if (!Files.exists(path)) {
+            return emptySet();
+        }
 
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(sourceLocation);
@@ -247,11 +249,10 @@ public class CloudSlangMavenCompiler extends AbstractCompiler {
 
         scanner.scan();
         String[] sourceDirectorySources = scanner.getIncludedFiles();
-        HashSet sources = new HashSet();
+        Set<String> sources = new HashSet<>();
 
         for (String sourceDirectorySource : sourceDirectorySources) {
-            File f = new File(sourceLocation, sourceDirectorySource);
-            sources.add(f.getPath());
+            sources.add(new File(sourceLocation, sourceDirectorySource).getPath());
         }
 
         return sources;

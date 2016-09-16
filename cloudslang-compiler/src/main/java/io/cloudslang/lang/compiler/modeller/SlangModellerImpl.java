@@ -11,15 +11,14 @@ package io.cloudslang.lang.compiler.modeller;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.ParseModellingResult;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/*
- * Created by stoneo on 2/2/2015.
- */
 
 @Component
 public class SlangModellerImpl implements SlangModeller {
@@ -64,5 +63,9 @@ public class SlangModellerImpl implements SlangModeller {
         aggregatedExceptions.addAll(parseModellingResult.getErrors());
         aggregatedExceptions.addAll(executableModellingResult.getErrors());
         return new ExecutableModellingResult(executableModellingResult.getExecutable(), aggregatedExceptions);
+    }
+
+    public void setExecutableBuilder(ExecutableBuilder executableBuilder) {
+        this.executableBuilder = executableBuilder;
     }
 }
