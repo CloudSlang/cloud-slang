@@ -15,7 +15,7 @@ import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.entities.ListForLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.MapForLoopStatement;
-import io.cloudslang.lang.entities.ParallelLoopStatement;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -98,17 +98,9 @@ public abstract class AbstractForTransformer extends AbstractInOutForTransformer
 
     private LoopStatement createLoopStatement(String varName, String collectionExpression, Accumulator dependencyAccumulator, boolean isParallelLoop) {
         executableValidator.validateLoopStatementVariable(varName);
-        LoopStatement loopStatement;
-        if (isParallelLoop) {
-            loopStatement = new ParallelLoopStatement(varName, collectionExpression,
+        return new ListForLoopStatement(varName, collectionExpression,
                     dependencyAccumulator.getFunctionDependencies(),
-                    dependencyAccumulator.getSystemPropertyDependencies());
-        } else {
-            loopStatement = new ListForLoopStatement(varName, collectionExpression,
-                    dependencyAccumulator.getFunctionDependencies(),
-                    dependencyAccumulator.getSystemPropertyDependencies());
-        }
-        return loopStatement;
+                    dependencyAccumulator.getSystemPropertyDependencies(), isParallelLoop);
     }
 
 }

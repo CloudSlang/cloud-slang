@@ -10,9 +10,7 @@
 package io.cloudslang.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
-import io.cloudslang.lang.entities.ParallelLoopStatement;
-import io.cloudslang.lang.entities.ResultNavigation;
-import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.*;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
@@ -35,6 +33,7 @@ import java.util.Map;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.python.google.common.collect.Lists;
@@ -61,7 +60,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
     private static final Logger logger = Logger.getLogger(ParallelLoopExecutionData.class);
 
-    public void addBranches(@Param(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY) ParallelLoopStatement parallelLoopStatement,
+    public void addBranches(@Param(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY) LoopStatement parallelLoopStatement,
                             @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                             @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                             @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
@@ -97,7 +96,14 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 branchRuntimeEnvironment.resetStacks();
 
                 Context branchContext = (Context) SerializationUtils.clone(flowContext);
-                branchContext.putVariable(parallelLoopStatement.getVarName(), splitItem);
+                if (parallelLoopStatement instanceof ListForLoopStatement) {
+                    branchContext.putVariable(((ListForLoopStatement)parallelLoopStatement).getVarName(), splitItem);
+                } else if (parallelLoopStatement instanceof MapForLoopStatement) {
+                    branchContext.putVariable(((MapForLoopStatement)parallelLoopStatement).getKeyName(),
+                            (Value)((ImmutablePair) splitItem.get()).getLeft());
+                    branchContext.putVariable(((MapForLoopStatement)parallelLoopStatement).getValueName(),
+                            (Value)((ImmutablePair) splitItem.get()).getRight());
+                }
                 updateCallArgumentsAndPushContextToStack(branchRuntimeEnvironment,
                         branchContext, new HashMap<String, Value>());
 

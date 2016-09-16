@@ -9,7 +9,8 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.bindings;
 
-import io.cloudslang.lang.entities.ParallelLoopStatement;
+import io.cloudslang.lang.entities.LoopStatement;
+import io.cloudslang.lang.entities.MapForLoopStatement;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
@@ -18,9 +19,11 @@ import io.cloudslang.lang.runtime.env.Context;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +33,7 @@ import org.springframework.stereotype.Component;
  * @author Bonczidai Levente
  */
 @Component
-public class ParallelLoopBinding {
+public class ParallelLoopBinding extends AbstractBinding {
 
     public static final String PARALLEL_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating parallel loop expression in step";
 
@@ -42,7 +45,7 @@ public class ParallelLoopBinding {
     }
 
     public List<Value> bindParallelLoopList(
-            ParallelLoopStatement parallelLoopStatement,
+            LoopStatement parallelLoopStatement,
             Context flowContext,
             Set<SystemProperty> systemProperties,
             String nodeName) {
@@ -55,6 +58,9 @@ public class ParallelLoopBinding {
         try {
             Value evalResult = scriptEvaluator.evalExpr(parallelLoopStatement.getExpression(),
                     flowContext.getImmutableViewOfVariables(), systemProperties, parallelLoopStatement.getFunctionDependencies());
+
+            evalResult = getEvalResultForMap(evalResult, parallelLoopStatement, parallelLoopStatement.getExpression());
+
             if (evalResult != null && evalResult.get() != null) {
                 //noinspection unchecked
                 for (Serializable serializable : ((List<Serializable>) evalResult.get())) {

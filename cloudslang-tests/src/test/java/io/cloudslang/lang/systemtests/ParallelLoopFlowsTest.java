@@ -204,6 +204,22 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         triggerWithData(SlangSource.fromFile(resource), path);
     }
 
+    @Test
+    public void testFlowWithInlineMapLoops() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_with_inline_map.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch_map.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Map<String, Value> userInputs = new HashMap<>();
+        RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, getSystemProperties());
+        List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
+        Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
+        List<String> expectedNameOutputs = verifyBranchPublishValues(branchesData);
+        verifyPublishValues(runtimeInformation, expectedNameOutputs);
+    }
+
     private Set<SystemProperty> getSystemProperties() {
         return Sets.newHashSet(
                 new SystemProperty("loop", "parallel.prop1", "publish_value")

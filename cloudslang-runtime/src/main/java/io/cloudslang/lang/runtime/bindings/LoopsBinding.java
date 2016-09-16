@@ -10,7 +10,6 @@
 package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.LoopStatement;
-import io.cloudslang.lang.entities.MapForLoopStatement;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
@@ -26,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.python.core.PyObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +33,7 @@ import org.springframework.stereotype.Component;
 import static io.cloudslang.lang.runtime.env.LoopCondition.LOOP_CONDITION_KEY;
 
 @Component
-public class LoopsBinding {
+public class LoopsBinding extends AbstractBinding {
 
     public static final String FOR_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating for loop expression in step";
     public static final String INVALID_MAP_EXPRESSION_MESSAGE = "Invalid expression for iterating maps";
@@ -104,20 +102,7 @@ public class LoopsBinding {
             throw new RuntimeException(FOR_LOOP_EXPRESSION_ERROR_MESSAGE + " '" + nodeName + "',\n\tError is: " + t.getMessage(), t);
         }
 
-        if (forLoopStatement instanceof MapForLoopStatement) {
-            if (evalResult != null && evalResult.get() instanceof Map) {
-                List<Map.Entry<Value, Value>> entriesAsValues = new ArrayList<>();
-                @SuppressWarnings("unchecked") Set<Map.Entry<Serializable, Serializable>> entrySet = ((Map) evalResult.get()).entrySet();
-                for (Map.Entry<Serializable, Serializable> entry : entrySet) {
-                    entriesAsValues.add(Pair.of(
-                            ValueFactory.create(entry.getKey(), evalResult.isSensitive()),
-                            ValueFactory.create(entry.getValue(), evalResult.isSensitive())));
-                }
-                evalResult = ValueFactory.create((Serializable) entriesAsValues);
-            } else {
-                throw new RuntimeException(INVALID_MAP_EXPRESSION_MESSAGE + ": " + collectionExpression);
-            }
-        }
+        evalResult = getEvalResultForMap(evalResult, forLoopStatement, collectionExpression);
 
         ForLoopCondition forLoopCondition = createForLoopCondition(evalResult);
         if (forLoopCondition == null) {

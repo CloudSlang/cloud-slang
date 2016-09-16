@@ -25,13 +25,19 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 public class ListForLoopStatement extends LoopStatement implements Serializable {
 
     private static final long serialVersionUID = -540865117927676643L;
+    public static final String FOR_LOOP_VAR_NAME_CANNOT_BE_EMPTY = "for loop var name cannot be empty";
+    public static final String PARALLEL_LOOP_VAR_NAME_CANNOT_BE_EMPTY = "parallel loop var name cannot be empty";
 
     private final String varName;
 
     public ListForLoopStatement(String varName, String collectionExpression, Set<ScriptFunction> functionDependencies,
-                                Set<String> systemPropertyDependencies) {
+                                Set<String> systemPropertyDependencies, boolean isParallelLoop) {
         super(collectionExpression, functionDependencies, systemPropertyDependencies);
-        Validate.notBlank(varName, "for loop var name cannot be empty");
+        String message = FOR_LOOP_VAR_NAME_CANNOT_BE_EMPTY;
+        if (isParallelLoop) {
+            message = PARALLEL_LOOP_VAR_NAME_CANNOT_BE_EMPTY;
+        }
+        Validate.notBlank(varName, message);
 
         this.varName = varName;
     }

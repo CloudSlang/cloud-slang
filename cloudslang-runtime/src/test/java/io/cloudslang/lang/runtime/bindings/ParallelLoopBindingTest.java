@@ -1,6 +1,6 @@
 package io.cloudslang.lang.runtime.bindings;
 
-import io.cloudslang.lang.entities.ParallelLoopStatement;
+import io.cloudslang.lang.entities.ListForLoopStatement;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.Value;
@@ -107,7 +107,7 @@ public class ParallelLoopBindingTest {
         parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), new Context(variables), EMPTY_SET, "nodeName");
     }
 
-    private ParallelLoopStatement createBasicSyncLoopStatement() {
-        return new ParallelLoopStatement("varName", "expression", EMPTY_FUNCTION_SET, EMPTY_PROPERTY_SET);
+    private ListForLoopStatement createBasicSyncLoopStatement() {
+        return new ListForLoopStatement("varName", "expression", EMPTY_FUNCTION_SET, EMPTY_PROPERTY_SET, true);
     }
 }

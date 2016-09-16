@@ -13,7 +13,6 @@ import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ListForLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
-import io.cloudslang.lang.entities.ParallelLoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
@@ -57,7 +56,7 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateStartStepPutForUnderTheRightKey() throws Exception {
-        LoopStatement statement = new ListForLoopStatement("1", "2", new HashSet<ScriptFunction>(), new HashSet<String>());
+        LoopStatement statement = new ListForLoopStatement("1", "2", new HashSet<ScriptFunction>(), new HashSet<String>(), false);
         HashMap<String, Serializable> preStepData = new HashMap<>();
         preStepData.put(SlangTextualKeys.FOR_KEY, statement);
         ExecutionStep startStep = factory.createBeginStepStep(1L, new ArrayList<Argument>(), preStepData, "", "");
@@ -191,11 +190,11 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateAddBranchesStepPutParallelLoopUnderTheRightKey() throws Exception {
-        ParallelLoopStatement statement = new ParallelLoopStatement("value", "values", new HashSet<ScriptFunction>(), new HashSet<String>());
+        ListForLoopStatement statement = new ListForLoopStatement("value", "values", new HashSet<ScriptFunction>(), new HashSet<String>(), true);
         HashMap<String, Serializable> preStepData = new HashMap<>();
         preStepData.put(SlangTextualKeys.PARALLEL_LOOP_KEY, statement);
         ExecutionStep startStep = factory.createAddBranchesStep(2L, 5L, 3L, preStepData, "refID", "evenCoolerStep");
-        ParallelLoopStatement actualStatement = (ParallelLoopStatement) startStep.getActionData()
+        ListForLoopStatement actualStatement = (ListForLoopStatement) startStep.getActionData()
                 .get(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY);
         Assert.assertNotNull("parallel loop statement not found in action data", actualStatement);
         Assert.assertSame("parallel loop statement in not correctly set under the key", statement, actualStatement);
