@@ -111,7 +111,7 @@ public class SlangImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCompileWithCorruptedFilePath() {
-        slang.compile(SlangSource.fromFile(new File("/")), new HashSet<SlangSource>());
+        slang.compile(SlangSource.fromFile(new File("")), new HashSet<SlangSource>());
     }
 
     @Test
@@ -237,7 +237,7 @@ public class SlangImplTest {
         Assert.assertEquals("Events size not as expected", ALL_EVENTS_SIZE, allEvents.size());
     }
 
-    private class EventListener implements ScoreEventListener {
+    private static class EventListener implements ScoreEventListener {
 
         @Override
         public synchronized void onEvent(ScoreEvent event) throws InterruptedException {

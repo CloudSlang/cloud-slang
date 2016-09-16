@@ -111,8 +111,8 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                     Map<String, Serializable> outputs = extractNotEmptyOutputs(data);
                     if (outputs.size() > 0) {
                         printForOperationOrFlow(data, Ansi.Color.WHITE, "\n" + OPERATION_OUTPUTS, "\n" + FLOW_OUTPUTS);
-                        for (String key : outputs.keySet()) {
-                            printWithColor(Ansi.Color.WHITE, "- " + key + " = " + outputs.get(key));
+                        for (Map.Entry<String, Serializable> entry : outputs.entrySet()) {
+                            printWithColor(Ansi.Color.WHITE, "- " + entry.getKey() + " = " + entry.getValue());
                         }
                     }
                 }
