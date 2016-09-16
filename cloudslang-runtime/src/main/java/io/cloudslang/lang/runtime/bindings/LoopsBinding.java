@@ -17,16 +17,12 @@ import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ForLoopCondition;
 import io.cloudslang.lang.runtime.env.LoopCondition;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
-import org.python.core.PyObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -116,31 +112,12 @@ public class LoopsBinding extends AbstractBinding {
         return forLoopCondition;
     }
 
-    private ForLoopCondition createForLoopCondition(Value loopCollection) {
-        Iterable<Value> iterable;
-
-        Serializable loopCollectionContent = loopCollection.get();
-        if (loopCollectionContent instanceof Iterable) {
-            //noinspection unchecked
-            iterable = (Iterable<Value>) loopCollectionContent;
-        } else if (loopCollectionContent instanceof String) {
-            String[] strings = ((String) loopCollectionContent).split(Pattern.quote(","));
-            iterable = convert(Arrays.asList(strings), loopCollection.isSensitive());
-        } else if (loopCollectionContent instanceof PyObject) {
-            PyObject pyObject = (PyObject) loopCollectionContent;
-            iterable = convert(pyObject.asIterable(), loopCollection.isSensitive());
-        } else {
+    private ForLoopCondition createForLoopCondition(Value evalResult) {
+        Iterable<Value> iterable = getIterableFromEvalResult(evalResult);
+        if (iterable == null) {
             return null;
         }
-
         return new ForLoopCondition(iterable);
     }
 
-    private Iterable<Value> convert(Iterable<? extends Serializable> iterable, boolean sensitive) {
-        List<Value> values = new ArrayList<>();
-        for (Serializable serializable : iterable) {
-            values.add(ValueFactory.create(serializable, sensitive));
-        }
-        return values;
-    }
 }

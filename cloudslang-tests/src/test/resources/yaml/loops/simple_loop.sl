@@ -17,7 +17,7 @@ flow:
   workflow:
     - print_values:
         loop:
-          for: value in values.split(",")
+          for: "value in '1,2,3'"
           do:
             ops.print:
               - text: ${ value }
