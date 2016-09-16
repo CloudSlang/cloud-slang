@@ -144,7 +144,6 @@ public abstract class AbstractExecutionData {
     protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment, Context currentContext, Map<String, Value> callArguments) {
         ContextStack contextStack = runEnvironment.getStack();
         contextStack.pushContext(currentContext);
-        //TODO: put a deep clone of the new context
         runEnvironment.putCallArguments(callArguments);
     }
 

@@ -101,7 +101,6 @@ public class SlangTestRunner {
                 SlangTestCase currentTestCase = currentTestCaseEntry.getValue();
                 String currentTestCaseName = currentTestCaseEntry.getKey();
                 String testFlowPath = currentTestCase.getTestFlowPath();
-                //todo: temporary solution
                 currentTestCase.setName(currentTestCaseName);
                 if (StringUtils.isBlank(currentTestCase.getResult())) {
                     currentTestCase.setResult(getResultFromFileName(testFlowPath));

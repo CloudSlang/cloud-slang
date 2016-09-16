@@ -234,7 +234,6 @@ public class ExecutableStepsTest {
         Assert.assertEquals(null, runEnv.removeNextStepPosition());
     }
 
-    //todo: split to several methods
     @Test
     public void testFinishExecutableEvents() {
         List<Output> possibleOutputs = Collections.singletonList(new Output("name", ValueFactory.create("name", false)));
