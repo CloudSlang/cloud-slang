@@ -98,8 +98,8 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                         int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
                         String prefix = StringUtils.repeat(STEP_PATH_PREFIX, matches);
 
-                        for (String key : stepOutputs.keySet()) {
-                            printWithColor(Ansi.Color.WHITE, prefix + key + " = " + stepOutputs.get(key));
+                        for (Map.Entry<String, Serializable> entry : stepOutputs.entrySet()) {
+                            printWithColor(Ansi.Color.WHITE, prefix + entry.getKey() + " = " + entry.getValue());
                         }
                     }
                 }
