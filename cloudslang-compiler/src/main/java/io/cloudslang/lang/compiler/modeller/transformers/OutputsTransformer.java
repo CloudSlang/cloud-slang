@@ -30,7 +30,7 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
 @Component
 public class OutputsTransformer extends AbstractOutputsTransformer implements Transformer<List<Object>, List<Output>> {
 
-    public static final List<String> KNOWN_KEYS = Arrays.asList(SENSITIVE_KEY, VALUE_KEY);
+    private static final List<String> KNOWN_KEYS = Arrays.asList(SENSITIVE_KEY, VALUE_KEY);
 
     @Override
     public TransformModellingResult<List<Output>> transform(List<Object> rawData) {
