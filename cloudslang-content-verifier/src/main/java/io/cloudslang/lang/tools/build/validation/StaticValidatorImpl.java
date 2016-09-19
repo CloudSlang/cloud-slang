@@ -13,6 +13,7 @@ import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.entities.bindings.InOutParam;
+import io.cloudslang.lang.entities.bindings.Input;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang.Validate;
 import org.springframework.stereotype.Component;
@@ -55,7 +56,8 @@ public class StaticValidatorImpl implements StaticValidator {
         for (InOutParam inOutParam : ListUtils.emptyIfNull(inOutParams)) {
             if (metadataInOutParams == null) {
                 throw new MetadataMissingException(errorMessagePrefix + "s are missing description entirely.");
-            } else if (metadataInOutParams.get(inOutParam.getName()) == null) {
+            } else if (metadataInOutParams.get(inOutParam.getName()) == null &&
+                    (!(inOutParam instanceof Input) || !((Input) inOutParam).isPrivateInput())) {
                 throw new MetadataMissingException(errorMessagePrefix + " '" + inOutParam.getName() + "' is missing description.");
             }
         }
