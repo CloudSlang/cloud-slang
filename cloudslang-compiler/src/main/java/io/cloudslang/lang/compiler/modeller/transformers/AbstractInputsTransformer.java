@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -93,16 +92,14 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
         // default is private=false
         boolean privateInput = props.containsKey(PRIVATE_INPUT_KEY) &&
                 (boolean) props.get(PRIVATE_INPUT_KEY);
-        boolean defaultSpecified = props.containsKey(DEFAULT_KEY);
+        boolean defaultKeyFound = props.containsKey(DEFAULT_KEY);
         String inputName = entry.getKey();
-        Serializable value = defaultSpecified ? props.get(DEFAULT_KEY) : null;
-        if (defaultSpecified && (value == null || StringUtils.EMPTY.equals(value))) {
-            defaultSpecified = false;
-        }
+        Serializable value = defaultKeyFound ? props.get(DEFAULT_KEY) : null;
+        boolean defaultSpecified = defaultKeyFound && value != null && !StringUtils.EMPTY.equals(value);
 
-        if (privateInput && !defaultSpecified) {
+        if (privateInput && required && !defaultSpecified) {
             throw new RuntimeException(
-                    "Input: '" + inputName + "' is private but no default value was specified");
+                    "Input: '" + inputName + "' is private and required but no default value was specified");
         }
 
         return createInput(inputName, value, sensitive, required, privateInput);
