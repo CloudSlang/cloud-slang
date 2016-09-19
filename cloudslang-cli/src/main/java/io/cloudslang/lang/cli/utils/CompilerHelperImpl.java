@@ -50,7 +50,7 @@ public class CompilerHelperImpl implements CompilerHelper {
 
     public static final String INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX = "' is not a directory";
     private static final Logger logger = Logger.getLogger(CompilerHelperImpl.class);
-    private static final String SP_DIR = "properties"; //TODO reconsider it after closing CloudSlang file extensions & some real usecases
+    private static final String SP_DIR = "properties";
     private static final String INPUT_DIR = "inputs";
     private static final String CONFIG_DIR = "configuration";
     private static final String DUPLICATE_SYSTEM_PROPERTY_ERROR_MESSAGE_PREFIX = "Duplicate system property: '";

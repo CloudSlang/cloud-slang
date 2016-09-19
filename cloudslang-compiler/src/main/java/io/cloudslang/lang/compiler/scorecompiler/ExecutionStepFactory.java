@@ -49,7 +49,7 @@ public class ExecutionStepFactory {
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.STEP_INPUTS_KEY, (Serializable) stepInputs);
         actionData.put(ScoreLangConstants.LOOP_KEY, preStepData.get(SlangTextualKeys.FOR_KEY));
-        actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
+        actionData.put(ScoreLangConstants.HOOKS, "TBD");
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
         actionData.put(ScoreLangConstants.REF_ID, refId);
         actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
@@ -68,7 +68,7 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.PREVIOUS_STEP_ID_KEY, index - 1);
         actionData.put(ScoreLangConstants.BREAK_LOOP_KEY, postStepData.get(SlangTextualKeys.BREAK_KEY));
         actionData.put(ScoreLangConstants.STEP_NAVIGATION_KEY, new HashMap<>(navigationValues));
-        actionData.put(ScoreLangConstants.HOOKS, "TBD"); //todo add implementation for user custom hooks
+        actionData.put(ScoreLangConstants.HOOKS, "TBD");
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
         actionData.put(ScoreLangConstants.PARALLEL_LOOP_KEY, parallelLoop);
 

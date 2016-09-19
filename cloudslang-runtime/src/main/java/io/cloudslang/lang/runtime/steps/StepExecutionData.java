@@ -198,8 +198,6 @@ public class StepExecutionData extends AbstractExecutionData {
                 }
             }
 
-            //todo: hook
-
             // if this is an endStep method from a branch then next execution step position should ne null (end the flow)
             // and result should be the one from the executable (navigation is handled in join branches step)
             Long nextPosition = null;

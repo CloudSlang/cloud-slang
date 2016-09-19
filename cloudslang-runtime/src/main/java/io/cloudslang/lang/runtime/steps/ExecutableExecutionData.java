@@ -78,15 +78,12 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             Map<String, Value> actionArguments = new HashMap<>();
 
-            //todo: clone action context before updating
             actionArguments.putAll(executableContext);
 
             //done with the user inputs, don't want it to be available in next startExecutable steps..
             if (userInputs != null) {
                 userInputs.clear();
             }
-
-            //todo: hook
 
             updateCallArgumentsAndPushContextToStack(runEnv, new Context(executableContext), actionArguments);
 
@@ -148,8 +145,6 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                             runEnv.getSystemProperties(),
                             executableOutputs
                     );
-
-            //todo: hook
 
             ReturnValues returnValues = new ReturnValues(operationReturnOutputs, result);
             runEnv.putReturnValues(returnValues);
