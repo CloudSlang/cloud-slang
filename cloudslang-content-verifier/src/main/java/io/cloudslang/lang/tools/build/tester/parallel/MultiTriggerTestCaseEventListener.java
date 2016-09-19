@@ -81,6 +81,8 @@ public class MultiTriggerTestCaseEventListener implements ScoreEventListener {
                     outputsMap.put(executionId, extractOutputs);
                 }
                 break;
+            default:
+                break;
         }
     }
 

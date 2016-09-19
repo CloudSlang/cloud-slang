@@ -22,7 +22,6 @@ public class BeginSlangTestCaseEvent extends SlangTestCaseEvent {
         if (obj.getClass() != getClass()) {
             return false;
         }
-        BeginSlangTestCaseEvent rhs = (BeginSlangTestCaseEvent) obj;
         return new EqualsBuilder()
                 .appendSuper(super.equals(obj))
                 .isEquals();

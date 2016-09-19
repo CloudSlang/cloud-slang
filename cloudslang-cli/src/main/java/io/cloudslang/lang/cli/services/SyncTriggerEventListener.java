@@ -49,7 +49,7 @@ public class SyncTriggerEventListener implements ScoreEventListener {
     private AtomicReference<String> errorMessage = new AtomicReference<>("");
     private boolean isDebugMode = false;
 
-    public void setIsDebugMode(boolean isDebugMode) {
+    public synchronized void setIsDebugMode(boolean isDebugMode) {
         this.isDebugMode = isDebugMode;
     }
 

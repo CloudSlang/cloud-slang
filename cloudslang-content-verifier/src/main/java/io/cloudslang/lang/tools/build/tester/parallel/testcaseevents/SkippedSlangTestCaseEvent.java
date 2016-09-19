@@ -22,7 +22,6 @@ public class SkippedSlangTestCaseEvent extends SlangTestCaseEvent {
         if (obj.getClass() != getClass()) {
             return false;
         }
-        SkippedSlangTestCaseEvent rhs = (SkippedSlangTestCaseEvent) obj;
         return new EqualsBuilder()
                 .appendSuper(super.equals(obj))
                 .isEquals();

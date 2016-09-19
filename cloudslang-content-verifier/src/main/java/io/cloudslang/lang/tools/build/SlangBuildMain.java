@@ -59,7 +59,7 @@ public class SlangBuildMain {
 
     private final static Logger log = Logger.getLogger(SlangBuildMain.class);
     private final static String NOT_TS = "!";
-    private static final int MAX_THREADS_TEST_RUNNER = 16;
+    private static final int MAX_THREADS_TEST_RUNNER = 32;
 
     public static void main(String[] args) {
         loadUserProperties();
@@ -223,8 +223,8 @@ public class SlangBuildMain {
             try {
                 String sThreadCount = appArgs.getThreadCount();
                 if (sThreadCount != null) {
-                    Integer threadCount = Integer.parseInt(sThreadCount);
-                    if ((threadCount > 0) || (threadCount <= MAX_THREADS_TEST_RUNNER)) {
+                    int threadCount = Integer.parseInt(sThreadCount);
+                    if ((threadCount > 0) && (threadCount <= MAX_THREADS_TEST_RUNNER)) {
                         return threadCount;
                     } else {
                         log.warn(threadCountErrorMessage);
