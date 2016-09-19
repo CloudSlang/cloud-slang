@@ -18,19 +18,27 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
- * Date: 3/25/2015
+ * Date: 2/3/2015
  *
  * @author Bonczidai Levente
  */
-public class ParallelLoopStatement extends LoopStatement implements Serializable {
+public class ListLoopStatement extends LoopStatement implements Serializable {
+
+    private static final long serialVersionUID = -540865117927676643L;
+    public static final String FOR_LOOP_VAR_NAME_CANNOT_BE_EMPTY = "for loop var name cannot be empty";
+    public static final String PARALLEL_LOOP_VAR_NAME_CANNOT_BE_EMPTY = "parallel loop var name cannot be empty";
 
     private final String varName;
 
-    public ParallelLoopStatement(String varName, String expression, Set<ScriptFunction> functionDependencies,
-                                 Set<String> systemPropertyDependencies) {
-        super(expression, functionDependencies, systemPropertyDependencies);
+    public ListLoopStatement(String varName, String collectionExpression, Set<ScriptFunction> functionDependencies,
+                             Set<String> systemPropertyDependencies, boolean isParallelLoop) {
+        super(collectionExpression, functionDependencies, systemPropertyDependencies);
+        String message = FOR_LOOP_VAR_NAME_CANNOT_BE_EMPTY;
+        if (isParallelLoop) {
+            message = PARALLEL_LOOP_VAR_NAME_CANNOT_BE_EMPTY;
+        }
+        Validate.notBlank(varName, message);
 
-        Validate.notBlank(varName, "parallel loop var name cannot be empty");
         this.varName = varName;
     }
 
@@ -38,7 +46,7 @@ public class ParallelLoopStatement extends LoopStatement implements Serializable
      * only here to satisfy serialization libraries
      */
     @SuppressWarnings("unused")
-    private ParallelLoopStatement() {
+    private ListLoopStatement() {
         varName = null;
     }
 
@@ -60,7 +68,7 @@ public class ParallelLoopStatement extends LoopStatement implements Serializable
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        ParallelLoopStatement that = (ParallelLoopStatement) o;
+        ListLoopStatement that = (ListLoopStatement) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))

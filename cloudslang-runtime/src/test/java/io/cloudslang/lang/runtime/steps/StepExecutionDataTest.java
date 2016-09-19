@@ -13,7 +13,7 @@ import io.cloudslang.dependency.api.services.DependencyService;
 import io.cloudslang.dependency.api.services.MavenConfig;
 import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
 import io.cloudslang.dependency.impl.services.MavenConfigImpl;
-import io.cloudslang.lang.entities.ListForLoopStatement;
+import io.cloudslang.lang.entities.ListLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
@@ -100,7 +100,7 @@ public class StepExecutionDataTest {
     }
 
     private LoopStatement createBasicForStatement(String varName, String collectionExpression) {
-        return new ListForLoopStatement(varName, collectionExpression, new HashSet<ScriptFunction>(), new HashSet<String>());
+        return new ListLoopStatement(varName, collectionExpression, new HashSet<ScriptFunction>(), new HashSet<String>(), false);
     }
 
     @Before

@@ -14,9 +14,9 @@ import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.entities.CompilationArtifact;
-import io.cloudslang.lang.entities.ListForLoopStatement;
+import io.cloudslang.lang.entities.ListLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
-import io.cloudslang.lang.entities.MapForLoopStatement;
+import io.cloudslang.lang.entities.MapLoopStatement;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.score.api.ExecutionPlan;
@@ -51,14 +51,14 @@ public class CompileForLoopsFlowTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    public static ListForLoopStatement validateListForLoopStatement(LoopStatement statement) {
-        Assert.assertEquals(true, statement instanceof ListForLoopStatement);
-        return (ListForLoopStatement) statement;
+    public static ListLoopStatement validateListForLoopStatement(LoopStatement statement) {
+        Assert.assertEquals(true, statement instanceof ListLoopStatement);
+        return (ListLoopStatement) statement;
     }
 
-    public static MapForLoopStatement validateMapForLoopStatement(LoopStatement statement) {
-        Assert.assertEquals(true, statement instanceof MapForLoopStatement);
-        return (MapForLoopStatement) statement;
+    public static MapLoopStatement validateMapForLoopStatement(LoopStatement statement) {
+        Assert.assertEquals(true, statement instanceof MapLoopStatement);
+        return (MapLoopStatement) statement;
     }
 
     @Test
@@ -72,9 +72,9 @@ public class CompileForLoopsFlowTest {
         assertTrue(step.getPreStepActionData().containsKey(SlangTextualKeys.FOR_KEY));
         LoopStatement forStatement = (LoopStatement) step.getPreStepActionData()
                 .get(SlangTextualKeys.FOR_KEY);
-        ListForLoopStatement listForLoopStatement = validateListForLoopStatement(forStatement);
-        assertEquals("values.split(\",\")", listForLoopStatement.getExpression());
-        assertEquals("value", listForLoopStatement.getVarName());
+        ListLoopStatement listLoopStatement = validateListForLoopStatement(forStatement);
+        assertEquals("values.split(\",\")", listLoopStatement.getExpression());
+        assertEquals("value", listLoopStatement.getVarName());
         @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) step.getPostStepActionData()
                 .get(SlangTextualKeys.PUBLISH_KEY);
         assertEquals("a", outputs.get(0).getValue().get());
@@ -106,9 +106,9 @@ public class CompileForLoopsFlowTest {
         assertTrue(step.getPreStepActionData().containsKey(SlangTextualKeys.FOR_KEY));
         LoopStatement forStatement = (LoopStatement) step.getPreStepActionData()
                 .get(SlangTextualKeys.FOR_KEY);
-        ListForLoopStatement listForLoopStatement = validateListForLoopStatement(forStatement);
-        assertEquals("values.split(\",\")", listForLoopStatement.getExpression());
-        assertEquals("value", listForLoopStatement.getVarName());
+        ListLoopStatement listLoopStatement = validateListForLoopStatement(forStatement);
+        assertEquals("values.split(\",\")", listLoopStatement.getExpression());
+        assertEquals("value", listLoopStatement.getVarName());
         @SuppressWarnings("unchecked") List<Map<String, String>> actual = (List<Map<String, String>>) step.getPostStepActionData()
                 .get(SlangTextualKeys.NAVIGATION_KEY);
         assertEquals("print_other_values", actual.get(0).get(ScoreLangConstants.SUCCESS_RESULT));
@@ -128,9 +128,9 @@ public class CompileForLoopsFlowTest {
                 .getActionData();
         assertTrue(startStepActionData.containsKey(ScoreLangConstants.LOOP_KEY));
         LoopStatement forStatement = (LoopStatement) startStepActionData.get(ScoreLangConstants.LOOP_KEY);
-        ListForLoopStatement listForLoopStatement = validateListForLoopStatement(forStatement);
-        assertEquals("values.split(\",\")", listForLoopStatement.getExpression());
-        assertEquals("value", listForLoopStatement.getVarName());
+        ListLoopStatement listLoopStatement = validateListForLoopStatement(forStatement);
+        assertEquals("values.split(\",\")", listLoopStatement.getExpression());
+        assertEquals("value", listLoopStatement.getVarName());
 
         Map<String, ?> endStepActionData = executionPlan.getStep(3L)
                 .getActionData();
@@ -189,10 +189,10 @@ public class CompileForLoopsFlowTest {
         assertTrue(step.getPreStepActionData().containsKey(SlangTextualKeys.FOR_KEY));
         LoopStatement forStatement = (LoopStatement) step.getPreStepActionData()
                 .get(SlangTextualKeys.FOR_KEY);
-        MapForLoopStatement mapForLoopStatement = validateMapForLoopStatement(forStatement);
-        assertEquals("person_map", mapForLoopStatement.getExpression());
-        assertEquals("k", mapForLoopStatement.getKeyName());
-        assertEquals("v", mapForLoopStatement.getValueName());
+        MapLoopStatement mapLoopStatement = validateMapForLoopStatement(forStatement);
+        assertEquals("person_map", mapLoopStatement.getExpression());
+        assertEquals("k", mapLoopStatement.getKeyName());
+        assertEquals("v", mapLoopStatement.getValueName());
         @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) step.getPostStepActionData()
                 .get(SlangTextualKeys.PUBLISH_KEY);
         assertEquals("a", outputs.get(0).getValue().get());
@@ -224,10 +224,10 @@ public class CompileForLoopsFlowTest {
         assertTrue(step.getPreStepActionData().containsKey(SlangTextualKeys.FOR_KEY));
         LoopStatement forStatement = (LoopStatement) step.getPreStepActionData()
                 .get(SlangTextualKeys.FOR_KEY);
-        MapForLoopStatement mapForLoopStatement = validateMapForLoopStatement(forStatement);
-        assertEquals("person_map", mapForLoopStatement.getExpression());
-        assertEquals("k", mapForLoopStatement.getKeyName());
-        assertEquals("v", mapForLoopStatement.getValueName());
+        MapLoopStatement mapLoopStatement = validateMapForLoopStatement(forStatement);
+        assertEquals("person_map", mapLoopStatement.getExpression());
+        assertEquals("k", mapLoopStatement.getKeyName());
+        assertEquals("v", mapLoopStatement.getValueName());
         @SuppressWarnings("unchecked") List<Map<String, String>> actual = (List<Map<String, String>>) step.getPostStepActionData()
                 .get(SlangTextualKeys.NAVIGATION_KEY);
         assertEquals("print_other_values", actual.get(0).get(ScoreLangConstants.SUCCESS_RESULT));
@@ -247,10 +247,10 @@ public class CompileForLoopsFlowTest {
                 .getActionData();
         assertTrue(startStartActionData.containsKey(ScoreLangConstants.LOOP_KEY));
         LoopStatement forStatement = (LoopStatement) startStartActionData.get(ScoreLangConstants.LOOP_KEY);
-        MapForLoopStatement mapForLoopStatement = validateMapForLoopStatement(forStatement);
-        assertEquals("person_map", mapForLoopStatement.getExpression());
-        assertEquals("k", mapForLoopStatement.getKeyName());
-        assertEquals("v", mapForLoopStatement.getValueName());
+        MapLoopStatement mapLoopStatement = validateMapForLoopStatement(forStatement);
+        assertEquals("person_map", mapLoopStatement.getExpression());
+        assertEquals("k", mapLoopStatement.getKeyName());
+        assertEquals("v", mapLoopStatement.getValueName());
 
         Map<String, ?> endStepActionData = executionPlan.getStep(3L)
                 .getActionData();

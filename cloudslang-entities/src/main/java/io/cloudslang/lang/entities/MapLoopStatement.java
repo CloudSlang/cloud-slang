@@ -22,15 +22,15 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  *
  * @author Bonczidai Levente
  */
-public class MapForLoopStatement extends LoopStatement implements Serializable {
+public class MapLoopStatement extends LoopStatement implements Serializable {
 
     private static final long serialVersionUID = -667210580560286978L;
 
     private final String keyName;
     private final String valueName;
 
-    public MapForLoopStatement(String keyName, String valueName, String collectionExpression,
-                               Set<ScriptFunction> functionDependencies, Set<String> systemPropertyDependencies) {
+    public MapLoopStatement(String keyName, String valueName, String collectionExpression,
+                            Set<ScriptFunction> functionDependencies, Set<String> systemPropertyDependencies) {
         super(collectionExpression, functionDependencies, systemPropertyDependencies);
         Validate.notBlank(keyName, "key name cannot be empty");
         Validate.notBlank(valueName, "value name cannot be empty");
@@ -43,7 +43,7 @@ public class MapForLoopStatement extends LoopStatement implements Serializable {
      * only here to satisfy serialization libraries
      */
     @SuppressWarnings("unused")
-    private MapForLoopStatement() {
+    private MapLoopStatement() {
         keyName = null;
         valueName = null;
     }
@@ -71,7 +71,7 @@ public class MapForLoopStatement extends LoopStatement implements Serializable {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        MapForLoopStatement that = (MapForLoopStatement) o;
+        MapLoopStatement that = (MapLoopStatement) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))

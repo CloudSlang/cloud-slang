@@ -4,9 +4,9 @@ import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
-import io.cloudslang.lang.entities.ListForLoopStatement;
+import io.cloudslang.lang.entities.ListLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
-import io.cloudslang.lang.entities.MapForLoopStatement;
+import io.cloudslang.lang.entities.MapLoopStatement;
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,38 +28,38 @@ public class ForTransformerTest extends TransformersTestParent {
     @Autowired
     private ForTransformer transformer;
 
-    public static ListForLoopStatement validateListForLoopStatement(LoopStatement statement) {
-        Assert.assertEquals(true, statement instanceof ListForLoopStatement);
-        return (ListForLoopStatement) statement;
+    public static ListLoopStatement validateListForLoopStatement(LoopStatement statement) {
+        Assert.assertEquals(true, statement instanceof ListLoopStatement);
+        return (ListLoopStatement) statement;
     }
 
-    public static MapForLoopStatement validateMapForLoopStatement(LoopStatement statement) {
-        Assert.assertEquals(true, statement instanceof MapForLoopStatement);
-        return (MapForLoopStatement) statement;
+    public static MapLoopStatement validateMapForLoopStatement(LoopStatement statement) {
+        Assert.assertEquals(true, statement instanceof MapLoopStatement);
+        return (MapLoopStatement) statement;
     }
 
     @Test
     public void testValidStatement() throws Exception {
         LoopStatement statement = transformer.transform("x in collection").getTransformedData();
-        ListForLoopStatement listForLoopStatement = validateListForLoopStatement(statement);
-        Assert.assertEquals("x", listForLoopStatement.getVarName());
-        Assert.assertEquals("collection", listForLoopStatement.getExpression());
+        ListLoopStatement listLoopStatement = validateListForLoopStatement(statement);
+        Assert.assertEquals("x", listLoopStatement.getVarName());
+        Assert.assertEquals("collection", listLoopStatement.getExpression());
     }
 
     @Test
     public void testValidStatementWithSpaces() throws Exception {
         LoopStatement statement = transformer.transform("x in range(0, 9)").getTransformedData();
-        ListForLoopStatement listForLoopStatement = validateListForLoopStatement(statement);
-        Assert.assertEquals("x", listForLoopStatement.getVarName());
-        Assert.assertEquals("range(0, 9)", listForLoopStatement.getExpression());
+        ListLoopStatement listLoopStatement = validateListForLoopStatement(statement);
+        Assert.assertEquals("x", listLoopStatement.getVarName());
+        Assert.assertEquals("range(0, 9)", listLoopStatement.getExpression());
     }
 
     @Test
     public void testValidStatementAndTrim() throws Exception {
         LoopStatement statement = transformer.transform(" min   in  collection  ").getTransformedData();
-        ListForLoopStatement listForLoopStatement = validateListForLoopStatement(statement);
-        Assert.assertEquals("min", listForLoopStatement.getVarName());
-        Assert.assertEquals("collection", listForLoopStatement.getExpression());
+        ListLoopStatement listLoopStatement = validateListForLoopStatement(statement);
+        Assert.assertEquals("min", listLoopStatement.getVarName());
+        Assert.assertEquals("collection", listLoopStatement.getExpression());
     }
 
     @Test
@@ -86,8 +86,8 @@ public class ForTransformerTest extends TransformersTestParent {
     @Test
     public void testMultipleInsAreTrimmed() throws Exception {
         LoopStatement statement = transformer.transform(" in   in in ").getTransformedData();
-        ListForLoopStatement listForLoopStatement = validateListForLoopStatement(statement);
-        Assert.assertEquals("in", listForLoopStatement.getExpression());
+        ListLoopStatement listLoopStatement = validateListForLoopStatement(statement);
+        Assert.assertEquals("in", listLoopStatement.getExpression());
     }
 
     @Test
@@ -99,45 +99,45 @@ public class ForTransformerTest extends TransformersTestParent {
     @Test
     public void testValidMapStatement() throws Exception {
         LoopStatement statement = transformer.transform("k, v in collection").getTransformedData();
-        MapForLoopStatement mapForLoopStatement = validateMapForLoopStatement(statement);
-        Assert.assertEquals("k", mapForLoopStatement.getKeyName());
-        Assert.assertEquals("v", mapForLoopStatement.getValueName());
+        MapLoopStatement mapLoopStatement = validateMapForLoopStatement(statement);
+        Assert.assertEquals("k", mapLoopStatement.getKeyName());
+        Assert.assertEquals("v", mapLoopStatement.getValueName());
         Assert.assertEquals("collection", statement.getExpression());
     }
 
     @Test
     public void testValidMapStatementSpaceBeforeComma() throws Exception {
         LoopStatement statement = transformer.transform("k ,v in collection").getTransformedData();
-        MapForLoopStatement mapForLoopStatement = validateMapForLoopStatement(statement);
-        Assert.assertEquals("k", mapForLoopStatement.getKeyName());
-        Assert.assertEquals("v", mapForLoopStatement.getValueName());
+        MapLoopStatement mapLoopStatement = validateMapForLoopStatement(statement);
+        Assert.assertEquals("k", mapLoopStatement.getKeyName());
+        Assert.assertEquals("v", mapLoopStatement.getValueName());
         Assert.assertEquals("collection", statement.getExpression());
     }
 
     @Test
     public void testValidMapStatementWithoutSpaceAfterComma() throws Exception {
         LoopStatement statement = transformer.transform("k,v in collection").getTransformedData();
-        MapForLoopStatement mapForLoopStatement = validateMapForLoopStatement(statement);
-        Assert.assertEquals("k", mapForLoopStatement.getKeyName());
-        Assert.assertEquals("v", mapForLoopStatement.getValueName());
+        MapLoopStatement mapLoopStatement = validateMapForLoopStatement(statement);
+        Assert.assertEquals("k", mapLoopStatement.getKeyName());
+        Assert.assertEquals("v", mapLoopStatement.getValueName());
         Assert.assertEquals("collection", statement.getExpression());
     }
 
     @Test
     public void testValidMapStatementAndTrim() throws Exception {
         LoopStatement statement = transformer.transform(" k, v   in  collection  ").getTransformedData();
-        MapForLoopStatement mapForLoopStatement = validateMapForLoopStatement(statement);
-        Assert.assertEquals("k", mapForLoopStatement.getKeyName());
-        Assert.assertEquals("v", mapForLoopStatement.getValueName());
+        MapLoopStatement mapLoopStatement = validateMapForLoopStatement(statement);
+        Assert.assertEquals("k", mapLoopStatement.getKeyName());
+        Assert.assertEquals("v", mapLoopStatement.getValueName());
         Assert.assertEquals("collection", statement.getExpression());
     }
 
     @Test
     public void testValidMapStatementAndTrimMultipleWhitSpaces() throws Exception {
         LoopStatement statement = transformer.transform("   k,    v     in  collection  ").getTransformedData();
-        MapForLoopStatement mapForLoopStatement = validateMapForLoopStatement(statement);
-        Assert.assertEquals("k", mapForLoopStatement.getKeyName());
-        Assert.assertEquals("v", mapForLoopStatement.getValueName());
+        MapLoopStatement mapLoopStatement = validateMapForLoopStatement(statement);
+        Assert.assertEquals("k", mapLoopStatement.getKeyName());
+        Assert.assertEquals("v", mapLoopStatement.getValueName());
         Assert.assertEquals("collection", statement.getExpression());
     }
 
