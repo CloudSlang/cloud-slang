@@ -1,6 +1,6 @@
 package io.cloudslang.lang.runtime.bindings;
 
-import io.cloudslang.lang.entities.ListForLoopStatement;
+import io.cloudslang.lang.entities.ListLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
@@ -54,7 +54,7 @@ public class LoopsBindingTest {
     private ScriptEvaluator scriptEvaluator;
 
     private LoopStatement createBasicForStatement() {
-        return new ListForLoopStatement("x", "[1]", new HashSet<ScriptFunction>(), new HashSet<String>(), false);
+        return new ListLoopStatement("x", "[1]", new HashSet<ScriptFunction>(), new HashSet<String>(), false);
     }
 
     @Test

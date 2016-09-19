@@ -22,7 +22,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  *
  * @author Bonczidai Levente
  */
-public class ListForLoopStatement extends LoopStatement implements Serializable {
+public class ListLoopStatement extends LoopStatement implements Serializable {
 
     private static final long serialVersionUID = -540865117927676643L;
     public static final String FOR_LOOP_VAR_NAME_CANNOT_BE_EMPTY = "for loop var name cannot be empty";
@@ -30,8 +30,8 @@ public class ListForLoopStatement extends LoopStatement implements Serializable 
 
     private final String varName;
 
-    public ListForLoopStatement(String varName, String collectionExpression, Set<ScriptFunction> functionDependencies,
-                                Set<String> systemPropertyDependencies, boolean isParallelLoop) {
+    public ListLoopStatement(String varName, String collectionExpression, Set<ScriptFunction> functionDependencies,
+                             Set<String> systemPropertyDependencies, boolean isParallelLoop) {
         super(collectionExpression, functionDependencies, systemPropertyDependencies);
         String message = FOR_LOOP_VAR_NAME_CANNOT_BE_EMPTY;
         if (isParallelLoop) {
@@ -46,7 +46,7 @@ public class ListForLoopStatement extends LoopStatement implements Serializable 
      * only here to satisfy serialization libraries
      */
     @SuppressWarnings("unused")
-    private ListForLoopStatement() {
+    private ListLoopStatement() {
         varName = null;
     }
 
@@ -68,7 +68,7 @@ public class ListForLoopStatement extends LoopStatement implements Serializable 
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        ListForLoopStatement that = (ListForLoopStatement) o;
+        ListLoopStatement that = (ListLoopStatement) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))

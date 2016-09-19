@@ -10,9 +10,9 @@
 package io.cloudslang.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
-import io.cloudslang.lang.entities.ListForLoopStatement;
+import io.cloudslang.lang.entities.ListLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
-import io.cloudslang.lang.entities.MapForLoopStatement;
+import io.cloudslang.lang.entities.MapLoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
@@ -91,15 +91,15 @@ public class StepExecutionData extends AbstractExecutionData {
                 if (loopCondition instanceof ForLoopCondition) {
                     ForLoopCondition forLoopCondition = (ForLoopCondition) loopCondition;
 
-                    if (loop instanceof ListForLoopStatement) {
+                    if (loop instanceof ListLoopStatement) {
                         // normal iteration
-                        String varName = ((ListForLoopStatement) loop).getVarName();
+                        String varName = ((ListLoopStatement) loop).getVarName();
                         loopsBinding.incrementListForLoop(varName, flowContext, forLoopCondition);
                     } else {
                         // map iteration
-                        MapForLoopStatement mapForLoopStatement = (MapForLoopStatement) loop;
-                        String keyName = mapForLoopStatement.getKeyName();
-                        String valueName = mapForLoopStatement.getValueName();
+                        MapLoopStatement mapLoopStatement = (MapLoopStatement) loop;
+                        String keyName = mapLoopStatement.getKeyName();
+                        String valueName = mapLoopStatement.getValueName();
                         loopsBinding.incrementMapForLoop(keyName, valueName, flowContext, forLoopCondition);
                     }
                 }

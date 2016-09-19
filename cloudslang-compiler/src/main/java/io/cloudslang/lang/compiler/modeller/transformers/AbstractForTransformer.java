@@ -12,9 +12,9 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
-import io.cloudslang.lang.entities.ListForLoopStatement;
+import io.cloudslang.lang.entities.ListLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
-import io.cloudslang.lang.entities.MapForLoopStatement;
+import io.cloudslang.lang.entities.MapLoopStatement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +88,7 @@ public abstract class AbstractForTransformer extends AbstractInOutForTransformer
     private LoopStatement createMapForLoopStatement(String keyName, String valueName, String collectionExpression, Accumulator dependencyAccumulator) {
         executableValidator.validateLoopStatementVariable(keyName);
         executableValidator.validateLoopStatementVariable(valueName);
-        return new MapForLoopStatement(
+        return new MapLoopStatement(
                 keyName,
                 valueName,
                 collectionExpression,
@@ -98,7 +98,7 @@ public abstract class AbstractForTransformer extends AbstractInOutForTransformer
 
     private LoopStatement createLoopStatement(String varName, String collectionExpression, Accumulator dependencyAccumulator, boolean isParallelLoop) {
         executableValidator.validateLoopStatementVariable(varName);
-        return new ListForLoopStatement(varName, collectionExpression,
+        return new ListLoopStatement(varName, collectionExpression,
                     dependencyAccumulator.getFunctionDependencies(),
                     dependencyAccumulator.getSystemPropertyDependencies(), isParallelLoop);
     }

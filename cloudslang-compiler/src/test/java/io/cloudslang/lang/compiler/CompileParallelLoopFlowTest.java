@@ -14,7 +14,7 @@ import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.entities.CompilationArtifact;
-import io.cloudslang.lang.entities.ListForLoopStatement;
+import io.cloudslang.lang.entities.ListLoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
@@ -477,8 +477,8 @@ public class CompileParallelLoopFlowTest {
 
     private void verifyParallelLoopStatement(Map<String, ?> addBranchesActionData) {
         assertTrue(addBranchesActionData.containsKey(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY));
-        ListForLoopStatement parallelLoopStatement =
-                (ListForLoopStatement) addBranchesActionData.get(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY);
+        ListLoopStatement parallelLoopStatement =
+                (ListLoopStatement) addBranchesActionData.get(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY);
         assertEquals("parallel loop statement value not as expected", "value", parallelLoopStatement.getVarName());
         assertEquals("parallel loop statement expression not as expected", "values", parallelLoopStatement.getExpression());
     }
@@ -493,7 +493,7 @@ public class CompileParallelLoopFlowTest {
 
     private void verifyParallelLoopStatement(Step step) {
         assertTrue(step.getPreStepActionData().containsKey(SlangTextualKeys.PARALLEL_LOOP_KEY));
-        ListForLoopStatement parallelLoopStatement = (ListForLoopStatement) step.getPreStepActionData()
+        ListLoopStatement parallelLoopStatement = (ListLoopStatement) step.getPreStepActionData()
                 .get(SlangTextualKeys.PARALLEL_LOOP_KEY);
         assertEquals("values", parallelLoopStatement.getExpression());
         assertEquals("value", parallelLoopStatement.getVarName());

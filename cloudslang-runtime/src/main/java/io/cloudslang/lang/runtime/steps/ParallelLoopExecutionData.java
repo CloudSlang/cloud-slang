@@ -96,12 +96,12 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 branchRuntimeEnvironment.resetStacks();
 
                 Context branchContext = (Context) SerializationUtils.clone(flowContext);
-                if (parallelLoopStatement instanceof ListForLoopStatement) {
-                    branchContext.putVariable(((ListForLoopStatement)parallelLoopStatement).getVarName(), splitItem);
-                } else if (parallelLoopStatement instanceof MapForLoopStatement) {
-                    branchContext.putVariable(((MapForLoopStatement)parallelLoopStatement).getKeyName(),
+                if (parallelLoopStatement instanceof ListLoopStatement) {
+                    branchContext.putVariable(((ListLoopStatement)parallelLoopStatement).getVarName(), splitItem);
+                } else if (parallelLoopStatement instanceof MapLoopStatement) {
+                    branchContext.putVariable(((MapLoopStatement)parallelLoopStatement).getKeyName(),
                             (Value)((ImmutablePair) splitItem.get()).getLeft());
-                    branchContext.putVariable(((MapForLoopStatement)parallelLoopStatement).getValueName(),
+                    branchContext.putVariable(((MapLoopStatement)parallelLoopStatement).getValueName(),
                             (Value)((ImmutablePair) splitItem.get()).getRight());
                 }
                 updateCallArgumentsAndPushContextToStack(branchRuntimeEnvironment,

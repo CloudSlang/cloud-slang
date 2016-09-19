@@ -1,7 +1,7 @@
 package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.LoopStatement;
-import io.cloudslang.lang.entities.MapForLoopStatement;
+import io.cloudslang.lang.entities.MapLoopStatement;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.lang3.tuple.Pair;
@@ -24,7 +24,7 @@ public class AbstractBinding {
     }
 
     protected Value getEvalResultForMap(Value evalResult, LoopStatement loopStatement, String collectionExpression) {
-        if (loopStatement instanceof MapForLoopStatement) {
+        if (loopStatement instanceof MapLoopStatement) {
             if (evalResult != null && evalResult.get() instanceof Map) {
                 List<Value> entriesAsValues = new ArrayList<>();
                 @SuppressWarnings("unchecked") Set<Map.Entry<Serializable, Serializable>> entrySet = ((Map) evalResult.get()).entrySet();

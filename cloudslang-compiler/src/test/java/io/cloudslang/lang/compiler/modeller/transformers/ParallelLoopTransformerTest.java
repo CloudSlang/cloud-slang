@@ -13,7 +13,7 @@ import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
-import io.cloudslang.lang.entities.ListForLoopStatement;
+import io.cloudslang.lang.entities.ListLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
 import junit.framework.Assert;
 import org.junit.Rule;
@@ -43,21 +43,21 @@ public class ParallelLoopTransformerTest extends TransformersTestParent {
 
     @Test
     public void testValidStatement() throws Exception {
-        ListForLoopStatement statement = (ListForLoopStatement) transformer.transform("x in collection").getTransformedData();
+        ListLoopStatement statement = (ListLoopStatement) transformer.transform("x in collection").getTransformedData();
         Assert.assertEquals("x", statement.getVarName());
         Assert.assertEquals("collection", statement.getExpression());
     }
 
     @Test
     public void testValidStatementWithSpaces() throws Exception {
-        ListForLoopStatement statement = (ListForLoopStatement) transformer.transform("x in range(0, 9)").getTransformedData();
+        ListLoopStatement statement = (ListLoopStatement) transformer.transform("x in range(0, 9)").getTransformedData();
         Assert.assertEquals("x", statement.getVarName());
         Assert.assertEquals("range(0, 9)", statement.getExpression());
     }
 
     @Test
     public void testValidStatementAndTrim() throws Exception {
-        ListForLoopStatement statement = (ListForLoopStatement) transformer.transform(" min   in  collection  ").getTransformedData();
+        ListLoopStatement statement = (ListLoopStatement) transformer.transform(" min   in  collection  ").getTransformedData();
         Assert.assertEquals("min", statement.getVarName());
         Assert.assertEquals("collection", statement.getExpression());
     }
