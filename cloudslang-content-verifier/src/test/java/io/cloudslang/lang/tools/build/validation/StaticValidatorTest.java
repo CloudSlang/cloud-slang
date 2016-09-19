@@ -54,7 +54,8 @@ public class StaticValidatorTest {
         List<Input> inputList = Lists.newArrayList(new Input.InputBuilder("input1", "value1").build(),
                 new Input.InputBuilder("input2", "value2").build(),
                 new Input.InputBuilder("input3", "value3").build());
-        Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", inputList, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
+        Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", inputList, null, null,
+                new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         Metadata metadata = new Metadata();
         Map<String, String> inputMap = new HashMap<>();
         inputMap.put("input1", "description1");
@@ -63,7 +64,25 @@ public class StaticValidatorTest {
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("Error for executable no_dependencies.empty_flow: Input 'input3' is missing description.");
-        staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()), newExecutable, metadata, true);
+        staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
+                newExecutable, metadata, true);
+    }
+
+    @Test
+    public void missingDescriptionForPrivateInputInput() throws URISyntaxException {
+        List<Input> inputList = Lists.newArrayList(new Input.InputBuilder("input1", "value1").build(),
+                new Input.InputBuilder("input2", "value2").build(),
+                new Input.InputBuilder("input3", "value3").withPrivateInput(true).build());
+        Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", inputList, null, null,
+                new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
+        Metadata metadata = new Metadata();
+        Map<String, String> inputMap = new HashMap<>();
+        inputMap.put("input1", "description1");
+        inputMap.put("input2", "description2");
+        metadata.setInputs(inputMap);
+
+        staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
+                newExecutable, metadata, true);
     }
 
     @Test
