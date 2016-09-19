@@ -138,7 +138,7 @@ public class NavigationTest extends SystemsTestsParent {
         expectedEx.expect(RuntimeException.class);
         expectedEx.expectMessage("Error running: 'operation_results_empty_list'.\n" +
                 "\tNo results were found");
-        triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
+        triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>());
     }
 
     @Test

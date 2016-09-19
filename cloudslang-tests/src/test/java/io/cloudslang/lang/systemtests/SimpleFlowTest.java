@@ -194,7 +194,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Value> userInputs = new HashMap<>();
-        triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
+        triggerWithData(compilationArtifact, userInputs, EMPTY_SET);
     }
 
     @Test
