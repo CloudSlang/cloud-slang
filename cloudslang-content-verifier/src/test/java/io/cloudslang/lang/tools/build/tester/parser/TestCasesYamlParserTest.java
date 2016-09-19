@@ -147,6 +147,32 @@ public class TestCasesYamlParserTest {
         parser.parseProperties(filePath.getPath());
     }
 
+    @Test
+    public void testExceptionContainsDetailsWhenInvalidSource() throws Exception {
+        URI fileUri = getClass().getResource("/test/invalid/invalid_field.inputs.yaml").toURI();
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(
+                "There was a problem parsing the YAML source: invalid_field.inputs.yaml."
+        );
+        exception.expectMessage(
+                "Error parsing slang test case: Unrecognized field \"invalid_field\"" +
+                        " (class io.cloudslang.lang.tools.build.tester.parse.SlangTestCase)," +
+                        " not marked as ignorable (8 known properties: \"outputs\", \"testFlowPath\"," +
+                        " \"name\", \"description\", \"testSuites\", \"systemPropertiesFile\", \"throwsException\"," +
+                        " \"result\"])"
+        );
+        exception.expectMessage(
+                " at [Source: {\"inputs\":[{\"text\":\"text to print\"}],\"description\":" +
+                        "\"Tests that print_text operation finishes with SUCCESS\",\"testFlowPath\":" +
+                        "\"base.print_property\",\"result\":\"SUCCESS\",\"invalid_field\":\"value\"};" +
+                        " line: 1, column: 181] (through reference chain:" +
+                        " io.cloudslang.lang.tools.build.tester.parse.SlangTestCase[\"invalid_field\"])"
+        );
+
+        parser.parseTestCases(SlangSource.fromFile(fileUri));
+    }
+
     @Configuration
     static class Config {
 
@@ -194,12 +220,12 @@ public class TestCasesYamlParserTest {
 
         @Bean
         public ExecutableValidator executableValidator() {
-           return new ExecutableValidatorImpl();
-       }
+            return new ExecutableValidatorImpl();
+        }
 
-       @Bean
+        @Bean
         public SystemPropertyValidator systemPropertyValidator() {
-           return new SystemPropertyValidatorImpl();
-       }
+            return new SystemPropertyValidatorImpl();
+        }
     }
 }

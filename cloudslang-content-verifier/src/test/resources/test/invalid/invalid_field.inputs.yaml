@@ -1,0 +1,23 @@
+testPrintPropertyWithTextInput:
+  inputs:
+    - text: text to print
+  description: Tests that print_text operation finishes with SUCCESS
+  testFlowPath: base.print_property
+  result: SUCCESS
+  invalid_field: value
+
+testPrintPropertyWithSysProperty:
+  description: Tests that print_text operation finishes with SUCCESS
+  systemPropertiesFile: ${project_path}\content\base\properties.yaml
+  testFlowPath: base.print_property
+  throwsException: false
+
+testOutputTextOp:
+  inputs:
+    - text: text to print
+  description: Tests outputs
+  testFlowPath: base.output_op
+  result: SUCCESS
+  outputs:
+    - output_text1: text to print
+    - output_text2: second output
