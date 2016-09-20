@@ -62,7 +62,7 @@ public class LangTestActions {
     @SuppressWarnings("unused")
     public Map<String, String> setConnectionOnNonSerializableSession(@Param("connection") GlobalSessionObject<NonSerializableObject> connection,
                                                                      @Param("value") String value) {
-        SessionResource<NonSerializableObject> sessionName = connection.getResource();
+        connection.getResource();
         Map<String, String> returnMap = new HashMap<>();
         connection.setResource(new NonSerializableSessionResource(new NonSerializableObject(value)));
         returnMap.put("connection", value);

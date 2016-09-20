@@ -83,7 +83,7 @@ public class ContentTestActions {
     @SuppressWarnings("unused")
     public Map<String, String> setNameOnNonSerializableSession(@Param("name") GlobalSessionObject<NonSerializableObject> name,
                                                                @Param("value") String value) {
-        SessionResource<NonSerializableObject> sessionName = name.getResource();
+        name.getResource();
         Map<String, String> returnMap = new HashMap<>();
         name.setResource(new NonSerializableSessionResource(new NonSerializableObject(value)));
         returnMap.put("name", value);

@@ -3,8 +3,6 @@ package io.cloudslang.lang.tools.build.tester.parallel.report;
 
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.TestRun;
-import java.io.IOException;
-import java.util.Map;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +16,9 @@ import org.rendersnake.CanvasMacros;
 import org.rendersnake.HtmlAttributes;
 import org.rendersnake.HtmlCanvas;
 import org.rendersnake.internal.CharactersWriteable;
+
+import java.io.IOException;
+import java.util.Map;
 
 import static io.cloudslang.lang.tools.build.tester.parallel.report.SlangTestCaseRunReportGeneratorService.BASIC_REPORT_CSS;
 import static io.cloudslang.lang.tools.build.tester.parallel.report.SlangTestCaseRunReportGeneratorService.EXCEPTION_OR_MESSAGE;

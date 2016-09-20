@@ -206,15 +206,14 @@ public class CloudSlangMavenCompiler extends AbstractCompiler {
             Enumeration enumEntries = jar.entries();
             while (enumEntries.hasMoreElements()) {
                 JarEntry file = (JarEntry) enumEntries.nextElement();
-                if (file.isDirectory() || (!file.getName().endsWith(".sl.yaml") && !file.getName().endsWith(".sl") && !file.getName().endsWith(".sl.yml"))) {
+                if ((file == null) || (file.isDirectory()) || (!file.getName().endsWith(".sl.yaml") && !file.getName().endsWith(".sl") && !file.getName().endsWith(".sl.yml"))) {
                     continue;
                 }
 
                 byte[] bytes;
                 try (InputStream is = jar.getInputStream(file)) {
                     bytes = IOUtils.toByteArray(is);
-                    Path filePath = Paths.get(file.getName());
-                    sources.put(filePath.getFileName().toString(), bytes);
+                    sources.put(file.getName(), bytes);
                 }
             }
         }

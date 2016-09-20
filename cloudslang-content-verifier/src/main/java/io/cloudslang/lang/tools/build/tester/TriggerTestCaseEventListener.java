@@ -85,6 +85,8 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
                     outputs = extractOutputs;
                 }
                 break;
+            default:
+                break;
         }
     }
 

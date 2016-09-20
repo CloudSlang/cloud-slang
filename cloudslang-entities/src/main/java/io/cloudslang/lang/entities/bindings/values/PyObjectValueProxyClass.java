@@ -14,6 +14,8 @@ package io.cloudslang.lang.entities.bindings.values;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 
+import static java.util.Arrays.copyOf;
+
 /**
  * PyObject value proxy class
  * <p>
@@ -28,7 +30,7 @@ public class PyObjectValueProxyClass {
     public PyObjectValueProxyClass(Class proxyClass, Constructor<?> constructor, Object[] params) {
         this.proxyClass = proxyClass;
         this.constructor = constructor;
-        this.params = params;
+        this.params = getParamsHelper(params);
     }
 
     public Class getProxyClass() {
@@ -48,11 +50,15 @@ public class PyObjectValueProxyClass {
     }
 
     public Object[] getParams() {
-        return params;
+        return getParamsHelper(this.params);
     }
 
     public void setParams(Object[] params) {
-        this.params = params;
+        this.params = getParamsHelper(params);
+    }
+
+    private static Object[] getParamsHelper(Object[] params) {
+        return (params != null) ? Arrays.copyOf(params, params.length) : null;
     }
 
     @Override

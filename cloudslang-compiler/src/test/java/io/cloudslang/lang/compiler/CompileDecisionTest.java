@@ -49,7 +49,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
 public class CompileDecisionTest {
-    public static final HashSet<ScriptFunction> SP_SCRIPT_FUNCTIONS_SET = Sets.newHashSet(ScriptFunction.GET_SYSTEM_PROPERTY);
+    private static final HashSet<ScriptFunction> SP_SCRIPT_FUNCTIONS_SET = Sets.newHashSet(ScriptFunction.GET_SYSTEM_PROPERTY);
     @Rule
     public ExpectedException exception = ExpectedException.none();
 

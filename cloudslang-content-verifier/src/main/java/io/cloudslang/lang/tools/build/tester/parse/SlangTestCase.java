@@ -10,6 +10,8 @@
 package io.cloudslang.lang.tools.build.tester.parse;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +22,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 /**
  * Created by stoneo on 3/15/2015.
  **/
-public class SlangTestCase {
+public class SlangTestCase implements Serializable {
 
     private String name;
 
