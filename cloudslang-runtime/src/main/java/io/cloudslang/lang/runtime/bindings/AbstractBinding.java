@@ -4,12 +4,15 @@ import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.MapLoopStatement;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.tuple.Pair;
 import org.python.core.PyObject;
-
-import java.io.Serializable;
-import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * User: bancl
@@ -43,15 +46,15 @@ public class AbstractBinding {
 
     protected Iterable<Value> getIterableFromEvalResult(Value loopCollection) {
         Serializable loopCollectionContent = loopCollection.get();
-        if (loopCollectionContent instanceof String) {
+        if (loopCollectionContent instanceof Iterable) {
+            //noinspection unchecked
+            return (Iterable<Value>) loopCollectionContent;
+        } else if (loopCollectionContent instanceof String) {
             String[] strings = ((String) loopCollectionContent).split(Pattern.quote(","));
             return convert(Arrays.asList(strings), loopCollection.isSensitive());
         } else if (loopCollectionContent instanceof PyObject) {
             PyObject pyObject = (PyObject) loopCollectionContent;
             return convert(pyObject.asIterable(), loopCollection.isSensitive());
-        } if (loopCollectionContent instanceof Iterable) {
-            //noinspection unchecked
-            return (Iterable<Value>) loopCollectionContent;
         } else {
             return null;
         }

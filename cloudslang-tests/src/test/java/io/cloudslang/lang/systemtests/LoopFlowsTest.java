@@ -63,6 +63,35 @@ public class LoopFlowsTest extends SystemsTestsParent {
     }
 
     @Test
+    public void testFlowWithLoopsPyListCaseWorks() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/simple_loop_pylist.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/print.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Map<String, Value> userInputs = new HashMap<>();
+        Set<SystemProperty> systemProperties = new HashSet<>();
+        systemProperties.add(
+                new SystemProperty("loop", "for.prop1", "for_value")
+        );
+
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
+
+        StepData firstStep = stepsData.get(FIRST_STEP_PATH);
+        StepData secondStep = stepsData.get(SECOND_STEP_KEY);
+        StepData thirdStep = stepsData.get(THIRD_STEP_KEY);
+
+        Map<String, Serializable> expectedInputs = new HashMap<>();
+        expectedInputs.put("text", "36905525");
+        Assert.assertEquals(expectedInputs, firstStep.getInputs());
+        expectedInputs.put("text", "8136ccef");
+        Assert.assertEquals(expectedInputs, secondStep.getInputs());
+        expectedInputs.put("text", "b22e5036");
+        Assert.assertEquals(expectedInputs, thirdStep.getInputs());
+    }
+
+    @Test
     public void testFlowWithLoopsWithCustomNavigation() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/loop_with_custom_navigation.sl").toURI();
         URI operation1 = getClass().getResource("/yaml/loops/print.sl").toURI();
