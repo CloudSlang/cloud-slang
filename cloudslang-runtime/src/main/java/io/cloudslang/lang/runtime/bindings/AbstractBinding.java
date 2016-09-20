@@ -47,8 +47,9 @@ public class AbstractBinding {
     protected Iterable<Value> getIterableFromEvalResult(Value loopCollection) {
         Serializable loopCollectionContent = loopCollection.get();
         if (loopCollectionContent instanceof Iterable) {
-            //noinspection unchecked
-            return (Iterable<Value>) loopCollectionContent;
+            @SuppressWarnings("unchecked")
+            Iterable<? extends Serializable> loopCollectionContentSerializable = (Iterable<? extends Serializable>) loopCollectionContent;
+            return convert(loopCollectionContentSerializable, loopCollection.isSensitive());
         } else if (loopCollectionContent instanceof String) {
             String[] strings = ((String) loopCollectionContent).split(Pattern.quote(","));
             return convert(Arrays.asList(strings), loopCollection.isSensitive());
