@@ -71,7 +71,7 @@ public class TestCasesYamlParser {
             return parseTestCases(parsedTestCases);
         } catch (Throwable e) {
             throw new RuntimeException("There was a problem parsing the YAML source: " + source.getFileName() +
-                    source.getFileExtension().getValue() + ".\n" + e.getMessage(), e);
+                    "." + source.getFileExtension().getValue() + ".\n" + e.getMessage(), e);
         }
     }
 
@@ -91,7 +91,7 @@ public class TestCasesYamlParser {
 
             return slangTestCase;
         } catch (IOException e) {
-            throw new RuntimeException("Error parsing slang test case", e);
+            throw new RuntimeException("Error parsing slang test case: " + e.getMessage(), e);
         }
     }
 

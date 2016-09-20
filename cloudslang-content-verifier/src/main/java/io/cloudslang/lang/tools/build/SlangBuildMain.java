@@ -100,7 +100,6 @@ public class SlangBuildMain {
         SlangTestCaseRunReportGeneratorService reportGeneratorService = context.getBean(SlangTestCaseRunReportGeneratorService.class);
         registerEventHandlers(slang);
 
-//        long time = System.currentTimeMillis();
         List<RuntimeException> exceptions = new ArrayList<>();
         try {
             SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath,
@@ -119,7 +118,6 @@ public class SlangBuildMain {
             if (shouldPrintCoverageData) {
                 printTestCoverageData(runTestsResults);
             }
-//            System.out.println("Took " + (System.currentTimeMillis() - time) / 1000f + " s.");
 
             if (isNotEmpty(runTestsResults.getFailedTests())) {
                 printBuildFailureSummary(projectPath, runTestsResults);
