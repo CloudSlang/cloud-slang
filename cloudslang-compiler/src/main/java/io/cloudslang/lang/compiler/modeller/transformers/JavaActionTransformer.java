@@ -1,13 +1,13 @@
 package io.cloudslang.lang.compiler.modeller.transformers;
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 
 /*
@@ -20,13 +20,12 @@ import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import java.util.ArrayList;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public class JavaActionTransformer extends AbstractTransformer implements Transformer<Map<String, String>, Map<String, String>> {
@@ -59,10 +58,14 @@ public class JavaActionTransformer extends AbstractTransformer implements Transf
     }
 
     @Override
-    public List<Scope> getScopes() {return Collections.singletonList(Scope.ACTION);}
+    public List<Scope> getScopes() {
+        return Collections.singletonList(Scope.ACTION);
+    }
 
     @Override
-    public String keyToTransform() {return SlangTextualKeys.JAVA_ACTION_KEY;}
+    public String keyToTransform() {
+        return SlangTextualKeys.JAVA_ACTION_KEY;
+    }
 
     private void transformKeys(Map<String, String> rawData) {
         // snake_case -> camelCase

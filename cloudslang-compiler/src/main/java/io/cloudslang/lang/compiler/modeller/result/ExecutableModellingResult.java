@@ -1,7 +1,6 @@
 package io.cloudslang.lang.compiler.modeller.result;
 
 import io.cloudslang.lang.compiler.modeller.model.Executable;
-
 import java.util.List;
 
 /**
@@ -21,6 +20,7 @@ public class ExecutableModellingResult implements ModellingResult {
         return executable;
     }
 
+    @Override
     public List<RuntimeException> getErrors() {
         return errors;
     }

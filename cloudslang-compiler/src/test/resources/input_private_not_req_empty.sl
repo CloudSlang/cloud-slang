@@ -1,3 +1,4 @@
+
 #   (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
 #   All rights reserved. This program and the accompanying materials
 #   are made available under the terms of the Apache License v2.0 which accompany this distribution.
@@ -7,20 +8,17 @@
 
 namespace: io.cloudslang
 
-imports:
-  ops: user.ops
-
-flow:
-  name: flow_missing_dependency_required_input_in_step
-  workflow:
-    - explicit_alias:
-        do:
-          ops.test_op:
-            - city: 'input_1'
-            - port: '22'
-
-    - implicit_alias:
-        do:
-          check_op:
-            - city: 'input_1'
-            - port: '22'
+operation:
+  name: input_private_not_req_empty
+  inputs:
+    - input1
+    - input2:
+        default: ''
+        required: false
+        private: true
+    - input3
+  python_action:
+    script: pass
+  results:
+    - SUCCESS: ${ 1 == 1 }
+    - FAILURE

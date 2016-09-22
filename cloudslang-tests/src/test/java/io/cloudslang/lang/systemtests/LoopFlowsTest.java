@@ -15,10 +15,6 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.io.Serializable;
 import java.net.URI;
 import java.util.Collections;
@@ -27,9 +23,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public class LoopFlowsTest extends SystemsTestsParent{
-    
+public class LoopFlowsTest extends SystemsTestsParent {
+
     @SuppressWarnings("unchecked")
     private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
 
@@ -60,6 +59,35 @@ public class LoopFlowsTest extends SystemsTestsParent{
         expectedInputs.put("text", "2");
         Assert.assertEquals(expectedInputs, secondStep.getInputs());
         expectedInputs.put("text", "3");
+        Assert.assertEquals(expectedInputs, thirdStep.getInputs());
+    }
+
+    @Test
+    public void testFlowWithLoopsPyListCaseWorks() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/simple_loop_pylist.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/print.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Map<String, Value> userInputs = new HashMap<>();
+        Set<SystemProperty> systemProperties = new HashSet<>();
+        systemProperties.add(
+                new SystemProperty("loop", "for.prop1", "for_value")
+        );
+
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
+
+        StepData firstStep = stepsData.get(FIRST_STEP_PATH);
+        StepData secondStep = stepsData.get(SECOND_STEP_KEY);
+        StepData thirdStep = stepsData.get(THIRD_STEP_KEY);
+
+        Map<String, Serializable> expectedInputs = new HashMap<>();
+        expectedInputs.put("text", "36905525");
+        Assert.assertEquals(expectedInputs, firstStep.getInputs());
+        expectedInputs.put("text", "8136ccef");
+        Assert.assertEquals(expectedInputs, secondStep.getInputs());
+        expectedInputs.put("text", "b22e5036");
         Assert.assertEquals(expectedInputs, thirdStep.getInputs());
     }
 
@@ -144,6 +172,19 @@ public class LoopFlowsTest extends SystemsTestsParent{
         Assert.assertEquals("print_other_values", thirdStep.getName());
     }
 
+    @Test
+    public void testFlowWithInlineMapLoops() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/simple_loop_with_inline_map.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/print.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Map<String, Value> userInputs = new HashMap<>();
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
+        verifyPersonMap(stepsData);
+    }
+
     @Ignore("Remove when support for maps in loops is added")
     @Test
     public void testFlowWithMapLoops() throws Exception {
@@ -172,7 +213,7 @@ public class LoopFlowsTest extends SystemsTestsParent{
         personMap.put("jane", ValueFactory.create(2));
         personMap.put("peter", ValueFactory.create("three"));
         Map<String, Value> userInputs = new HashMap<>();
-        userInputs.put("person_map", ValueFactory.create((Serializable)personMap));
+        userInputs.put("person_map", ValueFactory.create((Serializable) personMap));
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
         verifyPersonMap(stepsData);
     }
@@ -253,10 +294,10 @@ public class LoopFlowsTest extends SystemsTestsParent{
 
         Map<String, Serializable> context1 = new HashMap<>();
         context1.put("text", "john");
-        context1.put("text2", 1);
+        context1.put("text2", "1");
         Map<String, Serializable> context2 = new HashMap<>();
         context2.put("text", "jane");
-        context2.put("text2", 2);
+        context2.put("text2", "2");
         Map<String, Serializable> context3 = new HashMap<>();
         context3.put("text", "peter");
         context3.put("text2", "three");

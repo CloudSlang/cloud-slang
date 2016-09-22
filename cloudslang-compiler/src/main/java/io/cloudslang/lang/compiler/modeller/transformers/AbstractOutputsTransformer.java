@@ -1,24 +1,23 @@
 package io.cloudslang.lang.compiler.modeller.transformers;
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,16 +30,18 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Date: 12/11/2014
  * Time: 11:33
  */
-public abstract class AbstractOutputsTransformer  extends InOutTransformer {
+public abstract class AbstractOutputsTransformer extends InOutTransformer {
 
     @Autowired
     private PreCompileValidator preCompileValidator;
+    @Autowired
+    private ExecutableValidator executableValidator;
 
     public TransformModellingResult<List<Output>> transform(List<Object> rawData) {
         List<Output> transformedData = new ArrayList<>();
         List<RuntimeException> errors = new ArrayList<>();
 
-        if (CollectionUtils.isEmpty(rawData)){
+        if (CollectionUtils.isEmpty(rawData)) {
             return new BasicTransformModellingResult<>(transformedData, errors);
         }
 
@@ -92,7 +93,8 @@ public abstract class AbstractOutputsTransformer  extends InOutTransformer {
         }
     }
 
-    Output createOutput(String outputName, Serializable outputExpression, boolean sensitive){
+    Output createOutput(String outputName, Serializable outputExpression, boolean sensitive) {
+        executableValidator.validateOutputName(outputName);
         preCompileValidator.validateStringValue(outputName, outputExpression, this);
         Accumulator accumulator = extractFunctionData(outputExpression);
         return new Output(
@@ -104,7 +106,7 @@ public abstract class AbstractOutputsTransformer  extends InOutTransformer {
     }
 
     Output createRefOutput(String rawOutput, boolean sensitive) {
-        return new Output(rawOutput, ValueFactory.create(transformNameToExpression(rawOutput), sensitive));
+        return createOutput(rawOutput, transformNameToExpression(rawOutput), sensitive);
     }
 
     private String transformNameToExpression(String name) {

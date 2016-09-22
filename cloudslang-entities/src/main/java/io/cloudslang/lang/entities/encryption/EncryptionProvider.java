@@ -11,14 +11,13 @@ package io.cloudslang.lang.entities.encryption;
 
 import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import io.cloudslang.lang.spi.encryption.Encryption;
-import org.springframework.context.ApplicationContext;
-
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import org.springframework.context.ApplicationContext;
 
 /**
  * Encryptor factory
- *
+ * <p>
  * Created by Ifat Gavish on 30/05/2016
  */
 public class EncryptionProvider {

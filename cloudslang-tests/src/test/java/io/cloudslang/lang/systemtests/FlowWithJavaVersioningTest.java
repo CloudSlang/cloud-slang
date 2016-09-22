@@ -13,13 +13,16 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import org.junit.Assert;
+import org.junit.Test;
 
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
@@ -170,7 +173,7 @@ public class FlowWithJavaVersioningTest extends SystemsTestsParent {
         URI operationSum3 = getClass().getResource(operationPath).toURI();
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(operationSum3), null);
 
-        ScoreEvent event = trigger(compilationArtifact,  new HashMap<String, Value>(), new HashSet<SystemProperty>());
+        ScoreEvent event = trigger(compilationArtifact, new HashMap<String, Value>(), new HashSet<SystemProperty>());
         assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
         LanguageEventData languageEventData = (LanguageEventData) event.getData();
         String result = (String) languageEventData.getOutputs().get("version");

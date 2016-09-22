@@ -26,29 +26,24 @@ import org.apache.commons.lang.StringUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Bonczidai Levente
  * @since 3/18/2016
  */
 public class BindingScopeTest extends SystemsTestsParent {
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testStepPublishValues() throws Exception {
@@ -149,7 +144,7 @@ public class BindingScopeTest extends SystemsTestsParent {
                         message.contains("Input with name: 'city' is Required, but value is empty");
             }
         });
-        triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
+        triggerWithData(compilationArtifact, userInputs, systemProperties);
     }
 
     @Test
@@ -173,7 +168,7 @@ public class BindingScopeTest extends SystemsTestsParent {
                         message.contains("Input with name: 'city' is Required, but value is empty");
             }
         });
-        triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
+        triggerWithData(compilationArtifact, userInputs, systemProperties);
     }
 
     @Test

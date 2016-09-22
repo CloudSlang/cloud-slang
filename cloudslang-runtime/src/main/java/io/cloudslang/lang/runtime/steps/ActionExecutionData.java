@@ -24,19 +24,18 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.runtime.api.java.JavaRuntimeService;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
-import org.python.google.common.collect.Sets;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
+import org.python.google.common.collect.Sets;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
@@ -81,7 +80,7 @@ public class ActionExecutionData extends AbstractExecutionData {
         Map<String, SerializableSessionObject> serializableSessionData = runEnv.getSerializableDataMap();
         fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_ACTION_START, "Preparing to run action " + actionType,
                 runEnv.getExecutionPath().getParentPath(), LanguageEventData.StepType.ACTION, null,
-                Pair.of(LanguageEventData.CALL_ARGUMENTS, (Serializable)callArgumentsDeepCopy));
+                Pair.of(LanguageEventData.CALL_ARGUMENTS, (Serializable) callArgumentsDeepCopy));
         try {
             switch (actionType) {
                 case JAVA:
@@ -112,9 +111,9 @@ public class ActionExecutionData extends AbstractExecutionData {
 
     @SuppressWarnings("unchecked")
     private Map<String, Value> runJavaAction(Map<String, SerializableSessionObject> serializableSessionData,
-                                                    Map<String, Value> currentContext,
-                                                    Map<String, Object> nonSerializableExecutionData,
-                                                    String gav, String className, String methodName) {
+                                             Map<String, Value> currentContext,
+                                             Map<String, Object> nonSerializableExecutionData,
+                                             String gav, String className, String methodName) {
         Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService.execute(normalizeJavaGav(gav), className, methodName,
                 new CloudSlangJavaExecutionParameterProvider(serializableSessionData, createActionContext(currentContext), nonSerializableExecutionData));
         if (returnMap == null) {
@@ -143,6 +142,7 @@ public class ActionExecutionData extends AbstractExecutionData {
 
     /**
      * Checks whether need to append packaging type to the gav
+     *
      * @param gav
      * @param packagingType
      * @return
@@ -160,7 +160,7 @@ public class ActionExecutionData extends AbstractExecutionData {
     private Set<String> normalizePythonDependencies(Collection<String> dependencies) {
         Set<String> pythonDependencies = dependencies == null || dependencies.isEmpty() ? Sets.<String>newHashSet() : new HashSet<>(dependencies);
         Set<String> normalizedDependencies = new HashSet<>(pythonDependencies.size());
-        for (String dependency: pythonDependencies) {
+        for (String dependency : pythonDependencies) {
             normalizedDependencies.add(normalizeGav(dependency, PACKAGING_TYPE_ZIP));
         }
         return normalizedDependencies;

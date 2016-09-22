@@ -25,15 +25,18 @@ public class RegexConstants {
                     "\\s*" +
                     ScoreLangConstants.EXPRESSION_END_DELIMITER_ESCAPED +
                     "\\s*$";
-    public static final String SYSTEM_PROPERTY_DELIMITER = ".";
-    public static final String SYSTEM_PROPERTY_DELIMITER_ESCAPED = "\\" + SYSTEM_PROPERTY_DELIMITER;
-    public static final String SYSTEM_PROPERTY = "([\\w\\-" + SYSTEM_PROPERTY_DELIMITER + "]+)";
+    public static final String NAMESPACE_PROPERTY_DELIMITER = ".";
+    public static final String NAMESPACE_DELIMITER_ESCAPED = "\\" + NAMESPACE_PROPERTY_DELIMITER;
+    public static final String NAMESPACE_CHARS = "([\\w\\-" + NAMESPACE_PROPERTY_DELIMITER + "]+)";
+    public static final String SIMPLE_NAME_CHARS = "([\\w]+)";
+    public static final String RESULT_NAME_CHARS = "([\\w]+)";
+    public static final String VARIABLE_NAME_CHARS = "(([A-Za-z][\\w]*)|([_][\\w]+))";
     // match get_sp(key) function
-    public final static String SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE = "get_sp\\(\\s*'" + SYSTEM_PROPERTY + "'\\s*\\)";
-    public final static String SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE = "get_sp\\(\\s*\"" + SYSTEM_PROPERTY + "\"\\s*\\)";
+    public final static String SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE = "get_sp\\(\\s*'" + NAMESPACE_CHARS + "'\\s*\\)";
+    public final static String SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE = "get_sp\\(\\s*\"" + NAMESPACE_CHARS + "\"\\s*\\)";
     // match get_sp(key, default) function
-    public final static String SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE = "get_sp\\(\\s*'" + SYSTEM_PROPERTY + "'\\s*,\\s*(.+?)\\)";
-    public final static String SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE = "get_sp\\(\\s*\"" + SYSTEM_PROPERTY + "\"\\s*,\\s*(.+?)\\)";
+    public final static String SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE = "get_sp\\(\\s*'" + NAMESPACE_CHARS + "'\\s*,\\s*(.+?)\\)";
+    public final static String SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE = "get_sp\\(\\s*\"" + NAMESPACE_CHARS + "\"\\s*,\\s*(.+?)\\)";
     // match get() function
     public final static String GET_REGEX = "get\\((.+)\\)";
     public final static String GET_REGEX_WITH_DEFAULT = "get\\((.+?),(.+?)\\)";

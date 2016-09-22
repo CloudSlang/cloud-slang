@@ -10,32 +10,34 @@
 package io.cloudslang.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
-import io.cloudslang.lang.entities.*;
+import io.cloudslang.lang.entities.ListLoopStatement;
+import io.cloudslang.lang.entities.LoopStatement;
+import io.cloudslang.lang.entities.MapLoopStatement;
+import io.cloudslang.lang.entities.ResultNavigation;
+import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.ArgumentsBinding;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
-import io.cloudslang.lang.runtime.env.*;
-import io.cloudslang.lang.runtime.events.LanguageEventData;
-import org.apache.log4j.Logger;
-import org.apache.commons.lang3.tuple.Pair;
-import io.cloudslang.lang.entities.MapForLoopStatement;
-import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.runtime.env.Context;
+import io.cloudslang.lang.runtime.env.ForLoopCondition;
 import io.cloudslang.lang.runtime.env.LoopCondition;
+import io.cloudslang.lang.runtime.env.ReturnValues;
+import io.cloudslang.lang.runtime.env.RunEnvironment;
+import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
-import io.cloudslang.lang.entities.ResultNavigation;
-import io.cloudslang.lang.entities.bindings.Output;
-import io.cloudslang.lang.runtime.env.Context;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
@@ -89,15 +91,15 @@ public class StepExecutionData extends AbstractExecutionData {
                 if (loopCondition instanceof ForLoopCondition) {
                     ForLoopCondition forLoopCondition = (ForLoopCondition) loopCondition;
 
-                    if (loop instanceof ListForLoopStatement) {
+                    if (loop instanceof ListLoopStatement) {
                         // normal iteration
-                        String varName = ((ListForLoopStatement) loop).getVarName();
+                        String varName = ((ListLoopStatement) loop).getVarName();
                         loopsBinding.incrementListForLoop(varName, flowContext, forLoopCondition);
                     } else {
                         // map iteration
-                        MapForLoopStatement mapForLoopStatement = (MapForLoopStatement) loop;
-                        String keyName = mapForLoopStatement.getKeyName();
-                        String valueName = mapForLoopStatement.getValueName();
+                        MapLoopStatement mapLoopStatement = (MapLoopStatement) loop;
+                        String keyName = mapLoopStatement.getKeyName();
+                        String valueName = mapLoopStatement.getValueName();
                         loopsBinding.incrementMapForLoop(keyName, valueName, flowContext, forLoopCondition);
                     }
                 }
@@ -196,8 +198,6 @@ public class StepExecutionData extends AbstractExecutionData {
                 }
             }
 
-            //todo: hook
-
             // if this is an endStep method from a branch then next execution step position should ne null (end the flow)
             // and result should be the one from the executable (navigation is handled in join branches step)
             Long nextPosition = null;
@@ -242,7 +242,7 @@ public class StepExecutionData extends AbstractExecutionData {
                                      ReturnValues returnValues) {
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
                 LanguageEventData.StepType.STEP, nodeName,
-                Pair.of(LanguageEventData.OUTPUTS, (Serializable)publishValues),
+                Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
                 Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
                 Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition));
     }
@@ -264,7 +264,7 @@ public class StepExecutionData extends AbstractExecutionData {
     }
 
     private void saveStepInputsResultContext(Context context, Map<String, Value> stepInputsResultContext) {
-        context.putLanguageVariable(ScoreLangConstants.STEP_INPUTS_RESULT_CONTEXT, ValueFactory.create((Serializable)stepInputsResultContext));
+        context.putLanguageVariable(ScoreLangConstants.STEP_INPUTS_RESULT_CONTEXT, ValueFactory.create((Serializable) stepInputsResultContext));
     }
 
     private Map<String, Value> removeStepInputsResultContext(Context context) {

@@ -4,11 +4,10 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.tools.build.tester.TriggerTestCaseEventListener;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-import org.apache.commons.collections4.MapUtils;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.collections4.MapUtils;
 
 import static io.cloudslang.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
 import static io.cloudslang.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
@@ -56,8 +55,8 @@ public class MultiTriggerTestCaseEventListener implements ScoreEventListener {
     public synchronized void onEvent(ScoreEvent scoreEvent) throws InterruptedException {
         @SuppressWarnings("unchecked") Map<String, Serializable> data = (Map<String, Serializable>) scoreEvent.getData();
         LanguageEventData eventData;
-        Long executionId =  (data instanceof LanguageEventData) ? (((LanguageEventData) data).getExecutionId()) :
-                (Long) ((Map)data.get(SYSTEM_CONTEXT)).get(EXECUTION_ID_CONTEXT);
+        Long executionId = (data instanceof LanguageEventData) ? (((LanguageEventData) data).getExecutionId()) :
+                (Long) ((Map) data.get(SYSTEM_CONTEXT)).get(EXECUTION_ID_CONTEXT);
 
         switch (scoreEvent.getEventType()) {
             case SCORE_FINISHED_EVENT:
@@ -81,6 +80,8 @@ public class MultiTriggerTestCaseEventListener implements ScoreEventListener {
                 if (MapUtils.isNotEmpty(extractOutputs)) {
                     outputsMap.put(executionId, extractOutputs);
                 }
+                break;
+            default:
                 break;
         }
     }

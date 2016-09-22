@@ -13,12 +13,15 @@ package io.cloudslang.lang.compiler.modeller;
 
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
-
-import java.io.Serializable;
-import java.util.*;
 
 /*
  * Created by orius123 on 10/12/14.
@@ -53,8 +56,10 @@ public class TransformersHandler {
                 if (data != null) {
                     transformedData.put(key, (Serializable) data);
                 }
-                for (RuntimeException rex : transformModellingResult.getErrors()) {
-                    errors.add(wrapErrorMessage(rex, errorMessagePrefix));
+                if (rawData.containsKey(key)) {
+                    for (RuntimeException rex : transformModellingResult.getErrors()) {
+                        errors.add(wrapErrorMessage(rex, errorMessagePrefix));
+                    }
                 }
             } catch (ClassCastException e) {
                 Class transformerType = getTransformerFromType(transformer);

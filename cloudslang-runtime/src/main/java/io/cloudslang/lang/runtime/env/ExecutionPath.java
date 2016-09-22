@@ -9,11 +9,10 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.env;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import org.apache.commons.lang3.StringUtils;
 
 import static org.apache.commons.lang3.StringUtils.join;
 

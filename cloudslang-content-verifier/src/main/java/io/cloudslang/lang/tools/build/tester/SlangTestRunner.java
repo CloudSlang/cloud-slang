@@ -17,24 +17,14 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.tools.build.SlangBuildMain;
 import io.cloudslang.lang.tools.build.tester.parallel.MultiTriggerTestCaseEventListener;
-import io.cloudslang.lang.tools.build.tester.parallel.report.ThreadSafeRunTestResults;
 import io.cloudslang.lang.tools.build.tester.parallel.report.LoggingSlangTestCaseEventListener;
+import io.cloudslang.lang.tools.build.tester.parallel.report.ThreadSafeRunTestResults;
 import io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService;
 import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDispatchService;
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.FailedSlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import io.cloudslang.score.events.EventConstants;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.io.File;
 import java.io.Serializable;
 import java.util.Collection;
@@ -46,6 +36,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import static java.lang.Long.parseLong;
 import static java.lang.String.valueOf;
@@ -102,7 +101,6 @@ public class SlangTestRunner {
                 SlangTestCase currentTestCase = currentTestCaseEntry.getValue();
                 String currentTestCaseName = currentTestCaseEntry.getKey();
                 String testFlowPath = currentTestCase.getTestFlowPath();
-                //todo: temporary solution
                 currentTestCase.setName(currentTestCaseName);
                 if (StringUtils.isBlank(currentTestCase.getResult())) {
                     currentTestCase.setResult(getResultFromFileName(testFlowPath));
@@ -142,7 +140,7 @@ public class SlangTestRunner {
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
             SlangTestCase testCase = testCaseEntry.getValue();
             if (testCase == null) {
-                runTestsResults.addFailedTest(UNAVAILABLE_NAME, new TestRun(testCase, "Test case cannot be null"));
+                runTestsResults.addFailedTest(UNAVAILABLE_NAME, new TestRun(null, "Test case cannot be null"));
                 continue;
             }
             if (isTestCaseInActiveSuite(testCase, testSuites)) {
@@ -182,7 +180,7 @@ public class SlangTestRunner {
             for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
                 SlangTestCase testCase = testCaseEntry.getValue();
                 if (testCase == null) {
-                    testCaseEventDispatchService.notifyListeners(new FailedSlangTestCaseEvent(null, "Test case cannot be null", null));
+                    testCaseEventDispatchService.notifyListeners(new FailedSlangTestCaseEvent(new SlangTestCase(null, null, null, null, null, null, null, null, null), "Test case cannot be null", null));
                     continue;
                 }
                 SlangTestCaseRunnable slangTestCaseRunnable = new SlangTestCaseRunnable(testCase, compiledFlows, projectPath, testSuites, this, testCaseEventDispatchService, multiTriggerTestCaseEventListener);

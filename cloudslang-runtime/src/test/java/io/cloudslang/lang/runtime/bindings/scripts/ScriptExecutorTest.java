@@ -1,16 +1,20 @@
 package io.cloudslang.lang.runtime.bindings.scripts;
 
-import io.cloudslang.lang.entities.bindings.values.Value;
-import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.dependency.api.services.DependencyService;
 import io.cloudslang.dependency.api.services.MavenConfig;
 import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
 import io.cloudslang.dependency.impl.services.MavenConfigImpl;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutor;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,12 +29,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ScriptExecutorTest.Config.class)
@@ -53,8 +57,8 @@ public class ScriptExecutorTest {
         scriptInputValues.put("input1", value1);
         scriptInputValues.put("input2", value2);
         Map<Object, PyObject> scriptOutputValues = new HashMap<>();
-        PyObject PyObjectValue1 = (PyObject)ValueFactory.createPyObjectValue("value1", false);
-        PyObject PyObjectValue2 = (PyObject)ValueFactory.createPyObjectValue("value2", false);
+        PyObject PyObjectValue1 = (PyObject) ValueFactory.createPyObjectValue("value1", false);
+        PyObject PyObjectValue2 = (PyObject) ValueFactory.createPyObjectValue("value2", false);
         scriptOutputValues.put("output1", PyObjectValue1);
         scriptOutputValues.put("output2", PyObjectValue2);
         when(execInterpreter.getLocals()).thenReturn(new PyStringMap(scriptOutputValues));
@@ -66,8 +70,8 @@ public class ScriptExecutorTest {
 
         Map<String, Value> outputs = scriptExecutor.executeScript(script, scriptInputValues);
 
-        verify(execInterpreter).set(eq("input1"), eq((Value)PyObjectValue1));
-        verify(execInterpreter).set(eq("input2"), eq((Value)PyObjectValue2));
+        verify(execInterpreter).set(eq("input1"), eq((Value) PyObjectValue1));
+        verify(execInterpreter).set(eq("input2"), eq((Value) PyObjectValue2));
         verify(execInterpreter).exec(script);
         Assert.assertEquals(expectedScriptOutputs, outputs);
     }
@@ -113,7 +117,7 @@ public class ScriptExecutorTest {
         }
 
         @Bean
-        public PythonExecutionEngine pythonExecutionEngine(){
+        public PythonExecutionEngine pythonExecutionEngine() {
             return new PythonExecutionCachedEngine() {
                 protected PythonExecutor createNewExecutor(Set<String> filePaths) {
                     return new PythonExecutor(filePaths) {

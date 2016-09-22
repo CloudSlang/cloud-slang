@@ -12,7 +12,6 @@ package io.cloudslang.lang.systemtests;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-
 import java.util.ArrayList;
 import java.util.List;
 

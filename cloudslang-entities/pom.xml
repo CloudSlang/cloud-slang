@@ -8,20 +8,20 @@
         http://www.apache.org/licenses/LICENSE-2.0
     -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
     <artifactId>cloudslang-entities</artifactId>
 
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.9.71-SNAPSHOT</version>
+        <version>0.9.75-SNAPSHOT</version>
     </parent>
 
-	<dependencies>
-		<dependency>
-			<groupId>${score.group}</groupId>
-			<artifactId>score-api</artifactId>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>${score.group}</groupId>
+            <artifactId>score-api</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -29,10 +29,10 @@
             <version>${project.version}</version>
         </dependency>
 
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -54,15 +54,26 @@
             <artifactId>spring-context</artifactId>
         </dependency>
 
-        <!--test deps-->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
+
+        <!--Test dependencies-->
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -77,5 +88,5 @@
             <scope>test</scope>
         </dependency>
 
-	</dependencies>
+    </dependencies>
 </project>

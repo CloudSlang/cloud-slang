@@ -22,7 +22,6 @@ public class PassedSlangTestCaseEvent extends SlangTestCaseEvent {
         if (obj.getClass() != getClass()) {
             return false;
         }
-        PassedSlangTestCaseEvent rhs = (PassedSlangTestCaseEvent) obj;
         return new EqualsBuilder()
                 .appendSuper(super.equals(obj))
                 .isEquals();

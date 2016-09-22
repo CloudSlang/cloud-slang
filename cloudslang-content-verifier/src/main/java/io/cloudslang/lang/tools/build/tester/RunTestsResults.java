@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Queue;
+import java.util.ArrayDeque;
 
 
 /**
@@ -30,12 +32,15 @@ public class RunTestsResults implements IRunTestResults {
 
     private TreeSet<String> uncoveredExecutables;
 
-    public RunTestsResults(){
+    private Queue<RuntimeException> exceptions;
+
+    public RunTestsResults() {
         this.passedTests = new HashMap<>();
         this.failedTests = new HashMap<>();
         this.skippedTests = new HashMap<>();
-        coveredExecutables = new TreeSet<>();
-        uncoveredExecutables = new TreeSet<>();
+        this.coveredExecutables = new TreeSet<>();
+        this.uncoveredExecutables = new TreeSet<>();
+        this.exceptions = new ArrayDeque<>();
     }
 
     @Override
@@ -64,28 +69,38 @@ public class RunTestsResults implements IRunTestResults {
     }
 
     @Override
-    public void addPassedTest(String testCaseName, TestRun testRun){
+    public Queue<RuntimeException> getExceptions() {
+        return exceptions;
+    }
+
+    @Override
+    public void addPassedTest(String testCaseName, TestRun testRun) {
         passedTests.put(testCaseName, testRun);
     }
 
     @Override
-    public void addFailedTest(String testCaseName, TestRun testRun){
+    public void addFailedTest(String testCaseName, TestRun testRun) {
         failedTests.put(testCaseName, testRun);
     }
 
     @Override
-    public void addSkippedTest(String testCaseName, TestRun testRun){
+    public void addSkippedTest(String testCaseName, TestRun testRun) {
         skippedTests.put(testCaseName, testRun);
     }
 
     @Override
-    public void addCoveredExecutables(Set<String> coveredExecutables){
+    public void addCoveredExecutables(Set<String> coveredExecutables) {
         this.coveredExecutables.addAll(coveredExecutables);
     }
 
     @Override
-    public void addUncoveredExecutables(Set<String> uncoveredExecutables){
+    public void addUncoveredExecutables(Set<String> uncoveredExecutables) {
         this.uncoveredExecutables.addAll(uncoveredExecutables);
+    }
+
+    @Override
+    public void addExceptions(Queue<RuntimeException> exceptions) {
+        this.exceptions.addAll(exceptions);
     }
 
     @Override

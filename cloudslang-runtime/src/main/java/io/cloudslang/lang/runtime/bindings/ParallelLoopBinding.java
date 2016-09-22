@@ -9,21 +9,18 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.bindings;
 
-import io.cloudslang.lang.entities.ParallelLoopStatement;
+import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
-import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
+
+import java.util.List;
+import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Date: 3/25/2015
@@ -31,7 +28,7 @@ import java.util.Set;
  * @author Bonczidai Levente
  */
 @Component
-public class ParallelLoopBinding {
+public class ParallelLoopBinding extends AbstractBinding {
 
     public static final String PARALLEL_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating parallel loop expression in step";
 
@@ -43,7 +40,7 @@ public class ParallelLoopBinding {
     }
 
     public List<Value> bindParallelLoopList(
-            ParallelLoopStatement parallelLoopStatement,
+            LoopStatement parallelLoopStatement,
             Context flowContext,
             Set<SystemProperty> systemProperties,
             String nodeName) {
@@ -52,17 +49,14 @@ public class ParallelLoopBinding {
         Validate.notNull(systemProperties, "system properties cannot be null");
         Validate.notNull(nodeName, "node name cannot be null");
 
-        List<Value> result = new ArrayList<>();
+        List<Value> result;
         try {
             Value evalResult = scriptEvaluator.evalExpr(parallelLoopStatement.getExpression(),
                     flowContext.getImmutableViewOfVariables(), systemProperties, parallelLoopStatement.getFunctionDependencies());
-            if (evalResult != null && evalResult.get() != null) {
-                //noinspection unchecked
-                for (Serializable serializable : ((List<Serializable>)evalResult.get())) {
-                    Value value = ValueFactory.create(serializable, evalResult.isSensitive());
-                    result.add(value);
-                }
-            }
+
+            evalResult = getEvalResultForMap(evalResult, parallelLoopStatement, parallelLoopStatement.getExpression());
+
+            result = (List<Value>) getIterableFromEvalResult(evalResult);
         } catch (Throwable t) {
             throw new RuntimeException(generateParallelLoopExpressionMessage(nodeName, t.getMessage()), t);
         }

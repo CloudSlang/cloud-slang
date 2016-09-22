@@ -13,25 +13,25 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 /*
  * Created by orius123 on 05/11/14.
  */
+
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-
 @Component
-public class NavigateTransformer implements Transformer<List<Object>, List<Map<String, String>>>  {
+public class NavigateTransformer implements Transformer<List<Object>, List<Map<String, String>>> {
 
     @Override
     public TransformModellingResult<List<Map<String, String>>> transform(List<Object> rawData) {
         List<Map<String, String>> transformedData = new ArrayList<>();
         List<RuntimeException> errors = new ArrayList<>();
 
-        if (CollectionUtils.isEmpty(rawData)){
+        if (CollectionUtils.isEmpty(rawData)) {
             return new BasicTransformModellingResult<>(transformedData, errors);
         }
 

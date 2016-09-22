@@ -11,6 +11,8 @@ package io.cloudslang.lang.tools.build;
 
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 
+import java.util.List;
+
 /**
  * Created by stoneo on 4/1/2015.
  **/
@@ -22,10 +24,12 @@ public class SlangBuildResults {
 
     private final int numberOfCompiledSources;
     private final IRunTestResults runTestsResults;
+    private List<RuntimeException> compilationExceptions;
 
-    public SlangBuildResults(int numberOfCompiledSources, IRunTestResults runTestsResults) {
+    public SlangBuildResults(int numberOfCompiledSources, IRunTestResults runTestsResults, List<RuntimeException> exceptions) {
         this.numberOfCompiledSources = numberOfCompiledSources;
         this.runTestsResults = runTestsResults;
+        this.compilationExceptions = exceptions;
     }
 
     public int getNumberOfCompiledSources() {
@@ -34,6 +38,10 @@ public class SlangBuildResults {
 
     public IRunTestResults getRunTestsResults() {
         return runTestsResults;
+    }
+
+    public List<RuntimeException> getCompilationExceptions() {
+        return compilationExceptions;
     }
 
     @Override

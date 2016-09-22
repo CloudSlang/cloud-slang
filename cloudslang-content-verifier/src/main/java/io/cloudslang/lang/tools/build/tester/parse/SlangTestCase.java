@@ -10,18 +10,19 @@
 package io.cloudslang.lang.tools.build.tester.parse;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Created by stoneo on 3/15/2015.
  **/
-public class SlangTestCase {
+public class SlangTestCase implements Serializable {
 
     private String name;
 
@@ -44,11 +45,12 @@ public class SlangTestCase {
 
 
     //for jackson
-    private SlangTestCase() {}
+    private SlangTestCase() {
+    }
 
     public SlangTestCase(String name, String testFlowPath, String description, List<String> testSuites,
                          String systemPropertiesFile, List<Map> inputs, List<Map> outputs,
-                         Boolean throwsException, String result){
+                         Boolean throwsException, String result) {
         this.name = name;
         this.testFlowPath = testFlowPath;
         this.description = description;
@@ -77,7 +79,7 @@ public class SlangTestCase {
     }
 
     public List<String> getTestSuites() {
-        if(CollectionUtils.isEmpty(testSuites)) {
+        if (CollectionUtils.isEmpty(testSuites)) {
             this.testSuites = new ArrayList<>();
         }
         return testSuites;
@@ -111,7 +113,9 @@ public class SlangTestCase {
         return result;
     }
 
-    public void setResult(String result){ this.result = result; }
+    public void setResult(String result) {
+        this.result = result;
+    }
 
     @Override
     public boolean equals(Object o) {

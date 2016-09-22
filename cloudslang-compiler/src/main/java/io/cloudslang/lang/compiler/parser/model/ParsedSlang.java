@@ -9,7 +9,6 @@
 package io.cloudslang.lang.compiler.parser.model;
 
 import io.cloudslang.lang.compiler.Extension;
-
 import java.util.Map;
 
 /*
@@ -56,10 +55,10 @@ public class ParsedSlang {
     }
 
     public Type getType() {
-        if(flow != null) return Type.FLOW;
-        if(operation != null) return Type.OPERATION;
-        if(decision != null) return Type.DECISION;
-        if(properties != null) return Type.SYSTEM_PROPERTY_FILE;
+        if (flow != null) return Type.FLOW;
+        if (operation != null) return Type.OPERATION;
+        if (decision != null) return Type.DECISION;
+        if (properties != null) return Type.SYSTEM_PROPERTY_FILE;
         throw new RuntimeException(
                 "Source " + name + " has no content associated with " +
                         Type.FLOW.key() + "/" +
@@ -93,11 +92,11 @@ public class ParsedSlang {
 
         private String key;
 
-        Type(String key){
+        Type(String key) {
             this.key = key;
         }
 
-        public String key(){
+        public String key() {
             return key;
         }
     }

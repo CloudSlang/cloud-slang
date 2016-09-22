@@ -10,29 +10,34 @@
 package io.cloudslang.lang.entities;
 
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import java.io.Serializable;
+import java.util.Set;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-
-import java.io.Serializable;
-import java.util.Set;
 
 /**
  * Date: 2/3/2015
  *
  * @author Bonczidai Levente
  */
-public class ListForLoopStatement extends LoopStatement implements Serializable {
+public class ListLoopStatement extends LoopStatement implements Serializable {
 
     private static final long serialVersionUID = -540865117927676643L;
+    public static final String FOR_LOOP_VAR_NAME_CANNOT_BE_EMPTY = "for loop var name cannot be empty";
+    public static final String PARALLEL_LOOP_VAR_NAME_CANNOT_BE_EMPTY = "parallel loop var name cannot be empty";
 
     private final String varName;
 
-    public ListForLoopStatement(String varName, String collectionExpression, Set<ScriptFunction> functionDependencies,
-                                Set<String> systemPropertyDependencies) {
+    public ListLoopStatement(String varName, String collectionExpression, Set<ScriptFunction> functionDependencies,
+                             Set<String> systemPropertyDependencies, boolean isParallelLoop) {
         super(collectionExpression, functionDependencies, systemPropertyDependencies);
-        Validate.notBlank(varName, "for loop var name cannot be empty");
+        String message = FOR_LOOP_VAR_NAME_CANNOT_BE_EMPTY;
+        if (isParallelLoop) {
+            message = PARALLEL_LOOP_VAR_NAME_CANNOT_BE_EMPTY;
+        }
+        Validate.notBlank(varName, message);
 
         this.varName = varName;
     }
@@ -41,7 +46,7 @@ public class ListForLoopStatement extends LoopStatement implements Serializable 
      * only here to satisfy serialization libraries
      */
     @SuppressWarnings("unused")
-    private ListForLoopStatement() {
+    private ListLoopStatement() {
         varName = null;
     }
 
@@ -63,7 +68,7 @@ public class ListForLoopStatement extends LoopStatement implements Serializable 
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        ListForLoopStatement that = (ListForLoopStatement) o;
+        ListLoopStatement that = (ListLoopStatement) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))

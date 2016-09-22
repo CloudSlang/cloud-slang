@@ -10,9 +10,8 @@ package io.cloudslang.lang.compiler.modeller.model;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.bindings.Input;
-import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.Output;
-
+import io.cloudslang.lang.entities.bindings.Result;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +42,9 @@ public class Operation extends Executable {
         return action;
     }
 
-	@Override
-	public String getType() {
-		return SlangTextualKeys.OPERATION_TYPE;
-	}
+    @Override
+    public String getType() {
+        return SlangTextualKeys.OPERATION_TYPE;
+    }
 
 }

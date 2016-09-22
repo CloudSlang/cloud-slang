@@ -9,15 +9,13 @@ import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.PassedSlang
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.SkippedSlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.SlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentMap;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public class ThreadSafeRunTestResults implements IRunTestResults, ISlangTestCaseEventListener {
 
@@ -26,6 +24,7 @@ public class ThreadSafeRunTestResults implements IRunTestResults, ISlangTestCase
     private ConcurrentMap<String, TestRun> skippedTests;
     private TreeSet<String> coveredExecutables;
     private TreeSet<String> uncoveredExecutables;
+    private Queue<RuntimeException> exceptions;
 
     private final Object lockCoveredExecutables;
     private final Object lockUncoveredExecutables;
@@ -36,6 +35,7 @@ public class ThreadSafeRunTestResults implements IRunTestResults, ISlangTestCase
         this.skippedTests = new ConcurrentHashMap<>();
         this.coveredExecutables = new TreeSet<>();
         this.uncoveredExecutables = new TreeSet<>();
+        this.exceptions = new ConcurrentLinkedDeque<>();
 
         this.lockCoveredExecutables = new Object();
         this.lockUncoveredExecutables = new Object();
@@ -54,6 +54,11 @@ public class ThreadSafeRunTestResults implements IRunTestResults, ISlangTestCase
     @Override
     public Map<String, TestRun> getSkippedTests() {
         return new HashMap<>(skippedTests);
+    }
+
+    @Override
+    public Queue<RuntimeException> getExceptions() {
+        return exceptions;
     }
 
     @Override
@@ -97,6 +102,11 @@ public class ThreadSafeRunTestResults implements IRunTestResults, ISlangTestCase
         synchronized (lockUncoveredExecutables) {
             this.uncoveredExecutables.addAll(uncoveredExecutables);
         }
+    }
+
+    @Override
+    public void addExceptions(Queue<RuntimeException> exceptions) {
+        this.exceptions.addAll(exceptions);
     }
 
     @Override

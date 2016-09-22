@@ -20,8 +20,6 @@ import io.cloudslang.lang.entities.bindings.Result;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
-
-
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -62,7 +60,7 @@ public class PreCompileTransformersTest {
         Assert.assertTrue(errors.size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'operation_input_private_no_default' syntax is illegal.");
-        exception.expectMessage("Input: input_private_no_default is private but no default value was specified");
+        exception.expectMessage("Input: 'input_private_no_default' is private and required but no default value was specified");
         throw errors.get(0);
     }
 

@@ -11,9 +11,10 @@
 package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
-import io.cloudslang.lang.compiler.modeller.ExecutableBuilder;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
+import java.net.URI;
+import java.util.List;
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,9 +23,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.net.URI;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -47,8 +45,9 @@ public class PreCompilerErrorsTest {
         URI resource = getClass().getResource("/corrupted/no_op_flow_file.sl").toURI();
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error transforming source: no_op_flow_file to a Slang model. " +
-                "Source no_op_flow_file has no content associated with flow/operation/decision/properties property.");
+        exception.expectMessage("Error transforming source: no_op_flow_file to a Slang model." +
+                " Source no_op_flow_file has no content associated with flow/operation/decision/properties property."
+        );
         compiler.preCompileSource(SlangSource.fromFile(resource));
     }
 
@@ -59,7 +58,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Operation/Flow op_without_namespace must have a namespace");
+        exception.expectMessage("For source[op_without_namespace] namespace cannot be empty.");
         throw result.getErrors().get(0);
     }
 
@@ -81,7 +80,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Executable in source: missing_name_flow has no name");
+        exception.expectMessage("Executable has no name");
         throw result.getErrors().get(0);
     }
 
@@ -98,7 +97,7 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
-     public void testOperationWithWrongName() throws Exception {
+    public void testOperationWithWrongName() throws Exception {
         URI resource = getClass().getResource("/corrupted/wrong_name_operation.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
@@ -109,7 +108,7 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
-     public void testOperationWithWrongNameSLYAMLExtension() throws Exception {
+    public void testOperationWithWrongNameSLYAMLExtension() throws Exception {
         URI resource = getClass().getResource("/corrupted/wrong_name_operation.sl.yaml").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
@@ -368,7 +367,7 @@ public class PreCompilerErrorsTest {
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'private_input_without_default' syntax is illegal.\n" +
-                "Input: input_without_default is private but no default value was specified");
+                "Input: 'input_without_default' is private and required but no default value was specified");
         throw result.getErrors().get(0);
     }
 

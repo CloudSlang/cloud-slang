@@ -10,13 +10,12 @@
 
 package io.cloudslang.lang.cli;
 
+import io.cloudslang.lang.cli.converters.MapConverter;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import io.cloudslang.lang.cli.converters.MapConverter;
-
-import java.util.Map;
 
 /**
  * Date: 2/16/2015
@@ -38,41 +37,44 @@ public class MapConverterTest {
 
     private MapConverter mapConverter;
 
-    public MapConverterTest(){
+    public MapConverterTest() {
         mapConverter = new MapConverter();
     }
 
     @Test
-    public void testConvertSuccess(){
+    public void testConvertSuccess() {
         Map<String, String> inputs = mapConverter.convertFromText(VALID_INPUTS, null, null);
         Assert.assertEquals("value1", inputs.get(INPUT_1));
         Assert.assertEquals("value2", inputs.get(INPUT_2));
     }
+
     @Test
-    public void testConvertFailureWrongDelimiter(){
+    public void testConvertFailureWrongDelimiter() {
         expectException();
 
         Map<String, String> inputs = mapConverter.convertFromText(INVALID_INPUTS_WRONG_DELIMITER, null, null);
         Assert.assertEquals(null, inputs);
 
     }
+
     @Test
-    public void testConvertFailureConcatenated(){
+    public void testConvertFailureConcatenated() {
         expectException();
 
         Map<String, String> inputs = mapConverter.convertFromText(INVALID_INPUTS_CONCATENATED_VALUES, null, null);
         Assert.assertEquals(null, inputs);
 
     }
+
     @Test
-    public void testConvertSuccessComma(){
+    public void testConvertSuccessComma() {
         Map<String, String> inputs = mapConverter.convertFromText(VALID_INPUTS_WITH_COMMA, null, null);
         Assert.assertEquals("value1,value2", inputs.get(INPUT_1));
         Assert.assertEquals("value3,value4", inputs.get(INPUT_2));
     }
 
     @Test
-    public void testConvertFailureComma(){
+    public void testConvertFailureComma() {
         expectException();
 
         Map<String, String> inputs = mapConverter.convertFromText(INVALID_INPUTS_UNESCAPED_COMMA, null, null);

@@ -14,22 +14,13 @@ import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.entities.CompilationArtifact;
-import io.cloudslang.lang.entities.ParallelLoopStatement;
+import io.cloudslang.lang.entities.ListLoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
-import org.apache.commons.collections4.CollectionUtils;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -39,6 +30,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.collections4.CollectionUtils;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -226,10 +225,153 @@ public class CompileParallelLoopFlowTest {
         ExecutionStep joinBranchesStep = executionPlan.getStep(5L);
         Map<String, ?> joinBranchesActionData = joinBranchesStep.getActionData();
 
-        verifyNavigationValues(joinBranchesActionData);
+        verifyNavigationValuesSuccessFailure(joinBranchesActionData);
 
         assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
         assertNotNull("branch end step method not found", executionPlan.getStep(4L));
+    }
+
+    @Test
+    public void testCompileParallelLoopFlowNavigateDefault() throws Exception {
+        URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_default.sl").toURI();
+        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
+        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation1));
+        path.add(SlangSource.fromFile(operation2));
+        CompilationArtifact artifact = compiler.compile(SlangSource.fromFile(flow), path);
+        assertNotNull("artifact is null", artifact);
+
+        ExecutionPlan executionPlan = artifact.getExecutionPlan();
+        assertNotNull("executionPlan is null", executionPlan);
+
+        ExecutionStep addBranchesStep = executionPlan.getStep(2L);
+        assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
+        Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
+
+        verifyParallelLoopStatement(addBranchesActionData);
+
+        ExecutionStep joinBranchesStep = executionPlan.getStep(5L);
+        Map<String, ?> joinBranchesActionData = joinBranchesStep.getActionData();
+
+        verifyNavigationValuesSuccessFailure(joinBranchesActionData);
+
+        assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
+        assertNotNull("branch end step method not found", executionPlan.getStep(4L));
+    }
+
+    @Test
+    public void testCompileParallelLoopFlowNavigateDefaultCustom() throws Exception {
+        URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_default_custom.sl").toURI();
+        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch_custom_only.sl").toURI();
+        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation1));
+        path.add(SlangSource.fromFile(operation2));
+
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage(
+                "Cannot compile flow 'parallel_loop_navigate_default_custom' since for step 'print_values' " +
+                        "the navigation keys [FAILURE] have no matching results. The parallel loop depending on " +
+                        "'loops.parallel_loop.print_branch_custom_only' can have the following results: [SUCCESS]."
+        );
+
+        compiler.compile(SlangSource.fromFile(flow), path);
+    }
+
+    @Test
+    public void testCompileParallelLoopFlowNavigateCustom() throws Exception {
+        URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_custom.sl").toURI();
+        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch_custom_only.sl").toURI();
+        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation1));
+        path.add(SlangSource.fromFile(operation2));
+        CompilationArtifact artifact = compiler.compile(SlangSource.fromFile(flow), path);
+        assertNotNull("artifact is null", artifact);
+
+        ExecutionPlan executionPlan = artifact.getExecutionPlan();
+        assertNotNull("executionPlan is null", executionPlan);
+
+        ExecutionStep addBranchesStep = executionPlan.getStep(2L);
+        assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
+        Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
+
+        verifyParallelLoopStatement(addBranchesActionData);
+
+        ExecutionStep joinBranchesStep = executionPlan.getStep(5L);
+        Map<String, ?> joinBranchesActionData = joinBranchesStep.getActionData();
+
+        verifyNavigationValuesSuccess(joinBranchesActionData);
+
+        assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
+        assertNotNull("branch end step method not found", executionPlan.getStep(4L));
+    }
+
+    @Test
+    public void testCompileParallelLoopFlowNavigateDefaultSuccessOnly() throws Exception {
+        URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_default_success_only.sl").toURI();
+        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch_success_only.sl").toURI();
+        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation1));
+        path.add(SlangSource.fromFile(operation2));
+
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage(
+                "Cannot compile flow 'parallel_loop_navigate_default_success_only' since for step 'print_values' " +
+                        "the navigation keys [FAILURE] have no matching results. The parallel loop depending on " +
+                        "'loops.parallel_loop.print_branch_success_only' can have the following results: [SUCCESS]."
+        );
+
+        compiler.compile(SlangSource.fromFile(flow), path);
+    }
+
+    @Test
+    public void testCompileParallelLoopFlowNavigateSuccessOnly() throws Exception {
+        URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_success_only.sl").toURI();
+        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch_success_only.sl").toURI();
+        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation1));
+        path.add(SlangSource.fromFile(operation2));
+        CompilationArtifact artifact = compiler.compile(SlangSource.fromFile(flow), path);
+        assertNotNull("artifact is null", artifact);
+
+        ExecutionPlan executionPlan = artifact.getExecutionPlan();
+        assertNotNull("executionPlan is null", executionPlan);
+
+        ExecutionStep addBranchesStep = executionPlan.getStep(2L);
+        assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
+        Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
+
+        verifyParallelLoopStatement(addBranchesActionData);
+
+        ExecutionStep joinBranchesStep = executionPlan.getStep(5L);
+        Map<String, ?> joinBranchesActionData = joinBranchesStep.getActionData();
+
+        verifyNavigationValuesSuccess(joinBranchesActionData);
+
+        assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
+        assertNotNull("branch end step method not found", executionPlan.getStep(4L));
+    }
+
+    @Test
+    public void testCompileParallelLoopFlowNavigateNotWired() throws Exception {
+        URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_not_wired.sl").toURI();
+        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
+        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation1));
+        path.add(SlangSource.fromFile(operation2));
+
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage(
+                "Cannot compile flow 'parallel_loop_navigate_not_wired' since for step " +
+                        "'print_values' the parallel loop results [FAILURE] have no matching navigation."
+        );
+
+        compiler.compile(SlangSource.fromFile(flow), path);
     }
 
     @Test
@@ -257,7 +399,7 @@ public class CompileParallelLoopFlowTest {
 
         verifyPublishValues(joinBranchesActionData);
 
-        verifyNavigationValues(joinBranchesActionData);
+        verifyNavigationValuesSuccessFailure(joinBranchesActionData);
 
         assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
         ExecutionStep branchEndStepExecutionStep = executionPlan.getStep(4L);
@@ -314,7 +456,7 @@ public class CompileParallelLoopFlowTest {
         assertTrue(CollectionUtils.isEmpty(publishValues));
     }
 
-    private void verifyNavigationValues(Map<String, ?> joinBranchesActionData) {
+    private void verifyNavigationValuesSuccessFailure(Map<String, ?> joinBranchesActionData) {
         assertTrue(joinBranchesActionData.containsKey(ScoreLangConstants.STEP_NAVIGATION_KEY));
         @SuppressWarnings("unchecked") Map<String, ResultNavigation> actualNavigateValues =
                 (Map<String, ResultNavigation>) joinBranchesActionData.get(ScoreLangConstants.STEP_NAVIGATION_KEY);
@@ -324,10 +466,19 @@ public class CompileParallelLoopFlowTest {
         assertEquals("navigation values not as expected", expectedNavigationValues, actualNavigateValues);
     }
 
+    private void verifyNavigationValuesSuccess(Map<String, ?> joinBranchesActionData) {
+        assertTrue(joinBranchesActionData.containsKey(ScoreLangConstants.STEP_NAVIGATION_KEY));
+        @SuppressWarnings("unchecked") Map<String, ResultNavigation> actualNavigateValues =
+                (Map<String, ResultNavigation>) joinBranchesActionData.get(ScoreLangConstants.STEP_NAVIGATION_KEY);
+        Map<String, ResultNavigation> expectedNavigationValues = new HashMap<>();
+        expectedNavigationValues.put("SUCCESS", new ResultNavigation(6L, null));
+        assertEquals("navigation values not as expected", expectedNavigationValues, actualNavigateValues);
+    }
+
     private void verifyParallelLoopStatement(Map<String, ?> addBranchesActionData) {
         assertTrue(addBranchesActionData.containsKey(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY));
-        ParallelLoopStatement parallelLoopStatement =
-                (ParallelLoopStatement) addBranchesActionData.get(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY);
+        ListLoopStatement parallelLoopStatement =
+                (ListLoopStatement) addBranchesActionData.get(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY);
         assertEquals("parallel loop statement value not as expected", "value", parallelLoopStatement.getVarName());
         assertEquals("parallel loop statement expression not as expected", "values", parallelLoopStatement.getExpression());
     }
@@ -342,7 +493,7 @@ public class CompileParallelLoopFlowTest {
 
     private void verifyParallelLoopStatement(Step step) {
         assertTrue(step.getPreStepActionData().containsKey(SlangTextualKeys.PARALLEL_LOOP_KEY));
-        ParallelLoopStatement parallelLoopStatement = (ParallelLoopStatement) step.getPreStepActionData()
+        ListLoopStatement parallelLoopStatement = (ListLoopStatement) step.getPreStepActionData()
                 .get(SlangTextualKeys.PARALLEL_LOOP_KEY);
         assertEquals("values", parallelLoopStatement.getExpression());
         assertEquals("value", parallelLoopStatement.getVarName());

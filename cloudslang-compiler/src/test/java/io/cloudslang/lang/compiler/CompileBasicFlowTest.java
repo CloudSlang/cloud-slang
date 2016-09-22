@@ -8,30 +8,29 @@
  */
 package io.cloudslang.lang.compiler;
 
+import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
-import java.util.HashMap;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
-import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
-import io.cloudslang.lang.entities.ResultNavigation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import java.net.URI;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -127,38 +126,6 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("There is a different number of flow dependencies than expected", 1, dependencies.size());
         String dependency = dependencies.iterator().next();
         Assert.assertEquals("The flow dependency full name is wrong", "user.ops.test_op", dependency);
-    }
-
-    @Test
-    public void testValidateSlangModelWithDependenciesBasic() throws Exception {
-        URI flowUri = getClass().getResource("/basic_flow.yaml").toURI();
-        Executable flow = compiler.preCompile(SlangSource.fromFile(flowUri));
-
-        URI operationUri = getClass().getResource("/test_op.sl").toURI();
-        Executable op = compiler.preCompile(SlangSource.fromFile(operationUri));
-
-        Set<Executable> dependencies = new HashSet<>();
-        dependencies.add(op);
-        List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flow, dependencies);
-
-        Assert.assertEquals("", 0, errors.size());
-    }
-
-
-    @Test
-    public void testValidFlowWithMissingDependencyRequiredInputInGrandchild()throws Exception {
-        URI flowUri = getClass().getResource("/corrupted/flow_missing_dependency_required_input_in_grandchild.sl").toURI();
-        Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
-
-        URI operation2Uri = getClass().getResource("/check_op.sl").toURI();
-        Executable operation2Model = compiler.preCompile(SlangSource.fromFile(operation2Uri));
-        URI subFlowUri = getClass().getResource("/flow_implicit_alias_for_current_namespace.sl").toURI();
-        Executable subFlowModel = compiler.preCompile(SlangSource.fromFile(subFlowUri));
-        Set<Executable> dependencies = new HashSet<>();
-        dependencies.add(subFlowModel);
-        dependencies.add(operation2Model);
-        List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
-        Assert.assertEquals(0, errors.size());
     }
 
     @Test

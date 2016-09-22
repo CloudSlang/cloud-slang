@@ -27,4 +27,10 @@ public abstract class TransformersTestParent {
         throw errors.get(0);
     }
 
+    protected <F, T> void transformAndAssertNoErrorsTransformer(Transformer<F, T> transformer, F arg) {
+        List<RuntimeException> errors = transformer.transform(arg).getErrors();
+        Assert.assertNotNull(errors);
+        Assert.assertTrue(errors.size() == 0);
+    }
+
 }

@@ -10,48 +10,58 @@
 package io.cloudslang.lang.entities;
 
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import java.io.Serializable;
+import java.util.Set;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.io.Serializable;
-import java.util.Set;
-
 /**
- * Date: 3/25/2015
+ * Date: 2/3/2015
  *
  * @author Bonczidai Levente
  */
-public class ParallelLoopStatement extends LoopStatement implements Serializable {
+public class MapLoopStatement extends LoopStatement implements Serializable {
 
-    private final String varName;
+    private static final long serialVersionUID = -667210580560286978L;
 
-    public ParallelLoopStatement(String varName, String expression, Set<ScriptFunction> functionDependencies,
-                                 Set<String> systemPropertyDependencies) {
-        super(expression, functionDependencies, systemPropertyDependencies);
+    private final String keyName;
+    private final String valueName;
 
-        Validate.notBlank(varName, "parallel loop var name cannot be empty");
-        this.varName = varName;
+    public MapLoopStatement(String keyName, String valueName, String collectionExpression,
+                            Set<ScriptFunction> functionDependencies, Set<String> systemPropertyDependencies) {
+        super(collectionExpression, functionDependencies, systemPropertyDependencies);
+        Validate.notBlank(keyName, "key name cannot be empty");
+        Validate.notBlank(valueName, "value name cannot be empty");
+
+        this.keyName = keyName;
+        this.valueName = valueName;
     }
 
     /**
      * only here to satisfy serialization libraries
      */
     @SuppressWarnings("unused")
-    private ParallelLoopStatement() {
-        varName = null;
+    private MapLoopStatement() {
+        keyName = null;
+        valueName = null;
     }
 
-    public String getVarName() {
-        return varName;
+    public String getKeyName() {
+        return keyName;
+    }
+
+    public String getValueName() {
+        return valueName;
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
-                .append("varName", varName)
+                .append("keyName", keyName)
+                .append("valueName", valueName)
                 .toString();
     }
 
@@ -61,11 +71,12 @@ public class ParallelLoopStatement extends LoopStatement implements Serializable
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        ParallelLoopStatement that = (ParallelLoopStatement) o;
+        MapLoopStatement that = (MapLoopStatement) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(varName, that.varName)
+                .append(keyName, that.keyName)
+                .append(valueName, that.valueName)
                 .isEquals();
     }
 
@@ -73,7 +84,8 @@ public class ParallelLoopStatement extends LoopStatement implements Serializable
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .appendSuper(super.hashCode())
-                .append(varName)
+                .append(keyName)
+                .append(valueName)
                 .toHashCode();
     }
 

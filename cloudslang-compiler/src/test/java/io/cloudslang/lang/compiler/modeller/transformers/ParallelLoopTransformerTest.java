@@ -9,42 +9,55 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
+import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
+import io.cloudslang.lang.entities.ListLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
-import io.cloudslang.lang.entities.ParallelLoopStatement;
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Date: 4/1/2015
  *
  * @author Bonczidai Levente
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = ParallelLoopTransformerTest.Config.class)
 public class ParallelLoopTransformerTest extends TransformersTestParent {
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    private ParallelLoopForTransformer transformer = new ParallelLoopForTransformer();
+    @Autowired
+    private ParallelLoopForTransformer transformer;
 
     @Test
     public void testValidStatement() throws Exception {
-        ParallelLoopStatement statement = (ParallelLoopStatement) transformer.transform("x in collection").getTransformedData();
+        ListLoopStatement statement = (ListLoopStatement) transformer.transform("x in collection").getTransformedData();
         Assert.assertEquals("x", statement.getVarName());
         Assert.assertEquals("collection", statement.getExpression());
     }
 
     @Test
     public void testValidStatementWithSpaces() throws Exception {
-        ParallelLoopStatement statement = (ParallelLoopStatement) transformer.transform("x in range(0, 9)").getTransformedData();
+        ListLoopStatement statement = (ListLoopStatement) transformer.transform("x in range(0, 9)").getTransformedData();
         Assert.assertEquals("x", statement.getVarName());
         Assert.assertEquals("range(0, 9)", statement.getExpression());
     }
 
     @Test
     public void testValidStatementAndTrim() throws Exception {
-        ParallelLoopStatement statement = (ParallelLoopStatement) transformer.transform(" min   in  collection  ").getTransformedData();
+        ListLoopStatement statement = (ListLoopStatement) transformer.transform(" min   in  collection  ").getTransformedData();
         Assert.assertEquals("min", statement.getVarName());
         Assert.assertEquals("collection", statement.getExpression());
     }
@@ -52,15 +65,14 @@ public class ParallelLoopTransformerTest extends TransformersTestParent {
     @Test
     public void testNoVarName() throws Exception {
         exception.expect(RuntimeException.class);
-        exception.expectMessage("var name");
+        exception.expectMessage("Argument[] violates character rules.");
         transformAndThrowFirstException(transformer, "  in  collection");
     }
 
     @Test
     public void testVarNameContainInvalidChars() throws Exception {
         exception.expect(RuntimeException.class);
-        exception.expectMessage("var name");
-        exception.expectMessage("invalid");
+        exception.expectMessage("Argument[x a] violates character rules.");
         transformAndThrowFirstException(transformer, "x a  in  collection");
     }
 
@@ -83,4 +95,20 @@ public class ParallelLoopTransformerTest extends TransformersTestParent {
         Assert.assertNull(statement);
     }
 
+    @Configuration
+    public static class Config {
+        @Bean
+        public ParallelLoopForTransformer parallelLoopForTransformer() {
+            return new ParallelLoopForTransformer();
+        }
+        @Bean
+        public ExecutableValidator executableValidator() {
+            return new ExecutableValidatorImpl();
+        }
+
+        @Bean
+        public SystemPropertyValidator systemPropertyValidator() {
+            return new SystemPropertyValidatorImpl();
+        }
+    }
 }

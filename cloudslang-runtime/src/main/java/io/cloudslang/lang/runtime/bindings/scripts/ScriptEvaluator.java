@@ -17,18 +17,16 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.runtime.api.python.PythonEvaluationResult;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author stoneo
@@ -45,7 +43,7 @@ public class ScriptEvaluator extends ScriptProcessor {
                     "  return default_value if value is None else value";
     private static final String GET_SP_FUNCTION_DEFINITION =
             "def get_sp(key, default_value=None):" + LINE_SEPARATOR +
-                    "  property_value = " + SYSTEM_PROPERTIES_MAP +".get(key)" + LINE_SEPARATOR +
+                    "  property_value = " + SYSTEM_PROPERTIES_MAP + ".get(key)" + LINE_SEPARATOR +
                     "  return default_value if property_value is None else property_value";
     private static final String CHECK_EMPTY_FUNCTION_DEFINITION =
             "def check_empty(value_to_check, default_value=None):" + LINE_SEPARATOR +
@@ -58,11 +56,11 @@ public class ScriptEvaluator extends ScriptProcessor {
         try {
             Map<String, Serializable> pythonContext = createPythonContext(context);
             boolean systemPropertiesDefined = functionDependencies.contains(ScriptFunction.GET_SYSTEM_PROPERTY);
-            if(systemPropertiesDefined) {
+            if (systemPropertiesDefined) {
                 pythonContext.put(SYSTEM_PROPERTIES_MAP, (Serializable) prepareSystemProperties(systemProperties));
             }
             PythonEvaluationResult result = pythonRuntimeService.eval(buildAddFunctionsScript(functionDependencies), expr, pythonContext);
-            if(systemPropertiesDefined) {
+            if (systemPropertiesDefined) {
                 pythonContext.remove(SYSTEM_PROPERTIES_MAP);
             }
 
@@ -112,7 +110,7 @@ public class ScriptEvaluator extends ScriptProcessor {
     private String handleExceptionSpecialCases(String message) {
         String processedMessage = message;
         if (StringUtils.isNotEmpty(message) && message.contains("get_sp") && message.contains("not defined")) {
-            processedMessage =  message + ". Make sure to use correct syntax for the function: get_sp('fully.qualified.name', optional_default_value).";
+            processedMessage = message + ". Make sure to use correct syntax for the function: get_sp('fully.qualified.name', optional_default_value).";
         }
         return processedMessage;
     }

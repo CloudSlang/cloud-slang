@@ -14,11 +14,11 @@ flow:
   name: functions_test_flow
   inputs:
     - input1:
-        default: null
+        default: "value1"
         private: true
         required: false
     - input1_safe:
-        default: ${ get('input1', 'input1_default') }
+        default: ${ get('input1_does_not_exist', 'input1_default') }
         private: true
         required: false
     - input2:

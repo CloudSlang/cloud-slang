@@ -20,15 +20,15 @@ import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.Validate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
@@ -131,7 +131,7 @@ public class ExecutionPlanBuilder {
         List<ExecutionStep> stepExecutionSteps = new ArrayList<>();
 
         String stepName = step.getName();
-        Long currentId = getCurrentId(stepReferences, steps);
+        long currentId = getCurrentId(stepReferences, steps);
         boolean parallelLoop = step.isParallelLoop();
 
         //Begin Step
@@ -183,10 +183,10 @@ public class ExecutionPlanBuilder {
         return stepExecutionSteps;
     }
 
-    private Long getCurrentId(Map<String, Long> stepReferences, Deque<Step> steps) {
+    private long getCurrentId(Map<String, Long> stepReferences, Deque<Step> steps) {
         Long currentID;
 
-        Long max = Lambda.max(stepReferences);
+        long max = Lambda.max(stepReferences);
         Map.Entry maxEntry = Lambda.selectFirst(stepReferences.entrySet(), having(on(Map.Entry.class).getValue(), equalTo(max)));
         String referenceKey = (String) (maxEntry).getKey();
         Step step = null;

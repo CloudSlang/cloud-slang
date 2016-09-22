@@ -1,12 +1,12 @@
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 package io.cloudslang.lang.runtime.env;
 
@@ -16,10 +16,15 @@ import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
-import org.apache.commons.lang3.Validate;
-
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.apache.commons.lang3.Validate;
 
 /**
  * User: stoneo
@@ -66,7 +71,7 @@ public class RunEnvironment implements Serializable {
         this(new HashSet<SystemProperty>());
     }
 
-    public ContextStack getStack(){
+    public ContextStack getStack() {
         return contextStack;
     }
 
@@ -129,17 +134,17 @@ public class RunEnvironment implements Serializable {
     }
 
     public void decryptSensitiveData() {
-        for (Value value: prepareValuesForEncryptDecrypt()) {
-            if(value.isSensitive()) {
-                ((SensitiveValue)value).decrypt();
+        for (Value value : prepareValuesForEncryptDecrypt()) {
+            if (value.isSensitive()) {
+                ((SensitiveValue) value).decrypt();
             }
         }
     }
 
     public void encryptSensitiveData() {
-        for (Value value: prepareValuesForEncryptDecrypt()) {
-            if(value.isSensitive()) {
-                ((SensitiveValue)value).encrypt();
+        for (Value value : prepareValuesForEncryptDecrypt()) {
+            if (value.isSensitive()) {
+                ((SensitiveValue) value).encrypt();
             }
         }
     }
@@ -180,9 +185,9 @@ public class RunEnvironment implements Serializable {
     }
 
     private boolean containsSensitiveData(Collection<Value> data) {
-        if(data != null) {
-            for (Value value: data) {
-                if(value.isSensitive()) {
+        if (data != null) {
+            for (Value value : data) {
+                if (value.isSensitive()) {
                     return true;
                 }
             }
@@ -192,13 +197,13 @@ public class RunEnvironment implements Serializable {
 
     private List<Value> prepareValuesForEncryptDecrypt() {
         List<Value> valuesToCheck = new LinkedList<>();
-        if(callArguments != null) {
+        if (callArguments != null) {
             valuesToCheck.addAll(callArguments.values());
         }
-        if((returnValues != null) && (returnValues.getOutputs() != null)) {
+        if ((returnValues != null) && (returnValues.getOutputs() != null)) {
             valuesToCheck.addAll(returnValues.getOutputs().values());
         }
-        if(systemProperties != null) {
+        if (systemProperties != null) {
             valuesToCheck.addAll(Collections2.transform(systemProperties, new Function<SystemProperty, Value>() {
                 @Override
                 public Value apply(SystemProperty systemProperty) {

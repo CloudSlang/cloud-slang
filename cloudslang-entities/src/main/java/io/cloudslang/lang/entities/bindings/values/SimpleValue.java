@@ -12,12 +12,11 @@
 package io.cloudslang.lang.entities.bindings.values;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.io.Serializable;
 
 /**
  * Simple InOutParam value
- *
+ * <p>
  * Created by Ifat Gavish on 19/04/2016
  */
 public class SimpleValue implements Value {
@@ -66,6 +65,6 @@ public class SimpleValue implements Value {
 
     @Override
     public String toString() {
-        return content == null ? null : content.toString();
+        return content == null ? "" : content.toString();
     }
 }

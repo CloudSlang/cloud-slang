@@ -2,13 +2,12 @@ package io.cloudslang.lang.entities.utils;
 
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import junit.framework.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import junit.framework.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * @author Bonczidai Levente
@@ -16,7 +15,7 @@ import java.util.Map;
  */
 public class MapUtilsTest {
 
-    private static Map<String, Value> EMPTY_MAP =  Collections.emptyMap();
+    private static Map<String, Value> EMPTY_MAP = Collections.emptyMap();
     private static Map<String, Value> map1;
     private static Map<String, Value> map2;
     private static Map<String, Value> map_1_2;

@@ -20,13 +20,16 @@ import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.systemtests.RuntimeInformation;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.ValueSyntaxParent;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Bonczidai Levente
@@ -125,7 +128,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
     private void verifyFlowInputs(StepData flowData) {
         // verify `get`, `get_sp()`, `locals().get()` and mixed mode works
         Map<String, Serializable> expectedFlowInputs = new LinkedHashMap<>();
-        expectedFlowInputs.put("input1", null);
+        expectedFlowInputs.put("input1", "value1");
         expectedFlowInputs.put("input1_safe", "input1_default");
         expectedFlowInputs.put("input2", "22");
         expectedFlowInputs.put("input2_safe", "22");

@@ -80,9 +80,12 @@ public class LanguageEventData extends HashMap<String, Serializable> {
 
     public static StepType convertExecutableType(ExecutableType executableType) {
         switch (executableType) {
-            case FLOW: return StepType.FLOW;
-            case OPERATION: return StepType.OPERATION;
-            case DECISION: return StepType.DECISION;
+            case FLOW:
+                return StepType.FLOW;
+            case OPERATION:
+                return StepType.OPERATION;
+            case DECISION:
+                return StepType.DECISION;
             default:
                 throw new RuntimeException("Not implemented for executable type: " + executableType);
         }
@@ -92,7 +95,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
         return (String) get(STEP_NAME);
     }
 
-    public void setStepName(String stepName){
+    public void setStepName(String stepName) {
         put(STEP_NAME, stepName);
     }
 
@@ -100,7 +103,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
         return (StepType) get(STEP_TYPE);
     }
 
-    public void setStepType(StepType stepType){
+    public void setStepType(StepType stepType) {
         put(STEP_TYPE, stepType);
     }
 
@@ -165,7 +168,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     }
 
     public void setInputs(Map<String, Serializable> inputs) {
-        put(BOUND_INPUTS, (Serializable)inputs);
+        put(BOUND_INPUTS, (Serializable) inputs);
     }
 
     public Map<String, Serializable> getArguments() {
@@ -173,7 +176,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     }
 
     public void setArguments(Map<String, Serializable> arguments) {
-        put(BOUND_ARGUMENTS, (Serializable)arguments);
+        put(BOUND_ARGUMENTS, (Serializable) arguments);
     }
 
     public Map<String, Serializable> getOutputs() {
@@ -181,7 +184,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     }
 
     public void setOutputs(Map<String, Serializable> outputs) {
-        put(OUTPUTS, (Serializable)outputs);
+        put(OUTPUTS, (Serializable) outputs);
     }
 
     public Map<String, Serializable> getCallArguments() {
@@ -189,7 +192,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     }
 
     public void setCallArguments(Map<String, Serializable> callArguments) {
-        put(CALL_ARGUMENTS, (Serializable)callArguments);
+        put(CALL_ARGUMENTS, (Serializable) callArguments);
     }
 
     public List<Serializable> getParallelLoopBoundExpression() {
@@ -203,9 +206,9 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     @SuppressWarnings("unchecked")
     public static Serializable maskSensitiveValues(Serializable serializable) {
         if (serializable instanceof Map) {
-            return (Serializable)maskSensitiveValues((Map<String, Serializable>)serializable);
+            return (Serializable) maskSensitiveValues((Map<String, Serializable>) serializable);
         } else if (serializable instanceof List) {
-            return (Serializable)maskSensitiveValues((List<Serializable>)serializable);
+            return (Serializable) maskSensitiveValues((List<Serializable>) serializable);
         } else {
             return serializable;
         }
@@ -229,7 +232,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
 
     private static Serializable getMaskedValue(Serializable value) {
         if (value != null && value instanceof Value) {
-            return ((Value)value).isSensitive() ? SensitiveValue.SENSITIVE_VALUE_MASK : ((Value)value).get();
+            return ((Value) value).isSensitive() ? SensitiveValue.SENSITIVE_VALUE_MASK : ((Value) value).get();
         }
         return value;
     }

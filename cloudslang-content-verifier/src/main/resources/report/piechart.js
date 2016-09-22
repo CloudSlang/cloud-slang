@@ -1,4 +1,4 @@
-google.charts.load('current', {'packages' : ['corechart']});
+google.charts.load('current', {'packages': ['corechart']});
 google.charts.setOnLoadCallback(drawChart);
 function drawChart() {
     var passed = parseInt(document.getElementById('passed').innerHTML);
@@ -13,7 +13,7 @@ function drawChart() {
     ]);
 
     var options = {
-        title : 'Test Case Run Summary',
+        title: 'Test Case Run Summary',
         is3D: true,
         colors: ['#15DC07', '#DA101D', '#FFA500']
     };

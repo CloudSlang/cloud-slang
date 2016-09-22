@@ -17,7 +17,7 @@ flow:
   workflow:
     - print_values:
         parallel_loop:
-          for: value in values.split(",")
+          for: "value in '1,2,3'"
           do:
             ops.print_branch:
               - ID: ${ value }

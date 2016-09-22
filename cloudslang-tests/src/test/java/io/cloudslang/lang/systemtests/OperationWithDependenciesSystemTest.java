@@ -7,16 +7,18 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.score.api.ExecutionStep;
 import io.cloudslang.score.events.ScoreEvent;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import org.junit.Ignore;
+import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class OperationWithDependenciesSystemTest extends SystemsTestsParent {
     @Test(expected = RuntimeException.class)
@@ -24,6 +26,7 @@ public class OperationWithDependenciesSystemTest extends SystemsTestsParent {
         URL resource = getClass().getResource("/yaml/action_wo_dependencies_java_test.sl");
         slang.compile(SlangSource.fromFile(resource.toURI()), null);
     }
+
     @Test
     public void testCompileJavaActionWithDependencies() throws Exception {
         URL resource = getClass().getResource("/yaml/action_w_dependencies_java_test.sl");
@@ -48,6 +51,7 @@ public class OperationWithDependenciesSystemTest extends SystemsTestsParent {
         ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
         assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
+
     @Ignore("Enable when `dependencies` tag will be added")
     @Test
     public void testCompilePythonActionWithDependencies() throws Exception {

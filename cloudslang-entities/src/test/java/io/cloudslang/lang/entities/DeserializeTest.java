@@ -8,6 +8,8 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import java.io.IOException;
+import java.util.HashSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,9 +18,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.io.IOException;
-import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
 
@@ -87,20 +86,20 @@ public class DeserializeTest {
 
     @Test
     public void testDeserializeListForLoopStatement() throws IOException {
-        LoopStatement listForLoopStatement = new ListForLoopStatement("varName", "expression", new HashSet<ScriptFunction>(), new HashSet<String>());
-        testToAndFromJson(listForLoopStatement, ListForLoopStatement.class);
+        LoopStatement listForLoopStatement = new ListLoopStatement("varName", "expression", new HashSet<ScriptFunction>(), new HashSet<String>(), false);
+        testToAndFromJson(listForLoopStatement, ListLoopStatement.class);
     }
 
     @Test
     public void testDeserializeMapForLoopStatement() throws IOException {
-        MapForLoopStatement mapForLoopStatement = new MapForLoopStatement("keyName", "valueName", "expression", new HashSet<ScriptFunction>(), new HashSet<String>());
-        testToAndFromJson(mapForLoopStatement, MapForLoopStatement.class);
+        MapLoopStatement mapLoopStatement = new MapLoopStatement("keyName", "valueName", "expression", new HashSet<ScriptFunction>(), new HashSet<String>());
+        testToAndFromJson(mapLoopStatement, MapLoopStatement.class);
     }
 
     @Test
     public void testDeserializeParallelLoopStatement() throws IOException {
-        ParallelLoopStatement parallelLoopStatement = new ParallelLoopStatement("varName", "expression", new HashSet<ScriptFunction>(), new HashSet<String>());
-        testToAndFromJson(parallelLoopStatement, ParallelLoopStatement.class);
+        ListLoopStatement parallelLoopStatement = new ListLoopStatement("varName", "expression", new HashSet<ScriptFunction>(), new HashSet<String>(), true);
+        testToAndFromJson(parallelLoopStatement, ListLoopStatement.class);
     }
 
     @Test
@@ -111,5 +110,6 @@ public class DeserializeTest {
 
     @Configuration
     @ComponentScan("io.cloudslang.lang.entities")
-    static class Config {}
+    static class Config {
+    }
 }

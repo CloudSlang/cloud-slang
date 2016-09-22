@@ -8,16 +8,17 @@
  */
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.DEFAULT_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PRIVATE_INPUT_KEY;
@@ -29,6 +30,9 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
     @Autowired
     protected PreCompileValidator preCompileValidator;
 
+    @Autowired
+    private ExecutableValidator executableValidator;
+
     @Override
     public Class<? extends InOutParam> getTransformedObjectsClass() {
         return Input.class;
@@ -39,7 +43,7 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
         // this is our default behaviour that if the user specifies only a key, the key is also the ref we look for
         if (rawInput instanceof String) {
             String inputName = (String) rawInput;
-            return new Input.InputBuilder(inputName, null, false).build();
+            return createInput(inputName, null);
         } else if (rawInput instanceof Map) {
             @SuppressWarnings("unchecked")
             Map<String, ?> map = (Map<String, ?>) rawInput;
@@ -51,7 +55,7 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
                         "Please check all inputs are provided as a list and each input is preceded by a hyphen. " +
                         "Input \"" + iterator.next().getKey() + "\" is missing the hyphen.");
             }
-            if(entryValue == null){
+            if (entryValue == null) {
                 throw new RuntimeException("Could not transform Input : " + rawInput + " since it has a null value.\n\nMake sure a value is specified or that indentation is properly done.");
             }
             if (entryValue instanceof Map) {
@@ -88,13 +92,14 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
         // default is private=false
         boolean privateInput = props.containsKey(PRIVATE_INPUT_KEY) &&
                 (boolean) props.get(PRIVATE_INPUT_KEY);
-        boolean defaultSpecified = props.containsKey(DEFAULT_KEY);
+        boolean defaultKeyFound = props.containsKey(DEFAULT_KEY);
         String inputName = entry.getKey();
-        Serializable value = defaultSpecified ? props.get(DEFAULT_KEY) : null;
+        Serializable value = defaultKeyFound ? props.get(DEFAULT_KEY) : null;
+        boolean defaultSpecified = defaultKeyFound && value != null && !StringUtils.EMPTY.equals(value);
 
-        if (privateInput && !defaultSpecified) {
+        if (privateInput && required && !defaultSpecified) {
             throw new RuntimeException(
-                    "Input: " + inputName + " is private but no default value was specified");
+                    "Input: '" + inputName + "' is private and required but no default value was specified");
         }
 
         return createInput(inputName, value, sensitive, required, privateInput);
@@ -112,6 +117,7 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
             boolean sensitive,
             boolean required,
             boolean privateInput) {
+        executableValidator.validateInputName(name);
         preCompileValidator.validateStringValue(name, value, this);
         Accumulator dependencyAccumulator = extractFunctionData(value);
         return new Input.InputBuilder(name, value, sensitive)

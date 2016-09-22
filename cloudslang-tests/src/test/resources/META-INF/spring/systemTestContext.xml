@@ -8,16 +8,16 @@
     http://www.apache.org/licenses/LICENSE-2.0
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:score="http://www.cloudslang.io/schema/score"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:score="http://www.cloudslang.io/schema/score"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
                         http://www.springframework.org/schema/beans/spring-beans.xsd
                         http://www.cloudslang.io/schema/score
                         http://www.cloudslang.io/schema/score.xsd">
 
     <bean class="io.cloudslang.lang.commons.configuration.SlangCommonsSpringConfig"/>
 
-    <score:engine />
+    <score:engine/>
 
     <score:worker uuid="-1"/>
 
