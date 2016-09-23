@@ -63,6 +63,26 @@ public class LoopFlowsTest extends SystemsTestsParent {
     }
 
     @Test
+    public void testFlowWithLoopsWithAccumulator() throws Exception {
+        URI resource = getClass().getResource("/yaml/loops/loop_with_acc.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/loops/do_nothing.sl").toURI();
+
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        Map<String, Value> userInputs = new HashMap<>();
+        Set<SystemProperty> systemProperties = new HashSet<>();
+
+        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
+
+        StepData flowData = stepsData.get(EXEC_START_PATH);
+
+        Map<String, Serializable> expectedOutputs = new HashMap<>();
+        expectedOutputs.put("loop_result", "1 2 3");
+        Assert.assertEquals(expectedOutputs, flowData.getOutputs());
+    }
+
+    @Test
     public void testFlowWithLoopsPyListCaseWorks() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/simple_loop_pylist.sl").toURI();
         URI operation1 = getClass().getResource("/yaml/loops/print.sl").toURI();
