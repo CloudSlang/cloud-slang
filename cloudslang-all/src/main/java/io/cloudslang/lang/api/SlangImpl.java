@@ -12,6 +12,7 @@ import io.cloudslang.lang.compiler.MetadataExtractor;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
+import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
@@ -60,6 +61,20 @@ public class SlangImpl implements Slang {
 
         try {
             return compiler.compile(source, dependencySources);
+        } catch (Exception e) {
+            logger.error("Failed compilation for source : " + source.getFileName() + " ,Exception is : " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public CompilationModellingResult compileSource(SlangSource source, Set<SlangSource> dependencies) {
+
+        Validate.notNull(source, "Source can not be null");
+        Set<SlangSource> dependencySources = new HashSet<>(filter(notNullValue(), dependencies));
+
+        try {
+            return compiler.compileSource(source, dependencySources);
         } catch (Exception e) {
             logger.error("Failed compilation for source : " + source.getFileName() + " ,Exception is : " + e.getMessage());
             throw new RuntimeException(e);

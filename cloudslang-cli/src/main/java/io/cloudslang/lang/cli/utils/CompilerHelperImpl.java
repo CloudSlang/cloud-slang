@@ -13,12 +13,12 @@ import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.utils.SetUtils;
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,13 +63,51 @@ public class CompilerHelperImpl implements CompilerHelper {
     private SlangSourceService slangSourceService;
 
     @Override
-    public CompilationArtifact compile(String filePath, List<String> dependencies) throws IOException {
+    public CompilationArtifact compile(String filePath, List<String> dependencies) {
+        File file = getFile(filePath);
+
+        try {
+            return slang.compile(SlangSource.fromFile(file), getDependencySources(dependencies, file));
+        } catch (Exception e) {
+            logger.error("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    public CompilationModellingResult compileSource(String filePath, List<String> dependencies) {
+        File file = getFile(filePath);
+
+        try {
+            return slang.compileSource(SlangSource.fromFile(file), getDependencySources(dependencies, file));
+        } catch (Exception e) {
+            logger.error("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage());
+            throw e;
+        }
+    }
+
+    private File getFile(String filePath) {
         Validate.notNull(filePath, "File path can not be null");
-        Set<SlangSource> depsSources = new HashSet<>();
         File file = new File(filePath);
         Validate.isTrue(file.isFile(), "File: " + file.getName() + " was not found");
         Extension.validateSlangFileExtension(file.getName());
+        return file;
+    }
 
+    private Set<SlangSource> getDependencySources(List<String> dependencies, File file) {
+        dependencies = getDependenciesIfEmpty(dependencies, file);
+        Set<SlangSource> dependencySources = new HashSet<>();
+        for (String dependency : dependencies) {
+            Collection<File> dependenciesFiles = listSlangFiles(new File(dependency), true);
+            for (File dependencyCandidate : dependenciesFiles) {
+                SlangSource source = SlangSource.fromFile(dependencyCandidate);
+                dependencySources.add(source);
+            }
+        }
+        return dependencySources;
+    }
+
+    private List<String> getDependenciesIfEmpty(List<String> dependencies, File file) {
         if (CollectionUtils.isEmpty(dependencies)) {
             dependencies = new ArrayList<>();
             //app.home is the basedir property we set in our executables
@@ -84,19 +122,7 @@ public class CompilerHelperImpl implements CompilerHelper {
                 dependencies.add(file.getParent());
             }
         }
-        for (String dependency : dependencies) {
-            Collection<File> dependenciesFiles = listSlangFiles(new File(dependency), true);
-            for (File dependencyCandidate : dependenciesFiles) {
-                SlangSource source = SlangSource.fromFile(dependencyCandidate);
-                depsSources.add(source);
-            }
-        }
-        try {
-            return slang.compile(SlangSource.fromFile(file), depsSources);
-        } catch (Exception e) {
-            logger.error("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage());
-            throw e;
-        }
+        return dependencies;
     }
 
     @Override
