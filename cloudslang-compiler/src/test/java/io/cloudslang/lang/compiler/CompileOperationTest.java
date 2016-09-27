@@ -124,7 +124,7 @@ public class CompileOperationTest {
     public void testCompileOperationMissingActionProperties() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_missing_action_properties.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error compiling operation_missing_action_properties. " +
+        exception.expectMessage("Error compiling operation_missing_action_properties.sl. " +
                 "Operation: operation_missing_action_properties has no action data");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
@@ -133,7 +133,7 @@ public class CompileOperationTest {
     public void testCompileOperationMissingPythonScript() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_missing_python_script.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error compiling operation_missing_python_script. " +
+        exception.expectMessage("Error compiling operation_missing_python_script.sl. " +
                 "Operation: operation_missing_python_script has no action data");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
@@ -142,7 +142,7 @@ public class CompileOperationTest {
     public void testCompileOperationWithMissingNamespace() throws Exception {
         URL resource = getClass().getResource("/corrupted/op_without_namespace.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("For source[op_without_namespace] namespace cannot be empty.");
+        exception.expectMessage("For source[op_without_namespace.sl] namespace cannot be empty.");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 }
