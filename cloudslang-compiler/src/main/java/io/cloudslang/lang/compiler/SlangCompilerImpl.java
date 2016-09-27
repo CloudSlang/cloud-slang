@@ -162,21 +162,24 @@ public class SlangCompilerImpl implements SlangCompiler {
         Set<SystemProperty> modelledSystemProperties = new HashSet<>();
         Set<String> modelledSystemPropertyKeys = new HashSet<>();
 
-        List<Map<String, Object>> parsedSystemProperties = convertRawProperties(parsedSlang.getProperties(), source, exceptions);
-        for (Map<String, Object> propertyAsMap : parsedSystemProperties) {
-            Map.Entry<String, Object> propertyAsEntry = propertyAsMap.entrySet().iterator().next();
-            String propertyKey = getPropertyKey(propertyAsEntry, source, exceptions);
-            if (SetUtils.containsIgnoreCase(modelledSystemPropertyKeys, propertyKey)) {
-                exceptions.add(getException(source, new RuntimeException(
-                        DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX + propertyKey + "'.")));
-            } else {
-                modelledSystemPropertyKeys.add(propertyKey);
-            }
+        if (parsedSlang != null) { // parsedSlang is null when properties yaml node is not defined in the property .sl file
+            List<Map<String, Object>> parsedSystemProperties = convertRawProperties(parsedSlang.getProperties(), source, exceptions);
+            for (Map<String, Object> propertyAsMap : parsedSystemProperties) {
+                Map.Entry<String, Object> propertyAsEntry = propertyAsMap.entrySet().iterator().next();
+                String propertyKey = getPropertyKey(propertyAsEntry, source, exceptions);
+                if (SetUtils.containsIgnoreCase(modelledSystemPropertyKeys, propertyKey)) {
+                    exceptions.add(getException(source, new RuntimeException(
+                            DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX + propertyKey + "'.")));
+                } else {
+                    modelledSystemPropertyKeys.add(propertyKey);
+                }
 
-            Object propertyValue = propertyAsEntry.getValue();
-            SystemProperty property = transformSystemProperty(parsedSlang.getNamespace(), propertyKey, propertyValue);
-            modelledSystemProperties.add(property);
+                Object propertyValue = propertyAsEntry.getValue();
+                SystemProperty property = transformSystemProperty(parsedSlang.getNamespace(), propertyKey, propertyValue);
+                modelledSystemProperties.add(property);
+            }
         }
+
         return new SystemPropertyModellingResult(modelledSystemProperties, exceptions);
     }
 
