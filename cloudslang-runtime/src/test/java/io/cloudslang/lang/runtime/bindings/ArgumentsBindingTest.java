@@ -24,13 +24,6 @@ import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionNotCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -42,6 +35,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertNull;
 
@@ -57,7 +58,9 @@ public class ArgumentsBindingTest {
         File rootHome = new File(settingsXmlPath).getParentFile();
         File mavenHome = new File(rootHome, "maven");
         File mavenRepo = new File(rootHome, "test-mvn-repo");
-        mavenRepo.mkdirs();
+        if (!mavenRepo.exists() && !mavenRepo.mkdirs()) {
+            System.out.println("Could not create maven repo " + mavenRepo.toString());
+        }
 
         UnzipUtil.unzipToFolder(mavenHome.getAbsolutePath(), classLoader.getResourceAsStream("maven.zip"));
 

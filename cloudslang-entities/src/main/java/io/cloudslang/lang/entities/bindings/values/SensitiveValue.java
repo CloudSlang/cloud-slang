@@ -20,8 +20,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import javassist.util.proxy.ProxyObjectInputStream;
 import javassist.util.proxy.ProxyObjectOutputStream;
-import org.python.apache.commons.compress.utils.IOUtils;
-import org.python.apache.xerces.impl.dv.util.Base64;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 
 /**
  * Sensitive InOutParam value
@@ -125,14 +125,15 @@ public class SensitiveValue implements Value {
 
     protected String encrypt(Serializable originalContent) {
         byte[] serialized = serialize(originalContent);
-        String serializedAsString = Base64.encode(serialized);
+        String serializedAsString = Base64.encodeBase64String(serialized);
         return EncryptionProvider.get().encrypt(serializedAsString.toCharArray());
     }
 
     protected Serializable decrypt(String content) {
         char[] decrypted = EncryptionProvider.get().decrypt(content);
         String serializedAsString = new String(decrypted);
-        byte[] serialized = Base64.decode(serializedAsString);
+
+        byte[] serialized = Base64.decodeBase64(serializedAsString);
         return deserialize(serialized);
     }
 

@@ -10,7 +10,7 @@
     -->
     <groupId>io.cloudslang.lang</groupId>
     <artifactId>cloudslang</artifactId>
-    <version>0.9.74-SNAPSHOT</version>
+    <version>0.9.75-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A DSL for writing flows</description>
@@ -35,6 +35,8 @@
         <score.group>io.cloudslang</score.group>
         <score.version>0.3.39</score.version>
         <spring.version>4.2.5.RELEASE</spring.version>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
     </properties>
 
     <distributionManagement>
@@ -302,6 +304,12 @@
                 <groupId>com.mattbertolini</groupId>
                 <artifactId>liquibase-slf4j</artifactId>
                 <version>1.2.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.10</version>
             </dependency>
 
             <!-- DB drivers -->

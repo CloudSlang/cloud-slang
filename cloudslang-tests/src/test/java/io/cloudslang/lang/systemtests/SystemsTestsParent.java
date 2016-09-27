@@ -71,7 +71,9 @@ public abstract class SystemsTestsParent {
 
         File mavenHome = new File(rootHome, "maven");
         File mavenRepo = new File(rootHome, "test-mvn-repo");
-        mavenRepo.mkdirs();
+        if (!mavenRepo.exists() && !mavenRepo.mkdirs()) {
+            System.out.println("Could not create maven repo " + mavenRepo.toString());
+        }
 
         System.out.println("Maven home [" + mavenHome.getAbsolutePath() + "]");
         System.out.println("Maven repo [" + mavenRepo.getAbsolutePath() + "]");

@@ -57,7 +57,7 @@ public class NavigationsTest {
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         runtimeServices.setStepErrorKey("Error");
         try {
-            Long nextPosition = navigations.navigate(runEnv, runtimeServices);
+            navigations.navigate(runEnv, runtimeServices);
 
         } catch (RuntimeException e) {
             Collection<ScoreEvent> events = runtimeServices.getEvents();

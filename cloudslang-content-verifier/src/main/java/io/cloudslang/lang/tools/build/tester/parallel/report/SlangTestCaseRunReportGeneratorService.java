@@ -4,10 +4,17 @@ package io.cloudslang.lang.tools.build.tester.parallel.report;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.TestRun;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
+import org.apache.commons.io.FileUtils;
+import org.rendersnake.HtmlAttributes;
+import org.rendersnake.HtmlCanvas;
+import org.springframework.core.io.DefaultResourceLoader;
+
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.nio.file.Files;
@@ -15,15 +22,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.io.FileUtils;
-import org.rendersnake.HtmlAttributes;
-import org.rendersnake.HtmlCanvas;
-import org.springframework.core.io.DefaultResourceLoader;
 
 import static com.google.common.base.Joiner.on;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Locale.ENGLISH;
 
 /**
@@ -86,7 +90,7 @@ public class SlangTestCaseRunReportGeneratorService {
         String reportFileName = String.format(TEST_CASE_REPORT_NAME + FORMATTER_STRING + REPORT_EXTENSION, valueOf(currentTimeMillis()));
         Path path = Paths.get(reportDirectory, reportFileName);
 
-        try (Writer writer = new PrintWriter(new FileWriter(path.toFile(), false))) {
+        try (Writer writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path.toFile(), false), UTF_8)))) {
             HtmlCanvas reportPage = new HtmlCanvas(writer);
 
             HtmlCanvas reportPageHtml = reportPage.html();

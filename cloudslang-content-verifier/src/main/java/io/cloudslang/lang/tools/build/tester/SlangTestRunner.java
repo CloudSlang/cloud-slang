@@ -140,7 +140,7 @@ public class SlangTestRunner {
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
             SlangTestCase testCase = testCaseEntry.getValue();
             if (testCase == null) {
-                runTestsResults.addFailedTest(UNAVAILABLE_NAME, new TestRun(testCase, "Test case cannot be null"));
+                runTestsResults.addFailedTest(UNAVAILABLE_NAME, new TestRun(null, "Test case cannot be null"));
                 continue;
             }
             if (isTestCaseInActiveSuite(testCase, testSuites)) {
@@ -180,7 +180,7 @@ public class SlangTestRunner {
             for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
                 SlangTestCase testCase = testCaseEntry.getValue();
                 if (testCase == null) {
-                    testCaseEventDispatchService.notifyListeners(new FailedSlangTestCaseEvent(null, "Test case cannot be null", null));
+                    testCaseEventDispatchService.notifyListeners(new FailedSlangTestCaseEvent(new SlangTestCase(null, null, null, null, null, null, null, null, null), "Test case cannot be null", null));
                     continue;
                 }
                 SlangTestCaseRunnable slangTestCaseRunnable = new SlangTestCaseRunnable(testCase, compiledFlows, projectPath, testSuites, this, testCaseEventDispatchService, multiTriggerTestCaseEventListener);

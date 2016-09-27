@@ -116,7 +116,6 @@ public class TestCaseEventDispatchServiceTest {
                 } else if (value.equals(2)) {
                     assertEquals(FailedSlangTestCaseEvent.class, event.getClass());
                     assertEquals(failureMessage, ((FailedSlangTestCaseEvent) event).getFailureReason());
-                    assertEquals(failureMessage, ((FailedSlangTestCaseEvent) event).getFailureReason());
                     assertEquals(ex, ((FailedSlangTestCaseEvent) event).getFailureException());
                 } else if (value.equals(3)) {
                     assertEquals(PassedSlangTestCaseEvent.class, event.getClass());

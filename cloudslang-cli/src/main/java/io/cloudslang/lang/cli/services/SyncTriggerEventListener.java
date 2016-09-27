@@ -49,7 +49,7 @@ public class SyncTriggerEventListener implements ScoreEventListener {
     private AtomicReference<String> errorMessage = new AtomicReference<>("");
     private boolean isDebugMode = false;
 
-    public void setIsDebugMode(boolean isDebugMode) {
+    public synchronized void setIsDebugMode(boolean isDebugMode) {
         this.isDebugMode = isDebugMode;
     }
 
@@ -98,8 +98,8 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                         int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
                         String prefix = StringUtils.repeat(STEP_PATH_PREFIX, matches);
 
-                        for (String key : stepOutputs.keySet()) {
-                            printWithColor(Ansi.Color.WHITE, prefix + key + " = " + stepOutputs.get(key));
+                        for (Map.Entry<String, Serializable> entry : stepOutputs.entrySet()) {
+                            printWithColor(Ansi.Color.WHITE, prefix + entry.getKey() + " = " + entry.getValue());
                         }
                     }
                 }
@@ -111,8 +111,8 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                     Map<String, Serializable> outputs = extractNotEmptyOutputs(data);
                     if (outputs.size() > 0) {
                         printForOperationOrFlow(data, Ansi.Color.WHITE, "\n" + OPERATION_OUTPUTS, "\n" + FLOW_OUTPUTS);
-                        for (String key : outputs.keySet()) {
-                            printWithColor(Ansi.Color.WHITE, "- " + key + " = " + outputs.get(key));
+                        for (Map.Entry<String, Serializable> entry : outputs.entrySet()) {
+                            printWithColor(Ansi.Color.WHITE, "- " + entry.getKey() + " = " + entry.getValue());
                         }
                     }
                 }
@@ -120,6 +120,8 @@ public class SyncTriggerEventListener implements ScoreEventListener {
             case ScoreLangConstants.EVENT_EXECUTION_FINISHED:
                 flowFinished.set(true);
                 printFinishEvent(data);
+                break;
+            default:
                 break;
         }
     }

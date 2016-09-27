@@ -29,7 +29,7 @@ public class SlangBootstrapTest {
     public void testLoadUserProperties() throws Exception {
         mockStatic(Bootstrap.class);
         doNothing().when(Bootstrap.class);
-        SlangBootstrap.main(null);
+        SlangBootstrap.main(new String[0]);
 
         Assert.assertTrue(System.getProperty("cslang.encoding").endsWith("utf-8"));
         Assert.assertTrue(System.getProperty("app.home").endsWith("/slangbootstrap"));
