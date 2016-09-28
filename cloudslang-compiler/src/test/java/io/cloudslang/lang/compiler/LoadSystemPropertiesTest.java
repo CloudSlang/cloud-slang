@@ -91,6 +91,16 @@ public class LoadSystemPropertiesTest {
     }
 
     @Test
+    public void testInvalidMissingPropertiesTag() throws Exception {
+        URI propertiesURI = getClass().getResource("/properties/a/b/invalid_missing_properties_tag.prop.sl").toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(
+                "Unable to find property 'wrong_key' on class: io.cloudslang.lang.compiler.parser.model.ParsedSlang"
+        );
+        loadSystemProperties(SlangSource.fromFile(propertiesURI));
+    }
+
+    @Test
     public void testMapUnderProperties() throws Exception {
         URI propertiesURI = getClass().getResource("/properties/a/b/map_under_properties.prop.sl").toURI();
         exception.expect(RuntimeException.class);
