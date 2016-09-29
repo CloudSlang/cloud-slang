@@ -28,7 +28,14 @@ public class TestSuitesRunInfoServiceImpl implements TestSuiteRunInfoService {
 
     @Override
     public void setRunModeForTestSuite(final String testSuite, final TestCaseRunMode runMode) {
-        runModeMap.put(testSuite, runMode);
+        doSetRunModeForTestSuite(runMode, testSuite);
+    }
+
+    @Override
+    public void setRunModeForTestSuites(final List<String> testSuites, final TestCaseRunMode runMode) {
+        for (String testSuite : testSuites) {
+            doSetRunModeForTestSuite(runMode, testSuite);
+        }
     }
 
     @Override
@@ -51,6 +58,10 @@ public class TestSuitesRunInfoServiceImpl implements TestSuiteRunInfoService {
 
     private TestCaseRunMode doGetTestSuiteRunMode(String testSuite) {
         return runModeMap.get(testSuite);
+    }
+
+    private void doSetRunModeForTestSuite(TestCaseRunMode runMode, String testSuite) {
+        runModeMap.put(testSuite, runMode);
     }
 
 }

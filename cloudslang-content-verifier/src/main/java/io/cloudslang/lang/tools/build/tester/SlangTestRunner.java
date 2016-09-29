@@ -242,7 +242,7 @@ public class SlangTestRunner {
     }
 
     private void processActiveTest(final BulkRunMode bulkRunMode, final Map<TestCaseRunState, Map<String, SlangTestCase>> resultMap, Map.Entry<String, SlangTestCase> testCaseEntry, SlangTestCase testCase) {
-        if (bulkRunMode == BulkRunMode.POSSIBLE_MIXED) {
+        if (bulkRunMode == BulkRunMode.POSSIBLY_MIXED) {
             TestCaseRunMode runModeForTestCase = testSuiteRunInfoService.getRunModeForTestCase(testCase, new RunMultipleTestSuiteConflictResolutionStrategy(),
                     new SequentialRunTestSuiteResolutionStrategy());
             if (runModeForTestCase == TestCaseRunMode.SEQUENTIAL) {

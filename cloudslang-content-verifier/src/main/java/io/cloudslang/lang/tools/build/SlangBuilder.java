@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_PARALLEL;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_SEQUENTIAL;
-import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.POSSIBLE_MIXED;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.POSSIBLY_MIXED;
 
 /*
  * Created by stoneo on 2/9/2015.
@@ -136,7 +136,7 @@ public class SlangBuilder {
             slangTestRunner.runTestsSequential(projectPath, testCaseRunState.get(TestCaseRunState.SEQUENTIAL), compiledFlows, sequentialRunTestResults);
             runTestsResults = sequentialRunTestResults;
 
-        } else if (bulkRunMode == POSSIBLE_MIXED) { // Run some tests in parallel and rest of tests sequentially
+        } else if (bulkRunMode == POSSIBLY_MIXED) { // Run some tests in parallel and rest of tests sequentially
             ThreadSafeRunTestResults mixedTestResults = new ThreadSafeRunTestResults();
             Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunState = slangTestRunner.splitTestCasesByRunState(bulkRunMode, testCases, testSuites, mixedTestResults);
             slangTestRunner.runTestsSequential(projectPath, testCaseRunState.get(TestCaseRunState.SEQUENTIAL), compiledFlows, mixedTestResults);

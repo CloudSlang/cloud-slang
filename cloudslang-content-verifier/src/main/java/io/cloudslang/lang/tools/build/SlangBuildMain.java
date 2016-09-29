@@ -18,6 +18,7 @@ import io.cloudslang.lang.tools.build.commands.ApplicationArgs;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.TestRun;
 import io.cloudslang.lang.tools.build.tester.parallel.report.SlangTestCaseRunReportGeneratorService;
+import io.cloudslang.lang.tools.build.tester.runconfiguration.TestSuiteRunInfoService;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
 import org.apache.commons.collections4.ListUtils;
@@ -43,7 +44,7 @@ import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getEnumInsta
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getIntFromPropertiesWithDefaultAndRange;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_PARALLEL;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_SEQUENTIAL;
-import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.POSSIBLE_MIXED;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.POSSIBLY_MIXED;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.RunConfigurationProperties.TEST_COVERAGE;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.RunConfigurationProperties.TEST_PARALLEL_THREAD_COUNT;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.RunConfigurationProperties.TEST_SUITES_PARALLEL;
@@ -110,7 +111,7 @@ public class SlangBuildMain {
     public enum BulkRunMode {
         ALL_PARALLEL,
         ALL_SEQUENTIAL,
-        POSSIBLE_MIXED
+        POSSIBLY_MIXED
     }
 
     public static void main(String[] args) {
@@ -136,7 +137,7 @@ public class SlangBuildMain {
         List<String> testSuitesSequential = new ArrayList<>();
         BulkRunMode bulkRunMode = runTestsInParallel ? ALL_PARALLEL : ALL_SEQUENTIAL;
 
-        TestCaseRunMode testSuiteRunMode = TestCaseRunMode.SEQUENTIAL;
+        TestCaseRunMode unspecifiedTestSuiteRunMode = TestCaseRunMode.SEQUENTIAL;
         if (get(runConfigPath).isAbsolute() && isRegularFile(get(runConfigPath), NOFOLLOW_LINKS) && equalsIgnoreCase(PROPERTIES_FILE_EXTENSION, FilenameUtils.getExtension(runConfigPath))) {
             Properties runConfigurationProperties = getRunConfigurationProperties(runConfigPath);
             shouldPrintCoverageData = getBooleanFromPropertiesWithDefault(TEST_COVERAGE, shouldPrintCoverageData, runConfigurationProperties);
@@ -144,9 +145,9 @@ public class SlangBuildMain {
             testSuites = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_TO_RUN);
             testSuitesParallel = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_PARALLEL);
             testSuitesSequential = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_SEQUENTIAL);
-            testSuiteRunMode = getEnumInstanceFromPropertiesWithDefault(TEST_SUITES_RUN_UNSPECIFIED, TestCaseRunMode.PARALLEL, runConfigurationProperties);
-            addWarningsForMisconfiguredTestSuites(testSuiteRunMode, testSuites, testSuitesSequential, testSuitesParallel);
-            bulkRunMode = POSSIBLE_MIXED;
+            unspecifiedTestSuiteRunMode = getEnumInstanceFromPropertiesWithDefault(TEST_SUITES_RUN_UNSPECIFIED, TestCaseRunMode.SEQUENTIAL, runConfigurationProperties);
+            addWarningsForMisconfiguredTestSuites(unspecifiedTestSuiteRunMode, testSuites, testSuitesSequential, testSuitesParallel);
+            bulkRunMode = POSSIBLY_MIXED;
         } else {
             log.info(format(DID_NOT_DETECT_RUN_CONFIGURATION_PROPERTIES_FILE, runConfigPath));
         }
@@ -159,9 +160,10 @@ public class SlangBuildMain {
         log.info("Active test suites are: " +  join(testSuites, LIST_JOINER));
         log.info("Parallel run mode is configured for test suites: " + join(testSuitesParallel, LIST_JOINER));
         log.info("Sequential run mode is configured for test suites: " + join(testSuitesSequential, LIST_JOINER));
-        log.info("Default run mode is configured for test suites: " + join(getDefaultRunModeTestSuites(testSuites, testSuitesParallel, testSuitesSequential), LIST_JOINER));
-        log.info("Default run for test suites is: " + testSuiteRunMode.name().toLowerCase());
-        log.info("Run mode for tests: " + bulkRunMode.toString().toLowerCase(ENGLISH));
+        log.info("Default run mode '" + unspecifiedTestSuiteRunMode.name().toLowerCase() + "' is configured for test suites: "
+                + join(getDefaultRunModeTestSuites(testSuites, testSuitesParallel, testSuitesSequential), LIST_JOINER));
+
+        log.info("Bulk run mode for tests: " + bulkRunMode.toString().toLowerCase(ENGLISH));
 
         log.info("Print coverage data: " + valueOf(shouldPrintCoverageData));
         log.info("Validate description: " + valueOf(shouldValidateDescription));
@@ -175,6 +177,9 @@ public class SlangBuildMain {
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/testRunnerContext.xml");
         SlangBuilder slangBuilder = context.getBean(SlangBuilder.class);
         Slang slang = context.getBean(Slang.class);
+
+        updateTestSuiteMappings(context.getBean(TestSuiteRunInfoService.class), testSuitesParallel, testSuitesSequential, testSuites, unspecifiedTestSuiteRunMode);
+
         SlangTestCaseRunReportGeneratorService reportGeneratorService = context.getBean(SlangTestCaseRunReportGeneratorService.class);
         registerEventHandlers(slang);
 
@@ -214,7 +219,15 @@ public class SlangBuildMain {
         }
     }
 
-    private static List<String> getDefaultRunModeTestSuites(List<String> testSuites, List<String> testSuitesParallel, List<String> testSuitesSequential) {
+    private static void updateTestSuiteMappings(final TestSuiteRunInfoService testSuiteRunInfoService, final List<String> parallelSuites,
+                                                final List<String> sequentialSuites, final List<String> activeSuites, final TestCaseRunMode unspecifiedTestSuiteRunMode) {
+
+        testSuiteRunInfoService.setRunModeForTestSuites(parallelSuites, TestCaseRunMode.PARALLEL);
+        testSuiteRunInfoService.setRunModeForTestSuites(sequentialSuites, TestCaseRunMode.SEQUENTIAL);
+        testSuiteRunInfoService.setRunModeForTestSuites(getDefaultRunModeTestSuites(activeSuites, parallelSuites, sequentialSuites), unspecifiedTestSuiteRunMode);
+    }
+
+    private static List<String> getDefaultRunModeTestSuites(final List<String> testSuites, final List<String> testSuitesParallel, final List<String> testSuitesSequential) {
         return removeAll(new ArrayList<>(testSuites), union(testSuitesParallel, testSuitesSequential));
     }
 
