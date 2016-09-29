@@ -12,10 +12,13 @@ package io.cloudslang.lang.tools.build.commands;
 import com.beust.jcommander.DynamicParameter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.CommaParameterSplitter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class ApplicationArgs {
 
@@ -50,6 +53,10 @@ public class ApplicationArgs {
     @Parameter(names = {"--thread-count", "-th"},
             description = "Number of threads to be used in case of parallel test execution. Has no effect for sequential execution. By default, it is set to the number of processors.")
     public String threadCount;
+
+    @Parameter(names = {"--run-config-file", "-rcf"},
+            description = "Specifies the absolute path for the run configuration properties file.")
+    public String runConfigPath;
 
     @Parameter(names = {"--description", "-des"},
             description = "Whether or not to validate the inputs, outputs and results have description")
@@ -104,5 +111,9 @@ public class ApplicationArgs {
 
     public String getThreadCount() {
         return threadCount;
+    }
+
+    public String getRunConfigPath() {
+        return isEmpty(runConfigPath) ? "" : runConfigPath;
     }
 }

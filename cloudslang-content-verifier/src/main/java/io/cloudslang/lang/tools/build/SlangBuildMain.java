@@ -20,16 +20,6 @@ import io.cloudslang.lang.tools.build.tester.TestRun;
 import io.cloudslang.lang.tools.build.tester.parallel.report.SlangTestCaseRunReportGeneratorService;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
@@ -38,18 +28,49 @@ import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getBooleanFromPropertiesWithDefault;
+import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getEnumInstanceFromPropertiesWithDefault;
+import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getIntFromPropertiesWithDefaultAndRange;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.RunConfigurationProperties.TEST_COVERAGE;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.RunConfigurationProperties.TEST_PARALLEL_THREAD_COUNT;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.RunConfigurationProperties.TEST_SUITES_PARALLEL;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.RunConfigurationProperties.TEST_SUITES_RUN_UNSPECIFIED;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.RunConfigurationProperties.TEST_SUITES_SEQUENTIAL;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.RunConfigurationProperties.TEST_SUITES_TO_RUN;
 import static io.cloudslang.lang.tools.build.tester.SlangTestRunner.MAX_TIME_PER_TESTCASE_IN_MINUTES;
 import static io.cloudslang.lang.tools.build.tester.SlangTestRunner.TEST_CASE_TIMEOUT_IN_MINUTES_KEY;
 import static io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService.SLANG_TEST_RUNNER_THREAD_COUNT;
+import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
+import static java.nio.file.Files.createDirectories;
+import static java.nio.file.Files.exists;
+import static java.nio.file.Files.isRegularFile;
+import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
+import static java.nio.file.Paths.get;
+import static java.util.Arrays.asList;
+import static org.apache.commons.collections4.ListUtils.removeAll;
+import static org.apache.commons.collections4.ListUtils.union;
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 
-/*
- * Created by stoneo on 1/11/2015.
- */
+
 public class SlangBuildMain {
 
     private static final String TEST_CASE_REPORT_LOCATION = "cloudslang.test.case.report.location";
@@ -60,6 +81,24 @@ public class SlangBuildMain {
     private final static Logger log = Logger.getLogger(SlangBuildMain.class);
     private final static String NOT_TS = "!";
     private static final int MAX_THREADS_TEST_RUNNER = 32;
+    private static final String SUITE_LIST_SEPARATOR = ",";
+    private static final String MESSAGE_NOT_SCHEDULED_FOR_RUN_RULES = "Rules '%s' defined in '%s' key are not scheduled for run.";
+    public static final String MESSAGE_TEST_SUITES_WITH_UNSPECIFIED_MAPPING = "Test suites '%s' have unspecified mapping. They will run in '%s' mode.";
+    public static final String LIST_JOINER = ", ";
+
+    static class RunConfigurationProperties {
+        static final String TEST_COVERAGE = "test.coverage";
+        static final String TEST_PARALLEL_THREAD_COUNT = "test.parallel.thread.count";
+        static final String TEST_SUITES_TO_RUN = "test.suites.run";
+        static final String TEST_SUITES_PARALLEL = "test.suites.parallel";
+        static final String TEST_SUITES_SEQUENTIAL = "test.suites.sequential";
+        static final String TEST_SUITES_RUN_UNSPECIFIED = "test.suites.run.unspecified";
+    }
+
+    enum TestSuiteRunMode {
+        PARALLEL,
+        SEQUENTIAL
+    }
 
     public static void main(String[] args) {
         loadUserProperties();
@@ -67,8 +106,8 @@ public class SlangBuildMain {
         ApplicationArgs appArgs = new ApplicationArgs();
         parseArgs(args, appArgs);
         String projectPath = parseProjectPathArg(appArgs);
-        String contentPath = StringUtils.defaultIfEmpty(appArgs.getContentRoot(), projectPath + CONTENT_DIR);
-        String testsPath = StringUtils.defaultIfEmpty(appArgs.getTestRoot(), projectPath + TEST_DIR);
+        String contentPath = defaultIfEmpty(appArgs.getContentRoot(), projectPath + CONTENT_DIR);
+        String testsPath = defaultIfEmpty(appArgs.getTestRoot(), projectPath + TEST_DIR);
         List<String> testSuites = parseTestSuites(appArgs);
         boolean shouldPrintCoverageData = appArgs.shouldOutputCoverage();
         boolean runTestsInParallel = appArgs.isParallel();
@@ -77,18 +116,40 @@ public class SlangBuildMain {
         setProperty(SLANG_TEST_RUNNER_THREAD_COUNT, valueOf(threadCount));
         setProperty(TEST_CASE_TIMEOUT_IN_MINUTES_KEY, valueOf(testCaseTimeout));
         boolean shouldValidateDescription = appArgs.shouldValidateDescription();
+        String runConfigPath = FilenameUtils.normalize(appArgs.getRunConfigPath());
+
+        // Override with the values from the file if configured
+        List<String> testSuitesParallel = new ArrayList<>();
+        List<String> testSuitesSequential = new ArrayList<>();
+
+        TestSuiteRunMode testSuiteRunMode = TestSuiteRunMode.SEQUENTIAL;
+        if (get(runConfigPath).isAbsolute() && isRegularFile(get(runConfigPath), NOFOLLOW_LINKS)) {
+            Properties runConfigurationProperties = getRunConfigurationProperties(runConfigPath);
+            shouldPrintCoverageData = getBooleanFromPropertiesWithDefault(TEST_COVERAGE, shouldPrintCoverageData, runConfigurationProperties);
+            threadCount = getIntFromPropertiesWithDefaultAndRange(TEST_PARALLEL_THREAD_COUNT, threadCount, runConfigurationProperties, 1, MAX_THREADS_TEST_RUNNER + 1);
+            testSuites = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_TO_RUN);
+            testSuitesParallel = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_PARALLEL);
+            testSuitesSequential = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_SEQUENTIAL);
+            testSuiteRunMode = getEnumInstanceFromPropertiesWithDefault(TEST_SUITES_RUN_UNSPECIFIED, SlangBuildMain.TestSuiteRunMode.PARALLEL, runConfigurationProperties);
+            addWarningsForMisconfiguredTestSuites(testSuiteRunMode, testSuites, testSuitesSequential, testSuitesParallel);
+        }
 
         log.info("");
         log.info("------------------------------------------------------------");
         log.info("Building project: " + projectPath);
         log.info("Content root is at: " + contentPath);
         log.info("Test root is at: " + testsPath);
-        log.info("Active test suites are: " + Arrays.toString(testSuites.toArray()));
+        log.info("Active test suites are: " +  join(testSuites, LIST_JOINER));
+        log.info("Parallel run mode is configured for test suites: " + join(testSuitesParallel, LIST_JOINER));
+        log.info("Sequential run mode is configured for test suites: " + join(testSuitesSequential, LIST_JOINER));
+        log.info("Default run mode is configured for test suites: " + join(getDefaultRunModeTestSuites(testSuites, testSuitesParallel, testSuitesSequential), LIST_JOINER));
+        log.info("Default run for test suites is: " + testSuiteRunMode.name().toLowerCase());
+
         log.info("Print coverage data: " + valueOf(shouldPrintCoverageData));
         log.info("Validate description: " + valueOf(shouldValidateDescription));
         log.info("Parallel: " + valueOf(runTestsInParallel));
         log.info("Thread count: " + threadCount);
-        log.info("Test case timeout in minutes: " + (StringUtils.isEmpty(testCaseTimeout) ? valueOf(MAX_TIME_PER_TESTCASE_IN_MINUTES) : testCaseTimeout));
+        log.info("Test case timeout in minutes: " + (isEmpty(testCaseTimeout) ? valueOf(MAX_TIME_PER_TESTCASE_IN_MINUTES) : testCaseTimeout));
 
         log.info("");
         log.info("Loading...");
@@ -136,6 +197,53 @@ public class SlangBuildMain {
         }
     }
 
+    private static List<String> getDefaultRunModeTestSuites(List<String> testSuites, List<String> testSuitesParallel, List<String> testSuitesSequential) {
+        return removeAll(new ArrayList<>(testSuites), union(testSuitesParallel, testSuitesSequential));
+    }
+
+    private static void addWarningsForMisconfiguredTestSuites(final TestSuiteRunMode testSuiteRunMode, final List<String> testSuites, final List<String> testSuitesSequential,
+                                                              final List<String> testSuitesParallel) {
+        addWarningForSubsetOfRules(testSuites, testSuitesSequential, TEST_SUITES_SEQUENTIAL);
+        addWarningForSubsetOfRules(testSuites, testSuitesParallel, TEST_SUITES_PARALLEL);
+        addWarningForUnspecifiedRules(testSuiteRunMode, testSuites, testSuitesSequential, testSuitesParallel);
+    }
+
+    private static void addWarningForUnspecifiedRules(final TestSuiteRunMode testSuiteRunMode, final List<String> testSuites, final List<String> testSuitesSequential,
+                                                      final List<String> testSuitesParallel) {
+        List<String> union = union(testSuitesSequential, testSuitesParallel);
+        if (!union.containsAll(testSuites)) {
+            List<String> copy = new ArrayList<>(testSuites);
+            copy.removeAll(union);
+
+            log.info(format(MESSAGE_TEST_SUITES_WITH_UNSPECIFIED_MAPPING, join(copy, LIST_JOINER), testSuiteRunMode.name()));
+        }
+    }
+
+    private static void addWarningForSubsetOfRules(List<String> testSuites, List<String> testSuitesContained, String key) {
+        List<String> intersectWithContained = ListUtils.intersection(testSuites, testSuitesContained);
+        if (intersectWithContained.size() != testSuitesContained.size()) {
+            List<String> notScheduledForRun = new ArrayList<>(testSuitesContained);
+            notScheduledForRun.removeAll(intersectWithContained);
+            log.warn(format(MESSAGE_NOT_SCHEDULED_FOR_RUN_RULES, join(notScheduledForRun, LIST_JOINER), key));
+        }
+    }
+
+    private static List<String> getTestSuitesForKey(Properties runConfigurationProperties, String key) {
+        final String valueList = runConfigurationProperties.getProperty(key);
+        return StringUtils.isNotEmpty(valueList) ? parseTestSuitesToList(asList(valueList.split(SUITE_LIST_SEPARATOR))) : new ArrayList<String>();
+
+    }
+
+    private static Properties getRunConfigurationProperties(String runConfigPath) {
+        try (FileInputStream fileInputStream = new FileInputStream(new File(runConfigPath))) {
+            Properties properties = new Properties();
+            properties.load(fileInputStream);
+            return properties;
+        } catch (IOException ioEx) {
+            throw new RuntimeException(ioEx);
+        }
+    }
+
     private static void logErrors(List<RuntimeException> exceptions, String projectPath) {
         logErrorsPrefix();
         for (RuntimeException runtimeException : exceptions) {
@@ -158,9 +266,9 @@ public class SlangBuildMain {
     }
 
     private static void generateTestCaseReport(SlangTestCaseRunReportGeneratorService reportGeneratorService, IRunTestResults runTestsResults) throws IOException {
-        Path reportDirectoryPath = Paths.get(getProperty(TEST_CASE_REPORT_LOCATION));
-        if (!Files.exists(reportDirectoryPath)) {
-            Files.createDirectories(reportDirectoryPath);
+        Path reportDirectoryPath = get(getProperty(TEST_CASE_REPORT_LOCATION));
+        if (!exists(reportDirectoryPath)) {
+            createDirectories(reportDirectoryPath);
         }
         reportGeneratorService.generateReport(runTestsResults, reportDirectoryPath.toString());
     }
@@ -191,20 +299,47 @@ public class SlangBuildMain {
     }
 
     private static List<String> parseTestSuites(ApplicationArgs appArgs) {
+        final List<String> testSuitesArg = ListUtils.defaultIfNull(appArgs.getTestSuites(), new ArrayList<String>());
+        return parseTestSuitesToList(testSuitesArg);
+    }
+
+    private static List<String> parseTestSuitesToList(List<String> testSuitesArg) {
         List<String> testSuites = new ArrayList<>();
-        boolean runDefaultTests = true;
-        List<String> testSuitesArg = ListUtils.defaultIfNull(appArgs.getTestSuites(), new ArrayList<String>());
+        final String notDefaultTestSuite = NOT_TS + DEFAULT_TESTS;
+
+
+        boolean containsDefaultTestSuite = false;
+        boolean containsNotDefaultTestSuite = false;
         for (String testSuite : testSuitesArg) {
-            if (!testSuite.startsWith(NOT_TS)) {
-                testSuites.add(testSuite);
-            } else if (testSuite.equalsIgnoreCase(NOT_TS + DEFAULT_TESTS)) {
-                runDefaultTests = false;
+            if (isEmpty(testSuite)) { // Skip empty suites
+                continue;
+            }
+
+            if (!startsWithIgnoreCase(testSuite, NOT_TS) && !equalsIgnoreCase(testSuite, DEFAULT_TESTS)) { // every normal test suite except default
+                if (!isSuitePresent(testSuites, testSuite)) {
+                    testSuites.add(testSuite);
+                }
+            } else if (!containsNotDefaultTestSuite && equalsIgnoreCase(testSuite, DEFAULT_TESTS)) {   // !default test suite
+                containsDefaultTestSuite = true;
+            } else if (!containsNotDefaultTestSuite && equalsIgnoreCase(testSuite, notDefaultTestSuite)) { // default test suite
+                containsNotDefaultTestSuite = true;
             }
         }
-        if (runDefaultTests && !testSuitesArg.contains(DEFAULT_TESTS)) {
+
+        // Add the default test suite once
+        if (!containsNotDefaultTestSuite && containsDefaultTestSuite) {
             testSuites.add(DEFAULT_TESTS);
         }
         return testSuites;
+    }
+
+    private static boolean isSuitePresent(final List<String> crtList, final String testSuite) {
+        for (String crtSuite : crtList) {
+            if (equalsIgnoreCase(testSuite, crtSuite)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static String parseTestTimeout(ApplicationArgs appArgs) {
@@ -221,7 +356,7 @@ public class SlangBuildMain {
             try {
                 String sThreadCount = appArgs.getThreadCount();
                 if (sThreadCount != null) {
-                    int threadCount = Integer.parseInt(sThreadCount);
+                    int threadCount = parseInt(sThreadCount);
                     if ((threadCount > 0) && (threadCount <= MAX_THREADS_TEST_RUNNER)) {
                         return threadCount;
                     } else {
