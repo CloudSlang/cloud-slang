@@ -87,8 +87,11 @@ public class SlangBuildMain {
     private static final int MAX_THREADS_TEST_RUNNER = 32;
     private static final String SUITE_LIST_SEPARATOR = ",";
     private static final String MESSAGE_NOT_SCHEDULED_FOR_RUN_RULES = "Rules '%s' defined in '%s' key are not scheduled for run.";
-    public static final String MESSAGE_TEST_SUITES_WITH_UNSPECIFIED_MAPPING = "Test suites '%s' have unspecified mapping. They will run in '%s' mode.";
-    public static final String LIST_JOINER = ", ";
+    private static final String MESSAGE_TEST_SUITES_WITH_UNSPECIFIED_MAPPING = "Test suites '%s' have unspecified mapping. They will run in '%s' mode.";
+    private static final String LIST_JOINER = ", ";
+    private static final String PROPERTIES_FILE_EXTENSION = "properties";
+    private static final String DID_NOT_DETECT_RUN_CONFIGURATION_PROPERTIES_FILE = "Did not detect run configuration properties file at path '%s'. " +
+            "Check that the path you are using is an absolute path. Check that the path separator is '\\\\' for Windows, or '/' for Linux.";
 
     static class RunConfigurationProperties {
         static final String TEST_COVERAGE = "test.coverage";
@@ -134,7 +137,7 @@ public class SlangBuildMain {
         BulkRunMode bulkRunMode = runTestsInParallel ? ALL_PARALLEL : ALL_SEQUENTIAL;
 
         TestCaseRunMode testSuiteRunMode = TestCaseRunMode.SEQUENTIAL;
-        if (get(runConfigPath).isAbsolute() && isRegularFile(get(runConfigPath), NOFOLLOW_LINKS)) {
+        if (get(runConfigPath).isAbsolute() && isRegularFile(get(runConfigPath), NOFOLLOW_LINKS) && equalsIgnoreCase(PROPERTIES_FILE_EXTENSION, FilenameUtils.getExtension(runConfigPath))) {
             Properties runConfigurationProperties = getRunConfigurationProperties(runConfigPath);
             shouldPrintCoverageData = getBooleanFromPropertiesWithDefault(TEST_COVERAGE, shouldPrintCoverageData, runConfigurationProperties);
             threadCount = getIntFromPropertiesWithDefaultAndRange(TEST_PARALLEL_THREAD_COUNT, threadCount, runConfigurationProperties, 1, MAX_THREADS_TEST_RUNNER + 1);
@@ -144,6 +147,8 @@ public class SlangBuildMain {
             testSuiteRunMode = getEnumInstanceFromPropertiesWithDefault(TEST_SUITES_RUN_UNSPECIFIED, TestCaseRunMode.PARALLEL, runConfigurationProperties);
             addWarningsForMisconfiguredTestSuites(testSuiteRunMode, testSuites, testSuitesSequential, testSuitesParallel);
             bulkRunMode = POSSIBLE_MIXED;
+        } else {
+            log.info(format(DID_NOT_DETECT_RUN_CONFIGURATION_PROPERTIES_FILE, runConfigPath));
         }
 
         log.info("");
@@ -252,7 +257,7 @@ public class SlangBuildMain {
             properties.load(fileInputStream);
             return properties;
         } catch (IOException ioEx) {
-            throw new RuntimeException(ioEx);
+            throw new RuntimeException("Failed to read from properties file '" + runConfigPath + "': ", ioEx);
         }
     }
 
