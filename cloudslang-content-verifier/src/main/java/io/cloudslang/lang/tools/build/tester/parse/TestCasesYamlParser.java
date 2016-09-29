@@ -68,26 +68,27 @@ public class TestCasesYamlParser {
                 log.info("No tests cases were found in: " + source.getName());
                 return new HashMap<>();
             }
-            return parseTestCases(parsedTestCases);
+            return parseTestCases(parsedTestCases, source.getFilePath());
         } catch (Throwable e) {
             throw new RuntimeException("There was a problem parsing the YAML source: " + source.getName() +
                     "." + source.getFileExtension().getValue() + ".\n" + e.getMessage(), e);
         }
     }
 
-    private Map<String, SlangTestCase> parseTestCases(Map<String, Map> parsedTestCases) {
+    private Map<String, SlangTestCase> parseTestCases(Map<String, Map> parsedTestCases, String filePath) {
         Map<String, SlangTestCase> convertedTestCases = new HashMap<>();
         for (Map.Entry<String, Map> entry : parsedTestCases.entrySet()) {
-            convertedTestCases.put(entry.getKey(), parseTestCase(entry.getValue(), entry.getKey()));
+            convertedTestCases.put(entry.getKey(), parseTestCase(entry.getValue(), entry.getKey(), filePath));
         }
         return convertedTestCases;
     }
 
-    private SlangTestCase parseTestCase(Map map, String artifact) {
+    private SlangTestCase parseTestCase(Map map, String artifact, String filePath) {
         try {
             String content = objectMapper.writeValueAsString(map);
             SlangTestCase slangTestCase = objectMapper.readValue(content, SlangTestCase.class);
             setInputs(slangTestCase, map, artifact);
+            slangTestCase.setFilePath(filePath);
 
             return slangTestCase;
         } catch (IOException e) {

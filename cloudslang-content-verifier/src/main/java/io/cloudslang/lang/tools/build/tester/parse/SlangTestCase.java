@@ -10,7 +10,6 @@
 package io.cloudslang.lang.tools.build.tester.parse;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +42,7 @@ public class SlangTestCase implements Serializable {
 
     private String result;
 
+    private String filePath;
 
     //for jackson
     private SlangTestCase() {
@@ -60,6 +60,26 @@ public class SlangTestCase implements Serializable {
         this.outputs = outputs;
         this.throwsException = throwsException;
         this.result = result;
+        this.filePath = null;
+    }
+
+    public SlangTestCase(String name, String testFlowPath, String description, List<String> testSuites,
+                         String systemPropertiesFile, List<Map> inputs, List<Map> outputs,
+                         Boolean throwsException, String result, String filePath) {
+        this.name = name;
+        this.testFlowPath = testFlowPath;
+        this.description = description;
+        this.systemPropertiesFile = systemPropertiesFile;
+        this.testSuites = testSuites;
+        this.inputs = inputs;
+        this.outputs = outputs;
+        this.throwsException = throwsException;
+        this.result = result;
+        this.filePath = filePath;
+    }
+
+    public static String generateTestCaseReference(SlangTestCase slangTestCase) {
+        return slangTestCase.getName() + " [" + slangTestCase.getFilePath() + "]";
     }
 
     public String getName() {
@@ -115,6 +135,14 @@ public class SlangTestCase implements Serializable {
 
     public void setResult(String result) {
         this.result = result;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
     @Override
