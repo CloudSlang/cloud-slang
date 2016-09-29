@@ -21,6 +21,7 @@ import io.cloudslang.lang.tools.build.tester.parallel.report.SlangTestCaseRunRep
 import io.cloudslang.lang.tools.build.tester.runconfiguration.TestSuiteRunInfoService;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
@@ -93,6 +94,7 @@ public class SlangBuildMain {
     private static final String PROPERTIES_FILE_EXTENSION = "properties";
     private static final String DID_NOT_DETECT_RUN_CONFIGURATION_PROPERTIES_FILE = "Did not detect run configuration properties file at path '%s'. " +
             "Check that the path you are using is an absolute path. Check that the path separator is '\\\\' for Windows, or '/' for Linux.";
+    public static final String EMPTY = "<empty>";
 
     static class RunConfigurationProperties {
         static final String TEST_COVERAGE = "test.coverage";
@@ -157,13 +159,13 @@ public class SlangBuildMain {
         log.info("Building project: " + projectPath);
         log.info("Content root is at: " + contentPath);
         log.info("Test root is at: " + testsPath);
-        log.info("Active test suites are: " +  join(testSuites, LIST_JOINER));
-        log.info("Parallel run mode is configured for test suites: " + join(testSuitesParallel, LIST_JOINER));
-        log.info("Sequential run mode is configured for test suites: " + join(testSuitesSequential, LIST_JOINER));
+        log.info("Active test suites are: " + getTestSuiteForPrint(testSuites));
+        log.info("Parallel run mode is configured for test suites: " + getTestSuiteForPrint(testSuitesParallel));
+        log.info("Sequential run mode is configured for test suites: " + getTestSuiteForPrint(testSuitesSequential));
         log.info("Default run mode '" + unspecifiedTestSuiteRunMode.name().toLowerCase() + "' is configured for test suites: "
-                + join(getDefaultRunModeTestSuites(testSuites, testSuitesParallel, testSuitesSequential), LIST_JOINER));
+                + getTestSuiteForPrint(getDefaultRunModeTestSuites(testSuites, testSuitesParallel, testSuitesSequential)));
 
-        log.info("Bulk run mode for tests: " + bulkRunMode.toString().toLowerCase(ENGLISH));
+        log.info("Bulk run mode for tests: " + bulkRunMode.toString().replace("_", " ").toLowerCase(ENGLISH));
 
         log.info("Print coverage data: " + valueOf(shouldPrintCoverageData));
         log.info("Validate description: " + valueOf(shouldValidateDescription));
@@ -219,6 +221,10 @@ public class SlangBuildMain {
         }
     }
 
+    private static String getTestSuiteForPrint(List<String> testSuite) {
+        return CollectionUtils.isEmpty(testSuite) ? EMPTY : join(testSuite, LIST_JOINER);
+    }
+
     private static void updateTestSuiteMappings(final TestSuiteRunInfoService testSuiteRunInfoService, final List<String> parallelSuites,
                                                 final List<String> sequentialSuites, final List<String> activeSuites, final TestCaseRunMode unspecifiedTestSuiteRunMode) {
 
@@ -245,7 +251,7 @@ public class SlangBuildMain {
             List<String> copy = new ArrayList<>(testSuites);
             copy.removeAll(union);
 
-            log.info(format(MESSAGE_TEST_SUITES_WITH_UNSPECIFIED_MAPPING, join(copy, LIST_JOINER), testSuiteRunMode.name()));
+            log.info(format(MESSAGE_TEST_SUITES_WITH_UNSPECIFIED_MAPPING, getTestSuiteForPrint(copy), testSuiteRunMode.name()));
         }
     }
 
@@ -254,7 +260,7 @@ public class SlangBuildMain {
         if (intersectWithContained.size() != testSuitesContained.size()) {
             List<String> notScheduledForRun = new ArrayList<>(testSuitesContained);
             notScheduledForRun.removeAll(intersectWithContained);
-            log.warn(format(MESSAGE_NOT_SCHEDULED_FOR_RUN_RULES, join(notScheduledForRun, LIST_JOINER), key));
+            log.warn(format(MESSAGE_NOT_SCHEDULED_FOR_RUN_RULES, getTestSuiteForPrint(notScheduledForRun), key));
         }
     }
 
