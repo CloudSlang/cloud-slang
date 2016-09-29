@@ -41,6 +41,9 @@ import java.util.Set;
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getBooleanFromPropertiesWithDefault;
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getEnumInstanceFromPropertiesWithDefault;
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getIntFromPropertiesWithDefaultAndRange;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_PARALLEL;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_SEQUENTIAL;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.POSSIBLE_MIXED;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.RunConfigurationProperties.TEST_COVERAGE;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.RunConfigurationProperties.TEST_PARALLEL_THREAD_COUNT;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.RunConfigurationProperties.TEST_SUITES_PARALLEL;
@@ -61,6 +64,7 @@ import static java.nio.file.Files.isRegularFile;
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import static java.nio.file.Paths.get;
 import static java.util.Arrays.asList;
+import static java.util.Locale.ENGLISH;
 import static org.apache.commons.collections4.ListUtils.removeAll;
 import static org.apache.commons.collections4.ListUtils.union;
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;
@@ -95,9 +99,15 @@ public class SlangBuildMain {
         static final String TEST_SUITES_RUN_UNSPECIFIED = "test.suites.run.unspecified";
     }
 
-    public enum TestSuiteRunMode {
+    public enum TestCaseRunMode {
         PARALLEL,
         SEQUENTIAL
+    }
+
+    public enum BulkRunMode {
+        ALL_PARALLEL,
+        ALL_SEQUENTIAL,
+        POSSIBLE_MIXED
     }
 
     public static void main(String[] args) {
@@ -121,8 +131,9 @@ public class SlangBuildMain {
         // Override with the values from the file if configured
         List<String> testSuitesParallel = new ArrayList<>();
         List<String> testSuitesSequential = new ArrayList<>();
+        BulkRunMode bulkRunMode = runTestsInParallel ? ALL_PARALLEL : ALL_SEQUENTIAL;
 
-        TestSuiteRunMode testSuiteRunMode = TestSuiteRunMode.SEQUENTIAL;
+        TestCaseRunMode testSuiteRunMode = TestCaseRunMode.SEQUENTIAL;
         if (get(runConfigPath).isAbsolute() && isRegularFile(get(runConfigPath), NOFOLLOW_LINKS)) {
             Properties runConfigurationProperties = getRunConfigurationProperties(runConfigPath);
             shouldPrintCoverageData = getBooleanFromPropertiesWithDefault(TEST_COVERAGE, shouldPrintCoverageData, runConfigurationProperties);
@@ -130,8 +141,9 @@ public class SlangBuildMain {
             testSuites = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_TO_RUN);
             testSuitesParallel = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_PARALLEL);
             testSuitesSequential = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_SEQUENTIAL);
-            testSuiteRunMode = getEnumInstanceFromPropertiesWithDefault(TEST_SUITES_RUN_UNSPECIFIED, SlangBuildMain.TestSuiteRunMode.PARALLEL, runConfigurationProperties);
+            testSuiteRunMode = getEnumInstanceFromPropertiesWithDefault(TEST_SUITES_RUN_UNSPECIFIED, TestCaseRunMode.PARALLEL, runConfigurationProperties);
             addWarningsForMisconfiguredTestSuites(testSuiteRunMode, testSuites, testSuitesSequential, testSuitesParallel);
+            bulkRunMode = POSSIBLE_MIXED;
         }
 
         log.info("");
@@ -144,10 +156,10 @@ public class SlangBuildMain {
         log.info("Sequential run mode is configured for test suites: " + join(testSuitesSequential, LIST_JOINER));
         log.info("Default run mode is configured for test suites: " + join(getDefaultRunModeTestSuites(testSuites, testSuitesParallel, testSuitesSequential), LIST_JOINER));
         log.info("Default run for test suites is: " + testSuiteRunMode.name().toLowerCase());
+        log.info("Run mode for tests: " + bulkRunMode.toString().toLowerCase(ENGLISH));
 
         log.info("Print coverage data: " + valueOf(shouldPrintCoverageData));
         log.info("Validate description: " + valueOf(shouldValidateDescription));
-        log.info("Parallel: " + valueOf(runTestsInParallel));
         log.info("Thread count: " + threadCount);
         log.info("Test case timeout in minutes: " + (isEmpty(testCaseTimeout) ? valueOf(MAX_TIME_PER_TESTCASE_IN_MINUTES) : testCaseTimeout));
 
@@ -164,7 +176,7 @@ public class SlangBuildMain {
         List<RuntimeException> exceptions = new ArrayList<>();
         try {
             SlangBuildResults buildResults = slangBuilder.buildSlangContent(projectPath, contentPath, testsPath,
-                    testSuites, shouldValidateDescription, runTestsInParallel);
+                    testSuites, shouldValidateDescription, bulkRunMode);
             exceptions.addAll(buildResults.getCompilationExceptions());
             if (exceptions.size() > 0) {
                 logErrors(exceptions, projectPath);
@@ -201,14 +213,14 @@ public class SlangBuildMain {
         return removeAll(new ArrayList<>(testSuites), union(testSuitesParallel, testSuitesSequential));
     }
 
-    private static void addWarningsForMisconfiguredTestSuites(final TestSuiteRunMode testSuiteRunMode, final List<String> testSuites, final List<String> testSuitesSequential,
+    private static void addWarningsForMisconfiguredTestSuites(final TestCaseRunMode testSuiteRunMode, final List<String> testSuites, final List<String> testSuitesSequential,
                                                               final List<String> testSuitesParallel) {
         addWarningForSubsetOfRules(testSuites, testSuitesSequential, TEST_SUITES_SEQUENTIAL);
         addWarningForSubsetOfRules(testSuites, testSuitesParallel, TEST_SUITES_PARALLEL);
         addWarningForUnspecifiedRules(testSuiteRunMode, testSuites, testSuitesSequential, testSuitesParallel);
     }
 
-    private static void addWarningForUnspecifiedRules(final TestSuiteRunMode testSuiteRunMode, final List<String> testSuites, final List<String> testSuitesSequential,
+    private static void addWarningForUnspecifiedRules(final TestCaseRunMode testSuiteRunMode, final List<String> testSuites, final List<String> testSuitesSequential,
                                                       final List<String> testSuitesParallel) {
         List<String> union = union(testSuitesSequential, testSuitesParallel);
         if (!union.containsAll(testSuites)) {

@@ -1,7 +1,7 @@
 package io.cloudslang.lang.tools.build.tester.runconfiguration;
 
 
-import io.cloudslang.lang.tools.build.SlangBuildMain.TestSuiteRunMode;
+import io.cloudslang.lang.tools.build.SlangBuildMain.TestCaseRunMode;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.strategy.ConflictResolutionStrategy;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.strategy.DefaultResolutionStrategy;
@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class TestSuitesRunInfoServiceImpl implements TestSuiteRunInfoService {
 
-    private ConcurrentMap<String, TestSuiteRunMode> runModeMap;
+    private ConcurrentMap<String, TestCaseRunMode> runModeMap;
 
     @PostConstruct
     public void initialize() {
@@ -22,24 +22,24 @@ public class TestSuitesRunInfoServiceImpl implements TestSuiteRunInfoService {
     }
 
     @Override
-    public TestSuiteRunMode getRunModeForTestSuite(final String testSuite) {
+    public TestCaseRunMode getRunModeForTestSuite(final String testSuite) {
         return doGetTestSuiteRunMode(testSuite);
     }
 
     @Override
-    public void setRunModeForTestSuite(final String testSuite, final TestSuiteRunMode runMode) {
+    public void setRunModeForTestSuite(final String testSuite, final TestCaseRunMode runMode) {
         runModeMap.put(testSuite, runMode);
     }
 
     @Override
-    public TestSuiteRunMode getRunModeForTestCase(final SlangTestCase testCase, final ConflictResolutionStrategy<TestSuiteRunMode> multipleModeConflictStrategy,
-                                           final DefaultResolutionStrategy<TestSuiteRunMode> defaultTestSuiteStrategy) {
+    public TestCaseRunMode getRunModeForTestCase(final SlangTestCase testCase, final ConflictResolutionStrategy<TestCaseRunMode> multipleModeConflictStrategy,
+                                                 final DefaultResolutionStrategy<TestCaseRunMode> defaultTestSuiteStrategy) {
         List<String> testSuites = testCase.getTestSuites();
         if (testSuites.isEmpty()) {
             return defaultTestSuiteStrategy.getDefaultWhenUnspecified();
         }
 
-        TestSuiteRunMode result = null;
+        TestCaseRunMode result = null;
         for (String testSuite : testSuites) {
             result = multipleModeConflictStrategy.resolve(result, doGetTestSuiteRunMode(testSuite));
         }
@@ -49,7 +49,7 @@ public class TestSuitesRunInfoServiceImpl implements TestSuiteRunInfoService {
         return result;
     }
 
-    private TestSuiteRunMode doGetTestSuiteRunMode(String testSuite) {
+    private TestCaseRunMode doGetTestSuiteRunMode(String testSuite) {
         return runModeMap.get(testSuite);
     }
 

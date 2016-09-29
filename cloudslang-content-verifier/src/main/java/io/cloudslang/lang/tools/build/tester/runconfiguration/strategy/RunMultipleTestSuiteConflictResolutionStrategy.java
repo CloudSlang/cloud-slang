@@ -1,14 +1,14 @@
 package io.cloudslang.lang.tools.build.tester.runconfiguration.strategy;
 
 
-import io.cloudslang.lang.tools.build.SlangBuildMain.TestSuiteRunMode;
+import io.cloudslang.lang.tools.build.SlangBuildMain.TestCaseRunMode;
 
-import static io.cloudslang.lang.tools.build.SlangBuildMain.TestSuiteRunMode.SEQUENTIAL;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.TestCaseRunMode.SEQUENTIAL;
 
-public class RunMultipleTestSuiteConflictResolutionStrategy implements ConflictResolutionStrategy<TestSuiteRunMode> {
+public class RunMultipleTestSuiteConflictResolutionStrategy implements ConflictResolutionStrategy<TestCaseRunMode> {
 
     @Override
-    public TestSuiteRunMode resolve(TestSuiteRunMode entity1, TestSuiteRunMode entity2) {
+    public TestCaseRunMode resolve(TestCaseRunMode entity1, TestCaseRunMode entity2) {
         if (entity1 == null) {
             return entity2;
         } else if (entity2 == null) {

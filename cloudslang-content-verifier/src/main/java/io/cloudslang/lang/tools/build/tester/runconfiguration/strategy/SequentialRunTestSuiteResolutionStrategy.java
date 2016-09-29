@@ -1,14 +1,14 @@
 package io.cloudslang.lang.tools.build.tester.runconfiguration.strategy;
 
 
-import io.cloudslang.lang.tools.build.SlangBuildMain.TestSuiteRunMode;
+import io.cloudslang.lang.tools.build.SlangBuildMain.TestCaseRunMode;
 
-import static io.cloudslang.lang.tools.build.SlangBuildMain.TestSuiteRunMode.SEQUENTIAL;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.TestCaseRunMode.SEQUENTIAL;
 
-public class SequentialRunTestSuiteResolutionStrategy implements DefaultResolutionStrategy<TestSuiteRunMode>{
+public class SequentialRunTestSuiteResolutionStrategy implements DefaultResolutionStrategy<TestCaseRunMode> {
 
     @Override
-    public TestSuiteRunMode getDefaultWhenUnspecified() {
+    public TestCaseRunMode getDefaultWhenUnspecified() {
         return SEQUENTIAL;
     }
 }
