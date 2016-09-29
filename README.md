@@ -6,6 +6,7 @@ This project includes the CLI to trigger flows.
 
 [![Build Status](https://travis-ci.org/CloudSlang/cloud-slang.svg?branch=master)](https://travis-ci.org/CloudSlang/cloud-slang)
 [![Coverage Status](https://coveralls.io/repos/CloudSlang/cloud-slang/badge.svg?branch=master)](https://coveralls.io/r/CloudSlang/cloud-slang?branch=master)
+[![Code Climate](https://codeclimate.com/github/CloudSlang/cloud-slang/badges/gpa.svg)](https://codeclimate.com/github/CloudSlang/cloud-slang)
 
 #### Getting started:
 
