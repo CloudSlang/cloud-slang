@@ -95,7 +95,7 @@ public class SlangBuildMain {
         static final String TEST_SUITES_RUN_UNSPECIFIED = "test.suites.run.unspecified";
     }
 
-    enum TestSuiteRunMode {
+    public enum TestSuiteRunMode {
         PARALLEL,
         SEQUENTIAL
     }
