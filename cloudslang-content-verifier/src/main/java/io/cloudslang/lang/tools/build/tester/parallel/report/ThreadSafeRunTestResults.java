@@ -9,8 +9,11 @@ import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.PassedSlang
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.SkippedSlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.SlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentMap;
@@ -117,7 +120,13 @@ public class ThreadSafeRunTestResults implements IRunTestResults, ISlangTestCase
         } else if (event instanceof PassedSlangTestCaseEvent) {
             addPassedTest(slangTestCase.getName(), new TestRun(slangTestCase, null));
         } else if (event instanceof SkippedSlangTestCaseEvent) {
-            addSkippedTest(slangTestCase.getName(), new TestRun(slangTestCase, "Skipping test: " + slangTestCase.getName() + " because it is not in active test suites"));
+            addSkippedTest(
+                    slangTestCase.getName(),
+                    new TestRun(
+                            slangTestCase,
+                            "Skipping test: " + SlangTestCase.generateTestCaseReference(slangTestCase) + " because it is not in active test suites"
+                    )
+            );
         }
     }
 

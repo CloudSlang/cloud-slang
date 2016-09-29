@@ -42,7 +42,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Source empty_file cannot be empty");
+        exception.expectMessage("Source empty_file.sl cannot be empty");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -54,7 +54,7 @@ public class CompilerErrorsTest {
         path.add(SlangSource.fromFile(operation));
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error compiling source 'flow_navigate_same_level_as_step'.\n" +
+        exception.expectMessage("Error compiling source 'flow_navigate_same_level_as_step.sl'.\n" +
                 "Flow: 'flow_navigate_same_level_as_step' has steps with keyword on the same indentation as the step name " +
                 "or there is no space between step name and hyphen.");
         compiler.compile(SlangSource.fromFile(resource), path);
@@ -79,8 +79,8 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("There was a problem parsing the YAML source: not_yaml_file.\n" +
-                "Source not_yaml_file does not contain YAML content");
+        exception.expectMessage("There was a problem parsing the YAML source: not_yaml_file.sl.\n" +
+                "Source not_yaml_file.sl does not contain YAML content");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -89,8 +89,8 @@ public class CompilerErrorsTest {
         URI resource = getClass().getResource("/corrupted/no_op_flow_file.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error transforming source: no_op_flow_file to a Slang model. " +
-                "Source no_op_flow_file has no content associated with flow/operation/decision/properties property.");
+        exception.expectMessage("Error transforming source: no_op_flow_file.sl to a Slang model. " +
+                "Source no_op_flow_file.sl has no content associated with flow/operation/decision/properties property.");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -99,7 +99,7 @@ public class CompilerErrorsTest {
         URI systemProperties = getClass().getResource("/corrupted/system_properties.yaml").toURI();
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("There was a problem parsing the YAML source: system_properties.\n" +
+        exception.expectMessage("There was a problem parsing the YAML source: system_properties.yaml.\n" +
                 "Cannot create property=user.sys.props.host for JavaBean=io.cloudslang.lang.compiler.parser.model.ParsedSlang");
         compiler.compile(SlangSource.fromFile(systemProperties), path);
     }
@@ -113,7 +113,7 @@ public class CompilerErrorsTest {
         path.add(SlangSource.fromFile(operation));
         path.add(SlangSource.fromFile(systemProperties));
         exception.expect(RuntimeException.class);
-        exception.expectMessage("There was a problem parsing the YAML source: system_properties.\n" +
+        exception.expectMessage("There was a problem parsing the YAML source: system_properties.yaml.\n" +
                 "Cannot create property=user.sys.props.host for JavaBean=io.cloudslang.lang.compiler.parser.model.ParsedSlang");
         compiler.compile(SlangSource.fromFile(flow), path);
     }
@@ -284,7 +284,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("For source[op_without_namespace] namespace cannot be empty.");
+        exception.expectMessage("For source[op_without_namespace.sl] namespace cannot be empty.");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -338,7 +338,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error compiling no_workflow_flow. Flow: no_workflow has no workflow property");
+        exception.expectMessage("Error compiling no_workflow_flow.sl. Flow: no_workflow has no workflow property");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -348,7 +348,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error compiling no_workflow_data_flow. Flow: no_workflow_data has no workflow property");
+        exception.expectMessage("Error compiling no_workflow_data_flow.sl. Flow: no_workflow_data has no workflow property");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 
@@ -469,7 +469,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error compiling operation_with_no_action_data. " +
+        exception.expectMessage("Error compiling operation_with_no_action_data.sl. " +
                 "Operation: operation_with_no_action_data has no action data");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
@@ -480,7 +480,7 @@ public class CompilerErrorsTest {
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("There was a problem parsing the YAML source: operation_with_list_of_actions.\n" +
+        exception.expectMessage("There was a problem parsing the YAML source: operation_with_list_of_actions.sl.\n" +
                 "while parsing a block mapping");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
@@ -610,7 +610,7 @@ public class CompilerErrorsTest {
         Set<SlangSource> dependencies = new HashSet<>();
         dependencies.add(SlangSource.fromFile(dependency1));
         // change file name from source
-        dependencies.add(new SlangSource(duplicateFQNInitialSource.getSource(), "duplicate_fqn_1.sl"));
+        dependencies.add(new SlangSource(duplicateFQNInitialSource.getContent(), "duplicate_fqn_1.sl"));
         dependencies.add(SlangSource.fromFile(dependency3));
 
         exception.expect(RuntimeException.class);

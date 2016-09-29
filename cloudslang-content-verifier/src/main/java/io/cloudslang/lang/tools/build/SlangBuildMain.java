@@ -18,6 +18,7 @@ import io.cloudslang.lang.tools.build.commands.ApplicationArgs;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.TestRun;
 import io.cloudslang.lang.tools.build.tester.parallel.report.SlangTestCaseRunReportGeneratorService;
+import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
 import java.io.File;
@@ -259,8 +260,8 @@ public class SlangBuildMain {
             log.info("------------------------------------------------------------");
             log.info("Following " + runTestsResults.getPassedTests().size() + " test cases passed:");
             for (Map.Entry<String, TestRun> passedTest : runTestsResults.getPassedTests().entrySet()) {
-                String testCaseName = passedTest.getValue().getTestCase().getName();
-                log.info("- " + testCaseName.replaceAll("\n", "\n\t"));
+                String testCaseReference = SlangTestCase.generateTestCaseReference(passedTest.getValue().getTestCase());
+                log.info("- " + testCaseReference.replaceAll("\n", "\n\t"));
             }
         }
     }

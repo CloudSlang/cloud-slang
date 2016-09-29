@@ -34,7 +34,6 @@ import io.cloudslang.lang.tools.build.validation.StaticValidator;
 import io.cloudslang.lang.tools.build.validation.StaticValidatorImpl;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
 import io.cloudslang.score.api.ExecutionPlan;
-
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Files;
@@ -71,13 +70,13 @@ import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /*
@@ -254,12 +253,17 @@ public class SlangBuildTest {
     @Test
     public void testCompileValidSlangFileWithDependencies() throws Exception {
         URI resource = getClass().getResource("/dependencies").toURI();
+        URI emptyFlowURI = getClass().getResource("/dependencies/empty_flow.sl").toURI();
+        URI dependencyURI = getClass().getResource("/dependencies/dependency.sl").toURI();
+        SlangSource emptyFlowSource = SlangSource.fromFile(emptyFlowURI);
+        SlangSource dependencySource = SlangSource.fromFile(dependencyURI);
+
         Set<String> flowDependencies = new HashSet<>();
         flowDependencies.add("dependencies.dependency");
         Flow emptyFlowExecutable = new Flow(null, null, null, "dependencies", "empty_flow", null, null, null, flowDependencies, SYSTEM_PROPERTY_DEPENDENCIES);
-        when(slangCompiler.preCompile(new SlangSource("", "empty_flow"))).thenReturn(emptyFlowExecutable);
+        when(slangCompiler.preCompile(emptyFlowSource)).thenReturn(emptyFlowExecutable);
         Flow dependencyExecutable = new Flow(null, null, null, "dependencies", "dependency", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
-        when(slangCompiler.preCompile(new SlangSource("", "dependency"))).thenReturn(dependencyExecutable);
+        when(slangCompiler.preCompile(dependencySource)).thenReturn(dependencyExecutable);
         HashSet<Executable> dependencies = new HashSet<>();
         dependencies.add(dependencyExecutable);
         when(scoreCompiler.compile(emptyFlowExecutable, dependencies)).thenReturn(EMPTY_COMPILATION_ARTIFACT);

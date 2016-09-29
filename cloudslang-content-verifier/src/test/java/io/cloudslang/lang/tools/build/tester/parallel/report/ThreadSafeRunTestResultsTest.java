@@ -65,7 +65,13 @@ public class ThreadSafeRunTestResultsTest {
         assertEquals(0, threadSafeTestResults.getPassedTests().size());
         assertEquals(1, threadSafeTestResults.getSkippedTests().size());
         Assert.assertTrue(threadSafeTestResults.getSkippedTests().keySet().contains(nameSkipped));
-        assertEquals(new TestRun(testCase, "Skipping test: " + testCase.getName() + " because it is not in active test suites"), threadSafeTestResults.getSkippedTests().values().iterator().next());
+        TestRun expectedTestRun =
+                new TestRun(
+                        testCase,
+                        "Skipping test: " + SlangTestCase.generateTestCaseReference(testCase) + " because it is not in active test suites"
+                );
+        TestRun actualTestRun = threadSafeTestResults.getSkippedTests().values().iterator().next();
+        assertEquals(expectedTestRun, actualTestRun);
     }
 
     @Test

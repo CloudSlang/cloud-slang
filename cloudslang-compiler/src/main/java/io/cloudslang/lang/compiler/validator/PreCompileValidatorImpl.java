@@ -17,7 +17,6 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.utils.ResultUtils;
 import io.cloudslang.lang.entities.utils.SetUtils;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,7 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -411,15 +409,16 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     private void validateFileName(String executableName, ParsedSlang parsedSlang, ExecutableModellingResult result) {
         String fileName = parsedSlang.getName();
         Extension fileExtension = parsedSlang.getFileExtension();
-        if (StringUtils.isNotEmpty(executableName) && !executableName.equals(fileName)) {
+        String fileNameWithoutExtension = Extension.removeExtension(fileName);
+        if (StringUtils.isNotEmpty(executableName) && !executableName.equals(fileNameWithoutExtension)) {
             if (fileExtension == null) {
                 result.getErrors().add(new IllegalArgumentException("Operation/Flow " + executableName +
-                        " is declared in a file named \"" + fileName + "\"," +
+                        " is declared in a file named \"" + fileNameWithoutExtension + "\"," +
                         " it should be declared in a file named \"" + executableName + "\" plus a valid " +
                         "extension(" + Extension.getExtensionValuesAsString() + ") separated by \".\""));
             } else {
                 result.getErrors().add(new IllegalArgumentException("Operation/Flow " + executableName +
-                        " is declared in a file named \"" + fileName + "." + fileExtension.getValue() + "\"" +
+                        " is declared in a file named \"" + fileName + "\"" +
                         ", it should be declared in a file named \"" + executableName + "." + fileExtension.getValue() + "\""));
             }
         }

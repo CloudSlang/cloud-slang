@@ -63,7 +63,6 @@ public class SlangBuilder {
                 slangContentVerifier.createModelsAndValidate(contentPath, shouldValidateDescription);
         Map<String, Executable> slangModels = compilationResult.getResults();
 
-
         Map<String, CompilationArtifact> compiledSources = compileModels(slangModels);
 
         IRunTestResults runTestsResults = new RunTestsResults();
