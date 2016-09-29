@@ -70,8 +70,9 @@ public class TestCasesYamlParser {
             }
             return parseTestCases(parsedTestCases, source.getFilePath());
         } catch (Throwable e) {
-            throw new RuntimeException("There was a problem parsing the YAML source: " + source.getName() +
-                    "." + source.getFileExtension().getValue() + ".\n" + e.getMessage(), e);
+            throw new RuntimeException(
+                    "There was a problem parsing the YAML source: " + source.getName() + ".\n" + e.getMessage(), e
+            );
         }
     }
 

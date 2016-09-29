@@ -42,6 +42,7 @@ public class SlangTestCase implements Serializable {
 
     private String result;
 
+    @JsonIgnore
     private String filePath;
 
     //for jackson
