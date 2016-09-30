@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 
-public class TestSuitesRunInfoServiceImpl implements TestSuiteRunInfoService {
+public class TestSuitesRunInfoServiceImpl implements TestRunInfoService {
 
     private ConcurrentMap<String, TestCaseRunMode> runModeMap;
 
