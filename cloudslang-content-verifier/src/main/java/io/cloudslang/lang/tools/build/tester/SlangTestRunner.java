@@ -244,7 +244,7 @@ public class SlangTestRunner {
             if (isTestCaseInActiveSuite(testCase, testSuites)) {
                 processActiveTest(bulkRunMode, resultMap, testCaseEntry, testCase);
             } else {
-                processSkippedTest(runTestsResults, testCaseEntry, testCase);
+                processSkippedTest(runTestsResults, testCaseEntry, testCase, resultMap);
             }
         }
 
@@ -271,11 +271,13 @@ public class SlangTestRunner {
         }
     }
 
-    private void processSkippedTest(final IRunTestResults runTestsResults, Map.Entry<String, SlangTestCase> testCaseEntry, SlangTestCase testCase) {
+    private void processSkippedTest(final IRunTestResults runTestsResults, Map.Entry<String, SlangTestCase> testCaseEntry, SlangTestCase testCase,
+                                    final Map<TestCaseRunState, Map<String, SlangTestCase>> resultMap) {
         String message = "Skipping test: " + testCaseEntry.getKey() + " because it is not in active test suites";
         log.info(message);
 
         runTestsResults.addSkippedTest(testCase.getName(), new TestRun(testCase, message));
+        resultMap.get(TestCaseRunState.INACTIVE).put(testCaseEntry.getKey(), testCaseEntry.getValue());
     }
 
     private long getTestCaseTimeoutInMinutes() {
