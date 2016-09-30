@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-
+/**
+ * Service for managing test and test suite run information
+ */
 public class TestRunInfoServiceImpl implements TestRunInfoService {
 
     private ConcurrentMap<String, TestCaseRunMode> runModeMap;
