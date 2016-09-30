@@ -140,7 +140,7 @@ public class SlangBuilder {
             ThreadSafeRunTestResults mixedTestResults = new ThreadSafeRunTestResults();
             Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunState = slangTestRunner.splitTestCasesByRunState(bulkRunMode, testCases, testSuites, mixedTestResults);
             slangTestRunner.runTestsSequential(projectPath, testCaseRunState.get(TestCaseRunState.SEQUENTIAL), compiledFlows, mixedTestResults);
-            slangTestRunner.runTestsParallel(projectPath, testCaseRunState.get(TestCaseRunState.SEQUENTIAL), compiledFlows, mixedTestResults);
+            slangTestRunner.runTestsParallel(projectPath, testCaseRunState.get(TestCaseRunState.PARALLEL), compiledFlows, mixedTestResults);
             runTestsResults = mixedTestResults;
 
         } else {
