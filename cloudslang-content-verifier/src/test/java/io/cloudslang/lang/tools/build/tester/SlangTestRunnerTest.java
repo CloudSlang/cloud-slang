@@ -541,34 +541,6 @@ public class SlangTestRunnerTest {
         Assert.assertEquals("No test cases should be skipped", 0, runTestsResults.getSkippedTests().size());
     }
 
-    @Test
-    public void runTestCaseWithSeveralTestSuitesWithNoIntersection() {
-        Map<String, SlangTestCase> testCases = new HashMap<>();
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", Arrays.asList("new", "newer"), "mock", null, null, false, "SUCCESS");
-        testCases.put("test1", testCase);
-        HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
-        compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
-        prepareMockForEventListenerWithSuccessResult();
-        List<String> runtimeTestSuites = new ArrayList<>(specialRuntimeTestSuite);
-        runtimeTestSuites.add("anotherTestSuite");
-        final RunTestsResults runTestsResults = new RunTestsResults();
-        slangTestRunner.runTestsSequential("path", testCases, compiledFlows, runTestsResults);
-        Assert.assertEquals("1 test case should be skipped", 1, runTestsResults.getSkippedTests().size());
-    }
-
-    @Test
-    public void runTestCaseWithUnsupportedSpecialTestSuite() {
-        Map<String, SlangTestCase> testCases = new HashMap<>();
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", specialTestSuite, "mock", null, null, false, "SUCCESS");
-        testCases.put("test1", testCase);
-        HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
-        compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
-        prepareMockForEventListenerWithSuccessResult();
-        final RunTestsResults runTestsResults = new RunTestsResults();
-        slangTestRunner.runTestsSequential("path", testCases, compiledFlows, runTestsResults);
-        Assert.assertEquals("1 test case should be skipped", 1, runTestsResults.getSkippedTests().size());
-    }
-
     private void prepareMockForEventListenerWithSuccessResult() {
         Mockito.doAnswer(new Answer() {
             @Override
