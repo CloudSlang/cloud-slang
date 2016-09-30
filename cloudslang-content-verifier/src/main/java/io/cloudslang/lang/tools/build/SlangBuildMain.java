@@ -94,8 +94,10 @@ public class SlangBuildMain {
     private static final String PROPERTIES_FILE_EXTENSION = "properties";
     private static final String DID_NOT_DETECT_RUN_CONFIGURATION_PROPERTIES_FILE = "Did not detect run configuration properties file at path '%s'. " +
             "Check that the path you are using is an absolute path. Check that the path separator is '\\\\' for Windows, or '/' for Linux.";
-    public static final String EMPTY = "<empty>";
+    private static final String EMPTY = "<empty>";
+    private static final String NEW_LINE = System.lineSeparator();
 
+    // This class is a used in the interaction with the run configuration property file
     static class RunConfigurationProperties {
         static final String TEST_COVERAGE = "test.coverage";
         static final String TEST_PARALLEL_THREAD_COUNT = "test.parallel.thread.count";
@@ -105,11 +107,13 @@ public class SlangBuildMain {
         static final String TEST_SUITES_RUN_UNSPECIFIED = "test.suites.run.unspecified";
     }
 
+    // The possible ways to execute a test case
     public enum TestCaseRunMode {
         PARALLEL,
         SEQUENTIAL
     }
 
+    // The typical configuration on how to configure the run of all tests as a bulk
     public enum BulkRunMode {
         ALL_PARALLEL,
         ALL_SEQUENTIAL,
@@ -150,11 +154,11 @@ public class SlangBuildMain {
             unspecifiedTestSuiteRunMode = getEnumInstanceFromPropertiesWithDefault(TEST_SUITES_RUN_UNSPECIFIED, unspecifiedTestSuiteRunMode, runConfigurationProperties);
             addWarningsForMisconfiguredTestSuites(unspecifiedTestSuiteRunMode, testSuites, testSuitesSequential, testSuitesParallel);
             bulkRunMode = POSSIBLY_MIXED;
-        } else {
+        } else { // Warn when file is misconfigured, relative path, file does not exist or is not a properties file
             log.info(format(DID_NOT_DETECT_RUN_CONFIGURATION_PROPERTIES_FILE, runConfigPath));
         }
 
-        log.info(System.lineSeparator() + "------------------------------------------------------------");
+        log.info(NEW_LINE + "------------------------------------------------------------");
         log.info("Building project: " + projectPath);
         log.info("Content root is at: " + contentPath);
         log.info("Test root is at: " + testsPath);
@@ -171,7 +175,7 @@ public class SlangBuildMain {
         log.info("Thread count: " + threadCount);
         log.info("Test case timeout in minutes: " + (isEmpty(testCaseTimeout) ? valueOf(MAX_TIME_PER_TESTCASE_IN_MINUTES) : testCaseTimeout));
 
-        log.info(System.lineSeparator() + "Loading...");
+        log.info(NEW_LINE + "Loading...");
 
         //load application context
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/testRunnerContext.xml");
@@ -219,14 +223,33 @@ public class SlangBuildMain {
         }
     }
 
+
+    /**
+     *
+     * @param bulkRunMode the mode to configure the run of all tests
+     * @return String friendly version for print to the log or console
+     */
     private static String getBulkModeForPrint(BulkRunMode bulkRunMode) {
         return bulkRunMode.toString().replace("_", " ").toLowerCase(ENGLISH);
     }
 
+    /**
+     *
+     * @param testSuite the list of test suite names
+     * @return A string joining the test suite names using io.cloudslang.lang.tools.build.SlangBuildMain#LIST_JOINER
+     */
     private static String getTestSuiteForPrint(List<String> testSuite) {
         return CollectionUtils.isEmpty(testSuite) ? EMPTY : join(testSuite, LIST_JOINER);
     }
 
+    /**
+     *
+     * @param testSuiteRunInfoService the service responsible for managing run information
+     * @param parallelSuites the suite names to be executed in parallel
+     * @param sequentialSuites the suite names to be executed in sequential manner
+     * @param activeSuites the suite names that are active
+     * @param unspecifiedTestSuiteRunMode the default run mode for suites that don't explicitly mention a run mode.
+     */
     private static void updateTestSuiteMappings(final TestSuiteRunInfoService testSuiteRunInfoService, final List<String> parallelSuites,
                                                 final List<String> sequentialSuites, final List<String> activeSuites, final TestCaseRunMode unspecifiedTestSuiteRunMode) {
 
@@ -235,28 +258,57 @@ public class SlangBuildMain {
         testSuiteRunInfoService.setRunModeForTestSuites(getDefaultRunModeTestSuites(activeSuites, parallelSuites, sequentialSuites), unspecifiedTestSuiteRunMode);
     }
 
-    private static List<String> getDefaultRunModeTestSuites(final List<String> testSuites, final List<String> testSuitesParallel, final List<String> testSuitesSequential) {
-        return removeAll(new ArrayList<>(testSuites), union(testSuitesParallel, testSuitesSequential));
+    /**
+     *
+     * @param activeSuites the suite names that are active
+     * @param parallelSuites the suite names to be executed in parallel
+     * @param sequentialSuites the suite names to be executed in sequential manner
+     * @return
+     */
+    private static List<String> getDefaultRunModeTestSuites(final List<String> activeSuites, final List<String> parallelSuites, final List<String> sequentialSuites) {
+        return removeAll(new ArrayList<>(activeSuites), union(parallelSuites, sequentialSuites));
     }
 
-    private static void addWarningsForMisconfiguredTestSuites(final TestCaseRunMode testSuiteRunMode, final List<String> testSuites, final List<String> testSuitesSequential,
-                                                              final List<String> testSuitesParallel) {
-        addWarningForSubsetOfRules(testSuites, testSuitesSequential, TEST_SUITES_SEQUENTIAL);
-        addWarningForSubsetOfRules(testSuites, testSuitesParallel, TEST_SUITES_PARALLEL);
-        addWarningForUnspecifiedRules(testSuiteRunMode, testSuites, testSuitesSequential, testSuitesParallel);
+    /**
+     *
+     * @param unspecifiedTestSuiteRunMode the default run mode for suites that don't explicitly mention a run mode.
+     * @param activeSuites the suite names that are active
+     * @param sequentialSuites the suite names to be executed in sequential manner
+     * @param parallelSuites the suite names to be executed in parallel
+     */
+    private static void addWarningsForMisconfiguredTestSuites(final TestCaseRunMode unspecifiedTestSuiteRunMode, final List<String> activeSuites, final List<String> sequentialSuites,
+                                                              final List<String> parallelSuites) {
+        addWarningForSubsetOfRules(activeSuites, sequentialSuites, TEST_SUITES_SEQUENTIAL);
+        addWarningForSubsetOfRules(activeSuites, parallelSuites, TEST_SUITES_PARALLEL);
+        addInformativeNoteForUnspecifiedRules(unspecifiedTestSuiteRunMode, activeSuites, sequentialSuites, parallelSuites);
     }
 
-    private static void addWarningForUnspecifiedRules(final TestCaseRunMode testSuiteRunMode, final List<String> testSuites, final List<String> testSuitesSequential,
-                                                      final List<String> testSuitesParallel) {
-        List<String> union = union(testSuitesSequential, testSuitesParallel);
-        if (!union.containsAll(testSuites)) {
-            List<String> copy = new ArrayList<>(testSuites);
+    /**
+     * Displays an informative message in case there is at least one test suite left for default run mode.
+     *
+     * @param unspecifiedTestSuiteRunMode the default run mode for suites that don't explicitly mention a run mode.
+     * @param activeSuites the suite names that are active
+     * @param sequentialSuites the suite names to be executed in sequential manner
+     * @param parallelSuites the suite names to be executed in parallel
+     */
+    private static void addInformativeNoteForUnspecifiedRules(final TestCaseRunMode unspecifiedTestSuiteRunMode, final List<String> activeSuites, final List<String> sequentialSuites,
+                                                              final List<String> parallelSuites) {
+        List<String> union = union(sequentialSuites, parallelSuites);
+        if (!union.containsAll(activeSuites)) {
+            List<String> copy = new ArrayList<>(activeSuites);
             copy.removeAll(union);
 
-            log.info(format(MESSAGE_TEST_SUITES_WITH_UNSPECIFIED_MAPPING, getTestSuiteForPrint(copy), testSuiteRunMode.name()));
+            log.info(format(MESSAGE_TEST_SUITES_WITH_UNSPECIFIED_MAPPING, getTestSuiteForPrint(copy), unspecifiedTestSuiteRunMode.name()));
         }
     }
 
+    /**
+     * Displays a warning message for test suites that have rules defined for sequential or parallel execution but are not in active test suites.
+     *
+     * @param testSuites suite names contained in 'container' suites
+     * @param testSuitesContained suite names contained in 'contained' suites
+     * @param key run configuration property key
+     */
     private static void addWarningForSubsetOfRules(List<String> testSuites, List<String> testSuitesContained, String key) {
         List<String> intersectWithContained = ListUtils.intersection(testSuites, testSuitesContained);
         if (intersectWithContained.size() != testSuitesContained.size()) {
@@ -266,12 +318,25 @@ public class SlangBuildMain {
         }
     }
 
+    /**
+     * Returns the names of the suites from the run configuration java.util.Properties object at a certain key.
+     *
+     * @param runConfigurationProperties
+     * @param key
+     * @return
+     */
     private static List<String> getTestSuitesForKey(Properties runConfigurationProperties, String key) {
         final String valueList = runConfigurationProperties.getProperty(key);
         return StringUtils.isNotEmpty(valueList) ? parseTestSuitesToList(asList(valueList.split(SUITE_LIST_SEPARATOR))) : new ArrayList<String>();
 
     }
 
+    /**
+     *  Returns the properties entries inside that file as a java.util.Properties object.
+     *
+     * @param runConfigPath the absolute path to the run configuration properties file
+     * @return
+     */
     private static Properties getRunConfigurationProperties(String runConfigPath) {
         try (FileInputStream fileInputStream = new FileInputStream(new File(runConfigPath))) {
             Properties properties = new Properties();
