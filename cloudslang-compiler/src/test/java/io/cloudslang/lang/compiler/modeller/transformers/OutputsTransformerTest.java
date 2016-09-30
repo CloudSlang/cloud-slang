@@ -34,6 +34,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
@@ -92,6 +93,7 @@ public class OutputsTransformerTest {
     public static class Config {
 
         @Bean
+        @Scope("prototype")
         public Yaml yaml() {
             Yaml yaml = new Yaml();
             yaml.setBeanAccess(BeanAccess.FIELD);
@@ -100,7 +102,12 @@ public class OutputsTransformerTest {
 
         @Bean
         public YamlParser yamlParser() {
-            return new YamlParser();
+            return new YamlParser() {
+                @Override
+                public Yaml getYaml() {
+                    return yaml();
+                }
+            };
         }
 
         @Bean
