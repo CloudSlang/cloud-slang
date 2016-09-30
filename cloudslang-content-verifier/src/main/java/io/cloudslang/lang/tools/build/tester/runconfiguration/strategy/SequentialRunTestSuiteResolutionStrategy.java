@@ -5,6 +5,9 @@ import io.cloudslang.lang.tools.build.SlangBuildMain.TestCaseRunMode;
 
 import static io.cloudslang.lang.tools.build.SlangBuildMain.TestCaseRunMode.SEQUENTIAL;
 
+/**
+ * This class provides a resolution for the cases when a run mode for a test case is unspecified.
+ */
 public class SequentialRunTestSuiteResolutionStrategy implements DefaultResolutionStrategy<TestCaseRunMode> {
 
     @Override

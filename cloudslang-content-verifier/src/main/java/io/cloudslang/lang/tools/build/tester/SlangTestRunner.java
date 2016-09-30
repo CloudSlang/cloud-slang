@@ -26,7 +26,7 @@ import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDisp
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.FailedSlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
-import io.cloudslang.lang.tools.build.tester.runconfiguration.TestSuiteRunInfoService;
+import io.cloudslang.lang.tools.build.tester.runconfiguration.TestRunInfoService;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.strategy.RunMultipleTestSuiteConflictResolutionStrategy;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.strategy.SequentialRunTestSuiteResolutionStrategy;
 import io.cloudslang.score.events.EventConstants;
@@ -78,7 +78,7 @@ public class SlangTestRunner {
     private TestCaseEventDispatchService testCaseEventDispatchService;
 
     @Autowired
-    private TestSuiteRunInfoService testSuiteRunInfoService;
+    private TestRunInfoService testRunInfoService;
 
     private String[] TEST_CASE_FILE_EXTENSIONS = {"yaml", "yml"};
     private static final String TEST_CASE_PASSED = "Test case passed: ";
@@ -257,7 +257,7 @@ public class SlangTestRunner {
 
     private void processActiveTest(final BulkRunMode bulkRunMode, final Map<TestCaseRunState, Map<String, SlangTestCase>> resultMap, Map.Entry<String, SlangTestCase> testCaseEntry, SlangTestCase testCase) {
         if (bulkRunMode == BulkRunMode.POSSIBLY_MIXED) {
-            TestCaseRunMode runModeForTestCase = testSuiteRunInfoService.getRunModeForTestCase(testCase, new RunMultipleTestSuiteConflictResolutionStrategy(),
+            TestCaseRunMode runModeForTestCase = testRunInfoService.getRunModeForTestCase(testCase, new RunMultipleTestSuiteConflictResolutionStrategy(),
                     new SequentialRunTestSuiteResolutionStrategy());
             if (runModeForTestCase == TestCaseRunMode.SEQUENTIAL) {
                 resultMap.get(TestCaseRunState.SEQUENTIAL).put(testCaseEntry.getKey(), testCase);

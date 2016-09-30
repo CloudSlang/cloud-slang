@@ -8,7 +8,10 @@ import io.cloudslang.lang.tools.build.tester.runconfiguration.strategy.DefaultRe
 
 import java.util.List;
 
-public interface TestSuiteRunInfoService {
+/**
+ * Service interface for managing run information for test suite and test cases.
+ */
+public interface TestRunInfoService {
 
     TestCaseRunMode getRunModeForTestSuite(String testSuite);
 

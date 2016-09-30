@@ -5,6 +5,11 @@ import io.cloudslang.lang.tools.build.SlangBuildMain.TestCaseRunMode;
 
 import static io.cloudslang.lang.tools.build.SlangBuildMain.TestCaseRunMode.SEQUENTIAL;
 
+/**
+ * This class provides the resolution in case of test case run mode conflicts.
+ *  E.g. test case t1 that is included in test suites aa, bb, with rules aa - sequential, bb - parallel, will be executed sequentially.
+ */
+
 public class RunMultipleTestSuiteConflictResolutionStrategy implements ConflictResolutionStrategy<TestCaseRunMode> {
 
     @Override

@@ -18,7 +18,7 @@ import io.cloudslang.lang.tools.build.commands.ApplicationArgs;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.TestRun;
 import io.cloudslang.lang.tools.build.tester.parallel.report.SlangTestCaseRunReportGeneratorService;
-import io.cloudslang.lang.tools.build.tester.runconfiguration.TestSuiteRunInfoService;
+import io.cloudslang.lang.tools.build.tester.runconfiguration.TestRunInfoService;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
 import org.apache.commons.collections4.CollectionUtils;
@@ -182,7 +182,7 @@ public class SlangBuildMain {
         SlangBuilder slangBuilder = context.getBean(SlangBuilder.class);
         Slang slang = context.getBean(Slang.class);
 
-        updateTestSuiteMappings(context.getBean(TestSuiteRunInfoService.class), testSuitesParallel, testSuitesSequential, testSuites, unspecifiedTestSuiteRunMode);
+        updateTestSuiteMappings(context.getBean(TestRunInfoService.class), testSuitesParallel, testSuitesSequential, testSuites, unspecifiedTestSuiteRunMode);
 
         SlangTestCaseRunReportGeneratorService reportGeneratorService = context.getBean(SlangTestCaseRunReportGeneratorService.class);
         registerEventHandlers(slang);
@@ -244,18 +244,18 @@ public class SlangBuildMain {
 
     /**
      *
-     * @param testSuiteRunInfoService the service responsible for managing run information
+     * @param testRunInfoService the service responsible for managing run information
      * @param parallelSuites the suite names to be executed in parallel
      * @param sequentialSuites the suite names to be executed in sequential manner
      * @param activeSuites the suite names that are active
      * @param unspecifiedTestSuiteRunMode the default run mode for suites that don't explicitly mention a run mode.
      */
-    private static void updateTestSuiteMappings(final TestSuiteRunInfoService testSuiteRunInfoService, final List<String> parallelSuites,
+    private static void updateTestSuiteMappings(final TestRunInfoService testRunInfoService, final List<String> parallelSuites,
                                                 final List<String> sequentialSuites, final List<String> activeSuites, final TestCaseRunMode unspecifiedTestSuiteRunMode) {
 
-        testSuiteRunInfoService.setRunModeForTestSuites(parallelSuites, TestCaseRunMode.PARALLEL);
-        testSuiteRunInfoService.setRunModeForTestSuites(sequentialSuites, TestCaseRunMode.SEQUENTIAL);
-        testSuiteRunInfoService.setRunModeForTestSuites(getDefaultRunModeTestSuites(activeSuites, parallelSuites, sequentialSuites), unspecifiedTestSuiteRunMode);
+        testRunInfoService.setRunModeForTestSuites(parallelSuites, TestCaseRunMode.PARALLEL);
+        testRunInfoService.setRunModeForTestSuites(sequentialSuites, TestCaseRunMode.SEQUENTIAL);
+        testRunInfoService.setRunModeForTestSuites(getDefaultRunModeTestSuites(activeSuites, parallelSuites, sequentialSuites), unspecifiedTestSuiteRunMode);
     }
 
     /**
