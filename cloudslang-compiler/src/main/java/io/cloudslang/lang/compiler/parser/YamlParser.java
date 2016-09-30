@@ -15,26 +15,21 @@ import io.cloudslang.lang.compiler.modeller.result.ParseModellingResult;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
-@Component
-public class YamlParser {
-
-    @Autowired
-    private Yaml yaml;
+public abstract class YamlParser {
 
     @Autowired
     private ParserExceptionHandler parserExceptionHandler;
 
     @Autowired
     private ExecutableValidator executableValidator;
+
+    protected abstract Yaml getYaml();
 
     public ParsedSlang validateAndThrowFirstError(ParsedSlang parsedSlang) {
         ParseModellingResult parseModellingResult = validate(parsedSlang);
@@ -65,7 +60,7 @@ public class YamlParser {
         Validate.notEmpty(source.getSource(), "Source " + source.getFileName() + " cannot be empty");
 
         try {
-            ParsedSlang parsedSlang = yaml.loadAs(source.getSource(), ParsedSlang.class);
+            ParsedSlang parsedSlang = getYaml().loadAs(source.getSource(), ParsedSlang.class);
             if (parsedSlang == null) {
                 throw new RuntimeException("Source " + source.getFileName() + " does not contain YAML content");
             }
@@ -77,10 +72,6 @@ public class YamlParser {
             throw new RuntimeException("There was a problem parsing the YAML source: " +
                     source.getFileName() + ".\n" + parserExceptionHandler.getErrorMessage(e), e);
         }
-    }
-
-    public void setYaml(Yaml yaml) {
-        this.yaml = yaml;
     }
 
     public void setParserExceptionHandler(ParserExceptionHandler parserExceptionHandler) {
