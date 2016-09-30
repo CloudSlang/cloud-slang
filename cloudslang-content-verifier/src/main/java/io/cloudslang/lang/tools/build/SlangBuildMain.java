@@ -154,8 +154,7 @@ public class SlangBuildMain {
             log.info(format(DID_NOT_DETECT_RUN_CONFIGURATION_PROPERTIES_FILE, runConfigPath));
         }
 
-        log.info("");
-        log.info("------------------------------------------------------------");
+        log.info(System.lineSeparator() + "------------------------------------------------------------");
         log.info("Building project: " + projectPath);
         log.info("Content root is at: " + contentPath);
         log.info("Test root is at: " + testsPath);
@@ -165,15 +164,14 @@ public class SlangBuildMain {
         log.info("Default run mode '" + unspecifiedTestSuiteRunMode.name().toLowerCase() + "' is configured for test suites: "
                 + getTestSuiteForPrint(getDefaultRunModeTestSuites(testSuites, testSuitesParallel, testSuitesSequential)));
 
-        log.info("Bulk run mode for tests: " + bulkRunMode.toString().replace("_", " ").toLowerCase(ENGLISH));
+        log.info("Bulk run mode for tests: " + getBulkModeForPrint(bulkRunMode));
 
         log.info("Print coverage data: " + valueOf(shouldPrintCoverageData));
         log.info("Validate description: " + valueOf(shouldValidateDescription));
         log.info("Thread count: " + threadCount);
         log.info("Test case timeout in minutes: " + (isEmpty(testCaseTimeout) ? valueOf(MAX_TIME_PER_TESTCASE_IN_MINUTES) : testCaseTimeout));
 
-        log.info("");
-        log.info("Loading...");
+        log.info(System.lineSeparator() + "Loading...");
 
         //load application context
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/testRunnerContext.xml");
@@ -219,6 +217,10 @@ public class SlangBuildMain {
             logErrorsSuffix(projectPath);
             System.exit(1);
         }
+    }
+
+    private static String getBulkModeForPrint(BulkRunMode bulkRunMode) {
+        return bulkRunMode.toString().replace("_", " ").toLowerCase(ENGLISH);
     }
 
     private static String getTestSuiteForPrint(List<String> testSuite) {
