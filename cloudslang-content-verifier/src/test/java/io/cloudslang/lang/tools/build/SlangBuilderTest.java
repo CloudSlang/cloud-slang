@@ -101,8 +101,8 @@ import static org.python.google.common.collect.Sets.newHashSet;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = SlangBuildTest.Config.class)
-public class SlangBuildTest {
+@ContextConfiguration(classes = SlangBuilderTest.Config.class)
+public class SlangBuilderTest {
 
     private static final Set<String> SYSTEM_PROPERTY_DEPENDENCIES = Collections.emptySet();
     private static final CompilationArtifact EMPTY_COMPILATION_ARTIFACT =
