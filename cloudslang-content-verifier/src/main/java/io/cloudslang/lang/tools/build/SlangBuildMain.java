@@ -91,6 +91,7 @@ public class SlangBuildMain {
             "Check that the path you are using is an absolute path. Check that the path separator is '\\\\' for Windows, or '/' for Linux.";
     private static final String EMPTY = "<empty>";
     private static final String NEW_LINE = System.lineSeparator();
+    public static final String MESSAGE_BOTH_PARALLEL_AND_SEQUENTIAL_EXECUTION = "The '%s' suites are configured for both parallel and sequential execution. Each test suite must have only one execution mode (parallel or sequential).";
 
     // This class is a used in the interaction with the run configuration property file
     static class RunConfigurationProperties {
@@ -146,6 +147,7 @@ public class SlangBuildMain {
             testSuites = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_TO_RUN);
             testSuitesParallel = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_PARALLEL);
             testSuitesSequential = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_SEQUENTIAL);
+            addErrorIfSameTestSuiteIsInBothParallelOrSequential(testSuitesParallel, testSuitesSequential);
             unspecifiedTestSuiteRunMode = getEnumInstanceFromPropertiesWithDefault(TEST_SUITES_RUN_UNSPECIFIED, unspecifiedTestSuiteRunMode, runConfigurationProperties);
             addWarningsForMisconfiguredTestSuites(unspecifiedTestSuiteRunMode, testSuites, testSuitesSequential, testSuitesParallel);
             bulkRunMode = POSSIBLY_MIXED;
@@ -215,6 +217,15 @@ public class SlangBuildMain {
             log.error("Exception: " + e.getMessage());
             logErrorsSuffix(projectPath);
             System.exit(1);
+        }
+    }
+
+    private static void addErrorIfSameTestSuiteIsInBothParallelOrSequential(List<String> testSuitesParallel, List<String> testSuitesSequential) {
+        List<String> intersection = ListUtils.intersection(testSuitesParallel, testSuitesSequential);
+        if (!intersection.isEmpty()) {
+            String message = String.format(MESSAGE_BOTH_PARALLEL_AND_SEQUENTIAL_EXECUTION, getTestSuiteForPrint(intersection));
+            log.error(message);
+            throw new IllegalStateException();
         }
     }
 
