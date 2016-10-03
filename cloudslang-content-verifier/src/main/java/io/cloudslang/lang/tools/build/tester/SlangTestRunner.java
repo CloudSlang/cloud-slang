@@ -63,7 +63,7 @@ public class SlangTestRunner {
     private final static String PROJECT_PATH_TOKEN = "${project_path}";
     public static final long MAX_TIME_PER_TESTCASE_IN_MINUTES = 10;
     public static final String TEST_CASE_TIMEOUT_IN_MINUTES_KEY = "test.case.timeout.in.minutes";
-    public static final String PREFIX_BULLET = "    \u2022 ";
+    public static final String PREFIX_DASH = "    - ";
 
     @Autowired
     private TestCasesYamlParser parser;
@@ -213,7 +213,7 @@ public class SlangTestRunner {
             log.info("Running " + testCases.size() + " test(s) in " + runMode.toString().toLowerCase() + ": ");
             for (Map.Entry<String, SlangTestCase> stringSlangTestCaseEntry : testCases.entrySet()) {
                 final SlangTestCase slangTestCase = stringSlangTestCaseEntry.getValue();
-                log.info(PREFIX_BULLET + slangTestCase.getName());
+                log.info(PREFIX_DASH + slangTestCase.getName());
             }
         }
     }
