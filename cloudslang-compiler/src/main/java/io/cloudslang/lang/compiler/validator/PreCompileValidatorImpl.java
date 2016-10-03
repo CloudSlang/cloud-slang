@@ -377,14 +377,12 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     }
 
     private Step selectNextStepToCompile(Deque<Step> steps, String navigationTarget) {
-        Step nextStepToCompile = null;
         for (Step step : steps) {
-            if (step.getName().equals(navigationTarget)) {
-                nextStepToCompile = step;
-                break;
+            if (org.apache.commons.lang.StringUtils.equals(step.getName(), navigationTarget)) {
+                return step;
             }
         }
-        return nextStepToCompile;
+        return null;
     }
 
     private boolean isProcessed(String navigationTarget, Set<String> reachableStepNames, Set<String> reachableResultNames) {
