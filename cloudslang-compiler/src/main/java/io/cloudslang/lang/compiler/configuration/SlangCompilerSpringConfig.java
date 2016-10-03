@@ -14,11 +14,13 @@ package io.cloudslang.lang.compiler.configuration;
  * Created by orius123 on 05/11/14.
  */
 
+import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
 import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
@@ -27,6 +29,7 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 public class SlangCompilerSpringConfig {
 
     @Bean
+    @Scope("prototype")
     public Yaml yaml() {
         Yaml yaml = new Yaml();
         yaml.setBeanAccess(BeanAccess.FIELD);
@@ -41,5 +44,15 @@ public class SlangCompilerSpringConfig {
     @Bean
     public DummyEncryptor dummyEncryptor() {
         return new DummyEncryptor();
+    }
+
+    @Bean
+    public YamlParser yamlParser() {
+        return new YamlParser() {
+            @Override
+            public Yaml getYaml() {
+                return yaml();
+            }
+        };
     }
 }
