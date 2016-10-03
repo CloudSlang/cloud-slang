@@ -4,6 +4,7 @@ package io.cloudslang.lang.tools.build;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Properties;
 
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.PROPERTIES_OBJECT_CANNOT_BE_NULL;
@@ -11,6 +12,7 @@ import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.PROPERTY_KEY
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getBooleanFromPropertiesWithDefault;
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getEnumInstanceFromPropertiesWithDefault;
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getIntFromPropertiesWithDefaultAndRange;
+import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.parseTestSuitesToList;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.TestCaseRunMode.PARALLEL;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.TestCaseRunMode.SEQUENTIAL;
 import static org.junit.Assert.fail;
@@ -109,6 +111,62 @@ public class ArgumentProcessorUtilsTest {
         properties.setProperty("eee", "SeqUENTial");
         Assert.assertSame(SEQUENTIAL, getEnumInstanceFromPropertiesWithDefault("eee", PARALLEL, properties));
         Assert.assertSame(SEQUENTIAL, getEnumInstanceFromPropertiesWithDefault("eee", SEQUENTIAL, properties));
+    }
+
+    @Test
+    public void testParseTestSuitesToList() {
+        // Case 1
+        String testSuitesString = "!default,abc";
+
+        // Tested call
+        List<String> suites = parseTestSuitesToList(testSuitesString);
+        Assert.assertEquals(1, suites.size());
+        Assert.assertEquals("abc", suites.get(0));
+
+        // Case 2
+        testSuitesString = "default,abcd";
+
+        // Tested call
+        suites = parseTestSuitesToList(testSuitesString);
+        Assert.assertEquals(2, suites.size());
+        Assert.assertEquals("abcd", suites.get(0));
+        Assert.assertEquals("default", suites.get(1));
+
+        // Case 3
+        testSuitesString = "!ab,abcd,!ef,defg,!cd";
+
+        // Tested call
+        suites = parseTestSuitesToList(testSuitesString);
+        Assert.assertEquals(2, suites.size());
+        Assert.assertEquals("abcd", suites.get(0));
+        Assert.assertEquals("defg", suites.get(1));
+
+        // Case 4
+        testSuitesString = "!default,default,ef";
+
+        // Tested call
+        suites = parseTestSuitesToList(testSuitesString);
+        Assert.assertEquals(1, suites.size());
+        Assert.assertEquals("ef", suites.get(0));
+
+        // Case 5
+        testSuitesString = "default,!default,gh";
+
+        // Tested call
+        suites = parseTestSuitesToList(testSuitesString);
+        Assert.assertEquals(1, suites.size());
+        Assert.assertEquals("gh", suites.get(0));
+
+
+        // Case 6
+        testSuitesString = "abc,ef,gh,ef";
+
+        // Tested call
+        suites = parseTestSuitesToList(testSuitesString);
+        Assert.assertEquals(3, suites.size());
+        Assert.assertEquals("abc", suites.get(0));
+        Assert.assertEquals("ef", suites.get(1));
+        Assert.assertEquals("gh", suites.get(2));
     }
 
     private void testExceptionGetBooleanWithParams(final String key, final boolean defaultValue, final Properties properties, final String expectedMessage) {

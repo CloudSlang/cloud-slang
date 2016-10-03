@@ -25,7 +25,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -65,7 +64,6 @@ import static java.nio.file.Files.exists;
 import static java.nio.file.Files.isRegularFile;
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import static java.nio.file.Paths.get;
-import static java.util.Arrays.asList;
 import static java.util.Locale.ENGLISH;
 import static org.apache.commons.collections4.ListUtils.removeAll;
 import static org.apache.commons.collections4.ListUtils.union;
@@ -74,7 +72,6 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.join;
-import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 
 
 public class SlangBuildMain {
@@ -85,9 +82,7 @@ public class SlangBuildMain {
     public static final String DEFAULT_TESTS = "default";
 
     private final static Logger log = Logger.getLogger(SlangBuildMain.class);
-    private final static String NOT_TS = "!";
     private static final int MAX_THREADS_TEST_RUNNER = 32;
-    private static final String SUITE_LIST_SEPARATOR = ",";
     private static final String MESSAGE_NOT_SCHEDULED_FOR_RUN_RULES = "Rules '%s' defined in '%s' key are not scheduled for run.";
     private static final String MESSAGE_TEST_SUITES_WITH_UNSPECIFIED_MAPPING = "Test suites '%s' have unspecified mapping. They will run in '%s' mode.";
     private static final String LIST_JOINER = ", ";
@@ -327,8 +322,7 @@ public class SlangBuildMain {
      */
     private static List<String> getTestSuitesForKey(Properties runConfigurationProperties, String key) {
         final String valueList = runConfigurationProperties.getProperty(key);
-        return StringUtils.isNotEmpty(valueList) ? parseTestSuitesToList(asList(valueList.split(SUITE_LIST_SEPARATOR))) : new ArrayList<String>();
-
+        return ArgumentProcessorUtils.parseTestSuitesToList(valueList);
     }
 
     /**
@@ -403,46 +397,7 @@ public class SlangBuildMain {
 
     private static List<String> parseTestSuites(ApplicationArgs appArgs) {
         final List<String> testSuitesArg = ListUtils.defaultIfNull(appArgs.getTestSuites(), new ArrayList<String>());
-        return parseTestSuitesToList(testSuitesArg);
-    }
-
-    private static List<String> parseTestSuitesToList(List<String> testSuitesArg) {
-        List<String> testSuites = new ArrayList<>();
-        final String notDefaultTestSuite = NOT_TS + DEFAULT_TESTS;
-
-
-        boolean containsDefaultTestSuite = false;
-        boolean containsNotDefaultTestSuite = false;
-        for (String testSuite : testSuitesArg) {
-            if (isEmpty(testSuite)) { // Skip empty suites
-                continue;
-            }
-
-            if (!startsWithIgnoreCase(testSuite, NOT_TS) && !equalsIgnoreCase(testSuite, DEFAULT_TESTS)) { // every normal test suite except default
-                if (!isSuitePresent(testSuites, testSuite)) {
-                    testSuites.add(testSuite);
-                }
-            } else if (!containsNotDefaultTestSuite && equalsIgnoreCase(testSuite, DEFAULT_TESTS)) {   // !default test suite
-                containsDefaultTestSuite = true;
-            } else if (!containsNotDefaultTestSuite && equalsIgnoreCase(testSuite, notDefaultTestSuite)) { // default test suite
-                containsNotDefaultTestSuite = true;
-            }
-        }
-
-        // Add the default test suite once
-        if (!containsNotDefaultTestSuite && containsDefaultTestSuite) {
-            testSuites.add(DEFAULT_TESTS);
-        }
-        return testSuites;
-    }
-
-    private static boolean isSuitePresent(final List<String> crtList, final String testSuite) {
-        for (String crtSuite : crtList) {
-            if (equalsIgnoreCase(testSuite, crtSuite)) {
-                return true;
-            }
-        }
-        return false;
+        return ArgumentProcessorUtils.parseTestSuitesToList(testSuitesArg);
     }
 
     private static String parseTestTimeout(ApplicationArgs appArgs) {

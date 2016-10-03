@@ -2,6 +2,8 @@ package io.cloudslang.lang.tools.build;
 
 import org.apache.commons.lang3.Validate;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import static java.lang.Boolean.FALSE;
@@ -9,15 +11,20 @@ import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.valueOf;
+import static java.util.Arrays.asList;
 import static java.util.Locale.ENGLISH;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 
 /**
  * This class provides some utility operation to read values from a java.util.Properties object in a friendlier mode.
  */
 public class ArgumentProcessorUtils {
 
+    private final static String NOT_TS = "!";
+    private static final String SUITE_LIST_SEPARATOR = ",";
     public static final String PROPERTIES_OBJECT_CANNOT_BE_NULL = "Properties object cannot be null";
     public static final String PROPERTY_KEY_CANNOT_BE_NULL = "Property key cannot be null";
 
@@ -92,4 +99,52 @@ public class ArgumentProcessorUtils {
         Validate.notNull(propertyKey, PROPERTY_KEY_CANNOT_BE_NULL);
     }
 
+
+    /**
+     *
+     * @param suitesString commma separated string of test suite names.
+     * @return the test suite names as a java.util.List<String>
+     */
+    public static List<String> parseTestSuitesToList(final String suitesString) {
+        return isNotEmpty(suitesString) ? parseTestSuitesToList(asList(suitesString.split(SUITE_LIST_SEPARATOR))) : new ArrayList<String>();
+    }
+
+    static List<String> parseTestSuitesToList(List<String> testSuitesArg) {
+        List<String> testSuites = new ArrayList<>();
+        final String notDefaultTestSuite = NOT_TS + SlangBuildMain.DEFAULT_TESTS;
+
+
+        boolean containsDefaultTestSuite = false;
+        boolean containsNotDefaultTestSuite = false;
+        for (String testSuite : testSuitesArg) {
+            if (isEmpty(testSuite)) { // Skip empty suites
+                continue;
+            }
+
+            if (!startsWithIgnoreCase(testSuite, NOT_TS) && !equalsIgnoreCase(testSuite, SlangBuildMain.DEFAULT_TESTS)) { // every normal test suite except default
+                if (!isSuitePresent(testSuites, testSuite)) {
+                    testSuites.add(testSuite);
+                }
+            } else if (!containsNotDefaultTestSuite && equalsIgnoreCase(testSuite, SlangBuildMain.DEFAULT_TESTS)) {   // !default test suite
+                containsDefaultTestSuite = true;
+            } else if (!containsNotDefaultTestSuite && equalsIgnoreCase(testSuite, notDefaultTestSuite)) { // default test suite
+                containsNotDefaultTestSuite = true;
+            }
+        }
+
+        // Add the default test suite once
+        if (!containsNotDefaultTestSuite && containsDefaultTestSuite) {
+            testSuites.add(SlangBuildMain.DEFAULT_TESTS);
+        }
+        return testSuites;
+    }
+
+    private static boolean isSuitePresent(final List<String> crtList, final String testSuite) {
+        for (String crtSuite : crtList) {
+            if (equalsIgnoreCase(testSuite, crtSuite)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
