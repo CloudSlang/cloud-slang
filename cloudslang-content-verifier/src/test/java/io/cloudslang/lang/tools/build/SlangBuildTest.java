@@ -442,7 +442,7 @@ public class SlangBuildTest {
         final Map<String, CompilationArtifact> compiledFlows = new HashMap<>();
         final String projectPath = "aaa";
 
-        final AtomicReference<ThreadSafeRunTestResults> capturedArgument = new AtomicReference<>();
+        final AtomicReference<IRunTestResults> capturedArgument = new AtomicReference<>();
         doAnswer(getAnswer(capturedArgument)).when(slangTestRunner).splitTestCasesByRunState(any(BulkRunMode.class), anyMap(), anyList(), any(IRunTestResults.class));
         doNothing().when(slangTestRunner).runTestsParallel(anyString(), anyMap(), anyMap(), any(ThreadSafeRunTestResults.class));
 
@@ -451,7 +451,7 @@ public class SlangBuildTest {
 
         InOrder inOrder = Mockito.inOrder(slangTestRunner);
         inOrder.verify(slangTestRunner).splitTestCasesByRunState(eq(BulkRunMode.ALL_PARALLEL), eq(testCases), eq(testSuites), isA(ThreadSafeRunTestResults.class));
-        inOrder.verify(slangTestRunner).runTestsParallel(eq(projectPath), anyMap(), eq(compiledFlows), eq(capturedArgument.get()));
+        inOrder.verify(slangTestRunner).runTestsParallel(eq(projectPath), anyMap(), eq(compiledFlows), eq((ThreadSafeRunTestResults) capturedArgument.get()));
         verifyNoMoreInteractions(slangTestRunner);
         verify(slangTestRunner, never()).runTestsSequential(anyString(), anyMap(), anyMap(), any(IRunTestResults.class));
     }
@@ -471,7 +471,7 @@ public class SlangBuildTest {
         final Map<String, CompilationArtifact> compiledFlows = new HashMap<>();
         final String projectPath = "aaa";
 
-        final AtomicReference<ThreadSafeRunTestResults> theCapturedArgument = new AtomicReference<>();
+        final AtomicReference<IRunTestResults> theCapturedArgument = new AtomicReference<>();
         doAnswer(getAnswer(theCapturedArgument)).when(slangTestRunner).splitTestCasesByRunState(any(BulkRunMode.class), anyMap(), anyList(), any(IRunTestResults.class));
         doNothing().when(slangTestRunner).runTestsSequential(anyString(), anyMap(), anyMap(), any(IRunTestResults.class));
 
@@ -480,7 +480,7 @@ public class SlangBuildTest {
 
         InOrder inOrder = Mockito.inOrder(slangTestRunner);
         inOrder.verify(slangTestRunner).splitTestCasesByRunState(eq(BulkRunMode.ALL_SEQUENTIAL), eq(testCases), eq(testSuites), isA(RunTestsResults.class));
-        inOrder.verify(slangTestRunner).runTestsSequential(eq(projectPath), anyMap(), eq(compiledFlows), eq(theCapturedArgument.get()));
+        inOrder.verify(slangTestRunner).runTestsSequential(eq(projectPath), anyMap(), eq(compiledFlows), eq((RunTestsResults) theCapturedArgument.get()));
         verifyNoMoreInteractions(slangTestRunner);
         verify(slangTestRunner, never()).runTestsParallel(anyString(), anyMap(), anyMap(), any(ThreadSafeRunTestResults.class));
     }
@@ -559,13 +559,17 @@ public class SlangBuildTest {
         Assert.assertEquals(newHashSet(testCases.values()), newHashSet(ListUtils.union(listSeq, listPar)));
     }
 
-    private Answer getAnswer(final AtomicReference<ThreadSafeRunTestResults> theCapturedArgument) {
+    private Answer getAnswer(final AtomicReference<IRunTestResults> theCapturedArgument) {
         return new Answer() {
             @Override
             public Map<SlangTestRunner.TestCaseRunState, Map<String, SlangTestCase>> answer(InvocationOnMock invocationOnMock) throws Throwable {
                 Object[] arguments = invocationOnMock.getArguments();
                 Object argument = arguments[arguments.length - 1];
-                theCapturedArgument.set((ThreadSafeRunTestResults) argument);
+                if (argument instanceof ThreadSafeRunTestResults) {
+                    theCapturedArgument.set((ThreadSafeRunTestResults) argument);
+                } else if (argument instanceof RunTestsResults) {
+                    theCapturedArgument.set((RunTestsResults) argument);
+                }
 
                 return new LinkedHashMap<>();
             }
