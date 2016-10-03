@@ -124,6 +124,15 @@ public class SlangBuilder {
         log.info("Found " + testCases.size() + " tests");
         IRunTestResults runTestsResults;
 
+        runTestsResults = processRunTests(projectPath, testSuites, bulkRunMode, compiledFlows, testCases);
+
+        runTestsResults.addExceptions(compilationResult.getExceptions());
+        addCoverageDataToRunTestsResults(contentSlangModels, testFlowModels, testCases, runTestsResults);
+        return runTestsResults;
+    }
+
+    IRunTestResults processRunTests(String projectPath, List<String> testSuites, BulkRunMode bulkRunMode, Map<String, CompilationArtifact> compiledFlows, Map<String, SlangTestCase> testCases) {
+        IRunTestResults runTestsResults;
         if (bulkRunMode == ALL_PARALLEL) { // Run All tests in parallel
             ThreadSafeRunTestResults parallelRunTestResults = new ThreadSafeRunTestResults();
             Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunState = slangTestRunner.splitTestCasesByRunState(bulkRunMode, testCases, testSuites, parallelRunTestResults);
@@ -146,9 +155,6 @@ public class SlangBuilder {
         } else {
             throw new IllegalStateException(String.format(UNSUPPORTED_BULK_RUN_MODE, (bulkRunMode == null) ? null : bulkRunMode.toString()));
         }
-
-        runTestsResults.addExceptions(compilationResult.getExceptions());
-        addCoverageDataToRunTestsResults(contentSlangModels, testFlowModels, testCases, runTestsResults);
         return runTestsResults;
     }
 

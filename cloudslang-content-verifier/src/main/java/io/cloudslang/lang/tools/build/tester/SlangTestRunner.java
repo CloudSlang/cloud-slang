@@ -289,7 +289,7 @@ public class SlangTestRunner {
         }
     }
 
-    boolean isTestCaseInActiveSuite(SlangTestCase testCase, List<String> testSuites) {
+    public boolean isTestCaseInActiveSuite(SlangTestCase testCase, List<String> testSuites) {
         return (CollectionUtils.isEmpty(testCase.getTestSuites()) && testSuites.contains(SlangBuildMain.DEFAULT_TESTS)) ||
                 CollectionUtils.containsAny(testSuites, testCase.getTestSuites());
     }

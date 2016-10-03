@@ -8,7 +8,6 @@
  */
 package io.cloudslang.lang.tools.build;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
@@ -33,16 +32,22 @@ import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.TestRunInfoService;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.TestRunInfoServiceImpl;
+import io.cloudslang.lang.tools.build.tester.runconfiguration.strategy.ConflictResolutionStrategy;
+import io.cloudslang.lang.tools.build.tester.runconfiguration.strategy.DefaultResolutionStrategy;
 import io.cloudslang.lang.tools.build.validation.StaticValidator;
 import io.cloudslang.lang.tools.build.validation.StaticValidatorImpl;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
 import io.cloudslang.score.api.ExecutionPlan;
+import junit.framework.Assert;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,33 +62,42 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.python.google.common.collect.Sets.newHashSet;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -157,7 +171,7 @@ public class SlangBuildTest {
         Path testPath = null;
         try {
             String projectPath = "aaa/bb/cc";
-            List<String> suites = Lists.newArrayList("suite1", "suite2");
+            List<String> suites = newArrayList("suite1", "suite2");
             testPath = Files.createTempDirectory("testPath");
             String testPathString = testPath.toString();
 
@@ -407,6 +421,155 @@ public class SlangBuildTest {
         // test case: test flow path points to non existing executable
         // validate execution does not return when detects this situation and coverage data is added to results
         assertEquals(1, buildResults.getRunTestsResults().getUncoveredExecutables().size());
+    }
+
+    @Test
+    public void testProcessRunTestsParallel() {
+        final Map<String, SlangTestCase> testCases = new LinkedHashMap<>();
+        final SlangTestCase testCase1 = new SlangTestCase("test1", "testFlowPath", "desc", Arrays.asList("abc", "new"), "mock", null, null, false, "SUCCESS");
+        final SlangTestCase testCase2 = new SlangTestCase("test2", "testFlowPath", "desc", Arrays.asList("efg", "new"), "mock", null, null, false, "SUCCESS");
+        final SlangTestCase testCase3 = new SlangTestCase("test3", "testFlowPath", "desc", Arrays.asList("new", "new2"), "mock", null, null, false, "SUCCESS");
+        final SlangTestCase testCase4 = new SlangTestCase("test4", "testFlowPath", "desc", Arrays.asList("jjj", "new2"), "mock", null, null, false, "SUCCESS");
+        final SlangTestCase testCase5 = new SlangTestCase("test5", "testFlowPath", "desc", Arrays.asList("hhh", "jjj", "abc"), "mock", null, null, false, "SUCCESS");
+
+        testCases.put("test1", testCase1);
+        testCases.put("test2", testCase2);
+        testCases.put("test3", testCase3);
+        testCases.put("test4", testCase4);
+        testCases.put("test5", testCase5);
+
+        final List<String> testSuites = newArrayList("abc");
+        final Map<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        final String projectPath = "aaa";
+
+        final AtomicReference<ThreadSafeRunTestResults> capturedArgument = new AtomicReference<>();
+        doAnswer(getAnswer(capturedArgument)).when(slangTestRunner).splitTestCasesByRunState(any(BulkRunMode.class), anyMap(), anyList(), any(IRunTestResults.class));
+        doNothing().when(slangTestRunner).runTestsParallel(anyString(), anyMap(), anyMap(), any(ThreadSafeRunTestResults.class));
+
+        // Tested call
+        slangBuilder.processRunTests(projectPath, testSuites, BulkRunMode.ALL_PARALLEL, compiledFlows, testCases);
+
+        InOrder inOrder = Mockito.inOrder(slangTestRunner);
+        inOrder.verify(slangTestRunner).splitTestCasesByRunState(eq(BulkRunMode.ALL_PARALLEL), eq(testCases), eq(testSuites), isA(ThreadSafeRunTestResults.class));
+        inOrder.verify(slangTestRunner).runTestsParallel(eq(projectPath), anyMap(), eq(compiledFlows), eq(capturedArgument.get()));
+        verifyNoMoreInteractions(slangTestRunner);
+        verify(slangTestRunner, never()).runTestsSequential(anyString(), anyMap(), anyMap(), any(IRunTestResults.class));
+    }
+
+    @Test
+    public void testProcessRunTestsSequential() {
+        final Map<String, SlangTestCase> testCases = new LinkedHashMap<>();
+        final SlangTestCase testCase1 = new SlangTestCase("test1", "testFlowPath", "desc", Arrays.asList("abc", "new"), "mock", null, null, false, "SUCCESS");
+        final SlangTestCase testCase2 = new SlangTestCase("test2", "testFlowPath", "desc", Arrays.asList("efg", "new"), "mock", null, null, false, "SUCCESS");
+        final SlangTestCase testCase3 = new SlangTestCase("test3", "testFlowPath", "desc", Arrays.asList("new", "new2"), "mock", null, null, false, "SUCCESS");
+
+        testCases.put("test1", testCase1);
+        testCases.put("test2", testCase2);
+        testCases.put("test3", testCase3);
+
+        final List<String> testSuites = newArrayList("abc");
+        final Map<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        final String projectPath = "aaa";
+
+        final AtomicReference<ThreadSafeRunTestResults> theCapturedArgument = new AtomicReference<>();
+        doAnswer(getAnswer(theCapturedArgument)).when(slangTestRunner).splitTestCasesByRunState(any(BulkRunMode.class), anyMap(), anyList(), any(IRunTestResults.class));
+        doNothing().when(slangTestRunner).runTestsSequential(anyString(), anyMap(), anyMap(), any(IRunTestResults.class));
+
+        // Tested call
+        slangBuilder.processRunTests(projectPath, testSuites, BulkRunMode.ALL_SEQUENTIAL, compiledFlows, testCases);
+
+        InOrder inOrder = Mockito.inOrder(slangTestRunner);
+        inOrder.verify(slangTestRunner).splitTestCasesByRunState(eq(BulkRunMode.ALL_SEQUENTIAL), eq(testCases), eq(testSuites), isA(RunTestsResults.class));
+        inOrder.verify(slangTestRunner).runTestsSequential(eq(projectPath), anyMap(), eq(compiledFlows), eq(theCapturedArgument.get()));
+        verifyNoMoreInteractions(slangTestRunner);
+        verify(slangTestRunner, never()).runTestsParallel(anyString(), anyMap(), anyMap(), any(ThreadSafeRunTestResults.class));
+    }
+
+    @Test
+    public void testProcessRunTestsMixed() {
+        final Map<String, SlangTestCase> testCases = new LinkedHashMap<>();
+        final SlangTestCase testCase1 = new SlangTestCase("test1", "testFlowPath", "desc", Arrays.asList("abc", "new"), "mock", null, null, false, "SUCCESS");
+        final SlangTestCase testCase2 = new SlangTestCase("test2", "testFlowPath", "desc", Arrays.asList("efg", "new"), "mock", null, null, false, "SUCCESS");
+        final SlangTestCase testCase3 = new SlangTestCase("test3", "testFlowPath", "desc", Arrays.asList("new", "new2"), "mock", null, null, false, "SUCCESS");
+        final SlangTestCase testCase4 = new SlangTestCase("test4", "testFlowPath", "desc", Arrays.asList("new", "new2"), "mock", null, null, false, "SUCCESS");
+
+        testCases.put("test1", testCase1);
+        testCases.put("test2", testCase2);
+        testCases.put("test3", testCase3);
+        testCases.put("test4", testCase4);
+
+        final List<String> testSuites = newArrayList("new");
+        final Map<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        final String projectPath = "aaa";
+
+        final AtomicReference<ThreadSafeRunTestResults> theCapturedArgument = new AtomicReference<>();
+        final AtomicReference<Map<String, SlangTestCase>> capturedTestsSeq = new AtomicReference<>();
+        final AtomicReference<Map<String, SlangTestCase>> capturedTestsPar = new AtomicReference<>();
+
+        doCallRealMethod().when(slangTestRunner).isTestCaseInActiveSuite(any(SlangTestCase.class), anyList());
+        doReturn(SlangBuildMain.TestCaseRunMode.SEQUENTIAL)
+                .doReturn(SlangBuildMain.TestCaseRunMode.PARALLEL)
+                .doReturn(SlangBuildMain.TestCaseRunMode.PARALLEL)
+                .doReturn(SlangBuildMain.TestCaseRunMode.SEQUENTIAL)
+                .when(testRunInfoService).getRunModeForTestCase(any(SlangTestCase.class), any(ConflictResolutionStrategy.class), any(DefaultResolutionStrategy.class));
+
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Object[] arguments = invocationOnMock.getArguments();
+                Object argument = arguments[arguments.length - 1];
+                theCapturedArgument.set((ThreadSafeRunTestResults) argument);
+
+                return invocationOnMock.callRealMethod();
+            }
+        }).when(slangTestRunner).splitTestCasesByRunState(any(BulkRunMode.class), anyMap(), anyList(), any(IRunTestResults.class));
+
+        doAnswer(new Answer() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Object[] arguments = invocationOnMock.getArguments();
+                capturedTestsSeq.set((Map<String, SlangTestCase>) arguments[1]);
+
+                return null;
+            }
+        }).when(slangTestRunner).runTestsSequential(anyString(), anyMap(), anyMap(), any(IRunTestResults.class));
+        doAnswer(new Answer() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Object[] arguments = invocationOnMock.getArguments();
+                capturedTestsPar.set((Map<String, SlangTestCase>) arguments[1]);
+
+                return null;
+            }
+        }).when(slangTestRunner).runTestsParallel(anyString(), anyMap(), anyMap(), any(ThreadSafeRunTestResults.class));
+
+        // Tested call
+        slangBuilder.processRunTests(projectPath, testSuites, BulkRunMode.POSSIBLY_MIXED, compiledFlows, testCases);
+
+        InOrder inOrder = inOrder(slangTestRunner);
+        inOrder.verify(slangTestRunner).splitTestCasesByRunState(eq(BulkRunMode.POSSIBLY_MIXED), eq(testCases), eq(testSuites), isA(ThreadSafeRunTestResults.class));
+        inOrder.verify(slangTestRunner).runTestsSequential(eq(projectPath), anyMap(), eq(compiledFlows), eq(theCapturedArgument.get()));
+        inOrder.verify(slangTestRunner).runTestsParallel(anyString(), anyMap(), anyMap(), any(ThreadSafeRunTestResults.class));
+
+        final List<SlangTestCase> listSeq = newArrayList(capturedTestsSeq.get().values());
+        final List<SlangTestCase> listPar = newArrayList(capturedTestsPar.get().values());
+        Assert.assertEquals(0, ListUtils.intersection(listSeq, listPar).size()); // assures that a test is run only once
+        Assert.assertEquals(newHashSet(testCases.values()), newHashSet(ListUtils.union(listSeq, listPar)));
+    }
+
+    private Answer getAnswer(final AtomicReference<ThreadSafeRunTestResults> theCapturedArgument) {
+        return new Answer() {
+            @Override
+            public Map<SlangTestRunner.TestCaseRunState, Map<String, SlangTestCase>> answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Object[] arguments = invocationOnMock.getArguments();
+                Object argument = arguments[arguments.length - 1];
+                theCapturedArgument.set((ThreadSafeRunTestResults) argument);
+
+                return new LinkedHashMap<>();
+            }
+        };
     }
 
     @Configuration
