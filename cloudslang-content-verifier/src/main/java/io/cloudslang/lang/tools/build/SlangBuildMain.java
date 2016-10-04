@@ -182,7 +182,6 @@ public class SlangBuildMain {
 
         updateTestSuiteMappings(context.getBean(TestRunInfoService.class), testSuitesParallel, testSuitesSequential, testSuites, unspecifiedTestSuiteRunMode);
 
-        SlangTestCaseRunReportGeneratorService reportGeneratorService = context.getBean(SlangTestCaseRunReportGeneratorService.class);
         registerEventHandlers(slang);
 
         List<RuntimeException> exceptions = new ArrayList<>();
@@ -210,7 +209,7 @@ public class SlangBuildMain {
                 printBuildSuccessSummary(contentPath, buildResults, runTestsResults);
             }
 
-            generateTestCaseReport(reportGeneratorService, runTestsResults);
+            generateTestCaseReport(context.getBean(SlangTestCaseRunReportGeneratorService.class), runTestsResults);
             System.exit(isNotEmpty(runTestsResults.getFailedTests()) ? 1 : 0);
 
         } catch (Throwable e) {
