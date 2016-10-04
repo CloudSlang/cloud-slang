@@ -157,7 +157,7 @@ public class SlangTestRunner {
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
             SlangTestCase testCase = testCaseEntry.getValue();
 
-            log.info("Running test: " + testCaseEntry.getKey() + " - " + testCase.getDescription());
+            log.info("Running test: " + SlangTestCase.generateTestCaseReference(testCase) + " - " + testCase.getDescription());
             try {
                 CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
                 runTest(testCase, compiledTestFlow, projectPath);
@@ -274,7 +274,7 @@ public class SlangTestRunner {
 
     private void processSkippedTest(final IRunTestResults runTestsResults, Map.Entry<String, SlangTestCase> testCaseEntry, SlangTestCase testCase,
                                     final Map<TestCaseRunState, Map<String, SlangTestCase>> resultMap) {
-        String message = "Skipping test: " + testCaseEntry.getKey() + " because it is not in active test suites";
+        String message = "Skipping test: " + SlangTestCase.generateTestCaseReference(testCase) + " because it is not in active test suites";
         log.info(message);
 
         runTestsResults.addSkippedTest(testCase.getName(), new TestRun(testCase, message));
@@ -302,7 +302,7 @@ public class SlangTestRunner {
             log.info(testCasesWithMissingReferenceSize + " test cases have missing test flow references:");
             for (SlangTestCase slangTestCase : testCasesWithMissingReference) {
                 log.info(
-                        "For test case: " + slangTestCase.getName() +
+                        "For test case: " + SlangTestCase.generateTestCaseReference(slangTestCase) +
                                 " testFlowPath reference not found: " +
                                 slangTestCase.getTestFlowPath()
                 );
@@ -313,12 +313,12 @@ public class SlangTestRunner {
     public CompilationArtifact getCompiledTestFlow(Map<String, CompilationArtifact> compiledFlows, SlangTestCase testCase) {
         String testFlowPath = testCase.getTestFlowPath();
         if (StringUtils.isEmpty(testFlowPath)) {
-            throw new RuntimeException("For test case: " + testCase.getName() + " testFlowPath property is mandatory");
+            throw new RuntimeException("For test case: " + SlangTestCase.generateTestCaseReference(testCase) + " testFlowPath property is mandatory");
         }
         String testFlowPathTransformed = testFlowPath.replace(File.separatorChar, '.');
         CompilationArtifact compiledTestFlow = compiledFlows.get(testFlowPathTransformed);
         if (compiledTestFlow == null) {
-            throw new RuntimeException("Test flow: " + testFlowPath + " is missing. Referenced in test case: " + testCase.getName());
+            throw new RuntimeException("Test flow: " + testFlowPath + " is missing. Referenced in test case: " + SlangTestCase.generateTestCaseReference(testCase));
         }
         return compiledTestFlow;
     }
@@ -383,7 +383,6 @@ public class SlangTestRunner {
                                                     Map<String, Value> inputs,
                                                     Set<SystemProperty> systemProperties) {
 
-        String testCaseName = testCase.getName();
         String result = testCase.getResult();
         Map<String, Serializable> outputs = getTestCaseOutputsMap(testCase);
         String flowName = testCase.getTestFlowPath();
@@ -401,35 +400,30 @@ public class SlangTestRunner {
         String errorMessageFlowExecution = testsEventListener.getErrorMessage();
 
         String message;
+        String testCaseReference = SlangTestCase.generateTestCaseReference(testCase);
+
         if (BooleanUtils.isTrue(testCase.getThrowsException())) {
-            if (StringUtils.isBlank(errorMessageFlowExecution)) {
-                message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tFlow " +
-                        compilationArtifact.getExecutionPlan().getName() + " did not throw an exception as expected";
-                log.info(message);
-                throw new RuntimeException(message);
-            }
-            log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with exception as expected");
-            return executionId;
+            return handleExpectedExceptionCase(testCase, compilationArtifact, flowName, executionId, errorMessageFlowExecution, testCaseReference);
         }
 
         if (StringUtils.isNotBlank(errorMessageFlowExecution)) {
             // unexpected exception occurred during flow execution
-            message = "Error occurred while running test: " + testCaseName + " - " + testCase.getDescription() + "\n\t" + errorMessageFlowExecution;
+            message = "Error occurred while running test: " + testCaseReference + " - " + testCase.getDescription() + "\n\t" + errorMessageFlowExecution;
             log.info(message);
             throw new RuntimeException(message);
         }
 
         String executionResult = testsEventListener.getResult();
         if (result != null && !result.equals(executionResult)) {
-            message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tExpected result: " + result + "\n\tActual result: " + executionResult;
+            message = TEST_CASE_FAILED + testCaseReference + " - " + testCase.getDescription() + "\n\tExpected result: " + result + "\n\tActual result: " + executionResult;
             log.error(message);
             throw new RuntimeException(message);
         }
 
         Map<String, Serializable> executionOutputs = testsEventListener.getOutputs();
-        handleTestCaseFailuresFromOutputs(testCase, testCaseName, outputs, executionOutputs);
+        handleTestCaseFailuresFromOutputs(testCase, testCaseReference, outputs, executionOutputs);
 
-        log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with result: " + executionResult);
+        log.info(TEST_CASE_PASSED + testCaseReference + ". Finished running: " + flowName + " with result: " + executionResult);
         return executionId;
     }
 
@@ -437,7 +431,6 @@ public class SlangTestRunner {
                                                   Map<String, Value> inputs,
                                                   Set<SystemProperty> systemProperties, MultiTriggerTestCaseEventListener globalListener) {
 
-        String testCaseName = testCase.getName();
         String result = testCase.getResult();
         Map<String, Serializable> outputs = getTestCaseOutputsMap(testCase);
         String flowName = testCase.getTestFlowPath();
@@ -451,36 +444,43 @@ public class SlangTestRunner {
         String errorMessageFlowExecution = globalListener.getErrorMessageByExecutionId(executionId);
 
         String message;
-        if (BooleanUtils.isTrue(testCase.getThrowsException())) {
-            if (StringUtils.isBlank(errorMessageFlowExecution)) {
+        String testCaseReference = SlangTestCase.generateTestCaseReference(testCase);
 
-                message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tFlow " +
-                        compilationArtifact.getExecutionPlan().getName() + " did not throw an exception as expected";
-                log.info(message);
-                throw new RuntimeException(message);
-            }
-            log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with exception as expected");
-            return executionId;
+        if (BooleanUtils.isTrue(testCase.getThrowsException())) {
+            return handleExpectedExceptionCase(testCase, compilationArtifact, flowName, executionId, errorMessageFlowExecution, testCaseReference);
         }
 
         if (StringUtils.isNotBlank(errorMessageFlowExecution)) {
             // unexpected exception occurred during flow execution
-            message = "Error occurred while running test: " + testCaseName + " - " + testCase.getDescription() + "\n\t" + errorMessageFlowExecution;
+            message = "Error occurred while running test: " + testCaseReference + " - " + testCase.getDescription() + "\n\t" + errorMessageFlowExecution;
             log.info(message);
             throw new RuntimeException(message);
         }
 
         String executionResult = globalListener.getResultByExecutionId(executionId);
         if (result != null && !result.equals(executionResult)) {
-            message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tExpected result: " + result + "\n\tActual result: " + executionResult;
+            message = TEST_CASE_FAILED + testCaseReference + " - " + testCase.getDescription() + "\n\tExpected result: " + result + "\n\tActual result: " + executionResult;
             log.error(message);
             throw new RuntimeException(message);
         }
 
         Map<String, Serializable> executionOutputs = globalListener.getOutputsByExecutionId(executionId);
-        handleTestCaseFailuresFromOutputs(testCase, testCaseName, outputs, executionOutputs);
+        handleTestCaseFailuresFromOutputs(testCase, testCaseReference, outputs, executionOutputs);
 
-        log.info(TEST_CASE_PASSED + testCaseName + ". Finished running: " + flowName + " with result: " + executionResult);
+        log.info(TEST_CASE_PASSED + testCaseReference + ". Finished running: " + flowName + " with result: " + executionResult);
+        return executionId;
+    }
+
+    private Long handleExpectedExceptionCase(SlangTestCase testCase, CompilationArtifact compilationArtifact, String flowName, Long executionId, String errorMessageFlowExecution, String testCaseReference) {
+        String message;
+        if (StringUtils.isBlank(errorMessageFlowExecution)) {
+
+            message = TEST_CASE_FAILED + testCaseReference + " - " + testCase.getDescription() + "\n\tFlow " +
+                    compilationArtifact.getExecutionPlan().getName() + " did not throw an exception as expected";
+            log.info(message);
+            throw new RuntimeException(message);
+        }
+        log.info(TEST_CASE_PASSED + testCaseReference + ". Finished running: " + flowName + " with exception as expected");
         return executionId;
     }
 
@@ -491,7 +491,7 @@ public class SlangTestRunner {
         }
     }
 
-    private void handleTestCaseFailuresFromOutputs(SlangTestCase testCase, String testCaseName, Map<String, Serializable> outputs, Map<String, Serializable> executionOutputs) {
+    private void handleTestCaseFailuresFromOutputs(SlangTestCase testCase, String testCaseReference, Map<String, Serializable> outputs, Map<String, Serializable> executionOutputs) {
         String message;
         if (MapUtils.isNotEmpty(outputs)) {
             for (Map.Entry<String, Serializable> output : outputs.entrySet()) {
@@ -500,7 +500,7 @@ public class SlangTestRunner {
                 Serializable executionOutputValue = executionOutputs.get(outputName);
                 if (!executionOutputs.containsKey(outputName) ||
                         !outputsAreEqual(outputValue, executionOutputValue)) {
-                    message = TEST_CASE_FAILED + testCaseName + " - " + testCase.getDescription() + "\n\tFor output: " + outputName + "\n\tExpected value: " + outputValue + "\n\tActual value: " + executionOutputValue;
+                    message = TEST_CASE_FAILED + testCaseReference + " - " + testCase.getDescription() + "\n\tFor output: " + outputName + "\n\tExpected value: " + outputValue + "\n\tActual value: " + executionOutputValue;
                     log.error(message);
                     throw new RuntimeException(message);
                 }

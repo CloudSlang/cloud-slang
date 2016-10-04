@@ -38,6 +38,20 @@ import io.cloudslang.lang.tools.build.validation.StaticValidator;
 import io.cloudslang.lang.tools.build.validation.StaticValidatorImpl;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
 import io.cloudslang.score.api.ExecutionPlan;
+import java.io.File;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import junit.framework.Assert;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.io.FileUtils;
@@ -56,21 +70,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
-
-import java.io.File;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static junit.framework.Assert.assertEquals;
@@ -275,12 +274,17 @@ public class SlangBuilderTest {
     @Test
     public void testCompileValidSlangFileWithDependencies() throws Exception {
         URI resource = getClass().getResource("/dependencies").toURI();
+        URI emptyFlowURI = getClass().getResource("/dependencies/empty_flow.sl").toURI();
+        URI dependencyURI = getClass().getResource("/dependencies/dependency.sl").toURI();
+        SlangSource emptyFlowSource = SlangSource.fromFile(emptyFlowURI);
+        SlangSource dependencySource = SlangSource.fromFile(dependencyURI);
+
         Set<String> flowDependencies = new HashSet<>();
         flowDependencies.add("dependencies.dependency");
         Flow emptyFlowExecutable = new Flow(null, null, null, "dependencies", "empty_flow", null, null, null, flowDependencies, SYSTEM_PROPERTY_DEPENDENCIES);
-        when(slangCompiler.preCompile(new SlangSource("", "empty_flow"))).thenReturn(emptyFlowExecutable);
+        when(slangCompiler.preCompile(emptyFlowSource)).thenReturn(emptyFlowExecutable);
         Flow dependencyExecutable = new Flow(null, null, null, "dependencies", "dependency", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
-        when(slangCompiler.preCompile(new SlangSource("", "dependency"))).thenReturn(dependencyExecutable);
+        when(slangCompiler.preCompile(dependencySource)).thenReturn(dependencyExecutable);
         HashSet<Executable> dependencies = new HashSet<>();
         dependencies.add(dependencyExecutable);
         when(scoreCompiler.compile(emptyFlowExecutable, dependencies)).thenReturn(EMPTY_COMPILATION_ARTIFACT);
@@ -367,8 +371,6 @@ public class SlangBuilderTest {
         URI testResource = getClass().getResource("/test/valid").toURI();
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
-        final RunTestsResults runTestsResults = new RunTestsResults();
-        runTestsResults.addFailedTest("test1", new TestRun(new SlangTestCase("test1", "", null, null, null, null, null, null, null), "message"));
 
         doAnswer(new Answer() {
             @Override
@@ -392,8 +394,6 @@ public class SlangBuilderTest {
         URI testResource = getClass().getResource("/test/valid").toURI();
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
-        RunTestsResults runTestsResults = new RunTestsResults();
-        runTestsResults.addFailedTest("test1", new TestRun(new SlangTestCase("test1", "", null, null, null, null, null, null, null), "message"));
 
         doNothing().when(slangTestRunner).runTestsSequential(
                 any(String.class),

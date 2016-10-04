@@ -57,20 +57,20 @@ public abstract class YamlParser {
 
     public ParsedSlang parse(SlangSource source) {
 
-        Validate.notEmpty(source.getSource(), "Source " + source.getFileName() + " cannot be empty");
+        Validate.notEmpty(source.getContent(), "Source " + source.getName() + " cannot be empty");
 
         try {
-            ParsedSlang parsedSlang = getYaml().loadAs(source.getSource(), ParsedSlang.class);
+            ParsedSlang parsedSlang = getYaml().loadAs(source.getContent(), ParsedSlang.class);
             if (parsedSlang == null) {
-                throw new RuntimeException("Source " + source.getFileName() + " does not contain YAML content");
+                throw new RuntimeException("Source " + source.getName() + " does not contain YAML content");
             }
-            parsedSlang.setName(source.getFileName());
+            parsedSlang.setName(source.getName());
             parsedSlang.setFileExtension(source.getFileExtension());
 
             return parsedSlang;
         } catch (Throwable e) {
             throw new RuntimeException("There was a problem parsing the YAML source: " +
-                    source.getFileName() + ".\n" + parserExceptionHandler.getErrorMessage(e), e);
+                    source.getName() + ".\n" + parserExceptionHandler.getErrorMessage(e), e);
         }
     }
 
