@@ -16,6 +16,8 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.tools.build.SlangBuildMain;
+import io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode;
+import io.cloudslang.lang.tools.build.SlangBuildMain.TestCaseRunMode;
 import io.cloudslang.lang.tools.build.tester.parallel.MultiTriggerTestCaseEventListener;
 import io.cloudslang.lang.tools.build.tester.parallel.report.LoggingSlangTestCaseEventListener;
 import io.cloudslang.lang.tools.build.tester.parallel.report.ThreadSafeRunTestResults;
@@ -24,6 +26,9 @@ import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDisp
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.FailedSlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
+import io.cloudslang.lang.tools.build.tester.runconfiguration.TestRunInfoService;
+import io.cloudslang.lang.tools.build.tester.runconfiguration.strategy.RunMultipleTestSuiteConflictResolutionStrategy;
+import io.cloudslang.lang.tools.build.tester.runconfiguration.strategy.SequentialRunTestSuiteResolutionStrategy;
 import io.cloudslang.score.events.EventConstants;
 import java.io.File;
 import java.io.Serializable;
@@ -32,6 +37,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -58,6 +64,7 @@ public class SlangTestRunner {
     private final static String PROJECT_PATH_TOKEN = "${project_path}";
     public static final long MAX_TIME_PER_TESTCASE_IN_MINUTES = 10;
     public static final String TEST_CASE_TIMEOUT_IN_MINUTES_KEY = "test.case.timeout.in.minutes";
+    public static final String PREFIX_DASH = "    - ";
 
     @Autowired
     private TestCasesYamlParser parser;
@@ -71,12 +78,21 @@ public class SlangTestRunner {
     @Autowired
     private TestCaseEventDispatchService testCaseEventDispatchService;
 
+    @Autowired
+    private TestRunInfoService testRunInfoService;
+
     private String[] TEST_CASE_FILE_EXTENSIONS = {"yaml", "yml"};
-    public static final String TEST_CASE_PASSED = "Test case passed: ";
-    public static final String TEST_CASE_FAILED = "Test case failed: ";
+    private static final String TEST_CASE_PASSED = "Test case passed: ";
+    private static final String TEST_CASE_FAILED = "Test case failed: ";
 
     private static final Logger log = Logger.getLogger(SlangTestRunner.class);
     private static final String UNAVAILABLE_NAME = "N/A";
+
+    public enum TestCaseRunState {
+        PARALLEL,
+        SEQUENTIAL,
+        INACTIVE
+    }
 
     public Map<String, SlangTestCase> createTestCases(String testPath, Set<String> allAvailableExecutables) {
         Validate.notEmpty(testPath, "You must specify a path for tests");
@@ -124,50 +140,40 @@ public class SlangTestRunner {
     }
 
     /**
+     *
      * @param projectPath
      * @param testCases
      * @param compiledFlows
-     * @param testSuites
-     * @return RunTestsResults containing maps of passed, failed & skipped tests
+     * @param runTestsResults is updated to reflect skipped, failed passes test cases.
      */
-    public IRunTestResults runAllTestsSequential(String projectPath, Map<String, SlangTestCase> testCases,
-                                                 Map<String, CompilationArtifact> compiledFlows, List<String> testSuites) {
+    public void runTestsSequential(String projectPath, Map<String, SlangTestCase> testCases,
+                                   Map<String, CompilationArtifact> compiledFlows, IRunTestResults runTestsResults) {
 
-        IRunTestResults runTestsResults = new RunTestsResults();
         if (MapUtils.isEmpty(testCases)) {
-            return runTestsResults;
+            return;
         }
+        printTestForActualRunSummary(TestCaseRunMode.SEQUENTIAL, testCases);
+
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
             SlangTestCase testCase = testCaseEntry.getValue();
-            if (testCase == null) {
-                runTestsResults.addFailedTest(UNAVAILABLE_NAME, new TestRun(null, "Test case cannot be null"));
-                continue;
-            }
-            if (isTestCaseInActiveSuite(testCase, testSuites)) {
-                log.info("Running test: " + testCaseEntry.getKey() + " - " + testCase.getDescription());
-                try {
-                    CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
-                    runTest(testCase, compiledTestFlow, projectPath);
-                    runTestsResults.addPassedTest(testCase.getName(), new TestRun(testCase, null));
-                } catch (RuntimeException e) {
-                    runTestsResults.addFailedTest(testCase.getName(), new TestRun(testCase, e.getMessage()));
-                }
-            } else {
-                String message = "Skipping test: " + testCaseEntry.getKey() + " because it is not in active test suites";
-                log.info(message);
-                runTestsResults.addSkippedTest(testCase.getName(), new TestRun(testCase, message));
+
+            log.info("Running test: " + testCaseEntry.getKey() + " - " + testCase.getDescription());
+            try {
+                CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
+                runTest(testCase, compiledTestFlow, projectPath);
+                runTestsResults.addPassedTest(testCase.getName(), new TestRun(testCase, null));
+            } catch (RuntimeException e) {
+                runTestsResults.addFailedTest(testCase.getName(), new TestRun(testCase, e.getMessage()));
             }
         }
-        return runTestsResults;
     }
 
-    public IRunTestResults runAllTestsParallel(String projectPath, Map<String, SlangTestCase> testCases,
-                                               Map<String, CompilationArtifact> compiledFlows, List<String> testSuites) {
-
-        ThreadSafeRunTestResults runTestsResults = new ThreadSafeRunTestResults();
+    public void runTestsParallel(String projectPath, Map<String, SlangTestCase> testCases,
+                                 Map<String, CompilationArtifact> compiledFlows, ThreadSafeRunTestResults runTestsResults) {
         if (MapUtils.isEmpty(testCases)) {
-            return runTestsResults;
+            return;
         }
+        printTestForActualRunSummary(TestCaseRunMode.PARALLEL, testCases);
 
         testCaseEventDispatchService.unregisterAllListeners();
         testCaseEventDispatchService.registerListener(runTestsResults); // for gathering of report data
@@ -179,11 +185,7 @@ public class SlangTestRunner {
             Map<SlangTestCase, Future<?>> testCaseFutures = new LinkedHashMap<>();
             for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
                 SlangTestCase testCase = testCaseEntry.getValue();
-                if (testCase == null) {
-                    testCaseEventDispatchService.notifyListeners(new FailedSlangTestCaseEvent(new SlangTestCase(null, null, null, null, null, null, null, null, null), "Test case cannot be null", null));
-                    continue;
-                }
-                SlangTestCaseRunnable slangTestCaseRunnable = new SlangTestCaseRunnable(testCase, compiledFlows, projectPath, testSuites, this, testCaseEventDispatchService, multiTriggerTestCaseEventListener);
+                SlangTestCaseRunnable slangTestCaseRunnable = new SlangTestCaseRunnable(testCase, compiledFlows, projectPath, this, testCaseEventDispatchService, multiTriggerTestCaseEventListener);
                 testCaseFutures.put(testCase, parallelTestCaseExecutorService.submitTestCase(slangTestCaseRunnable));
             }
 
@@ -205,7 +207,78 @@ public class SlangTestRunner {
             testCaseEventDispatchService.unregisterAllListeners();
             slang.unSubscribeOnEvents(multiTriggerTestCaseEventListener);
         }
-        return runTestsResults;
+    }
+
+    private void printTestForActualRunSummary(TestCaseRunMode runMode, Map<String, SlangTestCase> testCases) {
+        if (!MapUtils.isEmpty(testCases)) {
+            log.info("Running " + testCases.size() + " test(s) in " + runMode.toString().toLowerCase(Locale.ENGLISH) + ": ");
+            for (Map.Entry<String, SlangTestCase> stringSlangTestCaseEntry : testCases.entrySet()) {
+                final SlangTestCase slangTestCase = stringSlangTestCaseEntry.getValue();
+                log.info(PREFIX_DASH + slangTestCase.getName());
+            }
+        }
+    }
+
+    /**
+     * Processes skipped tests and also handles null testcase failures
+     * @param testCases
+     * @param testSuites active test suites
+     * @param runTestsResults is updated to reflect skipped and fail fast scenarios
+     * @return
+     */
+    public Map<TestCaseRunState, Map<String, SlangTestCase>> splitTestCasesByRunState(final BulkRunMode bulkRunMode, final Map<String, SlangTestCase> testCases, final List<String> testSuites,
+                                                                                      final IRunTestResults runTestsResults) {
+        Map<TestCaseRunState, Map<String, SlangTestCase>> resultMap = new HashMap<>();
+
+        // Prepare the 3 categories inactive, parallel, sequential
+        for (TestCaseRunState testCaseRunState : TestCaseRunState.values()) {
+            resultMap.put(testCaseRunState, new LinkedHashMap<String, SlangTestCase>());
+        }
+
+        for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
+            final SlangTestCase testCase = testCaseEntry.getValue();
+            if (testCase == null) {
+                processQuickFailTest(runTestsResults);
+                continue;
+            }
+
+            if (isTestCaseInActiveSuite(testCase, testSuites)) {
+                processActiveTest(bulkRunMode, resultMap, testCaseEntry, testCase);
+            } else {
+                processSkippedTest(runTestsResults, testCaseEntry, testCase, resultMap);
+            }
+        }
+
+        return resultMap;
+    }
+
+    private void processQuickFailTest(final IRunTestResults runTestsResults) {
+        runTestsResults.addFailedTest(UNAVAILABLE_NAME, new TestRun(null, "Test case cannot be null"));
+    }
+
+    private void processActiveTest(final BulkRunMode bulkRunMode, final Map<TestCaseRunState, Map<String, SlangTestCase>> resultMap, Map.Entry<String, SlangTestCase> testCaseEntry, SlangTestCase testCase) {
+        if (bulkRunMode == BulkRunMode.POSSIBLY_MIXED) {
+            TestCaseRunMode runModeForTestCase = testRunInfoService.getRunModeForTestCase(testCase, new RunMultipleTestSuiteConflictResolutionStrategy(),
+                    new SequentialRunTestSuiteResolutionStrategy());
+            if (runModeForTestCase == TestCaseRunMode.SEQUENTIAL) {
+                resultMap.get(TestCaseRunState.SEQUENTIAL).put(testCaseEntry.getKey(), testCase);
+            } else if (runModeForTestCase == TestCaseRunMode.PARALLEL) {
+                resultMap.get(TestCaseRunState.PARALLEL).put(testCaseEntry.getKey(), testCase);
+            }
+        } else if (bulkRunMode == BulkRunMode.ALL_SEQUENTIAL) {
+            resultMap.get(TestCaseRunState.SEQUENTIAL).put(testCaseEntry.getKey(), testCase);
+        } else if (bulkRunMode == BulkRunMode.ALL_PARALLEL) {
+            resultMap.get(TestCaseRunState.PARALLEL).put(testCaseEntry.getKey(), testCase);
+        }
+    }
+
+    private void processSkippedTest(final IRunTestResults runTestsResults, Map.Entry<String, SlangTestCase> testCaseEntry, SlangTestCase testCase,
+                                    final Map<TestCaseRunState, Map<String, SlangTestCase>> resultMap) {
+        String message = "Skipping test: " + testCaseEntry.getKey() + " because it is not in active test suites";
+        log.info(message);
+
+        runTestsResults.addSkippedTest(testCase.getName(), new TestRun(testCase, message));
+        resultMap.get(TestCaseRunState.INACTIVE).put(testCaseEntry.getKey(), testCaseEntry.getValue());
     }
 
     private long getTestCaseTimeoutInMinutes() {

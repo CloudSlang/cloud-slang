@@ -11,9 +11,12 @@ package io.cloudslang.lang.tools.build;
 
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
+import io.cloudslang.lang.tools.build.tester.SlangTestRunner.TestCaseRunState;
+import io.cloudslang.lang.tools.build.tester.parallel.report.ThreadSafeRunTestResults;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.verifier.CompilationResult;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
@@ -31,6 +34,10 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_PARALLEL;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_SEQUENTIAL;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.POSSIBLY_MIXED;
+
 /*
  * Created by stoneo on 2/9/2015.
  */
@@ -41,6 +48,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SlangBuilder {
 
+    private static final String UNSUPPORTED_BULK_RUN_MODE = "Unsupported bulk run mode '%s'.";
+
     @Autowired
     private SlangContentVerifier slangContentVerifier;
 
@@ -49,7 +58,7 @@ public class SlangBuilder {
 
     private final static Logger log = Logger.getLogger(SlangBuilder.class);
 
-    public SlangBuildResults buildSlangContent(String projectPath, String contentPath, String testsPath, List<String> testSuits, boolean shouldValidateDescription, boolean runTestsInParallel) {
+    public SlangBuildResults buildSlangContent(String projectPath, String contentPath, String testsPath, List<String> testSuits, boolean shouldValidateDescription, BulkRunMode bulkRunMode) {
 
         String projectName = FilenameUtils.getName(projectPath);
         log.info("");
@@ -68,7 +77,7 @@ public class SlangBuilder {
 
         IRunTestResults runTestsResults = new RunTestsResults();
         if (StringUtils.isNotBlank(testsPath) && new File(testsPath).isDirectory()) {
-            runTestsResults = runTests(slangModels, projectPath, testsPath, testSuits, runTestsInParallel);
+            runTestsResults = runTests(slangModels, projectPath, testsPath, testSuits, bulkRunMode);
         }
         List<RuntimeException> exceptions = new ArrayList<>(runTestsResults.getExceptions());
         exceptions.addAll(compilationResult.getExceptions());
@@ -95,7 +104,7 @@ public class SlangBuilder {
     }
 
     IRunTestResults runTests(Map<String, Executable> contentSlangModels,
-                             String projectPath, String testsPath, List<String> testSuites, boolean runTestsInParallel) {
+                             String projectPath, String testsPath, List<String> testSuites, BulkRunMode bulkRunMode) {
         log.info("");
         log.info("--- compiling tests sources ---");
         // Compile all slang test flows under the test directory
@@ -114,13 +123,38 @@ public class SlangBuilder {
         log.info("--- running tests ---");
         log.info("Found " + testCases.size() + " tests");
         IRunTestResults runTestsResults;
-        if (runTestsInParallel) {
-            runTestsResults = slangTestRunner.runAllTestsParallel(projectPath, testCases, compiledFlows, testSuites);
-        } else {
-            runTestsResults = slangTestRunner.runAllTestsSequential(projectPath, testCases, compiledFlows, testSuites);
-        }
+
+        runTestsResults = processRunTests(projectPath, testSuites, bulkRunMode, compiledFlows, testCases);
+
         runTestsResults.addExceptions(compilationResult.getExceptions());
         addCoverageDataToRunTestsResults(contentSlangModels, testFlowModels, testCases, runTestsResults);
+        return runTestsResults;
+    }
+
+    IRunTestResults processRunTests(String projectPath, List<String> testSuites, BulkRunMode bulkRunMode, Map<String, CompilationArtifact> compiledFlows, Map<String, SlangTestCase> testCases) {
+        IRunTestResults runTestsResults;
+        if (bulkRunMode == ALL_PARALLEL) { // Run All tests in parallel
+            ThreadSafeRunTestResults parallelRunTestResults = new ThreadSafeRunTestResults();
+            Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunState = slangTestRunner.splitTestCasesByRunState(bulkRunMode, testCases, testSuites, parallelRunTestResults);
+            slangTestRunner.runTestsParallel(projectPath, testCaseRunState.get(TestCaseRunState.PARALLEL), compiledFlows, parallelRunTestResults);
+            runTestsResults = parallelRunTestResults;
+
+        } else if (bulkRunMode == ALL_SEQUENTIAL) { // Run all tests sequentially
+            RunTestsResults sequentialRunTestResults = new RunTestsResults();
+            Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunState = slangTestRunner.splitTestCasesByRunState(bulkRunMode, testCases, testSuites, sequentialRunTestResults);
+            slangTestRunner.runTestsSequential(projectPath, testCaseRunState.get(TestCaseRunState.SEQUENTIAL), compiledFlows, sequentialRunTestResults);
+            runTestsResults = sequentialRunTestResults;
+
+        } else if (bulkRunMode == POSSIBLY_MIXED) { // Run some tests in parallel and rest of tests sequentially
+            ThreadSafeRunTestResults mixedTestResults = new ThreadSafeRunTestResults();
+            Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunState = slangTestRunner.splitTestCasesByRunState(bulkRunMode, testCases, testSuites, mixedTestResults);
+            slangTestRunner.runTestsSequential(projectPath, testCaseRunState.get(TestCaseRunState.SEQUENTIAL), compiledFlows, mixedTestResults);
+            slangTestRunner.runTestsParallel(projectPath, testCaseRunState.get(TestCaseRunState.PARALLEL), compiledFlows, mixedTestResults);
+            runTestsResults = mixedTestResults;
+
+        } else {
+            throw new IllegalStateException(String.format(UNSUPPORTED_BULK_RUN_MODE, (bulkRunMode == null) ? null : bulkRunMode.toString()));
+        }
         return runTestsResults;
     }
 
