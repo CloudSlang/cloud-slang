@@ -18,16 +18,10 @@ import io.cloudslang.lang.tools.build.commands.ApplicationArgs;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.TestRun;
 import io.cloudslang.lang.tools.build.tester.parallel.report.SlangTestCaseRunReportGeneratorService;
+import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.TestRunInfoService;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.Validate;
-import org.apache.log4j.Logger;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -36,6 +30,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.Validate;
+import org.apache.log4j.Logger;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getBooleanFromPropertiesWithDefault;
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getEnumInstanceFromPropertiesWithDefault;
@@ -435,8 +435,8 @@ public class SlangBuildMain {
             log.info("------------------------------------------------------------");
             log.info("Following " + runTestsResults.getPassedTests().size() + " test cases passed:");
             for (Map.Entry<String, TestRun> passedTest : runTestsResults.getPassedTests().entrySet()) {
-                String testCaseName = passedTest.getValue().getTestCase().getName();
-                log.info("- " + testCaseName.replaceAll("\n", "\n\t"));
+                String testCaseReference = SlangTestCase.generateTestCaseReference(passedTest.getValue().getTestCase());
+                log.info("- " + testCaseReference.replaceAll("\n", "\n\t"));
             }
         }
     }
