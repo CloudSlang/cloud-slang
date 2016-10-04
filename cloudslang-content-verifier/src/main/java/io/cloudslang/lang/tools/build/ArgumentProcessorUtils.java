@@ -1,7 +1,11 @@
 package io.cloudslang.lang.tools.build;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -16,6 +20,7 @@ import static java.util.Locale.ENGLISH;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 
 /**
@@ -25,8 +30,10 @@ public class ArgumentProcessorUtils {
 
     private final static String NOT_TS = "!";
     private static final String SUITE_LIST_SEPARATOR = ",";
-    public static final String PROPERTIES_OBJECT_CANNOT_BE_NULL = "Properties object cannot be null";
-    public static final String PROPERTY_KEY_CANNOT_BE_NULL = "Property key cannot be null";
+    static final String PROPERTIES_OBJECT_CANNOT_BE_NULL = "Properties object cannot be null";
+    static final String PROPERTY_KEY_CANNOT_BE_NULL = "Property key cannot be null";
+    private static final String LIST_JOINER = ", ";
+    static final String EMPTY = "<empty>";
 
     private ArgumentProcessorUtils() {
     }
@@ -107,6 +114,41 @@ public class ArgumentProcessorUtils {
      */
     public static List<String> parseTestSuitesToList(final String suitesString) {
         return isNotEmpty(suitesString) ? parseTestSuitesToList(asList(suitesString.split(SUITE_LIST_SEPARATOR))) : new ArrayList<String>();
+    }
+
+    /**
+     *  Returns the properties entries inside that file as a java.util.Properties object.
+     *
+     * @param propertiesAbsolutePath the absolute path to the run configuration properties file
+     * @return
+     */
+    public static Properties getPropertiesFromFile(String propertiesAbsolutePath) {
+        try (FileInputStream fileInputStream = new FileInputStream(new File(propertiesAbsolutePath))) {
+            Properties properties = new Properties();
+            properties.load(fileInputStream);
+            return properties;
+        } catch (IOException ioEx) {
+            throw new RuntimeException("Failed to read from properties file '" + propertiesAbsolutePath + "': ", ioEx);
+        }
+    }
+
+    /**
+     *
+     * @param stringList the list of strings
+     * @param emptyMessage the empty message to use
+     * @return A string joining the test suite names using io.cloudslang.lang.tools.build.SlangBuildMain#LIST_JOINER
+     */
+    public static String getListForPrint(final List<String> stringList, final String emptyMessage) {
+        return CollectionUtils.isEmpty(stringList) ? ((emptyMessage == null) ? EMPTY : emptyMessage) : join(stringList, LIST_JOINER);
+    }
+
+    /**
+     *
+     * @param stringList the list of strings
+     * @return A string joining the test suite names using io.cloudslang.lang.tools.build.SlangBuildMain#LIST_JOINER
+     */
+    public static String getListForPrint(final List<String> stringList) {
+        return CollectionUtils.isEmpty(stringList) ? EMPTY : join(stringList, LIST_JOINER);
     }
 
     static List<String> parseTestSuitesToList(List<String> testSuitesArg) {

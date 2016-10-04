@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -210,7 +211,7 @@ public class SlangTestRunner {
 
     private void printTestForActualRunSummary(TestCaseRunMode runMode, Map<String, SlangTestCase> testCases) {
         if (!MapUtils.isEmpty(testCases)) {
-            log.info("Running " + testCases.size() + " test(s) in " + runMode.toString().toLowerCase() + ": ");
+            log.info("Running " + testCases.size() + " test(s) in " + runMode.toString().toLowerCase(Locale.ENGLISH) + ": ");
             for (Map.Entry<String, SlangTestCase> stringSlangTestCaseEntry : testCases.entrySet()) {
                 final SlangTestCase slangTestCase = stringSlangTestCaseEntry.getValue();
                 log.info(PREFIX_DASH + slangTestCase.getName());

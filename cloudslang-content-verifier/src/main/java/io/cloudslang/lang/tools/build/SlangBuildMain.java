@@ -21,7 +21,6 @@ import io.cloudslang.lang.tools.build.tester.parallel.report.SlangTestCaseRunRep
 import io.cloudslang.lang.tools.build.tester.runconfiguration.TestRunInfoService;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
@@ -30,7 +29,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -42,6 +40,7 @@ import java.util.Set;
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getBooleanFromPropertiesWithDefault;
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getEnumInstanceFromPropertiesWithDefault;
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getIntFromPropertiesWithDefaultAndRange;
+import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getListForPrint;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_PARALLEL;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_SEQUENTIAL;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.POSSIBLY_MIXED;
@@ -71,7 +70,6 @@ import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.join;
 
 
 public class SlangBuildMain {
@@ -85,22 +83,22 @@ public class SlangBuildMain {
     private static final int MAX_THREADS_TEST_RUNNER = 32;
     private static final String MESSAGE_NOT_SCHEDULED_FOR_RUN_RULES = "Rules '%s' defined in '%s' key are not scheduled for run.";
     private static final String MESSAGE_TEST_SUITES_WITH_UNSPECIFIED_MAPPING = "Test suites '%s' have unspecified mapping. They will run in '%s' mode.";
-    private static final String LIST_JOINER = ", ";
+
     private static final String PROPERTIES_FILE_EXTENSION = "properties";
     private static final String DID_NOT_DETECT_RUN_CONFIGURATION_PROPERTIES_FILE = "Did not detect run configuration properties file at path '%s'. " +
             "Check that the path you are using is an absolute path. Check that the path separator is '\\\\' for Windows, or '/' for Linux.";
-    private static final String EMPTY = "<empty>";
+
     private static final String NEW_LINE = System.lineSeparator();
-    public static final String MESSAGE_BOTH_PARALLEL_AND_SEQUENTIAL_EXECUTION = "The '%s' suites are configured for both parallel and sequential execution. Each test suite must have only one execution mode (parallel or sequential).";
+    private static final String MESSAGE_BOTH_PARALLEL_AND_SEQUENTIAL_EXECUTION = "The '%s' suites are configured for both parallel and sequential execution. Each test suite must have only one execution mode (parallel or sequential).";
 
     // This class is a used in the interaction with the run configuration property file
     static class RunConfigurationProperties {
         static final String TEST_COVERAGE = "test.coverage";
         static final String TEST_PARALLEL_THREAD_COUNT = "test.parallel.thread.count";
-        static final String TEST_SUITES_TO_RUN = "test.suites.run";
+        static final String TEST_SUITES_TO_RUN = "test.suites.active";
         static final String TEST_SUITES_PARALLEL = "test.suites.parallel";
         static final String TEST_SUITES_SEQUENTIAL = "test.suites.sequential";
-        static final String TEST_SUITES_RUN_UNSPECIFIED = "test.suites.run.unspecified";
+        static final String TEST_SUITES_RUN_UNSPECIFIED = "test.suites.run.mode.unspecified";
     }
 
     // The possible ways to execute a test case
@@ -140,7 +138,7 @@ public class SlangBuildMain {
 
         TestCaseRunMode unspecifiedTestSuiteRunMode = runTestsInParallel ? TestCaseRunMode.PARALLEL : TestCaseRunMode.SEQUENTIAL;
         if (get(runConfigPath).isAbsolute() && isRegularFile(get(runConfigPath), NOFOLLOW_LINKS) && equalsIgnoreCase(PROPERTIES_FILE_EXTENSION, FilenameUtils.getExtension(runConfigPath))) {
-            Properties runConfigurationProperties = getRunConfigurationProperties(runConfigPath);
+            Properties runConfigurationProperties = ArgumentProcessorUtils.getPropertiesFromFile(runConfigPath);
             shouldPrintCoverageData = getBooleanFromPropertiesWithDefault(TEST_COVERAGE, shouldPrintCoverageData, runConfigurationProperties);
             threadCount = getIntFromPropertiesWithDefaultAndRange(TEST_PARALLEL_THREAD_COUNT, Runtime.getRuntime().availableProcessors(), runConfigurationProperties, 1, MAX_THREADS_TEST_RUNNER + 1);
             testSuites = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_TO_RUN);
@@ -160,11 +158,11 @@ public class SlangBuildMain {
         log.info("Building project: " + projectPath);
         log.info("Content root is at: " + contentPath);
         log.info("Test root is at: " + testsPath);
-        log.info("Active test suites are: " + getTestSuiteForPrint(testSuites));
-        log.info("Parallel run mode is configured for test suites: " + getTestSuiteForPrint(testSuitesParallel));
-        log.info("Sequential run mode is configured for test suites: " + getTestSuiteForPrint(testSuitesSequential));
+        log.info("Active test suites are: " + getListForPrint(testSuites));
+        log.info("Parallel run mode is configured for test suites: " + getListForPrint(testSuitesParallel));
+        log.info("Sequential run mode is configured for test suites: " + getListForPrint(testSuitesSequential));
         log.info("Default run mode '" + unspecifiedTestSuiteRunMode.name().toLowerCase() + "' is configured for test suites: "
-                + getTestSuiteForPrint(getDefaultRunModeTestSuites(testSuites, testSuitesParallel, testSuitesSequential)));
+                + getListForPrint(getDefaultRunModeTestSuites(testSuites, testSuitesParallel, testSuitesSequential)));
 
         log.info("Bulk run mode for tests: " + getBulkModeForPrint(bulkRunMode));
 
@@ -221,9 +219,9 @@ public class SlangBuildMain {
     }
 
     private static void addErrorIfSameTestSuiteIsInBothParallelOrSequential(List<String> testSuitesParallel, List<String> testSuitesSequential) {
-        List<String> intersection = ListUtils.intersection(testSuitesParallel, testSuitesSequential);
+        final List<String> intersection = ListUtils.intersection(testSuitesParallel, testSuitesSequential);
         if (!intersection.isEmpty()) {
-            String message = String.format(MESSAGE_BOTH_PARALLEL_AND_SEQUENTIAL_EXECUTION, getTestSuiteForPrint(intersection));
+            final String message = String.format(MESSAGE_BOTH_PARALLEL_AND_SEQUENTIAL_EXECUTION, getListForPrint(intersection));
             log.error(message);
             throw new IllegalStateException();
         }
@@ -235,17 +233,8 @@ public class SlangBuildMain {
      * @param bulkRunMode the mode to configure the run of all tests
      * @return String friendly version for print to the log or console
      */
-    private static String getBulkModeForPrint(BulkRunMode bulkRunMode) {
+    private static String getBulkModeForPrint(final BulkRunMode bulkRunMode) {
         return bulkRunMode.toString().replace("_", " ").toLowerCase(ENGLISH);
-    }
-
-    /**
-     *
-     * @param testSuite the list of test suite names
-     * @return A string joining the test suite names using io.cloudslang.lang.tools.build.SlangBuildMain#LIST_JOINER
-     */
-    private static String getTestSuiteForPrint(List<String> testSuite) {
-        return CollectionUtils.isEmpty(testSuite) ? EMPTY : join(testSuite, LIST_JOINER);
     }
 
     /**
@@ -303,7 +292,7 @@ public class SlangBuildMain {
             List<String> copy = new ArrayList<>(activeSuites);
             copy.removeAll(union);
 
-            log.info(format(MESSAGE_TEST_SUITES_WITH_UNSPECIFIED_MAPPING, getTestSuiteForPrint(copy), unspecifiedTestSuiteRunMode.name()));
+            log.info(format(MESSAGE_TEST_SUITES_WITH_UNSPECIFIED_MAPPING, getListForPrint(copy), unspecifiedTestSuiteRunMode.name()));
         }
     }
 
@@ -319,7 +308,7 @@ public class SlangBuildMain {
         if (intersectWithContained.size() != testSuitesContained.size()) {
             List<String> notScheduledForRun = new ArrayList<>(testSuitesContained);
             notScheduledForRun.removeAll(intersectWithContained);
-            log.warn(format(MESSAGE_NOT_SCHEDULED_FOR_RUN_RULES, getTestSuiteForPrint(notScheduledForRun), key));
+            log.warn(format(MESSAGE_NOT_SCHEDULED_FOR_RUN_RULES, getListForPrint(notScheduledForRun), key));
         }
     }
 
@@ -333,22 +322,6 @@ public class SlangBuildMain {
     private static List<String> getTestSuitesForKey(Properties runConfigurationProperties, String key) {
         final String valueList = runConfigurationProperties.getProperty(key);
         return ArgumentProcessorUtils.parseTestSuitesToList(valueList);
-    }
-
-    /**
-     *  Returns the properties entries inside that file as a java.util.Properties object.
-     *
-     * @param runConfigPath the absolute path to the run configuration properties file
-     * @return
-     */
-    private static Properties getRunConfigurationProperties(String runConfigPath) {
-        try (FileInputStream fileInputStream = new FileInputStream(new File(runConfigPath))) {
-            Properties properties = new Properties();
-            properties.load(fileInputStream);
-            return properties;
-        } catch (IOException ioEx) {
-            throw new RuntimeException("Failed to read from properties file '" + runConfigPath + "': ", ioEx);
-        }
     }
 
     private static void logErrors(List<RuntimeException> exceptions, String projectPath) {

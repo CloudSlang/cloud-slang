@@ -1,9 +1,22 @@
 package io.cloudslang.lang.tools.build;
 
 
-import org.junit.Assert;
+import com.beust.jcommander.internal.Lists;
+import com.google.common.io.Resources;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 
@@ -12,9 +25,14 @@ import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.PROPERTY_KEY
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getBooleanFromPropertiesWithDefault;
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getEnumInstanceFromPropertiesWithDefault;
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getIntFromPropertiesWithDefaultAndRange;
+import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getListForPrint;
+import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getPropertiesFromFile;
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.parseTestSuitesToList;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.TestCaseRunMode.PARALLEL;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.TestCaseRunMode.SEQUENTIAL;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class ArgumentProcessorUtilsTest {
@@ -29,25 +47,25 @@ public class ArgumentProcessorUtilsTest {
     public void testGetBooleanFromPropertiesWithDefaultSuccess() {
         // Missing property, mean default value is returned
         Properties properties = new Properties();
-        Assert.assertEquals(true, getBooleanFromPropertiesWithDefault("bbb", true, properties));
-        Assert.assertEquals(false, getBooleanFromPropertiesWithDefault("bbb", false, properties));
+        assertEquals(true, getBooleanFromPropertiesWithDefault("bbb", true, properties));
+        assertEquals(false, getBooleanFromPropertiesWithDefault("bbb", false, properties));
 
         // Wrong value means default value is returned
         properties = new Properties();
         properties.setProperty("bbb", "jkasda");
-        Assert.assertEquals(true, getBooleanFromPropertiesWithDefault("bbb", true, properties));
-        Assert.assertEquals(false, getBooleanFromPropertiesWithDefault("bbb", false, properties));
+        assertEquals(true, getBooleanFromPropertiesWithDefault("bbb", true, properties));
+        assertEquals(false, getBooleanFromPropertiesWithDefault("bbb", false, properties));
 
         // Correct value means default is NOT taken
         properties = new Properties();
         properties.setProperty("bbb", "TruE");
-        Assert.assertEquals(true, getBooleanFromPropertiesWithDefault("bbb", false, properties));
-        Assert.assertEquals(true, getBooleanFromPropertiesWithDefault("bbb", true, properties));
+        assertEquals(true, getBooleanFromPropertiesWithDefault("bbb", false, properties));
+        assertEquals(true, getBooleanFromPropertiesWithDefault("bbb", true, properties));
 
         // Correct value means default is NOT taken
         properties.setProperty("ccc", "FalSE");
-        Assert.assertEquals(false, getBooleanFromPropertiesWithDefault("ccc", false, properties));
-        Assert.assertEquals(false, getBooleanFromPropertiesWithDefault("ccc", true, properties));
+        assertEquals(false, getBooleanFromPropertiesWithDefault("ccc", false, properties));
+        assertEquals(false, getBooleanFromPropertiesWithDefault("ccc", true, properties));
     }
 
     @Test
@@ -60,27 +78,27 @@ public class ArgumentProcessorUtilsTest {
     public void testGetIntFromPropertiesWithDefaultSuccess() {
         // Missing property, mean default value is returned
         Properties properties = new Properties();
-        Assert.assertEquals(11, getIntFromPropertiesWithDefaultAndRange("aaa", 11, properties, null, null));
-        Assert.assertEquals(21, getIntFromPropertiesWithDefaultAndRange("aaa", 21, properties, 2, 3));
+        assertEquals(11, getIntFromPropertiesWithDefaultAndRange("aaa", 11, properties, null, null));
+        assertEquals(21, getIntFromPropertiesWithDefaultAndRange("aaa", 21, properties, 2, 3));
 
         // Wrong value means default value is returned
         properties = new Properties();
         properties.setProperty("bbb", "56aava"); // string
-        Assert.assertEquals(20, getIntFromPropertiesWithDefaultAndRange("bbb", 20, properties, null, null));
+        assertEquals(20, getIntFromPropertiesWithDefaultAndRange("bbb", 20, properties, null, null));
         properties.setProperty("bbb", "11111111111111111111111"); //too large
-        Assert.assertEquals(40, getIntFromPropertiesWithDefaultAndRange("bbb", 40, properties, 6, 12));
+        assertEquals(40, getIntFromPropertiesWithDefaultAndRange("bbb", 40, properties, 6, 12));
 
         // Correct value means default is NOT taken
         properties = new Properties();
         properties.setProperty("ccc", "5");
-        Assert.assertEquals(5, getIntFromPropertiesWithDefaultAndRange("ccc", 10, properties, null, null));
-        Assert.assertEquals(5, getIntFromPropertiesWithDefaultAndRange("ccc", 11, properties, 1, 20));
-        Assert.assertEquals(5, getIntFromPropertiesWithDefaultAndRange("ccc", 12, properties, 1, null));
+        assertEquals(5, getIntFromPropertiesWithDefaultAndRange("ccc", 10, properties, null, null));
+        assertEquals(5, getIntFromPropertiesWithDefaultAndRange("ccc", 11, properties, 1, 20));
+        assertEquals(5, getIntFromPropertiesWithDefaultAndRange("ccc", 12, properties, 1, null));
 
         // Check that range is checked
         properties.setProperty("ddd", "234");
-        Assert.assertEquals(90, getIntFromPropertiesWithDefaultAndRange("ddd", 90, properties, 1, 100));
-        Assert.assertEquals(234, getIntFromPropertiesWithDefaultAndRange("ddd", 150, properties, 1, 300));
+        assertEquals(90, getIntFromPropertiesWithDefaultAndRange("ddd", 90, properties, 1, 100));
+        assertEquals(234, getIntFromPropertiesWithDefaultAndRange("ddd", 150, properties, 1, 300));
     }
 
     @Test
@@ -93,24 +111,24 @@ public class ArgumentProcessorUtilsTest {
     public void testGetEnumFromPropertiesWithDefaultSuccess() {
         // Missing property, mean default value is returned
         Properties properties = new Properties();
-        Assert.assertSame(PARALLEL, getEnumInstanceFromPropertiesWithDefault("bbb", PARALLEL, properties));
-        Assert.assertSame(SEQUENTIAL, getEnumInstanceFromPropertiesWithDefault("bbb", SEQUENTIAL, properties));
+        assertSame(PARALLEL, getEnumInstanceFromPropertiesWithDefault("bbb", PARALLEL, properties));
+        assertSame(SEQUENTIAL, getEnumInstanceFromPropertiesWithDefault("bbb", SEQUENTIAL, properties));
 
         // Wrong value means default value is returned
         properties = new Properties();
         properties.setProperty("ccc", "parall454");
-        Assert.assertSame(SEQUENTIAL, getEnumInstanceFromPropertiesWithDefault("ccc", SEQUENTIAL, properties));
-        Assert.assertSame(PARALLEL, getEnumInstanceFromPropertiesWithDefault("ccc", PARALLEL, properties));
+        assertSame(SEQUENTIAL, getEnumInstanceFromPropertiesWithDefault("ccc", SEQUENTIAL, properties));
+        assertSame(PARALLEL, getEnumInstanceFromPropertiesWithDefault("ccc", PARALLEL, properties));
 
         // Correct value means default is NOT taken
         properties = new Properties();
         properties.setProperty("bbb", "PaRaLLeL");
-        Assert.assertSame(PARALLEL, getEnumInstanceFromPropertiesWithDefault("bbb", PARALLEL, properties));
-        Assert.assertSame(PARALLEL, getEnumInstanceFromPropertiesWithDefault("bbb", SEQUENTIAL, properties));
+        assertSame(PARALLEL, getEnumInstanceFromPropertiesWithDefault("bbb", PARALLEL, properties));
+        assertSame(PARALLEL, getEnumInstanceFromPropertiesWithDefault("bbb", SEQUENTIAL, properties));
 
         properties.setProperty("eee", "SeqUENTial");
-        Assert.assertSame(SEQUENTIAL, getEnumInstanceFromPropertiesWithDefault("eee", PARALLEL, properties));
-        Assert.assertSame(SEQUENTIAL, getEnumInstanceFromPropertiesWithDefault("eee", SEQUENTIAL, properties));
+        assertSame(SEQUENTIAL, getEnumInstanceFromPropertiesWithDefault("eee", PARALLEL, properties));
+        assertSame(SEQUENTIAL, getEnumInstanceFromPropertiesWithDefault("eee", SEQUENTIAL, properties));
     }
 
     @Test
@@ -120,42 +138,42 @@ public class ArgumentProcessorUtilsTest {
 
         // Tested call
         List<String> suites = parseTestSuitesToList(testSuitesString);
-        Assert.assertEquals(1, suites.size());
-        Assert.assertEquals("abc", suites.get(0));
+        assertEquals(1, suites.size());
+        assertEquals("abc", suites.get(0));
 
         // Case 2
         testSuitesString = "default,abcd";
 
         // Tested call
         suites = parseTestSuitesToList(testSuitesString);
-        Assert.assertEquals(2, suites.size());
-        Assert.assertEquals("abcd", suites.get(0));
-        Assert.assertEquals("default", suites.get(1));
+        assertEquals(2, suites.size());
+        assertEquals("abcd", suites.get(0));
+        assertEquals("default", suites.get(1));
 
         // Case 3
         testSuitesString = "!ab,abcd,!ef,defg,!cd";
 
         // Tested call
         suites = parseTestSuitesToList(testSuitesString);
-        Assert.assertEquals(2, suites.size());
-        Assert.assertEquals("abcd", suites.get(0));
-        Assert.assertEquals("defg", suites.get(1));
+        assertEquals(2, suites.size());
+        assertEquals("abcd", suites.get(0));
+        assertEquals("defg", suites.get(1));
 
         // Case 4
         testSuitesString = "!default,default,ef";
 
         // Tested call
         suites = parseTestSuitesToList(testSuitesString);
-        Assert.assertEquals(1, suites.size());
-        Assert.assertEquals("ef", suites.get(0));
+        assertEquals(1, suites.size());
+        assertEquals("ef", suites.get(0));
 
         // Case 5
         testSuitesString = "default,!default,gh";
 
         // Tested call
         suites = parseTestSuitesToList(testSuitesString);
-        Assert.assertEquals(1, suites.size());
-        Assert.assertEquals("gh", suites.get(0));
+        assertEquals(1, suites.size());
+        assertEquals("gh", suites.get(0));
 
 
         // Case 6
@@ -163,10 +181,54 @@ public class ArgumentProcessorUtilsTest {
 
         // Tested call
         suites = parseTestSuitesToList(testSuitesString);
-        Assert.assertEquals(3, suites.size());
-        Assert.assertEquals("abc", suites.get(0));
-        Assert.assertEquals("ef", suites.get(1));
-        Assert.assertEquals("gh", suites.get(2));
+        assertEquals(3, suites.size());
+        assertEquals("abc", suites.get(0));
+        assertEquals("ef", suites.get(1));
+        assertEquals("gh", suites.get(2));
+    }
+
+    @Test
+    public void testGetPropertiesFromFileThrowsException() throws URISyntaxException, IOException {
+        InputStream fis = null;
+        Writer outputWriter = null;
+        File tempRunConfigFile = null;
+        try {
+            fis = new FileInputStream(new File(Resources.getResource("lang/tools/build/builder_run_configuration.properties").toURI()));
+            Path tempRunConfig = Files.createTempFile("temp_run_config", ".properties");
+
+            tempRunConfigFile = tempRunConfig.toFile();
+            outputWriter = new PrintWriter(new FileWriter(tempRunConfigFile));
+            IOUtils.copy(fis, outputWriter);
+            outputWriter.flush();
+
+            String absolutePath = tempRunConfigFile.getAbsolutePath();
+            Properties propertiesFromFile = getPropertiesFromFile(absolutePath);
+            assertEquals("false", propertiesFromFile.get(SlangBuildMain.RunConfigurationProperties.TEST_COVERAGE));
+            assertEquals("sequential", propertiesFromFile.get(SlangBuildMain.RunConfigurationProperties.TEST_SUITES_RUN_UNSPECIFIED));
+            assertEquals("!default,vmware-local,xml-local,images", propertiesFromFile.get(SlangBuildMain.RunConfigurationProperties.TEST_SUITES_TO_RUN));
+            assertEquals("images", propertiesFromFile.get(SlangBuildMain.RunConfigurationProperties.TEST_SUITES_SEQUENTIAL));
+            assertEquals("xml-local,vmware-local", propertiesFromFile.get(SlangBuildMain.RunConfigurationProperties.TEST_SUITES_PARALLEL));
+            assertEquals("8", propertiesFromFile.get(SlangBuildMain.RunConfigurationProperties.TEST_PARALLEL_THREAD_COUNT));
+        } finally {
+            IOUtils.closeQuietly(fis);
+            IOUtils.closeQuietly(outputWriter);
+            FileUtils.deleteQuietly(tempRunConfigFile);
+        }
+    }
+
+    @Test
+    public void testGetListForPrint() {
+        List<String> testSuites = Lists.newArrayList("aaa", "bbb", "ccc", "ddd");
+        assertEquals("aaa, bbb, ccc, ddd", getListForPrint(testSuites));
+
+        testSuites = Lists.newArrayList("AA1");
+        assertEquals("AA1", getListForPrint(testSuites));
+
+        testSuites = Lists.newArrayList();
+        assertEquals(ArgumentProcessorUtils.EMPTY, getListForPrint(testSuites));
+
+        testSuites = Lists.newArrayList();
+        assertEquals("empty list", getListForPrint(testSuites, "empty list"));
     }
 
     private void testExceptionGetBooleanWithParams(final String key, final boolean defaultValue, final Properties properties, final String expectedMessage) {
@@ -174,8 +236,8 @@ public class ArgumentProcessorUtilsTest {
             getBooleanFromPropertiesWithDefault(key, defaultValue, properties);
             fail("Expecting exception");
         } catch (Exception ex) {
-            Assert.assertTrue(ex instanceof NullPointerException);
-            Assert.assertEquals(expectedMessage, ex.getMessage());
+            assertTrue(ex instanceof NullPointerException);
+            assertEquals(expectedMessage, ex.getMessage());
         }
     }
 
@@ -185,8 +247,8 @@ public class ArgumentProcessorUtilsTest {
             getIntFromPropertiesWithDefaultAndRange(key, defaultValue, properties, lower, upper);
             fail("Expecting exception");
         } catch (Exception ex) {
-            Assert.assertTrue(ex instanceof NullPointerException);
-            Assert.assertEquals(expectedMessage, ex.getMessage());
+            assertTrue(ex instanceof NullPointerException);
+            assertEquals(expectedMessage, ex.getMessage());
         }
     }
 
@@ -195,8 +257,8 @@ public class ArgumentProcessorUtilsTest {
             getEnumInstanceFromPropertiesWithDefault(key, defaultValue, properties);
             fail("Expecting exception");
         } catch (Exception ex) {
-            Assert.assertTrue(ex instanceof NullPointerException);
-            Assert.assertEquals(expectedMessage, ex.getMessage());
+            assertTrue(ex instanceof NullPointerException);
+            assertEquals(expectedMessage, ex.getMessage());
         }
     }
 }
