@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -22,6 +23,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * Created by stoneo on 3/15/2015.
  **/
 public class SlangTestCase implements Serializable {
+    private static final String UNKNOWN_FILE_PATH = "<unknown file path>";
 
     private String name;
 
@@ -80,7 +82,10 @@ public class SlangTestCase implements Serializable {
     }
 
     public static String generateTestCaseReference(SlangTestCase slangTestCase) {
-        return slangTestCase.getName() + " [" + slangTestCase.getFilePath() + "]";
+        return slangTestCase.getName()
+                + " ["
+                + (StringUtils.isEmpty(slangTestCase.getFilePath()) ? UNKNOWN_FILE_PATH : slangTestCase.getFilePath())
+                + "]";
     }
 
     public String getName() {
