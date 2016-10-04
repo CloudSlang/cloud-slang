@@ -1,3 +1,12 @@
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.tools.build;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -28,7 +37,7 @@ import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
  */
 public class ArgumentProcessorUtils {
 
-    private final static String NOT_TS = "!";
+    private static final String NOT_TS = "!";
     private static final String SUITE_LIST_SEPARATOR = ",";
     static final String PROPERTIES_OBJECT_CANNOT_BE_NULL = "Properties object cannot be null";
     static final String PROPERTY_KEY_CANNOT_BE_NULL = "Property key cannot be null";
