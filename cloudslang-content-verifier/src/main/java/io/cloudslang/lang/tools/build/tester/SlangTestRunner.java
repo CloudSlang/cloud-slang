@@ -214,7 +214,7 @@ public class SlangTestRunner {
             log.info("Running " + testCases.size() + " test(s) in " + runMode.toString().toLowerCase(Locale.ENGLISH) + ": ");
             for (Map.Entry<String, SlangTestCase> stringSlangTestCaseEntry : testCases.entrySet()) {
                 final SlangTestCase slangTestCase = stringSlangTestCaseEntry.getValue();
-                log.info(PREFIX_DASH + slangTestCase.getName());
+                log.info(PREFIX_DASH + SlangTestCase.generateTestCaseReference(slangTestCase));
             }
         }
     }
