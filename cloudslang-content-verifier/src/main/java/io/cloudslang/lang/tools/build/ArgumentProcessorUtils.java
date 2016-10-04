@@ -125,9 +125,9 @@ public class ArgumentProcessorUtils {
                 if (!isSuitePresent(testSuites, testSuite)) {
                     testSuites.add(testSuite);
                 }
-            } else if (!containsNotDefaultTestSuite && equalsIgnoreCase(testSuite, SlangBuildMain.DEFAULT_TESTS)) {   // !default test suite
+            } else if (!containsNotDefaultTestSuite && equalsIgnoreCase(testSuite, SlangBuildMain.DEFAULT_TESTS)) {   // default test suite
                 containsDefaultTestSuite = true;
-            } else if (!containsNotDefaultTestSuite && equalsIgnoreCase(testSuite, notDefaultTestSuite)) { // default test suite
+            } else if (!containsNotDefaultTestSuite && equalsIgnoreCase(testSuite, notDefaultTestSuite)) { // !default test suite
                 containsNotDefaultTestSuite = true;
             }
         }

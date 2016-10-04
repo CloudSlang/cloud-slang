@@ -551,7 +551,7 @@ public class SlangBuilderTest {
         InOrder inOrder = inOrder(slangTestRunner);
         inOrder.verify(slangTestRunner).splitTestCasesByRunState(eq(BulkRunMode.POSSIBLY_MIXED), eq(testCases), eq(testSuites), isA(ThreadSafeRunTestResults.class));
         inOrder.verify(slangTestRunner).runTestsSequential(eq(projectPath), anyMap(), eq(compiledFlows), eq(theCapturedArgument.get()));
-        inOrder.verify(slangTestRunner).runTestsParallel(anyString(), anyMap(), anyMap(), any(ThreadSafeRunTestResults.class));
+        inOrder.verify(slangTestRunner).runTestsParallel(eq(projectPath), anyMap(), eq(compiledFlows), eq(theCapturedArgument.get()));
 
         final List<SlangTestCase> listSeq = newArrayList(capturedTestsSeq.get().values());
         final List<SlangTestCase> listPar = newArrayList(capturedTestsPar.get().values());

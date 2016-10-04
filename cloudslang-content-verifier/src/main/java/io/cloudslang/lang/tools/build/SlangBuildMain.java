@@ -129,7 +129,6 @@ public class SlangBuildMain {
         boolean runTestsInParallel = appArgs.isParallel();
         int threadCount = parseThreadCountArg(appArgs, runTestsInParallel);
         String testCaseTimeout = parseTestTimeout(appArgs);
-        setProperty(SLANG_TEST_RUNNER_THREAD_COUNT, valueOf(threadCount));
         setProperty(TEST_CASE_TIMEOUT_IN_MINUTES_KEY, valueOf(testCaseTimeout));
         boolean shouldValidateDescription = appArgs.shouldValidateDescription();
         String runConfigPath = FilenameUtils.normalize(appArgs.getRunConfigPath());
@@ -154,6 +153,8 @@ public class SlangBuildMain {
         } else { // Warn when file is misconfigured, relative path, file does not exist or is not a properties file
             log.info(format(DID_NOT_DETECT_RUN_CONFIGURATION_PROPERTIES_FILE, runConfigPath));
         }
+        // Setting thread count for visibility in ParallelTestCaseExecutorService
+        setProperty(SLANG_TEST_RUNNER_THREAD_COUNT, valueOf(threadCount));
 
         log.info(NEW_LINE + "------------------------------------------------------------");
         log.info("Building project: " + projectPath);
@@ -258,7 +259,6 @@ public class SlangBuildMain {
      */
     private static void updateTestSuiteMappings(final TestRunInfoService testRunInfoService, final List<String> parallelSuites,
                                                 final List<String> sequentialSuites, final List<String> activeSuites, final TestCaseRunMode unspecifiedTestSuiteRunMode) {
-
         testRunInfoService.setRunModeForTestSuites(parallelSuites, TestCaseRunMode.PARALLEL);
         testRunInfoService.setRunModeForTestSuites(sequentialSuites, TestCaseRunMode.SEQUENTIAL);
         testRunInfoService.setRunModeForTestSuites(getDefaultRunModeTestSuites(activeSuites, parallelSuites, sequentialSuites), unspecifiedTestSuiteRunMode);
