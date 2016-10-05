@@ -167,7 +167,7 @@ public class SlangBuildMain {
             IRunTestResults runTestsResults,
             String testCaseReportLocation) throws IOException {
         if (StringUtils.isNotBlank(testCaseReportLocation)) {
-            Path reportDirectoryPath = Paths.get(getProperty(TEST_CASE_REPORT_LOCATION));
+            Path reportDirectoryPath = Paths.get(testCaseReportLocation);
             if (!Files.exists(reportDirectoryPath)) {
                 Files.createDirectories(reportDirectoryPath);
             }
