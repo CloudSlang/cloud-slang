@@ -78,6 +78,11 @@ public class SlangBuildMain {
         setProperty(TEST_CASE_TIMEOUT_IN_MINUTES_KEY, valueOf(testCaseTimeout));
         boolean shouldValidateDescription = appArgs.shouldValidateDescription();
 
+        String testCaseReportLocation = getProperty(TEST_CASE_REPORT_LOCATION);
+        if (StringUtils.isBlank(testCaseReportLocation)) {
+            log.info("Test case report location property [" + TEST_CASE_REPORT_LOCATION + "] is not defined. Report will be skipped.");
+        }
+
         log.info("");
         log.info("------------------------------------------------------------");
         log.info("Building project: " + projectPath);
@@ -125,7 +130,7 @@ public class SlangBuildMain {
                 printBuildSuccessSummary(contentPath, buildResults, runTestsResults);
             }
 
-            generateTestCaseReport(reportGeneratorService, runTestsResults);
+            generateTestCaseReport(reportGeneratorService, runTestsResults, testCaseReportLocation);
             System.exit(isNotEmpty(runTestsResults.getFailedTests()) ? 1 : 0);
 
         } catch (Throwable e) {
@@ -157,12 +162,17 @@ public class SlangBuildMain {
         log.error("------------------------------------------------------------");
     }
 
-    private static void generateTestCaseReport(SlangTestCaseRunReportGeneratorService reportGeneratorService, IRunTestResults runTestsResults) throws IOException {
-        Path reportDirectoryPath = Paths.get(getProperty(TEST_CASE_REPORT_LOCATION));
-        if (!Files.exists(reportDirectoryPath)) {
-            Files.createDirectories(reportDirectoryPath);
+    private static void generateTestCaseReport(
+            SlangTestCaseRunReportGeneratorService reportGeneratorService,
+            IRunTestResults runTestsResults,
+            String testCaseReportLocation) throws IOException {
+        if (StringUtils.isNotBlank(testCaseReportLocation)) {
+            Path reportDirectoryPath = Paths.get(getProperty(TEST_CASE_REPORT_LOCATION));
+            if (!Files.exists(reportDirectoryPath)) {
+                Files.createDirectories(reportDirectoryPath);
+            }
+            reportGeneratorService.generateReport(runTestsResults, reportDirectoryPath.toString());
         }
-        reportGeneratorService.generateReport(runTestsResults, reportDirectoryPath.toString());
     }
 
     @SuppressWarnings("Duplicates")
