@@ -33,6 +33,7 @@ import java.util.Set;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -151,6 +152,12 @@ public class SlangBuildMain {
         } else { // Warn when file is misconfigured, relative path, file does not exist or is not a properties file
             log.info(format(DID_NOT_DETECT_RUN_CONFIGURATION_PROPERTIES_FILE, runConfigPath));
         }
+
+        String testCaseReportLocation = getProperty(TEST_CASE_REPORT_LOCATION);
+        if (StringUtils.isBlank(testCaseReportLocation)) {
+            log.info("Test case report location property [" + TEST_CASE_REPORT_LOCATION + "] is not defined. Report will be skipped.");
+        }
+
         // Setting thread count for visibility in ParallelTestCaseExecutorService
         setProperty(SLANG_TEST_RUNNER_THREAD_COUNT, valueOf(threadCount));
 
@@ -207,7 +214,11 @@ public class SlangBuildMain {
                 printBuildSuccessSummary(contentPath, buildResults, runTestsResults);
             }
 
-            generateTestCaseReport(context.getBean(SlangTestCaseRunReportGeneratorService.class), runTestsResults);
+            generateTestCaseReport(
+                    context.getBean(SlangTestCaseRunReportGeneratorService.class),
+                    runTestsResults,
+                    testCaseReportLocation
+            );
             System.exit(isNotEmpty(runTestsResults.getFailedTests()) ? 1 : 0);
 
         } catch (Throwable e) {
@@ -345,12 +356,17 @@ public class SlangBuildMain {
         log.error("------------------------------------------------------------");
     }
 
-    private static void generateTestCaseReport(SlangTestCaseRunReportGeneratorService reportGeneratorService, IRunTestResults runTestsResults) throws IOException {
-        Path reportDirectoryPath = get(getProperty(TEST_CASE_REPORT_LOCATION));
-        if (!exists(reportDirectoryPath)) {
-            createDirectories(reportDirectoryPath);
+    private static void generateTestCaseReport(
+            SlangTestCaseRunReportGeneratorService reportGeneratorService,
+            IRunTestResults runTestsResults,
+            String testCaseReportLocation) throws IOException {
+        if (StringUtils.isNotBlank(testCaseReportLocation)) {
+            Path reportDirectoryPath = get(testCaseReportLocation);
+            if (!exists(reportDirectoryPath)) {
+                createDirectories(reportDirectoryPath);
+            }
+            reportGeneratorService.generateReport(runTestsResults, reportDirectoryPath.toString());
         }
-        reportGeneratorService.generateReport(runTestsResults, reportDirectoryPath.toString());
     }
 
     @SuppressWarnings("Duplicates")
