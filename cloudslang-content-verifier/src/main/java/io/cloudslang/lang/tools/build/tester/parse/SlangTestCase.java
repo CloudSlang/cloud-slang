@@ -10,14 +10,16 @@
 package io.cloudslang.lang.tools.build.tester.parse;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.cloudslang.lang.tools.build.SlangBuildMain;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 /**
  * Created by stoneo on 3/15/2015.
@@ -105,11 +107,10 @@ public class SlangTestCase implements Serializable {
     }
 
     public List<String> getTestSuites() {
-        if (CollectionUtils.isEmpty(testSuites)) {
-            this.testSuites = new ArrayList<>();
-        }
-        return testSuites;
+        List<String> localTestSuites = this.testSuites;
+        return isEmpty(localTestSuites) ? newArrayList(SlangBuildMain.DEFAULT_TESTS) : newArrayList(localTestSuites);
     }
+
 
     public String getSystemPropertiesFile() {
         return systemPropertiesFile;
