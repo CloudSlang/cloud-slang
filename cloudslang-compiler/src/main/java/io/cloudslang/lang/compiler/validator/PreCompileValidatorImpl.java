@@ -1,6 +1,5 @@
 package io.cloudslang.lang.compiler.validator;
 
-import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.TransformersHandler;
@@ -17,7 +16,6 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.utils.ResultUtils;
 import io.cloudslang.lang.entities.utils.SetUtils;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,17 +25,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static ch.lambdaj.Lambda.exists;
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 
 /**
@@ -352,7 +346,9 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
             String navigationTarget = entry.getValue();
             if (!isProcessed(navigationTarget, reachableStepNames, reachableResultNames)) {
                 boolean isResult = resultNames.contains(navigationTarget);
-                Step nextStepToCompile = Lambda.selectFirst(steps, having(on(Step.class).getName(), equalTo(navigationTarget)));
+
+                Step nextStepToCompile = selectNextStepToCompile(steps, navigationTarget);
+
                 boolean isStep = nextStepToCompile != null;
 
                 if (isStep && isResult) {
@@ -378,6 +374,15 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
                 }
             }
         }
+    }
+
+    private Step selectNextStepToCompile(Deque<Step> steps, String navigationTarget) {
+        for (Step step : steps) {
+            if (org.apache.commons.lang.StringUtils.equals(step.getName(), navigationTarget)) {
+                return step;
+            }
+        }
+        return null;
     }
 
     private boolean isProcessed(String navigationTarget, Set<String> reachableStepNames, Set<String> reachableResultNames) {
@@ -411,15 +416,16 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     private void validateFileName(String executableName, ParsedSlang parsedSlang, ExecutableModellingResult result) {
         String fileName = parsedSlang.getName();
         Extension fileExtension = parsedSlang.getFileExtension();
-        if (StringUtils.isNotEmpty(executableName) && !executableName.equals(fileName)) {
+        String fileNameWithoutExtension = Extension.removeExtension(fileName);
+        if (StringUtils.isNotEmpty(executableName) && !executableName.equals(fileNameWithoutExtension)) {
             if (fileExtension == null) {
                 result.getErrors().add(new IllegalArgumentException("Operation/Flow " + executableName +
-                        " is declared in a file named \"" + fileName + "\"," +
+                        " is declared in a file named \"" + fileNameWithoutExtension + "\"," +
                         " it should be declared in a file named \"" + executableName + "\" plus a valid " +
                         "extension(" + Extension.getExtensionValuesAsString() + ") separated by \".\""));
             } else {
                 result.getErrors().add(new IllegalArgumentException("Operation/Flow " + executableName +
-                        " is declared in a file named \"" + fileName + "." + fileExtension.getValue() + "\"" +
+                        " is declared in a file named \"" + fileName + "\"" +
                         ", it should be declared in a file named \"" + executableName + "." + fileExtension.getValue() + "\""));
             }
         }

@@ -150,7 +150,7 @@ public class CompilerHelperImpl implements CompilerHelper {
         for (File inputFile : fileCollection) {
             logger.info("Loading file: " + inputFile);
             try {
-                String inputsFileContent = SlangSource.fromFile(inputFile).getSource();
+                String inputsFileContent = SlangSource.fromFile(inputFile).getContent();
                 Boolean emptyContent = true;
                 if (StringUtils.isNotEmpty(inputsFileContent)) {
                     @SuppressWarnings("unchecked") Map<String, ? extends Serializable> inputFileYamlContent =

@@ -8,7 +8,6 @@
  */
 package io.cloudslang.lang.tools.build;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
@@ -22,6 +21,7 @@ import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
@@ -31,28 +31,40 @@ import io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseE
 import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDispatchService;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
+import io.cloudslang.lang.tools.build.tester.runconfiguration.TestRunInfoService;
+import io.cloudslang.lang.tools.build.tester.runconfiguration.TestRunInfoServiceImpl;
+import io.cloudslang.lang.tools.build.tester.runconfiguration.strategy.ConflictResolutionStrategy;
+import io.cloudslang.lang.tools.build.tester.runconfiguration.strategy.DefaultResolutionStrategy;
 import io.cloudslang.lang.tools.build.validation.StaticValidator;
 import io.cloudslang.lang.tools.build.validation.StaticValidatorImpl;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
 import io.cloudslang.score.api.ExecutionPlan;
-
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+import junit.framework.Assert;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -60,33 +72,37 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.python.google.common.collect.Sets.newHashSet;
 
-/*
- * Created by stoneo on 2/11/2015.
- */
+
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = SlangBuildTest.Config.class)
-public class SlangBuildTest {
+@ContextConfiguration(classes = SlangBuilderTest.Config.class)
+public class SlangBuilderTest {
 
     private static final Set<String> SYSTEM_PROPERTY_DEPENDENCIES = Collections.emptySet();
     private static final CompilationModellingResult EMPTY_COMPILATION_MODELLING_RESULT =
@@ -123,6 +139,9 @@ public class SlangBuildTest {
     @Autowired
     public TestCaseEventDispatchService testCaseEventDispatchService;
 
+    @Autowired
+    private TestRunInfoService testRunInfoService;
+
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
@@ -137,14 +156,14 @@ public class SlangBuildTest {
     public void testNullDirPath() throws Exception {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("path");
-        slangBuilder.buildSlangContent(null, null, null, null, false, false);
+        slangBuilder.buildSlangContent(null, null, null, null, false, BulkRunMode.ALL_SEQUENTIAL);
     }
 
     @Test
     public void testEmptyDirPath() throws Exception {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("path");
-        slangBuilder.buildSlangContent("", "content", null, null, false, false);
+        slangBuilder.buildSlangContent("", "content", null, null, false, BulkRunMode.ALL_SEQUENTIAL);
     }
 
     @Test
@@ -152,17 +171,18 @@ public class SlangBuildTest {
         Path testPath = null;
         try {
             String projectPath = "aaa/bb/cc";
-            List<String> suites = Lists.newArrayList("suite1", "suite2");
+            List<String> suites = newArrayList("suite1", "suite2");
             testPath = Files.createTempDirectory("testPath");
             String testPathString = testPath.toString();
 
-            doReturn(new ThreadSafeRunTestResults()).when(slangTestRunner).runAllTestsParallel(eq(projectPath), anyMap(), anyMap(), eq(suites));
+            ThreadSafeRunTestResults runTestsResults = new ThreadSafeRunTestResults();
+            doNothing().when(slangTestRunner).runTestsParallel(eq(projectPath), anyMap(), anyMap(), any(ThreadSafeRunTestResults.class));
             doReturn(Maps.newHashMap()).when(slangTestRunner).createTestCases(anyString(), anySet());
-            doReturn(new ThreadSafeRunTestResults()).when(slangTestRunner).runAllTestsParallel(anyString(), anyMap(), anyMap(), anyList());
+//            doNothing().when(slangTestRunner).runTestsParallel(anyString(), anyMap(), anyMap(), new ThreadSafeRunTestResults());
 
-            slangBuilder.runTests(Maps.<String, Executable>newHashMap(), projectPath, testPathString, suites, true);
-            verify(slangTestRunner).runAllTestsParallel(eq(projectPath), anyMap(), anyMap(), eq(suites));
-            verify(slangTestRunner, never()).runAllTestsSequential(anyString(), anyMap(), anyMap(), anyList());
+            slangBuilder.runTests(Maps.<String, Executable>newHashMap(), projectPath, testPathString, suites, BulkRunMode.ALL_PARALLEL);
+            verify(slangTestRunner).runTestsParallel(eq(projectPath), anyMap(), anyMap(), eq(runTestsResults));
+            verify(slangTestRunner, never()).runTestsSequential(anyString(), anyMap(), anyMap(), any(RunTestsResults.class));
 
         } finally {
             if (testPath != null) {
@@ -176,7 +196,7 @@ public class SlangBuildTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("c/h/j");
         exception.expectMessage("directory");
-        slangBuilder.buildSlangContent("c/h/j", "c/h/j/content", null, null, false, false);
+        slangBuilder.buildSlangContent("c/h/j", "c/h/j/content", null, null, false, BulkRunMode.ALL_SEQUENTIAL);
     }
 
     @Test
@@ -184,7 +204,7 @@ public class SlangBuildTest {
         URI resource = getClass().getResource("/no_dependencies").toURI();
         when(slangCompiler.preCompile(any(SlangSource.class))).thenThrow(new RuntimeException());
         exception.expect(RuntimeException.class);
-        SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, BulkRunMode.ALL_SEQUENTIAL);
         assertNotNull(slangBuildResults.getCompilationExceptions());
         assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
         throw slangBuildResults.getCompilationExceptions().get(0);
@@ -198,7 +218,7 @@ public class SlangBuildTest {
         exception.expectMessage("1");
         exception.expectMessage("0");
         exception.expectMessage("compiled");
-        SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, BulkRunMode.ALL_SEQUENTIAL);
         assertNotNull(slangBuildResults.getCompilationExceptions());
         assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
         throw slangBuildResults.getCompilationExceptions().get(0);
@@ -209,7 +229,7 @@ public class SlangBuildTest {
         URI resource = getClass().getResource("/no_dependencies").toURI();
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
-        SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false, BulkRunMode.ALL_SEQUENTIAL);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
         assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
     }
@@ -220,7 +240,7 @@ public class SlangBuildTest {
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenThrow(new RuntimeException());
         exception.expect(RuntimeException.class);
-        slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, BulkRunMode.ALL_SEQUENTIAL);
     }
 
     @Test
@@ -234,7 +254,7 @@ public class SlangBuildTest {
         exception.expectMessage("0");
         exception.expectMessage("compile");
         exception.expectMessage("models");
-        slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, BulkRunMode.ALL_SEQUENTIAL);
     }
 
     @Test
@@ -250,23 +270,28 @@ public class SlangBuildTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("dependency");
         exception.expectMessage("dep1");
-        slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false ,false);
+        slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, BulkRunMode.ALL_SEQUENTIAL);
     }
 
     @Test
     public void testCompileValidSlangFileWithDependencies() throws Exception {
         URI resource = getClass().getResource("/dependencies").toURI();
+        URI emptyFlowURI = getClass().getResource("/dependencies/empty_flow.sl").toURI();
+        URI dependencyURI = getClass().getResource("/dependencies/dependency.sl").toURI();
+        SlangSource emptyFlowSource = SlangSource.fromFile(emptyFlowURI);
+        SlangSource dependencySource = SlangSource.fromFile(dependencyURI);
+
         Set<String> flowDependencies = new HashSet<>();
         flowDependencies.add("dependencies.dependency");
         Flow emptyFlowExecutable = new Flow(null, null, null, "dependencies", "empty_flow", null, null, null, flowDependencies, SYSTEM_PROPERTY_DEPENDENCIES);
-        when(slangCompiler.preCompile(new SlangSource("", "empty_flow"))).thenReturn(emptyFlowExecutable);
+        when(slangCompiler.preCompile(emptyFlowSource)).thenReturn(emptyFlowExecutable);
         Flow dependencyExecutable = new Flow(null, null, null, "dependencies", "dependency", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
-        when(slangCompiler.preCompile(new SlangSource("", "dependency"))).thenReturn(dependencyExecutable);
+        when(slangCompiler.preCompile(dependencySource)).thenReturn(dependencyExecutable);
         HashSet<Executable> dependencies = new HashSet<>();
         dependencies.add(dependencyExecutable);
         when(scoreCompiler.compile(emptyFlowExecutable, dependencies)).thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
         when(scoreCompiler.compile(dependencyExecutable, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
-        SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false, BulkRunMode.ALL_SEQUENTIAL);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
         // properties file should be ignored
         assertEquals("Did not compile all Slang files. Expected to compile: 2, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 2);
@@ -282,7 +307,7 @@ public class SlangBuildTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Namespace");
         exception.expectMessage("wrong.namespace");
-        SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, BulkRunMode.ALL_SEQUENTIAL);
         assertNotNull(slangBuildResults.getCompilationExceptions());
         assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
         throw slangBuildResults.getCompilationExceptions().get(0);
@@ -298,7 +323,7 @@ public class SlangBuildTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Name");
         exception.expectMessage("wrong_name");
-        SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, BulkRunMode.ALL_SEQUENTIAL);
         assertNotNull(slangBuildResults.getCompilationExceptions());
         assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
         throw slangBuildResults.getCompilationExceptions().get(0);
@@ -310,7 +335,7 @@ public class SlangBuildTest {
         Flow executable = new Flow(null, null, null, "no_dependencies-0123456789", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(executable);
         when(scoreCompiler.compile(executable, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
-        SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false, BulkRunMode.ALL_SEQUENTIAL);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
         assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
     }
@@ -321,7 +346,7 @@ public class SlangBuildTest {
         Flow executable = new Flow(null, null, null, "No_Dependencies", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(executable);
         when(scoreCompiler.compile(executable, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
-        SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, EMPTY_COMPILATION_MODELLING_RESULT, BulkRunMode.ALL_SEQUENTIAL);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
         assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
     }
@@ -336,7 +361,7 @@ public class SlangBuildTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("invalid-chars$");
         exception.expectMessage("alphanumeric");
-        SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, false);
+        SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, BulkRunMode.ALL_SEQUENTIAL);
         assertNotNull(slangBuildResults.getCompilationExceptions());
         assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
         throw slangBuildResults.getCompilationExceptions().get(0);
@@ -347,11 +372,18 @@ public class SlangBuildTest {
         URI contentResource = getClass().getResource("/no_dependencies").toURI();
         URI testResource = getClass().getResource("/test/valid").toURI();
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
-        when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
-        RunTestsResults runTestsResults = new RunTestsResults();
-        runTestsResults.addFailedTest("test1", new TestRun(new SlangTestCase("test1", "", null, null, null, null, null, null, null), "message"));
-        when(slangTestRunner.runAllTestsSequential((any(String.class)), anyMap(), anyMap(), anyList())).thenReturn(runTestsResults);
-        SlangBuildResults buildResults = slangBuilder.buildSlangContent(contentResource.getPath(), contentResource.getPath(), testResource.getPath(), null, false, false);
+        when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
+
+        doAnswer(new Answer() {
+            @Override
+            public Void answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Object[] arguments = invocationOnMock.getArguments();
+                RunTestsResults runTestsResultsInner = (RunTestsResults) arguments[arguments.length - 1];
+                runTestsResultsInner.addFailedTest("test1", new TestRun(new SlangTestCase("test1", "", null, null, null, null, null, null, null), "message"));
+                return null;
+            }
+        }).when(slangTestRunner).runTestsSequential((any(String.class)), anyMap(), anyMap(), any(RunTestsResults.class));
+        SlangBuildResults buildResults = slangBuilder.buildSlangContent(contentResource.getPath(), contentResource.getPath(), testResource.getPath(), null, false, false, BulkRunMode.ALL_SEQUENTIAL);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
         IRunTestResults actualRunTestsResults = buildResults.getRunTestsResults();
         assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " + numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
@@ -363,17 +395,13 @@ public class SlangBuildTest {
         URI contentResource = getClass().getResource("/no_dependencies").toURI();
         URI testResource = getClass().getResource("/test/valid").toURI();
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
-        when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
-        RunTestsResults runTestsResults = new RunTestsResults();
-        runTestsResults.addFailedTest("test1", new TestRun(new SlangTestCase("test1", "", null, null, null, null, null, null, null), "message"));
-        when(
-                slangTestRunner.runAllTestsSequential(
-                        any(String.class),
-                        anyMapOf(String.class, SlangTestCase.class),
-                        anyMapOf(String.class, CompilationArtifact.class),
-                        anyListOf(String.class)
-                )
-        ).thenReturn(runTestsResults);
+        when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_ARTIFACT);
+
+        doNothing().when(slangTestRunner).runTestsSequential(
+                any(String.class),
+                anyMapOf(String.class, SlangTestCase.class),
+                anyMapOf(String.class, CompilationArtifact.class),
+                any(ThreadSafeRunTestResults.class));
 
         Map<String, SlangTestCase> testCases = new HashMap<>();
         SlangTestCase testCaseWithIncorrectFlowPath = new SlangTestCase(
@@ -390,11 +418,164 @@ public class SlangBuildTest {
         testCases.put("i_don_t_exist", testCaseWithIncorrectFlowPath);
         when(slangTestRunner.createTestCases(anyString(), anySetOf(String.class))).thenReturn(testCases);
 
-        SlangBuildResults buildResults = slangBuilder.buildSlangContent(contentResource.getPath(), contentResource.getPath(), testResource.getPath(), null, false, false);
+        SlangBuildResults buildResults = slangBuilder.buildSlangContent(contentResource.getPath(), contentResource.getPath(), testResource.getPath(), null, false, BulkRunMode.ALL_SEQUENTIAL);
 
         // test case: test flow path points to non existing executable
         // validate execution does not return when detects this situation and coverage data is added to results
         assertEquals(1, buildResults.getRunTestsResults().getUncoveredExecutables().size());
+    }
+
+    @Test
+    public void testProcessRunTestsParallel() {
+        final Map<String, SlangTestCase> testCases = new LinkedHashMap<>();
+        final SlangTestCase testCase1 = new SlangTestCase("test1", "testFlowPath", "desc", Arrays.asList("abc", "new"), "mock", null, null, false, "SUCCESS");
+        final SlangTestCase testCase2 = new SlangTestCase("test2", "testFlowPath", "desc", Arrays.asList("efg", "new"), "mock", null, null, false, "SUCCESS");
+        final SlangTestCase testCase3 = new SlangTestCase("test3", "testFlowPath", "desc", Arrays.asList("new", "new2"), "mock", null, null, false, "SUCCESS");
+        final SlangTestCase testCase4 = new SlangTestCase("test4", "testFlowPath", "desc", Arrays.asList("jjj", "new2"), "mock", null, null, false, "SUCCESS");
+        final SlangTestCase testCase5 = new SlangTestCase("test5", "testFlowPath", "desc", Arrays.asList("hhh", "jjj", "abc"), "mock", null, null, false, "SUCCESS");
+
+        testCases.put("test1", testCase1);
+        testCases.put("test2", testCase2);
+        testCases.put("test3", testCase3);
+        testCases.put("test4", testCase4);
+        testCases.put("test5", testCase5);
+
+        final List<String> testSuites = newArrayList("abc");
+        final Map<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        final String projectPath = "aaa";
+
+        final AtomicReference<IRunTestResults> capturedArgument = new AtomicReference<>();
+        doAnswer(getAnswer(capturedArgument)).when(slangTestRunner).splitTestCasesByRunState(any(BulkRunMode.class), anyMap(), anyList(), any(IRunTestResults.class));
+        doNothing().when(slangTestRunner).runTestsParallel(anyString(), anyMap(), anyMap(), any(ThreadSafeRunTestResults.class));
+
+        // Tested call
+        slangBuilder.processRunTests(projectPath, testSuites, BulkRunMode.ALL_PARALLEL, compiledFlows, testCases);
+
+        InOrder inOrder = Mockito.inOrder(slangTestRunner);
+        inOrder.verify(slangTestRunner).splitTestCasesByRunState(eq(BulkRunMode.ALL_PARALLEL), eq(testCases), eq(testSuites), isA(ThreadSafeRunTestResults.class));
+        inOrder.verify(slangTestRunner).runTestsParallel(eq(projectPath), anyMap(), eq(compiledFlows), eq((ThreadSafeRunTestResults) capturedArgument.get()));
+        verifyNoMoreInteractions(slangTestRunner);
+        verify(slangTestRunner, never()).runTestsSequential(anyString(), anyMap(), anyMap(), any(IRunTestResults.class));
+    }
+
+    @Test
+    public void testProcessRunTestsSequential() {
+        final Map<String, SlangTestCase> testCases = new LinkedHashMap<>();
+        final SlangTestCase testCase1 = new SlangTestCase("test1", "testFlowPath", "desc", Arrays.asList("abc", "new"), "mock", null, null, false, "SUCCESS");
+        final SlangTestCase testCase2 = new SlangTestCase("test2", "testFlowPath", "desc", Arrays.asList("efg", "new"), "mock", null, null, false, "SUCCESS");
+        final SlangTestCase testCase3 = new SlangTestCase("test3", "testFlowPath", "desc", Arrays.asList("new", "new2"), "mock", null, null, false, "SUCCESS");
+
+        testCases.put("test1", testCase1);
+        testCases.put("test2", testCase2);
+        testCases.put("test3", testCase3);
+
+        final List<String> testSuites = newArrayList("abc");
+        final Map<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        final String projectPath = "aaa";
+
+        final AtomicReference<IRunTestResults> theCapturedArgument = new AtomicReference<>();
+        doAnswer(getAnswer(theCapturedArgument)).when(slangTestRunner).splitTestCasesByRunState(any(BulkRunMode.class), anyMap(), anyList(), any(IRunTestResults.class));
+        doNothing().when(slangTestRunner).runTestsSequential(anyString(), anyMap(), anyMap(), any(IRunTestResults.class));
+
+        // Tested call
+        slangBuilder.processRunTests(projectPath, testSuites, BulkRunMode.ALL_SEQUENTIAL, compiledFlows, testCases);
+
+        InOrder inOrder = Mockito.inOrder(slangTestRunner);
+        inOrder.verify(slangTestRunner).splitTestCasesByRunState(eq(BulkRunMode.ALL_SEQUENTIAL), eq(testCases), eq(testSuites), isA(RunTestsResults.class));
+        inOrder.verify(slangTestRunner).runTestsSequential(eq(projectPath), anyMap(), eq(compiledFlows), eq((RunTestsResults) theCapturedArgument.get()));
+        verifyNoMoreInteractions(slangTestRunner);
+        verify(slangTestRunner, never()).runTestsParallel(anyString(), anyMap(), anyMap(), any(ThreadSafeRunTestResults.class));
+    }
+
+    @Test
+    public void testProcessRunTestsMixed() {
+        final Map<String, SlangTestCase> testCases = new LinkedHashMap<>();
+        final SlangTestCase testCase1 = new SlangTestCase("test1", "testFlowPath", "desc", Arrays.asList("abc", "new"), "mock", null, null, false, "SUCCESS");
+        final SlangTestCase testCase2 = new SlangTestCase("test2", "testFlowPath", "desc", Arrays.asList("efg", "new"), "mock", null, null, false, "SUCCESS");
+        final SlangTestCase testCase3 = new SlangTestCase("test3", "testFlowPath", "desc", Arrays.asList("new", "new2"), "mock", null, null, false, "SUCCESS");
+        final SlangTestCase testCase4 = new SlangTestCase("test4", "testFlowPath", "desc", Arrays.asList("new", "new2"), "mock", null, null, false, "SUCCESS");
+
+        testCases.put("test1", testCase1);
+        testCases.put("test2", testCase2);
+        testCases.put("test3", testCase3);
+        testCases.put("test4", testCase4);
+
+        final List<String> testSuites = newArrayList("new");
+        final Map<String, CompilationArtifact> compiledFlows = new HashMap<>();
+        final String projectPath = "aaa";
+
+        final AtomicReference<ThreadSafeRunTestResults> theCapturedArgument = new AtomicReference<>();
+        final AtomicReference<Map<String, SlangTestCase>> capturedTestsSeq = new AtomicReference<>();
+        final AtomicReference<Map<String, SlangTestCase>> capturedTestsPar = new AtomicReference<>();
+
+        doCallRealMethod().when(slangTestRunner).isTestCaseInActiveSuite(any(SlangTestCase.class), anyList());
+        doReturn(SlangBuildMain.TestCaseRunMode.SEQUENTIAL)
+                .doReturn(SlangBuildMain.TestCaseRunMode.PARALLEL)
+                .doReturn(SlangBuildMain.TestCaseRunMode.PARALLEL)
+                .doReturn(SlangBuildMain.TestCaseRunMode.SEQUENTIAL)
+                .when(testRunInfoService).getRunModeForTestCase(any(SlangTestCase.class), any(ConflictResolutionStrategy.class), any(DefaultResolutionStrategy.class));
+
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Object[] arguments = invocationOnMock.getArguments();
+                Object argument = arguments[arguments.length - 1];
+                theCapturedArgument.set((ThreadSafeRunTestResults) argument);
+
+                return invocationOnMock.callRealMethod();
+            }
+        }).when(slangTestRunner).splitTestCasesByRunState(any(BulkRunMode.class), anyMap(), anyList(), any(IRunTestResults.class));
+
+        doAnswer(new Answer() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Object[] arguments = invocationOnMock.getArguments();
+                capturedTestsSeq.set((Map<String, SlangTestCase>) arguments[1]);
+
+                return null;
+            }
+        }).when(slangTestRunner).runTestsSequential(anyString(), anyMap(), anyMap(), any(IRunTestResults.class));
+        doAnswer(new Answer() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Object[] arguments = invocationOnMock.getArguments();
+                capturedTestsPar.set((Map<String, SlangTestCase>) arguments[1]);
+
+                return null;
+            }
+        }).when(slangTestRunner).runTestsParallel(anyString(), anyMap(), anyMap(), any(ThreadSafeRunTestResults.class));
+
+        // Tested call
+        slangBuilder.processRunTests(projectPath, testSuites, BulkRunMode.POSSIBLY_MIXED, compiledFlows, testCases);
+
+        InOrder inOrder = inOrder(slangTestRunner);
+        inOrder.verify(slangTestRunner).splitTestCasesByRunState(eq(BulkRunMode.POSSIBLY_MIXED), eq(testCases), eq(testSuites), isA(ThreadSafeRunTestResults.class));
+        inOrder.verify(slangTestRunner).runTestsSequential(eq(projectPath), anyMap(), eq(compiledFlows), eq(theCapturedArgument.get()));
+        inOrder.verify(slangTestRunner).runTestsParallel(eq(projectPath), anyMap(), eq(compiledFlows), eq(theCapturedArgument.get()));
+
+        final List<SlangTestCase> listSeq = newArrayList(capturedTestsSeq.get().values());
+        final List<SlangTestCase> listPar = newArrayList(capturedTestsPar.get().values());
+        Assert.assertEquals(0, ListUtils.intersection(listSeq, listPar).size()); // assures that a test is run only once
+        Assert.assertEquals(newHashSet(testCases.values()), newHashSet(ListUtils.union(listSeq, listPar)));
+    }
+
+    private Answer getAnswer(final AtomicReference<IRunTestResults> theCapturedArgument) {
+        return new Answer() {
+            @Override
+            public Map<SlangTestRunner.TestCaseRunState, Map<String, SlangTestCase>> answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Object[] arguments = invocationOnMock.getArguments();
+                Object argument = arguments[arguments.length - 1];
+                if (argument instanceof ThreadSafeRunTestResults) {
+                    theCapturedArgument.set((ThreadSafeRunTestResults) argument);
+                } else if (argument instanceof RunTestsResults) {
+                    theCapturedArgument.set((RunTestsResults) argument);
+                }
+
+                return new LinkedHashMap<>();
+            }
+        };
     }
 
     @Configuration
@@ -463,6 +644,11 @@ public class SlangBuildTest {
         @Bean
         public StaticValidator staticValidator() {
             return spy(StaticValidatorImpl.class);
+        }
+
+        @Bean
+        public TestRunInfoService test() {
+            return spy(TestRunInfoServiceImpl.class);
         }
     }
 }

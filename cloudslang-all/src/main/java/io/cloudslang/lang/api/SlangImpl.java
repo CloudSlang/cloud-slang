@@ -62,7 +62,7 @@ public class SlangImpl implements Slang {
         try {
             return compiler.compile(source, dependencySources);
         } catch (Exception e) {
-            logger.error("Failed compilation for source : " + source.getFileName() + " ,Exception is : " + e.getMessage());
+            logger.error("Failed compilation for source : " + source.getName() + " ,Exception is : " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -87,7 +87,7 @@ public class SlangImpl implements Slang {
         try {
             return metadataExtractor.extractMetadata(source);
         } catch (Exception e) {
-            logger.error("Failed metadata extraction for source : " + source.getFileName() + " ,Exception is : " + e.getMessage());
+            logger.error("Failed metadata extraction for source : " + source.getName() + " ,Exception is : " + e.getMessage());
             throw new RuntimeException(e);
         }
     }

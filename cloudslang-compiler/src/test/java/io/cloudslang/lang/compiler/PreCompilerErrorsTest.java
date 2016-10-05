@@ -45,8 +45,8 @@ public class PreCompilerErrorsTest {
         URI resource = getClass().getResource("/corrupted/no_op_flow_file.sl").toURI();
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error transforming source: no_op_flow_file to a Slang model." +
-                " Source no_op_flow_file has no content associated with flow/operation/decision/properties property."
+        exception.expectMessage("Error transforming source: no_op_flow_file.sl to a Slang model." +
+                " Source no_op_flow_file.sl has no content associated with flow/operation/decision/properties property."
         );
         compiler.preCompileSource(SlangSource.fromFile(resource));
     }
@@ -58,7 +58,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("For source[op_without_namespace] namespace cannot be empty.");
+        exception.expectMessage("For source[op_without_namespace.sl] namespace cannot be empty.");
         throw result.getErrors().get(0);
     }
 
@@ -88,7 +88,7 @@ public class PreCompilerErrorsTest {
     public void testOperationWithNullFileName() throws Exception {
         URI resource = getClass().getResource("/corrupted/wrong_name_operation.sl").toURI();
 
-        ExecutableModellingResult result = compiler.preCompileSource(new SlangSource(SlangSource.fromFile(resource).getSource(), null));
+        ExecutableModellingResult result = compiler.preCompileSource(new SlangSource(SlangSource.fromFile(resource).getContent(), null));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("should be declared in a file named \"test_op\" " +
@@ -220,7 +220,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error compiling no_workflow_flow. Flow: no_workflow has no workflow property");
+        exception.expectMessage("Error compiling no_workflow_flow.sl. Flow: no_workflow has no workflow property");
         throw result.getErrors().get(0);
     }
 
@@ -231,7 +231,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error compiling no_workflow_data_flow. Flow: no_workflow_data has " +
+        exception.expectMessage("Error compiling no_workflow_data_flow.sl. Flow: no_workflow_data has " +
                 "no workflow property");
         throw result.getErrors().get(0);
     }
@@ -402,7 +402,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error compiling operation_with_no_action_data. " +
+        exception.expectMessage("Error compiling operation_with_no_action_data.sl. " +
                 "Operation: operation_with_no_action_data has no action data");
         throw result.getErrors().get(0);
     }
@@ -539,7 +539,7 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error compiling source 'flow_on_failure_skipped'.\n" +
+        exception.expectMessage("Error compiling source 'flow_on_failure_skipped.sl'.\n" +
                 "Flow: 'flow_on_failure_skipped' has steps with keyword on the same indentation as the step name or " +
                 "there is no space between step name and hyphen.");
         throw result.getErrors().get(0);

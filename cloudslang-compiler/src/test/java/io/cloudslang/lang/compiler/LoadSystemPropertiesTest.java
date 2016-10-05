@@ -91,6 +91,16 @@ public class LoadSystemPropertiesTest {
     }
 
     @Test
+    public void testInvalidMissingPropertiesTag() throws Exception {
+        URI propertiesURI = getClass().getResource("/properties/a/b/invalid_missing_properties_tag.prop.sl").toURI();
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(
+                "Unable to find property 'wrong_key' on class: io.cloudslang.lang.compiler.parser.model.ParsedSlang"
+        );
+        loadSystemProperties(SlangSource.fromFile(propertiesURI));
+    }
+
+    @Test
     public void testMapUnderProperties() throws Exception {
         URI propertiesURI = getClass().getResource("/properties/a/b/map_under_properties.prop.sl").toURI();
         exception.expect(RuntimeException.class);
@@ -203,10 +213,10 @@ public class LoadSystemPropertiesTest {
         URI propertiesURI = getClass().getResource("/properties/a/b/multiple_invalid.prop.sl").toURI();
         SystemPropertyModellingResult result = compiler.loadSystemPropertiesFromSource(SlangSource.fromFile(propertiesURI));
         assertTrue(result.getErrors().size() == 3);
-        assertTrue(result.getErrors().get(0).getMessage().contains("Error loading properties source: 'multiple_invalid'. " +
+        assertTrue(result.getErrors().get(0).getMessage().contains("Error loading properties source: 'multiple_invalid.prop.sl'. " +
                 "Nested exception is: Error validating system property namespace." +
                 " Nested exception is: Argument[a.!.b] violates character rules."));
-        assertTrue(result.getErrors().get(1).getMessage().contains("Error loading properties source: 'multiple_invalid'. " +
+        assertTrue(result.getErrors().get(1).getMessage().contains("Error loading properties source: 'multiple_invalid.prop.sl'. " +
                 "Nested exception is: Error validating system property key. Nested exception is:" +
                 " Argument[c.?.name] violates character rules."));
         assertTrue(result.getErrors().get(2).getMessage().contains(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE));
@@ -219,7 +229,7 @@ public class LoadSystemPropertiesTest {
         URI propertiesURI = getClass().getResource("/properties/a/b/invalid_1.prop.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage(
-                "Error loading properties source: 'invalid_1'. Nested exception is: Error validating system property namespace." +
+                "Error loading properties source: 'invalid_1.prop.sl'. Nested exception is: Error validating system property namespace." +
                         " Nested exception is: Argument[a.!.b] violates character rules."
         );
         loadSystemProperties(SlangSource.fromFile(propertiesURI));
@@ -232,7 +242,7 @@ public class LoadSystemPropertiesTest {
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage(
-                "Error loading properties source: 'invalid_1'. Nested exception is: Error validating system property namespace." +
+                "Error loading properties source: 'invalid_1.prop.sl'. Nested exception is: Error validating system property namespace." +
                         " Nested exception is: Argument[a.!.b] violates character rules."
         );
         throw result.getErrors().get(0);
@@ -243,7 +253,7 @@ public class LoadSystemPropertiesTest {
         URI propertiesURI = getClass().getResource("/properties/a/b/invalid_2.prop.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage(
-                "Error loading properties source: 'invalid_2'. Nested exception is:" +
+                "Error loading properties source: 'invalid_2.prop.sl'. Nested exception is:" +
                         " Error validating system property key. Nested exception is:" +
                         " Argument[c.?.name] violates character rules."
         );

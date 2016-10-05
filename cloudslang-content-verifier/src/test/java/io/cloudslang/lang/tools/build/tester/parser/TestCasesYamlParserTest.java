@@ -183,7 +183,12 @@ public class TestCasesYamlParserTest {
 
         @Bean
         public YamlParser yamlParser() {
-            return new YamlParser();
+            return new YamlParser() {
+                @Override
+                public Yaml getYaml() {
+                    return yaml();
+                }
+            };
         }
 
         @Bean
