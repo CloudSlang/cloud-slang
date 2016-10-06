@@ -19,6 +19,8 @@ import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.api.ExecutionPlan;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -435,12 +437,12 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testPrintCompileErrors() {
-        when(compilerHelperMock.compileSource("C:\\CloudSlang\\cloud-slang\\cloud-slang\\cloudslang-cli\\some_slang_file.sl", null))
+        when(compilerHelperMock.compileSource(System.getProperty("user.dir") + File.separator + "some_slang_file.sl", null))
                 .thenReturn(new CompilationModellingResult(null, Lists.newArrayList(new RuntimeException("1"),
                         new RuntimeException("2"), new RuntimeException("3"))));
 
         CommandResult cr = shell.executeCommand("compile --f some_slang_file.sl");
-        Assert.assertEquals("method threw exception", "Following exceptions were found:" + System.lineSeparator() +
+        Assert.assertEquals("exception mismatch", "Following exceptions were found:" + System.lineSeparator() +
                 "\tclass java.lang.RuntimeException: 1" + System.lineSeparator() +
                 "\tclass java.lang.RuntimeException: 2" + System.lineSeparator() +
                 "\tclass java.lang.RuntimeException: 3" + System.lineSeparator(), cr.getException().getMessage());
