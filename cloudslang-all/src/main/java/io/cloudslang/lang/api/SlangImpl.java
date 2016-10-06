@@ -76,8 +76,8 @@ public class SlangImpl implements Slang {
         try {
             return compiler.compileSource(source, dependencySources);
         } catch (Exception e) {
-            logger.error("Failed compilation for source : " + source.getFileName() + " ,Exception is : " + e.getMessage());
-            throw new RuntimeException(e);
+            logger.error("Failed compilation for source : " + source.getName() + " ,Exception is : " + e.getMessage());
+            throw new RuntimeException("Failed compilation for source : " + source.getName() + " ,Exception is : " + e.getMessage(), e);
         }
     }
 

@@ -142,23 +142,23 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP) final List<String> classPath
     ) {
         CompilationModellingResult result = compilerHelper.compileSource(file.getAbsolutePath(), classPath);
-        return printCompileErrors(result.getErrors());
+        return printCompileErrors(result.getErrors(), file);
     }
 
-    private String printCompileErrors(List<RuntimeException> exceptions) {
+    private String printCompileErrors(List<RuntimeException> exceptions, File file) {
         StringBuilder stringBuilder = new StringBuilder();
         if (exceptions.size() > 0) {
-            stringBuilder.append("Following exceptions were found:\n");
+            stringBuilder.append("Following exceptions were found:" + System.lineSeparator());
             for (RuntimeException exception : exceptions) {
                 stringBuilder.append("\t");
                 stringBuilder.append(exception.getClass());
                 stringBuilder.append(": ");
                 stringBuilder.append(exception.getMessage());
-                stringBuilder.append("\n");
+                stringBuilder.append(System.lineSeparator());
             }
             throw new RuntimeException(stringBuilder.toString());
         } else {
-            stringBuilder.append("Compilation was successful");
+            stringBuilder.append("Compilation was successful for " + file.getName());
         }
         return StringUtils.trim(stringBuilder.toString());
     }
@@ -182,13 +182,13 @@ public class SlangCLI implements CommandMarker {
         if (CollectionUtils.isEmpty(systemProperties)) {
             stringBuilder.append("No system properties found.");
         } else {
-            stringBuilder.append("Following system properties were loaded:\n");
+            stringBuilder.append("Following system properties were loaded:" + System.lineSeparator());
             for (SystemProperty systemProperty : systemProperties) {
                 stringBuilder.append("\t");
                 stringBuilder.append(systemProperty.getFullyQualifiedName());
                 stringBuilder.append(": ");
                 stringBuilder.append(systemProperty.getValue());
-                stringBuilder.append("\n");
+                stringBuilder.append(System.lineSeparator());
             }
         }
         return StringUtils.trim(stringBuilder.toString());

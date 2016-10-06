@@ -100,8 +100,7 @@ public class SlangCompilerImpl implements SlangCompiler {
 
         executablePairs.remove(executableModellingResult.getExecutable());
 
-        CompilationModellingResult result = scoreCompiler.compile(executableModellingResult.getExecutable(),
-                executablePairs.keySet());
+        CompilationModellingResult result = scoreCompiler.compile(executableModellingResult.getExecutable(), executablePairs.keySet());
         errors.addAll(result.getErrors());
         return new CompilationModellingResult(result.getCompilationArtifact(), errors);
     }

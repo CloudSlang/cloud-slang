@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.cli.services.ScoreServices;
 import io.cloudslang.lang.cli.utils.CompilerHelper;
+import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Input;
@@ -424,12 +425,25 @@ public class SlangCLITest {
 
         CommandResult cr = shell.executeCommand("list --f system_properties.prop.sl");
 
-        Assert.assertEquals("Following system properties were loaded:\n" +
-                "\tnamespace1.key1: value1\n" +
-                "\tnamespace2.key2: value2\n" +
+        Assert.assertEquals("Following system properties were loaded:" + System.lineSeparator() +
+                "\tnamespace1.key1: value1" + System.lineSeparator() +
+                "\tnamespace2.key2: value2" + System.lineSeparator() +
                 "\tnamespace3.key3: value3", cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void testPrintCompileErrors() {
+        when(compilerHelperMock.compileSource("C:\\CloudSlang\\cloud-slang\\cloud-slang\\cloudslang-cli\\some_slang_file.sl", null))
+                .thenReturn(new CompilationModellingResult(null, Lists.newArrayList(new RuntimeException("1"),
+                        new RuntimeException("2"), new RuntimeException("3"))));
+
+        CommandResult cr = shell.executeCommand("compile --f some_slang_file.sl");
+        Assert.assertEquals("method threw exception", "Following exceptions were found:" + System.lineSeparator() +
+                "\tclass java.lang.RuntimeException: 1" + System.lineSeparator() +
+                "\tclass java.lang.RuntimeException: 2" + System.lineSeparator() +
+                "\tclass java.lang.RuntimeException: 3" + System.lineSeparator(), cr.getException().getMessage());
     }
 
 }

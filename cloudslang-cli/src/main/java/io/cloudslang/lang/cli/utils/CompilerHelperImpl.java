@@ -70,7 +70,7 @@ public class CompilerHelperImpl implements CompilerHelper {
             return slang.compile(SlangSource.fromFile(file), getDependencySources(dependencies, file));
         } catch (Exception e) {
             logger.error("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage());
-            throw e;
+            throw new RuntimeException("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage(), e);
         }
     }
 
@@ -82,7 +82,7 @@ public class CompilerHelperImpl implements CompilerHelper {
             return slang.compileSource(SlangSource.fromFile(file), getDependencySources(dependencies, file));
         } catch (Exception e) {
             logger.error("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage());
-            throw e;
+            throw new RuntimeException("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage(), e);
         }
     }
 

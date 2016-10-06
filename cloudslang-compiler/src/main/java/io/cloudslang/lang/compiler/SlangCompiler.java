@@ -30,7 +30,7 @@ public interface SlangCompiler {
     CompilationArtifact compile(SlangSource source, Set<SlangSource> path);
 
     /**
-     * Compile a CloudSlang source and its path to a {@link io.cloudslang.lang.entities.CompilationArtifact} object
+     * Compile a CloudSlang source and its dependencies to a {@link io.cloudslang.lang.entities.CompilationArtifact} object
      *
      * @param source the CloudSlang source file
      * @param path   a set of CloudSlang sources containing the source dependencies
