@@ -55,6 +55,30 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>analyze dependencies</id>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <configuration>
+                            <failOnWarning>true</failOnWarning>
+                            <ignoredUsedUndeclaredDependencies>
+                                <ignoredUsedUndeclaredDependency>org.codehaus.plexus:plexus-component-annotations:jar:1.5.5</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>org.codehaus.plexus:plexus-utils:jar:3.0.10</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>commons-io:commons-io:jar:2.4</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>org.apache.commons:commons-collections4:jar:4.1</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>org.codehaus.plexus:plexus-container-default:jar:1.0-alpha-9-stable-1</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>org.springframework:spring-context:jar:4.2.5.RELEASE</ignoredUsedUndeclaredDependency>
+                            </ignoredUsedUndeclaredDependencies>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
