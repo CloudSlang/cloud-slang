@@ -50,7 +50,6 @@ tr:nth-child(odd) {
 
 .test-summary {
     height: 300px;
-    margin-left: 700px;
     display: table-cell;
     vertical-align: middle;
     text-align: left;

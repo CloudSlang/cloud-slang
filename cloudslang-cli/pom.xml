@@ -142,7 +142,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.10</version>
                 <executions>
                     <execution>
                         <id>unpack</id>
@@ -162,6 +161,45 @@
                                     <destFileName>maven</destFileName>
                                 </artifactItem>
                             </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.10</version>
+                <executions>
+                    <execution>
+                        <id>analyze dependencies</id>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <configuration>
+                            <failOnWarning>true</failOnWarning>
+                            <!--For detection of used undeclared dependencies currently everything here is ignore because of existing issue to not fail the build now.-->
+                            <ignoredUsedUndeclaredDependencies>
+                                <ignoredUsedUndeclaredDependency>io.cloudslang.lang:cloudslang-runtime:jar:${project.version}</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>io.cloudslang.lang:cloudslang-entities:jar:${project.version}</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>io.cloudslang.lang:cloudslang-all:jar:${project.version}</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>io.cloudslang.lang:cloudslang-compiler:jar:${project.version}</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>log4j:log4j:jar:1.2.17</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>org.powermock:powermock-core:jar:1.6.5</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>org.springframework:spring-core:jar:4.2.5.RELEASE</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>org.springframework:spring-beans:jar:4.2.5.RELEASE</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>org.springframework:spring-context:jar:4.2.5.RELEASE</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>org.powermock:powermock-core:jar:1.6.5</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>org.hamcrest:hamcrest-all:jar:1.3</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>com.googlecode.lambdaj:lambdaj:jar:2.3.3</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>org.apache.commons:commons-lang3:jar:3.3.2</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>commons-io:commons-io:jar:2.4</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>org.apache.commons:commons-collections4:jar:4.1</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>org.yaml:snakeyaml:jar:1.16</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>com.google.guava:guava:jar:17.0</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>commons-lang:commons-lang:jar:2.6</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>io.cloudslang:score-api:jar:0.3.40</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>commons-collections:commons-collections:jar:3.2.2</ignoredUsedUndeclaredDependency>
+                            </ignoredUsedUndeclaredDependencies>
                         </configuration>
                     </execution>
                 </executions>

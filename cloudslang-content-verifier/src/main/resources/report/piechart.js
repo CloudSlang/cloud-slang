@@ -1,9 +1,9 @@
 google.charts.load('current', {'packages': ['corechart']});
 google.charts.setOnLoadCallback(drawChart);
 function drawChart() {
-    var passed = parseInt(document.getElementById('passed').innerHTML);
-    var failed = parseInt(document.getElementById('failed').innerHTML);
-    var skipped = parseInt(document.getElementById('skipped').innerHTML);
+    var passed = parseInt(document.getElementById('passed').innerHTML, 10);
+    var failed = parseInt(document.getElementById('failed').innerHTML, 10);
+    var skipped = parseInt(document.getElementById('skipped').innerHTML, 10);
 
     var data = google.visualization.arrayToDataTable([
         ['Header', 'Header'],
