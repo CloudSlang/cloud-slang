@@ -159,18 +159,4 @@ public class LoggingServiceImpl implements LoggingService, DisposableBean {
         }
     }
 
-//    public static void main(String[] args) throws Exception {
-//        LoggingServiceImpl loggingService = new LoggingServiceImpl();
-//        loggingService.initialize();
-//        Future<?> future1 = loggingService.logEvent(DEBUG, "Ana are mere");
-//        Future<?> future2 = loggingService.logEvent(INFO, "We are what we are");
-//        Future<?> future3 = loggingService.logEvent(ERROR, "Bianca are mere", new RuntimeException("BIANCA!"));
-//
-////        future1.get();
-////        future2.get();
-////        future3.get();
-//        loggingService.destroy();
-//    }
-
-
 }
