@@ -17,30 +17,30 @@ import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.tools.build.logging.LoggingService;
 import io.cloudslang.lang.tools.build.validation.MetadataMissingException;
 import io.cloudslang.lang.tools.build.validation.StaticValidator;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.Validate;
+import org.apache.log4j.Level;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.io.File;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Queue;
-import java.util.ArrayDeque;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.Validate;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.util.Set;
 
 /**
  * Created by stoneo on 3/15/2015.
  **/
 @Component
 public class SlangContentVerifier {
-
-    private final static Logger log = Logger.getLogger(SlangContentVerifier.class);
 
     @Autowired
     private SlangCompiler slangCompiler;
@@ -54,14 +54,17 @@ public class SlangContentVerifier {
     @Autowired
     private ScoreCompiler scoreCompiler;
 
+    @Autowired
+    private LoggingService loggingService;
+
     public CompilationResult createModelsAndValidate(String directoryPath, boolean shouldValidateDescription) {
         Validate.notEmpty(directoryPath, "You must specify a path");
         Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" + directoryPath + "\' does not lead to a directory");
         Map<String, Executable> slangModels = new HashMap<>();
         Collection<File> slangFiles = listSlangFiles(new File(directoryPath), true);
-        log.info("Start compiling all slang files under: " + directoryPath);
-        log.info(slangFiles.size() + " .sl files were found");
-        log.info("");
+        loggingService.logEvent(Level.INFO, "Start compiling all slang files under: " + directoryPath);
+        loggingService.logEvent(Level.INFO, slangFiles.size() + " .sl files were found");
+        loggingService.logEvent(Level.INFO, "");
         Queue<RuntimeException> exceptions = new ArrayDeque<>();
         for (File slangFile: slangFiles) {
             Executable sourceModel = null;
@@ -76,7 +79,7 @@ public class SlangContentVerifier {
                 }
             } catch (Exception e) {
                 String errorMessage = "Failed to extract metadata for file: \'" + slangFile.getAbsoluteFile() + "\'.\n" + e.getMessage();
-                log.error(errorMessage);
+                loggingService.logEvent(Level.ERROR, errorMessage);
                 exceptions.add(new RuntimeException(errorMessage, e));
                 if (e instanceof MetadataMissingException && sourceModel != null) {
                     slangModels.put(getUniqueName(sourceModel), sourceModel);
@@ -103,15 +106,15 @@ public class SlangContentVerifier {
                     Set<Executable> dependenciesModels = getModelDependenciesRecursively(slangModels, slangModel);
                     compiledSource = scoreCompiler.compile(slangModel, dependenciesModels);
                     if (compiledSource != null) {
-                        log.info("Compiled: \'" + slangModel.getNamespace() + "." + slangModel.getName() + "\' successfully");
+                        loggingService.logEvent(Level.INFO, "Compiled: \'" + slangModel.getNamespace() + "." + slangModel.getName() + "\' successfully");
                         compiledArtifacts.put(getUniqueName(slangModel), compiledSource);
                     } else {
-                        log.error("Failed to compile source: \'" + slangModel.getNamespace() + "." + slangModel.getName() + "\'");
+                        loggingService.logEvent(Level.ERROR, "Failed to compile source: \'" + slangModel.getNamespace() + "." + slangModel.getName() + "\'");
                     }
                 }
             } catch (Exception e) {
                 String errorMessage = "Failed compiling Slang source: \'" + slangModel.getNamespace() + "." + slangModel.getName() + "\'.\n" + e.getMessage();
-                log.error(errorMessage);
+                loggingService.logEvent(Level.ERROR, errorMessage);
                 throw new RuntimeException(errorMessage, e);
             }
         }

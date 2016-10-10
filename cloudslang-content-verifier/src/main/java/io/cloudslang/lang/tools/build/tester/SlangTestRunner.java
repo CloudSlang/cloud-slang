@@ -18,6 +18,7 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.tools.build.SlangBuildMain;
 import io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode;
 import io.cloudslang.lang.tools.build.SlangBuildMain.TestCaseRunMode;
+import io.cloudslang.lang.tools.build.logging.LoggingService;
 import io.cloudslang.lang.tools.build.tester.parallel.MultiTriggerTestCaseEventListener;
 import io.cloudslang.lang.tools.build.tester.parallel.report.LoggingSlangTestCaseEventListener;
 import io.cloudslang.lang.tools.build.tester.parallel.report.ThreadSafeRunTestResults;
@@ -30,6 +31,16 @@ import io.cloudslang.lang.tools.build.tester.runconfiguration.TestRunInfoService
 import io.cloudslang.lang.tools.build.tester.runconfiguration.strategy.RunMultipleTestSuiteConflictResolutionStrategy;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.strategy.SequentialRunTestSuiteResolutionStrategy;
 import io.cloudslang.score.events.EventConstants;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.log4j.Level;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.Collection;
@@ -42,15 +53,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import static java.lang.Long.parseLong;
 import static java.lang.String.valueOf;
@@ -81,11 +83,16 @@ public class SlangTestRunner {
     @Autowired
     private TestRunInfoService testRunInfoService;
 
+    @Autowired
+    private LoggingService loggingService;
+
+    @Autowired
+    private LoggingSlangTestCaseEventListener loggingSlangTestCaseEventListener;
+
     private String[] TEST_CASE_FILE_EXTENSIONS = {"yaml", "yml"};
     private static final String TEST_CASE_PASSED = "Test case passed: ";
     private static final String TEST_CASE_FAILED = "Test case failed: ";
 
-    private static final Logger log = Logger.getLogger(SlangTestRunner.class);
     private static final String UNAVAILABLE_NAME = "N/A";
 
     public enum TestCaseRunState {
@@ -101,10 +108,10 @@ public class SlangTestRunner {
                 "Directory path argument \'" + testPath + "\' does not lead to a directory");
         Collection<File> testCasesFiles = FileUtils.listFiles(testPathDir, TEST_CASE_FILE_EXTENSIONS, true);
 
-        log.info("");
-        log.info("--- parsing test cases ---");
-        log.info("Start parsing all test cases files under: " + testPath);
-        log.info(testCasesFiles.size() + " test cases files were found");
+        loggingService.logEvent(Level.INFO, "");
+        loggingService.logEvent(Level.INFO, "--- parsing test cases ---");
+        loggingService.logEvent(Level.INFO, "Start parsing all test cases files under: " + testPath);
+        loggingService.logEvent(Level.INFO, testCasesFiles.size() + " test cases files were found");
 
         Map<String, SlangTestCase> testCases = new HashMap<>();
         Set<SlangTestCase> testCasesWithMissingReference = new HashSet<>();
@@ -157,7 +164,7 @@ public class SlangTestRunner {
         for (Map.Entry<String, SlangTestCase> testCaseEntry : testCases.entrySet()) {
             SlangTestCase testCase = testCaseEntry.getValue();
 
-            log.info("Running test: " + SlangTestCase.generateTestCaseReference(testCase) + " - " + testCase.getDescription());
+            loggingService.logEvent(Level.INFO, "Running test: " + SlangTestCase.generateTestCaseReference(testCase) + " - " + testCase.getDescription());
             try {
                 CompilationArtifact compiledTestFlow = getCompiledTestFlow(compiledFlows, testCase);
                 runTest(testCase, compiledTestFlow, projectPath);
@@ -177,7 +184,7 @@ public class SlangTestRunner {
 
         testCaseEventDispatchService.unregisterAllListeners();
         testCaseEventDispatchService.registerListener(runTestsResults); // for gathering of report data
-        testCaseEventDispatchService.registerListener(new LoggingSlangTestCaseEventListener()); // for logging purpose
+        testCaseEventDispatchService.registerListener(loggingSlangTestCaseEventListener); // for logging purpose
 
         MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener = new MultiTriggerTestCaseEventListener();
         slang.subscribeOnEvents(multiTriggerTestCaseEventListener, createListenerEventTypesSet());
@@ -196,7 +203,7 @@ public class SlangTestRunner {
                 try {
                     testCaseFuture.get(testCaseTimeoutMinutes, MINUTES);
                 } catch (InterruptedException e) {
-                    log.error("Interrupted while waiting for result: ", e);
+                    loggingService.logEvent(Level.ERROR, "Interrupted while waiting for result: ", e);
                 } catch (TimeoutException e) {
                     testCaseEventDispatchService.notifyListeners(new FailedSlangTestCaseEvent(testCase, "Timeout reached for test case " + testCase.getName(), e));
                 } catch (Exception e) {
@@ -211,10 +218,10 @@ public class SlangTestRunner {
 
     private void printTestForActualRunSummary(TestCaseRunMode runMode, Map<String, SlangTestCase> testCases) {
         if (!MapUtils.isEmpty(testCases)) {
-            log.info("Running " + testCases.size() + " test(s) in " + runMode.toString().toLowerCase(Locale.ENGLISH) + ": ");
+            loggingService.logEvent(Level.INFO, "Running " + testCases.size() + " test(s) in " + runMode.toString().toLowerCase(Locale.ENGLISH) + ": ");
             for (Map.Entry<String, SlangTestCase> stringSlangTestCaseEntry : testCases.entrySet()) {
                 final SlangTestCase slangTestCase = stringSlangTestCaseEntry.getValue();
-                log.info(PREFIX_DASH + SlangTestCase.generateTestCaseReference(slangTestCase));
+                loggingService.logEvent(Level.INFO, PREFIX_DASH + SlangTestCase.generateTestCaseReference(slangTestCase));
             }
         }
     }
@@ -275,7 +282,7 @@ public class SlangTestRunner {
     private void processSkippedTest(final IRunTestResults runTestsResults, Map.Entry<String, SlangTestCase> testCaseEntry, SlangTestCase testCase,
                                     final Map<TestCaseRunState, Map<String, SlangTestCase>> resultMap) {
         String message = "Skipping test: " + SlangTestCase.generateTestCaseReference(testCase) + " because it is not in active test suites";
-        log.info(message);
+        loggingService.logEvent(Level.INFO, message);
 
         runTestsResults.addSkippedTest(testCase.getName(), new TestRun(testCase, message));
         resultMap.get(TestCaseRunState.INACTIVE).put(testCaseEntry.getKey(), testCaseEntry.getValue());
@@ -285,7 +292,7 @@ public class SlangTestRunner {
         try {
             return parseLong(getProperty(TEST_CASE_TIMEOUT_IN_MINUTES_KEY, valueOf(MAX_TIME_PER_TESTCASE_IN_MINUTES)));
         } catch (NumberFormatException nfEx) {
-            log.warn(String.format("Misconfigured test case timeout '%s'. Using default timeout %d.", getProperty(TEST_CASE_TIMEOUT_IN_MINUTES_KEY), MAX_TIME_PER_TESTCASE_IN_MINUTES));
+            loggingService.logEvent(Level.WARN, String.format("Misconfigured test case timeout '%s'. Using default timeout %d.", getProperty(TEST_CASE_TIMEOUT_IN_MINUTES_KEY), MAX_TIME_PER_TESTCASE_IN_MINUTES));
             return MAX_TIME_PER_TESTCASE_IN_MINUTES;
         }
     }
@@ -298,10 +305,10 @@ public class SlangTestRunner {
     private void printTestCasesWithMissingReference(Set<SlangTestCase> testCasesWithMissingReference) {
         int testCasesWithMissingReferenceSize = testCasesWithMissingReference.size();
         if (testCasesWithMissingReferenceSize > 0) {
-            log.info("");
-            log.info(testCasesWithMissingReferenceSize + " test cases have missing test flow references:");
+            loggingService.logEvent(Level.INFO, "");
+            loggingService.logEvent(Level.INFO, testCasesWithMissingReferenceSize + " test cases have missing test flow references:");
             for (SlangTestCase slangTestCase : testCasesWithMissingReference) {
-                log.info(
+                loggingService.logEvent(Level.INFO,
                         "For test case: " + SlangTestCase.generateTestCaseReference(slangTestCase) +
                                 " testFlowPath reference not found: " +
                                 slangTestCase.getTestFlowPath()
@@ -409,21 +416,21 @@ public class SlangTestRunner {
         if (StringUtils.isNotBlank(errorMessageFlowExecution)) {
             // unexpected exception occurred during flow execution
             message = "Error occurred while running test: " + testCaseReference + " - " + testCase.getDescription() + "\n\t" + errorMessageFlowExecution;
-            log.info(message);
+            loggingService.logEvent(Level.INFO, message);
             throw new RuntimeException(message);
         }
 
         String executionResult = testsEventListener.getResult();
         if (result != null && !result.equals(executionResult)) {
             message = TEST_CASE_FAILED + testCaseReference + " - " + testCase.getDescription() + "\n\tExpected result: " + result + "\n\tActual result: " + executionResult;
-            log.error(message);
+            loggingService.logEvent(Level.ERROR, message);
             throw new RuntimeException(message);
         }
 
         Map<String, Serializable> executionOutputs = testsEventListener.getOutputs();
         handleTestCaseFailuresFromOutputs(testCase, testCaseReference, outputs, executionOutputs);
 
-        log.info(TEST_CASE_PASSED + testCaseReference + ". Finished running: " + flowName + " with result: " + executionResult);
+        loggingService.logEvent(Level.INFO, TEST_CASE_PASSED + testCaseReference + ". Finished running: " + flowName + " with result: " + executionResult);
         return executionId;
     }
 
@@ -453,21 +460,21 @@ public class SlangTestRunner {
         if (StringUtils.isNotBlank(errorMessageFlowExecution)) {
             // unexpected exception occurred during flow execution
             message = "Error occurred while running test: " + testCaseReference + " - " + testCase.getDescription() + "\n\t" + errorMessageFlowExecution;
-            log.info(message);
+            loggingService.logEvent(Level.INFO, message);
             throw new RuntimeException(message);
         }
 
         String executionResult = globalListener.getResultByExecutionId(executionId);
         if (result != null && !result.equals(executionResult)) {
             message = TEST_CASE_FAILED + testCaseReference + " - " + testCase.getDescription() + "\n\tExpected result: " + result + "\n\tActual result: " + executionResult;
-            log.error(message);
+            loggingService.logEvent(Level.ERROR, message);
             throw new RuntimeException(message);
         }
 
         Map<String, Serializable> executionOutputs = globalListener.getOutputsByExecutionId(executionId);
         handleTestCaseFailuresFromOutputs(testCase, testCaseReference, outputs, executionOutputs);
 
-        log.info(TEST_CASE_PASSED + testCaseReference + ". Finished running: " + flowName + " with result: " + executionResult);
+        loggingService.logEvent(Level.INFO, TEST_CASE_PASSED + testCaseReference + ". Finished running: " + flowName + " with result: " + executionResult);
         return executionId;
     }
 
@@ -477,10 +484,10 @@ public class SlangTestRunner {
 
             message = TEST_CASE_FAILED + testCaseReference + " - " + testCase.getDescription() + "\n\tFlow " +
                     compilationArtifact.getExecutionPlan().getName() + " did not throw an exception as expected";
-            log.info(message);
+            loggingService.logEvent(Level.INFO, message);
             throw new RuntimeException(message);
         }
-        log.info(TEST_CASE_PASSED + testCaseReference + ". Finished running: " + flowName + " with exception as expected");
+        loggingService.logEvent(Level.INFO, TEST_CASE_PASSED + testCaseReference + ". Finished running: " + flowName + " with exception as expected");
         return executionId;
     }
 
@@ -501,7 +508,7 @@ public class SlangTestRunner {
                 if (!executionOutputs.containsKey(outputName) ||
                         !outputsAreEqual(outputValue, executionOutputValue)) {
                     message = TEST_CASE_FAILED + testCaseReference + " - " + testCase.getDescription() + "\n\tFor output: " + outputName + "\n\tExpected value: " + outputValue + "\n\tActual value: " + executionOutputValue;
-                    log.error(message);
+                    loggingService.logEvent(Level.ERROR, message);
                     throw new RuntimeException(message);
                 }
             }
