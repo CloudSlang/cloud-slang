@@ -17,6 +17,8 @@ import java.util.concurrent.Future;
 public interface LoggingService {
 
     Future<?> logEvent(final Level level, final String message);
+
     Future<?> logEvent(final Level level, final String message, final Throwable throwable);
+
     void waitForAllLogTasksToFinish();
 }

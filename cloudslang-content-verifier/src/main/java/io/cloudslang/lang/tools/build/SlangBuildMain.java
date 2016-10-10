@@ -182,8 +182,6 @@ public class SlangBuildMain {
 
         log.info(NEW_LINE + "Loading...");
 
-        //load application context
-//        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/testRunnerContext.xml");
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/testRunnerContext.xml");
         context.registerShutdownHook();
         SlangBuilder slangBuilder = context.getBean(SlangBuilder.class);
