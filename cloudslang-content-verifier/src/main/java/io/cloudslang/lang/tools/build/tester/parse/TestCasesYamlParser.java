@@ -21,6 +21,15 @@ import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.tools.build.logging.LoggingService;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.log4j.Level;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.Yaml;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -30,13 +39,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.yaml.snakeyaml.Yaml;
 
 @Component
 public class TestCasesYamlParser {
@@ -45,19 +47,23 @@ public class TestCasesYamlParser {
     private Yaml yaml;
 
     @Autowired
-    Slang slang;
+    private Slang slang;
 
     @Autowired
     private SlangSourceService slangSourceService;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private LoggingService loggingService;
 
-    private final static Logger log = Logger.getLogger(TestCasesYamlParser.class);
+    // // TODO: 10/10/2016 this needs to be fixed and have proper autowiring
+    // object mapper is thread safe if not re-configured , alternatively we can use With 2.0 and above, above can be augmented by noting that there is an even better way: use ObjectWriter and ObjectReader objects,
+    // which are full thread safe
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     public Map<String, SlangTestCase> parseTestCases(SlangSource source) {
 
         if (StringUtils.isEmpty(source.getContent())) {
-            log.info("No tests cases were found in: " + source.getName());
+            loggingService.logEvent(Level.INFO, "No tests cases were found in: " + source.getName());
             return new HashMap<>();
         }
         Validate.notEmpty(source.getContent(), "Source " + source.getName() + " cannot be empty");
@@ -65,7 +71,7 @@ public class TestCasesYamlParser {
         try {
             @SuppressWarnings("unchecked") Map<String, Map> parsedTestCases = yaml.loadAs(source.getContent(), Map.class);
             if (MapUtils.isEmpty(parsedTestCases)) {
-                log.info("No tests cases were found in: " + source.getName());
+                loggingService.logEvent(Level.INFO, "No tests cases were found in: " + source.getName());
                 return new HashMap<>();
             }
             return parseTestCases(parsedTestCases, source.getFilePath());

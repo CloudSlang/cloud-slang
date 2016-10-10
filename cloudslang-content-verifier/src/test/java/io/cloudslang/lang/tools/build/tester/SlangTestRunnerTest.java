@@ -9,6 +9,8 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.tools.build.SlangBuildMain;
+import io.cloudslang.lang.tools.build.logging.LoggingService;
+import io.cloudslang.lang.tools.build.logging.LoggingServiceImpl;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner.TestCaseRunState;
 import io.cloudslang.lang.tools.build.tester.parallel.MultiTriggerTestCaseEventListener;
 import io.cloudslang.lang.tools.build.tester.parallel.report.LoggingSlangTestCaseEventListener;
@@ -85,7 +87,6 @@ import static org.mockito.Mockito.when;
 @ContextConfiguration(classes = SlangTestRunnerTest.Config.class)
 public class SlangTestRunnerTest {
 
-
     @Autowired
     private SlangTestRunner slangTestRunner;
 
@@ -103,6 +104,9 @@ public class SlangTestRunnerTest {
 
     @Autowired
     private TestRunInfoService testRunInfoService;
+
+    @Autowired
+    private LoggingService loggingService;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -736,6 +740,11 @@ public class SlangTestRunnerTest {
         @Bean
         public TestRunInfoService testRunInfoServiceImpl() {
             return mock(TestRunInfoServiceImpl.class);
+        }
+
+        @Bean
+        public LoggingService loggingService() {
+            return new LoggingServiceImpl();
         }
     }
 

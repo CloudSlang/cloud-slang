@@ -21,6 +21,8 @@ import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode;
+import io.cloudslang.lang.tools.build.logging.LoggingService;
+import io.cloudslang.lang.tools.build.logging.LoggingServiceImpl;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
@@ -140,6 +142,9 @@ public class SlangBuilderTest {
 
     @Autowired
     private TestRunInfoService testRunInfoService;
+
+    @Autowired
+    private LoggingService loggingService;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -648,5 +653,11 @@ public class SlangBuilderTest {
         public TestRunInfoService test() {
             return spy(TestRunInfoServiceImpl.class);
         }
+
+        @Bean
+        public LoggingService loggingService() {
+            return new LoggingServiceImpl();
+        }
+
     }
 }
