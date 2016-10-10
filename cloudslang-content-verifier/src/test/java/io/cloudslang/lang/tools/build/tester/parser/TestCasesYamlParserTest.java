@@ -23,6 +23,8 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
 import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
+import io.cloudslang.lang.tools.build.logging.LoggingService;
+import io.cloudslang.lang.tools.build.logging.LoggingServiceImpl;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
 import java.io.Serializable;
@@ -64,6 +66,9 @@ public class TestCasesYamlParserTest {
 
     @Autowired
     private Slang slang;
+
+    @Autowired
+    private LoggingService loggingService;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -231,6 +236,11 @@ public class TestCasesYamlParserTest {
         @Bean
         public SystemPropertyValidator systemPropertyValidator() {
             return new SystemPropertyValidatorImpl();
+        }
+
+        @Bean
+        public LoggingService loggingService() {
+            return new LoggingServiceImpl();
         }
     }
 }
