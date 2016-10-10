@@ -12,6 +12,7 @@ package io.cloudslang.lang.tools.build;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode;
+import io.cloudslang.lang.tools.build.logging.LoggingService;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -56,18 +58,19 @@ public class SlangBuilder {
     @Autowired
     private SlangTestRunner slangTestRunner;
 
-    private final static Logger log = Logger.getLogger(SlangBuilder.class);
+    @Autowired
+    private LoggingService loggingService;
 
     public SlangBuildResults buildSlangContent(String projectPath, String contentPath, String testsPath, List<String> testSuits, boolean shouldValidateDescription, BulkRunMode bulkRunMode) {
 
         String projectName = FilenameUtils.getName(projectPath);
-        log.info("");
-        log.info("------------------------------------------------------------");
-        log.info("Building project: " + projectName);
-        log.info("------------------------------------------------------------");
+        loggingService.logEvent(Level.INFO, "");
+        loggingService.logEvent(Level.INFO, "------------------------------------------------------------");
+        loggingService.logEvent(Level.INFO, "Building project: " + projectName);
+        loggingService.logEvent(Level.INFO, "------------------------------------------------------------");
 
-        log.info("");
-        log.info("--- compiling sources ---");
+        loggingService.logEvent(Level.INFO, "");
+        loggingService.logEvent(Level.INFO, "--- compiling sources ---");
         CompilationResult compilationResult =
                 slangContentVerifier.createModelsAndValidate(contentPath, shouldValidateDescription);
         Map<String, Executable> slangModels = compilationResult.getResults();
@@ -99,14 +102,14 @@ public class SlangBuilder {
                     + compiledSlangFiles.size());
         }
 
-        log.info("Successfully finished Compilation of: " + compiledSlangFiles.size() + " Slang files");
+        loggingService.logEvent(Level.INFO, "Successfully finished Compilation of: " + compiledSlangFiles.size() + " Slang files");
         return compiledSlangFiles;
     }
 
     IRunTestResults runTests(Map<String, Executable> contentSlangModels,
                              String projectPath, String testsPath, List<String> testSuites, BulkRunMode bulkRunMode) {
-        log.info("");
-        log.info("--- compiling tests sources ---");
+        loggingService.logEvent(Level.INFO, "");
+        loggingService.logEvent(Level.INFO, "--- compiling tests sources ---");
         // Compile all slang test flows under the test directory
         CompilationResult compilationResult = slangContentVerifier.createModelsAndValidate(testsPath, false);
         Map<String, Executable> testFlowModels = compilationResult.getResults();
@@ -119,9 +122,9 @@ public class SlangBuilder {
 
         Set<String> allTestedFlowsFQN = mapExecutablesToFullyQualifiedName(allTestedFlowModels.values());
         Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath, allTestedFlowsFQN);
-        log.info("");
-        log.info("--- running tests ---");
-        log.info("Found " + testCases.size() + " tests");
+        loggingService.logEvent(Level.INFO, "");
+        loggingService.logEvent(Level.INFO, "--- running tests ---");
+        loggingService.logEvent(Level.INFO, "Found " + testCases.size() + " tests");
         IRunTestResults runTestsResults;
 
         runTestsResults = processRunTests(projectPath, testSuites, bulkRunMode, compiledFlows, testCases);
