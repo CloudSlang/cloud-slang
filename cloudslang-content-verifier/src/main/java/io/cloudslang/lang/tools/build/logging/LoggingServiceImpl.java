@@ -18,11 +18,10 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
 
 import javax.annotation.PostConstruct;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.apache.log4j.Level.DEBUG;
@@ -38,13 +37,11 @@ import static org.apache.log4j.Level.WARN;
 public class LoggingServiceImpl implements LoggingService, DisposableBean {
     private static final Logger logger = Logger.getLogger(LoggingServiceImpl.class);
 
-    private ExecutorService singleThreadExecutor;
-    private AtomicReference<Future> latestTask;
+    private ThreadPoolExecutor singleThreadExecutor;
 
     @PostConstruct
     public void initialize() {
-        singleThreadExecutor = newFixedThreadPool(1);
-        latestTask = new AtomicReference<>();
+        singleThreadExecutor = (ThreadPoolExecutor) newFixedThreadPool(1); // one thread only
     }
 
     @Override
@@ -61,7 +58,6 @@ public class LoggingServiceImpl implements LoggingService, DisposableBean {
     public void destroy() throws Exception {
         singleThreadExecutor.shutdown();
         singleThreadExecutor = null;
-        latestTask = null;
     }
 
     private Future<?> doLogEvent(Level level, String message, Throwable throwable) {
@@ -78,20 +74,16 @@ public class LoggingServiceImpl implements LoggingService, DisposableBean {
     }
 
     private Future<?> doSubmit(Level level, String message, Throwable throwable) {
-        Future<?> submit = singleThreadExecutor.submit((throwable != null) ? new LoggingDetailsRunnable(level, message, throwable)
+        return singleThreadExecutor.submit((throwable != null) ? new LoggingDetailsRunnable(level, message, throwable)
                 : new LoggingDetailsRunnable(level, message));
-        latestTask.set(submit);
-        return submit;
     }
 
     @Override
-    public void waitForAllLogTasks() {
-        Future future = latestTask.get();
+    public void waitForAllLogTasksToFinish() {
         try {
-            if (future != null) {
-                future.get(1, TimeUnit.MINUTES);
-            }
-        } catch (Exception ignore) {
+            singleThreadExecutor.shutdown();
+            singleThreadExecutor.awaitTermination(1, TimeUnit.MINUTES);
+        } catch (InterruptedException ignore) {
         }
     }
 

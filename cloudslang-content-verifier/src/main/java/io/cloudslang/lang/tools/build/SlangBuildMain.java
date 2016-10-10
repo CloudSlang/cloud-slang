@@ -38,7 +38,6 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getBooleanFromPropertiesWithDefault;
@@ -220,7 +219,7 @@ public class SlangBuildMain {
             } else {
                 printBuildSuccessSummary(contentPath, buildResults, runTestsResults, loggingService);
             }
-            loggingService.waitForAllLogTasks();
+            loggingService.waitForAllLogTasksToFinish();
 
             generateTestCaseReport(
                     context.getBean(SlangTestCaseRunReportGeneratorService.class),

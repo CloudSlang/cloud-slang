@@ -26,9 +26,7 @@ import org.mockito.stubbing.Answer;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -39,17 +37,14 @@ import static org.mockito.Mockito.doAnswer;
 @RunWith(MockitoJUnitRunner.class)
 public class LoggingServiceImplTest {
 
-    public static final String SINGLE_THREAD_EXECUTOR = "singleThreadExecutor";
-    public static final String LATEST_TASK = "latestTask";
+    private static final String SINGLE_THREAD_EXECUTOR = "singleThreadExecutor";
+    private static final String LATEST_TASK = "latestTask";
     @InjectMocks
     @Spy
     private LoggingServiceImpl loggingService;
 
     @Mock
-    private ExecutorService singleThreadExecutor;
-
-    @Mock
-    private AtomicReference<Future> latestTask;
+    private ThreadPoolExecutor singleThreadExecutor;
 
     @Test
     public void testInitialize() throws Exception {
@@ -60,15 +55,11 @@ public class LoggingServiceImplTest {
 
         Class<? extends LoggingServiceImpl> loggingServiceClass = localLoggingService.getClass();
         Field loggingServiceClassDeclaredField = loggingServiceClass.getDeclaredField(SINGLE_THREAD_EXECUTOR);
-        Field latestTaskField = loggingServiceClass.getDeclaredField(LATEST_TASK);
 
         loggingServiceClassDeclaredField.setAccessible(true);
-        latestTaskField.setAccessible(true);
         Object singleThreadExecutor = loggingServiceClassDeclaredField.get(localLoggingService);
-        Object latestTask = latestTaskField.get(localLoggingService);
 
-        assertTrue(singleThreadExecutor instanceof ExecutorService);
-        assertTrue(latestTask instanceof AtomicReference);
+        assertTrue(singleThreadExecutor instanceof ThreadPoolExecutor);
     }
 
     @Test
@@ -78,22 +69,16 @@ public class LoggingServiceImplTest {
 
         Class<? extends LoggingServiceImpl> loggingServiceClass = localLoggingService.getClass();
         Field loggingServiceClassDeclaredField = loggingServiceClass.getDeclaredField(SINGLE_THREAD_EXECUTOR);
-        Field latestTaskField = loggingServiceClass.getDeclaredField(LATEST_TASK);
 
         loggingServiceClassDeclaredField.setAccessible(true);
-        latestTaskField.setAccessible(true);
         Object singleThreadExecutor = loggingServiceClassDeclaredField.get(localLoggingService);
-        Object latestTask = latestTaskField.get(localLoggingService);
         assertNotNull(singleThreadExecutor);
-        assertNotNull(latestTask);
 
         // Tested call
         localLoggingService.destroy();
 
         singleThreadExecutor = loggingServiceClassDeclaredField.get(localLoggingService);
-        latestTask = latestTaskField.get(localLoggingService);
         assertNull(singleThreadExecutor);
-        assertNull(latestTask);
     }
 
     @Test
