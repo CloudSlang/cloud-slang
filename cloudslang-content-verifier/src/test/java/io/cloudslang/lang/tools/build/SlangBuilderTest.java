@@ -27,6 +27,7 @@ import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
 import io.cloudslang.lang.tools.build.tester.TestRun;
+import io.cloudslang.lang.tools.build.tester.parallel.report.LoggingSlangTestCaseEventListener;
 import io.cloudslang.lang.tools.build.tester.parallel.report.ThreadSafeRunTestResults;
 import io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService;
 import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDispatchService;
@@ -145,6 +146,9 @@ public class SlangBuilderTest {
 
     @Autowired
     private LoggingService loggingService;
+
+    @Autowired
+    private LoggingSlangTestCaseEventListener loggingSlangTestCaseEventListener;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -657,6 +661,11 @@ public class SlangBuilderTest {
         @Bean
         public LoggingService loggingService() {
             return new LoggingServiceImpl();
+        }
+
+        @Bean
+        public LoggingSlangTestCaseEventListener loggingSlangTestCaseEventListener() {
+            return new LoggingSlangTestCaseEventListener();
         }
 
     }

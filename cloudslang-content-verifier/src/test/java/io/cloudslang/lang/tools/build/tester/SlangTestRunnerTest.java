@@ -108,6 +108,9 @@ public class SlangTestRunnerTest {
     @Autowired
     private LoggingService loggingService;
 
+    @Autowired
+    private LoggingSlangTestCaseEventListener loggingSlangTestCaseEventListener;
+
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
@@ -745,6 +748,11 @@ public class SlangTestRunnerTest {
         @Bean
         public LoggingService loggingService() {
             return new LoggingServiceImpl();
+        }
+
+        @Bean
+        public LoggingSlangTestCaseEventListener loggingSlangTestCaseEventListener() {
+            return new LoggingSlangTestCaseEventListener();
         }
     }
 

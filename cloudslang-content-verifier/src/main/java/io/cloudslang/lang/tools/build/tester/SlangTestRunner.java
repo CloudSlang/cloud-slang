@@ -86,6 +86,9 @@ public class SlangTestRunner {
     @Autowired
     private LoggingService loggingService;
 
+    @Autowired
+    private LoggingSlangTestCaseEventListener loggingSlangTestCaseEventListener;
+
     private String[] TEST_CASE_FILE_EXTENSIONS = {"yaml", "yml"};
     private static final String TEST_CASE_PASSED = "Test case passed: ";
     private static final String TEST_CASE_FAILED = "Test case failed: ";
@@ -181,7 +184,7 @@ public class SlangTestRunner {
 
         testCaseEventDispatchService.unregisterAllListeners();
         testCaseEventDispatchService.registerListener(runTestsResults); // for gathering of report data
-        testCaseEventDispatchService.registerListener(new LoggingSlangTestCaseEventListener()); // for logging purpose
+        testCaseEventDispatchService.registerListener(loggingSlangTestCaseEventListener); // for logging purpose
 
         MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener = new MultiTriggerTestCaseEventListener();
         slang.subscribeOnEvents(multiTriggerTestCaseEventListener, createListenerEventTypesSet());

@@ -20,21 +20,21 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.tools.build.logging.LoggingService;
 import io.cloudslang.lang.tools.build.validation.MetadataMissingException;
 import io.cloudslang.lang.tools.build.validation.StaticValidator;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.Validate;
+import org.apache.log4j.Level;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.io.File;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Queue;
-import java.util.ArrayDeque;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.Validate;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.util.Set;
 
 /**
  * Created by stoneo on 3/15/2015.

@@ -13,6 +13,7 @@ import io.cloudslang.lang.commons.configuration.SlangCommonsSpringConfig;
 import io.cloudslang.lang.tools.build.SlangBuilder;
 import io.cloudslang.lang.tools.build.logging.LoggingServiceImpl;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
+import io.cloudslang.lang.tools.build.tester.parallel.report.LoggingSlangTestCaseEventListener;
 import io.cloudslang.lang.tools.build.tester.parallel.report.SlangTestCaseRunReportGeneratorService;
 import io.cloudslang.lang.tools.build.tester.parallel.services.ParallelTestCaseExecutorService;
 import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDispatchService;
@@ -77,6 +78,11 @@ public class SlangBuildSpringConfiguration {
     @Bean
     public LoggingServiceImpl loggingService() {
         return new LoggingServiceImpl();
+    }
+
+    @Bean
+    public LoggingSlangTestCaseEventListener loggingSlangTestCaseEventListener() {
+        return new LoggingSlangTestCaseEventListener();
     }
 
 }
