@@ -138,15 +138,29 @@ public class SlangCLI implements CommandMarker {
 
     @CliCommand(value = "compile", help = "Display compile errors for an executable")
     public String compileSource(
-            @CliOption(key = {"", "f", "file"}, mandatory = true, help = FILE_HELP) final File file,
+            @CliOption(key = {"", "d", "directory"}, mandatory = false, help = FILE_HELP) final List<String> directories,
+            @CliOption(key = {"", "f", "file"}, mandatory = false, help = FILE_HELP) final File file,
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP) final List<String> classPath
     ) {
-        CompilationModellingResult result = compilerHelper.compileSource(file.getAbsolutePath(), classPath);
-        return printCompileErrors(result.getErrors(), file);
+        if (directories != null) {
+            List<CompilationModellingResult> results = compilerHelper.compileFolders(directories);
+            return printAllCompileErrors(results);
+        } else {
+            CompilationModellingResult result = compilerHelper.compileSource(file.getAbsolutePath(), classPath);
+            return printCompileErrors(result.getErrors(), file, new StringBuilder());
+        }
     }
 
-    private String printCompileErrors(List<RuntimeException> exceptions, File file) {
+    private String printAllCompileErrors(List<CompilationModellingResult> results) {
         StringBuilder stringBuilder = new StringBuilder();
+        for (CompilationModellingResult result : results) {
+            printCompileErrors(result.getErrors(), result.getFile(), stringBuilder);
+            stringBuilder.append(System.lineSeparator());
+        }
+        return stringBuilder.toString();
+    }
+
+    private String printCompileErrors(List<RuntimeException> exceptions, File file, StringBuilder stringBuilder) {
         if (exceptions.size() > 0) {
             stringBuilder.append("Following exceptions were found:" + System.lineSeparator());
             for (RuntimeException exception : exceptions) {

@@ -23,6 +23,8 @@ public interface CompilerHelper {
 
     CompilationModellingResult compileSource(String filePath, List<String> dependencies);
 
+    List<CompilationModellingResult> compileFolders(List<String> foldersPaths);
+
     /**
      * Load system property sources written in yaml and map them to fully qualified names
      *

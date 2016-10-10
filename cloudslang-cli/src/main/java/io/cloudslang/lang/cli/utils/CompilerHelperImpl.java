@@ -20,14 +20,11 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.utils.SetUtils;
 import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
@@ -69,21 +66,47 @@ public class CompilerHelperImpl implements CompilerHelper {
         try {
             return slang.compile(SlangSource.fromFile(file), getDependencySources(dependencies, file));
         } catch (Exception e) {
-            logger.error("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage());
-            throw new RuntimeException("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage(), e);
+            handleException(file, e);
+            return null;
         }
     }
 
     @Override
     public CompilationModellingResult compileSource(String filePath, List<String> dependencies) {
         File file = getFile(filePath);
+        Set<SlangSource> dependencySources = getDependencySources(dependencies, file);
+        return compileSource(file, dependencySources);
+    }
 
+    private CompilationModellingResult compileSource(File file, Set<SlangSource> dependencySources) {
         try {
-            return slang.compileSource(SlangSource.fromFile(file), getDependencySources(dependencies, file));
+            return slang.compileSource(SlangSource.fromFile(file), dependencySources);
         } catch (Exception e) {
-            logger.error("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage());
-            throw new RuntimeException("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage(), e);
+            handleException(file, e);
+            return null;
         }
+    }
+
+    private void handleException(File file, Exception e) {
+        logger.error("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage());
+        throw new RuntimeException("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage(), e);
+    }
+
+    @Override
+    public List<CompilationModellingResult> compileFolders(List<String> foldersPaths) {
+        List<CompilationModellingResult> results = new ArrayList<>();
+        Set<SlangSource> dependencySources = getSourcesFromFolders(foldersPaths);
+        for (SlangSource dependencySource : dependencySources) {
+            File file = getFile(dependencySource.getFilePath());
+            try {
+                CompilationModellingResult result = slang.compileSource(dependencySource, dependencySources);
+                result.setFile(file);
+                results.add(result);
+            } catch (Exception e) {
+                logger.error("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage());
+            }
+        }
+        return results;
     }
 
     private File getFile(String filePath) {
@@ -96,6 +119,11 @@ public class CompilerHelperImpl implements CompilerHelper {
 
     private Set<SlangSource> getDependencySources(List<String> dependencies, File file) {
         dependencies = getDependenciesIfEmpty(dependencies, file);
+        Set<SlangSource> dependencySources = getSourcesFromFolders(dependencies);
+        return dependencySources;
+    }
+
+    private Set<SlangSource> getSourcesFromFolders(List<String> dependencies) {
         Set<SlangSource> dependencySources = new HashSet<>();
         for (String dependency : dependencies) {
             Collection<File> dependenciesFiles = listSlangFiles(new File(dependency), true);
