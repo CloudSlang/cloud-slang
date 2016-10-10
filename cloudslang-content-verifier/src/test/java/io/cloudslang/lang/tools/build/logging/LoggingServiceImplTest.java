@@ -10,6 +10,8 @@
 package io.cloudslang.lang.tools.build.logging;
 
 
+import org.apache.commons.lang3.concurrent.ConcurrentUtils;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.log4j.Level;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +27,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -35,12 +39,17 @@ import static org.mockito.Mockito.doAnswer;
 @RunWith(MockitoJUnitRunner.class)
 public class LoggingServiceImplTest {
 
+    public static final String SINGLE_THREAD_EXECUTOR = "singleThreadExecutor";
+    public static final String LATEST_TASK = "latestTask";
     @InjectMocks
     @Spy
     private LoggingServiceImpl loggingService;
 
     @Mock
     private ExecutorService singleThreadExecutor;
+
+    @Mock
+    private AtomicReference<Future> latestTask;
 
     @Test
     public void testInitialize() throws Exception {
@@ -50,12 +59,16 @@ public class LoggingServiceImplTest {
         localLoggingService.initialize();
 
         Class<? extends LoggingServiceImpl> loggingServiceClass = localLoggingService.getClass();
-        Field loggingServiceClassDeclaredField = loggingServiceClass.getDeclaredField("singleThreadExecutor");
+        Field loggingServiceClassDeclaredField = loggingServiceClass.getDeclaredField(SINGLE_THREAD_EXECUTOR);
+        Field latestTaskField = loggingServiceClass.getDeclaredField(LATEST_TASK);
 
         loggingServiceClassDeclaredField.setAccessible(true);
+        latestTaskField.setAccessible(true);
         Object singleThreadExecutor = loggingServiceClassDeclaredField.get(localLoggingService);
+        Object latestTask = latestTaskField.get(localLoggingService);
 
         assertTrue(singleThreadExecutor instanceof ExecutorService);
+        assertTrue(latestTask instanceof AtomicReference);
     }
 
     @Test
@@ -64,28 +77,42 @@ public class LoggingServiceImplTest {
         localLoggingService.initialize();
 
         Class<? extends LoggingServiceImpl> loggingServiceClass = localLoggingService.getClass();
-        Field loggingServiceClassDeclaredField = loggingServiceClass.getDeclaredField("singleThreadExecutor");
+        Field loggingServiceClassDeclaredField = loggingServiceClass.getDeclaredField(SINGLE_THREAD_EXECUTOR);
+        Field latestTaskField = loggingServiceClass.getDeclaredField(LATEST_TASK);
 
         loggingServiceClassDeclaredField.setAccessible(true);
+        latestTaskField.setAccessible(true);
         Object singleThreadExecutor = loggingServiceClassDeclaredField.get(localLoggingService);
+        Object latestTask = latestTaskField.get(localLoggingService);
         assertNotNull(singleThreadExecutor);
+        assertNotNull(latestTask);
 
         // Tested call
         localLoggingService.destroy();
 
         singleThreadExecutor = loggingServiceClassDeclaredField.get(localLoggingService);
+        latestTask = latestTaskField.get(localLoggingService);
         assertNull(singleThreadExecutor);
+        assertNull(latestTask);
     }
 
     @Test
     public void testLogEventWithTwoParams() {
         final List<Runnable> runnableList = new ArrayList<>();
+        final MutableInt mutableInt = new MutableInt(0);
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                mutableInt.increment();
                 Object[] arguments = invocationOnMock.getArguments();
                 runnableList.add((Runnable) arguments[0]);
-                return null;
+                if (mutableInt.getValue() == 1) {
+                    return ConcurrentUtils.constantFuture("aaa");
+                } else if (mutableInt.getValue() == 2) {
+                    return ConcurrentUtils.constantFuture("bbb");
+                } else {
+                    return null;
+                }
             }
         }).when(singleThreadExecutor).submit(Mockito.any(Runnable.class));
 
@@ -94,6 +121,7 @@ public class LoggingServiceImplTest {
         loggingService.logEvent(Level.ERROR, "bbb");
 
         assertEquals(2, runnableList.size());
+
         assertTrue(runnableList.get(0) instanceof LoggingServiceImpl.LoggingDetailsRunnable);
         assertTrue(runnableList.get(1) instanceof LoggingServiceImpl.LoggingDetailsRunnable);
 

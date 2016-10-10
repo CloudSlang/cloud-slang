@@ -18,5 +18,5 @@ public interface LoggingService {
 
     Future<?> logEvent(final Level level, final String message);
     Future<?> logEvent(final Level level, final String message, final Throwable throwable);
-
+    void waitForAllLogTasks();
 }
