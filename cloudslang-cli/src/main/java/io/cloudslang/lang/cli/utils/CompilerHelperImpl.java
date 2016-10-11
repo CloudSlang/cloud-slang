@@ -99,18 +99,21 @@ public class CompilerHelperImpl implements CompilerHelper {
     @Override
     public List<CompilationModellingResult> compileFolders(List<String> foldersPaths) {
         List<CompilationModellingResult> results = new ArrayList<>();
-        Set<SlangSource> dependencySources = getSourcesFromFolders(foldersPaths);
-        for (SlangSource dependencySource : dependencySources) {
-            File file = getFile(dependencySource.getFilePath());
-            try {
-                CompilationModellingResult result = slang.compileSource(dependencySource, dependencySources);
-                result.setFile(file);
-                results.add(result);
-            } catch (Exception e) {
-                logger.error("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage());
+        try {
+            Set<SlangSource> dependencySources = getSourcesFromFolders(foldersPaths);
+            for (SlangSource dependencySource : dependencySources) {
+                File file = getFile(dependencySource.getFilePath());
+                try {
+                    CompilationModellingResult result = slang.compileSource(dependencySource, dependencySources);
+                    result.setFile(file);
+                    results.add(result);
+                } catch (Exception e) {
+                    logger.error("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage());
+                }
             }
+        } finally {
+            slang.compileCleanUp();
         }
-        slang.compileCleanUp();
         return results;
     }
 
@@ -124,8 +127,7 @@ public class CompilerHelperImpl implements CompilerHelper {
 
     private Set<SlangSource> getDependencySources(List<String> dependencies, File file) {
         dependencies = getDependenciesIfEmpty(dependencies, file);
-        Set<SlangSource> dependencySources = getSourcesFromFolders(dependencies);
-        return dependencySources;
+        return getSourcesFromFolders(dependencies);
     }
 
     private Set<SlangSource> getSourcesFromFolders(List<String> dependencies) {
