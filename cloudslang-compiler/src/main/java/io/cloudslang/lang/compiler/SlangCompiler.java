@@ -9,6 +9,7 @@
 package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.modeller.model.Executable;
+import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.SystemPropertyModellingResult;
 import io.cloudslang.lang.entities.CompilationArtifact;
@@ -27,6 +28,16 @@ public interface SlangCompiler {
      * @return the compiled {@link io.cloudslang.lang.entities.CompilationArtifact}
      */
     CompilationArtifact compile(SlangSource source, Set<SlangSource> path);
+
+    /**
+     * Compile a CloudSlang source and its dependencies to a {@link io.cloudslang.lang.entities.CompilationArtifact} object
+     *
+     * @param source the CloudSlang source file
+     * @param path   a set of CloudSlang sources containing the source dependencies
+     * @return the compiled {@link CompilationModellingResult} object, containing an compilation artifact, and a list
+     * of all the errors that were found(if any).
+     */
+    CompilationModellingResult compileSource(SlangSource source, Set<SlangSource> path);
 
     /**
      * Pre-compile a CloudSlang source into an {@link io.cloudslang.lang.compiler.modeller.model.Executable}.

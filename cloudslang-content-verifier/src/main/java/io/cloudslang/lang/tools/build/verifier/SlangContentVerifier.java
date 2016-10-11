@@ -15,6 +15,7 @@ import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
+import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.tools.build.logging.LoggingService;
@@ -104,7 +105,8 @@ public class SlangContentVerifier {
                 CompilationArtifact compiledSource = compiledArtifacts.get(getUniqueName(slangModel));
                 if (compiledSource == null) {
                     Set<Executable> dependenciesModels = getModelDependenciesRecursively(slangModels, slangModel);
-                    compiledSource = scoreCompiler.compile(slangModel, dependenciesModels);
+                    CompilationModellingResult result = scoreCompiler.compile(slangModel, dependenciesModels);
+                    compiledSource = result.getCompilationArtifact();
                     if (compiledSource != null) {
                         loggingService.logEvent(Level.INFO, "Compiled: \'" + slangModel.getNamespace() + "." + slangModel.getName() + "\' successfully");
                         compiledArtifacts.put(getUniqueName(slangModel), compiledSource);

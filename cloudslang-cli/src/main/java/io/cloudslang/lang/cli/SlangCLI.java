@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import io.cloudslang.lang.cli.services.ScoreServices;
 import io.cloudslang.lang.cli.utils.CompilerHelper;
 import io.cloudslang.lang.cli.utils.MetadataHelper;
+import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
@@ -22,7 +23,6 @@ import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,28 +54,28 @@ public class SlangCLI implements CommandMarker {
 
     private final static Logger logger = Logger.getLogger(SlangCLI.class);
 
-    public static final String TRIGGERED_FLOW_MSG = "Triggered flow : ";
-    public static final String WITH_EXECUTION_ID_MSG = "Execution id: ";
-    public static final String FLOW_EXECUTION_TIME_TOOK = ", duration: ";
+    private static final String TRIGGERED_FLOW_MSG = "Triggered flow : ";
+    private static final String WITH_EXECUTION_ID_MSG = "Execution id: ";
+    private static final String FLOW_EXECUTION_TIME_TOOK = ", duration: ";
     private static final String CURRENTLY = "You are CURRENTLY running CloudSlang version: ";
-    public static final String RUN_HELP = "triggers a CloudSlang flow";
-    public static final String FILE_HELP = "Path to filename. e.g. run --f c:/.../your_flow.sl";
-    public static final String CLASSPATH_HELP = "Classpath, a directory comma separated list to flow dependencies, by default it will take flow file dir. " +
+    private static final String RUN_HELP = "triggers a CloudSlang flow";
+    private static final String FILE_HELP = "Path to filename. e.g. run --f c:/.../your_flow.sl";
+    private static final String CLASSPATH_HELP = "Classpath, a directory comma separated list to flow dependencies, by default it will take flow file dir. " +
             "e.g. run --f c:/.../your_flow.sl --i input1=root,input2=25 --cp c:/.../yaml";
-    public static final String INPUTS_HELP = "inputs in a key=value comma separated list. " +
+    private static final String INPUTS_HELP = "inputs in a key=value comma separated list. " +
             "e.g. run --f c:/.../your_flow.sl --i input1=root,input2=25";
-    public static final String INPUT_FILE_HELP = "comma separated list of input file locations. " +
+    private static final String INPUT_FILE_HELP = "comma separated list of input file locations. " +
             "e.g. run --f C:/.../your_flow.sl --if C:/.../inputs.yaml";
-    public static final String SYSTEM_PROPERTY_FILE_HELP = "comma separated list of system property file locations. " +
+    private static final String SYSTEM_PROPERTY_FILE_HELP = "comma separated list of system property file locations. " +
             "e.g. run --f c:/.../your_flow.sl --spf c:/.../yaml";
-    public static final String ENV_HELP = "Set environment var relevant to the CLI";
-    public static final String SET_ASYNC_HELP = "set the async. e.g. env --setAsync true";
-    public static final String CSLANG_VERSION_HELP = "Prints the CloudSlang version used";
-    public static final String INPUTS_COMMAND_HELP = "Get flow inputs";
-    public static final String PATH_TO_FILENAME_HELP = "Path to filename. e.g. /path/to/file.sl";
-    public static final String QUIET = "quiet";
-    public static final String DEBUG = "debug";
-    public static final String DEFAULT = "default";
+    private static final String ENV_HELP = "Set environment var relevant to the CLI";
+    private static final String SET_ASYNC_HELP = "set the async. e.g. env --setAsync true";
+    private static final String CSLANG_VERSION_HELP = "Prints the CloudSlang version used";
+    private static final String INPUTS_COMMAND_HELP = "Get flow inputs";
+    private static final String PATH_TO_FILENAME_HELP = "Path to filename. e.g. /path/to/file.sl";
+    private static final String QUIET = "quiet";
+    private static final String DEBUG = "debug";
+    private static final String DEFAULT = "default";
 
     @Autowired
     private ScoreServices scoreServices;
@@ -101,7 +101,7 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = INPUTS_HELP) final Map<String, ? extends Serializable> inputs,
             @CliOption(key = {"if", "input-file"}, mandatory = false, help = INPUT_FILE_HELP) final List<String> inputFiles,
             @CliOption(key = {"v", "verbose"}, mandatory = false, help = "default, quiet, debug(print each step outputs). e.g. run --f c:/.../your_flow.sl --v quiet", specifiedDefaultValue = "debug", unspecifiedDefaultValue = "default") final String verbose,
-            @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = SYSTEM_PROPERTY_FILE_HELP) final List<String> systemPropertyFiles) throws IOException {
+            @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = SYSTEM_PROPERTY_FILE_HELP) final List<String> systemPropertyFiles) {
 
         if (invalidVerboseInput(verbose)) throw new IllegalArgumentException("Verbose argument is invalid.");
 
@@ -136,10 +136,51 @@ public class SlangCLI implements CommandMarker {
         return !Arrays.asList(validArguments).contains(verbose.toLowerCase());
     }
 
+    @CliCommand(value = "compile", help = "Display compile errors for an executable")
+    public String compileSource(
+            @CliOption(key = {"", "d", "directory"}, mandatory = false, help = FILE_HELP) final List<String> directories,
+            @CliOption(key = {"", "f", "file"}, mandatory = false, help = FILE_HELP) final File file,
+            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP) final List<String> classPath
+    ) {
+        if (directories != null) {
+            List<CompilationModellingResult> results = compilerHelper.compileFolders(directories);
+            return printAllCompileErrors(results);
+        } else {
+            CompilationModellingResult result = compilerHelper.compileSource(file.getAbsolutePath(), classPath);
+            return printCompileErrors(result.getErrors(), file, new StringBuilder());
+        }
+    }
+
+    private String printAllCompileErrors(List<CompilationModellingResult> results) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (CompilationModellingResult result : results) {
+            printCompileErrors(result.getErrors(), result.getFile(), stringBuilder);
+            stringBuilder.append(System.lineSeparator());
+        }
+        return stringBuilder.toString();
+    }
+
+    private String printCompileErrors(List<RuntimeException> exceptions, File file, StringBuilder stringBuilder) {
+        if (exceptions.size() > 0) {
+            stringBuilder.append("Following exceptions were found:" + System.lineSeparator());
+            for (RuntimeException exception : exceptions) {
+                stringBuilder.append("\t");
+                stringBuilder.append(exception.getClass());
+                stringBuilder.append(": ");
+                stringBuilder.append(exception.getMessage());
+                stringBuilder.append(System.lineSeparator());
+            }
+            throw new RuntimeException(stringBuilder.toString());
+        } else {
+            stringBuilder.append("Compilation was successful for " + file.getName());
+        }
+        return StringUtils.trim(stringBuilder.toString());
+    }
+
     @CliCommand(value = "inspect", help = "Display metadata about an executable")
     public String inspectExecutable(
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = PATH_TO_FILENAME_HELP) final File executableFile
-    ) throws IOException {
+    ) {
         return metadataHelper.extractMetadata(executableFile);
     }
 
@@ -155,13 +196,13 @@ public class SlangCLI implements CommandMarker {
         if (CollectionUtils.isEmpty(systemProperties)) {
             stringBuilder.append("No system properties found.");
         } else {
-            stringBuilder.append("Following system properties were loaded:\n");
+            stringBuilder.append("Following system properties were loaded:" + System.lineSeparator());
             for (SystemProperty systemProperty : systemProperties) {
                 stringBuilder.append("\t");
                 stringBuilder.append(systemProperty.getFullyQualifiedName());
                 stringBuilder.append(": ");
                 stringBuilder.append(systemProperty.getValue());
-                stringBuilder.append("\n");
+                stringBuilder.append(System.lineSeparator());
             }
         }
         return StringUtils.trim(stringBuilder.toString());
@@ -169,7 +210,7 @@ public class SlangCLI implements CommandMarker {
 
     @CliCommand(value = "env", help = ENV_HELP)
     public String setEnvVar(
-            @CliOption(key = "setAsync", mandatory = true, help = SET_ASYNC_HELP) final boolean switchAsync) throws IOException {
+            @CliOption(key = "setAsync", mandatory = true, help = SET_ASYNC_HELP) final boolean switchAsync) {
         triggerAsync = switchAsync;
         return setEnvMessage(triggerAsync);
     }
@@ -177,8 +218,7 @@ public class SlangCLI implements CommandMarker {
     @CliCommand(value = "inputs", help = INPUTS_COMMAND_HELP)
     public List<String> getFlowInputs(
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = FILE_HELP) final File file,
-            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP) final List<String> classPath)
-            throws IOException {
+            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP) final List<String> classPath) {
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
         List<Input> inputs = compilationArtifact.getInputs();
         List<String> inputsResult = new ArrayList<>();
