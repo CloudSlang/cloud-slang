@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>cloudslang-commons</artifactId>
+            <artifactId>cloudslang-api-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
