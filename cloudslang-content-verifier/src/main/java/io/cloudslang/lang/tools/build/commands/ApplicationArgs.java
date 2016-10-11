@@ -12,7 +12,6 @@ package io.cloudslang.lang.tools.build.commands;
 import com.beust.jcommander.DynamicParameter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.CommaParameterSplitter;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +20,8 @@ import java.util.Map;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class ApplicationArgs {
+
+    private static final String DYNAMIC_PARAMETER_CHANGES_ONLY = "changes_only";
 
     @Parameter
     public List<String> parameters = new ArrayList<>();
@@ -115,5 +116,9 @@ public class ApplicationArgs {
 
     public String getRunConfigPath() {
         return isEmpty(runConfigPath) ? "" : runConfigPath;
+    }
+
+    public String getChangesOnlyConfigPath() {
+        return getDynamicParams().get(DYNAMIC_PARAMETER_CHANGES_ONLY);
     }
 }

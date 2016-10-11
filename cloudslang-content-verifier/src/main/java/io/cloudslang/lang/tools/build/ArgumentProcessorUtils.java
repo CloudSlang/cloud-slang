@@ -9,15 +9,19 @@
  *******************************************************************************/
 package io.cloudslang.lang.tools.build;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.Validate;
-
+import io.cloudslang.lang.compiler.SlangSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Validate;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -139,6 +143,11 @@ public class ArgumentProcessorUtils {
         } catch (IOException ioEx) {
             throw new RuntimeException("Failed to read from properties file '" + propertiesAbsolutePath + "': ", ioEx);
         }
+    }
+
+    public static Set<String> loadChangedItems(String filePath) throws IOException {
+        InputStream fileInputStream = new FileInputStream(filePath);
+        return new HashSet<>(IOUtils.readLines(fileInputStream, SlangSource.getCloudSlangCharset()));
     }
 
     /**

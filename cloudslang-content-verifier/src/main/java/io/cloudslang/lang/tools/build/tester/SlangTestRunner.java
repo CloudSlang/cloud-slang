@@ -11,10 +11,13 @@ package io.cloudslang.lang.tools.build.tester;
 
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
+import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.constants.MessageConstants;
 import io.cloudslang.lang.tools.build.SlangBuildMain;
 import io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode;
 import io.cloudslang.lang.tools.build.SlangBuildMain.TestCaseRunMode;
@@ -26,6 +29,7 @@ import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDisp
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.FailedSlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
+import io.cloudslang.lang.tools.build.tester.runconfiguration.BuildModeConfig;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.TestRunInfoService;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.strategy.RunMultipleTestSuiteConflictResolutionStrategy;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.strategy.SequentialRunTestSuiteResolutionStrategy;
@@ -80,6 +84,9 @@ public class SlangTestRunner {
 
     @Autowired
     private TestRunInfoService testRunInfoService;
+
+    @Autowired
+    private DependenciesHelper dependenciesHelper;
 
     private String[] TEST_CASE_FILE_EXTENSIONS = {"yaml", "yml"};
     private static final String TEST_CASE_PASSED = "Test case passed: ";
@@ -226,8 +233,12 @@ public class SlangTestRunner {
      * @param runTestsResults is updated to reflect skipped and fail fast scenarios
      * @return
      */
-    public Map<TestCaseRunState, Map<String, SlangTestCase>> splitTestCasesByRunState(final BulkRunMode bulkRunMode, final Map<String, SlangTestCase> testCases, final List<String> testSuites,
-                                                                                      final IRunTestResults runTestsResults) {
+    public Map<TestCaseRunState, Map<String, SlangTestCase>> splitTestCasesByRunState(
+            final BulkRunMode bulkRunMode,
+            final Map<String, SlangTestCase> testCases,
+            final List<String> testSuites,
+            final IRunTestResults runTestsResults,
+            final BuildModeConfig buildModeConfig) {
         Map<TestCaseRunState, Map<String, SlangTestCase>> resultMap = new HashMap<>();
 
         // Prepare the 3 categories inactive, parallel, sequential
@@ -242,7 +253,8 @@ public class SlangTestRunner {
                 continue;
             }
 
-            if (isTestCaseInActiveSuite(testCase, testSuites)) {
+            if (isTestCaseInActiveSuite(testCase, testSuites) &&
+                    enabledByBuildMode(buildModeConfig.getBuildMode(), testCase, buildModeConfig.getChangedFiles(), buildModeConfig.getAllTestedFlowModels())) {
                 processActiveTest(bulkRunMode, resultMap, testCaseEntry, testCase);
             } else {
                 processSkippedTest(runTestsResults, testCaseEntry, testCase, resultMap);
@@ -250,6 +262,32 @@ public class SlangTestRunner {
         }
 
         return resultMap;
+    }
+
+    private boolean enabledByBuildMode(
+            SlangBuildMain.BuildMode buildMode,
+            SlangTestCase slangTestCase,
+            Set<String> changedExecutables,
+            Map<String, Executable> allTestedFlowModels) {
+        switch (buildMode) {
+            case BASIC:
+                return true;
+            case CHANGED:
+                return isAffectedTestCase(slangTestCase, changedExecutables, allTestedFlowModels);
+            default:
+                throw new RuntimeException(MessageConstants.NOT_IMPLEMENTED_MESSAGE);
+        }
+    }
+
+    private boolean isAffectedTestCase(SlangTestCase slangTestCase, Set<String> changedExecutables, Map<String, Executable> allTestedFlowModels) {
+        String testFlowPath = slangTestCase.getTestFlowPath();
+        Executable testCaseReference = allTestedFlowModels.get(testFlowPath);
+        if (testCaseReference == null) {
+            throw new RuntimeException("Test case reference[" + testFlowPath + "] not found in compiled models.");
+        }
+        Set<String> testCaseDependencies = new HashSet<>(dependenciesHelper.fetchDependencies(testCaseReference, allTestedFlowModels));
+        testCaseDependencies.add(testFlowPath);
+        return CollectionUtils.containsAny(testCaseDependencies, changedExecutables);
     }
 
     private void processQuickFailTest(final IRunTestResults runTestsResults) {
