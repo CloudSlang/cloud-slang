@@ -442,6 +442,7 @@ public class SlangCLITest {
                         new RuntimeException("2"), new RuntimeException("3"))));
 
         CommandResult cr = shell.executeCommand("compile --f some_slang_file.sl");
+        Assert.assertNotNull(cr.getException());
         Assert.assertEquals("exception mismatch", "Following exceptions were found:" + System.lineSeparator() +
                 "\tclass java.lang.RuntimeException: 1" + System.lineSeparator() +
                 "\tclass java.lang.RuntimeException: 2" + System.lineSeparator() +

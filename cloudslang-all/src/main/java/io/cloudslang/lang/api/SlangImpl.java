@@ -23,17 +23,15 @@ import io.cloudslang.score.api.TriggeringProperties;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEventListener;
+import org.apache.commons.lang.Validate;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang.Validate;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import static ch.lambdaj.Lambda.filter;
-import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * @author stoneo
@@ -46,10 +44,13 @@ public class SlangImpl implements Slang {
 
     @Autowired
     private SlangCompiler compiler;
+
     @Autowired
     private MetadataExtractor metadataExtractor;
+
     @Autowired
     private Score score;
+
     @Autowired
     private EventBus eventBus;
 
@@ -57,7 +58,7 @@ public class SlangImpl implements Slang {
     public CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencies) {
 
         Validate.notNull(source, "Source can not be null");
-        Set<SlangSource> dependencySources = new HashSet<>(filter(notNullValue(), dependencies));
+        Set<SlangSource> dependencySources = filterOutNullSources(dependencies);
 
         try {
             return compiler.compile(source, dependencySources);
@@ -71,7 +72,7 @@ public class SlangImpl implements Slang {
     public CompilationModellingResult compileSource(SlangSource source, Set<SlangSource> dependencies) {
 
         Validate.notNull(source, "Source can not be null");
-        Set<SlangSource> dependencySources = new HashSet<>(filter(notNullValue(), dependencies));
+        Set<SlangSource> dependencySources = filterOutNullSources(dependencies);
 
         try {
             return compiler.compileSource(source, dependencySources);
@@ -79,6 +80,23 @@ public class SlangImpl implements Slang {
             logger.error("Failed compilation for source : " + source.getName() + " ,Exception is : " + e.getMessage());
             throw new RuntimeException("Failed compilation for source : " + source.getName() + " ,Exception is : " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void compileCleanUp() {
+        compiler.cleanUp();
+    }
+
+    private Set<SlangSource> filterOutNullSources(Set<SlangSource> dependencies) {
+        Set<SlangSource> dependencySources = new HashSet<>();
+        if (dependencies != null) {
+            for (SlangSource dependency : dependencies) {
+                if (dependency != null) {
+                    dependencySources.add(dependency);
+                }
+            }
+        }
+        return dependencySources;
     }
 
     @Override

@@ -68,6 +68,8 @@ public class CompilerHelperImpl implements CompilerHelper {
         } catch (Exception e) {
             handleException(file, e);
             return null;
+        } finally {
+            slang.compileCleanUp();
         }
     }
 
@@ -84,6 +86,8 @@ public class CompilerHelperImpl implements CompilerHelper {
         } catch (Exception e) {
             handleException(file, e);
             return null;
+        } finally {
+            slang.compileCleanUp();
         }
     }
 
@@ -106,6 +110,7 @@ public class CompilerHelperImpl implements CompilerHelper {
                 logger.error("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage());
             }
         }
+        slang.compileCleanUp();
         return results;
     }
 

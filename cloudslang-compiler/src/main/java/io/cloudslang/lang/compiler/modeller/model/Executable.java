@@ -23,6 +23,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public abstract class Executable {
 
+    public static final char DOT = '.';
     protected final Map<String, Serializable> preExecActionData;
     protected final Map<String, Serializable> postExecActionData;
     protected final String namespace;
@@ -32,6 +33,7 @@ public abstract class Executable {
     protected final List<Result> results;
     protected final Set<String> executableDependencies;
     protected final Set<String> systemPropertyDependencies;
+    private transient String id;
 
     protected Executable(Map<String, Serializable> preExecActionData,
                          Map<String, Serializable> postExecActionData,
@@ -51,6 +53,7 @@ public abstract class Executable {
         this.results = results;
         this.executableDependencies = executableDependencies;
         this.systemPropertyDependencies = systemPropertyDependencies;
+        id = namespace + DOT + name;
     }
 
     public Map<String, Serializable> getPreExecActionData() {
@@ -66,7 +69,7 @@ public abstract class Executable {
     }
 
     public String getId() {
-        return getNamespace() + "." + getName();
+        return id;
     }
 
     public String getName() {

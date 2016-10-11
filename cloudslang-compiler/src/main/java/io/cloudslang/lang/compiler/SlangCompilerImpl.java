@@ -67,6 +67,9 @@ public class SlangCompilerImpl implements SlangCompiler {
     @Autowired
     private SystemPropertyValidator systemPropertyValidator;
 
+    @Autowired
+    private CachedPrecompileService cachedPrecompileService;
+
     @Override
     public CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencySources) {
         CompilationModellingResult result = compileSource(source, dependencySources);
@@ -106,6 +109,11 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     @Override
+    public void cleanUp() {
+        cachedPrecompileService.cleanUp();
+    }
+
+    @Override
     public Executable preCompile(SlangSource source) {
         ExecutableModellingResult result = preCompileSource(source);
         if (result.getErrors().size() > 0) {
@@ -117,13 +125,20 @@ public class SlangCompilerImpl implements SlangCompiler {
     @Override
     public ExecutableModellingResult preCompileSource(SlangSource source) {
         Validate.notNull(source, "You must supply a source to compile");
+        final String filePath = source.getFilePath();
+        ExecutableModellingResult result = cachedPrecompileService.getValueFromCache(filePath);
+        if (result != null) {
+            return result;
+        }
 
         //first thing we parse the yaml file into java maps
         ParsedSlang parsedSlang = yamlParser.parse(source);
         ParseModellingResult parseModellingResult = yamlParser.validate(parsedSlang);
 
         // Then we transform the parsed Slang source to a Slang model
-        return slangModeller.createModel(parseModellingResult);
+        result = slangModeller.createModel(parseModellingResult);
+        cachedPrecompileService.cacheResult(filePath, result);
+        return result;
     }
 
     @Override

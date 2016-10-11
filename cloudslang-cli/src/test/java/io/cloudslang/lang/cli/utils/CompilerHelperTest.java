@@ -21,9 +21,11 @@ import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.hamcrest.BaseMatcher;
@@ -46,6 +48,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -101,6 +104,48 @@ public class CompilerHelperTest {
                         SlangSource.fromFile(flowPath)
                 )
         );
+        Mockito.verify(slang).compileCleanUp();
+    }
+
+    @Test
+    public void testCompileSourceCleanup() throws Exception {
+        URI flowPath = getClass().getResource("/executables/dir3/flow.sl").toURI();
+        URI opPath = getClass().getResource("/executables/dir3/dir3_1/test_op.sl").toURI();
+        compilerHelper.compileSource(flowPath.getPath(), null);
+        Mockito.verify(slang).compileSource(
+                SlangSource.fromFile(flowPath),
+                Sets.newHashSet(
+                        SlangSource.fromFile(opPath),
+                        SlangSource.fromFile(flowPath)
+                )
+        );
+        Mockito.verify(slang).compileCleanUp();
+    }
+
+    @Test
+    public void testCompileFoldersCleanup() throws Exception {
+        URI folderPath = getClass().getResource("/executables/dir3").toURI();
+        List<String> folders = new ArrayList<>();
+        folders.add(folderPath.getPath());
+        compilerHelper.compileFolders(folders);
+
+        URI flowPath = getClass().getResource("/executables/dir3/flow.sl").toURI();
+        URI opPath = getClass().getResource("/executables/dir3/dir3_1/test_op.sl").toURI();
+        Mockito.verify(slang).compileSource(
+                SlangSource.fromFile(flowPath),
+                Sets.newHashSet(
+                        SlangSource.fromFile(opPath),
+                        SlangSource.fromFile(flowPath)
+                )
+        );
+        Mockito.verify(slang).compileSource(
+                SlangSource.fromFile(opPath),
+                Sets.newHashSet(
+                        SlangSource.fromFile(opPath),
+                        SlangSource.fromFile(flowPath)
+                )
+        );
+        Mockito.verify(slang).compileCleanUp();
     }
 
     @Test
@@ -111,6 +156,7 @@ public class CompilerHelperTest {
         compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(folderPath.getPath()));
         Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath),
                 Sets.newHashSet(SlangSource.fromFile(flow2FilePath)));
+        Mockito.verify(slang).compileCleanUp();
     }
 
     @Test
@@ -127,6 +173,7 @@ public class CompilerHelperTest {
                         SlangSource.fromFile(dependency2)
                 )
         );
+        Mockito.verify(slang).compileCleanUp();
     }
 
     // flowprop.sl is not recognized as properties file
@@ -140,6 +187,7 @@ public class CompilerHelperTest {
                 SlangSource.fromFile(flowFilePath),
                 Sets.newHashSet(SlangSource.fromFile(flow2FilePath))
         );
+        Mockito.verify(slang).compileCleanUp();
     }
 
     @Test

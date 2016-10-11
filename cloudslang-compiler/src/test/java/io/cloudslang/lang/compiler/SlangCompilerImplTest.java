@@ -144,6 +144,11 @@ public class SlangCompilerImplTest {
         }
 
         @Bean
+        public CachedPrecompileService cachePrecompileService() {
+            return new CachedPrecompileService();
+        }
+
+        @Bean
         public CompileValidator compileValidator() {
             return mock(CompileValidator.class);
         }
