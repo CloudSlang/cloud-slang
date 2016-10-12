@@ -61,7 +61,7 @@ public class ApplicationArgs {
             description = "Whether or not to validate the inputs, outputs and results have description")
     public boolean validateDescription = false;
 
-    @Parameter(names = {"--changes_only", "-co"},
+    @Parameter(names = {"--changes-only", "-co"},
             description = "Run only tests from active suites that were affected by this changelist")
     public String changesOnlyConfigPath;
 
