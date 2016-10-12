@@ -142,9 +142,9 @@ public class SlangBuildMain {
         boolean shouldValidateDescription = appArgs.shouldValidateDescription();
         String runConfigPath = FilenameUtils.normalize(appArgs.getRunConfigPath());
 
+        BuildMode buildMode = null;
+        Set<String> changedFiles = null;
         try {
-            BuildMode buildMode;
-            Set<String> changedFiles;
             String smartModePath = appArgs.getChangesOnlyConfigPath();
             if (StringUtils.isEmpty(smartModePath)) {
                 buildMode = BuildMode.BASIC;
@@ -153,60 +153,66 @@ public class SlangBuildMain {
                 buildMode = BuildMode.CHANGED;
                 changedFiles = readChangedFilesFromSource(smartModePath);
             }
+        } catch (Exception ex) {
+            log.error("Exception: " + ex.getMessage());
+            System.exit(1);
+        }
 
-            // Override with the values from the file if configured
-            List<String> testSuitesParallel = new ArrayList<>();
-            List<String> testSuitesSequential = new ArrayList<>();
-            BulkRunMode bulkRunMode = runTestsInParallel ? ALL_PARALLEL : ALL_SEQUENTIAL;
+        // Override with the values from the file if configured
+        List<String> testSuitesParallel = new ArrayList<>();
+        List<String> testSuitesSequential = new ArrayList<>();
+        BulkRunMode bulkRunMode = runTestsInParallel ? ALL_PARALLEL : ALL_SEQUENTIAL;
 
-            TestCaseRunMode unspecifiedTestSuiteRunMode = runTestsInParallel ? TestCaseRunMode.PARALLEL : TestCaseRunMode.SEQUENTIAL;
-            if (get(runConfigPath).isAbsolute() && isRegularFile(get(runConfigPath), NOFOLLOW_LINKS) && equalsIgnoreCase(PROPERTIES_FILE_EXTENSION, FilenameUtils.getExtension(runConfigPath))) {
-                Properties runConfigurationProperties = ArgumentProcessorUtils.getPropertiesFromFile(runConfigPath);
-                shouldPrintCoverageData = getBooleanFromPropertiesWithDefault(TEST_COVERAGE, shouldPrintCoverageData, runConfigurationProperties);
-                threadCount = getIntFromPropertiesWithDefaultAndRange(TEST_PARALLEL_THREAD_COUNT, Runtime.getRuntime().availableProcessors(), runConfigurationProperties, 1, MAX_THREADS_TEST_RUNNER + 1);
-                testSuites = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_TO_RUN);
-                testSuitesParallel = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_PARALLEL);
-                testSuitesSequential = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_SEQUENTIAL);
-                addErrorIfSameTestSuiteIsInBothParallelOrSequential(testSuitesParallel, testSuitesSequential);
-                unspecifiedTestSuiteRunMode = getEnumInstanceFromPropertiesWithDefault(TEST_SUITES_RUN_UNSPECIFIED, unspecifiedTestSuiteRunMode, runConfigurationProperties);
-                addWarningsForMisconfiguredTestSuites(unspecifiedTestSuiteRunMode, testSuites, testSuitesSequential, testSuitesParallel);
-                bulkRunMode = POSSIBLY_MIXED;
-            } else { // Warn when file is misconfigured, relative path, file does not exist or is not a properties file
-                log.info(format(DID_NOT_DETECT_RUN_CONFIGURATION_PROPERTIES_FILE, runConfigPath));
-            }
+        TestCaseRunMode unspecifiedTestSuiteRunMode = runTestsInParallel ? TestCaseRunMode.PARALLEL : TestCaseRunMode.SEQUENTIAL;
+        if (get(runConfigPath).isAbsolute() && isRegularFile(get(runConfigPath), NOFOLLOW_LINKS) && equalsIgnoreCase(PROPERTIES_FILE_EXTENSION, FilenameUtils.getExtension(runConfigPath))) {
+            Properties runConfigurationProperties = ArgumentProcessorUtils.getPropertiesFromFile(runConfigPath);
+            shouldPrintCoverageData = getBooleanFromPropertiesWithDefault(TEST_COVERAGE, shouldPrintCoverageData, runConfigurationProperties);
+            threadCount = getIntFromPropertiesWithDefaultAndRange(TEST_PARALLEL_THREAD_COUNT, Runtime.getRuntime().availableProcessors(), runConfigurationProperties, 1, MAX_THREADS_TEST_RUNNER + 1);
+            testSuites = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_TO_RUN);
+            testSuitesParallel = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_PARALLEL);
+            testSuitesSequential = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_SEQUENTIAL);
+            addErrorIfSameTestSuiteIsInBothParallelOrSequential(testSuitesParallel, testSuitesSequential);
+            unspecifiedTestSuiteRunMode = getEnumInstanceFromPropertiesWithDefault(TEST_SUITES_RUN_UNSPECIFIED, unspecifiedTestSuiteRunMode, runConfigurationProperties);
+            addWarningsForMisconfiguredTestSuites(unspecifiedTestSuiteRunMode, testSuites, testSuitesSequential, testSuitesParallel);
+            bulkRunMode = POSSIBLY_MIXED;
+        } else { // Warn when file is misconfigured, relative path, file does not exist or is not a properties file
+            log.info(format(DID_NOT_DETECT_RUN_CONFIGURATION_PROPERTIES_FILE, runConfigPath));
+        }
 
-            String testCaseReportLocation = getProperty(TEST_CASE_REPORT_LOCATION);
-            if (StringUtils.isBlank(testCaseReportLocation)) {
-                log.info("Test case report location property [" + TEST_CASE_REPORT_LOCATION + "] is not defined. Report will be skipped.");
-            }
+        String testCaseReportLocation = getProperty(TEST_CASE_REPORT_LOCATION);
+        if (StringUtils.isBlank(testCaseReportLocation)) {
+            log.info("Test case report location property [" + TEST_CASE_REPORT_LOCATION + "] is not defined. Report will be skipped.");
+        }
 
-            // Setting thread count for visibility in ParallelTestCaseExecutorService
-            setProperty(SLANG_TEST_RUNNER_THREAD_COUNT, valueOf(threadCount));
+        // Setting thread count for visibility in ParallelTestCaseExecutorService
+        setProperty(SLANG_TEST_RUNNER_THREAD_COUNT, valueOf(threadCount));
 
-            log.info(NEW_LINE + "------------------------------------------------------------");
-            log.info("Building project: " + projectPath);
-            log.info("Content root is at: " + contentPath);
-            log.info("Test root is at: " + testsPath);
-            log.info("Active test suites are: " + getListForPrint(testSuites));
-            log.info("Parallel run mode is configured for test suites: " + getListForPrint(testSuitesParallel));
-            log.info("Sequential run mode is configured for test suites: " + getListForPrint(testSuitesSequential));
-            log.info("Default run mode '" + unspecifiedTestSuiteRunMode.name().toLowerCase() + "' is configured for test suites: "
-                    + getListForPrint(getDefaultRunModeTestSuites(testSuites, testSuitesParallel, testSuitesSequential)));
+        log.info(NEW_LINE + "------------------------------------------------------------");
+        log.info("Building project: " + projectPath);
+        log.info("Content root is at: " + contentPath);
+        log.info("Test root is at: " + testsPath);
+        log.info("Active test suites are: " + getListForPrint(testSuites));
+        log.info("Parallel run mode is configured for test suites: " + getListForPrint(testSuitesParallel));
+        log.info("Sequential run mode is configured for test suites: " + getListForPrint(testSuitesSequential));
+        log.info("Default run mode '" + unspecifiedTestSuiteRunMode.name().toLowerCase() + "' is configured for test suites: "
+                + getListForPrint(getDefaultRunModeTestSuites(testSuites, testSuitesParallel, testSuitesSequential)));
 
-            log.info("Bulk run mode for tests: " + getBulkModeForPrint(bulkRunMode));
+        log.info("Bulk run mode for tests: " + getBulkModeForPrint(bulkRunMode));
 
-            log.info("Print coverage data: " + valueOf(shouldPrintCoverageData));
-            log.info("Validate description: " + valueOf(shouldValidateDescription));
-            log.info("Thread count: " + threadCount);
-            log.info("Test case timeout in minutes: " + (isEmpty(testCaseTimeout) ? valueOf(MAX_TIME_PER_TESTCASE_IN_MINUTES) : testCaseTimeout));
+        log.info("Print coverage data: " + valueOf(shouldPrintCoverageData));
+        log.info("Validate description: " + valueOf(shouldValidateDescription));
+        log.info("Thread count: " + threadCount);
+        log.info("Test case timeout in minutes: " + (isEmpty(testCaseTimeout) ? valueOf(MAX_TIME_PER_TESTCASE_IN_MINUTES) : testCaseTimeout));
 
-            log.info(NEW_LINE + "Loading...");
+        log.info(NEW_LINE + "Loading...");
 
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/testRunnerContext.xml");
         context.registerShutdownHook();
         SlangBuilder slangBuilder = context.getBean(SlangBuilder.class);
         LoggingService loggingService = context.getBean(LoggingServiceImpl.class);
         Slang slang = context.getBean(Slang.class);
+
+        try {
 
             updateTestSuiteMappings(context.getBean(TestRunInfoService.class), testSuitesParallel, testSuitesSequential, testSuites, unspecifiedTestSuiteRunMode);
 

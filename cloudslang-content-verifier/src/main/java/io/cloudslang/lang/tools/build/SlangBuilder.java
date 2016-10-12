@@ -23,12 +23,6 @@ import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.BuildModeConfig;
 import io.cloudslang.lang.tools.build.verifier.CompilationResult;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Level;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,6 +31,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Level;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_PARALLEL;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_SEQUENTIAL;
@@ -125,7 +124,7 @@ public class SlangBuilder {
             SlangBuildMain.BuildMode buildMode,
             Set<String> changedFiles) {
         loggingService.logEvent(Level.INFO, "");
-        loggingService.logEvent(Level.INFO, "--- compiling tests sources -
+        loggingService.logEvent(Level.INFO, "--- compiling tests sources ---");
         // Compile all slang test flows under the test directory
         CompilationResult compilationResult = slangContentVerifier.createModelsAndValidate(testsPath, false);
         Map<String, Executable> testFlowModels = compilationResult.getResults();
