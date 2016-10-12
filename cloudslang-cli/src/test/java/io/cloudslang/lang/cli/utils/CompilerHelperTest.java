@@ -138,14 +138,14 @@ public class CompilerHelperTest {
 
         URI flowPath = getClass().getResource("/executables/dir3/flow.sl").toURI();
         URI opPath = getClass().getResource("/executables/dir3/dir3_1/test_op.sl").toURI();
-        InOrder inOrder = inOrder(slang);
-        inOrder.verify(slang).compileSource(
+        verify(slang).compileSource(
                 SlangSource.fromFile(opPath),
                 Sets.newHashSet(
                         SlangSource.fromFile(opPath),
                         SlangSource.fromFile(flowPath)
                 )
         );
+        InOrder inOrder = inOrder(slang);
         inOrder.verify(slang).compileSource(
                 SlangSource.fromFile(flowPath),
                 Sets.newHashSet(
