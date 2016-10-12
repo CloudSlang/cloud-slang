@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by bancl on 10/10/2016.
  */
-@Component
 public class CachedPrecompileService {
 
     private Cache<String, ExecutableModellingResult> cache;
@@ -20,7 +19,7 @@ public class CachedPrecompileService {
     public void init() {
         cache = CacheBuilder.newBuilder()
                 .maximumSize(500)
-                .concurrencyLevel(10)
+                .concurrencyLevel(2 * Runtime.getRuntime().availableProcessors())
                 .expireAfterWrite(60, TimeUnit.MINUTES).build();
     }
 

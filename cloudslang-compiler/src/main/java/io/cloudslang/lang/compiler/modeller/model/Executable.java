@@ -15,6 +15,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import io.cloudslang.lang.entities.constants.RegexConstants;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -23,7 +25,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public abstract class Executable {
 
-    public static final char DOT = '.';
     protected final Map<String, Serializable> preExecActionData;
     protected final Map<String, Serializable> postExecActionData;
     protected final String namespace;
@@ -53,7 +54,7 @@ public abstract class Executable {
         this.results = results;
         this.executableDependencies = executableDependencies;
         this.systemPropertyDependencies = systemPropertyDependencies;
-        id = namespace + DOT + name;
+        this.id = namespace + RegexConstants.NAMESPACE_PROPERTY_DELIMITER + name;
     }
 
     public Map<String, Serializable> getPreExecActionData() {

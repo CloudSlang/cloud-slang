@@ -14,6 +14,7 @@ package io.cloudslang.lang.compiler.configuration;
  * Created by orius123 on 05/11/14.
  */
 
+import io.cloudslang.lang.compiler.CachedPrecompileService;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
 import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
@@ -54,5 +55,10 @@ public class SlangCompilerSpringConfig {
                 return yaml();
             }
         };
+    }
+
+    @Bean
+    public CachedPrecompileService cachedPrecompileService() {
+        return new CachedPrecompileService();
     }
 }

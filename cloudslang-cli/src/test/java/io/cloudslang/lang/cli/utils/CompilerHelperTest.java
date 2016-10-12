@@ -39,6 +39,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -50,6 +51,8 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -80,7 +83,7 @@ public class CompilerHelperTest {
 
     @Before
     public void resetMocks() {
-        Mockito.reset(slang);
+        reset(slang);
     }
 
     @Test
@@ -97,14 +100,16 @@ public class CompilerHelperTest {
         URI flowPath = getClass().getResource("/executables/dir3/flow.sl").toURI();
         URI opPath = getClass().getResource("/executables/dir3/dir3_1/test_op.sl").toURI();
         compilerHelper.compile(flowPath.getPath(), null);
-        Mockito.verify(slang).compile(
+        InOrder inOrder = inOrder(slang);
+        inOrder.verify(slang).compile(
                 SlangSource.fromFile(flowPath),
                 Sets.newHashSet(
                         SlangSource.fromFile(opPath),
                         SlangSource.fromFile(flowPath)
                 )
         );
-        Mockito.verify(slang).compileCleanUp();
+        inOrder.verify(slang).compileCleanUp();
+        inOrder.verifyNoMoreInteractions();
     }
 
     @Test
@@ -112,14 +117,16 @@ public class CompilerHelperTest {
         URI flowPath = getClass().getResource("/executables/dir3/flow.sl").toURI();
         URI opPath = getClass().getResource("/executables/dir3/dir3_1/test_op.sl").toURI();
         compilerHelper.compileSource(flowPath.getPath(), null);
-        Mockito.verify(slang).compileSource(
+        InOrder inOrder = inOrder(slang);
+        inOrder.verify(slang).compileSource(
                 SlangSource.fromFile(flowPath),
                 Sets.newHashSet(
                         SlangSource.fromFile(opPath),
                         SlangSource.fromFile(flowPath)
                 )
         );
-        Mockito.verify(slang).compileCleanUp();
+        inOrder.verify(slang).compileCleanUp();
+        inOrder.verifyNoMoreInteractions();
     }
 
     @Test
@@ -131,21 +138,23 @@ public class CompilerHelperTest {
 
         URI flowPath = getClass().getResource("/executables/dir3/flow.sl").toURI();
         URI opPath = getClass().getResource("/executables/dir3/dir3_1/test_op.sl").toURI();
-        Mockito.verify(slang).compileSource(
-                SlangSource.fromFile(flowPath),
-                Sets.newHashSet(
-                        SlangSource.fromFile(opPath),
-                        SlangSource.fromFile(flowPath)
-                )
-        );
-        Mockito.verify(slang).compileSource(
+        InOrder inOrder = inOrder(slang);
+        inOrder.verify(slang).compileSource(
                 SlangSource.fromFile(opPath),
                 Sets.newHashSet(
                         SlangSource.fromFile(opPath),
                         SlangSource.fromFile(flowPath)
                 )
         );
-        Mockito.verify(slang).compileCleanUp();
+        inOrder.verify(slang).compileSource(
+                SlangSource.fromFile(flowPath),
+                Sets.newHashSet(
+                        SlangSource.fromFile(opPath),
+                        SlangSource.fromFile(flowPath)
+                )
+        );
+        inOrder.verify(slang).compileCleanUp();
+        inOrder.verifyNoMoreInteractions();
     }
 
     @Test
@@ -154,9 +163,11 @@ public class CompilerHelperTest {
         URI folderPath = getClass().getResource("/executables/dir1/").toURI();
         URI flow2FilePath = getClass().getResource("/executables/dir1/flow2.sl").toURI();
         compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(folderPath.getPath()));
-        Mockito.verify(slang).compile(SlangSource.fromFile(flowFilePath),
+        InOrder inOrder = inOrder(slang);
+        inOrder.verify(slang).compile(SlangSource.fromFile(flowFilePath),
                 Sets.newHashSet(SlangSource.fromFile(flow2FilePath)));
-        Mockito.verify(slang).compileCleanUp();
+        inOrder.verify(slang).compileCleanUp();
+        inOrder.verifyNoMoreInteractions();
     }
 
     @Test
@@ -166,14 +177,16 @@ public class CompilerHelperTest {
         URI dependency1 = getClass().getResource("/mixed_sl_files/configuration/properties/executables/test_flow.sl").toURI();
         URI dependency2 = getClass().getResource("/mixed_sl_files/configuration/properties/executables/test_op.sl").toURI();
         compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(folderPath.getPath()));
-        Mockito.verify(slang).compile(
+        InOrder inOrder = inOrder(slang);
+        inOrder.verify(slang).compile(
                 SlangSource.fromFile(flowFilePath),
                 Sets.newHashSet(
                         SlangSource.fromFile(dependency1),
                         SlangSource.fromFile(dependency2)
                 )
         );
-        Mockito.verify(slang).compileCleanUp();
+        inOrder.verify(slang).compileCleanUp();
+        inOrder.verifyNoMoreInteractions();
     }
 
     // flowprop.sl is not recognized as properties file
@@ -183,11 +196,13 @@ public class CompilerHelperTest {
         URI folderPath = getClass().getResource("/executables/dir2/").toURI();
         URI flow2FilePath = getClass().getResource("/executables/dir2/flowprop.sl").toURI();
         compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(folderPath.getPath()));
-        Mockito.verify(slang).compile(
+        InOrder inOrder = inOrder(slang);
+        inOrder.verify(slang).compile(
                 SlangSource.fromFile(flowFilePath),
                 Sets.newHashSet(SlangSource.fromFile(flow2FilePath))
         );
-        Mockito.verify(slang).compileCleanUp();
+        inOrder.verify(slang).compileCleanUp();
+        inOrder.verifyNoMoreInteractions();
     }
 
     @Test

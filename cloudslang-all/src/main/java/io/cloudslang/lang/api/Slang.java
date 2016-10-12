@@ -29,6 +29,9 @@ public interface Slang {
 
     CompilationModellingResult compileSource(SlangSource source, Set<SlangSource> dependencies);
 
+    /**
+     * Clean up the precompile cache.
+     */
     void compileCleanUp();
 
     /**
