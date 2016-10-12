@@ -114,7 +114,9 @@
                             <ignoredUsedUndeclaredDependencies>
                                 <ignoredUsedUndeclaredDependency>commons-lang:commons-lang:jar:2.6</ignoredUsedUndeclaredDependency>
                                 <ignoredUsedUndeclaredDependency>org.springframework:spring-beans:jar:4.2.5.RELEASE</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>io.cloudslang.lang:cloudslang-spi:jar:0.9.75-SNAPSHOT</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>
+                                    io.cloudslang.lang:cloudslang-spi:jar:${project.version}
+                                </ignoredUsedUndeclaredDependency>
                                 <ignoredUsedUndeclaredDependency> org.apache.commons:commons-collections4:jar:4.1</ignoredUsedUndeclaredDependency>
                             </ignoredUsedUndeclaredDependencies>
                         </configuration>
