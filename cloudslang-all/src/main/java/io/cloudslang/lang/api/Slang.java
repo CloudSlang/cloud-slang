@@ -10,6 +10,7 @@ package io.cloudslang.lang.api;
 
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
+import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
@@ -25,6 +26,8 @@ import java.util.Set;
  * @since 03/12/2014
  */
 public interface Slang {
+
+    CompilationModellingResult compileSource(SlangSource source, Set<SlangSource> dependencies);
 
     /**
      * Extract the metadata of a flow or operation written in CloudSlang

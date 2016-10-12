@@ -51,16 +51,18 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
     }
 
     @Override
-    public void validateNoDuplicateExecutables(
+    public List<RuntimeException> validateNoDuplicateExecutables(
             Executable currentExecutable,
             SlangSource currentSource,
             Map<Executable, SlangSource> allAvailableExecutables) {
+        List<RuntimeException> errors = new ArrayList<>();
         for (Map.Entry<Executable, SlangSource> entry : allAvailableExecutables.entrySet()) {
             Executable executable = entry.getKey();
             if (currentExecutable.getId().equalsIgnoreCase(executable.getId()) && !currentSource.equals(entry.getValue())) {
-                throw new RuntimeException("Duplicate executable found: '" + currentExecutable.getId() + "'");
+                errors.add(new RuntimeException("Duplicate executable found: '" + currentExecutable.getId() + "'"));
             }
         }
+        return errors;
     }
 
     private List<RuntimeException> validateModelWithDependencies(

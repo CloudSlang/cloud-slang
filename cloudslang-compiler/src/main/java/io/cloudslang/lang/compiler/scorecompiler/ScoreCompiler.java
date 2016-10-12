@@ -9,7 +9,8 @@
 package io.cloudslang.lang.compiler.scorecompiler;
 
 import io.cloudslang.lang.compiler.modeller.model.Executable;
-import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
+
 import java.util.List;
 import java.util.Set;
 
@@ -30,11 +31,11 @@ public interface ScoreCompiler {
      * Compile an {@link io.cloudslang.lang.compiler.modeller.model.Executable} and its path
      * to a {@link io.cloudslang.lang.entities.CompilationArtifact} object
      *
-     * @param source the {@link io.cloudslang.lang.compiler.modeller.model.Executable} source
-     * @param path   a set of {@link io.cloudslang.lang.compiler.modeller.model.Executable}s containing the source dependencies
+     * @param source the {@link Executable} source
+     * @param path   a set of {@link Executable}s containing the source dependencies
      * @return the compiled {@link io.cloudslang.lang.entities.CompilationArtifact}
      */
-    CompilationArtifact compile(Executable source, Set<Executable> path);
+    CompilationModellingResult compile(Executable source, Set<Executable> path);
 
     /**
      * Validate that the given {@Link io.cloudslang.lang.compiler.modeller.model.Executable} is valid regarding

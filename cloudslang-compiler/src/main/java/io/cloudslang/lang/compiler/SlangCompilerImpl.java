@@ -10,6 +10,7 @@ package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.modeller.SlangModeller;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
+import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.ParseModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.SystemPropertyModellingResult;
@@ -68,25 +69,40 @@ public class SlangCompilerImpl implements SlangCompiler {
 
     @Override
     public CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencySources) {
+        CompilationModellingResult result = compileSource(source, dependencySources);
+        if (result.getErrors().size() > 0) {
+            throw result.getErrors().get(0);
+        }
+        return result.getCompilationArtifact();
+    }
 
-        Executable executable = preCompile(source);
+    @Override
+    public CompilationModellingResult compileSource(SlangSource source, Set<SlangSource> dependencySources) {
+        ExecutableModellingResult executableModellingResult = preCompileSource(source);
+        List<RuntimeException> errors = executableModellingResult.getErrors();
 
         // we transform also all of the files in the given dependency sources to model objects
         Map<Executable, SlangSource> executablePairs = new HashMap<>();
-        executablePairs.put(executable, source);
+        executablePairs.put(executableModellingResult.getExecutable(), source);
 
         if (CollectionUtils.isNotEmpty(dependencySources)) {
             for (SlangSource currentSource : dependencySources) {
-                Executable preCompiledCurrentSource = preCompile(currentSource);
+                ExecutableModellingResult result = preCompileSource(currentSource);
+                Executable preCompiledCurrentSource = result.getExecutable();
+                errors.addAll(result.getErrors());
 
-                compileValidator.validateNoDuplicateExecutables(preCompiledCurrentSource, currentSource, executablePairs);
+                List<RuntimeException> validatorErrors = compileValidator.validateNoDuplicateExecutables(preCompiledCurrentSource, currentSource, executablePairs);
+                errors.addAll(validatorErrors);
 
                 executablePairs.put(preCompiledCurrentSource, currentSource);
             }
         }
 
-        executablePairs.remove(executable);
-        return scoreCompiler.compile(executable, executablePairs.keySet());
+        executablePairs.remove(executableModellingResult.getExecutable());
+
+        CompilationModellingResult result = scoreCompiler.compile(executableModellingResult.getExecutable(), executablePairs.keySet());
+        errors.addAll(result.getErrors());
+        return new CompilationModellingResult(result.getCompilationArtifact(), errors);
     }
 
     @Override

@@ -148,7 +148,7 @@ public class CompilerHelperTest {
         String currentDirPath = getClass().getResource("").getPath();
         String invalidDirPath = currentDirPath.concat("xxx");
 
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(RuntimeException.class);
         expectedException.expectMessage("xxx");
         expectedException.expectMessage(CompilerHelperImpl.INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX);
 
@@ -159,7 +159,7 @@ public class CompilerHelperTest {
     public void testInvalidDirPathForDependencies2() throws Exception {
         String flowFilePath = getClass().getResource("/flow.sl").getPath();
 
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(RuntimeException.class);
         expectedException.expectMessage("flow.sl");
         expectedException.expectMessage(CompilerHelperImpl.INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX);
 

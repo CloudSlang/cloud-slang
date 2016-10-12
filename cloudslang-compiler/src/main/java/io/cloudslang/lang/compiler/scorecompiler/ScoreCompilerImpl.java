@@ -16,6 +16,7 @@ import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Step;
+import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.compiler.validator.CompileValidator;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
@@ -52,47 +53,59 @@ public class ScoreCompilerImpl implements ScoreCompiler {
     private CompileValidator compileValidator;
 
     @Override
-    public CompilationArtifact compile(Executable executable, Set<Executable> path) {
-
+    public CompilationModellingResult compile(Executable executable, Set<Executable> path) {
+        List<RuntimeException> exceptions = new ArrayList<>();
         Map<String, Executable> filteredDependencies = new HashMap<>();
         //we handle dependencies only if the file has imports
         boolean hasDependencies = CollectionUtils.isNotEmpty(executable.getExecutableDependencies())
                 && executable.getType().equals(SlangTextualKeys.FLOW_TYPE);
         if (hasDependencies) {
-            Validate.notEmpty(path, "Source " + executable.getName() + " has dependencies but no path was given to the compiler");
-            Validate.noNullElements(path, "Source " + executable.getName() + " has empty dependencies");
+            try {
+                Validate.notEmpty(path, "Source " + executable.getName() + " has dependencies but no path was given to the compiler");
+                Validate.noNullElements(path, "Source " + executable.getName() + " has empty dependencies");
+            } catch (RuntimeException ex) {
+                exceptions.add(ex);
+            }
 
             //we add the current executable since a dependency can require it
             List<Executable> availableExecutables = new ArrayList<>(path);
             availableExecutables.add(executable);
 
-            //than we match the references to the actual dependencies
-            filteredDependencies = dependenciesHelper.matchReferences(executable, availableExecutables);
+            try {
+                //than we match the references to the actual dependencies
+                filteredDependencies = dependenciesHelper.matchReferences(executable, availableExecutables);
 
-            handleOnFailureCustomResults(executable, filteredDependencies);
+                handleOnFailureCustomResults(executable, filteredDependencies);
 
-            List<RuntimeException> errors = compileValidator.validateModelWithDependencies(executable, filteredDependencies);
-            if (errors.size() > 0) {
-                throw errors.get(0);
+                List<RuntimeException> errors = compileValidator.validateModelWithDependencies(executable, filteredDependencies);
+                exceptions.addAll(errors);
+            } catch (RuntimeException ex) {
+                exceptions.add(ex);
             }
 
         }
 
-        //next we create an execution plan for the required executable
-        ExecutionPlan executionPlan = compileToExecutionPlan(executable);
+        try {
+            //next we create an execution plan for the required executable
+            ExecutionPlan executionPlan = compileToExecutionPlan(executable);
 
-        //and also create execution plans for all other dependencies
-        Map<String, ExecutionPlan> dependencies = convertMap(filteredDependencies, new Converter<Executable, ExecutionPlan>() {
-            @Override
-            public ExecutionPlan convert(Executable compiledExecutable) {
-                return compileToExecutionPlan(compiledExecutable);
-            }
-        });
-        Collection<Executable> executables = new ArrayList<>(filteredDependencies.values());
-        executables.add(executable);
+            //and also create execution plans for all other dependencies
+            Map<String, ExecutionPlan> dependencies = convertMap(filteredDependencies, new Converter<Executable, ExecutionPlan>() {
+                @Override
+                public ExecutionPlan convert(Executable compiledExecutable) {
+                    return compileToExecutionPlan(compiledExecutable);
+                }
+            });
+            Collection<Executable> executables = new ArrayList<>(filteredDependencies.values());
+            executables.add(executable);
 
-        executionPlan.setSubflowsUUIDs(new HashSet<>(dependencies.keySet()));
-        return new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemPropertiesFromExecutables(executables));
+            executionPlan.setSubflowsUUIDs(new HashSet<>(dependencies.keySet()));
+            CompilationArtifact compilationArtifact = new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemPropertiesFromExecutables(executables));
+            return new CompilationModellingResult(compilationArtifact, exceptions);
+        } catch (RuntimeException ex) {
+            exceptions.add(ex);
+        }
+        return new CompilationModellingResult(null, exceptions);
     }
 
     private void handleOnFailureCustomResults(Executable executable, Map<String, Executable> filteredDependencies) {
