@@ -149,9 +149,11 @@ public class SlangBuildMain {
             if (StringUtils.isEmpty(smartModePath)) {
                 buildMode = BuildMode.BASIC;
                 changedFiles = new HashSet<>();
+                printBuildModeInfo(buildMode);
             } else {
                 buildMode = BuildMode.CHANGED;
                 changedFiles = readChangedFilesFromSource(smartModePath);
+                printBuildModeInfo(buildMode);
             }
         } catch (Exception ex) {
             log.error("Exception: " + ex.getMessage());
@@ -257,6 +259,10 @@ public class SlangBuildMain {
             logErrorsSuffix(projectPath, loggingService);
             System.exit(1);
         }
+    }
+
+    private static void printBuildModeInfo(BuildMode buildMode) {
+        log.info("Build mode set to: " + buildMode);
     }
 
     private static Set<String> readChangedFilesFromSource(String filePath) throws IOException {
