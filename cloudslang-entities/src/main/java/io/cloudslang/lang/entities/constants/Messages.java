@@ -12,6 +12,6 @@ package io.cloudslang.lang.entities.constants;
  * @author Bonczidai Levente
  * @since 10/10/2016
  */
-public class MessageConstants {
-    public static final String NOT_IMPLEMENTED_MESSAGE = "Not implemented";
+public class Messages {
+    public static final String UNKNOWN_EXECUTABLE_TYPE = "Unknown executable type";
 }

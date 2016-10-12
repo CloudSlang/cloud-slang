@@ -25,11 +25,10 @@ import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
-import io.cloudslang.lang.entities.constants.MessageConstants;
+import io.cloudslang.lang.entities.constants.Messages;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -57,13 +57,13 @@ public class DependenciesHelper {
 
         switch (executable.getType()) {
             case SlangTextualKeys.OPERATION_TYPE:
-                return Collections.emptySet();
+                return new HashSet<>();
             case SlangTextualKeys.DECISION_TYPE:
-                return Collections.emptySet();
+                return new HashSet<>();
             case SlangTextualKeys.FLOW_TYPE:
                 return processFlowForDependencies((Flow) executable, availableDependencies);
             default:
-                throw new RuntimeException(MessageConstants.NOT_IMPLEMENTED_MESSAGE);
+                throw new NotImplementedException(Messages.UNKNOWN_EXECUTABLE_TYPE);
         }
     }
 
@@ -73,7 +73,7 @@ public class DependenciesHelper {
             String stepReferenceId = step.getRefId();
             Executable stepReference = availableDependencies.get(stepReferenceId);
 
-            flowDependencies.add(step.getRefId());
+            flowDependencies.add(stepReferenceId);
             flowDependencies.addAll(fetchDependencies(stepReference, availableDependencies));
         }
         return flowDependencies;

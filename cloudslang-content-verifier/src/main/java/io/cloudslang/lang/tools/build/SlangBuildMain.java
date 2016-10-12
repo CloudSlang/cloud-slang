@@ -253,7 +253,7 @@ public class SlangBuildMain {
 
         } catch (Throwable e) {
             logErrorsPrefix(loggingService);
-            log.error("Exception: " + e.getMessage());
+            loggingService.logEvent(Level.ERROR, "Exception: " + e.getMessage());
             logErrorsSuffix(projectPath, loggingService);
             System.exit(1);
         }

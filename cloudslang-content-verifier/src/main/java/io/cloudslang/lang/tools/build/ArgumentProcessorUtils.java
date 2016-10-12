@@ -21,6 +21,7 @@ import java.util.Properties;
 import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.Validate;
 
 import static java.lang.Boolean.FALSE;
@@ -146,8 +147,14 @@ public class ArgumentProcessorUtils {
     }
 
     public static Set<String> loadChangedItems(String filePath) throws IOException {
-        InputStream fileInputStream = new FileInputStream(filePath);
-        return new HashSet<>(IOUtils.readLines(fileInputStream, SlangSource.getCloudSlangCharset()));
+        Set<String> changedItems = new HashSet<>();
+        try (InputStream fileInputStream = new FileInputStream(filePath)) {
+            LineIterator lineIterator = IOUtils.lineIterator(fileInputStream, SlangSource.getCloudSlangCharset());
+            while (lineIterator.hasNext()) {
+                changedItems.add(lineIterator.next());
+            }
+        }
+        return changedItems;
     }
 
     /**

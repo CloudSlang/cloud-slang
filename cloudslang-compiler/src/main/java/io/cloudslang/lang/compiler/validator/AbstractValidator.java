@@ -10,7 +10,7 @@ import io.cloudslang.lang.compiler.validator.matcher.VariableNamePatternMatcher;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
-import io.cloudslang.lang.entities.constants.RegexConstants;
+import io.cloudslang.lang.entities.constants.Regex;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
@@ -84,22 +84,22 @@ public abstract class AbstractValidator {
     }
 
     private void validateDelimiter(String input) {
-        if (input.startsWith(RegexConstants.NAMESPACE_PROPERTY_DELIMITER)) {
+        if (input.startsWith(Regex.NAMESPACE_PROPERTY_DELIMITER)) {
             throw new RuntimeException(
-                    "Argument[" + input +"] cannot start with delimiter[" + RegexConstants.NAMESPACE_PROPERTY_DELIMITER + "]."
+                    "Argument[" + input + "] cannot start with delimiter[" + Regex.NAMESPACE_PROPERTY_DELIMITER + "]."
             );
         }
-        if (input.endsWith(RegexConstants.NAMESPACE_PROPERTY_DELIMITER)) {
+        if (input.endsWith(Regex.NAMESPACE_PROPERTY_DELIMITER)) {
             throw new RuntimeException(
-                    "Argument[" + input +"] cannot end with delimiter[" + RegexConstants.NAMESPACE_PROPERTY_DELIMITER + "]."
+                    "Argument[" + input + "] cannot end with delimiter[" + Regex.NAMESPACE_PROPERTY_DELIMITER + "]."
             );
         }
-        String[] parts = input.split(RegexConstants.NAMESPACE_DELIMITER_ESCAPED);
+        String[] parts = input.split(Regex.NAMESPACE_DELIMITER_ESCAPED);
         for (String part : parts) {
             if ("".equals(part)) {
                 throw new RuntimeException(
                         "Argument[" + input + "] cannot contain multiple delimiters["
-                                + RegexConstants.NAMESPACE_PROPERTY_DELIMITER + "] without content."
+                                + Regex.NAMESPACE_PROPERTY_DELIMITER + "] without content."
                 );
             }
         }

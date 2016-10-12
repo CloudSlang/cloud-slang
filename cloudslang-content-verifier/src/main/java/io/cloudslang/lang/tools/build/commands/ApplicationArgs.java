@@ -21,8 +21,6 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class ApplicationArgs {
 
-    private static final String DYNAMIC_PARAMETER_CHANGES_ONLY = "changes_only";
-
     @Parameter
     public List<String> parameters = new ArrayList<>();
 
@@ -62,6 +60,10 @@ public class ApplicationArgs {
     @Parameter(names = {"--description", "-des"},
             description = "Whether or not to validate the inputs, outputs and results have description")
     public boolean validateDescription = false;
+
+    @Parameter(names = {"--changes_only", "-co"},
+            description = "Run only tests from active suites that were affected by this changelist")
+    public String changesOnlyConfigPath;
 
     @Parameter(names = {"--help", "-h"}, help = true,
             description = "Display help information")
@@ -119,6 +121,6 @@ public class ApplicationArgs {
     }
 
     public String getChangesOnlyConfigPath() {
-        return getDynamicParams().get(DYNAMIC_PARAMETER_CHANGES_ONLY);
+        return changesOnlyConfigPath;
     }
 }

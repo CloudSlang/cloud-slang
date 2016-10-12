@@ -11,8 +11,8 @@ package io.cloudslang.lang.tools.build;
 
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
-import io.cloudslang.lang.entities.constants.MessageConstants;
 import io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode;
+import io.cloudslang.lang.tools.build.constants.Messages;
 import io.cloudslang.lang.tools.build.logging.LoggingService;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -161,7 +162,7 @@ public class SlangBuilder {
                 buildModeConfig = BuildModeConfig.createChangedBuildModeConfig(changedFiles, allTestedFlowModels);
                 break;
             default:
-                throw new RuntimeException(MessageConstants.NOT_IMPLEMENTED_MESSAGE);
+                throw new NotImplementedException(Messages.UNKNOWN_BUILD_MODE);
         }
         return buildModeConfig;
     }
