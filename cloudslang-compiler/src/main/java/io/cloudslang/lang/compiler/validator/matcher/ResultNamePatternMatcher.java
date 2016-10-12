@@ -8,7 +8,7 @@
  */
 package io.cloudslang.lang.compiler.validator.matcher;
 
-import io.cloudslang.lang.entities.constants.RegexConstants;
+import io.cloudslang.lang.entities.constants.Regex;
 import java.util.regex.Pattern;
 
 /**
@@ -17,6 +17,6 @@ import java.util.regex.Pattern;
  */
 public class ResultNamePatternMatcher extends PatternMatcher {
     public ResultNamePatternMatcher() {
-        super(Pattern.compile(RegexConstants.RESULT_NAME_CHARS));
+        super(Pattern.compile(Regex.RESULT_NAME_CHARS));
     }
 }

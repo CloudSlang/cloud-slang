@@ -18,6 +18,12 @@
         </dependency>
 
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cloudslang-entities</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
         </dependency>
@@ -171,7 +177,6 @@
                                 <ignoredUsedUndeclaredDependency>commons-collections:commons-collections:jar:3.2.2</ignoredUsedUndeclaredDependency>
 
                                 <ignoredUsedUndeclaredDependency>io.cloudslang.lang:cloudslang-all:jar:${project.version}</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>io.cloudslang.lang:cloudslang-entities:jar:${project.version}</ignoredUsedUndeclaredDependency>
                                 <ignoredUsedUndeclaredDependency>io.cloudslang.lang:cloudslang-compiler:jar:${project.version}</ignoredUsedUndeclaredDependency>
                             </ignoredUsedUndeclaredDependencies>
                         </configuration>

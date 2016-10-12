@@ -12,6 +12,7 @@ package io.cloudslang.lang.tools.build;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode;
+import io.cloudslang.lang.tools.build.constants.Messages;
 import io.cloudslang.lang.tools.build.logging.LoggingService;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
@@ -19,14 +20,9 @@ import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner.TestCaseRunState;
 import io.cloudslang.lang.tools.build.tester.parallel.report.ThreadSafeRunTestResults;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
+import io.cloudslang.lang.tools.build.tester.runconfiguration.BuildModeConfig;
 import io.cloudslang.lang.tools.build.verifier.CompilationResult;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Level;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +31,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Level;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_PARALLEL;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_SEQUENTIAL;
@@ -61,7 +63,15 @@ public class SlangBuilder {
     @Autowired
     private LoggingService loggingService;
 
-    public SlangBuildResults buildSlangContent(String projectPath, String contentPath, String testsPath, List<String> testSuits, boolean shouldValidateDescription, BulkRunMode bulkRunMode) {
+    public SlangBuildResults buildSlangContent(
+            String projectPath,
+            String contentPath,
+            String testsPath,
+            List<String> testSuits,
+            boolean shouldValidateDescription,
+            BulkRunMode bulkRunMode,
+            SlangBuildMain.BuildMode buildMode,
+            Set<String> changedFiles) {
 
         String projectName = FilenameUtils.getName(projectPath);
         loggingService.logEvent(Level.INFO, "");
@@ -80,7 +90,7 @@ public class SlangBuilder {
 
         IRunTestResults runTestsResults = new RunTestsResults();
         if (StringUtils.isNotBlank(testsPath) && new File(testsPath).isDirectory()) {
-            runTestsResults = runTests(slangModels, projectPath, testsPath, testSuits, bulkRunMode);
+            runTestsResults = runTests(slangModels, projectPath, testsPath, testSuits, bulkRunMode, buildMode, changedFiles);
         }
         List<RuntimeException> exceptions = new ArrayList<>(runTestsResults.getExceptions());
         exceptions.addAll(compilationResult.getExceptions());
@@ -106,8 +116,14 @@ public class SlangBuilder {
         return compiledSlangFiles;
     }
 
-    IRunTestResults runTests(Map<String, Executable> contentSlangModels,
-                             String projectPath, String testsPath, List<String> testSuites, BulkRunMode bulkRunMode) {
+    IRunTestResults runTests(
+            Map<String, Executable> contentSlangModels,
+            String projectPath,
+            String testsPath,
+            List<String> testSuites,
+            BulkRunMode bulkRunMode,
+            SlangBuildMain.BuildMode buildMode,
+            Set<String> changedFiles) {
         loggingService.logEvent(Level.INFO, "");
         loggingService.logEvent(Level.INFO, "--- compiling tests sources ---");
         // Compile all slang test flows under the test directory
@@ -127,30 +143,56 @@ public class SlangBuilder {
         loggingService.logEvent(Level.INFO, "Found " + testCases.size() + " tests");
         IRunTestResults runTestsResults;
 
-        runTestsResults = processRunTests(projectPath, testSuites, bulkRunMode, compiledFlows, testCases);
+        BuildModeConfig buildModeConfig = createBuildModeConfig(buildMode, changedFiles, allTestedFlowModels);
+
+        runTestsResults = processRunTests(projectPath, testSuites, bulkRunMode, compiledFlows, testCases, buildModeConfig);
 
         runTestsResults.addExceptions(compilationResult.getExceptions());
         addCoverageDataToRunTestsResults(contentSlangModels, testFlowModels, testCases, runTestsResults);
         return runTestsResults;
     }
 
-    IRunTestResults processRunTests(String projectPath, List<String> testSuites, BulkRunMode bulkRunMode, Map<String, CompilationArtifact> compiledFlows, Map<String, SlangTestCase> testCases) {
+    private BuildModeConfig createBuildModeConfig(SlangBuildMain.BuildMode buildMode, Set<String> changedFiles, Map<String, Executable> allTestedFlowModels) {
+        BuildModeConfig buildModeConfig;
+        switch (buildMode) {
+            case BASIC:
+                buildModeConfig = BuildModeConfig.createBasicBuildModeConfig();
+                break;
+            case CHANGED:
+                buildModeConfig = BuildModeConfig.createChangedBuildModeConfig(changedFiles, allTestedFlowModels);
+                break;
+            default:
+                throw new NotImplementedException(Messages.UNKNOWN_BUILD_MODE);
+        }
+        return buildModeConfig;
+    }
+
+    IRunTestResults processRunTests(
+            String projectPath,
+            List<String> testSuites,
+            BulkRunMode bulkRunMode,
+            Map<String, CompilationArtifact> compiledFlows,
+            Map<String, SlangTestCase> testCases,
+            BuildModeConfig buildModeConfig) {
         IRunTestResults runTestsResults;
         if (bulkRunMode == ALL_PARALLEL) { // Run All tests in parallel
             ThreadSafeRunTestResults parallelRunTestResults = new ThreadSafeRunTestResults();
-            Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunState = slangTestRunner.splitTestCasesByRunState(bulkRunMode, testCases, testSuites, parallelRunTestResults);
+            Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunState =
+                    slangTestRunner.splitTestCasesByRunState(bulkRunMode, testCases, testSuites, parallelRunTestResults, buildModeConfig);
             slangTestRunner.runTestsParallel(projectPath, testCaseRunState.get(TestCaseRunState.PARALLEL), compiledFlows, parallelRunTestResults);
             runTestsResults = parallelRunTestResults;
 
         } else if (bulkRunMode == ALL_SEQUENTIAL) { // Run all tests sequentially
             RunTestsResults sequentialRunTestResults = new RunTestsResults();
-            Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunState = slangTestRunner.splitTestCasesByRunState(bulkRunMode, testCases, testSuites, sequentialRunTestResults);
+            Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunState =
+                    slangTestRunner.splitTestCasesByRunState(bulkRunMode, testCases, testSuites, sequentialRunTestResults, buildModeConfig);
             slangTestRunner.runTestsSequential(projectPath, testCaseRunState.get(TestCaseRunState.SEQUENTIAL), compiledFlows, sequentialRunTestResults);
             runTestsResults = sequentialRunTestResults;
 
         } else if (bulkRunMode == POSSIBLY_MIXED) { // Run some tests in parallel and rest of tests sequentially
             ThreadSafeRunTestResults mixedTestResults = new ThreadSafeRunTestResults();
-            Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunState = slangTestRunner.splitTestCasesByRunState(bulkRunMode, testCases, testSuites, mixedTestResults);
+            Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunState =
+                    slangTestRunner.splitTestCasesByRunState(bulkRunMode, testCases, testSuites, mixedTestResults, buildModeConfig);
             slangTestRunner.runTestsSequential(projectPath, testCaseRunState.get(TestCaseRunState.SEQUENTIAL), compiledFlows, mixedTestResults);
             slangTestRunner.runTestsParallel(projectPath, testCaseRunState.get(TestCaseRunState.PARALLEL), compiledFlows, mixedTestResults);
             runTestsResults = mixedTestResults;

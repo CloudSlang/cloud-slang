@@ -6,17 +6,12 @@
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-package io.cloudslang.lang.compiler.validator.matcher;
-
-import io.cloudslang.lang.entities.constants.Regex;
-import java.util.regex.Pattern;
+package io.cloudslang.lang.tools.build.constants;
 
 /**
  * @author Bonczidai Levente
- * @since 8/30/2016
+ * @since 10/12/2016
  */
-public class SimpleNamePatternMatcher extends PatternMatcher {
-    public SimpleNamePatternMatcher() {
-        super(Pattern.compile(Regex.SIMPLE_NAME_CHARS));
-    }
+public class Messages {
+    public static final String UNKNOWN_BUILD_MODE = "Unknown build mode";
 }
