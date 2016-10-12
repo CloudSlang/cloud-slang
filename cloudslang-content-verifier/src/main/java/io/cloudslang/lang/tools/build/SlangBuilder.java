@@ -12,7 +12,7 @@ package io.cloudslang.lang.tools.build;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode;
-import io.cloudslang.lang.tools.build.logging.LoggingService;
+import io.cloudslang.lang.logging.LoggingService;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;

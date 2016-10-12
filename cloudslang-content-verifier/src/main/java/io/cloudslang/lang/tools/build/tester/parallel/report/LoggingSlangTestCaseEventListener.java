@@ -1,7 +1,7 @@
 package io.cloudslang.lang.tools.build.tester.parallel.report;
 
 
-import io.cloudslang.lang.tools.build.logging.LoggingService;
+import io.cloudslang.lang.logging.LoggingService;
 import io.cloudslang.lang.tools.build.tester.ISlangTestCaseEventListener;
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.BeginSlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.SkippedSlangTestCaseEvent;

@@ -21,7 +21,7 @@ import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.SystemProperty;
-import io.cloudslang.lang.tools.build.logging.LoggingService;
+import io.cloudslang.lang.logging.LoggingService;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
