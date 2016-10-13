@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.cloudslang.lang.entities.constants.RegexConstants;
+import io.cloudslang.lang.entities.constants.Regex;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -55,7 +55,7 @@ public abstract class Executable {
         this.results = results;
         this.executableDependencies = executableDependencies;
         this.systemPropertyDependencies = systemPropertyDependencies;
-        this.id = namespace + RegexConstants.NAMESPACE_PROPERTY_DELIMITER + name;
+        this.id = namespace + Regex.NAMESPACE_PROPERTY_DELIMITER + name;
     }
 
     public Map<String, Serializable> getPreExecActionData() {
