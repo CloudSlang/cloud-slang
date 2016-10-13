@@ -645,15 +645,15 @@
         </profile>
     </profiles>
     <modules>
-        <!--<module>cloudslang-spi</module>-->
-        <!--<module>cloudslang-runtime</module>-->
-        <!--<module>cloudslang-compiler</module>-->
-        <!--<module>cloudslang-entities</module>-->
-        <!--<module>cloudslang-cli</module>-->
-        <!--<module>cloudslang-tests</module>-->
+        <module>cloudslang-spi</module>
+        <module>cloudslang-runtime</module>
+        <module>cloudslang-compiler</module>
+        <module>cloudslang-entities</module>
+        <module>cloudslang-cli</module>
+        <module>cloudslang-tests</module>
         <module>cloudslang-all</module>
-        <!--<module>cloudslang-content-verifier</module>-->
-        <!--<module>cloudslang-content-maven-compiler</module>-->
-        <!--<module>cloudslang-api-commons</module>-->
+        <module>cloudslang-content-verifier</module>
+        <module>cloudslang-content-maven-compiler</module>
+        <module>cloudslang-api-commons</module>
     </modules>
 </project>
