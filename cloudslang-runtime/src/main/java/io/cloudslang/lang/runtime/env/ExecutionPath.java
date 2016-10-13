@@ -44,17 +44,19 @@ public class ExecutionPath implements Serializable {
         position = parentPositions.pop();
     }
 
-    public String getCurrentPath() {
-        return getCurrentPath(position);
-    }
-
     public String getParentPath() {
         return join(parentPositions.descendingIterator(), PATH_SEPARATOR);
+    }
+
+    public String getCurrentPath() {
+        return getCurrentPath(position);
     }
 
     private String getCurrentPath(int position) {
         String parents = getParentPath();
         return StringUtils.isEmpty(parents) ? position + "" : parents + PATH_SEPARATOR + position;
     }
+
+
 
 }

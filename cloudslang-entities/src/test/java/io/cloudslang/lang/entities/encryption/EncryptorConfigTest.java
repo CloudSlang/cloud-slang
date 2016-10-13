@@ -59,8 +59,7 @@ public class EncryptorConfigTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     public void testEncryptionWithoutEncryptorImplementation() {
         String text = "Str1";
-        ((BeanDefinitionRegistry) ApplicationContextProvider.getApplicationContext().
-                getAutowireCapableBeanFactory()).removeBeanDefinition("getEncryption");
+        ((BeanDefinitionRegistry) ApplicationContextProvider.getApplicationContext().getAutowireCapableBeanFactory()).removeBeanDefinition("getEncryption");
         Encryption encryptor = EncryptionProvider.get();
         assertTrue(encryptor instanceof DummyEncryptor);
         assertEquals(encryptor.encrypt(text.toCharArray()), text);
