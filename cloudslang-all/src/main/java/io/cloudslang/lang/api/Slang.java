@@ -31,6 +31,11 @@ public interface Slang {
     CompilationModellingResult compileSource(SlangSource source, Set<SlangSource> dependencies);
 
     /**
+     * Clean up the precompile cache.
+     */
+    void compileCleanUp();
+
+    /**
      * Extract the metadata of a flow or operation written in CloudSlang
      *
      * @param source the CloudSlang source containing the flow
