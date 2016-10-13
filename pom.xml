@@ -563,7 +563,7 @@
                                 <consoleOutput>false</consoleOutput>
                                 <failsOnError>true</failsOnError>
                                 <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                                <maxAllowedViolations>441</maxAllowedViolations>
+                                <maxAllowedViolations>208</maxAllowedViolations>
                                 <logViolationsToConsole>true</logViolationsToConsole>
                                 <violationSeverity>warning</violationSeverity>
                                 <includeResources>false</includeResources>
