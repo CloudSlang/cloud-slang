@@ -35,10 +35,10 @@ public class SlangSourceTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    private final static String content = "file_content";
-    private final static Extension extension = Extension.SL;
-    private final static String nameWithoutExtension = "file_name";
-    private final static String name = nameWithoutExtension + FilenameUtils.EXTENSION_SEPARATOR_STR + extension.getValue();
+    private static final String content = "file_content";
+    private static final Extension extension = Extension.SL;
+    private static final String nameWithoutExtension = "file_name";
+    private static final String name = nameWithoutExtension + FilenameUtils.EXTENSION_SEPARATOR_STR + extension.getValue();
 
     private void assertSourceEquals(String nameSuffix, Extension expectedExtension) throws IOException {
         String name = nameWithoutExtension + nameSuffix;
