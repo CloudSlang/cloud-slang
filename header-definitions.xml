@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<additionalHeaders>
+    <cloudslang-java-header>
+        <firstLine>/*******************************************************************************</firstLine>
+        <beforeEachLine> </beforeEachLine>
+        <endLine> *******************************************************************************/</endLine>
+        <afterEachLine> </afterEachLine>
+        <firstLineDetectionPattern>/[*]{79}</firstLineDetectionPattern>
+        <lastLineDetectionPattern> [*]{79}/</lastLineDetectionPattern>
+        <allowBlankLines>false</allowBlankLines>
+        <isMultiline>true</isMultiline>
+        <padLines>false</padLines>
+    </cloudslang-java-header>
+</additionalHeaders>
