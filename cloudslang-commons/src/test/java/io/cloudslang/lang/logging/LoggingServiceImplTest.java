@@ -7,7 +7,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-package io.cloudslang.lang.tools.build.logging;
+package io.cloudslang.lang.logging;
 
 
 import org.apache.commons.lang3.concurrent.ConcurrentUtils;
