@@ -67,19 +67,19 @@ public class SlangSource {
     }
 
     public static SlangSource fromBytes(byte[] bytes, String name) {
-        return new SlangSource(new String(bytes, getCharset()), name);
+        return new SlangSource(new String(bytes, getCloudSlangCharset()), name);
     }
 
-    private static String readFileToString(File file) throws IOException {
-        Charset charset = getCharset();
-        return FileUtils.readFileToString(file, charset);
-    }
-
-    private static Charset getCharset() {
+    public static Charset getCloudSlangCharset() {
         String cslangEncoding = System.getProperty(SlangSystemPropertyConstant.CSLANG_ENCODING.getValue());
         return StringUtils.isEmpty(cslangEncoding) ?
                 StandardCharsets.UTF_8 :
                 Charset.forName(cslangEncoding);
+    }
+
+    private static String readFileToString(File file) throws IOException {
+        Charset charset = getCloudSlangCharset();
+        return FileUtils.readFileToString(file, charset);
     }
 
     public String getContent() {

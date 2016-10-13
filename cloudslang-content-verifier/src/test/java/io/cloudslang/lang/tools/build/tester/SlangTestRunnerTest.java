@@ -4,6 +4,18 @@ import com.google.common.collect.Lists;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
+import io.cloudslang.lang.compiler.modeller.ExecutableBuilder;
+import io.cloudslang.lang.compiler.modeller.TransformersHandler;
+import io.cloudslang.lang.compiler.modeller.model.Executable;
+import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
+import io.cloudslang.lang.compiler.modeller.transformers.ResultsTransformer;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
+import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
+import io.cloudslang.lang.compiler.validator.PreCompileValidator;
+import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.values.Value;
@@ -21,6 +33,7 @@ import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.FailedSlang
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.SlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
+import io.cloudslang.lang.tools.build.tester.runconfiguration.BuildModeConfig;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.TestRunInfoService;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.TestRunInfoServiceImpl;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.strategy.ConflictResolutionStrategy;
@@ -29,6 +42,21 @@ import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
+import java.io.Serializable;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.apache.commons.collections4.SetUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,21 +75,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.Serializable;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_PARALLEL;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_SEQUENTIAL;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.POSSIBLY_MIXED;
@@ -69,6 +82,7 @@ import static io.cloudslang.lang.tools.build.tester.SlangTestRunner.MAX_TIME_PER
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -110,6 +124,9 @@ public class SlangTestRunnerTest {
 
     @Autowired
     private LoggingSlangTestCaseEventListener loggingSlangTestCaseEventListener;
+
+    @Autowired
+    private DependenciesHelper dependenciesHelper;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -565,9 +582,10 @@ public class SlangTestRunnerTest {
         testCases.put("test1", testCase);
         List<String> testSuites = Lists.newArrayList("special");
         IRunTestResults runTestResults = new RunTestsResults();
+        BuildModeConfig buildModeConfig = BuildModeConfig.createBasicBuildModeConfig();
 
         // Tested call
-        Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunStateMapMap = slangTestRunner.splitTestCasesByRunState(ALL_SEQUENTIAL, testCases, testSuites, runTestResults);
+        Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunStateMapMap = slangTestRunner.splitTestCasesByRunState(ALL_SEQUENTIAL, testCases, testSuites, runTestResults, buildModeConfig);
 
         assertEquals(3, testCaseRunStateMapMap.size());
         assertEquals(0, testCaseRunStateMapMap.get(TestCaseRunState.INACTIVE).size());
@@ -584,9 +602,10 @@ public class SlangTestRunnerTest {
         testCases.put("test1", testCase);
         List<String> testSuites = Lists.newArrayList("new", "new1");
         IRunTestResults runTestResults = new RunTestsResults();
+        BuildModeConfig buildModeConfig = BuildModeConfig.createBasicBuildModeConfig();
 
         // Tested call
-        Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunStateMapMap = slangTestRunner.splitTestCasesByRunState(ALL_PARALLEL, testCases, testSuites, runTestResults);
+        Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunStateMapMap = slangTestRunner.splitTestCasesByRunState(ALL_PARALLEL, testCases, testSuites, runTestResults, buildModeConfig);
 
         assertEquals(3, testCaseRunStateMapMap.size());
         assertEquals(0, testCaseRunStateMapMap.get(TestCaseRunState.INACTIVE).size());
@@ -605,9 +624,10 @@ public class SlangTestRunnerTest {
         testCases.put("test2", testCase2);
         List<String> testSuites = Lists.newArrayList("ghf");
         IRunTestResults runTestResults = new RunTestsResults();
+        BuildModeConfig buildModeConfig = BuildModeConfig.createBasicBuildModeConfig();
 
         // Tested call
-        Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunStateMapMap = slangTestRunner.splitTestCasesByRunState(ALL_PARALLEL, testCases, testSuites, runTestResults);
+        Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunStateMapMap = slangTestRunner.splitTestCasesByRunState(ALL_PARALLEL, testCases, testSuites, runTestResults, buildModeConfig);
 
         assertEquals(3, testCaseRunStateMapMap.size());
         assertEquals(2, testCaseRunStateMapMap.get(TestCaseRunState.INACTIVE).size());
@@ -616,6 +636,29 @@ public class SlangTestRunnerTest {
 
         Assert.assertTrue(testCaseRunStateMapMap.get(TestCaseRunState.INACTIVE).values().contains(testCase1));
         Assert.assertTrue(testCaseRunStateMapMap.get(TestCaseRunState.INACTIVE).values().contains(testCase2));
+    }
+
+    @Test
+    public void testSplitTestCasesByRunStateDependencyHelperIsCalled() {
+        Map<String, SlangTestCase> testCases = new HashMap<>();
+        SlangTestCase testCase1 = new SlangTestCase("test1", "testFlowPath1", "desc", Arrays.asList("special", "new"), "mock", null, null, false, "SUCCESS");
+        SlangTestCase testCase2 = new SlangTestCase("test2", "testFlowPath2", "desc", Arrays.asList("special", "new"), "mock", null, null, false, "SUCCESS");
+        testCases.put("test1", testCase1);
+        testCases.put("test2", testCase2);
+        List<String> testSuites = Lists.newArrayList("special");
+        IRunTestResults runTestResults = new RunTestsResults();
+        Set<String> changedFiles = new HashSet<>();
+        Map<String, Executable> allTestedFlowModels = new HashMap<>();
+        Executable executable = mock(Executable.class);
+        allTestedFlowModels.put("testFlowPath1", executable);
+        allTestedFlowModels.put("testFlowPath2", executable);
+        BuildModeConfig buildModeConfig = BuildModeConfig.createChangedBuildModeConfig(changedFiles, allTestedFlowModels);
+        when(dependenciesHelper.fetchDependencies(any(Executable.class), anyMapOf(String.class, Executable.class))).thenReturn(new HashSet<String>());
+
+        // Tested call
+        slangTestRunner.splitTestCasesByRunState(ALL_SEQUENTIAL, testCases, testSuites, runTestResults, buildModeConfig);
+
+        verify(dependenciesHelper, times(2)).fetchDependencies(eq(executable), eq(allTestedFlowModels));
     }
 
     @Test
@@ -633,6 +676,7 @@ public class SlangTestRunnerTest {
         testCases.put("test5", testCase5);
         List<String> testSuites = Lists.newArrayList("abc", "new");
         IRunTestResults runTestResults = new RunTestsResults();
+        BuildModeConfig buildModeConfig = BuildModeConfig.createBasicBuildModeConfig();
 
         // Fourth call is skipped so only three calls are expected to testRunInfoService
         doReturn(SlangBuildMain.TestCaseRunMode.SEQUENTIAL)
@@ -642,7 +686,7 @@ public class SlangTestRunnerTest {
                 .when(testRunInfoService).getRunModeForTestCase(any(SlangTestCase.class), any(ConflictResolutionStrategy.class), any(DefaultResolutionStrategy.class));
 
         // Tested call
-        Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunStateMapMap = slangTestRunner.splitTestCasesByRunState(POSSIBLY_MIXED, testCases, testSuites, runTestResults);
+        Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunStateMapMap = slangTestRunner.splitTestCasesByRunState(POSSIBLY_MIXED, testCases, testSuites, runTestResults, buildModeConfig);
 
         assertEquals(3, testCaseRunStateMapMap.size());
         assertEquals(1, testCaseRunStateMapMap.get(TestCaseRunState.INACTIVE).size());
@@ -753,6 +797,47 @@ public class SlangTestRunnerTest {
         @Bean
         public LoggingSlangTestCaseEventListener loggingSlangTestCaseEventListener() {
             return new LoggingSlangTestCaseEventListener();
+        }
+
+        @Bean
+        public ExecutableBuilder executableBuilder() {
+            return new ExecutableBuilder();
+        }
+
+        ////////////////////// Context for DependenciesHelper ////////////////////////////
+        @Bean
+        public DependenciesHelper dependenciesHelper() {
+            return Mockito.mock(DependenciesHelper.class);
+        }
+
+        @Bean
+        public PublishTransformer publishTransformer() {
+            return Mockito.mock(PublishTransformer.class);
+        }
+
+        @Bean
+        public TransformersHandler transformersHandler() {
+            return Mockito.mock(TransformersHandler.class);
+        }
+
+        @Bean
+        public PreCompileValidator preCompileValidator() {
+            return new PreCompileValidatorImpl();
+        }
+
+        @Bean
+        public ResultsTransformer resultsTransformer() {
+            return Mockito.mock(ResultsTransformer.class);
+        }
+
+        @Bean
+        public ExecutableValidator executableValidator() {
+            return new ExecutableValidatorImpl();
+        }
+
+        @Bean
+        public SystemPropertyValidator systemPropertyValidator() {
+            return new SystemPropertyValidatorImpl();
         }
     }
 

@@ -16,6 +16,7 @@ package io.cloudslang.lang.compiler.modeller;
 import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
+import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
@@ -24,7 +25,7 @@ import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
-
+import io.cloudslang.lang.entities.constants.Messages;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,9 +35,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -49,6 +50,34 @@ public class DependenciesHelper {
 
     @Autowired
     private PublishTransformer publishTransformer;
+
+    public Set<String> fetchDependencies(Executable executable, Map<String, Executable> availableDependencies) {
+        Validate.notNull(executable);
+        Validate.notNull(availableDependencies);
+
+        switch (executable.getType()) {
+            case SlangTextualKeys.OPERATION_TYPE:
+                return new HashSet<>();
+            case SlangTextualKeys.DECISION_TYPE:
+                return new HashSet<>();
+            case SlangTextualKeys.FLOW_TYPE:
+                return processFlowForDependencies((Flow) executable, availableDependencies);
+            default:
+                throw new NotImplementedException(Messages.UNKNOWN_EXECUTABLE_TYPE);
+        }
+    }
+
+    private Set<String> processFlowForDependencies(Flow flow, Map<String, Executable> availableDependencies) {
+        Set<String> flowDependencies = new HashSet<>();
+        for (Step step : flow.getWorkflow().getSteps()) {
+            String stepReferenceId = step.getRefId();
+            Executable stepReference = availableDependencies.get(stepReferenceId);
+
+            flowDependencies.add(stepReferenceId);
+            flowDependencies.addAll(fetchDependencies(stepReference, availableDependencies));
+        }
+        return flowDependencies;
+    }
 
     /**
      * recursive matches executables with their references

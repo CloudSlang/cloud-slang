@@ -15,7 +15,7 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
  * @author Bonczidai Levente
  * @since 8/10/2016
  */
-public class RegexConstants {
+public class Regex {
     // match ${ expression } pattern
     public final static String EXPRESSION_REGEX =
             "^\\s*" +

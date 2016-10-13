@@ -11,6 +11,8 @@ package io.cloudslang.lang.tools.build.tester;
 
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
+import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
@@ -27,20 +29,11 @@ import io.cloudslang.lang.tools.build.tester.parallel.services.TestCaseEventDisp
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.FailedSlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
+import io.cloudslang.lang.tools.build.tester.runconfiguration.BuildModeConfig;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.TestRunInfoService;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.strategy.RunMultipleTestSuiteConflictResolutionStrategy;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.strategy.SequentialRunTestSuiteResolutionStrategy;
 import io.cloudslang.score.events.EventConstants;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.log4j.Level;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.io.File;
 import java.io.Serializable;
 import java.util.Collection;
@@ -53,6 +46,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.log4j.Level;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import static java.lang.Long.parseLong;
 import static java.lang.String.valueOf;
@@ -82,6 +84,9 @@ public class SlangTestRunner {
 
     @Autowired
     private TestRunInfoService testRunInfoService;
+
+    @Autowired
+    private DependenciesHelper dependenciesHelper;
 
     @Autowired
     private LoggingService loggingService;
@@ -233,8 +238,12 @@ public class SlangTestRunner {
      * @param runTestsResults is updated to reflect skipped and fail fast scenarios
      * @return
      */
-    public Map<TestCaseRunState, Map<String, SlangTestCase>> splitTestCasesByRunState(final BulkRunMode bulkRunMode, final Map<String, SlangTestCase> testCases, final List<String> testSuites,
-                                                                                      final IRunTestResults runTestsResults) {
+    public Map<TestCaseRunState, Map<String, SlangTestCase>> splitTestCasesByRunState(
+            final BulkRunMode bulkRunMode,
+            final Map<String, SlangTestCase> testCases,
+            final List<String> testSuites,
+            final IRunTestResults runTestsResults,
+            final BuildModeConfig buildModeConfig) {
         Map<TestCaseRunState, Map<String, SlangTestCase>> resultMap = new HashMap<>();
 
         // Prepare the 3 categories inactive, parallel, sequential
@@ -249,7 +258,8 @@ public class SlangTestRunner {
                 continue;
             }
 
-            if (isTestCaseInActiveSuite(testCase, testSuites)) {
+            if (isTestCaseInActiveSuite(testCase, testSuites) &&
+                    isEnabledByBuildMode(buildModeConfig.getBuildMode(), testCase, buildModeConfig.getChangedFiles(), buildModeConfig.getAllTestedFlowModels())) {
                 processActiveTest(bulkRunMode, resultMap, testCaseEntry, testCase);
             } else {
                 processSkippedTest(runTestsResults, testCaseEntry, testCase, resultMap);
@@ -257,6 +267,26 @@ public class SlangTestRunner {
         }
 
         return resultMap;
+    }
+
+    private boolean isEnabledByBuildMode(
+            SlangBuildMain.BuildMode buildMode,
+            SlangTestCase slangTestCase,
+            Set<String> changedExecutables,
+            Map<String, Executable> allTestedFlowModels) {
+        return (buildMode == SlangBuildMain.BuildMode.BASIC)
+                || (buildMode == SlangBuildMain.BuildMode.CHANGED && isAffectedTestCase(slangTestCase, changedExecutables, allTestedFlowModels));
+    }
+
+    private boolean isAffectedTestCase(SlangTestCase slangTestCase, Set<String> changedExecutables, Map<String, Executable> allTestedFlowModels) {
+        String testFlowPath = slangTestCase.getTestFlowPath();
+        Executable testCaseReference = allTestedFlowModels.get(testFlowPath);
+        if (testCaseReference == null) {
+            throw new RuntimeException("Test case reference[" + testFlowPath + "] not found in compiled models.");
+        }
+        Set<String> testCaseDependencies = dependenciesHelper.fetchDependencies(testCaseReference, allTestedFlowModels);
+        testCaseDependencies.add(testFlowPath);
+        return CollectionUtils.containsAny(testCaseDependencies, changedExecutables);
     }
 
     private void processQuickFailTest(final IRunTestResults runTestsResults) {
