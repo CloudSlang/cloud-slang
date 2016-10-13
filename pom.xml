@@ -521,6 +521,34 @@
                         </execution>
                     </executions>
                 </plugin>
+                <!--License checker for build-->
+                <plugin>
+                    <groupId>com.mycila</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>3.0</version>
+                    <configuration>
+                        <includes>
+                            <include>**/*.java</include>
+                        </includes>
+                        <!--Pass arguments using ${var} syntax in license.template file-->
+                        <properties>
+                            <copyright.year>2016</copyright.year>
+                        </properties>
+                        <!--Custom mapping for java extensions-->
+                        <useDefaultMapping>false</useDefaultMapping>
+                        <mapping>
+                            <java>cloudslang-java-header</java>
+                        </mapping>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
 
             </plugins>
         </pluginManagement>
