@@ -544,7 +544,7 @@
                         <execution>
                             <phase>process-resources</phase>
                             <goals>
-                                <goal>format</goal>
+                                <goal>check</goal>
                             </goals>
                         </execution>
                     </executions>
