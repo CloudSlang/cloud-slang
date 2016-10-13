@@ -41,6 +41,11 @@ public interface SlangCompiler {
     CompilationModellingResult compileSource(SlangSource source, Set<SlangSource> path);
 
     /**
+     * Clean up the precompile cache.
+     */
+    void cleanUp();
+
+    /**
      * Pre-compile a CloudSlang source into an {@link io.cloudslang.lang.compiler.modeller.model.Executable}.
      * If an error is found, an exception is thrown
      *
