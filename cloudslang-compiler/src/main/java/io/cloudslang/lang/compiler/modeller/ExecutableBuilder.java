@@ -569,28 +569,28 @@ public class ExecutableBuilder {
         }
     }
 
-    private String resolveReferenceID(String rawReferenceID, Map<String, String> imports, String namespace) {
-        executableValidator.validateStepReferenceId(rawReferenceID);
+    private String resolveReferenceID(String rawReferenceId, Map<String, String> imports, String namespace) {
+        executableValidator.validateStepReferenceId(rawReferenceId);
 
-        int numberOfDelimiters = StringUtils.countMatches(rawReferenceID, NAMESPACE_DELIMITER);
-        String resolvedReferenceID;
+        int numberOfDelimiters = StringUtils.countMatches(rawReferenceId, NAMESPACE_DELIMITER);
+        String resolvedReferenceId;
 
         if (numberOfDelimiters == 0) {
             // implicit namespace
-            resolvedReferenceID = namespace + NAMESPACE_DELIMITER + rawReferenceID;
+            resolvedReferenceId = namespace + NAMESPACE_DELIMITER + rawReferenceId;
         } else {
-            String prefix = StringUtils.substringBefore(rawReferenceID, NAMESPACE_DELIMITER);
-            String suffix = StringUtils.substringAfter(rawReferenceID, NAMESPACE_DELIMITER);
+            String prefix = StringUtils.substringBefore(rawReferenceId, NAMESPACE_DELIMITER);
+            String suffix = StringUtils.substringAfter(rawReferenceId, NAMESPACE_DELIMITER);
             if (MapUtils.isNotEmpty(imports) && imports.containsKey(prefix)) {
                 // expand alias
-                resolvedReferenceID = imports.get(prefix) + NAMESPACE_DELIMITER + suffix;
+                resolvedReferenceId = imports.get(prefix) + NAMESPACE_DELIMITER + suffix;
             } else {
                 // full path without alias expanding
-                resolvedReferenceID = rawReferenceID;
+                resolvedReferenceId = rawReferenceId;
             }
         }
 
-        return resolvedReferenceID;
+        return resolvedReferenceId;
     }
 
     /**

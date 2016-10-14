@@ -94,7 +94,7 @@ public class SlangTestRunner {
     @Autowired
     private LoggingSlangTestCaseEventListener loggingSlangTestCaseEventListener;
 
-    private String[] TEST_CASE_FILE_EXTENSIONS = {"yaml", "yml"};
+    private String[] testCaseFileExtensions = {"yaml", "yml"};
     private static final String TEST_CASE_PASSED = "Test case passed: ";
     private static final String TEST_CASE_FAILED = "Test case failed: ";
 
@@ -111,7 +111,7 @@ public class SlangTestRunner {
         File testPathDir = new File(testPath);
         Validate.isTrue(testPathDir.isDirectory(),
                 "Directory path argument \'" + testPath + "\' does not lead to a directory");
-        Collection<File> testCasesFiles = FileUtils.listFiles(testPathDir, TEST_CASE_FILE_EXTENSIONS, true);
+        Collection<File> testCasesFiles = FileUtils.listFiles(testPathDir, testCaseFileExtensions, true);
 
         loggingService.logEvent(Level.INFO, "");
         loggingService.logEvent(Level.INFO, "--- parsing test cases ---");

@@ -135,8 +135,8 @@ public class SlangBuilder {
         // Compiling all the test flows
         Map<String, CompilationArtifact> compiledFlows = slangContentVerifier.compileSlangModels(allTestedFlowModels);
 
-        Set<String> allTestedFlowsFQN = mapExecutablesToFullyQualifiedName(allTestedFlowModels.values());
-        Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath, allTestedFlowsFQN);
+        Set<String> allTestedFlowsFqn = mapExecutablesToFullyQualifiedName(allTestedFlowModels.values());
+        Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath, allTestedFlowsFqn);
         loggingService.logEvent(Level.INFO, "");
         loggingService.logEvent(Level.INFO, "--- running tests ---");
         loggingService.logEvent(Level.INFO, "Found " + testCases.size() + " tests");
