@@ -69,7 +69,9 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                             @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                             @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                             @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
+                            //CHECKSTYLE:OFF
                             @Param(ExecutionParametersConsts.RUNNING_EXECUTION_PLAN_ID) Long RUNNING_EXECUTION_PLAN_ID,
+                            //CHECKSTYLE:ON
                             @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
                             @Param(ScoreLangConstants.BRANCH_BEGIN_STEP_ID_KEY) Long branchBeginStep,
                             @Param(ScoreLangConstants.REF_ID) String refId) {
@@ -272,12 +274,12 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         String branchException = branch.getException();
         if (StringUtils.isNotEmpty(branchException)) {
             Map<String, Serializable> systemContextMap = branch.getSystemContext();
-            String branchID = null;
+            String branchId = null;
             if (MapUtils.isNotEmpty(systemContextMap)) {
                 ExecutionRuntimeServices branchExecutionRuntimeServices = new SystemContext(systemContextMap);
-                branchID = branchExecutionRuntimeServices.getBranchId();
+                branchId = branchExecutionRuntimeServices.getBranchId();
             }
-            logger.error("There was an error running branch: " + branchID + " Error is: " + branchException);
+            logger.error("There was an error running branch: " + branchId + " Error is: " + branchException);
             throw new RuntimeException(BRANCH_EXCEPTION_PREFIX + ": \n" + branchException);
         }
     }
