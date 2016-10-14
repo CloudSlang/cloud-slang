@@ -207,7 +207,7 @@ public class ExecutableBuilder {
                 Map<String, Object> actionRawData = getActionRawData(executableRawData, errors, parsedSlang, execName);
                 ActionModellingResult actionModellingResult = compileAction(actionRawData);
                 errors.addAll(actionModellingResult.getErrors());
-                Action action = actionModellingResult.getAction();
+                final Action action = actionModellingResult.getAction();
                 executableDependencies = new HashSet<>();
 
                 preCompileValidator.validateResultTypes(results, execName, errors);
