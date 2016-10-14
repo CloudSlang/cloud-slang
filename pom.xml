@@ -568,8 +568,6 @@
                                 <violationSeverity>warning</violationSeverity>
                                 <includeResources>false</includeResources>
                                 <includeTestResources>false</includeTestResources>
-                                <linkXRef>false</linkXRef>
-                                <fileExtensions>java</fileExtensions>
                             </configuration>
                             <goals>
                                 <goal>check</goal>
