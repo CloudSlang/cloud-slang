@@ -42,6 +42,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class CompileValidatorImpl extends AbstractValidator implements CompileValidator {
 
+    public static final String DUPLICATE_EXECUTABLE_FOUND = "Duplicate executable found: '%s'";
+
     @Override
     public List<RuntimeException> validateModelWithDependencies(
             Executable executable,
@@ -68,7 +70,7 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
         for (Map.Entry<Executable, SlangSource> entry : allAvailableExecutables.entrySet()) {
             Executable executable = entry.getKey();
             if (currentExecutable.getId().equalsIgnoreCase(executable.getId()) && !currentSource.equals(entry.getValue())) {
-                errors.add(new RuntimeException("Duplicate executable found: '" + currentExecutable.getId() + "'"));
+                errors.add(new RuntimeException(String.format(DUPLICATE_EXECUTABLE_FOUND, currentExecutable.getId())));
             }
         }
         return errors;

@@ -18,7 +18,7 @@ import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
-import io.cloudslang.lang.tools.build.logging.LoggingService;
+import io.cloudslang.lang.logging.LoggingService;
 import io.cloudslang.lang.tools.build.validation.MetadataMissingException;
 import io.cloudslang.lang.tools.build.validation.StaticValidator;
 import org.apache.commons.io.FileUtils;
