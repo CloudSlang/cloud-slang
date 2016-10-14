@@ -584,7 +584,7 @@ public class ActionStepsTest {
     @Test(timeout = DEFAULT_TIMEOUT)
     public void doJavaActionSetKeyOnNonSerializableSessionTest() {
         //prepare doAction arguments
-        RunEnvironment runEnv = new RunEnvironment();
+        final RunEnvironment runEnv = new RunEnvironment();
         HashMap<String, Object> nonSerializableExecutionData = new HashMap<>();
         GlobalSessionObject<ContentTestActions.NonSerializableObject> sessionObject = new GlobalSessionObject<>();
         ContentTestActions.NonSerializableObject employee = new ContentTestActions.NonSerializableObject("John");
@@ -646,7 +646,7 @@ public class ActionStepsTest {
     public void doJavaActionGetKeyFromSerializableSessionTest() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
-        Map<String, Value> initialCallArguments = new HashMap<>();
+        final Map<String, Value> initialCallArguments = new HashMap<>();
         HashMap<String, SerializableSessionObject> serializableExecutionData = new HashMap<>();
         SerializableSessionObject sessionObject = new SerializableSessionObject();
         sessionObject.setName("John");
@@ -744,7 +744,7 @@ public class ActionStepsTest {
                 "url = 'http://' + host + ':' + str(port)\n" +
                 "url2 = url + '/oo'\n" +
                 "another = 'just a string'\n" +
-//                we can also change..
+                // we can also change..
                 "port = 8081\n" +
                 "condition = 1==1\n" +
                 "print url";
@@ -958,7 +958,7 @@ public class ActionStepsTest {
     public void testPythonOutputSerializationErrorMessage() {
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.putCallArguments(new HashMap<String, Value>());
-        String userPythonScript =
+        final String userPythonScript =
                 "from datetime import datetime\n" +
                         NON_SERIALIZABLE_VARIABLE_NAME + " = datetime.utcnow()";
 

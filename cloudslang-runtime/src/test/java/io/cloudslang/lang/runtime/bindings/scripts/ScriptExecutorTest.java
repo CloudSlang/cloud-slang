@@ -61,7 +61,7 @@ public class ScriptExecutorTest {
     @Test
     public void testExecuteScript() throws Exception {
         reset(execInterpreter);
-        String script = "pass";
+        final String script = "pass";
         Map<String, Value> scriptInputValues = new HashMap<>();
         Value value1 = ValueFactory.create("value1");
         Value value2 = ValueFactory.create("value2");
@@ -79,7 +79,7 @@ public class ScriptExecutorTest {
         expectedScriptOutputs.put("output1", value1);
         expectedScriptOutputs.put("output2", value2);
 
-        Map<String, Value> outputs = scriptExecutor.executeScript(script, scriptInputValues);
+        final Map<String, Value> outputs = scriptExecutor.executeScript(script, scriptInputValues);
 
         verify(execInterpreter).set(eq("input1"), eq((Value) pyObjectValue1));
         verify(execInterpreter).set(eq("input2"), eq((Value) pyObjectValue2));

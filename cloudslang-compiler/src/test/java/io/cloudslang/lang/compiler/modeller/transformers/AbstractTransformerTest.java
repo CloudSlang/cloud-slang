@@ -26,7 +26,6 @@ public class AbstractTransformerTest extends TransformersTestParent {
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
-    ;
     private AbstractTransformer abstractTransformer;
     private Set<String> mandatoryKeys;
     private Set<String> optionalKeys;

@@ -110,12 +110,8 @@ public class ScriptEvaluatorTest {
         Set<SystemProperty> props = new HashSet<>();
         SystemProperty systemProperty = new SystemProperty("a.b", "c.key", "value");
         props.add(systemProperty);
-        Set<ScriptFunction> functionDependencies = Sets.newHashSet(
-                ScriptFunction.GET,
-                ScriptFunction.GET_SYSTEM_PROPERTY,
-                ScriptFunction.CHECK_EMPTY
-        );
-        ArgumentCaptor<String> scriptCaptor = ArgumentCaptor.forClass(String.class);
+        Set<ScriptFunction> functionDependencies = Sets.newHashSet(ScriptFunction.GET, ScriptFunction.GET_SYSTEM_PROPERTY, ScriptFunction.CHECK_EMPTY);
+        final ArgumentCaptor<String> scriptCaptor = ArgumentCaptor.forClass(String.class);
 
         Map<String, Serializable> scriptReturnContext = new HashMap<>();
         scriptReturnContext.put(SYSTEM_PROPERTIES_MAP, new PyDictionary());
@@ -132,7 +128,7 @@ public class ScriptEvaluatorTest {
 
         verify(pythonRuntimeService).eval(scriptCaptor.capture(), eq(expr), eq(expectedContext));
 
-        String actualScript = scriptCaptor.getValue();
+        final String actualScript = scriptCaptor.getValue();
         String[] actualFunctionsArray = actualScript.split(LINE_SEPARATOR + LINE_SEPARATOR);
         Set<String> actualFunctions = new HashSet<>();
         Collections.addAll(actualFunctions, actualFunctionsArray);

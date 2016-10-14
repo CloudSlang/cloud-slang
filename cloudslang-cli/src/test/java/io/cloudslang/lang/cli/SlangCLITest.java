@@ -56,22 +56,22 @@ import static org.mockito.Mockito.when;
 public class SlangCLITest {
 
     static final CompilationArtifact emptyCompilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>(), new HashSet<String>());
-    private final static String[] CONTEXT_PATH = {"classpath*:/META-INF/spring/test-spring-shell-plugin.xml"};
-    private final static String FLOW_PATH_BACKSLASH_INPUT = "C:\\\\basic_flow.yaml";
-    private final static String FLOW_PATH_BACKSLASH = "C:\\basic_flow.yaml";
-    private final static String DEPENDENCIES_PATH_BACKSLASH = "C:\\\\executables.dir1\\\\";
+    private static final String[] CONTEXT_PATH = {"classpath*:/META-INF/spring/test-spring-shell-plugin.xml"};
+    private static final String FLOW_PATH_BACKSLASH_INPUT = "C:\\\\basic_flow.yaml";
+    private static final String FLOW_PATH_BACKSLASH = "C:\\basic_flow.yaml";
+    private static final String DEPENDENCIES_PATH_BACKSLASH = "C:\\\\executables.dir1\\\\";
     private static final long DEFAULT_TIMEOUT = 10000;
     public static final String INPUT_FILE_PATH = "/inputs/inputs.yaml";
 
     private JLineShellComponent shell;
     private SlangCli slangCLI;
-    private ScoreServices ScoreServicesMock;
+    private ScoreServices scoreServicesMock;
     private CompilerHelper compilerHelperMock;
 
     public SlangCLITest() {
         Bootstrap bootstrap = new Bootstrap(null, CONTEXT_PATH);
         shell = bootstrap.getJLineShellComponent();
-        ScoreServicesMock = (ScoreServices) bootstrap.getApplicationContext().getBean("scoreServices");
+        scoreServicesMock = (ScoreServices) bootstrap.getApplicationContext().getBean("scoreServices");
         compilerHelperMock = (CompilerHelper) bootstrap.getApplicationContext().getBean("compilerHelper");
         slangCLI = bootstrap.getApplicationContext().getBean(SlangCli.class);
     }
@@ -85,15 +85,15 @@ public class SlangCLITest {
     public void testRunQuietlyValidFilePathAsync() throws Exception {
         slangCLI.setEnvVar(true);
 
-        long executionID = 1;
+        long executionId = 1;
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
-        when(ScoreServicesMock.trigger(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class))).thenReturn(executionID);
+        when(scoreServicesMock.trigger(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class))).thenReturn(executionId);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --v quiet");
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
-        verify(ScoreServicesMock).trigger(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class));
+        verify(scoreServicesMock).trigger(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class));
 
         Assert.assertEquals("method result mismatch", StringUtils.EMPTY, cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
@@ -102,15 +102,15 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunQuietlyValidFilePathSync() throws Exception {
-        long executionID = 1;
+        long executionId = 1;
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
-        when(ScoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(true), eq(false))).thenReturn(executionID);
+        when(scoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(true), eq(false))).thenReturn(executionId);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --v quiet");
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
-        verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(true), eq(false));
+        verify(scoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(true), eq(false));
 
         Assert.assertEquals("method result mismatch", StringUtils.EMPTY, cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
@@ -119,15 +119,15 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunDebugValidFilePathSync() throws Exception {
-        long executionID = 1;
+        long executionId = 1;
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
-        when(ScoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(true), eq(false))).thenReturn(executionID);
+        when(scoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(true), eq(false))).thenReturn(executionId);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --v debug");
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
-        verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(true));
+        verify(scoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(true));
 
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
@@ -143,17 +143,17 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunValidFilePathSync() throws Exception {
-        long executionID = 1;
+        long executionId = 1;
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
-        when(ScoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false))).thenReturn(executionID);
+        when(scoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false))).thenReturn(executionId);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT);
 
         // path may be processed as local in some environments
         // in this case the local directory path is prepended to the actual path
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
-        verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false));
+        verify(scoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false));
 
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
@@ -164,32 +164,32 @@ public class SlangCLITest {
         //set async mode
         slangCLI.setEnvVar(true);
 
-        long executionID = 1;
+        long executionId = 1;
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
-        when(ScoreServicesMock.trigger(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class))).thenReturn(executionID);
+        when(scoreServicesMock.trigger(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class))).thenReturn(executionId);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT);
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
-        verify(ScoreServicesMock).trigger(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class));
+        verify(scoreServicesMock).trigger(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class));
 
-        Assert.assertEquals("method result mismatch", SlangCli.triggerAsyncMsg(executionID, emptyCompilationArtifact.getExecutionPlan().getName()), cr.getResult());
+        Assert.assertEquals("method result mismatch", SlangCli.triggerAsyncMsg(executionId, emptyCompilationArtifact.getExecutionPlan().getName()), cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunValidWithOtherPathForDependencies() throws Exception {
-        long executionID = 1;
+        long executionId = 1;
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), anyListOf(String.class))).thenReturn(emptyCompilationArtifact);
-        when(ScoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false))).thenReturn(executionID);
+        when(scoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false))).thenReturn(executionId);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --cp " + DEPENDENCIES_PATH_BACKSLASH);
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), anyListOf(String.class));
-        verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false));
+        verify(scoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false));
 
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
@@ -197,7 +197,7 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunSyncWithInputsAndFileInputs() throws Exception {
-        long executionID = 1;
+        long executionId = 1;
         String inputsString = "--i input1=value1,input2=value2";
 
         Map<String, Value> inputsMap = new HashMap<>();
@@ -212,12 +212,12 @@ public class SlangCLITest {
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
         when(compilerHelperMock.loadInputsFromFile(anyList())).thenReturn(fileInputsMap);
-        when(ScoreServicesMock.triggerSync(eq(emptyCompilationArtifact), eq(inputsMap), anySetOf(SystemProperty.class), eq(false), eq(false))).thenReturn(executionID);
+        when(scoreServicesMock.triggerSync(eq(emptyCompilationArtifact), eq(inputsMap), anySetOf(SystemProperty.class), eq(false), eq(false))).thenReturn(executionId);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " " + inputsString);
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
-        verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), eq(inputsMap), anySetOf(SystemProperty.class), eq(false), eq(false));
+        verify(scoreServicesMock).triggerSync(eq(emptyCompilationArtifact), eq(inputsMap), anySetOf(SystemProperty.class), eq(false), eq(false));
 
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
@@ -227,7 +227,7 @@ public class SlangCLITest {
     public void testRunAsyncWithInputsAndFileInputs() throws Exception {
         slangCLI.setEnvVar(true);
 
-        long executionID = 1;
+        long executionId = 1;
         String inputsString = "--i input1=value1,input2=value2";
 
         Map<String, Value> inputsMap = new HashMap<>();
@@ -242,33 +242,33 @@ public class SlangCLITest {
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
         when(compilerHelperMock.loadInputsFromFile(anyList())).thenReturn(fileInputsMap);
-        when(ScoreServicesMock.trigger(eq(emptyCompilationArtifact), eq(inputsMap), anySetOf(SystemProperty.class))).thenReturn(executionID);
+        when(scoreServicesMock.trigger(eq(emptyCompilationArtifact), eq(inputsMap), anySetOf(SystemProperty.class))).thenReturn(executionId);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " " + inputsString);
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
-        verify(ScoreServicesMock).trigger(eq(emptyCompilationArtifact), eq(inputsMap), anySetOf(SystemProperty.class));
+        verify(scoreServicesMock).trigger(eq(emptyCompilationArtifact), eq(inputsMap), anySetOf(SystemProperty.class));
 
-        Assert.assertEquals("method result mismatch", SlangCli.triggerAsyncMsg(executionID, emptyCompilationArtifact.getExecutionPlan().getName()), cr.getResult());
+        Assert.assertEquals("method result mismatch", SlangCli.triggerAsyncMsg(executionId, emptyCompilationArtifact.getExecutionPlan().getName()), cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunSyncWithInputs() throws Exception {
-        long executionID = 1;
+        long executionId = 1;
         String inputsString = "--i input1=value1,input2=value2";
         Map<String, Value> inputsMap = new HashMap<>();
         inputsMap.put("input1", ValueFactory.create("value1"));
         inputsMap.put("input2", ValueFactory.create("value2"));
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
-        when(ScoreServicesMock.triggerSync(eq(emptyCompilationArtifact), eq(inputsMap), anySetOf(SystemProperty.class), eq(false), eq(false))).thenReturn(executionID);
+        when(scoreServicesMock.triggerSync(eq(emptyCompilationArtifact), eq(inputsMap), anySetOf(SystemProperty.class), eq(false), eq(false))).thenReturn(executionId);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " " + inputsString);
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
-        verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), eq(inputsMap), anySetOf(SystemProperty.class), eq(false), eq(false));
+        verify(scoreServicesMock).triggerSync(eq(emptyCompilationArtifact), eq(inputsMap), anySetOf(SystemProperty.class), eq(false), eq(false));
 
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
@@ -279,7 +279,7 @@ public class SlangCLITest {
         RuntimeException exception = new RuntimeException("exception message");
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
-        when(ScoreServicesMock.
+        when(scoreServicesMock.
                 triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false))).
                 thenThrow(exception);
 
@@ -288,7 +288,7 @@ public class SlangCLITest {
         // path may be processed as local in some environments
         // in this case the local directory path is prepended to the actual path
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
-        verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false));
+        verify(scoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false));
 
         Assert.assertEquals("exception not as expected", exception, cr.getException());
     }
@@ -298,37 +298,37 @@ public class SlangCLITest {
         //set async mode
         slangCLI.setEnvVar(true);
 
-        long executionID = 1;
+        long executionId = 1;
         String inputsString = "--i input1=value1,input2=value2";
         Map<String, Value> inputsMap = new HashMap<>();
         inputsMap.put("input1", ValueFactory.create("value1"));
         inputsMap.put("input2", ValueFactory.create("value2"));
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
-        when(ScoreServicesMock.trigger(eq(emptyCompilationArtifact), eq(inputsMap), anySetOf(SystemProperty.class))).thenReturn(executionID);
+        when(scoreServicesMock.trigger(eq(emptyCompilationArtifact), eq(inputsMap), anySetOf(SystemProperty.class))).thenReturn(executionId);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " " + inputsString);
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
-        verify(ScoreServicesMock).trigger(eq(emptyCompilationArtifact), eq(inputsMap), anySetOf(SystemProperty.class));
+        verify(scoreServicesMock).trigger(eq(emptyCompilationArtifact), eq(inputsMap), anySetOf(SystemProperty.class));
 
-        Assert.assertEquals("method result mismatch", SlangCli.triggerAsyncMsg(executionID, emptyCompilationArtifact.getExecutionPlan().getName()), cr.getResult());
+        Assert.assertEquals("method result mismatch", SlangCli.triggerAsyncMsg(executionId, emptyCompilationArtifact.getExecutionPlan().getName()), cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunSyncWithInputFiles() throws Exception {
-        long executionID = 1;
+        long executionId = 1;
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
-        when(ScoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false))).thenReturn(executionID);
+        when(scoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false))).thenReturn(executionId);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --if " + FLOW_PATH_BACKSLASH_INPUT);
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
         verify(compilerHelperMock).loadInputsFromFile(Collections.singletonList(FLOW_PATH_BACKSLASH));
-        verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false));
+        verify(scoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false));
 
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
@@ -336,16 +336,16 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunSyncWithSystemProperties() throws Exception {
-        long executionID = 1;
+        long executionId = 1;
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
-        when(ScoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false))).thenReturn(executionID);
+        when(scoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false))).thenReturn(executionId);
 
         CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --spf " + FLOW_PATH_BACKSLASH_INPUT);
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
         verify(compilerHelperMock).loadSystemProperties(Collections.singletonList(FLOW_PATH_BACKSLASH));
-        verify(ScoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false));
+        verify(scoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false));
 
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());

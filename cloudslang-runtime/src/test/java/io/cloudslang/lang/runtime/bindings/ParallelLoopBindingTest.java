@@ -80,7 +80,7 @@ public class ParallelLoopBindingTest {
         Map<String, Value> variables = new HashMap<>();
         variables.put("key1", ValueFactory.create("value1"));
         variables.put("key2", ValueFactory.create("value2"));
-        Context context = new Context(variables);
+        final Context context = new Context(variables);
         List<Value> expectedList = Lists.newArrayList(ValueFactory.create(1), ValueFactory.create(2), ValueFactory.create(3));
 
         when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET))).thenReturn(ValueFactory.create((Serializable) expectedList));
@@ -96,7 +96,7 @@ public class ParallelLoopBindingTest {
         Map<String, Value> variables = new HashMap<>();
         variables.put("key1", ValueFactory.create("value1"));
         variables.put("key2", ValueFactory.create("value2"));
-        Context context = new Context(variables);
+        final Context context = new Context(variables);
 
         when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET))).thenReturn(ValueFactory.create(Lists.newArrayList()));
 
