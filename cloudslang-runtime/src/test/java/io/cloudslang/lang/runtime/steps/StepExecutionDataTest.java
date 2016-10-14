@@ -244,7 +244,7 @@ public class StepExecutionDataTest {
 
     @Test
     public void testEndStepWithPublish() throws Exception {
-        List<Output> possiblePublishValues = Collections.singletonList(new Output("name", ValueFactory.create("name")));
+        final List<Output> possiblePublishValues = Collections.singletonList(new Output("name", ValueFactory.create("name")));
         RunEnvironment runEnv = createRunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), ScoreLangConstants.SUCCESS_RESULT));
         Context context = new Context(new HashMap<String, Value>());

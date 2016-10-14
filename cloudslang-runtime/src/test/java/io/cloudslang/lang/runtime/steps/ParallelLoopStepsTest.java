@@ -260,7 +260,7 @@ public class ParallelLoopStepsTest {
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> stepPublishValues = Lists.newArrayList(new Output("outputName", ValueFactory.create("outputExpression")));
+        final List<Output> stepPublishValues = Lists.newArrayList(new Output("outputName", ValueFactory.create("outputExpression")));
 
         Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, "CUSTOM_SUCCESS");
@@ -268,7 +268,7 @@ public class ParallelLoopStepsTest {
         stepNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
         stepNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
 
-        String nodeName = "nodeName";
+        final String nodeName = "nodeName";
 
         // prepare mocks
         Map<String, Serializable> runtimeContext1 = new HashMap<>();
@@ -310,7 +310,7 @@ public class ParallelLoopStepsTest {
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> stepPublishValues = Lists.newArrayList(new Output("outputName", ValueFactory.create("outputExpression")));
+        final List<Output> stepPublishValues = Lists.newArrayList(new Output("outputName", ValueFactory.create("outputExpression")));
 
         Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, "CUSTOM_SUCCESS");
@@ -318,7 +318,7 @@ public class ParallelLoopStepsTest {
         stepNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
         stepNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
 
-        String nodeName = "nodeName";
+        final String nodeName = "nodeName";
 
         // prepare mocks
         Map<String, Serializable> runtimeContext1 = new HashMap<>();
@@ -366,7 +366,7 @@ public class ParallelLoopStepsTest {
         Context context = new Context(variables);
         runEnvironment.getStack().pushContext(context);
 
-        List<Output> stepPublishValues = Lists.newArrayList(new Output("outputName", ValueFactory.create("outputExpression")));
+        final List<Output> stepPublishValues = Lists.newArrayList(new Output("outputName", ValueFactory.create("outputExpression")));
 
         Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, ScoreLangConstants.SUCCESS_RESULT);
@@ -374,7 +374,7 @@ public class ParallelLoopStepsTest {
         stepNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
         stepNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
 
-        String nodeName = "nodeName";
+        final String nodeName = "nodeName";
 
         // prepare mocks
         Map<String, Serializable> runtimeContext1 = new HashMap<>();
@@ -462,11 +462,11 @@ public class ParallelLoopStepsTest {
             ReturnValues returnValues1,
             ReturnValues returnValues2,
             ReturnValues returnValues3) {
-        ExecutionRuntimeServices executionRuntimeServices = mock(ExecutionRuntimeServices.class);
+        final ExecutionRuntimeServices executionRuntimeServices = mock(ExecutionRuntimeServices.class);
 
-        Map<String, Serializable> branchContext1 = new HashMap<>();
-        Map<String, Serializable> branchContext2 = new HashMap<>();
-        Map<String, Serializable> branchContext3 = new HashMap<>();
+        final Map<String, Serializable> branchContext1 = new HashMap<>();
+        final Map<String, Serializable> branchContext2 = new HashMap<>();
+        final Map<String, Serializable> branchContext3 = new HashMap<>();
         RunEnvironment branchRuntimeEnvironment1 = new RunEnvironment();
         RunEnvironment branchRuntimeEnvironment2 = new RunEnvironment();
         RunEnvironment branchRuntimeEnvironment3 = new RunEnvironment();

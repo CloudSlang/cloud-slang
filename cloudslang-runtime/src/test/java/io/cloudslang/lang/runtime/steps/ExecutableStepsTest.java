@@ -117,8 +117,8 @@ public class ExecutableStepsTest {
                         .withPrivateInput(false)
                         .build()
         );
-        RunEnvironment runEnv = new RunEnvironment();
-        ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
+        final RunEnvironment runEnv = new RunEnvironment();
+        final ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         Map<String, Value> resultMap = new HashMap<>();
         resultMap.put("input1", ValueFactory.create(inputs.get(0).getValue()));
         resultMap.put("input2", ValueFactory.create(inputs.get(1).getValue()));
@@ -189,7 +189,7 @@ public class ExecutableStepsTest {
 
     @Test
     public void testFinishExecutableWithOutput() throws Exception {
-        List<Output> possibleOutputs = Arrays.asList(new Output("name", ValueFactory.create("name")));
+        final List<Output> possibleOutputs = Arrays.asList(new Output("name", ValueFactory.create("name")));
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), null));
         runEnv.getExecutionPath().down();
@@ -237,8 +237,8 @@ public class ExecutableStepsTest {
 
     @Test
     public void testFinishExecutableEvents() {
-        List<Output> possibleOutputs = Collections.singletonList(new Output("name", ValueFactory.create("name", false)));
-        List<Result> possibleResults = Collections.singletonList(new Result(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create("true")));
+        final List<Output> possibleOutputs = Collections.singletonList(new Output("name", ValueFactory.create("name", false)));
+        final List<Result> possibleResults = Collections.singletonList(new Result(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create("true")));
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), null));
         runEnv.getExecutionPath().down();

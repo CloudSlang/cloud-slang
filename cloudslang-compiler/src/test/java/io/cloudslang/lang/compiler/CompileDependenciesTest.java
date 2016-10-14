@@ -49,21 +49,21 @@ public class CompileDependenciesTest {
 
     @Test(expected = RuntimeException.class)
     public void emptyPathButThereAreImports() throws Exception {
-        URI flow = getClass().getResource("/basic_flow.yaml").toURI();
+        final URI flow = getClass().getResource("/basic_flow.yaml").toURI();
         Set<SlangSource> path = new HashSet<>();
         compiler.compile(SlangSource.fromFile(flow), path);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullPathButThereAreImports() throws Exception {
-        URI flow = getClass().getResource("/basic_flow.yaml").toURI();
+        final URI flow = getClass().getResource("/basic_flow.yaml").toURI();
         compiler.compile(SlangSource.fromFile(flow), null);
     }
 
     @Test
     public void referenceDoesNoExistInPath() throws Exception {
-        URI flow = getClass().getResource("/basic_flow.yaml").toURI();
-        URI operation = getClass().getResource("/operation_with_data.sl").toURI();
+        final URI flow = getClass().getResource("/basic_flow.yaml").toURI();
+        final URI operation = getClass().getResource("/operation_with_data.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
 
@@ -75,8 +75,8 @@ public class CompileDependenciesTest {
 
     @Test
     public void importHasAKeyThatDoesNotExistInPath() throws Exception {
-        URI flow = getClass().getResource("/basic_flow.yaml").toURI();
-        URI operation = getClass().getResource("/flow_with_data.yaml").toURI();
+        final URI flow = getClass().getResource("/basic_flow.yaml").toURI();
+        final URI operation = getClass().getResource("/flow_with_data.yaml").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
 
@@ -88,10 +88,10 @@ public class CompileDependenciesTest {
 
     @Test
     public void filesThatAreNotImportedShouldNotBeCompiled() throws Exception {
-        URI flow = getClass().getResource("/basic_flow.yaml").toURI();
-        URI notImportedOperation = getClass().getResource("/flow_with_data.yaml").toURI();
-        URI importedOperation = getClass().getResource("/test_op.sl").toURI();
-        URI importedOperation2 = getClass().getResource("/check_Weather.sl").toURI();
+        final URI flow = getClass().getResource("/basic_flow.yaml").toURI();
+        final URI notImportedOperation = getClass().getResource("/flow_with_data.yaml").toURI();
+        final URI importedOperation = getClass().getResource("/test_op.sl").toURI();
+        final URI importedOperation2 = getClass().getResource("/check_Weather.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(notImportedOperation));
         path.add(SlangSource.fromFile(importedOperation));
@@ -104,7 +104,7 @@ public class CompileDependenciesTest {
 
     @Test
     public void sourceFileIsADirectory() throws Exception {
-        URI dir = getClass().getResource("/").toURI();
+        final URI dir = getClass().getResource("/").toURI();
 
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage(containsString("directories"));
@@ -114,9 +114,9 @@ public class CompileDependenciesTest {
 
     @Test
     public void subFlowRefId() throws Exception {
-        URI flow = getClass().getResource("/circular-dependencies/parent_flow.yaml").toURI();
-        URI childFlow = getClass().getResource("/circular-dependencies/child_flow.yaml").toURI();
-        URI operation = getClass().getResource("/test_op.sl").toURI();
+        final URI flow = getClass().getResource("/circular-dependencies/parent_flow.yaml").toURI();
+        final URI childFlow = getClass().getResource("/circular-dependencies/child_flow.yaml").toURI();
+        final URI operation = getClass().getResource("/test_op.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(childFlow));
         path.add(SlangSource.fromFile(operation));
@@ -132,9 +132,9 @@ public class CompileDependenciesTest {
 
     @Test
     public void bothFileAreDependentOnTheSameFile() throws Exception {
-        URI flow = getClass().getResource("/circular-dependencies/parent_flow.yaml").toURI();
-        URI childFlow = getClass().getResource("/circular-dependencies/child_flow.yaml").toURI();
-        URI operation = getClass().getResource("/test_op.sl").toURI();
+        final URI flow = getClass().getResource("/circular-dependencies/parent_flow.yaml").toURI();
+        final URI childFlow = getClass().getResource("/circular-dependencies/child_flow.yaml").toURI();
+        final URI operation = getClass().getResource("/test_op.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(childFlow));
         path.add(SlangSource.fromFile(operation));
@@ -146,9 +146,9 @@ public class CompileDependenciesTest {
 
     @Test
     public void circularDependencies() throws Exception {
-        URI flow = getClass().getResource("/circular-dependencies/circular_parent_flow.yaml").toURI();
-        URI childFlow = getClass().getResource("/circular-dependencies/circular_child_flow.yaml").toURI();
-        URI operation = getClass().getResource("/test_op.sl").toURI();
+        final URI flow = getClass().getResource("/circular-dependencies/circular_parent_flow.yaml").toURI();
+        final URI childFlow = getClass().getResource("/circular-dependencies/circular_child_flow.yaml").toURI();
+        final URI operation = getClass().getResource("/test_op.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(childFlow));
         path.add(SlangSource.fromFile(operation));
@@ -160,8 +160,8 @@ public class CompileDependenciesTest {
 
     @Test
     public void sameSourceAsDependencyWorks() throws Exception {
-        URI flow = getClass().getResource("/basic_flow.yaml").toURI();
-        URI importedOperation = getClass().getResource("/test_op.sl").toURI();
+        final URI flow = getClass().getResource("/basic_flow.yaml").toURI();
+        final URI importedOperation = getClass().getResource("/test_op.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(importedOperation));
         SlangSource flowSource = SlangSource.fromFile(flow);
