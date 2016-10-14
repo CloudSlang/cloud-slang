@@ -31,17 +31,17 @@ public class ExtensionTest {
     }
 
     @Test
-    public void testValidateSlangFileExtensionSL() {
+    public void testValidateSlangFileExtensionSl() {
         Extension.validateSlangFileExtension("slang.sl");
     }
 
     @Test
-    public void testValidateSlangFileExtensionSLYAML() {
+    public void testValidateSlangFileExtensionSlYaml() {
         Extension.validateSlangFileExtension("slang.sl.yaml");
     }
 
     @Test
-    public void testValidateSlangFileExtensionSLYML() {
+    public void testValidateSlangFileExtensionSlYml() {
         Extension.validateSlangFileExtension("slang.sl.yml");
     }
 
@@ -53,7 +53,7 @@ public class ExtensionTest {
     }
 
     @Test
-    public void testValidatePropertiesFileExtensionPROPSL() {
+    public void testValidatePropertiesFileExtensionPropSl() {
         Extension.validatePropertiesFileExtension("slang.prop.sl");
     }
 
@@ -78,7 +78,7 @@ public class ExtensionTest {
     }
 
     @Test
-    public void testGetYAMLFileExtension() {
+    public void testGetYamlFileExtension() {
         String[] extensions = Extension.getYamlFileExtensionValues();
         Assert.assertEquals(2, extensions.length);
         Assert.assertEquals("yaml", extensions[0]);

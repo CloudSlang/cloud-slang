@@ -109,8 +109,8 @@ public class CompileResultsTest {
     }
 
     private Executable preCompileExecutable(String source) throws Exception {
-        URL sourceURI = getClass().getResource(source);
-        return compiler.preCompile(SlangSource.fromFile(sourceURI.toURI()));
+        URL sourceUri = getClass().getResource(source);
+        return compiler.preCompile(SlangSource.fromFile(sourceUri.toURI()));
     }
 
     private void expectMessage(String message) {

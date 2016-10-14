@@ -605,18 +605,18 @@ public class CompilerErrorsTest {
     }
 
     @Test
-    public void testValidationDuplicateFQNIgnoreCase() throws Exception {
+    public void testValidationDuplicateFqnIgnoreCase() throws Exception {
         URI resource = getClass().getResource("/corrupted/duplicate/duplicate_fqn_1.sl").toURI();
         URI dependency1 = getClass().getResource("/noop.sl").toURI();
         URI dependency2 = getClass().getResource("/corrupted/duplicate/duplicate_fqn_2.sl").toURI();
         URI dependency3 = getClass().getResource("/basic_flow.yaml").toURI();
 
-        SlangSource duplicateFQNInitialSource = SlangSource.fromFile(dependency2);
+        SlangSource duplicateFqnInitialSource = SlangSource.fromFile(dependency2);
 
         Set<SlangSource> dependencies = new HashSet<>();
         dependencies.add(SlangSource.fromFile(dependency1));
         // change file name from source
-        dependencies.add(new SlangSource(duplicateFQNInitialSource.getContent(), "duplicate_fqn_1.sl"));
+        dependencies.add(new SlangSource(duplicateFqnInitialSource.getContent(), "duplicate_fqn_1.sl"));
         dependencies.add(SlangSource.fromFile(dependency3));
 
         exception.expect(RuntimeException.class);

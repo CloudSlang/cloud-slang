@@ -118,7 +118,7 @@ public class ParallelLoopStepsTest {
         ExecutionRuntimeServices executionRuntimeServices = mock(ExecutionRuntimeServices.class);
         List<Value> expectedSplitData = Lists.newArrayList(ValueFactory.create(1), ValueFactory.create(2), ValueFactory.create(3));
         when(parallelLoopBinding.bindParallelLoopList(eq(parallelLoopStatement), eq(context), eq(runEnvironment.getSystemProperties()), eq(nodeName))).thenReturn(expectedSplitData);
-        Long branchBeginStepID = 3L;
+        Long branchBeginStepId = 3L;
 
         // call method
         parallelLoopSteps.addBranches(
@@ -128,14 +128,14 @@ public class ParallelLoopStepsTest {
                 nodeName,
                 1234L,
                 5L,
-                branchBeginStepID,
+                branchBeginStepId,
                 refId
         );
 
         // verify expected behaviour
         ArgumentCaptor<Map> branchContextArgumentCaptor = ArgumentCaptor.forClass(Map.class);
         //noinspection unchecked
-        verify(executionRuntimeServices, times(3)).addBranch(eq(branchBeginStepID), eq(refId), branchContextArgumentCaptor.capture());
+        verify(executionRuntimeServices, times(3)).addBranch(eq(branchBeginStepId), eq(refId), branchContextArgumentCaptor.capture());
 
         List<Map> branchContexts = branchContextArgumentCaptor.getAllValues();
         List<Value> actualSplitData = Lists.newArrayList();
@@ -167,7 +167,7 @@ public class ParallelLoopStepsTest {
         ExecutionRuntimeServices executionRuntimeServices = mock(ExecutionRuntimeServices.class);
         List<Value> expectedSplitData = Lists.newArrayList(ValueFactory.create(1), ValueFactory.create(2), ValueFactory.create(3));
         when(parallelLoopBinding.bindParallelLoopList(eq(parallelLoopStatement), eq(context), eq(runEnvironment.getSystemProperties()), eq(nodeName))).thenReturn(expectedSplitData);
-        Long branchBeginStepID = 0L;
+        Long branchBeginStepId = 0L;
 
         // call method
         parallelLoopSteps.addBranches(
@@ -177,7 +177,7 @@ public class ParallelLoopStepsTest {
                 nodeName,
                 1234L,
                 5L,
-                branchBeginStepID,
+                branchBeginStepId,
                 refId
         );
 

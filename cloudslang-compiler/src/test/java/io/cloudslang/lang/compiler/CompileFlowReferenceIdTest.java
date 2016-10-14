@@ -36,7 +36,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class CompileFlowReferenceIDTest {
+public class CompileFlowReferenceIdTest {
 
     @Autowired
     private SlangCompiler compiler;
@@ -59,9 +59,9 @@ public class CompileFlowReferenceIDTest {
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
         ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceID = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
+        @SuppressWarnings("unchecked") String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
-        Assert.assertEquals("Wrong reference ID for step", "cloudslang.sample.simple_op", referenceID);
+        Assert.assertEquals("Wrong reference ID for step", "cloudslang.sample.simple_op", referenceId);
     }
 
     @Test
@@ -79,9 +79,9 @@ public class CompileFlowReferenceIDTest {
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
         ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceID = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
+        @SuppressWarnings("unchecked") String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
-        Assert.assertEquals("Wrong reference ID for step", "cloudslang.sample.simple_op", referenceID);
+        Assert.assertEquals("Wrong reference ID for step", "cloudslang.sample.simple_op", referenceId);
     }
 
     @Test
@@ -99,9 +99,9 @@ public class CompileFlowReferenceIDTest {
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
         ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceID = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
+        @SuppressWarnings("unchecked") String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
-        Assert.assertEquals("Wrong reference ID for step", "cloud.cloud_op", referenceID);
+        Assert.assertEquals("Wrong reference ID for step", "cloud.cloud_op", referenceId);
     }
 
     @Test
@@ -119,9 +119,9 @@ public class CompileFlowReferenceIDTest {
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
         ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceID = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
+        @SuppressWarnings("unchecked") String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
-        Assert.assertEquals("Wrong reference ID for step", "a.b.c.d.print", referenceID);
+        Assert.assertEquals("Wrong reference ID for step", "a.b.c.d.print", referenceId);
     }
 
     @Test
@@ -139,9 +139,9 @@ public class CompileFlowReferenceIDTest {
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
         ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceID = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
+        @SuppressWarnings("unchecked") String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
-        Assert.assertEquals("Wrong reference ID for step", "a.b.c.d.print", referenceID);
+        Assert.assertEquals("Wrong reference ID for step", "a.b.c.d.print", referenceId);
     }
 
     @Test

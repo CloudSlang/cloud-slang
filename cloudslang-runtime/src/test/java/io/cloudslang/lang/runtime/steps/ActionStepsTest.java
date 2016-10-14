@@ -855,7 +855,7 @@ public class ActionStepsTest {
 
 
     @Test
-    public void doActionPythonImportRightIOPackage() {
+    public void doActionPythonImportRightIoPackage() {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
 

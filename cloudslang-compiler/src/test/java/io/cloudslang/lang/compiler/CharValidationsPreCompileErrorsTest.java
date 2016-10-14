@@ -48,7 +48,7 @@ public class CharValidationsPreCompileErrorsTest {
     }
 
     @Test
-    public void testReferenceID() throws Exception {
+    public void testReferenceId() throws Exception {
         runAndValidateError("/corrupted/chars/flow_2.sl", "Argument[bo$$.ops.check_Weather] violates character rules.");
     }
 
