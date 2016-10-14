@@ -115,10 +115,10 @@ public class CompileDependenciesTest {
     @Test
     public void subFlowRefId() throws Exception {
         URI flow = getClass().getResource("/circular-dependencies/parent_flow.yaml").toURI();
-        URI child_flow = getClass().getResource("/circular-dependencies/child_flow.yaml").toURI();
+        URI childFlow = getClass().getResource("/circular-dependencies/child_flow.yaml").toURI();
         URI operation = getClass().getResource("/test_op.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
-        path.add(SlangSource.fromFile(child_flow));
+        path.add(SlangSource.fromFile(childFlow));
         path.add(SlangSource.fromFile(operation));
 
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
@@ -133,10 +133,10 @@ public class CompileDependenciesTest {
     @Test
     public void bothFileAreDependentOnTheSameFile() throws Exception {
         URI flow = getClass().getResource("/circular-dependencies/parent_flow.yaml").toURI();
-        URI child_flow = getClass().getResource("/circular-dependencies/child_flow.yaml").toURI();
+        URI childFlow = getClass().getResource("/circular-dependencies/child_flow.yaml").toURI();
         URI operation = getClass().getResource("/test_op.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
-        path.add(SlangSource.fromFile(child_flow));
+        path.add(SlangSource.fromFile(childFlow));
         path.add(SlangSource.fromFile(operation));
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
@@ -147,10 +147,10 @@ public class CompileDependenciesTest {
     @Test
     public void circularDependencies() throws Exception {
         URI flow = getClass().getResource("/circular-dependencies/circular_parent_flow.yaml").toURI();
-        URI child_flow = getClass().getResource("/circular-dependencies/circular_child_flow.yaml").toURI();
+        URI childFlow = getClass().getResource("/circular-dependencies/circular_child_flow.yaml").toURI();
         URI operation = getClass().getResource("/test_op.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
-        path.add(SlangSource.fromFile(child_flow));
+        path.add(SlangSource.fromFile(childFlow));
         path.add(SlangSource.fromFile(operation));
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();

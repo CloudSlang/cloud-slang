@@ -176,8 +176,8 @@ public class FlowWithJavaVersioningTest extends SystemsTestsParent {
         ScoreEvent event = trigger(compilationArtifact, userInputs, Collections.<SystemProperty>emptySet());
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
         LanguageEventData data = (LanguageEventData) event.getData();
-        Serializable result_object_value = data.getOutputs().get("result_object_value");
-        assertEquals("SessionValue", result_object_value);
+        Serializable resultObjectValue = data.getOutputs().get("result_object_value");
+        assertEquals("SessionValue", resultObjectValue);
     }
 
     private void testOperation(String operationPath, String expectedResultValue) throws URISyntaxException {
@@ -194,16 +194,16 @@ public class FlowWithJavaVersioningTest extends SystemsTestsParent {
     @Test
     public void testOperationWithParallelLoop() throws Exception {
         URI flow = getClass().getResource("/yaml/versioning/java_flow_with_loop.sl").toURI();
-        URI py_dependency_mul_op = getClass().getResource("/yaml/versioning/javaMulOfSum.sl").toURI();
+        URI pyDependencyMulOp = getClass().getResource("/yaml/versioning/javaMulOfSum.sl").toURI();
 
-        Set<SlangSource> dependencies = Sets.newHashSet(SlangSource.fromFile(py_dependency_mul_op));
+        Set<SlangSource> dependencies = Sets.newHashSet(SlangSource.fromFile(pyDependencyMulOp));
         final CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), dependencies);
 
         for (int iteration = 0; iteration < 20; iteration++) {
             String addedValue = String.valueOf(iteration);
-            Integer sum_of_mul_sum = 0;
+            Integer sumOfMulSum = 0;
             for (int i = 0; i < 20; i++) {
-                sum_of_mul_sum += (i + iteration) * (i + iteration);
+                sumOfMulSum += (i + iteration) * (i + iteration);
             }
             Map<String, Value> userInputs = new HashMap<>();
             userInputs.put("addedValue", ValueFactory.create(addedValue));
@@ -214,7 +214,7 @@ public class FlowWithJavaVersioningTest extends SystemsTestsParent {
             String actualResult = (String) languageEventData.getOutputs().get("sums_result");
             System.out.println("Expected [" + actualResult + "] for addedValue [" + addedValue + "]");
             assertNotNull("expected result 'muls_result' was not found", actualResult);
-            assertEquals(sum_of_mul_sum.toString(), actualResult);
+            assertEquals(sumOfMulSum.toString(), actualResult);
         }
     }
 }

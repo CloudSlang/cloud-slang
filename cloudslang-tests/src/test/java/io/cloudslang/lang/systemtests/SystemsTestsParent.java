@@ -92,9 +92,9 @@ public abstract class SystemsTestsParent {
         }
 
         System.setProperty(MavenConfigImpl.MAVEN_SETTINGS_PATH, settingsXmlPath);
-        String m2_conf_path = classLoader.getResource("m2.conf").getPath();
-        System.out.println("m2.conf path [" + m2_conf_path + "]");
-        System.setProperty(MavenConfigImpl.MAVEN_M2_CONF_PATH, m2_conf_path);
+        String m2ConfPath = classLoader.getResource("m2.conf").getPath();
+        System.out.println("m2.conf path [" + m2ConfPath + "]");
+        System.setProperty(MavenConfigImpl.MAVEN_M2_CONF_PATH, m2ConfPath);
 
         String provideralAlreadyConfigured = System.setProperty("python.executor.engine", PythonExecutionCachedEngine.class.getSimpleName());
         assertNull("python.executor.engine was configured before this test!!!!!!!", provideralAlreadyConfigured);

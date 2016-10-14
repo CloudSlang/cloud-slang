@@ -138,8 +138,8 @@ public class TestRunInfoServiceImplTest {
     public void testInitialize() throws IllegalAccessException, NoSuchFieldException {
         TestRunInfoServiceImpl local = new TestRunInfoServiceImpl();
         local.initialize();
-        Class<? extends TestRunInfoServiceImpl> aClass = local.getClass();
-        Field fieldRunModeMap = aClass.getDeclaredField("runModeMap");
+        Class<? extends TestRunInfoServiceImpl> localClass = local.getClass();
+        Field fieldRunModeMap = localClass.getDeclaredField("runModeMap");
         fieldRunModeMap.setAccessible(true);
         Object value = fieldRunModeMap.get(local);
         Assert.assertNotNull(value);
