@@ -87,13 +87,13 @@ public class SetUtilsTest {
     }
 
     @Test
-    public void testContainsIgnoreCaseBasedOnFQNEmpty() throws Exception {
-        Assert.assertFalse(SetUtils.containsIgnoreCaseBasedOnFQN(EMPTY_SET_SP, SP_1));
+    public void testContainsIgnoreCaseBasedOnFqnEmpty() throws Exception {
+        Assert.assertFalse(SetUtils.containsIgnoreCaseBasedOnFqn(EMPTY_SET_SP, SP_1));
     }
 
     @Test
-    public void testContainsIgnoreCaseBasedOnFQN() throws Exception {
-        Assert.assertTrue(SetUtils.containsIgnoreCaseBasedOnFQN(SET_SP_1, SP_1));
+    public void testContainsIgnoreCaseBasedOnFqn() throws Exception {
+        Assert.assertTrue(SetUtils.containsIgnoreCaseBasedOnFqn(SET_SP_1, SP_1));
     }
 
     @Test

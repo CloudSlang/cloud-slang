@@ -17,7 +17,7 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
  */
 public class Regex {
     // match ${ expression } pattern
-    public final static String EXPRESSION_REGEX =
+    public static final String EXPRESSION_REGEX =
             "^\\s*" +
                     ScoreLangConstants.EXPRESSION_START_DELIMITER_ESCAPED +
                     "\\s*" +

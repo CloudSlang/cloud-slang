@@ -22,9 +22,6 @@ import io.cloudslang.lang.entities.utils.SetUtils;
 import java.io.File;
 import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -240,7 +237,7 @@ public class CompilerHelperImpl implements CompilerHelper {
             File sourceFile) {
         for (Map.Entry<File, Set<SystemProperty>> entry : target.entrySet()) {
             for (SystemProperty propertyFromFile : propertiesFromFile) {
-                if (SetUtils.containsIgnoreCaseBasedOnFQN(entry.getValue(), propertyFromFile)) {
+                if (SetUtils.containsIgnoreCaseBasedOnFqn(entry.getValue(), propertyFromFile)) {
                     throw new RuntimeException(
                             DUPLICATE_SYSTEM_PROPERTY_ERROR_MESSAGE_PREFIX + propertyFromFile.getFullyQualifiedName() +
                                     "' in the following files: " + entry.getKey().getPath() + ", " + sourceFile.getPath()
