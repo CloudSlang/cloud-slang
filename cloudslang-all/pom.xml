@@ -91,6 +91,7 @@ http://www.apache.org/licenses/LICENSE-2.0
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+                <version>${plugins.maven-dependency-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>analyze dependencies</id>
