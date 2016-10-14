@@ -30,6 +30,24 @@
         </dependency>
 
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cloudslang-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cloudslang-all</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cloudslang-compiler</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
         </dependency>
@@ -104,6 +122,50 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.cloudslang</groupId>
+            <artifactId>score-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.python</groupId>
+            <artifactId>jython-standalone</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -170,21 +232,21 @@
                         </goals>
                         <configuration>
                             <failOnWarning>true</failOnWarning>
-                            <ignoredUsedUndeclaredDependencies>
-                                <ignoredUsedUndeclaredDependency>log4j:log4j:jar:1.2.17</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>io.cloudslang.lang:cloudslang-runtime:jar:${project.version}</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>org.springframework:spring-core:jar:4.2.5.RELEASE</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>org.springframework:spring-context:jar:4.2.5.RELEASE</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>org.springframework:spring-beans:jar:4.2.5.RELEASE</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>com.fasterxml.jackson.core:jackson-annotations:jar:2.6.0</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>commons-lang:commons-lang:jar:2.6</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>io.cloudslang:score-api:jar:0.3.40</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>org.python:jython-standalone:jar:2.7.0</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>commons-collections:commons-collections:jar:3.2.2</ignoredUsedUndeclaredDependency>
+                            <!--<ignoredUsedUndeclaredDependencies>-->
+                            <!--<ignoredUsedUndeclaredDependency>log4j:log4j:jar:1.2.17</ignoredUsedUndeclaredDependency>-->
+                            <!--<ignoredUsedUndeclaredDependency>io.cloudslang.lang:cloudslang-runtime:jar:${project.version}</ignoredUsedUndeclaredDependency>-->
+                            <!--<ignoredUsedUndeclaredDependency>org.springframework:spring-core:jar:4.2.5.RELEASE</ignoredUsedUndeclaredDependency>-->
+                            <!--<ignoredUsedUndeclaredDependency>org.springframework:spring-context:jar:4.2.5.RELEASE</ignoredUsedUndeclaredDependency>-->
+                            <!--<ignoredUsedUndeclaredDependency>org.springframework:spring-beans:jar:4.2.5.RELEASE</ignoredUsedUndeclaredDependency>-->
+                            <!--<ignoredUsedUndeclaredDependency>com.fasterxml.jackson.core:jackson-annotations:jar:2.6.0</ignoredUsedUndeclaredDependency>-->
+                            <!--<ignoredUsedUndeclaredDependency>commons-lang:commons-lang:jar:2.6</ignoredUsedUndeclaredDependency>-->
+                            <!--<ignoredUsedUndeclaredDependency>io.cloudslang:score-api:jar:0.3.40</ignoredUsedUndeclaredDependency>-->
+                            <!--<ignoredUsedUndeclaredDependency>org.python:jython-standalone:jar:2.7.0</ignoredUsedUndeclaredDependency>-->
+                            <!--<ignoredUsedUndeclaredDependency>commons-collections:commons-collections:jar:3.2.2</ignoredUsedUndeclaredDependency>-->
 
-                                <ignoredUsedUndeclaredDependency>io.cloudslang.lang:cloudslang-all:jar:${project.version}</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>io.cloudslang.lang:cloudslang-compiler:jar:${project.version}</ignoredUsedUndeclaredDependency>
-                            </ignoredUsedUndeclaredDependencies>
+                            <!--<ignoredUsedUndeclaredDependency>io.cloudslang.lang:cloudslang-all:jar:${project.version}</ignoredUsedUndeclaredDependency>-->
+                            <!--<ignoredUsedUndeclaredDependency>io.cloudslang.lang:cloudslang-compiler:jar:${project.version}</ignoredUsedUndeclaredDependency>-->
+                            <!--</ignoredUsedUndeclaredDependencies>-->
                         </configuration>
                     </execution>
                 </executions>
