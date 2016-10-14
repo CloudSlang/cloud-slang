@@ -232,21 +232,6 @@
                         </goals>
                         <configuration>
                             <failOnWarning>true</failOnWarning>
-                            <!--<ignoredUsedUndeclaredDependencies>-->
-                            <!--<ignoredUsedUndeclaredDependency>log4j:log4j:jar:1.2.17</ignoredUsedUndeclaredDependency>-->
-                            <!--<ignoredUsedUndeclaredDependency>io.cloudslang.lang:cloudslang-runtime:jar:${project.version}</ignoredUsedUndeclaredDependency>-->
-                            <!--<ignoredUsedUndeclaredDependency>org.springframework:spring-core:jar:4.2.5.RELEASE</ignoredUsedUndeclaredDependency>-->
-                            <!--<ignoredUsedUndeclaredDependency>org.springframework:spring-context:jar:4.2.5.RELEASE</ignoredUsedUndeclaredDependency>-->
-                            <!--<ignoredUsedUndeclaredDependency>org.springframework:spring-beans:jar:4.2.5.RELEASE</ignoredUsedUndeclaredDependency>-->
-                            <!--<ignoredUsedUndeclaredDependency>com.fasterxml.jackson.core:jackson-annotations:jar:2.6.0</ignoredUsedUndeclaredDependency>-->
-                            <!--<ignoredUsedUndeclaredDependency>commons-lang:commons-lang:jar:2.6</ignoredUsedUndeclaredDependency>-->
-                            <!--<ignoredUsedUndeclaredDependency>io.cloudslang:score-api:jar:0.3.40</ignoredUsedUndeclaredDependency>-->
-                            <!--<ignoredUsedUndeclaredDependency>org.python:jython-standalone:jar:2.7.0</ignoredUsedUndeclaredDependency>-->
-                            <!--<ignoredUsedUndeclaredDependency>commons-collections:commons-collections:jar:3.2.2</ignoredUsedUndeclaredDependency>-->
-
-                            <!--<ignoredUsedUndeclaredDependency>io.cloudslang.lang:cloudslang-all:jar:${project.version}</ignoredUsedUndeclaredDependency>-->
-                            <!--<ignoredUsedUndeclaredDependency>io.cloudslang.lang:cloudslang-compiler:jar:${project.version}</ignoredUsedUndeclaredDependency>-->
-                            <!--</ignoredUsedUndeclaredDependencies>-->
                         </configuration>
                     </execution>
                 </executions>
