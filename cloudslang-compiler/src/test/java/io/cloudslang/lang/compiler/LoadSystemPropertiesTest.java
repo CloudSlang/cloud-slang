@@ -13,9 +13,11 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.result.SystemPropertyModellingResult;
 import io.cloudslang.lang.entities.SystemProperty;
+
 import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;

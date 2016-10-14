@@ -20,6 +20,7 @@ import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
+
 import java.io.File;
 import java.io.Serializable;
 import java.net.URISyntaxException;
@@ -27,6 +28,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import junit.framework.Assert;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Before;

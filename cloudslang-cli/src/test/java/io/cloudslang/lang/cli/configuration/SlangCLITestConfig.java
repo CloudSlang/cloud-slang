@@ -14,7 +14,9 @@ import io.cloudslang.lang.cli.services.ScoreServicesImpl;
 import io.cloudslang.lang.cli.utils.CompilerHelper;
 import io.cloudslang.lang.cli.utils.CompilerHelperImpl;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
+
 import java.io.IOException;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

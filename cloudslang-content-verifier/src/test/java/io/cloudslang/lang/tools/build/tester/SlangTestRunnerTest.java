@@ -51,6 +51,7 @@ import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
+
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
@@ -66,6 +67,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
 import org.apache.commons.collections4.SetUtils;
 import org.junit.Assert;
 import org.junit.Before;

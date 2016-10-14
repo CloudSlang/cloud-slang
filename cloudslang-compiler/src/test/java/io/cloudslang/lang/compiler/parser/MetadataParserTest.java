@@ -11,8 +11,10 @@ package io.cloudslang.lang.compiler.parser;
 
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+
 import java.net.URI;
 import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,7 +52,9 @@ public class MetadataParserTest {
         Map<String, String> metadataMap = metadataParser.parse(SlangSource.fromFile(operation));
         boolean containsNulls = false;
         for (Map.Entry<String, String> entry : metadataMap.entrySet()) {
-            if (entry.getValue() == null) containsNulls = true;
+            if (entry.getValue() == null) {
+                containsNulls = true;
+            }
         }
         Assert.assertFalse("metadata map contains nulls", containsNulls);
     }

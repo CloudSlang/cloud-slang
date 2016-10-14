@@ -24,7 +24,7 @@ public class VariableNamePatternMatcherTest {
 
     @Before
     public void setUp() throws Exception {
-        variableNamePatternMatcher =  new VariableNamePatternMatcher();
+        variableNamePatternMatcher = new VariableNamePatternMatcher();
     }
 
     @Test

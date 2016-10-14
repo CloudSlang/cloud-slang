@@ -12,6 +12,7 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
@@ -634,8 +635,8 @@ public class CompilerErrorsTest {
         Assert.assertEquals(2, result.getErrors().size());
         Assert.assertEquals("Argument[print_ values] violates character rules.", result.getErrors().get(0).getMessage());
         Assert.assertEquals("Cannot compile flow 'loops.loop_with_break_on_non_existing_result' " +
-                "since in step 'print_ values' the results [CUSTOM_1, CUSTOM_2] declared in 'break' " +
-                "section are not declared in the dependency 'loops.print' result section.",
+                        "since in step 'print_ values' the results [CUSTOM_1, CUSTOM_2] declared in 'break' " +
+                        "section are not declared in the dependency 'loops.print' result section.",
                 result.getErrors().get(1).getMessage());
     }
 

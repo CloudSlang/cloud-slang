@@ -54,6 +54,7 @@ import io.cloudslang.lang.tools.build.validation.StaticValidator;
 import io.cloudslang.lang.tools.build.validation.StaticValidatorImpl;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
 import io.cloudslang.score.api.ExecutionPlan;
+
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Files;
@@ -68,6 +69,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+
 import junit.framework.Assert;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.io.FileUtils;

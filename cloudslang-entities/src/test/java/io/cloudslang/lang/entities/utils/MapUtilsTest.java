@@ -11,9 +11,11 @@ package io.cloudslang.lang.entities.utils;
 
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
 import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

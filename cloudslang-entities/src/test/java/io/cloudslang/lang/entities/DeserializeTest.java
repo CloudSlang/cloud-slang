@@ -17,8 +17,10 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+
 import java.io.IOException;
 import java.util.HashSet;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

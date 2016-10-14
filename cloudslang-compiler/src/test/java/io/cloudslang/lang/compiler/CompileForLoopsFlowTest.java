@@ -20,6 +20,7 @@ import io.cloudslang.lang.entities.MapLoopStatement;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.score.api.ExecutionPlan;
+
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;

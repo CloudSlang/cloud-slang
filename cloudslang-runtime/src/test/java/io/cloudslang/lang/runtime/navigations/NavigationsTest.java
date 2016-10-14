@@ -13,7 +13,9 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+
 import java.util.Collection;
+
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

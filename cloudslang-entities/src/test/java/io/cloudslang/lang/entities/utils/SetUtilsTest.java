@@ -13,11 +13,13 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
 import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

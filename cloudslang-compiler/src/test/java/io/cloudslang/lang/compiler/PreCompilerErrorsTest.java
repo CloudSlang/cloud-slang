@@ -12,8 +12,10 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
+
 import java.net.URI;
 import java.util.List;
+
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;

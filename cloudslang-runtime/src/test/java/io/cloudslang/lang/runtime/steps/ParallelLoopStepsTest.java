@@ -37,12 +37,14 @@ import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.score.api.EndBranchDataContainer;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -205,13 +207,11 @@ public class ParallelLoopStepsTest {
         runEnvironment.getStack().pushContext(context);
 
 
-
         Map<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         ResultNavigation successNavigation = new ResultNavigation(0L, ScoreLangConstants.SUCCESS_RESULT);
         ResultNavigation failureNavigation = new ResultNavigation(0L, ScoreLangConstants.FAILURE_RESULT);
         stepNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
         stepNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
-
 
 
         // prepare mocks

@@ -34,6 +34,7 @@ import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -42,6 +43,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;

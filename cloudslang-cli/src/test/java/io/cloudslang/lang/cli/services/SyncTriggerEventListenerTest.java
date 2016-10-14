@@ -10,9 +10,11 @@
 package io.cloudslang.lang.cli.services;
 
 import io.cloudslang.lang.runtime.events.LanguageEventData;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;

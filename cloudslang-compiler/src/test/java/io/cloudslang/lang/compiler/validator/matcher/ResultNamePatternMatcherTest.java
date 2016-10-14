@@ -24,7 +24,7 @@ public class ResultNamePatternMatcherTest {
 
     @Before
     public void setUp() throws Exception {
-        resultNamePatternMatcher =  new ResultNamePatternMatcher();
+        resultNamePatternMatcher = new ResultNamePatternMatcher();
     }
 
     @Test

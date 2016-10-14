@@ -11,9 +11,11 @@ package io.cloudslang.lang.entities.encryption;
 
 import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import io.cloudslang.lang.spi.encryption.Encryption;
+
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

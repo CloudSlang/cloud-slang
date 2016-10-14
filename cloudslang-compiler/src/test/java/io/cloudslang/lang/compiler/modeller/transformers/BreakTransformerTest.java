@@ -14,9 +14,11 @@ import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,10 +62,12 @@ public class BreakTransformerTest extends TransformersTestParent {
         public BreakTransformer breakTransformer() {
             return new BreakTransformer();
         }
+
         @Bean
         public ExecutableValidator executableValidator() {
             return new ExecutableValidatorImpl();
         }
+
         @Bean
         public SystemPropertyValidator systemPropertyValidator() {
             return new SystemPropertyValidatorImpl();
