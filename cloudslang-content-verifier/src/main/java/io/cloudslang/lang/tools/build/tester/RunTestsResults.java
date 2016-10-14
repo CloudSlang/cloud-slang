@@ -105,17 +105,21 @@ public class RunTestsResults implements IRunTestResults {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
 
         RunTestsResults that = (RunTestsResults) o;
 
-        if (passedTests != null ? !passedTests.equals(that.passedTests) : that.passedTests != null)
+        if (passedTests != null ? !passedTests.equals(that.passedTests) : that.passedTests != null) {
             return false;
-        if (failedTests != null ? !failedTests.equals(that.failedTests) : that.failedTests != null)
+        }
+        if (failedTests != null ? !failedTests.equals(that.failedTests) : that.failedTests != null) {
             return false;
+        }
         return !(skippedTests != null ? !skippedTests.equals(that.skippedTests) : that.skippedTests != null);
 
     }

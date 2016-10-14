@@ -19,10 +19,6 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.utils.SetUtils;
-import java.io.File;
-import java.io.Serializable;
-import java.util.*;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
@@ -32,6 +28,17 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
+
+import java.io.File;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static ch.lambdaj.Lambda.convert;
 
@@ -175,7 +182,9 @@ public class CompilerHelperImpl implements CompilerHelper {
         Collection<File> fileCollection;
         if (CollectionUtils.isEmpty(files)) {
             fileCollection = loadDefaultFiles(extensions, directory, false);
-            if (CollectionUtils.isEmpty(fileCollection)) return null;
+            if (CollectionUtils.isEmpty(fileCollection)) {
+                return null;
+            }
         } else {
             fileCollection = files;
         }
@@ -208,7 +217,9 @@ public class CompilerHelperImpl implements CompilerHelper {
         Collection<File> fileCollection;
         if (CollectionUtils.isEmpty(files)) {
             fileCollection = loadDefaultFiles(extensions, directory, true);
-            if (CollectionUtils.isEmpty(fileCollection)) return new HashSet<>();
+            if (CollectionUtils.isEmpty(fileCollection)) {
+                return new HashSet<>();
+            }
         } else {
             fileCollection = files;
             for (File propertyFileCandidate : fileCollection) {

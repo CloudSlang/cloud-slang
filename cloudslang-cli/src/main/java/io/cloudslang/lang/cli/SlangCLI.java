@@ -23,6 +23,7 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.time.StopWatch;
@@ -104,7 +106,9 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = {"v", "verbose"}, mandatory = false, help = "default, quiet, debug(print each step outputs). e.g. run --f c:/.../your_flow.sl --v quiet", specifiedDefaultValue = "debug", unspecifiedDefaultValue = "default") final String verbose,
             @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = SYSTEM_PROPERTY_FILE_HELP) final List<String> systemPropertyFiles) {
 
-        if (invalidVerboseInput(verbose)) throw new IllegalArgumentException("Verbose argument is invalid.");
+        if (invalidVerboseInput(verbose)) {
+            throw new IllegalArgumentException("Verbose argument is invalid.");
+        }
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
         Set<SystemProperty> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
