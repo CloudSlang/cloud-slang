@@ -147,12 +147,12 @@ public abstract class AbstractExecutionData {
         runEnvironment.putCallArguments(callArguments);
     }
 
-    protected void pushParentFlowDataOnStack(RunEnvironment runEnv, Long RUNNING_EXECUTION_PLAN_ID, Long nextStepId) {
+    protected void pushParentFlowDataOnStack(RunEnvironment runEnv, Long runningExecutionPlanId, Long nextStepId) {
         // create ParentFlowData object containing the current running execution plan id and
         // the next step id to navigate to in the current execution plan,
         // and push it to the ParentFlowStack for future use (once we finish running the ref operation/flow)
         ParentFlowStack stack = runEnv.getParentFlowStack();
-        stack.pushParentFlowData(new ParentFlowData(RUNNING_EXECUTION_PLAN_ID, nextStepId));
+        stack.pushParentFlowData(new ParentFlowData(runningExecutionPlanId, nextStepId));
     }
 
 }
