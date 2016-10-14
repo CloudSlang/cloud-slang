@@ -82,7 +82,7 @@ public class ScoreServicesImpl implements ScoreServices {
         scoreEventListener.setIsDebugMode(debug);
         slang.subscribeOnEvents(scoreEventListener, handlerTypes);
 
-        Long executionId = trigger(compilationArtifact, inputs, systemProperties);
+        final Long executionId = trigger(compilationArtifact, inputs, systemProperties);
 
         while (!scoreEventListener.isFlowFinished()) {
             try {

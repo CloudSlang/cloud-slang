@@ -96,7 +96,7 @@ public class TriggerFlows {
         Map<String, List<StepData>> branchesByPath = branchAggregatorListener.aggregate();
         Map<String, StepData> parallelSteps = joinAggregatorListener.aggregate();
 
-        RuntimeInformation runtimeInformation = new RuntimeInformation(steps, branchesByPath, parallelSteps);
+        final RuntimeInformation runtimeInformation = new RuntimeInformation(steps, branchesByPath, parallelSteps);
 
         slang.unSubscribeOnEvents(joinAggregatorListener);
         slang.unSubscribeOnEvents(branchAggregatorListener);

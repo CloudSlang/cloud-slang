@@ -33,7 +33,6 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
@@ -361,7 +360,6 @@ public class ExecutableBuilder {
         PeekingIterator<Map<String, Map<String, Object>>> iterator = new PeekingIterator<>(workFlowRawData.iterator());
         while (iterator.hasNext()) {
             Map<String, Map<String, Object>> stepRawData = iterator.next();
-            Map<String, Map<String, Object>> nextStepData = iterator.peek();
             String stepName = getStepName(stepRawData);
             validateStepName(stepName, errors);
             if (stepNames.contains(stepName) || onFailureStepNames.contains(stepName)) {
@@ -408,6 +406,7 @@ public class ExecutableBuilder {
             }
 
             String defaultSuccess;
+            Map<String, Map<String, Object>> nextStepData = iterator.peek();
             if (nextStepData != null) {
                 defaultSuccess = nextStepData.keySet().iterator().next();
             } else {
@@ -493,7 +492,7 @@ public class ExecutableBuilder {
         } else {
             try {
                 String refString = doRawData.keySet().iterator().next();
-                refId = resolveReferenceID(refString, imports, namespace);
+                refId = resolveReferenceId(refString, imports, namespace);
             } catch (RuntimeException rex) {
                 errors.add(rex);
             }
@@ -569,7 +568,7 @@ public class ExecutableBuilder {
         }
     }
 
-    private String resolveReferenceID(String rawReferenceId, Map<String, String> imports, String namespace) {
+    private String resolveReferenceId(String rawReferenceId, Map<String, String> imports, String namespace) {
         executableValidator.validateStepReferenceId(rawReferenceId);
 
         int numberOfDelimiters = StringUtils.countMatches(rawReferenceId, NAMESPACE_DELIMITER);

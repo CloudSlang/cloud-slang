@@ -135,7 +135,8 @@ public class MetadataParser {
 
     private String extractDescriptionString(SlangSource source) {
         StrBuilder sb = new StrBuilder();
-        boolean blockEndTagFound = false, blockStartTagFound = false;
+        boolean blockEndTagFound = false;
+        boolean blockStartTagFound = false;
         String firstLine = "";
         try (BufferedReader reader = new BufferedReader(new StringReader(source.getContent()))) {
             String line = getTrimmedLine(reader);

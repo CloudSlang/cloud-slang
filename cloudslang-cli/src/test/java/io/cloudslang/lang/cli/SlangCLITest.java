@@ -63,7 +63,7 @@ public class SlangCLITest {
     public static final String INPUT_FILE_PATH = "/inputs/inputs.yaml";
 
     private JLineShellComponent shell;
-    private SlangCLI slangCLI;
+    private SlangCli slangCLI;
     private ScoreServices ScoreServicesMock;
     private CompilerHelper compilerHelperMock;
 
@@ -72,7 +72,7 @@ public class SlangCLITest {
         shell = bootstrap.getJLineShellComponent();
         ScoreServicesMock = (ScoreServices) bootstrap.getApplicationContext().getBean("scoreServices");
         compilerHelperMock = (CompilerHelper) bootstrap.getApplicationContext().getBean("compilerHelper");
-        slangCLI = bootstrap.getApplicationContext().getBean(SlangCLI.class);
+        slangCLI = bootstrap.getApplicationContext().getBean(SlangCli.class);
     }
 
     @Before
@@ -173,7 +173,7 @@ public class SlangCLITest {
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
         verify(ScoreServicesMock).trigger(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class));
 
-        Assert.assertEquals("method result mismatch", SlangCLI.triggerAsyncMsg(executionID, emptyCompilationArtifact.getExecutionPlan().getName()), cr.getResult());
+        Assert.assertEquals("method result mismatch", SlangCli.triggerAsyncMsg(executionID, emptyCompilationArtifact.getExecutionPlan().getName()), cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
@@ -248,7 +248,7 @@ public class SlangCLITest {
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
         verify(ScoreServicesMock).trigger(eq(emptyCompilationArtifact), eq(inputsMap), anySetOf(SystemProperty.class));
 
-        Assert.assertEquals("method result mismatch", SlangCLI.triggerAsyncMsg(executionID, emptyCompilationArtifact.getExecutionPlan().getName()), cr.getResult());
+        Assert.assertEquals("method result mismatch", SlangCli.triggerAsyncMsg(executionID, emptyCompilationArtifact.getExecutionPlan().getName()), cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
@@ -311,7 +311,7 @@ public class SlangCLITest {
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
         verify(ScoreServicesMock).trigger(eq(emptyCompilationArtifact), eq(inputsMap), anySetOf(SystemProperty.class));
 
-        Assert.assertEquals("method result mismatch", SlangCLI.triggerAsyncMsg(executionID, emptyCompilationArtifact.getExecutionPlan().getName()), cr.getResult());
+        Assert.assertEquals("method result mismatch", SlangCli.triggerAsyncMsg(executionID, emptyCompilationArtifact.getExecutionPlan().getName()), cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
@@ -354,7 +354,7 @@ public class SlangCLITest {
     public void testSetEnvVarTrue() throws Exception {
         CommandResult cr = shell.executeCommand("env --setAsync true");
 
-        Assert.assertEquals("method result mismatch", SlangCLI.setEnvMessage(true), cr.getResult());
+        Assert.assertEquals("method result mismatch", SlangCli.setEnvMessage(true), cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
@@ -363,7 +363,7 @@ public class SlangCLITest {
     public void testSetEnvVarFalse() {
         CommandResult cr = shell.executeCommand("env --setAsync false");
 
-        Assert.assertEquals("method result mismatch", SlangCLI.setEnvMessage(false), cr.getResult());
+        Assert.assertEquals("method result mismatch", SlangCli.setEnvMessage(false), cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
