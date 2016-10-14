@@ -54,8 +54,8 @@ public class CompilerErrorsTest {
 
     @Test
     public void testNavigateOnSameLevelAsSteps() throws Exception {
-        URI resource = getClass().getResource("/corrupted/flow_navigate_same_level_as_step.sl").toURI();
-        URI operation = getClass().getResource("/test_op.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/flow_navigate_same_level_as_step.sl").toURI();
+        final URI operation = getClass().getResource("/test_op.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
 
@@ -68,8 +68,8 @@ public class CompilerErrorsTest {
 
     @Test
     public void testNavigateToNonExistingStep() throws Exception {
-        URI resource = getClass().getResource("/corrupted/flow_navigate_to_non_existing_step.sl").toURI();
-        URI operation = getClass().getResource("/test_op.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/flow_navigate_to_non_existing_step.sl").toURI();
+        final URI operation = getClass().getResource("/test_op.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
 
@@ -81,7 +81,7 @@ public class CompilerErrorsTest {
 
     @Test
     public void testNotYamlFile() throws Exception {
-        URI resource = getClass().getResource("/corrupted/not_yaml_file.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/not_yaml_file.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
@@ -92,8 +92,8 @@ public class CompilerErrorsTest {
 
     @Test
     public void testNotOpFlowFile() throws Exception {
-        URI resource = getClass().getResource("/corrupted/no_op_flow_file.sl").toURI();
-        Set<SlangSource> path = new HashSet<>();
+        final URI resource = getClass().getResource("/corrupted/no_op_flow_file.sl").toURI();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("Error transforming source: no_op_flow_file.sl to a Slang model. " +
                 "Source no_op_flow_file.sl has no content associated with flow/operation/decision/properties property.");
@@ -102,8 +102,8 @@ public class CompilerErrorsTest {
 
     @Test
     public void testSystemProperties() throws Exception {
-        URI systemProperties = getClass().getResource("/corrupted/system_properties.yaml").toURI();
-        Set<SlangSource> path = new HashSet<>();
+        final URI systemProperties = getClass().getResource("/corrupted/system_properties.yaml").toURI();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("There was a problem parsing the YAML source: system_properties.yaml.\n" +
                 "Cannot create property=user.sys.props.host for JavaBean=io.cloudslang.lang.compiler.parser.model.ParsedSlang");
@@ -112,10 +112,10 @@ public class CompilerErrorsTest {
 
     @Test
     public void testSystemPropertiesAsDep() throws Exception {
-        URI flow = getClass().getResource("/basic_flow.yaml").toURI();
-        URI operation = getClass().getResource("/test_op.sl").toURI();
-        URI systemProperties = getClass().getResource("/corrupted/system_properties.yaml").toURI();
-        Set<SlangSource> path = new HashSet<>();
+        final URI flow = getClass().getResource("/basic_flow.yaml").toURI();
+        final URI operation = getClass().getResource("/test_op.sl").toURI();
+        final URI systemProperties = getClass().getResource("/corrupted/system_properties.yaml").toURI();
+        final Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
         path.add(SlangSource.fromFile(systemProperties));
         exception.expect(RuntimeException.class);
@@ -126,10 +126,10 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithNavigationToMissingStep() throws Exception {
-        URI resource = getClass().getResource("/corrupted/flow_with_navigation_to_missing_step.sl").toURI();
-        URI operations = getClass().getResource("/java_op.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/flow_with_navigation_to_missing_step.sl").toURI();
+        final URI operations = getClass().getResource("/java_op.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
         exception.expect(RuntimeException.class);
         exception.expectMessage("Failed to compile step: Step1. The step/result name: " +
@@ -139,8 +139,8 @@ public class CompilerErrorsTest {
 
     @Test
     public void testNavigationSectionKeysNotInResultsSection() throws Exception {
-        URI resource = getClass().getResource("/corrupted/navigation/flow_1.yaml").toURI();
-        URI dep1 = getClass().getResource("/corrupted/navigation/op_1.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/navigation/flow_1.yaml").toURI();
+        final URI dep1 = getClass().getResource("/corrupted/navigation/op_1.sl").toURI();
 
         Set<SlangSource> dependencies = new HashSet<>();
         dependencies.add(SlangSource.fromFile(dep1));
@@ -156,8 +156,8 @@ public class CompilerErrorsTest {
 
     @Test
     public void testNavigationSectionResultsNotWired() throws Exception {
-        URI resource = getClass().getResource("/corrupted/navigation/flow_2.yaml").toURI();
-        URI dep1 = getClass().getResource("/corrupted/navigation/op_2.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/navigation/flow_2.yaml").toURI();
+        final URI dep1 = getClass().getResource("/corrupted/navigation/op_2.sl").toURI();
 
         Set<SlangSource> dependencies = new HashSet<>();
         dependencies.add(SlangSource.fromFile(dep1));
@@ -175,10 +175,10 @@ public class CompilerErrorsTest {
     public void testFlowWithMissingSpaceBeforeFirstImport() throws Exception {
         //covers "mapping values are not allowed here" error
 
-        URI resource = getClass().getResource("/corrupted/flow_with_missing_space_before_first_import.sl").toURI();
-        URI operations = getClass().getResource("/java_op.sl").toURI();
-        URI checkWeather = getClass().getResource("/check_Weather.sl").toURI();
-        URI flows = getClass().getResource("/flow_with_data.yaml").toURI();
+        final URI resource = getClass().getResource("/corrupted/flow_with_missing_space_before_first_import.sl").toURI();
+        final URI operations = getClass().getResource("/java_op.sl").toURI();
+        final URI checkWeather = getClass().getResource("/check_Weather.sl").toURI();
+        final URI flows = getClass().getResource("/flow_with_data.yaml").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
@@ -194,10 +194,10 @@ public class CompilerErrorsTest {
     public void testFlowWithWrongIndentation() throws Exception {
         //covers "Unable to find property 'X' on class: io.cloudslang.lang.compiler.parser.model.ParsedSlang"
 
-        URI resource = getClass().getResource("/corrupted/flow_with_wrong_indentation.sl").toURI();
-        URI operations = getClass().getResource("/java_op.sl").toURI();
-        URI flows = getClass().getResource("/flow_with_data.yaml").toURI();
-        URI checkWeather = getClass().getResource("/check_Weather.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/flow_with_wrong_indentation.sl").toURI();
+        final URI operations = getClass().getResource("/java_op.sl").toURI();
+        final URI flows = getClass().getResource("/flow_with_data.yaml").toURI();
+        final URI checkWeather = getClass().getResource("/check_Weather.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
@@ -214,10 +214,10 @@ public class CompilerErrorsTest {
     public void testFlowWhereMapCannotBeCreated() throws Exception {
         //covers "No single argument constructor found for interface java.util.Map"
 
-        URI resource = getClass().getResource("/corrupted/flow_where_map_cannot_be_created.sl").toURI();
-        URI operations = getClass().getResource("/java_op.sl").toURI();
-        URI flows = getClass().getResource("/flow_with_data.yaml").toURI();
-        URI checkWeather = getClass().getResource("/check_Weather.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/flow_where_map_cannot_be_created.sl").toURI();
+        final URI operations = getClass().getResource("/java_op.sl").toURI();
+        final URI flows = getClass().getResource("/flow_with_data.yaml").toURI();
+        final URI checkWeather = getClass().getResource("/check_Weather.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
@@ -233,9 +233,9 @@ public class CompilerErrorsTest {
     public void testFlowWithCorruptedKeyInImports() throws Exception {
         //covers problem parsing YAML source "while scanning a simple key"
 
-        URI resource = getClass().getResource("/corrupted/flow_with_corrupted_key_in_imports.sl").toURI();
-        URI operations = getClass().getResource("/java_op.sl").toURI();
-        URI flows = getClass().getResource("/flow_with_data.yaml").toURI();
+        final URI resource = getClass().getResource("/corrupted/flow_with_corrupted_key_in_imports.sl").toURI();
+        final URI operations = getClass().getResource("/java_op.sl").toURI();
+        final URI flows = getClass().getResource("/flow_with_data.yaml").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
@@ -248,8 +248,8 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithNavigationToMissingDefaultResults() throws Exception {
-        URI resource = getClass().getResource("/corrupted/flow_with_navigation_to_missing_default_results.sl").toURI();
-        URI operations = getClass().getResource("/java_op.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/flow_with_navigation_to_missing_default_results.sl").toURI();
+        final URI operations = getClass().getResource("/java_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
@@ -261,8 +261,8 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithMissingNavigationFromOperationResult() throws Exception {
-        URI resource = getClass().getResource("/corrupted/step_with_missing_navigation_from_operation_result_flow.sl").toURI();
-        URI operations = getClass().getResource("/java_op.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/step_with_missing_navigation_from_operation_result_flow.sl").toURI();
+        final URI operations = getClass().getResource("/java_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operations));
@@ -275,9 +275,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithMissingImports() throws Exception {
-        URI resource = getClass().getResource("/corrupted/missing_dependencies_imports_flow.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/missing_dependencies_imports_flow.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("Source missing_dependencies_imports_flow has " +
                 "dependencies but no path was given to the compiler");
@@ -286,9 +286,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testOpWithMissingNamespace() throws Exception {
-        URI resource = getClass().getResource("/corrupted/op_without_namespace.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/op_without_namespace.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("For source[op_without_namespace.sl] namespace cannot be empty.");
         compiler.compile(SlangSource.fromFile(resource), path);
@@ -296,9 +296,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithMissingName() throws Exception {
-        URI resource = getClass().getResource("/corrupted/missing_name_flow.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/missing_name_flow.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("Executable has no name");
         compiler.compile(SlangSource.fromFile(resource), path);
@@ -306,9 +306,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithInputsAsString() throws Exception {
-        URI resource = getClass().getResource("/corrupted/inputs_type_string_flow.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/inputs_type_string_flow.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("For flow 'inputs_type_string_flow' syntax is illegal.\n" +
                 "Under property: 'inputs' there should be a list of values, but instead there is a string.");
@@ -317,9 +317,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithInputsAsMap() throws Exception {
-        URI resource = getClass().getResource("/corrupted/inputs_type_map_flow.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/inputs_type_map_flow.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("For flow 'inputs_type_string_flow' syntax is illegal.\n" +
                 "Under property: 'inputs' there should be a list of values, but instead there is a map.\n" +
@@ -329,9 +329,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithIllegalTypeInput() throws Exception {
-        URI resource = getClass().getResource("/corrupted/flow_with_wrong_type_input.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/flow_with_wrong_type_input.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("For flow 'flow_with_wrong_type_input' syntax is illegal.\n" +
                 "Could not transform Input : 3");
@@ -340,9 +340,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithNoWorkflow() throws Exception {
-        URI resource = getClass().getResource("/corrupted/no_workflow_flow.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/no_workflow_flow.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("Error compiling no_workflow_flow.sl. Flow: no_workflow has no workflow property");
         compiler.compile(SlangSource.fromFile(resource), path);
@@ -350,9 +350,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithNoWorkflowData() throws Exception {
-        URI resource = getClass().getResource("/corrupted/no_workflow_data_flow.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/no_workflow_data_flow.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("Error compiling no_workflow_data_flow.sl. Flow: no_workflow_data has no workflow property");
         compiler.compile(SlangSource.fromFile(resource), path);
@@ -360,9 +360,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowStepWithNoData() throws Exception {
-        URI resource = getClass().getResource("/corrupted/no_step_data_flow.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/no_step_data_flow.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("Step: step1 has no data");
         compiler.compile(SlangSource.fromFile(resource), path);
@@ -370,9 +370,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowStepWithTwoKeysUnderDo() throws Exception {
-        URI resource = getClass().getResource("/corrupted/multiple_keys_under_do.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/multiple_keys_under_do.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("For step 'step1' syntax is illegal.\n" +
                 "Step has too many keys under the 'do' keyword,\n" +
@@ -382,9 +382,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithStepsAsList() throws Exception {
-        URI resource = getClass().getResource("/corrupted/workflow_with_step_map.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/workflow_with_step_map.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("Flow: 'workflow_with_step_map' syntax is illegal.\n" +
                 "Below 'workflow' property there should be a list of steps and not a map");
@@ -393,9 +393,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithOnFailureStepsAsList() throws Exception {
-        URI resource = getClass().getResource("/corrupted/on_failure_with_step_map.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/on_failure_with_step_map.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("Flow: 'on_failure_with_step_map' syntax is illegal.\n" +
                 "Below 'on_failure' property there should be a list of steps and not a map");
@@ -404,9 +404,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithNoRefStep() throws Exception {
-        URI resource = getClass().getResource("/corrupted/step_with_no_ref_flow.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/step_with_no_ref_flow.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("Step: 'step1' has no reference information");
         compiler.compile(SlangSource.fromFile(resource), path);
@@ -414,9 +414,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testStepWithListOfOps() throws Exception {
-        URI resource = getClass().getResource("/corrupted/step_with_list_of_ops.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/step_with_list_of_ops.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("For step 'step1' syntax is illegal.\n" +
                 "Under property: 'do' there should be a map of values, but instead there is a list.\n" +
@@ -426,9 +426,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testStepWithListOfDos() throws Exception {
-        URI resource = getClass().getResource("/corrupted/step_with_list_of_do_flow.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/step_with_list_of_do_flow.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("Step: step1 syntax is illegal.\n" +
                 "Below step name, there should be a map of values in the format:\n" +
@@ -439,10 +439,10 @@ public class CompilerErrorsTest {
 
     @Test
     public void testFlowWithMissingRefInPath() throws Exception {
-        URI resource = getClass().getResource("/basic_flow.yaml").toURI();
-        URI op = getClass().getResource("/operation_with_data.sl").toURI();
+        final URI resource = getClass().getResource("/basic_flow.yaml").toURI();
+        final URI op = getClass().getResource("/operation_with_data.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(op));
         exception.expect(RuntimeException.class);
         exception.expectMessage("Reference: 'user.ops.test_op' in executable: 'basic_flow', wasn't found in path");
@@ -451,8 +451,8 @@ public class CompilerErrorsTest {
 
     @Test
     public void testInputPrivateAndNoDefault() throws Exception {
-        URI resource = getClass().getResource("/private_input_without_default.sl").toURI();
-        Set<SlangSource> path = new HashSet<>();
+        final URI resource = getClass().getResource("/private_input_without_default.sl").toURI();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'private_input_without_default' syntax is illegal.\n" +
                 "Input: 'input_without_default' is private and required but no default value was specified");
@@ -461,8 +461,8 @@ public class CompilerErrorsTest {
 
     @Test
     public void testInputWithInvalidKey() throws Exception {
-        URI resource = getClass().getResource("/illegal_key_in_input.sl").toURI();
-        Set<SlangSource> path = new HashSet<>();
+        final URI resource = getClass().getResource("/illegal_key_in_input.sl").toURI();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'illegal_key_in_input' syntax is illegal.\n" +
                 "key: karambula in input: input_with_illegal_key is not a known property");
@@ -471,9 +471,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testOperationWithNoActionData() throws Exception {
-        URI resource = getClass().getResource("/corrupted/operation_with_no_action_data.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/operation_with_no_action_data.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("Error compiling operation_with_no_action_data.sl. " +
                 "Operation: operation_with_no_action_data has no action data");
@@ -482,9 +482,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testOperationWithListOfActions() throws Exception {
-        URI resource = getClass().getResource("/corrupted/operation_with_list_of_actions.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/operation_with_list_of_actions.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("There was a problem parsing the YAML source: operation_with_list_of_actions.sl.\n" +
                 "while parsing a block mapping");
@@ -493,9 +493,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testOperationWithListOfActionTypes() throws Exception {
-        URI resource = getClass().getResource("/corrupted/operation_with_list_of_action_types.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/operation_with_list_of_action_types.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("Action syntax is illegal.\n" +
                 "Under property: 'python_action' there should be a map of values, but instead there is a list.\n" +
@@ -505,10 +505,10 @@ public class CompilerErrorsTest {
 
     @Test
     public void testParentFlowWithCorruptedSubFlow() throws Exception {
-        URI resource = getClass().getResource("/corrupted/parent_flow_to_no_step_data_flow.sl").toURI();
-        URI subFlow = getClass().getResource("/corrupted/no_step_data_flow.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/parent_flow_to_no_step_data_flow.sl").toURI();
+        final URI subFlow = getClass().getResource("/corrupted/no_step_data_flow.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(subFlow));
         exception.expect(RuntimeException.class);
         exception.expectMessage("Step: step1 has no data");
@@ -517,9 +517,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testStepWithNavigateAsString() throws Exception {
-        URI resource = getClass().getResource("/corrupted/step_with_string_navigate_value.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/step_with_string_navigate_value.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("For step 'step1' syntax is illegal.\n" +
                 "Under property: 'navigate' there should be a list of values, but instead there is a string.");
@@ -528,9 +528,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testStepWithIllegalTypeOfNavigate() throws Exception {
-        URI resource = getClass().getResource("/corrupted/step_with_illegal_navigate_type.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/step_with_illegal_navigate_type.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("For step 'step1' syntax is illegal.\n" +
                 "Data for property: navigate -> 3 is illegal.\n" +
@@ -540,9 +540,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testDuplicateStepNamesInFlow() throws Exception {
-        URI resource = getClass().getResource("/corrupted/duplicate_step_name.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/duplicate_step_name.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("Step name: 'Step1' appears more than once in the workflow. " +
                 "Each step name in the workflow must be unique");
@@ -551,9 +551,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testNullValueInputFlow() throws Exception {
-        URI resource = getClass().getResource("/corrupted/flow_with_null_value_input.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/flow_with_null_value_input.sl").toURI();
 
-        Set<SlangSource> path = new HashSet<>();
+        final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("For flow 'flow_with_null_value_input' syntax is illegal.\n" +
                 "Could not transform Input : {input1=null} since it has a null value.\n" +
@@ -564,13 +564,13 @@ public class CompilerErrorsTest {
 
     @Test
     public void testValidationOfFlowThatCallsCorruptedFlow() throws Exception {
-        URI flowUri = getClass().getResource("/corrupted/flow_that_calls_corrupted_flow.sl").toURI();
+        final URI flowUri = getClass().getResource("/corrupted/flow_that_calls_corrupted_flow.sl").toURI();
 
-        URI operation1Uri = getClass().getResource("/test_op.sl").toURI();
-        URI operation2Uri = getClass().getResource("/check_op.sl").toURI();
-        URI operation3Uri = getClass().getResource("/corrupted/flow_input_in_step_same_name_as_dependency_output.sl").toURI();
+        final URI operation1Uri = getClass().getResource("/test_op.sl").toURI();
+        final URI operation2Uri = getClass().getResource("/check_op.sl").toURI();
+        final URI operation3Uri = getClass().getResource("/corrupted/flow_input_in_step_same_name_as_dependency_output.sl").toURI();
 
-        Set<SlangSource> dependencies = new HashSet<>();
+        final Set<SlangSource> dependencies = new HashSet<>();
         dependencies.add(SlangSource.fromFile(operation1Uri));
         dependencies.add(SlangSource.fromFile(operation2Uri));
         dependencies.add(SlangSource.fromFile(operation3Uri));
@@ -583,13 +583,13 @@ public class CompilerErrorsTest {
 
     @Test
     public void testValidationMatchingNavigation() throws Exception {
-        URI resource = getClass().getResource("/corrupted/matching-navigation/parent_flow.sl").toURI();
+        final URI resource = getClass().getResource("/corrupted/matching-navigation/parent_flow.sl").toURI();
 
-        URI subFlow = getClass().getResource("/corrupted/matching-navigation/child_flow.sl").toURI();
-        URI operation1 = getClass().getResource("/corrupted/matching-navigation/test_op.sl").toURI();
-        URI operation2 = getClass().getResource("/corrupted/matching-navigation/check_weather.sl").toURI();
-        URI operation3 = getClass().getResource("/corrupted/matching-navigation/get_time_zone.sl").toURI();
-        URI operation4 = getClass().getResource("/corrupted/matching-navigation/check_number.sl").toURI();
+        final URI subFlow = getClass().getResource("/corrupted/matching-navigation/child_flow.sl").toURI();
+        final URI operation1 = getClass().getResource("/corrupted/matching-navigation/test_op.sl").toURI();
+        final URI operation2 = getClass().getResource("/corrupted/matching-navigation/check_weather.sl").toURI();
+        final URI operation3 = getClass().getResource("/corrupted/matching-navigation/get_time_zone.sl").toURI();
+        final URI operation4 = getClass().getResource("/corrupted/matching-navigation/check_number.sl").toURI();
 
         Set<SlangSource> dependencies = new HashSet<>();
         dependencies.add(SlangSource.fromFile(subFlow));
@@ -606,10 +606,10 @@ public class CompilerErrorsTest {
 
     @Test
     public void testValidationDuplicateFqnIgnoreCase() throws Exception {
-        URI resource = getClass().getResource("/corrupted/duplicate/duplicate_fqn_1.sl").toURI();
-        URI dependency1 = getClass().getResource("/noop.sl").toURI();
-        URI dependency2 = getClass().getResource("/corrupted/duplicate/duplicate_fqn_2.sl").toURI();
-        URI dependency3 = getClass().getResource("/basic_flow.yaml").toURI();
+        final URI resource = getClass().getResource("/corrupted/duplicate/duplicate_fqn_1.sl").toURI();
+        final URI dependency1 = getClass().getResource("/noop.sl").toURI();
+        final URI dependency2 = getClass().getResource("/corrupted/duplicate/duplicate_fqn_2.sl").toURI();
+        final URI dependency3 = getClass().getResource("/basic_flow.yaml").toURI();
 
         SlangSource duplicateFqnInitialSource = SlangSource.fromFile(dependency2);
 
@@ -627,9 +627,9 @@ public class CompilerErrorsTest {
 
     @Test
     public void testCompileSource() throws URISyntaxException {
-        URI flow = getClass().getResource("/compile_errors/loop_with_break_on_non_existing_result.sl").toURI();
-        URI operation = getClass().getResource("/compile_errors/print.sl").toURI();
-        Set<SlangSource> path = new HashSet<>();
+        final URI flow = getClass().getResource("/compile_errors/loop_with_break_on_non_existing_result.sl").toURI();
+        final URI operation = getClass().getResource("/compile_errors/print.sl").toURI();
+        final Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
         CompilationModellingResult result = compiler.compileSource(SlangSource.fromFile(flow), path);
         Assert.assertEquals(2, result.getErrors().size());

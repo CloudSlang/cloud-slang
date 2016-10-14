@@ -137,14 +137,14 @@ public class ExecutionPlanBuilderTest {
         mockFinishStep(stepId, step, false);
     }
 
-    private void mockFinishParallelLoopStep(Long stepId, Step step) {
-        mockFinishStep(stepId, step, true);
-    }
-
     private void mockFinishStep(Long stepId, Step step, boolean isParallelLoop) {
         Map<String, Serializable> postStepActionData = step.getPostStepActionData();
         String stepName = step.getName();
         when(stepFactory.createFinishStepStep(eq(stepId), eq(postStepActionData), anyMapOf(String.class, ResultNavigation.class), eq(stepName), eq(isParallelLoop))).thenReturn(new ExecutionStep(stepId));
+    }
+
+    private void mockFinishParallelLoopStep(Long stepId, Step step) {
+        mockFinishStep(stepId, step, true);
     }
 
     private void mockBeginStep(Long stepId, Step step) {
@@ -154,11 +154,11 @@ public class ExecutionPlanBuilderTest {
         when(stepFactory.createBeginStepStep(eq(stepId), anyListOf(Argument.class), eq(preStepActionData), eq(refId), eq(name))).thenReturn(new ExecutionStep(stepId));
     }
 
-    private void mockAddBranchesStep(Long stepId, Long nextStepID, Long branchBeginStepID, Step step, Flow flow) {
+    private void mockAddBranchesStep(Long stepId, Long nextStepId, Long branchBeginStepId, Step step, Flow flow) {
         Map<String, Serializable> preStepActionData = step.getPreStepActionData();
         String refId = flow.getId();
         String name = step.getName();
-        when(stepFactory.createAddBranchesStep(eq(stepId), eq(nextStepID), eq(branchBeginStepID), eq(preStepActionData), eq(refId), eq(name))).thenReturn(new ExecutionStep(stepId));
+        when(stepFactory.createAddBranchesStep(eq(stepId), eq(nextStepId), eq(branchBeginStepId), eq(preStepActionData), eq(refId), eq(name))).thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockJoinBranchesStep(Long stepId, Step step) {
@@ -246,7 +246,7 @@ public class ExecutionPlanBuilderTest {
         mockBeginStep(3L, step);
         mockFinishParallelLoopStep(4L, step);
         mockJoinBranchesStep(5L, step);
-        ExecutionPlan executionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFlow);
+        final ExecutionPlan executionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFlow);
 
         verify(stepFactory).createAddBranchesStep(
                 eq(2L),
@@ -267,7 +267,7 @@ public class ExecutionPlanBuilderTest {
 
     @Test
     public void createFlowWithTwoSteps() throws Exception {
-        Deque<Step> steps = new LinkedList<>();
+        final Deque<Step> steps = new LinkedList<>();
         String secondStepName = "2ndStep";
         List<Map<String, String>> navigationStrings = new ArrayList<>();
         Map<String, String> successMap = new HashMap<>();

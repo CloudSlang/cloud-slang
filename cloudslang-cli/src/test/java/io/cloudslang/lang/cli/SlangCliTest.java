@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
  *
  * @author Bonczidai Levente
  */
-public class SlangCLITest {
+public class SlangCliTest {
 
     static final CompilationArtifact emptyCompilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>(), new HashSet<String>());
     private static final String[] CONTEXT_PATH = {"classpath*:/META-INF/spring/test-spring-shell-plugin.xml"};
@@ -64,33 +64,33 @@ public class SlangCLITest {
     public static final String INPUT_FILE_PATH = "/inputs/inputs.yaml";
 
     private JLineShellComponent shell;
-    private SlangCli slangCLI;
+    private SlangCli slangCli;
     private ScoreServices scoreServicesMock;
     private CompilerHelper compilerHelperMock;
 
-    public SlangCLITest() {
+    public SlangCliTest() {
         Bootstrap bootstrap = new Bootstrap(null, CONTEXT_PATH);
         shell = bootstrap.getJLineShellComponent();
         scoreServicesMock = (ScoreServices) bootstrap.getApplicationContext().getBean("scoreServices");
         compilerHelperMock = (CompilerHelper) bootstrap.getApplicationContext().getBean("compilerHelper");
-        slangCLI = bootstrap.getApplicationContext().getBean(SlangCli.class);
+        slangCli = bootstrap.getApplicationContext().getBean(SlangCli.class);
     }
 
     @Before
     public void before() throws Exception {
-        slangCLI.setEnvVar(false);
+        slangCli.setEnvVar(false);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunQuietlyValidFilePathAsync() throws Exception {
-        slangCLI.setEnvVar(true);
+        slangCli.setEnvVar(true);
 
-        long executionId = 1;
+        final long executionId = 1;
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
         when(scoreServicesMock.trigger(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class))).thenReturn(executionId);
 
-        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --v quiet");
+        final CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --v quiet");
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
         verify(scoreServicesMock).trigger(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class));
@@ -102,12 +102,12 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunQuietlyValidFilePathSync() throws Exception {
-        long executionId = 1;
+        final long executionId = 1;
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
         when(scoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(true), eq(false))).thenReturn(executionId);
 
-        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --v quiet");
+        final CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --v quiet");
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
         verify(scoreServicesMock).triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(true), eq(false));
@@ -119,7 +119,7 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunDebugValidFilePathSync() throws Exception {
-        long executionId = 1;
+        final long executionId = 1;
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
         when(scoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(true), eq(false))).thenReturn(executionId);
@@ -135,7 +135,7 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunInvalidVerboseArgumentValidFilePathSync() throws Exception {
-        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --v invalidArgument");
+        final CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --v invalidArgument");
 
         Assert.assertEquals("method threw exception", "Verbose argument is invalid.", cr.getException().getMessage());
         Assert.assertEquals("success should be true", false, cr.isSuccess());
@@ -143,7 +143,7 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunValidFilePathSync() throws Exception {
-        long executionId = 1;
+        final long executionId = 1;
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
         when(scoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false))).thenReturn(executionId);
@@ -162,9 +162,9 @@ public class SlangCLITest {
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunValidFilePathAsync() throws Exception {
         //set async mode
-        slangCLI.setEnvVar(true);
+        slangCli.setEnvVar(true);
 
-        long executionId = 1;
+        final long executionId = 1;
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
         when(scoreServicesMock.trigger(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class))).thenReturn(executionId);
@@ -181,7 +181,7 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunValidWithOtherPathForDependencies() throws Exception {
-        long executionId = 1;
+        final long executionId = 1;
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), anyListOf(String.class))).thenReturn(emptyCompilationArtifact);
         when(scoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false))).thenReturn(executionId);
@@ -197,8 +197,8 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunSyncWithInputsAndFileInputs() throws Exception {
-        long executionId = 1;
-        String inputsString = "--i input1=value1,input2=value2";
+        final long executionId = 1;
+        final String inputsString = "--i input1=value1,input2=value2";
 
         Map<String, Value> inputsMap = new HashMap<>();
         inputsMap.put("input1", ValueFactory.create("value1"));
@@ -225,10 +225,10 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunAsyncWithInputsAndFileInputs() throws Exception {
-        slangCLI.setEnvVar(true);
+        slangCli.setEnvVar(true);
 
-        long executionId = 1;
-        String inputsString = "--i input1=value1,input2=value2";
+        final long executionId = 1;
+        final String inputsString = "--i input1=value1,input2=value2";
 
         Map<String, Value> inputsMap = new HashMap<>();
         inputsMap.put("input1", ValueFactory.create("value1"));
@@ -256,8 +256,8 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunSyncWithInputs() throws Exception {
-        long executionId = 1;
-        String inputsString = "--i input1=value1,input2=value2";
+        final long executionId = 1;
+        final String inputsString = "--i input1=value1,input2=value2";
         Map<String, Value> inputsMap = new HashMap<>();
         inputsMap.put("input1", ValueFactory.create("value1"));
         inputsMap.put("input2", ValueFactory.create("value2"));
@@ -279,11 +279,11 @@ public class SlangCLITest {
         RuntimeException exception = new RuntimeException("exception message");
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
-        when(scoreServicesMock.
-                triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false))).
-                thenThrow(exception);
+        when(scoreServicesMock
+                .triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false)))
+                .thenThrow(exception);
 
-        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT);
+        final CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT);
 
         // path may be processed as local in some environments
         // in this case the local directory path is prepended to the actual path
@@ -296,10 +296,10 @@ public class SlangCLITest {
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunAsyncWithInputs() throws Exception {
         //set async mode
-        slangCLI.setEnvVar(true);
+        slangCli.setEnvVar(true);
 
-        long executionId = 1;
-        String inputsString = "--i input1=value1,input2=value2";
+        final long executionId = 1;
+        final String inputsString = "--i input1=value1,input2=value2";
         Map<String, Value> inputsMap = new HashMap<>();
         inputsMap.put("input1", ValueFactory.create("value1"));
         inputsMap.put("input2", ValueFactory.create("value2"));
@@ -319,12 +319,12 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testRunSyncWithInputFiles() throws Exception {
-        long executionId = 1;
+        final long executionId = 1;
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
         when(scoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false))).thenReturn(executionId);
 
-        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --if " + FLOW_PATH_BACKSLASH_INPUT);
+        final CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --if " + FLOW_PATH_BACKSLASH_INPUT);
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
         verify(compilerHelperMock).loadInputsFromFile(Collections.singletonList(FLOW_PATH_BACKSLASH));
@@ -341,7 +341,7 @@ public class SlangCLITest {
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(emptyCompilationArtifact);
         when(scoreServicesMock.triggerSync(eq(emptyCompilationArtifact), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class), eq(false), eq(false))).thenReturn(executionId);
 
-        CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --spf " + FLOW_PATH_BACKSLASH_INPUT);
+        final CommandResult cr = shell.executeCommand("run --f " + FLOW_PATH_BACKSLASH_INPUT + " --spf " + FLOW_PATH_BACKSLASH_INPUT);
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
         verify(compilerHelperMock).loadSystemProperties(Collections.singletonList(FLOW_PATH_BACKSLASH));
@@ -353,7 +353,7 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testSetEnvVarTrue() throws Exception {
-        CommandResult cr = shell.executeCommand("env --setAsync true");
+        final CommandResult cr = shell.executeCommand("env --setAsync true");
 
         Assert.assertEquals("method result mismatch", SlangCli.setEnvMessage(true), cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
@@ -362,7 +362,7 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testSetEnvVarFalse() {
-        CommandResult cr = shell.executeCommand("env --setAsync false");
+        final CommandResult cr = shell.executeCommand("env --setAsync false");
 
         Assert.assertEquals("method result mismatch", SlangCli.setEnvMessage(false), cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
@@ -371,7 +371,7 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testGetFlowInputs() throws Exception {
-        List<Input> inputsList = Lists.newArrayList(
+        final List<Input> inputsList = Lists.newArrayList(
                 new Input.InputBuilder("input1", "expression1").build(),
                 new Input.InputBuilder("input2", "expression2").build()
         );
@@ -379,7 +379,7 @@ public class SlangCLITest {
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(compilationArtifact);
 
-        CommandResult cr = shell.executeCommand("inputs --f " + FLOW_PATH_BACKSLASH_INPUT);
+        final CommandResult cr = shell.executeCommand("inputs --f " + FLOW_PATH_BACKSLASH_INPUT);
 
         verify(compilerHelperMock).compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class));
 
@@ -390,7 +390,7 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testGetFlowInputsWithOverride() throws Exception {
-        List<Input> inputsList = Lists.newArrayList(
+        final List<Input> inputsList = Lists.newArrayList(
                 new Input.InputBuilder("input1", "expression1").build(),
                 new Input.InputBuilder("input_override", "expression_override", false)
                         .withRequired(true)
@@ -398,7 +398,7 @@ public class SlangCLITest {
                         .build(),
                 new Input.InputBuilder("input2", "expression2").build()
         );
-        CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), inputsList, null);
+        final CompilationArtifact compilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), inputsList, null);
 
         when(compilerHelperMock.compile(contains(FLOW_PATH_BACKSLASH), isNull(List.class))).thenReturn(compilationArtifact);
 
@@ -413,9 +413,9 @@ public class SlangCLITest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testGetVersion() throws Exception {
-        CommandResult cr = shell.executeCommand("cslang --version");
+        final CommandResult cr = shell.executeCommand("cslang --version");
 
-        Assert.assertEquals("method result mismatch", slangCLI.version(), cr.getResult());
+        Assert.assertEquals("method result mismatch", slangCli.version(), cr.getResult());
         Assert.assertEquals("method threw exception", null, cr.getException());
         Assert.assertEquals("success should be true", true, cr.isSuccess());
     }
@@ -427,7 +427,7 @@ public class SlangCLITest {
                         new SystemProperty("namespace2", "key2", "value2"),
                         new SystemProperty("namespace3", "key3", "value3"))));
 
-        CommandResult cr = shell.executeCommand("list --f system_properties.prop.sl");
+        final CommandResult cr = shell.executeCommand("list --f system_properties.prop.sl");
 
         Assert.assertEquals("Following system properties were loaded:" + System.lineSeparator() +
                 "\tnamespace1.key1: value1" + System.lineSeparator() +
@@ -443,7 +443,7 @@ public class SlangCLITest {
                 .thenReturn(new CompilationModellingResult(null, Lists.newArrayList(new RuntimeException("1"),
                         new RuntimeException("2"), new RuntimeException("3"))));
 
-        CommandResult cr = shell.executeCommand("compile --f some_slang_file.sl");
+        final CommandResult cr = shell.executeCommand("compile --f some_slang_file.sl");
         Assert.assertNotNull(cr.getException());
         Assert.assertEquals("exception mismatch", "Following exceptions were found:" + System.lineSeparator() +
                 "\tclass java.lang.RuntimeException: 1" + System.lineSeparator() +

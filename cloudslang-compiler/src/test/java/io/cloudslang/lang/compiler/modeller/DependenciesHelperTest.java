@@ -76,7 +76,7 @@ public class DependenciesHelperTest {
     @Test
     public void testFetchDependenciesFlowOneStep() throws Exception {
         Flow flow = mock(Flow.class);
-        Workflow workflow = mock(Workflow.class);
+        final Workflow workflow = mock(Workflow.class);
         Step step = mock(Step.class);
         Deque<Step> steps = new ArrayDeque<>();
         steps.add(step);

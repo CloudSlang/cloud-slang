@@ -7,7 +7,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-package io.cloudslang.lang.systemtests.system_properties;
+package io.cloudslang.lang.systemtests.systemproperties;
 
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.api.Slang;
@@ -61,12 +61,12 @@ public class SensitiveSystemPropertiesTest extends ValueSyntaxParent {
     public void testValidSystemPropertiesFlow() throws Exception {
         URL executable = getClass().getResource("/yaml/functions/sensitive_system_properties_flow.sl");
         URI operation = getClass().getResource("/yaml/functions/sensitive_system_properties_op.sl").toURI();
-        URI propertiesFileURI = getClass().getResource("/yaml/properties/a/b/sensitive.prop.sl").toURI();
+        URI propertiesFileUri = getClass().getResource("/yaml/properties/a/b/sensitive.prop.sl").toURI();
         Set<SlangSource> dependencies = Sets.newHashSet(SlangSource.fromFile(operation));
         testExecutable(
                 SlangSource.fromFile(executable.toURI()),
                 dependencies,
-                SlangSource.fromFile(propertiesFileURI),
+                SlangSource.fromFile(propertiesFileUri),
                 ExecutableType.FLOW
         );
     }
@@ -74,18 +74,18 @@ public class SensitiveSystemPropertiesTest extends ValueSyntaxParent {
     @Test
     public void testValidSystemPropertiesOp() throws Exception {
         URL executable = getClass().getResource("/yaml/functions/sensitive_system_properties_op.sl");
-        URI propertiesFileURI = getClass().getResource("/yaml/properties/a/b/sensitive.prop.sl").toURI();
+        URI propertiesFileUri = getClass().getResource("/yaml/properties/a/b/sensitive.prop.sl").toURI();
         testExecutable(
                 SlangSource.fromFile(executable.toURI()),
                 EMPTY_SET,
-                SlangSource.fromFile(propertiesFileURI),
+                SlangSource.fromFile(propertiesFileUri),
                 ExecutableType.OPERATION
         );
     }
 
     @Test
     public void testInvalidKey() throws Exception {
-        URI propertiesFileURI = getClass().getResource("/yaml/properties/a/b/sensitive_invalid_key.prop.sl").toURI();
+        URI propertiesFileUri = getClass().getResource("/yaml/properties/a/b/sensitive_invalid_key.prop.sl").toURI();
 
         exception.expect(RuntimeException.class);
         exception.expectMessage(
@@ -93,28 +93,28 @@ public class SensitiveSystemPropertiesTest extends ValueSyntaxParent {
                         " Please take a look at the supported features per versions link"
         );
 
-        slang.loadSystemProperties(SlangSource.fromFile(propertiesFileURI));
+        slang.loadSystemProperties(SlangSource.fromFile(propertiesFileUri));
     }
 
     @Test
     public void testKeyNotString() throws Exception {
-        URI propertiesFileURI = getClass().getResource("/yaml/properties/a/b/sensitive_key_not_string.prop.sl").toURI();
+        URI propertiesFileUri = getClass().getResource("/yaml/properties/a/b/sensitive_key_not_string.prop.sl").toURI();
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("Artifact {flow.var3_sensitive} has invalid tag {123}: Value cannot be cast to String");
 
-        slang.loadSystemProperties(SlangSource.fromFile(propertiesFileURI));
+        slang.loadSystemProperties(SlangSource.fromFile(propertiesFileUri));
     }
 
     @Test
     public void testKeyNotStringd() throws Exception {
-        URI propertiesFileURI = getClass().getResource("/yaml/properties/a/b/sensitive_value_not_serializable.prop.sl").toURI();
+        final URI propertiesFileUri = getClass().getResource("/yaml/properties/a/b/sensitive_value_not_serializable.prop.sl").toURI();
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("Artifact {flow.var3_sensitive} has invalid value {java.lang.Object");
         exception.expectMessage("}: Value cannot be cast to Serializable");
 
-        slang.loadSystemProperties(SlangSource.fromFile(propertiesFileURI));
+        slang.loadSystemProperties(SlangSource.fromFile(propertiesFileUri));
     }
 
     private void testExecutable(

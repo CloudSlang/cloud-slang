@@ -148,7 +148,7 @@ public class SimpleFlowTest extends SystemsTestsParent {
     }
 
     @Test
-    public void testFlowWithRequiredInputUTF8() throws Exception {
+    public void testFlowWithRequiredInputUtf8() throws Exception {
         URI resource = getClass().getResource("/yaml/flow_with_required_input.sl").toURI();
         URI operations = getClass().getResource("/yaml/print.sl").toURI();
         String inputValue = FileUtils.readFileToString(new File(getClass().getResource("/inputs/utf8_input.txt").getFile()),

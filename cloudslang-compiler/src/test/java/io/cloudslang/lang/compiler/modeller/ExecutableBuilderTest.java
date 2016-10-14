@@ -217,7 +217,7 @@ public class ExecutableBuilderTest {
         Mockito.when(transformer.keyToTransform()).thenReturn(keyword);
         Mockito.when(transformer.getScopes()).thenReturn(Collections.singletonList(Transformer.Scope.BEFORE_STEP));
         final ParsedSlang mockParsedSlang = mockFlowSlangFile();
-        Map<String, Object> executableRawData = new HashMap<>();
+        final Map<String, Object> executableRawData = new HashMap<>();
         List<Map<String, Object>> workFlowData = new ArrayList<>();
         String stepName = "step1";
         Map<String, Object> stepRawData = new HashMap<>();
@@ -237,7 +237,7 @@ public class ExecutableBuilderTest {
     @Test
     public void stepWithEmptyDoEntranceThrowsException() throws Exception {
         final ParsedSlang mockParsedSlang = mockFlowSlangFile();
-        Map<String, Object> executableRawData = new HashMap<>();
+        final Map<String, Object> executableRawData = new HashMap<>();
         List<Map<String, Object>> workFlowData = new ArrayList<>();
         Map<String, Object> stepRawData = new HashMap<>();
 
@@ -259,8 +259,8 @@ public class ExecutableBuilderTest {
     public void simpleFlowDataIsValid() throws Exception {
         final ParsedSlang mockParsedSlang = mockFlowSlangFile();
 
-        Map<String, Object> executableRawData = new HashMap<>();
-        List<Map<String, Object>> workFlowData = new ArrayList<>();
+        final Map<String, Object> executableRawData = new HashMap<>();
+        final List<Map<String, Object>> workFlowData = new ArrayList<>();
         Map<String, Object> stepRawData = new HashMap<>();
         Map<String, Object> doRawData = new HashMap<>();
 
@@ -289,8 +289,8 @@ public class ExecutableBuilderTest {
     public void stepWithImplicitAlias() throws Exception {
         final ParsedSlang mockParsedSlang = mockFlowSlangFile();
 
-        Map<String, Object> executableRawData = new HashMap<>();
-        List<Map<String, Object>> workFlowData = new ArrayList<>();
+        final Map<String, Object> executableRawData = new HashMap<>();
+        final List<Map<String, Object>> workFlowData = new ArrayList<>();
         Map<String, Object> stepRawData = new HashMap<>();
         Map<String, Object> doRawData = new HashMap<>();
 

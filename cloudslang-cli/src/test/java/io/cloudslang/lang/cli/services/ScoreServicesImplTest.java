@@ -40,6 +40,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Mockito.any;
@@ -61,7 +62,7 @@ public class ScoreServicesImplTest {
 
     private static final long DEFAULT_THREAD_SLEEP_TIME = 100;
     private static final long DEFAULT_TIMEOUT = 5000;
-    private final static long DEFAULT_EXECUTION_ID = 1;
+    private static final long DEFAULT_EXECUTION_ID = 1;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -86,7 +87,7 @@ public class ScoreServicesImplTest {
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testSubscribe() throws Exception {
         ScoreEventListener eventHandler = mock(ScoreEventListener.class);
-        Set<String> eventTypes = Sets.newHashSet("a", "b");
+        Set<String> eventTypes = newHashSet("a", "b");
 
         scoreServicesImpl.subscribe(eventHandler, eventTypes);
 
@@ -95,26 +96,26 @@ public class ScoreServicesImplTest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testTrigger() throws Exception {
-        CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
+        final CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
         Map<String, Value> inputs = new HashMap<>();
         inputs.put("a", ValueFactory.create(1));
-        Set<SystemProperty> systemProperties = Sets.newHashSet(
+        Set<SystemProperty> systemProperties = newHashSet(
                 new SystemProperty("ns", "b", "c")
         );
 
-        long executionID = scoreServicesImpl.trigger(compilationArtifact, inputs, systemProperties);
+        long executionId = scoreServicesImpl.trigger(compilationArtifact, inputs, systemProperties);
 
         verify(slang).run(compilationArtifact, inputs, systemProperties);
-        assertEquals(DEFAULT_EXECUTION_ID, executionID);
+        assertEquals(DEFAULT_EXECUTION_ID, executionId);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testTriggerSyncSuccess() throws Exception {
         //prepare method args
-        CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
+        final CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
         Map<String, Value> inputs = new HashMap<>();
         inputs.put("a", ValueFactory.create(1));
-        Set<SystemProperty> systemProperties = Sets.newHashSet(
+        Set<SystemProperty> systemProperties = newHashSet(
                 new SystemProperty("ns", "b", "c")
         );
 
@@ -142,25 +143,23 @@ public class ScoreServicesImplTest {
         }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
 
         // invoke method
-        long executionID = scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false, false);
+        final long executionId = scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false, false);
 
         // verify constraints
         ArgumentCaptor<ScoreEventListener> scoreEventListenerArg = ArgumentCaptor.forClass(ScoreEventListener.class);
         verify(slang).subscribeOnEvents(scoreEventListenerArg.capture(), anySetOf(String.class));
         verify(slang).run(compilationArtifact, inputs, systemProperties);
         verify(slang).unSubscribeOnEvents(scoreEventListenerArg.getValue());
-        assertEquals("execution ID not as expected", DEFAULT_EXECUTION_ID, executionID);
+        assertEquals("execution ID not as expected", DEFAULT_EXECUTION_ID, executionId);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testTriggerSyncException() throws Exception {
         //prepare method args
-        CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
+        final CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
         Map<String, Value> inputs = new HashMap<>();
         inputs.put("a", ValueFactory.create(1));
-        Set<SystemProperty> systemProperties = Sets.newHashSet(
-                new SystemProperty("ns", "b", "c")
-        );
+        final Set<SystemProperty> systemProperties = newHashSet(new SystemProperty("ns", "b", "c"));
 
         /* stubbing subscribeEvents method - mocking the behaviour of the EventBus
          * After a specific amount of time a erroneous event followed by a finish event
@@ -203,12 +202,10 @@ public class ScoreServicesImplTest {
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testTriggerSyncSpException() throws Exception {
         //prepare method args
-        CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
-        Map<String, Value> inputs = new HashMap<>();
+        final CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
+        final Map<String, Value> inputs = new HashMap<>();
         ValueFactory.create(1);
-        Set<SystemProperty> systemProperties = Sets.newHashSet(
-                new SystemProperty("ns", "b", "c")
-        );
+        final Set<SystemProperty> systemProperties = newHashSet(new SystemProperty("ns", "b", "c"));
 
         doAnswer(new Answer<Object>() {
             public Object answer(InvocationOnMock invocation) {

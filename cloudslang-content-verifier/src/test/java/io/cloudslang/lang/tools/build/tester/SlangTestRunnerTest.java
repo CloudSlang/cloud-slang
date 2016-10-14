@@ -202,7 +202,7 @@ public class SlangTestRunnerTest {
 
     @Test
     public void createTestCaseWithDuplicateName() throws Exception {
-        URI resource = getClass().getResource("/test/duplicate").toURI();
+        final URI resource = getClass().getResource("/test/duplicate").toURI();
         Map<String, SlangTestCase> testCases = new HashMap<>();
         testCases.put("Test1", new SlangTestCase("Test1", "path", "desc", null, null, null, null, null, null));
         testCases.put("Test2", new SlangTestCase("Test1", "path2", "desc2", null, null, null, null, null, null));
@@ -367,7 +367,7 @@ public class SlangTestRunnerTest {
 
     @Test
     public void runTestCaseWithStringOutputs() {
-        Map<String, SlangTestCase> testCases = new HashMap<>();
+        final Map<String, SlangTestCase> testCases = new HashMap<>();
         ArrayList<Map> outputs = new ArrayList<>();
         Map<String, Serializable> output1 = new HashMap<>();
         output1.put("output1", "value1");
@@ -656,8 +656,8 @@ public class SlangTestRunnerTest {
         SlangTestCase testCase2 = new SlangTestCase("test2", "testFlowPath2", "desc", Arrays.asList("special", "new"), "mock", null, null, false, "SUCCESS");
         testCases.put("test1", testCase1);
         testCases.put("test2", testCase2);
-        List<String> testSuites = Lists.newArrayList("special");
-        IRunTestResults runTestResults = new RunTestsResults();
+        final List<String> testSuites = Lists.newArrayList("special");
+        final IRunTestResults runTestResults = new RunTestsResults();
         Set<String> changedFiles = new HashSet<>();
         Map<String, Executable> allTestedFlowModels = new HashMap<>();
         Executable executable = mock(Executable.class);

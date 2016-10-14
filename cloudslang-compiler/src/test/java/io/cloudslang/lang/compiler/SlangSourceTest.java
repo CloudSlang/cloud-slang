@@ -54,8 +54,8 @@ public class SlangSourceTest {
         Assert.assertTrue(source.getFilePath().endsWith(name));
     }
 
-    private void assertSourceEquals(URI fileURI, Extension expectedExtension) throws IOException {
-        SlangSource source = SlangSource.fromFile(fileURI);
+    private void assertSourceEquals(URI fileUri, Extension expectedExtension) throws IOException {
+        SlangSource source = SlangSource.fromFile(fileUri);
         Assert.assertEquals(content, source.getContent());
         Assert.assertEquals(name, source.getName());
         Assert.assertEquals(expectedExtension, source.getFileExtension());
@@ -69,67 +69,67 @@ public class SlangSourceTest {
     }
 
     @Test
-    public void testFromFileYAML_SLExtension() throws Exception {
+    public void testFromFileYamlSlExtension() throws Exception {
         assertSourceEquals(nameWithoutExtension + "." + Extension.YAML.getValue() + "." + Extension.SL.getValue(), Extension.SL);
     }
 
     @Test
-    public void testFromFileYAML_YMLExtension() throws Exception {
+    public void testFromFileYamlYmlExtension() throws Exception {
         assertSourceEquals(nameWithoutExtension + "." + Extension.YAML.getValue() + "." + Extension.YML.getValue(), Extension.YML);
     }
 
     @Test
-    public void testFromFileYML_SLExtension() throws Exception {
+    public void testFromFileYmlSlExtension() throws Exception {
         assertSourceEquals(nameWithoutExtension + "." + Extension.YML.getValue() + "." + Extension.SL.getValue(), Extension.SL);
     }
 
     @Test
-    public void testFromFileYML_SL_YAMLExtension() throws Exception {
+    public void testFromFileYmlSlYamlExtension() throws Exception {
         assertSourceEquals(nameWithoutExtension + "." + Extension.YML.getValue() + "." + Extension.SL_YAML.getValue(), Extension.SL_YAML);
     }
 
     @Test
-    public void testFromFileYML_SL_YMLExtension() throws Exception {
+    public void testFromFileYmlSlYmlExtension() throws Exception {
         assertSourceEquals(nameWithoutExtension + "." + Extension.YML.getValue() + "." + Extension.SL_YML.getValue(), Extension.SL_YML);
     }
 
     @Test
-    public void testFromFileSL_PROP_SLExtension() throws Exception {
+    public void testFromFileSlPropSlExtension() throws Exception {
         assertSourceEquals(nameWithoutExtension + "." + Extension.SL.getValue() + "." + Extension.PROP_SL.getValue(), Extension.PROP_SL);
     }
 
     @Test
-    public void testFromFilePROP_SL_SLExtension() throws Exception {
+    public void testFromFilePropSlSlExtension() throws Exception {
         assertSourceEquals(nameWithoutExtension + "." + Extension.PROP_SL.getValue() + "." + Extension.SL.getValue(), Extension.SL);
     }
 
     @Test
-    public void testFromFileSLExtension() throws Exception {
+    public void testFromFileSlExtension() throws Exception {
         assertSourceEquals(nameWithoutExtension + "." + Extension.SL.getValue(), Extension.SL);
     }
 
     @Test
-    public void testFromFileSL_YAMLExtension() throws Exception {
+    public void testFromFileSlYamlExtension() throws Exception {
         assertSourceEquals(nameWithoutExtension + "." + Extension.SL_YAML.getValue(), Extension.SL_YAML);
     }
 
     @Test
-    public void testFromFileSL_YMLExtension() throws Exception {
+    public void testFromFileSlYmlExtension() throws Exception {
         assertSourceEquals(nameWithoutExtension + "." + Extension.SL_YML.getValue(), Extension.SL_YML);
     }
 
     @Test
-    public void testFromFilePROP_SLExtension() throws Exception {
+    public void testFromFilePropSlExtension() throws Exception {
         assertSourceEquals(nameWithoutExtension + "." + Extension.PROP_SL.getValue(), Extension.PROP_SL);
     }
 
     @Test
-    public void testFromFileYAMLExtension() throws Exception {
+    public void testFromFileYamlExtension() throws Exception {
         assertSourceEquals(nameWithoutExtension + "." + Extension.YAML.getValue(), Extension.YAML);
     }
 
     @Test
-    public void testFromFileYMLExtension() throws Exception {
+    public void testFromFileYmlExtension() throws Exception {
         assertSourceEquals(nameWithoutExtension + "." + Extension.YML.getValue(), Extension.YML);
     }
 

@@ -63,7 +63,7 @@ public class OperationSystemTest extends SystemsTestsParent {
     @Test
     public void testCompileAndRunOperationWithDataMissingInput() throws Exception {
         URL resource = getClass().getResource("/yaml/test_op_2.sl");
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), null);
+        final CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), null);
         //Trigger ExecutionPlan
         Map<String, Value> userInputs = new HashMap<>();
         userInputs.put("input2", ValueFactory.create("value2"));

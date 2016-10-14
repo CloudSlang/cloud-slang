@@ -74,7 +74,7 @@ public class CompilerErrorsShallowValidationTest {
     @Test
     public void testValidationOfFlowWithMissingNavigationFromOperationResult() throws Exception {
         URI flowUri = getClass().getResource("/corrupted/step_with_missing_navigation_from_operation_result_flow.sl").toURI();
-        Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
+        final Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
 
         URI operationUri = getClass().getResource("/java_op.sl").toURI();
         Executable operationModel = compiler.preCompile(SlangSource.fromFile(operationUri));
@@ -92,10 +92,10 @@ public class CompilerErrorsShallowValidationTest {
 
     @Test
     public void testInputsNoDefaultNotInStep() throws Exception {
-        URI flowUri = getClass().getResource("/shallow_validation/test_inputs_no_default_not_in_step.sl").toURI();
-        Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
+        final URI flowUri = getClass().getResource("/shallow_validation/test_inputs_no_default_not_in_step.sl").toURI();
+        final Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
 
-        URI operation1Uri = getClass().getResource("/shallow_validation/test_op.sl").toURI();
+        final URI operation1Uri = getClass().getResource("/shallow_validation/test_op.sl").toURI();
         Executable operation1Model = compiler.preCompile(SlangSource.fromFile(operation1Uri));
         Set<Executable> dependencies = new HashSet<>();
         dependencies.add(operation1Model);
@@ -111,10 +111,10 @@ public class CompilerErrorsShallowValidationTest {
 
     @Test
     public void testInputsEmptyStringDefaultNotInStep() throws Exception {
-        URI flowUri = getClass().getResource("/shallow_validation/test_inputs_empty_string_default_not_in_step.sl").toURI();
-        Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
+        final URI flowUri = getClass().getResource("/shallow_validation/test_inputs_empty_string_default_not_in_step.sl").toURI();
+        final Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
 
-        URI operation1Uri = getClass().getResource("/shallow_validation/check_op.sl").toURI();
+        final URI operation1Uri = getClass().getResource("/shallow_validation/check_op.sl").toURI();
         Executable operation1Model = compiler.preCompile(SlangSource.fromFile(operation1Uri));
         Set<Executable> dependencies = new HashSet<>();
         dependencies.add(operation1Model);
@@ -131,10 +131,10 @@ public class CompilerErrorsShallowValidationTest {
 
     @Test
     public void testInputsNoDefaultInStep() throws Exception {
-        URI flowUri = getClass().getResource("/shallow_validation/test_inputs_no_default_in_step.sl").toURI();
-        Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
+        final URI flowUri = getClass().getResource("/shallow_validation/test_inputs_no_default_in_step.sl").toURI();
+        final Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
 
-        URI operation1Uri = getClass().getResource("/shallow_validation/test_op.sl").toURI();
+        final URI operation1Uri = getClass().getResource("/shallow_validation/test_op.sl").toURI();
         Executable operation1Model = compiler.preCompile(SlangSource.fromFile(operation1Uri));
         Set<Executable> dependencies = new HashSet<>();
         dependencies.add(operation1Model);
@@ -151,10 +151,10 @@ public class CompilerErrorsShallowValidationTest {
 
     @Test
     public void testInputsEmptyStringDefaultInStep() throws Exception {
-        URI flowUri = getClass().getResource("/shallow_validation/test_inputs_empty_string_default_in_step.sl").toURI();
-        Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
+        final URI flowUri = getClass().getResource("/shallow_validation/test_inputs_empty_string_default_in_step.sl").toURI();
+        final Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
 
-        URI operation1Uri = getClass().getResource("/shallow_validation/check_op.sl").toURI();
+        final URI operation1Uri = getClass().getResource("/shallow_validation/check_op.sl").toURI();
         Executable operation1Model = compiler.preCompile(SlangSource.fromFile(operation1Uri));
         Set<Executable> dependencies = new HashSet<>();
         dependencies.add(operation1Model);
@@ -171,13 +171,13 @@ public class CompilerErrorsShallowValidationTest {
 
     @Test
     public void testValidationOfFlowInputInStepWithSameNameAsDependencyOutput() throws Exception {
-        URI flowUri = getClass().getResource("/corrupted/flow_input_in_step_same_name_as_dependency_output.sl").toURI();
-        Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
+        final URI flowUri = getClass().getResource("/corrupted/flow_input_in_step_same_name_as_dependency_output.sl").toURI();
+        final Executable flowModel = compiler.preCompile(SlangSource.fromFile(flowUri));
 
-        URI operation1Uri = getClass().getResource("/test_op.sl").toURI();
-        Executable operation1Model = compiler.preCompile(SlangSource.fromFile(operation1Uri));
+        final URI operation1Uri = getClass().getResource("/test_op.sl").toURI();
+        final Executable operation1Model = compiler.preCompile(SlangSource.fromFile(operation1Uri));
         URI operation2Uri = getClass().getResource("/check_op.sl").toURI();
-        Executable operation2Model = compiler.preCompile(SlangSource.fromFile(operation2Uri));
+        final Executable operation2Model = compiler.preCompile(SlangSource.fromFile(operation2Uri));
         Set<Executable> dependencies = new HashSet<>();
         dependencies.add(operation1Model);
         dependencies.add(operation2Model);

@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -85,7 +86,7 @@ public class LoadSystemPropertiesTest {
 
     @Test
     public void testInvalidMissingProperties() throws Exception {
-        URI propertiesUri = getClass().getResource("/properties/a/b/invalid_missing_properties.prop.sl").toURI();
+        final URI propertiesUri = getClass().getResource("/properties/a/b/invalid_missing_properties.prop.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
         exception.expectMessage("no content associated");
@@ -94,7 +95,7 @@ public class LoadSystemPropertiesTest {
 
     @Test
     public void testInvalidMissingPropertiesTag() throws Exception {
-        URI propertiesUri = getClass().getResource("/properties/a/b/invalid_missing_properties_tag.prop.sl").toURI();
+        final URI propertiesUri = getClass().getResource("/properties/a/b/invalid_missing_properties_tag.prop.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage(
                 "Unable to find property 'wrong_key' on class: io.cloudslang.lang.compiler.parser.model.ParsedSlang"
@@ -104,7 +105,7 @@ public class LoadSystemPropertiesTest {
 
     @Test
     public void testMapUnderProperties() throws Exception {
-        URI propertiesUri = getClass().getResource("/properties/a/b/map_under_properties.prop.sl").toURI();
+        final URI propertiesUri = getClass().getResource("/properties/a/b/map_under_properties.prop.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
         exception.expectMessage(SlangTextualKeys.SYSTEM_PROPERTY_KEY);
@@ -115,7 +116,7 @@ public class LoadSystemPropertiesTest {
 
     @Test
     public void testListElementNotMap() throws Exception {
-        URI propertiesUri = getClass().getResource("/properties/a/b/list_element_not_map.prop.sl").toURI();
+        final URI propertiesUri = getClass().getResource("/properties/a/b/list_element_not_map.prop.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
         exception.expectMessage(SlangCompilerImpl.PROPERTY_LIST_ELEMENT_WRONG_TYPE_ERROR_MESSAGE_PREFIX);
@@ -125,7 +126,7 @@ public class LoadSystemPropertiesTest {
 
     @Test
     public void testListElementNull() throws Exception {
-        URI propertiesUri = getClass().getResource("/properties/a/b/list_element_null.prop.sl").toURI();
+        final URI propertiesUri = getClass().getResource("/properties/a/b/list_element_null.prop.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
         exception.expectMessage(SlangCompilerImpl.PROPERTY_LIST_ELEMENT_WRONG_TYPE_ERROR_MESSAGE_PREFIX);
@@ -135,7 +136,7 @@ public class LoadSystemPropertiesTest {
 
     @Test
     public void testListElementMapWithMultipleEntries() throws Exception {
-        URI propertiesUri = getClass().getResource("/properties/a/b/map_with_multiple_entries.prop.sl").toURI();
+        final URI propertiesUri = getClass().getResource("/properties/a/b/map_with_multiple_entries.prop.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
         exception.expectMessage(SlangCompilerImpl.SIZE_OF_SYSTEM_PROPERTY_ERROR_MESSAGE_PREFIX);
@@ -146,7 +147,7 @@ public class LoadSystemPropertiesTest {
 
     @Test
     public void testWrongSystemPropertyKeyType() throws Exception {
-        URI propertiesUri = getClass().getResource("/properties/a/b/wrong_key_type.prop.sl").toURI();
+        final URI propertiesUri = getClass().getResource("/properties/a/b/wrong_key_type.prop.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
         exception.expectMessage(SlangCompilerImpl.SYSTEM_PROPERTY_KEY_WRONG_TYPE_ERROR_MESSAGE_PREFIX);
@@ -157,7 +158,7 @@ public class LoadSystemPropertiesTest {
 
     @Test
     public void testWrongSystemPropertyKeyTypeFromSource() throws Exception {
-        URI propertiesUri = getClass().getResource("/properties/a/b/wrong_key_type.prop.sl").toURI();
+        final URI propertiesUri = getClass().getResource("/properties/a/b/wrong_key_type.prop.sl").toURI();
         SystemPropertyModellingResult result = compiler.loadSystemPropertiesFromSource(SlangSource.fromFile(propertiesUri));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
@@ -170,7 +171,7 @@ public class LoadSystemPropertiesTest {
 
     @Test
     public void testDuplicateKey() throws Exception {
-        URI propertiesUri = getClass().getResource("/properties/a/b/duplicate_key.prop.sl").toURI();
+        final URI propertiesUri = getClass().getResource("/properties/a/b/duplicate_key.prop.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
         exception.expectMessage(SlangCompilerImpl.DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX);
@@ -180,7 +181,7 @@ public class LoadSystemPropertiesTest {
 
     @Test
     public void testDuplicateIgnoringCaseSimpleKey() throws Exception {
-        URI propertiesUri = getClass().getResource("/properties/a/b/duplicate_ignoring_case_simple_key.prop.sl").toURI();
+        final URI propertiesUri = getClass().getResource("/properties/a/b/duplicate_ignoring_case_simple_key.prop.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
         exception.expectMessage(SlangCompilerImpl.DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX);
@@ -190,7 +191,7 @@ public class LoadSystemPropertiesTest {
 
     @Test
     public void testDuplicateIgnoringCaseComplexKey() throws Exception {
-        URI propertiesUri = getClass().getResource("/properties/a/b/duplicate_ignoring_case_complex_key.prop.sl").toURI();
+        final URI propertiesUri = getClass().getResource("/properties/a/b/duplicate_ignoring_case_complex_key.prop.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
         exception.expectMessage(SlangCompilerImpl.DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX);
@@ -200,7 +201,7 @@ public class LoadSystemPropertiesTest {
 
     @Test
     public void testDuplicateIgnoringCaseComplexKeyFromSource() throws Exception {
-        URI propertiesUri = getClass().getResource("/properties/a/b/duplicate_ignoring_case_complex_key.prop.sl").toURI();
+        final URI propertiesUri = getClass().getResource("/properties/a/b/duplicate_ignoring_case_complex_key.prop.sl").toURI();
         SystemPropertyModellingResult result = compiler.loadSystemPropertiesFromSource(SlangSource.fromFile(propertiesUri));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
@@ -212,7 +213,7 @@ public class LoadSystemPropertiesTest {
 
     @Test
     public void testMultipleExceptionsFromSource() throws Exception {
-        URI propertiesUri = getClass().getResource("/properties/a/b/multiple_invalid.prop.sl").toURI();
+        final URI propertiesUri = getClass().getResource("/properties/a/b/multiple_invalid.prop.sl").toURI();
         SystemPropertyModellingResult result = compiler.loadSystemPropertiesFromSource(SlangSource.fromFile(propertiesUri));
         assertTrue(result.getErrors().size() == 3);
         assertTrue(result.getErrors().get(0).getMessage().contains("Error loading properties source: 'multiple_invalid.prop.sl'. " +
@@ -228,7 +229,7 @@ public class LoadSystemPropertiesTest {
 
     @Test
     public void testInvalidCharsNamespace() throws Exception {
-        URI propertiesUri = getClass().getResource("/properties/a/b/invalid_1.prop.sl").toURI();
+        final URI propertiesUri = getClass().getResource("/properties/a/b/invalid_1.prop.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage(
                 "Error loading properties source: 'invalid_1.prop.sl'. Nested exception is: Error validating system property namespace." +
@@ -239,7 +240,7 @@ public class LoadSystemPropertiesTest {
 
     @Test
     public void testInvalidCharsNamespaceFromSource() throws Exception {
-        URI propertiesUri = getClass().getResource("/properties/a/b/invalid_1.prop.sl").toURI();
+        final URI propertiesUri = getClass().getResource("/properties/a/b/invalid_1.prop.sl").toURI();
         SystemPropertyModellingResult result = compiler.loadSystemPropertiesFromSource(SlangSource.fromFile(propertiesUri));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
@@ -252,7 +253,7 @@ public class LoadSystemPropertiesTest {
 
     @Test
     public void testInvalidCharsKey() throws Exception {
-        URI propertiesUri = getClass().getResource("/properties/a/b/invalid_2.prop.sl").toURI();
+        final URI propertiesUri = getClass().getResource("/properties/a/b/invalid_2.prop.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage(
                 "Error loading properties source: 'invalid_2.prop.sl'. Nested exception is:" +
@@ -267,9 +268,7 @@ public class LoadSystemPropertiesTest {
     }
 
     private Set<SystemProperty> getSystemPropertiesValidNullValue() {
-        return Sets.newHashSet(
-                new SystemProperty("a.b", "host", (String) null)
-        );
+        return newHashSet(new SystemProperty("a.b", "host", (String) null));
     }
 
     private Set<SystemProperty> loadSystemProperties(SlangSource source) {
@@ -281,11 +280,7 @@ public class LoadSystemPropertiesTest {
     }
 
     private Set<SystemProperty> getSystemPropertiesBasic(String namespace) {
-        return Sets.newHashSet(
-                new SystemProperty(namespace, "host", "localhost"),
-                new SystemProperty(namespace, "c.name", "john doe"),
-                new SystemProperty(namespace, "restrict.out.port", "8080")
-        );
+        return newHashSet(new SystemProperty(namespace, "host", "localhost"), new SystemProperty(namespace, "c.name", "john doe"), new SystemProperty(namespace, "restrict.out.port", "8080"));
     }
 
 }

@@ -198,14 +198,13 @@ public class SlangBuilderTest {
         Path testPath = null;
         try {
             String projectPath = "aaa/bb/cc";
-            List<String> suites = newArrayList("suite1", "suite2");
+            final List<String> suites = newArrayList("suite1", "suite2");
             testPath = Files.createTempDirectory("testPath");
             String testPathString = testPath.toString();
 
-            ThreadSafeRunTestResults runTestsResults = new ThreadSafeRunTestResults();
+            final ThreadSafeRunTestResults runTestsResults = new ThreadSafeRunTestResults();
             doNothing().when(slangTestRunner).runTestsParallel(eq(projectPath), anyMap(), anyMap(), any(ThreadSafeRunTestResults.class));
             doReturn(Maps.newHashMap()).when(slangTestRunner).createTestCases(anyString(), anySet());
-//            doNothing().when(slangTestRunner).runTestsParallel(anyString(), anyMap(), anyMap(), new ThreadSafeRunTestResults());
 
             slangBuilder.runTests(Maps.<String, Executable>newHashMap(), projectPath, testPathString, suites, BulkRunMode.ALL_PARALLEL, buildMode, changedFiles);
             verify(slangTestRunner).runTestsParallel(eq(projectPath), anyMap(), anyMap(), eq(runTestsResults));
@@ -239,7 +238,7 @@ public class SlangBuilderTest {
 
     @Test
     public void testNotAllSlangFilesWerePreCompiled() throws Exception {
-        URI resource = getClass().getResource("/no_dependencies").toURI();
+        final URI resource = getClass().getResource("/no_dependencies").toURI();
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(null);
         exception.expect(RuntimeException.class);
         exception.expectMessage("1");
@@ -253,7 +252,7 @@ public class SlangBuilderTest {
 
     @Test
     public void testCompileValidSlangFileNoDependencies() throws Exception {
-        URI resource = getClass().getResource("/no_dependencies").toURI();
+        final URI resource = getClass().getResource("/no_dependencies").toURI();
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, BulkRunMode.ALL_SEQUENTIAL, buildMode, changedFiles);
@@ -263,7 +262,7 @@ public class SlangBuilderTest {
 
     @Test
     public void testCompileInvalidSlangFile() throws Exception {
-        URI resource = getClass().getResource("/no_dependencies").toURI();
+        final URI resource = getClass().getResource("/no_dependencies").toURI();
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenThrow(new RuntimeException());
         exception.expect(RuntimeException.class);
@@ -272,7 +271,7 @@ public class SlangBuilderTest {
 
     @Test
     public void testNotAllSlangFilesWereCompiled() throws Exception {
-        URI resource = getClass().getResource("/no_dependencies").toURI();
+        final URI resource = getClass().getResource("/no_dependencies").toURI();
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(
                 new CompilationModellingResult(null, new ArrayList<RuntimeException>()));
@@ -286,7 +285,7 @@ public class SlangBuilderTest {
 
     @Test
     public void testCompileValidSlangFileWithMissingDependencies() throws Exception {
-        URI resource = getClass().getResource("/no_dependencies").toURI();
+        final URI resource = getClass().getResource("/no_dependencies").toURI();
         Set<String> flowDependencies = new HashSet<>();
         flowDependencies.add("dep1");
         Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, null, flowDependencies, SYSTEM_PROPERTY_DEPENDENCIES);
@@ -302,11 +301,11 @@ public class SlangBuilderTest {
 
     @Test
     public void testCompileValidSlangFileWithDependencies() throws Exception {
-        URI resource = getClass().getResource("/dependencies").toURI();
-        URI emptyFlowURI = getClass().getResource("/dependencies/empty_flow.sl").toURI();
-        URI dependencyURI = getClass().getResource("/dependencies/dependency.sl").toURI();
-        SlangSource emptyFlowSource = SlangSource.fromFile(emptyFlowURI);
-        SlangSource dependencySource = SlangSource.fromFile(dependencyURI);
+        final URI resource = getClass().getResource("/dependencies").toURI();
+        final URI emptyFlowUri = getClass().getResource("/dependencies/empty_flow.sl").toURI();
+        final URI dependencyUri = getClass().getResource("/dependencies/dependency.sl").toURI();
+        SlangSource emptyFlowSource = SlangSource.fromFile(emptyFlowUri);
+        SlangSource dependencySource = SlangSource.fromFile(dependencyUri);
 
         Set<String> flowDependencies = new HashSet<>();
         flowDependencies.add("dependencies.dependency");
@@ -326,8 +325,8 @@ public class SlangBuilderTest {
 
     @Test
     public void testInvalidNamespaceFlow() throws Exception {
-        URI resource = getClass().getResource("/no_dependencies").toURI();
-        Flow newExecutable = new Flow(null, null, null, "wrong.namespace", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
+        final URI resource = getClass().getResource("/no_dependencies").toURI();
+        final Flow newExecutable = new Flow(null, null, null, "wrong.namespace", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
         when(metadataExtractor.extractMetadata(any(SlangSource.class))).thenReturn(EMPTY_METADATA);
         doCallRealMethod().when(staticValidator).validateSlangFile(any(File.class), eq(newExecutable), eq(EMPTY_METADATA), eq(false));
@@ -342,8 +341,8 @@ public class SlangBuilderTest {
 
     @Test
     public void testInvalidFlowName() throws Exception {
-        URI resource = getClass().getResource("/no_dependencies").toURI();
-        Flow newExecutable = new Flow(null, null, null, "no_dependencies", "wrong_name", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
+        final URI resource = getClass().getResource("/no_dependencies").toURI();
+        final Flow newExecutable = new Flow(null, null, null, "no_dependencies", "wrong_name", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
         when(metadataExtractor.extractMetadata(any(SlangSource.class))).thenReturn(EMPTY_METADATA);
         doCallRealMethod().when(staticValidator).validateSlangFile(any(File.class), eq(newExecutable), eq(EMPTY_METADATA), eq(false));
@@ -358,8 +357,8 @@ public class SlangBuilderTest {
 
     @Test
     public void testValidFlowNamespaceWithAllValidCharsTypes() throws Exception {
-        URI resource = getClass().getResource("/no_dependencies-0123456789").toURI();
-        Flow executable = new Flow(null, null, null, "no_dependencies-0123456789", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
+        final URI resource = getClass().getResource("/no_dependencies-0123456789").toURI();
+        final Flow executable = new Flow(null, null, null, "no_dependencies-0123456789", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(executable);
         when(scoreCompiler.compile(executable, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, BulkRunMode.ALL_SEQUENTIAL, buildMode, changedFiles);
@@ -369,8 +368,8 @@ public class SlangBuilderTest {
 
     @Test
     public void testValidFlowNamespaceCaseInsensitive() throws Exception {
-        URI resource = getClass().getResource("/no_dependencies").toURI();
-        Flow executable = new Flow(null, null, null, "No_Dependencies", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
+        final URI resource = getClass().getResource("/no_dependencies").toURI();
+        final Flow executable = new Flow(null, null, null, "No_Dependencies", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(executable);
         when(scoreCompiler.compile(executable, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(), null, null, false, BulkRunMode.ALL_SEQUENTIAL, buildMode, changedFiles);
@@ -380,8 +379,8 @@ public class SlangBuilderTest {
 
     @Test
     public void testNamespaceWithInvalidCharsFlow() throws Exception {
-        URI resource = getClass().getResource("/invalid-chars$").toURI();
-        Flow newExecutable = new Flow(null, null, null, "invalid-chars$", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
+        final URI resource = getClass().getResource("/invalid-chars$").toURI();
+        final Flow newExecutable = new Flow(null, null, null, "invalid-chars$", "empty_flow", null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
         when(metadataExtractor.extractMetadata(any(SlangSource.class))).thenReturn(EMPTY_METADATA);
         doCallRealMethod().when(staticValidator).validateSlangFile(any(File.class), eq(newExecutable), eq(EMPTY_METADATA), eq(false));
@@ -396,8 +395,8 @@ public class SlangBuilderTest {
 
     @Test
     public void testCompileSlangFileAndRunTests() throws Exception {
-        URI contentResource = getClass().getResource("/no_dependencies").toURI();
-        URI testResource = getClass().getResource("/test/valid").toURI();
+        final URI contentResource = getClass().getResource("/no_dependencies").toURI();
+        final URI testResource = getClass().getResource("/test/valid").toURI();
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
 
@@ -419,8 +418,8 @@ public class SlangBuilderTest {
 
     @Test
     public void testTestCaseWithIncorrectTestFlowReference() throws Exception {
-        URI contentResource = getClass().getResource("/no_dependencies").toURI();
-        URI testResource = getClass().getResource("/test/valid").toURI();
+        final URI contentResource = getClass().getResource("/no_dependencies").toURI();
+        final URI testResource = getClass().getResource("/test/valid").toURI();
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
 

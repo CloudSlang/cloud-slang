@@ -36,13 +36,12 @@ public class YamlParserTest {
     public ExpectedException exception = ExpectedException.none();
 
     @InjectMocks
-    private YamlParser yamlParser =
-            new YamlParser() {
-                @Override
-                public Yaml getYaml() {
-                    return yaml;
-                }
-            };
+    private YamlParser yamlParser = new YamlParser() {
+        @Override
+        public Yaml getYaml() {
+            return yaml;
+        }
+    };
 
     @Mock
     private Yaml yaml;

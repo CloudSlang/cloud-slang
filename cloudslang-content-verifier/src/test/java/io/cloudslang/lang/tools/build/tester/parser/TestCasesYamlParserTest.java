@@ -112,7 +112,7 @@ public class TestCasesYamlParserTest {
     @Test
     public void testCaseFileParsingForNonTestCasesFile() throws Exception {
         String filePath = "/content/base/properties.prop.sl";
-        URI fileUri = getClass().getResource(filePath).toURI();
+        final URI fileUri = getClass().getResource(filePath).toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage("problem");
         exception.expectMessage("parsing");
@@ -123,7 +123,7 @@ public class TestCasesYamlParserTest {
     @Test
     public void illegalTestCaseFileParsing() throws Exception {
         String filePath = "/test/invalid/invalid_test_case.yaml";
-        URI fileUri = getClass().getResource(filePath).toURI();
+        final URI fileUri = getClass().getResource(filePath).toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage("slang");
         exception.expectMessage("parsing");
@@ -133,7 +133,7 @@ public class TestCasesYamlParserTest {
 
     @Test
     public void parseSystemPropertiesFile() throws Exception {
-        URI filePath = getClass().getResource("/content/base/properties.prop.sl").toURI();
+        final URI filePath = getClass().getResource("/content/base/properties.prop.sl").toURI();
         SlangSource source = SlangSource.fromFile(filePath);
         Set<SystemProperty> props = new HashSet<>();
 
@@ -144,7 +144,7 @@ public class TestCasesYamlParserTest {
 
     @Test
     public void parseSystemPropertiesFileInvalidExtension() throws Exception {
-        URI filePath = getClass().getResource("/content/base/print_text.sl").toURI();
+        final URI filePath = getClass().getResource("/content/base/print_text.sl").toURI();
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("print_text.sl");
@@ -156,7 +156,7 @@ public class TestCasesYamlParserTest {
 
     @Test
     public void testExceptionContainsDetailsWhenInvalidSource() throws Exception {
-        URI fileUri = getClass().getResource("/test/invalid/invalid_field.inputs.yaml").toURI();
+        final URI fileUri = getClass().getResource("/test/invalid/invalid_field.inputs.yaml").toURI();
 
         exception.expect(RuntimeException.class);
         exception.expectMessage(

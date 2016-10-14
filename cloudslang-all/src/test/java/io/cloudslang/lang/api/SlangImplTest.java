@@ -130,7 +130,7 @@ public class SlangImplTest {
 
     @Test
     public void testCompileWithDependencies() throws IOException {
-        SlangSource tempFile = createTempFile();
+        final SlangSource tempFile = createTempFile();
         File tempDependencyFile = File.createTempFile("tempDependency", null);
         tempDependencyFile.deleteOnExit();
         Set<SlangSource> dependencies = new HashSet<>();

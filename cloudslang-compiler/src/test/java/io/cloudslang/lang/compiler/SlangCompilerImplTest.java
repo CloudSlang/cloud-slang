@@ -86,7 +86,7 @@ public class SlangCompilerImplTest {
         when(yamlParserMock.validateAndThrowFirstError(eq(parsedSlangMock))).thenReturn(parsedSlangMock);
         when(parsedSlangMock.getType()).thenReturn(ParsedSlang.Type.SYSTEM_PROPERTY_FILE);
 
-        String namespace = "a.b";
+        final String namespace = "a.b";
         String key1 = "c.key1";
         String key2 = "c.key2";
         String value1 = "value1";

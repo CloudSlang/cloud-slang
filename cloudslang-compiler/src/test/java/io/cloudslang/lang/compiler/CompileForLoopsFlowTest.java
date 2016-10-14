@@ -67,8 +67,8 @@ public class CompileForLoopsFlowTest {
 
     @Test
     public void testPreCompileLoopFlow() throws Exception {
-        URI flow = getClass().getResource("/loops/simple_loop.sl").toURI();
-        Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
+        final URI flow = getClass().getResource("/loops/simple_loop.sl").toURI();
+        final Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
         assertNotNull("executable is null", executable);
         Step step = ((Flow) executable).getWorkflow()
                 .getSteps()
@@ -89,8 +89,8 @@ public class CompileForLoopsFlowTest {
 
     @Test
     public void testPreCompileLoopFlowWithBreak() throws Exception {
-        URI flow = getClass().getResource("/loops/loop_with_break.sl").toURI();
-        Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
+        final URI flow = getClass().getResource("/loops/loop_with_break.sl").toURI();
+        final Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
         assertNotNull("executable is null", executable);
         Step step = ((Flow) executable).getWorkflow()
                 .getSteps()
@@ -101,8 +101,8 @@ public class CompileForLoopsFlowTest {
 
     @Test
     public void testPreCompileLoopWithCustomNavigationFlow() throws Exception {
-        URI flow = getClass().getResource("/loops/loop_with_custom_navigation.sl").toURI();
-        Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
+        final URI flow = getClass().getResource("/loops/loop_with_custom_navigation.sl").toURI();
+        final Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
         assertNotNull("executable is null", executable);
         Step step = ((Flow) executable).getWorkflow()
                 .getSteps()
@@ -120,8 +120,8 @@ public class CompileForLoopsFlowTest {
 
     @Test
     public void testCompileLoopFlow() throws Exception {
-        URI flow = getClass().getResource("/loops/simple_loop.sl").toURI();
-        URI operation = getClass().getResource("/loops/print.sl").toURI();
+        final URI flow = getClass().getResource("/loops/simple_loop.sl").toURI();
+        final URI operation = getClass().getResource("/loops/print.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
         CompilationArtifact artifact = compiler.compile(SlangSource.fromFile(flow), path);
@@ -144,8 +144,8 @@ public class CompileForLoopsFlowTest {
 
     @Test
     public void testCompileEmptyLoopFlow() throws Exception {
-        URI flow = getClass().getResource("/loops/simple_loop_empty.sl").toURI();
-        URI operation = getClass().getResource("/loops/print.sl").toURI();
+        final URI flow = getClass().getResource("/loops/simple_loop_empty.sl").toURI();
+        final URI operation = getClass().getResource("/loops/print.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
         exception.expect(RuntimeException.class);
@@ -156,8 +156,8 @@ public class CompileForLoopsFlowTest {
 
     @Test
     public void testCompileEmptyStringLoopFlow() throws Exception {
-        URI flow = getClass().getResource("/loops/simple_loop_empty_string.sl").toURI();
-        URI operation = getClass().getResource("/loops/print.sl").toURI();
+        final URI flow = getClass().getResource("/loops/simple_loop_empty_string.sl").toURI();
+        final URI operation = getClass().getResource("/loops/print.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
         exception.expect(RuntimeException.class);
@@ -168,8 +168,8 @@ public class CompileForLoopsFlowTest {
 
     @Test
     public void testCompileLoopFlowWithBreak() throws Exception {
-        URI flow = getClass().getResource("/loops/loop_with_break.sl").toURI();
-        URI operation = getClass().getResource("/loops/print.sl").toURI();
+        final URI flow = getClass().getResource("/loops/loop_with_break.sl").toURI();
+        final URI operation = getClass().getResource("/loops/print.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
         CompilationArtifact artifact = compiler.compile(SlangSource.fromFile(flow), path);
@@ -184,7 +184,7 @@ public class CompileForLoopsFlowTest {
 
     @Test
     public void testPreCompileLoopFlowWithMap() throws Exception {
-        URI flow = getClass().getResource("/loops/simple_loop_with_map.sl").toURI();
+        final URI flow = getClass().getResource("/loops/simple_loop_with_map.sl").toURI();
         Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
         assertNotNull("executable is null", executable);
         Step step = ((Flow) executable).getWorkflow()
@@ -206,8 +206,8 @@ public class CompileForLoopsFlowTest {
 
     @Test
     public void testPreCompileLoopFlowWithMapWithBreak() throws Exception {
-        URI flow = getClass().getResource("/loops/loop_with_break_with_map.sl").toURI();
-        Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
+        final URI flow = getClass().getResource("/loops/loop_with_break_with_map.sl").toURI();
+        final Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
         assertNotNull("executable is null", executable);
         Step step = ((Flow) executable).getWorkflow()
                 .getSteps()
@@ -219,8 +219,8 @@ public class CompileForLoopsFlowTest {
     @Ignore("Remove when support for maps in loops is added")
     @Test
     public void testPreCompileLoopWithMapWithCustomNavigationFlow() throws Exception {
-        URI flow = getClass().getResource("/loops/loop_with_custom_navigation_with_map.sl").toURI();
-        Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
+        final URI flow = getClass().getResource("/loops/loop_with_custom_navigation_with_map.sl").toURI();
+        final Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
         assertNotNull("executable is null", executable);
         Step step = ((Flow) executable).getWorkflow()
                 .getSteps()
@@ -239,9 +239,9 @@ public class CompileForLoopsFlowTest {
 
     @Test
     public void testCompileLoopWithMapFlow() throws Exception {
-        URI flow = getClass().getResource("/loops/simple_loop_with_map.sl").toURI();
-        URI operation = getClass().getResource("/loops/print.sl").toURI();
-        Set<SlangSource> path = new HashSet<>();
+        final URI flow = getClass().getResource("/loops/simple_loop_with_map.sl").toURI();
+        final URI operation = getClass().getResource("/loops/print.sl").toURI();
+        final Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
         CompilationArtifact artifact = compiler.compile(SlangSource.fromFile(flow), path);
         assertNotNull("artifact is null", artifact);
@@ -264,9 +264,9 @@ public class CompileForLoopsFlowTest {
 
     @Test
     public void testCompileLoopFlowWithMapWithBreak() throws Exception {
-        URI flow = getClass().getResource("/loops/loop_with_break_with_map.sl").toURI();
-        URI operation = getClass().getResource("/loops/print.sl").toURI();
-        Set<SlangSource> path = new HashSet<>();
+        final URI flow = getClass().getResource("/loops/loop_with_break_with_map.sl").toURI();
+        final URI operation = getClass().getResource("/loops/print.sl").toURI();
+        final Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
         CompilationArtifact artifact = compiler.compile(SlangSource.fromFile(flow), path);
         assertNotNull("artifact is null", artifact);
@@ -280,9 +280,9 @@ public class CompileForLoopsFlowTest {
 
     @Test
     public void testCompileLoopFlowWithSystemProperty() throws Exception {
-        URI flow = getClass().getResource("/loops/loop_from_property_with_custom_navigation.sl").toURI();
-        URI operation = getClass().getResource("/loops/print.sl").toURI();
-        Set<SlangSource> path = new HashSet<>();
+        final URI flow = getClass().getResource("/loops/loop_from_property_with_custom_navigation.sl").toURI();
+        final URI operation = getClass().getResource("/loops/print.sl").toURI();
+        final Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
         CompilationArtifact artifact = compiler.compile(SlangSource.fromFile(flow), path);
         assertNotNull("artifact is null", artifact);
@@ -292,9 +292,9 @@ public class CompileForLoopsFlowTest {
 
     @Test
     public void testCompileLoopFlowWithBreakOnNonExistingResult() throws Exception {
-        URI flow = getClass().getResource("/loops/loop_with_break_on_non_existing_result.sl").toURI();
-        URI operation = getClass().getResource("/loops/print.sl").toURI();
-        Set<SlangSource> path = new HashSet<>();
+        final URI flow = getClass().getResource("/loops/loop_with_break_on_non_existing_result.sl").toURI();
+        final URI operation = getClass().getResource("/loops/print.sl").toURI();
+        final Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage(

@@ -46,8 +46,8 @@ public class CompileFlowReferenceIdTest {
 
     @Test
     public void testBasicAlias() throws Exception {
-        URI flow = getClass().getResource("/alias/basic_alias.yaml").toURI();
-        URI operation = getClass().getResource("/alias/simple_op.sl").toURI();
+        final URI flow = getClass().getResource("/alias/basic_alias.yaml").toURI();
+        final URI operation = getClass().getResource("/alias/simple_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
@@ -66,8 +66,8 @@ public class CompileFlowReferenceIdTest {
 
     @Test
     public void testDefaultNamespace() throws Exception {
-        URI flow = getClass().getResource("/alias/default_namespace.yaml").toURI();
-        URI operation = getClass().getResource("/alias/simple_op.sl").toURI();
+        final URI flow = getClass().getResource("/alias/default_namespace.yaml").toURI();
+        final URI operation = getClass().getResource("/alias/simple_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
@@ -86,8 +86,8 @@ public class CompileFlowReferenceIdTest {
 
     @Test
     public void testShortFullPathNoExpanding() throws Exception {
-        URI flow = getClass().getResource("/alias/short_full_path_no_expanding.yaml").toURI();
-        URI operation = getClass().getResource("/alias/cloud_op.sl").toURI();
+        final URI flow = getClass().getResource("/alias/short_full_path_no_expanding.yaml").toURI();
+        final URI operation = getClass().getResource("/alias/cloud_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
@@ -106,8 +106,8 @@ public class CompileFlowReferenceIdTest {
 
     @Test
     public void testLongFullPathNoExpanding() throws Exception {
-        URI flow = getClass().getResource("/alias/long_full_path_no_expanding.yaml").toURI();
-        URI operation = getClass().getResource("/alias/print.sl").toURI();
+        final URI flow = getClass().getResource("/alias/long_full_path_no_expanding.yaml").toURI();
+        final URI operation = getClass().getResource("/alias/print.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
@@ -126,8 +126,8 @@ public class CompileFlowReferenceIdTest {
 
     @Test
     public void testLongFullPathWithExpanding() throws Exception {
-        URI flow = getClass().getResource("/alias/long_full_path_with_expanding.yaml").toURI();
-        URI operation = getClass().getResource("/alias/print.sl").toURI();
+        final URI flow = getClass().getResource("/alias/long_full_path_with_expanding.yaml").toURI();
+        final URI operation = getClass().getResource("/alias/print.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
@@ -146,8 +146,8 @@ public class CompileFlowReferenceIdTest {
 
     @Test
     public void testReferenceNotFound() throws Exception {
-        URI flow = getClass().getResource("/alias/reference_not_found_flow.yaml").toURI();
-        URI operation = getClass().getResource("/alias/simple_op.sl").toURI();
+        final URI flow = getClass().getResource("/alias/reference_not_found_flow.yaml").toURI();
+        final URI operation = getClass().getResource("/alias/simple_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));

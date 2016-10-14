@@ -77,10 +77,10 @@ public class TestRunInfoServiceImplTest {
     @Test
     public void testSetRunModeForTestSuites() {
         TestCaseRunMode runModeMock = TestCaseRunMode.SEQUENTIAL;
-        doReturn(null).
-                doReturn(null).
-                doReturn(null).
-                when(runModeMap).put(anyString(), any(TestCaseRunMode.class));
+        doReturn(null)
+                .doReturn(null)
+                .doReturn(null)
+                .when(runModeMap).put(anyString(), any(TestCaseRunMode.class));
 
         // Tested call
         List<String> list = newArrayList("aaa", "bbb", "ccc");

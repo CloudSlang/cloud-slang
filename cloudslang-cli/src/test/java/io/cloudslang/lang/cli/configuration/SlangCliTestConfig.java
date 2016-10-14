@@ -30,7 +30,7 @@ import static org.mockito.Mockito.mock;
  */
 @Configuration
 @ComponentScan("io.cloudslang.lang.cli")
-public class SlangCLITestConfig {
+public class SlangCliTestConfig {
 
     @Bean
     public ScoreServices scoreServices() {

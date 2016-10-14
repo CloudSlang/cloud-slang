@@ -99,7 +99,7 @@ public class JavaActionTransformerTest extends TransformersTestParent {
     }
 
     @Test
-    public void testTransformWithoutGAV() throws Exception {
+    public void testTransformWithoutGav() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Following tags are missing: [gav]");
         transformAndThrowFirstException(javaActionTransformer, loadJavaActionData("/java_action_wo_dependencies.sl"));

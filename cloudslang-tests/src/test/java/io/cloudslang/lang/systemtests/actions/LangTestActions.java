@@ -26,8 +26,8 @@ import java.util.Map;
 public class LangTestActions {
 
     @SuppressWarnings("unused")
-    public Map<String, String> parseUrl(@Param("host") String host, @Param("port") String nova_port) {
-        String url = "http://" + host + ":" + nova_port;
+    public Map<String, String> parseUrl(@Param("host") String host, @Param("port") String novaPort) {
+        String url = "http://" + host + ":" + novaPort;
         System.out.println(url);
         Map<String, String> returnValue = new HashMap<>();
         returnValue.put("url", url);

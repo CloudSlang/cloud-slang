@@ -228,7 +228,7 @@ public class LoopFlowsTest extends SystemsTestsParent {
         final URI operation1 = getClass().getResource("/yaml/loops/print.sl").toURI();
 
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        final CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Value> personMap = new HashMap<>();
         personMap.put("john", ValueFactory.create(1));
@@ -247,7 +247,7 @@ public class LoopFlowsTest extends SystemsTestsParent {
         final URI operation1 = getClass().getResource("/yaml/loops/print.sl").toURI();
 
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        final CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Value> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
@@ -262,7 +262,7 @@ public class LoopFlowsTest extends SystemsTestsParent {
         final URI operation1 = getClass().getResource("/yaml/loops/operation_that_fails_when_value_is_2.sl").toURI();
 
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        final CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Value> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
@@ -277,7 +277,7 @@ public class LoopFlowsTest extends SystemsTestsParent {
         final URI operation1 = getClass().getResource("/yaml/loops/operation_that_fails_when_value_is_2.sl").toURI();
 
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        final CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Value> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
@@ -292,8 +292,8 @@ public class LoopFlowsTest extends SystemsTestsParent {
         final URI operation1 = getClass().getResource("/yaml/loops/operation_that_goes_to_custom_when_value_is_2.sl").toURI();
         final URI operation2 = getClass().getResource("/yaml/loops/print.sl").toURI();
 
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        final Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
+        final CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Value> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();
@@ -308,7 +308,7 @@ public class LoopFlowsTest extends SystemsTestsParent {
         final StepData secondStep = stepsData.get(SECOND_STEP_KEY);
         final StepData thirdStep = stepsData.get(THIRD_STEP_KEY);
         @SuppressWarnings("unchecked")
-        Set<Map<String, Serializable>> actualContextSet = Sets.newHashSet(
+        final Set<Map<String, Serializable>> actualContextSet = Sets.newHashSet(
                 firstStep.getInputs(),
                 secondStep.getInputs(),
                 thirdStep.getInputs()
