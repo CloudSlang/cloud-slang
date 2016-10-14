@@ -55,7 +55,7 @@ import javax.annotation.PostConstruct;
 @Component
 public class SlangCLI implements CommandMarker {
 
-    private final static Logger logger = Logger.getLogger(SlangCLI.class);
+    private static final Logger logger = Logger.getLogger(SlangCLI.class);
 
     private static final String TRIGGERED_FLOW_MSG = "Triggered flow : ";
     private static final String WITH_EXECUTION_ID_MSG = "Execution id: ";

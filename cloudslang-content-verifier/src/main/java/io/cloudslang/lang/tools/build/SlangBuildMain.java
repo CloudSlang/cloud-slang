@@ -83,7 +83,7 @@ public class SlangBuildMain {
     private static final String CONTENT_DIR = File.separator + "content";
     private static final String TEST_DIR = File.separator + "test";
 
-    private final static Logger log = Logger.getLogger(SlangBuildMain.class);
+    private static final Logger log = Logger.getLogger(SlangBuildMain.class);
     private static final int MAX_THREADS_TEST_RUNNER = 32;
     private static final String MESSAGE_NOT_SCHEDULED_FOR_RUN_RULES = "Rules '%s' defined in '%s' key are not scheduled for run.";
 

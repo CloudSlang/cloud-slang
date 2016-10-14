@@ -65,7 +65,7 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 @Component
 public class SlangTestRunner {
 
-    private final static String PROJECT_PATH_TOKEN = "${project_path}";
+    private static final String PROJECT_PATH_TOKEN = "${project_path}";
     public static final long MAX_TIME_PER_TESTCASE_IN_MINUTES = 10;
     public static final String TEST_CASE_TIMEOUT_IN_MINUTES_KEY = "test.case.timeout.in.minutes";
     public static final String PREFIX_DASH = "    - ";

@@ -39,7 +39,7 @@ public class SyncTriggerEventListener implements ScoreEventListener {
     public static final String FLOW_FINISHED_WITH_FAILURE_MSG = "Flow finished with failure";
     public static final String EXEC_START_PATH = "0";
     public static final int OUTPUT_VALUE_LIMIT = 100;
-    private final static String STEP_PATH_PREFIX = "- ";
+    private static final String STEP_PATH_PREFIX = "- ";
     public static final String FLOW_OUTPUTS = "Flow outputs:";
     public static final String OPERATION_OUTPUTS = "Operation outputs:";
     public static final String FINISHED_WITH_RESULT = " finished with result: ";
