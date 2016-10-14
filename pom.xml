@@ -161,7 +161,7 @@
             <!--end of score dependencies-->
 
             <dependency>
-                <groupId>io.cloudslang</groupId>
+                <groupId>${score.group}</groupId>
                 <artifactId>runtime-management-api</artifactId>
                 <version>${score.version}</version>
             </dependency>
