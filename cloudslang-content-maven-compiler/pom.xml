@@ -103,6 +103,8 @@
                             <!-- here to fix wrong detection -->
                             <ignoredUsedUndeclaredDependencies>
                                 <ignoredUsedUndeclaredDependency>org.codehaus.plexus:plexus-container-default:jar:1.0-alpha-9-stable-1</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>commons-lang:commons-lang:jar:2.0:test
+                                </ignoredUsedUndeclaredDependency>
                             </ignoredUsedUndeclaredDependencies>
                         </configuration>
                     </execution>
