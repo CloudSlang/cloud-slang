@@ -107,8 +107,8 @@ public abstract class AbstractValidator {
         for (String part : parts) {
             if ("".equals(part)) {
                 throw new RuntimeException(
-                        "Argument[" + input + "] cannot contain multiple delimiters["
-                                + Regex.NAMESPACE_PROPERTY_DELIMITER + "] without content."
+                        "Argument[" + input + "] cannot contain multiple delimiters[" +
+                                Regex.NAMESPACE_PROPERTY_DELIMITER + "] without content."
                 );
             }
         }

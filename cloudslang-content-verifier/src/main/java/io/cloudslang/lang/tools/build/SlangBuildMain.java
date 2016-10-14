@@ -196,8 +196,8 @@ public class SlangBuildMain {
         log.info("Active test suites are: " + getListForPrint(testSuites));
         log.info("Parallel run mode is configured for test suites: " + getListForPrint(testSuitesParallel));
         log.info("Sequential run mode is configured for test suites: " + getListForPrint(testSuitesSequential));
-        log.info("Default run mode '" + unspecifiedTestSuiteRunMode.name().toLowerCase() + "' is configured for test suites: "
-                + getListForPrint(getDefaultRunModeTestSuites(testSuites, testSuitesParallel, testSuitesSequential)));
+        log.info("Default run mode '" + unspecifiedTestSuiteRunMode.name().toLowerCase() + "' is configured for test suites: " +
+                getListForPrint(getDefaultRunModeTestSuites(testSuites, testSuitesParallel, testSuitesSequential)));
 
         log.info("Bulk run mode for tests: " + getBulkModeForPrint(bulkRunMode));
 
@@ -388,8 +388,8 @@ public class SlangBuildMain {
     }
 
     private static void logErrorsSuffix(String projectPath, final LoggingService loggingService) {
-        loggingService.logEvent(Level.ERROR, "FAILURE: Validation of slang files for project: \""
-                + projectPath + "\" failed.");
+        loggingService.logEvent(Level.ERROR, "FAILURE: Validation of slang files for project: \"" +
+                projectPath + "\" failed.");
         loggingService.logEvent(Level.ERROR, "------------------------------------------------------------");
         loggingService.logEvent(Level.ERROR, "");
     }
@@ -475,8 +475,8 @@ public class SlangBuildMain {
         loggingService.logEvent(Level.INFO, "------------------------------------------------------------");
         loggingService.logEvent(Level.INFO, "BUILD SUCCESS");
         loggingService.logEvent(Level.INFO, "------------------------------------------------------------");
-        loggingService.logEvent(Level.INFO, "Found " + buildResults.getNumberOfCompiledSources()
-                + " slang files under directory: \"" + contentPath + "\" and all are valid.");
+        loggingService.logEvent(Level.INFO, "Found " + buildResults.getNumberOfCompiledSources() +
+                " slang files under directory: \"" + contentPath + "\" and all are valid.");
         printNumberOfPassedAndSkippedTests(runTestsResults, loggingService);
         loggingService.logEvent(Level.INFO, "");
     }

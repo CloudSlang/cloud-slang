@@ -88,10 +88,8 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
 
         Map<String, Serializable> outputsMap = new HashMap<>();
 
-        boolean thereAreOutputsForRootPath =
-                data.containsKey(LanguageEventData.OUTPUTS)
-                        && data.containsKey(LanguageEventData.PATH)
-                        && data.getPath().equals(EXEC_START_PATH);
+        boolean thereAreOutputsForRootPath = data.containsKey(LanguageEventData.OUTPUTS) && data.containsKey(LanguageEventData.PATH) &&
+                data.getPath().equals(EXEC_START_PATH);
 
         if (thereAreOutputsForRootPath) {
             Map<String, Serializable> outputs = data.getOutputs();

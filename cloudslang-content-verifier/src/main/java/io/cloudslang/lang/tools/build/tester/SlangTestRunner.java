@@ -274,8 +274,8 @@ public class SlangTestRunner {
             SlangTestCase slangTestCase,
             Set<String> changedExecutables,
             Map<String, Executable> allTestedFlowModels) {
-        return (buildMode == SlangBuildMain.BuildMode.BASIC)
-                || (buildMode == SlangBuildMain.BuildMode.CHANGED && isAffectedTestCase(slangTestCase, changedExecutables, allTestedFlowModels));
+        return (buildMode == SlangBuildMain.BuildMode.BASIC) ||
+                (buildMode == SlangBuildMain.BuildMode.CHANGED && isAffectedTestCase(slangTestCase, changedExecutables, allTestedFlowModels));
     }
 
     private boolean isAffectedTestCase(SlangTestCase slangTestCase, Set<String> changedExecutables, Map<String, Executable> allTestedFlowModels) {

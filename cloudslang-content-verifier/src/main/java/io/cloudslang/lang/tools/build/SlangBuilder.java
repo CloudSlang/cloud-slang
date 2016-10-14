@@ -108,8 +108,7 @@ public class SlangBuilder {
 
         if (compiledSlangFiles.size() != slangModels.size()) {
             throw new RuntimeException("Some Slang files were not compiled.\n" +
-                    "Found: " + slangModels.size() + " slang models, but managed to compile only: "
-                    + compiledSlangFiles.size());
+                    "Found: " + slangModels.size() + " slang models, but managed to compile only: " + compiledSlangFiles.size());
         }
 
         loggingService.logEvent(Level.INFO, "Successfully finished Compilation of: " + compiledSlangFiles.size() + " Slang files");

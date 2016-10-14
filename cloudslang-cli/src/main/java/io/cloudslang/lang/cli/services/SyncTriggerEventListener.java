@@ -104,9 +104,8 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                 }
 
                 // Flow end case
-                else if (data.containsKey(LanguageEventData.OUTPUTS)
-                        && data.containsKey(LanguageEventData.PATH)
-                        && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
+                else if (data.containsKey(LanguageEventData.OUTPUTS) && data.containsKey(LanguageEventData.PATH) &&
+                        data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
                     Map<String, Serializable> outputs = extractNotEmptyOutputs(data);
                     if (outputs.size() > 0) {
                         printForOperationOrFlow(data, Ansi.Color.WHITE, "\n" + OPERATION_OUTPUTS, "\n" + FLOW_OUTPUTS);
