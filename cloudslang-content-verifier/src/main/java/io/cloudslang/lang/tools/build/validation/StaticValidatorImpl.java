@@ -33,7 +33,7 @@ public class StaticValidatorImpl implements StaticValidator {
     private static final Pattern PATTERN = Pattern.compile("^[\\w-\\.]+$");
 
     @Override
-    public void validateSlangFile(File slangFile, Executable executable, Metadata metadata, boolean shouldValidateDescription){
+    public void validateSlangFile(File slangFile, Executable executable, Metadata metadata, boolean shouldValidateDescription) {
         validateNamespace(slangFile, executable);
 
         validateExecutableName(slangFile, executable);
