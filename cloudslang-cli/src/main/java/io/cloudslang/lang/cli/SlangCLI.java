@@ -294,12 +294,9 @@ public class SlangCLI implements CommandMarker {
 
     private void logSlangEvent(ScoreEvent event) {
         LanguageEventData eventData = (LanguageEventData) event.getData();
-        logger.info(("[ " + eventData.getPath() + " - " + eventData.getStepName() + " ] "
-                + event.getEventType() + " - Inputs: " + eventData.getInputs()
-                + ", Outputs: " + eventData.getOutputs()
-                + ", Result: " + eventData.getResult()
-                + ", Raw Data: " + event.getData()
-        ));
+        logger.info(("[ " + eventData.getPath() + " - " + eventData.getStepName() + " ] " +
+                event.getEventType() + " - Inputs: " + eventData.getInputs() + ", Outputs: " + eventData.getOutputs() +
+                ", Result: " + eventData.getResult() + ", Raw Data: " + event.getData()));
     }
 
     private void logScoreEvent(ScoreEvent event) {
