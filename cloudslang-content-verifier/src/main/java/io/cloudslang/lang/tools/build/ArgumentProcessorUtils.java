@@ -102,8 +102,8 @@ public class ArgumentProcessorUtils {
             String propertyValue = properties.getProperty(propertyKey);
             if (isNotEmpty(propertyValue)) {
                 @SuppressWarnings("unchecked")
-                Class<T> aClass = (Class<T>) defaultValue.getClass();
-                return T.valueOf(aClass, propertyValue.toUpperCase(ENGLISH));
+                Class<T> defaultValueClass = (Class<T>) defaultValue.getClass();
+                return T.valueOf(defaultValueClass, propertyValue.toUpperCase(ENGLISH));
             }
         } catch (IllegalArgumentException ignore) {
         }
@@ -124,7 +124,7 @@ public class ArgumentProcessorUtils {
     /**
      *
      * @param suitesString commma separated string of test suite names.
-     * @return the test suite names as a java.util.List<String>
+     * @return the test suite names as a java.util.List of String type.
      */
     public static List<String> parseTestSuitesToList(final String suitesString) {
         return isNotEmpty(suitesString) ? parseTestSuitesToList(asList(suitesString.split(SUITE_LIST_SEPARATOR))) : new ArrayList<String>();

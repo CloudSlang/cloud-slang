@@ -420,8 +420,8 @@ public class SlangTestRunner {
                                                     Map<String, Value> inputs,
                                                     Set<SystemProperty> systemProperties) {
 
-        String result = testCase.getResult();
-        Map<String, Serializable> outputs = getTestCaseOutputsMap(testCase);
+        final String result = testCase.getResult();
+        final Map<String, Serializable> outputs = getTestCaseOutputsMap(testCase);
         String flowName = testCase.getTestFlowPath();
 
         TriggerTestCaseEventListener testsEventListener = new TriggerTestCaseEventListener();
@@ -468,8 +468,8 @@ public class SlangTestRunner {
                                                   Map<String, Value> inputs,
                                                   Set<SystemProperty> systemProperties, MultiTriggerTestCaseEventListener globalListener) {
 
-        String result = testCase.getResult();
-        Map<String, Serializable> outputs = getTestCaseOutputsMap(testCase);
+        final String result = testCase.getResult();
+        final Map<String, Serializable> outputs = getTestCaseOutputsMap(testCase);
         String flowName = testCase.getTestFlowPath();
 
         Long executionId = slang.run(compilationArtifact, inputs, systemProperties);

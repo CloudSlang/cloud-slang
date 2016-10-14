@@ -133,7 +133,7 @@ public class SlangBuilder {
         allTestedFlowModels.putAll(contentSlangModels);
 
         // Compiling all the test flows
-        Map<String, CompilationArtifact> compiledFlows = slangContentVerifier.compileSlangModels(allTestedFlowModels);
+        final Map<String, CompilationArtifact> compiledFlows = slangContentVerifier.compileSlangModels(allTestedFlowModels);
 
         Set<String> allTestedFlowsFqn = mapExecutablesToFullyQualifiedName(allTestedFlowModels.values());
         Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath, allTestedFlowsFqn);
