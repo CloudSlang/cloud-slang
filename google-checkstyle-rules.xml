@@ -214,4 +214,5 @@
         </module>
         <module name="CommentsIndentation"/>
     </module>
+    <module name="SuppressionCommentFilter"/>
 </module>

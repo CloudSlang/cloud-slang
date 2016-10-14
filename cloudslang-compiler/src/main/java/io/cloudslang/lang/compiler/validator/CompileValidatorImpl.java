@@ -54,28 +54,6 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
         return validateModelWithDependencies(executable, dependencies, verifiedExecutables, new ArrayList<RuntimeException>(), true);
     }
 
-    @Override
-    public List<RuntimeException> validateModelWithDirectDependencies(Executable executable, Map<String, Executable> directDependencies) {
-        List<RuntimeException> errors = new ArrayList<>();
-        Set<Executable> verifiedExecutables = new HashSet<>();
-        return validateModelWithDependencies(executable, directDependencies, verifiedExecutables, errors, false);
-    }
-
-    @Override
-    public List<RuntimeException> validateNoDuplicateExecutables(
-            Executable currentExecutable,
-            SlangSource currentSource,
-            Map<Executable, SlangSource> allAvailableExecutables) {
-        List<RuntimeException> errors = new ArrayList<>();
-        for (Map.Entry<Executable, SlangSource> entry : allAvailableExecutables.entrySet()) {
-            Executable executable = entry.getKey();
-            if (currentExecutable.getId().equalsIgnoreCase(executable.getId()) && !currentSource.equals(entry.getValue())) {
-                errors.add(new RuntimeException(String.format(DUPLICATE_EXECUTABLE_FOUND, currentExecutable.getId())));
-            }
-        }
-        return errors;
-    }
-
     private List<RuntimeException> validateModelWithDependencies(
             Executable executable,
             Map<String, Executable> dependencies,
@@ -101,6 +79,28 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
         if (recursive) {
             for (Executable reference : flowReferences) {
                 validateModelWithDependencies(reference, dependencies, verifiedExecutables, errors, true);
+            }
+        }
+        return errors;
+    }
+
+    @Override
+    public List<RuntimeException> validateModelWithDirectDependencies(Executable executable, Map<String, Executable> directDependencies) {
+        List<RuntimeException> errors = new ArrayList<>();
+        Set<Executable> verifiedExecutables = new HashSet<>();
+        return validateModelWithDependencies(executable, directDependencies, verifiedExecutables, errors, false);
+    }
+
+    @Override
+    public List<RuntimeException> validateNoDuplicateExecutables(
+            Executable currentExecutable,
+            SlangSource currentSource,
+            Map<Executable, SlangSource> allAvailableExecutables) {
+        List<RuntimeException> errors = new ArrayList<>();
+        for (Map.Entry<Executable, SlangSource> entry : allAvailableExecutables.entrySet()) {
+            Executable executable = entry.getKey();
+            if (currentExecutable.getId().equalsIgnoreCase(executable.getId()) && !currentSource.equals(entry.getValue())) {
+                errors.add(new RuntimeException(String.format(DUPLICATE_EXECUTABLE_FOUND, currentExecutable.getId())));
             }
         }
         return errors;
