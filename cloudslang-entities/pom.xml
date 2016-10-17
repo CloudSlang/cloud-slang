@@ -143,6 +143,12 @@
                 </configuration>
             </plugin>
 
+            <!--Check vulnerabilities in third party libraries-->
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+            </plugin>
+
         </plugins>
     </build>
 

@@ -124,6 +124,12 @@ http://www.apache.org/licenses/LICENSE-2.0
                 </configuration>
             </plugin>
 
+            <!--Check vulnerabilities in third party libraries-->
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+            </plugin>
+
 
         </plugins>
     </build>
