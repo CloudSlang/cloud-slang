@@ -126,6 +126,7 @@ public class CompilerHelperImpl implements CompilerHelper {
             }
         } finally {
             slang.compileCleanUp();
+            consolePrinter.waitForAllPrintTasksToFinish();
         }
         return results;
     }

@@ -11,9 +11,13 @@ package io.cloudslang.lang.cli.services;
 
 import org.fusesource.jansi.Ansi;
 
+import java.util.concurrent.Future;
+
 /**
  * Created by bancl on 10/17/2016.
  */
 public interface ConsolePrinter {
-    void printWithColor(Ansi.Color color, String msg);
+    void waitForAllPrintTasksToFinish();
+
+    Future<?> printWithColor(Ansi.Color color, String message);
 }
