@@ -10,6 +10,7 @@
 package io.cloudslang.lang.compiler;
 
 import java.util.Arrays;
+
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,8 +35,9 @@ public enum Extension {
 
     private static void initExtensionValues() {
         Extension[] extensions = values();
-        for (int i = 0; i < extensions.length; i++)
+        for (int i = 0; i < extensions.length; i++) {
             extensionValues[i] = extensions[i].getValue();
+        }
     }
 
     Extension(String value) {
@@ -84,7 +86,9 @@ public enum Extension {
                                               Extension[] extensions, String[] extensionValues) {
         boolean validFileExtension = false;
         for (Extension extension : extensions) {
-            if (extension.equals(fileExtension)) validFileExtension = true;
+            if (extension.equals(fileExtension)) {
+                validFileExtension = true;
+            }
         }
         String extensionsAsString = Arrays.toString(extensionValues);
         Validate.isTrue(validFileExtension,
@@ -95,7 +99,9 @@ public enum Extension {
 
     public static String removeExtension(String fileName) {
         Extension extension = findExtension(fileName);
-        if (extension != null) return StringUtils.removeEnd(fileName, "." + extension.getValue());
+        if (extension != null) {
+            return StringUtils.removeEnd(fileName, "." + extension.getValue());
+        }
         return fileName;
     }
 

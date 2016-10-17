@@ -23,6 +23,7 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.time.StopWatch;
@@ -51,9 +53,9 @@ import javax.annotation.PostConstruct;
  * @since 11/07/2014
  */
 @Component
-public class SlangCLI implements CommandMarker {
+public class SlangCli implements CommandMarker {
 
-    private final static Logger logger = Logger.getLogger(SlangCLI.class);
+    private static final Logger logger = Logger.getLogger(SlangCli.class);
 
     private static final String TRIGGERED_FLOW_MSG = "Triggered flow : ";
     private static final String WITH_EXECUTION_ID_MSG = "Execution id: ";
@@ -101,10 +103,13 @@ public class SlangCLI implements CommandMarker {
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP) final List<String> classPath,
             @CliOption(key = {"i", "inputs"}, mandatory = false, help = INPUTS_HELP) final Map<String, ? extends Serializable> inputs,
             @CliOption(key = {"if", "input-file"}, mandatory = false, help = INPUT_FILE_HELP) final List<String> inputFiles,
-            @CliOption(key = {"v", "verbose"}, mandatory = false, help = "default, quiet, debug(print each step outputs). e.g. run --f c:/.../your_flow.sl --v quiet", specifiedDefaultValue = "debug", unspecifiedDefaultValue = "default") final String verbose,
+            @CliOption(key = {"v", "verbose"}, mandatory = false, help = "default, quiet, debug(print each step outputs). e.g. run --f c:/.../your_flow.sl --v quiet",
+                    specifiedDefaultValue = "debug", unspecifiedDefaultValue = "default") final String verbose,
             @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = SYSTEM_PROPERTY_FILE_HELP) final List<String> systemPropertyFiles) {
 
-        if (invalidVerboseInput(verbose)) throw new IllegalArgumentException("Verbose argument is invalid.");
+        if (invalidVerboseInput(verbose)) {
+            throw new IllegalArgumentException("Verbose argument is invalid.");
+        }
 
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
         Set<SystemProperty> systemProperties = compilerHelper.loadSystemProperties(systemPropertyFiles);
@@ -290,12 +295,9 @@ public class SlangCLI implements CommandMarker {
 
     private void logSlangEvent(ScoreEvent event) {
         LanguageEventData eventData = (LanguageEventData) event.getData();
-        logger.info(("[ " + eventData.getPath() + " - " + eventData.getStepName() + " ] "
-                + event.getEventType() + " - Inputs: " + eventData.getInputs()
-                + ", Outputs: " + eventData.getOutputs()
-                + ", Result: " + eventData.getResult()
-                + ", Raw Data: " + event.getData()
-        ));
+        logger.info(("[ " + eventData.getPath() + " - " + eventData.getStepName() + " ] " +
+                event.getEventType() + " - Inputs: " + eventData.getInputs() + ", Outputs: " + eventData.getOutputs() +
+                ", Result: " + eventData.getResult() + ", Raw Data: " + event.getData()));
     }
 
     private void logScoreEvent(ScoreEvent event) {

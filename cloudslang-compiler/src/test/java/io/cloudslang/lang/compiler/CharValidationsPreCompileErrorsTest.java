@@ -11,7 +11,9 @@ package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
+
 import java.net.URI;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -46,7 +48,7 @@ public class CharValidationsPreCompileErrorsTest {
     }
 
     @Test
-    public void testReferenceID() throws Exception {
+    public void testReferenceId() throws Exception {
         runAndValidateError("/corrupted/chars/flow_2.sl", "Argument[bo$$.ops.check_Weather] violates character rules.");
     }
 

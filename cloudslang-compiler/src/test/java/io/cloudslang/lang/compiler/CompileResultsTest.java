@@ -13,9 +13,11 @@ import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Result;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -107,8 +109,8 @@ public class CompileResultsTest {
     }
 
     private Executable preCompileExecutable(String source) throws Exception {
-        URL sourceURI = getClass().getResource(source);
-        return compiler.preCompile(SlangSource.fromFile(sourceURI.toURI()));
+        URL sourceUri = getClass().getResource(source);
+        return compiler.preCompile(SlangSource.fromFile(sourceUri.toURI()));
     }
 
     private void expectMessage(String message) {

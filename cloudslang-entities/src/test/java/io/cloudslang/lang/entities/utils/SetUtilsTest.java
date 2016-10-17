@@ -13,11 +13,13 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
 import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -87,13 +89,13 @@ public class SetUtilsTest {
     }
 
     @Test
-    public void testContainsIgnoreCaseBasedOnFQNEmpty() throws Exception {
-        Assert.assertFalse(SetUtils.containsIgnoreCaseBasedOnFQN(EMPTY_SET_SP, SP_1));
+    public void testContainsIgnoreCaseBasedOnFqnEmpty() throws Exception {
+        Assert.assertFalse(SetUtils.containsIgnoreCaseBasedOnFqn(EMPTY_SET_SP, SP_1));
     }
 
     @Test
-    public void testContainsIgnoreCaseBasedOnFQN() throws Exception {
-        Assert.assertTrue(SetUtils.containsIgnoreCaseBasedOnFQN(SET_SP_1, SP_1));
+    public void testContainsIgnoreCaseBasedOnFqn() throws Exception {
+        Assert.assertTrue(SetUtils.containsIgnoreCaseBasedOnFqn(SET_SP_1, SP_1));
     }
 
     @Test

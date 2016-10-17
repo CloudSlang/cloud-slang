@@ -77,10 +77,10 @@ public class TestRunInfoServiceImplTest {
     @Test
     public void testSetRunModeForTestSuites() {
         TestCaseRunMode runModeMock = TestCaseRunMode.SEQUENTIAL;
-        doReturn(null).
-                doReturn(null).
-                doReturn(null).
-                when(runModeMap).put(anyString(), any(TestCaseRunMode.class));
+        doReturn(null)
+                .doReturn(null)
+                .doReturn(null)
+                .when(runModeMap).put(anyString(), any(TestCaseRunMode.class));
 
         // Tested call
         List<String> list = newArrayList("aaa", "bbb", "ccc");
@@ -138,8 +138,8 @@ public class TestRunInfoServiceImplTest {
     public void testInitialize() throws IllegalAccessException, NoSuchFieldException {
         TestRunInfoServiceImpl local = new TestRunInfoServiceImpl();
         local.initialize();
-        Class<? extends TestRunInfoServiceImpl> aClass = local.getClass();
-        Field fieldRunModeMap = aClass.getDeclaredField("runModeMap");
+        Class<? extends TestRunInfoServiceImpl> localClass = local.getClass();
+        Field fieldRunModeMap = localClass.getDeclaredField("runModeMap");
         fieldRunModeMap.setAccessible(true);
         Object value = fieldRunModeMap.get(local);
         Assert.assertNotNull(value);

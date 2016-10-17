@@ -12,8 +12,10 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
+
 import java.net.URI;
 import java.util.List;
+
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -109,7 +111,7 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
-    public void testOperationWithWrongNameSLYAMLExtension() throws Exception {
+    public void testOperationWithWrongNameSlYamlExtension() throws Exception {
         URI resource = getClass().getResource("/corrupted/wrong_name_operation.sl.yaml").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
@@ -120,7 +122,7 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
-    public void testOperationWithWrongNameSLYMLExtension() throws Exception {
+    public void testOperationWithWrongNameSlYmlExtension() throws Exception {
         URI resource = getClass().getResource("/corrupted/wrong_name_operation.sl.yml").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
@@ -131,7 +133,7 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
-    public void testOperationWithWrongNameYAMLExtension() throws Exception {
+    public void testOperationWithWrongNameYamlExtension() throws Exception {
         URI resource = getClass().getResource("/corrupted/wrong_name_operation.yaml").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
@@ -142,7 +144,7 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
-    public void testOperationWithWrongNameYMLExtension() throws Exception {
+    public void testOperationWithWrongNameYmlExtension() throws Exception {
         URI resource = getClass().getResource("/corrupted/wrong_name_operation.yml").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));

@@ -17,12 +17,14 @@ import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.events.ScoreEvent;
+
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -61,7 +63,7 @@ public class OperationSystemTest extends SystemsTestsParent {
     @Test
     public void testCompileAndRunOperationWithDataMissingInput() throws Exception {
         URL resource = getClass().getResource("/yaml/test_op_2.sl");
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), null);
+        final CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), null);
         //Trigger ExecutionPlan
         Map<String, Value> userInputs = new HashMap<>();
         userInputs.put("input2", ValueFactory.create("value2"));

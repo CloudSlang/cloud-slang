@@ -15,10 +15,12 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import org.junit.Assert;
 
 /**
@@ -87,13 +89,13 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
 
         // evaluated via Python
         expectedInputs.put("input_python_null", null);
-//      uncomment when types will be supported
-//        expectedInputs.put("input_python_list", Lists.newArrayList(1, 2 ,3));
-//        HashMap<String, Serializable> expectedInputMap = new LinkedHashMap<>();
-//        expectedInputMap.put("key1", "value1");
-//        expectedInputMap.put("key2", "value2");
-//        expectedInputMap.put("key3", "value3");
-//        expectedInputs.put("input_python_map", expectedInputMap);
+        // uncomment when types will be supported
+        // expectedInputs.put("input_python_list", Lists.newArrayList(1, 2 ,3));
+        // HashMap<String, Serializable> expectedInputMap = new LinkedHashMap<>();
+        // expectedInputMap.put("key1", "value1");
+        // expectedInputMap.put("key2", "value2");
+        // expectedInputMap.put("key3", "value3");
+        // expectedInputs.put("input_python_map", expectedInputMap);
         expectedInputs.put("b", "b");
         expectedInputs.put("b_copy", "b");
         expectedInputs.put("input_concat_1", "ab");

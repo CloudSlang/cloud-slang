@@ -10,8 +10,10 @@
 package io.cloudslang.lang.entities.utils;
 
 import com.google.common.collect.Sets;
+
 import java.util.Collections;
 import java.util.Set;
+
 import junit.framework.Assert;
 import org.junit.Test;
 

@@ -36,7 +36,7 @@ public class CloudSlangMavenCompilerTest extends AbstractCompilerTest {
     public void testCompilingSources() throws Exception {
         ArrayList messages = new ArrayList();
 
-        Compiler compiler = (Compiler)this.lookup(Compiler.ROLE, this.getRoleHint());
+        Compiler compiler = (Compiler) this.lookup(Compiler.ROLE, this.getRoleHint());
         messages.addAll(compiler.performCompile(getCompilerConfigurationShallowCompile()).getCompilerMessages());
 
         int numCompilerErrors = compilerErrorCount(messages);
@@ -73,7 +73,7 @@ public class CloudSlangMavenCompilerTest extends AbstractCompilerTest {
     private CompilerConfiguration getCompilerConfigurationNoShallowCompile() throws Exception {
         String sourceDir = getBasedir() + "/src/test/resources/content";
         Map<String, String> customCompilerArguments = new HashMap<>();
-        customCompilerArguments.put("ignore-dependencies","") ;
+        customCompilerArguments.put("ignore-dependencies", "");
 
 
         CompilerConfiguration compilerConfig = new CompilerConfiguration();
@@ -87,7 +87,7 @@ public class CloudSlangMavenCompilerTest extends AbstractCompilerTest {
     private CompilerConfiguration getCompilerConfigurationDontFailOnErrors() throws Exception {
         String sourceDir = getBasedir() + "/src/test/resources/content";
         Map<String, String> customCompilerArguments = new HashMap<>();
-        customCompilerArguments.put("ignore-errors","") ;
+        customCompilerArguments.put("ignore-errors", "");
 
         CompilerConfiguration compilerConfig = new CompilerConfiguration();
         compilerConfig.setClasspathEntries(this.getClasspath());

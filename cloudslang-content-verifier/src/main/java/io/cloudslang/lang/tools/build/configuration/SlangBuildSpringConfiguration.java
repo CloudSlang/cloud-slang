@@ -41,7 +41,7 @@ public class SlangBuildSpringConfiguration {
     }
 
     @Bean
-    public StaticValidator staticValidator(){
+    public StaticValidator staticValidator() {
         return new StaticValidatorImpl();
     }
 

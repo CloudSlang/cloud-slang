@@ -26,8 +26,9 @@ public class ParentFlowStack implements Serializable {
     }
 
     public ParentFlowData popParentFlowData() {
-        if (stack.empty())
+        if (stack.empty()) {
             return null;
+        }
         return stack.pop();
     }
 

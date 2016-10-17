@@ -11,9 +11,11 @@ package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
+
 import java.net.URI;
 import java.util.Iterator;
 import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;

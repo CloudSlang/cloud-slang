@@ -101,6 +101,7 @@ public class ParallelLoopTransformerTest extends TransformersTestParent {
         public ParallelLoopForTransformer parallelLoopForTransformer() {
             return new ParallelLoopForTransformer();
         }
+
         @Bean
         public ExecutableValidator executableValidator() {
             return new ExecutableValidatorImpl();

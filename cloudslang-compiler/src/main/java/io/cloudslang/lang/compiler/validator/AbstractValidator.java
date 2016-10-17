@@ -20,8 +20,10 @@ import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.constants.Regex;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -88,7 +90,7 @@ public abstract class AbstractValidator {
 
     private void validateChars(PatternMatcher patternMatcher, String input) {
         if (!patternMatcher.matchesEndToEnd(input)) {
-            throw new RuntimeException("Argument[" + input +"] violates character rules.");
+            throw new RuntimeException("Argument[" + input + "] violates character rules.");
         }
     }
 
@@ -107,8 +109,8 @@ public abstract class AbstractValidator {
         for (String part : parts) {
             if ("".equals(part)) {
                 throw new RuntimeException(
-                        "Argument[" + input + "] cannot contain multiple delimiters["
-                                + Regex.NAMESPACE_PROPERTY_DELIMITER + "] without content."
+                        "Argument[" + input + "] cannot contain multiple delimiters[" +
+                                Regex.NAMESPACE_PROPERTY_DELIMITER + "] without content."
                 );
             }
         }

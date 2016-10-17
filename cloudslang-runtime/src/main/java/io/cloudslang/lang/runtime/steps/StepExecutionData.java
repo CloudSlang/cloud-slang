@@ -66,7 +66,11 @@ public class StepExecutionData extends AbstractExecutionData {
                           @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                           @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
+
+                          //CHECKSTYLE:OFF: checkstyle:parametername
                           @Param(ExecutionParametersConsts.RUNNING_EXECUTION_PLAN_ID) Long RUNNING_EXECUTION_PLAN_ID,
+                          //CHECKSTYLE:ON
+
                           @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
                           @Param(ScoreLangConstants.REF_ID) String refId) {
         try {
@@ -130,7 +134,9 @@ public class StepExecutionData extends AbstractExecutionData {
             updateCallArgumentsAndPushContextToStack(runEnv, flowContext, boundInputs);
 
             // request the score engine to switch to the execution plan of the given ref
+            //CHECKSTYLE:OFF
             requestSwitchToRefExecutableExecutionPlan(runEnv, executionRuntimeServices, RUNNING_EXECUTION_PLAN_ID, refId, nextStepId);
+            //CHECKSTYLE:ON
 
             // set the start step of the given ref as the next step to execute (in the new running execution plan that will be set)
             runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
@@ -253,10 +259,10 @@ public class StepExecutionData extends AbstractExecutionData {
 
     private void requestSwitchToRefExecutableExecutionPlan(RunEnvironment runEnv,
                                                            ExecutionRuntimeServices executionRuntimeServices,
-                                                           Long RUNNING_EXECUTION_PLAN_ID,
+                                                           Long runningExecutionPlanId,
                                                            String refId,
                                                            Long nextStepId) {
-        pushParentFlowDataOnStack(runEnv, RUNNING_EXECUTION_PLAN_ID, nextStepId);
+        pushParentFlowDataOnStack(runEnv, runningExecutionPlanId, nextStepId);
 
         // request the score engine to switch the execution plan to the one with the given refId once it can
         Long subFlowRunningExecutionPlanId = executionRuntimeServices.getSubFlowRunningExecutionPlan(refId);

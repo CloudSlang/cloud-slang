@@ -39,7 +39,7 @@ public class SyncTriggerEventListener implements ScoreEventListener {
     public static final String FLOW_FINISHED_WITH_FAILURE_MSG = "Flow finished with failure";
     public static final String EXEC_START_PATH = "0";
     public static final int OUTPUT_VALUE_LIMIT = 100;
-    private final static String STEP_PATH_PREFIX = "- ";
+    private static final String STEP_PATH_PREFIX = "- ";
     public static final String FLOW_OUTPUTS = "Flow outputs:";
     public static final String OPERATION_OUTPUTS = "Operation outputs:";
     public static final String FINISHED_WITH_RESULT = " finished with result: ";
@@ -104,9 +104,8 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                 }
 
                 // Flow end case
-                else if (data.containsKey(LanguageEventData.OUTPUTS)
-                        && data.containsKey(LanguageEventData.PATH)
-                        && data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
+                else if (data.containsKey(LanguageEventData.OUTPUTS) && data.containsKey(LanguageEventData.PATH) &&
+                        data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
                     Map<String, Serializable> outputs = extractNotEmptyOutputs(data);
                     if (outputs.size() > 0) {
                         printForOperationOrFlow(data, Ansi.Color.WHITE, "\n" + OPERATION_OUTPUTS, "\n" + FLOW_OUTPUTS);

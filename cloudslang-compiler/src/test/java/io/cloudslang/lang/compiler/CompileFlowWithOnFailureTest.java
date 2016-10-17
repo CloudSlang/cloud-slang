@@ -17,10 +17,12 @@ import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
+
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,7 +78,6 @@ public class CompileFlowWithOnFailureTest {
 
     @Test
     public void testCompileMultipleOnFailure() throws Exception {
-        URI flow = getClass().getResource("/corrupted/multiple_on_failure.sl").toURI();
         URI operation = getClass().getResource("/test_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
@@ -85,12 +86,12 @@ public class CompileFlowWithOnFailureTest {
         expectedException.expectMessage("Multiple 'on_failure' steps found");
         expectedException.expect(RuntimeException.class);
 
+        URI flow = getClass().getResource("/corrupted/multiple_on_failure.sl").toURI();
         compiler.compile(SlangSource.fromFile(flow), path);
     }
 
     @Test
     public void testCompileSameNameInFlowAndOnFailure() throws Exception {
-        URI flow = getClass().getResource("/corrupted/same_step_name_in_flow_and_on_failure.sl").toURI();
         URI operation = getClass().getResource("/fail_on_input_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
@@ -100,12 +101,12 @@ public class CompileFlowWithOnFailureTest {
         expectedException.expectMessage("step_same_name");
         expectedException.expect(RuntimeException.class);
 
+        URI flow = getClass().getResource("/corrupted/same_step_name_in_flow_and_on_failure.sl").toURI();
         compiler.compile(SlangSource.fromFile(flow), path);
     }
 
     @Test
     public void testCompileOnFailureSecondStep() throws Exception {
-        URI flow = getClass().getResource("/corrupted/flow_with_on_failure_second_step.sl").toURI();
         URI operation = getClass().getResource("/test_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
@@ -114,12 +115,12 @@ public class CompileFlowWithOnFailureTest {
         expectedException.expect(RuntimeException.class);
         expectedException.expectMessage("'on_failure' should be last step in the workflow");
 
+        URI flow = getClass().getResource("/corrupted/flow_with_on_failure_second_step.sl").toURI();
         compiler.compile(SlangSource.fromFile(flow), path);
     }
 
     @Test
     public void testDefaultNavigationMissingResultOnFailure() throws Exception {
-        URI flow = getClass().getResource("/corrupted/default_navigation_missing_result_on_failure.sl").toURI();
         URI operation = getClass().getResource("/test_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
@@ -131,6 +132,7 @@ public class CompileFlowWithOnFailureTest {
                         " The step/result name: FAILURE of navigation: SUCCESS -> FAILURE is missing"
         );
 
+        URI flow = getClass().getResource("/corrupted/default_navigation_missing_result_on_failure.sl").toURI();
         compiler.compile(SlangSource.fromFile(flow), path);
     }
 

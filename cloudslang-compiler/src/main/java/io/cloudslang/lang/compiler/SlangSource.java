@@ -10,11 +10,13 @@
 package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -111,9 +113,13 @@ public class SlangSource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
 
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         SlangSource that = (SlangSource) o;
 

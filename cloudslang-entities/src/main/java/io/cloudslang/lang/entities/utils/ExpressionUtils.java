@@ -25,14 +25,14 @@ public final class ExpressionUtils {
     private ExpressionUtils() {
     }
 
-    private final static Pattern EXPRESSION_PATTERN = Pattern.compile(Regex.EXPRESSION_REGEX, Pattern.DOTALL);
-    private final static Pattern SYSTEM_PROPERTY_PATTERN_SINGLE_QUOTE = Pattern.compile(Regex.SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE);
-    private final static Pattern SYSTEM_PROPERTY_PATTERN_DOUBLE_QUOTE = Pattern.compile(Regex.SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE);
-    private final static Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_SINGLE_QUOTE = Pattern.compile(Regex.SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE);
-    private final static Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_DOUBLE_QUOTE = Pattern.compile(Regex.SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE);
-    private final static Pattern GET_PATTERN = Pattern.compile(Regex.GET_REGEX);
-    private final static Pattern GET_PATTERN_WITH_DEFAULT = Pattern.compile(Regex.GET_REGEX_WITH_DEFAULT);
-    private final static Pattern CHECK_EMPTY_PATTERN = Pattern.compile(Regex.CHECK_EMPTY_REGEX);
+    private static final Pattern EXPRESSION_PATTERN = Pattern.compile(Regex.EXPRESSION_REGEX, Pattern.DOTALL);
+    private static final Pattern SYSTEM_PROPERTY_PATTERN_SINGLE_QUOTE = Pattern.compile(Regex.SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE);
+    private static final Pattern SYSTEM_PROPERTY_PATTERN_DOUBLE_QUOTE = Pattern.compile(Regex.SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE);
+    private static final Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_SINGLE_QUOTE = Pattern.compile(Regex.SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE);
+    private static final Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_DOUBLE_QUOTE = Pattern.compile(Regex.SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE);
+    private static final Pattern GET_PATTERN = Pattern.compile(Regex.GET_REGEX);
+    private static final Pattern GET_PATTERN_WITH_DEFAULT = Pattern.compile(Regex.GET_REGEX_WITH_DEFAULT);
+    private static final Pattern CHECK_EMPTY_PATTERN = Pattern.compile(Regex.CHECK_EMPTY_REGEX);
 
     public static String extractExpression(Serializable value) {
         String expression = null;

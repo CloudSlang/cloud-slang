@@ -18,12 +18,14 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.SystemsTestsParent;
+
 import java.io.Serializable;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -74,15 +76,15 @@ public class DataFlowTest extends SystemsTestsParent {
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, SYSTEM_PROPERTIES).getSteps();
 
         Map<String, Serializable> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
-        String final_output = (String) flowOutputs.get("final_output");
+        String finalOutput = (String) flowOutputs.get("final_output");
         Assert.assertEquals("some of the inputs or outputs were not bound correctly",
-                13, final_output.length());
+                13, finalOutput.length());
         Assert.assertEquals("some of the inputs were not bound correctly",
-                6, StringUtils.countMatches(final_output, ">"));
+                6, StringUtils.countMatches(finalOutput, ">"));
         Assert.assertEquals("some of the outputs were not bound correctly",
-                5, StringUtils.countMatches(final_output, "<"));
+                5, StringUtils.countMatches(finalOutput, "<"));
         Assert.assertEquals("some of the results were not bound correctly",
-                2, StringUtils.countMatches(final_output, "|"));
+                2, StringUtils.countMatches(finalOutput, "|"));
     }
 
     @Ignore("Remove when types are supported")
@@ -101,9 +103,9 @@ public class DataFlowTest extends SystemsTestsParent {
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, SYSTEM_PROPERTIES).getSteps();
 
         Map<String, Serializable> flowOutputs = steps.get(EXEC_START_PATH).getOutputs();
-        int final_output = (int) flowOutputs.get("final_output");
+        int finalOutput = (int) flowOutputs.get("final_output");
         Assert.assertEquals("some of the inputs or outputs were not bound correctly",
-                13, final_output);
+                13, finalOutput);
     }
 
     @Test

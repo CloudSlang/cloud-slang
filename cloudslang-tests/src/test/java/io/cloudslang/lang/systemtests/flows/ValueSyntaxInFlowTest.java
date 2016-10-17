@@ -14,12 +14,14 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.ValueSyntaxParent;
+
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -71,13 +73,13 @@ public class ValueSyntaxInFlowTest extends ValueSyntaxParent {
 
         // evaluated via Python
         expectedStepArguments.put("input_python_null", null);
-//      uncomment when types will be supported
-//        expectedStepArguments.put("input_python_list", Lists.newArrayList(1, 2, 3));
-//        HashMap<String, Serializable> expectedInputPythonMap = new HashMap<>();
-//        expectedInputPythonMap.put("key1", "value1");
-//        expectedInputPythonMap.put("key2", "value2");
-//        expectedInputPythonMap.put("key3", "value3");
-//        expectedStepArguments.put("input_python_map", expectedInputPythonMap);
+        // uncomment when types will be supported
+        // expectedStepArguments.put("input_python_list", Lists.newArrayList(1, 2, 3));
+        // HashMap<String, Serializable> expectedInputPythonMap = new HashMap<>();
+        // expectedInputPythonMap.put("key1", "value1");
+        // expectedInputPythonMap.put("key2", "value2");
+        // expectedInputPythonMap.put("key3", "value3");
+        // expectedStepArguments.put("input_python_map", expectedInputPythonMap);
         expectedStepArguments.put("b", "b");
         expectedStepArguments.put("b_copy", "b");
         expectedStepArguments.put("input_concat_1", "ab");

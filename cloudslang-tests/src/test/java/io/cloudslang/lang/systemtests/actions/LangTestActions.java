@@ -13,6 +13,7 @@ import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import com.hp.oo.sdk.content.plugin.SessionResource;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,8 +26,8 @@ import java.util.Map;
 public class LangTestActions {
 
     @SuppressWarnings("unused")
-    public Map<String, String> parseUrl(@Param("host") String host, @Param("port") String nova_port) {
-        String url = "http://" + host + ":" + nova_port;
+    public Map<String, String> parseUrl(@Param("host") String host, @Param("port") String novaPort) {
+        String url = "http://" + host + ":" + novaPort;
         System.out.println(url);
         Map<String, String> returnValue = new HashMap<>();
         returnValue.put("url", url);

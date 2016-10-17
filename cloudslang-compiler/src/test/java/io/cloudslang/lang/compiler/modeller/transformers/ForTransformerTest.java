@@ -170,10 +170,12 @@ public class ForTransformerTest extends TransformersTestParent {
         public ForTransformer forTransformer() {
             return new ForTransformer();
         }
+
         @Bean
         public ExecutableValidator executableValidator() {
             return new ExecutableValidatorImpl();
         }
+
         @Bean
         public SystemPropertyValidator systemPropertyValidator() {
             return new SystemPropertyValidatorImpl();

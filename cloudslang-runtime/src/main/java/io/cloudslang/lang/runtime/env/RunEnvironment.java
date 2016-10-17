@@ -132,6 +132,17 @@ public class RunEnvironment implements Serializable {
                 containsSensitiveContexts();
     }
 
+    private boolean containsSensitiveData(Collection<Value> data) {
+        if (data != null) {
+            for (Value value : data) {
+                if (value.isSensitive()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public void decryptSensitiveData() {
         for (Value value : prepareValuesForEncryptDecrypt()) {
             if (value.isSensitive()) {
@@ -181,17 +192,6 @@ public class RunEnvironment implements Serializable {
         }
 
         return hasSensitive;
-    }
-
-    private boolean containsSensitiveData(Collection<Value> data) {
-        if (data != null) {
-            for (Value value : data) {
-                if (value.isSensitive()) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     private List<Value> prepareValuesForEncryptDecrypt() {

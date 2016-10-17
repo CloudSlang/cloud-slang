@@ -11,9 +11,11 @@ package io.cloudslang.lang.entities.encryption;
 
 import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import io.cloudslang.lang.spi.encryption.Encryption;
+
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,8 +61,7 @@ public class EncryptorConfigTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     public void testEncryptionWithoutEncryptorImplementation() {
         String text = "Str1";
-        ((BeanDefinitionRegistry) ApplicationContextProvider.getApplicationContext().
-                getAutowireCapableBeanFactory()).removeBeanDefinition("getEncryption");
+        ((BeanDefinitionRegistry) ApplicationContextProvider.getApplicationContext().getAutowireCapableBeanFactory()).removeBeanDefinition("getEncryption");
         Encryption encryptor = EncryptionProvider.get();
         assertTrue(encryptor instanceof DummyEncryptor);
         assertEquals(encryptor.encrypt(text.toCharArray()), text);

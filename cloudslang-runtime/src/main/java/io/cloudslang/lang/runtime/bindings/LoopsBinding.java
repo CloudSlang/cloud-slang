@@ -49,8 +49,8 @@ public class LoopsBinding extends AbstractBinding {
         Validate.notNull(systemProperties, "system properties cannot be null");
         Validate.notNull(nodeName, "node name cannot be null");
 
-        Value LoopConditionValue = flowContext.getLanguageVariable(LOOP_CONDITION_KEY);
-        if (LoopConditionValue == null) {
+        Value loopConditionValue = flowContext.getLanguageVariable(LOOP_CONDITION_KEY);
+        if (loopConditionValue == null) {
             LoopCondition loopCondition = createForLoopCondition(forLoopStatement, flowContext, systemProperties, nodeName);
             flowContext.putLanguageVariable(LOOP_CONDITION_KEY, ValueFactory.create(loopCondition));
         }

@@ -65,9 +65,8 @@ public class ScriptEvaluator extends ScriptProcessor {
 
             return ValueFactory.create(result.getEvalResult(), getSensitive(result.getResultContext(), systemPropertiesDefined));
         } catch (Exception exception) {
-            throw new RuntimeException(
-                    "Error in running script expression: '"
-                            + expr + "',\n\tException is: " + handleExceptionSpecialCases(exception.getMessage()), exception);
+            throw new RuntimeException("Error in running script expression: '" +
+                            expr + "',\n\tException is: " + handleExceptionSpecialCases(exception.getMessage()), exception);
         }
     }
 

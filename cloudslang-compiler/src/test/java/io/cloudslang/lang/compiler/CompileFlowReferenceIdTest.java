@@ -14,9 +14,11 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
+
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,7 +36,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class CompileFlowReferenceIDTest {
+public class CompileFlowReferenceIdTest {
 
     @Autowired
     private SlangCompiler compiler;
@@ -44,8 +46,8 @@ public class CompileFlowReferenceIDTest {
 
     @Test
     public void testBasicAlias() throws Exception {
-        URI flow = getClass().getResource("/alias/basic_alias.yaml").toURI();
-        URI operation = getClass().getResource("/alias/simple_op.sl").toURI();
+        final URI flow = getClass().getResource("/alias/basic_alias.yaml").toURI();
+        final URI operation = getClass().getResource("/alias/simple_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
@@ -57,15 +59,15 @@ public class CompileFlowReferenceIDTest {
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
         ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceID = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
+        @SuppressWarnings("unchecked") String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
-        Assert.assertEquals("Wrong reference ID for step", "cloudslang.sample.simple_op", referenceID);
+        Assert.assertEquals("Wrong reference ID for step", "cloudslang.sample.simple_op", referenceId);
     }
 
     @Test
     public void testDefaultNamespace() throws Exception {
-        URI flow = getClass().getResource("/alias/default_namespace.yaml").toURI();
-        URI operation = getClass().getResource("/alias/simple_op.sl").toURI();
+        final URI flow = getClass().getResource("/alias/default_namespace.yaml").toURI();
+        final URI operation = getClass().getResource("/alias/simple_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
@@ -77,15 +79,15 @@ public class CompileFlowReferenceIDTest {
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
         ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceID = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
+        @SuppressWarnings("unchecked") String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
-        Assert.assertEquals("Wrong reference ID for step", "cloudslang.sample.simple_op", referenceID);
+        Assert.assertEquals("Wrong reference ID for step", "cloudslang.sample.simple_op", referenceId);
     }
 
     @Test
     public void testShortFullPathNoExpanding() throws Exception {
-        URI flow = getClass().getResource("/alias/short_full_path_no_expanding.yaml").toURI();
-        URI operation = getClass().getResource("/alias/cloud_op.sl").toURI();
+        final URI flow = getClass().getResource("/alias/short_full_path_no_expanding.yaml").toURI();
+        final URI operation = getClass().getResource("/alias/cloud_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
@@ -97,15 +99,15 @@ public class CompileFlowReferenceIDTest {
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
         ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceID = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
+        @SuppressWarnings("unchecked") String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
-        Assert.assertEquals("Wrong reference ID for step", "cloud.cloud_op", referenceID);
+        Assert.assertEquals("Wrong reference ID for step", "cloud.cloud_op", referenceId);
     }
 
     @Test
     public void testLongFullPathNoExpanding() throws Exception {
-        URI flow = getClass().getResource("/alias/long_full_path_no_expanding.yaml").toURI();
-        URI operation = getClass().getResource("/alias/print.sl").toURI();
+        final URI flow = getClass().getResource("/alias/long_full_path_no_expanding.yaml").toURI();
+        final URI operation = getClass().getResource("/alias/print.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
@@ -117,15 +119,15 @@ public class CompileFlowReferenceIDTest {
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
         ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceID = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
+        @SuppressWarnings("unchecked") String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
-        Assert.assertEquals("Wrong reference ID for step", "a.b.c.d.print", referenceID);
+        Assert.assertEquals("Wrong reference ID for step", "a.b.c.d.print", referenceId);
     }
 
     @Test
     public void testLongFullPathWithExpanding() throws Exception {
-        URI flow = getClass().getResource("/alias/long_full_path_with_expanding.yaml").toURI();
-        URI operation = getClass().getResource("/alias/print.sl").toURI();
+        final URI flow = getClass().getResource("/alias/long_full_path_with_expanding.yaml").toURI();
+        final URI operation = getClass().getResource("/alias/print.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
@@ -137,15 +139,15 @@ public class CompileFlowReferenceIDTest {
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
         ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceID = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
+        @SuppressWarnings("unchecked") String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
-        Assert.assertEquals("Wrong reference ID for step", "a.b.c.d.print", referenceID);
+        Assert.assertEquals("Wrong reference ID for step", "a.b.c.d.print", referenceId);
     }
 
     @Test
     public void testReferenceNotFound() throws Exception {
-        URI flow = getClass().getResource("/alias/reference_not_found_flow.yaml").toURI();
-        URI operation = getClass().getResource("/alias/simple_op.sl").toURI();
+        final URI flow = getClass().getResource("/alias/reference_not_found_flow.yaml").toURI();
+        final URI operation = getClass().getResource("/alias/simple_op.sl").toURI();
 
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));

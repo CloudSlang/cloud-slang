@@ -20,6 +20,7 @@ import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.score.events.ScoreEvent;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
@@ -90,9 +92,9 @@ public abstract class SystemsTestsParent {
         }
 
         System.setProperty(MavenConfigImpl.MAVEN_SETTINGS_PATH, settingsXmlPath);
-        String m2_conf_path = classLoader.getResource("m2.conf").getPath();
-        System.out.println("m2.conf path [" + m2_conf_path + "]");
-        System.setProperty(MavenConfigImpl.MAVEN_M2_CONF_PATH, m2_conf_path);
+        String m2ConfPath = classLoader.getResource("m2.conf").getPath();
+        System.out.println("m2.conf path [" + m2ConfPath + "]");
+        System.setProperty(MavenConfigImpl.MAVEN_M2_CONF_PATH, m2ConfPath);
 
         String provideralAlreadyConfigured = System.setProperty("python.executor.engine", PythonExecutionCachedEngine.class.getSimpleName());
         assertNull("python.executor.engine was configured before this test!!!!!!!", provideralAlreadyConfigured);

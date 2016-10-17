@@ -27,12 +27,14 @@ import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -128,7 +130,7 @@ public class SlangImplTest {
 
     @Test
     public void testCompileWithDependencies() throws IOException {
-        SlangSource tempFile = createTempFile();
+        final SlangSource tempFile = createTempFile();
         File tempDependencyFile = File.createTempFile("tempDependency", null);
         tempDependencyFile.deleteOnExit();
         Set<SlangSource> dependencies = new HashSet<>();

@@ -102,8 +102,8 @@ public class ArgumentProcessorUtils {
             String propertyValue = properties.getProperty(propertyKey);
             if (isNotEmpty(propertyValue)) {
                 @SuppressWarnings("unchecked")
-                Class<T> aClass = (Class<T>) defaultValue.getClass();
-                return T.valueOf(aClass, propertyValue.toUpperCase(ENGLISH));
+                Class<T> defaultValueClass = (Class<T>) defaultValue.getClass();
+                return T.valueOf(defaultValueClass, propertyValue.toUpperCase(ENGLISH));
             }
         } catch (IllegalArgumentException ignore) {
         }
@@ -124,10 +124,40 @@ public class ArgumentProcessorUtils {
     /**
      *
      * @param suitesString commma separated string of test suite names.
-     * @return the test suite names as a java.util.List<String>
+     * @return the test suite names as a java.util.List of String type.
      */
     public static List<String> parseTestSuitesToList(final String suitesString) {
         return isNotEmpty(suitesString) ? parseTestSuitesToList(asList(suitesString.split(SUITE_LIST_SEPARATOR))) : new ArrayList<String>();
+    }
+
+    static List<String> parseTestSuitesToList(List<String> testSuitesArg) {
+        List<String> testSuites = new ArrayList<>();
+        final String notDefaultTestSuite = NOT_TS + SlangBuildMain.DEFAULT_TESTS;
+
+
+        boolean containsDefaultTestSuite = false;
+        boolean containsNotDefaultTestSuite = false;
+        for (String testSuite : testSuitesArg) {
+            if (isEmpty(testSuite)) { // Skip empty suites
+                continue;
+            }
+
+            if (!startsWithIgnoreCase(testSuite, NOT_TS) && !equalsIgnoreCase(testSuite, SlangBuildMain.DEFAULT_TESTS)) { // every normal test suite except default
+                if (!isSuitePresent(testSuites, testSuite)) {
+                    testSuites.add(testSuite);
+                }
+            } else if (!containsNotDefaultTestSuite && equalsIgnoreCase(testSuite, SlangBuildMain.DEFAULT_TESTS)) {   // default test suite
+                containsDefaultTestSuite = true;
+            } else if (!containsNotDefaultTestSuite && equalsIgnoreCase(testSuite, notDefaultTestSuite)) { // !default test suite
+                containsNotDefaultTestSuite = true;
+            }
+        }
+
+        // Add the default test suite once
+        if (!containsNotDefaultTestSuite && containsDefaultTestSuite) {
+            testSuites.add(SlangBuildMain.DEFAULT_TESTS);
+        }
+        return testSuites;
     }
 
     /**
@@ -174,36 +204,6 @@ public class ArgumentProcessorUtils {
      */
     public static String getListForPrint(final List<String> stringList) {
         return CollectionUtils.isEmpty(stringList) ? EMPTY : join(stringList, LIST_JOINER);
-    }
-
-    static List<String> parseTestSuitesToList(List<String> testSuitesArg) {
-        List<String> testSuites = new ArrayList<>();
-        final String notDefaultTestSuite = NOT_TS + SlangBuildMain.DEFAULT_TESTS;
-
-
-        boolean containsDefaultTestSuite = false;
-        boolean containsNotDefaultTestSuite = false;
-        for (String testSuite : testSuitesArg) {
-            if (isEmpty(testSuite)) { // Skip empty suites
-                continue;
-            }
-
-            if (!startsWithIgnoreCase(testSuite, NOT_TS) && !equalsIgnoreCase(testSuite, SlangBuildMain.DEFAULT_TESTS)) { // every normal test suite except default
-                if (!isSuitePresent(testSuites, testSuite)) {
-                    testSuites.add(testSuite);
-                }
-            } else if (!containsNotDefaultTestSuite && equalsIgnoreCase(testSuite, SlangBuildMain.DEFAULT_TESTS)) {   // default test suite
-                containsDefaultTestSuite = true;
-            } else if (!containsNotDefaultTestSuite && equalsIgnoreCase(testSuite, notDefaultTestSuite)) { // !default test suite
-                containsNotDefaultTestSuite = true;
-            }
-        }
-
-        // Add the default test suite once
-        if (!containsNotDefaultTestSuite && containsDefaultTestSuite) {
-            testSuites.add(SlangBuildMain.DEFAULT_TESTS);
-        }
-        return testSuites;
     }
 
     private static boolean isSuitePresent(final List<String> crtList, final String testSuite) {

@@ -15,6 +15,7 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
+
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -191,9 +193,9 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
     @Test
     public void testFlowContextInPublishSectionNotReachable() throws Exception {
-        URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_publish_flow_context.sl").toURI();
-        URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        final URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_publish_flow_context.sl").toURI();
+        final URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
+        final Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("flow_var");
@@ -204,11 +206,11 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
     @Test
     public void testFlowWithInlineMapLoops() throws Exception {
-        URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_with_inline_map.sl").toURI();
-        URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch_map.sl").toURI();
+        final URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_with_inline_map.sl").toURI();
+        final URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch_map.sl").toURI();
 
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        final CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
 
         Map<String, Value> userInputs = new HashMap<>();
         RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, getSystemProperties());
@@ -219,9 +221,7 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
     }
 
     private Set<SystemProperty> getSystemProperties() {
-        return Sets.newHashSet(
-                new SystemProperty("loop", "parallel.prop1", "publish_value")
-        );
+        return Sets.newHashSet(new SystemProperty("loop", "parallel.prop1", "publish_value"));
     }
 
     private RuntimeInformation triggerWithData(

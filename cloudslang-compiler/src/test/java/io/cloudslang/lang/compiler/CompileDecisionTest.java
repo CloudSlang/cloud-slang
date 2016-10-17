@@ -23,6 +23,7 @@ import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
+
 import java.io.Serializable;
 import java.net.URL;
 import java.util.Collections;
@@ -30,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import junit.framework.Assert;
 import org.apache.commons.collections4.MapUtils;
 import org.junit.Rule;

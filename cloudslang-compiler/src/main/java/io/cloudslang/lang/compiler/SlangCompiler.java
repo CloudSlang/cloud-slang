@@ -36,7 +36,7 @@ public interface SlangCompiler {
      * @param source the CloudSlang source file
      * @param path   a set of CloudSlang sources containing the source dependencies
      * @return the compiled {@link CompilationModellingResult} object, containing an compilation artifact, and a list
-     * of all the errors that were found(if any).
+     *     of all the errors that were found(if any).
      */
     CompilationModellingResult compileSource(SlangSource source, Set<SlangSource> path);
 
@@ -51,7 +51,7 @@ public interface SlangCompiler {
      *
      * @param source the {@link SlangSource}
      * @return an {@link io.cloudslang.lang.compiler.modeller.model.Executable} object, containing either a flow or
-     * operation in the file.
+     *     operation in the file.
      */
     Executable preCompile(SlangSource source);
 
@@ -61,7 +61,7 @@ public interface SlangCompiler {
      *
      * @param source the {@link SlangSource}
      * @return an {@link ExecutableModellingResult} object, containing an executable which is either a flow
-     * or an operations in the file, and a list of all the errors that were found (if any).
+     *     or an operations in the file, and a list of all the errors that were found (if any).
      */
     ExecutableModellingResult preCompileSource(SlangSource source);
 

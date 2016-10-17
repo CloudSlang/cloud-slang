@@ -21,11 +21,13 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.score.api.ExecutionStep;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;

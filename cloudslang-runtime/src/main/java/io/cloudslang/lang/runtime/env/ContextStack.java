@@ -26,8 +26,9 @@ public class ContextStack implements Serializable {
     }
 
     public Context popContext() {
-        if (stack.empty())
+        if (stack.empty()) {
             return null;
+        }
         return stack.pop();
     }
 
