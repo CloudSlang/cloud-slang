@@ -9,13 +9,12 @@
  *******************************************************************************/
 package io.cloudslang.maven.compiler;
 
-import org.codehaus.plexus.compiler.AbstractCompilerTest;
-import org.codehaus.plexus.compiler.Compiler;
-import org.codehaus.plexus.compiler.CompilerConfiguration;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import org.codehaus.plexus.compiler.AbstractCompilerTest;
+import org.codehaus.plexus.compiler.Compiler;
+import org.codehaus.plexus.compiler.CompilerConfiguration;
 
 /**
  * Created by hanael on 10/07/2016.
@@ -58,7 +57,6 @@ public class CloudSlangMavenCompilerTest extends AbstractCompilerTest {
 
         assertEquals("Wrong number of compilation errors.", 0, numCompilerErrors);
     }
-
 
     private CompilerConfiguration getCompilerConfigurationShallowCompile() throws Exception {
         String sourceDir = getBasedir() + "/src/test/resources/content";

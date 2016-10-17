@@ -69,6 +69,21 @@
             <artifactId>commons-codec</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+
         <!--Test dependencies-->
         <dependency>
             <groupId>junit</groupId>
@@ -95,6 +110,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+                <version>${plugins.maven-dependency-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>analyze dependencies</id>
@@ -103,11 +119,6 @@
                         </goals>
                         <configuration>
                             <failOnWarning>true</failOnWarning>
-                            <ignoredUsedUndeclaredDependencies>
-                                <ignoredUsedUndeclaredDependency>commons-lang:commons-lang:jar:2.6</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>org.springframework:spring-beans:jar:4.2.5.RELEASE</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>com.fasterxml.jackson.core:jackson-annotations:jar:2.6.0</ignoredUsedUndeclaredDependency>
-                            </ignoredUsedUndeclaredDependencies>
                         </configuration>
                     </execution>
                 </executions>

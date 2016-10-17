@@ -35,6 +35,8 @@
         <score.group>io.cloudslang</score.group>
         <score.version>0.3.40</score.version>
         <spring.version>4.2.5.RELEASE</spring.version>
+        <plugins.maven-dependency-plugin.version>2.10</plugins.maven-dependency-plugin.version>
+        <plugins.maven-dependency-plugin.version.old>2.8</plugins.maven-dependency-plugin.version.old>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
     </properties>
@@ -160,7 +162,7 @@
             <!--end of score dependencies-->
 
             <dependency>
-                <groupId>io.cloudslang</groupId>
+                <groupId>${score.group}</groupId>
                 <artifactId>runtime-management-api</artifactId>
                 <version>${score.version}</version>
             </dependency>
@@ -258,11 +260,16 @@
                 <scope>test</scope>
             </dependency>
 
-
             <dependency>
                 <groupId>org.eclipse.sisu</groupId>
                 <artifactId>org.eclipse.sisu.plexus</artifactId>
                 <version>0.3.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>2.6</version>
             </dependency>
 
             <!-- spring artifacts -->
@@ -366,6 +373,42 @@
                 <groupId>org.rendersnake</groupId>
                 <artifactId>rendersnake</artifactId>
                 <version>1.9.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-core</artifactId>
+                <version>1.6.5</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-all</artifactId>
+                <version>1.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>3.2.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-component-annotations</artifactId>
+                <version>1.5.5</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-utils</artifactId>
+                <version>3.0.10</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>2.6.0</version>
             </dependency>
 
         </dependencies>
@@ -493,7 +536,8 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>2.10</version>
+                    <!-- to fix version issues in submodules -->
+                    <version>${plugins.maven-dependency-plugin.version}</version>
                     <executions>
                         <execution>
                             <id>analyze dependencies</id>

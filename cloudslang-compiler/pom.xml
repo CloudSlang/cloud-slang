@@ -26,6 +26,11 @@
         </dependency>
 
         <dependency>
+            <groupId>${score.group}</groupId>
+            <artifactId>score-api</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
@@ -69,6 +74,41 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.python</groupId>
+            <artifactId>jython-standalone</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -76,6 +116,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+                <version>${plugins.maven-dependency-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>analyze dependencies</id>
@@ -84,16 +125,6 @@
                         </goals>
                         <configuration>
                             <failOnWarning>true</failOnWarning>
-                            <ignoredUsedUndeclaredDependencies>
-                                <ignoredUsedUndeclaredDependency>io.cloudslang:score-api:jar:0.3.40</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>commons-lang:commons-lang:jar:2.6</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>org.apache.commons:commons-lang3:jar:3.3.2</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>org.python:jython-standalone:jar:2.7.0</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>org.springframework:spring-core:jar:4.2.5.RELEASE</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>org.springframework:spring-beans:jar:4.2.5.RELEASE</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>org.hamcrest:hamcrest-all:jar:1.1</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>org.apache.commons:commons-collections4:jar:4.1</ignoredUsedUndeclaredDependency>
-                            </ignoredUsedUndeclaredDependencies>
                         </configuration>
                     </execution>
                 </executions>

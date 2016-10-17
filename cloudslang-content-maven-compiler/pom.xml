@@ -38,6 +38,38 @@
             <artifactId>cloudslang-compiler</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-component-annotations</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <!-- This plugin is needed in order to create a component.xml so plexus will know to load the compiler class-->
@@ -59,6 +91,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+                <version>${plugins.maven-dependency-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>analyze dependencies</id>
@@ -67,14 +100,15 @@
                         </goals>
                         <configuration>
                             <failOnWarning>true</failOnWarning>
+                            <!-- here to fix wrong detection -->
                             <ignoredUsedUndeclaredDependencies>
-                                <ignoredUsedUndeclaredDependency>org.codehaus.plexus:plexus-component-annotations:jar:1.5.5</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>org.codehaus.plexus:plexus-utils:jar:3.0.10</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>commons-io:commons-io:jar:2.4</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>org.apache.commons:commons-collections4:jar:4.1</ignoredUsedUndeclaredDependency>
                                 <ignoredUsedUndeclaredDependency>org.codehaus.plexus:plexus-container-default:jar:1.0-alpha-9-stable-1</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>org.springframework:spring-context:jar:4.2.5.RELEASE</ignoredUsedUndeclaredDependency>
                             </ignoredUsedUndeclaredDependencies>
+                            <!-- here to fix plexus issue -->
+                            <ignoredUnusedDeclaredDependencies>
+                                <ignoredUnusedDeclaredDependency>commons-lang:commons-lang:jar:2.0
+                                </ignoredUnusedDeclaredDependency>
+                            </ignoredUnusedDeclaredDependencies>
                         </configuration>
                     </execution>
                 </executions>
