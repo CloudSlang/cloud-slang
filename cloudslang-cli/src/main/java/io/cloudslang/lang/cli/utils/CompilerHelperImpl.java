@@ -11,6 +11,7 @@ package io.cloudslang.lang.cli.utils;
 
 import ch.lambdaj.function.convert.Converter;
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.cli.services.ConsolePrinter;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangSource;
@@ -25,6 +26,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.fusesource.jansi.Ansi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
@@ -59,10 +61,15 @@ public class CompilerHelperImpl implements CompilerHelper {
 
     @Autowired
     private Slang slang;
+
     @Autowired
     private Yaml yaml;
+
     @Autowired
     private SlangSourceService slangSourceService;
+
+    @Autowired
+    private ConsolePrinter consolePrinter;
 
     @Override
     public CompilationArtifact compile(String filePath, List<String> dependencies) {
@@ -108,6 +115,7 @@ public class CompilerHelperImpl implements CompilerHelper {
             Set<SlangSource> dependencySources = getSourcesFromFolders(foldersPaths);
             for (SlangSource dependencySource : dependencySources) {
                 File file = getFile(dependencySource.getFilePath());
+                consolePrinter.printWithColor(Ansi.Color.GREEN, "Compiling " + file.getName());
                 try {
                     CompilationModellingResult result = slang.compileSource(dependencySource, dependencySources);
                     result.setFile(file);

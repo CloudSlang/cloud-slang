@@ -11,6 +11,7 @@ package io.cloudslang.lang.cli.utils;
 
 import com.google.common.collect.Lists;
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.cli.services.ConsolePrinter;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.commons.services.impl.SlangSourceServiceImpl;
 import io.cloudslang.lang.compiler.SlangSource;
@@ -18,6 +19,7 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
 import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
+import org.fusesource.jansi.Ansi;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -50,6 +52,9 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -69,6 +74,9 @@ public class CompilerHelperTest {
 
     @Autowired
     private Slang slang;
+
+    @Autowired
+    private ConsolePrinter consolePrinter;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -147,6 +155,7 @@ public class CompilerHelperTest {
                         SlangSource.fromFile(flowPath)
                 )
         );
+        verify(consolePrinter, times(2)).printWithColor(any(Ansi.Color.class), anyString());
         InOrder inOrder = inOrder(slang);
         inOrder.verify(slang).compileSource(
                 SlangSource.fromFile(flowPath),
@@ -366,6 +375,11 @@ public class CompilerHelperTest {
         @Bean
         public SlangSourceService slangSourceService() {
             return new SlangSourceServiceImpl();
+        }
+
+        @Bean
+        public ConsolePrinter consolePrinter() {
+            return mock(ConsolePrinter.class);
         }
 
     }
