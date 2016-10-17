@@ -96,7 +96,7 @@ public class SlangTestCaseRunReportGeneratorServiceTest {
     @Test
     public void testGenerateHeader() throws IOException {
         HtmlCanvas canvas = mock(HtmlCanvas.class);
-        String csLogo = "csLogo";
+        final String csLogo = "csLogo";
 
         HtmlCanvas mockHeaderDiv = mock(HtmlCanvas.class);
         HtmlCanvas mockAnchor = mock(HtmlCanvas.class);

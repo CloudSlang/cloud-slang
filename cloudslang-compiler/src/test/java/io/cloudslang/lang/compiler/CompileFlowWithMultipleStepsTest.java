@@ -13,9 +13,11 @@ import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.score.api.ExecutionPlan;
+
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

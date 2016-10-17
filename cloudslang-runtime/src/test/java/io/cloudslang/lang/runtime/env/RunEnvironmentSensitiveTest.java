@@ -14,8 +14,10 @@ import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.spi.encryption.Encryption;
+
 import java.util.Map;
 import java.util.Set;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.python.google.common.collect.Maps;
@@ -181,8 +183,8 @@ public class RunEnvironmentSensitiveTest {
     private void testEncrypted(SystemProperty systemProperty1, SystemProperty systemProperty2,
                                Value callValue1, Value callValue2,
                                Value output1, Value output2, boolean encrypted) {
-        String systemPropertyContent1 = ((SensitiveValue) systemProperty1.getValue()).getContent();
-        String systemPropertyContent2 = ((SensitiveValue) systemProperty2.getValue()).getContent();
+        final String systemPropertyContent1 = ((SensitiveValue) systemProperty1.getValue()).getContent();
+        final String systemPropertyContent2 = ((SensitiveValue) systemProperty2.getValue()).getContent();
 
         String sp1 = systemProperty1.getValue().get().toString();
         assertEquals("systemProperty1", sp1);
@@ -193,8 +195,8 @@ public class RunEnvironmentSensitiveTest {
         assertEquals(encrypted ? "{Encrypted}" + sp1 : sp1, systemPropertyContent1);
         assertEquals(encrypted ? "{Encrypted}" + sp2 : sp2, systemPropertyContent2);
 
-        String callValue1Content = ((SensitiveValue) callValue1).getContent();
-        String callValue2Content = ((SensitiveValue) callValue2).getContent();
+        final String callValue1Content = ((SensitiveValue) callValue1).getContent();
+        final String callValue2Content = ((SensitiveValue) callValue2).getContent();
 
         String ca1 = callValue1.get().toString();
         assertEquals("callValue1", ca1);
@@ -204,8 +206,8 @@ public class RunEnvironmentSensitiveTest {
         assertEquals(encrypted ? "{Encrypted}rO0ABXQACmNhbGxWYWx1ZTE=" : ca1, callValue1Content);
         assertEquals(encrypted ? "{Encrypted}rO0ABXQACmNhbGxWYWx1ZTI=" : ca2, callValue2Content);
 
-        String output1Content = ((SensitiveValue) output1).getContent();
-        String output2Content = ((SensitiveValue) output2).getContent();
+        final String output1Content = ((SensitiveValue) output1).getContent();
+        final String output2Content = ((SensitiveValue) output2).getContent();
 
         String o1 = output1.get().toString();
         assertEquals("output1", o1);

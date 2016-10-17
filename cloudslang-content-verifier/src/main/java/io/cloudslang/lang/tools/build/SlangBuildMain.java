@@ -83,7 +83,7 @@ public class SlangBuildMain {
     private static final String CONTENT_DIR = File.separator + "content";
     private static final String TEST_DIR = File.separator + "test";
 
-    private final static Logger log = Logger.getLogger(SlangBuildMain.class);
+    private static final Logger log = Logger.getLogger(SlangBuildMain.class);
     private static final int MAX_THREADS_TEST_RUNNER = 32;
     private static final String MESSAGE_NOT_SCHEDULED_FOR_RUN_RULES = "Rules '%s' defined in '%s' key are not scheduled for run.";
 
@@ -131,15 +131,15 @@ public class SlangBuildMain {
         ApplicationArgs appArgs = new ApplicationArgs();
         parseArgs(args, appArgs);
         String projectPath = parseProjectPathArg(appArgs);
-        String contentPath = defaultIfEmpty(appArgs.getContentRoot(), projectPath + CONTENT_DIR);
-        String testsPath = defaultIfEmpty(appArgs.getTestRoot(), projectPath + TEST_DIR);
+        final String contentPath = defaultIfEmpty(appArgs.getContentRoot(), projectPath + CONTENT_DIR);
+        final String testsPath = defaultIfEmpty(appArgs.getTestRoot(), projectPath + TEST_DIR);
         List<String> testSuites = parseTestSuites(appArgs);
         boolean shouldPrintCoverageData = appArgs.shouldOutputCoverage();
         boolean runTestsInParallel = appArgs.isParallel();
         int threadCount = parseThreadCountArg(appArgs, runTestsInParallel);
         String testCaseTimeout = parseTestTimeout(appArgs);
         setProperty(TEST_CASE_TIMEOUT_IN_MINUTES_KEY, valueOf(testCaseTimeout));
-        boolean shouldValidateDescription = appArgs.shouldValidateDescription();
+        final boolean shouldValidateDescription = appArgs.shouldValidateDescription();
         String runConfigPath = FilenameUtils.normalize(appArgs.getRunConfigPath());
 
         BuildMode buildMode = null;
@@ -196,8 +196,8 @@ public class SlangBuildMain {
         log.info("Active test suites are: " + getListForPrint(testSuites));
         log.info("Parallel run mode is configured for test suites: " + getListForPrint(testSuitesParallel));
         log.info("Sequential run mode is configured for test suites: " + getListForPrint(testSuitesSequential));
-        log.info("Default run mode '" + unspecifiedTestSuiteRunMode.name().toLowerCase() + "' is configured for test suites: "
-                + getListForPrint(getDefaultRunModeTestSuites(testSuites, testSuitesParallel, testSuitesSequential)));
+        log.info("Default run mode '" + unspecifiedTestSuiteRunMode.name().toLowerCase() + "' is configured for test suites: " +
+                getListForPrint(getDefaultRunModeTestSuites(testSuites, testSuitesParallel, testSuitesSequential)));
 
         log.info("Bulk run mode for tests: " + getBulkModeForPrint(bulkRunMode));
 
@@ -388,8 +388,8 @@ public class SlangBuildMain {
     }
 
     private static void logErrorsSuffix(String projectPath, final LoggingService loggingService) {
-        loggingService.logEvent(Level.ERROR, "FAILURE: Validation of slang files for project: \""
-                + projectPath + "\" failed.");
+        loggingService.logEvent(Level.ERROR, "FAILURE: Validation of slang files for project: \"" +
+                projectPath + "\" failed.");
         loggingService.logEvent(Level.ERROR, "------------------------------------------------------------");
         loggingService.logEvent(Level.ERROR, "");
     }
@@ -425,9 +425,9 @@ public class SlangBuildMain {
 
     private static void parseArgs(String[] args, ApplicationArgs appArgs) {
         try {
-            JCommander jCommander = new JCommander(appArgs, args);
+            JCommander commander = new JCommander(appArgs, args);
             if (appArgs.isHelp()) {
-                jCommander.usage();
+                commander.usage();
                 System.exit(0);
             }
         } catch (ParameterException e) {
@@ -454,9 +454,9 @@ public class SlangBuildMain {
             int defaultThreadCount = Runtime.getRuntime().availableProcessors();
             String threadCountErrorMessage = format("Thread count is misconfigured. The thread count value must be a positive integer less than or equal to %d. Using %d threads.", MAX_THREADS_TEST_RUNNER, defaultThreadCount);
             try {
-                String sThreadCount = appArgs.getThreadCount();
-                if (sThreadCount != null) {
-                    int threadCount = parseInt(sThreadCount);
+                String stringThreadCount = appArgs.getThreadCount();
+                if (stringThreadCount != null) {
+                    int threadCount = parseInt(stringThreadCount);
                     if ((threadCount > 0) && (threadCount <= MAX_THREADS_TEST_RUNNER)) {
                         return threadCount;
                     } else {
@@ -475,8 +475,8 @@ public class SlangBuildMain {
         loggingService.logEvent(Level.INFO, "------------------------------------------------------------");
         loggingService.logEvent(Level.INFO, "BUILD SUCCESS");
         loggingService.logEvent(Level.INFO, "------------------------------------------------------------");
-        loggingService.logEvent(Level.INFO, "Found " + buildResults.getNumberOfCompiledSources()
-                + " slang files under directory: \"" + contentPath + "\" and all are valid.");
+        loggingService.logEvent(Level.INFO, "Found " + buildResults.getNumberOfCompiledSources() +
+                " slang files under directory: \"" + contentPath + "\" and all are valid.");
         printNumberOfPassedAndSkippedTests(runTestsResults, loggingService);
         loggingService.logEvent(Level.INFO, "");
     }
@@ -502,7 +502,7 @@ public class SlangBuildMain {
 
     private static void printBuildFailureSummary(String projectPath, IRunTestResults runTestsResults, final LoggingService loggingService) {
         printNumberOfPassedAndSkippedTests(runTestsResults, loggingService);
-        Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
+        final Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
         logErrorsPrefix(loggingService);
         loggingService.logEvent(Level.ERROR, "BUILD FAILURE");
         loggingService.logEvent(Level.ERROR, "------------------------------------------------------------");

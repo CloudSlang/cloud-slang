@@ -10,9 +10,11 @@
 package io.cloudslang.lang.cli.services;
 
 import io.cloudslang.lang.runtime.events.LanguageEventData;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
@@ -43,7 +45,9 @@ public class SyncTriggerEventListenerTest {
     public static final String ABBREVIATED_RESULT = "result that is too long will be abbreviated so that it does not affect CLI readability result tha...";
 
     LanguageEventData data;
-    Map<String, Serializable> outputs, expectedFilteredOutputs, actualFilteredOutputs;
+    Map<String, Serializable> outputs;
+    Map<String, Serializable> expectedFilteredOutputs;
+    Map<String, Serializable> actualFilteredOutputs;
 
     @Before
     public void before() throws Exception {

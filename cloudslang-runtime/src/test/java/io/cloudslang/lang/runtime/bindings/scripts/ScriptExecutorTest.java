@@ -20,10 +20,12 @@ import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutor;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,28 +61,28 @@ public class ScriptExecutorTest {
     @Test
     public void testExecuteScript() throws Exception {
         reset(execInterpreter);
-        String script = "pass";
+        final String script = "pass";
         Map<String, Value> scriptInputValues = new HashMap<>();
         Value value1 = ValueFactory.create("value1");
         Value value2 = ValueFactory.create("value2");
         scriptInputValues.put("input1", value1);
         scriptInputValues.put("input2", value2);
         Map<Object, PyObject> scriptOutputValues = new HashMap<>();
-        PyObject PyObjectValue1 = (PyObject) ValueFactory.createPyObjectValue("value1", false);
-        PyObject PyObjectValue2 = (PyObject) ValueFactory.createPyObjectValue("value2", false);
-        scriptOutputValues.put("output1", PyObjectValue1);
-        scriptOutputValues.put("output2", PyObjectValue2);
+        PyObject pyObjectValue1 = (PyObject) ValueFactory.createPyObjectValue("value1", false);
+        PyObject pyObjectValue2 = (PyObject) ValueFactory.createPyObjectValue("value2", false);
+        scriptOutputValues.put("output1", pyObjectValue1);
+        scriptOutputValues.put("output2", pyObjectValue2);
         when(execInterpreter.getLocals()).thenReturn(new PyStringMap(scriptOutputValues));
-        when(execInterpreter.get(eq("output1"))).thenReturn(PyObjectValue1);
-        when(execInterpreter.get(eq("output2"))).thenReturn(PyObjectValue2);
+        when(execInterpreter.get(eq("output1"))).thenReturn(pyObjectValue1);
+        when(execInterpreter.get(eq("output2"))).thenReturn(pyObjectValue2);
         Map<String, Serializable> expectedScriptOutputs = new HashMap<>();
         expectedScriptOutputs.put("output1", value1);
         expectedScriptOutputs.put("output2", value2);
 
-        Map<String, Value> outputs = scriptExecutor.executeScript(script, scriptInputValues);
+        final Map<String, Value> outputs = scriptExecutor.executeScript(script, scriptInputValues);
 
-        verify(execInterpreter).set(eq("input1"), eq((Value) PyObjectValue1));
-        verify(execInterpreter).set(eq("input2"), eq((Value) PyObjectValue2));
+        verify(execInterpreter).set(eq("input1"), eq((Value) pyObjectValue1));
+        verify(execInterpreter).set(eq("input2"), eq((Value) pyObjectValue2));
         verify(execInterpreter).exec(script);
         Assert.assertEquals(expectedScriptOutputs, outputs);
     }

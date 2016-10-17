@@ -10,11 +10,11 @@
 package io.cloudslang.lang.runtime.steps;
 
 
-
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import com.hp.oo.sdk.content.plugin.SessionResource;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;

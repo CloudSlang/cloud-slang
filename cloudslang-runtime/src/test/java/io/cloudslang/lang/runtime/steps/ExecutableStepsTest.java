@@ -37,6 +37,7 @@ import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +48,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -115,8 +117,8 @@ public class ExecutableStepsTest {
                         .withPrivateInput(false)
                         .build()
         );
-        RunEnvironment runEnv = new RunEnvironment();
-        ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
+        final RunEnvironment runEnv = new RunEnvironment();
+        final ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         Map<String, Value> resultMap = new HashMap<>();
         resultMap.put("input1", ValueFactory.create(inputs.get(0).getValue()));
         resultMap.put("input2", ValueFactory.create(inputs.get(1).getValue()));
@@ -187,7 +189,7 @@ public class ExecutableStepsTest {
 
     @Test
     public void testFinishExecutableWithOutput() throws Exception {
-        List<Output> possibleOutputs = Arrays.asList(new Output("name", ValueFactory.create("name")));
+        final List<Output> possibleOutputs = Arrays.asList(new Output("name", ValueFactory.create("name")));
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), null));
         runEnv.getExecutionPath().down();
@@ -235,8 +237,8 @@ public class ExecutableStepsTest {
 
     @Test
     public void testFinishExecutableEvents() {
-        List<Output> possibleOutputs = Collections.singletonList(new Output("name", ValueFactory.create("name", false)));
-        List<Result> possibleResults = Collections.singletonList(new Result(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create("true")));
+        final List<Output> possibleOutputs = Collections.singletonList(new Output("name", ValueFactory.create("name", false)));
+        final List<Result> possibleResults = Collections.singletonList(new Result(ScoreLangConstants.SUCCESS_RESULT, ValueFactory.create("true")));
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), null));
         runEnv.getExecutionPath().down();

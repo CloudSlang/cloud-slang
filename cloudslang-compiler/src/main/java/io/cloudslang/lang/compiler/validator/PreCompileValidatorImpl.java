@@ -233,8 +233,8 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     @Override
     public void validateStringValue(String name, Serializable value, InOutTransformer transformer) {
         if (value != null && !(value instanceof String)) {
-            throw new RuntimeException(StringUtils.capitalize(getMessagePart(transformer.getTransformedObjectsClass())) + ": '" + name
-                    + "' should have a String value.");
+            throw new RuntimeException(StringUtils.capitalize(getMessagePart(transformer.getTransformedObjectsClass())) +
+                    ": '" + name + "' should have a String value.");
         }
     }
 

@@ -10,7 +10,11 @@
 package io.cloudslang.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
-import io.cloudslang.lang.entities.*;
+import io.cloudslang.lang.entities.ListLoopStatement;
+import io.cloudslang.lang.entities.LoopStatement;
+import io.cloudslang.lang.entities.MapLoopStatement;
+import io.cloudslang.lang.entities.ResultNavigation;
+import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
@@ -25,11 +29,6 @@ import io.cloudslang.score.api.EndBranchDataContainer;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +38,12 @@ import org.apache.log4j.Logger;
 import org.python.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
@@ -64,7 +69,11 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                             @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                             @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                             @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
+
+                            //CHECKSTYLE:OFF: checkstyle:parametername
                             @Param(ExecutionParametersConsts.RUNNING_EXECUTION_PLAN_ID) Long RUNNING_EXECUTION_PLAN_ID,
+                            //CHECKSTYLE:ON
+
                             @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
                             @Param(ScoreLangConstants.BRANCH_BEGIN_STEP_ID_KEY) Long branchBeginStep,
                             @Param(ScoreLangConstants.REF_ID) String refId) {
@@ -97,12 +106,12 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
                 Context branchContext = (Context) SerializationUtils.clone(flowContext);
                 if (parallelLoopStatement instanceof ListLoopStatement) {
-                    branchContext.putVariable(((ListLoopStatement)parallelLoopStatement).getVarName(), splitItem);
+                    branchContext.putVariable(((ListLoopStatement) parallelLoopStatement).getVarName(), splitItem);
                 } else if (parallelLoopStatement instanceof MapLoopStatement) {
-                    branchContext.putVariable(((MapLoopStatement)parallelLoopStatement).getKeyName(),
-                            (Value)((ImmutablePair) splitItem.get()).getLeft());
-                    branchContext.putVariable(((MapLoopStatement)parallelLoopStatement).getValueName(),
-                            (Value)((ImmutablePair) splitItem.get()).getRight());
+                    branchContext.putVariable(((MapLoopStatement) parallelLoopStatement).getKeyName(),
+                            (Value) ((ImmutablePair) splitItem.get()).getLeft());
+                    branchContext.putVariable(((MapLoopStatement) parallelLoopStatement).getValueName(),
+                            (Value) ((ImmutablePair) splitItem.get()).getRight());
                 }
                 updateCallArgumentsAndPushContextToStack(branchRuntimeEnvironment,
                         branchContext, new HashMap<String, Value>());
@@ -267,12 +276,12 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         String branchException = branch.getException();
         if (StringUtils.isNotEmpty(branchException)) {
             Map<String, Serializable> systemContextMap = branch.getSystemContext();
-            String branchID = null;
+            String branchId = null;
             if (MapUtils.isNotEmpty(systemContextMap)) {
                 ExecutionRuntimeServices branchExecutionRuntimeServices = new SystemContext(systemContextMap);
-                branchID = branchExecutionRuntimeServices.getBranchId();
+                branchId = branchExecutionRuntimeServices.getBranchId();
             }
-            logger.error("There was an error running branch: " + branchID + " Error is: " + branchException);
+            logger.error("There was an error running branch: " + branchId + " Error is: " + branchException);
             throw new RuntimeException(BRANCH_EXCEPTION_PREFIX + ": \n" + branchException);
         }
     }

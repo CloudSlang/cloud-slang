@@ -21,6 +21,7 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Rule;
 import org.junit.Test;
@@ -154,8 +156,8 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testCompileParallelLoopFlow() throws Exception {
-        URI flow = getClass().getResource("/loops/parallel_loop/simple_parallel_loop.sl").toURI();
-        URI operation = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
+        final URI flow = getClass().getResource("/loops/parallel_loop/simple_parallel_loop.sl").toURI();
+        final URI operation = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
         CompilationArtifact artifact = compiler.compile(SlangSource.fromFile(flow), path);
@@ -176,8 +178,8 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testCompileParallelLoopFlowPublish() throws Exception {
-        URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_publish.sl").toURI();
-        URI operation = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
+        final URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_publish.sl").toURI();
+        final URI operation = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
         CompilationArtifact artifact = compiler.compile(SlangSource.fromFile(flow), path);
@@ -206,9 +208,9 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testCompileParallelLoopFlowNavigate() throws Exception {
-        URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate.sl").toURI();
-        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
-        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
+        final URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate.sl").toURI();
+        final URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
+        final URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation1));
         path.add(SlangSource.fromFile(operation2));
@@ -235,9 +237,9 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testCompileParallelLoopFlowNavigateDefault() throws Exception {
-        URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_default.sl").toURI();
-        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
-        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
+        final URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_default.sl").toURI();
+        final URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
+        final URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation1));
         path.add(SlangSource.fromFile(operation2));
@@ -264,9 +266,9 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testCompileParallelLoopFlowNavigateDefaultCustom() throws Exception {
-        URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_default_custom.sl").toURI();
-        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch_custom_only.sl").toURI();
-        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
+        final URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_default_custom.sl").toURI();
+        final URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch_custom_only.sl").toURI();
+        final URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation1));
         path.add(SlangSource.fromFile(operation2));
@@ -283,9 +285,9 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testCompileParallelLoopFlowNavigateCustom() throws Exception {
-        URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_custom.sl").toURI();
-        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch_custom_only.sl").toURI();
-        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
+        final URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_custom.sl").toURI();
+        final URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch_custom_only.sl").toURI();
+        final URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation1));
         path.add(SlangSource.fromFile(operation2));
@@ -312,9 +314,9 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testCompileParallelLoopFlowNavigateDefaultSuccessOnly() throws Exception {
-        URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_default_success_only.sl").toURI();
-        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch_success_only.sl").toURI();
-        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
+        final URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_default_success_only.sl").toURI();
+        final URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch_success_only.sl").toURI();
+        final URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation1));
         path.add(SlangSource.fromFile(operation2));
@@ -331,9 +333,9 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testCompileParallelLoopFlowNavigateSuccessOnly() throws Exception {
-        URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_success_only.sl").toURI();
-        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch_success_only.sl").toURI();
-        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
+        final URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_success_only.sl").toURI();
+        final URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch_success_only.sl").toURI();
+        final URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation1));
         path.add(SlangSource.fromFile(operation2));
@@ -360,9 +362,9 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testCompileParallelLoopFlowNavigateNotWired() throws Exception {
-        URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_not_wired.sl").toURI();
-        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
-        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
+        final URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_not_wired.sl").toURI();
+        final URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
+        final URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation1));
         path.add(SlangSource.fromFile(operation2));
@@ -378,9 +380,9 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testCompileParallelLoopFlowPublishNavigate() throws Exception {
-        URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_publish_navigate.sl").toURI();
-        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
-        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
+        final URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_publish_navigate.sl").toURI();
+        final URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
+        final URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation1));
         path.add(SlangSource.fromFile(operation2));
@@ -412,9 +414,9 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testPublishOnBranchThrowsException() throws Exception {
-        URI flow = getClass().getResource("/corrupted/loops/parallel_loop/parallel_loop_publish_on_branch.sl").toURI();
-        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
-        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
+        final URI flow = getClass().getResource("/corrupted/loops/parallel_loop/parallel_loop_publish_on_branch.sl").toURI();
+        final URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
+        final URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation1));
         path.add(SlangSource.fromFile(operation2));
@@ -428,9 +430,9 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testAggregateKeyThrowsException() throws Exception {
-        URI flow = getClass().getResource("/corrupted/loops/parallel_loop/parallel_loop_aggregate_key.sl").toURI();
-        URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
-        URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
+        final URI flow = getClass().getResource("/corrupted/loops/parallel_loop/parallel_loop_aggregate_key.sl").toURI();
+        final URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
+        final URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation1));
         path.add(SlangSource.fromFile(operation2));
@@ -485,20 +487,20 @@ public class CompileParallelLoopFlowTest {
         assertEquals("parallel loop statement expression not as expected", "values", parallelLoopStatement.getExpression());
     }
 
-    private Deque<Step> getStepsAfterPrecompileFlow(String flowPath) throws URISyntaxException {
-        URI flow = getClass().getResource(flowPath).toURI();
-        Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
-        assertNotNull("executable is null", executable);
-
-        return ((Flow) executable).getWorkflow().getSteps();
-    }
-
     private void verifyParallelLoopStatement(Step step) {
         assertTrue(step.getPreStepActionData().containsKey(SlangTextualKeys.PARALLEL_LOOP_KEY));
         ListLoopStatement parallelLoopStatement = (ListLoopStatement) step.getPreStepActionData()
                 .get(SlangTextualKeys.PARALLEL_LOOP_KEY);
         assertEquals("values", parallelLoopStatement.getExpression());
         assertEquals("value", parallelLoopStatement.getVarName());
+    }
+
+    private Deque<Step> getStepsAfterPrecompileFlow(String flowPath) throws URISyntaxException {
+        URI flow = getClass().getResource(flowPath).toURI();
+        Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
+        assertNotNull("executable is null", executable);
+
+        return ((Flow) executable).getWorkflow().getSteps();
     }
 
     private List<Output> getPublishOutputs(Step step) {

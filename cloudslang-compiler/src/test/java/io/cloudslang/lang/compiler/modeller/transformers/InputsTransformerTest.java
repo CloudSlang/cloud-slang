@@ -10,7 +10,6 @@
 package io.cloudslang.lang.compiler.modeller.transformers;
 
 
-
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.YamlParser;
@@ -26,6 +25,7 @@ import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
 import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
+
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -245,16 +246,16 @@ public class InputsTransformerTest extends TransformersTestParent {
     }
 
     @Test
-    public void testFunctionsAndSPDependencies() throws Exception {
+    public void testFunctionsAndSpDependencies() throws Exception {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMapWithFunctions).getTransformedData();
 
         // prepare parameters
         Set<ScriptFunction> setGet = Sets.newHashSet(ScriptFunction.GET);
-        Set<ScriptFunction> setSP = Sets.newHashSet(ScriptFunction.GET_SYSTEM_PROPERTY);
-        Set<ScriptFunction> setGetAndSP = new HashSet<>(setGet);
-        setGetAndSP.addAll(setSP);
-        Set<String> props1 = Sets.newHashSet("a.b.c.key");
-        Set<String> props2 = Sets.newHashSet("a.b.c.key", "d.e.f.key");
+        Set<ScriptFunction> setSp = Sets.newHashSet(ScriptFunction.GET_SYSTEM_PROPERTY);
+        Set<ScriptFunction> setGetAndSp = new HashSet<>(setGet);
+        setGetAndSp.addAll(setSp);
+        final Set<String> props1 = Sets.newHashSet("a.b.c.key");
+        final Set<String> props2 = Sets.newHashSet("a.b.c.key", "d.e.f.key");
         Set<ScriptFunction> emptySetScriptFunction = new HashSet<>();
         Set<String> emptySetString = new HashSet<>();
         Set<ScriptFunction> setGetAndCheckEmpty = new HashSet<>(setGet);
@@ -262,23 +263,23 @@ public class InputsTransformerTest extends TransformersTestParent {
 
         Assert.assertEquals("inputs size not as expected", 14, inputs.size());
 
-        verifyFunctionsAndSPDependencies(inputs, 0, emptySetScriptFunction, emptySetString);
-        verifyFunctionsAndSPDependencies(inputs, 1, emptySetScriptFunction, emptySetString);
-        verifyFunctionsAndSPDependencies(inputs, 2, setGet, emptySetString);
-        verifyFunctionsAndSPDependencies(inputs, 3, setSP, props1);
-        verifyFunctionsAndSPDependencies(inputs, 4, setSP, props1);
-        verifyFunctionsAndSPDependencies(inputs, 5, setGetAndSP, props1);
-        verifyFunctionsAndSPDependencies(inputs, 6, setGetAndSP, props1);
-        verifyFunctionsAndSPDependencies(inputs, 7, setGetAndSP, props2);
-        verifyFunctionsAndSPDependencies(inputs, 8, setGetAndSP, props1);
-        verifyFunctionsAndSPDependencies(inputs, 9, emptySetScriptFunction, emptySetString);
-        verifyFunctionsAndSPDependencies(inputs, 10, setSP, props1);
-        verifyFunctionsAndSPDependencies(inputs, 11, setGet, emptySetString);
-        verifyFunctionsAndSPDependencies(inputs, 12, setSP, props2);
-        verifyFunctionsAndSPDependencies(inputs, 13, setGetAndCheckEmpty, emptySetString);
+        verifyFunctionsAndSpDependencies(inputs, 0, emptySetScriptFunction, emptySetString);
+        verifyFunctionsAndSpDependencies(inputs, 1, emptySetScriptFunction, emptySetString);
+        verifyFunctionsAndSpDependencies(inputs, 2, setGet, emptySetString);
+        verifyFunctionsAndSpDependencies(inputs, 3, setSp, props1);
+        verifyFunctionsAndSpDependencies(inputs, 4, setSp, props1);
+        verifyFunctionsAndSpDependencies(inputs, 5, setGetAndSp, props1);
+        verifyFunctionsAndSpDependencies(inputs, 6, setGetAndSp, props1);
+        verifyFunctionsAndSpDependencies(inputs, 7, setGetAndSp, props2);
+        verifyFunctionsAndSpDependencies(inputs, 8, setGetAndSp, props1);
+        verifyFunctionsAndSpDependencies(inputs, 9, emptySetScriptFunction, emptySetString);
+        verifyFunctionsAndSpDependencies(inputs, 10, setSp, props1);
+        verifyFunctionsAndSpDependencies(inputs, 11, setGet, emptySetString);
+        verifyFunctionsAndSpDependencies(inputs, 12, setSp, props2);
+        verifyFunctionsAndSpDependencies(inputs, 13, setGetAndCheckEmpty, emptySetString);
     }
 
-    private void verifyFunctionsAndSPDependencies(
+    private void verifyFunctionsAndSpDependencies(
             List<Input> inputs,
             int inputIndex,
             Set<ScriptFunction> expectedFunctions,

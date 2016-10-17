@@ -10,9 +10,11 @@
 package io.cloudslang.lang.compiler.validator;
 
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +57,9 @@ public class ExecutableValidatorImpl extends AbstractValidator implements Execut
     public void validateImportsSection(ParsedSlang parsedSlang) {
         Map<String, String> imports = parsedSlang.getImports();
         ParsedSlang.Type executableType = parsedSlang.getType();
-        switch(executableType) {
-            case FLOW: break;
+        switch (executableType) {
+            case FLOW:
+                break;
             case OPERATION:
             case DECISION:
             case SYSTEM_PROPERTY_FILE:

@@ -136,9 +136,9 @@ public class ExecutionPlanBuilder {
         //Begin Step
         stepReferences.put(stepName, currentId);
         if (parallelLoop) {
-            Long joinStepID = currentId + NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS + 1;
+            Long joinStepId = currentId + NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS + 1;
             stepExecutionSteps.add(
-                    stepFactory.createAddBranchesStep(currentId++, joinStepID, currentId,
+                    stepFactory.createAddBranchesStep(currentId++, joinStepId, currentId,
                             step.getPreStepActionData(), compiledFlow.getId(), stepName
                     )
             );
@@ -183,7 +183,7 @@ public class ExecutionPlanBuilder {
     }
 
     private long getCurrentId(Map<String, Long> stepReferences, Deque<Step> steps) {
-        Long currentID;
+        Long currentId;
 
         long max = Lambda.max(stepReferences);
         Map.Entry maxEntry = Lambda.selectFirst(stepReferences.entrySet(), having(on(Map.Entry.class).getValue(), equalTo(max)));
@@ -198,13 +198,13 @@ public class ExecutionPlanBuilder {
 
         if (step == null || !step.isParallelLoop()) {
             // the reference is not a step or is not a parallel loop step
-            currentID = max + NUMBER_OF_STEP_EXECUTION_STEPS;
+            currentId = max + NUMBER_OF_STEP_EXECUTION_STEPS;
         } else {
             //async step
-            currentID = max + NUMBER_OF_STEP_EXECUTION_STEPS + NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS;
+            currentId = max + NUMBER_OF_STEP_EXECUTION_STEPS + NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS;
         }
 
-        return currentID;
+        return currentId;
     }
 
 }

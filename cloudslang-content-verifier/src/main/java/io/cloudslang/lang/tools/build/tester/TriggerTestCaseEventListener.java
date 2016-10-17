@@ -15,11 +15,13 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.collections4.MapUtils;
 
 /**
@@ -86,14 +88,14 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
 
         Map<String, Serializable> outputsMap = new HashMap<>();
 
-        boolean thereAreOutputsForRootPath =
-                data.containsKey(LanguageEventData.OUTPUTS)
-                        && data.containsKey(LanguageEventData.PATH)
-                        && data.getPath().equals(EXEC_START_PATH);
+        boolean thereAreOutputsForRootPath = data.containsKey(LanguageEventData.OUTPUTS) && data.containsKey(LanguageEventData.PATH) &&
+                data.getPath().equals(EXEC_START_PATH);
 
         if (thereAreOutputsForRootPath) {
             Map<String, Serializable> outputs = data.getOutputs();
-            if (MapUtils.isNotEmpty(outputs)) outputsMap.putAll(outputs);
+            if (MapUtils.isNotEmpty(outputs)) {
+                outputsMap.putAll(outputs);
+            }
         }
 
         return outputsMap;

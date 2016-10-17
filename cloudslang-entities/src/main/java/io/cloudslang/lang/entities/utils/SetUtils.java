@@ -33,7 +33,7 @@ public final class SetUtils {
         return false;
     }
 
-    public static boolean containsIgnoreCaseBasedOnFQN(Set<SystemProperty> set, SystemProperty element) {
+    public static boolean containsIgnoreCaseBasedOnFqn(Set<SystemProperty> set, SystemProperty element) {
         for (SystemProperty x : set) {
             if (x.getFullyQualifiedName().equalsIgnoreCase(element.getFullyQualifiedName())) {
                 return true;

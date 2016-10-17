@@ -58,8 +58,8 @@ public class ScoreCompilerImpl implements ScoreCompiler {
         List<RuntimeException> exceptions = new ArrayList<>();
         Map<String, Executable> filteredDependencies = new HashMap<>();
         //we handle dependencies only if the file has imports
-        boolean hasDependencies = CollectionUtils.isNotEmpty(executable.getExecutableDependencies())
-                && executable.getType().equals(SlangTextualKeys.FLOW_TYPE);
+        boolean hasDependencies = CollectionUtils.isNotEmpty(executable.getExecutableDependencies()) &&
+                executable.getType().equals(SlangTextualKeys.FLOW_TYPE);
         if (hasDependencies) {
             try {
                 Validate.notEmpty(path, "Source " + executable.getName() + " has dependencies but no path was given to the compiler");

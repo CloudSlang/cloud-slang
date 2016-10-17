@@ -46,15 +46,18 @@ public class SlangBuildResults {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
 
         SlangBuildResults that = (SlangBuildResults) o;
 
-        if (numberOfCompiledSources != that.numberOfCompiledSources)
+        if (numberOfCompiledSources != that.numberOfCompiledSources) {
             return false;
+        }
         return !(runTestsResults != null ? !runTestsResults.equals(that.runTestsResults) : that.runTestsResults != null);
 
     }

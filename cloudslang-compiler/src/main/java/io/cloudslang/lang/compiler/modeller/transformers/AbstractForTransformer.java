@@ -34,10 +34,10 @@ public abstract class AbstractForTransformer extends AbstractInOutForTransformer
     private ExecutableValidator executableValidator;
 
     // case: value in variable_name
-    private final static String FOR_REGEX = "^(\\s+)?(\\w+)\\s+(in)\\s+(\\w+)(\\s+)?$";
+    private static final String FOR_REGEX = "^(\\s+)?(\\w+)\\s+(in)\\s+(\\w+)(\\s+)?$";
     // case: key, value
-    private final static String KEY_VALUE_PAIR_REGEX = "^(\\s+)?(\\w+)(\\s+)?(,)(\\s+)?(\\w+)(\\s+)?$";
-    private final static String FOR_IN_KEYWORD = " in ";
+    private static final String KEY_VALUE_PAIR_REGEX = "^(\\s+)?(\\w+)(\\s+)?(,)(\\s+)?(\\w+)(\\s+)?$";
+    private static final String FOR_IN_KEYWORD = " in ";
 
     public TransformModellingResult<LoopStatement> transformToLoopStatement(String rawData, boolean isParallelLoop) {
         List<RuntimeException> errors = new ArrayList<>();

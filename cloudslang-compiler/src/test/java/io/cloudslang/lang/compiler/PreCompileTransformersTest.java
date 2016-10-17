@@ -15,9 +15,11 @@ import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
+
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;

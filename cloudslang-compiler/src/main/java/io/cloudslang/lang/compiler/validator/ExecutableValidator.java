@@ -10,6 +10,7 @@
 package io.cloudslang.lang.compiler.validator;
 
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+
 import java.util.List;
 import java.util.Map;
 
@@ -19,14 +20,24 @@ import java.util.Map;
  */
 public interface ExecutableValidator {
     void validateNamespace(ParsedSlang parsedSlang);
+
     void validateImportsSection(ParsedSlang parsedSlang);
+
     void validateStepReferenceId(String referenceId);
+
     void validateExecutableName(String executableName);
+
     void validateStepName(String stepName);
+
     void validateResultName(String resultName);
+
     void validateNavigationStrings(List<Map<String, String>> navigationStrings);
+
     void validateBreakKeys(List<String> breakKeys);
+
     void validateInputName(String name);
+
     void validateOutputName(String name);
+
     void validateLoopStatementVariable(String name);
 }

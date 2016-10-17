@@ -41,7 +41,7 @@ import java.util.Set;
  */
 public class SlangImpl implements Slang {
 
-    private final static Logger logger = Logger.getLogger(SlangImpl.class);
+    private static final Logger logger = Logger.getLogger(SlangImpl.class);
 
     @Autowired
     private SlangCompiler compiler;

@@ -108,8 +108,7 @@ public class SlangBuilder {
 
         if (compiledSlangFiles.size() != slangModels.size()) {
             throw new RuntimeException("Some Slang files were not compiled.\n" +
-                    "Found: " + slangModels.size() + " slang models, but managed to compile only: "
-                    + compiledSlangFiles.size());
+                    "Found: " + slangModels.size() + " slang models, but managed to compile only: " + compiledSlangFiles.size());
         }
 
         loggingService.logEvent(Level.INFO, "Successfully finished Compilation of: " + compiledSlangFiles.size() + " Slang files");
@@ -134,10 +133,10 @@ public class SlangBuilder {
         allTestedFlowModels.putAll(contentSlangModels);
 
         // Compiling all the test flows
-        Map<String, CompilationArtifact> compiledFlows = slangContentVerifier.compileSlangModels(allTestedFlowModels);
+        final Map<String, CompilationArtifact> compiledFlows = slangContentVerifier.compileSlangModels(allTestedFlowModels);
 
-        Set<String> allTestedFlowsFQN = mapExecutablesToFullyQualifiedName(allTestedFlowModels.values());
-        Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath, allTestedFlowsFQN);
+        Set<String> allTestedFlowsFqn = mapExecutablesToFullyQualifiedName(allTestedFlowModels.values());
+        Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath, allTestedFlowsFqn);
         loggingService.logEvent(Level.INFO, "");
         loggingService.logEvent(Level.INFO, "--- running tests ---");
         loggingService.logEvent(Level.INFO, "Found " + testCases.size() + " tests");

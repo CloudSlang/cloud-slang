@@ -22,12 +22,14 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -40,13 +42,13 @@ public class FlowWithPythonVersioningTest extends SystemsTestsParent {
     @Test
     public void testFlowWithOperationIfDifferentVersions() throws Exception {
         URI flow = getClass().getResource("/yaml/versioning/py_flow.yaml").toURI();
-        URI operation_sum3 = getClass().getResource("/yaml/versioning/py_dependency_sum3_op.sl").toURI();
-        URI operation_sum5 = getClass().getResource("/yaml/versioning/py_dependency_sum5_op.sl").toURI();
-        URI operation_mul3 = getClass().getResource("/yaml/versioning/py_dependency_mul3_op.sl").toURI();
-        URI operation_mul5 = getClass().getResource("/yaml/versioning/py_dependency_mul5_op.sl").toURI();
+        URI operationSum3 = getClass().getResource("/yaml/versioning/py_dependency_sum3_op.sl").toURI();
+        URI operationSum5 = getClass().getResource("/yaml/versioning/py_dependency_sum5_op.sl").toURI();
+        URI operationMul3 = getClass().getResource("/yaml/versioning/py_dependency_mul3_op.sl").toURI();
+        URI operationMul5 = getClass().getResource("/yaml/versioning/py_dependency_mul5_op.sl").toURI();
 
-        Set<SlangSource> dependencies = Sets.newHashSet(SlangSource.fromFile(operation_sum3), SlangSource.fromFile(operation_sum5),
-                SlangSource.fromFile(operation_mul3), SlangSource.fromFile(operation_mul5));
+        Set<SlangSource> dependencies = Sets.newHashSet(SlangSource.fromFile(operationSum3), SlangSource.fromFile(operationSum5),
+                SlangSource.fromFile(operationMul3), SlangSource.fromFile(operationMul5));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), dependencies);
 
         Map<String, Value> userInputs = new HashMap<>();
@@ -106,9 +108,9 @@ public class FlowWithPythonVersioningTest extends SystemsTestsParent {
     @Test
     public void testOperationWithParallelLoop() throws Exception {
         URI flow = getClass().getResource("/yaml/versioning/py_flow_with_loop.sl").toURI();
-        URI py_dependency_mul_op = getClass().getResource("/yaml/versioning/py_dependency_mul_op.sl").toURI();
+        URI pyDependencyMulOp = getClass().getResource("/yaml/versioning/py_dependency_mul_op.sl").toURI();
 
-        Set<SlangSource> dependencies = Sets.newHashSet(SlangSource.fromFile(py_dependency_mul_op));
+        Set<SlangSource> dependencies = Sets.newHashSet(SlangSource.fromFile(pyDependencyMulOp));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), dependencies);
 
         for (int addedValue = 0; addedValue < 20; addedValue++) {

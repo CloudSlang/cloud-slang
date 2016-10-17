@@ -10,7 +10,6 @@
 package io.cloudslang.lang.cli.utils;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.commons.services.impl.SlangSourceServiceImpl;
@@ -19,16 +18,6 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
 import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
-import java.io.File;
-import java.io.Serializable;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -41,7 +30,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,11 +38,22 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
-import static org.mockito.Matchers.anyString;
+import java.io.File;
+import java.io.Serializable;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static com.google.common.collect.Sets.newHashSet;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,8 +66,10 @@ public class CompilerHelperTest {
 
     @Autowired
     private CompilerHelper compilerHelper;
+
     @Autowired
     private Slang slang;
+
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
@@ -89,7 +90,7 @@ public class CompilerHelperTest {
 
     @Test
     public void testUnsupportedExtension() throws Exception {
-        URI flowFilePath = getClass().getResource("/flow.yaml").toURI();
+        final URI flowFilePath = getClass().getResource("/flow.yaml").toURI();
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("must have one of the following extensions");
         compilerHelper.compile(flowFilePath.getPath(), null);
@@ -98,13 +99,13 @@ public class CompilerHelperTest {
 
     @Test
     public void testDependenciesFileParentFolder() throws Exception {
-        URI flowPath = getClass().getResource("/executables/dir3/flow.sl").toURI();
-        URI opPath = getClass().getResource("/executables/dir3/dir3_1/test_op.sl").toURI();
+        final URI flowPath = getClass().getResource("/executables/dir3/flow.sl").toURI();
+        final URI opPath = getClass().getResource("/executables/dir3/dir3_1/test_op.sl").toURI();
         compilerHelper.compile(flowPath.getPath(), null);
         InOrder inOrder = inOrder(slang);
         inOrder.verify(slang).compile(
                 SlangSource.fromFile(flowPath),
-                Sets.newHashSet(
+                newHashSet(
                         SlangSource.fromFile(opPath),
                         SlangSource.fromFile(flowPath)
                 )
@@ -115,13 +116,13 @@ public class CompilerHelperTest {
 
     @Test
     public void testCompileSourceCleanup() throws Exception {
-        URI flowPath = getClass().getResource("/executables/dir3/flow.sl").toURI();
-        URI opPath = getClass().getResource("/executables/dir3/dir3_1/test_op.sl").toURI();
+        final URI flowPath = getClass().getResource("/executables/dir3/flow.sl").toURI();
+        final URI opPath = getClass().getResource("/executables/dir3/dir3_1/test_op.sl").toURI();
         compilerHelper.compileSource(flowPath.getPath(), null);
         InOrder inOrder = inOrder(slang);
         inOrder.verify(slang).compileSource(
                 SlangSource.fromFile(flowPath),
-                Sets.newHashSet(
+                newHashSet(
                         SlangSource.fromFile(opPath),
                         SlangSource.fromFile(flowPath)
                 )
@@ -132,16 +133,16 @@ public class CompilerHelperTest {
 
     @Test
     public void testCompileFoldersCleanup() throws Exception {
-        URI folderPath = getClass().getResource("/executables/dir3").toURI();
+        final URI folderPath = getClass().getResource("/executables/dir3").toURI();
         List<String> folders = new ArrayList<>();
         folders.add(folderPath.getPath());
         compilerHelper.compileFolders(folders);
 
-        URI flowPath = getClass().getResource("/executables/dir3/flow.sl").toURI();
-        URI opPath = getClass().getResource("/executables/dir3/dir3_1/test_op.sl").toURI();
+        final URI flowPath = getClass().getResource("/executables/dir3/flow.sl").toURI();
+        final URI opPath = getClass().getResource("/executables/dir3/dir3_1/test_op.sl").toURI();
         verify(slang).compileSource(
                 SlangSource.fromFile(opPath),
-                Sets.newHashSet(
+                newHashSet(
                         SlangSource.fromFile(opPath),
                         SlangSource.fromFile(flowPath)
                 )
@@ -149,7 +150,7 @@ public class CompilerHelperTest {
         InOrder inOrder = inOrder(slang);
         inOrder.verify(slang).compileSource(
                 SlangSource.fromFile(flowPath),
-                Sets.newHashSet(
+                newHashSet(
                         SlangSource.fromFile(opPath),
                         SlangSource.fromFile(flowPath)
                 )
@@ -160,28 +161,28 @@ public class CompilerHelperTest {
 
     @Test
     public void testFilePathValidWithOtherPathForDependencies() throws Exception {
-        URI flowFilePath = getClass().getResource("/flow.sl").toURI();
-        URI folderPath = getClass().getResource("/executables/dir1/").toURI();
-        URI flow2FilePath = getClass().getResource("/executables/dir1/flow2.sl").toURI();
+        final URI flowFilePath = getClass().getResource("/flow.sl").toURI();
+        final URI folderPath = getClass().getResource("/executables/dir1/").toURI();
+        final URI flow2FilePath = getClass().getResource("/executables/dir1/flow2.sl").toURI();
         compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(folderPath.getPath()));
         InOrder inOrder = inOrder(slang);
         inOrder.verify(slang).compile(SlangSource.fromFile(flowFilePath),
-                Sets.newHashSet(SlangSource.fromFile(flow2FilePath)));
+                newHashSet(SlangSource.fromFile(flow2FilePath)));
         inOrder.verify(slang).compileCleanUp();
         inOrder.verifyNoMoreInteractions();
     }
 
     @Test
     public void testCompileMixedSlangFiles() throws Exception {
-        URI flowFilePath = getClass().getResource("/flow.sl").toURI();
-        URI folderPath = getClass().getResource("/mixed_sl_files/").toURI();
-        URI dependency1 = getClass().getResource("/mixed_sl_files/configuration/properties/executables/test_flow.sl").toURI();
-        URI dependency2 = getClass().getResource("/mixed_sl_files/configuration/properties/executables/test_op.sl").toURI();
+        final URI flowFilePath = getClass().getResource("/flow.sl").toURI();
+        final URI folderPath = getClass().getResource("/mixed_sl_files/").toURI();
+        final URI dependency1 = getClass().getResource("/mixed_sl_files/configuration/properties/executables/test_flow.sl").toURI();
+        final URI dependency2 = getClass().getResource("/mixed_sl_files/configuration/properties/executables/test_op.sl").toURI();
         compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(folderPath.getPath()));
         InOrder inOrder = inOrder(slang);
         inOrder.verify(slang).compile(
                 SlangSource.fromFile(flowFilePath),
-                Sets.newHashSet(
+                newHashSet(
                         SlangSource.fromFile(dependency1),
                         SlangSource.fromFile(dependency2)
                 )
@@ -193,14 +194,14 @@ public class CompilerHelperTest {
     // flowprop.sl is not recognized as properties file
     @Test
     public void testCompileDependencyPropPartOfFileName() throws Exception {
-        URI flowFilePath = getClass().getResource("/flow.sl").toURI();
-        URI folderPath = getClass().getResource("/executables/dir2/").toURI();
-        URI flow2FilePath = getClass().getResource("/executables/dir2/flowprop.sl").toURI();
+        final URI flowFilePath = getClass().getResource("/flow.sl").toURI();
+        final URI folderPath = getClass().getResource("/executables/dir2/").toURI();
+        final URI flow2FilePath = getClass().getResource("/executables/dir2/flowprop.sl").toURI();
         compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(folderPath.getPath()));
         InOrder inOrder = inOrder(slang);
         inOrder.verify(slang).compile(
                 SlangSource.fromFile(flowFilePath),
-                Sets.newHashSet(SlangSource.fromFile(flow2FilePath))
+                newHashSet(SlangSource.fromFile(flow2FilePath))
         );
         inOrder.verify(slang).compileCleanUp();
         inOrder.verifyNoMoreInteractions();
@@ -208,9 +209,9 @@ public class CompilerHelperTest {
 
     @Test
     public void testInvalidDirPathForDependencies() throws Exception {
-        String flowFilePath = getClass().getResource("/flow.sl").getPath();
+        final String flowFilePath = getClass().getResource("/flow.sl").getPath();
         String currentDirPath = getClass().getResource("").getPath();
-        String invalidDirPath = currentDirPath.concat("xxx");
+        final String invalidDirPath = currentDirPath.concat("xxx");
 
         expectedException.expect(RuntimeException.class);
         expectedException.expectMessage("xxx");
@@ -221,7 +222,7 @@ public class CompilerHelperTest {
 
     @Test
     public void testInvalidDirPathForDependencies2() throws Exception {
-        String flowFilePath = getClass().getResource("/flow.sl").getPath();
+        final String flowFilePath = getClass().getResource("/flow.sl").getPath();
 
         expectedException.expect(RuntimeException.class);
         expectedException.expectMessage("flow.sl");
@@ -232,30 +233,24 @@ public class CompilerHelperTest {
 
     @Test
     public void testLoadSystemProperties() throws Exception {
-        Set<SystemProperty> systemProperties = Sets.newHashSet(
-                new SystemProperty("user.sys", "props.host", "localhost"),
+        final Set<SystemProperty> systemProperties = newHashSet(new SystemProperty("user.sys", "props.host", "localhost"),
                 new SystemProperty("user.sys", "props.port", "22"),
-                new SystemProperty("user.sys", "props.alla", "balla")
-        );
-        URI systemPropertyURI = getClass().getResource("/properties/system_properties.prop.sl").toURI();
-        SlangSource source = SlangSource.fromFile(systemPropertyURI);
+                new SystemProperty("user.sys", "props.alla", "balla"));
+        final URI systemPropertyUri = getClass().getResource("/properties/system_properties.prop.sl").toURI();
+        final SlangSource source = SlangSource.fromFile(systemPropertyUri);
         when(slang.loadSystemProperties(eq(source))).thenReturn(systemProperties);
 
-        compilerHelper.loadSystemProperties(Collections.singletonList(systemPropertyURI.getPath()));
+        compilerHelper.loadSystemProperties(Collections.singletonList(systemPropertyUri.getPath()));
 
         verify(slang).loadSystemProperties(eq(source));
     }
 
     @Test
     public void testLoadSystemPropertiesInvalidExtension() throws Exception {
-        URI props1 = getClass().getResource("/properties/duplicate/props1.prop.sl").toURI();
-        URI props2 = getClass().getResource("/properties/duplicate/props2.prop.sl").toURI();
-        Set<SystemProperty> systemProperties1 = Sets.newHashSet(
-                new SystemProperty("user.sys", "props.host", "localhost")
-        );
-        Set<SystemProperty> systemProperties2 = Sets.newHashSet(
-                new SystemProperty("user.SYS", "props.host", "localhost")
-        );
+        final URI props1 = getClass().getResource("/properties/duplicate/props1.prop.sl").toURI();
+        final URI props2 = getClass().getResource("/properties/duplicate/props2.prop.sl").toURI();
+        Set<SystemProperty> systemProperties1 = newHashSet(new SystemProperty("user.sys", "props.host", "localhost"));
+        Set<SystemProperty> systemProperties2 = newHashSet(new SystemProperty("user.SYS", "props.host", "localhost"));
         when(slang.loadSystemProperties(eq(SlangSource.fromFile(props1)))).thenReturn(systemProperties1);
         when(slang.loadSystemProperties(eq(SlangSource.fromFile(props2)))).thenReturn(systemProperties2);
 
@@ -269,7 +264,7 @@ public class CompilerHelperTest {
 
     @Test
     public void testLoadSystemPropertiesDefaultFolder() throws Exception {
-        String initialValue = System.getProperty(APP_HOME, "");
+        final String initialValue = System.getProperty(APP_HOME, "");
         String defaultDirPath = getClass().getResource("/mixed_sl_files/").getPath();
         System.setProperty(APP_HOME, defaultDirPath);
 
@@ -279,7 +274,7 @@ public class CompilerHelperTest {
         verify(slang, times((2))).loadSystemProperties(sourceCaptor.capture());
 
         Set<SlangSource> capturedSources = new HashSet<>(sourceCaptor.getAllValues());
-        Set<SlangSource> expectedSources = Sets.newHashSet(
+        Set<SlangSource> expectedSources = newHashSet(
                 SlangSource.fromFile(getClass().getResource("/mixed_sl_files/configuration/properties/properties/ubuntu.prop.sl").toURI()),
                 SlangSource.fromFile(getClass().getResource("/mixed_sl_files/configuration/properties/properties/windows.prop.sl").toURI())
         );
@@ -295,7 +290,7 @@ public class CompilerHelperTest {
         expected.put("port", ValueFactory.create("22", false));
         expected.put("username", ValueFactory.create("myusername", false));
         expected.put("password", ValueFactory.create("mypassword", true));
-        URI inputsFromFile = getClass().getResource("/inputs/inputs.yaml").toURI();
+        final URI inputsFromFile = getClass().getResource("/inputs/inputs.yaml").toURI();
         Map<String, ? extends Serializable> result = compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath()));
         Assert.assertNotNull(result);
         Assert.assertEquals(expected, result);
@@ -307,7 +302,7 @@ public class CompilerHelperTest {
         expectedException.expectMessage("inputs_value_missing.yaml} " +
                 "has unrecognized tag {bad_value_key}. Please take a look at the supported features per versions link");
 
-        URI inputsFromFile = getClass().getResource("/inputs/inputs_value_missing.yaml").toURI();
+        final URI inputsFromFile = getClass().getResource("/inputs/inputs_value_missing.yaml").toURI();
         compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath()));
     }
 
@@ -316,7 +311,7 @@ public class CompilerHelperTest {
         expectedException.expect(RuntimeException.class);
         expectedException.expectMessage("Inputs file");
 
-        URI inputsFromFile = getClass().getResource("/inputs/commented_inputs.yaml").toURI();
+        final URI inputsFromFile = getClass().getResource("/inputs/commented_inputs.yaml").toURI();
         compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath()));
     }
 

@@ -99,8 +99,8 @@ public class DependenciesHelper {
             if (resolvedDependencies.get(refId) == null) {
                 Executable matchingRef = Lambda.selectFirst(availableDependencies, having(on(Executable.class).getId(), equalTo(refId)));
                 if (matchingRef == null) {
-                    throw new RuntimeException("Reference: \'" + refId + "\' in executable: \'"
-                            + executable.getName() + "\', wasn't found in path");
+                    throw new RuntimeException("Reference: \'" + refId + "\' in executable: \'" +
+                            executable.getName() + "\', wasn't found in path");
                 }
 
                 //first we put the reference on the map

@@ -24,7 +24,7 @@ public class NamespacePatternMatcherTest {
 
     @Before
     public void setUp() throws Exception {
-        namespacePatternMatcher=  new NamespacePatternMatcher();
+        namespacePatternMatcher = new NamespacePatternMatcher();
     }
 
     @Test

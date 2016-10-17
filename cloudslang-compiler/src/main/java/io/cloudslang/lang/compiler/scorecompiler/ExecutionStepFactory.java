@@ -131,15 +131,15 @@ public class ExecutionStepFactory {
         return createGeneralStep(index, OPERATION_STEPS_CLASS, "finishExecutable", actionData);
     }
 
-    public ExecutionStep createAddBranchesStep(Long currentStepID, Long nextStepID, Long branchBeginStepID, Map<String, Serializable> preStepData, String refId, String stepName) {
+    public ExecutionStep createAddBranchesStep(Long currentStepId, Long nextStepId, Long branchBeginStepId, Map<String, Serializable> preStepData, String refId, String stepName) {
         Validate.notNull(preStepData, "preStepData is null");
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
         actionData.put(ScoreLangConstants.REF_ID, refId);
-        actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, nextStepID);
-        actionData.put(ScoreLangConstants.BRANCH_BEGIN_STEP_ID_KEY, branchBeginStepID);
+        actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, nextStepId);
+        actionData.put(ScoreLangConstants.BRANCH_BEGIN_STEP_ID_KEY, branchBeginStepId);
         actionData.put(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY, preStepData.get(SlangTextualKeys.PARALLEL_LOOP_KEY));
-        ExecutionStep executionStep = createGeneralStep(currentStepID, PARALLEL_LOOP_STEPS_CLASS, "addBranches", actionData);
+        ExecutionStep executionStep = createGeneralStep(currentStepId, PARALLEL_LOOP_STEPS_CLASS, "addBranches", actionData);
         executionStep.setSplitStep(true);
         return executionStep;
     }

@@ -28,10 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class TriggerFlows {
 
-    private final static HashSet<String> FINISHED_EVENTS =
+    private static final HashSet<String> FINISHED_EVENTS =
             Sets.newHashSet(ScoreLangConstants.EVENT_EXECUTION_FINISHED, ScoreLangConstants.SLANG_EXECUTION_EXCEPTION);
 
-    private final static HashSet<String> STEP_EVENTS =
+    private static final HashSet<String> STEP_EVENTS =
             Sets.newHashSet(
                     ScoreLangConstants.EVENT_INPUT_END,
                     ScoreLangConstants.EVENT_OUTPUT_END,
@@ -39,9 +39,9 @@ public class TriggerFlows {
                     ScoreLangConstants.EVENT_ARGUMENT_END
             );
 
-    private final static HashSet<String> BRANCH_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_BRANCH_END);
+    private static final HashSet<String> BRANCH_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_BRANCH_END);
 
-    private final static HashSet<String> PARALLEL_LOOP_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_JOIN_BRANCHES_END);
+    private static final HashSet<String> PARALLEL_LOOP_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_JOIN_BRANCHES_END);
 
     @Autowired
     private Slang slang;
@@ -59,15 +59,15 @@ public class TriggerFlows {
         };
         slang.subscribeOnEvents(finishListener, FINISHED_EVENTS);
 
-        long executionID = slang.run(compilationArtifact, userInputs, systemProperties);
+        long executionId = slang.run(compilationArtifact, userInputs, systemProperties);
 
         try {
             ScoreEvent event = null;
             boolean finishEventReceived = false;
             while (!finishEventReceived) {
                 event = finishEvent.take();
-                long executionIDFromEvent = (long) ((Map) event.getData()).get(LanguageEventData.EXECUTION_ID);
-                finishEventReceived = executionID == executionIDFromEvent;
+                long executionIdFromEvent = (long) ((Map) event.getData()).get(LanguageEventData.EXECUTION_ID);
+                finishEventReceived = executionId == executionIdFromEvent;
             }
             if (event.getEventType().equals(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION)) {
                 LanguageEventData languageEvent = (LanguageEventData) event.getData();
@@ -96,7 +96,7 @@ public class TriggerFlows {
         Map<String, List<StepData>> branchesByPath = branchAggregatorListener.aggregate();
         Map<String, StepData> parallelSteps = joinAggregatorListener.aggregate();
 
-        RuntimeInformation runtimeInformation = new RuntimeInformation(steps, branchesByPath, parallelSteps);
+        final RuntimeInformation runtimeInformation = new RuntimeInformation(steps, branchesByPath, parallelSteps);
 
         slang.unSubscribeOnEvents(joinAggregatorListener);
         slang.unSubscribeOnEvents(branchAggregatorListener);

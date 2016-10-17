@@ -26,6 +26,7 @@ import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.bindings.Result;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +35,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -104,7 +106,7 @@ public class ExecutableBuilderTest {
 
     @Test
     public void emptyExecutableDataThrowsException() throws Exception {
-        ParsedSlang mockParsedSlang = mockFlowSlangFile();
+        final ParsedSlang mockParsedSlang = mockFlowSlangFile();
         Map<String, Object> executableRawData = new HashMap<>();
         String flowName = "flow2";
         executableRawData.put(SlangTextualKeys.EXECUTABLE_NAME_KEY, flowName);
@@ -117,7 +119,7 @@ public class ExecutableBuilderTest {
 
     @Test
     public void emptyWorkFlowThrowsException() throws Exception {
-        ParsedSlang mockParsedSlang = mockFlowSlangFile();
+        final ParsedSlang mockParsedSlang = mockFlowSlangFile();
         Map<String, Object> executableRawData = new HashMap<>();
         executableRawData.put(SlangTextualKeys.WORKFLOW_KEY, new LinkedHashMap<>());
         String flowName = "flow2";
@@ -131,7 +133,7 @@ public class ExecutableBuilderTest {
 
     @Test
     public void emptyStepThrowsException() throws Exception {
-        ParsedSlang mockParsedSlang = mockFlowSlangFile();
+        final ParsedSlang mockParsedSlang = mockFlowSlangFile();
         Map<String, Object> executableRawData = new HashMap<>();
         List<Map<String, Object>> workFlowData = new ArrayList<>();
         String stepName = "step1";
@@ -149,7 +151,7 @@ public class ExecutableBuilderTest {
 
     @Test
     public void stepKeyThatHasNoTransformerThrowsException() throws Exception {
-        ParsedSlang mockParsedSlang = mockFlowSlangFile();
+        final ParsedSlang mockParsedSlang = mockFlowSlangFile();
         Map<String, Object> executableRawData = new HashMap<>();
         LinkedHashMap<Object, Object> workFlowData = new LinkedHashMap<>();
         String stepName = "step1";
@@ -171,7 +173,7 @@ public class ExecutableBuilderTest {
         String keyword = "a";
         Mockito.when(transformer.keyToTransform()).thenReturn(keyword);
         Mockito.when(transformer.getScopes()).thenReturn(Collections.singletonList(Transformer.Scope.ACTION));
-        ParsedSlang mockParsedSlang = mockFlowSlangFile();
+        final ParsedSlang mockParsedSlang = mockFlowSlangFile();
         Map<String, Object> executableRawData = new HashMap<>();
         LinkedHashMap<Object, Object> workFlowData = new LinkedHashMap<>();
         String stepName = "step1";
@@ -193,7 +195,7 @@ public class ExecutableBuilderTest {
         Mockito.when(transformer.keyToTransform()).thenReturn(keyword);
         Mockito.when(transformer.getScopes()).thenReturn(Collections.singletonList(Transformer.Scope.BEFORE_EXECUTABLE));
         Mockito.when(transformer.transform(any())).thenThrow(ClassCastException.class);
-        ParsedSlang mockParsedSlang = mockFlowSlangFile();
+        final ParsedSlang mockParsedSlang = mockFlowSlangFile();
         Map<String, Object> executableRawData = new HashMap<>();
         LinkedHashMap<Object, Object> workFlowData = new LinkedHashMap<>();
         String stepName = "step1";
@@ -214,8 +216,8 @@ public class ExecutableBuilderTest {
         String keyword = "a";
         Mockito.when(transformer.keyToTransform()).thenReturn(keyword);
         Mockito.when(transformer.getScopes()).thenReturn(Collections.singletonList(Transformer.Scope.BEFORE_STEP));
-        ParsedSlang mockParsedSlang = mockFlowSlangFile();
-        Map<String, Object> executableRawData = new HashMap<>();
+        final ParsedSlang mockParsedSlang = mockFlowSlangFile();
+        final Map<String, Object> executableRawData = new HashMap<>();
         List<Map<String, Object>> workFlowData = new ArrayList<>();
         String stepName = "step1";
         Map<String, Object> stepRawData = new HashMap<>();
@@ -234,8 +236,8 @@ public class ExecutableBuilderTest {
 
     @Test
     public void stepWithEmptyDoEntranceThrowsException() throws Exception {
-        ParsedSlang mockParsedSlang = mockFlowSlangFile();
-        Map<String, Object> executableRawData = new HashMap<>();
+        final ParsedSlang mockParsedSlang = mockFlowSlangFile();
+        final Map<String, Object> executableRawData = new HashMap<>();
         List<Map<String, Object>> workFlowData = new ArrayList<>();
         Map<String, Object> stepRawData = new HashMap<>();
 
@@ -255,10 +257,10 @@ public class ExecutableBuilderTest {
 
     @Test
     public void simpleFlowDataIsValid() throws Exception {
-        ParsedSlang mockParsedSlang = mockFlowSlangFile();
+        final ParsedSlang mockParsedSlang = mockFlowSlangFile();
 
-        Map<String, Object> executableRawData = new HashMap<>();
-        List<Map<String, Object>> workFlowData = new ArrayList<>();
+        final Map<String, Object> executableRawData = new HashMap<>();
+        final List<Map<String, Object>> workFlowData = new ArrayList<>();
         Map<String, Object> stepRawData = new HashMap<>();
         Map<String, Object> doRawData = new HashMap<>();
 
@@ -285,10 +287,10 @@ public class ExecutableBuilderTest {
 
     @Test
     public void stepWithImplicitAlias() throws Exception {
-        ParsedSlang mockParsedSlang = mockFlowSlangFile();
+        final ParsedSlang mockParsedSlang = mockFlowSlangFile();
 
-        Map<String, Object> executableRawData = new HashMap<>();
-        List<Map<String, Object>> workFlowData = new ArrayList<>();
+        final Map<String, Object> executableRawData = new HashMap<>();
+        final List<Map<String, Object>> workFlowData = new ArrayList<>();
         Map<String, Object> stepRawData = new HashMap<>();
         Map<String, Object> doRawData = new HashMap<>();
 
@@ -315,7 +317,7 @@ public class ExecutableBuilderTest {
 
     @Test
     public void invalidKeyWordsInOperationThrowsException() throws Exception {
-        ParsedSlang mockParsedSlang = mockOperationsSlangFile();
+        final ParsedSlang mockParsedSlang = mockOperationsSlangFile();
         Map<String, Object> executableRawData = new HashMap<>();
         String key = "a";
         executableRawData.put(key, "b");
@@ -336,7 +338,7 @@ public class ExecutableBuilderTest {
         Mockito.when(transformer.keyToTransform()).thenReturn(keyword);
         Mockito.when(transformer.getScopes()).thenReturn(Collections.singletonList(Transformer.Scope.BEFORE_EXECUTABLE));
 
-        ParsedSlang mockParsedSlang = mockOperationsSlangFile();
+        final ParsedSlang mockParsedSlang = mockOperationsSlangFile();
         Map<String, Object> executableRawData = new HashMap<>();
         executableRawData.put(keyword, "b");
         String operationName = "op1";

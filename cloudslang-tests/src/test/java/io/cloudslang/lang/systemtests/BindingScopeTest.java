@@ -124,7 +124,7 @@ public class BindingScopeTest extends SystemsTestsParent {
     @Test
     public void testInputRequiredWithEmptyValue() throws Exception {
         URL resource = getClass().getResource("/yaml/check_weather_input_required.sl");
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), new HashSet<SlangSource>());
+        final CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), new HashSet<SlangSource>());
 
         Map<String, Value> userInputs = new HashMap<>();
         userInputs.put("city", ValueFactory.create(""));
@@ -148,7 +148,7 @@ public class BindingScopeTest extends SystemsTestsParent {
     @Test
     public void testInputRequiredWithNullValue() throws Exception {
         URL resource = getClass().getResource("/yaml/check_weather_input_required.sl");
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), new HashSet<SlangSource>());
+        final CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), new HashSet<SlangSource>());
 
         Map<String, Value> userInputs = new HashMap<>();
         userInputs.put("city", ValueFactory.create(null));
@@ -305,10 +305,10 @@ public class BindingScopeTest extends SystemsTestsParent {
                 StringUtils.trim(ExpressionUtils.extractExpression(stepPublishValues.get(0).getValue().get()))
         );
 
-        CompilationArtifact compilationArtifact = slang.compile(flowSource, path);
+        final CompilationArtifact compilationArtifact = slang.compile(flowSource, path);
 
-        Map<String, Value> userInputs = Collections.emptyMap();
-        Set<SystemProperty> systemProperties = Collections.emptySet();
+        final Map<String, Value> userInputs = Collections.emptyMap();
+        final Set<SystemProperty> systemProperties = Collections.emptySet();
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("flow_var");

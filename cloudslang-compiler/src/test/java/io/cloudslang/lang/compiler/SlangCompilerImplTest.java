@@ -20,11 +20,13 @@ import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.entities.SystemProperty;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -84,7 +86,7 @@ public class SlangCompilerImplTest {
         when(yamlParserMock.validateAndThrowFirstError(eq(parsedSlangMock))).thenReturn(parsedSlangMock);
         when(parsedSlangMock.getType()).thenReturn(ParsedSlang.Type.SYSTEM_PROPERTY_FILE);
 
-        String namespace = "a.b";
+        final String namespace = "a.b";
         String key1 = "c.key1";
         String key2 = "c.key2";
         String value1 = "value1";

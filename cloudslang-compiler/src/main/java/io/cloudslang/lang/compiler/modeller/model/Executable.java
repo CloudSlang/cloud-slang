@@ -12,6 +12,7 @@ package io.cloudslang.lang.compiler.modeller.model;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -102,9 +103,13 @@ public abstract class Executable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
 
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Executable that = (Executable) o;
 

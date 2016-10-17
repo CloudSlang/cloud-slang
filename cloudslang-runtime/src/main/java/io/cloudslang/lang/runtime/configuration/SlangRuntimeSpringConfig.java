@@ -27,10 +27,10 @@ public class SlangRuntimeSpringConfig {
 
     static {
         Options.importSite = false;
-        setPythonIOEncoding();
+        setPythonIoEncoding();
     }
 
-    private static void setPythonIOEncoding() {
+    private static void setPythonIoEncoding() {
         String encodingValue = System.getProperty(SlangSystemPropertyConstant.CSLANG_ENCODING.getValue());
         if (StringUtils.isEmpty(encodingValue)) {
             encodingValue = StandardCharsets.UTF_8.name();

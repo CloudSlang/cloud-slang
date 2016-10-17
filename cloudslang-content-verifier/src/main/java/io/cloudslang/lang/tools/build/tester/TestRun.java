@@ -39,15 +39,18 @@ public class TestRun {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
 
         TestRun testRun = (TestRun) o;
 
-        if (testCase != null ? !testCase.equals(testRun.testCase) : testRun.testCase != null)
+        if (testCase != null ? !testCase.equals(testRun.testCase) : testRun.testCase != null) {
             return false;
+        }
         return !(message != null ? !message.equals(testRun.message) : testRun.message != null);
 
     }
