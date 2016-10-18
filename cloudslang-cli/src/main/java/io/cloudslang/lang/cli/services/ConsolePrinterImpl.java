@@ -59,6 +59,7 @@ public class ConsolePrinterImpl implements ConsolePrinter, DisposableBean {
             } catch (InterruptedException | ExecutionException | TimeoutException ignore) {
             }
         }
+        tasks.clear();
     }
 
     @Override

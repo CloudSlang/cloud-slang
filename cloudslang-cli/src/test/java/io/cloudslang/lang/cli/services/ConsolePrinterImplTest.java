@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -34,6 +35,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -44,6 +46,7 @@ import static org.mockito.Mockito.verify;
 public class ConsolePrinterImplTest {
 
     private static final String SINGLE_THREAD_EXECUTOR = "singleThreadExecutor";
+    private static final String TASKS = "tasks";
 
     @InjectMocks
     @Spy
@@ -62,10 +65,17 @@ public class ConsolePrinterImplTest {
         consolePrinter.initialize();
 
         Class<? extends ConsolePrinterImpl> consolePrinterClass = consolePrinter.getClass();
-        Field consolePrinterClassDeclaredField = consolePrinterClass.getDeclaredField(SINGLE_THREAD_EXECUTOR);
+        Field consolePrinterClassExecutorDeclaredField = consolePrinterClass.getDeclaredField(SINGLE_THREAD_EXECUTOR);
 
-        consolePrinterClassDeclaredField.setAccessible(true);
-        Object singleThreadExecutor = consolePrinterClassDeclaredField.get(consolePrinter);
+        consolePrinterClassExecutorDeclaredField.setAccessible(true);
+        Object singleThreadExecutor = consolePrinterClassExecutorDeclaredField.get(consolePrinter);
+
+        Field consolePrinterClassTasksDeclaredField = consolePrinterClass.getDeclaredField(TASKS);
+
+        consolePrinterClassTasksDeclaredField.setAccessible(true);
+        Object tasks = consolePrinterClassTasksDeclaredField.get(consolePrinter);
+
+        assertTrue(tasks instanceof ArrayList);
 
         assertTrue(singleThreadExecutor instanceof ThreadPoolExecutor);
         assertEquals(1, ((ThreadPoolExecutor) singleThreadExecutor).getMaximumPoolSize());
@@ -87,6 +97,35 @@ public class ConsolePrinterImplTest {
 
         singleThreadExecutor = consolePrinterClassDeclaredField.get(consolePrinter);
         assertNull(singleThreadExecutor);
+    }
+
+    @Test
+    public void testWaitForAllPrintTasksToFinish() throws Exception {
+        ConsolePrinterImpl consolePrinter = new ConsolePrinterImpl();
+        consolePrinter.initialize();
+
+        Class<? extends ConsolePrinterImpl> consolePrinterClass = consolePrinter.getClass();
+
+        Field consolePrinterClassTasksDeclaredField = consolePrinterClass.getDeclaredField(TASKS);
+
+        consolePrinterClassTasksDeclaredField.setAccessible(true);
+        Object tasksObject = consolePrinterClassTasksDeclaredField.get(consolePrinter);
+
+        assertTrue(tasksObject instanceof ArrayList);
+
+        List<Future<?>> tasks = (List) tasksObject;
+
+        Future<?> firstFuture = mock(Future.class);
+        Future<?> secondFuture = mock(Future.class);
+
+        tasks.add(firstFuture);
+        tasks.add(secondFuture);
+
+        consolePrinter.waitForAllPrintTasksToFinish();
+
+        assertEquals(0, tasks.size());
+        verify(firstFuture, times(1)).get(1, TimeUnit.MINUTES);
+        verify(secondFuture, times(1)).get(1, TimeUnit.MINUTES);
     }
 
     @Test
