@@ -60,6 +60,7 @@ public class LoggingServiceImplTest {
         Object singleThreadExecutor = loggingServiceClassDeclaredField.get(localLoggingService);
 
         assertTrue(singleThreadExecutor instanceof ThreadPoolExecutor);
+        assertEquals(1, ((ThreadPoolExecutor) singleThreadExecutor).getMaximumPoolSize());
     }
 
     @Test

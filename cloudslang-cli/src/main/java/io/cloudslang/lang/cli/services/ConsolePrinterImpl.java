@@ -9,6 +9,8 @@
  *******************************************************************************/
 package io.cloudslang.lang.cli.services;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 import org.springframework.beans.factory.DisposableBean;
@@ -70,7 +72,7 @@ public class ConsolePrinterImpl implements ConsolePrinter, DisposableBean {
         return null;
     }
 
-    private static class ConsolePrinterRunnable implements Runnable {
+    static class ConsolePrinterRunnable implements Runnable {
 
         private final Ansi.Color color;
         private final String message;
@@ -88,6 +90,32 @@ public class ConsolePrinterImpl implements ConsolePrinter, DisposableBean {
             } catch (Exception ignore) {
                 // so that this thread does not die
             }
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (object == null) {
+                return false;
+            }
+            if (object == this) {
+                return true;
+            }
+            if (object.getClass() != getClass()) {
+                return false;
+            }
+            ConsolePrinterRunnable consolePrinterRunnable = (ConsolePrinterRunnable) object;
+            return new EqualsBuilder()
+                    .append(this.color, consolePrinterRunnable.color)
+                    .append(this.message, consolePrinterRunnable.message)
+                    .isEquals();
+        }
+
+        @Override
+        public int hashCode() {
+            return new HashCodeBuilder()
+                    .append(color)
+                    .append(message)
+                    .toHashCode();
         }
     }
 
