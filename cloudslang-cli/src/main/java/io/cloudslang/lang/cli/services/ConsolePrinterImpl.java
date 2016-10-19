@@ -17,8 +17,6 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
@@ -37,12 +35,11 @@ public class ConsolePrinterImpl implements ConsolePrinter, DisposableBean {
 
     private ThreadPoolExecutor singleThreadExecutor;
 
-    private List<Future<?>> tasks;
+    private Future<?> lastTask;
 
     @PostConstruct
     public void initialize() {
         singleThreadExecutor = (ThreadPoolExecutor) newFixedThreadPool(1); // one thread only
-        tasks = new ArrayList<>();
     }
 
     @Override
@@ -53,21 +50,17 @@ public class ConsolePrinterImpl implements ConsolePrinter, DisposableBean {
 
     @Override
     public synchronized void waitForAllPrintTasksToFinish() {
-        for (Future<?> future : tasks) {
-            try {
-                future.get(1, TimeUnit.MINUTES);
-            } catch (InterruptedException | ExecutionException | TimeoutException ignore) {
-            }
+        try {
+            lastTask.get(1, TimeUnit.MINUTES);
+        } catch (InterruptedException | ExecutionException | TimeoutException ignore) {
         }
-        tasks.clear();
     }
 
     @Override
     public synchronized Future<?> printWithColor(final Ansi.Color color, final String message) {
         try {
-            Future<?> future = singleThreadExecutor.submit(new ConsolePrinterRunnable(color, message));
-            tasks.add(future);
-            return future;
+            lastTask = singleThreadExecutor.submit(new ConsolePrinterRunnable(color, message));
+            return lastTask;
         } catch (RejectedExecutionException ignore) {
         }
         return null;

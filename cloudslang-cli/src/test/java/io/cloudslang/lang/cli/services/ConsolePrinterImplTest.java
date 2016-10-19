@@ -33,11 +33,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by bancl on 10/18/2016.
@@ -46,7 +45,6 @@ import static org.mockito.Mockito.verify;
 public class ConsolePrinterImplTest {
 
     private static final String SINGLE_THREAD_EXECUTOR = "singleThreadExecutor";
-    private static final String TASKS = "tasks";
 
     @InjectMocks
     @Spy
@@ -56,7 +54,7 @@ public class ConsolePrinterImplTest {
     private ThreadPoolExecutor singleThreadExecutor;
 
     @Mock
-    private List<Future<?>> tasks;
+    private Future<?> lastTask;
 
     @Test
     public void testInitialize() throws Exception {
@@ -69,13 +67,6 @@ public class ConsolePrinterImplTest {
 
         consolePrinterClassExecutorDeclaredField.setAccessible(true);
         Object singleThreadExecutor = consolePrinterClassExecutorDeclaredField.get(consolePrinter);
-
-        Field consolePrinterClassTasksDeclaredField = consolePrinterClass.getDeclaredField(TASKS);
-
-        consolePrinterClassTasksDeclaredField.setAccessible(true);
-        Object tasks = consolePrinterClassTasksDeclaredField.get(consolePrinter);
-
-        assertTrue(tasks instanceof ArrayList);
 
         assertTrue(singleThreadExecutor instanceof ThreadPoolExecutor);
         assertEquals(1, ((ThreadPoolExecutor) singleThreadExecutor).getMaximumPoolSize());
@@ -101,31 +92,11 @@ public class ConsolePrinterImplTest {
 
     @Test
     public void testWaitForAllPrintTasksToFinish() throws Exception {
-        ConsolePrinterImpl consolePrinter = new ConsolePrinterImpl();
-        consolePrinter.initialize();
-
-        Class<? extends ConsolePrinterImpl> consolePrinterClass = consolePrinter.getClass();
-
-        Field consolePrinterClassTasksDeclaredField = consolePrinterClass.getDeclaredField(TASKS);
-
-        consolePrinterClassTasksDeclaredField.setAccessible(true);
-        Object tasksObject = consolePrinterClassTasksDeclaredField.get(consolePrinter);
-
-        assertTrue(tasksObject instanceof ArrayList);
-
-        List<Future<?>> tasks = (List) tasksObject;
-
-        Future<?> firstFuture = mock(Future.class);
-        Future<?> secondFuture = mock(Future.class);
-
-        tasks.add(firstFuture);
-        tasks.add(secondFuture);
+        when(lastTask.get(1, TimeUnit.MINUTES)).thenReturn(null);
 
         consolePrinter.waitForAllPrintTasksToFinish();
 
-        assertEquals(0, tasks.size());
-        verify(firstFuture, times(1)).get(1, TimeUnit.MINUTES);
-        verify(secondFuture, times(1)).get(1, TimeUnit.MINUTES);
+        verify(lastTask, times(1)).get(1, TimeUnit.MINUTES);
     }
 
     @Test
@@ -149,9 +120,9 @@ public class ConsolePrinterImplTest {
         }).when(singleThreadExecutor).submit(Mockito.any(Runnable.class));
 
         consolePrinter.printWithColor(Ansi.Color.GREEN, "firstMessage");
-        consolePrinter.printWithColor(Ansi.Color.GREEN, "secondMessage");
+        Future lastFuture = consolePrinter.printWithColor(Ansi.Color.GREEN, "secondMessage");
 
-        verify(tasks, times(2)).add(any(Future.class));
+        assertEquals("secondMessage", lastFuture.get());
 
         assertEquals(2, runnableList.size());
 
