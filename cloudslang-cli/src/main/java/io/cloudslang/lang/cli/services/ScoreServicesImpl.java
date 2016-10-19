@@ -15,12 +15,14 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEventListener;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.stereotype.Service;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import static io.cloudslang.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
 import static io.cloudslang.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
@@ -37,6 +39,9 @@ public class ScoreServicesImpl implements ScoreServices {
 
     @Autowired
     private Slang slang;
+
+    @Autowired
+    private AutowireCapableBeanFactory autowireCapableBeanFactory;
 
     public void subscribe(ScoreEventListener eventHandler, Set<String> eventTypes) {
         slang.subscribeOnEvents(eventHandler, eventTypes);
@@ -79,6 +84,7 @@ public class ScoreServicesImpl implements ScoreServices {
         }
 
         SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener();
+        autowireCapableBeanFactory.autowireBean(scoreEventListener);
         scoreEventListener.setIsDebugMode(debug);
         slang.subscribeOnEvents(scoreEventListener, handlerTypes);
 
