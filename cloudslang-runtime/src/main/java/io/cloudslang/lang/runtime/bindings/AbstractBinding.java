@@ -39,7 +39,9 @@ public class AbstractBinding {
         if (loopStatement instanceof MapLoopStatement) {
             if (evalResult != null && evalResult.get() instanceof Map) {
                 List<Value> entriesAsValues = new ArrayList<>();
-                @SuppressWarnings("unchecked") Set<Map.Entry<Serializable, Serializable>> entrySet = ((Map) evalResult.get()).entrySet();
+                @SuppressWarnings("unchecked") Set<Map.Entry<Serializable, Serializable>> entrySet =
+                        ((Map) evalResult.get()).entrySet();
+
                 for (Map.Entry<Serializable, Serializable> entry : entrySet) {
                     entriesAsValues.add(ValueFactory.create(Pair.of(
                             ValueFactory.create(entry.getKey(), evalResult.isSensitive()),
@@ -57,7 +59,8 @@ public class AbstractBinding {
         Serializable loopCollectionContent = loopCollection.get();
         if (loopCollectionContent instanceof Iterable) {
             @SuppressWarnings("unchecked")
-            Iterable<? extends Serializable> loopCollectionContentSerializable = (Iterable<? extends Serializable>) loopCollectionContent;
+            Iterable<? extends Serializable> loopCollectionContentSerializable =
+                    (Iterable<? extends Serializable>) loopCollectionContent;
             return convert(loopCollectionContentSerializable, loopCollection.isSensitive());
         } else if (loopCollectionContent instanceof String) {
             String[] strings = ((String) loopCollectionContent).split(Pattern.quote(","));

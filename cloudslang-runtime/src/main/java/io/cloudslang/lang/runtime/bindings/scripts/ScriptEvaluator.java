@@ -51,22 +51,26 @@ public class ScriptEvaluator extends ScriptProcessor {
     @Autowired
     private PythonRuntimeService pythonRuntimeService;
 
-    public Value evalExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties, Set<ScriptFunction> functionDependencies) {
+    public Value evalExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties,
+                          Set<ScriptFunction> functionDependencies) {
         try {
             Map<String, Serializable> pythonContext = createPythonContext(context);
             boolean systemPropertiesDefined = functionDependencies.contains(ScriptFunction.GET_SYSTEM_PROPERTY);
             if (systemPropertiesDefined) {
                 pythonContext.put(SYSTEM_PROPERTIES_MAP, (Serializable) prepareSystemProperties(systemProperties));
             }
-            PythonEvaluationResult result = pythonRuntimeService.eval(buildAddFunctionsScript(functionDependencies), expr, pythonContext);
+            PythonEvaluationResult result = pythonRuntimeService.eval(
+                    buildAddFunctionsScript(functionDependencies), expr, pythonContext);
             if (systemPropertiesDefined) {
                 pythonContext.remove(SYSTEM_PROPERTIES_MAP);
             }
 
-            return ValueFactory.create(result.getEvalResult(), getSensitive(result.getResultContext(), systemPropertiesDefined));
+            return ValueFactory.create(result.getEvalResult(),
+                    getSensitive(result.getResultContext(), systemPropertiesDefined));
         } catch (Exception exception) {
             throw new RuntimeException("Error in running script expression: '" +
-                            expr + "',\n\tException is: " + handleExceptionSpecialCases(exception.getMessage()), exception);
+                            expr + "',\n\tException is: " +
+                    handleExceptionSpecialCases(exception.getMessage()), exception);
         }
     }
 
@@ -87,7 +91,8 @@ public class ScriptEvaluator extends ScriptProcessor {
                     functions = appendDelimiterBetweenFunctions(functions);
                     break;
                 default:
-                    throw new RuntimeException("Error adding function to context: '" + function.getValue() + "' is not valid.");
+                    throw new RuntimeException("Error adding function to context: '" + function.getValue() +
+                            "' is not valid.");
             }
         }
         return functions;
@@ -100,7 +105,8 @@ public class ScriptEvaluator extends ScriptProcessor {
     private Map<String, Value> prepareSystemProperties(Set<SystemProperty> properties) {
         Map<String, Value> processedSystemProperties = new HashMap<>();
         for (SystemProperty property : properties) {
-            processedSystemProperties.put(property.getFullyQualifiedName(), ValueFactory.createPyObjectValue(property.getValue()));
+            processedSystemProperties.put(property.getFullyQualifiedName(),
+                    ValueFactory.createPyObjectValue(property.getValue()));
         }
         return processedSystemProperties;
     }
@@ -108,7 +114,8 @@ public class ScriptEvaluator extends ScriptProcessor {
     private String handleExceptionSpecialCases(String message) {
         String processedMessage = message;
         if (StringUtils.isNotEmpty(message) && message.contains("get_sp") && message.contains("not defined")) {
-            processedMessage = message + ". Make sure to use correct syntax for the function: get_sp('fully.qualified.name', optional_default_value).";
+            processedMessage = message + ". Make sure to use correct syntax for the function:" +
+                    " get_sp('fully.qualified.name', optional_default_value).";
         }
         return processedMessage;
     }

@@ -75,7 +75,8 @@ public class ArgumentsBindingTest {
         System.setProperty(MavenConfigImpl.MAVEN_SETTINGS_PATH, settingsXmlPath);
         System.setProperty(MavenConfigImpl.MAVEN_M2_CONF_PATH, classLoader.getResource("m2.conf").getPath());
 
-        String provideralAlreadyConfigured = System.setProperty("python.executor.engine", PythonExecutionNotCachedEngine.class.getSimpleName());
+        String provideralAlreadyConfigured = System.setProperty("python.executor.engine",
+                PythonExecutionNotCachedEngine.class.getSimpleName());
         assertNull("python.executor.engine was configured before this test!!!!!!!", provideralAlreadyConfigured);
     }
 
@@ -106,7 +107,8 @@ public class ArgumentsBindingTest {
 
     @Test
     public void testDefaultValueExpression() {
-        List<Argument> arguments = Collections.singletonList(new Argument("argument1", ValueFactory.create("${ 'value' }")));
+        List<Argument> arguments = Collections.singletonList(new Argument("argument1",
+                ValueFactory.create("${ 'value' }")));
         Map<String, Value> result = bindArguments(arguments);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
@@ -139,7 +141,8 @@ public class ArgumentsBindingTest {
 
     @Test
     public void testTwoArguments() {
-        List<Argument> arguments = Arrays.asList(new Argument("argument2", ValueFactory.create("yyy")), new Argument("argument1", ValueFactory.create("zzz")));
+        List<Argument> arguments = Arrays.asList(new Argument("argument2", ValueFactory.create("yyy")),
+                new Argument("argument1", ValueFactory.create("zzz")));
         Map<String, Value> result = bindArguments(arguments);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));
@@ -165,7 +168,8 @@ public class ArgumentsBindingTest {
     public void testArgumentRef() {
         Map<String, Value> context = new HashMap<>();
         context.put("argumentX", ValueFactory.create("xxx"));
-        List<Argument> arguments = Collections.singletonList(new Argument("argument1", ValueFactory.create("${ str(argumentX) }")));
+        List<Argument> arguments = Collections.singletonList(new Argument("argument1",
+                ValueFactory.create("${ str(argumentX) }")));
         Map<String, Value> result = bindArguments(arguments, context);
         Assert.assertFalse(result.isEmpty());
         Assert.assertTrue(result.containsKey("argument1"));

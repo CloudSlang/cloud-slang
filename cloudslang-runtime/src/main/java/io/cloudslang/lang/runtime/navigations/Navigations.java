@@ -39,7 +39,8 @@ public class Navigations {
 
         // If we have an error key stored, we fire an error event and return null as the next position
         if (executionRuntimeServices.hasStepErrorKey()) {
-            AbstractExecutionData.fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.SLANG_EXECUTION_EXCEPTION,
+            AbstractExecutionData.fireEvent(executionRuntimeServices, runEnv,
+                    ScoreLangConstants.SLANG_EXECUTION_EXCEPTION,
                     "Error detected during step", LanguageEventData.StepType.NAVIGATION, null,
                     Pair.of(LanguageEventData.EXCEPTION, executionRuntimeServices.getStepErrorKey()));
             throw new RuntimeException(executionRuntimeServices.getStepErrorKey());

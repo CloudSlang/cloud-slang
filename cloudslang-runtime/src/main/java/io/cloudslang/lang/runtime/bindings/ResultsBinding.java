@@ -75,7 +75,8 @@ public class ResultsBinding {
                     return presetResult;
                 }
             }
-            throw new RuntimeException("Result: " + presetResult + " that was calculated in the last step is not a possible result of the flow.");
+            throw new RuntimeException("Result: " + presetResult
+                    + " that was calculated in the last step is not a possible result of the flow.");
         }
 
         // In the case of operation, we resolve the result by searching for the first result with a true expression
@@ -100,7 +101,8 @@ public class ResultsBinding {
                 Map<String, Value> scriptContext = MapUtils.mergeMaps(inputs, context);
 
                 try {
-                    Value expressionResult = scriptEvaluator.evalExpr(expression, scriptContext, systemProperties, result.getFunctionDependencies());
+                    Value expressionResult = scriptEvaluator.evalExpr(expression, scriptContext, systemProperties,
+                            result.getFunctionDependencies());
                     Boolean evaluatedResult;
                     if (expressionResult.get() instanceof Integer) {
                         evaluatedResult = (Integer) expressionResult.get() != 0;
@@ -108,15 +110,18 @@ public class ResultsBinding {
                         evaluatedResult = (Boolean) expressionResult.get();
                     }
                     if (evaluatedResult == null) {
-                        throw new RuntimeException("Expression of the operation result: " + expression + " cannot be evaluated correctly to true or false value");
+                        throw new RuntimeException("Expression of the operation result: " + expression +
+                                " cannot be evaluated correctly to true or false value");
                     }
                     if (evaluatedResult) {
                         return resultName;
                     }
                 } catch (ClassCastException ex) {
-                    throw new RuntimeException("Error resolving the result. The expression " + expression + " does not return boolean value", ex);
+                    throw new RuntimeException("Error resolving the result. The expression " + expression +
+                            " does not return boolean value", ex);
                 } catch (Throwable t) {
-                    throw new RuntimeException("Error evaluating result: '" + resultName + "',\n\tError is: " + t.getMessage(), t);
+                    throw new RuntimeException("Error evaluating result: '" + resultName + "',\n\tError is: " +
+                            t.getMessage(), t);
                 }
             } else {
                 throw new RuntimeException("Error resolving the result. Value: '" + rawValue + "' is not valid.");
