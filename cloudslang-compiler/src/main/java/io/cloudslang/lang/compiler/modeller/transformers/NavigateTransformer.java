@@ -41,7 +41,8 @@ public class NavigateTransformer implements Transformer<List<Object>, List<Map<S
                 if (elementAsObject instanceof Map) {
                     Map elementAsMap = (Map) elementAsObject;
                     if (elementAsMap.size() != 1) {
-                        throw new RuntimeException("Each list item in the navigate section should contain exactly one key:value pair.");
+                        throw new RuntimeException("Each list item in the navigate " +
+                                "section should contain exactly one key:value pair.");
                     }
                     // - SUCCESS: some_step
                     Map.Entry navigationEntry = (Map.Entry) elementAsMap.entrySet().iterator().next();

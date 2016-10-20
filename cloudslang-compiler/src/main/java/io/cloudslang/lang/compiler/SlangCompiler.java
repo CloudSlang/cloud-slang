@@ -22,7 +22,8 @@ import java.util.Set;
 public interface SlangCompiler {
 
     /**
-     * Compile a CloudSlang source and its path to a {@link io.cloudslang.lang.entities.CompilationArtifact} object
+     * Compile a CloudSlang source and its path to a
+     *     {@link io.cloudslang.lang.entities.CompilationArtifact} object
      *
      * @param source the CloudSlang source file
      * @param path   a set of CloudSlang sources containing the source dependencies
@@ -31,7 +32,8 @@ public interface SlangCompiler {
     CompilationArtifact compile(SlangSource source, Set<SlangSource> path);
 
     /**
-     * Compile a CloudSlang source and its dependencies to a {@link io.cloudslang.lang.entities.CompilationArtifact} object
+     * Compile a CloudSlang source and its dependencies to a
+     *     {@link io.cloudslang.lang.entities.CompilationArtifact} object
      *
      * @param source the CloudSlang source file
      * @param path   a set of CloudSlang sources containing the source dependencies
@@ -78,7 +80,8 @@ public interface SlangCompiler {
      * @param directDependenciesModels the CloudSlang models of the direct dependencies
      * @return a list of the exceptions that were found (if any)
      */
-    List<RuntimeException> validateSlangModelWithDirectDependencies(Executable slangModel, Set<Executable> directDependenciesModels);
+    List<RuntimeException> validateSlangModelWithDirectDependencies(Executable slangModel,
+                                                                    Set<Executable> directDependenciesModels);
 
     Set<SystemProperty> loadSystemProperties(SlangSource source);
 

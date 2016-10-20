@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
+import static ch.lambdaj.Lambda.selectFirst;
 import static org.hamcrest.Matchers.equalTo;
 
 /*
@@ -74,7 +75,8 @@ public class ExecutionPlanBuilder {
 
         executionPlan.addStep(
                 stepFactory.createStartStep(
-                        1L, compiledDecision.getPreExecActionData(), compiledDecision.getInputs(), compiledDecision.getName(), ExecutableType.DECISION
+                        1L, compiledDecision.getPreExecActionData(),
+                        compiledDecision.getInputs(), compiledDecision.getName(), ExecutableType.DECISION
                 )
         );
         executionPlan.addStep(
@@ -108,7 +110,8 @@ public class ExecutionPlanBuilder {
             throw new RuntimeException("Flow: " + compiledFlow.getName() + " has no steps");
         }
 
-        List<ExecutionStep> stepExecutionSteps = buildStepExecutionSteps(steps.getFirst(), stepReferences, steps, compiledFlow);
+        List<ExecutionStep> stepExecutionSteps =
+                buildStepExecutionSteps(steps.getFirst(), stepReferences, steps, compiledFlow);
         executionPlan.addSteps(stepExecutionSteps);
 
         return executionPlan;
@@ -154,8 +157,9 @@ public class ExecutionPlanBuilder {
             Map.Entry<String, String> entry = map.entrySet().iterator().next();
             String nextStepName = entry.getValue();
             if (stepReferences.get(nextStepName) == null) {
-                Step nextStepToCompile = Lambda.selectFirst(steps, having(on(Step.class).getName(), equalTo(nextStepName)));
-                stepExecutionSteps.addAll(buildStepExecutionSteps(nextStepToCompile, stepReferences, steps, compiledFlow));
+                Step nextStepToCompile = selectFirst(steps, having(on(Step.class).getName(), equalTo(nextStepName)));
+                stepExecutionSteps.addAll(
+                        buildStepExecutionSteps(nextStepToCompile, stepReferences, steps, compiledFlow));
             }
             long nextStepId = stepReferences.get(nextStepName);
             String presetResult = (FLOW_END_STEP_ID == nextStepId) ? nextStepName : null;
@@ -186,7 +190,8 @@ public class ExecutionPlanBuilder {
         Long currentId;
 
         long max = Lambda.max(stepReferences);
-        Map.Entry maxEntry = Lambda.selectFirst(stepReferences.entrySet(), having(on(Map.Entry.class).getValue(), equalTo(max)));
+        Map.Entry maxEntry = selectFirst(stepReferences.entrySet(),
+                having(on(Map.Entry.class).getValue(), equalTo(max)));
         String referenceKey = (String) (maxEntry).getKey();
         Step step = null;
         for (Step stepItem : steps) {

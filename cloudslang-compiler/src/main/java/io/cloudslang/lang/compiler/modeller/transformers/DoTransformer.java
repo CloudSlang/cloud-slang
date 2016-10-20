@@ -60,7 +60,8 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
             for (Object rawArgument : rawArgumentsList) {
                 try {
                     Argument argument = transformListArgument(rawArgument);
-                    List<RuntimeException> validationErrors = preCompileValidator.validateNoDuplicateInOutParams(transformedData, argument);
+                    List<RuntimeException> validationErrors =
+                            preCompileValidator.validateNoDuplicateInOutParams(transformedData, argument);
                     if (CollectionUtils.isEmpty(validationErrors)) {
                         transformedData.add(argument);
                     } else {
@@ -100,7 +101,8 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
             return new Argument(argumentName);
         } else if (rawArgument instanceof Map) {
             @SuppressWarnings("unchecked")
-            Map.Entry<String, Serializable> entry = ((Map<String, Serializable>) rawArgument).entrySet().iterator().next();
+            Map.Entry<String, Serializable> entry = ((Map<String, Serializable>) rawArgument).entrySet()
+                    .iterator().next();
             Serializable entryValue = entry.getValue();
             // - some_input: some_expression
             return createArgument(entry, entryValue);

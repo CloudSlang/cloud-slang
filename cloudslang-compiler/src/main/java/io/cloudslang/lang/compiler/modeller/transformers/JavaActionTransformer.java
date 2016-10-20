@@ -29,7 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JavaActionTransformer extends AbstractTransformer implements Transformer<Map<String, String>, Map<String, String>> {
+public class JavaActionTransformer extends AbstractTransformer
+        implements Transformer<Map<String, String>, Map<String, String>> {
     @Autowired
     private DependencyFormatValidator dependencyFormatValidator;
 
@@ -70,8 +71,10 @@ public class JavaActionTransformer extends AbstractTransformer implements Transf
 
     private void transformKeys(Map<String, String> rawData) {
         // snake_case -> camelCase
-        rawData.put(ScoreLangConstants.JAVA_ACTION_CLASS_KEY, rawData.remove(SlangTextualKeys.JAVA_ACTION_CLASS_NAME_KEY));
-        rawData.put(ScoreLangConstants.JAVA_ACTION_METHOD_KEY, rawData.remove(SlangTextualKeys.JAVA_ACTION_METHOD_NAME_KEY));
+        rawData.put(ScoreLangConstants.JAVA_ACTION_CLASS_KEY,
+                rawData.remove(SlangTextualKeys.JAVA_ACTION_CLASS_NAME_KEY));
+        rawData.put(ScoreLangConstants.JAVA_ACTION_METHOD_KEY,
+                rawData.remove(SlangTextualKeys.JAVA_ACTION_METHOD_NAME_KEY));
         String gav = rawData.remove(SlangTextualKeys.JAVA_ACTION_GAV_KEY);
         dependencyFormatValidator.validateDependency(gav);
         rawData.put(ScoreLangConstants.JAVA_ACTION_GAV_KEY, gav);

@@ -57,7 +57,9 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
                         "Input \"" + iterator.next().getKey() + "\" is missing the hyphen.");
             }
             if (entryValue == null) {
-                throw new RuntimeException("Could not transform Input : " + rawInput + " since it has a null value.\n\nMake sure a value is specified or that indentation is properly done.");
+                throw new RuntimeException("Could not transform Input : " + rawInput +
+                        " since it has a null value.\n\n" +
+                        "Make sure a value is specified or that indentation is properly done.");
             }
             if (entryValue instanceof Map) {
                 // - some_inputs:
@@ -80,7 +82,8 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
 
         for (String key : props.keySet()) {
             if (!knownKeys.contains(key)) {
-                throw new RuntimeException("key: " + key + " in input: " + entry.getKey() + " is not a known property");
+                throw new RuntimeException("key: " + key + " in input: " + entry.getKey() +
+                        " is not a known property");
             }
         }
 

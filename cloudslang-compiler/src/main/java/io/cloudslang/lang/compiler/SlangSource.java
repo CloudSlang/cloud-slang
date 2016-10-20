@@ -50,7 +50,8 @@ public class SlangSource {
 
     public static SlangSource fromFile(File file) {
         Validate.notNull(file, "File cannot be null");
-        Validate.isTrue(file.isFile(), "File content: " + file.getName() + " doesn't lead to a file, directories are not supported");
+        Validate.isTrue(file.isFile(), "File content: " + file.getName() +
+                " doesn't lead to a file, directories are not supported");
 
         String content;
         try {

@@ -28,7 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PythonActionTransformer extends AbstractTransformer implements Transformer<Map<String, Serializable>, Map<String, Serializable>> {
+public class PythonActionTransformer extends AbstractTransformer
+        implements Transformer<Map<String, Serializable>, Map<String, Serializable>> {
     @Autowired
     private DependencyFormatValidator dependencyFormatValidator;
 
@@ -47,7 +48,9 @@ public class PythonActionTransformer extends AbstractTransformer implements Tran
             if (rawData != null) {
                 validateKeySet(rawData.keySet(), mandatoryKeySet, optionalKeySet);
                 if (dependenciesEnabled) {
-                    Collection<String> dependencies = (List<String>) rawData.get(SlangTextualKeys.PYTHON_ACTION_DEPENDENCIES_KEY);
+                    @SuppressWarnings("unchecked")
+                    Collection<String> dependencies =
+                            (List<String>) rawData.get(SlangTextualKeys.PYTHON_ACTION_DEPENDENCIES_KEY);
                     if (dependencies != null) {
                         for (String dependency : dependencies) {
                             dependencyFormatValidator.validateDependency(dependency);

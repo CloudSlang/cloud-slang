@@ -164,10 +164,13 @@ public class ExecutableBuilder {
                 transformersHandler
                         .runTransformers(executableRawData, postExecTransformers, errors, errorMessagePrefix));
 
-        @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) preExecutableActionData.remove(SlangTextualKeys.INPUTS_KEY);
-        @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) postExecutableActionData.remove(SlangTextualKeys.OUTPUTS_KEY);
+        @SuppressWarnings("unchecked") List<Input> inputs =
+                (List<Input>) preExecutableActionData.remove(SlangTextualKeys.INPUTS_KEY);
+        @SuppressWarnings("unchecked") List<Output> outputs =
+                (List<Output>) postExecutableActionData.remove(SlangTextualKeys.OUTPUTS_KEY);
 
-        @SuppressWarnings("unchecked") List<Result> results = (List<Result>) postExecutableActionData.remove(SlangTextualKeys.RESULTS_KEY);
+        @SuppressWarnings("unchecked") List<Result> results =
+                (List<Result>) postExecutableActionData.remove(SlangTextualKeys.RESULTS_KEY);
         results = results == null ? new ArrayList<Result>() : results;
 
         String namespace = parsedSlang.getNamespace();
@@ -184,7 +187,8 @@ public class ExecutableBuilder {
                         preCompileValidator.validateWorkflowRawData(parsedSlang,
                                         executableRawData.get(WORKFLOW_KEY), execName, errors);
 
-                Workflow onFailureWorkFlow = getOnFailureWorkflow(workFlowRawData, imports, errors, namespace, execName);
+                Workflow onFailureWorkFlow =
+                        getOnFailureWorkflow(workFlowRawData, imports, errors, namespace, execName);
 
                 WorkflowModellingResult workflowModellingResult =
                         compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false, namespace);
@@ -353,8 +357,8 @@ public class ExecutableBuilder {
                                                       String execName, List<RuntimeException> errors) {
         Map.Entry<String, Map<String, Object>> onFailureStep = getFirstOnFailureStep(onFailureData);
         if (onFailureStep.getValue().containsKey(NAVIGATION_KEY)) {
-            errors.add(new RuntimeException("Flow: '" + execName
-                    + "' syntax is illegal.\nThe step below 'on_failure' property should " +
+            errors.add(new RuntimeException("Flow: '" + execName +
+                    "' syntax is illegal.\nThe step below 'on_failure' property should " +
                     "not contain a \"navigate\" section."));
         }
     }
@@ -372,8 +376,8 @@ public class ExecutableBuilder {
                 .checkKeyWords("action data", "", actionRawData, actionTransformers, null, null);
 
         String errorMessagePrefix = "Action syntax is illegal.\n";
-        actionData.putAll(transformersHandler.
-                runTransformers(actionRawData, actionTransformers, errors, errorMessagePrefix));
+        actionData.putAll(
+                transformersHandler.runTransformers(actionRawData, actionTransformers, errors, errorMessagePrefix));
 
         Action action = new Action(actionData);
         return new ActionModellingResult(action, errors);
@@ -401,8 +405,8 @@ public class ExecutableBuilder {
             String stepName = getStepName(stepRawData);
             validateStepName(stepName, errors);
             if (stepNames.contains(stepName) || onFailureStepNames.contains(stepName)) {
-                errors.add(new RuntimeException("Step name: \'" + stepName
-                        + "\' appears more than once in the workflow. " + UNIQUE_STEP_NAME_MESSAGE_SUFFIX));
+                errors.add(new RuntimeException("Step name: \'" + stepName +
+                        "\' appears more than once in the workflow. " + UNIQUE_STEP_NAME_MESSAGE_SUFFIX));
             }
             stepNames.add(stepName);
             Map<String, Object> stepRawDataValue;

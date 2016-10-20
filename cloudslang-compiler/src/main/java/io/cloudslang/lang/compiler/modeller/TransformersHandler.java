@@ -39,7 +39,9 @@ public class TransformersHandler {
         return key.toLowerCase();
     }
 
-    public Map<String, Serializable> runTransformers(Map<String, Object> rawData, List<Transformer> scopeTransformers, List<RuntimeException> errors) {
+    public Map<String, Serializable> runTransformers(Map<String, Object> rawData,
+                                                     List<Transformer> scopeTransformers,
+                                                     List<RuntimeException> errors) {
         return runTransformers(rawData, scopeTransformers, errors, "");
     }
 
@@ -50,7 +52,8 @@ public class TransformersHandler {
             String key = keyToTransform(transformer);
             Object value = rawData.get(key);
             try {
-                @SuppressWarnings("unchecked") TransformModellingResult transformModellingResult = transformer.transform(value);
+                @SuppressWarnings("unchecked")
+                TransformModellingResult transformModellingResult = transformer.transform(value);
                 Object data = transformModellingResult.getTransformedData();
                 if (data != null) {
                     transformedData.put(key, (Serializable) data);
@@ -63,18 +66,22 @@ public class TransformersHandler {
             } catch (ClassCastException e) {
                 Class transformerType = getTransformerFromType(transformer);
                 if (value instanceof Map && transformerType.equals(List.class)) {
-                    errors.add(new RuntimeException(errorMessagePrefix + "Under property: '" + key + "' there should be a list of values, but instead there is a map.\n" +
+                    errors.add(new RuntimeException(errorMessagePrefix + "Under property: '" + key +
+                            "' there should be a list of values, but instead there is a map.\n" +
                             "By the Yaml spec lists properties are marked with a '- ' (dash followed by a space)"));
                 } else if (value instanceof List && transformerType.equals(Map.class)) {
-                    errors.add(new RuntimeException(errorMessagePrefix + "Under property: '" + key + "' there should be a map of values, but instead there is a list.\n" +
+                    errors.add(new RuntimeException(errorMessagePrefix + "Under property: '" + key +
+                            "' there should be a map of values, but instead there is a list.\n" +
                             "By the Yaml spec maps properties are NOT marked with a '- ' (dash followed by a space)"));
                 } else if (value instanceof String && transformerType.equals(Map.class)) {
-                    errors.add(new RuntimeException(errorMessagePrefix + "Under property: '" + key + "' there should be a map of values, but instead there is a string."));
+                    errors.add(new RuntimeException(errorMessagePrefix + "Under property: '" + key +
+                            "' there should be a map of values, but instead there is a string."));
                 } else if (value instanceof String && transformerType.equals(List.class)) {
-                    errors.add(new RuntimeException(errorMessagePrefix + "Under property: '" + key + "' there should be a list of values, but instead there is a string."));
+                    errors.add(new RuntimeException(errorMessagePrefix + "Under property: '" + key +
+                            "' there should be a list of values, but instead there is a string."));
                 } else {
-                    String message = "Data for property: " + key + " -> " + rawData.get(key).toString() + " is illegal." +
-                            "\n Transformer is: " + transformer.getClass().getSimpleName();
+                    String message = "Data for property: " + key + " -> " + rawData.get(key).toString() +
+                            " is illegal." + "\n Transformer is: " + transformer.getClass().getSimpleName();
                     errors.add(new RuntimeException(errorMessagePrefix + message, e));
                 }
             } catch (RuntimeException e) {
