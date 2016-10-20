@@ -34,7 +34,8 @@ public class Decision extends Executable {
             List<Result> results,
             Set<String> executableDependencies,
             Set<String> systemPropertyDependencies) {
-        super(preExecActionData, postExecActionData, namespace, name, inputs, outputs, results, executableDependencies, systemPropertyDependencies);
+        super(preExecActionData, postExecActionData, namespace, name, inputs,
+                outputs, results, executableDependencies, systemPropertyDependencies);
     }
 
     @Override

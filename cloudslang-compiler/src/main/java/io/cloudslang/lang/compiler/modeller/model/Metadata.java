@@ -93,14 +93,16 @@ public class Metadata {
         }
     }
 
-    private void appendStringField(StringBuilder stringBuilder, String fieldName, String fieldValue) throws IOException {
+    private void appendStringField(StringBuilder stringBuilder,
+                                   String fieldName, String fieldValue) throws IOException {
         if (StringUtils.isNotEmpty(fieldValue)) {
             stringBuilder.append(fieldName).append(": ");
             appendString(stringBuilder, fieldValue, "  ");
         }
     }
 
-    private void appendMapField(StringBuilder stringBuilder, String fieldName, Map<String, String> fieldMap) throws IOException {
+    private void appendMapField(StringBuilder stringBuilder,
+                                String fieldName, Map<String, String> fieldMap) throws IOException {
         if (MapUtils.isNotEmpty(fieldMap)) {
             stringBuilder.append(fieldName).append(": ");
             appendMap(stringBuilder, fieldMap);
@@ -118,7 +120,8 @@ public class Metadata {
         }
     }
 
-    private static void appendString(StringBuilder stringBuilder, String fieldValue, String spacing) throws IOException {
+    private static void appendString(StringBuilder stringBuilder,
+                                     String fieldValue, String spacing) throws IOException {
         List<String> lines = IOUtils.readLines(new StringReader(fieldValue));
         if (lines.size() > 1) {
             stringBuilder.append(System.lineSeparator());
