@@ -141,10 +141,12 @@ public class StepExecutionData extends AbstractExecutionData {
                     RUNNING_EXECUTION_PLAN_ID, refId, nextStepId);
             //CHECKSTYLE:ON
 
-            // set the start step of the given ref as the next step to execute (in the new running execution plan that will be set)
+            // set the start step of the given ref as the next step to execute
+            // (in the new running execution plan that will be set)
             runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
         } catch (RuntimeException e) {
-            logger.error("There was an error running the beginStep execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
+            logger.error("There was an error running the beginStep execution step of: \'" + nodeName +
+                    "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
         }
     }
@@ -208,8 +210,9 @@ public class StepExecutionData extends AbstractExecutionData {
                 }
             }
 
-            // if this is an endStep method from a branch then next execution step position should ne null (end the flow)
-            // and result should be the one from the executable (navigation is handled in join branches step)
+            // if this is an endStep method from a branch then next execution step position should ne null
+            // (end the flow) and result should be the one from the executable
+            // (navigation is handled in join branches step)
             Long nextPosition = null;
             String executableResult = executableReturnValues.getResult();
             String presetResult = executableResult;
@@ -244,8 +247,8 @@ public class StepExecutionData extends AbstractExecutionData {
             runEnv.getStack().pushContext(flowContext);
             runEnv.getExecutionPath().forward();
         } catch (RuntimeException e) {
-            logger.error("There was an error running the endStep execution step of: \'" + nodeName
-                    + "\'. Error is: " + e.getMessage());
+            logger.error("There was an error running the endStep execution step of: \'" + nodeName +
+                    "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);
         }
     }

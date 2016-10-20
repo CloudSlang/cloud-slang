@@ -53,6 +53,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.python.google.common.collect.Sets.newHashSet;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ScriptEvaluatorTest.Config.class)
@@ -89,14 +90,16 @@ public class ScriptEvaluatorTest {
         reset(pythonRuntimeService);
         when(pythonRuntimeService.eval(anyString(), anyString(), isA(Map.class)))
                 .thenReturn(new PythonEvaluationResult("result", new HashMap<String, Serializable>()));
-        scriptEvaluator.evalExpr("", new HashMap<String, Value>(), new HashSet<SystemProperty>(), new HashSet<ScriptFunction>());
+        scriptEvaluator.evalExpr("", new HashMap<String, Value>(),
+                new HashSet<SystemProperty>(), new HashSet<ScriptFunction>());
         verify(pythonRuntimeService).eval(eq(""), anyString(), anyMap());
     }
 
     @Test
     public void testEvalExprError() throws Exception {
         reset(pythonRuntimeService);
-        when(pythonRuntimeService.eval(anyString(), anyString(), anyMap())).thenThrow(new RuntimeException("error from interpreter"));
+        when(pythonRuntimeService.eval(anyString(), anyString(), anyMap()))
+                .thenThrow(new RuntimeException("error from interpreter"));
         exception.expect(RuntimeException.class);
         exception.expectMessage("input_expression");
         exception.expectMessage("error from interpreter");
@@ -110,7 +113,8 @@ public class ScriptEvaluatorTest {
         Set<SystemProperty> props = new HashSet<>();
         SystemProperty systemProperty = new SystemProperty("a.b", "c.key", "value");
         props.add(systemProperty);
-        Set<ScriptFunction> functionDependencies = Sets.newHashSet(ScriptFunction.GET, ScriptFunction.GET_SYSTEM_PROPERTY, ScriptFunction.CHECK_EMPTY);
+        Set<ScriptFunction> functionDependencies = newHashSet(ScriptFunction.GET,
+                ScriptFunction.GET_SYSTEM_PROPERTY, ScriptFunction.CHECK_EMPTY);
         final ArgumentCaptor<String> scriptCaptor = ArgumentCaptor.forClass(String.class);
 
         Map<String, Serializable> scriptReturnContext = new HashMap<>();
@@ -132,7 +136,7 @@ public class ScriptEvaluatorTest {
         String[] actualFunctionsArray = actualScript.split(LINE_SEPARATOR + LINE_SEPARATOR);
         Set<String> actualFunctions = new HashSet<>();
         Collections.addAll(actualFunctions, actualFunctionsArray);
-        Set<String> expectedFunctions = Sets.newHashSet(
+        Set<String> expectedFunctions = newHashSet(
                 GET_FUNCTION_DEFINITION,
                 GET_SP_FUNCTION_DEFINITION,
                 CHECK_EMPTY_FUNCTION_DEFINITION
