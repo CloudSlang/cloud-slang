@@ -434,7 +434,8 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testAggregateKeyThrowsException() throws Exception {
-        final URI flow = getClass().getResource("/corrupted/loops/parallel_loop/parallel_loop_aggregate_key.sl").toURI();
+        final URI flow = getClass()
+                .getResource("/corrupted/loops/parallel_loop/parallel_loop_aggregate_key.sl").toURI();
         final URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
         final URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
         Set<SlangSource> path = new HashSet<>();

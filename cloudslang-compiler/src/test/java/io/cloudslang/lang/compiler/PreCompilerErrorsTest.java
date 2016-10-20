@@ -49,7 +49,8 @@ public class PreCompilerErrorsTest {
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("Error transforming source: no_op_flow_file.sl to a Slang model." +
-                " Source no_op_flow_file.sl has no content associated with flow/operation/decision/properties property."
+                " Source no_op_flow_file.sl has no content associated with " +
+                "flow/operation/decision/properties property."
         );
         compiler.preCompileSource(SlangSource.fromFile(resource));
     }
@@ -91,7 +92,8 @@ public class PreCompilerErrorsTest {
     public void testOperationWithNullFileName() throws Exception {
         URI resource = getClass().getResource("/corrupted/wrong_name_operation.sl").toURI();
 
-        ExecutableModellingResult result = compiler.preCompileSource(new SlangSource(SlangSource.fromFile(resource).getContent(), null));
+        ExecutableModellingResult result =
+                compiler.preCompileSource(new SlangSource(SlangSource.fromFile(resource).getContent(), null));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("should be declared in a file named \"test_op\" " +
@@ -173,7 +175,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Inputs and outputs names should be different for \"io.cloudslang.base.json.same_input_and_output_name\". " +
+        exception.expectMessage("Inputs and outputs names should be different for " +
+                "\"io.cloudslang.base.json.same_input_and_output_name\". " +
                 "Please rename input/output \"json_path\"");
         throw result.getErrors().get(0);
     }

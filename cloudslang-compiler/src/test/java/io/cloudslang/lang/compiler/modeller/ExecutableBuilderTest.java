@@ -92,7 +92,8 @@ public class ExecutableBuilderTest {
         List<Result> results = new ArrayList<>();
         Map<String, Serializable> postExecutableActionData = new HashMap<>();
         postExecutableActionData.put(SlangTextualKeys.RESULTS_KEY, (Serializable) results);
-        Mockito.when(transformersHandler.runTransformers(anyMap(), anyList(), anyList(), anyString())).thenReturn(postExecutableActionData);
+        Mockito.when(transformersHandler.runTransformers(anyMap(), anyList(), anyList(), anyString()))
+                .thenReturn(postExecutableActionData);
 
         return parsedSlang;
     }
@@ -193,7 +194,8 @@ public class ExecutableBuilderTest {
     public void transformerThatCantCastTheDataThrowsException() throws Exception {
         String keyword = "a";
         Mockito.when(transformer.keyToTransform()).thenReturn(keyword);
-        Mockito.when(transformer.getScopes()).thenReturn(Collections.singletonList(Transformer.Scope.BEFORE_EXECUTABLE));
+        Mockito.when(transformer.getScopes())
+                .thenReturn(Collections.singletonList(Transformer.Scope.BEFORE_EXECUTABLE));
         Mockito.when(transformer.transform(any())).thenThrow(ClassCastException.class);
         final ParsedSlang mockParsedSlang = mockFlowSlangFile();
         Map<String, Object> executableRawData = new HashMap<>();
@@ -336,7 +338,8 @@ public class ExecutableBuilderTest {
     public void operationWithEmptyActionDataThrowException() throws Exception {
         String keyword = "a";
         Mockito.when(transformer.keyToTransform()).thenReturn(keyword);
-        Mockito.when(transformer.getScopes()).thenReturn(Collections.singletonList(Transformer.Scope.BEFORE_EXECUTABLE));
+        Mockito.when(transformer.getScopes())
+                .thenReturn(Collections.singletonList(Transformer.Scope.BEFORE_EXECUTABLE));
 
         final ParsedSlang mockParsedSlang = mockOperationsSlangFile();
         Map<String, Object> executableRawData = new HashMap<>();
@@ -351,7 +354,8 @@ public class ExecutableBuilderTest {
     }
 
     private Executable transformToExecutable(ParsedSlang mockParsedSlang, Map<String, Object> executableRawData) {
-        ExecutableModellingResult modellingResult = executableBuilder.transformToExecutable(mockParsedSlang, executableRawData);
+        ExecutableModellingResult modellingResult =
+                executableBuilder.transformToExecutable(mockParsedSlang, executableRawData);
         if (modellingResult.getErrors().size() > 0) {
             throw modellingResult.getErrors().get(0);
         }

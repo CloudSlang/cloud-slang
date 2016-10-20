@@ -102,7 +102,8 @@ public class InputsTransformerTest extends TransformersTestParent {
 
     @Test
     public void testDefaultValueInput() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
+        @SuppressWarnings("unchecked")
+        List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(2);
         Assert.assertEquals("input3", input.getName());
         Assert.assertEquals("value3", input.getValue().get());
@@ -110,7 +111,8 @@ public class InputsTransformerTest extends TransformersTestParent {
 
     @Test
     public void testInlineExprInput() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
+        @SuppressWarnings("unchecked")
+        List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(3);
         Assert.assertEquals("input4", input.getName());
         Assert.assertEquals("${ 'value4' if input3 == value3 else None }", input.getValue().get());
@@ -118,7 +120,8 @@ public class InputsTransformerTest extends TransformersTestParent {
 
     @Test
     public void testReqEncInput() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
+        @SuppressWarnings("unchecked")
+        List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(4);
         Assert.assertEquals("input5", input.getName());
         Assert.assertEquals(null, input.getValue().get());
@@ -128,7 +131,8 @@ public class InputsTransformerTest extends TransformersTestParent {
 
     @Test
     public void testDefaultExprReqInput() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
+        @SuppressWarnings("unchecked")
+        List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(5);
         Assert.assertEquals("input6", input.getName());
         Assert.assertEquals("${ 1 + 5 }", input.getValue().get());
@@ -138,7 +142,8 @@ public class InputsTransformerTest extends TransformersTestParent {
 
     @Test
     public void testInlineConstInput() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
+        @SuppressWarnings("unchecked")
+        List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(6);
         Assert.assertEquals("input7", input.getName());
         Assert.assertTrue("77".equals(input.getValue().get()));
@@ -148,7 +153,8 @@ public class InputsTransformerTest extends TransformersTestParent {
 
     @Test
     public void testDefaultExprRefInput() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
+        @SuppressWarnings("unchecked")
+        List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(7);
         Assert.assertEquals("input8", input.getName());
         Assert.assertEquals("${ input6 }", input.getValue().get());
@@ -158,7 +164,8 @@ public class InputsTransformerTest extends TransformersTestParent {
 
     @Test
     public void testOverrideInput() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
+        @SuppressWarnings("unchecked")
+        List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(8);
         Assert.assertEquals("input9", input.getName());
         Assert.assertEquals("${ input6 }", input.getValue().get());

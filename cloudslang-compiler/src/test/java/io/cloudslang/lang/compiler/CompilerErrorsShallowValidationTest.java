@@ -106,7 +106,8 @@ public class CompilerErrorsShallowValidationTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("Cannot compile flow 'io.cloudslang.test_inputs_no_default_not_in_step'. " +
                 "Step 'explicit_alias' does not declare all the mandatory inputs of its reference. " +
-                "The following inputs of 'user.ops.test_op' are not private, required and with no default value: alla.");
+                "The following inputs of 'user.ops.test_op' are not private, " +
+                "required and with no default value: alla.");
         List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         Assert.assertEquals(1, errors.size());
         throw errors.get(0);
