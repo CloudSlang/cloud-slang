@@ -30,8 +30,11 @@ import org.python.core.PyObject;
 public class AbstractBinding {
 
     protected void validateStringValue(String errorMessagePrefix, Value value) {
-        if (value != null && value.get() != null && !(value.get() instanceof String)) {
-            throw new RuntimeException(errorMessagePrefix + "' should have a String value.");
+        if (value != null && value.get() != null) {
+            Serializable val = value.get();
+            if (!(val instanceof String)) {
+                throw new RuntimeException(errorMessagePrefix + "' should have a String value, but got value '" + val + "' of type " + val.getClass().getSimpleName() + ".");
+            }
         }
     }
 
