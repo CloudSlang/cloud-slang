@@ -17,6 +17,7 @@ import io.cloudslang.lang.compiler.validator.matcher.ResultNamePatternMatcher;
 import io.cloudslang.lang.compiler.validator.matcher.SimpleNamePatternMatcher;
 import io.cloudslang.lang.compiler.validator.matcher.VariableNamePatternMatcher;
 import io.cloudslang.lang.entities.bindings.InOutParam;
+import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.constants.Regex;
@@ -66,6 +67,11 @@ public abstract class AbstractValidator {
 
     protected void validateListsHaveMutuallyExclusiveNames(List<? extends InOutParam> inOutParams, List<Output> outputs, String errorMessage) {
         for (InOutParam inOutParam : CollectionUtils.emptyIfNull(inOutParams)) {
+
+            if (inOutParam instanceof Input && ((Input) inOutParam).isPrivateInput()) {
+                continue;
+            }
+
             for (Output output : CollectionUtils.emptyIfNull(outputs)) {
                 if (StringUtils.equalsIgnoreCase(inOutParam.getName(), output.getName())) {
                     throw new IllegalArgumentException(errorMessage.replace(NAME_PLACEHOLDER, inOutParam.getName()));
