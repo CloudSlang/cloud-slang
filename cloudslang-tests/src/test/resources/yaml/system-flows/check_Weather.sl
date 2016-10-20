@@ -18,3 +18,4 @@ operation:
     - temperature: "30"
   results:
     - SUCCESS: ${ 1 == 1 }
+    - FAILURE

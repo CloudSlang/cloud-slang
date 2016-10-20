@@ -1,37 +1,56 @@
-package io.cloudslang.lang.compiler.modeller.transformers;
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
+package io.cloudslang.lang.compiler.modeller.transformers;
+
 
 
 /*
  * Created by orius123 on 05/11/14.
  */
 
+import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.Argument;
-import org.apache.commons.collections4.MapUtils;
-import org.springframework.stereotype.Component;
-
+import io.cloudslang.lang.entities.bindings.InOutParam;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public class DoTransformer extends InOutTransformer implements Transformer<Map<String, Object>, List<Argument>> {
 
+    @Autowired
+    private PreCompileValidator preCompileValidator;
+
     @Override
-    public List<Argument> transform(Map<String, Object> rawData) {
-        List<Argument> result = new ArrayList<>();
+    public TransformModellingResult<List<Argument>> transform(Map<String, Object> rawData) {
+        List<Argument> transformedData = new ArrayList<>();
+        List<RuntimeException> errors = new ArrayList<>();
         if (MapUtils.isEmpty(rawData)) {
-            return result;
+            return new BasicTransformModellingResult<>(transformedData, errors);
         } else if (rawData.size() > 1) {
-            throw new RuntimeException("Step has to many keys under the 'do' keyword,\n" +
-                    "May happen due to wrong indentation");
+            errors.add(
+                    new RuntimeException("Step has too many keys under the 'do' keyword,\n" +
+                            "May happen due to wrong indentation"
+                    )
+            );
+            return new BasicTransformModellingResult<>(transformedData, errors);
         }
         Map.Entry<String, Object> argumentsEntry = rawData.entrySet().iterator().next();
         Object rawArguments = argumentsEntry.getValue();
@@ -39,14 +58,23 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
             // list syntax
             List rawArgumentsList = (List) rawArguments;
             for (Object rawArgument : rawArgumentsList) {
-                Argument argument = transformListArgument(rawArgument);
-                result.add(argument);
+                try {
+                    Argument argument = transformListArgument(rawArgument);
+                    List<RuntimeException> validationErrors = preCompileValidator.validateNoDuplicateInOutParams(transformedData, argument);
+                    if (CollectionUtils.isEmpty(validationErrors)) {
+                        transformedData.add(argument);
+                    } else {
+                        errors.addAll(validationErrors);
+                    }
+                } catch (RuntimeException rex) {
+                    errors.add(rex);
+                }
             }
         } else if (rawArguments != null) {
-            throw new RuntimeException("Step arguments should be defined using a standard YAML list.");
+            errors.add(new RuntimeException("Step arguments should be defined using a standard YAML list."));
         }
 
-        return result;
+        return new BasicTransformModellingResult<>(transformedData, errors);
     }
 
     @Override
@@ -56,7 +84,12 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
 
     @Override
     public String keyToTransform() {
-        return null;
+        return SlangTextualKeys.DO_KEY;
+    }
+
+    @Override
+    public Class<? extends InOutParam> getTransformedObjectsClass() {
+        return Argument.class;
     }
 
     private Argument transformListArgument(Object rawArgument) {
@@ -70,14 +103,19 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
             Map.Entry<String, Serializable> entry = ((Map<String, Serializable>) rawArgument).entrySet().iterator().next();
             Serializable entryValue = entry.getValue();
             // - some_input: some_expression
-            Accumulator accumulator = extractFunctionData(entryValue);
-            return new Argument(
-                    entry.getKey(),
-                    entryValue,
-                    accumulator.getFunctionDependencies(),
-                    accumulator.getSystemPropertyDependencies()
-            );
+            return createArgument(entry, entryValue);
         }
         throw new RuntimeException("Could not transform step argument: " + rawArgument);
+    }
+
+    private Argument createArgument(Map.Entry<String, Serializable> entry, Serializable entryValue) {
+        preCompileValidator.validateStringValue(entry.getKey(), entryValue, this);
+        Accumulator accumulator = extractFunctionData(entryValue);
+        return new Argument(
+                entry.getKey(),
+                ValueFactory.create(entryValue),
+                accumulator.getFunctionDependencies(),
+                accumulator.getSystemPropertyDependencies()
+        );
     }
 }

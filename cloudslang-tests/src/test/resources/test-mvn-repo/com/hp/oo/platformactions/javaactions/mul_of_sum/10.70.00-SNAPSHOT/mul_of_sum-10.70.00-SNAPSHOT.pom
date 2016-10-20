@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.hp.oo.platformactions.javaactions</groupId>
+    <artifactId>mul_of_sum</artifactId>
+    <version>10.70.00-SNAPSHOT</version>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.hp.oo.platformactions.javaactions</groupId>
+            <artifactId>sum</artifactId>
+            <version>10.70.00-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hp.oo.platformactions.javaactions</groupId>
+            <artifactId>multiplier</artifactId>
+            <version>10.70.00-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hp.score.sdk</groupId>
+            <artifactId>score-content-sdk</artifactId>
+            <version>1.10.6</version>
+        </dependency>
+    </dependencies>
+</project>

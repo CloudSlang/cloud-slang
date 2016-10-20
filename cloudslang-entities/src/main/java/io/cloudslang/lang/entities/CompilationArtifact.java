@@ -1,22 +1,22 @@
-/*
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
  *
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
- */
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.entities;
 
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.score.api.ExecutionPlan;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /*
  * Created by orius123 on 10/11/14.
@@ -63,9 +63,13 @@ public class CompilationArtifact {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
 
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         CompilationArtifact that = (CompilationArtifact) o;
 

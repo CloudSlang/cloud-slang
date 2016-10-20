@@ -1,0 +1,63 @@
+#   (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+#   All rights reserved. This program and the accompanying materials
+#   are made available under the terms of the Apache License v2.0 which accompany this distribution.
+#
+#   The Apache License is available at
+#   http://www.apache.org/licenses/LICENSE-2.0
+
+namespace: user.versioning.flows
+
+imports:
+  ops: user.versioning.ops
+
+flow:
+  name: py_flow
+  inputs:
+    - var1:
+        required: true
+    - var2:
+        required: true
+  workflow:
+    - step_sum3:
+        do:
+          ops.py_dependency_sum3_op:
+            - var1
+            - var2
+        publish:
+          - result_sum3: ${version_sum3}
+        navigate:
+          - SUCCESS: step_sum5
+    - step_sum5:
+        do:
+          ops.py_dependency_sum5_op:
+            - var1
+            - var2
+        publish:
+          - result_sum5: ${version_sum5}
+        navigate:
+          - SUCCESS: step_mul3
+    - step_mul3:
+        do:
+          ops.py_dependency_mul3_op:
+            - var1
+            - var2
+        publish:
+          - result_mul3: ${version_mul3}
+        navigate:
+          - SUCCESS: step_mul5
+    - step_mul5:
+        do:
+          ops.py_dependency_mul5_op:
+            - var1
+            - var2
+        publish:
+          - result_mul5: ${version_mul5}
+        navigate:
+          - SUCCESS: SUCCESS
+  outputs:
+    - result_sum3
+    - result_sum5
+    - result_mul3
+    - result_mul5
+  results:
+    - SUCCESS

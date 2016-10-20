@@ -21,7 +21,7 @@ flow:
         private: true
 
     # helpers
-    - output_no_expression: output_no_expression_value
+    - output_no_expression_input: 'output_no_expression_value'
     - authorized_keys_path: './auth'
     - scp_host_port: '8888'
 
@@ -31,30 +31,31 @@ flow:
         required: false
     - input_system_property: ${get_sp('user.sys.props.host')}
     - input_private:
-        default: 25
+        default: '25'
         private: true
 
     # loaded by Yaml
-    - input_int: 22
+    - input_int: '22'
     - input_str_no_quotes: Hi
     - input_str_single: 'Hi'
     - input_str_double: "Hi"
-    - input_yaml_list: [1, 2, 3]
+    - input_yaml_list: '[1, 2, 3]'
     - input_properties_yaml_map_folded: {default: medium, required: false}
     - input_yaml_map:
-        default: {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
+        default: "{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}"
 
     # evalauted via Python
     - input_python_null:
         default: ${ None }
         required: false
-    - input_python_list: ${[1, 2, 3]}
-    - input_python_map: >
-        ${{
-        'key1': 'value1',
-        'key2': 'value2',
-        'key3': 'value3'
-        }}
+# uncomment when types will be supported
+#    - input_python_list: ${[1, 2, 3]}
+#    - input_python_map: >
+#        ${{
+#        'key1': 'value1',
+#        'key2': 'value2',
+#        'key3': 'value3'
+#        }}
     - b: b
     - b_copy: ${ b }
     - input_concat_1: ${'a' + b}
@@ -76,22 +77,22 @@ flow:
             - input_no_expression
 
             # loaded by Yaml
-            - input_int: 22
+            - input_int: '22'
             - input_str_no_quotes: Hi
             - input_str_single: 'Hi'
             - input_str_double: "Hi"
-            - input_yaml_list: [1, 2, 3]
-            - input_yaml_map_folded: {key1: medium, key2: false}
+            - input_yaml_list: '[1, 2, 3]'
+            - input_yaml_map_folded: "{key1: medium, key2: false}"
 
             # evalauted via Python
             - input_python_null: ${ None }
-            - input_python_list: ${[1, 2, 3]}
-            - input_python_map: >
-                ${{
-                'key1': 'value1',
-                'key2': 'value2',
-                'key3': 'value3'
-                }}
+#            - input_python_list: ${[1, 2, 3]}
+#            - input_python_map: >
+#                ${{
+#                'key1': 'value1',
+#                'key2': 'value2',
+#                'key3': 'value3'
+#                }}
             - b: b
             - b_copy: ${ b }
             - input_concat_1: ${'a' + b}
@@ -104,14 +105,14 @@ flow:
             - step_argument_null: null
         publish:
           - output_no_expression
-          - publish_int: 22
+          - publish_int: '22'
           - publish_str: publish_str_value
           - publish_expression: ${ publish_str + '_suffix' }
           - output_step_argument_null
 
   outputs:
     - output_no_expression
-    - output_int: 22
+    - output_int: '22'
     - output_str: output_str_value
     - output_expression: ${ output_str + '_suffix' }
     - output_step_argument_null

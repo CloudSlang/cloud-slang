@@ -1,23 +1,23 @@
-/**
- * ****************************************************************************
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
- * <p/>
+ *
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
- * *****************************************************************************
- */
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.entities;
 
+import io.cloudslang.lang.entities.bindings.values.SensitiveStringValue;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import java.io.Serializable;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-
-import java.io.Serializable;
 
 /**
  * @author Bonczidai Levente
@@ -27,9 +27,9 @@ public class SystemProperty implements Serializable {
 
     private final String namespace;
     private final String fullyQualifiedName;
-    private final String value;
+    private final Value value;
 
-    public SystemProperty(String namespace, String key, String value) {
+    private SystemProperty(String namespace, String key, Value value) {
         Validate.notNull(namespace, "System property namespace cannot be null");
         Validate.notEmpty(key, "System property key cannot be empty");
 
@@ -40,9 +40,21 @@ public class SystemProperty implements Serializable {
             fullyQualifiedName = key;
         }
 
+        if (value == null) {
+            value = ValueFactory.create(null);
+        }
+
         this.namespace = namespace;
         this.fullyQualifiedName = fullyQualifiedName;
         this.value = value;
+    }
+
+    public SystemProperty(String namespace, String key, SensitiveStringValue value) {
+        this(namespace, key, (Value) value);
+    }
+
+    public SystemProperty(String namespace, String key, String value) {
+        this(namespace, key, ValueFactory.create(value));
     }
 
     public SystemProperty(String key, String value) {
@@ -67,7 +79,7 @@ public class SystemProperty implements Serializable {
         return fullyQualifiedName;
     }
 
-    public String getValue() {
+    public Value getValue() {
         return value;
     }
 
@@ -82,9 +94,13 @@ public class SystemProperty implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
 
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         SystemProperty that = (SystemProperty) o;
 
@@ -103,5 +119,4 @@ public class SystemProperty implements Serializable {
                 .append(value)
                 .toHashCode();
     }
-
 }

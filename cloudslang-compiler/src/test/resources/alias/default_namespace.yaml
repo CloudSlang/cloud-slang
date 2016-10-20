@@ -13,4 +13,4 @@ flow:
     - step1:
         do:
           simple_op:
-            - cool_input: 25
+            - cool_input: '25'

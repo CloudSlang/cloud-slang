@@ -1,9 +1,18 @@
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.compiler;
+
+import java.util.Arrays;
 
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.Arrays;
 
 /**
  * User: bancl
@@ -19,14 +28,16 @@ public enum Extension {
 
     private final String value;
     private static final String[] extensionValues = new String[values().length];
+
     static {
         initExtensionValues();
     }
 
     private static void initExtensionValues() {
         Extension[] extensions = values();
-        for(int i = 0; i < extensions.length; i++)
+        for (int i = 0; i < extensions.length; i++) {
             extensionValues[i] = extensions[i].getValue();
+        }
     }
 
     Extension(String value) {
@@ -75,9 +86,11 @@ public enum Extension {
                                               Extension[] extensions, String[] extensionValues) {
         boolean validFileExtension = false;
         for (Extension extension : extensions) {
-            if (extension.equals(fileExtension)) validFileExtension = true;
+            if (extension.equals(fileExtension)) {
+                validFileExtension = true;
+            }
         }
-        String extensionsAsString =  Arrays.toString(extensionValues);
+        String extensionsAsString = Arrays.toString(extensionValues);
         Validate.isTrue(validFileExtension,
                 "File: " + fileName + " must have one of the following extensions: " +
                         extensionsAsString.substring(1, extensionsAsString.length() - 1) + "."
@@ -86,7 +99,9 @@ public enum Extension {
 
     public static String removeExtension(String fileName) {
         Extension extension = findExtension(fileName);
-        if (extension != null) return StringUtils.removeEnd(fileName, "." + extension.getValue());
+        if (extension != null) {
+            return StringUtils.removeEnd(fileName, "." + extension.getValue());
+        }
         return fileName;
     }
 

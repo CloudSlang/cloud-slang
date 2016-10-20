@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    	<!--
-        (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-        All rights reserved. This program and the accompanying materials
-        are made available under the terms of the Apache License v2.0 which accompany this distribution.
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!--
+    (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Apache License v2.0 which accompany this distribution.
 
-        The Apache License is available at
-        http://www.apache.org/licenses/LICENSE-2.0
-    -->
+    The Apache License is available at
+    http://www.apache.org/licenses/LICENSE-2.0
+-->
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.9.58-SNAPSHOT</version>
+        <version>1.0.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -22,6 +23,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cloudslang-entities</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cloudslang-spi</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -38,11 +45,16 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-		</dependency>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
 
         <dependency>
@@ -53,6 +65,41 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${score.group}</groupId>
+            <artifactId>runtime-management-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${score.group}</groupId>
+            <artifactId>runtime-management-impl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${score.group}</groupId>
+            <artifactId>dependency-management-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${score.group}</groupId>
+            <artifactId>dependency-management-impl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
         </dependency>
 
         <!-- For tests -->
@@ -66,10 +113,52 @@
             <artifactId>spring-test</artifactId>
         </dependency>
 
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+        </dependency>
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${plugins.maven-dependency-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>analyze dependencies</id>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <configuration>
+                            <failOnWarning>true</failOnWarning>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <configuration>
+                    <header>${project.parent.basedir}/license.template</header>
+                    <headerDefinitions>
+                        <headerDefinition>${project.parent.basedir}/header-definitions.xml</headerDefinition>
+                    </headerDefinitions>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <configLocation>${project.parent.basedir}/google-checkstyle-rules.xml</configLocation>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
 </project>

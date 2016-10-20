@@ -1,5 +1,5 @@
 /*******************************************************************************
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
  *
@@ -7,11 +7,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-
 package io.cloudslang.lang.compiler.modeller.transformers;
 
 import com.google.common.collect.Sets;
+
 import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,10 +22,10 @@ import org.junit.rules.ExpectedException;
  * @author Bonczidai Levente
  * @since 5/5/2016
  */
-public class AbstractTransformerTest {
+public class AbstractTransformerTest extends TransformersTestParent {
 
     @Rule
-    public ExpectedException exception = ExpectedException.none();;
+    public ExpectedException exception = ExpectedException.none();
     private AbstractTransformer abstractTransformer;
     private Set<String> mandatoryKeys;
     private Set<String> optionalKeys;
@@ -34,8 +35,9 @@ public class AbstractTransformerTest {
     private String invalidKey1;
 
     @Before
-    public void setUp(){
-        abstractTransformer = new AbstractTransformer() {};
+    public void setUp() {
+        abstractTransformer = new AbstractTransformer() {
+        };
         mandatoryKey1 = "mandatory1";
         mandatoryKey2 = "mandatory2";
         optionalKey1 = "optional1";

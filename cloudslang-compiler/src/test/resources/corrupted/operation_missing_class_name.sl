@@ -10,4 +10,5 @@ namespace: user.ops
 operation:
   name: operation_missing_class_name
   java_action:
+    gav: 'some:gove:here'
     method_name: someMethod

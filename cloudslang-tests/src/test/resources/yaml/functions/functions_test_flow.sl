@@ -14,15 +14,15 @@ flow:
   name: functions_test_flow
   inputs:
     - input1:
-        default: null
+        default: "value1"
         private: true
         required: false
     - input1_safe:
-        default: ${ get('input1', 'input1_default') }
+        default: ${ get('input1_does_not_exist', 'input1_default') }
         private: true
         required: false
     - input2:
-        default: 22
+        default: '22'
         private: true
     - input2_safe:
         default: ${ get('input2', 'input2_default') }
@@ -48,7 +48,7 @@ flow:
     - input_9: ${get(    'i_don_exist',        get_sp('a.b.c.host')       )}
     - input_10: ${get_sp('a.b.c.i_don_exist', get_sp('a.b.c.host'))}
     - input_11: ${get_sp('a.b.c.null_value', 'default_str')}
-    - value_propagate: ${ get_sp('propagate.flow.input') }
+    - value_propagate_input: ${ get_sp('propagate.flow.input') }
     - input_12: ${get_sp('chars-b.c-hyphen')}
     - input_13: ${get_sp('chars-b.c-hyphen', 'default_str')}
     - input_14: ${get_sp("a.b.c.host")}
@@ -72,7 +72,7 @@ flow:
             - input_9: ${get(    'i_don_exist',        get_sp('a.b.c.host')       )}
             - input_10: ${get_sp('a.b.c.i_don_exist', get_sp('a.b.c.host'))}
             - input_11: ${get_sp('a.b.c.null_value', 'default_str')}
-            - value_propagate: ${ value_propagate + get_sp('propagate.step.argument') }
+            - value_propagate_input: ${ value_propagate_input + get_sp('propagate.step.argument') }
             - input_12: ${get_sp('chars-b.c-hyphen')}
             - input_13: ${get_sp('chars-b.c-hyphen', 'default_str')}
             - input_14: ${get_sp("a.b.c.host")}

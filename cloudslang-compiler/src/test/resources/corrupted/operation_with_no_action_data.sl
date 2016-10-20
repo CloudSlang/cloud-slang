@@ -8,4 +8,4 @@ namespace: io.cloudslang
 
 operation:
   name: operation_with_no_action_data
-  action:
+  python_action:

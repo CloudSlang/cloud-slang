@@ -1,5 +1,5 @@
 /*******************************************************************************
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
  *
@@ -9,7 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities.bindings;
 
-import java.io.Serializable;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import java.util.Set;
 
 /**
@@ -20,14 +20,14 @@ public class Argument extends InOutParam {
 
     private boolean privateArgument;
 
-    public Argument(String name, Serializable value) {
+    public Argument(String name, Value value) {
         super(name, value);
         privateArgument = true;
     }
 
     public Argument(
             String name,
-            Serializable value,
+            Value value,
             Set<ScriptFunction> scriptFunctions,
             Set<String> systemPropertyDependencies) {
         super(name, value, scriptFunctions, systemPropertyDependencies);

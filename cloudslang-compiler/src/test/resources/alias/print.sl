@@ -10,6 +10,9 @@ namespace: a.b.c.d
 operation:
   name: print
   inputs:
-    - cool_input: 1992
+    - cool_input: '1992'
   python_action:
     script: 'print "hello world"'
+  results:
+    - SUCCESS: ${1==1}
+    - FAILURE

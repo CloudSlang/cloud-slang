@@ -1,5 +1,5 @@
 /*******************************************************************************
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
  *
@@ -9,11 +9,12 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.env;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import java.io.Serializable;
 import java.util.Iterator;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class ForLoopCondition implements LoopCondition {
 
@@ -32,8 +33,9 @@ public class ForLoopCondition implements LoopCondition {
         return iterator;
     }
 
-    public Serializable next() {
-        Serializable next = loopToCurrentObject().next();
+    public Value next() {
+        Serializable serializable = loopToCurrentObject().next();
+        Value next = serializable instanceof Value ? (Value) serializable : ValueFactory.create(serializable);
         index++;
         return next;
     }
@@ -45,10 +47,12 @@ public class ForLoopCondition implements LoopCondition {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
 
         ForLoopCondition that = (ForLoopCondition) o;
 

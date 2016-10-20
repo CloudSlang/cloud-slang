@@ -1,15 +1,22 @@
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.model;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * User: bancl

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
  *
@@ -9,15 +9,14 @@
  *******************************************************************************/
 package io.cloudslang.lang.cli.converters;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.shell.core.Completion;
 import org.springframework.shell.core.Converter;
 import org.springframework.shell.core.MethodTarget;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Date: 11/11/2014

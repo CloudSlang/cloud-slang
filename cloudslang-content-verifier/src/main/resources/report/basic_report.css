@@ -1,0 +1,78 @@
+.table {
+    border: 1px solid #C0C0C0;
+    border-collapse: collapse;
+    padding: 5px;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.table th {
+    border: 1px solid #C0C0C0;
+    padding: 5px;
+    background: #0BA04A;
+    color: white;
+}
+
+.table td {
+    border: 1px solid #C0C0C0;
+    padding: 5px;
+    text-overflow: ellipsis;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.status {
+    width: 100px;
+}
+
+.test-suite {
+    width: 150px;
+}
+
+.hidden {
+    display: none;
+    visibility: hidden;
+}
+
+tr:nth-child(even) {
+    background: #F2F2F2
+}
+
+tr:nth-child(odd) {
+    background: #FFFFFF
+}
+
+#piechart {
+    width: 700px;
+    height: 300px;
+    float: left;
+}
+
+.test-summary {
+    height: 300px;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: left;
+}
+
+.summary {
+    height: 300px;
+    display: table;
+}
+
+#header-bar {
+    width: 100%;
+}
+
+.report-title {
+    text-align: center;
+}
+
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+h1, h2 {
+    font-family: HPFutura, Helvetica, Arial, sans-serif;
+}

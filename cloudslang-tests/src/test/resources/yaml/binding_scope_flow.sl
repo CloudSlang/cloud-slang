@@ -18,7 +18,11 @@ flow:
           ops.binding_scope_op:
             - op_input_1: "op_input_1_step"
             - step_arg_1: "step_arg_1_value"
-            - op_output_2: "op_output_2_step"
+            - op_output_2_step: "op_output_2_step"
         publish:
           - step1_publish_1: ${ op_output_1 + ' ' + op_input_1 + ' ' + step_arg_1 }
           - step1_publish_2_conflict: ${ op_output_2 }
+        navigate:
+          - SUCCESS: SUCCESS
+  results:
+    - SUCCESS

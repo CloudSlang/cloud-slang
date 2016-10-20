@@ -1,5 +1,5 @@
 /*******************************************************************************
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
  *
@@ -14,13 +14,14 @@ import com.google.common.collect.Lists;
 import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static ch.lambdaj.Lambda.*;
+import static ch.lambdaj.Lambda.by;
+import static ch.lambdaj.Lambda.group;
+import static ch.lambdaj.Lambda.on;
 
 /**
  * Date: 4/8/2015
@@ -55,7 +56,7 @@ public class BranchAggregatorListener extends AbstractAggregatorListener {
                             path,
                             stepName,
                             new HashMap<String, Serializable>(),
-                            returnValues.getOutputs(),
+                            LanguageEventData.maskSensitiveValues(returnValues.getOutputs()),
                             null, returnValues.getResult()
                     )
             );

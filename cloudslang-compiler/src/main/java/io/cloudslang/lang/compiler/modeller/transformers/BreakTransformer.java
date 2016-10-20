@@ -1,5 +1,5 @@
 /*******************************************************************************
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
  *
@@ -9,27 +9,44 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.List;
-
 @Component
-public class BreakTransformer implements Transformer<List<String>, List<String>>{
+public class BreakTransformer implements Transformer<List<String>, List<String>> {
+
+    @Autowired
+    private ExecutableValidator executableValidator;
 
     @Override
-    public List<String> transform(List<String> rawData) {
+    public TransformModellingResult<List<String>> transform(List<String> rawData) {
+        List<String> transformedData = new ArrayList<>();
+        List<RuntimeException> errors = new ArrayList<>();
+
         if (rawData == null) {
-            return Arrays.asList(ScoreLangConstants.FAILURE_RESULT);
+            transformedData.add(ScoreLangConstants.FAILURE_RESULT);
+        } else {
+            try {
+                executableValidator.validateBreakKeys(rawData);
+                transformedData = rawData;
+            } catch (RuntimeException rex) {
+                errors.add(rex);
+            }
         }
 
-        return rawData;
+        return new BasicTransformModellingResult<>(transformedData, errors);
     }
 
     @Override
     public List<Scope> getScopes() {
-        return Arrays.asList(Scope.AFTER_STEP);
+        return Collections.singletonList(Scope.AFTER_STEP);
     }
 
     @Override

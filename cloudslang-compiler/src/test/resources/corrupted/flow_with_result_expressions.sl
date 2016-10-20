@@ -17,7 +17,7 @@ flow:
     - host
     - port: '22'
   workflow:
-    - CheckWeather:
+    - CheckWeather1:
         do:
           ops.test_op:
             - city: 'input_1'
@@ -26,6 +26,16 @@ flow:
           - weather
         navigate:
           - SUCCESS: SUCCESS
+          - FAILURE: CheckWeather2
+    - CheckWeather2:
+        do:
+          ops.test_op:
+            - city: 'input_1'
+            - port
+        publish:
+          - weather
+        navigate:
+          - SUCCESS: CUSTOM
           - FAILURE: FAILURE
   results:
     - SUCCESS: ${ 1 == 1 }

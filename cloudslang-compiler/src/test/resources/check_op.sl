@@ -14,3 +14,6 @@ operation:
         ${get_sp('user.sys.props.alla')}
   python_action:
     script: 'print "hello world"'
+  results:
+    - SUCCESS: ${ 1 == 1}
+    - FAILURE

@@ -1,15 +1,40 @@
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.entities;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
-import io.cloudslang.lang.entities.bindings.*;
-import org.junit.Before;
-import org.junit.Test;
+import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 
 import java.io.IOException;
+import java.util.HashSet;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = DeserializeTest.Config.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class DeserializeTest {
 
     private ObjectMapper mapper;
@@ -28,8 +53,7 @@ public class DeserializeTest {
 
     @Test
     public void testDeserializeInput() throws IOException {
-        Input input = new Input.InputBuilder("new_input", "some_expression")
-                .withEncrypted(true)
+        Input input = new Input.InputBuilder("new_input", "some_expression", true)
                 .withRequired(true)
                 .withPrivateInput(true)
                 .withFunctionDependencies(Sets.newHashSet(ScriptFunction.GET))
@@ -42,7 +66,7 @@ public class DeserializeTest {
     public void testDeserializeArgument() throws IOException {
         Argument argument = new Argument(
                 "new_argument",
-                "some_expression"
+                ValueFactory.create("some_expression")
         );
         testToAndFromJson(argument, Argument.class);
     }
@@ -51,7 +75,7 @@ public class DeserializeTest {
     public void testDeserializeOutput() throws IOException {
         Output output = new Output(
                 "new_output",
-                "some_expression");
+                ValueFactory.create("some_expression"));
         testToAndFromJson(output, Output.class);
     }
 
@@ -59,7 +83,7 @@ public class DeserializeTest {
     public void testDeserializeResult() throws IOException {
         Result result = new Result(
                 "new_result",
-                "some_expression");
+                ValueFactory.create("some_expression"));
         testToAndFromJson(result, Result.class);
     }
 
@@ -73,20 +97,20 @@ public class DeserializeTest {
 
     @Test
     public void testDeserializeListForLoopStatement() throws IOException {
-        LoopStatement listForLoopStatement = new ListForLoopStatement("varName", "expression");
-        testToAndFromJson(listForLoopStatement, ListForLoopStatement.class);
+        LoopStatement listForLoopStatement = new ListLoopStatement("varName", "expression", new HashSet<ScriptFunction>(), new HashSet<String>(), false);
+        testToAndFromJson(listForLoopStatement, ListLoopStatement.class);
     }
 
     @Test
     public void testDeserializeMapForLoopStatement() throws IOException {
-        MapForLoopStatement mapForLoopStatement = new MapForLoopStatement("keyName", "valueName", "expression");
-        testToAndFromJson(mapForLoopStatement, MapForLoopStatement.class);
+        MapLoopStatement mapLoopStatement = new MapLoopStatement("keyName", "valueName", "expression", new HashSet<ScriptFunction>(), new HashSet<String>());
+        testToAndFromJson(mapLoopStatement, MapLoopStatement.class);
     }
 
     @Test
-    public void testDeserializeAsyncLoopStatement() throws IOException {
-        AsyncLoopStatement asyncLoopStatement = new AsyncLoopStatement("varName", "expression");
-        testToAndFromJson(asyncLoopStatement, AsyncLoopStatement.class);
+    public void testDeserializeParallelLoopStatement() throws IOException {
+        ListLoopStatement parallelLoopStatement = new ListLoopStatement("varName", "expression", new HashSet<ScriptFunction>(), new HashSet<String>(), true);
+        testToAndFromJson(parallelLoopStatement, ListLoopStatement.class);
     }
 
     @Test
@@ -95,4 +119,8 @@ public class DeserializeTest {
         testToAndFromJson(systemProperty, SystemProperty.class);
     }
 
+    @Configuration
+    @ComponentScan("io.cloudslang.lang.entities")
+    static class Config {
+    }
 }

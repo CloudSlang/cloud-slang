@@ -20,8 +20,13 @@ flow:
         do:
           ops.get_time_zone:
             - time_zone_as_string
+        navigate:
+          - SUCCESS: step02
+          - NEGATIVE: FAILURE
     - step02:
         do:
           ops.test_op:
+        navigate:
+          - SUCCESS: SUCCESS
   outputs:
     - val_output: ${ input1 }

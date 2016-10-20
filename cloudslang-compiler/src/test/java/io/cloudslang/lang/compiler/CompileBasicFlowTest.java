@@ -1,43 +1,47 @@
-/*
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
  *
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
- */
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.compiler;
 
+import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
-import java.util.HashMap;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
-import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
-import io.cloudslang.lang.entities.ResultNavigation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /*
  * Created by orius123 on 05/11/14.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CompileBasicFlowTest {
 
     @Autowired
@@ -127,21 +131,6 @@ public class CompileBasicFlowTest {
         Assert.assertEquals("There is a different number of flow dependencies than expected", 1, dependencies.size());
         String dependency = dependencies.iterator().next();
         Assert.assertEquals("The flow dependency full name is wrong", "user.ops.test_op", dependency);
-    }
-
-    @Test
-    public void testValidateSlangModelWithDependenciesBasic() throws Exception {
-        URI flowUri = getClass().getResource("/basic_flow.yaml").toURI();
-        Executable flow = compiler.preCompile(SlangSource.fromFile(flowUri));
-
-        URI operationUri = getClass().getResource("/test_op.sl").toURI();
-        Executable op = compiler.preCompile(SlangSource.fromFile(operationUri));
-
-        Set<Executable> dependencies = new HashSet();
-        dependencies.add(op);
-        List<RuntimeException> errors = compiler.validateSlangModelWithDependencies(flow, dependencies);
-
-        Assert.assertEquals("", 0, errors.size());
     }
 
     @Test

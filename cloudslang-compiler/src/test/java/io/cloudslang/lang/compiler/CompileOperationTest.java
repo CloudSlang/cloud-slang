@@ -1,36 +1,40 @@
-/*
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
  *
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
- */
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.compiler;
 
+import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.score.api.ExecutionPlan;
+import io.cloudslang.score.api.ExecutionStep;
+
+import java.net.URL;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import io.cloudslang.score.api.ExecutionPlan;
-import io.cloudslang.score.api.ExecutionStep;
-import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
-import io.cloudslang.lang.entities.bindings.Input;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.net.URL;
-import java.util.List;
 
 /*
  * Created by orius123 on 05/11/14.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CompileOperationTest {
 
     @Rule
@@ -82,7 +86,7 @@ public class CompileOperationTest {
         Assert.assertEquals("Operation namespace is wrong", "user.ops", operation.getNamespace());
         Assert.assertEquals("There is a different number of operation inputs than expected", 1, operation.getInputs().size());
         Assert.assertEquals("There is a different number of operation outputs than expected", 2, operation.getOutputs().size());
-        Assert.assertEquals("There is a different number of operation results than expected", 1, operation.getResults().size());
+        Assert.assertEquals("There is a different number of operation results than expected", 2, operation.getResults().size());
         Assert.assertEquals("There is a different number of operation dependencies than expected", 0, operation.getExecutableDependencies().size());
     }
 
@@ -90,7 +94,8 @@ public class CompileOperationTest {
     public void testCompileOperationMissingClassName() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_missing_class_name.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage(SlangTextualKeys.JAVA_ACTION_CLASS_NAME_KEY);
+        exception.expectMessage("Action syntax is illegal.\n" +
+                "Following tags are missing: [" + SlangTextualKeys.JAVA_ACTION_CLASS_NAME_KEY);
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 
@@ -98,7 +103,8 @@ public class CompileOperationTest {
     public void testCompileOperationMissingMethodName() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_missing_method_name.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage(SlangTextualKeys.JAVA_ACTION_METHOD_NAME_KEY);
+        exception.expectMessage("Action syntax is illegal.\n" +
+                "Following tags are missing: [" + SlangTextualKeys.JAVA_ACTION_METHOD_NAME_KEY);
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 
@@ -106,7 +112,8 @@ public class CompileOperationTest {
     public void testCompileOperationInvalidActionProperty() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_invalid_action_property.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("IDontBelongHere");
+        exception.expectMessage("Action syntax is illegal.\n" +
+                "Following tags are invalid: [IDontBelongHere]. Please take a look at the supported features per versions link");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 
@@ -114,7 +121,7 @@ public class CompileOperationTest {
     public void testCompileOperationMultipleActionTypes() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_action_multiple_types.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Conflicting keys");
+        exception.expectMessage("Conflicting keys[java_action, python_action] at: operation_action_multiple_types");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 
@@ -122,8 +129,8 @@ public class CompileOperationTest {
     public void testCompileOperationMissingActionProperties() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_missing_action_properties.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("operation_missing_action_properties");
-        exception.expectMessage("no action data");
+        exception.expectMessage("Error compiling operation_missing_action_properties.sl. " +
+                "Operation: operation_missing_action_properties has no action data");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 
@@ -131,8 +138,8 @@ public class CompileOperationTest {
     public void testCompileOperationMissingPythonScript() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_missing_python_script.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("operation_missing_python_script");
-        exception.expectMessage("no action data");
+        exception.expectMessage("Error compiling operation_missing_python_script.sl. " +
+                "Operation: operation_missing_python_script has no action data");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 
@@ -140,7 +147,7 @@ public class CompileOperationTest {
     public void testCompileOperationWithMissingNamespace() throws Exception {
         URL resource = getClass().getResource("/corrupted/op_without_namespace.sl");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("namespace");
+        exception.expectMessage("For source[op_without_namespace.sl] namespace cannot be empty.");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 }

@@ -13,7 +13,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>0.9.58-SNAPSHOT</version>
+        <version>1.0.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -22,7 +22,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>cloudslang-all</artifactId>
+            <artifactId>cloudslang-api-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -30,6 +30,26 @@
             <groupId>${score.group}</groupId>
             <artifactId>score-all</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${score.group}</groupId>
+            <artifactId>runtime-management-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${score.group}</groupId>
+            <artifactId>runtime-management-impl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${score.group}</groupId>
+            <artifactId>dependency-management-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${score.group}</groupId>
+            <artifactId>dependency-management-impl</artifactId>
         </dependency>
 
         <dependency>
@@ -52,5 +72,64 @@
             <artifactId>spring-test</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>test-compile</phase>
+                        <configuration>
+                            <tasks>
+                                <unzip src="${project.build.testOutputDirectory}/dependencies-base.zip" dest="${project.build.testOutputDirectory}/test-mvn-repo" />
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${plugins.maven-dependency-plugin.version.old}</version>
+                <executions>
+                    <execution>
+                        <id>analyze dependencies</id>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <configuration>
+                            <failOnWarning>false</failOnWarning>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <configuration>
+                    <header>${project.parent.basedir}/license.template</header>
+                    <headerDefinitions>
+                        <headerDefinition>${project.parent.basedir}/header-definitions.xml</headerDefinition>
+                    </headerDefinitions>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <configLocation>${project.parent.basedir}/google-checkstyle-rules.xml</configLocation>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
 
 </project>

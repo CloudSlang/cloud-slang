@@ -1,30 +1,35 @@
-/**
- * ****************************************************************************
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
- * <p/>
+ *
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
- * *****************************************************************************
- */
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.systemtests.flows;
 
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.systemtests.RuntimeInformation;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.ValueSyntaxParent;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Bonczidai Levente
@@ -56,7 +61,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
 
-        Map<String, Serializable> userInputs = prepareUserInputs();
+        Map<String, Value> userInputs = prepareUserInputs();
         Set<SystemProperty> systemProperties = prepareSystemProperties();
 
         // trigger ExecutionPlan
@@ -86,7 +91,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
 
         // trigger ExecutionPlan
-        Map<String, Serializable> userInputs = new HashMap<>();
+        Map<String, Value> userInputs = new HashMap<>();
         RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, EMPTY_SET);
         Map<String, StepData> executionData = runtimeInformation.getSteps();
 
@@ -109,7 +114,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedArguments.put("input_9", "localhost");
         expectedArguments.put("input_10", "localhost");
         expectedArguments.put("input_11", "default_str");
-        expectedArguments.put("value_propagate", "flowInput_stepArg_");
+        expectedArguments.put("value_propagate_input", "flowInput_stepArg_");
         expectedArguments.put("input_12", "hyphen_value");
         expectedArguments.put("input_13", "hyphen_value");
         expectedArguments.put("input_14", "localhost");
@@ -123,11 +128,11 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
     private void verifyFlowInputs(StepData flowData) {
         // verify `get`, `get_sp()`, `locals().get()` and mixed mode works
         Map<String, Serializable> expectedFlowInputs = new LinkedHashMap<>();
-        expectedFlowInputs.put("input1", null);
+        expectedFlowInputs.put("input1", "value1");
         expectedFlowInputs.put("input1_safe", "input1_default");
-        expectedFlowInputs.put("input2", 22);
-        expectedFlowInputs.put("input2_safe", 22);
-        expectedFlowInputs.put("input_locals_found", 22);
+        expectedFlowInputs.put("input2", "22");
+        expectedFlowInputs.put("input2_safe", "22");
+        expectedFlowInputs.put("input_locals_found", "22");
         expectedFlowInputs.put("input_locals_not_found", "input_locals_not_found_default");
         expectedFlowInputs.put("exist", "exist_value");
         expectedFlowInputs.put("input_3", null);
@@ -139,7 +144,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedFlowInputs.put("input_9", "localhost");
         expectedFlowInputs.put("input_10", "localhost");
         expectedFlowInputs.put("input_11", "default_str");
-        expectedFlowInputs.put("value_propagate", "flowInput_");
+        expectedFlowInputs.put("value_propagate_input", "flowInput_");
         expectedFlowInputs.put("input_12", "hyphen_value");
         expectedFlowInputs.put("input_13", "hyphen_value");
         expectedFlowInputs.put("input_14", "localhost");
@@ -188,7 +193,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         return Sets.newHashSet(
                 new SystemProperty("a.b", "c.host", "localhost"),
                 new SystemProperty("cloudslang", "lang.key", "language"),
-                new SystemProperty("", "a.b.c.null_value", null),
+                new SystemProperty("", "a.b.c.null_value", (String) null),
                 new SystemProperty("propagate", "flow.input", "flowInput_"),
                 new SystemProperty("propagate", "step.argument", "stepArg_"),
                 new SystemProperty("propagate", "op.input", "opInput_"),
@@ -199,9 +204,9 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         );
     }
 
-    private Map<String, Serializable> prepareUserInputs() {
-        Map<String, Serializable> userInputs = new HashMap<>();
-        userInputs.put("exist", "exist_value");
+    private Map<String, Value> prepareUserInputs() {
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("exist", ValueFactory.create("exist_value"));
         return userInputs;
     }
 
@@ -228,13 +233,13 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
                 "op.input.prop5",
                 "op.output.prop1",
                 "op.result.prop1",
-                "async.aggregate.prop1",
-                "async.aggregate.prop2",
+                "parallel_loop.publish.prop1",
+                "parallel_loop.publish.prop2",
                 "for.input.prop1",
                 "for.input.prop2",
                 "for.publish.prop1",
                 "for.publish.prop2"
-                );
+        );
     }
-    
+
 }

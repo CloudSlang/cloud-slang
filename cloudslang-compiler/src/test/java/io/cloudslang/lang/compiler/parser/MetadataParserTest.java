@@ -1,7 +1,20 @@
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.compiler.parser;
 
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+
+import java.net.URI;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -10,9 +23,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.net.URI;
-import java.util.Map;
 
 /**
  * User: bancl
@@ -42,7 +52,9 @@ public class MetadataParserTest {
         Map<String, String> metadataMap = metadataParser.parse(SlangSource.fromFile(operation));
         boolean containsNulls = false;
         for (Map.Entry<String, String> entry : metadataMap.entrySet()) {
-            if (entry.getValue() == null) containsNulls = true;
+            if (entry.getValue() == null) {
+                containsNulls = true;
+            }
         }
         Assert.assertFalse("metadata map contains nulls", containsNulls);
     }

@@ -17,3 +17,5 @@ flow:
           ops.java_op:
         navigate:
           - SUCCESS: SUCCESS
+  results:
+    - SUCCESS

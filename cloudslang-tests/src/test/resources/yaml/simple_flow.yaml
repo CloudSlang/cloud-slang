@@ -17,7 +17,7 @@ flow:
     - time_zone_as_string:
         required: false
     - host: ${get_sp('user.sys.props.host')}
-    - port: 22
+    - port: '22'
   workflow:
     - Step1:
         do:

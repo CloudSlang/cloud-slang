@@ -1,0 +1,47 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+    <localRepository>${cloudslang.maven.repo.local}</localRepository>
+    <mirrors>
+        <mirror>
+            <id>io-cloudslang-mirror</id>
+            <mirrorOf>external:*,!io-cloudslang-repository-snapshots,!io-cloudslang-maven-plugins-repository</mirrorOf>
+            <url>${cloudslang.maven.repo.remote.url}</url>
+        </mirror>
+    </mirrors>
+
+    <profiles>
+        <profile>
+            <id>default-settings</id>
+            <properties>
+                <maven.dev.monitoring.enableMonitoring>false</maven.dev.monitoring.enableMonitoring>
+            </properties>
+
+            <repositories>
+                <repository>
+                    <id>io-cloudslang-repository-snapshots</id>
+                    <url>${cloudslang.maven.repo.remote.url}</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>io-cloudslang-maven-plugins-repository</id>
+                    <url>${cloudslang.maven.plugins.remote.url}</url>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+
+        </profile>
+    </profiles>
+    <activeProfiles>
+        <activeProfile>default-settings</activeProfile>
+    </activeProfiles>
+
+</settings>

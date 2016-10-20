@@ -35,3 +35,5 @@ flow:
               ops.test_op:
                 - alla: 'on_failure 1'
 
+  results:
+    - SUCCESS

@@ -1,13 +1,15 @@
-/*
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
  *
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
- */
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.api;
 
+import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.MetadataExtractor;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
@@ -16,6 +18,7 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.Score;
@@ -24,28 +27,31 @@ import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.python.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.Matchers.anySetOf;
+import static org.mockito.Matchers.eq;
 
 /**
  * User: stoneo
@@ -54,6 +60,7 @@ import static org.mockito.Matchers.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangImplTest.Config.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class SlangImplTest {
 
     static final CompilationArtifact emptyCompilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>(), new HashSet<String>());
@@ -75,7 +82,7 @@ public class SlangImplTest {
     private EventBus eventBus;
 
     @Before
-    public void init(){
+    public void init() {
         Mockito.reset(score, compiler);
     }
 
@@ -89,7 +96,7 @@ public class SlangImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testExtractMetadataNoFilePath(){
+    public void testExtractMetadataNoFilePath() {
         slang.extractMetadata(null);
     }
 
@@ -103,13 +110,13 @@ public class SlangImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCompileWithNoFilePath(){
+    public void testCompileWithNoFilePath() {
         slang.compile(null, new HashSet<SlangSource>());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCompileWithCorruptedFilePath(){
-        slang.compile(SlangSource.fromFile(new File("/")), new HashSet<SlangSource>());
+    public void testCompileWithCorruptedFilePath() {
+        slang.compile(SlangSource.fromFile(new File("")), new HashSet<SlangSource>());
     }
 
     @Test
@@ -123,7 +130,7 @@ public class SlangImplTest {
 
     @Test
     public void testCompileWithDependencies() throws IOException {
-        SlangSource tempFile = createTempFile();
+        final SlangSource tempFile = createTempFile();
         File tempDependencyFile = File.createTempFile("tempDependency", null);
         tempDependencyFile.deleteOnExit();
         Set<SlangSource> dependencies = new HashSet<>();
@@ -146,11 +153,11 @@ public class SlangImplTest {
     // tests for run() method
 
     @Test
-    public void testRun(){
+    public void testRun() {
         SystemProperty expectedSystemProperty = new SystemProperty("docker.sys", "props.port", "22");
         Long executionId = slang.run(
                 emptyCompilationArtifact,
-                new HashMap<String, Serializable>(),
+                new HashMap<String, Value>(),
                 Sets.newHashSet(expectedSystemProperty)
         );
         Assert.assertNotNull(executionId);
@@ -159,21 +166,21 @@ public class SlangImplTest {
         Mockito.verify(score).trigger(argumentCaptor.capture());
 
         TriggeringProperties triggeringProperties = argumentCaptor.getValue();
-        RunEnvironment runEnv = (RunEnvironment)triggeringProperties.getContext().get(ScoreLangConstants.RUN_ENV);
+        RunEnvironment runEnv = (RunEnvironment) triggeringProperties.getContext().get(ScoreLangConstants.RUN_ENV);
         Assert.assertNotNull(runEnv);
         Assert.assertTrue(triggeringProperties.getContext().containsKey(ScoreLangConstants.USER_INPUTS_KEY));
         Assert.assertTrue(runEnv.getSystemProperties().contains(expectedSystemProperty));
     }
 
     @Test
-    public void testRunWithNullInputs(){
+    public void testRunWithNullInputs() {
         Long executionId = slang.run(emptyCompilationArtifact, null, new HashSet<SystemProperty>());
         Assert.assertNotNull(executionId);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testRunWithNullCompilationArtifact(){
-        slang.run(null, new HashMap<String, Serializable>(), null);
+    public void testRunWithNullCompilationArtifact() {
+        slang.run(null, new HashMap<String, Value>(), null);
     }
 
     // tests for compileAndRun() method
@@ -183,10 +190,10 @@ public class SlangImplTest {
         Slang mockSlang = Mockito.mock(SlangImpl.class);
         SlangSource tempFile = createTempFile();
         Mockito.when(mockSlang.compile(tempFile, new HashSet<SlangSource>())).thenReturn(emptyCompilationArtifact);
-        Mockito.when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class), anySetOf(SystemProperty.class))).thenCallRealMethod();
-        Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashSet<SystemProperty>());
+        Mockito.when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class))).thenCallRealMethod();
+        Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Value>(), new HashSet<SystemProperty>());
         Assert.assertNotNull(id);
-        Mockito.verify(mockSlang).run(emptyCompilationArtifact, new HashMap<String, Serializable>(), new HashSet<SystemProperty>());
+        Mockito.verify(mockSlang).run(emptyCompilationArtifact, new HashMap<String, Value>(), new HashSet<SystemProperty>());
     }
 
     @Test
@@ -194,16 +201,16 @@ public class SlangImplTest {
         Slang mockSlang = Mockito.mock(SlangImpl.class);
         SlangSource tempFile = createTempFile();
 
-        Mockito.when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class), anyMapOf(String.class, Serializable.class), anySetOf(SystemProperty.class))).thenCallRealMethod();
-        Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashSet<SystemProperty>());
+        Mockito.when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class))).thenCallRealMethod();
+        Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Value>(), new HashSet<SystemProperty>());
         Assert.assertNotNull(id);
-        Mockito.verify(mockSlang).compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Serializable>(), new HashSet<SystemProperty>());
+        Mockito.verify(mockSlang).compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Value>(), new HashSet<SystemProperty>());
     }
 
     // tests for subscribeOnEvents() method
 
     @Test
-    public void testSubscribeOnEventsWithListener(){
+    public void testSubscribeOnEventsWithListener() {
         ScoreEventListener eventListener = new EventListener();
         Set<String> eventTypes = new HashSet<>();
         eventTypes.add(EventConstants.SCORE_ERROR_EVENT);
@@ -212,7 +219,7 @@ public class SlangImplTest {
     }
 
     @Test
-    public void testUnSubscribeOnEvents(){
+    public void testUnSubscribeOnEvents() {
         ScoreEventListener eventListener = new EventListener();
         slang.unSubscribeOnEvents(eventListener);
         Mockito.verify(eventBus).unsubscribe(eventListener);
@@ -220,7 +227,7 @@ public class SlangImplTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testSubscribeOnAllEventsWithListener(){
+    public void testSubscribeOnAllEventsWithListener() {
         Slang mockSlang = Mockito.mock(SlangImpl.class);
         ScoreEventListener eventListener = new EventListener();
         Mockito.doCallRealMethod().when(mockSlang).subscribeOnAllEvents(any(ScoreEventListener.class));
@@ -235,7 +242,7 @@ public class SlangImplTest {
         Assert.assertEquals("Events size not as expected", ALL_EVENTS_SIZE, allEvents.size());
     }
 
-    private class EventListener implements ScoreEventListener{
+    private static class EventListener implements ScoreEventListener {
 
         @Override
         public synchronized void onEvent(ScoreEvent event) throws InterruptedException {
@@ -253,7 +260,7 @@ public class SlangImplTest {
     static class Config {
 
         @Bean
-        public SlangImpl slang(){
+        public SlangImpl slang() {
             return new SlangImpl();
         }
 
@@ -270,12 +277,12 @@ public class SlangImplTest {
         }
 
         @Bean
-        public Score score(){
+        public Score score() {
             return Mockito.mock(Score.class);
         }
 
         @Bean
-        public EventBus eventBus(){
+        public EventBus eventBus() {
             return Mockito.mock(EventBus.class);
         }
     }

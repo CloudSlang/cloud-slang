@@ -23,6 +23,10 @@ flow:
         do:
           ops.produce_default_navigation:
             - navigationType
+        publish:
+          - default_output
         navigate:
           - SUCCESS: SUCCESS
           - FAILURE: on_failure
+  outputs:
+    - default_output

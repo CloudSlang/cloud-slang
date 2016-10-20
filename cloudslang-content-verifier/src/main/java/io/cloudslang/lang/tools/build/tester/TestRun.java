@@ -1,12 +1,12 @@
-/*
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
  *
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- */
+ *******************************************************************************/
 package io.cloudslang.lang.tools.build.tester;
 
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
@@ -39,15 +39,18 @@ public class TestRun {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
 
         TestRun testRun = (TestRun) o;
 
-        if (testCase != null ? !testCase.equals(testRun.testCase) : testRun.testCase != null)
+        if (testCase != null ? !testCase.equals(testRun.testCase) : testRun.testCase != null) {
             return false;
+        }
         return !(message != null ? !message.equals(testRun.message) : testRun.message != null);
 
     }

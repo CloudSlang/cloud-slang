@@ -13,6 +13,7 @@ operation:
     - host
     - port
   java_action:
+    gav: 'cloudslang.lang.systemtests:actions:1.0'
     class_name: io.cloudslang.lang.systemtests.actions.LangTestActions
     method_name: parseUrl
   outputs:

@@ -1,0 +1,6 @@
+host: localhost
+port: "22"
+password:
+  bad_value_key: mypassword
+  sensitive: true
+username: myusername

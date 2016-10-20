@@ -1,33 +1,37 @@
-/*
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
  *
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
- */
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.score.api.ExecutionPlan;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /*
  * Created by orius123 on 05/11/14.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CompileFlowWithMultipleStepsTest {
 
     @Autowired

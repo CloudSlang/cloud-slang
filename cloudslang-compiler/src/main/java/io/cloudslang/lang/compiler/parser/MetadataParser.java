@@ -1,4 +1,4 @@
-/*
+/*******************************************************************************
  * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
@@ -6,18 +6,12 @@
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- */
+ *******************************************************************************/
 package io.cloudslang.lang.compiler.parser;
 
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.utils.DescriptionTag;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.text.StrBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -27,6 +21,11 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.text.StrBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * User: bancl
@@ -45,7 +44,7 @@ public class MetadataParser {
     private ParserExceptionHandler parserExceptionHandler;
 
     public Map<String, String> parse(SlangSource source) {
-        Validate.notEmpty(source.getSource(), "Source " + source.getFileName() + " cannot be empty");
+        Validate.notEmpty(source.getContent(), "Source " + source.getName() + " cannot be empty");
         try {
             String description = extractDescriptionString(source);
             Map<String, String> tagMap = extractTagMap(description);
@@ -53,7 +52,7 @@ public class MetadataParser {
             return tagMap;
         } catch (Throwable e) {
             throw new RuntimeException("There was a problem parsing the description: " +
-                    source.getFileName() + ".\n" + parserExceptionHandler.getErrorMessage(e), e);
+                    source.getName() + ".\n" + parserExceptionHandler.getErrorMessage(e), e);
         }
     }
 
@@ -136,9 +135,10 @@ public class MetadataParser {
 
     private String extractDescriptionString(SlangSource source) {
         StrBuilder sb = new StrBuilder();
-        boolean blockEndTagFound = false, blockStartTagFound = false;
+        boolean blockEndTagFound = false;
+        boolean blockStartTagFound = false;
         String firstLine = "";
-        try (BufferedReader reader = new BufferedReader(new StringReader(source.getSource()))) {
+        try (BufferedReader reader = new BufferedReader(new StringReader(source.getContent()))) {
             String line = getTrimmedLine(reader);
             while (line != null) {
                 if (line.startsWith(BLOCK_END_TAG)) {
@@ -159,7 +159,7 @@ public class MetadataParser {
             checkStartingAndClosingTags(sb, firstLine, blockEndTagFound, blockStartTagFound);
         } catch (IOException e) {
             throw new RuntimeException("Error processing metadata, error extracting metadata from " +
-                    source.getFileName(), e);
+                    source.getName(), e);
         }
         return sb.build();
     }

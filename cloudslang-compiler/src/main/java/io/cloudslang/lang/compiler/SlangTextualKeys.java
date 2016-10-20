@@ -1,13 +1,23 @@
-package io.cloudslang.lang.compiler;
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
+package io.cloudslang.lang.compiler;
+
+/*******************************************************************************
+ * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 
 
 /*
@@ -21,6 +31,7 @@ public interface SlangTextualKeys {
     String OUTPUTS_KEY = "outputs";
     String FLOW_TYPE = "flow";
     String OPERATION_TYPE = "operation";
+    String DECISION_TYPE = "decision";
     String EXTENSIONS_KEY = "extensions";
 
     //flow
@@ -43,12 +54,13 @@ public interface SlangTextualKeys {
     String BREAK_KEY = "break";
     String PUBLISH_KEY = "publish";
     String NAVIGATION_KEY = "navigate";
-    String AGGREGATE_KEY = "aggregate";
+    String PARALLEL_LOOP_KEY = "parallel_loop";
 
     //inputs
+    String VALUE_KEY = "value";
     String DEFAULT_KEY = "default";
     String REQUIRED_KEY = "required";
-    String ENCRYPTED_KEY = "encrypted";
+    String SENSITIVE_KEY = "sensitive";
     String PRIVATE_INPUT_KEY = "private";
 
     // system properties

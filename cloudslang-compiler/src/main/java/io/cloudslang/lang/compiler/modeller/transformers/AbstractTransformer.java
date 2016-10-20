@@ -1,14 +1,12 @@
-/**
- * ****************************************************************************
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
- * <p/>
+ *
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
- * *****************************************************************************
- */
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
 import java.util.HashSet;
@@ -22,8 +20,9 @@ import org.apache.commons.lang.Validate;
  */
 public abstract class AbstractTransformer {
 
-    public static final String MISSING_KEYS_ERROR_MESSAGE_PREFIX = "Following keys are missing: ";
-    public static final String INVALID_KEYS_ERROR_MESSAGE_PREFIX = "Following keys are invalid: ";
+    public static final String MISSING_KEYS_ERROR_MESSAGE_PREFIX = "Following tags are missing: ";
+    public static final String INVALID_KEYS_ERROR_MESSAGE_PREFIX = "Following tags are invalid: ";
+    public static final String INVALID_KEYS_ERROR_MESSAGE_SUFFIX = ". Please take a look at the supported features per versions link";
 
     protected void validateKeySet(
             Set<String> keySet,
@@ -46,7 +45,8 @@ public abstract class AbstractTransformer {
         invalidKeys.removeAll(optionalKeys);
         if (CollectionUtils.isNotEmpty(invalidKeys)) {
             throw new RuntimeException(
-                    INVALID_KEYS_ERROR_MESSAGE_PREFIX + invalidKeys.toString()
+                    INVALID_KEYS_ERROR_MESSAGE_PREFIX + invalidKeys.toString() +
+                            INVALID_KEYS_ERROR_MESSAGE_SUFFIX
             );
         }
     }

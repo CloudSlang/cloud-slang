@@ -1,5 +1,5 @@
 /*******************************************************************************
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
  *
@@ -9,32 +9,27 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.bindings;
 
-import io.cloudslang.lang.entities.SystemProperty;
-import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
-import org.apache.commons.lang3.Validate;
-import org.apache.log4j.Logger;
-import io.cloudslang.lang.entities.MapForLoopStatement;
-import io.cloudslang.lang.runtime.env.LoopCondition;
 import io.cloudslang.lang.entities.LoopStatement;
+import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ForLoopCondition;
-import org.python.core.PyObject;
+import io.cloudslang.lang.runtime.env.LoopCondition;
+
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.lang3.Validate;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.List;
-import java.util.Set;
-import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 import static io.cloudslang.lang.runtime.env.LoopCondition.LOOP_CONDITION_KEY;
 
 @Component
-public class LoopsBinding {
+public class LoopsBinding extends AbstractBinding {
 
     public static final String FOR_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating for loop expression in step";
     public static final String INVALID_MAP_EXPRESSION_MESSAGE = "Invalid expression for iterating maps";
@@ -54,12 +49,12 @@ public class LoopsBinding {
         Validate.notNull(systemProperties, "system properties cannot be null");
         Validate.notNull(nodeName, "node name cannot be null");
 
-        Map<String, Serializable> langVariables = flowContext.getImmutableViewOfLanguageVariables();
-        if (!langVariables.containsKey(LOOP_CONDITION_KEY)) {
+        Value loopConditionValue = flowContext.getLanguageVariable(LOOP_CONDITION_KEY);
+        if (loopConditionValue == null) {
             LoopCondition loopCondition = createForLoopCondition(forLoopStatement, flowContext, systemProperties, nodeName);
-            flowContext.putLanguageVariable(LOOP_CONDITION_KEY, loopCondition);
+            flowContext.putLanguageVariable(LOOP_CONDITION_KEY, ValueFactory.create(loopCondition));
         }
-        return (LoopCondition) langVariables.get(LOOP_CONDITION_KEY);
+        return (LoopCondition) flowContext.getLanguageVariable(LOOP_CONDITION_KEY).get();
     }
 
     public void incrementListForLoop(String varName, Context flowContext, ForLoopCondition forLoopCondition) {
@@ -67,7 +62,7 @@ public class LoopsBinding {
         Validate.notNull(flowContext, "flow context cannot be null");
         Validate.notNull(forLoopCondition, "for condition cannot be null");
 
-        Serializable varValue = forLoopCondition.next();
+        Value varValue = forLoopCondition.next();
         flowContext.putVariable(varName, varValue);
         logger.debug("name: " + varName + ", value: " + varValue);
     }
@@ -78,14 +73,14 @@ public class LoopsBinding {
         Validate.notNull(flowContext, "flow context cannot be null");
         Validate.notNull(forLoopCondition, "for condition cannot be null");
 
-        @SuppressWarnings("unchecked") Map.Entry<Serializable, Serializable> entry = (Map.Entry<Serializable, Serializable>) forLoopCondition.next();
-        Serializable keyFromIteration = entry.getKey();
-        Serializable valueFromIteration = entry.getValue();
+        @SuppressWarnings("unchecked") Map.Entry<Value, Value> entry = (Map.Entry<Value, Value>) forLoopCondition.next().get();
+        Value keyFromIteration = entry.getKey();
+        Value valueFromIteration = entry.getValue();
 
         flowContext.putVariable(keyName, keyFromIteration);
         flowContext.putVariable(valueName, valueFromIteration);
         logger.debug("key name: " + keyName + ", value: " + keyFromIteration);
-        logger.debug("value name: " + keyName + ", value: " + valueFromIteration);
+        logger.debug("value name: " + valueName + ", value: " + valueFromIteration);
     }
 
     private LoopCondition createForLoopCondition(
@@ -93,27 +88,17 @@ public class LoopsBinding {
             Context flowContext,
             Set<SystemProperty> systemProperties,
             String nodeName) {
-        Map<String, Serializable> variables = flowContext.getImmutableViewOfVariables();
-        Serializable evalResult;
+        Map<String, Value> variables = flowContext.getImmutableViewOfVariables();
+        Value evalResult;
         String collectionExpression = forLoopStatement.getExpression();
         try {
-            evalResult = scriptEvaluator.evalExpr(collectionExpression, variables, systemProperties);
+            evalResult = scriptEvaluator.evalExpr(collectionExpression, variables, systemProperties,
+                    forLoopStatement.getFunctionDependencies());
         } catch (Throwable t) {
             throw new RuntimeException(FOR_LOOP_EXPRESSION_ERROR_MESSAGE + " '" + nodeName + "',\n\tError is: " + t.getMessage(), t);
         }
 
-        if (forLoopStatement instanceof MapForLoopStatement) {
-            if (evalResult instanceof Map) {
-                List<Map.Entry<Serializable, Serializable>> entriesAsSerializable = new ArrayList<>();
-                @SuppressWarnings("unchecked") Set<Map.Entry<Serializable, Serializable>> entrySet = ((Map) evalResult).entrySet();
-                for (Map.Entry<Serializable, Serializable> entry : entrySet) {
-                    entriesAsSerializable.add(Pair.of(entry.getKey(), entry.getValue()));
-                }
-                evalResult = (Serializable) entriesAsSerializable;
-            } else {
-                throw new RuntimeException(INVALID_MAP_EXPRESSION_MESSAGE + ": " + collectionExpression);
-            }
-        }
+        evalResult = getEvalResultForMap(evalResult, forLoopStatement, collectionExpression);
 
         ForLoopCondition forLoopCondition = createForLoopCondition(evalResult);
         if (forLoopCondition == null) {
@@ -127,21 +112,12 @@ public class LoopsBinding {
         return forLoopCondition;
     }
 
-    private ForLoopCondition createForLoopCondition(Serializable loopCollection){
-        Iterable<? extends Serializable> iterable;
-
-        if (loopCollection instanceof Iterable) {
-            iterable = (Iterable<Serializable>) loopCollection;
-        } else if (loopCollection instanceof String) {
-            String[] strings = ((String) loopCollection).split(Pattern.quote(","));
-            iterable = Arrays.asList(strings);
-        } else if (loopCollection instanceof PyObject) {
-            PyObject pyObject = (PyObject) loopCollection;
-            iterable = pyObject.asIterable();
-        } else {
+    private ForLoopCondition createForLoopCondition(Value evalResult) {
+        Iterable<Value> iterable = getIterableFromEvalResult(evalResult);
+        if (iterable == null) {
             return null;
         }
-
         return new ForLoopCondition(iterable);
     }
+
 }

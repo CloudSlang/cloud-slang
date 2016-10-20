@@ -1,11 +1,12 @@
-/*
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
  *
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
- */
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.entities;
 
 /**
@@ -29,6 +30,7 @@ public interface ScoreLangConstants {
 
     //action scope
     String ACTION_TYPE = "actionType";
+    String ACTION_DEPENDENCIES = "dependencies";
 
     String JAVA_ACTION_CLASS_KEY = "className";
     String JAVA_ACTION_METHOD_KEY = "methodName";
@@ -56,11 +58,11 @@ public interface ScoreLangConstants {
     String BREAK_LOOP_KEY = "breakOn";
     String STEP_INPUTS_RESULT_CONTEXT = "stepInputsResultContext";
 
-    // async loop
-    String ASYNC_LOOP_KEY = "async_loop";
-    String ASYNC_LOOP_STATEMENT_KEY = "asyncLoopStatement";
-    String STEP_AGGREGATE_KEY = "stepAggregateValues";
+    // parallel loop
+    String PARALLEL_LOOP_KEY = "parallelLoop";
+    String PARALLEL_LOOP_STATEMENT_KEY = "parallelLoopStatement";
     String BRANCH_BEGIN_STEP_ID_KEY = "branchBeginStep";
+    String BRANCH_RESULT_KEY = "branch_result";
 
     // Events types
     String SLANG_EXECUTION_EXCEPTION = "SLANG_EXECUTION_EXCEPTION";

@@ -1,24 +1,26 @@
-package io.cloudslang.lang.compiler.modeller;
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
+package io.cloudslang.lang.compiler.modeller;
 
+
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
-
-import java.io.Serializable;
-import java.util.*;
-
-import static ch.lambdaj.Lambda.exists;
-import static org.hamcrest.Matchers.equalToIgnoringCase;
 
 /*
  * Created by orius123 on 10/12/14.
@@ -48,9 +50,15 @@ public class TransformersHandler {
             String key = keyToTransform(transformer);
             Object value = rawData.get(key);
             try {
-                @SuppressWarnings("unchecked") Object transformedValue = transformer.transform(value);
-                if (transformedValue != null) {
-                    transformedData.put(key, (Serializable) transformedValue);
+                @SuppressWarnings("unchecked") TransformModellingResult transformModellingResult = transformer.transform(value);
+                Object data = transformModellingResult.getTransformedData();
+                if (data != null) {
+                    transformedData.put(key, (Serializable) data);
+                }
+                if (rawData.containsKey(key)) {
+                    for (RuntimeException rex : transformModellingResult.getErrors()) {
+                        errors.add(wrapErrorMessage(rex, errorMessagePrefix));
+                    }
                 }
             } catch (ClassCastException e) {
                 Class transformerType = getTransformerFromType(transformer);
@@ -70,56 +78,19 @@ public class TransformersHandler {
                     errors.add(new RuntimeException(errorMessagePrefix + message, e));
                 }
             } catch (RuntimeException e) {
-                errors.add(new RuntimeException(errorMessagePrefix + e.getMessage(), e));
+                errors.add(wrapErrorMessage(e, errorMessagePrefix));
             }
         }
         return transformedData;
     }
 
-    private Class getTransformerFromType(Transformer transformer){
+    private Class getTransformerFromType(Transformer transformer) {
         ResolvableType resolvableType = ResolvableType.forClass(Transformer.class, transformer.getClass());
         return resolvableType.getGeneric(0).resolve();
     }
 
-    public List<RuntimeException> checkKeyWords(
-            String dataLogicalName,
-            Map<String, Object> rawData,
-            List<Transformer> allRelevantTransformers,
-            List<String> additionalValidKeyWords,
-            List<List<String>> constraintGroups) {
-        Set<String> validKeywords = new HashSet<>();
-
-        List<RuntimeException> errors = new ArrayList<>();
-        if (additionalValidKeyWords != null) {
-            validKeywords.addAll(additionalValidKeyWords);
-        }
-
-        for (Transformer transformer : allRelevantTransformers) {
-            validKeywords.add(keyToTransform(transformer));
-        }
-
-        Set<String> rawDataKeySet = rawData.keySet();
-        for (String key : rawDataKeySet) {
-            if (!(exists(validKeywords, equalToIgnoringCase(key)))) {
-                errors.add(new RuntimeException("Property: \'" + key + "\' at: \'" + dataLogicalName + "\' is illegal"));
-            }
-        }
-
-        if (constraintGroups != null) {
-            for (List<String> group : constraintGroups) {
-                boolean found = false;
-                for (String key : group) {
-                    if (rawDataKeySet.contains(key)) {
-                        if (found) {
-                            // one key from this group was already found in action data
-                            errors.add(new RuntimeException("Conflicting keys at: " + dataLogicalName));
-                        } else {
-                            found = true;
-                        }
-                    }
-                }
-            }
-        }
-        return errors;
+    private RuntimeException wrapErrorMessage(RuntimeException rex, String errorMessagePrefix) {
+        return new RuntimeException(errorMessagePrefix + rex.getMessage(), rex);
     }
+
 }

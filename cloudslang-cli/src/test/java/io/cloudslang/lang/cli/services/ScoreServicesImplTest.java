@@ -1,5 +1,5 @@
 /*******************************************************************************
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
  *
@@ -7,14 +7,14 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-
 package io.cloudslang.lang.cli.services;
 
-import com.google.common.collect.Sets;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
@@ -38,9 +38,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.anySetOf;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyMapOf;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Date: 24/2/2015
@@ -53,7 +60,7 @@ public class ScoreServicesImplTest {
 
     private static final long DEFAULT_THREAD_SLEEP_TIME = 100;
     private static final long DEFAULT_TIMEOUT = 5000;
-    private final static long DEFAULT_EXECUTION_ID = 1;
+    private static final long DEFAULT_EXECUTION_ID = 1;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -65,48 +72,48 @@ public class ScoreServicesImplTest {
     private Slang slang;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         reset(slang);
         when(
                 slang.run(
                         any(CompilationArtifact.class),
-                        anyMapOf(String.class, Serializable.class),
+                        anyMapOf(String.class, Value.class),
                         anySetOf(SystemProperty.class)))
                 .thenReturn(DEFAULT_EXECUTION_ID);
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testSubscribe() throws Exception {
         ScoreEventListener eventHandler = mock(ScoreEventListener.class);
-        Set<String> eventTypes = Sets.newHashSet("a", "b");
+        Set<String> eventTypes = newHashSet("a", "b");
 
         scoreServicesImpl.subscribe(eventHandler, eventTypes);
 
         verify(slang).subscribeOnEvents(eventHandler, eventTypes);
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
-     public void testTrigger() throws Exception {
-        CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
-        Map<String, Serializable > inputs = new HashMap<>();
-        inputs.put("a", 1);
-        Set<SystemProperty> systemProperties  = Sets.newHashSet(
-            new SystemProperty("ns", "b", "c")
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void testTrigger() throws Exception {
+        final CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
+        Map<String, Value> inputs = new HashMap<>();
+        inputs.put("a", ValueFactory.create(1));
+        Set<SystemProperty> systemProperties = newHashSet(
+                new SystemProperty("ns", "b", "c")
         );
 
-        long executionID = scoreServicesImpl.trigger(compilationArtifact, inputs, systemProperties);
+        long executionId = scoreServicesImpl.trigger(compilationArtifact, inputs, systemProperties);
 
         verify(slang).run(compilationArtifact, inputs, systemProperties);
-        assertEquals(DEFAULT_EXECUTION_ID, executionID);
+        assertEquals(DEFAULT_EXECUTION_ID, executionId);
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testTriggerSyncSuccess() throws Exception {
         //prepare method args
-        CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
-        Map<String, Serializable > inputs = new HashMap<>();
-        inputs.put("a", 1);
-        Set<SystemProperty> systemProperties  = Sets.newHashSet(
+        final CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
+        Map<String, Value> inputs = new HashMap<>();
+        inputs.put("a", ValueFactory.create(1));
+        Set<SystemProperty> systemProperties = newHashSet(
                 new SystemProperty("ns", "b", "c")
         );
 
@@ -119,12 +126,13 @@ public class ScoreServicesImplTest {
             public Object answer(InvocationOnMock invocation) {
                 final ScoreEventListener scoreEventListener = (ScoreEventListener) invocation.getArguments()[0];
                 Thread eventDispatcherThread = new Thread() {
-                    public void run(){
+                    public void run() {
                         try {
                             Thread.sleep(DEFAULT_THREAD_SLEEP_TIME);
                             ScoreEvent scoreFinishedEvent = new ScoreEvent(EventConstants.SCORE_FINISHED_EVENT, new HashMap<>());
                             scoreEventListener.onEvent(scoreFinishedEvent);
-                        } catch (InterruptedException ignore) {}
+                        } catch (InterruptedException ignore) {
+                        }
                     }
                 };
                 eventDispatcherThread.start();
@@ -133,25 +141,23 @@ public class ScoreServicesImplTest {
         }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
 
         // invoke method
-        long executionID = scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false, false);
+        final long executionId = scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false, false);
 
         // verify constraints
         ArgumentCaptor<ScoreEventListener> scoreEventListenerArg = ArgumentCaptor.forClass(ScoreEventListener.class);
         verify(slang).subscribeOnEvents(scoreEventListenerArg.capture(), anySetOf(String.class));
         verify(slang).run(compilationArtifact, inputs, systemProperties);
         verify(slang).unSubscribeOnEvents(scoreEventListenerArg.getValue());
-        assertEquals("execution ID not as expected", DEFAULT_EXECUTION_ID, executionID);
+        assertEquals("execution ID not as expected", DEFAULT_EXECUTION_ID, executionId);
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testTriggerSyncException() throws Exception {
         //prepare method args
-        CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
-        Map<String, Serializable > inputs = new HashMap<>();
-        inputs.put("a", 1);
-        Set<SystemProperty> systemProperties  = Sets.newHashSet(
-                new SystemProperty("ns", "b", "c")
-        );
+        final CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
+        Map<String, Value> inputs = new HashMap<>();
+        inputs.put("a", ValueFactory.create(1));
+        final Set<SystemProperty> systemProperties = newHashSet(new SystemProperty("ns", "b", "c"));
 
         /* stubbing subscribeEvents method - mocking the behaviour of the EventBus
          * After a specific amount of time a erroneous event followed by a finish event
@@ -162,7 +168,7 @@ public class ScoreServicesImplTest {
             public Object answer(InvocationOnMock invocation) {
                 final ScoreEventListener scoreEventListener = (ScoreEventListener) invocation.getArguments()[0];
                 Thread eventDispatcherThread = new Thread() {
-                    public void run(){
+                    public void run() {
                         try {
                             Thread.sleep(DEFAULT_THREAD_SLEEP_TIME);
 
@@ -175,7 +181,8 @@ public class ScoreServicesImplTest {
 
                             scoreEventListener.onEvent(slangExecutionExceptionEvent);
                             scoreEventListener.onEvent(scoreFinishedEvent);
-                        } catch (InterruptedException ignore) {}
+                        } catch (InterruptedException ignore) {
+                        }
                     }
                 };
                 eventDispatcherThread.start();
@@ -190,21 +197,19 @@ public class ScoreServicesImplTest {
         scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false, false);
     }
 
-    @Test (timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testTriggerSyncSpException() throws Exception {
         //prepare method args
-        CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
-        Map<String, Serializable > inputs = new HashMap<>();
-        inputs.put("a", 1);
-        Set<SystemProperty> systemProperties  = Sets.newHashSet(
-                new SystemProperty("ns", "b", "c")
-        );
+        final CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
+        final Map<String, Value> inputs = new HashMap<>();
+        ValueFactory.create(1);
+        final Set<SystemProperty> systemProperties = newHashSet(new SystemProperty("ns", "b", "c"));
 
         doAnswer(new Answer<Object>() {
             public Object answer(InvocationOnMock invocation) {
                 final ScoreEventListener scoreEventListener = (ScoreEventListener) invocation.getArguments()[0];
                 Thread eventDispatcherThread = new Thread() {
-                    public void run(){
+                    public void run() {
                         try {
                             Thread.sleep(DEFAULT_THREAD_SLEEP_TIME);
 
@@ -217,7 +222,8 @@ public class ScoreServicesImplTest {
 
                             scoreEventListener.onEvent(slangExecutionExceptionEvent);
                             scoreEventListener.onEvent(scoreFinishedEvent);
-                        } catch (InterruptedException ignore) {}
+                        } catch (InterruptedException ignore) {
+                        }
                     }
                 };
                 eventDispatcherThread.start();
@@ -245,6 +251,11 @@ public class ScoreServicesImplTest {
         @Bean
         public Slang slang() {
             return mock(Slang.class);
+        }
+
+        @Bean
+        public ConsolePrinter consolePrinter() {
+            return new ConsolePrinterImpl();
         }
 
     }

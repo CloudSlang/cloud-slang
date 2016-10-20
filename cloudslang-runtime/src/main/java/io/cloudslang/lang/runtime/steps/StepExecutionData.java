@@ -1,5 +1,5 @@
 /*******************************************************************************
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
  *
@@ -10,30 +10,34 @@
 package io.cloudslang.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
-import io.cloudslang.lang.entities.*;
+import io.cloudslang.lang.entities.ListLoopStatement;
+import io.cloudslang.lang.entities.LoopStatement;
+import io.cloudslang.lang.entities.MapLoopStatement;
+import io.cloudslang.lang.entities.ResultNavigation;
+import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.ArgumentsBinding;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
-import io.cloudslang.lang.runtime.env.*;
-import io.cloudslang.lang.runtime.events.LanguageEventData;
-import org.apache.log4j.Logger;
-import org.apache.commons.lang3.tuple.Pair;
-import io.cloudslang.lang.entities.MapForLoopStatement;
-import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.runtime.env.Context;
+import io.cloudslang.lang.runtime.env.ForLoopCondition;
 import io.cloudslang.lang.runtime.env.LoopCondition;
+import io.cloudslang.lang.runtime.env.ReturnValues;
+import io.cloudslang.lang.runtime.env.RunEnvironment;
+import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
-import io.cloudslang.lang.entities.ResultNavigation;
-import io.cloudslang.lang.entities.bindings.Output;
-import io.cloudslang.lang.runtime.env.Context;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
@@ -53,7 +57,7 @@ public class StepExecutionData extends AbstractExecutionData {
 
     @Autowired
     private LoopsBinding loopsBinding;
-    
+
     private static final Logger logger = Logger.getLogger(StepExecutionData.class);
 
     @SuppressWarnings("unused")
@@ -62,7 +66,11 @@ public class StepExecutionData extends AbstractExecutionData {
                           @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                           @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
+
+                          //CHECKSTYLE:OFF: checkstyle:parametername
                           @Param(ExecutionParametersConsts.RUNNING_EXECUTION_PLAN_ID) Long RUNNING_EXECUTION_PLAN_ID,
+                          //CHECKSTYLE:ON
+
                           @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
                           @Param(ScoreLangConstants.REF_ID) String refId) {
         try {
@@ -78,7 +86,7 @@ public class StepExecutionData extends AbstractExecutionData {
             //loops
             if (loopStatementExist(loop)) {
                 LoopCondition loopCondition = loopsBinding.getOrCreateLoopCondition(loop, flowContext, runEnv.getSystemProperties(), nodeName);
-                if (!loopCondition.hasMore()) {
+                if (loopCondition == null || !loopCondition.hasMore()) {
                     runEnv.putNextStepPosition(nextStepId);
                     runEnv.getStack().pushContext(flowContext);
                     return;
@@ -87,21 +95,21 @@ public class StepExecutionData extends AbstractExecutionData {
                 if (loopCondition instanceof ForLoopCondition) {
                     ForLoopCondition forLoopCondition = (ForLoopCondition) loopCondition;
 
-                    if (loop instanceof ListForLoopStatement) {
+                    if (loop instanceof ListLoopStatement) {
                         // normal iteration
-                        String varName = ((ListForLoopStatement) loop).getVarName();
+                        String varName = ((ListLoopStatement) loop).getVarName();
                         loopsBinding.incrementListForLoop(varName, flowContext, forLoopCondition);
                     } else {
                         // map iteration
-                        MapForLoopStatement mapForLoopStatement = (MapForLoopStatement) loop;
-                        String keyName = mapForLoopStatement.getKeyName();
-                        String valueName = mapForLoopStatement.getValueName();
+                        MapLoopStatement mapLoopStatement = (MapLoopStatement) loop;
+                        String keyName = mapLoopStatement.getKeyName();
+                        String valueName = mapLoopStatement.getValueName();
                         loopsBinding.incrementMapForLoop(keyName, valueName, flowContext, forLoopCondition);
                     }
                 }
             }
 
-            Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
+            Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
 
             sendStartBindingArgumentsEvent(
                     stepInputs,
@@ -111,7 +119,7 @@ public class StepExecutionData extends AbstractExecutionData {
                     nodeName
             );
 
-            Map<String, Serializable> boundInputs = argumentsBinding.bindArguments(stepInputs, flowVariables, runEnv.getSystemProperties());
+            Map<String, Value> boundInputs = argumentsBinding.bindArguments(stepInputs, flowVariables, runEnv.getSystemProperties());
             saveStepInputsResultContext(flowContext, boundInputs);
 
             sendEndBindingArgumentsEvent(
@@ -126,7 +134,9 @@ public class StepExecutionData extends AbstractExecutionData {
             updateCallArgumentsAndPushContextToStack(runEnv, flowContext, boundInputs);
 
             // request the score engine to switch to the execution plan of the given ref
+            //CHECKSTYLE:OFF
             requestSwitchToRefExecutableExecutionPlan(runEnv, executionRuntimeServices, RUNNING_EXECUTION_PLAN_ID, refId, nextStepId);
+            //CHECKSTYLE:ON
 
             // set the start step of the given ref as the next step to execute (in the new running execution plan that will be set)
             runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
@@ -148,7 +158,7 @@ public class StepExecutionData extends AbstractExecutionData {
                         @Param(ScoreLangConstants.PREVIOUS_STEP_ID_KEY) Long previousStepId,
                         @Param(ScoreLangConstants.BREAK_LOOP_KEY) List<String> breakOn,
                         @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
-                        @Param(ScoreLangConstants.ASYNC_LOOP_KEY) boolean async_loop) {
+                        @Param(ScoreLangConstants.PARALLEL_LOOP_KEY) boolean parallelLoop) {
 
         try {
             Context flowContext = runEnv.getStack().popContext();
@@ -158,28 +168,34 @@ public class StepExecutionData extends AbstractExecutionData {
                     LanguageEventData.StepType.STEP, nodeName,
                     Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable) stepPublishValues),
                     Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues),
-                    Pair.of("operationReturnValues", executableReturnValues));
+                    Pair.of("executableReturnValues", executableReturnValues),
+                    Pair.of("parallelLoop", parallelLoop)
+            );
 
-            Map<String, Serializable> argumentsResultContext = removeStepInputsResultContext(flowContext);
-            Map<String, Serializable> publishValues =
-                    outputsBinding.bindOutputs(
-                            argumentsResultContext,
-                            executableReturnValues.getOutputs(),
-                            runEnv.getSystemProperties(),
-                            stepPublishValues
-                    );
-
+            Map<String, Value> argumentsResultContext = removeStepInputsResultContext(flowContext);
+            Map<String, Value> publishValues;
+            if (parallelLoop) {
+                publishValues = new HashMap<>(executableReturnValues.getOutputs());
+            } else {
+                publishValues =
+                        outputsBinding.bindOutputs(
+                                argumentsResultContext,
+                                executableReturnValues.getOutputs(),
+                                runEnv.getSystemProperties(),
+                                stepPublishValues
+                        );
+            }
             flowContext.putVariables(publishValues);
 
             //loops
-            Map<String, Serializable> langVariables = flowContext.getImmutableViewOfLanguageVariables();
+            Map<String, Value> langVariables = flowContext.getImmutableViewOfLanguageVariables();
             if (langVariables.containsKey(LoopCondition.LOOP_CONDITION_KEY)) {
-                LoopCondition loopCondition = (LoopCondition) langVariables.get(LoopCondition.LOOP_CONDITION_KEY);
+                LoopCondition loopCondition = (LoopCondition) langVariables.get(LoopCondition.LOOP_CONDITION_KEY).get();
                 if (!shouldBreakLoop(breakOn, executableReturnValues) && loopCondition.hasMore()) {
                     runEnv.putNextStepPosition(previousStepId);
                     runEnv.getStack().pushContext(flowContext);
                     throwEventOutputEnd(runEnv, executionRuntimeServices, nodeName,
-                            (Serializable) publishValues, previousStepId,
+                            publishValues, previousStepId,
                             new ReturnValues(publishValues, executableReturnValues.getResult()));
                     runEnv.getExecutionPath().forward();
                     return;
@@ -188,15 +204,13 @@ public class StepExecutionData extends AbstractExecutionData {
                 }
             }
 
-            //todo: hook
-
             // if this is an endStep method from a branch then next execution step position should ne null (end the flow)
             // and result should be the one from the executable (navigation is handled in join branches step)
             Long nextPosition = null;
             String executableResult = executableReturnValues.getResult();
             String presetResult = executableResult;
 
-            if (!async_loop) {
+            if (!parallelLoop) {
                 // set the position of the next step - for the use of the navigation
                 // find in the navigation values the correct next step position, according to the operation result, and set it
                 ResultNavigation navigation = stepNavigationValues.get(executableResult);
@@ -211,13 +225,12 @@ public class StepExecutionData extends AbstractExecutionData {
 
             runEnv.putNextStepPosition(nextPosition);
 
-            Map<String, Serializable> flowVariables = flowContext.getImmutableViewOfVariables();
-            HashMap<String, Serializable> outputs = new HashMap<>(flowVariables);
+            Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
+            HashMap<String, Value> outputs = new HashMap<>(flowVariables);
 
             ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : executableResult);
             runEnv.putReturnValues(returnValues);
-            throwEventOutputEnd(runEnv, executionRuntimeServices, nodeName,
-                    (Serializable) publishValues, nextPosition, returnValues);
+            throwEventOutputEnd(runEnv, executionRuntimeServices, nodeName, publishValues, nextPosition, returnValues);
 
             runEnv.getStack().pushContext(flowContext);
             runEnv.getExecutionPath().forward();
@@ -230,12 +243,12 @@ public class StepExecutionData extends AbstractExecutionData {
     private void throwEventOutputEnd(RunEnvironment runEnv,
                                      ExecutionRuntimeServices executionRuntimeServices,
                                      String nodeName,
-                                     Serializable publishValues,
+                                     Map<String, Value> publishValues,
                                      Long nextPosition,
                                      ReturnValues returnValues) {
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
                 LanguageEventData.StepType.STEP, nodeName,
-                Pair.of(LanguageEventData.OUTPUTS, publishValues),
+                Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
                 Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
                 Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition));
     }
@@ -246,24 +259,24 @@ public class StepExecutionData extends AbstractExecutionData {
 
     private void requestSwitchToRefExecutableExecutionPlan(RunEnvironment runEnv,
                                                            ExecutionRuntimeServices executionRuntimeServices,
-                                                           Long RUNNING_EXECUTION_PLAN_ID,
+                                                           Long runningExecutionPlanId,
                                                            String refId,
                                                            Long nextStepId) {
-        pushParentFlowDataOnStack(runEnv, RUNNING_EXECUTION_PLAN_ID, nextStepId);
+        pushParentFlowDataOnStack(runEnv, runningExecutionPlanId, nextStepId);
 
         // request the score engine to switch the execution plan to the one with the given refId once it can
         Long subFlowRunningExecutionPlanId = executionRuntimeServices.getSubFlowRunningExecutionPlan(refId);
         executionRuntimeServices.requestToChangeExecutionPlan(subFlowRunningExecutionPlanId);
     }
 
-    private void saveStepInputsResultContext(Context context, Map<String, Serializable> stepInputsResultContext) {
-        context.putLanguageVariable(ScoreLangConstants.STEP_INPUTS_RESULT_CONTEXT, (Serializable) stepInputsResultContext);
+    private void saveStepInputsResultContext(Context context, Map<String, Value> stepInputsResultContext) {
+        context.putLanguageVariable(ScoreLangConstants.STEP_INPUTS_RESULT_CONTEXT, ValueFactory.create((Serializable) stepInputsResultContext));
     }
 
-    private Map<String, Serializable> removeStepInputsResultContext(Context context) {
-        Serializable rawValue = context.removeLanguageVariable(ScoreLangConstants.STEP_INPUTS_RESULT_CONTEXT);
+    private Map<String, Value> removeStepInputsResultContext(Context context) {
+        Value rawValue = context.removeLanguageVariable(ScoreLangConstants.STEP_INPUTS_RESULT_CONTEXT);
         @SuppressWarnings("unchecked")
-        Map<String, Serializable> stepInputsResultContext = rawValue == null ? null : (Map<String, Serializable>) rawValue;
+        Map<String, Value> stepInputsResultContext = rawValue == null ? null : (Map<String, Value>) rawValue.get();
         return stepInputsResultContext;
     }
 

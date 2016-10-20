@@ -1,3 +1,12 @@
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.cli.utils;
 
 import io.cloudslang.lang.api.Slang;
@@ -11,6 +20,10 @@ import io.cloudslang.lang.compiler.parser.MetadataParser;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.score.api.Score;
 import io.cloudslang.score.events.EventBus;
+
+import java.io.File;
+import java.net.URI;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,9 +33,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
-
-import java.io.File;
-import java.net.URI;
 
 import static org.mockito.Mockito.mock;
 
@@ -60,7 +70,7 @@ public class MetadataHelperTest {
     }
 
     @Test
-     public void testPrettyPrint() throws Exception {
+    public void testPrettyPrint() throws Exception {
         URI flowFilePath = getClass().getResource("/metadata/metadata.sl").toURI();
         String metadataToPrint = metadataHelper.extractMetadata(new File(flowFilePath));
         Assert.assertNotNull(metadataToPrint);

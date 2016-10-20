@@ -1,17 +1,17 @@
-/*
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
  *
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- */
+ *******************************************************************************/
 package io.cloudslang.lang.tools.build;
 
-import io.cloudslang.lang.tools.build.tester.RunTestsResults;
+import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * Created by stoneo on 4/1/2015.
@@ -23,32 +23,41 @@ import java.util.Map;
 public class SlangBuildResults {
 
     private final int numberOfCompiledSources;
-    private final RunTestsResults runTestsResults;
+    private final IRunTestResults runTestsResults;
+    private List<RuntimeException> compilationExceptions;
 
-    public SlangBuildResults(int numberOfCompiledSources, RunTestsResults runTestsResults) {
+    public SlangBuildResults(int numberOfCompiledSources, IRunTestResults runTestsResults, List<RuntimeException> exceptions) {
         this.numberOfCompiledSources = numberOfCompiledSources;
         this.runTestsResults = runTestsResults;
+        this.compilationExceptions = exceptions;
     }
 
     public int getNumberOfCompiledSources() {
         return numberOfCompiledSources;
     }
 
-    public RunTestsResults getRunTestsResults() {
+    public IRunTestResults getRunTestsResults() {
         return runTestsResults;
+    }
+
+    public List<RuntimeException> getCompilationExceptions() {
+        return compilationExceptions;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
 
         SlangBuildResults that = (SlangBuildResults) o;
 
-        if (numberOfCompiledSources != that.numberOfCompiledSources)
+        if (numberOfCompiledSources != that.numberOfCompiledSources) {
             return false;
+        }
         return !(runTestsResults != null ? !runTestsResults.equals(that.runTestsResults) : that.runTestsResults != null);
 
     }

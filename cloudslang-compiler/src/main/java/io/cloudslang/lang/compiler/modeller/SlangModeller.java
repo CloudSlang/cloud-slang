@@ -1,15 +1,16 @@
-/*
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
  *
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
- */
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller;
 
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
-import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+import io.cloudslang.lang.compiler.modeller.result.ParseModellingResult;
 
 /*
  * Created by stoneo on 2/2/2015.
@@ -23,9 +24,10 @@ public interface SlangModeller {
 
     /**
      * Pre-compile a Slang source into an {@link ExecutableModellingResult}
-     * @param parsedSlang the {@link io.cloudslang.lang.compiler.parser.model.ParsedSlang} source
+     * @param parseModellingResult the {@link io.cloudslang.lang.compiler.parser.model.ParsedSlang} source
+     *
      * @return an {@link ExecutableModellingResult} object, containing an executable
-     * which is either a flow or an operations in the file
+     *     which is either a flow or an operations in the file
      */
-    ExecutableModellingResult createModel(ParsedSlang parsedSlang);
+    ExecutableModellingResult createModel(ParseModellingResult parseModellingResult);
 }

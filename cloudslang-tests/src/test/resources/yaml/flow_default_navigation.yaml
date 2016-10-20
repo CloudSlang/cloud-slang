@@ -30,6 +30,7 @@ flow:
             - city: 'AwesomeCity'
         navigate:
           - SUCCESS: SUCCESS # end flow with success result
+          - FAILURE: FAILURE
 
     - on_failure: # default navigation: go to this step on failure
         - send_error_mail:
@@ -41,6 +42,3 @@ flow:
                 - recipient: ${ emailRecipient }
                 - subject: 'Flow failure'
                 - body: 'Default failure navigation here'
-            navigate:
-              - SUCCESS: FAILURE # end flow with failure result
-              - FAILURE: FAILURE

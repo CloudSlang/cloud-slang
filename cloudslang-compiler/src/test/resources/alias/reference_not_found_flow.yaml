@@ -16,4 +16,4 @@ flow:
     - step1:
         do:
           sample_typo.simple_op:
-            - cool_input: 25
+            - cool_input: '25'

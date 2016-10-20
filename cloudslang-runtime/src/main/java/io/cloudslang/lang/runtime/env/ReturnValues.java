@@ -1,31 +1,31 @@
 /*******************************************************************************
-* (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License v2.0 which accompany this distribution.
-*
-* The Apache License is available at
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-*******************************************************************************/
-
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.runtime.env;
 
+import io.cloudslang.lang.entities.bindings.values.Value;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ReturnValues implements Serializable{
+public class ReturnValues implements Serializable {
 
-    private final Map<String, Serializable> outputs;
+    private final Map<String, Value> outputs;
 
     private final String result;
 
-    public ReturnValues(Map<String, Serializable> outputs, String result) {
+    public ReturnValues(Map<String, Value> outputs, String result) {
         this.outputs = new HashMap<>(outputs);
         this.result = result;
     }
 
-    public Map<String, Serializable> getOutputs() {
+    public Map<String, Value> getOutputs() {
         return outputs;
     }
 
@@ -40,5 +40,4 @@ public class ReturnValues implements Serializable{
                 "outputs=" + outputs +
                 '}';
     }
-
 }

@@ -17,11 +17,11 @@ operation:
     - input4: ${ 'value4' if input3 == value3 else None }
     - input5:
         required: yes
-        encrypted: true
+        sensitive: true
     - input6:
         default: ${ 1 + 5 }
         required: False
-    - input7: 77
+    - input7: '77'
     - input8:
         default: ${ input6 }
     - input9:
@@ -31,7 +31,7 @@ operation:
         default: ${ input5 }
     - input11: ${ 5 + 6 }
     - input12: ${ "mighty" + " max"   + varX }
-    - input13: true
+    - input13: 'true'
 
   python_action:
     script: |

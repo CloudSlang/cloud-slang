@@ -1,26 +1,25 @@
-/**
- * ****************************************************************************
- * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License v2.0 which accompany this distribution.
- * <p/>
+ *
  * The Apache License is available at
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
- * *****************************************************************************
- */
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.systemtests.flows;
 
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.ValueSyntaxParent;
-import org.junit.Test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Map;
+
+import org.junit.Test;
 
 /**
  * @author Bonczidai Levente
