@@ -24,6 +24,7 @@ import io.cloudslang.lang.runtime.bindings.scripts.ScriptExecutor;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
+import io.cloudslang.lang.runtime.steps.ContentTestActions.NonSerializableObject;
 import io.cloudslang.runtime.api.java.JavaRuntimeService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.java.JavaExecutionCachedEngine;
@@ -59,6 +60,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static io.cloudslang.lang.entities.ActionType.JAVA;
 import static io.cloudslang.lang.entities.ActionType.PYTHON;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -127,7 +129,7 @@ public class ActionStepsTest {
         Map<String, Value> actualOutputs = actualReturnValues.getOutputs();
 
         //verify matching
-        Assert.assertEquals("Java action outputs are not as expected", expectedOutputs, actualOutputs);
+        assertEquals("Java action outputs are not as expected", expectedOutputs, actualOutputs);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -156,7 +158,7 @@ public class ActionStepsTest {
         );
 
         //verify matching
-        Assert.assertEquals(nextStepPosition, runEnv.removeNextStepPosition());
+        assertEquals(nextStepPosition, runEnv.removeNextStepPosition());
     }
 
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
@@ -235,9 +237,10 @@ public class ActionStepsTest {
         Assert.assertNotNull(eventActionStart);
         LanguageEventData data = (LanguageEventData) eventActionStart.getData();
         Map<String, Serializable> actualCallArguments = data.getCallArguments();
-        Assert.assertEquals(callArguments.size(), actualCallArguments.size());
+        assertEquals(callArguments.size(), actualCallArguments.size());
         for (Map.Entry<String, Value> entry : callArguments.entrySet()) {
-            Assert.assertEquals("Python action call arguments are not as expected", entry.getValue().get(), actualCallArguments.get(entry.getKey()));
+            assertEquals("Python action call arguments are not as expected",
+                    entry.getValue().get(), actualCallArguments.get(entry.getKey()));
         }
     }
 
@@ -279,9 +282,10 @@ public class ActionStepsTest {
         Assert.assertNotNull(eventActionStart);
         LanguageEventData data = (LanguageEventData) eventActionStart.getData();
         Map<String, Serializable> actualCallArguments = data.getCallArguments();
-        Assert.assertEquals(callArguments.size(), actualCallArguments.size());
+        assertEquals(callArguments.size(), actualCallArguments.size());
         for (Map.Entry<String, Value> entry : callArguments.entrySet()) {
-            Assert.assertEquals("Python action call arguments are not as expected", entry.getValue().get(), actualCallArguments.get(entry.getKey()));
+            assertEquals("Python action call arguments are not as expected",
+                    entry.getValue().get(), actualCallArguments.get(entry.getKey()));
         }
     }
 
@@ -433,7 +437,7 @@ public class ActionStepsTest {
         Map<String, Value> actualOutputs = actualReturnValues.getOutputs();
 
         //verify matching
-        Assert.assertEquals("Java action outputs are not as expected", expectedOutputs, actualOutputs);
+        assertEquals("Java action outputs are not as expected", expectedOutputs, actualOutputs);
     }
 
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
@@ -481,7 +485,7 @@ public class ActionStepsTest {
                 DEPENDENCIES_DEFAULT
         );
         ReturnValues returnValues = runEnv.removeReturnValues();
-        Assert.assertEquals(5, returnValues.getOutputs().get("port").get());
+        assertEquals(5, returnValues.getOutputs().get("port").get());
     }
 
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
@@ -515,7 +519,7 @@ public class ActionStepsTest {
         Map<String, Value> actualOutputs = actualReturnValues.getOutputs();
 
         //verify matching
-        Assert.assertEquals("Java action output should be empty map", expectedOutputs, actualOutputs);
+        assertEquals("Java action output should be empty map", expectedOutputs, actualOutputs);
     }
 
     @Test(expected = RuntimeException.class, timeout = DEFAULT_TIMEOUT)
@@ -549,7 +553,7 @@ public class ActionStepsTest {
         Map<String, Value> actualOutputs = actualReturnValues.getOutputs();
 
         //verify matching
-        Assert.assertEquals("Java action output should be empty map", expectedOutputs, actualOutputs);
+        assertEquals("Java action output should be empty map", expectedOutputs, actualOutputs);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -557,8 +561,8 @@ public class ActionStepsTest {
         //prepare doAction arguments
         RunEnvironment runEnv = new RunEnvironment();
         HashMap<String, Object> nonSerializableExecutionData = new HashMap<>();
-        GlobalSessionObject<ContentTestActions.NonSerializableObject> sessionObject = new GlobalSessionObject<>();
-        ContentTestActions.NonSerializableObject employee = new ContentTestActions.NonSerializableObject("John");
+        GlobalSessionObject<NonSerializableObject> sessionObject = new GlobalSessionObject<>();
+        NonSerializableObject employee = new NonSerializableObject("John");
         sessionObject.setResource(new ContentTestActions.NonSerializableSessionResource(employee));
         nonSerializableExecutionData.put("name", sessionObject);
 
@@ -578,7 +582,7 @@ public class ActionStepsTest {
 
         Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
         Assert.assertTrue(outputs.containsKey("name"));
-        Assert.assertEquals("John", outputs.get("name").get());
+        assertEquals("John", outputs.get("name").get());
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -586,8 +590,8 @@ public class ActionStepsTest {
         //prepare doAction arguments
         final RunEnvironment runEnv = new RunEnvironment();
         HashMap<String, Object> nonSerializableExecutionData = new HashMap<>();
-        GlobalSessionObject<ContentTestActions.NonSerializableObject> sessionObject = new GlobalSessionObject<>();
-        ContentTestActions.NonSerializableObject employee = new ContentTestActions.NonSerializableObject("John");
+        GlobalSessionObject<NonSerializableObject> sessionObject = new GlobalSessionObject<>();
+        NonSerializableObject employee = new NonSerializableObject("John");
         sessionObject.setResource(new ContentTestActions.NonSerializableSessionResource(employee));
         nonSerializableExecutionData.put("name", sessionObject);
         Map<String, Value> initialCallArguments = new HashMap<>();
@@ -611,11 +615,11 @@ public class ActionStepsTest {
         Assert.assertTrue(nonSerializableExecutionData.containsKey("name"));
 
         @SuppressWarnings("unchecked")
-        GlobalSessionObject<ContentTestActions.NonSerializableObject> updatedSessionObject =
-                (GlobalSessionObject<ContentTestActions.NonSerializableObject>) nonSerializableExecutionData.get("name");
-        ContentTestActions.NonSerializableObject nonSerializableObject = updatedSessionObject.get();
+        GlobalSessionObject<NonSerializableObject> updatedSessionObject =
+                (GlobalSessionObject<NonSerializableObject>) nonSerializableExecutionData.get("name");
+        NonSerializableObject nonSerializableObject = updatedSessionObject.get();
         String actualName = nonSerializableObject.getName();
-        Assert.assertEquals("David", actualName);
+        assertEquals("David", actualName);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -670,7 +674,7 @@ public class ActionStepsTest {
 
         Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
         Assert.assertTrue(outputs.containsKey("name"));
-        Assert.assertEquals("John", outputs.get("name").get());
+        assertEquals("John", outputs.get("name").get());
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -679,7 +683,8 @@ public class ActionStepsTest {
         RunEnvironment runEnv = new RunEnvironment();
         Map<String, Value> initialCallArguments = new HashMap<>();
         HashMap<String, Object> serializableExecutionData = new HashMap<>();
-        initialCallArguments.put(ExecutionParametersConsts.SERIALIZABLE_SESSION_CONTEXT, ValueFactory.create(serializableExecutionData));
+        initialCallArguments.put(ExecutionParametersConsts.SERIALIZABLE_SESSION_CONTEXT,
+                ValueFactory.create(serializableExecutionData));
         runEnv.putCallArguments(initialCallArguments);
 
         //invoke doAction
@@ -777,7 +782,7 @@ public class ActionStepsTest {
         Map<String, Value> actualOutputs = actualReturnValues.getOutputs();
 
         //verify matching
-        Assert.assertEquals("Python action outputs are not as expected", expectedOutputs, actualOutputs);
+        assertEquals("Python action outputs are not as expected", expectedOutputs, actualOutputs);
     }
 
     @Test
@@ -816,7 +821,7 @@ public class ActionStepsTest {
         Map<String, Value> actualOutputs = actualReturnValues.getOutputs();
 
         //verify matching
-        Assert.assertEquals("Invalid types passed exclusion",
+        assertEquals("Invalid types passed exclusion",
                 1, actualOutputs.size());
     }
 
