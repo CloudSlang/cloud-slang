@@ -29,6 +29,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.assertEquals;
+
 /*
  * Created by orius123 on 05/11/14.
  */
@@ -48,7 +50,7 @@ public class CompileOperationTest {
         URL resource = getClass().getResource("/test_op.sl");
         ExecutionPlan executionPlan = compiler.compile(SlangSource.fromFile(resource.toURI()), null).getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
-        Assert.assertEquals("there is a different number of steps than expected", 3, executionPlan.getSteps().size());
+        assertEquals("there is a different number of steps than expected", 3, executionPlan.getSteps().size());
     }
 
     @Test
@@ -57,9 +59,10 @@ public class CompileOperationTest {
         ExecutionPlan executionPlan = compiler.compile(SlangSource.fromFile(resource.toURI()), null).getExecutionPlan();
 
         ExecutionStep startStep = executionPlan.getStep(1L);
-        @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) startStep.getActionData().get(ScoreLangConstants.EXECUTABLE_INPUTS_KEY);
+        @SuppressWarnings("unchecked")
+        List<Input> inputs = (List<Input>) startStep.getActionData().get(ScoreLangConstants.EXECUTABLE_INPUTS_KEY);
         Assert.assertNotNull("inputs doesn't exist", inputs);
-        Assert.assertEquals("there is a different number of inputs than expected", 13, inputs.size());
+        assertEquals("there is a different number of inputs than expected", 13, inputs.size());
 
         ExecutionStep actionStep = executionPlan.getStep(2L);
         String script = (String) actionStep.getActionData().get(ScoreLangConstants.PYTHON_ACTION_SCRIPT_KEY);
@@ -82,12 +85,15 @@ public class CompileOperationTest {
         Executable operation = compiler.preCompile(SlangSource.fromFile(resource.toURI()));
 
         Assert.assertNotNull("preCompiledMetaData is null", operation);
-        Assert.assertEquals("Operation name is wrong", "check_Weather", operation.getName());
-        Assert.assertEquals("Operation namespace is wrong", "user.ops", operation.getNamespace());
-        Assert.assertEquals("There is a different number of operation inputs than expected", 1, operation.getInputs().size());
-        Assert.assertEquals("There is a different number of operation outputs than expected", 2, operation.getOutputs().size());
-        Assert.assertEquals("There is a different number of operation results than expected", 2, operation.getResults().size());
-        Assert.assertEquals("There is a different number of operation dependencies than expected", 0, operation.getExecutableDependencies().size());
+        assertEquals("Operation name is wrong", "check_Weather", operation.getName());
+        assertEquals("Operation namespace is wrong", "user.ops", operation.getNamespace());
+        assertEquals("There is a different number of operation inputs than expected", 1, operation.getInputs().size());
+        assertEquals("There is a different number of operation outputs than expected",
+                2, operation.getOutputs().size());
+        assertEquals("There is a different number of operation results than expected",
+                2, operation.getResults().size());
+        assertEquals("There is a different number of operation dependencies than expected",
+                0, operation.getExecutableDependencies().size());
     }
 
     @Test
@@ -113,7 +119,8 @@ public class CompileOperationTest {
         URL resource = getClass().getResource("/corrupted/operation_invalid_action_property.sl");
         exception.expect(RuntimeException.class);
         exception.expectMessage("Action syntax is illegal.\n" +
-                "Following tags are invalid: [IDontBelongHere]. Please take a look at the supported features per versions link");
+                "Following tags are invalid: [IDontBelongHere]. " +
+                "Please take a look at the supported features per versions link");
         compiler.compile(SlangSource.fromFile(resource.toURI()), null);
     }
 

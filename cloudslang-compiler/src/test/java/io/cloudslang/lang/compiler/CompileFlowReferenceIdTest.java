@@ -59,7 +59,8 @@ public class CompileFlowReferenceIdTest {
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
         ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
+        @SuppressWarnings("unchecked")
+        String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
         Assert.assertEquals("Wrong reference ID for step", "cloudslang.sample.simple_op", referenceId);
     }
@@ -79,7 +80,8 @@ public class CompileFlowReferenceIdTest {
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
         ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
+        @SuppressWarnings("unchecked")
+        String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
         Assert.assertEquals("Wrong reference ID for step", "cloudslang.sample.simple_op", referenceId);
     }
@@ -99,7 +101,8 @@ public class CompileFlowReferenceIdTest {
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
         ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
+        @SuppressWarnings("unchecked")
+        String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
         Assert.assertEquals("Wrong reference ID for step", "cloud.cloud_op", referenceId);
     }
@@ -119,7 +122,8 @@ public class CompileFlowReferenceIdTest {
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
         ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
+        @SuppressWarnings("unchecked")
+        String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
         Assert.assertEquals("Wrong reference ID for step", "a.b.c.d.print", referenceId);
     }
@@ -139,7 +143,8 @@ public class CompileFlowReferenceIdTest {
         Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
 
         ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
+        @SuppressWarnings("unchecked")
+        String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
         Assert.assertEquals("Wrong reference ID for step", "a.b.c.d.print", referenceId);
     }

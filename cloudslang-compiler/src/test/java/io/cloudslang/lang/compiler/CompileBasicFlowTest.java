@@ -86,7 +86,8 @@ public class CompileBasicFlowTest {
         assertEquals("there is a different number of inputs than expected", 1, inputs.size());
 
         ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
-        @SuppressWarnings("unchecked") List<Argument> stepInputs = (List<Argument>) beginStepExecutionStep.getActionData()
+        @SuppressWarnings("unchecked")
+        List<Argument> stepInputs = (List<Argument>) beginStepExecutionStep.getActionData()
                 .get(ScoreLangConstants.STEP_INPUTS_KEY);
         Assert.assertNotNull("arguments doesn't exist", stepInputs);
         assertEquals("there is a different number of arguments than expected", 3, stepInputs.size());
@@ -95,9 +96,11 @@ public class CompileBasicFlowTest {
         assertEquals("CheckWeather", beginStepExecutionStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
 
         ExecutionStep endStepExecutionStep = executionPlan.getStep(3L);
-        @SuppressWarnings("unchecked") List<Output> publish = (List<Output>) endStepExecutionStep.getActionData()
+        @SuppressWarnings("unchecked")
+        List<Output> publish = (List<Output>) endStepExecutionStep.getActionData()
                 .get(ScoreLangConstants.STEP_PUBLISH_KEY);
-        @SuppressWarnings("unchecked") Map<String, ResultNavigation> navigate =
+        @SuppressWarnings("unchecked")
+        final Map<String, ResultNavigation> navigate =
                 (Map<String, ResultNavigation>) endStepExecutionStep.getActionData()
                         .get(ScoreLangConstants.STEP_NAVIGATION_KEY);
         assertEquals("CheckWeather", endStepExecutionStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));

@@ -113,7 +113,8 @@ public class CompileForLoopsFlowTest {
         ListLoopStatement listLoopStatement = validateListForLoopStatement(forStatement);
         assertEquals("values.split(\",\")", listLoopStatement.getExpression());
         assertEquals("value", listLoopStatement.getVarName());
-        @SuppressWarnings("unchecked") List<Map<String, String>> actual = (List<Map<String, String>>) step.getPostStepActionData()
+        @SuppressWarnings("unchecked")
+        List<Map<String, String>> actual = (List<Map<String, String>>) step.getPostStepActionData()
                 .get(SlangTextualKeys.NAVIGATION_KEY);
         assertEquals("print_other_values", actual.get(0).get(ScoreLangConstants.SUCCESS_RESULT));
     }

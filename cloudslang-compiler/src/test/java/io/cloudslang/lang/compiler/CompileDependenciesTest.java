@@ -33,6 +33,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -99,8 +100,8 @@ public class CompileDependenciesTest {
         path.add(SlangSource.fromFile(importedOperation2));
 
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
-        Assert.assertThat(compilationArtifact.getDependencies(), Matchers.<String, ExecutionPlan>hasKey("user.ops.test_op"));
-        Assert.assertThat(compilationArtifact.getDependencies(),
+        assertThat(compilationArtifact.getDependencies(), Matchers.<String, ExecutionPlan>hasKey("user.ops.test_op"));
+        assertThat(compilationArtifact.getDependencies(),
                 not(Matchers.<String, ExecutionPlan>hasKey("slang.sample.flows.SimpleFlow")));
     }
 
