@@ -75,8 +75,8 @@ public class ResultsBinding {
                     return presetResult;
                 }
             }
-            throw new RuntimeException("Result: " + presetResult
-                    + " that was calculated in the last step is not a possible result of the flow.");
+            throw new RuntimeException("Result: " + presetResult +
+                    " that was calculated in the last step is not a possible result of the flow.");
         }
 
         // In the case of operation, we resolve the result by searching for the first result with a true expression

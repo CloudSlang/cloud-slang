@@ -30,7 +30,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ParallelLoopBinding extends AbstractBinding {
 
-    public static final String PARALLEL_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating parallel loop expression in step";
+    public static final String PARALLEL_LOOP_EXPRESSION_ERROR_MESSAGE =
+            "Error evaluating parallel loop expression in step";
 
     @Autowired
     private ScriptEvaluator scriptEvaluator;
@@ -52,7 +53,8 @@ public class ParallelLoopBinding extends AbstractBinding {
         List<Value> result;
         try {
             Value evalResult = scriptEvaluator.evalExpr(parallelLoopStatement.getExpression(),
-                    flowContext.getImmutableViewOfVariables(), systemProperties, parallelLoopStatement.getFunctionDependencies());
+                    flowContext.getImmutableViewOfVariables(),
+                    systemProperties, parallelLoopStatement.getFunctionDependencies());
 
             evalResult = getEvalResultForMap(evalResult, parallelLoopStatement, parallelLoopStatement.getExpression());
 

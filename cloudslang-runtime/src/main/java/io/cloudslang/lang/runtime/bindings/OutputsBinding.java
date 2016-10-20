@@ -23,6 +23,8 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static io.cloudslang.lang.entities.utils.ExpressionUtils.extractExpression;
+
 /**
  * Date: 11/7/2014
  *
@@ -49,13 +51,14 @@ public class OutputsBinding extends AbstractBinding {
                 String errorMessagePrefix = "Error binding output: '" + output.getName();
                 Value rawValue = output.getValue();
                 Value valueToAssign = rawValue;
-                String expressionToEvaluate = ExpressionUtils.extractExpression(rawValue == null ? null : rawValue.get());
+                String expressionToEvaluate = extractExpression(rawValue == null ? null : rawValue.get());
                 if (expressionToEvaluate != null) {
                     // initialize with null value if key does not exist
                     scriptContext.put(outputKey, scriptContext.get(outputKey));
                     try {
                         //evaluate expression
-                        Value value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, output.getFunctionDependencies());
+                        Value value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext,
+                                systemProperties, output.getFunctionDependencies());
                         valueToAssign = ValueFactory.create(value, rawValue != null && rawValue.isSensitive());
                     } catch (Throwable t) {
                         throw new RuntimeException(errorMessagePrefix + "',\n\tError is: " + t.getMessage(), t);
