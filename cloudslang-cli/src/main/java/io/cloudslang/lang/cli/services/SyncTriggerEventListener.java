@@ -103,7 +103,8 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                         String prefix = StringUtils.repeat(STEP_PATH_PREFIX, matches);
 
                         for (Map.Entry<String, Serializable> entry : stepOutputs.entrySet()) {
-                            consolePrinter.printWithColor(Ansi.Color.WHITE, prefix + entry.getKey() + " = " + entry.getValue());
+                            consolePrinter.printWithColor(Ansi.Color.WHITE, prefix +
+                                    entry.getKey() + " = " + entry.getValue());
                         }
                     }
                 }
@@ -115,7 +116,8 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                     if (outputs.size() > 0) {
                         printForOperationOrFlow(data, Ansi.Color.WHITE, "\n" + OPERATION_OUTPUTS, "\n" + FLOW_OUTPUTS);
                         for (Map.Entry<String, Serializable> entry : outputs.entrySet()) {
-                            consolePrinter.printWithColor(Ansi.Color.WHITE, "- " + entry.getKey() + " = " + entry.getValue());
+                            consolePrinter.printWithColor(Ansi.Color.WHITE, "- " +
+                                    entry.getKey() + " = " + entry.getValue());
                         }
                     }
                 }
