@@ -17,6 +17,8 @@ import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.events.ScoreEvent;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -24,9 +26,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 /**
  * User: stoneo
@@ -56,6 +55,25 @@ public class OperationSystemTest extends SystemsTestsParent {
         userInputs.put("input2", ValueFactory.create("value2"));
         userInputs.put("input4", ValueFactory.create("value4"));
         userInputs.put("input5", ValueFactory.create("value5"));
+        ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
+        Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
+    }
+
+    @Test
+    public void testCompileAndRunOperationWithWrongInputType() throws Exception {
+
+        //Trigger ExecutionPlan
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("input1", ValueFactory.create(new Integer(11)));
+        userInputs.put("input2", ValueFactory.create("value2"));
+        userInputs.put("input4", ValueFactory.create("value4"));
+        userInputs.put("input5", ValueFactory.create("value5"));
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Error binding input: 'input1' should have a String value, but got value '11' of type Integer.");
+
+        URL resource = getClass().getResource("/yaml/test_op_2.sl");
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), null);
         ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }

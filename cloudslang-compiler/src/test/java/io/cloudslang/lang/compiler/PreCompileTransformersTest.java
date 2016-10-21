@@ -123,7 +123,7 @@ public class PreCompileTransformersTest {
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'check_weather_optional_input_boolean' syntax is illegal.");
-        exception.expectMessage("Input: 'city' should have a String value.");
+        exception.expectMessage("Input: 'city' should have a String value, but got value 'true' of type Boolean.");
         throw errors.get(0);
     }
 
@@ -137,7 +137,7 @@ public class PreCompileTransformersTest {
         Assert.assertTrue(errors.size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'check_weather_optional_input_default_integer' syntax is illegal.");
-        exception.expectMessage("Input: 'input_with_default_value' should have a String value.");
+        exception.expectMessage("Input: 'input_with_default_value' should have a String value, but got value '2' of type Integer.");
         throw errors.get(0);
     }
 
@@ -152,7 +152,7 @@ public class PreCompileTransformersTest {
         Assert.assertTrue(errors.size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("For step 'bootstrap_node' syntax is illegal.");
-        exception.expectMessage("Step input: 'input_with_sensitive_no_default' should have a String value.");
+        exception.expectMessage("Step input: 'input_with_sensitive_no_default' should have a String value, but got value '2.5' of type Double.");
         throw errors.get(0);
     }
 
@@ -167,7 +167,7 @@ public class PreCompileTransformersTest {
         Assert.assertTrue(errors.size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("For flow 'check_weather_flow_output_default_double' syntax is illegal.");
-        exception.expectMessage("Output / publish value: 'flow_output_0' should have a String value.");
+        exception.expectMessage("Output / publish value: 'flow_output_0' should have a String value, but got value '3.5' of type Double.");
         throw errors.get(0);
     }
 
