@@ -125,7 +125,8 @@ public class ThreadSafeRunTestResults implements IRunTestResults, ISlangTestCase
     public synchronized void onEvent(SlangTestCaseEvent event) {
         SlangTestCase slangTestCase = event.getSlangTestCase();
         if (event instanceof FailedSlangTestCaseEvent) {
-            addFailedTest(slangTestCase.getName(), new TestRun(slangTestCase, ((FailedSlangTestCaseEvent) event).getFailureReason()));
+            addFailedTest(slangTestCase.getName(),
+                    new TestRun(slangTestCase, ((FailedSlangTestCaseEvent) event).getFailureReason()));
         } else if (event instanceof PassedSlangTestCaseEvent) {
             addPassedTest(slangTestCase.getName(), new TestRun(slangTestCase, null));
         } else if (event instanceof SkippedSlangTestCaseEvent) {
@@ -133,7 +134,8 @@ public class ThreadSafeRunTestResults implements IRunTestResults, ISlangTestCase
                     slangTestCase.getName(),
                     new TestRun(
                             slangTestCase,
-                            "Skipping test: " + SlangTestCase.generateTestCaseReference(slangTestCase) + " because it is not in active test suites"
+                            "Skipping test: " + SlangTestCase.generateTestCaseReference(slangTestCase) +
+                                    " because it is not in active test suites"
                     )
             );
         }

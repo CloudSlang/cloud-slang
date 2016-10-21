@@ -11,7 +11,6 @@ package io.cloudslang.lang.tools.build;
 
 
 import com.beust.jcommander.internal.Lists;
-import com.google.common.io.Resources;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -29,6 +28,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 
+import static com.google.common.io.Resources.getResource;
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.PROPERTIES_OBJECT_CANNOT_BE_NULL;
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.PROPERTY_KEY_CANNOT_BE_NULL;
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getBooleanFromPropertiesWithDefault;
@@ -37,6 +37,12 @@ import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getIntFromPr
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getListForPrint;
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getPropertiesFromFile;
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.parseTestSuitesToList;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.RunConfigurationProperties.TEST_COVERAGE;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.RunConfigurationProperties.TEST_PARALLEL_THREAD_COUNT;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.RunConfigurationProperties.TEST_SUITES_PARALLEL;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.RunConfigurationProperties.TEST_SUITES_RUN_UNSPECIFIED;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.RunConfigurationProperties.TEST_SUITES_SEQUENTIAL;
+import static io.cloudslang.lang.tools.build.SlangBuildMain.RunConfigurationProperties.TEST_SUITES_TO_RUN;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.TestCaseRunMode.PARALLEL;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.TestCaseRunMode.SEQUENTIAL;
 import static org.junit.Assert.assertEquals;
@@ -202,7 +208,8 @@ public class ArgumentProcessorUtilsTest {
         Writer outputWriter = null;
         File tempRunConfigFile = null;
         try {
-            fis = new FileInputStream(new File(Resources.getResource("lang/tools/build/builder_run_configuration.properties").toURI()));
+            fis = new FileInputStream(new File(
+                    getResource("lang/tools/build/builder_run_configuration.properties").toURI()));
             Path tempRunConfig = Files.createTempFile("temp_run_config", ".properties");
 
             tempRunConfigFile = tempRunConfig.toFile();
@@ -212,12 +219,12 @@ public class ArgumentProcessorUtilsTest {
 
             String absolutePath = tempRunConfigFile.getAbsolutePath();
             Properties propertiesFromFile = getPropertiesFromFile(absolutePath);
-            assertEquals("false", propertiesFromFile.get(SlangBuildMain.RunConfigurationProperties.TEST_COVERAGE));
-            assertEquals("sequential", propertiesFromFile.get(SlangBuildMain.RunConfigurationProperties.TEST_SUITES_RUN_UNSPECIFIED));
-            assertEquals("!default,vmware-local,xml-local,images", propertiesFromFile.get(SlangBuildMain.RunConfigurationProperties.TEST_SUITES_TO_RUN));
-            assertEquals("images", propertiesFromFile.get(SlangBuildMain.RunConfigurationProperties.TEST_SUITES_SEQUENTIAL));
-            assertEquals("xml-local,vmware-local", propertiesFromFile.get(SlangBuildMain.RunConfigurationProperties.TEST_SUITES_PARALLEL));
-            assertEquals("8", propertiesFromFile.get(SlangBuildMain.RunConfigurationProperties.TEST_PARALLEL_THREAD_COUNT));
+            assertEquals("false", propertiesFromFile.get(TEST_COVERAGE));
+            assertEquals("sequential", propertiesFromFile.get(TEST_SUITES_RUN_UNSPECIFIED));
+            assertEquals("!default,vmware-local,xml-local,images", propertiesFromFile.get(TEST_SUITES_TO_RUN));
+            assertEquals("images", propertiesFromFile.get(TEST_SUITES_SEQUENTIAL));
+            assertEquals("xml-local,vmware-local", propertiesFromFile.get(TEST_SUITES_PARALLEL));
+            assertEquals("8", propertiesFromFile.get(TEST_PARALLEL_THREAD_COUNT));
         } finally {
             IOUtils.closeQuietly(fis);
             IOUtils.closeQuietly(outputWriter);
@@ -240,7 +247,8 @@ public class ArgumentProcessorUtilsTest {
         assertEquals("empty list", getListForPrint(testSuites, "empty list"));
     }
 
-    private void testExceptionGetBooleanWithParams(final String key, final boolean defaultValue, final Properties properties, final String expectedMessage) {
+    private void testExceptionGetBooleanWithParams(final String key, final boolean defaultValue,
+                                                   final Properties properties, final String expectedMessage) {
         try {
             getBooleanFromPropertiesWithDefault(key, defaultValue, properties);
             fail("Expecting exception");
@@ -250,7 +258,8 @@ public class ArgumentProcessorUtilsTest {
         }
     }
 
-    private void testExceptionGetIntWithParams(final String key, final int defaultValue, final Properties properties, final String expectedMessage,
+    private void testExceptionGetIntWithParams(final String key, final int defaultValue,
+                                               final Properties properties, final String expectedMessage,
                                                final Integer lower, final Integer upper) {
         try {
             getIntFromPropertiesWithDefaultAndRange(key, defaultValue, properties, lower, upper);
@@ -261,7 +270,9 @@ public class ArgumentProcessorUtilsTest {
         }
     }
 
-    private <T extends Enum<T>> void testExceptionGetEnumWithParams(final String key, T defaultValue, final Properties properties, final String expectedMessage) {
+    private <T extends Enum<T>> void testExceptionGetEnumWithParams(final String key, T defaultValue,
+                                                                    final Properties properties,
+                                                                    final String expectedMessage) {
         try {
             getEnumInstanceFromPropertiesWithDefault(key, defaultValue, properties);
             fail("Expecting exception");

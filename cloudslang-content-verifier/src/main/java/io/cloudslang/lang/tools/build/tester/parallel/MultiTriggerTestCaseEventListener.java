@@ -56,16 +56,14 @@ public class MultiTriggerTestCaseEventListener implements ScoreEventListener {
         return errorMessageMap.get(executionId);
     }
 
-    public Map<String, Serializable> getOutputsByExecutionId(Long executionId) {
-        return outputsMap.get(executionId);
-    }
-
     @Override
     public synchronized void onEvent(ScoreEvent scoreEvent) throws InterruptedException {
-        @SuppressWarnings("unchecked") Map<String, Serializable> data = (Map<String, Serializable>) scoreEvent.getData();
+        @SuppressWarnings("unchecked")
+        Map<String, Serializable> data = (Map<String, Serializable>) scoreEvent.getData();
         LanguageEventData eventData;
         Long executionId = (data instanceof LanguageEventData) ? (((LanguageEventData) data).getExecutionId()) :
                 (Long) ((Map) data.get(SYSTEM_CONTEXT)).get(EXECUTION_ID_CONTEXT);
+
 
         switch (scoreEvent.getEventType()) {
             case SCORE_FINISHED_EVENT:
@@ -93,6 +91,10 @@ public class MultiTriggerTestCaseEventListener implements ScoreEventListener {
             default:
                 break;
         }
+    }
+
+    public Map<String, Serializable> getOutputsByExecutionId(Long executionId) {
+        return outputsMap.get(executionId);
     }
 
 }

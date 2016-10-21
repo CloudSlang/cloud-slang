@@ -96,10 +96,12 @@ public class SlangTestCaseRunReportGeneratorService {
 
 
     public void generateReport(IRunTestResults iRunTestResults, String reportDirectory) throws IOException {
-        String reportFileName = String.format(TEST_CASE_REPORT_NAME + FORMATTER_STRING + REPORT_EXTENSION, valueOf(currentTimeMillis()));
+        String reportFileName = String.format(TEST_CASE_REPORT_NAME + FORMATTER_STRING +
+                REPORT_EXTENSION, valueOf(currentTimeMillis()));
         Path path = Paths.get(reportDirectory, reportFileName);
 
-        try (Writer writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path.toFile(), false), UTF_8)))) {
+        try (Writer writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(path.toFile(), false), UTF_8)))) {
             HtmlCanvas reportPage = new HtmlCanvas(writer);
 
             HtmlCanvas reportPageHtml = reportPage.html();
@@ -139,9 +141,12 @@ public class SlangTestCaseRunReportGeneratorService {
         divSummary._div();
 
         // Hidden divs used to be able to link data to piechart.js
-        reportPageBody.div(new HtmlAttributes().id(PASSED.toLowerCase(ENGLISH)).class_(HIDDEN_CLASS)).content(passedCount);
-        reportPageBody.div(new HtmlAttributes().id(FAILED.toLowerCase(ENGLISH)).class_(HIDDEN_CLASS)).content(failedCount);
-        reportPageBody.div(new HtmlAttributes().id(SKIPPED.toLowerCase(ENGLISH)).class_(HIDDEN_CLASS)).content(skippedCount);
+        reportPageBody.div(new HtmlAttributes().id(PASSED.toLowerCase(ENGLISH))
+                .class_(HIDDEN_CLASS)).content(passedCount);
+        reportPageBody.div(new HtmlAttributes().id(FAILED.toLowerCase(ENGLISH))
+                .class_(HIDDEN_CLASS)).content(failedCount);
+        reportPageBody.div(new HtmlAttributes().id(SKIPPED.toLowerCase(ENGLISH))
+                .class_(HIDDEN_CLASS)).content(skippedCount);
     }
 
     public void createResourcesFolder(String reportDirectory) throws IOException {
@@ -152,14 +157,19 @@ public class SlangTestCaseRunReportGeneratorService {
     }
 
     public void copyResources(String reportDirectory) throws IOException {
-        copyResourceFromClasspath(reportDirectory, Paths.get(IMAGES, CLOUD_SLANG_LOGO_PNG), Paths.get(RES, CLOUD_SLANG_LOGO_PNG));
-        copyResourceFromClasspath(reportDirectory, Paths.get(REPORT, BASIC_REPORT_CSS), Paths.get(RES, BASIC_REPORT_CSS));
-        copyResourceFromClasspath(reportDirectory, Paths.get(REPORT, PIECHART_JS), Paths.get(RES, PIECHART_JS));
+        copyResourceFromClasspath(reportDirectory, Paths.get(IMAGES, CLOUD_SLANG_LOGO_PNG),
+                Paths.get(RES, CLOUD_SLANG_LOGO_PNG));
+        copyResourceFromClasspath(reportDirectory, Paths.get(REPORT, BASIC_REPORT_CSS),
+                Paths.get(RES, BASIC_REPORT_CSS));
+        copyResourceFromClasspath(reportDirectory, Paths.get(REPORT, PIECHART_JS),
+                Paths.get(RES, PIECHART_JS));
     }
 
-    private void copyResourceFromClasspath(String reportDirectory, Path relativePathSource, Path relativePathDest) throws IOException {
+    private void copyResourceFromClasspath(String reportDirectory, Path relativePathSource,
+                                           Path relativePathDest) throws IOException {
         File destination = Paths.get(reportDirectory).resolve(relativePathDest).toFile();
-        InputStream sourceStream = new DefaultResourceLoader().getResource(CLASSPATH + relativePathSource.toString()).getInputStream();
+        InputStream sourceStream = new DefaultResourceLoader().getResource(CLASSPATH +
+                relativePathSource.toString()).getInputStream();
         // overwrite if exists
         FileUtils.copyInputStreamToFile(sourceStream, destination);
     }
@@ -198,7 +208,8 @@ public class SlangTestCaseRunReportGeneratorService {
         }
     }
 
-    private void appendTestRunRowToTable(HtmlCanvas table, TestRun testRun, SlangTestCase testCase, String result) throws IOException {
+    private void appendTestRunRowToTable(HtmlCanvas table, TestRun testRun,
+                                         SlangTestCase testCase, String result) throws IOException {
         table.tr().td().content(testCase.getName())
                 .td(getClass(TEST_SUITES_CSS_CLASS)).content(getTestSuites(testCase))
                 .td(getClass(STATUS_CSS_CLASS)).content(result)

@@ -90,7 +90,8 @@ public class SlangBuilder {
 
         IRunTestResults runTestsResults = new RunTestsResults();
         if (StringUtils.isNotBlank(testsPath) && new File(testsPath).isDirectory()) {
-            runTestsResults = runTests(slangModels, projectPath, testsPath, testSuits, bulkRunMode, buildMode, changedFiles);
+            runTestsResults =
+                    runTests(slangModels, projectPath, testsPath, testSuits, bulkRunMode, buildMode, changedFiles);
         }
         List<RuntimeException> exceptions = new ArrayList<>(runTestsResults.getExceptions());
         exceptions.addAll(compilationResult.getExceptions());
@@ -108,10 +109,12 @@ public class SlangBuilder {
 
         if (compiledSlangFiles.size() != slangModels.size()) {
             throw new RuntimeException("Some Slang files were not compiled.\n" +
-                    "Found: " + slangModels.size() + " slang models, but managed to compile only: " + compiledSlangFiles.size());
+                    "Found: " + slangModels.size() + " slang models, but managed to compile only: " +
+                    compiledSlangFiles.size());
         }
 
-        loggingService.logEvent(Level.INFO, "Successfully finished Compilation of: " + compiledSlangFiles.size() + " Slang files");
+        loggingService.logEvent(Level.INFO, "Successfully finished Compilation of: " +
+                compiledSlangFiles.size() + " Slang files");
         return compiledSlangFiles;
     }
 
@@ -133,7 +136,8 @@ public class SlangBuilder {
         allTestedFlowModels.putAll(contentSlangModels);
 
         // Compiling all the test flows
-        final Map<String, CompilationArtifact> compiledFlows = slangContentVerifier.compileSlangModels(allTestedFlowModels);
+        final Map<String, CompilationArtifact> compiledFlows =
+                slangContentVerifier.compileSlangModels(allTestedFlowModels);
 
         Set<String> allTestedFlowsFqn = mapExecutablesToFullyQualifiedName(allTestedFlowModels.values());
         Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath, allTestedFlowsFqn);
@@ -144,14 +148,16 @@ public class SlangBuilder {
 
         BuildModeConfig buildModeConfig = createBuildModeConfig(buildMode, changedFiles, allTestedFlowModels);
 
-        runTestsResults = processRunTests(projectPath, testSuites, bulkRunMode, compiledFlows, testCases, buildModeConfig);
+        runTestsResults =
+                processRunTests(projectPath, testSuites, bulkRunMode, compiledFlows, testCases, buildModeConfig);
 
         runTestsResults.addExceptions(compilationResult.getExceptions());
         addCoverageDataToRunTestsResults(contentSlangModels, testFlowModels, testCases, runTestsResults);
         return runTestsResults;
     }
 
-    private BuildModeConfig createBuildModeConfig(SlangBuildMain.BuildMode buildMode, Set<String> changedFiles, Map<String, Executable> allTestedFlowModels) {
+    private BuildModeConfig createBuildModeConfig(SlangBuildMain.BuildMode buildMode, Set<String> changedFiles,
+                                                  Map<String, Executable> allTestedFlowModels) {
         BuildModeConfig buildModeConfig;
         switch (buildMode) {
             case BASIC:
@@ -177,27 +183,38 @@ public class SlangBuilder {
         if (bulkRunMode == ALL_PARALLEL) { // Run All tests in parallel
             ThreadSafeRunTestResults parallelRunTestResults = new ThreadSafeRunTestResults();
             Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunState =
-                    slangTestRunner.splitTestCasesByRunState(bulkRunMode, testCases, testSuites, parallelRunTestResults, buildModeConfig);
-            slangTestRunner.runTestsParallel(projectPath, testCaseRunState.get(TestCaseRunState.PARALLEL), compiledFlows, parallelRunTestResults);
+                    slangTestRunner.splitTestCasesByRunState(bulkRunMode, testCases, testSuites,
+                            parallelRunTestResults, buildModeConfig);
+
+            slangTestRunner.runTestsParallel(projectPath, testCaseRunState.get(TestCaseRunState.PARALLEL),
+                    compiledFlows, parallelRunTestResults);
             runTestsResults = parallelRunTestResults;
 
         } else if (bulkRunMode == ALL_SEQUENTIAL) { // Run all tests sequentially
             RunTestsResults sequentialRunTestResults = new RunTestsResults();
             Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunState =
-                    slangTestRunner.splitTestCasesByRunState(bulkRunMode, testCases, testSuites, sequentialRunTestResults, buildModeConfig);
-            slangTestRunner.runTestsSequential(projectPath, testCaseRunState.get(TestCaseRunState.SEQUENTIAL), compiledFlows, sequentialRunTestResults);
+                    slangTestRunner.splitTestCasesByRunState(bulkRunMode, testCases, testSuites,
+                            sequentialRunTestResults, buildModeConfig);
+
+            slangTestRunner.runTestsSequential(projectPath, testCaseRunState.get(TestCaseRunState.SEQUENTIAL),
+                    compiledFlows, sequentialRunTestResults);
             runTestsResults = sequentialRunTestResults;
 
         } else if (bulkRunMode == POSSIBLY_MIXED) { // Run some tests in parallel and rest of tests sequentially
             ThreadSafeRunTestResults mixedTestResults = new ThreadSafeRunTestResults();
             Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunState =
-                    slangTestRunner.splitTestCasesByRunState(bulkRunMode, testCases, testSuites, mixedTestResults, buildModeConfig);
-            slangTestRunner.runTestsSequential(projectPath, testCaseRunState.get(TestCaseRunState.SEQUENTIAL), compiledFlows, mixedTestResults);
-            slangTestRunner.runTestsParallel(projectPath, testCaseRunState.get(TestCaseRunState.PARALLEL), compiledFlows, mixedTestResults);
+                    slangTestRunner.splitTestCasesByRunState(bulkRunMode, testCases, testSuites,
+                            mixedTestResults, buildModeConfig);
+            slangTestRunner.runTestsSequential(projectPath, testCaseRunState.get(TestCaseRunState.SEQUENTIAL),
+                    compiledFlows, mixedTestResults);
+
+            slangTestRunner.runTestsParallel(projectPath, testCaseRunState.get(TestCaseRunState.PARALLEL),
+                    compiledFlows, mixedTestResults);
             runTestsResults = mixedTestResults;
 
         } else {
-            throw new IllegalStateException(String.format(UNSUPPORTED_BULK_RUN_MODE, (bulkRunMode == null) ? null : bulkRunMode.toString()));
+            throw new IllegalStateException(String
+                    .format(UNSUPPORTED_BULK_RUN_MODE, (bulkRunMode == null) ? null : bulkRunMode.toString()));
         }
         return runTestsResults;
     }
@@ -210,7 +227,8 @@ public class SlangBuilder {
         return fullyQualifiedNames;
     }
 
-    void addCoverageDataToRunTestsResults(Map<String, Executable> contentSlangModels, Map<String, Executable> testFlowModels,
+    void addCoverageDataToRunTestsResults(Map<String, Executable> contentSlangModels,
+                                          Map<String, Executable> testFlowModels,
                                           Map<String, SlangTestCase> testCases, IRunTestResults runTestsResults) {
         Set<String> coveredContent = new HashSet<>();
         Set<String> uncoveredContent = new HashSet<>();
@@ -226,10 +244,12 @@ public class SlangBuilder {
             if (testFlowModel == null) {
                 continue;
             }
-            addAllDependenciesToCoveredContent(coveredContent, testFlowModel.getExecutableDependencies(), contentSlangModels);
+            addAllDependenciesToCoveredContent(coveredContent,
+                    testFlowModel.getExecutableDependencies(), contentSlangModels);
         }
         Set<String> contentExecutablesNames = contentSlangModels.keySet();
-        // Add to the covered content set also all the direct test case's test flows, which are part of the tested content
+        // Add to the covered content set also all the direct test case's test flows,
+        // which are part of the tested content
         for (SlangTestCase testCase : testCases.values()) {
             String testFlowPath = testCase.getTestFlowPath();
             // Add the test flow only if it part of the content, and not of the test flows
@@ -255,7 +275,8 @@ public class SlangBuilder {
      * @param directDependencies
      * @param contentSlangModels
      */
-    private void addAllDependenciesToCoveredContent(Set<String> allDependencies, Set<String> directDependencies, Map<String, Executable> contentSlangModels) {
+    private void addAllDependenciesToCoveredContent(Set<String> allDependencies, Set<String> directDependencies,
+                                                    Map<String, Executable> contentSlangModels) {
         for (String dependency : directDependencies) {
             if (allDependencies.contains(dependency)) {
                 continue;
@@ -264,7 +285,8 @@ public class SlangBuilder {
             Executable executable = contentSlangModels.get(dependency);
             // Executable will be null in case of a dependecy which is a test flow (and not patr of the content)
             if (executable != null) {
-                addAllDependenciesToCoveredContent(allDependencies, executable.getExecutableDependencies(), contentSlangModels);
+                addAllDependenciesToCoveredContent(allDependencies,
+                        executable.getExecutableDependencies(), contentSlangModels);
             }
         }
     }

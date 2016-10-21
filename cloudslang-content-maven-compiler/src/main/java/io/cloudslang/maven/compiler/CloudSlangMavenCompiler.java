@@ -86,7 +86,8 @@ public class CloudSlangMavenCompiler extends AbstractCompiler {
         String[] sourceFiles = getSourceFiles(config);
         Map<String, byte[]> dependenciesSourceFiles = getDependenciesSourceFiles(config);
         if (sourceFiles.length > 0) {
-            System.out.println("Compiling " + sourceFiles.length + " " + "source file" + (sourceFiles.length == 1 ? "" : "s"));
+            System.out.println("Compiling " + sourceFiles.length + " " +
+                    "source file" + (sourceFiles.length == 1 ? "" : "s"));
             for (String sourceFile : sourceFiles) {
                 compilerMessage.addAll(compileFile(sourceFile, sourceFiles, dependenciesSourceFiles));
             }
@@ -107,10 +108,12 @@ public class CloudSlangMavenCompiler extends AbstractCompiler {
         //This parameter is passed in the compiler plugin whether to compile the flow with its dependencies
         compileWithDependencies = !config.getCustomCompilerArgumentsAsMap().containsKey(IGNORE_DEPENDENCIES);
         //This parameter is used to control the error level. if not set only warnings will be shown
-        errorLevel = config.getCustomCompilerArgumentsAsMap().containsKey(IGNORE_ERRORS) ? CompilerMessage.Kind.WARNING : CompilerMessage.Kind.ERROR;
+        errorLevel = config.getCustomCompilerArgumentsAsMap().containsKey(IGNORE_ERRORS) ?
+                CompilerMessage.Kind.WARNING : CompilerMessage.Kind.ERROR;
     }
 
-    private List<CompilerMessage> compileFile(String sourceFile, String[] sourceFiles, Map<String, byte[]> dependenciesSourceFiles) {
+    private List<CompilerMessage> compileFile(String sourceFile, String[] sourceFiles,
+                                              Map<String, byte[]> dependenciesSourceFiles) {
         ExecutableModellingResult executableModellingResult;
         List<CompilerMessage> compilerMessages = new ArrayList<>();
 
@@ -120,11 +123,13 @@ public class CloudSlangMavenCompiler extends AbstractCompiler {
             executableModellingResult = slangCompiler.preCompileSource(slangSource);
             if (!CollectionUtils.isEmpty(executableModellingResult.getErrors())) {
                 for (RuntimeException runtimeException : executableModellingResult.getErrors()) {
-                    compilerMessages.add(new CompilerMessage(sourceFile + ": " + runtimeException.getMessage(), errorLevel));
+                    compilerMessages.add(new CompilerMessage(sourceFile + ": " +
+                            runtimeException.getMessage(), errorLevel));
                 }
             } else {
                 if (compileWithDependencies) {
-                    compilerMessages.addAll(validateSlangModelWithDependencies(executableModellingResult, sourceFiles, dependenciesSourceFiles, sourceFile));
+                    compilerMessages.addAll(validateSlangModelWithDependencies(executableModellingResult,
+                            sourceFiles, dependenciesSourceFiles, sourceFile));
                 }
             }
         } catch (Exception e) {
@@ -134,11 +139,14 @@ public class CloudSlangMavenCompiler extends AbstractCompiler {
         return compilerMessages;
     }
 
-    private List<CompilerMessage> validateSlangModelWithDependencies(ExecutableModellingResult executableModellingResult, String[] dependencies, Map<String, byte[]> dependenciesSourceFiles, String sourceFile) {
+    private List<CompilerMessage> validateSlangModelWithDependencies(ExecutableModellingResult modellingResult,
+                                                                     String[] dependencies,
+                                                                     Map<String, byte[]> dependenciesSourceFiles,
+                                                                     String sourceFile) {
         List<CompilerMessage> compilerMessages = new ArrayList<>();
         Set<Executable> dependenciesExecutables = new HashSet<>();
 
-        Executable executable = executableModellingResult.getExecutable();
+        Executable executable = modellingResult.getExecutable();
         //we need to verify only flows
         if (!executable.getType().equals("flow")) {
             return compilerMessages;
@@ -147,8 +155,8 @@ public class CloudSlangMavenCompiler extends AbstractCompiler {
         for (String dependency : dependencies) {
             try {
                 SlangSource slangSource = SlangSource.fromFile(new File(dependency));
-                executableModellingResult = slangCompiler.preCompileSource(slangSource);
-                dependenciesExecutables.add(executableModellingResult.getExecutable());
+                modellingResult = slangCompiler.preCompileSource(slangSource);
+                dependenciesExecutables.add(modellingResult.getExecutable());
             } catch (Exception e) {
                 this.getLogger().warn("Could not compile source: " + dependency);
             }
@@ -157,14 +165,15 @@ public class CloudSlangMavenCompiler extends AbstractCompiler {
         for (Map.Entry<String, byte[]> dependencyEntry : dependenciesSourceFiles.entrySet()) {
             try {
                 SlangSource slangSource = SlangSource.fromBytes(dependencyEntry.getValue(), dependencyEntry.getKey());
-                executableModellingResult = slangCompiler.preCompileSource(slangSource);
-                dependenciesExecutables.add(executableModellingResult.getExecutable());
+                modellingResult = slangCompiler.preCompileSource(slangSource);
+                dependenciesExecutables.add(modellingResult.getExecutable());
             } catch (Exception e) {
                 this.getLogger().warn("Could not compile source: " + dependencyEntry.getKey());
             }
         }
 
-        List<RuntimeException> exceptions = slangCompiler.validateSlangModelWithDirectDependencies(executable, dependenciesExecutables);
+        List<RuntimeException> exceptions = slangCompiler.validateSlangModelWithDirectDependencies(executable,
+                dependenciesExecutables);
         for (RuntimeException runtimeException : exceptions) {
             compilerMessages.add(new CompilerMessage(sourceFile + ": " + runtimeException.getMessage(), errorLevel));
         }
@@ -186,7 +195,8 @@ public class CloudSlangMavenCompiler extends AbstractCompiler {
         return sources.toArray(new String[sources.size()]);
     }
 
-    private static Map<String, byte[]> getDependenciesSourceFiles(CompilerConfiguration config) throws CompilerException {
+    private static Map<String, byte[]> getDependenciesSourceFiles(CompilerConfiguration config)
+            throws CompilerException {
         if (config.getClasspathEntries().isEmpty()) {
             return Collections.emptyMap();
         }
@@ -215,7 +225,9 @@ public class CloudSlangMavenCompiler extends AbstractCompiler {
             Enumeration enumEntries = jar.entries();
             while (enumEntries.hasMoreElements()) {
                 JarEntry file = (JarEntry) enumEntries.nextElement();
-                if ((file == null) || (file.isDirectory()) || (!file.getName().endsWith(".sl.yaml") && !file.getName().endsWith(".sl") && !file.getName().endsWith(".sl.yml"))) {
+                if ((file == null) || (file.isDirectory()) ||
+                        (!file.getName().endsWith(".sl.yaml") &&
+                                !file.getName().endsWith(".sl") && !file.getName().endsWith(".sl.yml"))) {
                     continue;
                 }
 

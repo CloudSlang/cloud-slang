@@ -57,14 +57,16 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
 
     @Override
     public synchronized void onEvent(ScoreEvent scoreEvent) throws InterruptedException {
-        @SuppressWarnings("unchecked") Map<String, Serializable> data = (Map<String, Serializable>) scoreEvent.getData();
+        @SuppressWarnings("unchecked")
+        Map<String, Serializable> data = (Map<String, Serializable>) scoreEvent.getData();
         LanguageEventData eventData;
         switch (scoreEvent.getEventType()) {
             case EventConstants.SCORE_FINISHED_EVENT:
                 break;
             case EventConstants.SCORE_ERROR_EVENT:
             case EventConstants.SCORE_FAILURE_EVENT:
-                errorMessage.set(data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " + data.get(EventConstants.SCORE_ERROR_MSG));
+                errorMessage.set(data.get(EventConstants.SCORE_ERROR_LOG_MSG) + " , " +
+                        data.get(EventConstants.SCORE_ERROR_MSG));
                 flowFinished.set(true);
                 break;
             case ScoreLangConstants.EVENT_EXECUTION_FINISHED:
@@ -88,7 +90,8 @@ public class TriggerTestCaseEventListener implements ScoreEventListener {
 
         Map<String, Serializable> outputsMap = new HashMap<>();
 
-        boolean thereAreOutputsForRootPath = data.containsKey(LanguageEventData.OUTPUTS) && data.containsKey(LanguageEventData.PATH) &&
+        boolean thereAreOutputsForRootPath = data.containsKey(LanguageEventData.OUTPUTS) &&
+                data.containsKey(LanguageEventData.PATH) &&
                 data.getPath().equals(EXEC_START_PATH);
 
         if (thereAreOutputsForRootPath) {

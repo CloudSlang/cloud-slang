@@ -50,19 +50,20 @@ public class TestRunInfoServiceImpl implements TestRunInfoService {
     }
 
     @Override
-    public TestCaseRunMode getRunModeForTestCase(final SlangTestCase testCase, final ConflictResolutionStrategy<TestCaseRunMode> multipleModeConflictStrategy,
-                                                 final DefaultResolutionStrategy<TestCaseRunMode> defaultTestSuiteStrategy) {
+    public TestCaseRunMode getRunModeForTestCase(final SlangTestCase testCase,
+                                                 final ConflictResolutionStrategy<TestCaseRunMode> conflictStrategy,
+                                                 final DefaultResolutionStrategy<TestCaseRunMode> defaultStrategy) {
         List<String> testSuites = testCase.getTestSuites();
         if (testSuites.isEmpty()) {
-            return defaultTestSuiteStrategy.getDefaultWhenUnspecified();
+            return defaultStrategy.getDefaultWhenUnspecified();
         }
 
         TestCaseRunMode result = null;
         for (String testSuite : testSuites) {
-            result = multipleModeConflictStrategy.resolve(result, doGetTestSuiteRunMode(testSuite));
+            result = conflictStrategy.resolve(result, doGetTestSuiteRunMode(testSuite));
         }
         if (result == null) {
-            return defaultTestSuiteStrategy.getDefaultWhenUnspecified();
+            return defaultStrategy.getDefaultWhenUnspecified();
         }
         return result;
     }

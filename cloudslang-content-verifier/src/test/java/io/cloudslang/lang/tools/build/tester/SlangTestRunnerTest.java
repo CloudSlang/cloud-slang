@@ -90,6 +90,8 @@ import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_PARA
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_SEQUENTIAL;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.POSSIBLY_MIXED;
 import static io.cloudslang.lang.tools.build.tester.SlangTestRunner.MAX_TIME_PER_TESTCASE_IN_MINUTES;
+import static io.cloudslang.lang.tools.build.tester.runconfiguration.BuildModeConfig.createChangedBuildModeConfig;
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -143,7 +145,7 @@ public class SlangTestRunnerTest {
     public ExpectedException exception = ExpectedException.none();
 
     private List<String> specialTestSuite = Collections.singletonList("special");
-    private List<String> specialRuntimeTestSuite = Arrays.asList("special", "default");
+    private List<String> specialRuntimeTestSuite = asList("special", "default");
     private Set<String> allAvailableExecutables = SetUtils.emptySet();
 
     @Before
@@ -176,7 +178,8 @@ public class SlangTestRunnerTest {
     @Test
     public void createTestCaseWithPathWithNoTests() throws Exception {
         URI resource = getClass().getResource("/dependencies").toURI();
-        Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(resource.getPath(), allAvailableExecutables);
+        Map<String, SlangTestCase> testCases = slangTestRunner
+                .createTestCases(resource.getPath(), allAvailableExecutables);
         assertEquals("No test cases were supposed to be created", 0, testCases.size());
     }
 
@@ -186,7 +189,8 @@ public class SlangTestRunnerTest {
         Map<String, SlangTestCase> testCases = new HashMap<>();
         testCases.put("", new SlangTestCase("", "path", "desc", null, null, null, null, null, null));
         when(parser.parseTestCases(Mockito.any(SlangSource.class))).thenReturn(testCases);
-        Map<String, SlangTestCase> foundTestCases = slangTestRunner.createTestCases(resource.getPath(), allAvailableExecutables);
+        Map<String, SlangTestCase> foundTestCases = slangTestRunner
+                .createTestCases(resource.getPath(), allAvailableExecutables);
         assertEquals("1 test case was supposed to be created", 1, foundTestCases.size());
     }
 
@@ -196,7 +200,8 @@ public class SlangTestRunnerTest {
         Map<String, SlangTestCase> testCases = new HashMap<>();
         testCases.put("Test1", new SlangTestCase("Test1", "path", "desc", null, null, null, null, null, null));
         when(parser.parseTestCases(Mockito.any(SlangSource.class))).thenReturn(testCases);
-        Map<String, SlangTestCase> foundTestCases = slangTestRunner.createTestCases(resource.getPath(), allAvailableExecutables);
+        Map<String, SlangTestCase> foundTestCases = slangTestRunner
+                .createTestCases(resource.getPath(), allAvailableExecutables);
         assertEquals("1 test case was supposed to be created", 1, foundTestCases.size());
     }
 
@@ -220,16 +225,20 @@ public class SlangTestRunnerTest {
         Map<String, SlangTestCase> testCases = new HashMap<>();
         testCases.put("Test1", new SlangTestCase("Test1", "path-FAILURE", "desc", null, null, null, null, null, null));
         when(parser.parseTestCases(Mockito.any(SlangSource.class))).thenReturn(testCases);
-        Map<String, SlangTestCase> foundTestCases = slangTestRunner.createTestCases(resource.getPath(), allAvailableExecutables);
+        Map<String, SlangTestCase> foundTestCases = slangTestRunner
+                .createTestCases(resource.getPath(), allAvailableExecutables);
         assertEquals("1 test case was supposed to be created", 1, foundTestCases.size());
         SlangTestCase testCase = foundTestCases.values().iterator().next();
-        assertEquals("Test case should get the result value from the file name (FAILURE)", "FAILURE", testCase.getResult());
+        assertEquals("Test case should get the result value from the file name (FAILURE)",
+                "FAILURE", testCase.getResult());
     }
 
     @Test
     public void runTestCasesFromEmptyMap() {
         final RunTestsResults runTestsResults = new RunTestsResults();
-        slangTestRunner.runTestsSequential("path", new HashMap<String, SlangTestCase>(), new HashMap<String, CompilationArtifact>(), runTestsResults);
+        slangTestRunner
+                .runTestsSequential("path", new HashMap<String, SlangTestCase>(),
+                        new HashMap<String, CompilationArtifact>(), runTestsResults);
         assertEquals("No test cases should fail", 0, runTestsResults.getFailedTests().size());
     }
 
@@ -247,7 +256,8 @@ public class SlangTestRunnerTest {
         SlangTestCase testCase = new SlangTestCase("test1", null, null, null, null, null, null, null, null);
         testCases.put("test1", testCase);
         final RunTestsResults runTestsResults = new RunTestsResults();
-        slangTestRunner.runTestsSequential("path", testCases, new HashMap<String, CompilationArtifact>(), runTestsResults);
+        slangTestRunner.runTestsSequential("path", testCases,
+                new HashMap<String, CompilationArtifact>(), runTestsResults);
         Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
         assertEquals("1 test case should fail", 1, failedTests.size());
         TestRun failedTest = failedTests.values().iterator().next();
@@ -262,7 +272,8 @@ public class SlangTestRunnerTest {
         SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", null, null, null, null, null, null, null);
         testCases.put("test1", testCase);
         final RunTestsResults runTestsResults = new RunTestsResults();
-        slangTestRunner.runTestsSequential("path", testCases, new HashMap<String, CompilationArtifact>(), runTestsResults);
+        slangTestRunner
+                .runTestsSequential("path", testCases, new HashMap<String, CompilationArtifact>(), runTestsResults);
         Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
         assertEquals("1 test case should fail", 1, failedTests.size());
         TestRun failedTest = failedTests.values().iterator().next();
@@ -304,11 +315,14 @@ public class SlangTestRunnerTest {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
                 Object[] arguments = invocationOnMock.getArguments();
-                subscribeArgumentsHolder.setMultiTriggerTestCaseEventListener((MultiTriggerTestCaseEventListener) arguments[0]);
-                subscribeArgumentsHolder.setEventTypes((Set<String>) arguments[1]);
+                MultiTriggerTestCaseEventListener listener = (MultiTriggerTestCaseEventListener) arguments[0];
+                subscribeArgumentsHolder.setMultiTriggerTestCaseEventListener(listener);
+                @SuppressWarnings("unchecked")
+                Set<String> argument = (Set<String>) arguments[1];
+                subscribeArgumentsHolder.setEventTypes(argument);
                 return null;
             }
-        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), any(Set.class));
+        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
 
         final Future futureTestCase1 = mock(Future.class);
         final Future futureTestCase2 = mock(Future.class);
@@ -337,7 +351,8 @@ public class SlangTestRunnerTest {
         verify(testCaseEventDispatchService).registerListener(isA(ThreadSafeRunTestResults.class));
         verify(testCaseEventDispatchService).registerListener(isA(LoggingSlangTestCaseEventListener.class));
 
-        verify(slang).subscribeOnEvents(eq(subscribeArgumentsHolder.getMultiTriggerTestCaseEventListener()), eq(subscribeArgumentsHolder.getEventTypes()));
+        verify(slang).subscribeOnEvents(eq(subscribeArgumentsHolder.getMultiTriggerTestCaseEventListener()),
+                eq(subscribeArgumentsHolder.getEventTypes()));
 
         InOrder inOrderTestCases = inOrder(parallelTestCaseExecutorService);
         inOrderTestCases.verify(parallelTestCaseExecutorService).submitTestCase(eq(runnableList.get(0)));
@@ -354,7 +369,8 @@ public class SlangTestRunnerTest {
     @Test
     public void runTestCaseWithEmptyOutputs() {
         Map<String, SlangTestCase> testCases = new HashMap<>();
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, new ArrayList<Map>(), false, null);
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null,
+                new ArrayList<Map>(), false, null);
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
@@ -376,7 +392,8 @@ public class SlangTestRunnerTest {
         outputs.add(output1);
         outputs.add(output2);
 
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, outputs, null, null);
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null,
+                "mock", null, outputs, null, null);
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
@@ -396,7 +413,8 @@ public class SlangTestRunnerTest {
         Map<String, Value> output1 = new HashMap<>();
         output1.put("output1", null);
         outputs.add(output1);
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, outputs, null, null);
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null,
+                "mock", null, outputs, null, null);
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
@@ -415,7 +433,8 @@ public class SlangTestRunnerTest {
         Map<String, Serializable> output1 = new HashMap<>();
         output1.put("output1", 1);
         outputs.add(output1);
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, outputs, null, null);
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null,
+                "mock", null, outputs, null, null);
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
@@ -434,7 +453,8 @@ public class SlangTestRunnerTest {
         Map<String, Serializable> output1 = new HashMap<>();
         output1.put("output1", 1);
         outputs.add(output1);
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, outputs, null, null);
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null,
+                "mock", null, outputs, null, null);
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
@@ -453,7 +473,8 @@ public class SlangTestRunnerTest {
         Map<String, Serializable> output1 = new HashMap<>();
         output1.put("output1", Boolean.TRUE);
         outputs.add(output1);
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, outputs, null, null);
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null,
+                "mock", null, outputs, null, null);
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
@@ -468,7 +489,8 @@ public class SlangTestRunnerTest {
     @Test
     public void runTestCaseThatExpectsException() {
         Map<String, SlangTestCase> testCases = new HashMap<>();
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, null, true, null);
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null,
+                "mock", null, null, true, null);
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
@@ -481,7 +503,8 @@ public class SlangTestRunnerTest {
     @Test
     public void runFailTestCaseThatExpectsException() {
         Map<String, SlangTestCase> testCases = new HashMap<>();
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, null, true, null);
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null,
+                "mock", null, null, true, null);
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
@@ -494,7 +517,8 @@ public class SlangTestRunnerTest {
     @Test
     public void runTestCaseWithUnexpectedException() {
         Map<String, SlangTestCase> testCases = new HashMap<>();
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, null, false, null);
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null,
+                "mock", null, null, false, null);
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
@@ -507,7 +531,8 @@ public class SlangTestRunnerTest {
     @Test
     public void runTestCaseWithResult() {
         Map<String, SlangTestCase> testCases = new HashMap<>();
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, null, false, "SUCCESS");
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null,
+                "mock", null, null, false, "SUCCESS");
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
@@ -520,7 +545,8 @@ public class SlangTestRunnerTest {
     @Test
     public void runFailTestCaseWithWrongResult() {
         Map<String, SlangTestCase> testCases = new HashMap<>();
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null, "mock", null, null, false, "FAILURE");
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", null,
+                "mock", null, null, false, "FAILURE");
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
@@ -533,7 +559,8 @@ public class SlangTestRunnerTest {
     @Test
     public void runTestCaseWithSystemProperties() {
         Map<String, SlangTestCase> testCases = new HashMap<>();
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", null, null, "mock", null, null, null, null);
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", null, null,
+                "mock", null, null, null, null);
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
@@ -546,7 +573,8 @@ public class SlangTestRunnerTest {
     @Test
     public void runTestCaseWithSpecialTestSuiteSuccess() {
         Map<String, SlangTestCase> testCases = new HashMap<>();
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", specialTestSuite, "mock", null, null, false, "SUCCESS");
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", specialTestSuite,
+                "mock", null, null, false, "SUCCESS");
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
@@ -559,7 +587,8 @@ public class SlangTestRunnerTest {
     @Test
     public void runTestCaseWithSpecialTestSuiteWhenSeveralTestCasesAreGiven() {
         Map<String, SlangTestCase> testCases = new HashMap<>();
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", specialTestSuite, "mock", null, null, false, "SUCCESS");
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", specialTestSuite,
+                "mock", null, null, false, "SUCCESS");
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
@@ -574,7 +603,8 @@ public class SlangTestRunnerTest {
     @Test
     public void runTestCaseWithSeveralTestSuitesWithIntersection() {
         Map<String, SlangTestCase> testCases = new HashMap<>();
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", Arrays.asList("special", "new"), "mock", null, null, false, "SUCCESS");
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", asList("special", "new"),
+                "mock", null, null, false, "SUCCESS");
         testCases.put("test1", testCase);
         HashMap<String, CompilationArtifact> compiledFlows = new HashMap<>();
         compiledFlows.put("testFlowPath", new CompilationArtifact(new ExecutionPlan(), null, null, null));
@@ -589,14 +619,16 @@ public class SlangTestRunnerTest {
     @Test
     public void testSplitTestCasesByRunStateAllSequential() {
         Map<String, SlangTestCase> testCases = new HashMap<>();
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", Arrays.asList("special", "new"), "mock", null, null, false, "SUCCESS");
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc",
+                asList("special", "new"), "mock", null, null, false, "SUCCESS");
         testCases.put("test1", testCase);
         List<String> testSuites = Lists.newArrayList("special");
         IRunTestResults runTestResults = new RunTestsResults();
         BuildModeConfig buildModeConfig = BuildModeConfig.createBasicBuildModeConfig();
 
         // Tested call
-        Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunStateMapMap = slangTestRunner.splitTestCasesByRunState(ALL_SEQUENTIAL, testCases, testSuites, runTestResults, buildModeConfig);
+        Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunStateMapMap = slangTestRunner
+                .splitTestCasesByRunState(ALL_SEQUENTIAL, testCases, testSuites, runTestResults, buildModeConfig);
 
         assertEquals(3, testCaseRunStateMapMap.size());
         assertEquals(0, testCaseRunStateMapMap.get(TestCaseRunState.INACTIVE).size());
@@ -609,14 +641,16 @@ public class SlangTestRunnerTest {
     @Test
     public void testSplitTestCasesByRunStateAllParallel() {
         Map<String, SlangTestCase> testCases = new HashMap<>();
-        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc", Arrays.asList("abc", "new"), "mock", null, null, false, "SUCCESS");
+        SlangTestCase testCase = new SlangTestCase("test1", "testFlowPath", "desc",
+                asList("abc", "new"), "mock", null, null, false, "SUCCESS");
         testCases.put("test1", testCase);
         List<String> testSuites = Lists.newArrayList("new", "new1");
         IRunTestResults runTestResults = new RunTestsResults();
         BuildModeConfig buildModeConfig = BuildModeConfig.createBasicBuildModeConfig();
 
         // Tested call
-        Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunStateMapMap = slangTestRunner.splitTestCasesByRunState(ALL_PARALLEL, testCases, testSuites, runTestResults, buildModeConfig);
+        Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunStateMapMap = slangTestRunner
+                .splitTestCasesByRunState(ALL_PARALLEL, testCases, testSuites, runTestResults, buildModeConfig);
 
         assertEquals(3, testCaseRunStateMapMap.size());
         assertEquals(0, testCaseRunStateMapMap.get(TestCaseRunState.INACTIVE).size());
@@ -629,8 +663,10 @@ public class SlangTestRunnerTest {
     @Test
     public void testSplitTestCasesByRunStateAllSkipped() {
         Map<String, SlangTestCase> testCases = new HashMap<>();
-        SlangTestCase testCase1 = new SlangTestCase("test1", "testFlowPath", "desc", Arrays.asList("abc", "new"), "mock", null, null, false, "SUCCESS");
-        SlangTestCase testCase2 = new SlangTestCase("test2", "testFlowPath", "desc", Arrays.asList("efg", "new"), "mock", null, null, false, "SUCCESS");
+        SlangTestCase testCase1 = new SlangTestCase("test1", "testFlowPath", "desc",
+                asList("abc", "new"), "mock", null, null, false, "SUCCESS");
+        SlangTestCase testCase2 = new SlangTestCase("test2", "testFlowPath", "desc",
+                asList("efg", "new"), "mock", null, null, false, "SUCCESS");
         testCases.put("test1", testCase1);
         testCases.put("test2", testCase2);
         List<String> testSuites = Lists.newArrayList("ghf");
@@ -638,7 +674,8 @@ public class SlangTestRunnerTest {
         BuildModeConfig buildModeConfig = BuildModeConfig.createBasicBuildModeConfig();
 
         // Tested call
-        Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunStateMapMap = slangTestRunner.splitTestCasesByRunState(ALL_PARALLEL, testCases, testSuites, runTestResults, buildModeConfig);
+        Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunStateMapMap = slangTestRunner
+                .splitTestCasesByRunState(ALL_PARALLEL, testCases, testSuites, runTestResults, buildModeConfig);
 
         assertEquals(3, testCaseRunStateMapMap.size());
         assertEquals(2, testCaseRunStateMapMap.get(TestCaseRunState.INACTIVE).size());
@@ -652,8 +689,10 @@ public class SlangTestRunnerTest {
     @Test
     public void testSplitTestCasesByRunStateDependencyHelperIsCalled() {
         Map<String, SlangTestCase> testCases = new HashMap<>();
-        SlangTestCase testCase1 = new SlangTestCase("test1", "testFlowPath1", "desc", Arrays.asList("special", "new"), "mock", null, null, false, "SUCCESS");
-        SlangTestCase testCase2 = new SlangTestCase("test2", "testFlowPath2", "desc", Arrays.asList("special", "new"), "mock", null, null, false, "SUCCESS");
+        SlangTestCase testCase1 = new SlangTestCase("test1", "testFlowPath1", "desc",
+                asList("special", "new"), "mock", null, null, false, "SUCCESS");
+        SlangTestCase testCase2 = new SlangTestCase("test2", "testFlowPath2", "desc",
+                asList("special", "new"), "mock", null, null, false, "SUCCESS");
         testCases.put("test1", testCase1);
         testCases.put("test2", testCase2);
         final List<String> testSuites = Lists.newArrayList("special");
@@ -663,11 +702,13 @@ public class SlangTestRunnerTest {
         Executable executable = mock(Executable.class);
         allTestedFlowModels.put("testFlowPath1", executable);
         allTestedFlowModels.put("testFlowPath2", executable);
-        BuildModeConfig buildModeConfig = BuildModeConfig.createChangedBuildModeConfig(changedFiles, allTestedFlowModels);
-        when(dependenciesHelper.fetchDependencies(any(Executable.class), anyMapOf(String.class, Executable.class))).thenReturn(new HashSet<String>());
+        BuildModeConfig buildModeConfig = createChangedBuildModeConfig(changedFiles, allTestedFlowModels);
+        when(dependenciesHelper.fetchDependencies(any(Executable.class), anyMapOf(String.class, Executable.class)))
+                .thenReturn(new HashSet<String>());
 
         // Tested call
-        slangTestRunner.splitTestCasesByRunState(ALL_SEQUENTIAL, testCases, testSuites, runTestResults, buildModeConfig);
+        slangTestRunner
+                .splitTestCasesByRunState(ALL_SEQUENTIAL, testCases, testSuites, runTestResults, buildModeConfig);
 
         verify(dependenciesHelper, times(2)).fetchDependencies(eq(executable), eq(allTestedFlowModels));
     }
@@ -675,11 +716,16 @@ public class SlangTestRunnerTest {
     @Test
     public void testSplitTestCasesByRunStatePossiblyMixed() {
         Map<String, SlangTestCase> testCases = new LinkedHashMap<>();
-        SlangTestCase testCase1 = new SlangTestCase("test1", "testFlowPath", "desc", Arrays.asList("abc", "new"), "mock", null, null, false, "SUCCESS");
-        SlangTestCase testCase2 = new SlangTestCase("test2", "testFlowPath", "desc", Arrays.asList("efg", "new"), "mock", null, null, false, "SUCCESS");
-        SlangTestCase testCase3 = new SlangTestCase("test3", "testFlowPath", "desc", Arrays.asList("new", "new2"), "mock", null, null, false, "SUCCESS");
-        SlangTestCase testCase4 = new SlangTestCase("test4", "testFlowPath", "desc", Arrays.asList("jjj", "new2"), "mock", null, null, false, "SUCCESS");
-        SlangTestCase testCase5 = new SlangTestCase("test5", "testFlowPath", "desc", Arrays.asList("hhh", "jjj", "abc"), "mock", null, null, false, "SUCCESS");
+        SlangTestCase testCase1 = new SlangTestCase("test1", "testFlowPath", "desc",
+                asList("abc", "new"), "mock", null, null, false, "SUCCESS");
+        SlangTestCase testCase2 = new SlangTestCase("test2", "testFlowPath", "desc",
+                asList("efg", "new"), "mock", null, null, false, "SUCCESS");
+        SlangTestCase testCase3 = new SlangTestCase("test3", "testFlowPath", "desc",
+                asList("new", "new2"), "mock", null, null, false, "SUCCESS");
+        SlangTestCase testCase4 = new SlangTestCase("test4", "testFlowPath", "desc",
+                asList("jjj", "new2"), "mock", null, null, false, "SUCCESS");
+        SlangTestCase testCase5 = new SlangTestCase("test5", "testFlowPath", "desc",
+                asList("hhh", "jjj", "abc"), "mock", null, null, false, "SUCCESS");
         testCases.put("test1", testCase1);
         testCases.put("test2", testCase2);
         testCases.put("test3", testCase3);
@@ -694,10 +740,13 @@ public class SlangTestRunnerTest {
                 .doReturn(SlangBuildMain.TestCaseRunMode.PARALLEL)
                 .doReturn(SlangBuildMain.TestCaseRunMode.PARALLEL)
                 .doReturn(SlangBuildMain.TestCaseRunMode.SEQUENTIAL)
-                .when(testRunInfoService).getRunModeForTestCase(any(SlangTestCase.class), any(ConflictResolutionStrategy.class), any(DefaultResolutionStrategy.class));
+                .when(testRunInfoService).getRunModeForTestCase(any(SlangTestCase.class),
+                any(ConflictResolutionStrategy.class),
+                any(DefaultResolutionStrategy.class));
 
         // Tested call
-        Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunStateMapMap = slangTestRunner.splitTestCasesByRunState(POSSIBLY_MIXED, testCases, testSuites, runTestResults, buildModeConfig);
+        Map<TestCaseRunState, Map<String, SlangTestCase>> testCaseRunStateMapMap = slangTestRunner
+                .splitTestCasesByRunState(POSSIBLY_MIXED, testCases, testSuites, runTestResults, buildModeConfig);
 
         assertEquals(3, testCaseRunStateMapMap.size());
         assertEquals(1, testCaseRunStateMapMap.get(TestCaseRunState.INACTIVE).size());
@@ -868,8 +917,8 @@ public class SlangTestRunnerTest {
             return eventTypes;
         }
 
-        public void setMultiTriggerTestCaseEventListener(MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener) {
-            this.multiTriggerTestCaseEventListener = multiTriggerTestCaseEventListener;
+        public void setMultiTriggerTestCaseEventListener(MultiTriggerTestCaseEventListener listener) {
+            this.multiTriggerTestCaseEventListener = listener;
         }
 
         public void setEventTypes(Set<String> eventTypes) {

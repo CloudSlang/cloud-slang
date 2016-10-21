@@ -28,6 +28,7 @@ public interface TestRunInfoService {
 
     void setRunModeForTestSuites(List<String> testSuites, TestCaseRunMode runMode);
 
-    TestCaseRunMode getRunModeForTestCase(SlangTestCase testCase, ConflictResolutionStrategy<TestCaseRunMode> multipleModeConflictStrategy,
+    TestCaseRunMode getRunModeForTestCase(SlangTestCase testCase,
+                                          ConflictResolutionStrategy<TestCaseRunMode> multipleModeConflictStrategy,
                                           DefaultResolutionStrategy<TestCaseRunMode> defaultTestSuiteStrategy);
 }

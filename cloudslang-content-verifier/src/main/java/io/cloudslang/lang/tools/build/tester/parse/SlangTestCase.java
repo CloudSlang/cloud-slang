@@ -84,7 +84,8 @@ public class SlangTestCase implements Serializable {
     }
 
     public static String generateTestCaseReference(SlangTestCase slangTestCase) {
-        return slangTestCase.getName() + " [" + (StringUtils.isEmpty(slangTestCase.getFilePath()) ? UNKNOWN_FILE_PATH : slangTestCase.getFilePath()) + "]";
+        return slangTestCase.getName() + " [" + (StringUtils.isEmpty(slangTestCase.getFilePath()) ?
+                UNKNOWN_FILE_PATH : slangTestCase.getFilePath()) + "]";
     }
 
     public String getName() {
