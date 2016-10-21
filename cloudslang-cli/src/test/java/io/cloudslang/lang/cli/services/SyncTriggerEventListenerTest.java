@@ -144,5 +144,10 @@ public class SyncTriggerEventListenerTest {
             return new SyncTriggerEventListener();
         }
 
+        @Bean
+        public ConsolePrinter consolePrinter() {
+            return new ConsolePrinterImpl();
+        }
+
     }
 }

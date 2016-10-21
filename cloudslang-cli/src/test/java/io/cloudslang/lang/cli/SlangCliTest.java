@@ -529,4 +529,12 @@ public class SlangCliTest {
                 "\tclass java.lang.RuntimeException: 3" + System.lineSeparator(), cr.getException().getMessage());
     }
 
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void testCompileNoArgument() {
+        final CommandResult cr = shell.executeCommand("compile");
+        Assert.assertNotNull(cr.getException());
+        Assert.assertEquals("You should specify directory(otherwise known as option 'd') " +
+                "or file(otherwise known as option 'f').", cr.getException().getMessage());
+    }
+
 }

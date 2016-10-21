@@ -159,9 +159,12 @@ public class SlangCli implements CommandMarker {
         if (directories != null) {
             List<CompilationModellingResult> results = compilerHelper.compileFolders(directories);
             return printAllCompileErrors(results);
-        } else {
+        } else if (file != null) {
             CompilationModellingResult result = compilerHelper.compileSource(file.getAbsolutePath(), classPath);
             return printCompileErrors(result.getErrors(), file, new StringBuilder());
+        } else {
+            throw new IllegalArgumentException("You should specify directory(otherwise known as option 'd') " +
+                    "or file(otherwise known as option 'f').");
         }
     }
 

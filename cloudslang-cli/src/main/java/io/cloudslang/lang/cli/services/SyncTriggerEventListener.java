@@ -25,6 +25,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -47,6 +48,9 @@ public class SyncTriggerEventListener implements ScoreEventListener {
     private AtomicBoolean flowFinished = new AtomicBoolean(false);
     private AtomicReference<String> errorMessage = new AtomicReference<>("");
     private boolean isDebugMode = false;
+
+    @Autowired
+    private ConsolePrinter consolePrinter;
 
     public synchronized void setIsDebugMode(boolean isDebugMode) {
         this.isDebugMode = isDebugMode;
@@ -73,7 +77,7 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                         data.get(EventConstants.SCORE_ERROR_MSG));
                 break;
             case EventConstants.SCORE_FAILURE_EVENT:
-                printWithColor(Ansi.Color.RED, FLOW_FINISHED_WITH_FAILURE_MSG);
+                consolePrinter.printWithColor(Ansi.Color.RED, FLOW_FINISHED_WITH_FAILURE_MSG);
                 flowFinished.set(true);
                 break;
             case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
@@ -86,7 +90,7 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                     String path = eventData.getPath();
                     int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
                     String prefix = StringUtils.repeat(STEP_PATH_PREFIX, matches);
-                    printWithColor(Ansi.Color.YELLOW, prefix + stepName);
+                    consolePrinter.printWithColor(Ansi.Color.YELLOW, prefix + stepName);
                 }
                 break;
             case ScoreLangConstants.EVENT_OUTPUT_END:
@@ -99,7 +103,7 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                         String prefix = StringUtils.repeat(STEP_PATH_PREFIX, matches);
 
                         for (Map.Entry<String, Serializable> entry : stepOutputs.entrySet()) {
-                            printWithColor(Ansi.Color.WHITE, prefix + entry.getKey() + " = " + entry.getValue());
+                            consolePrinter.printWithColor(Ansi.Color.WHITE, prefix + entry.getKey() + " = " + entry.getValue());
                         }
                     }
                 }
@@ -111,7 +115,7 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                     if (outputs.size() > 0) {
                         printForOperationOrFlow(data, Ansi.Color.WHITE, "\n" + OPERATION_OUTPUTS, "\n" + FLOW_OUTPUTS);
                         for (Map.Entry<String, Serializable> entry : outputs.entrySet()) {
-                            printWithColor(Ansi.Color.WHITE, "- " + entry.getKey() + " = " + entry.getValue());
+                            consolePrinter.printWithColor(Ansi.Color.WHITE, "- " + entry.getKey() + " = " + entry.getValue());
                         }
                     }
                 }
@@ -156,16 +160,10 @@ public class SyncTriggerEventListener implements ScoreEventListener {
     private void printForOperationOrFlow(Map<String, Serializable> data, Ansi.Color color,
                                          String operationMessage, String flowMessage) {
         if (LanguageEventData.StepType.OPERATION.equals(data.get(LanguageEventData.STEP_TYPE))) {
-            printWithColor(color, operationMessage);
+            consolePrinter.printWithColor(color, operationMessage);
         } else {
-            printWithColor(color, flowMessage);
+            consolePrinter.printWithColor(color, flowMessage);
         }
-    }
-
-    private void printWithColor(Ansi.Color color, String msg) {
-        AnsiConsole.out().print(ansi().fg(color).a(msg).newline());
-        AnsiConsole.out().print(ansi().fg(Ansi.Color.WHITE));
-
     }
 }
 
